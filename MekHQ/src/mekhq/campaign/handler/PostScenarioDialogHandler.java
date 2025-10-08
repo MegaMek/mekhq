@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.handler;
@@ -42,7 +47,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
-import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
@@ -60,9 +65,9 @@ public class PostScenarioDialogHandler {
      * Handles post-game resolution checks, dialogs, and actions after a scenario is completed.
      *
      * <p>
-     * This method is responsible for performing several post-combat processes, including retirement checks,
-     * automatic application of awards, restarting campaign operations, and cleaning up temporary files.
-     * Additionally, it triggers a {@link ScenarioResolvedEvent} to indicate the resolution of the current scenario.
+     * This method is responsible for performing several post-combat processes, including retirement checks, automatic
+     * application of awards, restarting campaign operations, and cleaning up temporary files. Additionally, it triggers
+     * a {@link ScenarioResolvedEvent} to indicate the resolution of the current scenario.
      * </p>
      *
      * <b>Steps Performed:</b>
@@ -79,16 +84,16 @@ public class PostScenarioDialogHandler {
      * background threads to ensure that the {@code currentScenario} is still accessible at the time of the event.
      * </p>
      *
-     * @param campaignGUI The {@link CampaignGUI} instance used to manage UI interactions and
-     *                   display any necessary dialogs.
-     * @param campaign The {@link Campaign} instance containing the current state of the campaign
-     *                and its personnel.
+     * @param campaignGUI     The {@link CampaignGUI} instance used to manage UI interactions and display any necessary
+     *                        dialogs.
+     * @param campaign        The {@link Campaign} instance containing the current state of the campaign and its
+     *                        personnel.
      * @param currentScenario The {@link Scenario} that has just been resolved.
-     * @param tracker The {@link ResolveScenarioTracker} containing the results and details of the
-     *               scenario resolution.
+     * @param tracker         The {@link ResolveScenarioTracker} containing the results and details of the scenario
+     *                        resolution.
      */
     public static void handle(CampaignGUI campaignGUI, Campaign campaign, Scenario currentScenario,
-                              ResolveScenarioTracker tracker) {
+          ResolveScenarioTracker tracker) {
         postCombatRetirementCheck(campaignGUI, campaign, currentScenario);
         postCombatAutoApplyAward(campaign, tracker);
         restartRats(campaign);
@@ -101,8 +106,11 @@ public class PostScenarioDialogHandler {
             LOGGER.error(e, "An error occurred during scenario resolution: {}", e.getMessage());
             LOGGER.errorDialog(
                   e,
-                  "A critical error has occurred during the scenario resolution. This issue is under investigation." +
-                        "\n\nPlease open an issue report and include your MekHQ log file for further assessment.",
+                  """
+                        A critical error has occurred during the scenario resolution. This issue is under investigation.\
+                        
+                        
+                        Please open an issue report and include your MekHQ log file for further assessment.""",
                   "Critical Error"
             );
         }
@@ -126,10 +134,11 @@ public class PostScenarioDialogHandler {
         }
     }
 
-    private static void postCombatRetirementCheck(CampaignGUI campaignGUI, Campaign campaign, Scenario currentScenario) {
+    private static void postCombatRetirementCheck(CampaignGUI campaignGUI, Campaign campaign,
+          Scenario currentScenario) {
         if (!campaign.getRetirementDefectionTracker().getRetirees().isEmpty()) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
-                campaign.getMission(currentScenario.getMissionId()), false);
+                  campaign.getMission(currentScenario.getMissionId()), false);
 
             if (!rdd.wasAborted()) {
                 campaign.applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
@@ -160,7 +169,7 @@ public class PostScenarioDialogHandler {
             boolean isCivilianHelp = false;
 
             if (tracker.getScenario() instanceof AtBScenario atbScenario) {
-                isCivilianHelp = atbScenario.getScenarioType() == AtBScenario.CIVILIANHELP;
+                isCivilianHelp = atbScenario.getScenarioType() == AtBScenario.CIVILIAN_HELP;
             }
 
             AutoAwardsController autoAwardsController = new AutoAwardsController();

@@ -24,28 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.baseComponents;
 
+import javax.swing.JLabel;
+
 import mekhq.campaign.universe.SourceableValue;
 
-import javax.swing.*;
-
 /**
- * This class extends a basic JLabel to handle the characteristics of a sourceable value,
- * namely adding the sourced information as a tooltip.
+ * This class extends a basic JLabel to handle the characteristics of a sourceable value, namely adding the sourced
+ * information as a tooltip.
  */
 public class SourceableValueLabel extends JLabel {
 
-    SourceableValue sourcedValue;
+    SourceableValue<?> sourcedValue;
     String format;
 
 
-    public SourceableValueLabel(SourceableValue v) {
+    public SourceableValueLabel(SourceableValue<?> v) {
         this(v, "%s");
 
     }
-    public SourceableValueLabel(SourceableValue v, String f) {
+
+    public SourceableValueLabel(SourceableValue<?> v, String f) {
         super();
         sourcedValue = v;
         format = f;
@@ -54,6 +60,8 @@ public class SourceableValueLabel extends JLabel {
 
     private void initialize() {
         setText(String.format(format, sourcedValue.getValue()));
-        setToolTipText("<html><b>Source:</b> " + (sourcedValue.isCanon() ? sourcedValue.getSource() : "noncanon") + "</html>");
+        setToolTipText("<html><b>Source:</b> " +
+                             (sourcedValue.isCanon() ? sourcedValue.getSource() : "noncanon") +
+                             "</html>");
     }
 }

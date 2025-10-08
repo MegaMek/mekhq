@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -282,11 +287,10 @@ public enum MergingSurnameStyle {
             case WEIGHTED:
             default:
                 MMLogger.create(MergingSurnameStyle.class)
-                      .error(String.format(
-                            "Merging Surname Style %s is not defined, and cannot be used for \"%s\" and \"%s\"",
+                      .error("Merging Surname Style {} is not defined, and cannot be used for \"{}\" and \"{}\"",
                             surnameStyle.name(),
                             origin.getFullName(),
-                            spouse.getFullName()));
+                            spouse.getFullName());
                 break;
         }
 
@@ -332,7 +336,7 @@ public enum MergingSurnameStyle {
         }
 
         MMLogger.create(MergingSurnameStyle.class)
-              .error("Unable to parse " + text + " into a MergingSurnameStyle. Returning FEMALE.");
+              .error("Unable to parse {} into a MergingSurnameStyle. Returning FEMALE.", text);
         return FEMALE;
     }
     // endregion File I/O

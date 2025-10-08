@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.education;
 
@@ -46,20 +51,17 @@ import mekhq.MHQConstants;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
- * The AcademyFactory class is responsible for generating academy blueprints by
- * reading the data from XML sources.
- * It provides methods to retrieve a list of set names and a list of academies
- * for a given set name.
+ * The AcademyFactory class is responsible for generating academy blueprints by reading the data from XML sources. It
+ * provides methods to retrieve a list of set names and a list of academies for a given set name.
  */
 public class AcademyFactory {
-    private static final MMLogger logger = MMLogger.create(AcademyFactory.class);
+    private static final MMLogger LOGGER = MMLogger.create(AcademyFactory.class);
 
     private static AcademyFactory instance = null;
     private final Map<String, Map<String, Academy>> academyMap;
 
     /**
-     * This class is responsible for generating academy blueprint by reading the
-     * data from XML sources.
+     * This class is responsible for generating academy blueprint by reading the data from XML sources.
      */
     private AcademyFactory() {
         academyMap = new HashMap<>();
@@ -69,9 +71,8 @@ public class AcademyFactory {
     }
 
     /**
-     * Returns an instance of the AcademyFactory.
-     * If an instance already exists, it returns the existing instance.
-     * If no instance exists, it creates a new instance and returns it.
+     * Returns an instance of the AcademyFactory. If an instance already exists, it returns the existing instance. If no
+     * instance exists, it creates a new instance and returns it.
      *
      * @return the AcademyFactory instance
      */
@@ -96,6 +97,7 @@ public class AcademyFactory {
      * Retrieves a list of all academies for a given set name.
      *
      * @param setName the name of the set
+     *
      * @return a list of academies for the given set
      */
     public List<Academy> getAllAcademiesForSet(String setName) {
@@ -110,7 +112,7 @@ public class AcademyFactory {
             try (InputStream inputStream = new FileInputStream(file)) {
                 loadAcademyFromStream(inputStream, new File(file).getName());
             } catch (IOException e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }
@@ -129,7 +131,7 @@ public class AcademyFactory {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
             academySet = unmarshaller.unmarshal(MHQXMLUtility.createSafeXmlSource(inputStream), AcademySet.class)
-                    .getValue();
+                               .getValue();
 
             Map<String, Academy> tempAcademyMap = new HashMap<>();
             String currentSetName = fileName.replaceFirst("[.][^.]+$", "");
@@ -142,7 +144,7 @@ public class AcademyFactory {
             }
             academyMap.put(currentSetName, tempAcademyMap);
         } catch (JAXBException e) {
-            logger.error("Error loading XML for academies", e);
+            LOGGER.error("Error loading XML for academies", e);
         }
     }
 }

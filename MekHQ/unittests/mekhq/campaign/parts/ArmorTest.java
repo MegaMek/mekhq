@@ -39,20 +39,21 @@ import static org.mockito.Mockito.when;
 
 import java.util.stream.Stream;
 
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology.TechRating;
+import megamek.common.enums.TechRating;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.parts.protomeks.ProtoMekArmor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Tests {@link Armor} and its children, {@link BaArmor}, {@link SVArmor}, and {@link ProtoMekArmor}.
+ * Tests {@link Armor} and its children, {@link BAArmor}, {@link SVArmor}, and {@link ProtoMekArmor}.
  */
 
 public class ArmorTest {
@@ -78,12 +79,11 @@ public class ArmorTest {
     /**
      * For best results, don't use these directly, clone them first and use the clones!
      *
-     * @return
      */
     public static Stream<Armor> armorParameter() {
         return Stream.of(new Armor(1, ARMOR_TYPE, ARMOR_AMOUNT, Entity.LOC_NONE, false, false, mockCampaign),
               new ProtoMekArmor(1, ARMOR_TYPE, ARMOR_AMOUNT, Entity.LOC_NONE, false, mockCampaign),
-              new BaArmor(1, ARMOR_AMOUNT, ARMOR_TYPE, Entity.LOC_NONE, false, mockCampaign),
+              new BAArmor(1, ARMOR_AMOUNT, ARMOR_TYPE, Entity.LOC_NONE, false, mockCampaign),
               new SVArmor(SV_ARMOR_BAR, TechRating.D, ARMOR_AMOUNT, Entity.LOC_NONE, mockCampaign));
     }
 
@@ -313,7 +313,7 @@ public class ArmorTest {
         int partCount = warehouse.getSpareParts().size();
 
         // Assert
-        assertEquals(ARMOR_AMOUNT -1, amountAvailable);
+        assertEquals(ARMOR_AMOUNT - 1, amountAvailable);
         assertEquals(2, partCount);
     }
 
@@ -329,7 +329,7 @@ public class ArmorTest {
         warehouse.addPart(armorDifferentType, false);
 
         // Act
-        armor.changeAmountAvailable( -(ARMOR_AMOUNT+12));
+        armor.changeAmountAvailable(-(ARMOR_AMOUNT + 12));
         int amountAvailable = armor.getAmountAvailable();
         int partCount = warehouse.getSpareParts().size();
 

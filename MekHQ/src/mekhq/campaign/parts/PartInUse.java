@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,8 +24,12 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.parts;
 
 import java.util.ArrayList;
@@ -35,21 +39,22 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import megamek.common.AmmoType;
+import megamek.common.equipment.AmmoType;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingBattleArmorSuit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 
 public class PartInUse {
     private String description;
-    private IAcquisitionWork partToBuy;
+    private final IAcquisitionWork partToBuy;
     private int useCount;
     private int storeCount;
     private double tonnagePerItem;
     private int transferCount;
     private int plannedCount;
     private Money cost = Money.zero();
-    private List<Part> spares = new ArrayList<>();
+    private final List<Part> spares = new ArrayList<>();
     private double requestedStock;
     private boolean isBundle;
 
@@ -81,7 +86,7 @@ public class PartInUse {
             sb.append(((AmmoStorage) partToBuy).getName());
             appendDetails(sb, (Part) ((AmmoStorage) partToBuy).getAcquisitionWork());
             this.description = sb.toString();
-            AmmoType ammoType = (AmmoType) ((AmmoStorage) partToBuy).getType();
+            AmmoType ammoType = ((AmmoStorage) partToBuy).getType();
             if (ammoType.getKgPerShot() > 0) {
                 this.tonnagePerItem = ammoType.getKgPerShot() / 1000.0;
             } else {
@@ -96,11 +101,11 @@ public class PartInUse {
         if (null != partToBuy) {
             this.cost = partToBuy.getBuyCost();
             String descString = partToBuy.getAcquisitionName();
-            if( !(descString.contains("(") && descString.contains(")")) && !(part instanceof EnginePart)) {
+            if (!(descString.contains("(") && descString.contains(")")) && !(part instanceof EnginePart)) {
                 descString = descString.split(",")[0];
                 descString = descString.split("<")[0];
             }
-            if(descString.equals("Turret")) {
+            if (descString.equals("Turret")) {
                 descString += " " + part.getTonnage() + " tons";
             }
             this.description = descString;
@@ -119,8 +124,8 @@ public class PartInUse {
      */
     public List<Part> getSpares() {
         return spares.stream()
-            .sorted(Comparator.comparing(Part::getQuality))
-            .collect(Collectors.toList());
+                     .sorted(Comparator.comparing(Part::getQuality))
+                     .collect(Collectors.toList());
     }
 
     /**

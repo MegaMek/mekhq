@@ -24,14 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.unit.actions;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import megamek.common.AmmoType;
 import megamek.common.equipment.AmmoMounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
@@ -40,12 +43,9 @@ import mekhq.campaign.unit.Unit;
 
 /**
  * Checks for additional ammo bins and adds the appropriate part.
- *
- * Large craft can combine all the ammo of a single type into a single bin.
- * Switching the munition type
- * of one or more tons of ammo can require the addition of an ammo bin and can
- * change the ammo bin
- * capacity.
+ * <p>
+ * Large craft can combine all the ammo of a single type into a single bin. Switching the munition type of one or more
+ * tons of ammo can require the addition of an ammo bin and can change the ammo bin capacity.
  */
 public class AdjustLargeCraftAmmoAction implements IUnitAction {
 
@@ -56,31 +56,30 @@ public class AdjustLargeCraftAmmoAction implements IUnitAction {
         }
 
         Map<Integer, LargeCraftAmmoBin> ammoParts = new HashMap<>();
-        for (Part p : unit.getParts()) {
-            if (p instanceof LargeCraftAmmoBin) {
-                LargeCraftAmmoBin ammoBin = (LargeCraftAmmoBin) p;
+        for (Part part : unit.getParts()) {
+            if (part instanceof LargeCraftAmmoBin ammoBin) {
                 ammoParts.put(ammoBin.getEquipmentNum(), ammoBin);
             }
         }
 
-        for (AmmoMounted m : unit.getEntity().getAmmo()) {
-            int eqNum = unit.getEntity().getEquipmentNum(m);
+        for (AmmoMounted ammoMounted : unit.getEntity().getAmmo()) {
+            int eqNum = unit.getEntity().getEquipmentNum(ammoMounted);
             LargeCraftAmmoBin part = ammoParts.get(eqNum);
             if (null == part) {
-                part = new LargeCraftAmmoBin((int) unit.getEntity().getWeight(), (AmmoType) m.getType(), eqNum,
-                        m.getOriginalShots() - m.getBaseShotsLeft(), m.getSize(), campaign);
+                part = new LargeCraftAmmoBin((int) unit.getEntity().getWeight(), ammoMounted.getType(), eqNum,
+                      ammoMounted.getOriginalShots() - ammoMounted.getBaseShotsLeft(), ammoMounted.getSize(), campaign);
 
                 // Add the part to the unit
                 unit.addPart(part);
 
                 // Add the part to the bay (NOTE: must be on a unit first)
-                part.setBay(unit.getEntity().getBayByAmmo(m));
+                part.setBay(unit.getEntity().getBayByAmmo(ammoMounted));
 
                 // Add the part to the Campaign
-                campaign.getQuartermaster().addPart(part, 0);
+                campaign.getQuartermaster().addPart(part, 0, false);
             } else {
                 // Reset the AmmoType
-                part.changeMunition((AmmoType) m.getType());
+                part.changeMunition(ammoMounted.getType());
             }
         }
     }

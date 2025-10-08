@@ -32,8 +32,7 @@
  */
 package mekhq.campaign.randomEvents.personalities;
 
-import static java.lang.Math.max;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.*;
 
 import java.util.ArrayList;
@@ -41,6 +40,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
@@ -60,14 +60,15 @@ import mekhq.campaign.randomEvents.personalities.enums.Social;
  * trait values, and calculating a personality's overall value for campaign mechanics.
  */
 public class PersonalityController {
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public final static int PERSONALITY_QUIRK_CHANCE = 10;
 
     /**
-     * @deprecated use {@link #generatePersonality(Person, boolean)} instead
+     * @deprecated use {@link #generatePersonality(Person)} instead
      */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public static void generatePersonality(Person person) {
-        generatePersonality(person, false);
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public static void generatePersonality(Person person, boolean isBigPersonality) {
+        generatePersonality(person);
     }
 
     /**
@@ -81,75 +82,60 @@ public class PersonalityController {
      * @param person the person for whom the personality will be generated; this person's attributes will be updated
      *               based on generated traits
      */
-    public static void generatePersonality(Person person, boolean isBigPersonality) {
+    public static void generatePersonality(Person person) {
         // As this method can be applied over an existing personality profile, we first reset the character's
         // personality to default.
-        person.setAggression(Aggression.NONE);
-        person.setAmbition(Ambition.NONE);
-        person.setGreed(Greed.NONE);
-        person.setSocial(Social.NONE);
+        resetPersonality(person);
 
         // Then we generate a new personality
-        List<PersonalityTraitType> possibleTraits = new ArrayList<>(Arrays.asList(PersonalityTraitType.AGGRESSION,
-              PersonalityTraitType.AMBITION,
-              PersonalityTraitType.GREED,
-              PersonalityTraitType.SOCIAL));
+        List<PersonalityTraitType> possibleTraits = new ArrayList<>();
+        possibleTraits.add(PersonalityTraitType.AGGRESSION);
+        possibleTraits.add(PersonalityTraitType.AMBITION);
+        possibleTraits.add(PersonalityTraitType.GREED);
+        possibleTraits.add(PersonalityTraitType.SOCIAL);
+        possibleTraits.add(PersonalityTraitType.PERSONALITY_QUIRK);
 
-        Collections.shuffle(possibleTraits);
+        int iterations = 2;
 
-        List<PersonalityTraitType> chosenTraits = new ArrayList<>();
+        while (iterations != 0 && !possibleTraits.isEmpty()) {
+            PersonalityTraitType pickedTrait = ObjectUtility.getRandomItem(possibleTraits);
+            possibleTraits.remove(pickedTrait);
+            iterations--;
 
-        PersonalityTraitType firstTrait = possibleTraits.get(0);
-        possibleTraits.remove(firstTrait);
-        chosenTraits.add(firstTrait);
-
-        if (isBigPersonality || (randomInt(4) == 0)) {
-            PersonalityTraitType secondTrait = possibleTraits.get(0);
-            possibleTraits.remove(secondTrait);
-            chosenTraits.add(secondTrait);
-        }
-
-        if (randomInt(4) == 0) {
-            PersonalityTraitType thirdTrait = possibleTraits.get(0);
-            possibleTraits.remove(thirdTrait);
-            chosenTraits.add(thirdTrait);
-        }
-
-        if (randomInt(4) == 0) {
-            PersonalityTraitType forthTrait = possibleTraits.get(0);
-            chosenTraits.add(forthTrait);
-        }
-
-        for (PersonalityTraitType traitType : chosenTraits) {
-            switch (traitType) {
+            switch (pickedTrait) {
                 case AGGRESSION -> {
                     String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
                     person.setAggression(Aggression.fromString(traitIndex));
+                    person.setAggressionDescriptionIndex(randomInt(Aggression.MAXIMUM_VARIATIONS));
                 }
                 case AMBITION -> {
                     String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
                     person.setAmbition(Ambition.fromString(traitIndex));
+                    person.setAmbitionDescriptionIndex(randomInt(Ambition.MAXIMUM_VARIATIONS));
                 }
                 case GREED -> {
                     String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
                     person.setGreed(Greed.fromString(traitIndex));
+                    person.setGreedDescriptionIndex(randomInt(Greed.MAXIMUM_VARIATIONS));
                 }
                 case SOCIAL -> {
                     String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
                     person.setSocial(Social.fromString(traitIndex));
+                    person.setSocialDescriptionIndex(randomInt(Social.MAXIMUM_VARIATIONS));
                 }
-                default -> {
+                case PERSONALITY_QUIRK -> {
+                    int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
+                    String traitIndex = String.valueOf(traitRoll);
+                    person.setPersonalityQuirk(PersonalityQuirk.fromString(traitIndex));
+                    person.setPersonalityQuirkDescriptionIndex(randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS));
                 }
+                default -> {}
             }
         }
 
-        // PERSONALITY QUIRK
-        generateAndApplyPersonalityQuirk(person);
-
-        // REASONING
-        int firstReasoning = randomInt(8346);
-        int secondReasoning = isBigPersonality ? randomInt(8346) : 0;
-        person.setReasoning(generateReasoning(max(firstReasoning, secondReasoning)));
+        // Always generate Reasoning
+        int reasoningRoll = randomInt(8346);
+        person.setReasoning(generateReasoning(reasoningRoll));
 
         // finally, write the description
         writePersonalityDescription(person);
@@ -157,11 +143,31 @@ public class PersonalityController {
     }
 
     /**
+     * Resets the personality attributes of the given {@link Person} to their default (neutral) values.
+     *
+     * <p>This sets aggression, ambition, greed, social, and personality quirk to {@code NONE}, and reasoning to
+     * {@code AVERAGE}.
+     *
+     * @param person the {@link Person} whose personality attributes will be reset
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static void resetPersonality(Person person) {
+        person.setAggression(Aggression.NONE);
+        person.setAmbition(Ambition.NONE);
+        person.setGreed(Greed.NONE);
+        person.setSocial(Social.NONE);
+        person.setReasoning(Reasoning.AVERAGE);
+        person.setPersonalityQuirk(PersonalityQuirk.NONE);
+    }
+
+    /**
      * @deprecated use {@link #generatePersonality(Person, boolean)} instead
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public static void generateBigPersonality(Person person) {
-        // As this method is likely going to be be applied over an existing personality profile, we
+        // As this method is likely going to be applied over an existing personality profile, we
         // wipe the old to ensure a clean slate.
         person.setAggression(Aggression.NONE);
         person.setAmbition(Ambition.NONE);
@@ -223,11 +229,6 @@ public class PersonalityController {
         // PERSONALITY QUIRK
         generateAndApplyPersonalityQuirk(person);
 
-        // REASONING
-        int firstReasoning = randomInt(8346);
-        int secondReasoning = randomInt(8346);
-        person.setReasoning(generateReasoning(max(firstReasoning, secondReasoning)));
-
         // finally, write the description
         writePersonalityDescription(person);
         writeInterviewersNotes(person);
@@ -240,6 +241,7 @@ public class PersonalityController {
      * @param person the person to whom the personality quirk will be applied; their quirk attribute is updated based on
      *               the rolled quirk
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public static void generateAndApplyPersonalityQuirk(Person person) {
         // This ensures we're rolling a value between 1 and the maximum index in the enum
         int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
@@ -292,63 +294,23 @@ public class PersonalityController {
               person.getSocial(),
               person.getSocialDescriptionIndex());
 
-        // Reasoning and personality quirk are handled differently to general personality traits.
-        // REASONING
-        Reasoning reasoning = person.getReasoning();
-        String reasoningDescription = "";
-        if (!reasoning.isAverageType()) {
-            reasoningDescription = reasoning.getDescription(person.getReasoningDescriptionIndex(), gender, givenName);
-        }
-
         // PERSONALITY QUIRK
         PersonalityQuirk personalityQuirk = person.getPersonalityQuirk();
-        String quirkDescription = "";
         if (!personalityQuirk.isNone()) {
-            quirkDescription = personalityQuirk.getDescription(person.getPrimaryRole(),
+            String quirkDescription = personalityQuirk.getDescription(person.getPrimaryRole(),
                   person.getPersonalityQuirkDescriptionIndex(),
                   gender,
                   person.getOriginFaction(),
                   givenName);
+            traitDescriptions.add(quirkDescription);
         }
 
         // Build the description proper
         StringBuilder personalityDescription = new StringBuilder();
 
-        // Append the first trait description, if exists, without wrapping in <p>
-        // We do this so that we don't end up with weird spacing
-        if (!traitDescriptions.isEmpty()) {
-            personalityDescription.append(traitDescriptions.get(0));
+        for (String description : traitDescriptions) {
+            personalityDescription.append(description);
             personalityDescription.append(' ');
-        }
-
-        for (int i = 1; i < traitDescriptions.size(); i++) {
-            if (i % 2 == 0) {
-                personalityDescription.append("<p>");
-            }
-
-            personalityDescription.append(traitDescriptions.get(i));
-
-            if (i % 2 == 1 || i == traitDescriptions.size() - 1) {
-                personalityDescription.append("</p>");
-            } else {
-                personalityDescription.append(' ');
-            }
-        }
-
-        if (!reasoningDescription.isBlank()) {
-            if (!personalityDescription.toString().isBlank()) {
-                personalityDescription.append("<p>").append(reasoningDescription).append("</p>");
-            } else {
-                personalityDescription.append(reasoningDescription);
-            }
-        }
-
-        if (!quirkDescription.isBlank()) {
-            if (!personalityDescription.toString().isBlank()) {
-                personalityDescription.append("<p>").append(quirkDescription).append("</p>");
-            } else {
-                personalityDescription.append(quirkDescription);
-            }
         }
 
         person.setPersonalityDescription(personalityDescription.toString());
@@ -365,11 +327,9 @@ public class PersonalityController {
               person.getSocialDescriptionIndex());
 
         // Reasoning and personality quirk are handled differently to general personality traits.
-        // REASONING
+        // Build the description proper
         Reasoning reasoning = person.getReasoning();
         String examResults = reasoning.getExamResults();
-
-        // Build the description proper
         StringBuilder interviewersNotes = new StringBuilder("<html>");
 
         interviewersNotes.append(examResults);
@@ -500,9 +460,9 @@ public class PersonalityController {
 
 
     /**
-     * Generates an {@link Reasoning} enum value for a person based on a randomly rolled value. Each reasoning
-     * level is mapped to a specific range of values, with lower rolls producing less intelligent results and higher
-     * rolls producing more intelligent results.
+     * Generates an {@link Reasoning} enum value for a person based on a randomly rolled value. Each reasoning level is
+     * mapped to a specific range of values, with lower rolls producing less intelligent results and higher rolls
+     * producing more intelligent results.
      *
      * @param roll the random roll value used to determine the {@link Reasoning} enum value
      *

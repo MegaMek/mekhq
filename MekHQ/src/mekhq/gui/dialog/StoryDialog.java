@@ -24,22 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
-import mekhq.campaign.storyarc.Personality;
-import mekhq.campaign.storyarc.storypoint.DialogStoryPoint;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
+import mekhq.campaign.storyArc.Personality;
+import mekhq.campaign.storyArc.storypoint.DialogStoryPoint;
 
 /**
- * This is the base class for dialogs related to the Story Arc, to help create a
- * similar look and feel.
- * Inheriting classes must call initialize() in their constructors and override
- * getMainPanel()
+ * This is the base class for dialogs related to the Story Arc, to help create a similar look and feel. Inheriting
+ * classes must call initialize() in their constructors and override getMainPanel()
  */
 public abstract class StoryDialog extends JDialog implements ActionListener {
 
@@ -47,7 +59,7 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
 
     private int imgWidth;
 
-    private DialogStoryPoint storyPoint;
+    private final DialogStoryPoint storyPoint;
 
     public StoryDialog(final JFrame parent, DialogStoryPoint sEvent) {
         super(parent, sEvent.getTitle(), true);

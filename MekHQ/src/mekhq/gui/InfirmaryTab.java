@@ -59,10 +59,10 @@ import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.OptimizeInfirmaryAssignments;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.event.MedicPoolChangedEvent;
-import mekhq.campaign.event.PersonEvent;
-import mekhq.campaign.event.PersonMedicalAssignmentEvent;
-import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.events.MedicPoolChangedEvent;
+import mekhq.campaign.events.persons.PersonEvent;
+import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
+import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -81,7 +81,6 @@ public final class InfirmaryTab extends CampaignGuiTab {
     private JTable docTable;
     private RoundedJButton btnAssignDoc;
     private RoundedJButton btnUnassignDoc;
-    private RoundedJButton btnOptimizeAssignments;
     private JList<Person> listAssignedPatient;
     private JList<Person> listUnassignedPatient;
 
@@ -147,7 +146,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         btnUnassignDoc.setEnabled(false);
         btnUnassignDoc.addActionListener(ev -> unassignDoctor());
 
-        btnOptimizeAssignments = new RoundedJButton(resourceMap.getString("btnOptimizeAssignments.text"));
+        RoundedJButton btnOptimizeAssignments = new RoundedJButton(resourceMap.getString("btnOptimizeAssignments.text"));
         btnOptimizeAssignments.addActionListener(ev -> new OptimizeInfirmaryAssignments(getCampaign()));
 
         // Create a panel to group the buttons together horizontally
@@ -326,8 +325,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
             return;
         }
         int size = Math.max(getWidth(), getHeight());
-        g.drawImage(bgImage, 0, 0, size, size, (img, infoflags, x, y, width, height) -> {
-            if ((infoflags & ImageObserver.ALLBITS) != 0) {
+        g.drawImage(bgImage, 0, 0, size, size, (img, infoFlags, x, y, width, height) -> {
+            if ((infoFlags & ImageObserver.ALLBITS) != 0) {
                 repaint();
                 return false;
             }
@@ -486,7 +485,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
             // Knock out inactive doctors
             if ((patient.getDoctorId() != null) &&
                       (getCampaign().getPerson(patient.getDoctorId()) != null) &&
-                      !getCampaign().getPerson(patient.getDoctorId()).getStatus().isActive()) {
+                      !getCampaign().getPerson(patient.getDoctorId()).getStatus().isActiveFlexible()) {
                 patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
             }
             if (patient.getDoctorId() == null) {
@@ -521,8 +520,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
         listUnassignedPatient.setSelectedIndices(unassignedIndices);
     }
 
-    private ActionScheduler doctorListScheduler = new ActionScheduler(this::refreshDoctorsList);
-    private ActionScheduler patientListScheduler = new ActionScheduler(this::refreshPatientList);
+    private final ActionScheduler doctorListScheduler = new ActionScheduler(this::refreshDoctorsList);
+    private final ActionScheduler patientListScheduler = new ActionScheduler(this::refreshPatientList);
 
     @Subscribe
     public void handle(ScenarioResolvedEvent ev) {

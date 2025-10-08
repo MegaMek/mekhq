@@ -108,6 +108,8 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "resetToFirstTech", campaignOptions.isResetToFirstTech());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techsUseAdministration",
               campaignOptions.isTechsUseAdministration());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUsefulAsTechs",
+              campaignOptions.isUseUsefulAsTechs());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useQuirks", campaignOptions.isUseQuirks());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "xpCostMultiplier", campaignOptions.getXpCostMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioXP", campaignOptions.getScenarioXP());
@@ -144,6 +146,10 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAmmoByType", campaignOptions.isUseAmmoByType());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "waitingPeriod", campaignOptions.getWaitingPeriod());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionSkill", campaignOptions.getAcquisitionSkill());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "useFunctionalAppraisal",
+              campaignOptions.isUseFunctionalAppraisal());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "acquisitionPersonnelCategory",
@@ -275,6 +281,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayScenarioLog", campaignOptions.isDisplayScenarioLog());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayKillRecord", campaignOptions.isDisplayKillRecord());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayMedicalRecord", campaignOptions.isDisplayMedicalRecord());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayPatientRecord", campaignOptions.isDisplayPatientRecord());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "displayAssignmentRecord",
@@ -338,6 +345,7 @@ public class CampaignOptionsMarshaller {
               indent,
               "doctorsUseAdministration",
               campaignOptions.isDoctorsUseAdministration());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUsefulMedics", campaignOptions.isUseUsefulMedics());
         // endregion Medical
 
         // region Prisoners
@@ -345,6 +353,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "prisonerCaptureStyle",
               campaignOptions.getPrisonerCaptureStyle().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "useFunctionalEscapeArtist",
+              campaignOptions.isUseFunctionalEscapeArtist());
         // endregion Prisoners
 
         // region Dependent
@@ -814,7 +826,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForFood", campaignOptions.isPayForFood());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForHousing", campaignOptions.isPayForHousing());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoanLimits", campaignOptions.isUseLoanLimits());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePercentageMaint", campaignOptions.isUsePercentageMaint());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePercentageMaint", campaignOptions.isUsePercentageMaintenance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "infantryDontCount", campaignOptions.isInfantryDontCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePeacetimeCost", campaignOptions.isUsePeacetimeCost());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useExtendedPartsModifier",
@@ -966,12 +978,6 @@ public class CampaignOptionsMarshaller {
         // endregion Contract Market
         // endregion Markets Tab
 
-        // region RATs Tab
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStaticRATs", campaignOptions.isUseStaticRATs());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rats", campaignOptions.getRATs());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreRATEra", campaignOptions.isIgnoreRATEra());
-        // endregion RATs Tab
-
         // region AtB Tab
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", campaignOptions.getSkillLevel().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveMethod", campaignOptions.getAutoResolveMethod().name());
@@ -1030,7 +1036,7 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isAssignPortraitOnRoleChange());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowDuplicatePortraits",
               campaignOptions.isAllowDuplicatePortraits());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForAeros", campaignOptions.isAllowOpForAeros());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForAeros", campaignOptions.isAllowOpForAerospace());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForLocalUnits", campaignOptions.isAllowOpForLocalUnits());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForAeroChance", campaignOptions.getOpForAeroChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLocalUnitChance", campaignOptions.getOpForLocalUnitChance());
@@ -1040,8 +1046,8 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModChance", campaignOptions.getScenarioModChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModBV", campaignOptions.getScenarioModBV());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoConfigMunitions", campaignOptions.isAutoConfigMunitions());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoGenerateOpForCallsigns",
-              campaignOptions.isAutoGenerateOpForCallsigns());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoGenerateOpForCallSigns",
+              campaignOptions.isAutoGenerateOpForCallSigns());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "minimumCallsignSkillLevel",
@@ -1072,6 +1078,10 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePortraitForType", campaignOptions.isUsePortraitForRoles());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackFactionStanding", campaignOptions.isTrackFactionStanding());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "trackClimateRegardChanges",
+              campaignOptions.isTrackClimateRegardChanges());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "useFactionStandingNegotiation",

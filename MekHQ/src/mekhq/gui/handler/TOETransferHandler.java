@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,18 +24,14 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.handler;
 
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.unit.Unit;
-import mekhq.gui.CampaignGUI;
-
-import javax.swing.*;
-import javax.swing.tree.TreePath;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -43,9 +39,20 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.UUID;
+import javax.swing.JComponent;
+import javax.swing.JTree;
+import javax.swing.TransferHandler;
+import javax.swing.tree.TreePath;
+
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.unit.Unit;
+import mekhq.gui.CampaignGUI;
 
 public class TOETransferHandler extends TransferHandler {
-    private static final MMLogger logger = MMLogger.create(TOETransferHandler.class);
+    private static final MMLogger LOGGER = MMLogger.create(TOETransferHandler.class);
 
     private final CampaignGUI gui;
 
@@ -127,8 +134,8 @@ public class TOETransferHandler extends TransferHandler {
         Transferable t = support.getTransferable();
         try {
             StringTokenizer st = new StringTokenizer(
-                    (String) t.getTransferData(DataFlavor.stringFlavor),
-                    "|");
+                  (String) t.getTransferData(DataFlavor.stringFlavor),
+                  "|");
             String type = st.nextToken();
             String id = st.nextToken();
             if (type.equals("UNIT")) {
@@ -138,9 +145,9 @@ public class TOETransferHandler extends TransferHandler {
                 force = gui.getCampaign().getForce(Integer.parseInt(id));
             }
         } catch (UnsupportedFlavorException ufe) {
-            logger.error("UnsupportedFlavor: " + ufe.getMessage());
+            LOGGER.error("UnsupportedFlavor: {}", ufe.getMessage());
         } catch (IOException ioe) {
-            logger.error("I/O error: " + ioe.getMessage());
+            LOGGER.error("I/O error: {}", ioe.getMessage());
         }
 
         if ((force != null) && (superForce != null) && force.isAncestorOf(superForce)) {
@@ -176,9 +183,9 @@ public class TOETransferHandler extends TransferHandler {
                 }
             }
         } catch (UnsupportedFlavorException ufe) {
-            logger.error("UnsupportedFlavor: " + ufe.getMessage());
+            LOGGER.error("UnsupportedFlavor: {}", ufe.getMessage());
         } catch (IOException ioe) {
-            logger.error("I/O error: " + ioe.getMessage());
+            LOGGER.error("I/O error: {}", ioe.getMessage());
         }
 
         // Get drop location info.

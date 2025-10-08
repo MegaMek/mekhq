@@ -25,25 +25,28 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.AmmoType;
-import megamek.common.BattleArmor;
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.PartInventory;
 
 /**
- * Battle Armor ammo bins need to look for shots for all the remaining troopers
- * in the
- * squad.
+ * Battle Armor ammo bins need to look for shots for all the remaining troopers in the squad.
  * TODO: Think about how to handle the case of understrength squads. Right now
  * they
  * pay for more ammo than they need, but this is easier than trying to track
@@ -54,22 +57,22 @@ import mekhq.campaign.parts.PartInventory;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BattleArmorAmmoBin extends AmmoBin {
-    private static final MMLogger logger = MMLogger.create(BattleArmorAmmoBin.class);
+    private static final MMLogger LOGGER = MMLogger.create(BattleArmorAmmoBin.class);
 
     public BattleArmorAmmoBin() {
         this(0, null, -1, 0, false, null);
     }
 
     public BattleArmorAmmoBin(int tonnage, @Nullable AmmoType et, int equipNum,
-            int shots, boolean singleShot, @Nullable Campaign c) {
+          int shots, boolean singleShot, @Nullable Campaign c) {
         super(tonnage, et, equipNum, shots, singleShot, false, c);
     }
 
     @Override
     public BattleArmorAmmoBin clone() {
         BattleArmorAmmoBin clone = new BattleArmorAmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded,
-                isOneShot(),
-                campaign);
+              isOneShot(),
+              campaign);
         clone.copyBaseData(this);
         clone.shotsNeeded = this.shotsNeeded;
         return clone;
@@ -142,10 +145,10 @@ public class BattleArmorAmmoBin extends AmmoBin {
     }
 
     /**
-     * Requisition ammo for this bin and remove it
-     * from the warehouse.
-     * Only allow Battle Armor Ammo bins to be loaded
-     * in <code>getNumTroopers()</code> bins at a time.
+     * Requisition ammo for this bin and remove it from the warehouse. Only allow Battle Armor Ammo bins to be loaded
+     * in
+     * <code>getNumTroopers()</code> bins at a time.
+     *
      * @see #getNumTroopers()
      */
     @Override
@@ -155,8 +158,9 @@ public class BattleArmorAmmoBin extends AmmoBin {
 
             // Calculate the actual shots needed
             int shotsPerTrooper = shotsNeeded / getNumTroopers();
-            int shotsToReload = Math.min(shotsPerTrooper, (int) Math.floor( (double) getAmountAvailable() / getNumTroopers()));
-            for (int shotsPerSuitLoaded = 0; shotsPerSuitLoaded < shotsToReload; shotsPerSuitLoaded++ ) {
+            int shotsToReload = Math.min(shotsPerTrooper,
+                  (int) Math.floor((double) getAmountAvailable() / getNumTroopers()));
+            for (int shotsPerSuitLoaded = 0; shotsPerSuitLoaded < shotsToReload; shotsPerSuitLoaded++) {
                 int shots = requisitionAmmo(getType(), getNumTroopers());
                 shotsNeeded -= shots;
             }
@@ -225,8 +229,8 @@ public class BattleArmorAmmoBin extends AmmoBin {
     protected int calculateShots() {
         int shots = (int) Math.floor(1000 / getType().getKgPerShot());
         if (shots <= 0) {
-            // FIXME: no idea what to do here, these really should be fixed on the MM side
-            // because presumably this is happening because KgperShot is -1 or 0
+            // FIXME: no idea what to do here, these really should be fixed on the MM side because presumably this is
+            //  happening because KgperShot is -1 or 0
             shots = 20;
         }
 
@@ -236,16 +240,6 @@ public class BattleArmorAmmoBin extends AmmoBin {
     @Override
     public String getAcquisitionExtraDesc() {
         return calculateShots() + " shots";
-    }
-
-    @Override
-    public String getAcquisitionBonus() {
-        String bonus = getAllAcquisitionMods().getValueAsString();
-        if (getAllAcquisitionMods().getValue() > -1) {
-            bonus = "+" + bonus;
-        }
-
-        return "(" + bonus + ")";
     }
 
     @Override
@@ -284,13 +278,13 @@ public class BattleArmorAmmoBin extends AmmoBin {
          */
 
         if (type == null) {
-            logger.error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
+            LOGGER.error("Mounted.restore: could not restore equipment type \"{}\"", typeName);
             return;
         }
         try {
             equipTonnage = type.getTonnage(null);
         } catch (NullPointerException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
     }
 }

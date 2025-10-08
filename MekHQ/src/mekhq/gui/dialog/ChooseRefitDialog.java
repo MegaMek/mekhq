@@ -50,14 +50,14 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.Entity;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -73,18 +73,14 @@ public class ChooseRefitDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ChooseRefitDialog.class);
 
     // region Variable Declarations
-    private Campaign campaign;
-    private Unit unit;
+    private final Campaign campaign;
+    private final Unit unit;
     private RefitTableModel refitModel;
 
-    private JButton btnClose;
     private JButton btnRefit;
     private JButton btnCustomize;
     private JTable refitTable;
-    private JScrollPane scrRefitTable;
-    private JList<String> lstShopping;
     private JScrollPane scrShoppingList;
-    private JTextPane txtOldUnit;
     private JTextPane txtNewUnit;
     private JScrollPane scrOldUnit;
     private JScrollPane scrNewUnit;
@@ -132,7 +128,7 @@ public class ChooseRefitDialog extends JDialog {
         refitSorter.setComparator(RefitTableModel.COL_CLASS, new ClassSorter());
         refitSorter.setComparator(RefitTableModel.COL_COST, new FormattedNumberSorter());
         refitTable.setRowSorter(refitSorter);
-        scrRefitTable = new JScrollPaneWithSpeed();
+        JScrollPane scrRefitTable = new JScrollPaneWithSpeed();
         scrRefitTable.setViewportView(refitTable);
         scrRefitTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("refitTable.title")));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -160,7 +156,7 @@ public class ChooseRefitDialog extends JDialog {
         scrShoppingList.setPreferredSize(new Dimension(300, 200));
         getContentPane().add(scrShoppingList, gridBagConstraints);
 
-        txtOldUnit = new JTextPane();
+        JTextPane txtOldUnit = new JTextPane();
         txtOldUnit.setEditable(false);
         txtOldUnit.setContentType("text/html");
         txtOldUnit.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
@@ -205,7 +201,7 @@ public class ChooseRefitDialog extends JDialog {
         btnCustomize.addActionListener(evt -> confirmCustomize());
         panBtn.add(btnCustomize, new GridBagConstraints());
 
-        btnClose = new JButton(resourceMap.getString("btnClose.text"));
+        JButton btnClose = new JButton(resourceMap.getString("btnClose.text"));
         btnClose.addActionListener(evt -> cancel());
         panBtn.add(btnClose, new GridBagConstraints());
 
@@ -282,7 +278,7 @@ public class ChooseRefitDialog extends JDialog {
         btnRefit.setEnabled(!campaign.getCampaignOptions().isAllowCanonRefitOnly() || r.getNewEntity().isCanon());
         btnCustomize.setEnabled(true);
 
-        lstShopping = new JList<>(r.getShoppingListDescription());
+        JList<String> lstShopping = new JList<>(r.getShoppingListDescription());
         scrShoppingList.setViewportView(lstShopping);
         EntityReadout mv = EntityReadout.createReadout(r.getNewEntity(), false, true);
         txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getFullReadout() + "</div>");
@@ -322,7 +318,7 @@ public class ChooseRefitDialog extends JDialog {
         public final static int COL_CLASS = 1;
         public final static int COL_BV = 2;
         public final static int COL_TIME = 3;
-        public final static int COL_NPART = 4;
+        public final static int COL_NUM_PART = 4;
         public final static int COL_TARGET = 5;
         public final static int COL_COST = 6;
         public final static int N_COL = 7;
@@ -348,7 +344,7 @@ public class ChooseRefitDialog extends JDialog {
                 case COL_CLASS -> "Class";
                 case COL_BV -> "BV";
                 case COL_TIME -> "Time";
-                case COL_NPART -> "# Parts";
+                case COL_NUM_PART -> "# Parts";
                 case COL_COST -> "Cost";
                 case COL_TARGET -> "Kit TN";
                 default -> "?";
@@ -370,7 +366,7 @@ public class ChooseRefitDialog extends JDialog {
                 return r.getNewEntity().calculateBattleValue(true, true);
             } else if (col == COL_TIME) {
                 return r.getTime();
-            } else if (col == COL_NPART) {
+            } else if (col == COL_NUM_PART) {
                 return r.getShoppingList().size();
             } else if (col == COL_COST) {
                 return r.getCost().toAmountAndSymbolString();

@@ -24,12 +24,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
-
-import megamek.codeUtilities.ObjectUtility;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static mekhq.campaign.personnel.enums.BloodGroup.*;
@@ -37,6 +38,10 @@ import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mockStatic;
+
+import megamek.codeUtilities.ObjectUtility;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 class BloodGroupTest {
     @Test
@@ -89,7 +94,7 @@ class BloodGroupTest {
             cumulativeChance += bloodGroup.getChance();
         }
 
-        assertEquals(cumulativeChance, 100);
+        assertEquals(100, cumulativeChance);
     }
 
     @Test

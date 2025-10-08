@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,19 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
 import java.util.List;
-
 import javax.swing.table.AbstractTableModel;
 
 /**
- * An table model for displaying data in lists
+ * A table model for displaying data in lists
  */
-public abstract class DataTableModel extends AbstractTableModel {
+public abstract class DataTableModel<T> extends AbstractTableModel {
     protected String[] columnNames;
-    protected List<?> data;
+    protected List<T> data;
 
     @Override
     public int getRowCount() {
@@ -62,17 +66,12 @@ public abstract class DataTableModel extends AbstractTableModel {
         return getValueAt(0, c).getClass();
     }
 
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
-    }
-
     public List<?> getData() {
         return data;
     }
 
     // fill table with values
-    public void setData(List<?> array) {
+    public void setData(List<T> array) {
         data = array;
         fireTableDataChanged();
     }

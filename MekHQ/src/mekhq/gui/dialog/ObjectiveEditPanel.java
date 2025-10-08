@@ -24,8 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.border.LineBorder;
 
 import megamek.common.OffBoardDirection;
 import mekhq.campaign.mission.ObjectiveEffect;
@@ -36,21 +49,14 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.campaign.mission.ScenarioTemplate;
-
-import javax.swing.*;
-import javax.swing.border.LineBorder;
-import java.awt.*;
-import java.util.List;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * UI for creating or editing a single scenario objective
  */
 public class ObjectiveEditPanel extends JDialog {
-    private JLabel lblShortDescription;
     private JTextArea txtShortDescription;
-    private JLabel lblObjectiveType;
     private JComboBox<ObjectiveCriterion> cboObjectiveType;
     private JComboBox<String> cboDirection;
     private JTextField txtPercentage;
@@ -77,9 +83,9 @@ public class ObjectiveEditPanel extends JDialog {
 
     private JList<String> lstDetails;
 
-    private ScenarioTemplate currentScenarioTemplate;
-    private ScenarioObjective objective;
-    private ScenarioTemplateEditorDialog parent;
+    private final ScenarioTemplate currentScenarioTemplate;
+    private final ScenarioObjective objective;
+    private final ScenarioTemplateEditorDialog parent;
 
     public ObjectiveEditPanel(ScenarioTemplate template, ScenarioTemplateEditorDialog parent) {
         currentScenarioTemplate = template;
@@ -93,7 +99,8 @@ public class ObjectiveEditPanel extends JDialog {
         setLocationRelativeTo(parent);
     }
 
-    public ObjectiveEditPanel(ScenarioTemplate template, ScenarioObjective objective, ScenarioTemplateEditorDialog parent) {
+    public ObjectiveEditPanel(ScenarioTemplate template, ScenarioObjective objective,
+          ScenarioTemplateEditorDialog parent) {
         currentScenarioTemplate = template;
         this.objective = objective;
         this.parent = parent;
@@ -193,7 +200,7 @@ public class ObjectiveEditPanel extends JDialog {
      * Handles the "description" row.
      */
     private void addDescriptionUI(GridBagConstraints gbc) {
-        lblShortDescription = new JLabel("Short Description:");
+        JLabel lblShortDescription = new JLabel("Short Description:");
 
         JScrollPane txtScroll = new JScrollPaneWithSpeed();
         txtShortDescription = new JTextArea();
@@ -210,7 +217,8 @@ public class ObjectiveEditPanel extends JDialog {
         JButton btnAddDetail = new JButton("Add");
         JButton btnRemoveDetail = new JButton("Remove");
 
-        lstDetails.addListSelectionListener(e -> btnRemoveDetail.setEnabled(!lstDetails.getSelectedValuesList().isEmpty()));
+        lstDetails.addListSelectionListener(e -> btnRemoveDetail.setEnabled(!lstDetails.getSelectedValuesList()
+                                                                                   .isEmpty()));
         lstDetails.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         btnRemoveDetail.addActionListener(e -> this.removeDetails());
         btnAddDetail.addActionListener(e -> this.addDetail(txtDetail));
@@ -246,7 +254,7 @@ public class ObjectiveEditPanel extends JDialog {
     private void addObjectiveTypeUI(GridBagConstraints gbc) {
         JPanel objectivePanel = new JPanel();
 
-        lblObjectiveType = new JLabel("Objective Type:");
+        JLabel lblObjectiveType = new JLabel("Objective Type:");
         cboObjectiveType = new JComboBox<>();
         for (ObjectiveCriterion objectiveType : ObjectiveCriterion.values()) {
             cboObjectiveType.addItem(objectiveType);
@@ -299,9 +307,11 @@ public class ObjectiveEditPanel extends JDialog {
         JLabel lblFailureEffects = new JLabel("Effects on failure:");
 
         successEffects = new JList<>();
-        successEffects.addListSelectionListener(e -> btnRemoveSuccess.setEnabled(!successEffects.getSelectedValuesList().isEmpty()));
+        successEffects.addListSelectionListener(e -> btnRemoveSuccess.setEnabled(!successEffects.getSelectedValuesList()
+                                                                                        .isEmpty()));
         failureEffects = new JList<>();
-        failureEffects.addListSelectionListener(e -> btnRemoveFailure.setEnabled(!failureEffects.getSelectedValuesList().isEmpty()));
+        failureEffects.addListSelectionListener(e -> btnRemoveFailure.setEnabled(!failureEffects.getSelectedValuesList()
+                                                                                        .isEmpty()));
 
         btnRemoveSuccess = new JButton("Remove");
         btnRemoveSuccess.addActionListener(e -> this.removeEffect(ObjectiveEffectConditionType.ObjectiveSuccess));
@@ -468,7 +478,7 @@ public class ObjectiveEditPanel extends JDialog {
      * Event handler for the 'add' button for scenario effects
      */
     private void addEffect() {
-        int amount = 0;
+        int amount;
         try {
             amount = Integer.parseInt(txtAmount.getText());
             lblMagnitude.setForeground(UIManager.getColor("text"));
@@ -529,7 +539,11 @@ public class ObjectiveEditPanel extends JDialog {
     }
 
     private void addForce() {
-        objective.addForce(cboForceName.getSelectedItem().toString());
+        Object object = cboForceName.getSelectedItem();
+
+        if (object instanceof String string) {
+            objective.addForce(string);
+        }
 
         updateForceList();
         pack();
@@ -576,26 +590,34 @@ public class ObjectiveEditPanel extends JDialog {
     }
 
     private void setDirectionDropdownVisibility() {
-        switch ((ObjectiveCriterion) cboObjectiveType.getSelectedItem()) {
-            case PreventReachMapEdge:
-            case ReachMapEdge:
-                cboDirection.setVisible(true);
-                break;
-            default:
-                cboDirection.setVisible(false);
-                break;
+        Object object = cboObjectiveType.getSelectedItem();
+
+        if (object instanceof ObjectiveCriterion criterion) {
+            switch (criterion) {
+                case PreventReachMapEdge:
+                case ReachMapEdge:
+                    cboDirection.setVisible(true);
+                    break;
+                default:
+                    cboDirection.setVisible(false);
+                    break;
+            }
         }
     }
 
     private void updateTimeLimitUI() {
-        boolean enable = !cboTimeScaling.getSelectedItem().equals(TimeLimitType.None);
+        Object object = cboTimeScaling.getSelectedItem();
 
-        txtTimeLimit.setEnabled(enable);
-        cboTimeLimitDirection.setEnabled(enable);
+        if (object instanceof TimeLimitType timeLimit) {
+            boolean enable = !timeLimit.equals(TimeLimitType.None);
+
+            txtTimeLimit.setEnabled(enable);
+            cboTimeLimitDirection.setEnabled(enable);
+        }
     }
 
     private void saveObjectiveAndClose() {
-        int number = 0;
+        int number;
         int timeLimit = 0;
 
         try {

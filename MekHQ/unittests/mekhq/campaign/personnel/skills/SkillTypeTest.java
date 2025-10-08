@@ -32,9 +32,9 @@
  */
 package mekhq.campaign.personnel.skills;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -220,7 +220,7 @@ class SkillTypeTest {
         if (firstAttribute != NONE) {
             assertTrue(flavorText.contains(firstAttribute.getLabel()),
                   "Did not include first Attribute: " +
-                        firstAttribute.toString() +
+                        firstAttribute +
                         " for Skill: " +
                         skillType.getName());
         }
@@ -229,7 +229,7 @@ class SkillTypeTest {
         if (secondAttribute != NONE) {
             assertTrue(flavorText.contains(secondAttribute.getLabel()),
                   "Did not include second Attribute: " +
-                        secondAttribute.toString() +
+                        secondAttribute +
                         " for Skill: " +
                         skillType.getName());
         }
@@ -255,7 +255,7 @@ class SkillTypeTest {
         if (firstAttribute != NONE) {
             assertTrue(flavorText.contains(firstAttribute.getLabel()),
                   "Did not include first Attribute: " +
-                        firstAttribute.toString() +
+                        firstAttribute +
                         " for Skill: " +
                         skillType.getName());
         }
@@ -264,7 +264,7 @@ class SkillTypeTest {
         if (secondAttribute != NONE) {
             assertTrue(flavorText.contains(secondAttribute.getLabel()),
                   "Did not include second Attribute: " +
-                        secondAttribute.toString() +
+                        secondAttribute +
                         " for Skill: " +
                         skillType.getName());
         }

@@ -24,8 +24,27 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.autoAwards;
+
+import java.awt.Dialog.ModalityType;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import javax.swing.JOptionPane;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -39,12 +58,6 @@ import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.dialog.AutoAwardsDialog;
-
-import javax.swing.*;
-import java.awt.Dialog.ModalityType;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class AutoAwardsController {
     private Campaign campaign;
@@ -68,7 +81,7 @@ public class AutoAwardsController {
     /**
      * The controller for the manual-automatic processing of Awards
      *
-     * @param campaign                    the campaign to be processed
+     * @param campaign the campaign to be processed
      */
     public void ManualController(Campaign campaign, boolean isManualPrompt) {
         logger.info("autoAwards (Manual) has started");
@@ -88,13 +101,13 @@ public class AutoAwardsController {
             logger.info("AutoAwards found no personnel, skipping the Award Ceremony");
 
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
-                    MekHQ.getMHQOptions().getLocale());
+                  MekHQ.getMHQOptions().getLocale());
 
             if (isManualPrompt) {
                 JOptionPane.showMessageDialog(null,
-                        resources.getString("txtNoneEligible.text"),
-                        resources.getString("AutoAwardsDialog.title"),
-                        JOptionPane.INFORMATION_MESSAGE);
+                      resources.getString("txtNoneEligible.text"),
+                      resources.getString("AutoAwardsDialog.title"),
+                      JOptionPane.INFORMATION_MESSAGE);
             }
         }
 
@@ -104,7 +117,7 @@ public class AutoAwardsController {
     /**
      * The controller for the processing of awards prompted by a change in rank
      *
-     * @param campaign                    the campaign to be processed
+     * @param campaign the campaign to be processed
      */
     public void PromotionController(Campaign campaign, boolean isManualPrompt) {
         logger.info("autoAwards (Promotion) has started");
@@ -130,8 +143,8 @@ public class AutoAwardsController {
     /**
      * The primary controller for the automatic processing of Awards
      *
-     * @param campaign                    the campaign to be processed
-     * @param mission                    the mission just completed
+     * @param campaign             the campaign to be processed
+     * @param mission              the mission just completed
      * @param missionWasSuccessful true if the Mission was a complete Success, otherwise false
      */
     public void PostMissionController(Campaign campaign, Mission mission, Boolean missionWasSuccessful) {
@@ -158,12 +171,13 @@ public class AutoAwardsController {
     /**
      * Processes awards after a scenario is concluded.
      *
-     * @param campaign the campaign
-     * @param personnel the personnel involved in the scenario, mapped by their UUID
-     * @param scenarioKills the kills made during the scenario, mapped by personnel UUID
-     * @param wasCivilianHelp whether the scenario (if any) was AtB Scenario CIVILIANHELP
+     * @param campaign        the campaign
+     * @param personnel       the personnel involved in the scenario, mapped by their UUID
+     * @param scenarioKills   the kills made during the scenario, mapped by personnel UUID
+     * @param wasCivilianHelp whether the scenario (if any) was AtB Scenario CIVILIAN_HELP
      */
-    public void PostScenarioController(Campaign campaign, HashMap<UUID, Integer> personnel, HashMap<UUID, List<Kill>>scenarioKills, boolean wasCivilianHelp) {
+    public void PostScenarioController(Campaign campaign, HashMap<UUID, Integer> personnel,
+          HashMap<UUID, List<Kill>> scenarioKills, boolean wasCivilianHelp) {
         logger.info("autoAwards (Scenario Conclusion) has started");
 
         this.campaign = campaign;
@@ -228,9 +242,10 @@ public class AutoAwardsController {
     /**
      * The primary controller for the automatic processing of Training Awards
      *
-     * @param campaign                    the campaign to be processed
+     * @param campaign the campaign to be processed
      */
-    public void PostGraduationController(Campaign campaign, List<UUID> personnel, HashMap<UUID, List<Object>> academyAttributes) {
+    public void PostGraduationController(Campaign campaign, List<UUID> personnel,
+          HashMap<UUID, List<Object>> academyAttributes) {
         logger.info("autoAwards (Education Conclusion) has started");
 
         this.campaign = campaign;
@@ -268,8 +283,8 @@ public class AutoAwardsController {
             // Check conditions of the person being active, not currently a prisoner, and not a civilian.
             // If all conditions are met, add their ID to the list.
             if ((person.getStatus().isActive())
-                    && (!person.getPrisonerStatus().isCurrentPrisoner())
-                    && (!person.getPrimaryRole().isCivilian())) {
+                      && (!person.getPrisonerStatus().isCurrentPrisoner())
+                      && (!person.getPrimaryRole().isCivilian())) {
                 personnel.add(person.getId());
             }
 
@@ -279,10 +294,11 @@ public class AutoAwardsController {
             // is after or equal to the last mission's end date.
             // If all these conditions are met, add their ID to the list.
             if (person.getStatus().isDead()
-                    && (issuePosthumous)
-                    && (!person.getPrisonerStatus().isCurrentPrisoner())
-                    && (!person.getPrimaryRole().isCivilian())) {
-                if (person.getDateOfDeath().isAfter(lastMissionEndDate) || person.getDateOfDeath().equals(lastMissionEndDate)) {
+                      && (issuePosthumous)
+                      && (!person.getPrisonerStatus().isCurrentPrisoner())
+                      && (!person.getPrimaryRole().isCivilian())) {
+                if (person.getDateOfDeath().isAfter(lastMissionEndDate) ||
+                          person.getDateOfDeath().equals(lastMissionEndDate)) {
                     personnel.add(person.getId());
                 }
             }
@@ -313,6 +329,12 @@ public class AutoAwardsController {
         }
 
         // Initialize a variable to hold the ending date of the last contract.
+
+        // Return the ending date of the last contract.
+        return getLastContractEndingDate(completedContracts);
+    }
+
+    private static LocalDate getLastContractEndingDate(List<AtBContract> completedContracts) {
         LocalDate lastContractEndingDate = null;
 
         // Loop through each contract in the list of completed contracts.
@@ -331,15 +353,14 @@ public class AutoAwardsController {
                 lastContractEndingDate = endingDate;
             }
         }
-
-        // Return the ending date of the last contract.
         return lastContractEndingDate;
     }
 
     /**
      * Builds the award list and filters it, so we're not processing the same awards multiple times
      *
-     * @param awardListCase when the award controller was called: 0 manual (or monthly), 1 post-mission, 2 post-scenario, 3 rank
+     * @param awardListCase when the award controller was called: 0 manual (or monthly), 1 post-mission, 2
+     *                      post-scenario, 3 rank
      */
     private void buildAwardLists(int awardListCase) {
         ArrayList<Award> awards = new ArrayList<>();
@@ -383,7 +404,7 @@ public class AutoAwardsController {
                             break;
                         case "kill":
                             if ((!award.getRange().equalsIgnoreCase("scenario"))
-                                    && (!award.getRange().equalsIgnoreCase("mission"))) {
+                                      && (!award.getRange().equalsIgnoreCase("mission"))) {
                                 if (campaign.getCampaignOptions().isEnableFormationKillAwards()) {
                                     killAwards.add(award);
                                 } else {
@@ -437,7 +458,8 @@ public class AutoAwardsController {
                     }
                 }
                 // These logs help users double-check that the number of awards found matches their records
-                logger.info("autoAwards found {} Kill Awards (excluding Mission & Scenario Kill Awards)", killAwards.size());
+                logger.info("autoAwards found {} Kill Awards (excluding Mission & Scenario Kill Awards)",
+                      killAwards.size());
                 logger.info("autoAwards found {} Rank Awards", rankAwards.size());
                 logger.info("autoAwards found {} Scenario Awards", scenarioAwards.size());
                 logger.info("autoAwards found {} Skill Awards", skillAwards.size());
@@ -478,7 +500,7 @@ public class AutoAwardsController {
                             // Scenario Kill Awards are handled by the post-scenario controller
                             if (!award.getRange().equalsIgnoreCase("scenario")) {
                                 if ((campaign.getCampaignOptions().isEnableIndividualKillAwards())
-                                        || (campaign.getCampaignOptions().isEnableFormationKillAwards())) {
+                                          || (campaign.getCampaignOptions().isEnableFormationKillAwards())) {
                                     killAwards.add(award);
                                 } else {
                                     ignoredAwards.add(award);
@@ -556,7 +578,8 @@ public class AutoAwardsController {
                         case "divider":
                             break;
                         case "kill":
-                            if ((campaign.getCampaignOptions().isEnableIndividualKillAwards()) && (award.getRange().equalsIgnoreCase("scenario"))) {
+                            if ((campaign.getCampaignOptions().isEnableIndividualKillAwards()) &&
+                                      (award.getRange().equalsIgnoreCase("scenario"))) {
 
                                 killAwards.add(award);
                             }
@@ -586,7 +609,8 @@ public class AutoAwardsController {
                     }
                 }
 
-                logger.info("autoAwards found {} Scenario Kill Awards (excluding Mission & Lifetime Kill Awards)", killAwards.size());
+                logger.info("autoAwards found {} Scenario Kill Awards (excluding Mission & Lifetime Kill Awards)",
+                      killAwards.size());
                 logger.info("autoAwards found {} Injury Awards", injuryAwards.size());
                 logger.info("autoAwards found {} Misc Awards", miscAwards.size());
                 logger.info("autoAwards found {} Scenario Awards", scenarioAwards.size());
@@ -641,12 +665,13 @@ public class AutoAwardsController {
     /**
      * Process the awards for the given personnel.
      *
-     * @param personnel               the List of personnel to process awards for
-     * @param missionWasSuccessful    true if the mission was successful, false otherwise
-     * @param academyAttributes       a map of academy attributes, null if not processing graduation awards
-     * @param isManualPrompt          whether autoAwards was triggered manually
+     * @param personnel            the List of personnel to process awards for
+     * @param missionWasSuccessful true if the mission was successful, false otherwise
+     * @param academyAttributes    a map of academy attributes, null if not processing graduation awards
+     * @param isManualPrompt       whether autoAwards was triggered manually
      */
-    private void ProcessAwards(List<UUID> personnel, Boolean missionWasSuccessful, @Nullable HashMap<UUID, List<Object>> academyAttributes, boolean isManualPrompt) {
+    private void ProcessAwards(List<UUID> personnel, Boolean missionWasSuccessful,
+          @Nullable HashMap<UUID, List<Object>> academyAttributes, boolean isManualPrompt) {
         Map<Integer, Map<Integer, List<Object>>> allAwardData = new HashMap<>();
         Map<Integer, List<Object>> processedData;
         int allAwardDataKey = 0;
@@ -661,7 +686,9 @@ public class AutoAwardsController {
             }
         }
 
-        if ((!factionHunterAwards.isEmpty()) && (campaign.getCampaignOptions().isUseAtB()) && (mission instanceof AtBContract)) {
+        if ((!factionHunterAwards.isEmpty()) &&
+                  (campaign.getCampaignOptions().isUseAtB()) &&
+                  (mission instanceof AtBContract)) {
             processedData = FactionHunterAwardsManager(personnel);
 
             if (processedData != null) {
@@ -759,13 +786,13 @@ public class AutoAwardsController {
             logger.info("Zero personnel were found eligible for Awards");
 
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
-                    MekHQ.getMHQOptions().getLocale());
+                  MekHQ.getMHQOptions().getLocale());
 
             if (isManualPrompt) {
                 JOptionPane.showMessageDialog(null,
-                        resources.getString("txtNoneEligible.text"),
-                        resources.getString("AutoAwardsDialog.title"),
-                        JOptionPane.INFORMATION_MESSAGE);
+                      resources.getString("txtNoneEligible.text"),
+                      resources.getString("AutoAwardsDialog.title"),
+                      JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
@@ -787,7 +814,7 @@ public class AutoAwardsController {
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Contract Awards.",
-                        campaign.getPerson(person).getFullName());
+                      campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -826,7 +853,7 @@ public class AutoAwardsController {
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Faction Hunter Awards.",
-                        campaign.getPerson(person).getFullName());
+                      campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -888,9 +915,10 @@ public class AutoAwardsController {
     private Map<Integer, List<Object>> KillAwardsManager(List<UUID> personnel) {
         // prep the kill award data so that we only have to process it once
         Map<Integer, List<Kill>> missionKillData = personnel.stream()
-                .flatMap(person -> campaign.getKillsFor(person).stream())
-                .filter(kill -> mission != null && (kill.getMissionId() == mission.getId()))
-                .collect(Collectors.groupingBy(Kill::getForceId));
+                                                         .flatMap(person -> campaign.getKillsFor(person).stream())
+                                                         .filter(kill -> mission != null &&
+                                                                               (kill.getMissionId() == mission.getId()))
+                                                         .collect(Collectors.groupingBy(Kill::getForceId));
 
         // process the award data, checking for award eligibility
         Map<Integer, List<Object>> awardData = new HashMap<>();
@@ -903,7 +931,7 @@ public class AutoAwardsController {
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Kill Awards.",
-                        campaign.getPerson(person).getFullName());
+                      campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -927,9 +955,11 @@ public class AutoAwardsController {
      *
      * @param personnel     the List of personnel to be processed for awards
      * @param scenarioKills a map of personnel and their corresponding list of Kills
+     *
      * @return a map containing the award data, or null if no awards are applicable
      */
-    private Map<Integer, List<Object>> ScenarioKillAwardsManager(List<UUID> personnel, HashMap<UUID, List<Kill>> scenarioKills) {
+    private Map<Integer, List<Object>> ScenarioKillAwardsManager(List<UUID> personnel,
+          HashMap<UUID, List<Kill>> scenarioKills) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
@@ -939,11 +969,14 @@ public class AutoAwardsController {
             Map<Integer, List<Object>> data;
 
             try {
-                data = ScenarioKillAwards.ScenarioKillAwardsProcessor(campaign, person, killAwards, personalKills.size());
+                data = ScenarioKillAwards.ScenarioKillAwardsProcessor(campaign,
+                      person,
+                      killAwards,
+                      personalKills.size());
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Scenario Kill Awards.",
-                        campaign.getPerson(person).getFullName());
+                      campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -965,15 +998,17 @@ public class AutoAwardsController {
     /**
      * This method is the manager for processing Miscellaneous Awards.
      *
-     * @param personnel        the personnel to be processed
-     * @param missionWasSuccessful    true if the mission was successful, false otherwise
-     * @param wasCivilianHelp  true if the scenario (if relevant) was AtB Scenario type CIVILIANHELP
-     * @param wasScenario      true if the award is for a scenario, false otherwise
-     * @param scenarioKills    a map of personnel and their corresponding list of Kills
+     * @param personnel            the personnel to be processed
+     * @param missionWasSuccessful true if the mission was successful, false otherwise
+     * @param wasCivilianHelp      true if the scenario (if relevant) was AtB Scenario type CIVILIAN_HELP
+     * @param wasScenario          true if the award is for a scenario, false otherwise
+     * @param scenarioKills        a map of personnel and their corresponding list of Kills
+     *
      * @return a map containing the award data, or null if no awards are applicable
      */
-    private Map<Integer, List<Object>> MiscAwardsManager(HashMap<UUID, Integer> personnel, boolean missionWasSuccessful, boolean wasScenario,
-                                                         boolean wasCivilianHelp, HashMap<UUID, List<Kill>> scenarioKills) {
+    private Map<Integer, List<Object>> MiscAwardsManager(HashMap<UUID, Integer> personnel, boolean missionWasSuccessful,
+          boolean wasScenario,
+          boolean wasCivilianHelp, HashMap<UUID, List<Kill>> scenarioKills) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
@@ -1017,15 +1052,15 @@ public class AutoAwardsController {
 
             try {
                 data = MiscAwards.MiscAwardsProcessor(
-                        campaign,
-                        mission,
-                        person,
-                        miscAwards,
-                        missionWasSuccessful,
-                        wasCivilianHelp,
-                        personalKills.size(),
-                        personnel.get(person),
-                        supportPersonOfTheYear
+                      campaign,
+                      mission,
+                      person,
+                      miscAwards,
+                      missionWasSuccessful,
+                      wasCivilianHelp,
+                      personalKills.size(),
+                      personnel.get(person),
+                      supportPersonOfTheYear
                 );
             } catch (Exception e) {
                 data = null;
@@ -1165,7 +1200,8 @@ public class AutoAwardsController {
                 data = TheatreOfWarAwards.TheatreOfWarAwardsProcessor(campaign, mission, person, theatreOfWarAwards);
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Theatre of War Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Theatre of War Awards.",
+                      campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1221,17 +1257,21 @@ public class AutoAwardsController {
     /**
      * This is the manager for this type of award, processing eligibility and preparing awardData
      *
-     * @param personnel the personnel to be processed
+     * @param personnel         the personnel to be processed
      * @param academyAttributes the academy attributes mapped to the personnel being processed
      */
-    private Map<Integer, List<Object>> TrainingAwardsManager(List<UUID> personnel, HashMap<UUID, List<Object>> academyAttributes) {
+    private Map<Integer, List<Object>> TrainingAwardsManager(List<UUID> personnel,
+          HashMap<UUID, List<Object>> academyAttributes) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
         for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
             try {
-                data = TrainingAwards.TrainingAwardsProcessor(campaign, person, academyAttributes.get(person), trainingAwards);
+                data = TrainingAwards.TrainingAwardsProcessor(campaign,
+                      person,
+                      academyAttributes.get(person),
+                      trainingAwards);
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Training Awards.", campaign.getPerson(person).getFullName());
@@ -1256,7 +1296,7 @@ public class AutoAwardsController {
     /**
      * This is called from within an Award Type module and prepares data for use by displayAwardCeremony()
      *
-     * @param person the person being processed
+     * @param person         the person being processed
      * @param eligibleAwards the Awards they are eligible for
      */
     public static Map<Integer, List<Object>> prepareAwardData(UUID person, List<Award> eligibleAwards) {

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.parts.equipment;
@@ -31,21 +36,20 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
+import megamek.common.units.Entity;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.InfantryAmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Ammo bin for infantry weapons used by small support vehicles
@@ -68,11 +72,11 @@ public class InfantryAmmoBin extends AmmoBin {
      * @param shots      The number of shots of ammo needed to refill the bin
      * @param weaponType The weapon this ammo is for
      * @param clips      The number of clips of ammo
-     * @param omniPodded Whether the weapon is pod-mounted on an omnivehicle
+     * @param omniPodded Whether the weapon is pod-mounted on an OmniVehicle
      * @param c          The campaign instance
      */
     public InfantryAmmoBin(int tonnage, @Nullable AmmoType ammoType, int equipNum, int shots,
-            @Nullable InfantryWeapon weaponType, int clips, boolean omniPodded, @Nullable Campaign c) {
+          @Nullable InfantryWeapon weaponType, int clips, boolean omniPodded, @Nullable Campaign c) {
         super(tonnage, ammoType, equipNum, shots, false, omniPodded, c);
         this.size = clips;
         if (weaponType != null) {
@@ -105,7 +109,7 @@ public class InfantryAmmoBin extends AmmoBin {
     @Override
     public InfantryAmmoBin clone() {
         InfantryAmmoBin clone = new InfantryAmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded,
-                getWeaponType(), getClips(), omniPodded, campaign);
+              getWeaponType(), getClips(), omniPodded, campaign);
         clone.copyBaseData(this);
         return clone;
     }
@@ -143,9 +147,8 @@ public class InfantryAmmoBin extends AmmoBin {
     }
 
     /**
-     * Changes the capacity of this bin. This is done when redistributing capacity
-     * between
-     * standard and inferno munitions.
+     * Changes the capacity of this bin. This is done when redistributing capacity between standard and inferno
+     * munitions.
      *
      * @param clips The new capacity in number of clips
      */
@@ -159,7 +162,7 @@ public class InfantryAmmoBin extends AmmoBin {
 
     /**
      * Sets the number of shots needed in the {@code InfantryAmmoBin}.
-     *
+     * <p>
      * NB: this can be negative if the capacity has changed.
      *
      * @param shots The number of shots needed.
@@ -259,15 +262,15 @@ public class InfantryAmmoBin extends AmmoBin {
     @Override
     public MissingInfantryAmmoBin getMissingPart() {
         return new MissingInfantryAmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), getWeaponType(),
-                getClips(), omniPodded, campaign);
+              getClips(), omniPodded, campaign);
     }
 
     @Override
     public boolean isSamePartType(Part part) {
         return (getClass() == part.getClass())
-                && getType().equals(((InfantryAmmoBin) part).getType())
-                && Objects.equals(getWeaponType(), ((InfantryAmmoBin) part).getWeaponType())
-                && getClips() == ((InfantryAmmoBin) part).getClips();
+                     && getType().equals(((InfantryAmmoBin) part).getType())
+                     && Objects.equals(getWeaponType(), ((InfantryAmmoBin) part).getWeaponType())
+                     && getClips() == ((InfantryAmmoBin) part).getClips();
     }
 
     @Override
@@ -296,7 +299,7 @@ public class InfantryAmmoBin extends AmmoBin {
             if (mounted.getLinked() != null) {
                 index = unit.getEntity().getEquipmentNum(mounted.getLinked());
             } else if ((mounted.getLinkedBy() != null)
-                    && (mounted.getLinkedBy().getType() instanceof AmmoType)) {
+                             && (mounted.getLinkedBy().getType() instanceof AmmoType)) {
                 index = unit.getEntity().getEquipmentNum(mounted.getLinkedBy());
             }
             for (Part part : unit.getParts()) {

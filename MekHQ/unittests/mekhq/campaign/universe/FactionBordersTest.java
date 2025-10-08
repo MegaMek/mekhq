@@ -24,25 +24,30 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 
 public class FactionBordersTest {
 
-    private Faction factionUs = createFaction("us", false);
-    private Faction factionThem = createFaction("them", false);
+    private final Faction factionUs = createFaction("us", false);
+    private final Faction factionThem = createFaction("them", false);
 
     private Faction createFaction(final String key, final boolean periphery) {
         Faction faction = mock(Faction.class);
@@ -76,10 +81,10 @@ public class FactionBordersTest {
 
         List<PlanetarySystem> border = us.getBorderSystems(them, 1.1);
 
-        assertEquals(border.size(), 2);
+        assertEquals(2, border.size());
         for (PlanetarySystem p : border) {
-            assertEquals(Math.abs(p.getX()), 1, RegionPerimeter.EPSILON);
-            assertEquals(p.getY(), 0, RegionPerimeter.EPSILON);
+            assertEquals(1, Math.abs(p.getX()), RegionPerimeter.EPSILON);
+            assertEquals(0, p.getY(), RegionPerimeter.EPSILON);
         }
     }
 }

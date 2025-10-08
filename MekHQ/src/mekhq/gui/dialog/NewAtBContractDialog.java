@@ -58,8 +58,8 @@ import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
-import mekhq.campaign.stratcon.StratconContractDefinition;
-import mekhq.campaign.stratcon.StratconContractInitializer;
+import mekhq.campaign.stratCon.StratConContractDefinition;
+import mekhq.campaign.stratCon.StratConContractInitializer;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -74,7 +74,7 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
  * @author Neoancient
  */
 public class NewAtBContractDialog extends NewContractDialog {
-    private static final MMLogger logger = MMLogger.create(NewAtBContractDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(NewAtBContractDialog.class);
 
     protected FactionComboBox cbEmployer;
     protected FactionComboBox cbEnemy;
@@ -108,7 +108,7 @@ public class NewAtBContractDialog extends NewContractDialog {
             setName("NewAtBContractDialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -403,7 +403,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         txtDesc.setPreferredSize(new Dimension(400, 200));
         txtDesc.setMinimumSize(new Dimension(400, 200));
         gbc.gridx = 0;
-        gbc.gridy = y++;
+        gbc.gridy = y;
         gbc.gridwidth = 3;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
@@ -590,6 +590,11 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
 
+        contract.createEmployerLiaison(campaign);
+        if (contract.getEnemy().isClan()) {
+            contract.createClanOpponent(campaign);
+        }
+
         campaign.getFinances()
               .credit(TransactionType.CONTRACT_PAYMENT,
                     campaign.getLocalDate(),
@@ -601,9 +606,9 @@ public class NewAtBContractDialog extends NewContractDialog {
         // campaign
         // to ensure presence of mission ID
         if (campaign.getCampaignOptions().isUseStratCon()) {
-            StratconContractInitializer.initializeCampaignState(contract,
+            StratConContractInitializer.initializeCampaignState(contract,
                   campaign,
-                  Objects.requireNonNull(StratconContractDefinition.getContractDefinition(contract.getContractType())));
+                  Objects.requireNonNull(StratConContractDefinition.getContractDefinition(contract.getContractType())));
         }
 
         setVisible(false);
@@ -629,19 +634,19 @@ public class NewAtBContractDialog extends NewContractDialog {
             contract.setStartDate(null);
             needUpdatePayment = true;
         } else if (source.equals(cbEmployer)) {
-            logger.info("Setting employer code to {}", getCurrentEmployerCode());
+            LOGGER.info("Setting employer code to {}", getCurrentEmployerCode());
 
-            long time = System.currentTimeMillis();
+            long time = java.lang.System.currentTimeMillis();
             contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
-            logger.info("to set employer code: {}", System.currentTimeMillis() - time);
+            LOGGER.info("to set employer code: {}", java.lang.System.currentTimeMillis() - time);
 
-            time = System.currentTimeMillis();
+            time = java.lang.System.currentTimeMillis();
             updateEnemies();
-            logger.info("to update enemies: {}", System.currentTimeMillis() - time);
+            LOGGER.info("to update enemies: {}", java.lang.System.currentTimeMillis() - time);
 
-            time = System.currentTimeMillis();
+            time = java.lang.System.currentTimeMillis();
             updatePlanets();
-            logger.info("to update planets: {}", System.currentTimeMillis() - time);
+            LOGGER.info("to update planets: {}", java.lang.System.currentTimeMillis() - time);
             needUpdatePayment = true;
         } else if (source.equals(cbEnemy)) {
             contract.setEnemyCode(getCurrentEnemyCode());

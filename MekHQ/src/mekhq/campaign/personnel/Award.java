@@ -47,6 +47,7 @@ import mekhq.utilities.MHQXMLUtility;
 
 /**
  * This class represents an award given to a person
+ *
  * @author Miguel Azevedo
  */
 @XmlRootElement(name = "award")
@@ -101,8 +102,9 @@ public class Award implements Comparable<Award> {
 
     }
 
-    public Award(String name, String set,  String description, String group, List<String> medals, List<String> ribbons,
-                 List<String> miscs, int xp, int edge, boolean stackable, int qty, String item, String size, String range, int id) {
+    public Award(String name, String set, String description, String group, List<String> medals, List<String> ribbons,
+          List<String> miscs, int xp, int edge, boolean stackable, int qty, String item, String size, String range,
+          int id) {
         this.name = name;
         this.set = set;
         this.description = description;
@@ -123,7 +125,8 @@ public class Award implements Comparable<Award> {
 
     /**
      * Writes this award to xml file and format.
-     * @param pw printer writer reference to write the xml
+     *
+     * @param pw     printer writer reference to write the xml
      * @param indent indentation
      */
     public void writeToXML(final PrintWriter pw, int indent) {
@@ -169,8 +172,8 @@ public class Award implements Comparable<Award> {
     }
 
     /**
-     * Returns the xml element 'qty'
-     * Use getQuantity() if looking for the number of times an award has been issued to an individual
+     * Returns the xml element 'qty' Use getQuantity() if looking for the number of times an award has been issued to an
+     * individual
      */
     public int getQty() {
         return qty;
@@ -194,20 +197,23 @@ public class Award implements Comparable<Award> {
 
     /**
      * Gets the file name of an award given i times.
-     * @param i times given the award
+     *
+     * @param i         times given the award
      * @param fileNames list containing all the file names
+     *
      * @return the file name
      */
     private String getFileName(int i, List<String> fileNames) {
         if (i > fileNames.size()) {
-            return fileNames.get(fileNames.size()-1);
+            return fileNames.get(fileNames.size() - 1);
         }
 
-        return fileNames.get(i-1);
+        return fileNames.get(i - 1);
     }
 
     /**
      * @param i number of times this award has been awarded
+     *
      * @return the filename of the ribbon
      */
     public String getRibbonFileName(int i) {
@@ -220,6 +226,7 @@ public class Award implements Comparable<Award> {
 
     /**
      * @param i number of times this award has been awarded
+     *
      * @return the filename of the medal
      */
     public String getMedalFileName(int i) {
@@ -232,6 +239,7 @@ public class Award implements Comparable<Award> {
 
     /**
      * @param i number of times this award has been awarded
+     *
      * @return the filename of the misc
      */
     public String getMiscFileName(int i) {
@@ -252,27 +260,32 @@ public class Award implements Comparable<Award> {
 
     /**
      * Creates a copy of this award and sets a given date.
+     *
      * @return award with new date
      */
     public Award createCopy() {
         return new Award(this.name, this.set, this.description, this.group, this.medals, this.ribbons, this.miscs,
-                this.xp, this.edge, this.stackable, this.qty, this.item, this.size, this.range, this.id);
+              this.xp, this.edge, this.stackable, this.qty, this.item, this.size, this.range, this.id);
     }
 
     /**
      * Checks if an award can be awarded to a given person
+     *
      * @param person to be given the award
+     *
      * @return true if this award can be awarded to the selected person
      */
     public boolean canBeAwarded(Person person) {
         // If we wish to force the user to not be able to give awards for some reason (e.g. lack of kill count),
-        // we need to create classes for each awards and override this method.
+        // we need to create classes for each award and override this method.
         return (!person.getAwardController().hasAward(this) || stackable);
     }
 
     /**
      * Checks if an award can be awarded to a given group of people
+     *
      * @param people to be given the award
+     *
      * @return true if this award can be awarded to the selected people
      */
     public boolean canBeAwarded(Person... people) {
@@ -286,8 +299,10 @@ public class Award implements Comparable<Award> {
 
     /**
      * Checks if two awards are equal
-     * @param set is the name of the set of this award
+     *
+     * @param set  is the name of the set of this award
      * @param name is the name of the award
+     *
      * @return true if it is equal
      */
     public boolean equals(String set, String name) {
@@ -296,7 +311,9 @@ public class Award implements Comparable<Award> {
 
     /**
      * Compares an award with this one by priority: xp, edge and name. Used for sorting.
+     *
      * @param other award to be compared
+     *
      * @return int used for sorting
      */
     @Override
@@ -306,6 +323,7 @@ public class Award implements Comparable<Award> {
 
     /**
      * Adds a date to the award, as if the award was given again.
+     *
      * @param date to be added.
      */
     public void addDate(LocalDate date) {
@@ -318,6 +336,7 @@ public class Award implements Comparable<Award> {
 
     /**
      * Merges all dates from one award into the other
+     *
      * @param award from the dates will be collected
      */
     public void mergeDatesFrom(Award award) {
@@ -326,6 +345,7 @@ public class Award implements Comparable<Award> {
 
     /**
      * Generates a list of strings of formatted dates
+     *
      * @return a list of strings representing the dates in the input format
      */
     public List<String> getFormattedDates() {
@@ -358,19 +378,21 @@ public class Award implements Comparable<Award> {
     }
 
     /**
-     * @return the tooltip for an award.
-     *
      * @param campaignOptions the campaign options to determine the tooltip content
+     *
+     * @return the tooltip for an award.
      */
     public String getTooltip(CampaignOptions campaignOptions, Person person) {
-        boolean awardXP = (campaignOptions.getAwardBonusStyle().isBoth()) || (campaignOptions.getAwardBonusStyle().isXP());
-        boolean awardEdge = (campaignOptions.getAwardBonusStyle().isBoth()) || (campaignOptions.getAwardBonusStyle().isEdge());
+        boolean awardXP = (campaignOptions.getAwardBonusStyle().isBoth()) ||
+                                (campaignOptions.getAwardBonusStyle().isXP());
+        boolean awardEdge = (campaignOptions.getAwardBonusStyle().isBoth()) ||
+                                  (campaignOptions.getAwardBonusStyle().isEdge());
 
         int issueCount = person.getAwardController().getNumberOfAwards(this);
 
         StringBuilder tooltip = new StringBuilder();
         tooltip.append("<html>").append(getName()).append("<br>").append(getDescription())
-                .append("<br>").append("<br>");
+              .append("<br>").append("<br>");
 
         if ((awardXP) && (xp > 0)) {
             tooltip.append("XP: +").append(xp);
@@ -405,8 +427,9 @@ public class Award implements Comparable<Award> {
 
     /**
      * Replaces a date of an award
+     *
      * @param toReplace date to replace
-     * @param newDate new date that will replace the other
+     * @param newDate   new date that will replace the other
      */
     public void replaceDate(LocalDate toReplace, LocalDate newDate) {
         if (toReplace.equals(newDate)) {

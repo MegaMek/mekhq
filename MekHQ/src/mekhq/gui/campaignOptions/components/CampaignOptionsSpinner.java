@@ -47,22 +47,22 @@ import megamek.common.annotations.Nullable;
 /**
  * A specialized {@link JSpinner} component for use in campaign options dialogs.
  * <p>
- * This spinner is highly configurable, supporting both integer and double values,
- * customizable tooltips (with word wrapping), and dynamic resource loading for names
- * and tooltips. The spinner also applies consistent styling for consistent
- * appearance in the UI.
+ * This spinner is highly configurable, supporting both integer and double values, customizable tooltips (with word
+ * wrapping), and dynamic resource loading for names and tooltips. The spinner also applies consistent styling for
+ * consistent appearance in the UI.
  */
 public class CampaignOptionsSpinner extends JSpinner {
     /**
      * Creates a {@link CampaignOptionsSpinner} with fully configurable numeric values and tooltip settings.
      * <p>
-     * The spinner uses a {@link SpinnerNumberModel} that supports both integer and double values.
-     * The tooltip is fetched from a resource bundle using the key {@code "lbl" + name + ".tooltip"} and can be
-     * wrapped to a specified line length using {@code customWrapSize}. If {@code noTooltip} is set to {@code true},
-     * the spinner will not have a tooltip.
+     * The spinner uses a {@link SpinnerNumberModel} that supports both integer and double values. The tooltip is
+     * fetched from a resource bundle using the key {@code "lbl" + name + ".tooltip"} and can be wrapped to a specified
+     * line length using {@code customWrapSize}. If {@code noTooltip} is set to {@code true}, the spinner will not have
+     * a tooltip.
      *
      * @param name           the name of the spinner, used to construct its resource bundle keys and internal name
-     * @param customWrapSize the maximum number of characters per line for the tooltip (or 100 by default if {@code null})
+     * @param customWrapSize the maximum number of characters per line for the tooltip (or 100 by default if
+     *                       {@code null})
      * @param defaultValue   the default value of the spinner (integer or double)
      * @param minimum        the minimum value for the spinner (integer or double)
      * @param maximum        the maximum value for the spinner (integer or double)
@@ -70,8 +70,8 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param noTooltip      if {@code true}, the spinner will not have a tooltip
      */
     public CampaignOptionsSpinner(String name, @Nullable Integer customWrapSize,
-                                  Number defaultValue, Number minimum,
-                                  Number maximum, Number stepSize, boolean noTooltip) {
+          Number defaultValue, Number minimum,
+          Number maximum, Number stepSize, boolean noTooltip) {
         super(createSpinnerModel(defaultValue, minimum, maximum, stepSize));
 
         if (!noTooltip) {
@@ -87,8 +87,8 @@ public class CampaignOptionsSpinner extends JSpinner {
     /**
      * Creates a {@link CampaignOptionsSpinner} for integer values with default tooltip settings.
      * <p>
-     * The spinner will be initialized with an integer-based {@link SpinnerNumberModel} using the
-     * provided minimum, maximum, step size, and default value.
+     * The spinner will be initialized with an integer-based {@link SpinnerNumberModel} using the provided minimum,
+     * maximum, step size, and default value.
      *
      * @param name         the name of the spinner, used to construct its resource bundle keys and internal name
      * @param defaultValue the default value of the spinner (integer)
@@ -97,15 +97,15 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param stepSize     the step value for incrementing or decrementing the spinner (integer)
      */
     public CampaignOptionsSpinner(String name, int defaultValue, int minimum,
-                                  int maximum, int stepSize) {
+          int maximum, int stepSize) {
         this(name, null, defaultValue, minimum, maximum, stepSize, false);
     }
 
     /**
      * Creates a {@link CampaignOptionsSpinner} for double values with default tooltip settings.
      * <p>
-     * The spinner will be initialized with a double-based {@link SpinnerNumberModel} using the
-     * provided minimum, maximum, step size, and default value.
+     * The spinner will be initialized with a double-based {@link SpinnerNumberModel} using the provided minimum,
+     * maximum, step size, and default value.
      *
      * @param name         the name of the spinner, used to construct its resource bundle keys and internal name
      * @param defaultValue the default value of the spinner (double)
@@ -114,32 +114,33 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param stepSize     the step value for incrementing or decrementing the spinner (double)
      */
     public CampaignOptionsSpinner(String name, double defaultValue, double minimum,
-                                  double maximum, double stepSize) {
+          double maximum, double stepSize) {
         this(name, null, defaultValue, minimum, maximum, stepSize, false);
     }
 
     /**
-     * Creates a {@link SpinnerNumberModel} for the spinner by detecting whether
-     * integer or double-based values should be used.
+     * Creates a {@link SpinnerNumberModel} for the spinner by detecting whether integer or double-based values should
+     * be used.
      *
      * @param defaultValue the default value (integer or double)
      * @param minimum      the minimum value (integer or double)
      * @param maximum      the maximum value (integer or double)
      * @param stepSize     the step size (integer or double)
+     *
      * @return a configured {@link SpinnerNumberModel} for the spinner
      */
     private static SpinnerNumberModel createSpinnerModel(Number defaultValue, Number minimum,
-                                                         Number maximum, Number stepSize) {
+          Number maximum, Number stepSize) {
         if (defaultValue instanceof Double || minimum instanceof Double ||
-                maximum instanceof Double || stepSize instanceof Double) {
+                  maximum instanceof Double || stepSize instanceof Double) {
             // Use a double-based model for floating-point precision
             return new SpinnerNumberModel(
-                    defaultValue.doubleValue(), minimum.doubleValue(), maximum.doubleValue(), stepSize.doubleValue()
+                  defaultValue.doubleValue(), minimum.doubleValue(), maximum.doubleValue(), stepSize.doubleValue()
             );
         } else {
             // Use an integer-based model for whole numbers
             return new SpinnerNumberModel(
-                    defaultValue.intValue(), minimum.intValue(), maximum.intValue(), stepSize.intValue()
+                  defaultValue.intValue(), minimum.intValue(), maximum.intValue(), stepSize.intValue()
             );
         }
     }

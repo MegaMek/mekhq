@@ -33,6 +33,7 @@
 package mekhq.service.mrms;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -42,20 +43,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Mek;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
-import megamek.common.TargetRoll;
+import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
-import megamek.logging.MMLogger;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
@@ -70,7 +68,6 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import org.junit.jupiter.api.BeforeAll;
@@ -85,7 +82,6 @@ import org.mockito.Mockito;
  * JUnit Tests for {@link MRMSService}
  */
 public class MRMSServiceTest {
-    static MMLogger logger = MMLogger.create(MRMSServiceTest.class);
 
     static int DEFAULT_TARGET_NUMBER = 6;
 
@@ -106,11 +102,6 @@ public class MRMSServiceTest {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         SkillType.initializeTypes();
-        try {
-            Systems.setInstance(Systems.loadDefault());
-        } catch (Exception ex) {
-            logger.error("", ex);
-        }
 
         mockFaction = Mockito.mock(Faction.class);
         when(mockFaction.getShortName()).thenReturn("Faction");
@@ -128,7 +119,7 @@ public class MRMSServiceTest {
         when(mockBaseTargetRoll.getValue()).thenReturn(targetRoll);
 
         mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.getMRMSOptions()).thenReturn(new ArrayList<MRMSOption>());
+        when(mockCampaignOptions.getMRMSOptions()).thenReturn(new ArrayList<>());
 
         warehouse = new Warehouse();
 
@@ -176,8 +167,8 @@ public class MRMSServiceTest {
         int targetNumberMax = 6;
         int dailyTimeMin = 0;
 
-        Unit unit = new Unit(createEntity("UrbanMech UM-R69"), mockCampaign);
-
+        Entity entity = getUrbanMek();
+        Unit unit = new Unit(entity, mockCampaign);
         addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, targetNumberPreferred, targetNumberMax, dailyTimeMin);
 
         when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
@@ -196,10 +187,7 @@ public class MRMSServiceTest {
         unit.getEntity().setArmor(1, Mek.LOC_HEAD);
         unit.initializeParts(true);
         unit.getEntity().setArmor(0, Mek.LOC_HEAD);
-        unit.getParts().stream().filter(p -> p instanceof Armor).map(p -> (Armor) p).forEach(armor -> {
-            breakArmor(armor);
-
-        });
+        unit.getParts().stream().filter(p -> p instanceof Armor).map(p -> (Armor) p).forEach(this::breakArmor);
 
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(6);
@@ -208,6 +196,13 @@ public class MRMSServiceTest {
 
 
         verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
+    }
+
+    private static Entity getUrbanMek() {
+        String unitName = "UrbanMech UM-R69";
+        Entity entity = getEntityForUnitTesting(unitName, false);
+        assertNotNull(entity, "Entity not found for " + unitName);
+        return entity;
     }
 
     @Nested
@@ -223,7 +218,9 @@ public class MRMSServiceTest {
         public void beforeEach() {
             when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
 
-            unit = new Unit(createEntity("UrbanMech UM-R69"), mockCampaign);
+            Entity entity = getUrbanMek();
+            assert entity != null;
+            unit = new Unit(entity, mockCampaign);
             unit.initializeParts(true);
         }
 
@@ -307,7 +304,8 @@ public class MRMSServiceTest {
         public void beforeEach() {
             when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
 
-            unit = new Unit(createEntity("UrbanMech UM-R69"), mockCampaign);
+            Entity entity = getUrbanMek();
+            unit = new Unit(entity, mockCampaign);
             unit.initializeParts(true);
         }
 
@@ -334,7 +332,7 @@ public class MRMSServiceTest {
         }
 
         /**
-         * When "Use Extra Time" and "Use Rush Job" options are deactivated, MRMS will succeed unless the part's TN is 
+         * When "Use Extra Time" and "Use Rush Job" options are deactivated, MRMS will succeed unless the part's TN is
          * higher than the "Max TN" setting ("Preferred TN" not considered).
          */
         @Nested
@@ -350,7 +348,7 @@ public class MRMSServiceTest {
              * Unit isn't repaired if the TN is above the "max TN" setting
              */
             @Test
-            public void testMRMSUnitsTargetNumbersifTNAbovePreferredAboveMax() {
+            public void testMRMSUnitsTargetNumbersIfTNAbovePreferredAboveMax() {
                 doMRMSUnitsTargetNumbersWhereTNAbovePreferredAboveMax();
 
                 // Assert
@@ -362,7 +360,7 @@ public class MRMSServiceTest {
              * Unit is repaired if the TN is equal or lower than the "max TN" setting
              */
             @Test
-            public void testMRMSUnitsTargetNumbersifTNAbovePreferredBelowMax() {
+            public void testMRMSUnitsTargetNumbersIfTNAbovePreferredBelowMax() {
                 doMRMSUnitsTargetNumbersWhereTNAbovePreferredBelowMax();
 
                 // Assert
@@ -377,7 +375,7 @@ public class MRMSServiceTest {
              * Unit isn't repaired if the TN is above the "max TN" setting
              */
             @Test
-            public void testMRMSUnitsTargetNumbersifTNBelowPreferredAboveMax() {
+            public void testMRMSUnitsTargetNumbersIfTNBelowPreferredAboveMax() {
                 doMRMSUnitsTargetNumbersWhereTNBelowPreferredAboveMax();
 
                 // Assert
@@ -389,7 +387,7 @@ public class MRMSServiceTest {
              * Unit is repaired if the TN is equal or lower than the "max TN" setting
              */
             @Test
-            public void testMRMSUnitsTargetNumbersifTNBelowPreferredBelowMax() {
+            public void testMRMSUnitsTargetNumbersIfTNBelowPreferredBelowMax() {
                 doMRMSUnitsTargetNumbersWhereTNBelowPreferredBelowMax();
 
                 // Assert
@@ -411,12 +409,12 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit is repaired even if the TN is above the "max TN" setting when it is able to reduce the TN to
-             * equal or lower than the "max TN" setting via extra time. The MRMS will try to get the adjusted TN as
-             * close as possible to the "Preferred TN" setting.
+             * Unit is repaired even if the TN is above the "max TN" setting when it is able to reduce the TN to equal
+             * or lower than the "max TN" setting via extra time. The MRMS will try to get the adjusted TN as close as
+             * possible to the "Preferred TN" setting.
              */
             @Test
-            public void testMRMSUnitsTargetNumbersifTNAbovePreferredAboveMax() {
+            public void testMRMSUnitsTargetNumbersIfTNAbovePreferredAboveMax() {
                 doMRMSUnitsTargetNumbersWhereTNAbovePreferredAboveMax();
 
                 // Assert
@@ -428,12 +426,12 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit is repaired even if the TN is above the "Max TN" setting when it is able to reduce the TN to
-             * equal or lower than the "max TN" setting via extra time. The MRMS will try to get the adjusted TN as
-             * close as possible to the "Preferred TN" setting, using extra time if it currently above it.
+             * Unit is repaired even if the TN is above the "Max TN" setting when it is able to reduce the TN to equal
+             * or lower than the "max TN" setting via extra time. The MRMS will try to get the adjusted TN as close as
+             * possible to the "Preferred TN" setting, using extra time if it currently above it.
              */
             @Test
-            public void testMRMSUnitsTargetNumbersifTNAbovePreferredBelowMax() {
+            public void testMRMSUnitsTargetNumbersIfTNAbovePreferredBelowMax() {
                 doMRMSUnitsTargetNumbersWhereTNAbovePreferredBelowMax();
 
                 // Assert
@@ -449,7 +447,7 @@ public class MRMSServiceTest {
              * "Preferred TN" setting must be equal or lower than the "Max TN" setting.
              */
             @Test
-            public void testMRMSUnitsTargetNumbersifTNBelowPreferredAboveMax() {
+            public void testMRMSUnitsTargetNumbersIfTNBelowPreferredAboveMax() {
                 doMRMSUnitsTargetNumbersWhereTNBelowPreferredAboveMax();
 
                 // Assert
@@ -462,7 +460,7 @@ public class MRMSServiceTest {
              * as close as possible to the "Preferred TN" setting, using rush job if it currently below it.
              */
             @Test
-            public void testMRMSUnitsTargetNumbersifTNBelowPreferredBelowMax() {
+            public void testMRMSUnitsTargetNumbersIfTNBelowPreferredBelowMax() {
                 doMRMSUnitsTargetNumbersWhereTNBelowPreferredBelowMax();
 
                 // Assert
@@ -474,10 +472,10 @@ public class MRMSServiceTest {
             }
 
             /**
-             * Unit isn't repaired if the TN is above the "Max TN" setting and we can't reach it even with extra time
+             * Unit isn't repaired if the TN is above the "Max TN" setting, and we can't reach it even with extra time
              */
             @Test
-            public void testMRMSUnitsTargetNumbersifTNWayAbovePreferredWayAboveMax() {
+            public void testMRMSUnitsTargetNumbersIfTNWayAbovePreferredWayAboveMax() {
                 doMRMSUnitsTargetNumbersWhereTNWayAbovePreferredWayAboveMax();
 
                 // Assert
@@ -490,7 +488,7 @@ public class MRMSServiceTest {
              * as close as possible to the "Preferred TN" setting, using extra time if it currently above it.
              */
             @Test
-            public void testMRMSUnitsTargetNumbersifTNWayAbovePreferredWayBelowMax() {
+            public void testMRMSUnitsTargetNumbersIfTNWayAbovePreferredWayBelowMax() {
                 doMRMSUnitsTargetNumbersWhereTNWayAbovePreferredWayBelowMax();
 
                 // Assert
@@ -506,7 +504,7 @@ public class MRMSServiceTest {
              * "Preferred TN" setting must be equal or lower than the "Max TN" setting.
              */
             @Test
-            public void testMRMSUnitsTargetNumbersifTNWayBelowPreferredWayAboveMax() {
+            public void testMRMSUnitsTargetNumbersIfTNWayBelowPreferredWayAboveMax() {
                 doMRMSUnitsTargetNumbersWhereTNWayBelowPreferredWayAboveMax();
 
                 // Assert
@@ -519,7 +517,7 @@ public class MRMSServiceTest {
              * as close as possible to the "Preferred TN" setting, using rush job if it currently below it.
              */
             @Test
-            public void testMRMSUnitsTargetNumbersifTNWayBelowPreferredWayBelowMax() {
+            public void testMRMSUnitsTargetNumbersIfTNWayBelowPreferredWayBelowMax() {
                 doMRMSUnitsTargetNumbersWhereTNWayBelowPreferredWayBelowMax();
 
                 // Assert
@@ -634,12 +632,6 @@ public class MRMSServiceTest {
         }
     }
 
-    private void breakPart(Part part) {
-        if (part instanceof Armor armor) {
-            breakArmor(armor);
-        }
-    }
-
     private void breakArmor(Armor armor) {
         int armorAmount = armor.getAmount();
         doAnswer(inv -> {
@@ -667,7 +659,7 @@ public class MRMSServiceTest {
         }
     }
 
-    private Person addMockTech(String skillType, SkillLevel skillLevel) {
+    private void addMockTech(String skillType, SkillLevel skillLevel) {
         Person mockTech = mock(Person.class);
         when(mockCampaign.getTechs(anyBoolean())).thenReturn(List.of(mockTech));
         when(mockTech.canTech(any(Entity.class))).thenReturn(true);
@@ -678,7 +670,6 @@ public class MRMSServiceTest {
         when(mockTech.getMinutesLeft()).thenReturn(480);
         when(mockTech.getATOWAttributes()).thenReturn(new Attributes());
 
-        return mockTech;
     }
 
     private void addMRMSOption(PartRepairType partRepairType, int skillMin, int skillMax, int targetNumberPreferred,
@@ -690,33 +681,4 @@ public class MRMSServiceTest {
         when(mockCampaignOptions.getMRMSOptions()).thenReturn(mrmsOptions);
     }
 
-    /**
-     * Creates an {@link Entity} from the given unit name by retrieving its information from the cache.
-     *
-     * <p>If the unit cannot be found or loaded, appropriate error logging occurs, and {@code null}
-     * is returned.
-     * </p>
-     *
-     * @param unitName The name of the unit to retrieve and parse.
-     *
-     * @return The {@link Entity} representing the unit, or {@code null} if the unit cannot be loaded.
-     */
-    private Entity createEntity(String unitName) {
-        MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unitName);
-        if (mekSummary == null) {
-            logger.error("Cannot find entry for {}", unitName);
-            return null;
-        }
-
-        MekFileParser mekFileParser;
-
-        try {
-            mekFileParser = new MekFileParser(mekSummary.getSourceFile(), mekSummary.getEntryName());
-        } catch (Exception ex) {
-            logger.error("Unable to load unit: {}", mekSummary.getEntryName(), ex);
-            return null;
-        }
-
-        return mekFileParser.getEntity();
-    }
 }

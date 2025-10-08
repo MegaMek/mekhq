@@ -24,20 +24,31 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.util.StringJoiner;
 
-import megamek.common.Compute;
-import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingLFBattery;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -47,14 +58,19 @@ import org.w3c.dom.NodeList;
  * @author MKerensky
  */
 public class LFBattery extends Part {
-    private static final MMLogger logger = MMLogger.create(LFBattery.class);
+    private static final MMLogger LOGGER = MMLogger.create(LFBattery.class);
 
     // Not specified in IO - use SO p158
     public static final TechAdvancement TA_LF_BATTERY = new TechAdvancement(TechBase.ALL)
-            .setAdvancement(2519, 2529, 2600).setPrototypeFactions(Faction.TH)
-            .setProductionFactions(Faction.TH).setTechRating(TechRating.D)
-            .setAvailability(AvailabilityValue.E, AvailabilityValue.F, AvailabilityValue.E, AvailabilityValue.E)
-            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+                                                              .setAdvancement(2519, 2529, 2600)
+                                                              .setPrototypeFactions(Faction.TH)
+                                                              .setProductionFactions(Faction.TH)
+                                                              .setTechRating(TechRating.D)
+                                                              .setAvailability(AvailabilityValue.E,
+                                                                    AvailabilityValue.F,
+                                                                    AvailabilityValue.E,
+                                                                    AvailabilityValue.E)
+                                                              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     // Standard, primitive, compact, subcompact...
     private int coreType;
@@ -100,8 +116,8 @@ public class LFBattery extends Part {
                 }
             }
             if (checkForDestruction
-                    && hits > priorHits
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
@@ -138,8 +154,7 @@ public class LFBattery extends Part {
     @Override
     public void fix() {
         super.fix();
-        if (null != unit && unit.getEntity() instanceof Jumpship) {
-            Jumpship js = ((Jumpship) unit.getEntity());
+        if (null != unit && unit.getEntity() instanceof Jumpship js) {
             js.setLFBatteryHit(false);
             // Also repair your KF Drive integrity - +1 point if you have other components
             // to fix
@@ -155,8 +170,7 @@ public class LFBattery extends Part {
     @Override
     public void remove(boolean salvage) {
         if (null != unit) {
-            if (unit.getEntity() instanceof Jumpship) {
-                Jumpship js = ((Jumpship) unit.getEntity());
+            if (unit.getEntity() instanceof Jumpship js) {
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
                 js.setLFBatteryHit(true);
             }
@@ -169,7 +183,7 @@ public class LFBattery extends Part {
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -208,8 +222,8 @@ public class LFBattery extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof LFBattery
-                && coreType == ((LFBattery) part).getCoreType()
-                && docks == ((LFBattery) part).getDocks();
+                     && coreType == ((LFBattery) part).getCoreType()
+                     && docks == ((LFBattery) part).getDocks();
     }
 
     @Override
@@ -233,7 +247,7 @@ public class LFBattery extends Part {
                     docks = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }
@@ -251,7 +265,7 @@ public class LFBattery extends Part {
             joiner.add(details);
         }
         joiner.add(getUnitTonnage() + " tons")
-                .add(getDocks() + " collars");
+              .add(getDocks() + " collars");
         return joiner.toString();
     }
 

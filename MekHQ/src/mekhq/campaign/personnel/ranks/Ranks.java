@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,8 +25,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.ranks;
+
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -37,16 +44,12 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
@@ -56,14 +59,18 @@ import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.RankSystemType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * Ranks keeps track of all data-file loaded rank systems. It does not include
- * the campaign rank
- * system, if there is a custom one there.
+ * Ranks keeps track of all data-file loaded rank systems. It does not include the campaign rank system, if there is a
+ * custom one there.
  */
 public class Ranks {
-    private static final MMLogger logger = MMLogger.create(Ranks.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Ranks";
+    private static final MMLogger LOGGER = MMLogger.create(Ranks.class);
 
     // region Variable Declarations
     public static final String DEFAULT_SYSTEM_CODE = "SSLDF";
@@ -106,7 +113,7 @@ public class Ranks {
     }
 
     public static void exportRankSystemsToFile(@Nullable File file,
-            final Collection<RankSystem> rankSystems) {
+          final Collection<RankSystem> rankSystems) {
         if (file == null) {
             return;
         }
@@ -116,24 +123,29 @@ public class Ranks {
             file = new File(path);
         }
         int indent = 0;
-        try (OutputStream fos = new FileOutputStream(file);
-                OutputStream bos = new BufferedOutputStream(fos);
-                OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
-                PrintWriter pw = new PrintWriter(osw)) {
+        try (OutputStream fileOutputStream = new FileOutputStream(file);
+              OutputStream outputStream = new BufferedOutputStream(fileOutputStream);
+              OutputStreamWriter osw = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+              PrintWriter writer = new PrintWriter(osw)) {
             // Then save it out to that file.
-            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "rankSystems", "version", MHQConstants.VERSION);
+            writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+
+            String year = String.valueOf(LocalDate.now().getYear()).replace(",", "");
+            String legalStatement = getFormattedTextAt(RESOURCE_BUNDLE, "Ranks.legalStatement", year);
+            writer.println(legalStatement.trim());
+
+            MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "rankSystems", "version", MHQConstants.VERSION);
             for (final RankSystem rankSystem : rankSystems) {
-                rankSystem.writeToXML(pw, indent, true);
+                rankSystem.writeToXML(writer, indent, true);
             }
-            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "rankSystems");
+            MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "rankSystems");
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
     public static void initializeRankSystems() {
-        logger.info("Starting Rank Systems XML load...");
+        LOGGER.info("Starting Rank Systems XML load...");
         setRankSystems(new HashMap<>());
         final RankValidator rankValidator = new RankValidator();
         for (final RankSystemType type : RankSystemType.values()) {
@@ -147,7 +159,7 @@ public class Ranks {
                     File userDirRanks = new File(userDir + "/" + MHQConstants.RANKS_FILE_PATH);
                     if (userDirRanks.exists()) {
                         rankSystems.addAll(
-                                loadRankSystemsFromFile(new File(userDir + "/" + MHQConstants.RANKS_FILE_PATH), type));
+                              loadRankSystemsFromFile(new File(userDir + "/" + MHQConstants.RANKS_FILE_PATH), type));
                     }
                 }
             }
@@ -159,17 +171,25 @@ public class Ranks {
         }
 
         if (!getRankSystems().containsKey(DEFAULT_SYSTEM_CODE)) {
-            logger.fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
-                    + " system. Initialization failure, shutting MekHQ down.");
-            System.exit(-1);
+            LOGGER.error("Error: Unable to Load the default rank system {}. This is likely due to a missing ranks " +
+                               "directory Please report to the MegaMek Team.", DEFAULT_SYSTEM_CODE);
+
+            // In the event that we have failed to load any Rank Systems we're going to load in an empty placeholder
+            // System. This ensures that we do not have a null RankSystems array and also don't have to deal with
+            // adding null handlers across the entire mhq codebase. This placeholder was made necessary due to the
+            // major data overhaul that occurred in 2025. - Illiani, Sep 25 2025
+            getRankSystems().put(DEFAULT_SYSTEM_CODE,
+                  new RankSystem(DEFAULT_SYSTEM_CODE, "Unknown", "", RankSystemType.DEFAULT));
+            return;
         }
 
-        logger.info("Completed Rank System XML Load");
+        LOGGER.info("Completed Rank System XML Load");
     }
 
     public static void reinitializeRankSystems(final Campaign campaign) {
         // Initialization is set up so that it will clear what exists
         initializeRankSystems();
+
         // Then, we need to check and fix any issues that may arise from the file load
         final RankValidator rankValidator = new RankValidator();
         rankValidator.checkAssignedRankSystems(campaign);
@@ -177,7 +197,7 @@ public class Ranks {
     }
 
     public static List<RankSystem> loadRankSystemsFromFile(final @Nullable File file,
-            final RankSystemType type) {
+          final RankSystemType type) {
         if (file == null) {
             return new ArrayList<>();
         }
@@ -187,7 +207,7 @@ public class Ranks {
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
             return new ArrayList<>();
         }
 
@@ -205,7 +225,7 @@ public class Ranks {
 
             if (wn.getNodeName().equalsIgnoreCase("rankSystem") && wn.hasChildNodes()) {
                 final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), version, true,
-                        type);
+                      type);
                 if (rankSystem != null) {
                     rankSystems.add(rankSystem);
                 }

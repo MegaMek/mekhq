@@ -36,7 +36,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -45,7 +45,7 @@ import mekhq.module.api.PersonnelMarketMethod;
 /**
  * Method for personnel market generation given in the replacement personnel section of Campaign Operations
  */
-@Deprecated(since = "0.50.06", forRemoval = false)
+@Deprecated(since = "0.50.06")
 public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
     @Override
     public String getModuleName() {
@@ -63,7 +63,7 @@ public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
             p = c.newPerson(PersonnelRole.DOCTOR);
         } else if (roll == 3) { // ASF or Proto Pilot
             if (c.getFaction().isClan() && c.getLocalDate().isAfter(LocalDate.of(3059, 1, 1))
-                    && Compute.d6(2) < 6) {
+                      && Compute.d6(2) < 6) {
                 p = c.newPerson(PersonnelRole.PROTOMEK_PILOT);
             } else {
                 p = c.newPerson(PersonnelRole.AEROSPACE_PILOT);
@@ -74,7 +74,7 @@ public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
             p = c.newPerson((Compute.d6() < 3) ? PersonnelRole.GROUND_VEHICLE_DRIVER : PersonnelRole.VEHICLE_GUNNER);
         } else if (roll == 6 || roll == 8) { // Infantry
             p = c.newPerson((c.getFaction().isClan() && Compute.d6(2) > 3)
-                    ? PersonnelRole.BATTLE_ARMOUR : PersonnelRole.SOLDIER);
+                                  ? PersonnelRole.BATTLE_ARMOUR : PersonnelRole.SOLDIER);
         } else if (roll == 11) { // Tech
             p = c.newPerson(techRoles.get(Compute.randomInt(techRoles.size())));
         } else if (roll == 12) { // Vessel Crew

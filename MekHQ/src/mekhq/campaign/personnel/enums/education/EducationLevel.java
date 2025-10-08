@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums.education;
 
@@ -35,30 +40,36 @@ import mekhq.MekHQ;
 
 public enum EducationLevel {
     // region Enum Declarations
-    EARLY_CHILDHOOD("EducationLevel.EARLY_CHILDHOOD.text", "EducationLevel.EARLY_CHILDHOOD.toolTipText"),
-    HIGH_SCHOOL("EducationLevel.HIGH_SCHOOL.text", "EducationLevel.HIGH_SCHOOL.toolTipText"),
-    COLLEGE("EducationLevel.COLLEGE.text", "EducationLevel.COLLEGE.toolTipText"),
-    POST_GRADUATE("EducationLevel.POST_GRADUATE.text", "EducationLevel.POST_GRADUATE.toolTipText"),
-    DOCTORATE("EducationLevel.DOCTORATE.text", "EducationLevel.DOCTORATE.toolTipText");
+    EARLY_CHILDHOOD("EducationLevel.EARLY_CHILDHOOD.text", "EducationLevel.EARLY_CHILDHOOD.toolTipText", 0),
+    HIGH_SCHOOL("EducationLevel.HIGH_SCHOOL.text", "EducationLevel.HIGH_SCHOOL.toolTipText", 1),
+    COLLEGE("EducationLevel.COLLEGE.text", "EducationLevel.COLLEGE.toolTipText", 2),
+    POST_GRADUATE("EducationLevel.POST_GRADUATE.text", "EducationLevel.POST_GRADUATE.toolTipText", 3),
+    DOCTORATE("EducationLevel.DOCTORATE.text", "EducationLevel.DOCTORATE.toolTipText", 4);
     // endregion Enum Declarations
 
     // region Variable Declarations
     private final String name;
     private final String toolTipText;
+    private final int order;
     // endregion Variable Declarations
 
     // region Constructors
-    EducationLevel(final String name, final String toolTipText) {
+    EducationLevel(final String name, final String toolTipText, final int order) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
               MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
+        this.order = order;
     }
     // endregion Constructors
 
     // region Getters
     public String getToolTipText() {
         return toolTipText;
+    }
+
+    public int getOrder() {
+        return order;
     }
     // endregion Getters
 

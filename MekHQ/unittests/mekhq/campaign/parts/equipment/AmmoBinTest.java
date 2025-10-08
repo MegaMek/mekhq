@@ -56,11 +56,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.Mounted;
-import megamek.common.ProtoMek;
 import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.Mounted;
+import megamek.common.units.Entity;
+import megamek.common.units.ProtoMek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
@@ -362,7 +362,7 @@ public class AmmoBinTest {
 
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
 
-        // Create an ammobin with a non-standard munition type ...
+        // Create an ammo bin with a non-standard munition type ...
         int equipmentNum = 42;
         AmmoBin ammoBin = new AmmoBin(0, ammoType, equipmentNum, 0, false, false, mockCampaign);
 
@@ -451,7 +451,7 @@ public class AmmoBinTest {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
         Campaign mockCampaign = mock(Campaign.class);
         AmmoBin ammoBin = new AmmoBin(0, isSRM2InfernoAmmo, 42,
-                isSRM2InfernoAmmo.getShots() - 1, false, false, mockCampaign);
+              isSRM2InfernoAmmo.getShots() - 1, false, false, mockCampaign);
         ammoBin.setId(25);
 
         // Write the AmmoBin XML
@@ -572,7 +572,13 @@ public class AmmoBinTest {
     public void emptyAmmoBinWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
         Campaign mockCampaign = mock(Campaign.class);
-        AmmoBin ammoBin = new AmmoBin(0, isSRM2InfernoAmmo, 42, isSRM2InfernoAmmo.getShots(), false, false, mockCampaign);
+        AmmoBin ammoBin = new AmmoBin(0,
+              isSRM2InfernoAmmo,
+              42,
+              isSRM2InfernoAmmo.getShots(),
+              false,
+              false,
+              mockCampaign);
         ammoBin.setId(25);
 
         // Write the AmmoBin XML
@@ -1496,7 +1502,8 @@ public class AmmoBinTest {
             when(mockAmmoRack2.getType()).thenReturn(ammo2);
         }
 
-        @Test void matchingACAmmo () {
+        @Test
+        void matchingACAmmo() {
             ammo1 = (AmmoType) AmmoType.get("ISAC5 Ammo");
             ammo2 = (AmmoType) AmmoType.get("ISAC5 Ammo");
 
@@ -1507,7 +1514,8 @@ public class AmmoBinTest {
             assertTrue(ammoBin1.isSamePartType(ammoBin2));
         }
 
-        @Test void mismatchedACAmmo () {
+        @Test
+        void mismatchedACAmmo() {
             ammo1 = (AmmoType) AmmoType.get("ISAC5 Ammo");
             ammo2 = (AmmoType) AmmoType.get("ISAC10 Ammo");
 

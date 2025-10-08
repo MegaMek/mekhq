@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -187,31 +192,13 @@ public enum BabySurnameStyle {
      * @return The Welsh-style surname
      */
     private String getWelshNymic(final String givenName, final Gender babyGender) {
-        switch (babyGender) {
-            case FEMALE:
-                return "ferch " + givenName;
-            case MALE:
-            default:
-                switch (givenName.charAt(0)) {
-                    case 'a':
-                    case 'A':
-                    case 'e':
-                    case 'E':
-                    case 'i':
-                    case 'I':
-                    case 'o':
-                    case 'O':
-                    case 'u':
-                    case 'U':
-                    case 'w':
-                    case 'W':
-                    case 'y':
-                    case 'Y':
-                        return "ab " + givenName;
-                    default:
-                        return "ap " + givenName;
-                }
-        }
+        return switch (babyGender) {
+            case FEMALE -> "ferch " + givenName;
+            default -> switch (givenName.charAt(0)) {
+                case 'a', 'A', 'e', 'E', 'i', 'I', 'o', 'O', 'u', 'U', 'w', 'W', 'y', 'Y' -> "ab " + givenName;
+                default -> "ap " + givenName;
+            };
+        };
     }
 
     /**
@@ -223,18 +210,15 @@ public enum BabySurnameStyle {
      * @return The Icelandic-style surname
      */
     private String getIcelandicNymic(final String givenName, final Gender babyGender) {
-        switch (babyGender) {
-            case MALE:
-                return givenName + "sson";
-            case FEMALE:
-                return givenName + "sd\u00F3ttir";
-            default:
-                return givenName + "sbur";
-        }
+        return switch (babyGender) {
+            case MALE -> givenName + "sson";
+            case FEMALE -> givenName + "sd\u00F3ttir";
+            default -> givenName + "sbur";
+        };
     }
 
     /**
-     * This creates an Russian-style surname based on the supplied given name and the gender of the baby
+     * This creates a Russian-style surname based on the supplied given name and the gender of the baby
      *
      * @param givenName  the given name to create the surname from
      * @param babyGender the baby's gender
@@ -242,22 +226,11 @@ public enum BabySurnameStyle {
      * @return The Russian-style surname
      */
     private String getRussianNymic(final String givenName, final Gender babyGender) {
-        switch (givenName.charAt(givenName.length() - 1)) {
-            case 'a':
-            case 'A':
-            case 'e':
-            case 'E':
-            case 'i':
-            case 'I':
-            case 'o':
-            case 'O':
-            case 'u':
-            case 'U':
-                return givenName.substring(0, givenName.length() - 1) + (babyGender.isMale() ? "evich" : "evna");
-            default:
-                return givenName + (babyGender.isMale() ? "ovich" : "ovna");
-
-        }
+        return switch (givenName.charAt(givenName.length() - 1)) {
+            case 'a', 'A', 'e', 'E', 'i', 'I', 'o', 'O', 'u', 'U' ->
+                  givenName.substring(0, givenName.length() - 1) + (babyGender.isMale() ? "evich" : "evna");
+            default -> givenName + (babyGender.isMale() ? "ovich" : "ovna");
+        };
     }
 
     // region File I/O
@@ -275,7 +248,7 @@ public enum BabySurnameStyle {
         }
 
         MMLogger.create(BabySurnameStyle.class)
-              .error("Unable to parse " + text + " into a BabySurnameStyle. Returning MOTHERS.");
+              .error("Unable to parse {} into a BabySurnameStyle. Returning MOTHERS.", text);
         return MOTHERS;
     }
     // endregion File I/O

@@ -53,11 +53,11 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
 
+import megamek.client.ui.dialogs.clientDialogs.PlanetaryConditionsDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.dialogs.clientDialogs.PlanetaryConditionsDialog;
 import megamek.common.Player;
-import megamek.common.planetaryconditions.PlanetaryConditions;
+import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -77,19 +77,19 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
  * @author Taharqa
  */
 public class CustomizeScenarioDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(CustomizeScenarioDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(CustomizeScenarioDialog.class);
 
     // region Variable declarations
-    private JFrame frame;
-    private Scenario scenario;
-    private Mission mission;
-    private Campaign campaign;
-    private boolean newScenario;
+    private final JFrame frame;
+    private final Scenario scenario;
+    private final Mission mission;
+    private final Campaign campaign;
+    private final boolean newScenario;
     private LocalDate date;
     private ScenarioDeploymentLimit deploymentLimits;
     private PlanetaryConditions planetaryConditions;
-    private Player player;
-    private List<BotForce> botForces;
+    private final Player player;
+    private final List<BotForce> botForces;
 
     // map parameters
     private int mapSizeX;
@@ -99,18 +99,18 @@ public class CustomizeScenarioDialog extends JDialog {
     private int boardType;
 
     // objectives
-    private List<ScenarioObjective> objectives;
+    private final List<ScenarioObjective> objectives;
     private JTable objectiveTable;
-    private ObjectiveTableModel objectiveModel;
+    private final ObjectiveTableModel objectiveModel;
 
     // loot
-    private ArrayList<Loot> loots;
+    private final ArrayList<Loot> loots;
     private JTable lootTable;
-    private LootTableModel lootModel;
+    private final LootTableModel lootModel;
 
     // other forces
     private JTable forcesTable;
-    private BotForceTableModel forcesModel;
+    private final BotForceTableModel forcesModel;
 
     // panels
     private JPanel panDeploymentLimits;
@@ -314,7 +314,8 @@ public class CustomizeScenarioDialog extends JDialog {
                                               EventTiming.PreForceGeneration;
 
             for (String modifierKey : AtBScenarioModifier.getOrderedModifierKeys()) {
-                if (AtBScenarioModifier.getScenarioModifier(modifierKey).getEventTiming() == scenarioState) {
+                AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierKey);
+                if (modifier != null && modifier.getEventTiming() == scenarioState) {
                     modifierBox.addItem(modifierKey);
                 }
             }
@@ -453,7 +454,7 @@ public class CustomizeScenarioDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -654,9 +655,12 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void editLimits(ActionEvent evt) {
-        EditScenarioDeploymentLimitDialog esdld = new EditScenarioDeploymentLimitDialog(frame, true, deploymentLimits);
-        esdld.setVisible(true);
-        deploymentLimits = esdld.getDeploymentLimit();
+        EditScenarioDeploymentLimitDialog editScenarioDeploymentLimitDialog = new EditScenarioDeploymentLimitDialog(
+              frame,
+              true,
+              deploymentLimits);
+        editScenarioDeploymentLimitDialog.setVisible(true);
+        deploymentLimits = editScenarioDeploymentLimitDialog.getDeploymentLimit();
         refreshDeploymentLimits();
     }
 
@@ -884,41 +888,41 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void changeMapSettings() {
-        EditMapSettingsDialog emsd = new EditMapSettingsDialog(frame,
+        EditMapSettingsDialog editMapSettingsDialog = new EditMapSettingsDialog(frame,
               true,
               boardType,
               usingFixedMap,
               map,
               mapSizeX,
               mapSizeY);
-        emsd.setVisible(true);
-        boardType = emsd.getBoardType();
-        usingFixedMap = emsd.getUsingFixedMap();
-        map = emsd.getMap();
-        mapSizeX = emsd.getMapSizeX();
-        mapSizeY = emsd.getMapSizeY();
+        editMapSettingsDialog.setVisible(true);
+        boardType = editMapSettingsDialog.getBoardType();
+        usingFixedMap = editMapSettingsDialog.getUsingFixedMap();
+        map = editMapSettingsDialog.getMap();
+        mapSizeX = editMapSettingsDialog.getMapSizeX();
+        mapSizeY = editMapSettingsDialog.getMapSizeY();
         refreshMapSettings();
     }
 
     private void initObjectivesPanel(ResourceBundle resourceMap) {
         panObjectives = new JPanel(new BorderLayout());
 
-        JPanel panBtns = new JPanel(new GridLayout(1, 0));
+        JPanel panButtons = new JPanel(new GridLayout(1, 0));
         JButton btnAddObjective = new JButton(resourceMap.getString("btnAddObjective.text"));
         btnAddObjective.addActionListener(evt -> addObjective());
         btnAddObjective.setEnabled(scenario.getStatus().isCurrent());
-        panBtns.add(btnAddObjective);
+        panButtons.add(btnAddObjective);
 
         btnEditObjective = new JButton(resourceMap.getString("btnEditObjective.text"));
         btnEditObjective.setEnabled(false);
         btnEditObjective.addActionListener(evt -> editObjective());
-        panBtns.add(btnEditObjective);
+        panButtons.add(btnEditObjective);
 
         btnDeleteObjective = new JButton(resourceMap.getString("btnDeleteObjective.text"));
         btnDeleteObjective.setEnabled(false);
         btnDeleteObjective.addActionListener(evt -> deleteObjective());
-        panBtns.add(btnDeleteObjective);
-        panObjectives.add(panBtns, BorderLayout.PAGE_START);
+        panButtons.add(btnDeleteObjective);
+        panObjectives.add(panButtons, BorderLayout.PAGE_START);
 
         objectiveTable = new JTable(objectiveModel);
         TableColumn column;
@@ -947,13 +951,13 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void addObjective() {
-        CustomizeScenarioObjectiveDialog csod = new CustomizeScenarioObjectiveDialog(frame,
+        CustomizeScenarioObjectiveDialog customizeScenarioObjectiveDialog = new CustomizeScenarioObjectiveDialog(frame,
               true,
               new ScenarioObjective(),
               getBotForceNames());
-        csod.setVisible(true);
-        if (null != csod.getObjective()) {
-            objectives.add(csod.getObjective());
+        customizeScenarioObjectiveDialog.setVisible(true);
+        if (null != customizeScenarioObjectiveDialog.getObjective()) {
+            objectives.add(customizeScenarioObjectiveDialog.getObjective());
         }
         refreshObjectiveTable();
     }
@@ -961,11 +965,12 @@ public class CustomizeScenarioDialog extends JDialog {
     private void editObjective() {
         ScenarioObjective objective = objectiveModel.getObjectiveAt(objectiveTable.getSelectedRow());
         if (null != objective) {
-            CustomizeScenarioObjectiveDialog csod = new CustomizeScenarioObjectiveDialog(frame,
+            CustomizeScenarioObjectiveDialog customizeScenarioObjectiveDialog = new CustomizeScenarioObjectiveDialog(
+                  frame,
                   true,
                   objective,
                   getBotForceNames());
-            csod.setVisible(true);
+            customizeScenarioObjectiveDialog.setVisible(true);
             refreshObjectiveTable();
         }
     }
@@ -995,22 +1000,22 @@ public class CustomizeScenarioDialog extends JDialog {
     private void initLootPanel(ResourceBundle resourceMap) {
         panLoot = new JPanel(new BorderLayout());
 
-        JPanel panBtns = new JPanel(new GridLayout(1, 0));
+        JPanel panButtons = new JPanel(new GridLayout(1, 0));
         JButton btnAddLoot = new JButton(resourceMap.getString("btnAddLoot.text"));
         btnAddLoot.addActionListener(evt -> addLoot());
         btnAddLoot.setEnabled(scenario.getStatus().isCurrent());
-        panBtns.add(btnAddLoot);
+        panButtons.add(btnAddLoot);
 
         btnEditLoot = new JButton(resourceMap.getString("btnEditLoot.text"));
         btnEditLoot.setEnabled(false);
         btnEditLoot.addActionListener(evt -> editLoot());
-        panBtns.add(btnEditLoot);
+        panButtons.add(btnEditLoot);
 
         btnDeleteLoot = new JButton(resourceMap.getString("btnDeleteLoot.text"));
         btnDeleteLoot.setEnabled(false);
         btnDeleteLoot.addActionListener(evt -> deleteLoot());
-        panBtns.add(btnDeleteLoot);
-        panLoot.add(panBtns, BorderLayout.PAGE_START);
+        panButtons.add(btnDeleteLoot);
+        panLoot.add(panButtons, BorderLayout.PAGE_START);
 
         lootTable = new JTable(lootModel);
         TableColumn column;
@@ -1034,10 +1039,10 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void addLoot() {
-        LootDialog ekld = new LootDialog(frame, true, new Loot(), campaign);
-        ekld.setVisible(true);
-        if (null != ekld.getLoot()) {
-            lootModel.addLoot(ekld.getLoot());
+        LootDialog lootDialog = new LootDialog(frame, true, new Loot(), campaign);
+        lootDialog.setVisible(true);
+        if (null != lootDialog.getLoot()) {
+            lootModel.addLoot(lootDialog.getLoot());
         }
         refreshLootTable();
     }
@@ -1045,8 +1050,8 @@ public class CustomizeScenarioDialog extends JDialog {
     private void editLoot() {
         Loot loot = lootModel.getLootAt(lootTable.getSelectedRow());
         if (null != loot) {
-            LootDialog ekld = new LootDialog(frame, true, loot, campaign);
-            ekld.setVisible(true);
+            LootDialog lootDialog = new LootDialog(frame, true, loot, campaign);
+            lootDialog.setVisible(true);
             refreshLootTable();
         }
     }
@@ -1076,24 +1081,24 @@ public class CustomizeScenarioDialog extends JDialog {
     private void initOtherForcesPanel(ResourceBundle resourceMap) {
         panOtherForces = new JPanel(new BorderLayout());
 
-        JPanel panBtns = new JPanel(new GridLayout(1, 0));
+        JPanel panButtons = new JPanel(new GridLayout(1, 0));
         JButton btnAddForce = new JButton(resourceMap.getString("btnAddForce.text"));
         btnAddForce.addActionListener(evt -> addForce());
         btnAddForce.setEnabled(scenario.getStatus().isCurrent());
-        panBtns.add(btnAddForce);
+        panButtons.add(btnAddForce);
 
         btnEditForce = new JButton(resourceMap.getString("btnEditForce.text"));
         btnEditForce.setEnabled(false);
         btnEditForce.addActionListener(evt -> editForce());
         btnEditForce.setEnabled(false);
-        panBtns.add(btnEditForce);
+        panButtons.add(btnEditForce);
 
         btnDeleteForce = new JButton(resourceMap.getString("btnDeleteForce.text"));
         btnDeleteForce.setEnabled(false);
         btnDeleteForce.addActionListener(evt -> deleteForce());
         btnDeleteForce.setEnabled(false);
-        panBtns.add(btnDeleteForce);
-        panOtherForces.add(panBtns, BorderLayout.PAGE_START);
+        panButtons.add(btnDeleteForce);
+        panOtherForces.add(panButtons, BorderLayout.PAGE_START);
 
         forcesTable = new JTable(forcesModel);
         TableColumn column;
@@ -1117,10 +1122,10 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void addForce() {
-        CustomizeBotForceDialog cbfd = new CustomizeBotForceDialog(frame, true, null, campaign);
-        cbfd.setVisible(true);
-        if (null != cbfd.getBotForce()) {
-            forcesModel.addForce(cbfd.getBotForce());
+        CustomizeBotForceDialog customizeBotForceDialog = new CustomizeBotForceDialog(frame, true, null, campaign);
+        customizeBotForceDialog.setVisible(true);
+        if (null != customizeBotForceDialog.getBotForce()) {
+            forcesModel.addForce(customizeBotForceDialog.getBotForce());
         }
         refreshForcesTable();
     }
@@ -1128,8 +1133,8 @@ public class CustomizeScenarioDialog extends JDialog {
     private void editForce() {
         BotForce bf = forcesModel.getBotForceAt(forcesTable.getSelectedRow());
         String nameOld = bf.getName();
-        CustomizeBotForceDialog cbfd = new CustomizeBotForceDialog(frame, true, bf, campaign);
-        cbfd.setVisible(true);
+        CustomizeBotForceDialog customizeBotForceDialog = new CustomizeBotForceDialog(frame, true, bf, campaign);
+        customizeBotForceDialog.setVisible(true);
         refreshForcesTable();
         if (!bf.getName().equals(nameOld)) {
             checkForceRename(nameOld, bf.getName());
@@ -1191,14 +1196,18 @@ public class CustomizeScenarioDialog extends JDialog {
      */
     private void btnAddModifierActionPerformed(ActionEvent event) {
         AtBDynamicScenario scenarioPtr = (AtBDynamicScenario) scenario;
-        AtBScenarioModifier modifierPtr = AtBScenarioModifier.getScenarioModifier(modifierBox.getSelectedItem()
-                                                                                        .toString());
-        EventTiming timing = scenarioPtr.getNumBots() > 0 ?
-                                   EventTiming.PostForceGeneration :
-                                   EventTiming.PreForceGeneration;
+        Object modifierObject = modifierBox.getSelectedItem();
+        if (modifierObject instanceof String modifier) {
+            AtBScenarioModifier modifierPtr = AtBScenarioModifier.getScenarioModifier(modifier);
+            if (modifierPtr != null) {
+                EventTiming timing = scenarioPtr.getNumBots() > 0 ?
+                                           EventTiming.PostForceGeneration :
+                                           EventTiming.PreForceGeneration;
 
-        modifierPtr.processModifier(scenarioPtr, campaign, timing);
-        txtDesc.setText(txtDesc.getText() + "\n\n" + modifierPtr.getAdditionalBriefingText());
+                modifierPtr.processModifier(scenarioPtr, campaign, timing);
+                txtDesc.setText(txtDesc.getText() + "\n\n" + modifierPtr.getAdditionalBriefingText());
+            }
+        }
     }
 
 }

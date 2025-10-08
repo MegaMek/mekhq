@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+/*
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,20 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.unit.enums;
 
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmorHandles;
+import megamek.common.battleArmor.BattleArmorHandlesTank;
+import megamek.common.battleArmor.ProtoMekClampMount;
+import megamek.common.bays.*;
+import megamek.common.equipment.ClampMountMek;
+import megamek.common.equipment.ClampMountTank;
+import megamek.common.equipment.DockingCollar;
+import megamek.common.equipment.TankTrailerHitch;
+import megamek.common.equipment.Transporter;
+import megamek.common.units.DropShuttleBay;
+import megamek.common.units.InfantryCompartment;
+import megamek.common.units.NavalRepairFacility;
+import megamek.common.units.ReinforcedRepairFacility;
 import mekhq.campaign.enums.CampaignTransportType;
 
 /**
- * Entities are equipped with different Transporters.
- * TransporterTypes are the different kinds of
- * transporters from MegaMek that are implemented
- * to be used with CampaignTransportTypes, like
- * Mek Bays, Docking Collars, Battle Armor Handles,
- * or Infantry Compartments.
+ * Entities are equipped with different Transporters. TransporterTypes are the different kinds of transporters from
+ * MegaMek that are implemented to be used with CampaignTransportTypes, like Mek Bays, Docking Collars, Battle Armor
+ * Handles, or Infantry Compartments.
  *
  * @see Transporter
  * @see CampaignTransportType
@@ -49,7 +63,7 @@ public enum TransporterType {
     HEAVY_VEHICLE_BAY(HeavyVehicleBay.class),
     NAVAL_REPAIR_FACILITY(NavalRepairFacility.class),
     REINFORCED_REPAIR_FACILITY(ReinforcedRepairFacility.class),
-    DROPSHUTTLE_BAY(DropshuttleBay.class),
+    DROPSHUTTLE_BAY(DropShuttleBay.class),
     LIGHT_VEHICLE_BAY(LightVehicleBay.class),
     SUPER_HEAVY_VEHICLE_BAY(SuperHeavyVehicleBay.class),
     MEK_BAY(MekBay.class),
@@ -81,15 +95,15 @@ public enum TransporterType {
     // endregion Constructor
 
     /**
-     * An Entity's Transporters need to be mapped to their
-     * TransporterTypes. For the provided Transporter,
-     * this returns its corresponding TransporterType,
-     * or null if it's not found.
+     * An Entity's Transporters need to be mapped to their TransporterTypes. For the provided Transporter, this returns
+     * its corresponding TransporterType, or null if it's not found.
+     *
+     * @param transporter specific transporter to return the type of
+     * @param <T>         extends Transporter
+     *
+     * @return TransporterType (enum) of the provided transporter, or null
      *
      * @see Transporter
-     * @param transporter specific transporter to return the type of
-     * @return TransporterType (enum) of the provided transporter, or null
-     * @param <T> extends Transporter
      */
     public static <T extends Transporter> TransporterType getTransporterType(T transporter) {
         for (TransporterType transporterType : TransporterType.values()) {
@@ -102,7 +116,8 @@ public enum TransporterType {
 
     /**
      * The specific Class of Transporter that corresponds to this TransporterType
+     *
      * @return Class that extends Transporter
      */
-    public Class<? extends Transporter> getTransporterClass() { return transporterClass; }
+    public Class<? extends Transporter> getTransporterClass() {return transporterClass;}
 }

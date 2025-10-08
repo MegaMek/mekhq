@@ -33,10 +33,9 @@
 package mekhq.campaign.personnel;
 
 import static java.lang.Math.ceil;
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
-import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
+import static java.lang.Math.min;
+import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.enums.BloodmarkLevel.BLOODMARK_ZERO;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -53,9 +52,10 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 
 /**
@@ -167,6 +167,10 @@ public class Bloodmark {
      * @since 0.50.07
      */
     public static boolean checkForAssassinationAttempt(Person target, LocalDate today, boolean isCampaignPlanetside) {
+        if (target.isChild(today, true)) { // Children are not eligible for bloodmark assassinations
+            return false;
+        }
+
         List<LocalDate> bloodhuntSchedule = target.getBloodhuntSchedule();
         if (bloodhuntSchedule.isEmpty()) {
             return false;
@@ -237,7 +241,9 @@ public class Bloodmark {
         }
 
         // Inflict injuries or wounds as appropriate
-        wounds = adjustmentWoundsForSPAs(person, wounds);
+        wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(person,
+              campaign.getCampaignOptions().isUseInjuryFatigue(),
+              campaign.getCampaignOptions().getFatigueRate(), wounds);
         processWounds(campaign, person, today, wounds);
 
         String report = getReport(person.getStatus().isDead(), person.getHyperlinkedFullTitle(), bountyHunterName);
@@ -263,11 +269,11 @@ public class Bloodmark {
     static int getWounds(int bountyHunterSkill) {
         int wounds = 0;
         int bountyHunterRoll = randomInt(bountyHunterSkill);
-        while (bountyHunterRoll == 0) { // Increase severity with each successful loop
+        while (bountyHunterRoll == 0 && wounds < 6) { // Increase severity with each successful loop
             wounds += d6(1);
             bountyHunterRoll = randomInt(bountyHunterSkill);
         }
-        return wounds;
+        return min(wounds, 6);
     }
 
     /**
@@ -289,40 +295,6 @@ public class Bloodmark {
 
         bountyHunterName = bountyHunterName.toUpperCase();
         return bountyHunterName;
-    }
-
-    /**
-     * Adjusts the number of wounds based on the target person's special personnel abilities (SPAs).
-     * <ul>
-     *     <li>If the person has the {@code Glass Jaw} flaw (and not {@code Toughness}), the wounds are doubled.</li>
-     *     <li>If the person has the {@code Toughness} ability (and not {@code Glass Jaw}), the wounds are reduced to
-     *     75% of the original amount, rounded up.</li>
-     *     <li>If the person has both or neither, the wounds remain unchanged.</li>
-     * </ul>
-     *
-     * @param person the person whose SPA modifiers should be checked
-     * @param wounds the initial number of wounds to adjust
-     *
-     * @return the adjusted number of wounds after applying SPA effects
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    static int adjustmentWoundsForSPAs(Person person, int wounds) {
-        boolean hasGlassJaw = person.getOptions().booleanOption(FLAW_GLASS_JAW);
-        boolean hasToughness = person.getOptions().booleanOption(ATOW_TOUGHNESS);
-
-        if (hasGlassJaw && hasToughness) {
-            return wounds;
-        }
-
-        if (hasGlassJaw) {
-            return wounds * 2;
-        } else if (hasToughness) {
-            return (int) ceil(wounds * 0.75);
-        }
-
-        return wounds;
     }
 
     /**

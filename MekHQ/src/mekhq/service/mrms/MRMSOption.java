@@ -45,7 +45,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class MRMSOption {
-    private static final MMLogger logger = MMLogger.create(MRMSOption.class);
+    private static final MMLogger LOGGER = MMLogger.create(MRMSOption.class);
 
     // region Variable Declarations
     private PartRepairType type;
@@ -63,10 +63,17 @@ public class MRMSOption {
 
     // region Constructors
     public MRMSOption(PartRepairType type) {
-        this(type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_LEGENDARY, TARGET_NUMBER_PREFERRED, TARGET_NUMBER_MAX, DAILY_TIME_MIN);
+        this(type,
+              false,
+              SkillType.EXP_ULTRA_GREEN,
+              SkillType.EXP_LEGENDARY,
+              TARGET_NUMBER_PREFERRED,
+              TARGET_NUMBER_MAX,
+              DAILY_TIME_MIN);
     }
 
-    public MRMSOption(PartRepairType type, boolean active, int skillMin, int skillMax, int targetNumberPreferred, int targetNumberMax, int dailyTimeMin) {
+    public MRMSOption(PartRepairType type, boolean active, int skillMin, int skillMax, int targetNumberPreferred,
+          int targetNumberMax, int dailyTimeMin) {
         this.type = type;
         this.active = active;
         this.skillMin = skillMin;
@@ -202,12 +209,12 @@ public class MRMSOption {
 
                 if ((mrmsOption.getType() == PartRepairType.UNKNOWN_LOCATION) ||
                           !partRepairTypes.contains(mrmsOption.getType())) {
-                    logger.error("Attempted to load MRMSOption with illegal type id of " + mrmsOption.getType());
+                    LOGGER.error("Attempted to load MRMSOption with illegal type id of " + mrmsOption.getType());
                 } else {
                     mrmsOptions.add(mrmsOption);
                 }
             } catch (Exception ex) {
-                logger.error("Failed to parse MRMSOption from XML", ex);
+                LOGGER.error("Failed to parse MRMSOption from XML", ex);
             }
         }
 
@@ -243,7 +250,7 @@ public class MRMSOption {
                     mrmsOption.setDailyTimeMin(Integer.parseInt(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
 

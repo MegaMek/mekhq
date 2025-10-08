@@ -60,7 +60,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 
 import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -78,7 +77,6 @@ import mekhq.gui.dialog.glossary.NewGlossaryDialog;
  * @since 0.50.07
  */
 public class GMToolsConfirmationDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(GMToolsConfirmationDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
     private final int PADDING = scaleForGUI(10);
@@ -94,11 +92,11 @@ public class GMToolsConfirmationDialog extends JDialog {
     /**
      * Constructs a new confirmation dialog for a GMTools action.
      *
-     * @param parent              parent dialog for positioning
-     * @param campaignIcon        image icon for the campaign or faction
-     * @param actionType          the action type being confirmed
-     * @param selectedFaction     an optional {@link Faction} object used to tailor the dialog
-     * @param currentGameYear     the current game year
+     * @param parent          parent dialog for positioning
+     * @param campaignIcon    image icon for the campaign or faction
+     * @param actionType      the action type being confirmed
+     * @param selectedFaction an optional {@link Faction} object used to tailor the dialog
+     * @param currentGameYear the current game year
      *
      * @author Illiani
      * @since 0.50.07
@@ -235,7 +233,7 @@ public class GMToolsConfirmationDialog extends JDialog {
         btnCancel.addActionListener(evt -> dispose());
 
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-                "gmTools.confirmation.button.confirm"));
+              "gmTools.confirmation.button.confirm"));
         btnConfirm.addActionListener(evt -> {
             actionWasConfirmed = true;
             dispose();

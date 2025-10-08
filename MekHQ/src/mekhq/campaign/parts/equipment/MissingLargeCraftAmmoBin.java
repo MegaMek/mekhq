@@ -24,28 +24,32 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.AmmoType;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.WeaponMounted;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author cwspain
  */
 public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
-    private static final MMLogger logger = MMLogger.create(MissingLargeCraftAmmoBin.class);
+    private static final MMLogger LOGGER = MMLogger.create(MissingLargeCraftAmmoBin.class);
 
     private int bayEqNum;
 
@@ -56,15 +60,14 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
     }
 
     public MissingLargeCraftAmmoBin(int tonnage, @Nullable AmmoType et, int equipNum, double capacity,
-            @Nullable Campaign c) {
+          @Nullable Campaign c) {
         super(tonnage, et, equipNum, false, false, c);
         this.size = capacity;
     }
 
     /**
-     * @return The <code>Mounted</code> of the unit's <code>Entity</code> that
-     *         contains this ammo bin,
-     *         or null if there is no unit or the ammo bin is not in any bay.
+     * @return The <code>Mounted</code> of the unit's <code>Entity</code> that contains this ammo bin, or null if there
+     *       is no unit or the ammo bin is not in any bay.
      */
     public @Nullable WeaponMounted getBay() {
         if (getUnit() == null) {
@@ -88,15 +91,13 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
             }
         }
 
-        logger.warn("Could not find weapon bay for " + typeName + " for " + unit.getName());
+        LOGGER.warn("Could not find weapon bay for {} for {}", typeName, unit.getName());
         return null;
     }
 
     /**
-     * Sets the bay for this ammo bin. Does not check whether the ammo bin is
-     * actually in the bay.
+     * Sets the bay for this ammo bin. Does not check whether the ammo bin is actually in the bay.
      *
-     * @param bay
      */
     public void setBay(WeaponMounted bay) {
         if (null != unit) {
@@ -106,10 +107,8 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
     }
 
     /**
-     * Sets the bay for this ammo bin. Does not check whether the ammo bin is
-     * actually in the bay.
+     * Sets the bay for this ammo bin. Does not check whether the ammo bin is actually in the bay.
      *
-     * @param bayEqNum
      */
     public void setBay(int bayEqNum) {
         this.bayEqNum = bayEqNum;
@@ -140,7 +139,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
         if (Objects.equals(part.getClass(), LargeCraftAmmoBin.class)) {
             LargeCraftAmmoBin ammoBin = (LargeCraftAmmoBin) part;
             return getType().equals(ammoBin.getType())
-                    && (getFullShots() == ammoBin.getFullShots());
+                         && (getFullShots() == ammoBin.getFullShots());
         }
         return false;
     }
@@ -159,7 +158,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
     public void fix() {
         LargeCraftAmmoBin replacement = getNewPart();
         unit.addPart(replacement);
-        campaign.getQuartermaster().addPart(replacement, 0);
+        campaign.getQuartermaster().addPart(replacement, 0, false);
 
         remove(false);
 
@@ -187,7 +186,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
                     bayEqNum = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }

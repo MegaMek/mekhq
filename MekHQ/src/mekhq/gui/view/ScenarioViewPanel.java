@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -59,8 +59,8 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.planetaryconditions.Atmosphere;
-import megamek.common.planetaryconditions.PlanetaryConditions;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.PlanetaryConditions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
@@ -74,14 +74,13 @@ import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ScenarioViewPanel extends JScrollablePanel {
-    private JFrame frame;
 
-    private Scenario scenario;
-    private Campaign campaign;
-    private ForceStub forces;
+    private final Scenario scenario;
+    private final Campaign campaign;
     private List<BotForceStub> botStubs;
 
     private JPanel pnlInfo;
@@ -92,28 +91,28 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private JPanel pnlForces;
     private JPanel pnlOtherForces;
     private JPanel pnlReport;
-    private JTextPane txtDesc;
 
-    private StubTreeModel forceModel;
+    private final StubTreeModel forceModel;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel",
-            MekHQ.getMHQOptions().getLocale());
+    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel",
+          MekHQ.getMHQOptions().getLocale());
 
-    public ScenarioViewPanel(JFrame f, Campaign c, Scenario s) {
+    public ScenarioViewPanel(JFrame frame, Campaign campaign, Scenario scenario) {
         super();
-        this.frame = f;
-        this.scenario = s;
-        this.campaign = c;
-        this.forces = s.getStatus().isCurrent() ? new ForceStub(s.getForces(c), c) : s.getForceStub();
+        this.scenario = scenario;
+        this.campaign = campaign;
+        ForceStub forces = scenario.getStatus().isCurrent() ?
+                                 new ForceStub(scenario.getForces(campaign), campaign) :
+                                 scenario.getForceStub();
         forceModel = new StubTreeModel(forces);
 
         botStubs = new ArrayList<>();
-        if (s.getStatus().isCurrent()) {
-            for (int i = 0; i < s.getNumBots(); i++) {
-                botStubs.add(s.getBotForce(i).generateStub(campaign));
+        if (scenario.getStatus().isCurrent()) {
+            for (int i = 0; i < scenario.getNumBots(); i++) {
+                botStubs.add(scenario.getBotForce(i).generateStub(this.campaign));
             }
         } else {
-            botStubs = s.getBotForcesStubs();
+            botStubs = scenario.getBotForcesStubs();
         }
 
         initComponents();
@@ -172,8 +171,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
         pnlInfo = new JPanel(new BorderLayout());
         pnlInfo.setName("pnlStats");
         pnlInfo.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(scenario.getName())));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(scenario.getName())));
 
         JLabel lblStatus = new JLabel("<html><b>" + scenario.getStatus() + "</b></html>");
         lblStatus.setToolTipText(scenario.getStatus().getToolTipText());
@@ -181,7 +180,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         pnlInfo.add(lblStatus, BorderLayout.PAGE_START);
 
         if (null != scenario.getDescription() && !scenario.getDescription().isEmpty()) {
-            txtDesc = new JTextPane();
+            JTextPane txtDesc = new JTextPane();
             txtDesc.setName("txtDesc");
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
@@ -193,8 +192,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void fillForces() {
         pnlForces = new JPanel(new BorderLayout());
         pnlForces.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("pnlForces.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("pnlForces.title"))));
 
         JTree forceTree = new JTree();
         forceTree.setModel(forceModel);
@@ -206,16 +205,16 @@ public class ScenarioViewPanel extends JScrollablePanel {
         pnlOtherForces = new JPanel();
         pnlOtherForces.setLayout(new BoxLayout(pnlOtherForces, BoxLayout.PAGE_AXIS));
         pnlOtherForces.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("pnlOtherForces.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("pnlOtherForces.title"))));
 
         for (BotForceStub stub : botStubs) {
             if (null == stub) {
                 continue;
             }
 
-            DefaultMutableTreeNode top = new DefaultMutableTreeNode(stub.getName());
-            for (String en : stub.getEntityList()) {
+            DefaultMutableTreeNode top = new DefaultMutableTreeNode(stub.name());
+            for (String en : stub.entityList()) {
                 top.add(new DefaultMutableTreeNode(en));
             }
             JTree tree = new JTree(top);
@@ -232,8 +231,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void fillReport() {
         pnlReport = new JPanel(new BorderLayout());
         pnlReport.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("pnlReport.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("pnlReport.title"))));
         JTextPane txtReport = new JTextPane();
         txtReport.setName("txtReport");
         txtReport.setEditable(false);
@@ -245,8 +244,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void fillLoot() {
         pnlLoot = new JPanel();
         pnlLoot.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("pnlLoot.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("pnlLoot.title"))));
         pnlLoot.setLayout(new BoxLayout(pnlLoot, BoxLayout.PAGE_AXIS));
         for (Loot loot : scenario.getLoot()) {
             pnlLoot.add(new JLabel(loot.getShortDescription()));
@@ -257,8 +256,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         pnlDeployment = new JPanel(new GridBagLayout());
         pnlDeployment.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("pnlDeployment.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("pnlDeployment.title"))));
 
         GridBagConstraints leftGbc = new GridBagConstraints();
         leftGbc.gridx = 0;
@@ -292,7 +291,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
         leftGbc.gridy++;
         pnlDeployment.add(lblQuantityLimit, leftGbc);
 
-        JLabel lblQuantityLimitDesc = new JLabel(scenario.getDeploymentLimit().getQuantityLimitDesc(scenario, campaign));
+        JLabel lblQuantityLimitDesc = new JLabel(scenario.getDeploymentLimit()
+                                                       .getQuantityLimitDesc(scenario, campaign));
         rightGbc.gridy++;
         pnlDeployment.add(lblQuantityLimitDesc, rightGbc);
 
@@ -324,8 +324,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         pnlObjectives = new JPanel(new BorderLayout());
         pnlObjectives.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("pnlObjectives.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("pnlObjectives.title"))));
 
         StringBuilder objectiveBuilder = new StringBuilder();
 
@@ -390,8 +390,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         pnlMap = new JPanel(new GridBagLayout());
         pnlMap.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("pnlMap.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("pnlMap.title"))));
 
         GridBagConstraints leftGbc = new GridBagConstraints();
         leftGbc.gridx = 0;
@@ -549,8 +549,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
     }
 
     protected static class StubTreeModel implements TreeModel {
-        private ForceStub rootForce;
-        private Vector<TreeModelListener> listeners = new Vector<>();
+        private final ForceStub rootForce;
+        private final Vector<TreeModelListener> listeners = new Vector<>();
 
         public StubTreeModel(ForceStub root) {
             rootForce = root;
@@ -588,7 +588,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         @Override
         public boolean isLeaf(Object node) {
             return (node instanceof UnitStub)
-                    || ((node instanceof ForceStub) && ((ForceStub) node).getAllChildren().isEmpty());
+                         || ((node instanceof ForceStub) && ((ForceStub) node).getAllChildren().isEmpty());
         }
 
         @Override
@@ -618,8 +618,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
-                                                      boolean expanded, boolean leaf, int row,
-                                                      boolean hasFocus) {
+              boolean expanded, boolean leaf, int row,
+              boolean hasFocus) {
             super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             setIcon(getIcon(value));
             return this;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,13 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
+import java.util.ArrayList;
+
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.AtBContract;
@@ -39,13 +46,11 @@ import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
-import java.util.ArrayList;
-
 @AtBScenarioEnabled
 public class HoldTheLineBuiltInScenario extends AtBScenario {
     @Override
     public int getScenarioType() {
-        return HOLDTHELINE;
+        return HOLD_THE_LINE;
     }
 
     @Override
@@ -60,7 +65,7 @@ public class HoldTheLineBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         int enemyStart;
         int playerHome;
 
@@ -93,7 +98,7 @@ public class HoldTheLineBuiltInScenario extends AtBScenario {
         int weightClass = combatTeam != null ? combatTeam.getWeightClass(campaign) : EntityWeightClass.WEIGHT_LIGHT;
 
         addEnemyForce(enemyEntities, weightClass, EntityWeightClass.WEIGHT_ASSAULT,
-            isAttacker() ? 0 : 4, 0, campaign);
+              isAttacker() ? 0 : 4, 0, campaign);
 
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
     }
@@ -110,11 +115,11 @@ public class HoldTheLineBuiltInScenario extends AtBScenario {
         // Attacker must destroy 50% and keep 66% alive
         // Defender must destroy 33% and keep 50% alive
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1,
-                isAttacker() ? 50 : 33);
+              isAttacker() ? 50 : 33);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(
-                campaign, contract, this, 1, isAttacker() ? 66 : 50,false);
+              campaign, contract, this, 1, isAttacker() ? 66 : 50, false);
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
-                this);
+              this);
 
         if (keepAttachedUnitsAlive != null) {
             getScenarioObjectives().add(keepAttachedUnitsAlive);

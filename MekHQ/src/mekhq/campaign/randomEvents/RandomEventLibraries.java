@@ -24,24 +24,29 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
-import mekhq.campaign.randomEvents.prisoners.yaml.PrisonerEventDataWrapper;
+import static java.io.File.separator;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.io.File.separator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
+import mekhq.campaign.randomEvents.prisoners.yaml.PrisonerEventDataWrapper;
 
 /**
- * A utility class that manages the loading and retrieval of random event data
- * from YAML files. Organizes the events into separate lists for later use.
+ * A utility class that manages the loading and retrieval of random event data from YAML files. Organizes the events
+ * into separate lists for later use.
  */
 public class RandomEventLibraries {
     // file addresses
@@ -59,12 +64,12 @@ public class RandomEventLibraries {
     private final String PRISONER_EVENTS_MINOR = DIRECTORY + "PrisonerMinorEventData" + EXTENSION;
 
     // lists
-    private List<PrisonerEventData> prisonerEventsMajor = new ArrayList<>();
-    private List<PrisonerEventData> prisonerEventsMinor = new ArrayList<>();
+    private final List<PrisonerEventData> prisonerEventsMajor = new ArrayList<>();
+    private final List<PrisonerEventData> prisonerEventsMinor = new ArrayList<>();
 
     /**
-     * Constructs a {@code RandomEventLibraries} object and initializes the event data
-     * by loading it from the YAML files.
+     * Constructs a {@code RandomEventLibraries} object and initializes the event data by loading it from the YAML
+     * files.
      */
     public RandomEventLibraries() {
         buildPrisonerEventData();
@@ -73,8 +78,8 @@ public class RandomEventLibraries {
     /**
      * Retrieves a list of prisoner events based on their severity (major or minor).
      *
-     * @param isMajor {@code true} to retrieve major prisoner events, {@code false} to retrieve
-     *                           minor prisoner events.
+     * @param isMajor {@code true} to retrieve major prisoner events, {@code false} to retrieve minor prisoner events.
+     *
      * @return a {@link List} of {@link PrisonerEventData} corresponding to the specified event severity.
      */
     public List<PrisonerEventData> getPrisonerEvents(boolean isMajor) {
@@ -87,8 +92,7 @@ public class RandomEventLibraries {
 
     /**
      * Loads prisoner event data from predefined YAML files ({@code PRISONER_EVENTS_MAJOR} and
-     * {@code PRISONER_EVENTS_MINOR}) and organizes the individual events into major and minor
-     * event lists.
+     * {@code PRISONER_EVENTS_MINOR}) and organizes the individual events into major and minor event lists.
      * <p>
      * Uses Jackson for YAML deserialization via the {@link ObjectMapper}.
      * </p>
@@ -103,8 +107,8 @@ public class RandomEventLibraries {
             try {
                 // Deserialize YAML into PrisonerEventDataWrapper
                 PrisonerEventDataWrapper wrapper = objectMapper.readValue(
-                    new File(eventFile),
-                    PrisonerEventDataWrapper.class
+                      new File(eventFile),
+                      PrisonerEventDataWrapper.class
                 );
 
                 // Access and sort individual events

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.campaignOptions.enums;
 
@@ -37,20 +42,20 @@ import org.junit.jupiter.api.Test;
 
 class ProcurementPersonnelPickTest {
     @Test
-    public void testFromString_Validpick() {
+    public void testFromStringValidPick() {
         ProcurementPersonnelPick pick = ProcurementPersonnelPick.fromString(LOGISTICS.name());
         assertEquals(LOGISTICS, pick);
     }
 
     @Test
-    public void testFromString_Invalidpick() {
+    public void testFromStringInvalidPick() {
         ProcurementPersonnelPick pick = ProcurementPersonnelPick.fromString("INVALID_pick");
 
         assertEquals(NONE, pick);
     }
 
     @Test
-    public void testFromString_Nullpick() {
+    public void testFromStringNullPick() {
         ProcurementPersonnelPick pick = ProcurementPersonnelPick.fromString(null);
 
         assertEquals(NONE, pick);

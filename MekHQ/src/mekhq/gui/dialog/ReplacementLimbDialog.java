@@ -103,7 +103,7 @@ public class ReplacementLimbDialog {
      *
      * <p>The behavior of the button creation is determined by the following conditions:</p>
      * <ul>
-     *     <li>If sufficient funds are unavailable, or if there is no qualified doctor and it is not planetside,
+     *     <li>If sufficient funds are unavailable, or if there is no qualified doctor, and it is not planetside,
      *         only an "Understood" button is created.</li>
      *     <li>Otherwise, both "Decline" and "Accept" buttons are created.</li>
      * </ul>
@@ -117,7 +117,7 @@ public class ReplacementLimbDialog {
      * @return A {@link List} of {@link String} objects representing the dialog buttons.
      */
     private static List<String> createButtons(boolean hasQualifiedDoctor, boolean isPlanetside,
-                                                              boolean hasSufficientFunds) {
+          boolean hasSufficientFunds) {
         List<String> buttons = new ArrayList<>();
 
         if (!hasSufficientFunds || (!hasQualifiedDoctor && !isPlanetside)) {
@@ -145,8 +145,8 @@ public class ReplacementLimbDialog {
      * @return A {@link String} containing the localized in-character message for the dialog.
      */
     private static String createInCharacterMessage(boolean isPlanetside, boolean hasQualifiedDoctors,
-                                                   String commanderAddress, Person patient, Money cost,
-                                                   boolean hasSufficientFunds) {
+          String commanderAddress, Person patient, Money cost,
+          boolean hasSufficientFunds) {
         String keyAddendum = "normal";
 
         if (!hasQualifiedDoctors && hasSufficientFunds) {
@@ -180,7 +180,7 @@ public class ReplacementLimbDialog {
     private Person getSpeaker() {
         Person seniorDoctor = null;
 
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             if (person.isDoctor()) {
                 if (person.outRanksUsingSkillTiebreaker(campaign, seniorDoctor)) {
                     seniorDoctor = person;

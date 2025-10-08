@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.enums;
 
@@ -35,13 +40,13 @@ import mekhq.MekHQ;
 public enum ContractCommandRights {
     // region Enum Declarations
     INTEGRATED("ContractCommandRights.INTEGRATED.text", "ContractCommandRights.INTEGRATED.toolTipText",
-            "ContractCommandRights.INTEGRATED.stratConText"),
+          "ContractCommandRights.INTEGRATED.stratConText"),
     HOUSE("ContractCommandRights.HOUSE.text", "ContractCommandRights.HOUSE.toolTipText",
-            "ContractCommandRights.HOUSE.stratConText"),
+          "ContractCommandRights.HOUSE.stratConText"),
     LIAISON("ContractCommandRights.LIAISON.text", "ContractCommandRights.LIAISON.toolTipText",
-            "ContractCommandRights.LIAISON.stratConText"),
+          "ContractCommandRights.LIAISON.stratConText"),
     INDEPENDENT("ContractCommandRights.INDEPENDENT.text", "ContractCommandRights.INDEPENDENT.toolTipText",
-            "ContractCommandRights.INDEPENDENT.stratConText");
+          "ContractCommandRights.INDEPENDENT.stratConText");
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -53,7 +58,7 @@ public enum ContractCommandRights {
     // region Constructors
     ContractCommandRights(final String name, final String toolTipText, final String stratConText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.stratConText = resources.getString(stratConText);
@@ -89,8 +94,10 @@ public enum ContractCommandRights {
     // endregion Boolean Comparison Methods
 
     // region File I/O
+
     /**
      * @param text containing the ContractCommandRights
+     *
      * @return the saved ContractCommandRights
      */
     public static ContractCommandRights parseFromString(final String text) {
@@ -118,7 +125,7 @@ public enum ContractCommandRights {
         }
 
         MMLogger.create(ContractCommandRights.class)
-                .error("Unable to parse " + text + " into a ContractCommandRights. Returning HOUSE.");
+              .error("Unable to parse {} into a ContractCommandRights. Returning HOUSE.", text);
         return HOUSE;
     }
     // endregion File I/O

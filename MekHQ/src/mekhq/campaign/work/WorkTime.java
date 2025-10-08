@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.work;
 
@@ -49,7 +54,8 @@ public enum WorkTime {
     RUSH_30(-1, "Rush Job (1/30)", 5, true, 5, 1.0 / 30.0);
 
     // Initialize by-id array lookup table
-    private static WorkTime[] idMap;
+    private static final WorkTime[] idMap;
+
     static {
         int maxId = 0;
         for (WorkTime workTime : values()) {
@@ -66,12 +72,12 @@ public enum WorkTime {
 
     /** Default (Strategic Operations) work time modifiers */
     public static final WorkTime[] DEFAULT_TIMES = {
-            NORMAL, EXTRA_2, EXTRA_3, EXTRA_4, RUSH_2, RUSH_4, RUSH_8
+          NORMAL, EXTRA_2, EXTRA_3, EXTRA_4, RUSH_2, RUSH_4, RUSH_8
     };
 
     /** StratOps times in increasing order **/
     public static final WorkTime[] STRAT_OPTS_INCREASING_TIMES = {
-            RUSH_8, RUSH_4, RUSH_2, NORMAL, EXTRA_2, EXTRA_3, EXTRA_4
+          RUSH_8, RUSH_4, RUSH_2, NORMAL, EXTRA_2, EXTRA_3, EXTRA_4
     };
 
     /**
@@ -87,7 +93,7 @@ public enum WorkTime {
     public static WorkTime of(String str) {
         try {
             return of(Integer.parseInt(str));
-        } catch (NumberFormatException nfex) {
+        } catch (NumberFormatException ignored) {
             // Try something else
         }
         return valueOf(str.toUpperCase(Locale.ROOT));
@@ -164,7 +170,7 @@ public enum WorkTime {
             return workTime;
         }
 
-        MMLogger.create(WorkTime.class).error("Unable to parse " + text + " into a WorkTime. Returning NORMAL.");
+        MMLogger.create(WorkTime.class).error("Unable to parse {} into a WorkTime. Returning NORMAL.", text);
         return NORMAL;
     }
     // endregion File I/O

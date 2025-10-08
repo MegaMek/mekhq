@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,25 +24,39 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import megamek.common.*;
+import java.util.ArrayList;
+
+import megamek.common.OffBoardDirection;
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-
-import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class ReconRaidBuiltInScenario extends AtBScenario {
     @Override
     public int getScenarioType() {
-        return RECONRAID;
+        return RECON_RAID;
     }
 
     @Override
@@ -57,7 +71,7 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         int enemyStart;
         int playerHome;
 
@@ -89,8 +103,12 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
         CombatTeam combatTeam = getCombatTeamById(campaign);
         int weightClass = combatTeam != null ? combatTeam.getWeightClass(campaign) : EntityWeightClass.WEIGHT_LIGHT;
 
-        addEnemyForce(enemyEntities, weightClass, isAttacker() ? EntityWeightClass.WEIGHT_ASSAULT : EntityWeightClass.WEIGHT_MEDIUM,
-            0, 0, campaign);
+        addEnemyForce(enemyEntities,
+              weightClass,
+              isAttacker() ? EntityWeightClass.WEIGHT_ASSAULT : EntityWeightClass.WEIGHT_MEDIUM,
+              0,
+              0,
+              campaign);
 
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
     }
@@ -106,7 +124,7 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
 
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 50);
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
-                this);
+              this);
 
         if (keepAttachedUnitsAlive != null) {
             getScenarioObjectives().add(keepAttachedUnitsAlive);
@@ -114,20 +132,20 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
 
         if (isAttacker()) {
             ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract,
-                    this, 1, 75, false);
+                  this, 1, 75, false);
             getScenarioObjectives().add(keepFriendliesAlive);
 
             ScenarioObjective raidObjective = new ScenarioObjective();
             raidObjective.setObjectiveCriterion(ObjectiveCriterion.Custom);
             raidObjective.setDescription(
-                    String.format("%s:", defaultResourceBundle.getString("battleDetails.reconRaid.name")));
+                  String.format("%s:", defaultResourceBundle.getString("battleDetails.reconRaid.name")));
             raidObjective.addDetail(String.format(
-                    defaultResourceBundle.getString("battleDetails.reconRaid.instructions.oppositeEdge"),
-                    OffBoardDirection.translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(getStartingPos()))));
+                  defaultResourceBundle.getString("battleDetails.reconRaid.instructions.oppositeEdge"),
+                  OffBoardDirection.translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(getStartingPos()))));
             raidObjective.addDetail(defaultResourceBundle.getString("battleDetails.reconRaid.instructions.stayStill"));
             raidObjective.addDetail(
-                    String.format(defaultResourceBundle.getString("battleDetails.reconRaid.instructions.returnEdge"),
-                            OffBoardDirection.translateBoardStart(getStartingPos())));
+                  String.format(defaultResourceBundle.getString("battleDetails.reconRaid.instructions.returnEdge"),
+                        OffBoardDirection.translateBoardStart(getStartingPos())));
             raidObjective.addDetail(defaultResourceBundle.getString("battleDetails.reconRaid.instructions.reward"));
 
             ObjectiveEffect victoryEffect = new ObjectiveEffect();

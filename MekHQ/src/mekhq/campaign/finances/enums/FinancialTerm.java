@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances.enums;
 
@@ -54,7 +59,7 @@ public enum FinancialTerm {
     // region Constructors
     FinancialTerm(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -89,12 +94,10 @@ public enum FinancialTerm {
     // endregion Boolean Comparison Methods
 
     /**
-     * @param today the origin date, which will normally (but not always) be the
-     *              current date
-     * @return the next valid date for the financial term, with a built-in grace
-     *         period to line up
-     *         everything to the first day of a financial setup (Monday, First of
-     *         the Month, First of the Year)
+     * @param today the origin date, which will normally (but not always) be the current date
+     *
+     * @return the next valid date for the financial term, with a built-in grace period to line up everything to the
+     *       first day of a financial setup (Monday, First of the Month, First of the Year)
      */
     public LocalDate nextValidDate(final LocalDate today) {
         return nextValidDate(today.minusDays(1), today);
@@ -102,97 +105,86 @@ public enum FinancialTerm {
 
     /**
      * @param yesterday the day before today
-     * @param today     the origin date, which will normally (but not always) be the
-     *                  current date
-     * @return the next valid date for the financial term, with a built-in grace
-     *         period to line up
-     *         everything to the first day of a financial setup (Monday, First of
-     *         the Month, First of the Year)
+     * @param today     the origin date, which will normally (but not always) be the current date
+     *
+     * @return the next valid date for the financial term, with a built-in grace period to line up everything to the
+     *       first day of a financial setup (Monday, First of the Month, First of the Year)
      */
     public LocalDate nextValidDate(final LocalDate yesterday, final LocalDate today) {
-        switch (this) {
-            case BIWEEKLY:
+        return switch (this) {
+            case BIWEEKLY -> {
                 // First, find the first day of the current week
                 final LocalDate date = today.with(WeekFields.of(DayOfWeek.MONDAY, 7).dayOfWeek(), 1);
                 // Second, add two weeks to the date if this is an even week, or three if it is
                 // not
-                return date.plusWeeks(
-                        ((date.get(WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()) % 2) == 0)
-                                ? 2
-                                : 3);
-            case MONTHLY:
+                yield date.plusWeeks(
+                      ((date.get(WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()) % 2) == 0)
+                            ? 2
+                            : 3);
+                // Second, add two weeks to the date if this is an even week, or three if it is
+                // not
+            }
+            case MONTHLY ->
                 // First, determine if the term would end today. If it would, use today or
                 // otherwise
                 // adjust to the first day of the next month.
                 // Second, add a month to the determined date
-                return (endsToday(yesterday, today) ? today : today.with(TemporalAdjusters.firstDayOfNextMonth()))
+                  (endsToday(yesterday, today) ? today : today.with(TemporalAdjusters.firstDayOfNextMonth()))
                         .plusMonths(1);
-            case QUARTERLY:
+            case QUARTERLY ->
                 // Determine if the term would end today
                 // If it is, return today plus three months
                 // Otherwise, then adjust to the first day of the current quarter before adding
                 // six
                 // months
-                return endsToday(yesterday, today) ? today.plusMonths(3)
+                  endsToday(yesterday, today) ? today.plusMonths(3)
                         : today.with(IsoFields.DAY_OF_QUARTER, 1).plusMonths(6);
-            case SEMIANNUALLY:
+            case SEMIANNUALLY ->
                 // Determine if the term would end today
                 // If it would, return today plus six months
                 // Otherwise, then adjust to the first day of the current quarter before adding
                 // twelve months if today is in an even quarter or nine months otherwise
-                return endsToday(yesterday, today) ? today.plusMonths(6)
+                  endsToday(yesterday, today) ? today.plusMonths(6)
                         : today.with(IsoFields.DAY_OF_QUARTER, 1)
                                 .plusMonths((today.get(IsoFields.QUARTER_OF_YEAR) % 2 != 0) ? 12 : 9);
-            case ANNUALLY:
-            default:
+            default ->
                 // First, use today if the term would end today or otherwise adjust to the first
                 // day
                 // of the next year.
                 // Second, add a year to the determined date
-                return (endsToday(yesterday, today) ? today : today.with(TemporalAdjusters.firstDayOfNextYear()))
+                  (endsToday(yesterday, today) ? today : today.with(TemporalAdjusters.firstDayOfNextYear()))
                         .plusYears(1);
-        }
+        };
     }
 
     /**
      * @param yesterday the day before today
-     * @param today     the origin date, which will normally (but not always) be the
-     *                  current date
+     * @param today     the origin date, which will normally (but not always) be the current date
+     *
      * @return if the current financial term ends today
      */
     public boolean endsToday(final LocalDate yesterday, final LocalDate today) {
-        switch (this) {
-            case BIWEEKLY:
+        return switch (this) {
+            case BIWEEKLY ->
                 // Start of the week, on an even week
-                return (today.get(WeekFields.of(DayOfWeek.MONDAY, 7).dayOfWeek()) == 1)
+                  (today.get(WeekFields.of(DayOfWeek.MONDAY, 7).dayOfWeek()) == 1)
                         && ((today.get(WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()) % 2) == 0);
-            case MONTHLY:
-                return today.getMonth() != yesterday.getMonth();
-            case QUARTERLY:
-                return today.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR);
-            case SEMIANNUALLY:
-                return (today.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR))
-                        && (today.get(IsoFields.QUARTER_OF_YEAR) % 2 != 0);
-            case ANNUALLY:
-            default:
-                return today.getYear() != yesterday.getYear();
-        }
+            case MONTHLY -> today.getMonth() != yesterday.getMonth();
+            case QUARTERLY -> today.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR);
+            case SEMIANNUALLY -> (today.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR))
+                                       && (today.get(IsoFields.QUARTER_OF_YEAR) % 2 != 0);
+            default -> today.getYear() != yesterday.getYear();
+        };
     }
 
     public double determineYearlyDenominator() {
-        switch (this) {
-            case BIWEEKLY:
-                return 26;
-            case MONTHLY:
-                return 12;
-            case QUARTERLY:
-                return 4;
-            case SEMIANNUALLY:
-                return 2;
-            case ANNUALLY:
-            default:
-                return 1;
-        }
+        return switch (this) {
+            case BIWEEKLY -> 26;
+            case MONTHLY -> 12;
+            case QUARTERLY -> 4;
+            case SEMIANNUALLY -> 2;
+            default -> 1;
+        };
     }
 
     // region File I/O
@@ -221,7 +213,7 @@ public enum FinancialTerm {
         }
 
         MMLogger.create(FinancialTerm.class)
-                .error("Unable to parse " + text + " into a FinancialTerm. Returning ANNUALLY.");
+              .error("Unable to parse {} into a FinancialTerm. Returning ANNUALLY.", text);
         return ANNUALLY;
     }
     // endregion File I/O

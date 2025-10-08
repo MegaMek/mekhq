@@ -32,8 +32,8 @@
  */
 package mekhq.campaign.personnel.generator;
 
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
@@ -79,16 +79,17 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // roll small arms skill
         if (!person.getSkills().hasSkill(SkillType.S_SMALL_ARMS)) {
-            int sarmsLvl = Utilities.generateExpLevel((primaryRole.isSupport(true) || secondaryRole.isSupport(true)) ?
-                                                            skillPreferences.getSupportSmallArmsBonus() :
-                                                            skillPreferences.getCombatSmallArmsBonus());
+            int smallArmsLevel = Utilities.generateExpLevel((primaryRole.isSupport(true) ||
+                                                                   secondaryRole.isSupport(true)) ?
+                                                                  skillPreferences.getSupportSmallArmsBonus() :
+                                                                  skillPreferences.getCombatSmallArmsBonus());
 
             if (primaryRole.isCivilian()) {
-                sarmsLvl = 0;
+                smallArmsLevel = 0;
             }
 
-            if (sarmsLvl > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_SMALL_ARMS, sarmsLvl, skillPreferences.randomizeSkill(), bonus);
+            if (smallArmsLevel > SkillType.EXP_ULTRA_GREEN) {
+                addSkill(person, SkillType.S_SMALL_ARMS, smallArmsLevel, skillPreferences.randomizeSkill(), bonus);
             }
         }
 
@@ -125,7 +126,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         if (campaignOptions.isAdminsHaveNegotiation() && (primaryRole.isAdministrator())) {
             addSkill(person, SkillType.S_NEGOTIATION, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
-        
+
         // roll Administration skill
         if (campaignOptions.isTechsUseAdministration() && (person.isTech() || primaryRole.isVesselCrew())) {
             addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);

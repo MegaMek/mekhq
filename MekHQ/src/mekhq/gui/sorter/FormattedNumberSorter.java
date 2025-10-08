@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.sorter;
 
@@ -39,7 +44,7 @@ import megamek.logging.MMLogger;
  * @author Jay Lawson
  */
 public class FormattedNumberSorter implements Comparator<String> {
-    private static final MMLogger logger = MMLogger.create(FormattedNumberSorter.class);
+    private static final MMLogger LOGGER = MMLogger.create(FormattedNumberSorter.class);
 
     private static final String PLUS_SIGN = "+";
     private static final DecimalFormat FORMAT = new DecimalFormat();
@@ -62,18 +67,18 @@ public class FormattedNumberSorter implements Comparator<String> {
         } else if (s1.isBlank()) {
             return 1;
         }
-        // lets find the weight class integer for each name
+        // let's find the weight class integer for each name
         long l0 = 0;
         try {
             l0 = FORMAT.parse(s0).longValue();
         } catch (ParseException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
         long l1 = 0;
         try {
             l1 = FORMAT.parse(s1).longValue();
         } catch (ParseException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
         return Long.compare(l0, l1);
     }

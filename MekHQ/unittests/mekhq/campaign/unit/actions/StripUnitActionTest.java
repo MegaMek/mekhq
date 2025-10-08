@@ -24,11 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.actions;
 
-import megamek.common.EquipmentType;
-import mekhq.TestUtilities;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
@@ -37,8 +43,7 @@ import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import testUtilities.MHQTestUtilities;
 
 public class StripUnitActionTest {
     @BeforeAll
@@ -55,7 +60,7 @@ public class StripUnitActionTest {
     @Test
     public void strippedMekHasNoSalvageableParts() {
         StripUnitAction action = new StripUnitAction();
-        Campaign campaign = TestUtilities.getTestCampaign();
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
         action.execute(campaign, unit);
         assertTrue(unit.getSalvageableParts().isEmpty());
@@ -64,7 +69,7 @@ public class StripUnitActionTest {
     @Test
     public void strippedLAMHasNoSalvageableParts() {
         StripUnitAction action = new StripUnitAction();
-        Campaign campaign = TestUtilities.getTestCampaign();
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getWaspLAMMk1());
         action.execute(campaign, unit);
         assertTrue(unit.getSalvageableParts().isEmpty());
@@ -73,7 +78,7 @@ public class StripUnitActionTest {
     @Test
     public void strippedQuadVeeHasNoSalvageableParts() {
         StripUnitAction action = new StripUnitAction();
-        Campaign campaign = TestUtilities.getTestCampaign();
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getArionStandard());
         action.execute(campaign, unit);
         assertTrue(unit.getSalvageableParts().isEmpty());
@@ -82,7 +87,7 @@ public class StripUnitActionTest {
     @Test
     public void strippedUnitIsSalvaged() {
         StripUnitAction action = new StripUnitAction();
-        Campaign campaign = TestUtilities.getTestCampaign();
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
         action.execute(campaign, unit);
         assertTrue(unit.isSalvage());

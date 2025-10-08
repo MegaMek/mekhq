@@ -39,14 +39,14 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 public class SupportRating {
-    private static final MMLogger logger = MMLogger.create(SupportRating.class);
+    private static final MMLogger LOGGER = MMLogger.create(SupportRating.class);
     private static final int VEHICLE_WEIGHT_DIVIDER = 15;
 
     /**
@@ -84,7 +84,7 @@ public class SupportRating {
         // Add the total value into the supportRating map
         supportRating.put("total", Map.of("total", total));
 
-        logger.debug("Support Rating = {}", total);
+        LOGGER.debug("Support Rating = {}", total);
 
         // Return the final map containing the calculated values
         return supportRating;
@@ -112,7 +112,7 @@ public class SupportRating {
         LocalDate today = campaign.getLocalDate();
 
         int administratorCount = 0;
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             boolean isAdult = !person.isChild(today);
 
             if (isAdult &&
@@ -135,7 +135,7 @@ public class SupportRating {
         int total = personnelCount > administratorCount ? -5 : 0;
         administrationRequirements.put("total", total);
 
-        logger.debug("Administrator Requirements = {}",
+        LOGGER.debug("Administrator Requirements = {}",
               administrationRequirements.entrySet()
                     .stream()
                     .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
@@ -240,7 +240,7 @@ public class SupportRating {
         technicianRequirements.put("totals", List.of(totalRequirements, totalTechs));
         technicianRequirements.put("rating", List.of(calculateTechRating(percentage)));
 
-        logger.debug("Technician Requirements = {}",
+        LOGGER.debug("Technician Requirements = {}",
               technicianRequirements.entrySet()
                     .stream()
                     .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
@@ -297,7 +297,7 @@ public class SupportRating {
         techCounts.put("techAeroCount", 0);
         techCounts.put("techBattleArmorCount", 0);
 
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             updateCount(person::isTechMek, "techMekCount", techCounts);
             updateCount(person::isTechMechanic, "techMechanicCount", techCounts);
             updateCount(person::isTechAero, "techAeroCount", techCounts);

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,24 +25,29 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
 import megamek.common.TechAdvancement;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
+import megamek.common.equipment.WeaponType;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -54,7 +59,7 @@ import org.w3c.dom.NodeList;
 public class MissingEquipmentPart extends MissingPart {
     private static final MMLogger logger = MMLogger.create(MissingEquipmentPart.class);
 
-    // crap equipmenttype is not serialized!
+    // crap EquipmentType is not serialized!
     protected transient EquipmentType type;
     protected String typeName;
     protected int equipmentNum;
@@ -82,7 +87,7 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c, double eTonnage, double size,
-                                boolean omniPodded) {
+          boolean omniPodded) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
@@ -131,7 +136,7 @@ public class MissingEquipmentPart extends MissingPart {
         }
 
         if (type == null) {
-            logger.error("Mounted.restore: could not restore equipment type \"" + name + "\"");
+            logger.error("Mounted.restore: could not restore equipment type \"{}\"", name);
         }
     }
 
@@ -181,8 +186,8 @@ public class MissingEquipmentPart extends MissingPart {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
 
-            campaign.getQuartermaster().addPart(actualReplacement, 0);
-            replacement.decrementQuantity();
+            campaign.getQuartermaster().addPart(actualReplacement, 0, false);
+            replacement.changeQuantity(-1);
 
             ((EquipmentPart) actualReplacement).setEquipmentNum(equipmentNum);
 
@@ -266,7 +271,7 @@ public class MissingEquipmentPart extends MissingPart {
                 return mounted;
             }
 
-            logger.warn("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
+            logger.warn("Missing valid equipment for {} on unit {}", getName(), getUnit().getName());
         }
 
         return null;
@@ -328,9 +333,9 @@ public class MissingEquipmentPart extends MissingPart {
 
     @Override
     public EquipmentPart getNewPart() {
-        EquipmentPart epart = new EquipmentPart(getUnitTonnage(), type, -1, size, omniPodded, campaign);
-        epart.setEquipTonnage(equipTonnage);
-        return epart;
+        EquipmentPart ePart = new EquipmentPart(getUnitTonnage(), type, -1, size, omniPodded, campaign);
+        ePart.setEquipTonnage(equipTonnage);
+        return ePart;
     }
 
     @Override

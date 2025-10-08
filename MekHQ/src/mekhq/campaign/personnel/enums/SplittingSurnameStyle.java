@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -39,19 +44,19 @@ import mekhq.campaign.personnel.Person;
 public enum SplittingSurnameStyle {
     // region Enum Declarations
     ORIGIN_CHANGES_SURNAME("SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.text",
-            "SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.toolTipText",
-            "SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.dropDownText"),
+          "SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.toolTipText",
+          "SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.dropDownText"),
     SPOUSE_CHANGES_SURNAME("SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.text",
-            "SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.toolTipText",
-            "SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.dropDownText"),
+          "SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.toolTipText",
+          "SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.dropDownText"),
     BOTH_CHANGE_SURNAME("SplittingSurnameStyle.BOTH_CHANGE_SURNAME.text",
-            "SplittingSurnameStyle.BOTH_CHANGE_SURNAME.toolTipText",
-            "SplittingSurnameStyle.BOTH_CHANGE_SURNAME.dropDownText"),
+          "SplittingSurnameStyle.BOTH_CHANGE_SURNAME.toolTipText",
+          "SplittingSurnameStyle.BOTH_CHANGE_SURNAME.dropDownText"),
     BOTH_KEEP_SURNAME("SplittingSurnameStyle.BOTH_KEEP_SURNAME.text",
-            "SplittingSurnameStyle.BOTH_KEEP_SURNAME.toolTipText",
-            "SplittingSurnameStyle.BOTH_KEEP_SURNAME.dropDownText"),
+          "SplittingSurnameStyle.BOTH_KEEP_SURNAME.toolTipText",
+          "SplittingSurnameStyle.BOTH_KEEP_SURNAME.dropDownText"),
     WEIGHTED("SplittingSurnameStyle.WEIGHTED.text", "SplittingSurnameStyle.WEIGHTED.toolTipText",
-            "SplittingSurnameStyle.WEIGHTED.dropDownText");
+          "SplittingSurnameStyle.WEIGHTED.dropDownText");
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -63,7 +68,7 @@ public enum SplittingSurnameStyle {
     // region Constructors
     SplittingSurnameStyle(final String name, final String toolTipText, final String dropDownText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.dropDownText = resources.getString(dropDownText);
@@ -111,8 +116,11 @@ public enum SplittingSurnameStyle {
      */
     public void apply(final Campaign campaign, final Person origin, final Person spouse) {
         final SplittingSurnameStyle surnameStyle = isWeighted()
-                ? createWeightedSurnameMap(campaign.getCampaignOptions().getDivorceSurnameWeights()).randomItem()
-                : this;
+                                                         ?
+                                                         createWeightedSurnameMap(campaign.getCampaignOptions()
+                                                                                        .getDivorceSurnameWeights()).randomItem()
+                                                         :
+                                                         this;
 
         switch (surnameStyle) {
             case ORIGIN_CHANGES_SURNAME:
@@ -139,19 +147,21 @@ public enum SplittingSurnameStyle {
             case WEIGHTED:
             default:
                 MMLogger.create(SplittingSurnameStyle.class)
-                        .error(String.format(
-                                "Splitting Surname Style %s is not defined, and cannot be used for \"%s\" and \"%s\"",
-                                surnameStyle.name(), origin.getFullName(), spouse.getFullName()));
+                      .error("Splitting Surname Style {} is not defined, and cannot be used for \"{}\" and \"{}\"",
+                            surnameStyle.name(),
+                            origin.getFullName(),
+                            spouse.getFullName());
                 break;
         }
     }
 
     /**
      * @param weights the weights to use in creating the weighted surname map
+     *
      * @return the created weighted surname map
      */
     WeightedIntMap<SplittingSurnameStyle> createWeightedSurnameMap(
-            final Map<SplittingSurnameStyle, Integer> weights) {
+          final Map<SplittingSurnameStyle, Integer> weights) {
         final WeightedIntMap<SplittingSurnameStyle> map = new WeightedIntMap<>();
         for (final SplittingSurnameStyle style : SplittingSurnameStyle.values()) {
             if (style.isWeighted()) {

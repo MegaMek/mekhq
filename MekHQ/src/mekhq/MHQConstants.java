@@ -44,7 +44,7 @@ import megamek.SuiteConstants;
 public final class MHQConstants extends SuiteConstants {
     // region General Constants
     public static final String PROJECT_NAME = "MekHQ";
-    public static final int ASTECH_TEAM_SIZE = 6;
+    public static final int AS_TECH_TEAM_SIZE = 6;
     public static final int MAX_JUMP_RADIUS = 30; //
     public static final int PREGNANCY_STANDARD_DURATION = 280; // standard duration of a pregnancy in days (40 weeks)
     public static final String EGO_OBJECTIVE_NAME = "Player";
@@ -136,7 +136,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String ABSENT_BACKGROUND = "absentBackground";
     public static final String FATIGUED_FOREGROUND = "fatiguedForeground";
     public static final String FATIGUED_BACKGROUND = "fatiguedBackground";
-    public static final String STRATCON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
+    public static final String STRAT_CON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
     public static final String FONT_COLOR_AMAZING = "fontColorAmazing";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
@@ -168,7 +168,7 @@ public final class MHQConstants extends SuiteConstants {
 
     // region New Day
     public static final String NEW_DAY_NODE = "mekhq/prefs/newDay";
-    public static final String NEW_DAY_ASTECH_POOL_FILL = "newDayAstechPoolFill";
+    public static final String NEW_DAY_AS_TECH_POOL_FILL = "newDayAstechPoolFill";
     public static final String NEW_DAY_MEDIC_POOL_FILL = "newDayMedicPoolFill";
     public static final String NEW_DAY_MRMS = "newDayMRMS";
     public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
@@ -204,11 +204,11 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_UNTREATED_PERSONNEL = "nagUntreatedPersonnel";
     public static final String NAG_NO_COMMANDER = "nagNoCommander";
     public static final String NAG_CONTRACT_ENDED = "nagContractEnded";
-    public static final String NAG_INSUFFICIENT_ASTECHS = "nagInsufficientAstechs";
-    public static final String NAG_INSUFFICIENT_ASTECH_TIME = "nagInsufficientAstechTime";
+    public static final String NAG_INSUFFICIENT_AS_TECHS = "nagInsufficientAstechs";
+    public static final String NAG_INSUFFICIENT_AS_TECH_TIME = "nagInsufficientAstechTime";
     public static final String NAG_INSUFFICIENT_MEDICS = "nagInsufficientMedics";
     public static final String NAG_SHORT_DEPLOYMENT = "nagShortDeployment";
-    public static final String NAG_UNRESOLVED_STRATCON_CONTACTS = "nagUnresolvedStratConContacts";
+    public static final String NAG_UNRESOLVED_STRAT_CON_CONTACTS = "nagUnresolvedStratConContacts";
     public static final String NAG_OUTSTANDING_SCENARIOS = "nagOutstandingScenarios";
     public static final String NAG_INVALID_FACTION = "nagInvalidFaction";
     public static final String NAG_UNABLE_TO_AFFORD_EXPENSES = "nagUnableToAffordExpenses";
@@ -264,7 +264,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
     public static final String AWARDS_IMAGE_DIRECTORY_PATH = "data/images/awards";
     public static final String ACADEMY_DIRECTORY_PATH = "data/universe/academies/";
-    public static final String RATINFO_DIR = "data/universe/ratdata/";
+    public static final String RAT_INFO_DIR = "data/universe/ratdata/";
     public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
     public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
     public static final String FINANCIAL_INSTITUTIONS_FILE_PATH = "data/universe/financialInstitutions.xml";
@@ -276,30 +276,30 @@ public final class MHQConstants extends SuiteConstants {
     public static final String USER_RANDOM_DEATH_CAUSES_FILE_PATH = "userdata/data/universe/randomDeathCauses.xml";
     public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
     public static final String USER_CAMPAIGN_PRESET_DIRECTORY = "userdata/data/campaignPresets/";
-    public static final String STRATCON_MUL_FILES_DIRECTORY = "data/scenariotemplates/fixedmuls/";
+    public static final String STRAT_CON_MUL_FILES_DIRECTORY = "data/scenariotemplates/fixedmuls/";
     public static final String PLANETARY_SYSTEM_DIRECTORY_PATH = "data/universe/planetary_systems";
     public static final String FORCE_ICON_PATH = "data/images/force";
     public static final String PERSONNEL_MARKET_DIRECTORY_PATH = "data/universe/markets/personnelMarket/";
-    public static final String MAPGEN_PATH = "data/mapgen";
+    public static final String MAP_GEN_PATH = "data/mapgen";
 
     // region StratCon
-    public static final String STRATCON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
-    public static final String STRATCON_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/hostileFacilityModifiers.xml";
-    public static final String STRATCON_ALLIED_FACILITY_MODS = "./data/scenariomodifiers/alliedFacilityModifiers.xml";
-    public static final String STRATCON_GROUND_MODS = "./data/scenariomodifiers/groundBattleModifiers.xml";
-    public static final String STRATCON_AIR_MODS = "./data/scenariomodifiers/airBattleModifiers.xml";
-    public static final String STRATCON_PRIMARY_PLAYER_FORCE_MODS = "./data/scenariomodifiers/primaryPlayerForceModifiers.xml";
-    public static final String STRATCON_SCENARIO_MANIFEST = "./data/scenariotemplates/ScenarioManifest.xml";
-    public static final String STRATCON_USER_SCENARIO_MANIFEST = "./data/scenariotemplates/UserScenarioManifest.xml";
-    public static final String STRATCON_SCENARIO_TEMPLATE_PATH = "./data/scenariotemplates/";
-    public static final String STRATCON_FACILITY_MANIFEST = "./data/stratconfacilities/facilitymanifest.xml";
-    public static final String STRATCON_USER_FACILITY_MANIFEST = "./data/stratconfacilities/userfacilitymanifest.xml";
-    public static final String STRATCON_FACILITY_PATH = "./data/stratconfacilities/";
-    public static final String STRATCON_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/ContractDefinitionManifest.xml";
-    public static final String STRATCON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.xml";
-    public static final String STRATCON_CONTRACT_PATH = "./data/stratconcontractdefinitions/";
+    public static final String STRAT_CON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
+    public static final String STRAT_CON_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/hostileFacilityModifiers.xml";
+    public static final String STRAT_CON_ALLIED_FACILITY_MODS = "./data/scenariomodifiers/alliedFacilityModifiers.xml";
+    public static final String STRAT_CON_GROUND_MODS = "./data/scenariomodifiers/groundBattleModifiers.xml";
+    public static final String STRAT_CON_AIR_MODS = "./data/scenariomodifiers/airBattleModifiers.xml";
+    public static final String STRAT_CON_PRIMARY_PLAYER_FORCE_MODS = "./data/scenariomodifiers/primaryPlayerForceModifiers.xml";
+    public static final String STRAT_CON_SCENARIO_MANIFEST = "./data/scenariotemplates/ScenarioManifest.xml";
+    public static final String STRAT_CON_USER_SCENARIO_MANIFEST = "./data/scenariotemplates/UserScenarioManifest.xml";
+    public static final String STRAT_CON_SCENARIO_TEMPLATE_PATH = "./data/scenariotemplates/";
+    public static final String STRAT_CON_FACILITY_MANIFEST = "./data/stratconfacilities/facilitymanifest.xml";
+    public static final String STRAT_CON_USER_FACILITY_MANIFEST = "./data/stratconfacilities/userfacilitymanifest.xml";
+    public static final String STRAT_CON_FACILITY_PATH = "./data/stratconfacilities/";
+    public static final String STRAT_CON_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/ContractDefinitionManifest.xml";
+    public static final String STRAT_CON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.xml";
+    public static final String STRAT_CON_CONTRACT_PATH = "./data/stratconcontractdefinitions/";
 
-    public static final String STRATCON_BIOME_MANIFEST_PATH = "./data/stratconbiomedefinitions/StratconBiomeManifest.xml";
+    public static final String STRAT_CON_BIOME_MANIFEST_PATH = "./data/stratconbiomedefinitions/StratConBiomeManifest.xml";
     public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.xml";
     public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
     public static final String ALLIED_FACILITY_SCENARIO = "Base Defense.xml";
@@ -351,6 +351,7 @@ public final class MHQConstants extends SuiteConstants {
     // endregion File Paths
 
     // startregion Important Dates
+    public static final LocalDate CLAN_INVASION_FIRST_WAVE_BEGINS = LocalDate.of(3050, 3, 7);
     public static final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
     // endregion Important Dates
 }

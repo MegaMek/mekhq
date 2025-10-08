@@ -32,24 +32,35 @@
  */
 package mekhq.gui.dialog.glossary;
 
+import static mekhq.gui.dialog.glossary.NewGlossaryDialog.DOCUMENTATION_COMMAND_STRING;
+import static mekhq.gui.dialog.glossary.NewGlossaryDialog.documentationEntries;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.EnhancedTabbedPane;
+import megamek.common.ui.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MHQPDFReaderPanel;
-
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import java.awt.*;
-
-import static mekhq.gui.dialog.glossary.NewGlossaryDialog.DOCUMENTATION_COMMAND_STRING;
-import static mekhq.gui.dialog.glossary.NewGlossaryDialog.documentationEntries;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 /**
  * Dialog for displaying {@link DocumentationEntry} details in a tabbed interface, along with a contents pane listing

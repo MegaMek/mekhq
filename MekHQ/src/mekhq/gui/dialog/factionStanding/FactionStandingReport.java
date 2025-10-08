@@ -63,9 +63,10 @@ import javax.swing.border.Border;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
-import megamek.utilities.FastJScrollPane;
 import megamek.utilities.ImageUtilities;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -126,6 +127,9 @@ public class FactionStandingReport extends JDialog {
     private final boolean isFactionStandingEnabled;
     private final CampaignOptions campaignOptions;
 
+    private final boolean hideClanFactions;
+    private final boolean hideNonClanFactions;
+
     private final List<String> innerSphereFactions = new ArrayList<>();
     private final List<String> innerSphereMinorFactions = new ArrayList<>();
     private final List<String> clanFactions = new ArrayList<>();
@@ -140,7 +144,7 @@ public class FactionStandingReport extends JDialog {
      * Constructs a {@link FactionStandingReport} which generates a {@link JDialog} displaying faction standings for the
      * specified campaign and related data.
      *
-     * @param frame The parent {@link JFrame} that acts as the owner of this report dialog.
+     * @param frame    The parent {@link JFrame} that acts as the owner of this report dialog.
      * @param campaign The current campaign
      *
      * @author Illiani
@@ -156,6 +160,12 @@ public class FactionStandingReport extends JDialog {
         factions = Factions.getInstance();
         this.campaignOptions = campaign.getCampaignOptions();
         this.isFactionStandingEnabled = campaignOptions.isTrackFactionStanding();
+
+        // We minus a day as otherwise this will return false if today is the first day of the First Wave
+        boolean clanInvasionHasBegun = MHQConstants.CLAN_INVASION_FIRST_WAVE_BEGINS.minusDays(1).isBefore(today);
+        boolean campaignIsClan = campaignFaction.isClan();
+        hideClanFactions = !clanInvasionHasBegun && !campaignIsClan;
+        hideNonClanFactions = !clanInvasionHasBegun && campaignIsClan;
 
         sortFactions();
         createReportPanel();
@@ -227,11 +237,16 @@ public class FactionStandingReport extends JDialog {
                 continue;
             }
 
+            boolean factionIsClan = faction.isClan();
+            if ((factionIsClan && hideClanFactions) || (!factionIsClan && hideNonClanFactions)) {
+                continue;
+            }
+
             if (!faction.validIn(gameYear)) {
                 deadFactions.add(factionCode);
             } else if (faction.isMercenaryOrganization() || factionCode.equals(PIRACY_SUCCESS_INDEX_FACTION_CODE)) {
                 specialFactions.add(factionCode);
-            } else if (faction.isClan()) {
+            } else if (factionIsClan) {
                 clanFactions.add(factionCode);
             } else if (faction.isDeepPeriphery()) {
                 deepPeripheryFactions.add(factionCode);
@@ -273,13 +288,24 @@ public class FactionStandingReport extends JDialog {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
         if (isFactionStandingEnabled) {
-            tabbedPane.addTab(innerSphereTabTitle, createReportPanelForFactionGroup(innerSphereFactions));
-            tabbedPane.addTab(innerSphereMinorTabTitle, createReportPanelForFactionGroup(innerSphereMinorFactions));
-            tabbedPane.addTab(clanTabTitle, createReportPanelForFactionGroup(clanFactions));
-            tabbedPane.addTab(peripheryTabTitle, createReportPanelForFactionGroup(peripheryFactions));
-            tabbedPane.addTab(deepPeripheryTabTitle, createReportPanelForFactionGroup(deepPeripheryFactions));
-            tabbedPane.addTab(specialTabTitle, createReportPanelForFactionGroup(specialFactions));
-            tabbedPane.addTab(deadTabTitle, createReportPanelForFactionGroup(deadFactions));
+            Object[][] tabs = {
+                  { innerSphereTabTitle, innerSphereFactions },
+                  { innerSphereMinorTabTitle, innerSphereMinorFactions },
+                  { clanTabTitle, clanFactions },
+                  { peripheryTabTitle, peripheryFactions },
+                  { deepPeripheryTabTitle, deepPeripheryFactions },
+                  { specialTabTitle, specialFactions },
+                  { deadTabTitle, deadFactions }
+            };
+
+            for (Object[] tab : tabs) {
+                String title = (String) tab[0];
+                @SuppressWarnings("unchecked")
+                List<String> factions = (List<String>) tab[1];
+                if (!factions.isEmpty()) {
+                    tabbedPane.addTab(title, createReportPanelForFactionGroup(factions));
+                }
+            }
         } else {
             tabbedPane.addTab(disabledTitle, createFactionStandingDisabledTab());
         }
@@ -470,6 +496,7 @@ public class FactionStandingReport extends JDialog {
      * Constructs a panel describing the specified faction, including logo, description, and regard slider.
      *
      * @param factionCode the code of the faction to be displayed
+     *
      * @return a {@link JPanel} representing the faction's standing information
      *
      * @author Illiani
@@ -533,8 +560,8 @@ public class FactionStandingReport extends JDialog {
     }
 
     /**
-     * Creates a Compound Border consisting of a {@code RoundedLineBorder} colored according to the specified
-     * faction standing level, combined with internal padding.
+     * Creates a Compound Border consisting of a {@code RoundedLineBorder} colored according to the specified faction
+     * standing level, combined with internal padding.
      *
      * <p>The color selection is determined by the faction standing level:<br>
      * <ul>
@@ -586,7 +613,7 @@ public class FactionStandingReport extends JDialog {
      * @param faction       the faction object
      * @param factionRegard the regard value for this faction
      *
-     * @return a HTML string for displaying faction details, standing, and description
+     * @return an HTML string for displaying faction details, standing, and description
      *
      * @author Illiani
      * @since 0.50.07
@@ -674,9 +701,9 @@ public class FactionStandingReport extends JDialog {
     /**
      * Calculates the standing effects description string for a given faction regard value.
      *
-     * @param isClan {@code true} if the faction is a Clan faction, otherwise {@code false}
+     * @param isClan                          {@code true} if the faction is a Clan faction, otherwise {@code false}
      * @param isPirateOrMercenaryOrganization {@code true} if the faction is a pirate or mercenary organization
-     * @param factionRegard the regard value of the faction
+     * @param factionRegard                   the regard value of the faction
      *
      * @return the standing effects description for the corresponding {@link FactionStandingLevel}
      *
@@ -690,10 +717,10 @@ public class FactionStandingReport extends JDialog {
     }
 
     /**
-     * Creates a mouse adapter that updates the effects panel's text when the mouse enters the associated 
-     * component.
+     * Creates a mouse adapter that updates the effects panel's text when the mouse enters the associated component.
      *
      * @param replacementText the text to set in the effects panel; if null, an empty string is used
+     *
      * @return a {@link MouseAdapter} that updates the effects panel on mouse enter
      *
      * @author Illiani
@@ -720,9 +747,10 @@ public class FactionStandingReport extends JDialog {
      * name.
      *
      * @param container the container to search within
-     * @param name the name of the component to find
-     * @param type the class type of the component to find
-     * @param <T> the type parameter extending {@link Component}
+     * @param name      the name of the component to find
+     * @param type      the class type of the component to find
+     * @param <T>       the type parameter extending {@link Component}
+     *
      * @return the found component cast to the specified type, or null if not found
      *
      * @author Illiani

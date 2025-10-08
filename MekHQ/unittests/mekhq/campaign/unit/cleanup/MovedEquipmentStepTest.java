@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,25 +24,38 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.cleanup;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+
+import mekhq.campaign.parts.Part;
+import org.mockito.ArgumentCaptor;
+import org.mockito.stubbing.Answer;
+
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
-import org.junit.jupiter.api.Test;
-
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
 
 public class MovedEquipmentStepTest {
     @Test
@@ -74,9 +87,13 @@ public class MovedEquipmentStepTest {
     @Test
     public void doesNotMatchDestroyedEquipmentTest() {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
-        Mounted mockMount = mock(Mounted.class);
+        Mounted<EquipmentType> mockMount = (Mounted<EquipmentType>) mock(Mounted.class);
         when(mockMount.isDestroyed()).thenReturn(true);
-        when(mockProposal.getEquipment()).thenReturn(Collections.singletonMap(0, mockMount).entrySet());
+
+        doAnswer(ans -> {
+            return Collections.singletonMap(0, mockMount).entrySet();
+        }).when(mockProposal).getEquipment();
+
         EquipmentPart mockPart = mock(EquipmentPart.class);
 
         MovedEquipmentStep step = new MovedEquipmentStep();
@@ -91,7 +108,9 @@ public class MovedEquipmentStepTest {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.isDestroyed()).thenReturn(true);
-        when(mockProposal.getEquipment()).thenReturn(Collections.singletonMap(0, mockMount).entrySet());
+        doAnswer(ans -> {
+            return Collections.singletonMap(0, mockMount).entrySet();
+        }).when(mockProposal).getEquipment();
         MissingEquipmentPart mockMissingPart = mock(MissingEquipmentPart.class);
 
         MovedEquipmentStep step = new MovedEquipmentStep();
@@ -106,7 +125,9 @@ public class MovedEquipmentStepTest {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mock(EquipmentType.class));
-        when(mockProposal.getEquipment()).thenReturn(Collections.singletonMap(0, mockMount).entrySet());
+        doAnswer(ans -> {
+            return Collections.singletonMap(0, mockMount).entrySet();
+        }).when(mockProposal).getEquipment();
         EquipmentPart mockPart = mock(EquipmentPart.class);
         when(mockPart.getType()).thenReturn(mock(EquipmentType.class));
 
@@ -122,7 +143,9 @@ public class MovedEquipmentStepTest {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mock(EquipmentType.class));
-        when(mockProposal.getEquipment()).thenReturn(Collections.singletonMap(0, mockMount).entrySet());
+        doAnswer(ans -> {
+            return Collections.singletonMap(0, mockMount).entrySet();
+        }).when(mockProposal).getEquipment();
         MissingEquipmentPart mockMissingPart = mock(MissingEquipmentPart.class);
         when(mockMissingPart.getType()).thenReturn(mock(EquipmentType.class));
 
@@ -139,7 +162,9 @@ public class MovedEquipmentStepTest {
         EquipmentType mockType = mock(EquipmentType.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mockType);
-        when(mockProposal.getEquipment()).thenReturn(Collections.singletonMap(1, mockMount).entrySet());
+        doAnswer(ans -> {
+            return Collections.singletonMap(1, mockMount).entrySet();
+        }).when(mockProposal).getEquipment();
         EquipmentPart mockPart = mock(EquipmentPart.class);
         when(mockPart.getType()).thenReturn(mockType);
 
@@ -156,7 +181,9 @@ public class MovedEquipmentStepTest {
         EquipmentType mockType = mock(EquipmentType.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mockType);
-        when(mockProposal.getEquipment()).thenReturn(Collections.singletonMap(1, mockMount).entrySet());
+        doAnswer(ans -> {
+            return Collections.singletonMap(1, mockMount).entrySet();
+        }).when(mockProposal).getEquipment();
         MissingEquipmentPart mockMissingPart = mock(MissingEquipmentPart.class);
         when(mockMissingPart.getType()).thenReturn(mockType);
 

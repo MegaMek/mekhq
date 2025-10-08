@@ -32,6 +32,23 @@
  */
 package mekhq.gui;
 
+import static java.lang.Math.round;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.models.XTableColumnModel;
@@ -45,7 +62,16 @@ import megamek.common.preference.IPreferenceChangeListener;
 import megamek.logging.MMLogger;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
-import mekhq.campaign.event.*;
+import mekhq.campaign.events.DeploymentChangedEvent;
+import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.events.OvertimeModeEvent;
+import mekhq.campaign.events.parts.PartWorkEvent;
+import mekhq.campaign.events.persons.PersonChangedEvent;
+import mekhq.campaign.events.persons.PersonLogEvent;
+import mekhq.campaign.events.persons.PersonNewEvent;
+import mekhq.campaign.events.persons.PersonRemovedEvent;
+import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
+import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -58,30 +84,13 @@ import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
 
-import javax.swing.*;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import static java.lang.Math.round;
-
 /**
  * Tab for interacting with all personnel
  */
 public final class PersonnelTab extends CampaignGuiTab {
-    private static final MMLogger logger = MMLogger.create(PersonnelTab.class);
+    private static final MMLogger LOGGER = MMLogger.create(PersonnelTab.class);
 
-    public static final int PERSONNEL_VIEW_WIDTH = UIUtil.scaleForGUI(600);
+    public static final int PERSONNEL_VIEW_WIDTH = UIUtil.scaleForGUI(700);
 
     private JSplitPane splitPersonnel;
     private JTable personnelTable;
@@ -294,7 +303,7 @@ public final class PersonnelTab extends CampaignGuiTab {
             personnelTable.setName("personnelTable");
             preferences.manage(new JTablePreference(personnelTable));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -411,8 +420,8 @@ public final class PersonnelTab extends CampaignGuiTab {
         SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
-    private ActionScheduler personnelListScheduler = new ActionScheduler(this::refreshPersonnelList);
-    private ActionScheduler filterPersonnelScheduler = new ActionScheduler(this::filterPersonnel);
+    private final ActionScheduler personnelListScheduler = new ActionScheduler(this::refreshPersonnelList);
+    private final ActionScheduler filterPersonnelScheduler = new ActionScheduler(this::filterPersonnel);
 
     @Subscribe
     public void handle(OptionsChangedEvent ev) {

@@ -39,7 +39,6 @@ import java.awt.GridBagLayout;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
@@ -117,22 +116,22 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
     //region Constructors
     public CreateCampaignPreset(final JFrame frame, final Campaign campaign,
-                                final @Nullable CampaignPreset preset) {
+          final @Nullable CampaignPreset preset) {
         super(frame, "CreateCampaignPresetDialog", "CreateCampaignPresetDialog.title");
         this.campaign = campaign;
         setPreset(preset);
         setDate(campaign.getLocalDate());
         setCompanyGenerationOptions(null);
         this.gameOptions = ((preset == null) || (preset.getGameOptions() == null))
-                ? campaign.getGameOptions() : preset.getGameOptions();
+                                 ? campaign.getGameOptions() : preset.getGameOptions();
         this.campaignOptions = ((preset == null) || (preset.getCampaignOptions() == null))
-                ? campaign.getCampaignOptions() : preset.getCampaignOptions();
+                                     ? campaign.getCampaignOptions() : preset.getCampaignOptions();
         this.randomSkillPreferences = ((preset == null) || (preset.getRandomSkillPreferences() == null))
-                ? campaign.getRandomSkillPreferences() : preset.getRandomSkillPreferences();
+                                            ? campaign.getRandomSkillPreferences() : preset.getRandomSkillPreferences();
         this.skills = ((preset == null) || preset.getSkills().isEmpty())
-                ? SkillType.getSkillHash() : preset.getSkills();
+                            ? SkillType.getSkillHash() : preset.getSkills();
         this.specialAbilities = ((preset == null) || preset.getSpecialAbilities().isEmpty())
-                ? SpecialAbility.getSpecialAbilities() : preset.getSpecialAbilities();
+                                      ? SpecialAbility.getSpecialAbilities() : preset.getSpecialAbilities();
         initialize();
     }
     //endregion Constructors
@@ -226,7 +225,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
     private void restoreComboStartingSystem() {
         getComboStartingSystem().removeAllItems();
         getComboStartingSystem().setModel(new DefaultComboBoxModel<>(getPlanetarySystems(
-                getChkStartingSystemFactionSpecific().isSelected() ? getComboFaction().getSelectedItem() : null)));
+              getChkStartingSystemFactionSpecific().isSelected() ? getComboFaction().getSelectedItem() : null)));
         restoreComboStartingPlanet();
     }
 
@@ -238,11 +237,11 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         this.comboStartingPlanet = comboStartingPlanet;
     }
 
-    private void restoreComboStartingPlanet()  {
+    private void restoreComboStartingPlanet() {
         final PlanetarySystem system = getComboStartingSystem().getSelectedItem();
         if (system != null) {
             getComboStartingPlanet().setModel(new DefaultComboBoxModel<>(
-                    system.getPlanets().toArray(new Planet[]{})));
+                  system.getPlanets().toArray(new Planet[] {})));
             getComboStartingPlanet().setSelectedItem(system.getPrimaryPlanet());
         } else {
             getComboStartingPlanet().removeAllItems();
@@ -395,7 +394,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         // Create Panel Components
         setChkSpecifyDate(new JCheckBox(resources.getString("chkSpecifyDate.text")));
         getChkSpecifyDate().setToolTipText(String.format(resources.getString("chkSpecifyDate.toolTipText"),
-                MekHQ.getMHQOptions().getDisplayFormattedDate(LocalDate.ofYearDay(3067, 1))));
+              MekHQ.getMHQOptions().getDisplayFormattedDate(LocalDate.ofYearDay(3067, 1))));
         getChkSpecifyDate().setName("chkSpecifyDate");
         getChkSpecifyDate().addActionListener(evt -> btnDate.setEnabled(getChkSpecifyDate().isSelected()));
 
@@ -423,7 +422,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
         final DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
         factionModel.addAll(FactionDisplay.getSortedFactionDisplays(
-                Factions.getInstance().getChoosableFactions(), getDate()));
+              Factions.getInstance().getChoosableFactions(), getDate()));
         setComboFaction(new MMComboBox<>("comboFactions", factionModel));
 
         setChkSpecifyPlanet(new JCheckBox(resources.getString("chkSpecifyPlanet.text")));
@@ -437,13 +436,17 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         });
 
         setChkStartingSystemFactionSpecific(new JCheckBox(resources.getString("FactionSpecific.text")));
-        getChkStartingSystemFactionSpecific().setToolTipText(resources.getString("chkStartingSystemFactionSpecific.toolTipText"));
+        getChkStartingSystemFactionSpecific().setToolTipText(resources.getString(
+              "chkStartingSystemFactionSpecific.toolTipText"));
         getChkStartingSystemFactionSpecific().setName("chkStartingSystemFactionSpecific");
         getChkStartingSystemFactionSpecific().addActionListener(evt -> {
             final FactionDisplay factionDisplay = getComboFaction().getSelectedItem();
             final PlanetarySystem startingSystem = getComboStartingSystem().getSelectedItem();
-            if ((factionDisplay == null) || (startingSystem == null)
-                    || !startingSystem.getFactionSet(getCampaign().getLocalDate()).contains(factionDisplay.getFaction())) {
+            if ((factionDisplay == null) ||
+                      (startingSystem == null)
+                      ||
+                      !startingSystem.getFactionSet(getCampaign().getLocalDate())
+                             .contains(factionDisplay.getFaction())) {
                 restoreComboStartingSystem();
             }
         });
@@ -453,8 +456,8 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getComboStartingSystem().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                  final int index, final boolean isSelected,
+                  final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PlanetarySystem) {
                     setText(((PlanetarySystem) value).getName(getCampaign().getLocalDate()));
@@ -466,7 +469,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
             final PlanetarySystem startingSystem = getComboStartingSystem().getSelectedItem();
             final Planet startingPlanet = getComboStartingPlanet().getSelectedItem();
             if ((startingSystem == null)
-                    || (startingPlanet != null) && !startingPlanet.getParentSystem().equals(startingSystem)) {
+                      || (startingPlanet != null) && !startingPlanet.getParentSystem().equals(startingSystem)) {
                 restoreComboStartingPlanet();
             }
         });
@@ -476,8 +479,8 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getComboStartingPlanet().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                  final int index, final boolean isSelected,
+                  final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Planet) {
                     setText(((Planet) value).getName(getCampaign().getLocalDate()));
@@ -493,7 +496,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
         final Comparator<String> comparator = new NaturalOrderComparator();
         final SortedComboBoxModel<RankSystem> rankSystemModel = new SortedComboBoxModel<>(
-                (systemA, systemB) -> comparator.compare(systemA.toString(), systemB.toString()));
+              (systemA, systemB) -> comparator.compare(systemA.toString(), systemB.toString()));
         rankSystemModel.addAll(Ranks.getRankSystems().values());
         if ((getCampaign() != null) && getCampaign().getRankSystem().getType().isCampaign()) {
             rankSystemModel.addElement(getCampaign().getRankSystem());
@@ -503,8 +506,8 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getComboRankSystem().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                  final int index, final boolean isSelected,
+                  final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof RankSystem) {
                     list.setToolTipText(((RankSystem) value).getDescription());
@@ -525,8 +528,10 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getChkGM().setToolTipText(resources.getString("chkGM.toolTipText"));
         getChkGM().setName("chkGM");
 
-        setChkSpecifyCompanyGenerationOptions(new JCheckBox(resources.getString("chkSpecifyCompanyGenerationOptions.text")));
-        getChkSpecifyCompanyGenerationOptions().setToolTipText(resources.getString("chkSpecifyCompanyGenerationOptions.toolTipText"));
+        setChkSpecifyCompanyGenerationOptions(new JCheckBox(resources.getString(
+              "chkSpecifyCompanyGenerationOptions.text")));
+        getChkSpecifyCompanyGenerationOptions().setToolTipText(resources.getString(
+              "chkSpecifyCompanyGenerationOptions.toolTipText"));
         getChkSpecifyCompanyGenerationOptions().setName("chkSpecifyCompanyGenerationOptions");
 
         final RoundedJButton btnCompanyGenerationOptions = new RoundedJButton(resources.getString(
@@ -560,55 +565,55 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(getChkSpecifyDate())
-                                .addComponent(btnDate, Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(getChkSpecifyFaction())
-                                .addComponent(getComboFaction(), Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(getChkSpecifyPlanet())
-                                .addComponent(getChkStartingSystemFactionSpecific(), Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(getComboStartingSystem())
-                                .addComponent(getComboStartingPlanet(), Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(getChkSpecifyRankSystem())
-                                .addComponent(getComboRankSystem(), Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblContractCount)
-                                .addComponent(getSpnContractCount(), Alignment.LEADING))
-                        .addComponent(getChkGM())
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(getChkSpecifyCompanyGenerationOptions())
-                                .addComponent(btnCompanyGenerationOptions, Alignment.LEADING))
+              layout.createSequentialGroup()
+                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                    .addComponent(getChkSpecifyDate())
+                                    .addComponent(btnDate, Alignment.LEADING))
+                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                    .addComponent(getChkSpecifyFaction())
+                                    .addComponent(getComboFaction(), Alignment.LEADING))
+                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                    .addComponent(getChkSpecifyPlanet())
+                                    .addComponent(getChkStartingSystemFactionSpecific(), Alignment.LEADING))
+                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                    .addComponent(getComboStartingSystem())
+                                    .addComponent(getComboStartingPlanet(), Alignment.LEADING))
+                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                    .addComponent(getChkSpecifyRankSystem())
+                                    .addComponent(getComboRankSystem(), Alignment.LEADING))
+                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                    .addComponent(lblContractCount)
+                                    .addComponent(getSpnContractCount(), Alignment.LEADING))
+                    .addComponent(getChkGM())
+                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                    .addComponent(getChkSpecifyCompanyGenerationOptions())
+                                    .addComponent(btnCompanyGenerationOptions, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(getChkSpecifyDate())
-                                .addComponent(btnDate))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(getChkSpecifyFaction())
-                                .addComponent(getComboFaction()))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(getChkSpecifyPlanet())
-                                .addComponent(getChkStartingSystemFactionSpecific()))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(getComboStartingSystem())
-                                .addComponent(getComboStartingPlanet()))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(getChkSpecifyRankSystem())
-                                .addComponent(getComboRankSystem()))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblContractCount)
-                                .addComponent(getSpnContractCount()))
-                        .addComponent(getChkGM())
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(getChkSpecifyCompanyGenerationOptions())
-                                .addComponent(btnCompanyGenerationOptions))
+              layout.createParallelGroup(Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                                    .addComponent(getChkSpecifyDate())
+                                    .addComponent(btnDate))
+                    .addGroup(layout.createSequentialGroup()
+                                    .addComponent(getChkSpecifyFaction())
+                                    .addComponent(getComboFaction()))
+                    .addGroup(layout.createSequentialGroup()
+                                    .addComponent(getChkSpecifyPlanet())
+                                    .addComponent(getChkStartingSystemFactionSpecific()))
+                    .addGroup(layout.createSequentialGroup()
+                                    .addComponent(getComboStartingSystem())
+                                    .addComponent(getComboStartingPlanet()))
+                    .addGroup(layout.createSequentialGroup()
+                                    .addComponent(getChkSpecifyRankSystem())
+                                    .addComponent(getComboRankSystem()))
+                    .addGroup(layout.createSequentialGroup()
+                                    .addComponent(lblContractCount)
+                                    .addComponent(getSpnContractCount()))
+                    .addComponent(getChkGM())
+                    .addGroup(layout.createSequentialGroup()
+                                    .addComponent(getChkSpecifyCompanyGenerationOptions())
+                                    .addComponent(btnCompanyGenerationOptions))
         );
 
         return panel;
@@ -647,19 +652,19 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(getChkSpecifyGameOptions())
-                                .addComponent(btnGameOptions, Alignment.LEADING))
-                        .addComponent(getChkSpecifyCampaignOptions())
+              layout.createSequentialGroup()
+                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                    .addComponent(getChkSpecifyGameOptions())
+                                    .addComponent(btnGameOptions, Alignment.LEADING))
+                    .addComponent(getChkSpecifyCampaignOptions())
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(getChkSpecifyGameOptions())
-                                .addComponent(btnGameOptions))
-                        .addComponent(getChkSpecifyCampaignOptions())
+              layout.createParallelGroup(Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                                    .addComponent(getChkSpecifyGameOptions())
+                                    .addComponent(btnGameOptions))
+                    .addComponent(getChkSpecifyCampaignOptions())
         );
 
         return panel;
@@ -671,14 +676,20 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getOkButton().setEnabled(false);
         restoreComboStartingSystem();
         final Faction faction = (getPreset() == null) || (getPreset().getFaction() == null)
-                ? getCampaign().getFaction() : getPreset().getFaction();
+                                      ? getCampaign().getFaction() : getPreset().getFaction();
         getComboFaction().setSelectedItem(new FactionDisplay(faction, getDate()));
         getComboStartingSystem().setSelectedItem((getPreset() == null) || (getPreset().getPlanet() == null)
-                ? getCampaign().getLocation().getCurrentSystem() : getPreset().getPlanet().getParentSystem());
+                                                       ?
+                                                       getCampaign().getLocation().getCurrentSystem() :
+                                                       getPreset().getPlanet().getParentSystem());
         getComboStartingPlanet().setSelectedItem((getPreset() == null) || (getPreset().getPlanet() == null)
-                ? getCampaign().getLocation().getCurrentSystem().getPrimaryPlanet() : getPreset().getPlanet());
+                                                       ?
+                                                       getCampaign().getLocation()
+                                                             .getCurrentSystem()
+                                                             .getPrimaryPlanet() :
+                                                       getPreset().getPlanet());
         getComboRankSystem().setSelectedItem((getPreset() == null) || (getPreset().getRankSystem() == null)
-                ? getCampaign().getRankSystem() : getPreset().getRankSystem());
+                                                   ? getCampaign().getRankSystem() : getPreset().getRankSystem());
         if (getPreset() != null) {
             getSpnContractCount().setValue(getPreset().getContractCount());
         }
@@ -752,7 +763,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
             final String text = resources.getString("blankPresetName.text");
             if (display) {
                 JOptionPane.showMessageDialog(getFrame(), text, resources.getString("ValidationFailure.title"),
-                        JOptionPane.ERROR_MESSAGE);
+                      JOptionPane.ERROR_MESSAGE);
             }
             getOkButton().setEnabled(false);
             getOkButton().setToolTipText(text);
@@ -766,29 +777,32 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
             final String text = resources.getString("nullFactionSpecified.text");
             getOkButton().setToolTipText(text);
             if (display && JOptionPane.showConfirmDialog(getFrame(), text,
-                    resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                  resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) !=
+                                 JOptionPane.OK_OPTION) {
                 getOkButton().setEnabled(false);
                 return ValidationState.FAILURE;
             }
         }
 
         if (getChkSpecifyPlanet().isSelected()
-                && (getComboStartingPlanet().getSelectedItem() == null)) {
+                  && (getComboStartingPlanet().getSelectedItem() == null)) {
             final String text = resources.getString("nullPlanetSpecified.text");
             getOkButton().setToolTipText(text);
             if (display && JOptionPane.showConfirmDialog(getFrame(), text,
-                    resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                  resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) !=
+                                 JOptionPane.OK_OPTION) {
                 getOkButton().setEnabled(false);
                 return ValidationState.FAILURE;
             }
         }
 
         if (getChkSpecifyRankSystem().isSelected()
-                && (getComboRankSystem().getSelectedItem() == null)) {
+                  && (getComboRankSystem().getSelectedItem() == null)) {
             final String text = resources.getString("nullRankSystemSpecified.text");
             getOkButton().setToolTipText(text);
             if (display && JOptionPane.showConfirmDialog(getFrame(), text,
-                    resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                  resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) !=
+                                 JOptionPane.OK_OPTION) {
                 getOkButton().setEnabled(false);
                 return ValidationState.FAILURE;
             }
@@ -805,8 +819,9 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
     private PlanetarySystem[] getPlanetarySystems(final @Nullable FactionDisplay faction) {
         return getCampaign().getSystems().stream()
-                .filter(p -> (faction == null) || p.getFactionSet(getCampaign().getLocalDate()).contains(faction.getFaction()))
-                .sorted(Comparator.comparing(p -> p.getName(getCampaign().getLocalDate())))
-                .collect(Collectors.toList()).toArray(new PlanetarySystem[]{});
+                     .filter(p -> (faction == null) ||
+                                        p.getFactionSet(getCampaign().getLocalDate()).contains(faction.getFaction()))
+                     .sorted(Comparator.comparing(p -> p.getName(getCampaign().getLocalDate())))
+                     .toList().toArray(new PlanetarySystem[] {});
     }
 }

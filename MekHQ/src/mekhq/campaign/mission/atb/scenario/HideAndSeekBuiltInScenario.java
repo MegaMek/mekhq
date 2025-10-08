@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,13 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.AtBContract;
@@ -38,19 +47,14 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-import mekhq.campaign.stratcon.StratconBiomeManifest;
-import mekhq.campaign.stratcon.StratconBiomeManifest.MapTypeList;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import mekhq.campaign.stratCon.StratConBiomeManifest;
+import mekhq.campaign.stratCon.StratConBiomeManifest.MapTypeList;
 
 @AtBScenarioEnabled
 public class HideAndSeekBuiltInScenario extends AtBScenario {
     @Override
     public int getScenarioType() {
-        return HIDEANDSEEK;
+        return HIDE_AND_SEEK;
     }
 
     @Override
@@ -65,15 +69,15 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 
     @Override
     public void setTerrain() {
-        Map<String, MapTypeList> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
-        List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
+        Map<String, MapTypeList> mapTypes = StratConBiomeManifest.getInstance().getBiomeMapTypes();
+        List<String> keys = mapTypes.keySet().stream().sorted().toList();
         do {
             setTerrainType(keys.get(Compute.randomInt(keys.size())));
         } while (getTerrainType().equals("ColdSea")
-                || getTerrainType().equals("FrozenSea")
-                || getTerrainType().equals("HotSea")
-                || getTerrainType().equals("Plains")
-                || getTerrainType().equals("Savannah"));
+                       || getTerrainType().equals("FrozenSea")
+                       || getTerrainType().equals("HotSea")
+                       || getTerrainType().equals("Plains")
+                       || getTerrainType().equals("Savannah"));
     }
 
     @Override
@@ -88,7 +92,7 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         int enemyStart;
         int playerHome;
 
@@ -122,10 +126,10 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 
         if (isAttacker()) {
             addEnemyForce(enemyEntities, weightClass, EntityWeightClass.WEIGHT_ASSAULT, 2,
-                0, campaign);
+                  0, campaign);
         } else {
             addEnemyForce(enemyEntities, weightClass, EntityWeightClass.WEIGHT_HEAVY, 0,
-                0, campaign);
+                  0, campaign);
         }
 
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
@@ -138,11 +142,11 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
         // Attacker must destroy 50% and keep 66% alive
         // Defender must destroy 33% and keep 50% alive
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1,
-                isAttacker() ? 50 : 33);
+              isAttacker() ? 50 : 33);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(
-                campaign, contract, this, 1, isAttacker() ? 66 : 50, false);
+              campaign, contract, this, 1, isAttacker() ? 66 : 50, false);
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
-                this);
+              this);
 
         if (keepAttachedUnitsAlive != null) {
             getScenarioObjectives().add(keepAttachedUnitsAlive);

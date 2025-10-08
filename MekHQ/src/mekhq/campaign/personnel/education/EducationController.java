@@ -32,14 +32,10 @@
  */
 package mekhq.campaign.personnel.education;
 
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PERSONALITY_QUIRK_CHANCE;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateAndApplyPersonalityQuirk;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -53,15 +49,15 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
-import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -77,7 +73,7 @@ import mekhq.utilities.ReportingUtilities;
  * education process, calculate education level, and enroll a person into an academy.
  */
 public class EducationController {
-    private static final MMLogger logger = MMLogger.create(EducationController.class);
+    private static final MMLogger LOGGER = MMLogger.create(EducationController.class);
 
     private static final String BUNDLE_NAME = "mekhq.resources.Education";
 
@@ -163,11 +159,10 @@ public class EducationController {
         if (campaignOptions.isUseRandomPersonalities()) {
             roll += (person.getReasoning().getReasoningScore() / 4);
         }
-
-        // Calculate target number based on base target number and faculty skill
+        // Calculate the target number based on base target number and faculty skill
         int targetNumber = campaignOptions.getEntranceExamBaseTargetNumber() - academy.getFacultySkill();
 
-        // If roll meets the target number, the application is successful
+        // If the roll meets the target number, the application is successful
         if (roll >= targetNumber) {
             return true;
         } else {
@@ -200,7 +195,7 @@ public class EducationController {
         Academy academy = getAcademy(academySet, academyNameInSet);
 
         if (academy == null) {
-            logger.error("No academy found with name {} in set {}", academyNameInSet, academySet);
+            LOGGER.error("No academy found with name {} in set {}", academyNameInSet, academySet);
             return null;
         }
 
@@ -295,7 +290,7 @@ public class EducationController {
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.STUDENT);
 
         if (academy.isHomeSchool()) {
-            // if the student is being home schooled, we skip the journey to the 'academy'
+            // if the student is being homeschooled, we skip the journey to the 'academy'
             person.setEduEducationStage(EducationStage.EDUCATION);
         } else {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
@@ -323,17 +318,17 @@ public class EducationController {
 
         boolean hasActiveParent = false;
         if (spouse != null) {
-            if (spouse.getStatus().isActive() && (spouse.isDependent() || !spouse.isEmployed())) {
+            if (spouse.getStatus().isActiveFlexible() && (spouse.isDependent() || !spouse.isEmployed())) {
                 person.addEduTagAlong(spouse.getId());
                 spouse.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
             }
 
-            hasActiveParent = spouse.getStatus().isActive();
+            hasActiveParent = spouse.getStatus().isActiveFlexible();
         }
 
         if (!hasActiveParent) {
             for (Person child : children) {
-                if (child.getStatus().isActive()) {
+                if (child.getStatus().isActiveFlexible()) {
                     if (child.isChild(campaign.getLocalDate())) {
                         person.addEduTagAlong(child.getId());
                         child.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
@@ -376,7 +371,7 @@ public class EducationController {
      */
     public static void reEnrollPerson(Campaign campaign, Person person, Academy academy) {
         if (academy.isHomeSchool()) {
-            // if the student is being home schooled, we skip the journey to the 'academy'
+            // if the student is being homeschooled, we skip the journey to the 'academy'
             person.setEduEducationStage(EducationStage.EDUCATION);
         } else {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
@@ -564,7 +559,7 @@ public class EducationController {
         Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
         if (academy == null) {
-            logger.debug("Found null academy for {} skipping", person.getFullTitle());
+            LOGGER.debug("Found null academy for {} skipping", person.getFullTitle());
             return false;
         }
 
@@ -595,7 +590,7 @@ public class EducationController {
             return false;
         }
 
-        logger.error("Failed to process education stage: {}", educationStage);
+        LOGGER.error("Failed to process education stage: {}", educationStage);
         return false;
     }
 
@@ -707,7 +702,7 @@ public class EducationController {
      * @param resources the resource bundle containing localized strings
      */
     private static void beginJourneyHome(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        // if the student is being home schooled, they skip the journey home.
+        // if the student is being homeschooled, they skip the journey home.
         if (academy.isHomeSchool()) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
 
@@ -855,10 +850,10 @@ public class EducationController {
             int roll;
 
             if (militaryDiceSize > 1) {
-                roll = Compute.randomInt(militaryDiceSize);
+                roll = randomInt(militaryDiceSize);
 
                 if (academy.isHomeSchool()) {
-                    int secondRoll = Compute.randomInt(militaryDiceSize);
+                    int secondRoll = randomInt(militaryDiceSize);
 
                     if (secondRoll < roll) {
                         roll = secondRoll;
@@ -942,7 +937,7 @@ public class EducationController {
         // characters, so we treat them as children - even though at 16 they can take Roles.
         if (person.isChild(campaign.getLocalDate(), true)) {
             if (childDiceSize > 1) {
-                roll = Compute.randomInt(childDiceSize);
+                roll = randomInt(childDiceSize);
             } else {
                 roll = -1;
             }
@@ -950,7 +945,7 @@ public class EducationController {
             diceSize = childDiceSize;
         } else {
             if (adultDiceSize > 1) {
-                roll = Compute.randomInt(adultDiceSize);
+                roll = randomInt(adultDiceSize);
             } else {
                 roll = -1;
             }
@@ -1035,9 +1030,8 @@ public class EducationController {
         String reportText = academy.isHomeSchool() ? "dropOutHomeSchooled.text" : "dropOut.text";
 
         String coloredOpen = String.format("<span color='%s'>", negativeHexColor);
-        String coloredClose = CLOSING_SPAN_TAG;
 
-        String report = String.format(resources.getString(reportText), personTitle, coloredOpen, coloredClose);
+        String report = String.format(resources.getString(reportText), personTitle, coloredOpen, CLOSING_SPAN_TAG);
 
         campaign.addReport(report);
     }
@@ -1164,11 +1158,11 @@ public class EducationController {
      * @return true if the person completed their education, false otherwise
      */
     private static boolean graduateAdult(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        int graduationRoll = Compute.randomInt(100);
+        int graduationRoll = randomInt(100);
         int roll;
 
         if (academy.isHomeSchool()) {
-            int secondRoll = Compute.randomInt(100);
+            int secondRoll = randomInt(100);
 
             if (secondRoll < graduationRoll) {
                 graduationRoll = secondRoll;
@@ -1185,21 +1179,21 @@ public class EducationController {
 
         // qualification failed
         if (graduationRoll < 5) {
+            String reportMessage;
             if (academy.isHomeSchool()) {
-                String reportMessage = String.format(resources.getString("graduatedFailedHomeSchooled.text"),
+                reportMessage = String.format(resources.getString("graduatedFailedHomeSchooled.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                       CLOSING_SPAN_TAG);
 
-                campaign.addReport(reportMessage);
             } else {
-                String reportMessage = String.format(resources.getString("graduatedFailed.text"),
+                reportMessage = String.format(resources.getString("graduatedFailed.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                       CLOSING_SPAN_TAG);
 
-                campaign.addReport(reportMessage);
             }
+            campaign.addReport(reportMessage);
 
             ServiceLogger.eduFailed(person,
                   campaign.getLocalDate(),
@@ -1233,15 +1227,15 @@ public class EducationController {
 
         if (graduationRoll >= 99) {
             if (d6(1) >= 5) {
+                String reportMessage;
                 if (academy.isHomeSchool()) {
-                    String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
+                    reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                           person.getHyperlinkedFullTitle(),
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG);
 
-                    campaign.addReport(reportMessage);
                 } else {
-                    String reportMessage = String.format(resources.getString("graduatedTop.text"),
+                    reportMessage = String.format(resources.getString("graduatedTop.text"),
                           person.getHyperlinkedFullTitle(),
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG,
@@ -1249,18 +1243,18 @@ public class EducationController {
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG);
 
-                    campaign.addReport(reportMessage);
                 }
+                campaign.addReport(reportMessage);
             } else {
+                String reportMessage;
                 if (academy.isHomeSchool()) {
-                    String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
+                    reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                           person.getHyperlinkedFullTitle(),
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG);
 
-                    campaign.addReport(reportMessage);
                 } else {
-                    String reportMessage = String.format(resources.getString("graduatedTop.text"),
+                    reportMessage = String.format(resources.getString("graduatedTop.text"),
                           person.getHyperlinkedFullTitle(),
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG,
@@ -1268,8 +1262,8 @@ public class EducationController {
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG);
 
-                    campaign.addReport(reportMessage);
                 }
+                campaign.addReport(reportMessage);
             }
 
             ServiceLogger.eduGraduatedPlus(person,
@@ -1291,15 +1285,15 @@ public class EducationController {
         if (graduationRoll >= 90) {
             if (d6(1) >= 5) {
 
+                String reportMessage;
                 if (academy.isHomeSchool()) {
-                    String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
+                    reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                           person.getHyperlinkedFullTitle(),
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG);
 
-                    campaign.addReport(reportMessage);
                 } else {
-                    String reportMessage = String.format(resources.getString("graduatedHonors.text"),
+                    reportMessage = String.format(resources.getString("graduatedHonors.text"),
                           person.getHyperlinkedFullTitle(),
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG,
@@ -1307,18 +1301,18 @@ public class EducationController {
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG);
 
-                    campaign.addReport(reportMessage);
                 }
+                campaign.addReport(reportMessage);
             } else {
+                String reportMessage;
                 if (academy.isHomeSchool()) {
-                    String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
+                    reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                           person.getHyperlinkedFullTitle(),
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG);
 
-                    campaign.addReport(reportMessage);
                 } else {
-                    String reportMessage = String.format(resources.getString("graduatedHonors.text"),
+                    reportMessage = String.format(resources.getString("graduatedHonors.text"),
                           person.getHyperlinkedFullTitle(),
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG,
@@ -1326,8 +1320,8 @@ public class EducationController {
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG);
 
-                    campaign.addReport(reportMessage);
                 }
+                campaign.addReport(reportMessage);
             }
 
             ServiceLogger.eduGraduatedPlus(person,
@@ -1347,39 +1341,39 @@ public class EducationController {
 
         // default graduation
         if (d6(1) >= 5) {
+            String reportMessage;
             if (academy.isHomeSchool()) {
-                String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
+                reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG);
 
-                campaign.addReport(reportMessage);
             } else {
-                String reportMessage = String.format(resources.getString("graduated.text"),
+                reportMessage = String.format(resources.getString("graduated.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG,
                       ' ' + resources.getString(graduationEventPicker()));
 
-                campaign.addReport(reportMessage);
             }
+            campaign.addReport(reportMessage);
         } else {
+            String reportMessage;
             if (academy.isHomeSchool()) {
-                String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
+                reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG);
 
-                campaign.addReport(reportMessage);
             } else {
-                String reportMessage = String.format(resources.getString("graduated.text"),
+                reportMessage = String.format(resources.getString("graduated.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG,
                       "");
 
-                campaign.addReport(reportMessage);
             }
+            campaign.addReport(reportMessage);
         }
 
         ServiceLogger.eduGraduated(person,
@@ -1465,10 +1459,10 @@ public class EducationController {
      * @param academy  the Prep School from which the person is being graduated
      */
     private static void graduateChild(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        int graduationRoll = Compute.randomInt(100);
+        int graduationRoll = randomInt(100);
 
         if (academy.isHomeSchool()) {
-            int secondRoll = Compute.randomInt(100);
+            int secondRoll = randomInt(100);
 
             if (secondRoll < graduationRoll) {
                 graduationRoll = secondRoll;
@@ -1485,37 +1479,37 @@ public class EducationController {
         }
 
         if (graduationRoll < 30) {
+            String reportMessage;
             if (academy.isHomeSchool()) {
-                String reportMessage = String.format(resources.getString("graduatedBarelyHomeSchooled.text"),
+                reportMessage = String.format(resources.getString("graduatedBarelyHomeSchooled.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                       CLOSING_SPAN_TAG);
 
-                campaign.addReport(reportMessage);
             } else {
-                String reportMessage = String.format(resources.getString("graduatedBarely.text"),
+                reportMessage = String.format(resources.getString("graduatedBarely.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                       CLOSING_SPAN_TAG);
 
-                campaign.addReport(reportMessage);
             }
+            campaign.addReport(reportMessage);
         } else {
+            String reportMessage;
             if (academy.isHomeSchool()) {
-                String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
+                reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG);
 
-                campaign.addReport(reportMessage);
             } else {
-                String reportMessage = String.format(resources.getString("graduatedChild.text"),
+                reportMessage = String.format(resources.getString("graduatedChild.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG);
 
-                campaign.addReport(reportMessage);
             }
+            campaign.addReport(reportMessage);
         }
 
         ServiceLogger.eduGraduated(person,
@@ -1572,15 +1566,6 @@ public class EducationController {
                 person.setOriginFaction(campaign.getFaction());
             }
 
-            // People coming out of re-education camps have a chance to become a little weird
-            if (person.getPersonalityQuirk().isNone()) {
-                if (randomInt(PERSONALITY_QUIRK_CHANCE / 2) == 0) {
-                    generateAndApplyPersonalityQuirk(person);
-                    writePersonalityDescription(person);
-                    writeInterviewersNotes(person);
-                }
-            }
-
             // brainwashed personnel should have higher than average loyalty, so they roll
             // 4d6 and drop the lowest roll
             List<Integer> rolls = new ArrayList<>();
@@ -1624,15 +1609,26 @@ public class EducationController {
             }
         }
 
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Integer curriculumXpRate = campaignOptions.getCurriculumXpRate();
+        boolean isLogSkillGain = campaignOptions.isPersonnelLogSkillGain();
         for (String skill : curriculum) {
             if (skill.equalsIgnoreCase("none")) {
                 return;
             }
 
             if (skill.equalsIgnoreCase("xp")) {
-                person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
+                person.awardXP(campaign, curriculumXpRate);
             } else {
                 updateSkill(person, educationLevel, skill);
+
+                String skillParsed = Academy.skillParser(skill);
+                int actualSkillLevel = person.hasSkill(skillParsed) ? person.getSkill(skillParsed).getLevel() : 0;
+                PerformanceLogger.improvedSkill(isLogSkillGain,
+                      person,
+                      campaign.getLocalDate(),
+                      skill,
+                      actualSkillLevel);
             }
         }
     }
@@ -1669,7 +1665,7 @@ public class EducationController {
         while (underTarget) {
             Skill skill = person.getSkill(skillParsed);
             if (skill == null) {
-                logger.error("Skill {} not found for person {}", skillParsed, person.getFullTitle());
+                LOGGER.error("Skill {} not found for person {}", skillParsed, person.getFullTitle());
                 underTarget = false;
                 continue;
             }
@@ -1731,7 +1727,7 @@ public class EducationController {
         curriculum = curriculum.stream().map(String::trim).toList();
 
         for (int i = 0; i < bonusCount; i++) {
-            int roll = Compute.randomInt(curriculum.size());
+            int roll = randomInt(curriculum.size());
 
             try {
                 String skillParsed = Academy.skillParser(curriculum.get(roll));
@@ -1773,7 +1769,7 @@ public class EducationController {
         List<String> graduationEventTable = graduationEventTable();
         Collections.shuffle(graduationEventTable);
 
-        return graduationEventTable.get(Compute.randomInt(graduationEventTable.size()));
+        return graduationEventTable.get(randomInt(graduationEventTable.size()));
     }
 
     /**
@@ -2051,7 +2047,7 @@ public class EducationController {
                                             Reasoning.values().length / 2;
         passRate += reasoningModifier;
 
-        final boolean flunked = Compute.randomInt(100) <= passRate;
+        final boolean flunked = randomInt(100) <= passRate;
 
         EducationLevel educationLevel;
         if (isCombatRole) {
@@ -2096,7 +2092,7 @@ public class EducationController {
         if (experienceLevel < EXP_REGULAR) {
             // Second-chance roll for High School
             if (flunked) {
-                flunked = Compute.randomInt(100) < passRate;
+                flunked = randomInt(100) < passRate;
             }
 
             return flunked ? EducationLevel.EARLY_CHILDHOOD : EducationLevel.HIGH_SCHOOL;
@@ -2135,7 +2131,7 @@ public class EducationController {
         if (experienceLevel < EXP_REGULAR) {
             // Second-chance roll for High School
             if (flunked) {
-                flunked = Compute.randomInt(100) < passRate;
+                flunked = randomInt(100) < passRate;
             }
 
             return flunked ? EducationLevel.EARLY_CHILDHOOD : EducationLevel.HIGH_SCHOOL;

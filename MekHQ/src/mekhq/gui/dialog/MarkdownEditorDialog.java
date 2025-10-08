@@ -24,32 +24,39 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.util.ResourceBundle;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 import mekhq.MekHQ;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.ResourceBundle;
-
 /**
  * This dialog contains a MarkdownEditorPanel that the user can use to write markdown flavored text.
+ *
  * @author Taharqa (Aaron Gullickson)
  */
 public class MarkdownEditorDialog extends JDialog {
     private MarkdownEditorPanel mkEditor;
-    private JButton btnOK;
-    private JButton btnCancel;
     private boolean changed;
 
     /**
      * Constructor
-     * @param parent
-     * @param modal
+     *
      * @param title - a <code>String</code> for the title of the dialog
-     * @param text - a <code>String</code> for existing text to be placed in the editor when created.
+     * @param text  - a <code>String</code> for existing text to be placed in the editor when created.
      */
     public MarkdownEditorDialog(JFrame parent, boolean modal, String title, String text) {
         super(parent, modal);
@@ -70,11 +77,11 @@ public class MarkdownEditorDialog extends JDialog {
     private void initComponents() {
 
         mkEditor = new MarkdownEditorPanel();
-        btnOK = new JButton();
-        btnCancel = new JButton();
+        JButton btnOK = new JButton();
+        JButton btnCancel = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.TextAreaDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         setLayout(new GridBagLayout());
 
@@ -113,6 +120,7 @@ public class MarkdownEditorDialog extends JDialog {
 
     /**
      * Get the text currently in the editor
+     *
      * @return <code>String</code> of the current text in the editor
      */
     public String getText() {
@@ -126,6 +134,7 @@ public class MarkdownEditorDialog extends JDialog {
 
     /**
      * Was anything changed. Used to determine whether the user canceled the dialog of hit ok
+     *
      * @return a <code>boolean</code> indicating whether anything was changed
      */
     public boolean wasChanged() {

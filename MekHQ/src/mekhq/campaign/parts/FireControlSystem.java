@@ -25,27 +25,28 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.units.Aero;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingFireControlSystem;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -80,9 +81,9 @@ public class FireControlSystem extends Part {
         if (null != unit && unit.getEntity() instanceof Aero) {
             hits = ((Aero) unit.getEntity()).getFCSHits();
             if (checkForDestruction
-                    && hits > priorHits
-                    && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits
+                      && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             } else if (hits >= 3) {
                 remove(false);
@@ -95,7 +96,7 @@ public class FireControlSystem extends Part {
         int time;
         if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
             // Test of proposed errata for repair times
-            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship))  {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 120;
                 if (unit.getEntity().hasNavalC3()) {
                     time *= 2;
@@ -105,8 +106,6 @@ public class FireControlSystem extends Part {
             }
             if (isSalvaging()) {
                 time *= 10;
-            } else if (hits == 1) {
-                time *= 1;
             } else if (hits == 2) {
                 time *= 2;
             }
@@ -164,13 +163,13 @@ public class FireControlSystem extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -206,9 +205,9 @@ public class FireControlSystem extends Part {
     public void calculateCost() {
         if (null != unit) {
             if (unit.getEntity() instanceof SmallCraft) {
-                cost = Money.of(100000 + 10000 * ((SmallCraft) unit.getEntity()).getArcswGuns());
+                cost = Money.of(100000 + 10000 * ((SmallCraft) unit.getEntity()).getArcsWithGuns());
             } else if (unit.getEntity() instanceof Jumpship) {
-                cost = Money.of(100000 + 10000 * ((Jumpship) unit.getEntity()).getArcswGuns());
+                cost = Money.of(100000 + 10000 * ((Jumpship) unit.getEntity()).getArcsWithGuns());
             }
         }
     }

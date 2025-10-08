@@ -51,7 +51,7 @@ import mekhq.campaign.ResolveScenarioTracker;
  * @author Taharqa
  */
 public class ChooseMulFilesDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(ChooseMulFilesDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(ChooseMulFilesDialog.class);
 
     private final ResolveScenarioTracker tracker;
 
@@ -188,7 +188,7 @@ public class ChooseMulFilesDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

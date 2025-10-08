@@ -24,10 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.determineTargetNumber;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -45,7 +50,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.common.TargetRoll;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
@@ -59,7 +64,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  *
  * <p>This dialog allows the user to perform skill checks for a specific skill by selecting the skill, applying
  * modifiers, and choosing whether to use Edge. It consists of an initial dialog to gather input, executes the skill
- * check, and then presents the result in a results dialog.</p>
+ * check, and then presents the result in a results' dialog.</p>
  *
  * @author Illiani
  * @since 0.50.05
@@ -167,7 +172,7 @@ public class SkillCheckDialog {
 
 
     /**
-     * Displays the results of the skill check in a results dialog.
+     * Displays the results of the skill check in a results' dialog.
      *
      * @param results the results text to display
      *

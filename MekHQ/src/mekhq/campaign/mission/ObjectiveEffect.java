@@ -24,21 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.mission;
 
 /**
- * A data structure containing metadata relevant to the effect that completing or failing an objective
- * can have.
- * @author NickAragua
+ * A data structure containing metadata relevant to the effect that completing or failing an objective can have.
  *
+ * @author NickAragua
  */
 public class ObjectiveEffect {
 
     /**
-     * The possible type of effect scaling effects,
-     * aka what you multiply the effect by.
+     * The possible type of effect scaling effects, aka what you multiply the effect by.
      */
     public enum EffectScalingType {
         /*
@@ -116,11 +118,11 @@ public class ObjectiveEffect {
         FacilityCaptured("Facility captured and changes controller", false);
 
         private final String descriptiveText;
-        private boolean magnitudeIsRelevant;
+        private final boolean magnitudeIsRelevant;
 
         /**
-         * Whether the scaling is relevant for this particular objective effect type -
-         * e.g. it doesn't matter how many times you destroy a facility, it's still destroyed
+         * Whether the scaling is relevant for this particular objective effect type - e.g. it doesn't matter how many
+         * times you destroy a facility, it's still destroyed
          */
         public boolean isMagnitudeRelevant() {
             return magnitudeIsRelevant;

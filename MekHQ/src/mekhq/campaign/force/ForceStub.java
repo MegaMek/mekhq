@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,15 +25,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.force;
 
 import java.io.PrintWriter;
 import java.util.UUID;
 import java.util.Vector;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
@@ -43,22 +45,23 @@ import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * this is a hierarchical object that represents forces from the TO&amp;E using
- * strings rather than unit objects. This makes it static and thus usable to
- * keep track of forces involved in completed scenarios
+ * this is a hierarchical object that represents forces from the TO&amp;E using strings rather than unit objects. This
+ * makes it static and thus usable to keep track of forces involved in completed scenarios
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ForceStub {
-    private static final MMLogger logger = MMLogger.create(ForceStub.class);
+    private static final MMLogger LOGGER = MMLogger.create(ForceStub.class);
 
     // region Variable Declarations
     private String name;
     private StandardForceIcon forceIcon;
-    private Vector<ForceStub> subForces;
-    private Vector<UnitStub> units;
+    private final Vector<ForceStub> subForces;
+    private final Vector<UnitStub> units;
     // endregion Variable Declarations
 
     // region Constructors
@@ -116,18 +119,18 @@ public class ForceStub {
 
         if (!units.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "units");
-            for (UnitStub ustub : units) {
-                ustub.writeToXML(pw, indent);
+            for (UnitStub unitStub : units) {
+                unitStub.writeToXML(pw, indent);
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "units");
         }
 
         if (!subForces.isEmpty()) {
-            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "subforces");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "subForces");
             for (ForceStub sub : subForces) {
                 sub.writeToXML(pw, indent);
             }
-            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "subforces");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "subForces");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forceStub");
     }
@@ -153,22 +156,22 @@ public class ForceStub {
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         } else if (!wn3.getNodeName().equalsIgnoreCase("unitStub")) {
-                            logger
-                                    .error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
+                            LOGGER
+                                  .error("Unknown node type not loaded in ForceStub nodes: {}", wn3.getNodeName());
                             continue;
                         }
 
                         retVal.units.add(UnitStub.generateInstanceFromXML(wn3));
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("subforces")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("subForces")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         } else if (!wn3.getNodeName().equalsIgnoreCase("forceStub")) {
-                            logger
-                                    .error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
+                            LOGGER
+                                  .error("Unknown node type not loaded in ForceStub nodes: {}", wn3.getNodeName());
                             continue;
                         }
 
@@ -177,7 +180,7 @@ public class ForceStub {
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         return retVal;

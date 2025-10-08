@@ -24,13 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.enums;
 
-import mekhq.MekHQ;
-
 import java.util.List;
 import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
 
 public enum PersonnelFilterStyle {
     //region Enum Declarations
@@ -47,7 +52,7 @@ public enum PersonnelFilterStyle {
     //region Constructors
     PersonnelFilterStyle(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -74,18 +79,14 @@ public enum PersonnelFilterStyle {
     //endregion Boolean Comparison Methods
 
     public List<PersonnelFilter> getFilters(final boolean standard) {
-        switch (this) {
-            case INDIVIDUAL_ROLE:
-                return standard ? PersonnelFilter.getIndividualRolesStandardPersonnelFilters()
-                        : PersonnelFilter.getIndividualRolesExpandedPersonnelFilters();
-            case ALL:
-                return standard ? PersonnelFilter.getAllStandardFilters()
-                        : PersonnelFilter.getAllIndividualRoleFilters();
-            default:
-            case STANDARD:
-                return standard ? PersonnelFilter.getStandardPersonnelFilters()
-                        : PersonnelFilter.getExpandedPersonnelFilters();
-        }
+        return switch (this) {
+            case INDIVIDUAL_ROLE -> standard ? PersonnelFilter.getIndividualRolesStandardPersonnelFilters()
+                                          : PersonnelFilter.getIndividualRolesExpandedPersonnelFilters();
+            case ALL -> standard ? PersonnelFilter.getAllStandardFilters()
+                              : PersonnelFilter.getAllIndividualRoleFilters();
+            default -> standard ? PersonnelFilter.getStandardPersonnelFilters()
+                             : PersonnelFilter.getExpandedPersonnelFilters();
+        };
     }
 
     @Override

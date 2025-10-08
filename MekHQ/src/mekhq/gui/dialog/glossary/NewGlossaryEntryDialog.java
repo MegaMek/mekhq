@@ -32,12 +32,25 @@
  */
 package mekhq.gui.dialog.glossary;
 
+import static mekhq.gui.dialog.glossary.NewGlossaryDialog.DOCUMENTATION_COMMAND_STRING;
+import static mekhq.gui.dialog.glossary.NewGlossaryDialog.GLOSSARY_COMMAND_STRING;
+import static mekhq.gui.dialog.glossary.NewGlossaryDialog.glossaryEntries;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.FlatLafStyleBuilder;
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.EnhancedTabbedPane;
+import megamek.common.ui.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
@@ -46,14 +59,6 @@ import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
-
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import java.awt.*;
-import java.util.List;
-
-import static mekhq.gui.dialog.glossary.NewGlossaryDialog.*;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 /**
  * Dialog for displaying {@link GlossaryEntry} details in a tabbed interface, along with a contents pane listing all

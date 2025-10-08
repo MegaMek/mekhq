@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.market.contractMarket;
 
-import static megamek.common.Compute.d6;
+import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
@@ -115,7 +115,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         //for (AtBContract contract : campaign.getActiveAtBContracts()) {
         //checkForSubcontracts(campaign, contract, unitRatingMod);
         //}
-        // TODO: CamopsMarket: allow players to choose negotiators and send them out, removing them
+        // TODO: CamOpsMarket: allow players to choose negotiators and send them out, removing them
         // from other tasks they're doing. For now just use the highest negotiation skill on the force.
         int ratingMod = campaign.getReputation().getReputationModifier();
         HiringHallModifiers hiringHallModifiers = getHiringHallModifiers(campaign);
@@ -131,7 +131,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
 
         int numOffers = getNumberOfOffers(rollNegotiation(negotiationSkill, ratingMod + hiringHallModifiers.offersMod) -
-                BASE_NEGOTIATION_TARGET) + negotiatorModifier;
+                                                BASE_NEGOTIATION_TARGET) + negotiatorModifier;
 
         if (isGrayMonday) {
             for (int i = 0; i < numOffers; i++) {
@@ -245,7 +245,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     private Optional<AtBContract> generateContract(Campaign campaign, ReputationController reputation,
-                                                   HiringHallModifiers hiringHallModifiers) {
+          HiringHallModifiers hiringHallModifiers) {
         AtBContract contract = new AtBContract("UnnamedContract");
         lastId++;
         contract.setId(lastId);

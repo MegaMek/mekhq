@@ -24,10 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.log;
 
 public enum LogEntryType {
-    MEDICAL, AWARD, SERVICE, PERSONAL, CUSTOM, HISTORICAL, //Used for historical daily log
-    ASSIGNMENT, PERFORMANCE
+    ASSIGNMENT,
+    AWARD,
+    CUSTOM,
+    HISTORICAL, //Used for historical daily log
+    MEDICAL,
+    PATIENT,
+    PERFORMANCE,
+    PERSONAL,
+    SERVICE
 }

@@ -34,21 +34,21 @@ package mekhq.campaign.finances;
 
 import java.util.stream.Collectors;
 
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.Dropship;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.Mek;
-import megamek.common.ProtoMek;
-import megamek.common.Tank;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.units.Aero;
+import megamek.common.units.Dropship;
+import megamek.common.units.Infantry;
+import megamek.common.units.Jumpship;
+import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.Contract;
 
 public class FinancialReport {
     private Money assets = Money.zero();
-    private Money liabilities = Money.zero();
+    private final Money liabilities = Money.zero();
     private Money cash = Money.zero();
     private Money loans = Money.zero();
     private Money mek = Money.zero();
@@ -73,7 +73,7 @@ public class FinancialReport {
 
     public Money getTotalAssets() {
         return assets.plus(cash).plus(mek).plus(vee).plus(ba).plus(infantry).plus(largeCraft)
-                    .plus(smallCraft).plus(proto).plus(spareParts);
+                     .plus(smallCraft).plus(proto).plus(spareParts);
     }
 
     public Money getTotalLiabilities() {
@@ -174,7 +174,7 @@ public class FinancialReport {
             } else if (u.getEntity() instanceof Infantry) {
                 r.infantry = r.infantry.plus(value);
             } else if (u.getEntity() instanceof Dropship
-                    || u.getEntity() instanceof Jumpship) {
+                             || u.getEntity() instanceof Jumpship) {
                 r.largeCraft = r.largeCraft.plus(value);
             } else if (u.getEntity() instanceof Aero) {
                 r.smallCraft = r.smallCraft.plus(value);
@@ -184,9 +184,9 @@ public class FinancialReport {
         });
 
         r.spareParts = r.spareParts.plus(
-            campaign.getWarehouse().streamSpareParts()
-                .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
-                .collect(Collectors.toList()));
+              campaign.getWarehouse().streamSpareParts()
+                    .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
+                    .collect(Collectors.toList()));
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Accountant accountant = campaign.getAccountant();
@@ -207,9 +207,9 @@ public class FinancialReport {
         }
 
         r.contracts = r.contracts.plus(
-            campaign.getActiveContracts()
-                .stream().map(Contract::getMonthlyPayOut)
-                .collect(Collectors.toList()));
+              campaign.getActiveContracts()
+                    .stream().map(Contract::getMonthlyPayOut)
+                    .collect(Collectors.toList()));
 
         return r;
     }

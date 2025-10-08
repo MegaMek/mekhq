@@ -61,6 +61,7 @@ import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
+import megamek.common.util.DateUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -97,6 +98,9 @@ import mekhq.gui.displayWrappers.FactionDisplay;
  * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */
 public class GeneralTab {
+    private static final LocalDate RANDOM_DATE_EARLIEST = LocalDate.of(2470, 1, 1);
+    private static final LocalDate RANDOM_DATE_LATEST = LocalDate.of(3151, 1, 1);
+
     private final JFrame frame;
     private final Campaign campaign;
     private final CampaignOptionsDialogMode mode;
@@ -108,6 +112,7 @@ public class GeneralTab {
     private MMComboBox<FactionDisplay> comboFaction;
     private JLabel lblDate;
     private RoundedJButton btnDate;
+    private RoundedJButton btnRandomDate;
     private LocalDate date;
     private JLabel lblCamo;
     private RoundedJButton btnCamo;
@@ -115,7 +120,6 @@ public class GeneralTab {
     private JLabel lblIcon;
     private RoundedJButton btnIcon;
     private StandardForceIcon unitIcon;
-    private JLabel lblFurtherReading;
 
     /**
      * Constructs a new instance of the {@code GeneralTab} using the provided {@link Campaign} and {@link JFrame}.
@@ -200,9 +204,17 @@ public class GeneralTab {
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.addActionListener(this::btnDateActionPerformed);
 
+        // Randomize starting date
+        btnRandomDate = new CampaignOptionsButton("RandomDate");
+        btnRandomDate.addActionListener(e -> {
+            LocalDate randomDate = DateUtilities.getRandomDateBetween(RANDOM_DATE_EARLIEST, RANDOM_DATE_LATEST);
+            setDate(randomDate);
+        });
+
         if (mode != CampaignOptionsDialogMode.STARTUP && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
             lblDate.setEnabled(false);
             btnDate.setEnabled(false);
+            btnRandomDate.setEnabled(false);
         }
 
         // Camouflage
@@ -236,6 +248,7 @@ public class GeneralTab {
         layout.gridy++;
         panel.add(lblDate, layout);
         panel.add(btnDate, layout);
+        panel.add(btnRandomDate, layout);
 
         layout.gridy++;
         panel.add(lblName, layout);
@@ -342,6 +355,7 @@ public class GeneralTab {
 
         lblDate = new JLabel();
         btnDate = new RoundedJButton();
+        btnRandomDate = new RoundedJButton();
 
         lblCamo = new JLabel();
         btnCamo = new RoundedJButton() {
@@ -448,7 +462,7 @@ public class GeneralTab {
      * @return A {@link JPanel} containing additional informational components.
      */
     private JPanel createFurtherReadingPanel() {
-        lblFurtherReading = new CampaignOptionsLabel("FurtherReading", null, true);
+        JLabel lblFurtherReading = new CampaignOptionsLabel("FurtherReading", null, true);
 
         final JPanel panel = new CampaignOptionsStandardPanel("FurtherReadingPanel", true, "FurtherReadingPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -469,8 +483,7 @@ public class GeneralTab {
      * <p>
      * This is a convenience method that uses the default campaign options, default date, and default faction to
      * populate the relevant data fields in the user interface. It essentially delegates the work to the overloaded
-     * method {@link #loadValuesFromCampaignOptions(LocalDate, Faction)} with all parameters set to
-     * {@code null}.
+     * method {@link #loadValuesFromCampaignOptions(LocalDate, Faction)} with all parameters set to {@code null}.
      */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null, null);
@@ -492,11 +505,12 @@ public class GeneralTab {
      *     custom configuration.</li>
      *     <li>Performing required UI updates (e.g., repainting date labels).</li>
      * </ul>
-     *
+     * <p>
      *  @param presetDate            Optional {@link LocalDate} to be used as the active date. If {@code null}, the
      *                              campaign's current date is used.
-     * @param presetFaction         Optional {@link Faction} to be used in the faction selection field. If {@code null},
-     *                              the campaign's default faction is used.
+     *
+     * @param presetFaction Optional {@link Faction} to be used in the faction selection field. If {@code null}, the
+     *                      campaign's default faction is used.
      */
     public void loadValuesFromCampaignOptions(@Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
         txtName.setText(campaign.getName());
@@ -516,8 +530,8 @@ public class GeneralTab {
      * Applies the updated campaign options from the general tab's UI components to the {@link Campaign}. This method
      * ensures that any changes made in the UI are reflected in the campaign's settings.
      *
-     * @param isStartUp             A boolean indicating if the campaign is in a startup state.
-     * @param isSaveAction          A boolean indicating if this is a save action.
+     * @param isStartUp    A boolean indicating if the campaign is in a startup state.
+     * @param isSaveAction A boolean indicating if this is a save action.
      */
     public void applyCampaignOptionsToCampaign(boolean isStartUp, boolean isSaveAction) {
         // First, we apply any updates to the campaign

@@ -25,18 +25,27 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
-
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.*;
-import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
-import mekhq.utilities.MHQXMLUtility;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
+
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
+import megamek.codeUtilities.ObjectUtility;
+import megamek.common.compute.Compute;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -127,10 +136,10 @@ public class NewsItem {
         int maxRandomDays;
         switch (datePrecision) {
             case MONTH:
-                maxRandomDays = Math.toIntExact(ChronoUnit.DAYS.between(date, date.plus(1, ChronoUnit.MONTHS)));
+                maxRandomDays = Math.toIntExact(ChronoUnit.DAYS.between(date, date.plusMonths(1)));
                 break;
             case YEAR:
-                maxRandomDays = Math.toIntExact(ChronoUnit.DAYS.between(date, date.plus(1, ChronoUnit.YEARS)));
+                maxRandomDays = Math.toIntExact(ChronoUnit.DAYS.between(date, date.plusYears(1)));
                 break;
             case DECADE:
                 maxRandomDays = Math.toIntExact(ChronoUnit.DAYS.between(date, date.plus(1, ChronoUnit.DECADES)));
@@ -206,5 +215,5 @@ public class NewsItem {
     }
 
     /** News precision enum */
-    public enum Precision { DAY, MONTH, YEAR, DECADE }
+    public enum Precision {DAY, MONTH, YEAR, DECADE}
 }

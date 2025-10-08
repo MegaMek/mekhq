@@ -24,40 +24,47 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
+
+import java.awt.Component;
+import java.awt.FontMetrics;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
+import javax.swing.JTable;
+import javax.swing.JTextPane;
+import javax.swing.UIManager;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Kill;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
-import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import java.awt.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-
-public class PersonnelKillLogModel extends DataTableModel {
+public class PersonnelKillLogModel extends DataTableModel<Kill> {
     private static final String EMPTY_CELL = "";
 
     public static final int COL_DATE = 0;
     public static final int COL_TEXT = 1;
 
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelKillLogModel",
-            MekHQ.getMHQOptions().getLocale());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
+          "mekhq.resources.PersonnelKillLogModel",
+          MekHQ.getMHQOptions().getLocale());
     private final int dateTextWidth;
 
     public PersonnelKillLogModel() {
-        data = new ArrayList<Kill>();
-        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMHQOptions().getDisplayFormattedDate(LocalDate.now()).concat("MM"));
-    }
-
-    @Override
-    public int getRowCount() {
-        return data.size();
+        data = new ArrayList<>();
+        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMHQOptions()
+                                                                .getDisplayFormattedDate(LocalDate.now())
+                                                                .concat("MM"));
     }
 
     @Override
@@ -67,27 +74,23 @@ public class PersonnelKillLogModel extends DataTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case COL_DATE:
-                return resourceMap.getString("date.heading");
-            case COL_TEXT:
-                return resourceMap.getString("kill.heading");
-            default:
-                return EMPTY_CELL;
-        }
+        return switch (column) {
+            case COL_DATE -> resourceMap.getString("date.heading");
+            case COL_TEXT -> resourceMap.getString("kill.heading");
+            default -> EMPTY_CELL;
+        };
     }
 
     @Override
     public Object getValueAt(int row, int column) {
         Kill kill = getKill(row);
-        switch (column) {
-            case COL_DATE:
-                return MekHQ.getMHQOptions().getDisplayFormattedDate(kill.getDate());
-            case COL_TEXT:
-                return String.format(resourceMap.getString("killDetail.format"), kill.getWhatKilled(), kill.getKilledByWhat());
-            default:
-                return EMPTY_CELL;
-        }
+        return switch (column) {
+            case COL_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(kill.getDate());
+            case COL_TEXT -> String.format(resourceMap.getString("killDetail.format"),
+                  kill.getWhatKilled(),
+                  kill.getKilledByWhat());
+            default -> EMPTY_CELL;
+        };
     }
 
     @Override
@@ -95,55 +98,39 @@ public class PersonnelKillLogModel extends DataTableModel {
         return String.class;
     }
 
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
-    }
-
     public Kill getKill(int row) {
         if ((row < 0) || (row >= data.size())) {
             return null;
         } else {
-            return (Kill) data.get(row);
+            return data.get(row);
         }
     }
 
     public int getAlignment(int column) {
-        switch (column) {
-            case COL_DATE:
-                return StyleConstants.ALIGN_RIGHT;
-            case COL_TEXT:
-                return StyleConstants.ALIGN_LEFT;
-            default:
-                return StyleConstants.ALIGN_CENTER;
-        }
+        return switch (column) {
+            case COL_DATE -> StyleConstants.ALIGN_RIGHT;
+            case COL_TEXT -> StyleConstants.ALIGN_LEFT;
+            default -> StyleConstants.ALIGN_CENTER;
+        };
     }
 
     public int getPreferredWidth(int column) {
-        switch (column) {
-            case COL_DATE:
-                return dateTextWidth;
-            case COL_TEXT:
-                return 300;
-            default:
-                return 100;
-        }
+        return switch (column) {
+            case COL_DATE -> dateTextWidth;
+            case COL_TEXT -> 300;
+            default -> 100;
+        };
     }
 
     public boolean hasConstantWidth(int col) {
-        switch (col) {
-            case COL_DATE:
-                return true;
-            default:
-                return false;
-        }
+        return col == COL_DATE;
     }
 
     public PersonnelKillLogModel.Renderer getRenderer() {
         return new PersonnelKillLogModel.Renderer();
     }
 
-    public static class Renderer extends JTextPane implements TableCellRenderer  {
+    public static class Renderer extends JTextPane implements TableCellRenderer {
         private final SimpleAttributeSet attribs = new SimpleAttributeSet();
         private final FontMetrics metrics;
 
@@ -157,7 +144,7 @@ public class PersonnelKillLogModel extends DataTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
+              boolean hasFocus, int row, int column) {
             setText((String) value);
             StyleConstants.setAlignment(attribs, ((PersonnelKillLogModel) table.getModel()).getAlignment(column));
             setParagraphAttributes(attribs, false);

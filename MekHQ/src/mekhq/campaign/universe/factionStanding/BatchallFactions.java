@@ -34,8 +34,6 @@ package mekhq.campaign.universe.factionStanding;
 
 import java.util.List;
 
-import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 
 /**
@@ -45,13 +43,14 @@ import mekhq.campaign.Campaign;
 public class BatchallFactions {
 
     public static final List<String> BATCHALL_FACTIONS = List.of("CBS", "CB", "CCC", "CCO",
-        "CDS", "CFM", "CGB", "CGS", "CHH", "CIH", "CJF", "CMG", "CNC", "CSJ", "CSR", "CSA", "CSV",
-        "CSL", "CWI", "CW", "CWE", "CWIE", "CEI", "RD", "RA", "CP", "AML", "CLAN");
+          "CDS", "CFM", "CGB", "CGS", "CHH", "CIH", "CJF", "CMG", "CNC", "CSJ", "CSR", "CSA", "CSV",
+          "CSL", "CWI", "CW", "CWE", "CWIE", "CEI", "RD", "RA", "CP", "AML", "CLAN");
 
     /**
      * Determines whether a given faction engages in batchalling.
      *
      * @param factionCode The faction code to check eligibility for. Must be a non-null {@link String}.
+     *
      * @return {@code true} if the faction code engages in batchalling, {@code false} otherwise.
      */
     public static boolean usesBatchalls(String factionCode) {
@@ -69,49 +68,10 @@ public class BatchallFactions {
      *
      * @param campaign    The campaign for which to retrieve the greeting.
      * @param factionCode The faction code for which to retrieve the greeting.
+     *
      * @return The greeting message as a {@link String}.
      */
     public static String getGreeting(Campaign campaign, String factionCode) {
-        final int infamy = MathUtility.clamp(campaign.getFameAndInfamy().getFameLevelForFaction(factionCode),
-            0, 5);
-
-        // Faction special handlers
-        String version = "";
-        switch (factionCode) {
-            case "CWE" -> factionCode = "CW"; // Wolf Empire uses the lines for Clan Wolf
-            case "CGB" -> { // The Ghost Bear Dominion uses the lines for the Rasalhague Dominion
-                if (campaign.getGameYear() < 3060) {
-                    factionCode = "CGB";
-                } else {
-                    factionCode = "RD";
-                }
-            }
-            // Alyina Mercantile League isn't big enough to warrant their own lines, so they use the
-            // generic fallback
-            case "AML" -> factionCode = "CLAN";
-            case "CDS" -> { // This handles the switch from Clan Diamond Shark to Clan Sea Fox
-                if (campaign.getGameYear() < 3100) {
-                    version = "Version 1";
-                } else {
-                    version = "Version 2";
-                }
-            }
-            default -> {}
-        }
-
-        // The rest of the method
-        String greeting;
-        int type;
-
-        if (infamy == 5) {
-            // greeting = resources.getString("greetingCLANLevel5Type0.text");
-        } else {
-            type = Compute.randomInt(3);
-            // String greetingReference = String.format(resources.getString("greetingFormatBatchall.text"),
-            //                factionCode, version, infamy, type);
-            // greeting = resources.getString(greetingReference);
-        }
-
         return "";
     }
 }

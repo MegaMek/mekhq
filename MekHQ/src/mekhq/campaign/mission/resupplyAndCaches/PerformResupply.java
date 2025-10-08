@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
@@ -46,8 +46,8 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_T
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.GROUND_VEHICLE_DRIVER;
-import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
-import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
+import static mekhq.campaign.stratCon.StratConContractInitializer.getUnoccupiedCoords;
+import static mekhq.campaign.stratCon.StratConRulesManager.generateExternalScenario;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.dialog.ResupplyConvoyChoice.ConvoyResponseType.CANCEL;
 import static mekhq.gui.dialog.ResupplyConvoyChoice.ConvoyResponseType.PLAYER;
@@ -65,10 +65,10 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
-import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
@@ -83,10 +83,10 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconCoords;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConCoords;
+import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.ResupplyConvoyChoice;
 import mekhq.gui.dialog.resupplyAndCaches.DialogResupplyFocus;
@@ -171,8 +171,8 @@ public class PerformResupply {
             // won't use player convoys.
             if (!isGuerrilla && !isPirate) {
                 ResupplyConvoyChoice convoyChoice = new ResupplyConvoyChoice(resupply.getCampaign(), isIndependent,
-                      resupply.getPlayerConvoys().size(), resupply.getTargetCargoTonnagePlayerConvoy(),
-                      resupply.getTargetCargoTonnage(), contract.getMoraleLevel().toString());
+                      resupply.getTargetCargoTonnagePlayerConvoy(), resupply.getTargetCargoTonnage(),
+                      resupply.getTotalPlayerCargoCapacity(), contract.getMoraleLevel().toString());
 
                 ResupplyConvoyChoice.ConvoyResponseType responseType = convoyChoice.getResponseType();
                 if (CANCEL.equals(responseType)) {
@@ -427,7 +427,8 @@ public class PerformResupply {
      * @param convoyContents     a list of {@link Part} objects representing convoy cargo.
      * @param interceptionChance the calculated chance of interception for the convoy.
      */
-    private static void generateInterceptionOrConvoyEvent(Resupply resupply, @Nullable Force convoy, @Nullable List<Part> convoyContents, int interceptionChance) {
+    private static void generateInterceptionOrConvoyEvent(Resupply resupply, @Nullable Force convoy,
+          @Nullable List<Part> convoyContents, int interceptionChance) {
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
 
@@ -512,7 +513,8 @@ public class PerformResupply {
      * @param targetConvoy   the {@link Force} representing the player's convoy. Can be {@code null} for NPC convoys.
      * @param convoyContents a list of {@link Part} objects representing the resupply cargo.
      */
-    private static void processConvoyInterception(Resupply resupply, @Nullable Force targetConvoy, @Nullable List<Part> convoyContents) {
+    private static void processConvoyInterception(Resupply resupply, @Nullable Force targetConvoy,
+          @Nullable List<Part> convoyContents) {
         final String DIRECTORY = "data/scenariotemplates/";
         final String GENERIC = DIRECTORY + "Emergency Convoy Defense.xml";
         final String PLAYER_AEROSPACE_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player - Low-Atmosphere.xml";
@@ -560,10 +562,10 @@ public class PerformResupply {
 
         // Pick a random track where the interception will take place. If we fail to get a track,
         // we log an error and make the delivery, in the same manner as above.
-        StratconTrackState track;
+        StratConTrackState track;
         try {
-            final StratconCampaignState campaignState = contract.getStratconCampaignState();
-            List<StratconTrackState> tracks = campaignState.getTracks();
+            final StratConCampaignState campaignState = contract.getStratconCampaignState();
+            List<StratConTrackState> tracks = campaignState.getTracks();
             track = ObjectUtility.getRandomItem(tracks);
         } catch (NullPointerException e) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -576,7 +578,7 @@ public class PerformResupply {
             return;
         }
 
-        StratconCoords coords = getUnoccupiedCoords(track);
+        StratConCoords coords = getUnoccupiedCoords(track);
 
         if (coords == null) {
             handleFallbackMessage(resupply, convoyContents, campaign);
@@ -590,7 +592,7 @@ public class PerformResupply {
         // Generate the scenario, placing it in a random hex that does not currently contain a
         // scenario, or a facility. If the player is really lucky, the scenario will spawn on top
         // of a force already deployed to the Strategic Map.
-        StratconScenario scenario = generateExternalScenario(campaign,
+        StratConScenario scenario = generateExternalScenario(campaign,
               contract,
               track,
               coords,

@@ -24,21 +24,31 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.cleanup;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
-import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.parts.*;
-import mekhq.campaign.parts.equipment.*;
+import megamek.common.equipment.Mounted;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.Unit;
 
 public class EquipmentProposal {
     // region Variable Declarations
     protected final Unit unit;
-    protected final Map<Integer, Mounted> equipment = new HashMap<>();
+    protected final Map<Integer, Mounted<?>> equipment = new HashMap<>();
     protected final Map<Part, Integer> original = new HashMap<>();
     protected final Map<Part, Integer> mapped = new HashMap<>();
     // endregion Variable Declarations
@@ -74,7 +84,7 @@ public class EquipmentProposal {
         return Collections.unmodifiableSet(original.keySet());
     }
 
-    public Set<Map.Entry<Integer, Mounted>> getEquipment() {
+    public Set<Map.Entry<Integer, Mounted<?>>> getEquipment() {
         return Collections.unmodifiableSet(equipment.entrySet());
     }
 

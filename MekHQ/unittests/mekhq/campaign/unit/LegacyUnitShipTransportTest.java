@@ -24,27 +24,50 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit;
-
-import megamek.common.*;
-import mekhq.campaign.Campaign;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
-import java.util.Vector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyDouble;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.UUID;
+import java.util.Vector;
+
+import megamek.common.bays.ASFBay;
+import megamek.common.bays.Bay;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Transporter;
+import megamek.common.game.Game;
+import megamek.common.units.Aero;
+import megamek.common.units.AeroSpaceFighter;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
+import mekhq.campaign.Campaign;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 //
 
 /**
  * Psi - Transport has been split into Ship & Tactical transport.
+ *
  * @see UnitTransportTest
  */
 public class LegacyUnitShipTransportTest {
@@ -65,7 +88,6 @@ public class LegacyUnitShipTransportTest {
         Unit transport = new Unit();
         when(mockCampaign.getGame()).thenReturn(mockGame);
         mockCampaign.importUnit(transport);
-
 
 
         // We start with empty transport bays
@@ -175,8 +197,8 @@ public class LegacyUnitShipTransportTest {
 
         // Create a fake entity to back the real transport Unit
         Dropship mockVengeance = mock(Dropship.class);
-        Unit transport = new Unit(mockVengeance,campaign);
-        ASFBay mockASFBay = new ASFBay(100, 1 ,0);
+        Unit transport = new Unit(mockVengeance, campaign);
+        ASFBay mockASFBay = new ASFBay(100, 1, 0);
 
         // Initialize bays
         Vector<Bay> bays = new Vector<>();
@@ -214,7 +236,7 @@ public class LegacyUnitShipTransportTest {
 
         // And we should not have had our bay space recalculated.
         verify(transport, times(0)).updateBayCapacity(anyInt(), anyDouble(),
-                anyBoolean(), anyInt());
+              anyBoolean(), anyInt());
     }
 
     @Test
@@ -236,6 +258,6 @@ public class LegacyUnitShipTransportTest {
 
         // And we should not have had our bay space recalculated.
         verify(transport0, times(0)).updateBayCapacity(anyInt(), anyDouble(),
-                anyBoolean(), anyInt());
+              anyBoolean(), anyInt());
     }
 }

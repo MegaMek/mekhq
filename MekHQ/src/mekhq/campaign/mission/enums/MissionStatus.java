@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.enums;
 
@@ -49,7 +54,7 @@ public enum MissionStatus {
     // region Constructors
     MissionStatus(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -83,10 +88,8 @@ public enum MissionStatus {
     }
 
     /**
-     * This is used to determine whether a status means that the mission is
-     * completed.
-     * This is purposefully not a check to see if it is active for future proofing
-     * reasons
+     * This is used to determine whether a status means that the mission is completed. This is purposefully not a check
+     * to see if it is active for future proofing reasons
      *
      * @return true if the mission has been completed, otherwise false
      */
@@ -96,8 +99,10 @@ public enum MissionStatus {
     // endregion Boolean Comparison Methods
 
     // region File I/O
+
     /**
      * @param text containing the MissionStatus
+     *
      * @return the saved MissionStatus
      */
     public static MissionStatus parseFromString(final String text) {
@@ -127,7 +132,7 @@ public enum MissionStatus {
         }
 
         MMLogger.create(MissionStatus.class)
-                .error("Unable to parse " + text + " into a MissionStatus. Returning ACTIVE.");
+              .error("Unable to parse {} into a MissionStatus. Returning ACTIVE.", text);
         return ACTIVE;
     }
     // endregion File I/O

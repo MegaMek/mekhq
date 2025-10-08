@@ -45,21 +45,19 @@ public class HRStrainNagLogic {
      * Checks whether a campaign is experiencing HR Strain.
      *
      * <p>HR Strain occurs when the HR Strain level is greater than zero.
-     * This method serves as a simple utility check to determine if HR Strain
-     * exists in the campaign based on the provided strain level.</p>
+     * This method serves as a simple utility check to determine if HR Strain exists in the campaign based on the
+     * provided strain level.</p>
      *
-     * @param hrStrain The HR Strain level of the campaign. A value greater than 0
-     *                    indicates the presence of HR Strain.
+     * @param hrStrain The HR Strain level of the campaign. A value greater than 0 indicates the presence of HR Strain.
      *
-     * @return {@code true} if HR Strain is present (i.e., {@code hrStrain > 0}).
-     *         {@code false} otherwise.
+     * @return {@code true} if HR Strain is present (i.e., {@code hrStrain > 0}). {@code false} otherwise.
      */
     public static boolean hasHRStrain(int hrStrain) {
         return hrStrain > 0;
     }
 
     @Deprecated(since = "0.50.07", forRemoval = true)
-    public class AdminStrainNagLogic extends HRStrainNagLogic {
+    public static class AdminStrainNagLogic extends HRStrainNagLogic {
         public AdminStrainNagLogic() {}
     }
 }

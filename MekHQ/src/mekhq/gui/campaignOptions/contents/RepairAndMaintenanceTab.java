@@ -52,8 +52,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
- * Represents a tab in the campaign options UI used to configure settings related to
- * repair and maintenance in a campaign.
+ * Represents a tab in the campaign options UI used to configure settings related to repair and maintenance in a
+ * campaign.
  * <p>
  * This tab is divided into two sections:
  * </p>
@@ -71,9 +71,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 public class RepairAndMaintenanceTab {
     private final CampaignOptions campaignOptions;
 
-    //start Repair Tab
-    private CampaignOptionsHeaderPanel repairHeader;
     private JCheckBox chkTechsUseAdministration;
+    private JCheckBox chkUsefulAsTechs;
     private JCheckBox useEraModsCheckBox;
     private JCheckBox assignedTechFirstCheckBox;
     private JCheckBox resetToFirstTechCheckBox;
@@ -86,8 +85,6 @@ public class RepairAndMaintenanceTab {
     private JSpinner spnDestroyPartTarget;
     //end Repair Tab
 
-    //start Maintenance Tab
-    private CampaignOptionsHeaderPanel maintenanceHeader;
     private JCheckBox checkMaintenance;
     private JLabel lblMaintenanceDays;
     private JSpinner spnMaintenanceDays;
@@ -104,11 +101,10 @@ public class RepairAndMaintenanceTab {
     //end Maintenance Tab
 
     /**
-     * Constructs a {@code RepairAndMaintenanceTab} instance for configuring
-     * repair and maintenance-related settings.
+     * Constructs a {@code RepairAndMaintenanceTab} instance for configuring repair and maintenance-related settings.
      *
-     * @param campaignOptions the {@link CampaignOptions} object to be used
-     *        for managing repair and maintenance options.
+     * @param campaignOptions the {@link CampaignOptions} object to be used for managing repair and maintenance
+     *                        options.
      */
     public RepairAndMaintenanceTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
@@ -127,12 +123,13 @@ public class RepairAndMaintenanceTab {
     /**
      * Initializes the components for the Repair Tab.
      * <p>
-     * The Repair Tab includes settings for era-based modifications, technician assignment,
-     * equipment quirks, damage margins, and destruction thresholds.
+     * The Repair Tab includes settings for era-based modifications, technician assignment, equipment quirks, damage
+     * margins, and destruction thresholds.
      * </p>
      */
     private void initializeRepairTab() {
         chkTechsUseAdministration = new JCheckBox();
+        chkUsefulAsTechs = new JCheckBox();
         useEraModsCheckBox = new JCheckBox();
 
         assignedTechFirstCheckBox = new JCheckBox();
@@ -154,8 +151,8 @@ public class RepairAndMaintenanceTab {
     /**
      * Initializes the components for the Maintenance Tab.
      * <p>
-     * The Maintenance Tab includes settings for maintenance scheduling, quality rules,
-     * randomization factors, and logging options.
+     * The Maintenance Tab includes settings for maintenance scheduling, quality rules, randomization factors, and
+     * logging options.
      * </p>
      */
     private void initializeMaintenanceTab() {
@@ -186,19 +183,23 @@ public class RepairAndMaintenanceTab {
     /**
      * Creates the panel for the Repair Tab.
      * <p>
-     * This tab provides configurable options for managing repair rules, handling quirks,
-     * setting margins for equipment survival, and incorporating era modifications.
+     * This tab provides configurable options for managing repair rules, handling quirks, setting margins for equipment
+     * survival, and incorporating era modifications.
      * </p>
      *
      * @return a {@link JPanel} representing the Repair Tab.
      */
     public JPanel createRepairTab() {
         // Header
-        repairHeader = new CampaignOptionsHeaderPanel("RepairTab",
-              getImageDirectory() + "logo_clan_burrock.png", 3);
+        //start Repair Tab
+        CampaignOptionsHeaderPanel repairHeader = new CampaignOptionsHeaderPanel("RepairTab",
+              getImageDirectory() + "logo_clan_burrock.png", 4);
 
         chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration");
         chkTechsUseAdministration.addMouseListener(createTipPanelUpdater(repairHeader, "TechsUseAdministration"));
+
+        chkUsefulAsTechs = new CampaignOptionsCheckBox("UsefulAsTechs");
+        chkUsefulAsTechs.addMouseListener(createTipPanelUpdater(repairHeader, "UsefulAsTechs"));
 
         useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
         useEraModsCheckBox.addMouseListener(createTipPanelUpdater(repairHeader, "UseEraModsCheckBox"));
@@ -220,13 +221,13 @@ public class RepairAndMaintenanceTab {
         lblDamageMargin = new CampaignOptionsLabel("DamageMargin");
         lblDamageMargin.addMouseListener(createTipPanelUpdater(repairHeader, "DamageMargin"));
         spnDamageMargin = new CampaignOptionsSpinner("DamageMargin",
-            1, 1, 20, 1);
+              1, 1, 20, 1);
         spnDamageMargin.addMouseListener(createTipPanelUpdater(repairHeader, "DamageMargin"));
 
         lblDestroyPartTarget = new CampaignOptionsLabel("DestroyPartTarget");
         lblDestroyPartTarget.addMouseListener(createTipPanelUpdater(repairHeader, "DestroyPartTarget"));
         spnDestroyPartTarget = new CampaignOptionsSpinner("DestroyPartTarget",
-            2, 2, 13, 1);
+              2, 2, 13, 1);
         spnDestroyPartTarget.addMouseListener(createTipPanelUpdater(repairHeader, "DestroyPartTarget"));
 
         // Layout the Panel
@@ -237,6 +238,9 @@ public class RepairAndMaintenanceTab {
         layoutLeft.gridy = 0;
         layoutLeft.gridwidth = 1;
         panelLeft.add(chkTechsUseAdministration, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(chkUsefulAsTechs, layoutLeft);
 
         layoutLeft.gridy++;
         panelLeft.add(useEraModsCheckBox, layoutLeft);
@@ -251,7 +255,7 @@ public class RepairAndMaintenanceTab {
         panelLeft.add(useQuirksBox, layoutLeft);
 
         final JPanel panelRight = new CampaignOptionsStandardPanel("RepairTabRight", true,
-            "RepairTabRight");
+              "RepairTabRight");
         final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
 
         layoutRight.gridx = 0;
@@ -296,15 +300,16 @@ public class RepairAndMaintenanceTab {
     /**
      * Creates the panel for the Maintenance Tab.
      * <p>
-     * This tab provides configurable options for managing maintenance cycles,
-     * quality standards, planetary effects, and custom rules for units' upkeep.
+     * This tab provides configurable options for managing maintenance cycles, quality standards, planetary effects, and
+     * custom rules for units' upkeep.
      * </p>
      *
      * @return a {@link JPanel} representing the Maintenance Tab.
      */
     public JPanel createMaintenanceTab() {
         // Header
-        maintenanceHeader = new CampaignOptionsHeaderPanel("MaintenanceTab",
+        //start Maintenance Tab
+        CampaignOptionsHeaderPanel maintenanceHeader = new CampaignOptionsHeaderPanel("MaintenanceTab",
               getImageDirectory() + "logo_magistracy_of_canopus.png", 6);
 
         // Contents
@@ -314,19 +319,19 @@ public class RepairAndMaintenanceTab {
         lblMaintenanceDays = new CampaignOptionsLabel("MaintenanceDays");
         lblMaintenanceDays.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceDays"));
         spnMaintenanceDays = new CampaignOptionsSpinner("MaintenanceDays",
-            7, 1, 365, 1);
+              7, 1, 365, 1);
         spnMaintenanceDays.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceDays"));
 
         lblMaintenanceBonus = new CampaignOptionsLabel("MaintenanceBonus");
         lblMaintenanceBonus.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceBonus"));
         spnMaintenanceBonus = new CampaignOptionsSpinner("MaintenanceBonus",
-            0, -13, 13, 1);
+              0, -13, 13, 1);
         spnMaintenanceBonus.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceBonus"));
 
         lblDefaultMaintenanceTime = new CampaignOptionsLabel("DefaultMaintenanceTime");
         lblDefaultMaintenanceTime.addMouseListener(createTipPanelUpdater(maintenanceHeader, "DefaultMaintenanceTime"));
         spnDefaultMaintenanceTime = new CampaignOptionsSpinner("DefaultMaintenanceTime",
-            1, 1, 4, 1);
+              1, 1, 4, 1);
         spnDefaultMaintenanceTime.addMouseListener(createTipPanelUpdater(maintenanceHeader, "DefaultMaintenanceTime"));
 
         useQualityMaintenance = new CampaignOptionsCheckBox("UseQualityMaintenance");
@@ -420,15 +425,15 @@ public class RepairAndMaintenanceTab {
     }
 
     /**
-     * Applies the current tab's repair and maintenance settings from the UI components
-     * to the provided {@link CampaignOptions}.
+     * Applies the current tab's repair and maintenance settings from the UI components to the provided
+     * {@link CampaignOptions}.
      * <p>
-     * If no custom {@link CampaignOptions} are provided, uses the default
-     * {@link CampaignOptions} associated with this tab.
+     * If no custom {@link CampaignOptions} are provided, uses the default {@link CampaignOptions} associated with this
+     * tab.
      * </p>
      *
-     * @param presetCampaignOptions optional custom {@link CampaignOptions} object to
-     *                              apply the current settings to. If {@code null}, the default options are modified.
+     * @param presetCampaignOptions optional custom {@link CampaignOptions} object to apply the current settings to. If
+     *                              {@code null}, the default options are modified.
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
@@ -438,6 +443,7 @@ public class RepairAndMaintenanceTab {
 
         // Repair
         options.setTechsUseAdministration(chkTechsUseAdministration.isSelected());
+        options.setIsUseUsefulAsTechs(chkUsefulAsTechs.isSelected());
         options.setEraMods(useEraModsCheckBox.isSelected());
         options.setAssignedTechFirst(assignedTechFirstCheckBox.isSelected());
         options.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
@@ -461,23 +467,21 @@ public class RepairAndMaintenanceTab {
     }
 
     /**
-     * Loads the repair and maintenance settings from the default {@link CampaignOptions}
-     * into the tab's UI components.
+     * Loads the repair and maintenance settings from the default {@link CampaignOptions} into the tab's UI components.
      */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
     /**
-     * Loads the repair and maintenance settings from the {@link CampaignOptions} object
-     * into the tab's UI components.
+     * Loads the repair and maintenance settings from the {@link CampaignOptions} object into the tab's UI components.
      * <p>
-     * If no custom {@link CampaignOptions} are provided, the default
-     * {@link CampaignOptions} associated with this tab is used.
+     * If no custom {@link CampaignOptions} are provided, the default {@link CampaignOptions} associated with this tab
+     * is used.
      * </p>
      *
-     * @param presetCampaignOptions optional custom {@link CampaignOptions} object to load settings from.
-     *                              If {@code null}, the default options are used.
+     * @param presetCampaignOptions optional custom {@link CampaignOptions} object to load settings from. If
+     *                              {@code null}, the default options are used.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
@@ -487,6 +491,7 @@ public class RepairAndMaintenanceTab {
 
         // Repair
         chkTechsUseAdministration.setSelected(options.isTechsUseAdministration());
+        chkUsefulAsTechs.setSelected(options.isUseUsefulAsTechs());
         useEraModsCheckBox.setSelected(options.isUseEraMods());
         assignedTechFirstCheckBox.setSelected(options.isAssignedTechFirst());
         resetToFirstTechCheckBox.setSelected(options.isResetToFirstTech());

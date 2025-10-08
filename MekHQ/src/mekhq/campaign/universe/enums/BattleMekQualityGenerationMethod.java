@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.enums;
 
@@ -45,8 +50,10 @@ import mekhq.campaign.universe.generators.battleMekQualityGenerators.WindchildBa
  */
 public enum BattleMekQualityGenerationMethod {
     //region Enum Declarations
-    AGAINST_THE_BOT("BattleMekQualityGenerationMethod.AGAINST_THE_BOT.text", "BattleMekQualityGenerationMethod.AGAINST_THE_BOT.toolTipText"),
-    WINDCHILD("BattleMekQualityGenerationMethod.WINDCHILD.text", "BattleMekQualityGenerationMethod.WINDCHILD.toolTipText"),
+    AGAINST_THE_BOT("BattleMekQualityGenerationMethod.AGAINST_THE_BOT.text",
+          "BattleMekQualityGenerationMethod.AGAINST_THE_BOT.toolTipText"),
+    WINDCHILD("BattleMekQualityGenerationMethod.WINDCHILD.text",
+          "BattleMekQualityGenerationMethod.WINDCHILD.toolTipText"),
     F("BattleMekQualityGenerationMethod.F.text", "BattleMekQualityGenerationMethod.F.toolTipText"),
     D("BattleMekQualityGenerationMethod.D.text", "BattleMekQualityGenerationMethod.D.toolTipText"),
     C("BattleMekQualityGenerationMethod.C.text", "BattleMekQualityGenerationMethod.C.toolTipText"),
@@ -63,7 +70,7 @@ public enum BattleMekQualityGenerationMethod {
     //region Constructors
     BattleMekQualityGenerationMethod(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -110,25 +117,16 @@ public enum BattleMekQualityGenerationMethod {
     //endregion Boolean Comparison Methods
 
     public AbstractBattleMekQualityGenerator getGenerator() {
-        switch (this) {
-            case AGAINST_THE_BOT:
-                return new AtBBattleMekQualityGenerator();
-            case F:
-                return new FBattleMekQualityGenerator();
-            case D:
-                return new DBattleMekQualityGenerator();
-            case C:
-                return new CBattleMekQualityGenerator();
-            case B:
-                return new BBattleMekQualityGenerator();
-            case A:
-                return new ABattleMekQualityGenerator();
-            case A_STAR:
-                return new AStarBattleMekQualityGenerator();
-            case WINDCHILD:
-            default:
-                return new WindchildBattleMekQualityGenerator();
-        }
+        return switch (this) {
+            case AGAINST_THE_BOT -> new AtBBattleMekQualityGenerator();
+            case F -> new FBattleMekQualityGenerator();
+            case D -> new DBattleMekQualityGenerator();
+            case C -> new CBattleMekQualityGenerator();
+            case B -> new BBattleMekQualityGenerator();
+            case A -> new ABattleMekQualityGenerator();
+            case A_STAR -> new AStarBattleMekQualityGenerator();
+            default -> new WindchildBattleMekQualityGenerator();
+        };
     }
 
     @Override

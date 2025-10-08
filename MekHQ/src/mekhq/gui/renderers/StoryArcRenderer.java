@@ -24,18 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.renderers;
 
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import mekhq.campaign.storyarc.StoryArcStub;
+import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.panels.StoryArcPanel;
 
 public class StoryArcRenderer extends StoryArcPanel implements ListCellRenderer<StoryArcStub> {
@@ -47,15 +51,15 @@ public class StoryArcRenderer extends StoryArcPanel implements ListCellRenderer<
 
     @Override
     public Component getListCellRendererComponent(final JList<? extends StoryArcStub> list,
-                                                  final StoryArcStub value, final int index,
-                                                  final boolean isSelected,
-                                                  final boolean cellHasFocus) {
+          final StoryArcStub value, final int index,
+          final boolean isSelected,
+          final boolean cellHasFocus) {
         // JTextArea::setForeground and JTextArea::setBackground don't work properly with the
         // default return, but by recreating the colour it works properly
         final Color foreground = new Color((isSelected
-                ? list.getSelectionForeground() : list.getForeground()).getRGB());
+                                                  ? list.getSelectionForeground() : list.getForeground()).getRGB());
         final Color background = new Color((isSelected
-                ? list.getSelectionBackground() : list.getBackground()).getRGB());
+                                                  ? list.getSelectionBackground() : list.getBackground()).getRGB());
         setForeground(foreground);
         setBackground(background);
 

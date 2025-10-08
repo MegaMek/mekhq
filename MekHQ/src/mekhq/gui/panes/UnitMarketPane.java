@@ -43,19 +43,19 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.dialogs.iconChooser.EntityImagePanel;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityViewPane;
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JTabbedPanePreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.icons.Camouflage;
+import megamek.common.units.Entity;
+import megamek.common.units.UnitType;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -71,7 +71,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
 
 public class UnitMarketPane extends AbstractMHQSplitPane {
-    private static final MMLogger logger = MMLogger.create(UnitMarketPane.class);
+    private static final MMLogger LOGGER = MMLogger.create(UnitMarketPane.class);
 
     // region Variable Declarations
     private final Campaign campaign;
@@ -332,7 +332,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
         // Create Sorter
         setMarketSorter(new TableRowSorter<>(getMarketModel()));
-        getMarketSorter().setComparator(UnitMarketTableModel.COL_WEIGHTCLASS, new WeightClassSorter());
+        getMarketSorter().setComparator(UnitMarketTableModel.COL_WEIGHT_CLASS, new WeightClassSorter());
         getMarketSorter().setComparator(UnitMarketTableModel.COL_UNIT, new NaturalOrderComparator());
         getMarketSorter().setComparator(UnitMarketTableModel.COL_PRICE, new FormattedNumberSorter());
         getMarketSorter().setComparator(UnitMarketTableModel.COL_PERCENT, new NaturalOrderComparator());
@@ -434,7 +434,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
             final Entity entity = offer.getEntity();
             if (entity == null) {
-                logger.error("Cannot purchase a null entity");
+                LOGGER.error("Cannot purchase a null entity");
                 getCampaign().getUnitMarket().getOffers().remove(offer);
                 offersIterator.remove();
                 continue;
@@ -544,18 +544,13 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                     return false;
                 }
 
-                switch (offer.get().getUnitType()) {
-                    case UnitType.MEK:
-                        return getChkShowMeks().isSelected();
-                    case UnitType.TANK:
-                        return getChkShowVehicles().isSelected();
-                    case UnitType.AEROSPACEFIGHTER:
-                        return getChkShowAerospace().isSelected();
-                    case UnitType.CONV_FIGHTER:
-                        return getChkShowConvAero().isSelected();
-                    default:
-                        return false;
-                }
+                return switch (offer.get().getUnitType()) {
+                    case UnitType.MEK -> getChkShowMeks().isSelected();
+                    case UnitType.TANK -> getChkShowVehicles().isSelected();
+                    case UnitType.AEROSPACE_FIGHTER -> getChkShowAerospace().isSelected();
+                    case UnitType.CONV_FIGHTER -> getChkShowConvAero().isSelected();
+                    default -> false;
+                };
             }
         });
     }

@@ -24,15 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
-
-import mekhq.MekHQ;
 
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
 
 /**
  * This enum is used to format the Time in Service and Time in Rank outputs
@@ -54,7 +59,7 @@ public enum TimeInDisplayFormat {
     //region Constructors
     TimeInDisplayFormat(final String name, final String displayFormat) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.displayFormat = resources.getString(displayFormat);
     }
@@ -89,24 +94,20 @@ public enum TimeInDisplayFormat {
     //endregion Boolean Comparison Methods
 
     public String getDisplayFormattedOutput(final LocalDate initialDate, final LocalDate today) {
-        switch (this) {
-            case DAYS:
-                return String.format(getDisplayFormat(),
-                        Math.toIntExact(ChronoUnit.DAYS.between(initialDate, today)));
-            case WEEKS:
-                return String.format(getDisplayFormat(),
-                        Math.toIntExact(ChronoUnit.WEEKS.between(initialDate, today)));
-            case MONTHS:
-                return String.format(getDisplayFormat(),
-                        Math.toIntExact(ChronoUnit.MONTHS.between(initialDate, today)));
-            case MONTHS_YEARS:
+        return switch (this) {
+            case DAYS -> String.format(getDisplayFormat(),
+                  Math.toIntExact(ChronoUnit.DAYS.between(initialDate, today)));
+            case WEEKS -> String.format(getDisplayFormat(),
+                  Math.toIntExact(ChronoUnit.WEEKS.between(initialDate, today)));
+            case MONTHS -> String.format(getDisplayFormat(),
+                  Math.toIntExact(ChronoUnit.MONTHS.between(initialDate, today)));
+            case MONTHS_YEARS -> {
                 final Period period = Period.between(initialDate, today);
-                return String.format(getDisplayFormat(), period.getMonths(), period.getYears());
-            case YEARS:
-            default:
-                return String.format(getDisplayFormat(),
-                        Math.toIntExact(ChronoUnit.YEARS.between(initialDate, today)));
-        }
+                yield String.format(getDisplayFormat(), period.getMonths(), period.getYears());
+            }
+            default -> String.format(getDisplayFormat(),
+                  Math.toIntExact(ChronoUnit.YEARS.between(initialDate, today)));
+        };
     }
 
     @Override

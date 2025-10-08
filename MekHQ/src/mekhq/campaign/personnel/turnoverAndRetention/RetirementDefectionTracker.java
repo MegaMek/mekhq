@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 - Carl Spain. All rights reserved.
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -45,10 +45,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
-import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.options.IOption;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -77,7 +77,7 @@ import org.w3c.dom.NodeList;
  *       retire/defect/get sacked and families of those killed in battle.
  */
 public class RetirementDefectionTracker {
-    private static final MMLogger logger = MMLogger.create(RetirementDefectionTracker.class);
+    private static final MMLogger LOGGER = MMLogger.create(RetirementDefectionTracker.class);
 
     public static final int RETIREMENT_AGE = 50;
 
@@ -138,9 +138,8 @@ public class RetirementDefectionTracker {
             getManagementSkillValues(campaign);
         }
 
-        for (Person person : campaign.getActivePersonnel(true)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             if ((person.getPrimaryRole().isCivilian()) ||
-                      (!person.getPrisonerStatus().isFree()) ||
                       (person.isDeployed())) {
                 continue;
             }
@@ -511,10 +510,8 @@ public class RetirementDefectionTracker {
      * @param campaign The Campaign object for which to calculate the management skill values.
      */
     private void getManagementSkillValues(Campaign campaign) {
-        for (Person person : campaign.getActivePersonnel(true)) {
-            if ((person.getPrimaryRole().isCivilian()) ||
-                      (person.getPrisonerStatus().isPrisoner()) ||
-                      (person.getPrisonerStatus().isPrisonerDefector())) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
+            if (person.getPrimaryRole().isCivilian()) {
                 continue;
             }
 
@@ -682,13 +679,12 @@ public class RetirementDefectionTracker {
     public static int getHRStrain(Campaign campaign) {
         double personnel = 0;
 
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             PersonnelRole primaryRole = person.getPrimaryRole();
-            if (primaryRole.isAssistant() && person.getSecondaryRole().isNone()) {
-                continue;
-            } else if (primaryRole.isCivilian()) {
+
+            if (primaryRole.isCivilian()) {
                 personnel += 0.1;
-            } else {
+            } else if (!(primaryRole.isAssistant() && person.getSecondaryRole().isNone())) {
                 personnel++;
             }
         }
@@ -710,7 +706,7 @@ public class RetirementDefectionTracker {
         boolean isClanCampaign = campaign.isClanCampaign();
         LocalDate today = campaign.getLocalDate();
 
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             boolean isAdmin = person.getPrimaryRole().isAdministratorHR() ||
                                     person.getSecondaryRole().isAdministratorHR();
             if (!isAdmin) {
@@ -795,7 +791,7 @@ public class RetirementDefectionTracker {
 
         Money profits = campaign.getFinances().getProfits();
 
-        int totalShares = campaign.getActivePersonnel(true)
+        int totalShares = campaign.getActivePersonnel(false, true)
                                 .stream()
                                 .mapToInt(p -> p.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll()))
                                 .sum();
@@ -1258,7 +1254,7 @@ public class RetirementDefectionTracker {
                 }
             }
         } catch (Exception ex) {
-            logger.error(
+            LOGGER.error(
                   "RetirementDefectionTracker: either the class name is invalid or the listed name doesn't exist.",
                   ex);
         }

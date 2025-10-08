@@ -53,7 +53,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 
 public class Factions {
-    private static final MMLogger logger = MMLogger.create(Factions.class);
+    private static final MMLogger LOGGER = MMLogger.create(Factions.class);
 
     // region Variable Declarations
     private static Factions instance;
@@ -112,6 +112,7 @@ public class Factions {
      * factions (those whose short name contains a dot, {@code .}) are not included in the results.</p>
      *
      * @param date the date for which to check faction activity
+     *
      * @return a collection of active factions (excluding Commands) for the specified date
      */
     public Collection<Faction> getActiveFactions(LocalDate date) {
@@ -144,23 +145,24 @@ public class Factions {
         return new ArrayList<>(factions.keySet());
     }
 
-    public Faction getFaction(String sname) {
+    public Faction getFaction(String name) {
         Faction defaultFaction = new Faction();
-        return factions.getOrDefault(sname, defaultFaction);
+        return factions.getOrDefault(name, defaultFaction);
     }
 
     public Faction getFactionFromFullNameAndYear(final String factionName, final int year) {
         return factions.values().stream()
-                .filter(faction -> faction.getFullName(year).equals(factionName))
-                .findFirst()
-                .orElse(null);
+                     .filter(faction -> faction.getFullName(year).equals(factionName))
+                     .findFirst()
+                     .orElse(null);
     }
 
     /**
-     * Helper function that gets the faction record for the specified faction, or a
-     * fallback general faction record. Useful for RAT generator activity.
+     * Helper function that gets the faction record for the specified faction, or a fallback general faction record.
+     * Useful for RAT generator activity.
      *
      * @param faction The faction whose MegaMek faction record to retrieve.
+     *
      * @return Found faction record or null.
      */
     public FactionRecord getFactionRecordOrFallback(String faction) {
@@ -182,7 +184,7 @@ public class Factions {
 
             if (fRec == null) {
                 String message = String.format("Could not locate faction record for %s", faction);
-                logger.error(message);
+                LOGGER.error(message);
             }
         }
 
@@ -192,10 +194,10 @@ public class Factions {
     /**
      * Loads the default Factions data.
      */
-    public static Factions loadDefault() {
-        logger.info("Starting load of faction data from XML...");
-        Factions factions = load();
-        logger.info(String.format("Loaded a total of %d factions", factions.factions.size()));
+    public static Factions loadDefault(boolean isForTesting) {
+        LOGGER.info("Starting load of faction data from XML...");
+        Factions factions = load(isForTesting);
+        LOGGER.info("Loaded a total of {} factions", factions.factions.size());
         return factions;
     }
 
@@ -203,10 +205,10 @@ public class Factions {
      * Loads Factions data from a file.
      *
      */
-    public static Factions load() {
+    public static Factions load(boolean isForTesting) {
         // Factions are populated from the new unified factions list instead of loading them directly
         Factions factionsObject = new Factions();
-        Factions2.getInstance().getFactions().stream()
+        Factions2.getInstance(isForTesting).getFactions().stream()
               .map(Faction::new)
               .forEach(f -> factionsObject.factions.put(f.getShortName(), f));
         return factionsObject;
@@ -217,7 +219,7 @@ public class Factions {
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public static ImageIcon getFactionLogo(Campaign campaign, String factionCode,
-                                           boolean fallbackDateDependent) {
+          boolean fallbackDateDependent) {
         return getFactionLogo(campaign.getGameYear(), factionCode);
     }
 

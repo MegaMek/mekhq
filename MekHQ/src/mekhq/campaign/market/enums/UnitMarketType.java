@@ -24,12 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.enums;
 
 import java.util.ResourceBundle;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -52,7 +57,7 @@ public enum UnitMarketType {
     // region Constructors
     UnitMarketType(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
     // endregion Constructors
@@ -107,7 +112,7 @@ public enum UnitMarketType {
         }
 
         MMLogger.create(UnitMarketType.class)
-                .error("Unable to parse " + text + " into a UnitMarketType. Returning OPEN.");
+              .error("Unable to parse {} into a UnitMarketType. Returning OPEN.", text);
         return OPEN;
     }
     // endregion File I/O
@@ -120,46 +125,26 @@ public enum UnitMarketType {
     /**
      * Calculates the price percentage based on a given modifier and d6 roll.
      *
-     * @param modifier the modifier to adjust the price (a negative modifier
-     *                 decreases price, positive increases price)
+     * @param modifier the modifier to adjust the price (a negative modifier decreases price, positive increases price)
+     *
      * @return the calculated price
+     *
      * @throws IllegalStateException if the roll value is unexpected
      */
     public static int getPricePercentage(int modifier) {
         int roll = Compute.d6(2);
-        int value;
-
-        switch (roll) {
-            case 2:
-                value = modifier + 3;
-                break;
-            case 3:
-                value = modifier + 2;
-                break;
-            case 4:
-            case 5:
-                value = modifier + 1;
-                break;
-            case 6:
-            case 7:
-            case 8:
-                value = modifier;
-                break;
-            case 9:
-            case 10:
-                value = modifier - 1;
-                break;
-            case 11:
-                value = modifier - 2;
-                break;
-            case 12:
-                value = modifier - 3;
-                break;
-            default:
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/getPrice: "
-                                + roll);
-        }
+        int value = switch (roll) {
+            case 2 -> modifier + 3;
+            case 3 -> modifier + 2;
+            case 4, 5 -> modifier + 1;
+            case 6, 7, 8 -> modifier;
+            case 9, 10 -> modifier - 1;
+            case 11 -> modifier - 2;
+            case 12 -> modifier - 3;
+            default -> throw new IllegalStateException(
+                  "Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/getPrice: "
+                        + roll);
+        };
 
         return 100 + (value * 5);
     }
@@ -168,19 +153,20 @@ public enum UnitMarketType {
      * Returns the quality of a unit based on the given market type.
      *
      * @param market the type of market
+     *
      * @return the quality of the unit
      */
     public static PartQuality getQuality(Campaign campaign, UnitMarketType market) {
 
         if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
-            return Unit.getRandomUnitQuality(switch(market) {
+            return Unit.getRandomUnitQuality(switch (market) {
                 case OPEN, MERCENARY -> 0;
                 case EMPLOYER -> -1;
                 case BLACK_MARKET -> Compute.d6(1) <= 2 ? -12 : 12; // forces A/F
                 case FACTORY -> 12; // Forces F
             });
         } else {
-            return switch(market) {
+            return switch (market) {
                 case OPEN, MERCENARY -> PartQuality.QUALITY_C;
                 case EMPLOYER -> PartQuality.QUALITY_B;
                 case BLACK_MARKET -> Compute.d6(1) <= 2 ? PartQuality.QUALITY_A : PartQuality.QUALITY_F;

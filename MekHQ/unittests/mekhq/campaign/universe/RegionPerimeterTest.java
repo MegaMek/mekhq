@@ -24,22 +24,27 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
-
-import mekhq.campaign.universe.RegionPerimeter.GrahamScanPointSorter;
-import mekhq.campaign.universe.RegionPerimeter.Point;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import mekhq.campaign.universe.RegionPerimeter.GrahamScanPointSorter;
+import mekhq.campaign.universe.RegionPerimeter.Point;
+import org.junit.jupiter.api.Test;
 
 public class RegionPerimeterTest {
 
@@ -60,9 +65,9 @@ public class RegionPerimeterTest {
 
         list.sort(RegionPerimeter.leastYSorter);
 
-        assertEquals(list.get(0).getY(), -1, RegionPerimeter.EPSILON);
-        assertEquals(list.get(0).getX(), -1, RegionPerimeter.EPSILON);
-        assertEquals(list.get(1).getX(), 2, RegionPerimeter.EPSILON);
+        assertEquals(-1, list.get(0).y(), RegionPerimeter.EPSILON);
+        assertEquals(-1, list.get(0).x(), RegionPerimeter.EPSILON);
+        assertEquals(2, list.get(1).x(), RegionPerimeter.EPSILON);
     }
 
     @Test
@@ -91,7 +96,7 @@ public class RegionPerimeterTest {
         Point p1 = new Point(1, 1);
         Point p2 = new Point(2, 2);
 
-        assertEquals(RegionPerimeter.vectorCrossProduct(origin, p1, p2), 0, RegionPerimeter.EPSILON);
+        assertEquals(0, RegionPerimeter.vectorCrossProduct(origin, p1, p2), RegionPerimeter.EPSILON);
     }
 
     @Test
@@ -99,10 +104,10 @@ public class RegionPerimeterTest {
         Comparator<Point> sorter = new GrahamScanPointSorter(new Point(0, 0));
         List<Point> list = new ArrayList<>();
         Point[] points = new Point[] {
-            new Point(1, 0),
-            new Point(1, 1),
-            new Point(0, 1),
-            new Point(-1, 1)
+              new Point(1, 0),
+              new Point(1, 1),
+              new Point(0, 1),
+              new Point(-1, 1)
         };
         list.add(points[1]);
         list.add(points[3]);
@@ -112,8 +117,8 @@ public class RegionPerimeterTest {
         list.sort(sorter);
 
         for (int i = 0; i < list.size(); i++) {
-            assertEquals(list.get(i).getX(), points[i].getX(), RegionPerimeter.EPSILON);
-            assertEquals(list.get(i).getY(), points[i].getY(), RegionPerimeter.EPSILON);
+            assertEquals(list.get(i).x(), points[i].x(), RegionPerimeter.EPSILON);
+            assertEquals(list.get(i).y(), points[i].y(), RegionPerimeter.EPSILON);
         }
     }
 
@@ -129,7 +134,7 @@ public class RegionPerimeterTest {
         RegionPerimeter border = new RegionPerimeter(list);
 
         for (Point p : border.getVertices()) {
-            assertTrue((Math.abs(p.getX()) == 1) || (Math.abs(p.getY()) == 1));
+            assertTrue((Math.abs(p.x()) == 1) || (Math.abs(p.y()) == 1));
         }
     }
 
@@ -156,9 +161,9 @@ public class RegionPerimeterTest {
     @Test
     public void testIntersectionTriangleClippedByRectangle() {
         List<Point> triangle = new ArrayList<>();
-        triangle.add(new Point(0,  2));
-        triangle.add(new Point(-2,  -2));
-        triangle.add(new Point(2,  -2));
+        triangle.add(new Point(0, 2));
+        triangle.add(new Point(-2, -2));
+        triangle.add(new Point(2, -2));
         List<Point> rectangle = new ArrayList<>();
         rectangle.add(new Point(-3, 0));
         rectangle.add(new Point(3, 0));
@@ -177,9 +182,9 @@ public class RegionPerimeterTest {
     @Test
     public void testIntersectionNonOverlappingRegions() {
         List<Point> region1 = new ArrayList<>();
-        region1.add(new Point(3,  2));
-        region1.add(new Point(1,  -2));
-        region1.add(new Point(5,  -2));
+        region1.add(new Point(3, 2));
+        region1.add(new Point(1, -2));
+        region1.add(new Point(5, -2));
         List<Point> region2 = new ArrayList<>();
         region2.add(new Point(-3, 2));
         region2.add(new Point(-1, -2));
@@ -207,7 +212,7 @@ public class RegionPerimeterTest {
 
         List<Point> intersection = r1.intersection(r2, 1.0);
 
-        assertEquals(intersection.size(), 4);
+        assertEquals(4, intersection.size());
         assertTrue(intersection.contains(new Point(-1, -3)));
         assertTrue(intersection.contains(new Point(1, -3)));
         assertTrue(intersection.contains(new Point(1, 3)));

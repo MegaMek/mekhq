@@ -61,8 +61,8 @@ import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.event.NewDayEvent;
-import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.events.NewDayEvent;
+import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
@@ -80,7 +80,7 @@ import mekhq.gui.view.PlanetViewPanel;
  */
 public final class MapTab extends CampaignGuiTab implements ActionListener {
     private static final int PADDING = UIUtil.scaleForGUI(10);
-    
+
     private JViewport mapView;
     private JPanel panMapView;
     private InterstellarMapPanel panMap;
@@ -136,6 +136,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
             public void focusGained(FocusEvent e) {
                 suggestPlanet.setBorder(BorderFactory.createLineBorder(suggestPlanet.getBackground(), 1));
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 suggestPlanet.setBorder(BorderFactory.createLineBorder(suggestPlanet.getBackground(), 1));

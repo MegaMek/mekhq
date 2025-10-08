@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog.factionStanding.factionJudgment;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getFallbackFactionKey;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getInCharacterText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -78,7 +78,7 @@ public class FactionJudgmentSceneDialog {
      * @param commander       the primary character representing the command
      * @param secondCharacter a secondary character involved in the scene (nullable)
      * @param sceneType       the type of judgment scene to display
-     * @param judgingFaction the faction performing the judgment
+     * @param judgingFaction  the faction performing the judgment
      *
      * @author Illiani
      * @since 0.50.07
@@ -156,6 +156,7 @@ public class FactionJudgmentSceneDialog {
      * outcomes.
      *
      * @param sceneType the type of faction judgment scene
+     *
      * @return a list of formatted button label strings for display
      *
      * @author Illiani

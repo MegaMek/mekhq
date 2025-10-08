@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,19 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.reportDialogs;
+
+import java.awt.Container;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
 
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
-
 /**
  * This displays a standard report for MekHQ.
- *
+ * <p>
  * Inheriting classes must call initialize() in their constructors and override getText.
  */
 public abstract class AbstractReportDialog extends AbstractMHQDialogBasic {

@@ -24,21 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.menus;
 
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JMenuItem;
+
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
-
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This is a standard menu that takes a person and lets the user assign a unit for them to tech
@@ -60,8 +64,8 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
         // 4) Person must be a tech
         // 5) Person must have free maintenance time
         if (!person.getStatus().isActive() || !person.getPrisonerStatus().isFree()
-                || person.isDeployed() || !person.isTech()
-                || (person.getMaintenanceTimeUsing() >= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
+                  || person.isDeployed() || !person.isTech()
+                  || (person.getMaintenanceTimeUsing() >= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
             return;
         }
 
@@ -81,11 +85,14 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
         // 2) Potentially maintained by the person
         // 3) The unit can take a tech and the person can afford the time to maintain the unit
         final List<Unit> units = HangarSorter.defaultSorting()
-                .sort(campaign.getHangar().getUnitsStream().filter(Unit::isAvailable)
-                        .filter(unit -> person.canTech(unit.getEntity()))
-                        .filter(unit -> unit.canTakeTech()
-                                && (person.getMaintenanceTimeUsing() + unit.getMaintenanceTime() <= Person.PRIMARY_ROLE_SUPPORT_TIME)))
-                .collect(Collectors.toList());
+                                       .sort(campaign.getHangar().getUnitsStream().filter(Unit::isAvailable)
+                                                   .filter(unit -> person.canTech(unit.getEntity()))
+                                                   .filter(unit -> unit.canTakeTech()
+                                                                         &&
+                                                                         (person.getMaintenanceTimeUsing() +
+                                                                                unit.getMaintenanceTime() <=
+                                                                                Person.PRIMARY_ROLE_SUPPORT_TIME)))
+                                       .toList();
         for (final Unit unit : units) {
             if (unit.getEntity().getUnitType() != unitType) {
                 // Add the current menus, first the Entity Weight Class menu to the Unit Type menu,
@@ -99,9 +106,9 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
 
                 // And create the new menus
                 unitTypeMenu = new JScrollableMenu("unitTypeMenu",
-                        UnitType.getTypeDisplayableName(unitType));
+                      UnitType.getTypeDisplayableName(unitType));
                 entityWeightClassMenu = new JScrollableMenu("entityWeightClassMenu",
-                        EntityWeightClass.getClassName(weightClass, unit.getEntity()));
+                      EntityWeightClass.getClassName(weightClass, unit.getEntity()));
             } else if (unit.getEntity().getWeightClass() != weightClass) {
                 // Add the current Entity Weight Class menu to the Unit Type menu
                 unitTypeMenu.add(entityWeightClassMenu);
@@ -111,7 +118,7 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
 
                 // And create the new Entity Weight Class menu
                 entityWeightClassMenu = new JScrollableMenu("entityWeightClassMenu",
-                        EntityWeightClass.getClassName(weightClass, unit.getEntity()));
+                      EntityWeightClass.getClassName(weightClass, unit.getEntity()));
             }
 
             final JMenuItem miUnit = new JMenuItem(unit.getName());

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -35,23 +40,22 @@ import static org.mockito.Mockito.when;
 
 import java.util.ResourceBundle;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import megamek.common.BipedMek;
-import megamek.common.Dropship;
-import megamek.common.EquipmentType;
-import megamek.common.Jumpship;
+import megamek.common.units.BipedMek;
+import megamek.common.units.Dropship;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Jumpship;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 class ROMDesignationTest {
     // region Variable Declarations
     private static final ROMDesignation[] designations = ROMDesignation.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     @BeforeAll
@@ -353,13 +357,13 @@ class ROMDesignationTest {
         when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
         when(mockPerson.getSecondaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_COMMAND);
         assertEquals(" " + ROMDesignation.EPSILON + ' ' + ROMDesignation.CHI,
-                ROMDesignation.getComStarBranchDesignation(mockPerson));
+              ROMDesignation.getComStarBranchDesignation(mockPerson));
 
         // Both Designators Set - Zetta Kappa - Expect " Zeta Kappa"
         when(mockPerson.getPrimaryDesignator()).thenReturn(ROMDesignation.ZETA);
         when(mockPerson.getSecondaryDesignator()).thenReturn(ROMDesignation.KAPPA);
         assertEquals(" " + ROMDesignation.ZETA + ' ' + ROMDesignation.KAPPA,
-                ROMDesignation.getComStarBranchDesignation(mockPerson));
+              ROMDesignation.getComStarBranchDesignation(mockPerson));
     }
 
     // region File I/O

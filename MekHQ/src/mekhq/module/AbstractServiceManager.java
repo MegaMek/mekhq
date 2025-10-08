@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.module;
 
@@ -31,7 +36,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
@@ -46,7 +50,7 @@ import mekhq.module.api.MekHQModule;
  * @author Neoancient
  */
 abstract public class AbstractServiceManager<T extends MekHQModule> {
-    private static final MMLogger logger = MMLogger.create(AbstractServiceManager.class);
+    private static final MMLogger LOGGER = MMLogger.create(AbstractServiceManager.class);
 
     private final ServiceLoader<T> loader;
     private final Map<String, T> services;
@@ -60,14 +64,13 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
 
     private void loadServices() {
         try {
-            for (Iterator<T> iter = loader.iterator(); iter.hasNext();) {
-                final T service = iter.next();
-                logger.debug("Found service " + service.getModuleName());
+            for (final T service : loader) {
+                LOGGER.debug("Found service {}", service.getModuleName());
 
                 services.put(service.getModuleName(), service);
             }
         } catch (Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
     }
 
@@ -83,10 +86,9 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
     /**
      * Retrieves a specific instance of the service
      *
-     * @param key The name of the method, returned by the service's getMethodName
-     *            method.
-     * @return The service associated with the key, or null if there is no such
-     *         service.
+     * @param key The name of the method, returned by the service's getMethodName method.
+     *
+     * @return The service associated with the key, or null if there is no such service.
      */
     public @Nullable T getService(String key) {
         return services.get(key);
@@ -103,12 +105,15 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
      * Retrieve a collection of all available services
      *
      * @param sort Whether to sort the collection by the service name.
+     *
      * @return An unmodifiable collection of the services
      */
     public Collection<T> getAllServices(boolean sort) {
         if (sort) {
-            return Collections.unmodifiableCollection(services.values().stream()
-                    .sorted(Comparator.comparing(MekHQModule::getModuleName)).collect(Collectors.toList()));
+            return services.values()
+                         .stream()
+                         .sorted(Comparator.comparing(MekHQModule::getModuleName))
+                         .collect(Collectors.toUnmodifiableList());
         }
         return Collections.unmodifiableCollection(services.values());
     }

@@ -24,16 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances.financialInstitutions;
 
-import megamek.common.Compute;
-import mekhq.MHQConstants;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,9 +45,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyInt;
+import megamek.common.compute.Compute;
+import mekhq.MHQConstants;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 public class FinancialInstitutionsTest {
 
@@ -112,12 +117,15 @@ public class FinancialInstitutionsTest {
             financialInstitutions.when(FinancialInstitutions::getFinancialInstitutions).thenCallRealMethod();
             financialInstitutions.when(FinancialInstitutions::initializeFinancialInstitutions).thenCallRealMethod();
 
-            financialInstitutions.when(() -> FinancialInstitutions.loadFinancialInstitutionsFromFile(new File(MHQConstants.FINANCIAL_INSTITUTIONS_FILE_PATH))).thenReturn(canonFinancialInstitutions);
-            financialInstitutions.when(() -> FinancialInstitutions.loadFinancialInstitutionsFromFile(new File(MHQConstants.USER_FINANCIAL_INSTITUTIONS_FILE_PATH))).thenReturn(new ArrayList<>());
+            financialInstitutions.when(() -> FinancialInstitutions.loadFinancialInstitutionsFromFile(new File(
+                  MHQConstants.FINANCIAL_INSTITUTIONS_FILE_PATH))).thenReturn(canonFinancialInstitutions);
+            financialInstitutions.when(() -> FinancialInstitutions.loadFinancialInstitutionsFromFile(new File(
+                  MHQConstants.USER_FINANCIAL_INSTITUTIONS_FILE_PATH))).thenReturn(new ArrayList<>());
             FinancialInstitutions.initializeFinancialInstitutions();
             assertEquals(2, FinancialInstitutions.getFinancialInstitutions().size());
 
-            financialInstitutions.when(() -> FinancialInstitutions.loadFinancialInstitutionsFromFile(new File(MHQConstants.USER_FINANCIAL_INSTITUTIONS_FILE_PATH))).thenReturn(userdataFinancialInstitutions);
+            financialInstitutions.when(() -> FinancialInstitutions.loadFinancialInstitutionsFromFile(new File(
+                  MHQConstants.USER_FINANCIAL_INSTITUTIONS_FILE_PATH))).thenReturn(userdataFinancialInstitutions);
             FinancialInstitutions.initializeFinancialInstitutions();
             assertEquals(3, FinancialInstitutions.getFinancialInstitutions().size());
         }
@@ -127,15 +135,15 @@ public class FinancialInstitutionsTest {
     public void testLoadFinancialInstitutionsFromFile(final @TempDir Path temporaryDirectory) throws IOException {
         final Path path = temporaryDirectory.resolve("financialInstitutions.xml");
         final List<String> inputText = Arrays.asList("<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<financialInstitutions>",
-                "<institution>",
-                "<name>Bank of Oriente</name>",
-                "</institution>",
-                "<institution>",
-                "<name>ComStar Green</name>",
-                "<shutterDate>20-20-20</shutterDate>",
-                "</institution>",
-                "</financialInstitutions>");
+              "<financialInstitutions>",
+              "<institution>",
+              "<name>Bank of Oriente</name>",
+              "</institution>",
+              "<institution>",
+              "<name>ComStar Green</name>",
+              "<shutterDate>20-20-20</shutterDate>",
+              "</institution>",
+              "</financialInstitutions>");
         Files.write(path, inputText);
 
         assertEquals(1, FinancialInstitutions.loadFinancialInstitutionsFromFile(path.toFile()).size());

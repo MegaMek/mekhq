@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.skills;
 
@@ -189,8 +194,6 @@ public class AttributesTest {
         final Attributes attributes = new Attributes();
         final Phenotype phenotype = Phenotype.GENERAL;
         final PersonnelOptions options = new PersonnelOptions();
-
-        final int attributeCap = phenotype.getAttributeCap(CHARISMA);
 
         attributes.setAttributeScore(phenotype, options, CHARISMA, MAXIMUM_ATTRIBUTE_SCORE + 1);
         assertEquals(phenotype.getAttributeCap(CHARISMA), attributes.getAttributeScore(CHARISMA));

@@ -24,17 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.companyGeneration;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.enums.CompanyGenerationPersonType;
 
 /**
- * This is used to track a person and their specific setup during Company Generator generation. It
- * has been designed to allow for any portion of the setup to be changed by the frontend.
+ * This is used to track a person and their specific setup during Company Generator generation. It has been designed to
+ * allow for any portion of the setup to be changed by the frontend.
  *
  * @author Justin "Windchild" Bowen
  */
@@ -52,7 +57,7 @@ public class CompanyGenerationPersonTracker {
     }
 
     public CompanyGenerationPersonTracker(final CompanyGenerationPersonType personType,
-                                          final Person person) {
+          final Person person) {
         setPersonType(personType);
         setPerson(person);
         setParameters(null);

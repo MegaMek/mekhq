@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,12 +24,21 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.AtBContract;
@@ -37,13 +46,8 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-import mekhq.campaign.stratcon.StratconBiomeManifest;
-import mekhq.campaign.stratcon.StratconBiomeManifest.MapTypeList;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import mekhq.campaign.stratCon.StratConBiomeManifest;
+import mekhq.campaign.stratCon.StratConBiomeManifest.MapTypeList;
 
 @AtBScenarioEnabled
 public class ProbeBuiltInScenario extends AtBScenario {
@@ -64,8 +68,8 @@ public class ProbeBuiltInScenario extends AtBScenario {
 
     @Override
     public void setTerrain() {
-        Map<String, MapTypeList> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
-        List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
+        Map<String, MapTypeList> mapTypes = StratConBiomeManifest.getInstance().getBiomeMapTypes();
+        List<String> keys = mapTypes.keySet().stream().sorted().toList();
         do {
             setTerrainType(keys.get(Compute.randomInt(keys.size())));
         } while (getTerrainType().toUpperCase().contains("URBAN"));
@@ -73,7 +77,7 @@ public class ProbeBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         int playerHome = startPos[Compute.randomInt(4)];
         setStartingPos(playerHome);
 
@@ -93,7 +97,7 @@ public class ProbeBuiltInScenario extends AtBScenario {
         int weightClass = combatTeam != null ? combatTeam.getWeightClass(campaign) : EntityWeightClass.WEIGHT_LIGHT;
 
         addEnemyForce(enemyEntities, weightClass, EntityWeightClass.WEIGHT_MEDIUM, 0, 0,
-                campaign);
+              campaign);
 
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
     }
@@ -104,9 +108,9 @@ public class ProbeBuiltInScenario extends AtBScenario {
 
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 25);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                1, 75, false);
+              1, 75, false);
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
-                this);
+              this);
 
         if (keepAttachedUnitsAlive != null) {
             getScenarioObjectives().add(keepAttachedUnitsAlive);

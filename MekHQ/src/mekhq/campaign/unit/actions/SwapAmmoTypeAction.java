@@ -24,30 +24,33 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.actions;
 
-import megamek.common.AmmoType;
+import java.util.Objects;
+
+import megamek.common.equipment.AmmoType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
-
-import java.util.Objects;
 
 /**
  * Swaps the {@code AmmoType} for an {@code AmmoBin} on a {@code Unit}.
  */
-public class SwapAmmoTypeAction implements IUnitAction {
-
-    private final AmmoBin ammoBin;
-    private final AmmoType ammoType;
+public record SwapAmmoTypeAction(AmmoBin ammoBin, AmmoType ammoType) implements IUnitAction {
 
     /**
      * Initializes a new instance of the {@code SwapAmmoTypeAction} class.
-     * @param ammoBin The {@code AmmoBin} to swap ammo.
+     *
+     * @param ammoBin  The {@code AmmoBin} to swap ammo.
      * @param ammoType The new {@code AmmoType} to use in the {@code ammoBin}.
      */
     public SwapAmmoTypeAction(AmmoBin ammoBin, AmmoType ammoType) {

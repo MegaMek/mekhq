@@ -25,19 +25,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.finances.Money;
-import org.w3c.dom.Node;
-
-import megamek.common.Entity;
-import megamek.common.Tank;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.common.units.Entity;
+import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingPart;
+import org.w3c.dom.Node;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)

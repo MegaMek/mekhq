@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,33 +24,37 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.mission.atb;
 
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 
 public interface IAtBScenario {
-    public int getScenarioType();
+    int getScenarioType();
 
-    public String getScenarioTypeDescription();
+    String getScenarioTypeDescription();
 
-    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities);
+    void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+          ArrayList<Entity> enemyEntities);
 
-    public boolean canAddDropShips();
+    boolean canAddDropShips();
 
-    public boolean isStandardScenario();
+    boolean isStandardScenario();
 
-    public boolean isSpecialScenario();
+    boolean isSpecialScenario();
 
-    public boolean isBigBattle();
+    boolean isBigBattle();
 
-    public String getResourceKey();
+    String getResourceKey();
 
-    public ResourceBundle getResourceBundle();
+    ResourceBundle getResourceBundle();
 }

@@ -24,18 +24,33 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.rating.CamOpsReputation;
-
-import megamek.common.*;
-import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.Unit;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import megamek.common.bays.SuperHeavyVehicleBay;
+import megamek.common.bays.ASFBay;
+import megamek.common.bays.BattleArmorBay;
+import megamek.common.bays.Bay;
+import megamek.common.bays.HeavyVehicleBay;
+import megamek.common.bays.InfantryBay;
+import megamek.common.bays.LightVehicleBay;
+import megamek.common.bays.MekBay;
+import megamek.common.bays.ProtoMekBay;
+import megamek.common.bays.SmallCraftBay;
+import megamek.common.units.Entity;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.unit.Unit;
 
 public class TransportationRating {
     final static int BELOW_CAPACITY = 0;
@@ -48,10 +63,10 @@ public class TransportationRating {
     /**
      * Calculates the transportation rating for the given campaign.
      *
-     * @param campaign The campaign for which to calculate the transportation
-     *                 rating.
-     * @return A list containing maps of transportation capacities and requirements,
-     *         including the transportation rating.
+     * @param campaign The campaign for which to calculate the transportation rating.
+     *
+     * @return A list containing maps of transportation capacities and requirements, including the transportation
+     *       rating.
      */
     public static List<Map<String, Integer>> calculateTransportationRating(Campaign campaign) {
         // Calculate transportation capacities and requirements for the campaign
@@ -183,7 +198,7 @@ public class TransportationRating {
         int dockingCollarCount = transportationCapacities.get("dockingCollars");
 
         if ((dockingCollarCount >= 0)
-            && (dockingCollarCount >= transportationRequirements.get("dropShipCount"))) {
+                  && (dockingCollarCount >= transportationRequirements.get("dropShipCount"))) {
             transportationRating += 5;
             logger.debug("Exceeding docking collar requirements: +5");
         }
@@ -205,8 +220,9 @@ public class TransportationRating {
     /**
      * Returns capacity rating based on provided rating and capacityRating parameters.
      *
-     * @param rating the input rating
+     * @param rating         the input rating
      * @param capacityRating the current capacity rating
+     *
      * @return the determined capacity rating
      */
     private static int getCapacityRating(int rating, int capacityRating) {
@@ -224,11 +240,11 @@ public class TransportationRating {
     }
 
     /**
-     * Calculates the transportation rating adjustment based on capacity and
-     * requirements.
+     * Calculates the transportation rating adjustment based on capacity and requirements.
      *
      * @param capacity     the transport bay capacity
      * @param requirements the transport bay usage
+     *
      * @return the rating calculated based on the capacity and requirements
      */
     protected static int calculateRating(int capacity, int requirements) {
@@ -250,12 +266,10 @@ public class TransportationRating {
     /**
      * Retrieves the transportation bays and passenger capacity for a campaign.
      *
-     * @param campaign the campaign to retrieve the transportation bays and
-     *                 passenger capacity for
-     * @return a map containing the transportation bays and passenger capacity,
-     *         where each key represents
-     *         a bay type and its corresponding value represents the count or
-     *         capacity
+     * @param campaign the campaign to retrieve the transportation bays and passenger capacity for
+     *
+     * @return a map containing the transportation bays and passenger capacity, where each key represents a bay type and
+     *       its corresponding value represents the count or capacity
      */
     private static Map<String, Integer> calculateTransportationCapacities(Campaign campaign) {
         int uncrewedUnits = 0;
@@ -263,7 +277,7 @@ public class TransportationRating {
         int hasJumpShipOrWarShip = 0;
 
         int smallCraftBays = 0, mekBays = 0, asfBays = 0, superHeavyVehicleBays = 0, heavyVehicleBays = 0,
-                lightVehicleBays = 0, protoMekBays = 0, battleArmorBays = 0, infantryBays = 0, passengerCapacity = 0;
+              lightVehicleBays = 0, protoMekBays = 0, battleArmorBays = 0, infantryBays = 0, passengerCapacity = 0;
 
         // Iterating through each unit in the campaign
         for (Unit unit : campaign.getActiveUnits()) {
@@ -307,7 +321,8 @@ public class TransportationRating {
                     battleArmorBays += (int) bay.getCapacity();
                 } else if (bay instanceof InfantryBay) {
                     infantryBays += (int) Math
-                            .floor(bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight());
+                                                .floor(bay.getCapacity() /
+                                                             ((InfantryBay) bay).getPlatoonType().getWeight());
                 }
 
                 passengerCapacity += bay.getPersonnel(entity.isClan());
@@ -318,16 +333,16 @@ public class TransportationRating {
 
         // Map the capacity of each bay type
         Map<String, Integer> transportationCapacities = new HashMap<>(Map.of(
-                "smallCraftBays", smallCraftBays,
-                "mekBays", mekBays,
-                "asfBays", asfBays,
-                "superHeavyVehicleBays", superHeavyVehicleBays,
-                "heavyVehicleBays", heavyVehicleBays,
-                "lightVehicleBays", lightVehicleBays,
-                "protoMekBays", protoMekBays,
-                "battleArmorBays", battleArmorBays,
-                "infantryBays", infantryBays,
-                "passengerCapacity", passengerCapacity));
+              "smallCraftBays", smallCraftBays,
+              "mekBays", mekBays,
+              "asfBays", asfBays,
+              "superHeavyVehicleBays", superHeavyVehicleBays,
+              "heavyVehicleBays", heavyVehicleBays,
+              "lightVehicleBays", lightVehicleBays,
+              "protoMekBays", protoMekBays,
+              "battleArmorBays", battleArmorBays,
+              "infantryBays", infantryBays,
+              "passengerCapacity", passengerCapacity));
 
         // add the supplemental information to the map
         transportationCapacities.put("hasJumpShipOrWarShip", hasJumpShipOrWarShip);
@@ -336,9 +351,9 @@ public class TransportationRating {
 
         // log the stored information to aid debugging
         logger.debug("Transportation Capacities = {}",
-                transportationCapacities.entrySet().stream()
-                        .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
-                        .collect(Collectors.joining()));
+              transportationCapacities.entrySet().stream()
+                    .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
+                    .collect(Collectors.joining()));
 
         // return the map
         return transportationCapacities;
@@ -347,15 +362,15 @@ public class TransportationRating {
     /**
      * Calculates the transport requirements for the given campaign.
      *
-     * @param campaign the campaign for which to calculate the transport
-     *                 requirements
+     * @param campaign the campaign for which to calculate the transport requirements
+     *
      * @return a map containing the count for each type of entity in the campaign
      */
     private static Map<String, Integer> calculateTransportRequirements(Campaign campaign) {
         // Initialize variables to store counts of different unit types
         int dropShipCount = 0, smallCraftCount = 0, mekCount = 0, asfCount = 0, superHeavyVehicleCount = 0,
-                heavyVehicleCount = 0, lightVehicleCount = 0, protoMekCount = 0, battleArmorCount = 0,
-                infantryCount = 0;
+              heavyVehicleCount = 0, lightVehicleCount = 0, protoMekCount = 0, battleArmorCount = 0,
+              infantryCount = 0;
 
         // Iterate through each unit in the campaign
         for (Unit unit : campaign.getActiveUnits()) {
@@ -394,32 +409,33 @@ public class TransportationRating {
 
         // Count the number of passengers by filtering the personnel list
         int passengerCount = (int) campaign.getPersonnel().stream()
-                .filter(person -> !person.getStatus().isAbsent() && !person.getStatus().isDepartedUnit())
-                .filter(person -> person.getUnit() == null)
-                .count();
+                                         .filter(person -> !person.getStatus().isAbsent() &&
+                                                                 !person.getStatus().isDepartedUnit())
+                                         .filter(person -> person.getUnit() == null)
+                                         .count();
 
         // Map each unit count to its type
         Map<String, Integer> transportRequirements = new HashMap<>(Map.of(
-                "dropShipCount", dropShipCount,
-                "smallCraftCount", smallCraftCount,
-                "mekCount", mekCount,
-                "asfCount", asfCount,
-                "superHeavyVehicleCount", superHeavyVehicleCount,
-                "heavyVehicleCount", heavyVehicleCount,
-                "lightVehicleCount", lightVehicleCount,
-                "protoMekCount", protoMekCount,
-                "battleArmorCount", battleArmorCount,
-                "infantryCount", infantryCount));
+              "dropShipCount", dropShipCount,
+              "smallCraftCount", smallCraftCount,
+              "mekCount", mekCount,
+              "asfCount", asfCount,
+              "superHeavyVehicleCount", superHeavyVehicleCount,
+              "heavyVehicleCount", heavyVehicleCount,
+              "lightVehicleCount", lightVehicleCount,
+              "protoMekCount", protoMekCount,
+              "battleArmorCount", battleArmorCount,
+              "infantryCount", infantryCount));
 
         transportRequirements.put("totalVehicleCount",
-                (superHeavyVehicleCount + heavyVehicleCount + lightVehicleCount));
+              (superHeavyVehicleCount + heavyVehicleCount + lightVehicleCount));
         transportRequirements.put("passengerCount", passengerCount);
 
         // Log the calculated transport requirements
         logger.debug("Transportation Requirements = {}",
-                transportRequirements.entrySet().stream()
-                        .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
-                        .collect(Collectors.joining()));
+              transportRequirements.entrySet().stream()
+                    .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
+                    .collect(Collectors.joining()));
 
         // Returns a map with calculated counts for each unit type
         return transportRequirements;

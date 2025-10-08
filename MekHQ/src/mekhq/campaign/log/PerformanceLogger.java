@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.log;
 
@@ -44,20 +49,31 @@ public class PerformanceLogger {
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.LogEntries",
           MekHQ.getMHQOptions().getLocale());
 
-    public static void gainedXpFromMedWork(Person doctor, LocalDate date, int taskXP) {
-        String message = resources.getString("gainedXpFromMedWork.text");
-        doctor.addPerformanceLogEntry(new PerformanceLogEntry(date, MessageFormat.format(message, taskXP)));
-    }
-
-    public static void successfullyTreatedWithXp(Person doctor, Person patient, LocalDate date, int injuries, int xp) {
-        String message = resources.getString("successfullyTreatedWithXp.text");
-        doctor.addPerformanceLogEntry(new PerformanceLogEntry(date,
-              MessageFormat.format(message, patient, injuries, xp)));
-    }
-
+    /**
+     * @deprecated use {@link #improvedSkill(boolean, Person, LocalDate, String, int)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public static void improvedSkill(final Campaign campaign, final Person person, final LocalDate date,
           final String skill, final String value) {
         if (campaign.getCampaignOptions().isPersonnelLogSkillGain()) {
+            person.addPerformanceLogEntry(new PerformanceLogEntry(date,
+                  MessageFormat.format(resources.getString("improvedSkill.text"), skill, value)));
+        }
+    }
+
+    /**
+     * Logs a skill improvement event for a specified person if skill gain logging  is enabled. This method records the
+     * event details including the skill improved, its value, and the date of the improvement.
+     *
+     * @param isLogSkillGain a boolean indicating whether skill gain logging is enabled
+     * @param person         the {@link Person} object representing the individual gaining the skill
+     * @param date           the {@link LocalDate} of the skill improvement
+     * @param skill          a {@link String} representing the name of the skill that was improved
+     * @param value          an {@code int} representing the value of the improvement to the skill
+     */
+    public static void improvedSkill(final boolean isLogSkillGain, final Person person, final LocalDate date,
+          final String skill, final int value) {
+        if (isLogSkillGain) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,
                   MessageFormat.format(resources.getString("improvedSkill.text"), skill, value)));
         }

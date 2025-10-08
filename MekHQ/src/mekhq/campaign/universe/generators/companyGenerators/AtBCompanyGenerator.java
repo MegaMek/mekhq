@@ -24,11 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.generators.companyGenerators;
 
-import megamek.common.MekSummary;
 import megamek.common.annotations.Nullable;
+import megamek.common.loaders.MekSummary;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.rating.IUnitRating;
@@ -49,15 +54,16 @@ public class AtBCompanyGenerator extends AbstractCompanyGenerator {
     //endregion Constructors
 
     //region Personnel
+
     /**
-     * @param faction the faction to use in generating the commanding officer's rank
-     * @param tracker the commanding officer's tracker
+     * @param faction        the faction to use in generating the commanding officer's rank
+     * @param tracker        the commanding officer's tracker
      * @param numMekWarriors the number of MekWarriors in their force, used to determine their rank
      */
     @Override
     protected void generateCommandingOfficerRank(final Faction faction,
-                                                 final CompanyGenerationPersonTracker tracker,
-                                                 final int numMekWarriors) {
+          final CompanyGenerationPersonTracker tracker,
+          final int numMekWarriors) {
         if (numMekWarriors >= 36) {
             tracker.getPerson().setRank(Rank.RWO_MAX + (faction.isComStarOrWoB() ? 7 : 8));
         } else if (numMekWarriors >= 12) {
@@ -71,23 +77,25 @@ public class AtBCompanyGenerator extends AbstractCompanyGenerator {
     //endregion Personnel
 
     //region Units
+
     /**
-     * @param campaign the campaign to generate for
+     * @param campaign   the campaign to generate for
      * @param parameters the parameters to use in generation
-     * @param faction the faction to generate the mek from
+     * @param faction    the faction to generate the mek from
+     *
      * @return the MekSummary generated from the provided parameters, or null if generation fails
      */
     @Override
     protected @Nullable MekSummary generateMekSummary(final Campaign campaign,
-                                                        final AtBRandomMekParameters parameters,
-                                                        final Faction faction) {
+          final AtBRandomMekParameters parameters,
+          final Faction faction) {
         if (parameters.isStarLeague() && !faction.isComStarOrWoB()) {
             if (faction.isClan()) {
                 // Clan Pilots generate from Front Line tables instead of Star League
                 parameters.setQuality(IUnitRating.DRAGOON_B);
                 return generateMekSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
             } else {
-                // Roll on the Star League Royal table if you get a SL mek with A* Rating
+                // Roll on the Star League Royal table if you get an SL mek with A* Rating
                 final String factionCode = (parameters.getQuality() == IUnitRating.DRAGOON_ASTAR) ? "SL.R" : "SL";
                 return generateMekSummary(campaign, parameters, factionCode, getOptions().getStarLeagueYear());
             }

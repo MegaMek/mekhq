@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
 
@@ -34,7 +39,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettings;
@@ -42,13 +46,13 @@ import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.bot.princess.PrincessException;
 import megamek.client.ui.util.PlayerColour;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityListFile;
-import megamek.common.IStartingPositions;
-import megamek.common.UnitNameTracker;
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
 import megamek.common.icons.Camouflage;
+import megamek.common.interfaces.IStartingPositions;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityListFile;
+import megamek.common.units.UnitNameTracker;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -60,7 +64,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class BotForce implements IPlayerSettings {
-    private static final MMLogger logger = MMLogger.create(BotForce.class);
+    private static final MMLogger LOGGER = MMLogger.create(BotForce.class);
 
     private transient final UnitNameTracker nameTracker = new UnitNameTracker();
     private String name;
@@ -90,7 +94,7 @@ public class BotForce implements IPlayerSettings {
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
-            logger.error("Error getting Princess default behaviors", ex);
+            LOGGER.error("Error getting Princess default behaviors", ex);
         }
         bfRandomizer = null;
     }
@@ -116,7 +120,7 @@ public class BotForce implements IPlayerSettings {
     }
 
     public BotForce(String name, int team, int start, int home, List<Entity> entityList, Camouflage camouflage,
-                    PlayerColour colour) {
+          PlayerColour colour) {
         this.name = name;
         this.team = team;
         this.startingPos = start;
@@ -128,7 +132,7 @@ public class BotForce implements IPlayerSettings {
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
-            logger.error("Error getting Princess default behaviors", ex);
+            LOGGER.error("Error getting Princess default behaviors", ex);
         }
         behaviorSettings.setRetreatEdge(CardinalEdge.NEAREST);
         behaviorSettings.setDestinationEdge(CardinalEdge.NONE);
@@ -154,7 +158,7 @@ public class BotForce implements IPlayerSettings {
             copy.setBotForceRandomizer(this.getBotForceRandomizer().clone());
         }
         // UUID is immutable so this should work
-        copy.traitors = traitors.stream().collect(Collectors.toList());
+        copy.traitors = new ArrayList<>(traitors);
         copy.setBehaviorSettings(new BehaviorSettings());
         copy.getBehaviorSettings().setAutoFlee(this.getBehaviorSettings().shouldAutoFlee());
         copy.getBehaviorSettings().setForcedWithdrawal(this.getBehaviorSettings().isForcedWithdrawal());
@@ -166,35 +170,25 @@ public class BotForce implements IPlayerSettings {
         copy.getBehaviorSettings().setSelfPreservationIndex(this.getBehaviorSettings().getSelfPreservationIndex());
         copy.getBehaviorSettings().setHerdMentalityIndex(this.getBehaviorSettings().getHerdMentalityIndex());
         // this bit of trickery seems to work to make a proper copy of the entity list
-        copy.fixedEntityList = this.getFixedEntityListDirect().stream().collect(Collectors.toList());
+        copy.fixedEntityList = new ArrayList<>(this.getFixedEntityListDirect());
 
         return copy;
     }
 
     /* Convert from MM's Board to Princess's HomeEdge */
     public CardinalEdge findCardinalEdge(int start) {
-        switch (start) {
-            case Board.START_N:
-                return CardinalEdge.NORTH;
-            case Board.START_S:
-                return CardinalEdge.SOUTH;
-            case Board.START_E:
-                return CardinalEdge.EAST;
-            case Board.START_W:
-                return CardinalEdge.WEST;
-            case Board.START_NW:
-                return (Compute.randomInt(2) == 0) ? CardinalEdge.NORTH : CardinalEdge.WEST;
-            case Board.START_NE:
-                return (Compute.randomInt(2) == 0) ? CardinalEdge.NORTH : CardinalEdge.EAST;
-            case Board.START_SW:
-                return (Compute.randomInt(2) == 0) ? CardinalEdge.SOUTH : CardinalEdge.WEST;
-            case Board.START_SE:
-                return (Compute.randomInt(2) == 0) ? CardinalEdge.SOUTH : CardinalEdge.EAST;
-            case Board.START_ANY:
-                return CardinalEdge.getCardinalEdge(Compute.randomInt(4));
-            default:
-                return CardinalEdge.NONE;
-        }
+        return switch (start) {
+            case Board.START_N -> CardinalEdge.NORTH;
+            case Board.START_S -> CardinalEdge.SOUTH;
+            case Board.START_E -> CardinalEdge.EAST;
+            case Board.START_W -> CardinalEdge.WEST;
+            case Board.START_NW -> (Compute.randomInt(2) == 0) ? CardinalEdge.NORTH : CardinalEdge.WEST;
+            case Board.START_NE -> (Compute.randomInt(2) == 0) ? CardinalEdge.NORTH : CardinalEdge.EAST;
+            case Board.START_SW -> (Compute.randomInt(2) == 0) ? CardinalEdge.SOUTH : CardinalEdge.WEST;
+            case Board.START_SE -> (Compute.randomInt(2) == 0) ? CardinalEdge.SOUTH : CardinalEdge.EAST;
+            case Board.START_ANY -> CardinalEdge.getCardinalEdge(Compute.randomInt(4));
+            default -> CardinalEdge.NONE;
+        };
     }
 
     public String getName() {
@@ -367,7 +361,7 @@ public class BotForce implements IPlayerSettings {
 
         for (Entity entity : getFullEntityList(c)) {
             if (entity == null) {
-                logger.error(
+                LOGGER.error(
                       "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
             } else {
                 bv += entity.calculateBattleValue(true, false);
@@ -381,7 +375,7 @@ public class BotForce implements IPlayerSettings {
 
         for (Entity entity : getFixedEntityList()) {
             if (entity == null) {
-                logger.error(
+                LOGGER.error(
                       "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
             } else {
                 bv += entity.calculateBattleValue(true, false);
@@ -467,8 +461,6 @@ public class BotForce implements IPlayerSettings {
      * Checks to see if a given unit has a crew member among the traitor personnel IDs. This is used primarily to
      * determine if a unit can be deployed to a scenario.
      *
-     * @param unit
-     *
      * @return a boolean indicating whether this unit is a traitor
      */
     public boolean isTraitor(Unit unit) {
@@ -516,7 +508,7 @@ public class BotForce implements IPlayerSettings {
         try {
             EntityListFile.writeEntityList(pw, (ArrayList<Entity>) getFixedEntityListDirect());
         } catch (IOException ex) {
-            logger.error("Error loading entities for BotForce " + this.getName(), ex);
+            LOGGER.error("Error loading entities for BotForce {}", this.getName(), ex);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "entities");
 
@@ -589,7 +581,7 @@ public class BotForce implements IPlayerSettings {
                             try {
                                 en = MHQXMLUtility.parseSingleEntityMul((Element) wn3, campaign);
                             } catch (Exception ex) {
-                                logger.error("Error loading allied unit in scenario", ex);
+                                LOGGER.error("Error loading allied unit in scenario", ex);
                             }
 
                             if (en != null) {
@@ -623,7 +615,7 @@ public class BotForce implements IPlayerSettings {
                     }
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }

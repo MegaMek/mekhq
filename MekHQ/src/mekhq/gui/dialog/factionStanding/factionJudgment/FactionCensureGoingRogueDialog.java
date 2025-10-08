@@ -116,7 +116,7 @@ public class FactionCensureGoingRogueDialog {
      * Constructs and displays the dialog for selecting a new affiliation when going rogue. The dialog is modal and
      * completes upon construction.
      *
-     * @param campaign the campaign context to use for available factions and dialog content.
+     * @param campaign                the campaign context to use for available factions and dialog content.
      * @param isUsingFactionStandings {@code true} if the campaign has faction standings enabled.
      *
      * @author Illiani
@@ -292,10 +292,10 @@ public class FactionCensureGoingRogueDialog {
     private JPanel getFactionPanel() {
         JPanel factionPanel = new JPanel();
         JLabel lblFactions = new JLabel(getTextAt(RESOURCE_BUNDLE, "FactionCensureGoingRogueDialog.possibleFactions"));
-        MMComboBox<String> cmboFactions = new MMComboBox<>("choicePerson", createPersonGroupModel());
+        MMComboBox<String> comboFactions = new MMComboBox<>("choicePerson", createPersonGroupModel());
 
         factionPanel.add(lblFactions);
-        factionPanel.add(cmboFactions);
+        factionPanel.add(comboFactions);
 
         return factionPanel;
     }

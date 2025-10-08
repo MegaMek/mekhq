@@ -25,15 +25,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.*;
+import java.util.StringJoiner;
+
+import megamek.common.CriticalSlot;
+import megamek.common.compute.Compute;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
-
-import java.util.StringJoiner;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -55,9 +64,7 @@ public class HeatSink extends EquipmentPart {
     }
 
     /**
-     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer
-     * detail, boolean ignoreAmmo)
-     *
+     * Copied from megamek.common.units.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
      */
     @Override
     public Money getStickerPrice() {
@@ -83,12 +90,12 @@ public class HeatSink extends EquipmentPart {
                     remove(false);
                     return;
                 }
-                hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum,
-                        mounted.getLocation());
+                hits = unit.getEntity().getDamagedCriticalSlots(CriticalSlot.TYPE_EQUIPMENT, equipmentNum,
+                      mounted.getLocation());
             }
             if (checkForDestruction
-                    && hits > priorHits
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
@@ -111,11 +118,6 @@ public class HeatSink extends EquipmentPart {
     }
 
     @Override
-    public boolean needsFixing() {
-        return hits > 0;
-    }
-
-    @Override
     public PartRepairType getRepairPartType() {
         return PartRepairType.HEAT_SINK;
     }
@@ -126,14 +128,11 @@ public class HeatSink extends EquipmentPart {
     }
 
     /**
-     * Gets a string containing details regarding the part,
-     * and optionally include information on its repair
-     * status.
+     * Gets a string containing details regarding the part, and optionally include information on its repair status.
      *
-     * @param includeRepairDetails {@code true} if the details
-     *                             should include information such as the number of
-     *                             hits or how much it would cost to repair the
-     *                             part.
+     * @param includeRepairDetails {@code true} if the details should include information such as the number of hits or
+     *                             how much it would cost to repair the part.
+     *
      * @return A string containing details regarding the part.
      */
     @Override
@@ -143,7 +142,7 @@ public class HeatSink extends EquipmentPart {
             sj.add(getTechBaseName());
         }
 
-        if( !super.getDetails(includeRepairDetails).isEmpty()) {
+        if (!super.getDetails(includeRepairDetails).isEmpty()) {
             sj.add(super.getDetails(includeRepairDetails));
         }
 

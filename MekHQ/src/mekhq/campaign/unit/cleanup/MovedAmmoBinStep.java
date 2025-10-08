@@ -24,13 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.cleanup;
 
 import java.util.Map.Entry;
 
-import megamek.common.AmmoType;
-import megamek.common.Mounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 
@@ -43,7 +48,7 @@ public class MovedAmmoBinStep extends UnscrambleStep {
     }
 
     public void visit(final EquipmentProposal proposal, final AmmoBin ammoBin) {
-        for (final Entry<Integer, Mounted> equipment : proposal.getEquipment()) {
+        for (final Entry<Integer, Mounted<?>> equipment : proposal.getEquipment()) {
             final Mounted<?> m = equipment.getValue();
             if (m.isDestroyed() || !(m.getType() instanceof AmmoType)) {
                 continue;

@@ -24,13 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.icons;
 
 import java.awt.Image;
 import java.io.PrintWriter;
-
-import org.w3c.dom.Node;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -38,13 +41,11 @@ import mekhq.MHQConstants;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
 
 /**
- * ForcePieceIcon is an implementation of StandardForceIcon that contains and
- * displays a Force Icon
- * Piece from the Force Icon Directory's Pieces Subdirectory. These are then
- * combined together to
- * form a single LayeredForceIcon.
+ * ForcePieceIcon is an implementation of StandardForceIcon that contains and displays a Force Icon Piece from the Force
+ * Icon Directory's Pieces Subdirectory. These are then combined to form a single LayeredForceIcon.
  *
  * @see LayeredForceIconLayer
  * @see LayeredForceIcon
@@ -64,7 +65,7 @@ public class ForcePieceIcon extends StandardForceIcon {
     }
 
     public ForcePieceIcon(final LayeredForceIconLayer layer, final @Nullable String category,
-            final @Nullable String filename) {
+          final @Nullable String filename) {
         super(category, filename);
         setLayer(layer);
     }
@@ -135,7 +136,7 @@ public class ForcePieceIcon extends StandardForceIcon {
     @Override
     public String toString() {
         return hasDefaultCategory() ? getLayer().getLayerPath() + getFilename()
-                : getLayer().getLayerPath() + getCategory() + getFilename();
+                     : getLayer().getLayerPath() + getCategory() + getFilename();
     }
 
     @Override
@@ -144,10 +145,9 @@ public class ForcePieceIcon extends StandardForceIcon {
             return false;
         } else if (this == other) {
             return true;
-        } else if (other instanceof ForcePieceIcon) {
-            final ForcePieceIcon dOther = (ForcePieceIcon) other;
+        } else if (other instanceof ForcePieceIcon dOther) {
             return (dOther.getLayer() == getLayer()) && dOther.getCategory().equals(getCategory())
-                    && dOther.getFilename().equals(getFilename());
+                         && dOther.getFilename().equals(getFilename());
         } else {
             return false;
         }

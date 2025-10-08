@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,15 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
 
-import megamek.common.Board;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.board.Board;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -50,7 +55,7 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return ALLIEDTRAITORS;
+        return ALLIED_TRAITORS;
     }
 
     @Override
@@ -65,23 +70,24 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         setStartingPos(Board.START_CENTER);
         int enemyStart = Board.START_CENTER;
 
         for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
             enemyEntities = new ArrayList<>();
             enemyEntities.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
-                    getContract(campaign).getAllyQuality(), UnitType.MEK, weight, campaign));
+                  getContract(campaign).getAllyQuality(), UnitType.MEK, weight, campaign));
 
             enemyEntities.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
-                    getContract(campaign).getAllyQuality(), UnitType.MEK, weight, campaign));
+                  getContract(campaign).getAllyQuality(), UnitType.MEK, weight, campaign));
 
             getSpecialScenarioEnemies().add(enemyEntities);
         }
 
         addBotForce(
-                new BotForce(getContract(campaign).getAllyBotName(), 2, enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
+              new BotForce(getContract(campaign).getAllyBotName(), 2, enemyStart, getSpecialScenarioEnemies().get(0)),
+              campaign);
     }
 
     @Override
@@ -94,7 +100,12 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
         // this is a special case where the target is actually the "allied" bot.
         destroyHostiles.clearForces();
         destroyHostiles.addForce(allyBotName);
-        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 1, 100, false);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign,
+              contract,
+              this,
+              1,
+              100,
+              false);
         keepFriendliesAlive.removeForce(allyBotName);
 
         getScenarioObjectives().add(destroyHostiles);

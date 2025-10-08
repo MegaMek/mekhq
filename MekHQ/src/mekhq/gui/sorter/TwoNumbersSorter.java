@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.sorter;
 
@@ -34,13 +39,12 @@ import java.util.regex.Pattern;
 /**
  * A comparator for two numbers formatted like: "123 [54]"
  * <p>
- * Sorts by first number, then if available second number.
- * Numbers without a second number are sorted before all those with them,
- * the same way FormattedNumberSorter would do so.
+ * Sorts by first number, then if available second number. Numbers without a second number are sorted before all those
+ * with them, the same way FormattedNumberSorter would do so.
  */
 public final class TwoNumbersSorter implements Comparator<String> {
     private static final Comparator<String> NUM_SORTER = new FormattedNumberSorter();
-    private static final Pattern NUM_PATTERN = Pattern.compile("^([+-]?\\d*)\\s+\\[([+-]?\\d*)\\]\\s*$");
+    private static final Pattern NUM_PATTERN = Pattern.compile("^([+-]?\\d*)\\s+\\[([+-]?\\d*)]\\s*$");
 
     @Override
     public int compare(String s1, String s2) {

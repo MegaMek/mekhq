@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.panels;
 
@@ -40,11 +45,11 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JSpinner.NumberEditor;
 
-import megamek.client.ui.panels.JDisableablePanel;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
-import megamek.common.EntityWeightClass;
+import megamek.client.ui.panels.JDisableablePanel;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.EntityWeightClass;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -92,7 +97,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
     private JCheckBox chkAssignMostSkilledToPrimaryLances;
     private JCheckBox chkAutomaticallyAssignRanks;
     private JCheckBox chkUseSpecifiedFactionToAssignRanks;
-    private JCheckBox chkAssignMekWarriorsCallsigns;
+    private JCheckBox chkAssignMekWarriorsCallSigns;
     private JCheckBox chkAssignFounderFlag;
 
     // Personnel Randomization
@@ -361,12 +366,12 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         this.chkUseSpecifiedFactionToAssignRanks = chkUseSpecifiedFactionToAssignRanks;
     }
 
-    public JCheckBox getChkAssignMekWarriorsCallsigns() {
-        return chkAssignMekWarriorsCallsigns;
+    public JCheckBox getChkAssignMekWarriorsCallSigns() {
+        return chkAssignMekWarriorsCallSigns;
     }
 
-    public void setChkAssignMekWarriorsCallsigns(final JCheckBox chkAssignMekWarriorsCallsigns) {
-        this.chkAssignMekWarriorsCallsigns = chkAssignMekWarriorsCallsigns;
+    public void setChkAssignMekWarriorsCallSigns(final JCheckBox chkAssignMekWarriorsCallSigns) {
+        this.chkAssignMekWarriorsCallSigns = chkAssignMekWarriorsCallSigns;
     }
 
     public JCheckBox getChkAssignFounderFlag() {
@@ -1056,10 +1061,10 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
               "chkUseSpecifiedFactionToAssignRanks.toolTipText"));
         getChkUseSpecifiedFactionToAssignRanks().setName("chkUseSpecifiedFactionToAssignRanks");
 
-        setChkAssignMekWarriorsCallsigns(new JCheckBox(resources.getString("chkAssignMekWarriorsCallsigns.text")));
-        getChkAssignMekWarriorsCallsigns().setToolTipText(resources.getString(
-              "chkAssignMekWarriorsCallsigns.toolTipText"));
-        getChkAssignMekWarriorsCallsigns().setName("chkAssignMekWarriorsCallsigns");
+        setChkAssignMekWarriorsCallSigns(new JCheckBox(resources.getString("chkAssignMekWarriorsCallSigns.text")));
+        getChkAssignMekWarriorsCallSigns().setToolTipText(resources.getString(
+              "chkAssignMekWarriorsCallSigns.toolTipText"));
+        getChkAssignMekWarriorsCallSigns().setName("chkAssignMekWarriorsCallSigns");
 
         setChkAssignFounderFlag(new JCheckBox(resources.getString("chkAssignFounderFlag.text")));
         getChkAssignFounderFlag().setToolTipText(resources.getString("chkAssignFounderFlag.toolTipText"));
@@ -1095,7 +1100,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
                                       .addComponent(getChkAssignMostSkilledToPrimaryLances())
                                       .addComponent(getChkAutomaticallyAssignRanks())
                                       .addComponent(getChkUseSpecifiedFactionToAssignRanks())
-                                      .addComponent(getChkAssignMekWarriorsCallsigns())
+                                      .addComponent(getChkAssignMekWarriorsCallSigns())
                                       .addComponent(getChkAssignFounderFlag()));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
@@ -1112,7 +1117,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
                                         .addComponent(getChkAssignMostSkilledToPrimaryLances())
                                         .addComponent(getChkAutomaticallyAssignRanks())
                                         .addComponent(getChkUseSpecifiedFactionToAssignRanks())
-                                        .addComponent(getChkAssignMekWarriorsCallsigns())
+                                        .addComponent(getChkAssignMekWarriorsCallSigns())
                                         .addComponent(getChkAssignFounderFlag()));
 
         return panel;
@@ -2054,7 +2059,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         getChkAssignMostSkilledToPrimaryLances().setSelected(options.isAssignMostSkilledToPrimaryLances());
         getChkAutomaticallyAssignRanks().setSelected(options.isAutomaticallyAssignRanks());
         getChkUseSpecifiedFactionToAssignRanks().setSelected(options.isUseSpecifiedFactionToAssignRanks());
-        getChkAssignMekWarriorsCallsigns().setSelected(options.isAssignMekWarriorsCallsigns());
+        getChkAssignMekWarriorsCallSigns().setSelected(options.isAssignMekWarriorsCallSigns());
         getChkAssignFounderFlag().setSelected(options.isAssignFounderFlag());
 
         // Personnel Randomization
@@ -2186,7 +2191,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         options.setAssignMostSkilledToPrimaryLances(getChkAssignMostSkilledToPrimaryLances().isSelected());
         options.setAutomaticallyAssignRanks(getChkAutomaticallyAssignRanks().isSelected());
         options.setUseSpecifiedFactionToAssignRanks(getChkUseSpecifiedFactionToAssignRanks().isSelected());
-        options.setAssignMekWarriorsCallsigns(getChkAssignMekWarriorsCallsigns().isSelected());
+        options.setAssignMekWarriorsCallSigns(getChkAssignMekWarriorsCallSigns().isSelected());
         options.setAssignFounderFlag(getChkAssignFounderFlag().isSelected());
 
         // Personnel Randomization
@@ -2268,7 +2273,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
      *
      * @param display to display dialogs containing the messages or not
      *
-     * @return true if the data validates successfully, otherwise false
      */
     public ValidationState validateOptions(final boolean display) {
         // region Errors

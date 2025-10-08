@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2015-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,7 +36,6 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 
 import java.awt.Component;
 import java.awt.Image;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,12 +48,12 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.EntityWeightClass;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.UnitType;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.Tank;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -67,7 +66,7 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class RetirementTableModel extends AbstractTableModel {
-    private static final MMLogger logger = MMLogger.create(RetirementTableModel.class);
+    private static final MMLogger LOGGER = MMLogger.create(RetirementTableModel.class);
 
     public static final int COL_PERSON = 0;
     public static final int COL_ASSIGN = 1;
@@ -82,19 +81,19 @@ public class RetirementTableModel extends AbstractTableModel {
     public static final int N_COL = 10;
 
     private static final String[] colNames = {
-            "Person", "Assignment", "Force", "Target Number",
-            "Shares", "Retention Bonus", "Pay Bonus", "Custom Modifier",
-            "Payout", "Unit"
+          "Person", "Assignment", "Force", "Target Number",
+          "Shares", "Retention Bonus", "Pay Bonus", "Custom Modifier",
+          "Payout", "Unit"
     };
 
     private final Campaign campaign;
     private List<UUID> data;
     private Map<UUID, TargetRoll> targets;
-    private Map<UUID, Boolean> payBonus;
-    private Map<UUID, Integer> miscMods;
+    private final Map<UUID, Boolean> payBonus;
+    private final Map<UUID, Integer> miscMods;
     private int generalMod;
     private Map<UUID, UUID> unitAssignments;
-    private Map<UUID, Money> altPayout;
+    private final Map<UUID, Money> altPayout;
     boolean editPayout;
 
     public RetirementTableModel(Campaign c) {
@@ -121,9 +120,9 @@ public class RetirementTableModel extends AbstractTableModel {
         for (UUID id : targets.keySet()) {
             data.add(id);
             payBonus.put(id,
-                    ((campaign.getCampaignOptions().isPayBonusDefault())
-                            && (targets.get(id).getValue() >= campaign.getCampaignOptions()
-                                    .getPayBonusDefaultThreshold())));
+                  ((campaign.getCampaignOptions().isPayBonusDefault())
+                         && (targets.get(id).getValue() >= campaign.getCampaignOptions()
+                                                                 .getPayBonusDefaultThreshold())));
             miscMods.put(id, 0);
         }
         fireTableDataChanged();
@@ -175,7 +174,7 @@ public class RetirementTableModel extends AbstractTableModel {
         try {
             retVal = getValueAt(0, col).getClass();
         } catch (NullPointerException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
         return retVal;
     }
@@ -274,16 +273,12 @@ public class RetirementTableModel extends AbstractTableModel {
                  */
                 if ((campaign.getRetirementDefectionTracker().getPayout(person.getId()).getWeightClass() == 0 &&
                            null != unitAssignments.get(person.getId())) ||
-                        (campaign.getCampaignOptions().isUseShareSystem() &&
-                                campaign.getCampaignOptions().isTrackOriginalUnit() &&
-                               Objects.equals(person.getOriginalUnitId(), unitAssignments.get(person.getId())) &&
-                               null != campaign.getUnit(unitAssignments.get(person.getId())))) {
+                          (campaign.getCampaignOptions().isUseShareSystem() &&
+                                 campaign.getCampaignOptions().isTrackOriginalUnit() &&
+                                 Objects.equals(person.getOriginalUnitId(), unitAssignments.get(person.getId())) &&
+                                 null != campaign.getUnit(unitAssignments.get(person.getId())))) {
                     payout = payout.minus(campaign.getUnit(unitAssignments.get(person.getId())).getBuyCost());
                 }
-
-                // if the person is under contract, we don't check whether they need a unit or are owed a shortfall
-                LocalDate recruitmentDate = person.getRecruitment();
-
 
                 if (isBreakingContract(person,
                       campaign.getLocalDate(),
@@ -293,7 +288,7 @@ public class RetirementTableModel extends AbstractTableModel {
                         payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker()
                                                                                                     .getPayout(person.getId())
                                                                                                     .getWeightClass(),
-                                RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(person.getId())))));
+                              RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(person.getId())))));
                     }
 
                     // if the person requires a unit, but doesn't have one...
@@ -303,7 +298,7 @@ public class RetirementTableModel extends AbstractTableModel {
                         payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker()
                                                                                                     .getPayout(person.getId())
                                                                                                     .getWeightClass(),
-                                0));
+                              0));
                     }
                 }
 
@@ -319,7 +314,7 @@ public class RetirementTableModel extends AbstractTableModel {
                 if (null != unitAssignments.get(person.getId())) {
                     return campaign.getUnit(unitAssignments.get(person.getId())).getName();
                 } else if (campaign.getRetirementDefectionTracker().getPayout(person.getId())
-                        .getWeightClass() < EntityWeightClass.WEIGHT_LIGHT) {
+                                 .getWeightClass() < EntityWeightClass.WEIGHT_LIGHT) {
                     return "";
                 } else {
                     return "Class " +
@@ -391,9 +386,9 @@ public class RetirementTableModel extends AbstractTableModel {
     public class TextRenderer extends MekHqTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
+              boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,
-                    hasFocus, row, column);
+                  hasFocus, row, column);
             int actualCol = table.convertColumnIndexToModel(column);
             setHorizontalAlignment(getAlignment(actualCol));
 
@@ -408,7 +403,7 @@ public class RetirementTableModel extends AbstractTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
+              boolean hasFocus, int row, int column) {
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
             Person p = getPerson(actualRow);

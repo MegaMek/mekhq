@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs;
 
@@ -85,12 +90,13 @@ public class InsufficientMedicsNagDialog extends ImmersiveDialogNag {
      *       found.
      */
     @Override
-    protected @Nullable Person getSpeaker(@Nullable Campaign campaign, @Nullable AdministratorSpecialization specialization) {
+    protected @Nullable Person getSpeaker(@Nullable Campaign campaign,
+          @Nullable AdministratorSpecialization specialization) {
         if (campaign == null) {
             return null;
         }
 
-        List<Person> potentialSpeakers = campaign.getActivePersonnel(false);
+        List<Person> potentialSpeakers = campaign.getActivePersonnel(false, false);
 
         if (potentialSpeakers.isEmpty()) {
             return getFallbackSpeaker(campaign);
@@ -171,8 +177,6 @@ public class InsufficientMedicsNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed due to insufficient medics, {@code false} otherwise.
      */
     public static boolean checkNag(int medicsRequired) {
-        final String NAG_KEY = NAG_INSUFFICIENT_MEDICS;
-
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && hasMedicsNeeded(medicsRequired);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_INSUFFICIENT_MEDICS) && hasMedicsNeeded(medicsRequired);
     }
 }

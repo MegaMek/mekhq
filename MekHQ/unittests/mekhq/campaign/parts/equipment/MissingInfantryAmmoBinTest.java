@@ -24,21 +24,45 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
+import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
+import static mekhq.campaign.parts.AmmoUtilities.getInfantryWeapon;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+
 import megamek.Version;
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.EquipmentTypeLookup;
-import megamek.common.Mounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.EquipmentTypeLookup;
+import megamek.common.equipment.Mounted;
+import megamek.common.units.Entity;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
-import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
@@ -46,20 +70,6 @@ import org.mockito.ArgumentCaptor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
-import static mekhq.campaign.parts.AmmoUtilities.getInfantryWeapon;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class MissingInfantryAmmoBinTest {
     @Test
@@ -74,7 +84,13 @@ public class MissingInfantryAmmoBinTest {
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
-        MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0, ammoType, 18, weaponType, 1, false, mockCampaign);
+        MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0,
+              ammoType,
+              18,
+              weaponType,
+              1,
+              false,
+              mockCampaign);
 
         assertEquals(PartRepairType.AMMUNITION, missingAmmoBin.getMRMSOptionType());
     }
@@ -86,7 +102,13 @@ public class MissingInfantryAmmoBinTest {
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
         int clips = 5;
-        MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0, ammoType, 18, weaponType, clips, false, mockCampaign);
+        MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0,
+              ammoType,
+              18,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // Get a new part that represents the missing bin
         InfantryAmmoBin newPart = missingAmmoBin.getNewPart();
@@ -119,7 +141,13 @@ public class MissingInfantryAmmoBinTest {
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
         Campaign mockCampaign = mock(Campaign.class);
-        MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0, ammoType, 18, weaponType, 6, false, mockCampaign);
+        MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0,
+              ammoType,
+              18,
+              weaponType,
+              6,
+              false,
+              mockCampaign);
         missingAmmoBin.setId(25);
 
         // Write the AmmoBin XML
@@ -158,12 +186,19 @@ public class MissingInfantryAmmoBinTest {
     }
 
     @Test
-    public void omnipoddedMissingInfantryAmmoBinWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
+    public void omnipoddedMissingInfantryAmmoBinWriteToXmlTest()
+          throws ParserConfigurationException, SAXException, IOException {
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
         Campaign mockCampaign = mock(Campaign.class);
-        MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0, ammoType, 18, weaponType, 6, true, mockCampaign);
+        MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0,
+              ammoType,
+              18,
+              weaponType,
+              6,
+              true,
+              mockCampaign);
         missingAmmoBin.setId(25);
 
         // Write the AmmoBin XML
@@ -210,10 +245,23 @@ public class MissingInfantryAmmoBinTest {
         InfantryWeapon otherWeaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_TAG);
 
         int clips = 6;
-        MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0, ammoType, 18, weaponType, clips, true, mockCampaign);
+        MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0,
+              ammoType,
+              18,
+              weaponType,
+              clips,
+              true,
+              mockCampaign);
 
         // Same type AmmoBin
-        InfantryAmmoBin replacementBin = new InfantryAmmoBin(0, ammoType, -1, 0, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin replacementBin = new InfantryAmmoBin(0,
+              ammoType,
+              -1,
+              0,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // Check and see if same type AmmoBin replacement works.
         assertTrue(missingAmmoBin.isAcceptableReplacement(replacementBin, false));
@@ -253,10 +301,23 @@ public class MissingInfantryAmmoBinTest {
         InfantryWeapon otherWeaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_TAG);
 
         int clips = 6;
-        MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0, ammoType, 18, weaponType, clips, true, mockCampaign);
+        MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0,
+              ammoType,
+              18,
+              weaponType,
+              clips,
+              true,
+              mockCampaign);
 
         // Different Ammo Type
-        InfantryAmmoBin replacementBin = new InfantryAmmoBin(0, otherAmmoType, -1, 0, weaponType, clips, false, mockCampaign);
+        InfantryAmmoBin replacementBin = new InfantryAmmoBin(0,
+              otherAmmoType,
+              -1,
+              0,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
 
         // Check and see if this replacement fails.
         assertFalse(missingAmmoBin.isAcceptableReplacement(replacementBin, false));
@@ -301,7 +362,13 @@ public class MissingInfantryAmmoBinTest {
 
         // Create a missing ammo bin on a unit
         int equipmentNum = 18;
-        MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0, ammoType, equipmentNum, weaponType, clips, false, mockCampaign);
+        MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              weaponType,
+              clips,
+              false,
+              mockCampaign);
         Unit unit = mock(Unit.class);
         ArgumentCaptor<Part> replacementCaptor = ArgumentCaptor.forClass(Part.class);
         doAnswer(ans -> {
@@ -315,7 +382,7 @@ public class MissingInfantryAmmoBinTest {
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
         missingAmmoBin.setUnit(unit);
-        quartermaster.addPart(missingAmmoBin, 0);
+        quartermaster.addPart(missingAmmoBin, 0, false);
 
         // Attempt to fix the missing ammo bin
         missingAmmoBin.fix();

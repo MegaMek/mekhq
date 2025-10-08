@@ -50,38 +50,33 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * This class is a test class for the {@link UnableToAffordExpensesNagDialog} class.
- * It contains tests for various scenarios related to the {@code isUnableToAffordExpenses} method
+ * This class is a test class for the {@link UnableToAffordExpensesNagDialog} class. It contains tests for various
+ * scenarios related to the {@code isUnableToAffordExpenses} method
  */
 class UnableToAffordExpensesNagLogicTest {
     // Mock objects for the tests
     // I know some of these can be converted to a local variable, but it makes sense to keep all the
     // mock objects in one place
     private Campaign campaign;
-    private CampaignOptions campaignOptions;
-    private Finances finances;
-    private Unit unit;
-    private Hangar hangar;
-    private Warehouse warehouse;
     private FinancialReport report;
 
     /**
-     * Test setup for each test, runs before each test.
-     * Initializes the mock objects and sets up the necessary mock behaviors.
+     * Test setup for each test, runs before each test. Initializes the mock objects and sets up the necessary mock
+     * behaviors.
      */
     @BeforeEach
     void init() {
         // Initialize the mock objects
         campaign = mock(Campaign.class);
-        campaignOptions = mock(CampaignOptions.class);
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
 
-        finances = mock(Finances.class);
+        Finances finances = mock(Finances.class);
 
-        unit = mock(Unit.class);
-        hangar = mock(Hangar.class);
+        Unit unit = mock(Unit.class);
+        Hangar hangar = mock(Hangar.class);
         hangar.addUnit(unit);
 
-        warehouse = mock(Warehouse.class);
+        Warehouse warehouse = mock(Warehouse.class);
 
         report = mock(FinancialReport.class);
 

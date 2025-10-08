@@ -24,10 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.determineTargetNumber;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
@@ -206,7 +211,7 @@ public class AttributeCheckDialog {
 
 
     /**
-     * Displays the results of the Attribute check in a results dialog.
+     * Displays the results of the Attribute check in a results' dialog.
      *
      * @param results the results text to display
      *

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,19 +25,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
 import java.awt.Component;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
 
@@ -72,18 +76,13 @@ public class LootTableModel extends AbstractTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case COL_NAME:
-                return "Name";
-            case COL_MONEY:
-                return "Money";
-            case COL_MEKS:
-                return "# Units";
-            case COL_PARTS:
-                return "# Parts";
-            default:
-                return "?";
-        }
+        return switch (column) {
+            case COL_NAME -> "Name";
+            case COL_MONEY -> "Money";
+            case COL_MEKS -> "# Units";
+            case COL_PARTS -> "# Parts";
+            default -> "?";
+        };
     }
 
     @Override
@@ -95,23 +94,13 @@ public class LootTableModel extends AbstractTableModel {
             loot = getLootAt(row);
         }
 
-        switch (col) {
-            case COL_NAME:
-                return loot.getName();
-            case COL_MONEY:
-                return loot.getCash().toAmountAndSymbolString();
-            case COL_MEKS:
-                return loot.getUnits().size();
-            case COL_PARTS:
-                return loot.getParts().size();
-            default:
-                return "?";
-        }
-    }
-
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
+        return switch (col) {
+            case COL_NAME -> loot.getName();
+            case COL_MONEY -> loot.getCash().toAmountAndSymbolString();
+            case COL_MEKS -> loot.getUnits().size();
+            case COL_PARTS -> loot.getParts().size();
+            default -> "?";
+        };
     }
 
     @Override
@@ -133,13 +122,10 @@ public class LootTableModel extends AbstractTableModel {
     }
 
     public int getColumnWidth(int c) {
-        switch (c) {
-            case COL_MONEY:
-            case COL_NAME:
-                return 100;
-            default:
-                return 20;
-        }
+        return switch (c) {
+            case COL_MONEY, COL_NAME -> 100;
+            default -> 20;
+        };
     }
 
     public int getAlignment(int col) {
@@ -147,16 +133,13 @@ public class LootTableModel extends AbstractTableModel {
     }
 
     public String getTooltip(int row, int col) {
-        switch (col) {
-            case COL_MEKS:
-                return getLootAt(row).getUnits().stream().map(Entity::getDisplayName)
-                        .collect(Collectors.joining(", "));
-            case COL_PARTS:
-                return getLootAt(row).getParts().stream().map(Part::getPartName)
-                        .collect(Collectors.joining(", "));
-            default:
-                return null;
-        }
+        return switch (col) {
+            case COL_MEKS -> getLootAt(row).getUnits().stream().map(Entity::getDisplayName)
+                                   .collect(Collectors.joining(", "));
+            case COL_PARTS -> getLootAt(row).getParts().stream().map(Part::getPartName)
+                                    .collect(Collectors.joining(", "));
+            default -> null;
+        };
     }
 
     // fill table with values
@@ -172,8 +155,8 @@ public class LootTableModel extends AbstractTableModel {
     public class Renderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus,
-                int row, int column) {
+              boolean isSelected, boolean hasFocus,
+              int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             int actualCol = table.convertColumnIndexToModel(column);

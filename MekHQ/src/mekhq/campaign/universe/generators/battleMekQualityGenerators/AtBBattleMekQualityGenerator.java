@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.generators.battleMekQualityGenerators;
 
@@ -42,25 +47,13 @@ public class AtBBattleMekQualityGenerator extends AbstractBattleMekQualityGenera
 
     @Override
     public int generate(final int roll) {
-        switch (roll) {
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                return IUnitRating.DRAGOON_F;
-            case 6:
-            case 7:
-            case 8:
-                return IUnitRating.DRAGOON_D;
-            case 9:
-            case 10:
-                return IUnitRating.DRAGOON_C;
-            case 11:
-                return IUnitRating.DRAGOON_B;
-            case 12:
-                return IUnitRating.DRAGOON_A;
-            default:
-                return IUnitRating.DRAGOON_ASTAR;
-        }
+        return switch (roll) {
+            case 2, 3, 4, 5 -> IUnitRating.DRAGOON_F;
+            case 6, 7, 8 -> IUnitRating.DRAGOON_D;
+            case 9, 10 -> IUnitRating.DRAGOON_C;
+            case 11 -> IUnitRating.DRAGOON_B;
+            case 12 -> IUnitRating.DRAGOON_A;
+            default -> IUnitRating.DRAGOON_ASTAR;
+        };
     }
 }

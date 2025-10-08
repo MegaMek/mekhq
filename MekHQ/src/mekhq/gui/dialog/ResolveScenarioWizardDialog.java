@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,6 +33,7 @@
  */
 package mekhq.gui.dialog;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.RESUPPLY_LOOT_BOX_NAME;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -40,6 +41,7 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -61,12 +63,12 @@ import java.util.UUID;
 import javax.swing.*;
 
 import megamek.client.ui.Messages;
+import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.GunEmplacement;
+import megamek.common.equipment.GunEmplacement;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -83,7 +85,7 @@ import mekhq.campaign.mission.ScenarioObjectiveProcessor;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
-import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
@@ -97,16 +99,16 @@ import mekhq.utilities.ReportingUtilities;
  */
 public class ResolveScenarioWizardDialog extends JDialog {
     // region Variable Declarations
-    final static String UNITSPANEL = "Your Units";
-    final static String PILOTPANEL = "Your Personnel";
-    final static String SALVAGEPANEL = "Salvage";
-    final static String PRISONERPANEL = "Captured Personnel";
-    final static String KILLSPANEL = "Assign Kills";
-    final static String REWARDPANEL = "Costs & Payouts";
-    final static String OBJECTIVEPANEL = "Objective Status";
-    final static String PREVIEWPANEL = "Preview";
+    final static String UNITS_PANEL = "Your Units";
+    final static String PILOT_PANEL = "Your Personnel";
+    final static String SALVAGE_PANEL = "Salvage";
+    final static String PRISONER_PANEL = "Captured Personnel";
+    final static String KILLS_PANEL = "Assign Kills";
+    final static String REWARD_PANEL = "Costs & Payouts";
+    final static String OBJECTIVE_PANEL = "Objective Status";
+    final static String PREVIEW_PANEL = "Preview";
 
-    private Campaign campaign;
+    private final Campaign campaign;
     private final JFrame frame;
 
     private final ResolveScenarioTracker tracker;
@@ -117,15 +119,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JButton btnBack;
 
     private JTabbedPane tabMain;
-
-    private JPanel pnlUnitStatus;
-    private JPanel pnlObjectiveStatus;
-    private JPanel pnlPilotStatus;
-    private JPanel pnlSalvage;
-    private JPanel pnlPrisonerStatus;
-    private JPanel pnlKills;
-    private JPanel pnlRewards;
-    private JPanel pnlPreview;
 
     /*
      * Unit status panel components
@@ -254,16 +247,16 @@ public class ResolveScenarioWizardDialog extends JDialog {
         tabMain = new JTabbedPane();
 
         // region Make Tab Panels
-        pnlUnitStatus = makeUnitStatusPanel();
+        JPanel pnlUnitStatus = makeUnitStatusPanel();
         tabMain.add(wrapWithInstructions(pnlUnitStatus,
               null,
-              resourceMap.getString("txtInstructions.text.missingunits")), UNITSPANEL);
+              resourceMap.getString("txtInstructions.text.missingunits")), UNITS_PANEL);
 
-        pnlPilotStatus = makePilotStatusPanel();
+        JPanel pnlPilotStatus = makePilotStatusPanel();
         tabMain.add(wrapWithInstructions(pnlPilotStatus, null, resourceMap.getString("txtInstructions.text.personnel")),
-              PILOTPANEL);
+              PILOT_PANEL);
 
-        pnlSalvage = makeSalvagePanel();
+        JPanel pnlSalvage = makeSalvagePanel();
 
         String report = resourceMap.getString("txtInstructions.text.salvage");
         if (tracker.isEmployerEvokingSpecialClause()) {
@@ -277,31 +270,31 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             report = resourceMap.getString("txtInstructions.text.salvage.special.unformatted");
         }
-        tabMain.add(wrapWithInstructions(pnlSalvage, null, report), SALVAGEPANEL);
+        tabMain.add(wrapWithInstructions(pnlSalvage, null, report), SALVAGE_PANEL);
 
-        pnlPrisonerStatus = makePrisonerStatusPanel();
+        JPanel pnlPrisonerStatus = makePrisonerStatusPanel();
         tabMain.add(wrapWithInstructions(pnlPrisonerStatus,
               null,
-              resourceMap.getString("txtInstructions.text.prisoners")), PRISONERPANEL);
+              resourceMap.getString("txtInstructions.text.prisoners")), PRISONER_PANEL);
 
-        pnlKills = makeKillsPanel();
+        JPanel pnlKills = makeKillsPanel();
         tabMain.add(wrapWithInstructions(pnlKills, null, resourceMap.getString("txtInstructions.text.kills")),
-              KILLSPANEL);
+              KILLS_PANEL);
 
-        pnlRewards = makeRewardsPanel();
+        JPanel pnlRewards = makeRewardsPanel();
         tabMain.add(wrapWithInstructions(pnlRewards, null, resourceMap.getString("txtInstructions.text.reward")),
-              REWARDPANEL);
+              REWARD_PANEL);
 
-        pnlObjectiveStatus = makeObjectiveStatusPanel();
+        JPanel pnlObjectiveStatus = makeObjectiveStatusPanel();
         tabMain.add(wrapWithInstructions(pnlObjectiveStatus,
               null,
-              resourceMap.getString("txtInstructions.text.objectives")), OBJECTIVEPANEL);
+              resourceMap.getString("txtInstructions.text.objectives")), OBJECTIVE_PANEL);
 
-        pnlPreview = makePreviewPanel();
+        JPanel pnlPreview = makePreviewPanel();
         scrPreviewPanel = new JScrollPaneWithSpeed();
         tabMain.add(wrapWithInstructions(pnlPreview,
               scrPreviewPanel,
-              resourceMap.getString("txtInstructions.text.preview")), PREVIEWPANEL);
+              resourceMap.getString("txtInstructions.text.preview")), PREVIEW_PANEL);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -574,7 +567,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             JButton btnViewPilot = new JButton("View Personnel");
             btnViewPilot.addActionListener(evt -> showPerson(status, false));
-            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridx = gridx;
             pnlPilotStatus.add(btnViewPilot, gridBagConstraints);
             sortedPeopleIndex++;
         }
@@ -641,7 +634,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                                        maxSalvagePct +
                                        "%)</span></html>";
             lblSalvagePct2 = new JLabel(salvageUsed);
-            gridBagConstraints.gridx = gridx--;
+            gridBagConstraints.gridx = gridx;
             pnlSalvageValue.add(lblSalvagePct2, gridBagConstraints);
 
             gridBagConstraints = new GridBagConstraints();
@@ -671,7 +664,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridx = gridx++;
         pnlSalvage.add(new JLabel(resourceMap.getString("lblSell.text")), gridBagConstraints);
 
-        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridx = gridx;
         pnlSalvage.add(new JLabel(resourceMap.getString("lblEscaped.text")), gridBagConstraints);
 
         // Initialize the tracking ArrayLists
@@ -746,7 +739,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             btnSalvageEditUnit.setActionCommand(unit.getId().toString());
             btnSalvageEditUnit.addActionListener(new EditUnitListener(true));
             buttonsSalvageEditUnit.add(btnSalvageEditUnit);
-            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridx = gridx;
             pnlSalvage.add(btnSalvageEditUnit, gridBagConstraints);
         }
 
@@ -778,7 +771,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridx = gridx++;
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisoner")), gridBagConstraints);
 
-        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridx = gridx;
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("kia")), gridBagConstraints);
 
         int prisonerIndex = 0;
@@ -846,7 +839,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             JButton btnViewPrisoner = new JButton("View Personnel");
             btnViewPrisoner.addActionListener(evt -> showPerson(status, true));
-            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridx = gridx;
             pnlPrisonerStatus.add(btnViewPrisoner, gridBagConstraints);
 
             // if the person is dead, set the checkbox and skip all this captured stuff
@@ -1630,13 +1623,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
         }
 
-        StratconRulesManager.processScenarioCompletion(tracker);
+        StratConRulesManager.processScenarioCompletion(tracker);
 
         if (reinforcementsSent &&
                   tracker.getScenario().getStatus().isOverallVictory() &&
                   tracker.getScenario().getLinkedScenario() != 0) {
 
-            StratconRulesManager.linkedScenarioProcessing(tracker, linkedForces);
+            StratConRulesManager.linkedScenarioProcessing(tracker, linkedForces);
         }
 
         aborted = false;
@@ -1656,16 +1649,16 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private void setEnabledTabs() {
         for (int i = 0; i < tabMain.getTabCount(); i++) {
             boolean enable = switch (tabMain.getTitleAt(i)) {
-                case UNITSPANEL -> !tracker.getUnitsStatus().isEmpty();
-                case OBJECTIVEPANEL -> tracker.getScenario().hasObjectives();
-                case PILOTPANEL -> !tracker.getPeopleStatus().isEmpty();
-                case PRISONERPANEL -> !tracker.getOppositionPersonnel().isEmpty();
-                case SALVAGEPANEL -> !tracker.getPotentialSalvage().isEmpty() &&
-                                           (!(tracker.getMission() instanceof Contract) ||
-                                                  ((Contract) tracker.getMission()).canSalvage());
-                case KILLSPANEL -> !tracker.getKillCredits().isEmpty();
-                case REWARDPANEL -> !loots.isEmpty();
-                case PREVIEWPANEL -> true;
+                case UNITS_PANEL -> !tracker.getUnitsStatus().isEmpty();
+                case OBJECTIVE_PANEL -> tracker.getScenario().hasObjectives();
+                case PILOT_PANEL -> !tracker.getPeopleStatus().isEmpty();
+                case PRISONER_PANEL -> !tracker.getOppositionPersonnel().isEmpty();
+                case SALVAGE_PANEL -> !tracker.getPotentialSalvage().isEmpty() &&
+                                            (!(tracker.getMission() instanceof Contract) ||
+                                                   ((Contract) tracker.getMission()).canSalvage());
+                case KILLS_PANEL -> !tracker.getKillCredits().isEmpty();
+                case REWARD_PANEL -> !loots.isEmpty();
+                case PREVIEW_PANEL -> true;
                 default -> false;
             };
             tabMain.setEnabledAt(i, enable);
@@ -1931,8 +1924,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         dialog.getContentPane().add(btn, gridBagConstraints);
 
-        dialog.setMinimumSize(UIUtil.scaleForGUI(450, 700));
-        dialog.setPreferredSize(UIUtil.scaleForGUI(450, 700));
+        Dimension dimension = scaleForGUI(700, 700);
+        dialog.setMinimumSize(dimension);
+        dialog.setPreferredSize(dimension);
         dialog.validate();
         dialog.setLocationRelativeTo(frame);
         dialog.setVisible(true);
@@ -1976,14 +1970,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
      *
      * @author NickAragua
      */
-    private static class CheckBoxKIAListener implements ItemListener {
-        private final JSlider slider;
-        private final JCheckBox checkbox;
-
-        public CheckBoxKIAListener(JSlider slider, JCheckBox checkBox) {
-            this.slider = slider;
-            this.checkbox = checkBox;
-        }
+    private record CheckBoxKIAListener(JSlider slider, JCheckBox checkbox) implements ItemListener {
 
         @Override
         public void itemStateChanged(ItemEvent e) {

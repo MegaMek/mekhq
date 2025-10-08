@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
@@ -46,7 +51,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 /**
  * A table model for displaying parts
  */
-public class PartsTableModel extends DataTableModel {
+public class PartsTableModel extends DataTableModel<Part> {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PartsTableModel";
 
     public final static int COL_QUANTITY = 0;
@@ -85,7 +90,7 @@ public class PartsTableModel extends DataTableModel {
      *                   initialized with an empty data source.
      */
     public PartsTableModel(@Nullable Set<PartInUse> partsInUse) {
-        data = new ArrayList<Part>();
+        data = new ArrayList<>();
 
         if (partsInUse != null) {
             for (PartInUse partInUse : partsInUse) {
@@ -95,11 +100,6 @@ public class PartsTableModel extends DataTableModel {
                 partsUseData.put(acquisitionPart, partInUse.getUseCount());
             }
         }
-    }
-
-    @Override
-    public int getRowCount() {
-        return data.size();
     }
 
     @Override
@@ -131,7 +131,7 @@ public class PartsTableModel extends DataTableModel {
         if (data.isEmpty()) {
             return "";
         } else {
-            part = (Part) data.get(row);
+            part = data.get(row);
         }
 
         if (col == COL_NAME) {
@@ -162,14 +162,14 @@ public class PartsTableModel extends DataTableModel {
             return useCount;
         }
         if (col == COL_QUALITY) {
-            String appendum;
+            String append;
 
             if (part.isBrandNew()) {
-                appendum = getFormattedTextAt(RESOURCE_BUNDLE, "addendum.brandNew");
+                append = getFormattedTextAt(RESOURCE_BUNDLE, "addendum.brandNew");
             } else {
-                appendum = getFormattedTextAt(RESOURCE_BUNDLE, "addendum.used");
+                append = getFormattedTextAt(RESOURCE_BUNDLE, "addendum.used");
             }
-            return part.getQualityName() + " (" + appendum + ')';
+            return part.getQualityName() + " (" + append + ')';
         }
         if (col == COL_TON) {
             return Math.round(part.getTonnage() * 100) / 100.0;
@@ -187,45 +187,29 @@ public class PartsTableModel extends DataTableModel {
     }
 
     public Part getPartAt(int row) {
-        return ((Part) data.get(row));
+        return data.get(row);
     }
 
     public int getColumnWidth(int c) {
-        switch (c) {
-            case COL_NAME:
-            case COL_DETAIL:
-                return 120;
-            case COL_REPAIR:
-                return 140;
-            case COL_STATUS:
-                return 40;
-            case COL_TECH_BASE:
-            case COL_COST:
-            case COL_TOTAL_COST:
-                return 20;
-            default:
-                return 3;
-        }
+        return switch (c) {
+            case COL_NAME, COL_DETAIL -> 120;
+            case COL_REPAIR -> 140;
+            case COL_STATUS -> 40;
+            case COL_TECH_BASE, COL_COST, COL_TOTAL_COST -> 20;
+            default -> 3;
+        };
     }
 
     public int getAlignment(int col) {
-        switch (col) {
-            case COL_QUALITY:
-                return SwingConstants.CENTER;
-            case COL_COST:
-            case COL_TOTAL_COST:
-            case COL_TON:
-                return SwingConstants.RIGHT;
-            default:
-                return SwingConstants.LEFT;
-        }
+        return switch (col) {
+            case COL_QUALITY -> SwingConstants.CENTER;
+            case COL_COST, COL_TOTAL_COST, COL_TON -> SwingConstants.RIGHT;
+            default -> SwingConstants.LEFT;
+        };
     }
 
     public @Nullable String getTooltip(int row, int col) {
-        switch (col) {
-            default:
-                return null;
-        }
+        return null;
     }
 
     public PartsTableModel.Renderer getRenderer() {
@@ -235,7 +219,7 @@ public class PartsTableModel extends DataTableModel {
     public class Renderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-                                                       int row, int column) {
+              int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             int actualCol = table.convertColumnIndexToModel(column);

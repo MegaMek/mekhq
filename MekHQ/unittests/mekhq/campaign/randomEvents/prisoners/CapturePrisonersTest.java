@@ -24,12 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.randomEvents.prisoners;
 
 import static java.lang.Math.round;
-import static megamek.common.MiscType.createBeagleActiveProbe;
-import static megamek.common.MiscType.createISImprovedSensors;
+import static megamek.common.equipment.MiscType.createBeagleActiveProbe;
+import static megamek.common.equipment.MiscType.createISImprovedSensors;
 import static mekhq.campaign.randomEvents.prisoners.CapturePrisoners.*;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
@@ -45,9 +50,9 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.Set;
 
-import megamek.common.ITechnology;
-import megamek.common.ITechnology.AvailabilityValue;
-import megamek.common.MapSettings;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.interfaces.ITechnology;
+import megamek.common.loaders.MapSettings;
 import megamek.common.universe.FactionTag;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
@@ -59,21 +64,21 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * The {@link CapturePrisonersTest} class is a test suite for validating the functionality of the
- * prisoner capture and processing mechanisms. This class contains a variety of unit test cases to
- * ensure all intended scenarios for capturing and handling prisoners are resolved correctly.
+ * The {@link CapturePrisonersTest} class is a test suite for validating the functionality of the prisoner capture and
+ * processing mechanisms. This class contains a variety of unit test cases to ensure all intended scenarios for
+ * capturing and handling prisoners are resolved correctly.
  *
  * <p>The test cases examine different settings such as ground and space environments, the use of
- * sensors and probes, the capture of NPCs, and the processing of prisoners under specific factions
- * or capture methods such as Campaign Operations and MekHQ. Additionally, scenarios regarding
- * prisoner defection are also tested for various factions and conditions.</p>
+ * sensors and probes, the capture of NPCs, and the processing of prisoners under specific factions or capture methods
+ * such as Campaign Operations and MekHQ. Additionally, scenarios regarding prisoner defection are also tested for
+ * various factions and conditions.</p>
  */
 class CapturePrisonersTest {
     private static Factions factions;
 
     @BeforeAll
     public static void setup() {
-        Factions.setInstance(Factions.loadDefault());
+        Factions.setInstance(Factions.loadDefault(true));
         factions = Factions.getInstance();
     }
 
@@ -95,9 +100,9 @@ class CapturePrisonersTest {
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
-            + HAS_BATTLEFIELD_CONTROL
-            + GOING_TO_GROUND
-            + SAR_CONTAINS_VTOL_OR_WIGE;
+                                         + HAS_BATTLEFIELD_CONTROL
+                                         + GOING_TO_GROUND
+                                         + SAR_CONTAINS_VTOL_OR_WIGE;
 
         int actualTargetNumber = capturePrisoners.getSarTargetNumber().getValue();
         assertEquals(expectedTargetNumber, actualTargetNumber);
@@ -119,14 +124,17 @@ class CapturePrisonersTest {
         AvailabilityValue improvedSensorsAvailability = getPartAvailability(today, false);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, activeProbeAvailability.getIndex());
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign,
+              mockFaction,
+              scenario,
+              activeProbeAvailability.getIndex());
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
-            + HAS_BATTLEFIELD_CONTROL
-            + GOING_TO_GROUND
-            + SAR_CONTAINS_VTOL_OR_WIGE
-            + SAR_HAS_ACTIVE_PROBE;
+                                         + HAS_BATTLEFIELD_CONTROL
+                                         + GOING_TO_GROUND
+                                         + SAR_CONTAINS_VTOL_OR_WIGE
+                                         + SAR_HAS_ACTIVE_PROBE;
 
         int actualTargetNumber = capturePrisoners.getSarTargetNumber().getValue();
         assertEquals(expectedTargetNumber, actualTargetNumber);
@@ -146,14 +154,17 @@ class CapturePrisonersTest {
         AvailabilityValue improvedSensorsAvailability = getPartAvailability(today, false);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, improvedSensorsAvailability.getIndex());
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign,
+              mockFaction,
+              scenario,
+              improvedSensorsAvailability.getIndex());
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
-            + HAS_BATTLEFIELD_CONTROL
-            + GOING_TO_GROUND
-            + SAR_CONTAINS_VTOL_OR_WIGE
-            + SAR_HAS_IMPROVED_SENSORS;
+                                         + HAS_BATTLEFIELD_CONTROL
+                                         + GOING_TO_GROUND
+                                         + SAR_CONTAINS_VTOL_OR_WIGE
+                                         + SAR_HAS_IMPROVED_SENSORS;
 
         int actualTargetNumber = capturePrisoners.getSarTargetNumber().getValue();
         assertEquals(expectedTargetNumber, actualTargetNumber);
@@ -177,9 +188,9 @@ class CapturePrisonersTest {
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
-            + HAS_BATTLEFIELD_CONTROL
-            + NOT_IN_PLANET_ORBIT
-            + SAR_INCLUDES_DROPSHIP;
+                                         + HAS_BATTLEFIELD_CONTROL
+                                         + NOT_IN_PLANET_ORBIT
+                                         + SAR_INCLUDES_DROPSHIP;
 
         int actualTargetNumber = capturePrisoners.getSarTargetNumber().getValue();
         assertEquals(expectedTargetNumber, actualTargetNumber);
@@ -280,10 +291,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, mockFaction, false, true);
 
         // Assert
-        PrisonerStatus expectedStatus = PRISONER;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(PRISONER, actualStatus);
     }
 
     @Test
@@ -301,7 +311,10 @@ class CapturePrisonersTest {
 
         Person prisoner = new Person(mockCampaign);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
+              campaignFaction,
+              scenario,
+              DRAGOON_C) {
             @Override
             protected int d6(int dice) {
                 return Integer.MIN_VALUE;
@@ -313,10 +326,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, campaignFaction, false, true);
 
         // Assert
-        PrisonerStatus expectedStatus = PRISONER;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(PRISONER, actualStatus);
     }
 
     @Test
@@ -336,7 +348,10 @@ class CapturePrisonersTest {
         Faction prisonerFaction = factions.getFaction("CJF");
         prisoner.setOriginFaction(prisonerFaction);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
+              campaignFaction,
+              scenario,
+              DRAGOON_C) {
             @Override
             protected int d6(int dice) {
                 return Integer.MAX_VALUE;
@@ -348,10 +363,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, campaignFaction, false, true);
 
         // Assert
-        PrisonerStatus expectedStatus = BECOMING_BONDSMAN;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(BECOMING_BONDSMAN, actualStatus);
     }
 
     @Test
@@ -381,10 +395,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, mockFaction, true, true);
 
         // Assert
-        PrisonerStatus expectedStatus = PRISONER;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(PRISONER, actualStatus);
     }
 
     @Test
@@ -402,7 +415,10 @@ class CapturePrisonersTest {
 
         Person prisoner = new Person(mockCampaign);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
+              campaignFaction,
+              scenario,
+              DRAGOON_C) {
             @Override
             protected int d6(int dice) {
                 return Integer.MIN_VALUE;
@@ -414,10 +430,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, campaignFaction, true, true);
 
         // Assert
-        PrisonerStatus expectedStatus = PRISONER;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(PRISONER, actualStatus);
     }
 
     @Test
@@ -437,7 +452,10 @@ class CapturePrisonersTest {
         Faction prisonerFaction = factions.getFaction("LA");
         prisoner.setOriginFaction(prisonerFaction);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C) {
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
+              campaignFaction,
+              scenario,
+              DRAGOON_C) {
             @Override
             protected int d6(int dice) {
                 return Integer.MAX_VALUE;
@@ -449,10 +467,9 @@ class CapturePrisonersTest {
         capturePrisoners.processPrisoner(prisoner, campaignFaction, true, true);
 
         // Assert
-        PrisonerStatus expectedStatus = BECOMING_BONDSMAN;
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
-        assertSame(expectedStatus, actualStatus);
+        assertSame(BECOMING_BONDSMAN, actualStatus);
     }
 
     @Test
@@ -476,10 +493,8 @@ class CapturePrisonersTest {
         int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
         // Assert
-        int expectedTargetNumber = DEFECTION_CHANCE;
-        int actualTargetNumber = defectionChance;
 
-        assertEquals(expectedTargetNumber, actualTargetNumber);
+        assertEquals(DEFECTION_CHANCE, defectionChance);
     }
 
     @Test
@@ -507,9 +522,8 @@ class CapturePrisonersTest {
 
         // Assert
         int expectedTargetNumber = (int) round(DEFECTION_CHANCE * MERCENARY_MULTIPLIER);
-        int actualTargetNumber = defectionChance;
 
-        assertEquals(expectedTargetNumber, actualTargetNumber);
+        assertEquals(expectedTargetNumber, defectionChance);
     }
 
     @Test
@@ -535,10 +549,8 @@ class CapturePrisonersTest {
         int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
         // Assert
-        int expectedTargetNumber = DEFECTION_CHANCE;
-        int actualTargetNumber = defectionChance;
 
-        assertEquals(expectedTargetNumber, actualTargetNumber);
+        assertEquals(DEFECTION_CHANCE, defectionChance);
     }
 
     @Test
@@ -564,26 +576,25 @@ class CapturePrisonersTest {
 
         // Assert
         int expectedTargetNumber = DEFECTION_CHANCE * CLAN_DEZGRA_MULTIPLIER;
-        int actualTargetNumber = defectionChance;
 
-        assertEquals(expectedTargetNumber, actualTargetNumber);
+        assertEquals(expectedTargetNumber, defectionChance);
     }
 
 
     // Utility Methods
 
     /**
-     * Determines the availability of a particular part based on the current date
-     * and whether an active probe is being used.
+     * Determines the availability of a particular part based on the current date and whether an active probe is being
+     * used.
      *
-     * @param today The current date represented as a LocalDate object.
+     * @param today         The current date represented as a LocalDate object.
      * @param isActiveProbe A boolean indicating if an active probe is being utilized.
-     * @return An integer representing the availability of the part for the given year
-     *         and technology type.
+     *
+     * @return An integer representing the availability of the part for the given year and technology type.
      */
     private AvailabilityValue getPartAvailability(LocalDate today, boolean isActiveProbe) {
         int year = today.getYear();
-        ITechnology.Faction techFaction = ITechnology.getFactionFromMMAbbr("IS");
+        megamek.common.enums.Faction techFaction = ITechnology.getFactionFromMMAbbr("IS");
 
         if (isActiveProbe) {
             return createBeagleActiveProbe().calcYearAvailability(year, false, techFaction);

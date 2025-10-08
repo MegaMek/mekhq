@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -536,6 +537,8 @@ public enum PersonnelRole {
                   SkillType.S_ART_COOKING,
                   SkillType.S_SENSOR_OPERATIONS);
             skills.addAll(relevantSkills);
+        } else if (this == SOLDIER) {
+            skills.addAll(INFANTRY_GUNNERY_SKILLS);
         } else {
             skills.addAll(getSkillsForProfession());
         }
@@ -1048,7 +1051,6 @@ public enum PersonnelRole {
                      this == SENSOR_TECHNICIAN ||
                      this == CHEF;
     }
-
 
 
     /**

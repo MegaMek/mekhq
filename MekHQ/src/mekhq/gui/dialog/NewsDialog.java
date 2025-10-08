@@ -63,7 +63,7 @@ public class NewsDialog extends ImmersiveDialogSimple {
     private static final int OPERATION_KLONDIKE = 2822;
 
     private static final List<NewsNetwork> NEWS_NETWORKS = getNewsNetworks();
-    private static final String CHATTERWEB_NETWORK_NAME = "chatterweb";
+    private static final String CHATTER_WEB_NETWORK_NAME = "chatterWeb";
     private static final String AFFILIATE_NETWORK_NAME = "affiliateNewsNetworks";
 
     /**
@@ -74,7 +74,7 @@ public class NewsDialog extends ImmersiveDialogSimple {
      * even though no specific person is associated with the message. Only the provided central message is shown.
      * </p>
      *
-     * @param campaign the current {@link Campaign} context
+     * @param campaign      the current {@link Campaign} context
      * @param centerMessage the main message to display in the dialog
      */
     public NewsDialog(Campaign campaign, String centerMessage) {
@@ -93,13 +93,13 @@ public class NewsDialog extends ImmersiveDialogSimple {
     /**
      * Builds the speaker panel that consists of the network's image and descriptive text.
      *
-     * @param speaker  The {@link Person} representing the speaker (may be {@code null}).
+     * @param speaker  The {@link Person} representing the speaker (maybe {@code null}).
      * @param campaign The {@link Campaign} object providing relevant game details.
      *
      * @return A {@link JPanel} containing the speaker's image and description.
      */
     @Override
-    protected JPanel buildSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
+    protected JPanel buildLeftSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
         JPanel speakerBox = new JPanel();
         speakerBox.setLayout(new BoxLayout(speakerBox, BoxLayout.Y_AXIS));
         speakerBox.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -143,7 +143,7 @@ public class NewsDialog extends ImmersiveDialogSimple {
         final String NETWORK_NAME = network.name;
         String networkCode = getFormattedTextAt(RESOURCE_BUNDLE, NETWORK_NAME + ".network");
         String networkName = "";
-        if (NETWORK_NAME.equals(CHATTERWEB_NETWORK_NAME)) {
+        if (NETWORK_NAME.equals(CHATTER_WEB_NETWORK_NAME)) {
             networkName = campaign.getFaction().getFullName(campaign.getGameYear());
         } else if (!NETWORK_NAME.equals(AFFILIATE_NETWORK_NAME)) {
             networkName = getFormattedTextAt(RESOURCE_BUNDLE, NETWORK_NAME + ".name");
@@ -180,9 +180,9 @@ public class NewsDialog extends ImmersiveDialogSimple {
         int currentYear = campaign.getGameYear();
 
         if (campaign.getFaction().isClan() && currentYear >= OPERATION_KLONDIKE) {
-            // After Klondike Chatterweb comes along, and it makes sense for that to be used by the
+            // After Klondike Chatter web comes along, and it makes sense for that to be used by the
             // Clans moving forward
-            return NEWS_NETWORKS.get(NEWS_NETWORKS.size() - 2); // Chatterweb
+            return NEWS_NETWORKS.get(NEWS_NETWORKS.size() - 2); // Chatter web
         }
 
         for (NewsNetwork network : NEWS_NETWORKS) {
@@ -226,7 +226,7 @@ public class NewsDialog extends ImmersiveDialogSimple {
               "data/images/universe/factions/logo_solaris_VII.png");
 
         // These two should always be last
-        NewsNetwork chatterweb = new NewsNetwork(CHATTERWEB_NETWORK_NAME,
+        NewsNetwork chatterWeb = new NewsNetwork(CHATTER_WEB_NETWORK_NAME,
               0,
               0,
               "data/images/universe/factions/logo_clan_generic.png");
@@ -240,7 +240,7 @@ public class NewsDialog extends ImmersiveDialogSimple {
               starlightBroadcasting,
               comStarNewsBureau,
               interstellarNewsNetwork,
-              chatterweb,
+              chatterWeb,
               affiliateNewsNetworks);
     }
 

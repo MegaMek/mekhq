@@ -52,28 +52,26 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * This class is a test class for the {@link OutstandingScenariosNagDialog} class.
- * It contains tests for various scenarios related to the {@code checkForOutstandingScenarios} method
+ * This class is a test class for the {@link OutstandingScenariosNagDialog} class. It contains tests for various
+ * scenarios related to the {@code checkForOutstandingScenarios} method
  */
 class OutstandingScenariosNagLogicTest {
     private Campaign campaign;
-    private CampaignOptions campaignOptions;
-    private AtBContract contract;
     private AtBScenario scenario1, scenario2;
     private LocalDate today;
 
     protected final transient ResourceBundle resources = ResourceBundle.getBundle(
-        "mekhq.resources.GUI", MekHQ.getMHQOptions().getLocale());
+          "mekhq.resources.GUI", MekHQ.getMHQOptions().getLocale());
 
     /**
-     * Test setup for each test, runs before each test.
-     * Initializes the mock objects and sets up the necessary mock behaviors.
+     * Test setup for each test, runs before each test. Initializes the mock objects and sets up the necessary mock
+     * behaviors.
      */
     @BeforeEach
     void init() {
         campaign = mock(Campaign.class);
-        campaignOptions = mock(CampaignOptions.class);
-        contract = mock(AtBContract.class);
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        AtBContract contract = mock(AtBContract.class);
         scenario1 = mock(AtBScenario.class);
         scenario2 = mock(AtBScenario.class);
         today = LocalDate.of(3025, 1, 1);

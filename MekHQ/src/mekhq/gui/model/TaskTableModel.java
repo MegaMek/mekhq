@@ -44,12 +44,12 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.client.ui.util.UIUtil;
-import megamek.common.TargetRoll;
+import megamek.common.rolls.TargetRoll;
 import mekhq.IconPackage;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.PodSpace;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.work.IPartWork;
@@ -60,11 +60,11 @@ import mekhq.gui.RepairTaskInfo;
 /**
  * A table model for displaying work items
  */
-public class TaskTableModel extends DataTableModel {
-    private static Map<String, Person> techCache = new HashMap<>();
+public class TaskTableModel extends DataTableModel<IPartWork> {
+    private static final Map<String, Person> techCache = new HashMap<>();
 
-    private CampaignGUI gui;
-    private ITechWorkPanel panel;
+    private final CampaignGUI gui;
+    private final ITechWorkPanel panel;
 
     private interface REPAIR_STATE { // TODO : Enum Swapover
         int AVAILABLE = 0;
@@ -76,25 +76,25 @@ public class TaskTableModel extends DataTableModel {
 
     public TaskTableModel(CampaignGUI gui, ITechWorkPanel panel) {
         columnNames = new String[] { "Tasks" };
-        data = new ArrayList<IPartWork>();
+        data = new ArrayList<>();
         this.gui = gui;
         this.panel = panel;
     }
 
     @Override
     public Object getValueAt(int row, int col) {
-        return ((IPartWork) data.get(row)).getDesc();
+        return data.get(row).getDesc();
     }
 
     public IPartWork getTaskAt(int row) {
-        return (IPartWork) data.get(row);
+        return data.get(row);
     }
 
     public IPartWork[] getTasksAt(int[] rows) {
         IPartWork[] tasks = new IPartWork[rows.length];
         for (int i = 0; i < rows.length; i++) {
             int row = rows[i];
-            tasks[i] = (IPartWork) data.get(row);
+            tasks[i] = data.get(row);
         }
         return tasks;
     }
@@ -111,8 +111,8 @@ public class TaskTableModel extends DataTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus,
-                                                       int row, int column) {
+              boolean isSelected, boolean hasFocus,
+              int row, int column) {
             table.setRowHeight(UIUtil.scaleForGUI(100));
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
@@ -138,7 +138,8 @@ public class TaskTableModel extends DataTableModel {
             } else {
                 if (part instanceof MissingPart) {
                     if (!((MissingPart) part).isReplacementAvailable()) {
-                        PartInventory inventories = gui.getCampaign().getPartInventory(((MissingPart) part).getNewPart());
+                        PartInventory inventories = gui.getCampaign()
+                                                          .getPartInventory(((MissingPart) part).getNewPart());
 
                         if ((inventories.getTransit() > 0) || (inventories.getOrdered() > 0)) {
                             availableLevel = REPAIR_STATE.IN_TRANSIT;
@@ -147,7 +148,8 @@ public class TaskTableModel extends DataTableModel {
                         }
                     }
                 } else if (part instanceof PodSpace && !part.isSalvaging()) {
-                    Matcher m = Pattern.compile(".*(\\d+)/(\\d+).*(\\d+) in transit, (\\d+) on order.*").matcher(part.getDetails());
+                    Matcher m = Pattern.compile(".*(\\d+)/(\\d+).*(\\d+) in transit, (\\d+) on order.*")
+                                      .matcher(part.getDetails());
                     if (m.matches()) {
                         //Show available if at least one replacement can be made
                         if (m.group(2).equals("0")) {
@@ -203,7 +205,9 @@ public class TaskTableModel extends DataTableModel {
                     if (null != tech) {
                         TargetRoll roll = gui.getCampaign().getTargetFor(part, tech);
 
-                        if ((roll.getValue() == TargetRoll.IMPOSSIBLE) || (roll.getValue() == TargetRoll.AUTOMATIC_FAIL) || (roll.getValue() == TargetRoll.CHECK_FALSE)) {
+                        if ((roll.getValue() == TargetRoll.IMPOSSIBLE) ||
+                                  (roll.getValue() == TargetRoll.AUTOMATIC_FAIL) ||
+                                  (roll.getValue() == TargetRoll.CHECK_FALSE)) {
                             availableLevel = REPAIR_STATE.BLOCKED;
                         }
                     }

@@ -24,29 +24,33 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.resupplyAndCaches.Resupply;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.MekActuator;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.universe.Faction;
+import static mekhq.campaign.market.procurement.Procurement.getTechFaction;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static mekhq.campaign.market.procurement.Procurement.getTechFaction;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.universe.Faction;
 
 /**
- * Utility class for managing and facilitating dialog-related operations
- * in resupply missions within MekHQ campaigns.
+ * Utility class for managing and facilitating dialog-related operations in resupply missions within MekHQ campaigns.
  *
  * <p>This class includes methods for:</p>
  * <ul>
@@ -68,6 +72,7 @@ public class ResupplyDialogUtilities {
      * (Clan or Mixed), potential extinction status, tonnage, and ammunition shot counts.</p>
      *
      * @param resupply the {@link Resupply} instance defining the convoy's context.
+     *
      * @return a {@link List} of formatted strings representing the parts report, sorted alphabetically.
      */
     static List<String> createPartsReport(Resupply resupply) {
@@ -78,48 +83,49 @@ public class ResupplyDialogUtilities {
         final List<Part> convoyContents = resupply.getConvoyContents();
 
         Map<String, Integer> entries = convoyContents.stream().collect(Collectors.toMap(
-            part -> {
-                String name = part.getName();
-                String quality = part.getQualityName();
+              part -> {
+                  String name = part.getName();
+                  String quality = part.getQualityName();
 
-                String append = part.isClan() ? " (Clan)" : "";
-                append = part.isMixedTech() ? " (Mixed)" : append;
-                append += " (" + quality + ')';
-                append += part.isExtinct(year, originFaction.isClan(), getTechFaction(originFaction)) ?
-                    " (<b>EXTINCT!</b>)" : "";
+                  String append = part.isClan() ? " (Clan)" : "";
+                  append = part.isMixedTech() ? " (Mixed)" : append;
+                  append += " (" + quality + ')';
+                  append += part.isExtinct(year, originFaction.isClan(), getTechFaction(originFaction)) ?
+                                  " (<b>EXTINCT!</b>)" : "";
 
-                if (part instanceof AmmoBin) {
-                    return ((AmmoBin) part).getType().getName() + append;
-                } else if (part instanceof MekLocation || part instanceof MekActuator) {
-                    return name + " (" + part.getUnitTonnage() + "t)" + append;
-                } else {
-                    return name + append;
-                }
-            },
-            part -> {
-                if (part instanceof AmmoBin) {
-                    return ((AmmoBin) part).getFullShots() * 5;
-                } else if (part instanceof Armor) {
-                    return (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * 5);
-                } else {
-                    return 1;
-                }
-            },
-            Integer::sum));
+                  if (part instanceof AmmoBin) {
+                      return ((AmmoBin) part).getType().getName() + append;
+                  } else if (part instanceof MekLocation || part instanceof MekActuator) {
+                      return name + " (" + part.getUnitTonnage() + "t)" + append;
+                  } else {
+                      return name + append;
+                  }
+              },
+              part -> {
+                  if (part instanceof AmmoBin) {
+                      return ((AmmoBin) part).getFullShots() * 5;
+                  } else if (part instanceof Armor) {
+                      return (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * 5);
+                  } else {
+                      return 1;
+                  }
+              },
+              Integer::sum));
 
         return entries.keySet().stream()
-            .map(item -> item + " x" + entries.get(item))
-            .sorted()
-            .collect(Collectors.toList());
+                     .map(item -> item + " x" + entries.get(item))
+                     .sorted()
+                     .collect(Collectors.toList());
     }
 
     /**
-     * Formats a list of part reports into an array of three columns for visual representation,
-     * ensuring that the parts are distributed across the columns evenly.
+     * Formats a list of part reports into an array of three columns for visual representation, ensuring that the parts
+     * are distributed across the columns evenly.
      *
      * <p>Each column entry is prepended with a bullet point and presented as an HTML string for rendering.</p>
      *
      * @param partsReport the {@link List} of part report entries to be formatted.
+     *
      * @return a {@link String} array containing three HTML-formatted columns.
      */
     public static String[] formatColumnData(List<String> partsReport) {
@@ -142,6 +148,7 @@ public class ResupplyDialogUtilities {
      * name is resolved for the campaign's current game year.</p>
      *
      * @param resupply the {@link Resupply} instance defining the mission's context.
+     *
      * @return a {@link String} containing the enemy faction reference.
      */
     public static String getEnemyFactionReference(Resupply resupply) {

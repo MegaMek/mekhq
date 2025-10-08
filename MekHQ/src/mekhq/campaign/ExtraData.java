@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
@@ -35,8 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-
-import org.w3c.dom.Node;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -50,6 +53,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.logging.MMLogger;
+import org.w3c.dom.Node;
 
 /**
  * Class for holding extra data/properties with free-form strings as keys.
@@ -62,23 +66,23 @@ import megamek.logging.MMLogger;
  * ExtraData.Key&lt;Integer&gt; INTKEY = new ExtraData.IntKey("int_key");
  * ExtraData.Key&lt;Double&gt; DOUBLEKEY = new ExtraData.DoubleKey("double_key");
  * ExtraData.Key&lt;DateTime&gt; DATEKEY = new ExtraData.DateKey("current date");
- * ExtraData.Key&lt;Boolean&gt; BOOLEANKEY = new ExtraData.BooleanKey("realy?");
+ * ExtraData.Key&lt;Boolean&gt; BOOLEANKEY = new ExtraData.BooleanKey("really?");
  * ExtraData.Key&lt;String&gt; PLAIN_OLD_BORING_KEY = new ExtraData.StringKey("stuff");
  * </pre>
- *
+ * <p>
  * - setting and getting data
  *
  * <pre>
  * ed.set(INTKEY, 75);
  * ed.set(DOUBLEKEY, 12.5);
  * ed.set(DATEKEY, new DateTime());
- * Integer intVal = ed.get(INTKEY));
- * Double doubleVal = ed.get(DOUBLEKEY));
- * DateTime date = ed.get(DATEKEY));
+ * Integer intVal = ed.get(INTKEY);
+ * Double doubleVal = ed.get(DOUBLEKEY);
+ * DateTime date = ed.get(DATEKEY);
  * // the next one guarantees to not return null, but -1 if the value is not set
  * int anotherIntVal = ed.get(INTKEY, -1);
  * </pre>
- *
+ * <p>
  * - saving to XML and creating from XML
  *
  * <pre>
@@ -93,6 +97,7 @@ public class ExtraData {
 
     private static final Marshaller marshaller;
     private static final Unmarshaller unmarshaller;
+
     static {
         Marshaller m = null;
         Unmarshaller u = null;
@@ -110,6 +115,7 @@ public class ExtraData {
     }
 
     private static final Map<Class<?>, StringAdapter<?>> ADAPTERS = new HashMap<>();
+
     static {
         ADAPTERS.put(String.class, new StringAdapter<String>() {
             @Override
@@ -191,8 +197,7 @@ public class ExtraData {
     }
 
     /**
-     * @return the value associated with the given key, or <code>null</code> if
-     *         there isn't one
+     * @return the value associated with the given key, or <code>null</code> if there isn't one
      */
     public <T> T get(Key<T> key) {
         if (!values.containsKey(key.type)) {
@@ -202,8 +207,7 @@ public class ExtraData {
     }
 
     /**
-     * @return the value associated with the given key, or the default value if
-     *         there isn't one
+     * @return the value associated with the given key, or the default value if there isn't one
      */
     public <T> T get(Key<T> key, T defaultValue) {
         T result = get(key);
@@ -256,8 +260,7 @@ public class ExtraData {
     // XML marshalling/unmarshalling support classes and methods
 
     /**
-     * Register an adapter translating from String to the given value.
-     * Already existing adapters are not overwritten.
+     * Register an adapter translating from String to the given value. Already existing adapters are not overwritten.
      */
     public static <T> void registerAdapter(Class<T> cls, StringAdapter<T> adapter) {
         if ((null != cls) && (null != adapter) && !ADAPTERS.containsKey(cls)) {
@@ -297,9 +300,9 @@ public class ExtraData {
     }
 
     private static class JAXBValueAdapter
-            extends XmlAdapter<XmlValueListArray, Map<Class<?>, Map<String, Object>>> {
+          extends XmlAdapter<XmlValueListArray, Map<Class<?>, Map<String, Object>>> {
         @Override
-        public Map<Class<?>, Map<String, Object>> unmarshal(XmlValueListArray v) throws Exception {
+        public Map<Class<?>, Map<String, Object>> unmarshal(XmlValueListArray v) {
             if ((null == v) || (null == v.list) || v.list.isEmpty()) {
                 return new HashMap<>();
             }
@@ -327,7 +330,7 @@ public class ExtraData {
         }
 
         @Override
-        public XmlValueListArray marshal(Map<Class<?>, Map<String, Object>> v) throws Exception {
+        public XmlValueListArray marshal(Map<Class<?>, Map<String, Object>> v) {
             if ((null == v) || v.isEmpty()) {
                 return null;
             }
@@ -418,8 +421,7 @@ public class ExtraData {
             if ((null == object) || (getClass() != object.getClass())) {
                 return false;
             }
-            @SuppressWarnings("unchecked")
-            final Key<T> other = (Key<T>) object;
+            @SuppressWarnings("unchecked") final Key<T> other = (Key<T>) object;
             return Objects.equals(name, other.name) && (type == other.type);
         }
     }

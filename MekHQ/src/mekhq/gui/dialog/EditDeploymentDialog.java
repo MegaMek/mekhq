@@ -24,26 +24,43 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.GBC;
-import megamek.client.ui.util.UIUtil;
-import megamek.client.ui.util.UIUtil.TipButton;
-import megamek.common.IStartingPositions;
-import megamek.common.Player;
-import mekhq.MekHQ;
+import static megamek.client.ui.util.UIUtil.uiGreen;
 
-import javax.swing.*;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.NumberFormatter;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 
-import static megamek.client.ui.util.UIUtil.*;
+import megamek.client.ui.GBC;
+import megamek.client.ui.util.UIUtil;
+import megamek.client.ui.util.UIUtil.TipButton;
+import megamek.common.Player;
+import megamek.common.interfaces.IStartingPositions;
+import mekhq.MekHQ;
 
 public class EditDeploymentDialog extends JDialog {
 
@@ -74,7 +91,7 @@ public class EditDeploymentDialog extends JDialog {
     private void initComponents() {
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditDeploymentDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         panStartButtons.setAlignmentX(Component.LEFT_ALIGNMENT);
         for (int i = 0; i < 11; i++) {
@@ -96,16 +113,16 @@ public class EditDeploymentDialog extends JDialog {
         updateStartGrid();
 
         SpinnerNumberModel mStartingAnyNWx = new SpinnerNumberModel(player.getStartingAnyNWx() + 1, 0,
-                null, 1);
+              null, 1);
         spinStartingAnyNWx = new JSpinner(mStartingAnyNWx);
         SpinnerNumberModel mStartingAnyNWy = new SpinnerNumberModel(player.getStartingAnyNWy() + 1, 0,
-                null, 1);
+              null, 1);
         spinStartingAnyNWy = new JSpinner(mStartingAnyNWy);
         SpinnerNumberModel mStartingAnySEx = new SpinnerNumberModel(player.getStartingAnySEx() + 1, 0,
-                null, 1);
+              null, 1);
         spinStartingAnySEx = new JSpinner(mStartingAnySEx);
         SpinnerNumberModel mStartingAnySEy = new SpinnerNumberModel(player.getStartingAnySEy() + 1, 0,
-                null, 1);
+              null, 1);
         spinStartingAnySEy = new JSpinner(mStartingAnySEy);
 
         GridBagLayout gbl = new GridBagLayout();
@@ -168,7 +185,7 @@ public class EditDeploymentDialog extends JDialog {
 
         for (int i = 0; i < 11; i++) {
             butStartPos[i].setText(butText[i].toString());
-            if (butTT[i].length() > 0) {
+            if (!butTT[i].isEmpty()) {
                 butStartPos[i].setToolTipText(butTT[i].toString());
             }
         }
@@ -192,13 +209,13 @@ public class EditDeploymentDialog extends JDialog {
         player.setStartWidth(parseField(txtWidth));
         player.setStartOffset(parseField(txtOffset));
         player.setStartingAnyNWx(
-                Math.min((Integer) spinStartingAnyNWx.getValue(), (Integer) spinStartingAnySEx.getValue()) - 1);
+              Math.min((Integer) spinStartingAnyNWx.getValue(), (Integer) spinStartingAnySEx.getValue()) - 1);
         player.setStartingAnyNWy(
-                Math.min((Integer) spinStartingAnyNWy.getValue(), (Integer) spinStartingAnySEy.getValue()) - 1);
+              Math.min((Integer) spinStartingAnyNWy.getValue(), (Integer) spinStartingAnySEy.getValue()) - 1);
         player.setStartingAnySEx(
-                Math.max((Integer) spinStartingAnyNWx.getValue(), (Integer) spinStartingAnySEx.getValue()) - 1);
+              Math.max((Integer) spinStartingAnyNWx.getValue(), (Integer) spinStartingAnySEx.getValue()) - 1);
         player.setStartingAnySEy(
-                Math.max((Integer) spinStartingAnyNWy.getValue(), (Integer) spinStartingAnySEy.getValue()) - 1);
+              Math.max((Integer) spinStartingAnyNWy.getValue(), (Integer) spinStartingAnySEy.getValue()) - 1);
         this.setVisible(false);
     }
 
@@ -207,8 +224,7 @@ public class EditDeploymentDialog extends JDialog {
     }
 
     /**
-     * Parse the given field and return the integer it contains or 0, if
-     * the field cannot be parsed.
+     * Parse the given field and return the integer it contains or 0, if the field cannot be parsed.
      */
     private int parseField(JTextField field) {
         try {

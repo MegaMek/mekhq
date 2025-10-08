@@ -24,16 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
-import mekhq.io.FileType;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
+import java.awt.FileDialog;
 import java.io.File;
 import java.util.Optional;
+import javax.swing.JFrame;
+
+import mekhq.io.FileType;
 
 /**
  * GUI/Swing utility methods
@@ -59,15 +63,18 @@ public class GUI {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> fileDialogSave(JFrame parent, String title, FileType fileType, String directoryPath, String saveFilename) {
+    public static Optional<File> fileDialogSave(JFrame parent, String title, FileType fileType, String directoryPath,
+          String saveFilename) {
         return fileDialog(parent, title, fileType, directoryPath, saveFilename);
     }
 
-    private static Optional<File> fileDialog(JFrame parent, String title, FileType fileType, String directoryPath, String saveFilename ) {
+    private static Optional<File> fileDialog(JFrame parent, String title, FileType fileType, String directoryPath,
+          String saveFilename) {
         return awtFileDialog(parent, title, fileType, directoryPath, saveFilename);
     }
 
-    private static Optional<File> awtFileDialog(JFrame parent, String title, FileType fileType, String directoryPath, String saveFilename) {
+    private static Optional<File> awtFileDialog(JFrame parent, String title, FileType fileType, String directoryPath,
+          String saveFilename) {
         FileDialog fd = new FileDialog(parent, title);
         fd.setDirectory(directoryPath);
         if (saveFilename != null) {
@@ -87,18 +94,4 @@ public class GUI {
         }
     }
 
-    private static Optional<File> swingFileDialog(JFrame parent, String title, FileType fileType, String directoryPath, String saveFilename) {
-        JFileChooser fd = new JFileChooser(directoryPath);
-        fd.setDialogTitle(title);
-        if (saveFilename != null) {
-            fd.setSelectedFile(new File(saveFilename));
-        }
-        fd.addChoosableFileFilter(new FileNameExtensionFilter(fileType.getDescription(), fileType.getExtensions().toArray(new String[0])));
-        int buttonClicked = saveFilename != null
-                          ? fd.showSaveDialog(parent)
-                          : fd.showOpenDialog(parent);
-        return buttonClicked == JFileChooser.APPROVE_OPTION
-             ? Optional.ofNullable(fd.getSelectedFile())
-             : Optional.empty();
-    }
 }

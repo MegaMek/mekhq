@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -86,7 +86,7 @@ import mekhq.MekHQ;
  * dc.getDate(); }
  */
 public class DateChooser extends JDialog implements ActionListener, FocusListener, KeyListener {
-    private static final MMLogger logger = MMLogger.create(DateChooser.class);
+    private static final MMLogger LOGGER = MMLogger.create(DateChooser.class);
 
     public static final int OK_OPTION = 1;
     public static final int CANCEL_OPTION = 2;
@@ -125,7 +125,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     /**
      * Constructor for DateChooser which has parent dialog
      *
-     * @param parentDialog JDialog istance. Dialog that owns this
+     * @param parentDialog JDialog instance. Dialog that owns this
      * @param date         LocalDate instance that will be the initial date for this dialog
      */
     public DateChooser(JDialog parentDialog, LocalDate date) {
@@ -303,7 +303,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -315,7 +315,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     }
 
     /**
-     * Displays a DateChooser dialog on the screen. If a new date is selected returnsor OK_OPTION. If the action is
+     * Displays a DateChooser dialog on the screen. If a new date is selected returns or OK_OPTION. If the action is
      * canceled returns CANCEL_OPTION. Both of the returned values are defined as static constants.
      */
     public int showDateChooser() {
@@ -357,7 +357,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 try {
                     year = Integer.parseInt(yearLabel.getText());
                 } catch (NumberFormatException e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                 }
                 yearLabel.setText(String.valueOf(--year));
                 updateDayGrid(false);
@@ -368,7 +368,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 try {
                     year = Integer.parseInt(yearLabel.getText());
                 } catch (NumberFormatException e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                 }
                 yearLabel.setText(String.valueOf(++year));
                 updateDayGrid(false);
@@ -382,7 +382,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                     year = Integer.parseInt(yearLabel.getText());
                     day = Integer.parseInt(label);
                 } catch (NumberFormatException e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                 }
 
                 // Set the date field to the new date.
@@ -421,7 +421,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         try {
             year = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
 
         // decide what day of the week is the first day of this month
@@ -506,7 +506,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         try {
             year = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
 
         return LocalDate.of(year, month, 1).lengthOfMonth();
@@ -609,7 +609,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      * Creates a JButton representing a specific era.
      *
      * @param era The era index. The possible values are: - 0: Age of War - 1: Star League - 2: Early Succession War -
-     *            3: Late Succession War (Lostech) - 4: Late Succession War (Renaissance) - 5: Clan Invasion - 6: Civil
+     *            3: Late Succession War (LosTech) - 4: Late Succession War (Renaissance) - 5: Clan Invasion - 6: Civil
      *            War - 7: Jihad - 8: Early Republic - 9: Late Republic - 10: Dark Age - 11: IlClan
      *
      * @return The created JButton object representing the specified era.

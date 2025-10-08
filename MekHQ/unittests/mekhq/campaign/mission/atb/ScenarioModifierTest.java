@@ -24,18 +24,29 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb;
 
-import org.junit.jupiter.api.Test;
-
+import static mekhq.campaign.mission.atb.AtBScenarioModifier.initializeScenarioModifiers;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author NickAragua
  */
 public class ScenarioModifierTest {
+    @BeforeAll
+    public static void setUpClass() {
+        initializeScenarioModifiers(true);
+    }
 
     /**
      * Tests that the initial loading of the scenario modifier manifest works.

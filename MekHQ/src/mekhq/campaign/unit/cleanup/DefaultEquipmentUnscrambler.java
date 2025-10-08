@@ -24,13 +24,18 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.cleanup;
 
 import java.util.Arrays;
 import java.util.List;
 
-import megamek.common.BattleArmor;
+import megamek.common.battleArmor.BattleArmor;
 import mekhq.campaign.unit.Unit;
 
 public class DefaultEquipmentUnscrambler extends EquipmentUnscrambler {
@@ -47,7 +52,7 @@ public class DefaultEquipmentUnscrambler extends EquipmentUnscrambler {
     @Override
     protected List<UnscrambleStep> createSteps() {
         return Arrays.asList(new ExactMatchStep(), new ApproximateMatchStep(),
-                new MovedEquipmentStep(), new MovedAmmoBinStep());
+              new MovedEquipmentStep(), new MovedAmmoBinStep());
     }
 
     @Override

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
 
@@ -31,31 +36,27 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.common.options.IOption;
+import megamek.logging.MMLogger;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.options.IOption;
-import megamek.logging.MMLogger;
-import mekhq.utilities.MHQXMLUtility;
-
 /**
- * Parses custom SPA file and passes data to the PersonnelOption constructor so
- * the custom
- * abilities are included.
+ * Parses custom SPA file and passes data to the PersonnelOption constructor so the custom abilities are included.
  *
  * @author Neoancient
  */
 public class CustomOption {
-    private static final MMLogger logger = MMLogger.create(CustomOption.class);
+    private static final MMLogger LOGGER = MMLogger.create(CustomOption.class);
 
     private static List<CustomOption> customAbilities = null;
 
-    private String name;
+    private final String name;
     private String group;
     private int type;
     private Object defaultVal;
@@ -107,7 +108,7 @@ public class CustomOption {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
             return;
         }
 
@@ -148,7 +149,7 @@ public class CustomOption {
     public static CustomOption generateInstanceFromXML(Node wn) {
         String key = wn.getAttributes().getNamedItem("name").getTextContent();
         if (null == key) {
-            logger.error("Custom ability does not have a 'name' attribute.");
+            LOGGER.error("Custom ability does not have a 'name' attribute.");
             return null;
         }
 
@@ -182,7 +183,7 @@ public class CustomOption {
                     break;
             }
         } catch (Exception ex) {
-            logger.error("Error parsing custom ability " + retVal.name, ex);
+            LOGGER.error(ex, "Error parsing custom ability {}", retVal.name);
         }
 
         return retVal;

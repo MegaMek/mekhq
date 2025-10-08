@@ -24,8 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
+
+import java.io.PrintWriter;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -35,13 +42,11 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-
 /**
  * @author Justin "Windchild" Bowen
  */
 public class RandomOriginOptions {
-    private static final MMLogger logger = MMLogger.create(RandomOriginOptions.class);
+    private static final MMLogger LOGGER = MMLogger.create(RandomOriginOptions.class);
 
     // region Variable Declarations
     private boolean randomizeOrigin;
@@ -59,7 +64,13 @@ public class RandomOriginOptions {
         setRandomizeOrigin(!campaignOptions);
         setRandomizeDependentOrigin(!campaignOptions);
         setRandomizeAroundSpecifiedPlanet(!campaignOptions);
-        setSpecifiedPlanet(Systems.getInstance().getSystemById("Terra").getPrimaryPlanet());
+        try {
+            setSpecifiedPlanet(Systems.getInstance().getSystemById("Terra").getPrimaryPlanet());
+        } catch (Exception ex) {
+            LOGGER.error("Failed to load default specified planet. If this wasn't during automated testing this must " +
+                               "be investigated.", ex);
+            setSpecifiedPlanet(new Planet("Terra"));
+        }
         setOriginSearchRadius(campaignOptions ? 45 : 1000);
         setOriginDistanceScale(campaignOptions ? 0.6 : 0.2);
         setAllowClanOrigins(false);
@@ -68,6 +79,7 @@ public class RandomOriginOptions {
     // endregion Constructors
 
     // region Getters/Setters
+
     /**
      * Gets a value indicating whether to randomize the origin of personnel.
      */
@@ -101,18 +113,15 @@ public class RandomOriginOptions {
     }
 
     /**
-     * @return whether to randomize around a specified planet of the campaign's
-     *         current planet
+     * @return whether to randomize around a specified planet of the campaign's current planet
      */
     public boolean isRandomizeAroundSpecifiedPlanet() {
         return randomizeAroundSpecifiedPlanet;
     }
 
     /**
-     * @param randomizeAroundSpecifiedPlanet true to randomize around a specified
-     *                                       planet, otherwise
-     *                                       it will randomize around the campaign's
-     *                                       current planet
+     * @param randomizeAroundSpecifiedPlanet true to randomize around a specified planet, otherwise it will randomize
+     *                                       around the campaign's current planet
      */
     public void setRandomizeAroundSpecifiedPlanet(final boolean randomizeAroundSpecifiedPlanet) {
         this.randomizeAroundSpecifiedPlanet = randomizeAroundSpecifiedPlanet;
@@ -156,11 +165,9 @@ public class RandomOriginOptions {
     }
 
     /**
-     * Sets the distance scale factor to apply when weighting random origin planets
-     * (should be
-     * between 0.1 and 2.0, with 0.6 being the standard base). Values above 1.0
-     * prefer the current
-     * location, while values closer to 0.1 spread out the selection.
+     * Sets the distance scale factor to apply when weighting random origin planets (should be between 0.1 and 2.0, with
+     * 0.6 being the standard base). Values above 1.0 prefer the current location, while values closer to 0.1 spread out
+     * the selection.
      */
     public void setOriginDistanceScale(final double originDistanceScale) {
         this.originDistanceScale = originDistanceScale;
@@ -178,18 +185,14 @@ public class RandomOriginOptions {
     }
 
     /**
-     * Gets a value indicating whether to randomize origin to the planetary level,
-     * rather than just
-     * the system level.
+     * Gets a value indicating whether to randomize origin to the planetary level, rather than just the system level.
      */
     public boolean isExtraRandomOrigin() {
         return extraRandomOrigin;
     }
 
     /**
-     * Sets a value indicating whether to randomize origin to the planetary level,
-     * rather than just
-     * the system level.
+     * Sets a value indicating whether to randomize origin to the planetary level, rather than just the system level.
      */
     public void setExtraRandomOrigin(final boolean extraRandomOrigin) {
         this.extraRandomOrigin = extraRandomOrigin;
@@ -206,12 +209,12 @@ public class RandomOriginOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeOrigin", isRandomizeOrigin());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeDependentOrigin", isRandomizeDependentOrigin());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeAroundSpecifiedPlanet",
-                isRandomizeAroundSpecifiedPlanet());
+              isRandomizeAroundSpecifiedPlanet());
         if (isRandomizeAroundSpecifiedPlanet()) {
             if (getSpecifiedPlanet() != null) {
                 MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "specifiedPlanet",
-                    "systemId", getSpecifiedPlanet().getParentSystem().getId(),
-                    getSpecifiedPlanet().getId());
+                      "systemId", getSpecifiedPlanet().getParentSystem().getId(),
+                      getSpecifiedPlanet().getId());
             } else {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeAroundSpecifiedPlanet", false);
             }
@@ -226,10 +229,11 @@ public class RandomOriginOptions {
     /**
      * @param nl              the node list to parse the options from
      * @param campaignOptions if the parser is for a Campaign Options parsing or not
+     *
      * @return the parsed random origin options, or null if the parsing fails
      */
     public static @Nullable RandomOriginOptions parseFromXML(final NodeList nl,
-            final boolean campaignOptions) {
+          final boolean campaignOptions) {
         final RandomOriginOptions options = new RandomOriginOptions(campaignOptions);
         try {
             for (int i = 0; i < nl.getLength(); i++) {
@@ -246,10 +250,10 @@ public class RandomOriginOptions {
                         break;
                     case "specifiedPlanet":
                         final String specifiedPlanetSystemId = wn.getAttributes().getNamedItem("systemId")
-                                .getTextContent().trim();
+                                                                     .getTextContent().trim();
                         final String specifiedPlanetPlanetId = wn.getTextContent().trim();
                         options.setSpecifiedPlanet(Systems.getInstance().getSystemById(specifiedPlanetSystemId)
-                                .getPlanetById(specifiedPlanetPlanetId));
+                                                         .getPlanetById(specifiedPlanetPlanetId));
                         break;
                     case "originSearchRadius":
                         options.setOriginSearchRadius(Integer.parseInt(wn.getTextContent().trim()));
@@ -268,7 +272,7 @@ public class RandomOriginOptions {
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
             return null;
         }
 

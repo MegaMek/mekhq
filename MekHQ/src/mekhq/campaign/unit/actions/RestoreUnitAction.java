@@ -36,34 +36,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import megamek.common.Aero;
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.Mek;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import megamek.common.util.C3Util;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.MissingThrusters;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingThrusters;
 import mekhq.campaign.unit.Unit;
 
 /**
  * Restores a unit to an undamaged state.
  */
-public class RestoreUnitAction implements IUnitAction {
-    private static final MMLogger logger = MMLogger.create(RestoreUnitAction.class);
-
-    private final IEntityCopyFactory entityCopyFactory;
+public record RestoreUnitAction(IEntityCopyFactory entityCopyFactory) implements IUnitAction {
+    private static final MMLogger LOGGER = MMLogger.create(RestoreUnitAction.class);
 
     /**
      * Creates a new {@code RestoreUnitAction} instance using the default means of creating entity copies.
@@ -136,7 +134,7 @@ public class RestoreUnitAction implements IUnitAction {
      * @param unit     The unit to restore.
      */
     private void oldUnitRestoration(Campaign campaign, Unit unit) {
-        logger.warn("Falling back to old unit restoration logic");
+        LOGGER.warn("Falling back to old unit restoration logic");
 
         unit.setSalvage(false);
 
@@ -153,7 +151,7 @@ public class RestoreUnitAction implements IUnitAction {
                         }
                     }
                     // We magically acquire a replacement part, then fix the missing one.
-                    campaign.getQuartermaster().addPart(((MissingPart) part).getNewPart(), 0);
+                    campaign.getQuartermaster().addPart(((MissingPart) part).getNewPart(), 0, false);
                     part.fix();
                     part.resetTimeSpent();
                     part.resetOvertime();
@@ -176,11 +174,9 @@ public class RestoreUnitAction implements IUnitAction {
 
                 // replace damaged armor and reload ammo bins after fixing their respective
                 // locations
-                if (part instanceof Armor) {
-                    final Armor armor = (Armor) part;
+                if (part instanceof Armor armor) {
                     armor.setAmount(armor.getTotalAmount());
-                } else if (part instanceof AmmoBin) {
-                    final AmmoBin ammoBin = (AmmoBin) part;
+                } else if (part instanceof AmmoBin ammoBin) {
 
                     // we magically find the ammo we need, then load the bin
                     // we only want to get the amount of ammo the bin actually needs
@@ -195,9 +191,10 @@ public class RestoreUnitAction implements IUnitAction {
             // TODO: Make this less painful. We just want to fix hips and shoulders.
             Entity entity = unit.getEntity();
             if (entity instanceof Mek) {
-                for (int loc : new int[] { Mek.LOC_CLEG, Mek.LOC_LLEG, Mek.LOC_RLEG, Mek.LOC_LARM, Mek.LOC_RARM }) {
-                    int numberOfCriticals = entity.getNumberOfCriticals(loc);
-                    for (int crit = 0; crit < numberOfCriticals; ++crit) {
+                for (int loc : new int[] { Mek.LOC_CENTER_LEG, Mek.LOC_LEFT_LEG, Mek.LOC_RIGHT_LEG, Mek.LOC_LEFT_ARM,
+                                           Mek.LOC_RIGHT_ARM }) {
+                    int numberOfCriticalSlots = entity.getNumberOfCriticalSlots(loc);
+                    for (int crit = 0; crit < numberOfCriticalSlots; ++crit) {
                         CriticalSlot slot = entity.getCritical(loc, crit);
                         if (null != slot) {
                             slot.setHit(false);
@@ -243,7 +240,7 @@ public class RestoreUnitAction implements IUnitAction {
                     return new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
                 }
             } catch (EntityLoadingException e) {
-                logger.error("Cannot restore unit from entity, could not find: " + entity.getShortNameRaw(), e);
+                LOGGER.error("Cannot restore unit from entity, could not find: {}", entity.getShortNameRaw(), e);
             }
 
             return null;

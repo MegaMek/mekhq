@@ -43,13 +43,12 @@ import javax.swing.JPanel;
 
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.enums.ValidationState;
-import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -70,8 +69,9 @@ import mekhq.gui.panels.CompanyGenerationOptionsPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
- * This is currently just a temporary dialog over the CompanyGenerationOptionsPanel.
- * Wave 5 will be when this gets redone to be far nicer and more customizable.
+ * This is currently just a temporary dialog over the CompanyGenerationOptionsPanel. Wave 5 will be when this gets
+ * redone to be far nicer and more customizable.
+ *
  * @author Justin "Windchild" Bowen
  */
 public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
@@ -120,7 +120,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     @Override
     protected Container createCenterPane() {
         setCompanyGenerationOptionsPanel(new CompanyGenerationOptionsPanel(getFrame(), getCampaign(),
-                getCompanyGenerationOptions()));
+              getCompanyGenerationOptions()));
         return new JScrollPaneWithSpeed(getCompanyGenerationOptionsPanel());
     }
 
@@ -136,19 +136,19 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
               "CompanyGenerationDialog.btnApply.toolTipText", this::confirmationActionListener));
 
         panel.add(new MMButton("btnCancel", resources, "Cancel.text",
-                "Cancel.toolTipText", this::cancelActionPerformed));
+              "Cancel.toolTipText", this::cancelActionPerformed));
 
         panel.add(new MMButton("btnRestore", resources, "RestoreDefaults.text",
-                "CompanyGenerationDialog.btnRestore.toolTipText",
-                evt -> getCompanyGenerationOptionsPanel().setOptions()));
+              "CompanyGenerationDialog.btnRestore.toolTipText",
+              evt -> getCompanyGenerationOptionsPanel().setOptions()));
 
         panel.add(new MMButton("btnImport", resources, "Import.text",
-                "CompanyGenerationDialog.btnImport.toolTipText",
-                evt -> getCompanyGenerationOptionsPanel().importOptionsFromXML()));
+              "CompanyGenerationDialog.btnImport.toolTipText",
+              evt -> getCompanyGenerationOptionsPanel().importOptionsFromXML()));
 
         panel.add(new MMButton("btnExport", resources, "Export.text",
-                "CompanyGenerationDialog.btnExport.toolTipText",
-                evt -> getCompanyGenerationOptionsPanel().exportOptionsToXML()));
+              "CompanyGenerationDialog.btnExport.toolTipText",
+              evt -> getCompanyGenerationOptionsPanel().exportOptionsToXML()));
 
         return panel;
     }
@@ -188,10 +188,10 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         final List<AmmoStorage> ammunition = generator.generateAmmunition(getCampaign(), units);
         units.addAll(generator.applyPhaseTwoToCampaign(getCampaign(), mothballedEntities, parts, armour, ammunition));
 
-        final Contract contract = null;
-        generator.applyPhaseThreeToCampaign(getCampaign(), trackers, units, parts, armour, ammunition, contract);
+        generator.applyPhaseThreeToCampaign(getCampaign(), trackers, units, parts, armour, ammunition, null);
 
-        MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCompanyGenerationOptionsPanel().getCampaign().getForces()));
+        MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(),
+              getCompanyGenerationOptionsPanel().getCampaign().getForces()));
 
         if (campaign.getCampaignOptions().isEnableAutoAwards()) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();

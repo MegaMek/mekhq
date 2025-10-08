@@ -83,8 +83,8 @@ public class FactionStandingUtilities {
      *
      * @param regard the regard value to evaluate
      *
-     * @return the matching {@code FactionStandingLevel} for the given regard, or {@code STANDING_LEVEL_4} if no match is
-     *       found
+     * @return the matching {@code FactionStandingLevel} for the given regard, or {@code STANDING_LEVEL_4} if no match
+     *       is found
      *
      * @author Illiani
      * @since 0.50.07
@@ -107,7 +107,7 @@ public class FactionStandingUtilities {
         // I'm not expecting this to happen, given we already accept all values between Integer#MIN_VALUE and
         // Integer#MAX_VALUE. But if it somehow does, we'll just return STANDING_LEVEL_4 as a default.
         LOGGER.warn("Regard value {} is outside of the faction standing level range. Returning STANDING_LEVEL_4.",
-              FactionStandingLevel.STANDING_LEVEL_4);
+              regard);
 
         return FactionStandingLevel.STANDING_LEVEL_4;
     }
@@ -334,8 +334,8 @@ public class FactionStandingUtilities {
     }
 
     /**
-     * Determines whether command circuit access should be granted based on campaign settings, GM mode, current
-     * faction standings, and a list of active contracts.
+     * Determines whether command circuit access should be granted based on campaign settings, GM mode, current faction
+     * standings, and a list of active contracts.
      *
      * <p>Access is immediately granted if both command circuit requirements are overridden and GM mode is
      * active. If not, and if faction standing is used as a criterion, the method evaluates the player's highest faction
@@ -697,7 +697,7 @@ public class FactionStandingUtilities {
      * @param factionName           the name of any relevant faction
      * @param campaignName          the name of the current campaign
      * @param locationName          the name of the relevant system or planet; may be {@code null} if there isn't any
-     *                             locational information in the scene.
+     *                              locational information in the scene.
      *
      * @return a formatted narrative {@link String} populated with character and context
      *

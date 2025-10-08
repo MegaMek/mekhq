@@ -47,8 +47,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
 import megamek.client.ui.Messages;
-import megamek.common.Entity;
-import megamek.common.UnitType;
+import megamek.common.units.Entity;
+import megamek.common.units.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -65,6 +65,7 @@ import mekhq.utilities.ReportingUtilities;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ForceViewPanel extends JScrollablePanel {
@@ -149,7 +150,7 @@ public class ForceViewPanel extends JScrollablePanel {
 
     private void fillStats() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         JLabel lblType = new JLabel();
         JLabel lblAssign1 = new JLabel();
@@ -212,7 +213,7 @@ public class ForceViewPanel extends JScrollablePanel {
             assigned = force.getParentForce().getName();
         }
 
-        int nexty = 0;
+        int nextY = 0;
 
         if (null != type) {
             lblType.setName("lblType");
@@ -230,13 +231,13 @@ public class ForceViewPanel extends JScrollablePanel {
             lblType.getAccessibleContext().setAccessibleDescription("Force Type: " + forceLabel);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.gridy = nextY;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblType, gridBagConstraints);
-            nexty++;
+            nextY++;
         }
 
         if (!commanderName.isBlank()) {
@@ -244,7 +245,7 @@ public class ForceViewPanel extends JScrollablePanel {
             lblCommander1.setText(resourceMap.getString("lblCommander1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.gridy = nextY;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblCommander1, gridBagConstraints);
@@ -254,20 +255,20 @@ public class ForceViewPanel extends JScrollablePanel {
             lblCommander1.setLabelFor(lblCommander2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.gridy = nextY;
             gridBagConstraints.weightx = 0.5;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblCommander2, gridBagConstraints);
-            nexty++;
+            nextY++;
         }
 
         lblFormationType1.setName("lblFormationType1");
         lblFormationType1.setText(resourceMap.getString("lblFormationType1.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.gridy = nextY;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblFormationType1, gridBagConstraints);
@@ -277,13 +278,13 @@ public class ForceViewPanel extends JScrollablePanel {
         lblFormationType1.setLabelFor(lblFormationType2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.gridy = nextY;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblFormationType2, gridBagConstraints);
-        nexty++;
+        nextY++;
 
         if (null != force.getTechID()) {
             if (!lanceTech.isBlank()) {
@@ -291,7 +292,7 @@ public class ForceViewPanel extends JScrollablePanel {
                 lblTech1.setText(resourceMap.getString("lblTech1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = nexty;
+                gridBagConstraints.gridy = nextY;
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlStats.add(lblTech1, gridBagConstraints);
@@ -301,14 +302,14 @@ public class ForceViewPanel extends JScrollablePanel {
                 lblTech1.setLabelFor(lblTech2);
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 1;
-                gridBagConstraints.gridy = nexty;
+                gridBagConstraints.gridy = nextY;
                 gridBagConstraints.weightx = 0.5;
                 gridBagConstraints.insets = new Insets(0, 10, 0, 0);
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlStats.add(lblTech2, gridBagConstraints);
-                nexty++;
-                }
+                nextY++;
+            }
         }
 
         if (!assigned.isBlank()) {
@@ -316,7 +317,7 @@ public class ForceViewPanel extends JScrollablePanel {
             lblAssign1.setText(resourceMap.getString("lblAssign1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.gridy = nextY;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblAssign1, gridBagConstraints);
@@ -326,20 +327,20 @@ public class ForceViewPanel extends JScrollablePanel {
             lblAssign1.setLabelFor(lblAssign2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.gridy = nextY;
             gridBagConstraints.weightx = 0.5;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblAssign2, gridBagConstraints);
-            nexty++;
+            nextY++;
         }
 
         lblBV1.setName("lblBV1");
         lblBV1.setText(resourceMap.getString("lblBV1.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.gridy = nextY;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblBV1, gridBagConstraints);
@@ -349,19 +350,19 @@ public class ForceViewPanel extends JScrollablePanel {
         lblBV1.setLabelFor(lblBV1);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.gridy = nextY;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblBV2, gridBagConstraints);
-        nexty++;
+        nextY++;
 
         lblTonnage1.setName("lblTonnage1");
         lblTonnage1.setText(resourceMap.getString("lblTonnage1.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.gridy = nextY;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTonnage1, gridBagConstraints);
@@ -371,13 +372,13 @@ public class ForceViewPanel extends JScrollablePanel {
         lblTonnage1.setLabelFor(lblTonnage2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.gridy = nextY;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTonnage2, gridBagConstraints);
-        nexty++;
+        nextY++;
 
         // if AtB is enabled, set tooltip to show lance weight breakdowns
         if (campaign.getCampaignOptions().isUseAtB()) {
@@ -390,7 +391,7 @@ public class ForceViewPanel extends JScrollablePanel {
         lblCost1.setText(resourceMap.getString("lblCost1.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.gridy = nextY;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblCost1, gridBagConstraints);
@@ -400,13 +401,12 @@ public class ForceViewPanel extends JScrollablePanel {
         lblCost1.setLabelFor(lblCost2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.gridy = nextY;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblCost2, gridBagConstraints);
-        nexty++;
 
         //BV
         //Tonnage?
@@ -422,15 +422,15 @@ public class ForceViewPanel extends JScrollablePanel {
 
         JLabel lblForce;
 
-        int nexty = 0;
+        int nextY = 0;
         for (Force subForce : force.getSubForces()) {
             lblForce = new JLabel();
             lblForce.setText(getForceSummary(subForce));
             lblForce.setIcon(subForce.getForceIcon().getImageIcon(72));
-            nexty++;
+            nextY++;
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.gridy = nextY;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weighty = 1.0;
             gridBagConstraints.weightx = 1.0;
@@ -456,7 +456,8 @@ public class ForceViewPanel extends JScrollablePanel {
             }
         }
         //sort person vector by rank
-        units.sort((u1, u2) -> ((Comparable<Integer>) u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric()));
+        units.sort((u1, u2) -> ((Comparable<Integer>) u2.getCommander().getRankNumeric()).compareTo(u1.getCommander()
+                                                                                                          .getRankNumeric()));
         units.addAll(unmannedUnits);
         for (Unit unit : units) {
             Person p = unit.getCommander();
@@ -467,11 +468,11 @@ public class ForceViewPanel extends JScrollablePanel {
                 lblPerson.setIcon(p.getPortrait().getImageIcon());
             } else {
                 lblPerson.getAccessibleContext().setAccessibleName("Unmanned Unit");
-                  }
-            nexty++;
+            }
+            nextY++;
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.gridy = nextY;
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.weighty = 1.0;
             gridBagConstraints.fill = GridBagConstraints.BOTH;
@@ -482,7 +483,7 @@ public class ForceViewPanel extends JScrollablePanel {
             lblPerson.setLabelFor(lblUnit);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = nexty;
+            gridBagConstraints.gridy = nextY;
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.weighty = 1.0;
             gridBagConstraints.weightx = 1.0;
@@ -493,17 +494,17 @@ public class ForceViewPanel extends JScrollablePanel {
     }
 
     public String getForceSummary(Person person, Unit unit) {
-        if(null == person) {
+        if (null == person) {
             return "";
         }
 
         StringBuilder toReturn = new StringBuilder();
         toReturn.append("<html><nobr><font size='3'><b>")
-            .append(person.getFullTitle())
-            .append("</b><br/><b>")
-            .append(SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false)))
-            .append("</b> ")
-            .append(person.getRoleDesc());
+              .append(person.getFullTitle())
+              .append("</b><br/><b>")
+              .append(SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false)))
+              .append("</b> ")
+              .append(person.getRoleDesc());
 
         toReturn.append("<br>");
 
@@ -518,24 +519,24 @@ public class ForceViewPanel extends JScrollablePanel {
                 String injuriesMessage = " " + injuryCount + (injuryCount == 1 ? " injury" : " injuries");
 
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    ReportingUtilities.getNegativeColor(), injuriesMessage));
+                      ReportingUtilities.getNegativeColor(), injuriesMessage));
             }
 
         } else {
             if (null != unit && null != unit.getEntity() && null != unit.getEntity().getCrew()
-                    && unit.getEntity().getCrew().getHits() > 0) {
+                      && unit.getEntity().getCrew().getHits() > 0) {
                 isInjured = true;
                 int hitCount = unit.getEntity().getCrew().getHits();
 
                 String hitsMessage = " " + hitCount + (hitCount == 1 ? " hit" : " hits");
 
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    ReportingUtilities.getNegativeColor(), hitsMessage));
+                      ReportingUtilities.getNegativeColor(), hitsMessage));
             }
         }
 
         int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
-              person.getSkillLevel(campaign, false), campaign.getFieldKitchenWithinCapacity());
+              person.getSkillLevel(campaign, false));
         if (campaign.getCampaignOptions().isUseFatigue() && (effectiveFatigue > 0)) {
             isFatigued = true;
             if (isInjured) {
@@ -546,7 +547,7 @@ public class ForceViewPanel extends JScrollablePanel {
             String fatigueMessage = effectiveFatigue + " fatigue";
 
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                ReportingUtilities.getWarningColor(), fatigueMessage));
+                  ReportingUtilities.getWarningColor(), fatigueMessage));
         }
 
         if (!(isInjured || isFatigued)) {
@@ -583,8 +584,8 @@ public class ForceViewPanel extends JScrollablePanel {
                 toReturn += Messages.getString("ChatLounge.C3iNone");
             } else {
                 toReturn += Messages
-                        .getString("ChatLounge.C3iNetwork")
-                        + entity.getC3NetId();
+                                  .getString("ChatLounge.C3iNetwork")
+                                  + entity.getC3NetId();
                 if (entity.calculateFreeC3Nodes() > 0) {
                     toReturn += Messages.getString("ChatLounge.C3Nodes", entity.calculateFreeC3Nodes());
                 }
@@ -598,7 +599,9 @@ public class ForceViewPanel extends JScrollablePanel {
         }
         // If this is a transport ship, tell us what bay capacity is at
         if (!unit.getEntity().getTransportBays().isEmpty()) {
-            int veeTotal = (int) (unit.getCurrentLightVehicleCapacity() + unit.getCurrentHeavyVehicleCapacity() + unit.getCurrentSuperHeavyVehicleCapacity());
+            int veeTotal = (int) (unit.getCurrentLightVehicleCapacity() +
+                                        unit.getCurrentHeavyVehicleCapacity() +
+                                        unit.getCurrentSuperHeavyVehicleCapacity());
             int aeroTotal = (int) (unit.getCurrentASFCapacity() + unit.getCurrentSmallCraftCapacity());
             if (unit.getCurrentMekCapacity() > 0) {
                 toReturn += "<br><i>" + "Mek Bays: " + (int) unit.getCurrentMekCapacity() + " free.</i>";
@@ -613,7 +616,10 @@ public class ForceViewPanel extends JScrollablePanel {
                 toReturn += "<br><i>" + "ProtoMek Bays: " + (int) unit.getCurrentProtoMekCapacity() + " free.</i>";
             }
             if (unit.getCurrentBattleArmorCapacity() > 0) {
-                toReturn += "<br><i>" + "Battle Armor Bays: " + (int) unit.getCurrentBattleArmorCapacity() + " free.</i>";
+                toReturn += "<br><i>" +
+                                  "Battle Armor Bays: " +
+                                  (int) unit.getCurrentBattleArmorCapacity() +
+                                  " free.</i>";
             }
             if (unit.getCurrentInfantryCapacity() > 0) {
                 toReturn += "<br><i>" + "Infantry Bays: " + (int) unit.getCurrentInfantryCapacity() + " tons free.</i>";
@@ -640,6 +646,7 @@ public class ForceViewPanel extends JScrollablePanel {
      * Returns a summary of the given Force in HTML format.
      *
      * @param force the Force to generate the summary for
+     *
      * @return a summary of the Force in HTML format
      */
     public String getForceSummary(Force force) {
@@ -671,7 +678,11 @@ public class ForceViewPanel extends JScrollablePanel {
         }
 
         StringBuilder summary = new StringBuilder();
-        summary.append("<html><font size='4'><b>").append(force.getName()).append("</b> (").append(commander).append(")</font><br/>");
+        summary.append("<html><font size='4'><b>")
+              .append(force.getName())
+              .append("</b> (")
+              .append(commander)
+              .append(")</font><br/>");
         summary.append("<font>");
         appendSummary(summary, "Number of Units", number);
         appendSummary(summary, "BV", battleValue);

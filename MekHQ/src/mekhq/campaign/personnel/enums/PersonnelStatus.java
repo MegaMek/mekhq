@@ -90,7 +90,8 @@ public enum PersonnelStatus {
     SEPPUKU(NotificationSeverity.NEGATIVE, true, true),
     BACKGROUND_CHARACTER(NotificationSeverity.WARNING, false, false),
     IMPRISONED(NotificationSeverity.NEGATIVE, false, false),
-    DISHONORABLY_DISCHARGED(NotificationSeverity.NEGATIVE, false, false);
+    DISHONORABLY_DISCHARGED(NotificationSeverity.NEGATIVE, false, false),
+    CAMP_FOLLOWER(NotificationSeverity.WARNING, true, false);
 
     /**
      * Represents the severity levels of a status.
@@ -254,7 +255,20 @@ public enum PersonnelStatus {
     // region Boolean Comparison Methods
 
     /**
+     * Checks if the character has either the {@link #ACTIVE} or {@link #CAMP_FOLLOWER} personnel status.
+     *
+     * @return {@code true} if the character has the {@link #ACTIVE} personnel status {@code false} otherwise.
+     */
+    public boolean isActiveFlexible() {
+        return this == ACTIVE || this == CAMP_FOLLOWER;
+    }
+
+    /**
      * Checks if the character has the {@link #ACTIVE} personnel status.
+     *
+     * <p><b>Usage:</b> In most cases we likely want to use {@link #isActiveFlexible()} as this will also return
+     * {@code true} for 'camp follower' characters. Those characters are also 'active', just not active employees of the
+     * player's campaign.</p>
      *
      * @return {@code true} if the character has the {@link #ACTIVE} personnel status {@code false} otherwise.
      */
@@ -498,6 +512,15 @@ public enum PersonnelStatus {
      */
     public boolean isDishonorablyDischarged() {
         return this == DISHONORABLY_DISCHARGED;
+    }
+
+    /**
+     * Checks if the character has the {@link #CAMP_FOLLOWER} personnel status.
+     *
+     * @return {@code true} if the character has the {@link #CAMP_FOLLOWER} personnel status {@code false} otherwise.
+     */
+    public boolean isCampFollower() {
+        return this == CAMP_FOLLOWER;
     }
 
     /**

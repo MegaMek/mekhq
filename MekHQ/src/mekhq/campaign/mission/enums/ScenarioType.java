@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.enums;
 
@@ -33,13 +38,13 @@ import megamek.logging.MMLogger;
  * Represents the type of scenario within MekHQ.
  *
  * <p>This enum defines specific scenario types that can occur in the game. It provides utility
- * methods to distinguish between various types and supports parsing from string representations,
- * with graceful error handling.</p>
+ * methods to distinguish between various types and supports parsing from string representations, with graceful error
+ * handling.</p>
  *
  * <p>Currently available scenario types:</p>
  * <ul>
  *   <li>{@code NONE} - Default scenario type.</li>
- *   <li>{@code SPECIAL_LOSTECH} - Indicates a special LosTech-related scenario.</li>
+ *   <li>{@code SPECIAL_LOS_TECH} - Indicates a special LosTech-related scenario.</li>
  *   <li>{@code SPECIAL_RESUPPLY} - Indicates a resupply-related scenario.</li>
  * </ul>
  *
@@ -48,7 +53,7 @@ import megamek.logging.MMLogger;
  */
 public enum ScenarioType {
     NONE,
-    SPECIAL_LOSTECH,
+    SPECIAL_LOS_TECH,
     SPECIAL_RESUPPLY,
     SPECIAL_JAIL_BREAK,
     CONVOY;
@@ -57,12 +62,12 @@ public enum ScenarioType {
      * @return {@code true} if the scenario is considered a LosTech scenario, {@code false} otherwise.
      */
     public boolean isLosTech() {
-        return this == SPECIAL_LOSTECH;
+        return this == SPECIAL_LOS_TECH;
     }
 
     /**
-     * @return {@code true} if the scenario is considered a convoy scenario, {@code false} otherwise. Convoy scenarios involve the
-     * defense or interception of a convoys with supplies, VIPs, or resupplies.
+     * @return {@code true} if the scenario is considered a convoy scenario, {@code false} otherwise. Convoy scenarios
+     *       involve the defense or interception of a convoys with supplies, VIPs, or resupplies.
      */
     public boolean isConvoy() {
         return this == SPECIAL_RESUPPLY || this == CONVOY;
@@ -86,7 +91,7 @@ public enum ScenarioType {
      * @return {@code true} if the instance is one of the special types; {@code false} otherwise.
      */
     public boolean isSpecial() {
-        return this == SPECIAL_LOSTECH || this == SPECIAL_RESUPPLY || this == SPECIAL_JAIL_BREAK;
+        return this == SPECIAL_LOS_TECH || this == SPECIAL_RESUPPLY || this == SPECIAL_JAIL_BREAK;
     }
 
     /**
@@ -111,8 +116,9 @@ public enum ScenarioType {
      * <p>Note: If the input is invalid (e.g., a non-integer string or out-of-bounds index), the error
      * is logged via {@link MMLogger} and the fallback {@code NONE} is returned.</p>
      *
-     * @param text the string to be parsed into a {@code ScenarioType}, representing either
-     *             an integer index or the enum constant name.
+     * @param text the string to be parsed into a {@code ScenarioType}, representing either an integer index or the enum
+     *             constant name.
+     *
      * @return the parsed {@code ScenarioType}, or {@code NONE} if parsing fails.
      */
     public static ScenarioType parseFromString(final String text) {
@@ -126,7 +132,7 @@ public enum ScenarioType {
         } catch (Exception ignored) {}
 
         MMLogger.create(ScenarioType.class)
-            .warn("Unable to parse {} into an ScenarioType. Returning NONE.", text);
+              .warn("Unable to parse {} into an ScenarioType. Returning NONE.", text);
 
         return NONE;
     }

@@ -24,24 +24,30 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.bays.Bay;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingBayDoor;
+import mekhq.campaign.parts.missing.MissingCubicle;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import megamek.common.Bay;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.TechAdvancement;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
 
 /**
  * @author Neoancient
@@ -96,7 +102,7 @@ public class TransportBayPart extends Part {
             int prevDoorHits = 0;
             for (Part p : getChildParts()) {
                 if ((p instanceof MissingBayDoor)
-                        || ((p instanceof BayDoor) && p.needsFixing())) {
+                          || ((p instanceof BayDoor) && p.needsFixing())) {
                     prevDoorHits++;
                 }
             }
@@ -105,11 +111,11 @@ public class TransportBayPart extends Part {
                 // exceptions from removing destroyed doors. We might as well filter anything that's
                 // not an undamaged door at the same time.
                 List<Part> doors = getChildParts().stream()
-                        .filter(p -> (p instanceof BayDoor) && !p.needsFixing())
-                        .collect(Collectors.toList());
+                                         .filter(p -> (p instanceof BayDoor) && !p.needsFixing())
+                                         .toList();
                 for (Part door : doors) {
                     if (checkForDestruction
-                            && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                              && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                         door.remove(false);
                     } else {
                         door.hits = 1;
@@ -124,8 +130,8 @@ public class TransportBayPart extends Part {
             // equal to the increase in damage.
             if ((hits > prevHits) && checkForDestruction) {
                 List<Part> cubicles = getChildParts().stream()
-                        .filter(p -> p instanceof Cubicle)
-                        .collect(Collectors.toList());
+                                            .filter(p -> p instanceof Cubicle)
+                                            .toList();
                 while ((hits > prevHits) && !cubicles.isEmpty()) {
                     Part cubicle = cubicles.get(Compute.randomInt(cubicles.size()));
                     cubicle.remove(false);

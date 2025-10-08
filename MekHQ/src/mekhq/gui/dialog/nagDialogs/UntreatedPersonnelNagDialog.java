@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs;
 
@@ -66,12 +71,13 @@ public class UntreatedPersonnelNagDialog extends ImmersiveDialogNag {
      *       found.
      */
     @Override
-    protected @Nullable Person getSpeaker(@Nullable Campaign campaign, @Nullable Campaign.AdministratorSpecialization specialization) {
+    protected @Nullable Person getSpeaker(@Nullable Campaign campaign,
+          @Nullable Campaign.AdministratorSpecialization specialization) {
         if (campaign == null) {
             return null;
         }
 
-        List<Person> potentialSpeakers = campaign.getActivePersonnel(false);
+        List<Person> potentialSpeakers = campaign.getActivePersonnel(false, false);
 
         if (potentialSpeakers.isEmpty()) {
             return getFallbackSpeaker(campaign);
@@ -138,13 +144,12 @@ public class UntreatedPersonnelNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed due to untreated injuries, {@code false} otherwise.
      */
     public static boolean checkNag(List<Person> activePersonnel, int baseBedCount, boolean isDoctorsUseAdministration) {
-        final String NAG_KEY = NAG_UNTREATED_PERSONNEL;
 
         int totalDoctorCapacity = calculateTotalDoctorCapacity(activePersonnel,
               isDoctorsUseAdministration,
               baseBedCount);
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNTREATED_PERSONNEL) &&
                      campaignHasUntreatedInjuries(activePersonnel, totalDoctorCapacity);
     }
 }

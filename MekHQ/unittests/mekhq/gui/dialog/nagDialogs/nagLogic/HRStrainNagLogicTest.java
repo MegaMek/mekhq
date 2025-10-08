@@ -1,14 +1,14 @@
 /*
  * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
- * This file is part of MegaMek.
+ * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
+ * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
+ * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -38,9 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 /**
- * This test class verifies the functionality of the `hasAdminStrain` method
- * in the `AdminStrainNagLogic` class. The method checks if the given
- * admin strain value is positive.
+ * This test class verifies the functionality of the `hasAdminStrain` method in the `AdminStrainNagLogic` class. The
+ * method checks if the given admin strain value is positive.
  */
 public class HRStrainNagLogicTest {
     @Test

@@ -24,8 +24,12 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign;
 
 import java.io.PrintWriter;
@@ -40,21 +44,20 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Represents a hangar which contains zero or more units.
  */
 public class Hangar {
-    private Map<UUID, Unit> units = new LinkedHashMap<>();
+    private final Map<UUID, Unit> units = new LinkedHashMap<>();
 
     /**
      * Adds a unit to the hangar.
-     *
-     * If the unit does not have an ID, one is
-     * assigned to it.
+     * <p>
+     * If the unit does not have an ID, one is assigned to it.
      *
      * @param unit The unit to add to the hangar.
      */
@@ -72,9 +75,10 @@ public class Hangar {
 
     /**
      * Gets a unit by a given ID.
+     *
      * @param id The unique identifier of a unit.
-     * @return The unit matching the unique identifier,
-     *         otherwise null if that unit does not exist.
+     *
+     * @return The unit matching the unique identifier, otherwise null if that unit does not exist.
      */
     public @Nullable Unit getUnit(UUID id) {
         return units.get(id);
@@ -82,6 +86,7 @@ public class Hangar {
 
     /**
      * Gets a collection of units in the hangar.
+     *
      * @return A collection of units in the hangar.
      */
     public Collection<Unit> getUnits() {
@@ -90,6 +95,7 @@ public class Hangar {
 
     /**
      * Gets a Stream of units in the hangar.
+     *
      * @return A Stream of units in the hangar.
      */
     public Stream<Unit> getUnitsStream() {
@@ -98,7 +104,9 @@ public class Hangar {
 
     /**
      * Calculates the total costs for the units in the hangar.
+     *
      * @param getCosts A function which returns a cost for a unit.
+     *
      * @return The total costs for the units.
      */
     public Money getUnitCosts(Function<Unit, Money> getCosts) {
@@ -106,10 +114,11 @@ public class Hangar {
     }
 
     /**
-     * Calculates the total costs for the units matching a predicate
-     * in the hangar.
+     * Calculates the total costs for the units matching a predicate in the hangar.
+     *
      * @param predicate A function to use to select a unit.
-     * @param getCosts A function which returns a cost for a selected unit.
+     * @param getCosts  A function which returns a cost for a selected unit.
+     *
      * @return The total costs for the units selected by the predicate.
      */
     public Money getUnitCosts(Predicate<Unit> predicate, Function<Unit, Money> getCosts) {
@@ -118,6 +127,7 @@ public class Hangar {
 
     /**
      * Executes a function for each unit in the hangar.
+     *
      * @param consumer A function to apply to each unit.
      */
     public void forEachUnit(Consumer<Unit> consumer) {
@@ -126,6 +136,7 @@ public class Hangar {
 
     /**
      * Executes a function for each unit in the hangar.
+     *
      * @param consumer A function to apply to each ID-unit pair.
      */
     public void forEachUnit(BiConsumer<UUID, Unit> consumer) {
@@ -134,9 +145,10 @@ public class Hangar {
 
     /**
      * Searches for a specific unit using the given predicate.
+     *
      * @param predicate A function to use to select a given unit.
-     * @return The first unit found which matches the predicate,
-     *         otherwise null if no unit was found.
+     *
+     * @return The first unit found which matches the predicate, otherwise null if no unit was found.
      */
     public @Nullable Unit findUnit(final @Nullable Predicate<Unit> predicate) {
         if (predicate == null) {
@@ -153,7 +165,9 @@ public class Hangar {
 
     /**
      * Removes a unit from the hangar.
+     *
      * @param id The unit ID.
+     *
      * @return true if the unit was removed, otherwise false.
      */
     public boolean removeUnit(UUID id) {

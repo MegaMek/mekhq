@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2040-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -112,7 +112,7 @@ public class SkillsTab {
     private JLabel lblEdgeCost;
     private JSpinner spnEdgeCost;
 
-    private static final MMLogger logger = MMLogger.create(SkillsTab.class);
+    private static final MMLogger LOGGER = MMLogger.create(SkillsTab.class);
 
     /**
      * Constructs a new `SkillsTab` instance and initializes the necessary data structures for managing skill
@@ -151,7 +151,7 @@ public class SkillsTab {
         lblEdgeCost = new JLabel();
         spnEdgeCost = new JSpinner();
     }
-    
+
     /**
      * Creates the main panel for the SkillsTab UI based on the provided {@link SkillSubType} category.
      *
@@ -231,8 +231,9 @@ public class SkillsTab {
         }
 
         // Content
-        pnlEdgeCost = createEdgeCostPanel();
-        pnlEdgeCost.setVisible(category == COMBAT_GUNNERY);
+        if (category == COMBAT_GUNNERY) {
+            pnlEdgeCost = createEdgeCostPanel();
+        }
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel(panelName, true);
@@ -262,10 +263,12 @@ public class SkillsTab {
         layout.gridy = 0;
         panel.add(headerPanel, layout);
 
-        layout.gridwidth = 2;
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(pnlEdgeCost, layout);
+        if (category == COMBAT_GUNNERY) {
+            layout.gridwidth = 2;
+            layout.gridx = 0;
+            layout.gridy++;
+            panel.add(pnlEdgeCost, layout);
+        }
 
         layout.gridwidth = 1;
         layout.gridx = 0;
@@ -549,7 +552,7 @@ public class SkillsTab {
     /**
      * Loads skill values into the UI components from the campaign options.
      * <p>
-     * The method populates the spinners, labels, and comboboxes for all skills with their corresponding properties
+     * The method populates the spinners, labels, and combo boxes for all skills with their corresponding properties
      * (e.g., target numbers, costs, and milestones) retrieved from the campaign's configuration.
      * </p>
      *
@@ -571,7 +574,7 @@ public class SkillsTab {
 
             // Skip outdated or missing skills
             if (allTargetNumbers.get(skillName) == null) {
-                logger.info("(loadValuesFromCampaignOptions) Skipping outdated or missing skill: {}", skillName);
+                LOGGER.info("(loadValuesFromCampaignOptions) Skipping outdated or missing skill: {}", skillName);
                 continue;
             }
 
@@ -622,13 +625,13 @@ public class SkillsTab {
      * assignments for milestone thresholds.
      * </p>
      *
-     * @param currentIndex        the position in the milestone sequence.
-     * @param greenIndex   the index where Green begins.
-     * @param regularIndex the index where Regular begins.
-     * @param veteranIndex the index where Veteran begins.
-     * @param eliteIndex   the index where Elite begins.
-     * @param heroicIndex   the index where Heroic begins.
-     * @param legendaryIndex   the index where Legendary begins.
+     * @param currentIndex   the position in the milestone sequence.
+     * @param greenIndex     the index where Green begins.
+     * @param regularIndex   the index where Regular begins.
+     * @param veteranIndex   the index where Veteran begins.
+     * @param eliteIndex     the index where Elite begins.
+     * @param heroicIndex    the index where Heroic begins.
+     * @param legendaryIndex the index where Legendary begins.
      *
      * @return the corresponding {@link SkillLevel} for the given milestone.
      */
@@ -681,7 +684,7 @@ public class SkillsTab {
             }
 
             if (type == null) {
-                logger.info("(applyCampaignOptionsToCampaign) Skipping outdated or missing skill: {}", skillName);
+                LOGGER.info("(applyCampaignOptionsToCampaign) Skipping outdated or missing skill: {}", skillName);
                 continue;
             }
 

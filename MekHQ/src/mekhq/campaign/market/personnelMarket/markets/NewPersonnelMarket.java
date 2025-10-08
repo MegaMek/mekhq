@@ -33,8 +33,8 @@
 package mekhq.campaign.market.personnelMarket.markets;
 
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.Person.CONNECTIONS_TARGET_NUMBER;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
@@ -70,7 +70,7 @@ import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.MarketNewPersonnelEvent;
+import mekhq.campaign.events.MarketNewPersonnelEvent;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
@@ -105,7 +105,7 @@ public class NewPersonnelMarket {
     @SuppressWarnings(value = "FieldCanBeLocal")
     private static final int PROFESSION_EXTINCTION_IGNORE_VALUE = -1;
 
-    final private Campaign campaign;
+    private Campaign campaign;
     private PersonnelMarketStyle associatedPersonnelMarketStyle = PERSONNEL_MARKET_DISABLED;
     private Faction campaignFaction;
     private LocalDate today;
@@ -130,14 +130,10 @@ public class NewPersonnelMarket {
     /**
      * Creates a new Personnel Market instance bound to a campaign.
      *
-     * @param campaign the parent {@link Campaign} instance to associate with this personnel market
-     *
      * @author Illiani
      * @since 0.50.06
      */
-    public NewPersonnelMarket(Campaign campaign) {
-        this.campaign = campaign;
-
+    public NewPersonnelMarket() {
         clanMarketEntries = new HashMap<>();
         innerSphereMarketEntries = new HashMap<>();
     }
@@ -148,7 +144,9 @@ public class NewPersonnelMarket {
      * @param campaign   The relevant campaign save
      * @param parentNode XML node parent containing market data
      * @param version    Version the save was last made in
+     *
      * @return Loaded Personnel Market instance
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -167,11 +165,12 @@ public class NewPersonnelMarket {
                 if (nodeName.equalsIgnoreCase("associatedPersonnelMarketStyle")) {
                     PersonnelMarketStyle marketStyle = PersonnelMarketStyle.fromString(nodeContents);
                     personnelMarket = switch (marketStyle) {
-                        case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket(campaign);
-                        case MEKHQ -> new PersonnelMarketMekHQ(campaign);
-                        case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised(campaign);
-                        case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict(campaign);
+                        case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket();
+                        case MEKHQ -> new PersonnelMarketMekHQ();
+                        case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised();
+                        case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict();
                     };
+                    personnelMarket.setCampaign(campaign);
                 }
             }
         } catch (Exception ex) {
@@ -182,7 +181,7 @@ public class NewPersonnelMarket {
             logger.error("Using fallback Personnel Market. This means we've failed to load the Personnel Market data " +
                                "from the campaign save. If this save predates 50.07 that's to be expected. Otherwise, " +
                                "please report this as a bug.");
-            return new NewPersonnelMarket(campaign);
+            return new NewPersonnelMarket();
         }
 
         try {
@@ -307,8 +306,8 @@ public class NewPersonnelMarket {
                       commander.getFullTitle(), roll, CONNECTIONS_TARGET_NUMBER);
                 if (roll >= CONNECTIONS_TARGET_NUMBER) {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "connections.recruits",
-                            commander.getHyperlinkedFullTitle(), additionalRecruitRolls,
-                            spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG));
+                          commander.getHyperlinkedFullTitle(), additionalRecruitRolls,
+                          spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG));
 
                     return additionalRecruitRolls;
                 }
@@ -333,6 +332,7 @@ public class NewPersonnelMarket {
      *
      * @param writer Output PrintWriter
      * @param indent XML indentation level
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -380,6 +380,7 @@ public class NewPersonnelMarket {
      * Gets the associated personnel market style used by this market.
      *
      * @return the personnel market style
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -391,6 +392,7 @@ public class NewPersonnelMarket {
      * Sets the market style for the personnel market.
      *
      * @param associatedPersonnelMarketStyle the personnel market style to use
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -402,6 +404,7 @@ public class NewPersonnelMarket {
      * Gets the recruitment divider value for low population systems.
      *
      * @return recruitment divider integer
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -413,6 +416,7 @@ public class NewPersonnelMarket {
      * Sets the recruitment divider for low population systems.
      *
      * @param lowPopulationRecruitmentDivider recruitment divider to set
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -424,6 +428,7 @@ public class NewPersonnelMarket {
      * Gets the unit reputation cutoff value for recruitment.
      *
      * @return reputation cutoff threshold
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -435,6 +440,7 @@ public class NewPersonnelMarket {
      * Sets the cutoff value for unit reputation in recruitment eligibility.
      *
      * @param unitReputationRecruitmentCutoff reputation cutoff to set
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -446,6 +452,7 @@ public class NewPersonnelMarket {
      * Returns the map of available clan market entries and their role distributions.
      *
      * @return map of personnel roles to market entries (Clan)
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -457,6 +464,7 @@ public class NewPersonnelMarket {
      * Sets the clan market entries data.
      *
      * @param clanMarketEntries map of personnel roles to market entries
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -468,6 +476,7 @@ public class NewPersonnelMarket {
      * Returns the map of available Inner Sphere market entries and their role distributions.
      *
      * @return map of personnel roles to market entries (Inner Sphere)
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -479,6 +488,7 @@ public class NewPersonnelMarket {
      * Sets the Inner Sphere market entries data.
      *
      * @param innerSphereMarketEntries map of personnel roles to market entries
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -490,6 +500,7 @@ public class NewPersonnelMarket {
      * Returns the campaign associated with this Personnel Market.
      *
      * @return campaign instance
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -498,9 +509,17 @@ public class NewPersonnelMarket {
     }
 
     /**
+     * @param campaign Campaign instance that this instance will be attached to and access
+     */
+    public void setCampaign(Campaign campaign) {
+        this.campaign = campaign;
+    }
+
+    /**
      * Returns the faction associated with the campaign for recruitment filtering.
      *
      * @return campaign's faction
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -515,6 +534,7 @@ public class NewPersonnelMarket {
      * Sets the campaign's faction, influencing applicant origins.
      *
      * @param campaignFaction the new campaign faction
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -526,6 +546,7 @@ public class NewPersonnelMarket {
      * Returns the in-game date currently used for market evaluation.
      *
      * @return current date
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -540,6 +561,7 @@ public class NewPersonnelMarket {
      * Sets the in-game date used to determine market status.
      *
      * @param today new current date
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -551,6 +573,7 @@ public class NewPersonnelMarket {
      * Returns the campaign year for market behavior.
      *
      * @return game year
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -577,6 +600,7 @@ public class NewPersonnelMarket {
      * Returns the factions from which applicants may originate.
      *
      * @return list of applicant origin factions
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -588,6 +612,7 @@ public class NewPersonnelMarket {
      * Sets the list of origin factions for new applicants.
      *
      * @param applicantOriginFactions list to set
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -599,6 +624,7 @@ public class NewPersonnelMarket {
      * Returns the current list of market applicants.
      *
      * @return list of applicants
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -613,6 +639,7 @@ public class NewPersonnelMarket {
      * Returns the index or filter value last used for applicant selection.
      *
      * @return filter index
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -624,6 +651,7 @@ public class NewPersonnelMarket {
      * Sets the last-used selection filter value.
      *
      * @param lastSelectedFilter filter index
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -635,6 +663,7 @@ public class NewPersonnelMarket {
      * Adds a new applicant to the current applicant pool.
      *
      * @param applicant the new Personnel applicant
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -658,6 +687,7 @@ public class NewPersonnelMarket {
      * Sets the list of current market applicants.
      *
      * @param currentApplicants list of applicants to set
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -669,6 +699,7 @@ public class NewPersonnelMarket {
      * Returns whether a golden hello (recruitment incentive) is being offered.
      *
      * @return {@code true} if a golden hello is offered, otherwise {@code false}
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -680,6 +711,7 @@ public class NewPersonnelMarket {
      * Sets whether a golden hello (recruitment incentive) is being offered.
      *
      * @param offeringGoldenHello {@code true} to offer, {@code false} otherwise
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -715,6 +747,7 @@ public class NewPersonnelMarket {
      * Returns whether rare personnel are available on the market.
      *
      * @return {@code true} if rare personnel are present, otherwise {@code false}
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -726,6 +759,7 @@ public class NewPersonnelMarket {
      * Sets the status of rare personnel availability.
      *
      * @param hasRarePersonnel {@code true} if present, {@code false} otherwise
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -788,6 +822,7 @@ public class NewPersonnelMarket {
      * Returns the number of recruitment rolls performed for the current market evaluation.
      *
      * @return recruitment rolls value
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -799,6 +834,7 @@ public class NewPersonnelMarket {
      * Sets the number of recruitment rolls for the market.
      *
      * @param recruitmentRolls number of rolls to set
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -810,6 +846,7 @@ public class NewPersonnelMarket {
      * Returns the planetary system currently used for market context.
      *
      * @return planetary system
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -824,6 +861,7 @@ public class NewPersonnelMarket {
      * Sets the planetary system for the current personnel market.
      *
      * @param currentSystem planetary system to set
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -835,6 +873,7 @@ public class NewPersonnelMarket {
      * Gets an availability message describing the market's state or conditions.
      *
      * @return market availability message
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -843,7 +882,7 @@ public class NewPersonnelMarket {
     }
 
     /**
-     * Reinitializes market state and key internal data.
+     * Reinitialized market state and key internal data.
      *
      * @author Illiani
      * @since 0.50.06
@@ -869,7 +908,9 @@ public class NewPersonnelMarket {
      * {@code count()} is less than or equal to zero.</p>
      *
      * @param marketEntries the map of personnel roles to market entries to sanitize; modified in place
+     *
      * @return the sanitized map, containing only entries with positive weights
+     *
      * @author Illiani
      * @since 0.50.06
      */
@@ -900,17 +941,19 @@ public class NewPersonnelMarket {
     }
 
     /**
-     * Returns a list of {@link PersonnelMarketEntry} objects sorted alphabetically by the string value
-     * of each entry's profession. This ensures a deterministic order for processing or testing, regardless of the
-     * original iteration order of the provided map.
+     * Returns a list of {@link PersonnelMarketEntry} objects sorted alphabetically by the string value of each entry's
+     * profession. This ensures a deterministic order for processing or testing, regardless of the original iteration
+     * order of the provided map.
      *
      * @param marketEntries a map containing personnel roles as keys and their corresponding market entries as values
+     *
      * @return a list of market entries sorted alphabetically by profession
+     *
      * @author Illiani
      * @since 0.50.06
      */
     public List<PersonnelMarketEntry> getMarketEntriesAsList(Map<PersonnelRole, PersonnelMarketEntry> marketEntries) {
-        // Maps are inherently non-deterministic in their order, however, we want to be able to both use a map (for
+        // Maps are inherently non-deterministic in their order, however, we want to be able to both use a map for
         // the key:value pairs, but also we need a deterministic list to ease testing. So we create a list here and
         // sort alphabetically based on the profession tied to each entry. This makes testing substantially easier
         // without removing from the randomness of the pick
@@ -926,11 +969,12 @@ public class NewPersonnelMarket {
      * <p>This method selects an entry from the ordered market entries, iterates through available fallback
      * professions if necessary, and creates a new {@link Person}.</p>
      *
-     * @param unorderedMarketEntries a mapping of {@link PersonnelRole} to {@link PersonnelMarketEntry} representing
-     *                              all personnel market entries.
-     * @param orderedMarketEntries a list of {@link PersonnelMarketEntry} objects, ordered by profession.
-     * @return a newly generated {@link Person} representing the applicant, or {@code null} if no suitable
-     *         applicant could be generated.
+     * @param unorderedMarketEntries a mapping of {@link PersonnelRole} to {@link PersonnelMarketEntry} representing all
+     *                               personnel market entries.
+     * @param orderedMarketEntries   a list of {@link PersonnelMarketEntry} objects, ordered by profession.
+     *
+     * @return a newly generated {@link Person} representing the applicant, or {@code null} if no suitable applicant
+     *       could be generated.
      */
     @Nullable
     Person generateSingleApplicant(Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries,
@@ -1042,6 +1086,7 @@ public class NewPersonnelMarket {
      * color-coded rank, and name of the experience level. Pluralization is handled automatically.</p>
      *
      * @param campaign the campaign for which to generate the personnel report
+     *
      * @return a formatted HTML report string summarizing applicant counts by experience level
      *
      * @author Illiani
@@ -1049,6 +1094,8 @@ public class NewPersonnelMarket {
      */
     private String generatePersonnelReport(Campaign campaign) {
         StringBuilder report = new StringBuilder(getTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report"));
+
+        int civilians = 0;
 
         // Define the experience levels and tie them to their respective constants.
         final int[] expLevels = {
@@ -1068,6 +1115,11 @@ public class NewPersonnelMarket {
 
         // Tally applicants per experience level
         for (Person applicant : currentApplicants) {
+            if (applicant.isCivilian()) {
+                civilians++;
+                continue;
+            }
+
             int experienceLevel = applicant.getExperienceLevel(campaign, false);
             for (int i = 0; i < expLevels.length; i++) {
                 if (experienceLevel == expLevels[i]) {
@@ -1085,6 +1137,14 @@ public class NewPersonnelMarket {
                       .append(getFormattedTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report.experienceLevel",
                             applicantCounts[i], colors[i], names[i], CLOSING_SPAN_TAG, pluralizer));
             }
+        }
+
+        if (civilians > 0) {
+            int pluralizer = civilians > 1 ? 1 : 0;
+            report.append("<br>")
+                  .append(getFormattedTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report.experienceLevel",
+                        civilians, "", getTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report.civilians"), "",
+                        pluralizer));
         }
 
         return report.toString();
@@ -1128,8 +1188,9 @@ public class NewPersonnelMarket {
      * Processes an XML node containing applicant data and loads it into the supplied personnel market.
      *
      * @param personnelMarket the personnel market instance being loaded
-     * @param parentNode              the XML node representing applicant data
+     * @param parentNode      the XML node representing applicant data
      * @param version         serialization version
+     *
      * @author Illiani
      * @since 0.50.06
      */

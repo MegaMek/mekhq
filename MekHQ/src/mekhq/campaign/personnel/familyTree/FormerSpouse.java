@@ -24,8 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.familyTree;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
@@ -36,9 +44,6 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.time.LocalDate;
-
 public class FormerSpouse {
     //region Variables
     private Person formerSpouse;
@@ -47,9 +52,9 @@ public class FormerSpouse {
     //endregion Variables
 
     //region Constructors
+
     /**
-     * This creates an empty FormerSpouse object
-     * This case should only be used for reading from XML
+     * This creates an empty FormerSpouse object This case should only be used for reading from XML
      */
     private FormerSpouse() {
 
@@ -57,11 +62,10 @@ public class FormerSpouse {
 
     /**
      * @param formerSpouse the new former spouse
-     * @param date the date the person became a former spouse
-     * @param reason the reason the person is a former spouse
+     * @param date         the date the person became a former spouse
+     * @param reason       the reason the person is a former spouse
      */
-    public FormerSpouse(final Person formerSpouse, final LocalDate date,
-                        final FormerSpouseReason reason) {
+    public FormerSpouse(final Person formerSpouse, final LocalDate date, final FormerSpouseReason reason) {
         setFormerSpouse(formerSpouse);
         setDate(date);
         setReason(reason);
@@ -69,6 +73,7 @@ public class FormerSpouse {
     //endregion Constructors
 
     //region Getters/Setters
+
     /**
      * @return the former spouse
      */
@@ -109,7 +114,7 @@ public class FormerSpouse {
      */
     public void setReason(final FormerSpouseReason reason) {
         this.reason = reason;
-     }
+    }
     //endregion Getters/Setters
 
     //region File I/O
@@ -148,32 +153,32 @@ public class FormerSpouse {
     //endregion File I/O
 
     /**
-     * @return a string describing this former spouse in the format
-     * "{{ Reason }}: {{ Full Title }} ({{ Date }})"
+     * @return a string describing this former spouse in the format "{{ Reason }}: {{ Full Title }} ({{ Date }})"
      */
     @Override
     public String toString() {
         return String.format("%s: %s (%s)", getReason(), getFormerSpouse().getFullTitle(),
-                MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()));
+              MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()));
     }
 
     /**
-     * Note that this equal does not enforce uniqueness upon multiple former spouse objects created
-     * between the same people on the same day for the same reason.
+     * Note that this equal does not enforce uniqueness upon multiple former spouse objects created between the same
+     * people on the same day for the same reason.
+     *
      * @param object the object to compare to the former spouse
+     *
      * @return true if they are equal, otherwise false
      */
     @Override
     public boolean equals(@Nullable Object object) {
         if (this == object) {
             return true;
-        } else if (!(object instanceof FormerSpouse)) {
+        } else if (!(object instanceof FormerSpouse passedInFormerSpouse)) {
             return false;
         } else {
-            final FormerSpouse formerSpouse = (FormerSpouse) object;
-            return getFormerSpouse().equals(formerSpouse.getFormerSpouse())
-                    && getDate().isEqual(formerSpouse.getDate())
-                    && (getReason() == formerSpouse.getReason());
+            return getFormerSpouse().equals(passedInFormerSpouse.getFormerSpouse())
+                         && getDate().isEqual(passedInFormerSpouse.getDate())
+                         && (getReason() == passedInFormerSpouse.getReason());
         }
     }
 

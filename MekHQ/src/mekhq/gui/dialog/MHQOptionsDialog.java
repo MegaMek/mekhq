@@ -80,7 +80,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  * This dialog uses the following Mnemonics: C, D, M, M, S, U, W, Y
  */
 public class MHQOptionsDialog extends AbstractMHQButtonDialog {
-    private static final MMLogger logger = MMLogger.create(MHQOptionsDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(MHQOptionsDialog.class);
 
     // region Variable Declaration
     // region Display
@@ -178,7 +178,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     // endregion Autosave
 
     // region New Day
-    private JCheckBox chkNewDayAstechPoolFill;
+    private JCheckBox chkNewDayAsTechPoolFill;
     private JCheckBox chkNewDayMedicPoolFill;
     private JCheckBox chkNewDayMRMS;
     private JCheckBox chkNewDayOptimizeMedicalAssignments;
@@ -200,8 +200,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionUntreatedPersonnelNag;
     private JCheckBox optionNoCommanderNag;
     private JCheckBox optionContractEndedNag;
-    private JCheckBox optionInsufficientAstechsNag;
-    private JCheckBox optionInsufficientAstechTimeNag;
+    private JCheckBox optionInsufficientAsTechsNag;
+    private JCheckBox optionInsufficientAsTechTimeNag;
     private JCheckBox optionInsufficientMedicsNag;
     private JCheckBox optionShortDeploymentNag;
     private JCheckBox optionUnresolvedStratConContactsNag;
@@ -642,7 +642,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         // endregion Create Graphical Components
 
         // region Layout
-        // Layout the UI
+        //  the UI
         JPanel body = new JPanel();
         GroupLayout layout = new GroupLayout(body);
         body.setLayout(layout);
@@ -917,9 +917,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "lblNewDayForceIconOperationalStatusStyle.text"));
 
         // Create Panel Components
-        chkNewDayAstechPoolFill = new JCheckBox(resources.getString("chkNewDayAstechPoolFill.text"));
-        chkNewDayAstechPoolFill.setToolTipText(resources.getString("chkNewDayAstechPoolFill.toolTipText"));
-        chkNewDayAstechPoolFill.setName("chkNewDayAstechPoolFill");
+        chkNewDayAsTechPoolFill = new JCheckBox(resources.getString("chkNewDayAstechPoolFill.text"));
+        chkNewDayAsTechPoolFill.setToolTipText(resources.getString("chkNewDayAstechPoolFill.toolTipText"));
+        chkNewDayAsTechPoolFill.setName("chkNewDayAsTechPoolFill");
 
         chkNewDayMedicPoolFill = new JCheckBox(resources.getString("chkNewDayMedicPoolFill.text"));
         chkNewDayMedicPoolFill.setToolTipText(resources.getString("chkNewDayMedicPoolFill.toolTipText"));
@@ -983,7 +983,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(layout.createSequentialGroup()
-                                      .addComponent(chkNewDayAstechPoolFill)
+                                      .addComponent(chkNewDayAsTechPoolFill)
                                       .addComponent(chkNewDayMedicPoolFill)
                                       .addComponent(chkNewDayMRMS)
                                       .addComponent(chkNewDayOptimizeMedicalAssignments)
@@ -996,7 +996,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                             40)));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
-                                        .addComponent(chkNewDayAstechPoolFill)
+                                        .addComponent(chkNewDayAsTechPoolFill)
                                         .addComponent(chkNewDayMedicPoolFill)
                                         .addComponent(chkNewDayMRMS)
                                         .addComponent(chkNewDayOptimizeMedicalAssignments)
@@ -1071,13 +1071,13 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionContractEndedNag.setToolTipText(resources.getString("optionContractEndedNag.toolTipText"));
         optionContractEndedNag.setName("optionContractEndedNag");
 
-        optionInsufficientAstechsNag = new JCheckBox(resources.getString("optionInsufficientAstechsNag.text"));
-        optionInsufficientAstechsNag.setToolTipText(resources.getString("optionInsufficientAstechsNag.toolTipText"));
-        optionInsufficientAstechsNag.setName("optionInsufficientAstechsNag");
+        optionInsufficientAsTechsNag = new JCheckBox(resources.getString("optionInsufficientAstechsNag.text"));
+        optionInsufficientAsTechsNag.setToolTipText(resources.getString("optionInsufficientAstechsNag.toolTipText"));
+        optionInsufficientAsTechsNag.setName("optionInsufficientAsTechsNag");
 
-        optionInsufficientAstechTimeNag = new JCheckBox(resources.getString("optionInsufficientAstechTimeNag.text"));
-        optionInsufficientAstechTimeNag.setToolTipText(resources.getString("optionInsufficientAstechTimeNag.toolTipText"));
-        optionInsufficientAstechTimeNag.setName("optionInsufficientAstechTimeNag");
+        optionInsufficientAsTechTimeNag = new JCheckBox(resources.getString("optionInsufficientAstechTimeNag.text"));
+        optionInsufficientAsTechTimeNag.setToolTipText(resources.getString("optionInsufficientAstechTimeNag.toolTipText"));
+        optionInsufficientAsTechTimeNag.setName("optionInsufficientAsTechTimeNag");
 
         optionInsufficientMedicsNag = new JCheckBox(resources.getString("optionInsufficientMedicsNag.text"));
         optionInsufficientMedicsNag.setToolTipText(resources.getString("optionInsufficientMedicsNag.toolTipText"));
@@ -1137,8 +1137,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(optionUntreatedPersonnelNag)
                                       .addComponent(optionNoCommanderNag)
                                       .addComponent(optionContractEndedNag)
-                                      .addComponent(optionInsufficientAstechsNag)
-                                      .addComponent(optionInsufficientAstechTimeNag)
+                                      .addComponent(optionInsufficientAsTechsNag)
+                                      .addComponent(optionInsufficientAsTechTimeNag)
                                       .addComponent(optionInsufficientMedicsNag)
                                       .addComponent(optionShortDeploymentNag)
                                       .addComponent(optionUnresolvedStratConContactsNag)
@@ -1157,8 +1157,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(optionUntreatedPersonnelNag)
                                         .addComponent(optionNoCommanderNag)
                                         .addComponent(optionContractEndedNag)
-                                        .addComponent(optionInsufficientAstechsNag)
-                                        .addComponent(optionInsufficientAstechTimeNag)
+                                        .addComponent(optionInsufficientAsTechsNag)
+                                        .addComponent(optionInsufficientAsTechTimeNag)
                                         .addComponent(optionInsufficientMedicsNag)
                                         .addComponent(optionShortDeploymentNag)
                                         .addComponent(optionUnresolvedStratConContactsNag)
@@ -1192,7 +1192,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
             URL helpFile = new File(MMConstants.USER_DIR_README_FILE).toURI().toURL();
             userDirHelp.addActionListener(e -> new HelpDialog(helpTitle, helpFile, getFrame()).setVisible(true));
         } catch (MalformedURLException e) {
-            logger.error("Could not find the user data directory readme file at {}", MMConstants.USER_DIR_README_FILE);
+            LOGGER.error("Could not find the user data directory readme file at {}", MMConstants.USER_DIR_README_FILE);
         }
 
         final JLabel lblStartGameDelay = new JLabel(resources.getString("lblStartGameDelay.text"));
@@ -1438,9 +1438,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setAutosaveYearlyValue(optionSaveYearly.isSelected());
         MekHQ.getMHQOptions().setAutosaveBeforeScenariosValue(checkSaveBeforeScenarios.isSelected());
         MekHQ.getMHQOptions().setAutosaveBeforeMissionEndValue(checkSaveBeforeContractEnd.isSelected());
-        MekHQ.getMHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
+        MekHQ.getMHQOptions().setMaximumNumberOfAutoSavesValue((Integer) spinnerSavedGamesCount.getValue());
 
-        MekHQ.getMHQOptions().setNewDayAstechPoolFill(chkNewDayAstechPoolFill.isSelected());
+        MekHQ.getMHQOptions().setNewDayAsTechPoolFill(chkNewDayAsTechPoolFill.isSelected());
         MekHQ.getMHQOptions().setNewDayMedicPoolFill(chkNewDayMedicPoolFill.isSelected());
         MekHQ.getMHQOptions().setNewDayMRMS(chkNewDayMRMS.isSelected());
         MekHQ.getMHQOptions().setNewDayOptimizeMedicalAssignments(chkNewDayOptimizeMedicalAssignments.isSelected());
@@ -1464,16 +1464,16 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_NO_COMMANDER, optionNoCommanderNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_CONTRACT_ENDED, optionContractEndedNag.isSelected());
         MekHQ.getMHQOptions()
-              .setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECHS, optionInsufficientAstechsNag.isSelected());
+              .setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_AS_TECHS, optionInsufficientAsTechsNag.isSelected());
         MekHQ.getMHQOptions()
-              .setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME,
-                    optionInsufficientAstechTimeNag.isSelected());
+              .setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_AS_TECH_TIME,
+                    optionInsufficientAsTechTimeNag.isSelected());
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_MEDICS, optionInsufficientMedicsNag.isSelected());
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_SHORT_DEPLOYMENT, optionShortDeploymentNag.isSelected());
         MekHQ.getMHQOptions()
-              .setNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS,
+              .setNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS,
                     optionUnresolvedStratConContactsNag.isSelected());
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
@@ -1600,9 +1600,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionSaveYearly.setSelected(MekHQ.getMHQOptions().getAutosaveYearlyValue());
         checkSaveBeforeScenarios.setSelected(MekHQ.getMHQOptions().getAutosaveBeforeScenariosValue());
         checkSaveBeforeContractEnd.setSelected(MekHQ.getMHQOptions().getAutosaveBeforeMissionEndValue());
-        spinnerSavedGamesCount.setValue(MekHQ.getMHQOptions().getMaximumNumberOfAutosavesValue());
+        spinnerSavedGamesCount.setValue(MekHQ.getMHQOptions().getMaximumNumberOfAutoSavesValue());
 
-        chkNewDayAstechPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayAstechPoolFill());
+        chkNewDayAsTechPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayAsTechPoolFill());
         chkNewDayMedicPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayMedicPoolFill());
         chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
         chkNewDayOptimizeMedicalAssignments.setSelected(MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments());
@@ -1627,16 +1627,16 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                       .getNagDialogIgnore(MHQConstants.NAG_UNTREATED_PERSONNEL));
         optionNoCommanderNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_NO_COMMANDER));
         optionContractEndedNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_CONTRACT_ENDED));
-        optionInsufficientAstechsNag.setSelected(MekHQ.getMHQOptions()
-                                                       .getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECHS));
-        optionInsufficientAstechTimeNag.setSelected(MekHQ.getMHQOptions()
-                                                          .getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME));
+        optionInsufficientAsTechsNag.setSelected(MekHQ.getMHQOptions()
+                                                       .getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_AS_TECHS));
+        optionInsufficientAsTechTimeNag.setSelected(MekHQ.getMHQOptions()
+                                                          .getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_AS_TECH_TIME));
         optionInsufficientMedicsNag.setSelected(MekHQ.getMHQOptions()
                                                       .getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_MEDICS));
         optionShortDeploymentNag.setSelected(MekHQ.getMHQOptions()
                                                    .getNagDialogIgnore(MHQConstants.NAG_SHORT_DEPLOYMENT));
         optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMHQOptions()
-                                                              .getNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS));
+                                                              .getNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS));
         optionOutstandingScenariosNag.setSelected(MekHQ.getMHQOptions()
                                                         .getNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS));
         optionInvalidFactionNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INVALID_FACTION));

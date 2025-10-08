@@ -24,12 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums.education;
 
-import mekhq.MekHQ;
-
 import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
 
 public enum EducationStage {
     //region Enum Declarations
@@ -49,7 +54,7 @@ public enum EducationStage {
     //region Constructors
     EducationStage(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -89,23 +94,17 @@ public enum EducationStage {
 
     //region File I/O
     public static EducationStage parseFromString(final String educationLevel) {
-        switch (educationLevel) {
-            case "None":
-                return NONE;
-            case "Journeying to Campus":
-                return JOURNEY_TO_CAMPUS;
-            case "Undergoing Education":
-                return EDUCATION;
-            case "Graduating":
-                return GRADUATING;
-            case "Dropping Out":
-                return DROPPING_OUT;
-            case "Journeying from Campus":
-                return JOURNEY_FROM_CAMPUS;
-            default:
-                throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/education/EducationStage.java/parseFromString: "
+        return switch (educationLevel) {
+            case "None" -> NONE;
+            case "Journeying to Campus" -> JOURNEY_TO_CAMPUS;
+            case "Undergoing Education" -> EDUCATION;
+            case "Graduating" -> GRADUATING;
+            case "Dropping Out" -> DROPPING_OUT;
+            case "Journeying from Campus" -> JOURNEY_FROM_CAMPUS;
+            default -> throw new IllegalStateException(
+                  "Unexpected value in mekhq/campaign/personnel/enums/education/EducationStage.java/parseFromString: "
                         + educationLevel);
-        }
+        };
     }
     //endregion File I/O
 

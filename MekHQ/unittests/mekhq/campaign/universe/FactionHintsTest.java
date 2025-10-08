@@ -24,19 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
-
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.Collections;
+
+import org.junit.jupiter.api.Test;
 
 public class FactionHintsTest {
 
@@ -104,8 +110,8 @@ public class FactionHintsTest {
 
         LocalDate now = LocalDate.of(3005, 1, 1);
 
-        assertEquals(hints.getCurrentWar(f1, f2, now), WAR_NAME);
-        assertEquals(hints.getCurrentWar(f2, f1, now), WAR_NAME);
+        assertEquals(WAR_NAME, hints.getCurrentWar(f1, f2, now));
+        assertEquals(WAR_NAME, hints.getCurrentWar(f2, f1, now));
         // This test will fail if run between 3000 and 3010
         assertNull(hints.getCurrentWar(f1, f2, LocalDate.now()));
     }
@@ -139,7 +145,7 @@ public class FactionHintsTest {
         assertTrue(hints.getContainedFactions(outer, now).contains(inner));
         assertEquals(hints.getContainedFactionHost(inner, now), outer);
         assertTrue(hints.isContainedFactionOpponent(outer, inner, opponent, now));
-        assertEquals(hints.getAltLocationFraction(outer, inner, now), 0.5, RegionPerimeter.EPSILON);
+        assertEquals(0.5, hints.getAltLocationFraction(outer, inner, now), RegionPerimeter.EPSILON);
     }
 
     @Test

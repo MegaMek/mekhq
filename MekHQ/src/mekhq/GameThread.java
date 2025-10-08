@@ -24,14 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,11 +51,11 @@ import megamek.client.ui.clientGUI.IDisconnectSilently;
 import megamek.client.ui.clientGUI.ILocalBots;
 import megamek.client.ui.clientGUI.MegaMekGUI;
 import megamek.client.ui.util.MegaMekController;
-import megamek.common.Entity;
-import megamek.common.MapSettings;
-import megamek.common.WeaponOrderHandler;
-import megamek.common.planetaryconditions.PlanetaryConditions;
+import megamek.common.loaders.MapSettings;
+import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.preference.PreferenceManager;
+import megamek.common.units.Entity;
+import megamek.common.weapons.handlers.WeaponOrderHandler;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -64,10 +65,10 @@ import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ScenarioUtils;
 
 class GameThread extends Thread implements CloseClientListener {
-    private static final MMLogger logger = MMLogger.create(GameThread.class);
+    private static final MMLogger LOGGER = MMLogger.create(GameThread.class);
 
     // region Variable Declarations
-    protected String myname;
+    protected String myName;
     protected String password;
     protected Client client;
     protected IClientGUI swingGui;
@@ -139,7 +140,7 @@ class GameThread extends Thread implements CloseClientListener {
     public GameThread(String name, String password, Client client, MekHQ app, List<Unit> units, Scenario scenario,
           boolean started) {
         super(name);
-        myname = name.trim();
+        myName = name.trim();
         this.password = password;
         this.client = client;
         this.app = app;
@@ -174,7 +175,7 @@ class GameThread extends Thread implements CloseClientListener {
 
         createController();
         swingGui = new ClientGUI(client, controller);
-        controller.clientgui = swingGui;
+        controller.clientGUI = swingGui;
         localBots = (ClientGUI) swingGui;
         swingGui.initialize();
 
@@ -182,7 +183,7 @@ class GameThread extends Thread implements CloseClientListener {
             client.connect();
         } catch (Exception ex) {
             Sentry.captureException(ex);
-            logger.error("MegaMek client failed to connect to server", ex);
+            LOGGER.error("MegaMek client failed to connect to server", ex);
             return;
         }
 
@@ -196,11 +197,11 @@ class GameThread extends Thread implements CloseClientListener {
                   (i < MekHQ.getMHQOptions().getStartGameClientRetryCount()) && client.getGame().getPhase().isUnknown();
                   i++) {
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameClientDelay());
-                logger.warn("Client has not finished initialization, and is currently in an unknown phase.");
+                LOGGER.warn("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
             if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
-                logger.info("Thread in lounge");
+                LOGGER.info("Thread in lounge");
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
 
                 if (started) {
@@ -258,8 +259,7 @@ class GameThread extends Thread implements CloseClientListener {
                         botClient.connect();
                         botClient.startPrecognition();
                     } catch (Exception e) {
-                        Sentry.captureException(e);
-                        logger.error(String.format("Could not connect with Bot name %s", bf.getName()), e);
+                        LOGGER.error(e, "Could not connect with Bot name {}", bf.getName());
                     }
                     getLocalBots().put(name, botClient);
 
@@ -274,7 +274,7 @@ class GameThread extends Thread implements CloseClientListener {
             }
         } catch (Exception e) {
             Sentry.captureException(e);
-            logger.error("", e);
+            LOGGER.error("", e);
         } finally {
             disconnectGuiSilently();
             client.die();
@@ -311,7 +311,7 @@ class GameThread extends Thread implements CloseClientListener {
             }
 
             if (botClient.getLocalPlayer() == null) {
-                logger.error(String.format("Could not configure bot %s", botClient.getName()));
+                LOGGER.error("Could not configure bot {}", botClient.getName());
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
 
@@ -335,7 +335,7 @@ class GameThread extends Thread implements CloseClientListener {
             }
         } catch (Exception ex) {
             Sentry.captureException(ex);
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
@@ -380,7 +380,7 @@ class GameThread extends Thread implements CloseClientListener {
             WeaponOrderHandler.saveWeaponOrderFile();
         } catch (IOException e) {
             Sentry.captureException(e);
-            logger.error("Error saving custom weapon orders!", e);
+            LOGGER.error("Error saving custom weapon orders!", e);
         }
         stop = true;
     }
@@ -392,7 +392,6 @@ class GameThread extends Thread implements CloseClientListener {
     public void quit() {
         client.die();
         client = null;// explicit null of the MM client. Wasn't/isn't being
-        // GC'ed.
         System.gc();
     }
 

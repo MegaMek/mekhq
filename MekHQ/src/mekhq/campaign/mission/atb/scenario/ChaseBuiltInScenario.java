@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,19 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
 
+import java.util.ArrayList;
+
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.PrincessException;
-import megamek.common.*;
+import megamek.common.OffBoardDirection;
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.Infantry;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-
-import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class ChaseBuiltInScenario extends AtBScenario {
@@ -74,7 +89,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         boolean startNorth = Compute.d6() > 3;
 
         int destinationEdge = startNorth ? Board.START_S : Board.START_N;
@@ -93,9 +108,9 @@ public class ChaseBuiltInScenario extends AtBScenario {
         CombatTeam combatTeam = getCombatTeamById(campaign);
         int weightClass = combatTeam != null ? combatTeam.getWeightClass(campaign) : EntityWeightClass.WEIGHT_LIGHT;
         addEnemyForce(enemyEntities, weightClass, EntityWeightClass.WEIGHT_ASSAULT, 0,
-                -1, campaign);
+              -1, campaign);
         addEnemyForce(enemyEntities, weightClass, EntityWeightClass.WEIGHT_ASSAULT, 0,
-                -1, campaign);
+              -1, campaign);
 
         BotForce botForce = getEnemyBotForce(getContract(campaign), startEdge, getEnemyHome(), enemyEntities);
 
@@ -103,7 +118,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
             if (isAttacker()) {
                 if (null != allyEntitiesForce) {
                     allyEntitiesForce
-                            .setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
+                          .setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
 
                     allyEntitiesForce.setDestinationEdge(destinationEdge);
                 }
@@ -154,13 +169,20 @@ public class ChaseBuiltInScenario extends AtBScenario {
         super.setObjectives(campaign, contract);
 
         ScenarioObjective destroyHostiles = isAttacker()
-                ? CommonObjectiveFactory.getBreakthrough(contract, this, campaign, 1, 50,
-                        OffBoardDirection
-                                .translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(getStartingPos())))
-                : CommonObjectiveFactory.getPreventEnemyBreakthrough(contract, 1, 50,
-                        OffBoardDirection.translateBoardStart(getEnemyHome()));
+                                                  ?
+                                                  CommonObjectiveFactory.getBreakthrough(contract,
+                                                        this,
+                                                        campaign,
+                                                        1,
+                                                        50,
+                                                        OffBoardDirection
+                                                              .translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(
+                                                                    getStartingPos())))
+                                                  :
+                                                  CommonObjectiveFactory.getPreventEnemyBreakthrough(contract, 1, 50,
+                                                        OffBoardDirection.translateBoardStart(getEnemyHome()));
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
-                this);
+              this);
 
         if (keepAttachedUnitsAlive != null) {
             getScenarioObjectives().add(keepAttachedUnitsAlive);

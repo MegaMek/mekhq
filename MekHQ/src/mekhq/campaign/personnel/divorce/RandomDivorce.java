@@ -32,14 +32,13 @@
  */
 package mekhq.campaign.personnel.divorce;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 
 /**
- * The {@link RandomDivorce} class is an implementation of the {@link AbstractDivorce} class that
- * represents a divorce method based on random chance.
- * The divorce outcome is determined by rolling a die with a specified number of sides.
+ * The {@link RandomDivorce} class is an implementation of the {@link AbstractDivorce} class that represents a divorce
+ * method based on random chance. The divorce outcome is determined by rolling a die with a specified number of sides.
  */
 public class RandomDivorce extends AbstractDivorce {
     //region Variable Declarations
@@ -47,9 +46,10 @@ public class RandomDivorce extends AbstractDivorce {
     //endregion Variable Declarations
 
     //region Constructors
+
     /**
-     * The {@link RandomDivorce} class is an implementation of the {@link AbstractDivorce} class that
-     * represents a divorce method based on random chance.
+     * The {@link RandomDivorce} class is an implementation of the {@link AbstractDivorce} class that represents a
+     * divorce method based on random chance.
      */
     public RandomDivorce(final CampaignOptions options) {
         super(RandomDivorceMethod.DICE_ROLL, options);

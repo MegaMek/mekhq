@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -45,7 +50,7 @@ public enum FormerSpouseReason {
     // region Constructors
     FormerSpouseReason(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
     // endregion Constructors
@@ -82,7 +87,7 @@ public enum FormerSpouseReason {
         }
 
         MMLogger.create(FormerSpouseReason.class)
-                .error("Unable to parse " + text + " into a FormerSpouseReason. Returning WIDOWED.");
+              .error("Unable to parse {} into a FormerSpouseReason. Returning WIDOWED.", text);
         return WIDOWED;
     }
     // endregion File I/O

@@ -32,19 +32,17 @@
  */
 package mekhq.campaign.parts.enums;
 
-import mekhq.MekHQ;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import megamek.common.enums.TechRating;
 import mekhq.utilities.ReportingUtilities;
 
-import java.util.*;
-import megamek.common.ITechnology.TechRating;
-
 /**
- * Represents the quality of a Part. Quality is a scale that ranges from A to F.
- * By the book, A
- * is bad and F is good, but there is an option that inverts this scale, hence
- * the 'reverse'
- * options on the various functions available here.
- *
+ * Represents the quality of a Part. Quality is a scale that ranges from A to F. By the book, A is bad and F is good,
+ * but there is an option that inverts this scale, hence the 'reverse' options on the various functions available here.
+ * <p>
  * Internally quality is represented by a number 0 to 5, bad to good.
  */
 public enum PartQuality {
@@ -71,7 +69,8 @@ public enum PartQuality {
             REVERSED_NAME_LOOKUP.put(q.reversedName, q);
         }
     }
-    private PartQuality(int index, String name, String reversedName, int repairModifier, TechRating techRating) {
+
+    PartQuality(int index, String name, String reversedName, int repairModifier, TechRating techRating) {
         this.index = index;
         this.name = name;
         this.reversedName = reversedName;
@@ -95,6 +94,7 @@ public enum PartQuality {
 
     /**
      * @param reversed - are quality names reversed per the campaign option
+     *
      * @return String letter name for quality A-F bad-good (or good-bad if reversed)
      */
     public String getName(boolean reversed) {
@@ -113,8 +113,9 @@ public enum PartQuality {
 
     /**
      * @param rawQuality - numeric quality 0-5 bad-good
+     *
      * @return corresponding PartQuality
-     * @throws IllegalArgumentException
+     *
      */
     public static PartQuality fromNumeric(int rawQuality) {
         try {
@@ -126,18 +127,20 @@ public enum PartQuality {
 
     /**
      * @param reversed - are quality names reversed per the campaign option
+     *
      * @return String letter name for quality A-F bad-good (or good-bad if reversed)
      */
     public String toName(boolean reversed) {
         return getName(reversed);
     }
 
-  /**
-   * @param code - one-character String name from A-F bad-good (or good-bad if reversed)
-   * @param reversed - are quality names reversed per the campaign option
-   * @return corresponding PartQuality
-   * @throws IllegalArgumentException
-   */
+    /**
+     * @param code     - one-character String name from A-F bad-good (or good-bad if reversed)
+     * @param reversed - are quality names reversed per the campaign option
+     *
+     * @return corresponding PartQuality
+     *
+     */
     public static PartQuality fromName(String code, boolean reversed) {
         try {
             if (!reversed) {
@@ -153,7 +156,7 @@ public enum PartQuality {
     /**
      * @return modifier for repair rolls using a part of this quality
      */
-    public int getRepairModifier(){
+    public int getRepairModifier() {
         return this.repairModifier;
     }
 
@@ -195,9 +198,9 @@ public enum PartQuality {
      * @return A list of PartQualities in order bad to good
      */
     public static List<PartQuality> allQualities(boolean reversed) {
-            if (reversed) {
-                return List.of(QUALITY_F,QUALITY_E,QUALITY_D,QUALITY_C,QUALITY_B,QUALITY_A);
-            }
-            return List.of(QUALITY_A,QUALITY_B,QUALITY_C,QUALITY_D,QUALITY_E,QUALITY_F);
+        if (reversed) {
+            return List.of(QUALITY_F, QUALITY_E, QUALITY_D, QUALITY_C, QUALITY_B, QUALITY_A);
+        }
+        return List.of(QUALITY_A, QUALITY_B, QUALITY_C, QUALITY_D, QUALITY_E, QUALITY_F);
     }
 }

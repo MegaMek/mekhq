@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
 
@@ -35,14 +40,13 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.common.MekSummary;
 import megamek.common.enums.SkillLevel;
+import megamek.common.loaders.MekSummary;
 import megamek.logging.MMLogger;
 import mekhq.campaign.rating.IUnitRating;
 
 /**
- * Base class for unit generators containing common functionality.
- * Currently, only turret-related code.
+ * Base class for unit generators containing common functionality. Currently, only turret-related code.
  *
  * @author NickAragua
  */
@@ -50,13 +54,12 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
     private static final MMLogger logger = MMLogger.create(AbstractUnitGenerator.class);
 
     private Map<Integer, String> ratRatingMappings = null;
-    private TreeSet<Integer> turretRatYears = new TreeSet<>();
-    private Map<Integer, Map<String, String>> turretRatNames = new HashMap<>();
+    private final TreeSet<Integer> turretRatYears = new TreeSet<>();
+    private final Map<Integer, Map<String, String>> turretRatNames = new HashMap<>();
 
     /**
-     * Worker function to initialize the mapping between a numeric quality rating
-     * level
-     * and an alphabetic one (such as one used in the RATs)
+     * Worker function to initialize the mapping between a numeric quality rating level and an alphabetic one (such as
+     * one used in the RATs)
      */
     private void initializeRatRatingMappings() {
         // TODO : Switch this with a call to a new IUnitRating array
@@ -78,11 +81,12 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
      * @param skill       The skill level of the turret operator
      * @param quality     The quality level of the turret
      * @param currentYear The current year
+     *
      * @return List of turrets
      */
     @Override
     public List<MekSummary> generateTurrets(int num, SkillLevel skill, int quality, int currentYear) {
-        int ratYear;
+        Integer ratYear;
 
         // less dirty hack
         // we loop through the names of available turret RATs
@@ -94,7 +98,7 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
         // we can handle any number of them.
         initializeRatRatingMappings();
 
-        for (Iterator<String> rats = RandomUnitGenerator.getInstance().getRatList(); rats.hasNext();) {
+        for (Iterator<String> rats = RandomUnitGenerator.getInstance().getRatList(); rats.hasNext(); ) {
             String currentName = rats.next();
             if (currentName.contains("Turrets")) {
                 String turretQuality = currentName.substring(currentName.length() - 1);

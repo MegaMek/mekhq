@@ -24,18 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.unit;
 
-import megamek.common.Transporter;
+import java.util.Optional;
+
+import megamek.common.bays.Bay;
+import megamek.common.equipment.Transporter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.enums.TransporterType;
 
-import java.util.Optional;
-
 /**
- * Represents an assignment on a transport.
+ * Represents an assignment on transport.
+ *
  * @see ITransportedUnitsSummary
  * @see mekhq.campaign.enums.CampaignTransportType
  */
@@ -43,7 +50,7 @@ public interface ITransportAssignment {
 
     /**
      * The transport that is assigned
-     * @return
+     *
      */
     Unit getTransport();
 
@@ -55,37 +62,43 @@ public interface ITransportAssignment {
 
     /**
      * Where is this unit being transported?
+     *
      * @return The transporter this unit is in
      */
     Transporter getTransportedLocation();
 
     /**
      * Is this unit in a specific location?
+     *
      * @return true if it is
      */
     boolean hasTransportedLocation();
 
     /**
      * Convert location to hash to assist with saving/loading
+     *
      * @return hash int, or null if none
      */
     Optional<Integer> hashTransportedLocation();
 
     /**
      * After loading UnitRefs need converted to Units
-     * @see Unit#fixReferences(Campaign campaign)
+     *
      * @param campaign Campaign we need to fix references for
-     * @param unit Unit we need to fix references for
+     * @param unit     Unit we need to fix references for
+     *
+     * @see Unit#fixReferences(Campaign)
      */
     void fixReferences(Campaign campaign, Unit unit);
 
     /**
-     * Bays have some extra functionality other transporters don't have, like
-     * having a tech crew, which will matter for boarding actions against
-     * dropships and other Ship Transports. This method determines if this
-     * transport assignment is for a Bay.
+     * Bays have some extra functionality other transporters don't have, like having a tech crew, which will matter for
+     * boarding actions against dropships and other Ship Transports. This method determines if this transport assignment
+     * is for a Bay.
+     *
      * @return true if the unit is transported in a Bay or a subclass
-     * @see megamek.common.Bay
+     *
+     * @see Bay
      */
     boolean isTransportedInBay();
 

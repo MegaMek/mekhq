@@ -24,19 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.io;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
+import javax.imageio.ImageIO;
 
 import megamek.common.util.fileUtils.ImageFileFactory;
 import megamek.common.util.fileUtils.ItemFile;
 
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
-import java.util.Objects;
-
 /**
- * FIXME : I am a bandaid that allows award pngs to be loaded despite having features not supported by Java.
+ * FIXME : I am a band aid that allows award pngs to be loaded despite having features not supported by Java.
  * FIXME : I should be removed when that is fixed.
  */
 public class AwardFileFactory extends ImageFileFactory {
@@ -49,8 +54,9 @@ public class AwardFileFactory extends ImageFileFactory {
     /**
      * Get the <code>ItemFile</code> for the given <code>File</code>.
      *
-     * @param file The input <code>File</code> object that will be read to produce the item.
-     *             This value must not be <code>null</code>.
+     * @param file The input <code>File</code> object that will be read to produce the item. This value must not be
+     *             <code>null</code>.
+     *
      * @return an <code>ItemFile</code> for the given file.
      */
     @Override

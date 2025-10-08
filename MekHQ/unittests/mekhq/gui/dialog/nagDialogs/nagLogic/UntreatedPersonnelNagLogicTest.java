@@ -42,15 +42,13 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import megamek.common.EquipmentType;
-import megamek.logging.MMLogger;
+import megamek.common.equipment.EquipmentType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Systems;
 import mekhq.gui.dialog.nagDialogs.UntreatedPersonnelNagDialog;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,11 +72,6 @@ class UntreatedPersonnelNagLogicTest {
         EquipmentType.initializeTypes();
         SkillType.initializeTypes();
         Ranks.initializeRankSystems();
-        try {
-            Systems.setInstance(Systems.loadDefault());
-        } catch (Exception ex) {
-            MMLogger.create(UntreatedPersonnelNagLogicTest.class).error("", ex);
-        }
     }
 
     /**

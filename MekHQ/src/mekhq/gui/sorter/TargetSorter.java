@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.sorter;
 
@@ -37,7 +42,7 @@ import megamek.logging.MMLogger;
  * @author Jay Lawson
  */
 public class TargetSorter implements Comparator<String> {
-    private static final MMLogger logger = MMLogger.create(TargetSorter.class);
+    private static final MMLogger LOGGER = MMLogger.create(TargetSorter.class);
 
     @Override
     public int compare(String s0, String s1) {
@@ -60,7 +65,7 @@ public class TargetSorter implements Comparator<String> {
                 try {
                     r0 = Integer.parseInt(s0);
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                     r0 = Integer.MAX_VALUE - 1;
                 }
                 break;
@@ -80,7 +85,7 @@ public class TargetSorter implements Comparator<String> {
                 try {
                     r1 = Integer.parseInt(s1);
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                     r1 = Integer.MAX_VALUE - 1;
                 }
                 break;

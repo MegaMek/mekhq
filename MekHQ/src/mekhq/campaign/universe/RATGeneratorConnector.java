@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016 - Carl Spain. All rights reserved.
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
 
@@ -41,10 +46,10 @@ import megamek.client.ratgenerator.ModelRecord;
 import megamek.client.ratgenerator.Parameters;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ratgenerator.UnitTable;
-import megamek.common.EntityMovementMode;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 
 /**
@@ -53,7 +58,7 @@ import megamek.logging.MMLogger;
  * @author Neoancient
  */
 public class RATGeneratorConnector extends AbstractUnitGenerator {
-    private static final MMLogger logger = MMLogger.create(RATGeneratorConnector.class);
+    private static final MMLogger LOGGER = MMLogger.create(RATGeneratorConnector.class);
 
     /**
      * Initialize RATGenerator and load the data for the current game year
@@ -63,7 +68,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
         RATGenerator.getInstance().loadYear(year);
@@ -187,7 +192,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator {
                     FactionRecord newFaction = RATGenerator.getInstance().getFaction(factionCode);
                     if (newFaction == null) {
                         // No parent faction found
-                        logger.warn("Failed lookup of faction code '" + factionCode + "', skipping...");
+                        LOGGER.warn("Failed lookup of faction code '{}', skipping...", factionCode);
                         continue;
                     }
                     parameters.setFaction(RATGenerator.getInstance().getFaction(factionCode));

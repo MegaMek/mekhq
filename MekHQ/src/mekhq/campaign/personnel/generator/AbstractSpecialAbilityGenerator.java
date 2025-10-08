@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.generator;
 
@@ -35,36 +40,38 @@ import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 
 /**
- * Represents a class which can generate new Special Abilities
- * for a {@link Person}.
+ * Represents a class which can generate new Special Abilities for a {@link Person}.
  */
 public abstract class AbstractSpecialAbilityGenerator {
 
-    private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
+    private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
 
     /**
      * Gets the {@link RandomSkillPreferences}.
+     *
      * @return The {@link RandomSkillPreferences} to use.
      */
     public RandomSkillPreferences getSkillPreferences() {
-        return rskillPrefs;
+        return randomSkillPreferences;
     }
 
     /**
      * Sets the {@link RandomSkillPreferences}.
+     *
      * @param skillPreferences A {@link RandomSkillPreferences} to use.
      */
     public void setSkillPreferences(RandomSkillPreferences skillPreferences) {
-        rskillPrefs = Objects.requireNonNull(skillPreferences);
+        randomSkillPreferences = Objects.requireNonNull(skillPreferences);
     }
 
     /**
-     * Generates special abilities for the {@link Person} given their
-     * experience level.
+     * Generates special abilities for the {@link Person} given their experience level.
+     *
      * @param campaign The {@link Campaign} the person is a part of
-     * @param person The {@link Person} to add special abilities.
-     * @param expLvl The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
-     * @return A value indicating whether or not a special ability was assigned.
+     * @param person   The {@link Person} to add special abilities.
+     * @param expLvl   The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
+     *
+     * @return A value indicating whether a special ability was assigned.
      */
     public abstract boolean generateSpecialAbilities(Campaign campaign, Person person, int expLvl);
 }

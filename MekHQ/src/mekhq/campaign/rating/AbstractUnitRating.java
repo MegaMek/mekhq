@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.rating;
 
@@ -35,8 +40,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.*;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.bays.*;
 import megamek.common.enums.SkillLevel;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SpaceStation;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -171,7 +183,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
      */
     protected BigDecimal calcAverageExperience() {
         return hasUnits() ? getTotalSkillLevels().divide(getNumberUnits(), PRECISION, HALF_EVEN)
-                : BigDecimal.ZERO;
+                     : BigDecimal.ZERO;
     }
 
     /**
@@ -303,16 +315,16 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
         // Compute the score.
         BigDecimal scoredPercent = getTransportPercent().subtract(
-                new BigDecimal(50));
+              new BigDecimal(50));
         if (scoredPercent.compareTo(BigDecimal.ZERO) < 0) {
             return value;
         }
         BigDecimal percentageScore = scoredPercent.divide(new BigDecimal(10),
-                0,
-                RoundingMode.DOWN);
+              0,
+              RoundingMode.DOWN);
         value += percentageScore.multiply(new BigDecimal(5))
-                .setScale(0, RoundingMode.DOWN)
-                .intValue();
+                       .setScale(0, RoundingMode.DOWN)
+                       .intValue();
         value = Math.min(value, 25);
 
         // Only the highest of these values should be used, regardless of how
@@ -347,22 +359,15 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
     @Override
     public String getUnitRatingName(int rating) {
-        switch (rating) {
-            case DRAGOON_F:
-                return "F";
-            case DRAGOON_D:
-                return "D";
-            case DRAGOON_C:
-                return "C";
-            case DRAGOON_B:
-                return "B";
-            case DRAGOON_A:
-                return "A";
-            case DRAGOON_ASTAR:
-                return "A*";
-            default:
-                return "Unrated";
-        }
+        return switch (rating) {
+            case DRAGOON_F -> "F";
+            case DRAGOON_D -> "D";
+            case DRAGOON_C -> "C";
+            case DRAGOON_B -> "B";
+            case DRAGOON_A -> "A";
+            case DRAGOON_ASTAR -> "A*";
+            default -> "Unrated";
+        };
     }
 
     @Override
@@ -387,8 +392,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Calculates the weighted value of the unit based on if it is Infantry,
-     * Battle Armor or something else.
+     * Calculates the weighted value of the unit based on if it is Infantry, Battle Armor or something else.
      *
      * @param u The {@code Unit} to be evaluated.
      */
@@ -410,7 +414,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     /**
      * Returns the sum of all experience rating for all combat units.
      *
-     * @param canInit Whether or not this method may initialize the values
+     * @param canInit Whether this method may initialize the values
      */
     BigDecimal getTotalSkillLevels(boolean canInit) {
         if (canInit && !isInitialized()) {
@@ -439,8 +443,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     protected abstract int calculateUnitRatingScore();
 
     /**
-     * Recalculates the dragoons rating. If this has already been done, the
-     * initialized flag should already be set true
+     * Recalculates the dragoons rating. If this has already been done, the initialized flag should already be set true
      * and this method will immediately exit.
      */
     protected void initValues() {
@@ -490,11 +493,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Updates the count of storage bays that may be used in Interstellar transport
-     * (part of transport capacity calculations)
+     * Updates the count of storage bays that may be used in Interstellar transport (part of transport capacity
+     * calculations)
      *
-     * @param e is the unit that may or may not contain bays that need to be
-     *          included in the count
+     * @param e is the unit that may or may not contain bays that need to be included in the count
      */
     void updateBayCount(Entity e) {
         if (((e instanceof Jumpship) || (e instanceof Dropship)) && !(e instanceof SpaceStation)) {
@@ -517,7 +519,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
                     setBaBayCount(getBaBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof InfantryBay) {
                     setInfantryBayCount(getInfantryBayCount()
-                            + (int) Math.floor(bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
+                                              +
+                                              (int) Math.floor(bay.getCapacity() /
+                                                                     ((InfantryBay) bay).getPlatoonType().getWeight()));
                 }
             }
         }
@@ -693,11 +697,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Calculate the number of infantry "platoons" present in the company, based on
-     * the numbers
-     * of various infantry present. Per CamOps, the simplification is that an
-     * infantry cube can
-     * house 28 infantry.
+     * Calculate the number of infantry "platoons" present in the company, based on the numbers of various infantry
+     * present. Per CamOps, the simplification is that an infantry cube can house 28 infantry.
      *
      * @return Number of infantry "platoons" in the company.
      */
@@ -890,20 +891,20 @@ public abstract class AbstractUnitRating implements IUnitRating {
         this.transportPercent = transportPercent;
     }
 
-    void updateUnitCounts(Unit u) {
-        if (u.isMothballed()) {
+    void updateUnitCounts(Unit unit) {
+        if (unit.isMothballed()) {
             return;
         }
-        logger.debug("Adding " + u.getName() + " to unit counts.");
+        logger.debug("Adding {} to unit counts.", unit.getName());
 
-        Entity e = u.getEntity();
-        if (null == e) {
-            logger.debug("Unit " + u.getName() + " is not an Entity.  Skipping.");
+        Entity entity = unit.getEntity();
+        if (null == entity) {
+            logger.debug("Unit {} is not an Entity.  Skipping.", unit.getName());
             return;
         }
 
-        int unitType = e.getUnitType();
-        logger.debug("Unit " + u.getName() + " is a " + UnitType.getTypeDisplayableName(unitType));
+        int unitType = entity.getUnitType();
+        logger.debug("Unit {} is a {}", unit.getName(), UnitType.getTypeDisplayableName(unitType));
         // TODO : Add Airship when MegaMek supports it.
         switch (unitType) {
             case UnitType.MEK:
@@ -915,10 +916,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.GUN_EMPLACEMENT:
             case UnitType.VTOL:
             case UnitType.TANK:
-                logger.debug("Unit " + u.getName() + " weight is " + e.getWeight());
-                if (e.getWeight() <= 50f) {
+                logger.debug("Unit {} weight is {}", unit.getName(), entity.getWeight());
+                if (entity.getWeight() <= 50f) {
                     incrementLightVeeCount();
-                } else if (e.getWeight() <= 100f) {
+                } else if (entity.getWeight() <= 100f) {
                     incrementHeavyVeeCount();
                 } else {
                     incrementSuperHeavyVeeCount();
@@ -936,16 +937,16 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.JUMPSHIP:
                 incrementJumpShipCount();
                 break;
-            case UnitType.AEROSPACEFIGHTER:
+            case UnitType.AEROSPACE_FIGHTER:
             case UnitType.CONV_FIGHTER:
                 incrementFighterCount();
                 break;
             case UnitType.BATTLE_ARMOR:
                 incrementNumberBaSquads();
-                incrementBattleArmorCount(((BattleArmor) e).getSquadSize());
+                incrementBattleArmorCount(((BattleArmor) entity).getSquadSize());
                 break;
             case UnitType.INFANTRY:
-                Infantry i = (Infantry) e;
+                Infantry i = (Infantry) entity;
 
                 incrementInfantryCount(i.getSquadSize() * i.getSquadCount());
                 incrementInfantryUnitCount();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,30 +24,40 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
-
-import megamek.client.bot.princess.BehaviorSettingsFactory;
-import megamek.client.bot.princess.PrincessException;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.mission.*;
-import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
-import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
-import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
-import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 import java.util.ArrayList;
 import java.util.UUID;
 
+import megamek.client.bot.princess.BehaviorSettingsFactory;
+import megamek.client.bot.princess.PrincessException;
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ObjectiveEffect;
+import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
+import mekhq.campaign.mission.atb.AtBScenarioEnabled;
+
 @AtBScenarioEnabled
 public class ExtractionBuiltInScenario extends AtBScenario {
-    private static final MMLogger logger = MMLogger.create(ExtractionBuiltInScenario.class);
+    private static final MMLogger LOGGER = MMLogger.create(ExtractionBuiltInScenario.class);
 
     private static final String CIVILIAN_FORCE_ID = "Civilians";
 
@@ -68,7 +78,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         int enemyStart;
         int otherStart;
         int otherHome;
@@ -137,7 +147,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
                 addBotForce(bf, campaign);
             }
         } catch (PrincessException ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
@@ -147,7 +157,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 
         ScenarioObjective keepFriendliesAlive = null;
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
-                this);
+              this);
         ScenarioObjective destroyHostiles = null;
         ScenarioObjective civilianObjective;
 
@@ -170,7 +180,8 @@ public class ExtractionBuiltInScenario extends AtBScenario {
             bonusEffect.howMuch = 1;
             civilianObjective.addSuccessEffect(bonusEffect);
             civilianObjective.addDetail(String
-                    .format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"), bonusEffect.howMuch));
+                                              .format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"),
+                                                    bonusEffect.howMuch));
         } else {
             civilianObjective = CommonObjectiveFactory.getDestroyEnemies(CIVILIAN_FORCE_ID, 1, 100);
             civilianObjective.setTimeLimit(10);

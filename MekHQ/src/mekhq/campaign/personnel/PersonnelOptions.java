@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
 
@@ -50,7 +55,7 @@ import megamek.logging.MMLogger;
  * @author Neoancient
  */
 public class PersonnelOptions extends PilotOptions {
-    private static final MMLogger logger = MMLogger.create(PersonnelOptions.class);
+    private static final MMLogger LOGGER = MMLogger.create(PersonnelOptions.class);
 
     public static final String EDGE_MEDICAL = "edge_when_heal_crit_fail";
     public static final String EDGE_REPAIR_BREAK_PART = "edge_when_repair_break_part";
@@ -90,6 +95,10 @@ public class PersonnelOptions extends PilotOptions {
     public static final String ATOW_TECH_EMPATHY = "atow_tech_empathy";
     public static final String FLAW_TRANSIT_DISORIENTATION_SYNDROME = "flaw_transit_disorientation_syndrome";
     public static final String FLAW_ILLITERATE = "flaw_illiterate";
+    public static final String UNOFFICIAL_HOUDINI = "unofficial_houdini";
+    public static final String UNOFFICIAL_MASTER_IMPERSONATOR = "unofficial_master_impersonator";
+    public static final String UNOFFICIAL_COUNTERFEITER = "unofficial_counterfeiter";
+    public static final String UNOFFICIAL_NATURAL_THESPIAN = "unofficial_natural_thespian";
 
     public static final String DARK_SECRET_TRIVIAL = "dark_secret_trivial";
     public static final String DARK_SECRET_SIGNIFICANT = "dark_secret_significant";
@@ -180,18 +189,18 @@ public class PersonnelOptions extends PilotOptions {
 
         if (null == l3a) {
             // This really shouldn't happen.
-            logger.warn("Could not find L3Advantage group");
+            LOGGER.warn("Could not find L3Advantage group");
             l3a = addGroup("adv", PilotOptions.LVL3_ADVANTAGES);
         }
         if (null == edge) {
             // This really shouldn't happen.
-            logger.warn("Could not find edge group");
+            LOGGER.warn("Could not find edge group");
             edge = addGroup("edge", PilotOptions.EDGE_ADVANTAGES);
             addOption(edge, OptionsConstants.EDGE, 0);
         }
         if (null == md) {
             // This really shouldn't happen.
-            logger.warn("Could not find augmentation (MD) group");
+            LOGGER.warn("Could not find augmentation (MD) group");
             md = addGroup("md", PilotOptions.MD_ADVANTAGES);
         }
 
@@ -229,6 +238,10 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, ATOW_TECH_EMPATHY, false);
         addOption(l3a, FLAW_TRANSIT_DISORIENTATION_SYNDROME, false);
         addOption(l3a, FLAW_ILLITERATE, false);
+        addOption(l3a, UNOFFICIAL_HOUDINI, false);
+        addOption(l3a, UNOFFICIAL_MASTER_IMPERSONATOR, false);
+        addOption(l3a, UNOFFICIAL_COUNTERFEITER, false);
+        addOption(l3a, UNOFFICIAL_NATURAL_THESPIAN, false);
 
         addOption(l3a, DARK_SECRET_TRIVIAL, false);
         addOption(l3a, DARK_SECRET_SIGNIFICANT, false);
@@ -380,7 +393,7 @@ public class PersonnelOptions extends PilotOptions {
             case MADNESS_REGRESSION, MADNESS_HYSTERIA -> COMPULSION_CHECK_MODIFIER_SEVERE;
             case MADNESS_BERSERKER, MADNESS_CATATONIA -> COMPULSION_CHECK_MODIFIER_EXTREME;
             default -> {
-                logger.warn("Unexpected compulsion name provided: {}", name);
+                LOGGER.warn("Unexpected compulsion name provided: {}", name);
                 yield COMPULSION_CHECK_MODIFIER_TRIVIAL;
             }
         };
@@ -400,9 +413,9 @@ public class PersonnelOptions extends PilotOptions {
      */
     private static class PersonnelOptionsInfo extends AbstractOptionsInfo {
         private static boolean initialized = false;
-        private static AbstractOptionsInfo instance = new PersonnelOptionsInfo();
+        private static final AbstractOptionsInfo instance = new PersonnelOptionsInfo();
 
-        private Hashtable<String, IOptionInfo> optionsHash = new Hashtable<>();
+        private final Hashtable<String, IOptionInfo> optionsHash = new Hashtable<>();
 
         public static AbstractOptionsInfo getInstance() {
             if (!initialized) {
@@ -434,13 +447,8 @@ public class PersonnelOptions extends PilotOptions {
      *
      * @author Neoancient
      */
-    private static class PersonnelOptionInfo implements IOptionInfo {
-        private String name;
-        private static PilotOptions mmOptions = new PilotOptions();
-
-        public PersonnelOptionInfo(String name) {
-            this.name = name;
-        }
+    private record PersonnelOptionInfo(String name) implements IOptionInfo {
+        private static final PilotOptions mmOptions = new PilotOptions();
 
         @Override
         public String getDisplayableName() {

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.death;
 
+import static megamek.common.eras.EraFlag.STAR_LEAGUE;
 import static mekhq.campaign.personnel.enums.AgeGroup.ADULT;
 import static mekhq.campaign.personnel.enums.AgeGroup.BABY;
 import static mekhq.campaign.personnel.enums.AgeGroup.CHILD;
@@ -39,7 +40,6 @@ import static mekhq.campaign.personnel.enums.AgeGroup.ELDER;
 import static mekhq.campaign.personnel.enums.AgeGroup.PRETEEN;
 import static mekhq.campaign.personnel.enums.AgeGroup.TEENAGER;
 import static mekhq.campaign.personnel.enums.AgeGroup.TODDLER;
-import static mekhq.campaign.universe.enums.EraFlag.STAR_LEAGUE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -70,12 +70,12 @@ import org.junit.jupiter.api.Test;
  * Unit tests for the {@link RandomDeath} class.
  *
  * <p>This class contains a suite of tests that validate the functionality of various methods
- * in the {@code RandomDeath} class, including determining if a person can die, simulating
- * random deaths, processing weekly death events, and evaluating campaign-specific configurations.</p>
+ * in the {@code RandomDeath} class, including determining if a person can die, simulating random deaths, processing
+ * weekly death events, and evaluating campaign-specific configurations.</p>
  *
  * <p>These tests use mocked dependencies, such as {@link Person}, {@link Campaign}, and
- * {@link CampaignOptions}, to isolate the functionality of individual methods and ensure
- * accurate testing without requiring an entire campaign environment.</p>
+ * {@link CampaignOptions}, to isolate the functionality of individual methods and ensure accurate testing without
+ * requiring an entire campaign environment.</p>
  *
  * <p>Key Testing Scenarios:</p>
  * <ul>
@@ -100,13 +100,13 @@ public class RandomDeathTest {
     public void beforeAll() {
         // Prep Age Groups
         ageGroups = Map.of(
-            ELDER, true,
-            ADULT, false,
-            TEENAGER, true,
-            PRETEEN, true,
-            CHILD, true,
-            TODDLER, true,
-            BABY, true
+              ELDER, true,
+              ADULT, false,
+              TEENAGER, true,
+              PRETEEN, true,
+              CHILD, true,
+              TODDLER, true,
+              BABY, true
         );
 
         mockedCampaign = mock(Campaign.class);
@@ -120,7 +120,8 @@ public class RandomDeathTest {
         when(mockedCampaignOptions.getRandomDeathMultiplier()).thenReturn(1.0);
         when(mockedCampaign.getLocalDate()).thenReturn(mockedToday);
 
-        randomDeath = new RandomDeath(mockedCampaign);
+        randomDeath = new RandomDeath();
+        randomDeath.setCampaign(mockedCampaign);
     }
 
     @Test
@@ -208,7 +209,7 @@ public class RandomDeathTest {
         when(mockedCampaign.getLocalDate()).thenReturn(LocalDate.now());
 
         // Create the RandomDeath object normally, then spy on it
-        RandomDeath realRandomDeath = new RandomDeath(mockedCampaign) {
+        RandomDeath realRandomDeath = new RandomDeath() {
             @Override
             protected int randomInt(int bound) {
                 return 1000; // Simulate rolling a 1000
@@ -216,6 +217,7 @@ public class RandomDeathTest {
         };
 
         RandomDeath randomDeath = spy(realRandomDeath);
+        randomDeath.setCampaign(mockedCampaign);
 
         // Ensure mocked methods return valid results
         doReturn(1000.0).when(randomDeath).getBaseDeathChance(mockedPerson);
@@ -255,7 +257,7 @@ public class RandomDeathTest {
         when(mockedCampaign.getLocalDate()).thenReturn(LocalDate.now());
 
         // Create the RandomDeath object normally, then spy on it
-        RandomDeath realRandomDeath = new RandomDeath(mockedCampaign) {
+        RandomDeath realRandomDeath = new RandomDeath() {
             @Override
             protected int randomInt(int bound) {
                 return 1; // Simulate rolling a 1
@@ -263,6 +265,7 @@ public class RandomDeathTest {
         };
 
         RandomDeath randomDeath = spy(realRandomDeath); // Spy on the real object
+        randomDeath.setCampaign(mockedCampaign);
 
         // Ensure mocked methods return valid results
         doReturn(1000.0).when(randomDeath).getBaseDeathChance(mockedPerson);

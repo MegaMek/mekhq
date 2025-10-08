@@ -39,13 +39,13 @@ import java.awt.Insets;
 import java.util.ArrayList;
 import javax.swing.*;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
-import megamek.common.Entity;
-import megamek.common.MekSummaryCache;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -58,7 +58,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  * @author Taharqa
  */
 public class LootDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(LootDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(LootDialog.class);
 
     private final JFrame frame;
     private final Loot loot;
@@ -67,13 +67,9 @@ public class LootDialog extends JDialog {
     private final ArrayList<Part> parts;
     private final Campaign campaign;
 
-    private JButton btnOK;
-    private JButton btnCancel;
     private JTextField txtName;
     private JSpinner spnCash;
-    private JButton btnAddUnit;
     private JButton btnRemoveUnit;
-    private JButton btnAddPart;
     private JButton btnRemovePart;
     private JList<String> listUnits;
     private JList<String> listParts;
@@ -99,11 +95,11 @@ public class LootDialog extends JDialog {
     private void initComponents() {
 
         txtName = new JTextField();
-        btnOK = new JButton("Done");
-        btnCancel = new JButton("Cancel");
-        btnAddUnit = new JButton("Add");
+        JButton btnOK = new JButton("Done");
+        JButton btnCancel = new JButton("Cancel");
+        JButton btnAddUnit = new JButton("Add");
         btnRemoveUnit = new JButton("Remove");
-        btnAddPart = new JButton("Add");
+        JButton btnAddPart = new JButton("Add");
         btnRemovePart = new JButton("Remove");
         listUnits = new JList<>(new DefaultListModel<>());
         listParts = new JList<>(new DefaultListModel<>());
@@ -275,7 +271,7 @@ public class LootDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

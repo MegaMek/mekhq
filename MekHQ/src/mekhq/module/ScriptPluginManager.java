@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.module;
 
@@ -33,7 +38,6 @@ import java.io.Reader;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
@@ -42,16 +46,14 @@ import megamek.logging.MMLogger;
 import mekhq.module.api.MekHQModule;
 
 /**
- * Manages plugins requiring interpretation by a scripting engine. As scripts
- * are encountered while
- * parsing the plugins directory they are converted to instances of the
- * MekHQModule interface for
- * use by the various specific module managers.
+ * Manages plugins requiring interpretation by a scripting engine. As scripts are encountered while parsing the plugins
+ * directory they are converted to instances of the MekHQModule interface for use by the various specific module
+ * managers.
  *
  * @author Neoancient
  */
 public class ScriptPluginManager {
-    private static final MMLogger logger = MMLogger.create(ScriptPluginManager.class);
+    private static final MMLogger LOGGER = MMLogger.create(ScriptPluginManager.class);
 
     private static ScriptPluginManager instance;
 
@@ -89,7 +91,7 @@ public class ScriptPluginManager {
     private void addModule(File script, String extension) {
         ScriptEngine engine = scriptEngineManager.getEngineByExtension(extension);
         if (null == engine) {
-            logger.warn("Could not find script engine for extension " + extension);
+            LOGGER.warn("Could not find script engine for extension {}", extension);
             return;
         }
         try (Reader fileReader = new FileReader(script)) {
@@ -101,7 +103,7 @@ public class ScriptPluginManager {
                 }
             }
         } catch (Exception e) {
-            logger.error("While parsing script " + script.getName(), e);
+            LOGGER.error("While parsing script {}", script.getName(), e);
         }
     }
 
@@ -109,10 +111,10 @@ public class ScriptPluginManager {
     private static void listEngines() {
         ScriptEngineManager mgr = new ScriptEngineManager(PluginManager.getInstance().getClassLoader());
         for (ScriptEngineFactory engine : mgr.getEngineFactories()) {
-            logger.info("Engine: " + engine.getEngineName());
-            logger.info("\tVersion: " + engine.getEngineVersion());
-            logger.info("\tAlias: " + engine.getNames());
-            logger.info("\tLanguage name: " + engine.getLanguageName() + "\n");
+            LOGGER.info("Engine: {}", engine.getEngineName());
+            LOGGER.info("\tVersion: {}", engine.getEngineVersion());
+            LOGGER.info("\tAlias: {}", engine.getNames());
+            LOGGER.info("\tLanguage name: {}\n", engine.getLanguageName());
         }
     }
 }

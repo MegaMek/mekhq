@@ -68,7 +68,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * It is primarily composed of multiple `JPanel` sections organized using `GroupLayout` for modularity and clarity.
  */
 public class FinancesTab {
-    private final Campaign campaign;
     private final CampaignOptions campaignOptions;
 
     //start General Options
@@ -150,7 +149,6 @@ public class FinancesTab {
      *                 campaign-related options and data.
      */
     public FinancesTab(Campaign campaign) {
-        this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
 
         initialize();
@@ -849,7 +847,7 @@ public class FinancesTab {
 
         // General Options
         options.setLoanLimits(useLoanLimitsBox.isSelected());
-        options.setUsePercentageMaint(usePercentageMaintenanceBox.isSelected());
+        options.setUsePercentageMaintenance(usePercentageMaintenanceBox.isSelected());
         options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
         options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
         options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
@@ -916,7 +914,7 @@ public class FinancesTab {
 
         // General Options
         useLoanLimitsBox.setSelected(options.isUseLoanLimits());
-        usePercentageMaintenanceBox.setSelected(options.isUsePercentageMaint());
+        usePercentageMaintenanceBox.setSelected(options.isUsePercentageMaintenance());
         useExtendedPartsModifierBox.setSelected(options.isUseExtendedPartsModifier());
         usePeacetimeCostBox.setSelected(options.isUsePeacetimeCost());
         showPeacetimeCostBox.setSelected(options.isShowPeacetimeCost());

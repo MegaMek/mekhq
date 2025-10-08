@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel.procreation;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
@@ -47,9 +47,10 @@ public class RandomProcreation extends AbstractProcreation {
     //endregion Variable Declarations
 
     //region Constructors
+
     /**
-     * Constructor to create a {@link RandomProcreation} object. This object is used to manage
-     * randomly determined procreation events within the game's campaign.
+     * Constructor to create a {@link RandomProcreation} object. This object is used to manage randomly determined
+     * procreation events within the game's campaign.
      *
      * @param options the campaign settings.
      */
@@ -61,9 +62,10 @@ public class RandomProcreation extends AbstractProcreation {
     //endregion Constructors
 
     //region Getters/Setters
+
     /**
-     * Sets the size of the relationship die.
-     * The relationship die size determines the probability of procreation for a person who has a spouse.
+     * Sets the size of the relationship die. The relationship die size determines the probability of procreation for a
+     * person who has a spouse.
      *
      * @param relationshipDieSize the size of the relationship die
      */
@@ -72,9 +74,8 @@ public class RandomProcreation extends AbstractProcreation {
     }
 
     /**
-     * Sets the size of the relationshipless die.
-     * The relationship die size determines the probability of procreation for a person who does not
-     * have a spouse.
+     * Sets the size of the relationshipless die. The relationship die size determines the probability of procreation
+     * for a person who does not have a spouse.
      *
      * @param relationshiplessDieSize the size of the relationship die
      */

@@ -55,7 +55,7 @@ public class ResupplyConvoyChoice {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ResupplyConvoyChoice";
 
     /** Type of response chosen in the dialog. */
-    private ConvoyResponseType responseType = ConvoyResponseType.CANCEL;
+    private final ConvoyResponseType responseType;
 
     /**
      * Enum representing the possible responses to the resupply convoy dialog.
@@ -100,7 +100,7 @@ public class ResupplyConvoyChoice {
      * @since 0.50.07
      */
     public ResupplyConvoyChoice(Campaign campaign, boolean isForcedPlayerConvoy, int enhancedTonnage,
-          int normalTonnage, int availableCargoSpace, String moraleString) {
+          int normalTonnage, double availableCargoSpace, String moraleString) {
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT),
               null,
@@ -134,7 +134,7 @@ public class ResupplyConvoyChoice {
      * @since 0.50.07
      */
     private String getInCharacterMessage(boolean isForcedPlayerConvoy, String commanderAddress, int enhancedTonnage,
-          int normalTonnage, int availableCargoSpace) {
+          int normalTonnage, double availableCargoSpace) {
         String key;
 
         if (isForcedPlayerConvoy) {

@@ -40,7 +40,6 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
 
-import megamek.logging.MMLogger;
 import mekhq.gui.dialog.glossary.NewGlossaryDialog;
 
 /**
@@ -56,7 +55,6 @@ import mekhq.gui.dialog.glossary.NewGlossaryDialog;
  * @since 0.50.06
  */
 public class TutorialHyperlinkPanel extends JPanel {
-    private static final MMLogger LOGGER = MMLogger.create(TutorialHyperlinkPanel.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.TutorialHyperlinkPanel";
 
     /** Command string key indicating a glossary lookup request in a hyperlink event. */
@@ -67,6 +65,7 @@ public class TutorialHyperlinkPanel extends JPanel {
      *
      * <p>Displays HTML-formatted, centered text with hyperlinks on a transparent background. Hyperlinks are handled by
      * {@link NewGlossaryDialog#handleGlossaryHyperlinkClick(JDialog, HyperlinkEvent)}.</p>
+     *
      * @param key The resource key used to look up the tutorial/instructional text for display.
      *
      * @author Illiani

@@ -44,9 +44,9 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
  * A dialog class used to notify players about HR Strain in their campaign.
  *
  * <p>The {@code HRStrainNagDialog} extends {@link ImmersiveDialogNag} and provides a specialized
- * nag dialog specifically intended to alert players when HR Strain occurs. It utilizes predefined
- * parameters such as the "HR" specialization, the "NAG_HR_STRAIN" constant, and a specific message key to display
- * relevant information to the player.</p>
+ * nag dialog specifically intended to alert players when HR Strain occurs. It utilizes predefined parameters such as
+ * the "HR" specialization, the "NAG_HR_STRAIN" constant, and a specific message key to display relevant information to
+ * the player.</p>
  */
 public class HRStrainNagDialog extends ImmersiveDialogNag {
 
@@ -55,8 +55,8 @@ public class HRStrainNagDialog extends ImmersiveDialogNag {
      *
      * <p>This constructor sets up the nag dialog using predefined parameters specific to administrative
      * strain scenarios. It passes the {@code HR} specialization to highlight administrators relevant to human resources
-     * and uses the {@code NAG_HR_STRAIN} constant for suppression control. The {@code "HRStrainNagDialog"}
-     * message key is used to retrieve localized message content.</p>
+     * and uses the {@code NAG_HR_STRAIN} constant for suppression control. The {@code "HRStrainNagDialog"} message key
+     * is used to retrieve localized message content.</p>
      *
      * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
      *                 settings required for dialog construction.
@@ -77,7 +77,7 @@ public class HRStrainNagDialog extends ImmersiveDialogNag {
      *     <li>The campaign's HR Strain level is above 0.</li>
      * </ul>
      *
-     * @param isUseTurnover    {@code true} if turnover-based checks are enabled, {@code false} otherwise.
+     * @param isUseTurnover {@code true} if turnover-based checks are enabled, {@code false} otherwise.
      * @param isUseHRStrain {@code true} if HR Strain checks are enabled, {@code false} otherwise.
      * @param hrStrainLevel The current level of HR Strain in the campaign.
      *
@@ -91,7 +91,7 @@ public class HRStrainNagDialog extends ImmersiveDialogNag {
     }
 
     @Deprecated(since = "0.50.07", forRemoval = true)
-    public class AdminStrainNagDialog extends HRStrainNagDialog {
+    public static class AdminStrainNagDialog extends HRStrainNagDialog {
         public AdminStrainNagDialog(Campaign campaign) {
             super(campaign);
         }

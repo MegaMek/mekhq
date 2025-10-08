@@ -24,12 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
 import java.awt.Component;
 import java.util.List;
-
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
@@ -72,20 +76,14 @@ public class ObjectiveTableModel extends AbstractTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case COL_CRITERION:
-                return "Type";
-            case COL_AMOUNT:
-                return "Amount";
-            case COL_TIME:
-                return "Time limits";
-            case COL_SUCCESS_EFFECT:
-                return "On Success";
-            case COL_FAILURE_EFFECT:
-                return "On Failure";
-            default:
-                return "?";
-        }
+        return switch (column) {
+            case COL_CRITERION -> "Type";
+            case COL_AMOUNT -> "Amount";
+            case COL_TIME -> "Time limits";
+            case COL_SUCCESS_EFFECT -> "On Success";
+            case COL_FAILURE_EFFECT -> "On Failure";
+            default -> "?";
+        };
     }
 
     public void addObjective(ScenarioObjective objective) {
@@ -107,16 +105,16 @@ public class ObjectiveTableModel extends AbstractTableModel {
                 return objective.getObjectiveCriterion().toString();
             case COL_AMOUNT:
                 return objective.getAmountType().equals(ObjectiveAmountType.Percentage)
-                        ? objective.getPercentage() + "%"
-                        : objective.getAmount() + " units";
+                             ? objective.getPercentage() + "%"
+                             : objective.getAmount() + " units";
             case COL_TIME:
                 if (objective.getTimeLimitType().equals(TimeLimitType.None)) {
                     return "None";
                 }
                 String timeDirection = objective.isTimeLimitAtMost() ? "At most " : "At least ";
                 return objective.getTimeLimitType().equals(TimeLimitType.Fixed)
-                        ? timeDirection + objective.getTimeLimit() + " turns"
-                        : timeDirection + '(' + objective.getTimeLimitScaleFactor() + "x unit count) turns";
+                             ? timeDirection + objective.getTimeLimit() + " turns"
+                             : timeDirection + '(' + objective.getTimeLimitScaleFactor() + "x unit count) turns";
             case COL_SUCCESS_EFFECT:
                 return objective.getSuccessEffects().size() + " Effect(s)";
             case COL_FAILURE_EFFECT:
@@ -131,17 +129,11 @@ public class ObjectiveTableModel extends AbstractTableModel {
     }
 
     public int getColumnWidth(int c) {
-        switch (c) {
-            default:
-                return 20;
-        }
+        return 20;
     }
 
     public int getAlignment(int col) {
-        switch (col) {
-            default:
-                return SwingConstants.LEFT;
-        }
+        return SwingConstants.LEFT;
     }
 
     public String getTooltip(int row, int col) {
@@ -190,8 +182,8 @@ public class ObjectiveTableModel extends AbstractTableModel {
     public class Renderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus,
-                int row, int column) {
+              boolean isSelected, boolean hasFocus,
+              int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             int actualCol = table.convertColumnIndexToModel(column);

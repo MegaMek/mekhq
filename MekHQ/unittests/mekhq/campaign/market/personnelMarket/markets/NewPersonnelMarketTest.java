@@ -57,7 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
@@ -81,7 +81,7 @@ class NewPersonnelMarketTest {
 
     @Test
     void testGetMarketEntriesAsList_EmptyCase() {
-        NewPersonnelMarket personnelMarket = new NewPersonnelMarket(null);
+        NewPersonnelMarket personnelMarket = new NewPersonnelMarket();
         Map<PersonnelRole, PersonnelMarketEntry> marketEntries = Map.of();
 
         List<PersonnelMarketEntry> sortedList = personnelMarket.getMarketEntriesAsList(marketEntries);
@@ -91,7 +91,7 @@ class NewPersonnelMarketTest {
 
     @Test
     void testGetMarketEntriesAsList_SingleEntry() {
-        NewPersonnelMarket personnelMarket = new NewPersonnelMarket(null);
+        NewPersonnelMarket personnelMarket = new NewPersonnelMarket();
         Map<PersonnelRole, PersonnelMarketEntry> marketEntries = Map.of(DOCTOR, marketEntryDoctor);
         List<PersonnelRole> expectedOrder = List.of(DOCTOR);
 
@@ -105,7 +105,7 @@ class NewPersonnelMarketTest {
 
     @Test
     void testGetMarketEntriesAsList_NormalMixedCase() {
-        NewPersonnelMarket personnelMarket = new NewPersonnelMarket(null);
+        NewPersonnelMarket personnelMarket = new NewPersonnelMarket();
         Map<PersonnelRole, PersonnelMarketEntry> marketEntries = Map.of(DOCTOR,
               marketEntryDoctor,
               MEKWARRIOR,
@@ -125,7 +125,7 @@ class NewPersonnelMarketTest {
     @Test
     void testSanitizeMarketEntries_removesEntriesWithNonPositiveWeight() {
         // Setup
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
 
         Map<PersonnelRole, PersonnelMarketEntry> marketEntries = new HashMap<>();
         marketEntries.put(PersonnelRole.DOCTOR, entry(PersonnelRole.DOCTOR, -2, 4));
@@ -144,7 +144,7 @@ class NewPersonnelMarketTest {
     @Test
     void testSanitizeMarketEntries_removesEntriesWithNonPositiveCount() {
         // Setup
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
 
         Map<PersonnelRole, PersonnelMarketEntry> marketEntries = new HashMap<>();
         marketEntries.put(PersonnelRole.DOCTOR, entry(PersonnelRole.DOCTOR, 2, -4));
@@ -163,7 +163,7 @@ class NewPersonnelMarketTest {
     @Test
     void testSanitizeMarketEntries_removesEntryWithBothWeightAndCountZeroOrNegative() {
         // Setup
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
 
         Map<PersonnelRole, PersonnelMarketEntry> marketEntries = new HashMap<>();
         marketEntries.put(PersonnelRole.DOCTOR, entry(PersonnelRole.DOCTOR, -2, -4));
@@ -182,7 +182,7 @@ class NewPersonnelMarketTest {
     @Test
     void testSanitizeMarketEntries_preservesAllValidEntries() {
         // Setup
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
 
         Map<PersonnelRole, PersonnelMarketEntry> marketEntries = new HashMap<>();
         marketEntries.put(DOCTOR, entry(DOCTOR, 2, 4));
@@ -199,7 +199,7 @@ class NewPersonnelMarketTest {
     @Test
     void testSanitizeMarketEntries_removesOnlyInvalidEntriesMixed() {
         // Setup
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
 
         Map<PersonnelRole, PersonnelMarketEntry> marketEntries = new HashMap<>();
         marketEntries.put(DOCTOR, entry(DOCTOR, -2, 4));
@@ -226,7 +226,7 @@ class NewPersonnelMarketTest {
     @Test
     void testSanitizeMarketEntries_handlesEmptyMap() {
         // Setup
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
 
         Map<PersonnelRole, PersonnelMarketEntry> marketEntries = new HashMap<>();
 
@@ -246,7 +246,7 @@ class NewPersonnelMarketTest {
         // Act
         try (MockedStatic<Compute> mockedRandom = mockStatic(Compute.class)) {
             mockedRandom.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
-            NewPersonnelMarket market = spy(new NewPersonnelMarket(null));
+            NewPersonnelMarket market = spy(new NewPersonnelMarket());
             PersonnelMarketEntry result = market.pickEntry(marketEntries);
 
             // Assert
@@ -256,7 +256,7 @@ class NewPersonnelMarketTest {
 
     @Test
     void testPickEntry_emptyListReturnsNull() {
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
         assertNull(market.pickEntry(List.of()));
     }
 
@@ -265,7 +265,7 @@ class NewPersonnelMarketTest {
         // Setup
         PersonnelMarketEntry zeroDoctor = entry(DOCTOR, 0, 1);
         PersonnelMarketEntry negativeMekWarrior = entry(MEKWARRIOR, -1, 1);
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
 
         // Act
         PersonnelMarketEntry pick = market.pickEntry(List.of(zeroDoctor, negativeMekWarrior));
@@ -278,7 +278,7 @@ class NewPersonnelMarketTest {
     void testPickEntry_singlePositiveEntryAlwaysPicked() {
         // Setup
         try (MockedStatic<Compute> mockedRandom = mockStatic(Compute.class)) {
-            NewPersonnelMarket market = new NewPersonnelMarket(null);
+            NewPersonnelMarket market = new NewPersonnelMarket();
             mockedRandom.when(() -> Compute.randomInt(1)).thenReturn(0);
 
             PersonnelMarketEntry negativeMekWarrior = entry(MEKWARRIOR, -1, 1);
@@ -296,7 +296,7 @@ class NewPersonnelMarketTest {
     void testPickEntry_multiplePositiveEntriesEachPickable(int randomValue, String expectedEntryKey) {
         // Setup
         List<PersonnelMarketEntry> entries = List.of(marketEntryAdminHR, marketEntryDoctor, marketEntryMekWarrior);
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
 
         // Act
         try (MockedStatic<Compute> mockedRandom = mockStatic(Compute.class)) {
@@ -318,7 +318,7 @@ class NewPersonnelMarketTest {
         PersonnelMarketEntry weightedMekWarrior = entry(MEKWARRIOR, 10, 1);
         List<PersonnelMarketEntry> entries = List.of(weightedMekWarrior, zeroDoctor);
 
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
 
         // Act
         try (MockedStatic<Compute> mockedRandom = mockStatic(Compute.class)) {
@@ -339,7 +339,7 @@ class NewPersonnelMarketTest {
 
         List<PersonnelMarketEntry> entries = List.of(weightedMekWarrior, negativeCountDoctor, zeroCountLAMPilot);
 
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
 
         // Act
         try (MockedStatic<Compute> mockedRandom = mockStatic(Compute.class)) {
@@ -366,7 +366,7 @@ class NewPersonnelMarketTest {
               negativeWeightProtoMekPilot,
               zeroWeightAdmin);
 
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
 
         // Act
         try (MockedStatic<Compute> mockedRandom = mockStatic(Compute.class)) {
@@ -380,7 +380,7 @@ class NewPersonnelMarketTest {
     @Test
     void generateSingleApplicant_returnNullForNoPick() {
         // Setup
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
 
         // Act
         Person applicant = market.generateSingleApplicant(new HashMap<>(), List.of());
@@ -392,7 +392,7 @@ class NewPersonnelMarketTest {
     @Test
     void vetEntryForIntroductionAndExtinctionYears_returnNullIfOutOfIterations() {
         // Setup
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
         market.setGameYear(9999);
 
         PersonnelMarketEntry impossibleSoldier = new PersonnelMarketEntry(1, SOLDIER, 1, 3050, 3100, SOLDIER);
@@ -410,7 +410,7 @@ class NewPersonnelMarketTest {
     @Test
     void vetEntryForIntroductionAndExtinctionYears_introductionYearMatchesCurrentYear() {
         // Setup
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
         market.setGameYear(3050);
 
         PersonnelMarketEntry soldier = new PersonnelMarketEntry(1, SOLDIER, 1, 3050, 3100, DEPENDENT);
@@ -427,7 +427,7 @@ class NewPersonnelMarketTest {
     @Test
     void vetEntryForIntroductionAndExtinctionYears_introductionYearBeforeCurrentYearExtinctionYearAfterCurrentYear() {
         // Setup
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
         market.setGameYear(3051);
 
         PersonnelMarketEntry soldier = new PersonnelMarketEntry(1, SOLDIER, 1, 3050, 3100, DEPENDENT);
@@ -444,7 +444,7 @@ class NewPersonnelMarketTest {
     @Test
     void vetEntryForIntroductionAndExtinctionYears_introductionYearAfterCurrentYear() {
         // Setup
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
         market.setGameYear(3049);
 
         PersonnelMarketEntry soldier = new PersonnelMarketEntry(1, SOLDIER, 1, 3050, 3100, DEPENDENT);
@@ -461,7 +461,7 @@ class NewPersonnelMarketTest {
     @Test
     void vetEntryForIntroductionAndExtinctionYears_currentYearEqualsExtinctionYear() {
         // Setup
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
         market.setGameYear(3100);
 
         PersonnelMarketEntry soldier = new PersonnelMarketEntry(1, SOLDIER, 1, 3050, 3100, DEPENDENT);
@@ -478,7 +478,7 @@ class NewPersonnelMarketTest {
     @Test
     void vetEntryForIntroductionAndExtinctionYears_currentYearAfterExtinctionYear() {
         // Setup
-        NewPersonnelMarket market = new NewPersonnelMarket(null);
+        NewPersonnelMarket market = new NewPersonnelMarket();
         market.setGameYear(3101);
 
         PersonnelMarketEntry soldier = new PersonnelMarketEntry(1, SOLDIER, 1, 3050, 3100, DEPENDENT);
@@ -497,7 +497,8 @@ class NewPersonnelMarketTest {
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
-        NewPersonnelMarket market = new NewPersonnelMarket(mockCampaign);
+        NewPersonnelMarket market = new NewPersonnelMarket();
+        market.setCampaign(mockCampaign);
         market.setGameYear(3050);
 
         Faction faction = new Faction();
@@ -528,7 +529,8 @@ class NewPersonnelMarketTest {
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
-        NewPersonnelMarket market = new NewPersonnelMarket(mockCampaign);
+        NewPersonnelMarket market = new NewPersonnelMarket();
+        market.setCampaign(mockCampaign);
         market.setGameYear(3050);
 
         Faction faction = new Faction();

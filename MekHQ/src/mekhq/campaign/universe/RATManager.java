@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016 - Carl Spain. All Rights Reserved.
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
 
@@ -32,40 +37,37 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.*;
 import java.util.function.Predicate;
-
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ratgenerator.MissionRole;
+import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.event.Subscribe;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
+import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ratgenerator.MissionRole;
-import megamek.common.Compute;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
-import megamek.common.annotations.Nullable;
-import megamek.common.event.Subscribe;
-import megamek.logging.MMLogger;
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
-import mekhq.campaign.event.OptionsChangedEvent;
-import mekhq.utilities.MHQXMLUtility;
-
 /**
- * Provides a front end to RandomUnitGenerator that allows the user to generate
- * units
- * based on criteria such as faction, unit type, and weight class. May be
- * restricted to
- * a certain subset of all available RATs.
+ * Provides a front end to RandomUnitGenerator that allows the user to generate units based on criteria such as faction,
+ * unit type, and weight class. May be restricted to a certain subset of all available RATs.
  *
  * @author Neoancient
+ * @deprecated No longer in use
  */
+@Deprecated(since = "0.50.07", forRemoval = true)
 public class RATManager extends AbstractUnitGenerator {
-    private static final MMLogger logger = MMLogger.create(RATManager.class);
+    private static final MMLogger LOGGER = MMLogger.create(RATManager.class);
 
     // allRATs.get(collectionName).get(era); eras are sorted from latest to earliest
     private final Map<String, LinkedHashMap<Integer, List<RAT>>> allRATs;
@@ -138,7 +140,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     private boolean loadCollection(String name) {
         if (!fileNames.containsKey(name)) {
-            logger.error("RAT collection " + name + " not found in " + MHQConstants.RATINFO_DIR);
+            LOGGER.error("RAT collection {} not found in " + MHQConstants.RAT_INFO_DIR, name);
             return false;
         }
         /* Need RUG to be loaded for validation */
@@ -146,10 +148,10 @@ public class RATManager extends AbstractUnitGenerator {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
-        File f = new File(MHQConstants.RATINFO_DIR, fileNames.get(name));
+        File f = new File(MHQConstants.RAT_INFO_DIR, fileNames.get(name));
 
         Document xmlDoc;
         DocumentBuilder db;
@@ -158,7 +160,7 @@ public class RATManager extends AbstractUnitGenerator {
             db = MHQXMLUtility.newSafeDocumentBuilder();
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            logger.error("While loading RAT info from " + f.getName() + ": ", ex);
+            LOGGER.error("While loading RAT info from {}: ", f.getName(), ex);
             return false;
         }
 
@@ -183,16 +185,16 @@ public class RATManager extends AbstractUnitGenerator {
                             allRATs.get(name).put(era, new ArrayList<>());
                             parseEraNode(eraNode, name, era);
                         } catch (NumberFormatException ex) {
-                            logger.error("Could not parse year " + year + " in " + name);
+                            LOGGER.error("Could not parse year {} in {}", year, name);
                         }
                     } else {
-                        logger.error("year attribute not found for era in RAT collection " + name);
+                        LOGGER.error("year attribute not found for era in RAT collection {}", name);
                     }
                 }
             }
             return !allRATs.get(name).isEmpty();
         } else {
-            logger.error("source attribute not found for RAT data in " + f.getName());
+            LOGGER.error("source attribute not found for RAT data in {}", f.getName());
             return false;
         }
     }
@@ -223,59 +225,61 @@ public class RATManager extends AbstractUnitGenerator {
     }
 
     /**
-     * Scans ratdata directory for list of available RATs that can be used by
-     * CampaignOptions
-     * to provide a list.
+     * Scans RatData directory for list of available RATs that can be used by CampaignOptions to provide a list.
      */
     public static void populateCollectionNames() {
         allCollections = new HashMap<>();
 
-        File dir = new File(MHQConstants.RATINFO_DIR);
+        File dir = new File(MHQConstants.RAT_INFO_DIR);
         if (!dir.isDirectory()) {
-            logger.error("Ratinfo directory not found");
+            LOGGER.error("RatInfo directory not found");
             return;
         }
 
-        for (File f : dir.listFiles()) {
-            if (!f.getName().endsWith(".xml")) {
-                continue;
-            }
-            Document xmlDoc;
-            try (FileInputStream fis = new FileInputStream(f)) {
-                xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(fis);
-            } catch (Exception ex) {
-                logger.error("While loading RAT info from " + f.getName() + ": ", ex);
-                continue;
-            }
-            Element elem = xmlDoc.getDocumentElement();
-            NodeList nl = elem.getChildNodes();
-            elem.normalize();
+        File[] files = dir.listFiles();
 
-            String name;
-            List<Integer> eras = new ArrayList<>();
+        if (files != null) {
+            for (File f : files) {
+                if (!f.getName().endsWith(".xml")) {
+                    continue;
+                }
+                Document xmlDoc;
+                try (FileInputStream fis = new FileInputStream(f)) {
+                    xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(fis);
+                } catch (Exception ex) {
+                    LOGGER.error("While loading RAT info from {}: ", f.getName(), ex);
+                    continue;
+                }
+                Element elem = xmlDoc.getDocumentElement();
+                NodeList nl = elem.getChildNodes();
+                elem.normalize();
 
-            if (elem.getAttributes().getNamedItem("source") != null) {
-                name = elem.getAttributes().getNamedItem("source").getTextContent();
-                for (int j = 0; j < nl.getLength(); j++) {
-                    Node eraNode = nl.item(j);
-                    if (eraNode.getNodeName().equalsIgnoreCase("era")) {
-                        String year = eraNode.getAttributes().getNamedItem("year").getTextContent();
-                        if (year != null) {
-                            try {
-                                eras.add(Integer.parseInt(year));
-                            } catch (NumberFormatException ex) {
-                                logger.error("Could not parse year " + year + " in " + f.getName());
+                String name;
+                List<Integer> eras = new ArrayList<>();
+
+                if (elem.getAttributes().getNamedItem("source") != null) {
+                    name = elem.getAttributes().getNamedItem("source").getTextContent();
+                    for (int j = 0; j < nl.getLength(); j++) {
+                        Node eraNode = nl.item(j);
+                        if (eraNode.getNodeName().equalsIgnoreCase("era")) {
+                            String year = eraNode.getAttributes().getNamedItem("year").getTextContent();
+                            if (year != null) {
+                                try {
+                                    eras.add(Integer.parseInt(year));
+                                } catch (NumberFormatException ex) {
+                                    LOGGER.error("Could not parse year {} in {}", year, f.getName());
+                                }
+                            } else {
+                                LOGGER.error("year attribute not found for era in {}", f.getName());
                             }
-                        } else {
-                            logger.error("year attribute not found for era in " + f.getName());
                         }
                     }
+                    fileNames.put(name, f.getName());
+                    Collections.sort(eras);
+                    allCollections.put(name, eras);
+                } else {
+                    LOGGER.error("source attribute not found for RAT data in {}", f.getName());
                 }
-                fileNames.put(name, f.getName());
-                Collections.sort(eras);
-                allCollections.put(name, eras);
-            } else {
-                logger.error("source attribute not found for RAT data in " + f.getName());
             }
         }
     }
@@ -293,8 +297,8 @@ public class RATManager extends AbstractUnitGenerator {
                 }
                 for (String f : factionList) {
                     Optional<RAT> match = collection.get(era).stream()
-                            .filter(rat -> rat.matches(f, unitType, weightClass, quality))
-                            .findFirst();
+                                                .filter(rat -> rat.matches(f, unitType, weightClass, quality))
+                                                .findFirst();
                     if (match.isPresent()) {
                         return match.get();
                     }
@@ -313,8 +317,8 @@ public class RATManager extends AbstractUnitGenerator {
                 for (int era : eras) {
                     for (String f : factionList) {
                         Optional<RAT> match = collection.get(era).stream()
-                                .filter(rat -> rat.matches(f, unitType, weightClass, quality))
-                                .findFirst();
+                                                    .filter(rat -> rat.matches(f, unitType, weightClass, quality))
+                                                    .findFirst();
                         if (match.isPresent()) {
                             return match.get();
                         }
@@ -336,7 +340,7 @@ public class RATManager extends AbstractUnitGenerator {
         final Faction faction = Factions.getInstance().getFaction(factionCode);
         if (faction.getAlternativeFactionCodes() != null) {
             final List<String> alternativeFactionCodes = new ArrayList<>(
-                    Arrays.asList(faction.getAlternativeFactionCodes()));
+                  Arrays.asList(faction.getAlternativeFactionCodes()));
             while (!alternativeFactionCodes.isEmpty()) {
                 factionTree.add(alternativeFactionCodes.remove(Compute.randomInt(alternativeFactionCodes.size())));
             }
@@ -357,12 +361,12 @@ public class RATManager extends AbstractUnitGenerator {
     @Override
     public boolean isSupportedUnitType(final int unitType) {
         return (unitType == UnitType.MEK)
-                || (unitType == UnitType.TANK)
-                || (unitType == UnitType.AEROSPACEFIGHTER)
-                || (unitType == UnitType.DROPSHIP)
-                || (unitType == UnitType.INFANTRY)
-                || (unitType == UnitType.BATTLE_ARMOR)
-                || (unitType == UnitType.PROTOMEK);
+                     || (unitType == UnitType.TANK)
+                     || (unitType == UnitType.AEROSPACE_FIGHTER)
+                     || (unitType == UnitType.DROPSHIP)
+                     || (unitType == UnitType.INFANTRY)
+                     || (unitType == UnitType.BATTLE_ARMOR)
+                     || (unitType == UnitType.PROTOMEK);
     }
 
     /*
@@ -373,17 +377,17 @@ public class RATManager extends AbstractUnitGenerator {
      */
     @Override
     public @Nullable MekSummary generate(final String faction, final int unitType, final int weightClass,
-            final int year, final int quality, @Nullable Predicate<MekSummary> filter) {
+          final int year, final int quality, @Nullable Predicate<MekSummary> filter) {
         final List<MekSummary> list = generate(1, faction, unitType, weightClass, year, quality, filter);
         return list.isEmpty() ? null : list.get(0);
     }
 
     @Override
     public @Nullable MekSummary generate(final String faction, final int unitType, final int weightClass,
-            final int year, final int quality,
-            final Collection<EntityMovementMode> movementModes,
-            final Collection<MissionRole> missionRoles,
-            @Nullable Predicate<MekSummary> filter) {
+          final int year, final int quality,
+          final Collection<EntityMovementMode> movementModes,
+          final Collection<MissionRole> missionRoles,
+          @Nullable Predicate<MekSummary> filter) {
         final List<MekSummary> list = generate(1, faction, unitType, weightClass, year, quality, movementModes, filter);
         return list.isEmpty() ? null : list.get(0);
     }
@@ -396,7 +400,7 @@ public class RATManager extends AbstractUnitGenerator {
      */
     @Override
     public List<MekSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
-            final int year, final int quality, @Nullable Predicate<MekSummary> filter) {
+          final int year, final int quality, @Nullable Predicate<MekSummary> filter) {
         final RAT rat = findRAT(faction, unitType, weightClass, year, quality);
         if (rat != null) {
             if (unitType == UnitType.TANK) {
@@ -419,15 +423,15 @@ public class RATManager extends AbstractUnitGenerator {
 
     @Override
     public List<MekSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
-            final int year, final int quality,
-            final Collection<EntityMovementMode> movementModes,
-            final Collection<MissionRole> missionRoles,
-            @Nullable Predicate<MekSummary> filter) {
+          final int year, final int quality,
+          final Collection<EntityMovementMode> movementModes,
+          final Collection<MissionRole> missionRoles,
+          @Nullable Predicate<MekSummary> filter) {
         final RAT rat = findRAT(faction, unitType, weightClass, year, quality);
         if (rat != null) {
             if (!movementModes.isEmpty()) {
                 final Predicate<MekSummary> moveFilter = ms -> movementModes
-                        .contains(EntityMovementMode.parseFromString(ms.getUnitSubType()));
+                                                                     .contains(EntityMovementMode.parseFromString(ms.getUnitSubType()));
                 filter = (filter == null) ? moveFilter : filter.and(moveFilter);
             }
             return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
@@ -436,27 +440,23 @@ public class RATManager extends AbstractUnitGenerator {
     }
 
     /**
-     * Generates a single unit, for the given faction, using the given set of
-     * parameters.
-     * Note that some of the properties of the parameters may be ignored for
-     * generation mechanisms that aren't the RAT Generator
+     * Generates a single unit, for the given faction, using the given set of parameters. Note that some of the
+     * properties of the parameters may be ignored for generation mechanisms that aren't the RAT Generator
      *
      * @param parameters data structure containing unit generation parameters
+     *
      * @return Generated units. Null if none generated.
      */
     @Override
     public @Nullable MekSummary generate(final UnitGeneratorParameters parameters) {
         return generate(parameters.getFaction(), parameters.getUnitType(), parameters.getWeightClass(),
-                parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
+              parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
     }
 
     /**
-     * Generates a list of mek summaries from a RAT determined by the given faction,
-     * quality and other parameters.
-     * Note that for the purposes of this implementation, the only properties of
-     * "parameters" used are
-     * unit type, year, weight classes and movement modes. We also expect the rating
-     * to be a number 1-5, rather than A-F.
+     * Generates a list of mek summaries from a RAT determined by the given faction, quality and other parameters. Note
+     * that for the purposes of this implementation, the only properties of "parameters" used are unit type, year,
+     * weight classes and movement modes. We also expect the rating to be a number 1-5, rather than A-F.
      *
      * @param count      How many units to generate
      * @param parameters RATGenerator parameters (some are ignored)
@@ -464,7 +464,7 @@ public class RATManager extends AbstractUnitGenerator {
     @Override
     public List<MekSummary> generate(final int count, final UnitGeneratorParameters parameters) {
         return generate(count, parameters.getFaction(), parameters.getUnitType(), parameters.getWeightClass(),
-                parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
+              parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
     }
 
     private static class RAT {
@@ -476,15 +476,15 @@ public class RATManager extends AbstractUnitGenerator {
 
         public boolean matches(String faction, int unitType, int weightClass, int quality) {
             return (factions.contains(faction) || factions.isEmpty())
-                    && (unitTypes.contains(unitType) || unitTypes.isEmpty())
-                    && (weightClasses.contains(weightClass) || weightClasses.isEmpty() || weightClass < 0)
-                    && (ratings.contains(quality) || ratings.isEmpty());
+                         && (unitTypes.contains(unitType) || unitTypes.isEmpty())
+                         && (weightClasses.contains(weightClass) || weightClasses.isEmpty() || weightClass < 0)
+                         && (ratings.contains(quality) || ratings.isEmpty());
         }
 
         public static RAT createFromXml(Node node) {
             RAT retVal = new RAT();
             if (node.getAttributes().getNamedItem("name") == null) {
-                logger.error("Name attribute missing");
+                LOGGER.error("Name attribute missing");
                 return null;
             }
             retVal.ratName = node.getAttributes().getNamedItem("name").getTextContent();
@@ -528,7 +528,7 @@ public class RATManager extends AbstractUnitGenerator {
                                     retVal.unitTypes.add(UnitType.CONV_FIGHTER);
                                     break;
                                 case "Aero":
-                                    retVal.unitTypes.add(UnitType.AEROSPACEFIGHTER);
+                                    retVal.unitTypes.add(UnitType.AEROSPACE_FIGHTER);
                                     break;
                                 case "Small Craft":
                                     retVal.unitTypes.add(UnitType.SMALL_CRAFT);

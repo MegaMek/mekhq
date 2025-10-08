@@ -25,31 +25,37 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.CriticalSlot;
-import megamek.common.IArmorState;
-import megamek.common.Mounted;
-import megamek.common.Tank;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.IArmorState;
+import megamek.common.equipment.Mounted;
+import megamek.common.equipment.WeaponType;
+import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingTurret;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Turret extends TankLocation {
-    private static final MMLogger logger = MMLogger.create(Turret.class);
+    private static final MMLogger LOGGER = MMLogger.create(Turret.class);
 
     protected double weight;
 
@@ -98,8 +104,8 @@ public class Turret extends TankLocation {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof Turret
-                && getLoc() == ((Turret) part).getLoc()
-                && getTonnage() == part.getTonnage();
+                     && getLoc() == ((Turret) part).getLoc()
+                     && getTonnage() == part.getTonnage();
     }
 
     @Override
@@ -127,7 +133,7 @@ public class Turret extends TankLocation {
                     damage = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }
@@ -145,13 +151,13 @@ public class Turret extends TankLocation {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
             ((Tank) unit.getEntity()).unlockTurret();
         }
         setUnit(null);
@@ -191,7 +197,7 @@ public class Turret extends TankLocation {
                 return "must salvage armor in this location first";
             }
             // you can only salvage a location that has nothing left on it
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+            for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
                 CriticalSlot slot = unit.getEntity().getCritical(loc, i);
                 // ignore empty & non-hittable slots
                 if ((slot == null) || !slot.isEverHittable()) {
@@ -199,7 +205,7 @@ public class Turret extends TankLocation {
                 }
                 if (slot.isRepairable()) {
                     return "Repairable parts in " + unit.getEntity().getLocationName(loc)
-                            + " must be salvaged or scrapped first.";
+                                 + " must be salvaged or scrapped first.";
                 }
             }
         }
@@ -213,7 +219,7 @@ public class Turret extends TankLocation {
             return "You must scrap armor in the turret first";
         }
         // you can only scrap a location that has nothing left on it
-        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+        for (int i = 0; i < unit.getEntity().getNumberOfCriticalSlots(loc); i++) {
             CriticalSlot slot = unit.getEntity().getCritical(loc, i);
             // ignore empty & non-hittable slots
             if ((slot == null) || !slot.isEverHittable()) {
@@ -229,11 +235,6 @@ public class Turret extends TankLocation {
     @Override
     public boolean canNeverScrap() {
         return false;
-    }
-
-    @Override
-    public String getDetails() {
-        return getDetails(true);
     }
 
     @Override

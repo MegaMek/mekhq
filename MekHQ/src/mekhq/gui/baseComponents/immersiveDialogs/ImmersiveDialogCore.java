@@ -94,22 +94,21 @@ import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
  * allowing for dynamic configurations based on the input parameters.</p>
  */
 public class ImmersiveDialogCore extends JDialog {
-    private final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
+    private final static String RESOURCE_BUNDLE = "mekhq.resources.GUI";
     public final static String PERSON_COMMAND_STRING = "PERSON";
     public final static String MISSION_COMMAND_STRING = "MISSION";
     public final static String SCENARIO_COMMAND_STRING = "SCENARIO";
 
-    private Campaign campaign;
+    private final Campaign campaign;
 
     private int CENTER_WIDTH = scaleForGUI(400);
 
     private final int PADDING = scaleForGUI(5);
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
 
-    private JPanel northPanel;
-    private JPanel southPanel;
-    private Person leftSpeaker;
-    private Person rightSpeaker;
+    private final JPanel southPanel;
+    private final Person leftSpeaker;
+    private final Person rightSpeaker;
 
     private JSpinner spinner;
     private int spinnerValue;
@@ -242,14 +241,13 @@ public class ImmersiveDialogCore extends JDialog {
 
         // Left box for speaker details
         if (leftSpeaker != null) {
-            JPanel pnlLeftSpeaker = buildSpeakerPanel(leftSpeaker, campaign);
+            JPanel pnlLeftSpeaker = buildLeftSpeakerPanel(leftSpeaker, campaign);
             pnlLeftSpeaker.setBorder(new EmptyBorder(0, getPadding(), 0, 0));
 
             // Add pnlLeftSpeaker to mainPanel
             constraints.gridx = gridx;
             constraints.gridy = 0;
             constraints.weightx = 1;
-            constraints.weighty = 1;
             mainPanel.add(pnlLeftSpeaker, constraints);
             gridx++;
         }
@@ -265,7 +263,7 @@ public class ImmersiveDialogCore extends JDialog {
 
         // Right box for speaker details
         if (rightSpeaker != null) {
-            JPanel pnlRightSpeaker = buildSpeakerPanel(rightSpeaker, campaign);
+            JPanel pnlRightSpeaker = buildRightSpeakerPanel(rightSpeaker, campaign);
             pnlRightSpeaker.setBorder(new EmptyBorder(0, 0, 0, getPadding()));
 
             // Add pnlRightSpeaker to mainPanel
@@ -328,25 +326,13 @@ public class ImmersiveDialogCore extends JDialog {
      */
     private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
           @Nullable JPanel supplementalPanel, @Nullable ImageIcon imageIcon) {
-        northPanel = new JPanel(new BorderLayout());
+        JPanel northPanel = new JPanel(new BorderLayout());
 
         // Buttons panel
         JPanel buttonPanel = populateButtonPanel(buttons, isVerticalLayout, supplementalPanel);
 
         // Create a JEditorPane for the center message
-        JEditorPane editorPane = new JEditorPane();
-        editorPane.setContentType("text/html");
-        editorPane.setEditable(false);
-        editorPane.setFocusable(false);
-        editorPane.setBorder(BorderFactory.createEmptyBorder());
-        editorPane.setBorder(new EmptyBorder(0, getPadding(), 0, getPadding()));
-
-        // Use inline CSS to set font family, size, and other style properties
-        String fontStyle = "font-family: Noto Sans;";
-        editorPane.setText(String.format("<div style='width: %s; %s'>%s</div>",
-              max(buttonPanel.getPreferredSize().width, CENTER_WIDTH),
-              fontStyle,
-              centerMessage));
+        JEditorPane editorPane = getJEditorPane(centerMessage, buttonPanel);
         setFontScaling(editorPane, false, 1.1);
 
         // Add a HyperlinkListener to capture hyperlink clicks
@@ -387,6 +373,23 @@ public class ImmersiveDialogCore extends JDialog {
         northPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         return northPanel;
+    }
+
+    private JEditorPane getJEditorPane(String centerMessage, JPanel buttonPanel) {
+        JEditorPane editorPane = new JEditorPane();
+        editorPane.setContentType("text/html");
+        editorPane.setEditable(false);
+        editorPane.setFocusable(false);
+        editorPane.setBorder(BorderFactory.createEmptyBorder());
+        editorPane.setBorder(new EmptyBorder(0, getPadding(), 0, getPadding()));
+
+        // Use inline CSS to set font family, size, and other style properties
+        String fontStyle = "font-family: Noto Sans;";
+        editorPane.setText(String.format("<div style='width: %s; %s'>%s</div>",
+              max(buttonPanel.getPreferredSize().width, CENTER_WIDTH),
+              fontStyle,
+              centerMessage));
+        return editorPane;
     }
 
     /**
@@ -481,6 +484,20 @@ public class ImmersiveDialogCore extends JDialog {
         pnlOutOfCharacter.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         // Create a JEditorPane for the message
+        JEditorPane editorPane = getJEditorPane(outOfCharacterMessage);
+        setFontScaling(editorPane, false, 1);
+
+        // Add a HyperlinkListener to capture hyperlink clicks
+        editorPane.addHyperlinkListener(this::hyperlinkEventListenerActions);
+
+        // Add the editor pane to the panel
+        pnlOutOfCharacter.add(editorPane);
+
+        // Add the panel to the southPanel
+        southPanel.add(pnlOutOfCharacter, BorderLayout.SOUTH);
+    }
+
+    private JEditorPane getJEditorPane(String outOfCharacterMessage) {
         JEditorPane editorPane = new JEditorPane();
         editorPane.setContentType("text/html");
         editorPane.setEditable(false);
@@ -492,16 +509,7 @@ public class ImmersiveDialogCore extends JDialog {
 
         // Use inline CSS to set font family, size, and other style properties
         editorPane.setText(String.format("<div style='width: %s'>%s</div>", width, outOfCharacterMessage));
-        setFontScaling(editorPane, false, 1);
-
-        // Add a HyperlinkListener to capture hyperlink clicks
-        editorPane.addHyperlinkListener(this::hyperlinkEventListenerActions);
-
-        // Add the editor pane to the panel
-        pnlOutOfCharacter.add(editorPane);
-
-        // Add the panel to the southPanel
-        southPanel.add(pnlOutOfCharacter, BorderLayout.SOUTH);
+        return editorPane;
     }
 
     /**
@@ -690,19 +698,19 @@ public class ImmersiveDialogCore extends JDialog {
         }
     }
 
-
     /**
-     * Builds a panel for displaying a speaker's image, name, and role.
-     * <p>
-     * This method creates a vertically stacked panel that includes the person's icon, title, and any additional
-     * descriptive information (e.g., roles, forces, or campaign affiliations).
+     * Builds a panel containing a visual representation of the left-side speaker.
      *
-     * @param speaker  The character shown in the dialog, can be {@code null} for no speaker
-     * @param campaign The current campaign.
+     * <p>The panel includes the speaker's image (if available) and their descriptive information. The name and
+     * description are determined from the given {@link Campaign} and optional {@link Person}. The layout and sizing are
+     * set to align with user interface expectations.</p>
      *
-     * @return A {@link JPanel} forming the speaker's dialog box.
+     * @param speaker  the {@link Person} to be shown as the left speaker; may be {@code null}
+     * @param campaign the current {@link Campaign} providing context and fallback values
+     *
+     * @return a {@link JPanel} displaying the left speaker's image and description
      */
-    protected JPanel buildSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
+    protected JPanel buildLeftSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
         JPanel speakerBox = new JPanel();
         speakerBox.setLayout(new BoxLayout(speakerBox, BoxLayout.Y_AXIS));
         speakerBox.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -736,6 +744,25 @@ public class ImmersiveDialogCore extends JDialog {
         speakerBox.add(leftDescription);
 
         return speakerBox;
+    }
+
+    /**
+     * Builds a panel for the right-side speaker.
+     *
+     * <p><b>Usage:</b> By default, this implementation delegates to {@link #buildLeftSpeakerPanel(Person, Campaign)}.
+     * However, it can be independently overridden to allow for customization of the panel. Such as when we want to have
+     * the left and right speaker panels visually distinctive.</p>
+     *
+     * @param speaker  the {@link Person} to be shown as the right speaker; may be {@code null}
+     * @param campaign the current {@link Campaign} providing context and fallback values
+     *
+     * @return a {@link JPanel} displaying the right speaker's image and description
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    protected JPanel buildRightSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
+        return buildLeftSpeakerPanel(speaker, campaign);
     }
 
     /**

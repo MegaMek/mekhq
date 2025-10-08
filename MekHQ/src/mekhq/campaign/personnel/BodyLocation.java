@@ -24,15 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
+
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.BodyLocation.XMLAdapter;
-
-import java.util.*;
 
 @XmlJavaTypeAdapter(value = XMLAdapter.class)
 public enum BodyLocation {
@@ -59,15 +69,16 @@ public enum BodyLocation {
     private final BodyLocation parent;
 
     /**
-     * We can't use an EnumSet here because it requires the whole enum to be initialised. We
-     * fix it later, in the static code block.
+     * We can't use an EnumSet here because it requires the whole enum to be initialised. We fix it later, in the static
+     * code block.
      */
     private Set<BodyLocation> children = new HashSet<>();
     //endregion Variable Declarations
 
     //region Static Initialization
     // Initialize by-id array lookup table
-    private static BodyLocation[] idMap;
+    private static final BodyLocation[] idMap;
+
     static {
         int maxId = 0;
         for (BodyLocation workTime : values()) {
@@ -101,7 +112,7 @@ public enum BodyLocation {
 
     BodyLocation(int id, String localizationString, boolean limb, BodyLocation parent) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.id = id;
         this.locationName = resources.getString(localizationString);
         this.limb = limb;

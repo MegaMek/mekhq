@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -64,34 +64,44 @@ import megamek.SuiteConstants;
 import megamek.client.Client;
 import megamek.client.HeadlessClient;
 import megamek.client.bot.princess.BehaviorSettings;
+import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.abstractDialogs.AutoResolveChanceDialog;
 import megamek.client.ui.dialogs.abstractDialogs.AutoResolveProgressDialog;
+import megamek.client.ui.dialogs.gameConnectionDialogs.ConnectDialog;
+import megamek.client.ui.dialogs.gameConnectionDialogs.HostDialog;
 import megamek.client.ui.dialogs.helpDialogs.AutoResolveSimulationLogDialog;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.preferences.SuitePreferences;
-import megamek.client.ui.clientGUI.GUIPreferences;
-import megamek.client.ui.dialogs.gameConnectionDialogs.ConnectDialog;
-import megamek.client.ui.dialogs.gameConnectionDialogs.HostDialog;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.Board;
 import megamek.common.annotations.Nullable;
-import megamek.common.autoresolve.acar.SimulatedClient;
-import megamek.common.autoresolve.converter.SetupForces;
-import megamek.common.autoresolve.converter.SingletonForces;
-import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
+import megamek.common.autoResolve.acar.SimulatedClient;
+import megamek.common.autoResolve.converter.SetupForces;
+import megamek.common.autoResolve.converter.SingletonForces;
+import megamek.common.autoResolve.event.AutoResolveConcludedEvent;
+import megamek.common.board.Board;
 import megamek.common.event.*;
+import megamek.common.event.board.GameBoardChangeEvent;
+import megamek.common.event.board.GameBoardNewEvent;
+import megamek.common.event.entity.GameEntityChangeEvent;
+import megamek.common.event.entity.GameEntityNewEvent;
+import megamek.common.event.entity.GameEntityNewOffboardEvent;
+import megamek.common.event.entity.GameEntityRemoveEvent;
+import megamek.common.event.player.GamePlayerChangeEvent;
+import megamek.common.event.player.GamePlayerChatEvent;
+import megamek.common.event.player.GamePlayerConnectedEvent;
+import megamek.common.event.player.GamePlayerDisconnectedEvent;
 import megamek.common.internationalization.I18n;
 import megamek.common.net.marshalling.SanityInputFilter;
-import megamek.common.planetaryconditions.PlanetaryConditions;
+import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
-import megamek.server.totalwarfare.TWGameManager;
+import megamek.server.totalWarfare.TWGameManager;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.autoresolve.MekHQSetupForces;
-import mekhq.campaign.autoresolve.StratconSetupForces;
+import mekhq.campaign.autoResolve.MekHQSetupForces;
+import mekhq.campaign.autoResolve.StratConSetupForces;
 import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -100,7 +110,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.ScenarioTemplate.BattlefieldControlType;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
@@ -420,7 +430,7 @@ public class MekHQ implements GameListener {
     /**
      * @param campaignGUI the {@link CampaignGUI} to set
      */
-    public void setCampaigngui(CampaignGUI campaignGUI) {
+    public void setCampaignGUI(CampaignGUI campaignGUI) {
         this.campaignGUI = campaignGUI;
     }
 
@@ -755,7 +765,7 @@ public class MekHQ implements GameListener {
 
     private SetupForces getSetupForces(Scenario scenario, List<Unit> units) {
         if (scenario instanceof AtBScenario atBScenario) {
-            return new StratconSetupForces(getCampaign(), units, atBScenario, new SingletonForces());
+            return new StratConSetupForces(getCampaign(), units, atBScenario, new SingletonForces());
         }
         return new MekHQSetupForces(getCampaign(), units, scenario, new SingletonForces());
     }
@@ -843,7 +853,7 @@ public class MekHQ implements GameListener {
             if (resolveDialog.wasAborted()) {
                 postAbortedAutoResolve(autoResolveConcludedEvent, scenario, tracker);
             } else {
-                // If the autoresolve is not aborted, follow with the PostScenario Handler as normal
+                // If the auto resolve is not aborted, follow with the PostScenario Handler as normal
                 PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker);
             }
         } catch (Exception ex) {
@@ -861,7 +871,7 @@ public class MekHQ implements GameListener {
                         "AtbScenario {}, AutoResolveConcludedEvent {}", scenario, autoResolveConcludedEvent);
             LOGGER.errorDialog(
                   I18n.getTextAt("AbortingResolveScenarioWizard",
-                        Sentry.isEnabled() ? "errorMessage.withSentry": "errorMessage.withoutSentry"),
+                        Sentry.isEnabled() ? "errorMessage.withSentry" : "errorMessage.withoutSentry"),
                   I18n.getTextAt("AbortingResolveScenarioWizard",
                         "errorMessage.title"));
         }
@@ -886,6 +896,7 @@ public class MekHQ implements GameListener {
             throw new NullPointerException(errorMessage);
         }
     }
+
     /*
      * Access methods for event bus.
      */
@@ -907,7 +918,7 @@ public class MekHQ implements GameListener {
     private void initEventHandlers() {
         EVENT_BUS.register(new XPHandler());
 
-        StratconRulesManager srm = new StratconRulesManager();
+        StratConRulesManager srm = new StratConRulesManager();
         srm.startup();
         EVENT_BUS.register(srm);
     }

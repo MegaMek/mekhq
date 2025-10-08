@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.ranks;
 
@@ -39,10 +44,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -50,9 +51,12 @@ import megamek.utilities.xml.MMXMLUtility;
 import mekhq.MHQConstants;
 import mekhq.campaign.personnel.enums.RankSystemType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class RankSystem {
-    private static final MMLogger logger = MMLogger.create(RankSystem.class);
+    private static final MMLogger LOGGER = MMLogger.create(RankSystem.class);
 
     // region Variable Declarations
     private String code; // Primary Key, must be unique
@@ -80,7 +84,7 @@ public class RankSystem {
     }
 
     public RankSystem(final String code, final String name,
-            final String description, final RankSystemType type) {
+          final String description, final RankSystemType type) {
         setCode(code);
         setType(type);
         setName(name);
@@ -178,16 +182,16 @@ public class RankSystem {
         }
         int indent = 0;
         try (OutputStream fos = new FileOutputStream(file);
-                OutputStream bos = new BufferedOutputStream(fos);
-                OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
-                PrintWriter pw = new PrintWriter(osw)) {
+              OutputStream bos = new BufferedOutputStream(fos);
+              OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
+              PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "individualRankSystem", "version", MHQConstants.VERSION);
             writeToXML(pw, indent, true);
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "individualRankSystem");
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
@@ -195,7 +199,7 @@ public class RankSystem {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "rankSystem");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "code", getCode());
 
-        // Only write out any other information if we are exporting the system or we are
+        // Only write out any other information if we are exporting the system, or we are
         // using a
         // campaign-specific custom system
         if (export || getType().isCampaign()) {
@@ -222,9 +226,9 @@ public class RankSystem {
      * This generates a single Rank System from an XML file
      *
      * @param file the file to load, or null if none are to be loaded
-     * @return the single (or first) rank system located within the file, or null if
-     *         no file is
-     *         provided or there is an error
+     *
+     * @return the single (or first) rank system located within the file, or null if no file is provided or there is an
+     *       error
      */
     public static @Nullable RankSystem generateIndividualInstanceFromXML(final @Nullable File file) {
         if (file == null) {
@@ -237,7 +241,7 @@ public class RankSystem {
         try (InputStream is = new FileInputStream(file)) {
             element = MHQXMLUtility.newSafeDocumentBuilder().parse(is).getDocumentElement();
         } catch (Exception ex) {
-            logger.error("Failed to open file, returning null", ex);
+            LOGGER.error("Failed to open file, returning null", ex);
             return null;
         }
         element.normalize();
@@ -252,7 +256,7 @@ public class RankSystem {
                 return generateInstanceFromXML(wn.getChildNodes(), version);
             }
         }
-        logger.error("Failed to parse file, returning null");
+        LOGGER.error("Failed to parse file, returning null");
         return null;
     }
 
@@ -261,11 +265,11 @@ public class RankSystem {
      *
      * @param nl      the node list to parse the rank system from
      * @param version the version to parse the rank system at
-     * @return the unvalidated parsed rank system, or null if there is an issue in
-     *         parsing
+     *
+     * @return the unvalidated parsed rank system, or null if there is an issue in parsing
      */
     public static @Nullable RankSystem generateInstanceFromXML(final NodeList nl,
-            final Version version) {
+          final Version version) {
         return generateInstanceFromXML(nl, version, false, RankSystemType.CAMPAIGN);
     }
 
@@ -274,13 +278,13 @@ public class RankSystem {
      * @param version     the version to parse the rank system at
      * @param initialLoad whether this is the initial load or a later load
      * @param type        the type of rank system being loaded
-     * @return the un-validated parsed rank system, or null if there is an issue in
-     *         parsing
+     *
+     * @return the un-validated parsed rank system, or null if there is an issue in parsing
      */
     public static @Nullable RankSystem generateInstanceFromXML(final NodeList nl,
-            final Version version,
-            final boolean initialLoad,
-            final RankSystemType type) {
+          final Version version,
+          final boolean initialLoad,
+          final RankSystemType type) {
         final RankSystem rankSystem = new RankSystem(type);
         // Dump the ranks ArrayList so we can re-use it.
         rankSystem.setRanks(new ArrayList<>());
@@ -291,7 +295,7 @@ public class RankSystem {
 
                 if (wn.getNodeName().equalsIgnoreCase("code")) {
                     final String systemCode = MMXMLUtility.unEscape(wn.getTextContent().trim());
-                    // If this isn't the initial load and we already have a loaded system with the
+                    // If this isn't the initial load, and we already have a loaded system with the
                     // provided key, just return the rank system saved by the key in question.
                     // This does not need to be validated to ensure it is a proper rank system
                     if (!initialLoad && Ranks.getRankSystems().containsKey(systemCode)) {
@@ -311,7 +315,7 @@ public class RankSystem {
                 }
             }
         } catch (Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
             return null;
         }
         return rankSystem;

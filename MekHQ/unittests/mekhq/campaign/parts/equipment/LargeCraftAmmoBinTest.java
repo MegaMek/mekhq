@@ -58,9 +58,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.Mounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.units.Entity;
+import megamek.common.equipment.Mounted;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.WeaponMounted;
 import mekhq.campaign.Campaign;
@@ -91,7 +91,12 @@ public class LargeCraftAmmoBinTest {
         int equipmentNum = 18;
         int shotsNeeded = ammoType.getShots();
         double capacity = 12.0;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         assertEquals(ammoType, ammoBin.getType());
         assertEquals(equipmentNum, ammoBin.getEquipmentNum());
@@ -110,7 +115,12 @@ public class LargeCraftAmmoBinTest {
         int bayNum = 31;
         int shotsNeeded = ammoType.getShots() - 1;
         double capacity = 12.0;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
         ammoBin.setBay(bayNum);
 
         // Ensure the clone has all the same stuff
@@ -148,7 +158,12 @@ public class LargeCraftAmmoBinTest {
         int equipmentNum = 18;
         int shotsNeeded = ammoType.getShots() - 1;
         double capacity = 12.0;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         assertNull(ammoBin.getMissingPart());
         assertTrue(ammoBin.canNeverScrap());
@@ -163,7 +178,12 @@ public class LargeCraftAmmoBinTest {
         int bayNum = 31;
         int shotsNeeded = ammoType.getShots();
         double capacity = 12.0;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
         ammoBin.setId(25);
 
         // Setup the unit for the ammo bin
@@ -391,7 +411,12 @@ public class LargeCraftAmmoBinTest {
         int bayNum = 31;
         int capacity = 5;
         int shotsNeeded = ammoType.getShots() * capacity;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         Unit unit = mock(Unit.class);
         when(unit.getParts()).thenReturn(Arrays.asList(new Part[] { ammoBin }));
@@ -421,7 +446,12 @@ public class LargeCraftAmmoBinTest {
         int bayNum = 31;
         int capacity = 5;
         int shotsNeeded = 0;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         Unit unit = mock(Unit.class);
         when(unit.getParts()).thenReturn(Arrays.asList(new Part[] { ammoBin }));
@@ -451,7 +481,12 @@ public class LargeCraftAmmoBinTest {
         int bayNum = 31;
         int capacity = 5;
         int shotsNeeded = ammoType.getShots() * capacity;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // Setup another bin that isn't a match.
         LargeCraftAmmoBin otherBin = mock(LargeCraftAmmoBin.class);
@@ -486,7 +521,12 @@ public class LargeCraftAmmoBinTest {
         int bayNum = 31;
         int capacity = 5;
         int shotsNeeded = 0;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // Setup another bin that isn't a match.
         LargeCraftAmmoBin otherBin = mock(LargeCraftAmmoBin.class);
@@ -701,7 +741,12 @@ public class LargeCraftAmmoBinTest {
         int equipmentNum = 18;
         int capacity = 2;
         int shotsNeeded = ammoType.getShots() * capacity;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -736,7 +781,12 @@ public class LargeCraftAmmoBinTest {
         int equipmentNum = 19;
         int shotsNeeded = 0;
         int capacity = 3;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -784,7 +834,12 @@ public class LargeCraftAmmoBinTest {
         int capacity = 5;
         int capacityNeeded = 2;
         int shotsNeeded = ammoType.getShots() * capacityNeeded;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -855,7 +910,12 @@ public class LargeCraftAmmoBinTest {
         int capacity = 7;
         int shotsNeeded = ammoType.getShots() * capacity;
         int equipmentNum = 42;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -891,7 +951,12 @@ public class LargeCraftAmmoBinTest {
         int capacity = 2;
         int shotsNeeded = ammoType.getShots() * capacity;
         int equipmentNum = 42;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -934,7 +999,12 @@ public class LargeCraftAmmoBinTest {
         int capacity = 3;
         int shotsNeeded = ammoType.getShots() * capacity;
         int equipmentNum = 42;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -976,7 +1046,12 @@ public class LargeCraftAmmoBinTest {
         int capacity = 4;
         int shotsNeeded = ammoType.getShots() * capacity;
         int equipmentNum = 42;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1041,7 +1116,12 @@ public class LargeCraftAmmoBinTest {
         int capacity = 7;
         int shotsNeeded = ammoType.getShots() * capacity;
         int equipmentNum = 42;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1077,7 +1157,12 @@ public class LargeCraftAmmoBinTest {
         int capacity = 2;
         int shotsNeeded = ammoType.getShots() * capacity;
         int equipmentNum = 42;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1120,7 +1205,12 @@ public class LargeCraftAmmoBinTest {
         int capacity = 3;
         int shotsNeeded = ammoType.getShots() * capacity;
         int equipmentNum = 42;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1162,7 +1252,12 @@ public class LargeCraftAmmoBinTest {
         int capacity = 4;
         int shotsNeeded = ammoType.getShots() * capacity;
         int equipmentNum = 42;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1203,7 +1298,12 @@ public class LargeCraftAmmoBinTest {
         int equipmentNum = 13;
         int capacity = 5;
         int shotsNeeded = ammoType.getShots() * capacity;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1235,7 +1335,12 @@ public class LargeCraftAmmoBinTest {
         int equipmentNum = 13;
         int shotsNeeded = 0;
         int capacity = 3;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1265,7 +1370,12 @@ public class LargeCraftAmmoBinTest {
         int equipmentNum = 13;
         int capacity = 3;
         int shotsNeeded = ammoType.getShots() * (capacity - 1);
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1295,7 +1405,12 @@ public class LargeCraftAmmoBinTest {
         int equipmentNum = 13;
         int capacity = 3;
         int shotsNeeded = -ammoType.getShots();
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1349,7 +1464,12 @@ public class LargeCraftAmmoBinTest {
         int capacity = 3;
         int shotsNeeded = ammoType.getShots() * capacity;
         int equipmentNum = 42;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1385,7 +1505,12 @@ public class LargeCraftAmmoBinTest {
         int capacity = 3;
         int shotsNeeded = ammoType.getShots() * capacity;
         int equipmentNum = 42;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1428,7 +1553,12 @@ public class LargeCraftAmmoBinTest {
         int capacity = 3;
         int shotsNeeded = ammoType.getShots() * capacity;
         int equipmentNum = 42;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);
@@ -1470,7 +1600,12 @@ public class LargeCraftAmmoBinTest {
         int capacity = 3;
         int shotsNeeded = ammoType.getShots();
         int equipmentNum = 42;
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, shotsNeeded, capacity, mockCampaign);
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
 
         // ... place the ammo bin on a unit ...
         Unit mockUnit = mock(Unit.class);

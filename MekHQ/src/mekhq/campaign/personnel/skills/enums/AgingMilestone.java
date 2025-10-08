@@ -36,8 +36,6 @@ import static java.lang.Integer.MAX_VALUE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_SKILL_ATTRIBUTE;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import megamek.logging.MMLogger;
-
 public enum AgingMilestone {
     NONE(0, 25, 0, 0, 0, 0, 0, 0, 0, 0, false, false),
     TWENTY_FIVE(25, 31, 50, 50, 0, 50, 50, 50, 50, 0, false, false),
@@ -50,7 +48,6 @@ public enum AgingMilestone {
     NINETY_ONE(91, 101, -150, -175, -150, -125, -150, -100, -100, 2, true, true),
     ONE_HUNDRED_ONE(101, MAX_VALUE, -200, -200, -200, -150, -200, -100, -150, 2, true, true);
 
-    private static final MMLogger logger = MMLogger.create(AgingMilestone.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AgingMilestone";
 
     public static final int CLAN_REPUTATION_MULTIPLIER = 150;
@@ -130,7 +127,7 @@ public enum AgingMilestone {
     /**
      * Retrieves the value of the specified skill attribute for this object.
      *
-     * <p><b>Usage:</b> this exists to assit testing and should not be directly called. Use
+     * <p><b>Usage:</b> this exists to assist testing and should not be directly called. Use
      * {@link #getAttributeModifier(SkillAttribute)} instead.</p>
      *
      * @param attribute the {@link SkillAttribute} to retrieve; must not be {@code null}
@@ -182,10 +179,6 @@ public enum AgingMilestone {
             case INTELLIGENCE -> cumulativeIntelligence;
             case WILLPOWER -> cumulativeWillpower;
             case CHARISMA -> cumulativeCharisma;
-            default -> {
-                logger.error("Invalid attribute: {}", attribute);
-                yield 0;
-            }
         };
     }
 

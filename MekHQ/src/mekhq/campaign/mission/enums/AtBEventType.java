@@ -24,19 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.enums;
 
 public enum AtBEventType {
-    BONUSROLL,
+    BONUS_ROLL,
     SPECIAL_SCENARIO,
-    CIVILDISTURBANCE,
-    SPORADICUPRISINGS,
+    CIVIL_DISTURBANCE,
+    SPORADIC_UPRISINGS,
     REBELLION,
     BETRAYAL,
     TREACHERY,
-    LOGISTICSFAILURE,
+    LOGISTICS_FAILURE,
     REINFORCEMENTS,
-    SPECIALEVENTS,
-    BIGBATTLE
+    SPECIAL_EVENTS,
+    BIG_BATTLE
 }

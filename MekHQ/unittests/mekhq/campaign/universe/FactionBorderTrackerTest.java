@@ -24,17 +24,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
-
-import mekhq.campaign.universe.FactionBorderTracker.RegionHex;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -43,10 +39,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import mekhq.campaign.universe.FactionBorderTracker.RegionHex;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+
 public class FactionBorderTrackerTest {
 
-    private Faction factionUs = createFaction("us", false, false);
-    private Faction factionThem = createFaction("them", false, false);
+    private final Faction factionUs = createFaction("us", false, false);
+    private final Faction factionThem = createFaction("them", false, false);
 
     // Builds a sample universe with a faction "us" with one planet at (0, 0) and
     // faction
@@ -87,36 +92,36 @@ public class FactionBorderTrackerTest {
     }
 
     @Test
-    public void testFactionBorderTrackerAllPlanets() throws InterruptedException {
+    public void testFactionBorderTrackerAllPlanets() {
         FactionBorderTracker tracker = buildTestTracker();
         tracker.setDefaultBorderSize(1, 1, 1);
 
         List<PlanetarySystem> border = tracker.getBorderSystems(factionUs, factionThem);
 
-        assertEquals(tracker.getBorders(factionUs).getSystems().size(), 1);
-        assertEquals(tracker.getBorders(factionThem).getSystems().size(), 12);
-        assertEquals(border.size(), 2);
+        assertEquals(1, tracker.getBorders(factionUs).getSystems().size());
+        assertEquals(12, tracker.getBorders(factionThem).getSystems().size());
+        assertEquals(2, border.size());
         for (PlanetarySystem p : border) {
-            assertEquals(Math.abs(p.getX()), 1, RegionPerimeter.EPSILON);
-            assertEquals(p.getY(), 0, RegionPerimeter.EPSILON);
+            assertEquals(1, Math.abs(p.getX()), RegionPerimeter.EPSILON);
+            assertEquals(0, p.getY(), RegionPerimeter.EPSILON);
         }
     }
 
     @Test
-    public void testFactionBorderTrackerSmallerRegion() throws InterruptedException {
+    public void testFactionBorderTrackerSmallerRegion() {
         FactionBorderTracker tracker = buildTestTracker();
         tracker.setDefaultBorderSize(1, 1, 1);
         tracker.setRegionRadius(1.1);
 
         List<PlanetarySystem> border = tracker.getBorderSystems(factionUs, factionThem);
 
-        assertEquals(tracker.getBorders(factionUs).getSystems().size(), 1);
-        assertEquals(tracker.getBorders(factionThem).getSystems().size(), 2);
-        assertEquals(border.size(), 2);
+        assertEquals(1, tracker.getBorders(factionUs).getSystems().size());
+        assertEquals(2, tracker.getBorders(factionThem).getSystems().size());
+        assertEquals(2, border.size());
     }
 
     @Test
-    public void testFactionBorderTrackerEmptyRegion() throws InterruptedException {
+    public void testFactionBorderTrackerEmptyRegion() {
         FactionBorderTracker tracker = buildTestTracker();
         tracker.setDefaultBorderSize(1, 1, 1);
         tracker.setRegionRadius(10);
@@ -126,7 +131,7 @@ public class FactionBorderTrackerTest {
 
         assertNull(tracker.getBorders(factionUs));
         assertNull(tracker.getBorders(factionThem));
-        assertEquals(border.size(), 0);
+        assertEquals(0, border.size());
     }
 
     @Test
@@ -137,9 +142,9 @@ public class FactionBorderTrackerTest {
         FactionBorderTracker tracker = buildTestTracker();
         tracker.setDefaultBorderSize(1, 2, 3);
 
-        assertEquals(tracker.getBorderSize(is), 1, RegionPerimeter.EPSILON);
-        assertEquals(tracker.getBorderSize(periphery), 2, RegionPerimeter.EPSILON);
-        assertEquals(tracker.getBorderSize(clan), 3, RegionPerimeter.EPSILON);
+        assertEquals(1, tracker.getBorderSize(is), RegionPerimeter.EPSILON);
+        assertEquals(2, tracker.getBorderSize(periphery), RegionPerimeter.EPSILON);
+        assertEquals(3, tracker.getBorderSize(clan), RegionPerimeter.EPSILON);
     }
 
     @Test
@@ -149,7 +154,7 @@ public class FactionBorderTrackerTest {
         tracker.setDefaultBorderSize(1, 2, 3);
         tracker.setBorderSize(is, 30);
 
-        assertEquals(tracker.getBorderSize(is), 30, RegionPerimeter.EPSILON);
+        assertEquals(30, tracker.getBorderSize(is), RegionPerimeter.EPSILON);
     }
 
     @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,12 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.sorter;
 
 import java.util.Comparator;
 
-import megamek.common.EntityWeightClass;
+import megamek.common.units.EntityWeightClass;
 
 /**
  * A comparator for unit weight classes
@@ -39,7 +44,7 @@ import megamek.common.EntityWeightClass;
 public class WeightClassSorter implements Comparator<String> {
     @Override
     public int compare(String s0, String s1) {
-        // lets find the weight class integer for each name
+        // let's find the weight class integer for each name
         int l0 = 0;
         int l1 = 0;
         for (int i = 0; i < EntityWeightClass.SIZE; i++) {

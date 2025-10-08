@@ -24,13 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.menus;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
-
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -46,12 +50,10 @@ import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.io.FileType;
 
 /**
- * This is a standard menu that takes a unit and lets the user export their icon
- * with the camouflage
- * applied to it.
+ * This is a standard menu that takes a unit and lets the user export their icon with the camouflage applied to it.
  */
 public class ExportUnitSpriteMenu extends JScrollableMenu {
-    private static final MMLogger logger = MMLogger.create(ExportUnitSpriteMenu.class);
+    private static final MMLogger LOGGER = MMLogger.create(ExportUnitSpriteMenu.class);
 
     // region Constructors
     public ExportUnitSpriteMenu(final JFrame frame, final Campaign campaign, final Unit unit) {
@@ -70,7 +72,7 @@ public class ExportUnitSpriteMenu extends JScrollableMenu {
         miCurrentCamouflage.setToolTipText(resources.getString("miCurrentCamouflage.toolTipText"));
         miCurrentCamouflage.setName("miCurrentCamouflage");
         miCurrentCamouflage
-                .addActionListener(evt -> exportSprite(frame, unit, unit.getUtilizedCamouflage(campaign), false));
+              .addActionListener(evt -> exportSprite(frame, unit, unit.getUtilizedCamouflage(campaign), false));
         add(miCurrentCamouflage);
 
         final JMenuItem miCurrentDamage = new JMenuItem(resources.getString("miCurrentDamage.text"));
@@ -80,11 +82,11 @@ public class ExportUnitSpriteMenu extends JScrollableMenu {
         add(miCurrentDamage);
 
         final JMenuItem miCurrentCamouflageAndDamage = new JMenuItem(
-                resources.getString("miCurrentCamouflageAndDamage.text"));
+              resources.getString("miCurrentCamouflageAndDamage.text"));
         miCurrentCamouflageAndDamage.setToolTipText(resources.getString("miCurrentCamouflageAndDamage.toolTipText"));
         miCurrentCamouflageAndDamage.setName("miCurrentCamouflageAndDamage");
         miCurrentCamouflageAndDamage
-                .addActionListener(evt -> exportSprite(frame, unit, unit.getUtilizedCamouflage(campaign), true));
+              .addActionListener(evt -> exportSprite(frame, unit, unit.getUtilizedCamouflage(campaign), true));
         add(miCurrentCamouflageAndDamage);
 
         final JMenuItem miSelectedCamouflage = new JMenuItem(resources.getString("miSelectedCamouflage.text"));
@@ -92,7 +94,7 @@ public class ExportUnitSpriteMenu extends JScrollableMenu {
         miSelectedCamouflage.setName("miSelectedCamouflage");
         miSelectedCamouflage.addActionListener(evt -> {
             final CamoChooserDialog camoChooserDialog = new CamoChooserDialog(frame,
-                    unit.getUtilizedCamouflage(campaign));
+                  unit.getUtilizedCamouflage(campaign));
             if (camoChooserDialog.showDialog().isConfirmed()) {
                 exportSprite(frame, unit, camoChooserDialog.getSelectedItem(), false);
             }
@@ -100,13 +102,13 @@ public class ExportUnitSpriteMenu extends JScrollableMenu {
         add(miSelectedCamouflage);
 
         final JMenuItem miSelectedCamouflageAndCurrentDamage = new JMenuItem(
-                resources.getString("miSelectedCamouflageAndCurrentDamage.text"));
+              resources.getString("miSelectedCamouflageAndCurrentDamage.text"));
         miSelectedCamouflageAndCurrentDamage.setToolTipText(
-                resources.getString("miSelectedCamouflageAndCurrentDamage.toolTipText"));
+              resources.getString("miSelectedCamouflageAndCurrentDamage.toolTipText"));
         miSelectedCamouflageAndCurrentDamage.setName("miSelectedCamouflageAndCurrentDamage");
         miSelectedCamouflageAndCurrentDamage.addActionListener(evt -> {
             final CamoChooserDialog camoChooserDialog = new CamoChooserDialog(frame,
-                    unit.getUtilizedCamouflage(campaign));
+                  unit.getUtilizedCamouflage(campaign));
             if (camoChooserDialog.showDialog().isConfirmed()) {
                 exportSprite(frame, unit, camoChooserDialog.getSelectedItem(), true);
             }
@@ -116,10 +118,10 @@ public class ExportUnitSpriteMenu extends JScrollableMenu {
     // endregion Initialization
 
     private void exportSprite(final JFrame frame, final Unit unit, final Camouflage camouflage,
-            final boolean showDamage) {
+          final boolean showDamage) {
         // Save Location
         File file = GUI.fileDialogSave(frame, resources.getString("ExportUnitSpriteDialog.title"), FileType.PNG,
-                MekHQ.getMHQOptions().getUnitSpriteExportPath(), unit.getName() + ".png").orElse(null);
+              MekHQ.getMHQOptions().getUnitSpriteExportPath(), unit.getName() + ".png").orElse(null);
         if (file == null) {
             return;
         }
@@ -134,7 +136,7 @@ public class ExportUnitSpriteMenu extends JScrollableMenu {
         // Get the Sprite
         final Image sprite = unit.getImage(this, camouflage, showDamage);
         if (sprite == null) {
-            logger.error("Null sprite");
+            LOGGER.error("Null sprite");
             return;
         }
 
@@ -142,7 +144,7 @@ public class ExportUnitSpriteMenu extends JScrollableMenu {
         try {
             ImageIO.write((BufferedImage) sprite, "png", file);
         } catch (Exception ex) {
-            logger.error("Failed to export to file", ex);
+            LOGGER.error("Failed to export to file", ex);
         }
     }
 }

@@ -24,27 +24,33 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
+
+import java.awt.Component;
+import java.util.List;
+import java.util.Objects;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Kill;
 
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
-import java.util.List;
-import java.util.Objects;
-
 public class KillTableModel extends AbstractTableModel {
     protected List<Kill> data;
 
-    public static final int COL_DATE    = 0;
-    public static final int COL_KILLED  = 1;
-    public static final int COL_KILLER  = 2;
-    public static final int N_COL       = 3;
+    public static final int COL_DATE = 0;
+    public static final int COL_KILLED = 1;
+    public static final int COL_KILLER = 2;
+    public static final int N_COL = 3;
 
     public KillTableModel(List<Kill> entries) {
         Objects.requireNonNull(entries);
@@ -63,16 +69,12 @@ public class KillTableModel extends AbstractTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case COL_DATE:
-                return "Date";
-            case COL_KILLED:
-                return "Kill";
-            case COL_KILLER:
-                return "With";
-            default:
-                return "?";
-        }
+        return switch (column) {
+            case COL_DATE -> "Date";
+            case COL_KILLED -> "Kill";
+            case COL_KILLER -> "With";
+            default -> "?";
+        };
     }
 
     @Override
@@ -83,21 +85,12 @@ public class KillTableModel extends AbstractTableModel {
         } else {
             kill = data.get(row);
         }
-        switch (col) {
-            case COL_DATE:
-                return MekHQ.getMHQOptions().getDisplayFormattedDate(kill.getDate());
-            case COL_KILLED:
-                return kill.getWhatKilled();
-            case COL_KILLER:
-                return kill.getKilledByWhat();
-            default:
-                return "?";
-        }
-    }
-
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
+        return switch (col) {
+            case COL_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(kill.getDate());
+            case COL_KILLED -> kill.getWhatKilled();
+            case COL_KILLER -> kill.getKilledByWhat();
+            default -> "?";
+        };
     }
 
     @Override
@@ -110,12 +103,10 @@ public class KillTableModel extends AbstractTableModel {
     }
 
     public int getColumnWidth(int c) {
-        switch (c) {
-            case COL_DATE:
-                return 20;
-            default:
-                return 100;
+        if (c == COL_DATE) {
+            return 20;
         }
+        return 100;
     }
 
     public int getAlignment(int col) {
@@ -138,7 +129,7 @@ public class KillTableModel extends AbstractTableModel {
     public class Renderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
+              boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
             setOpaque(true);

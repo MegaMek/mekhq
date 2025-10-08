@@ -54,12 +54,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
-import megamek.common.AmmoType;
-import megamek.common.BombType;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.enums.BombType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
@@ -360,15 +361,8 @@ public class AmmoStorageTest {
         Campaign mockCampaign = mock(Campaign.class);
 
         // Create Full and Half bins
-        Map<String, String> fullAndHalfs = new HashMap<>();
-        fullAndHalfs.put("IS Ammo MG - Full", "IS Machine Gun Ammo - Half");
-        fullAndHalfs.put("Clan Machine Gun Ammo - Full", "Clan Machine Gun Ammo - Half");
-        fullAndHalfs.put("IS Light Machine Gun Ammo - Full", "IS Light Machine Gun Ammo - Half");
-        fullAndHalfs.put("Clan Light Machine Gun Ammo - Full", "Clan Light Machine Gun Ammo - Half");
-        fullAndHalfs.put("IS Heavy Machine Gun Ammo - Full", "IS Heavy Machine Gun Ammo - Half");
-        fullAndHalfs.put("Clan Heavy Machine Gun Ammo - Full", "Clan Heavy Machine Gun Ammo - Half");
-        fullAndHalfs.put("IS Ammo Nail/Rivet - Full", "IS Ammo Nail/Rivet - Half");
-        for (Entry<String, String> pair : fullAndHalfs.entrySet()) {
+        Map<String, String> fullAndHalves = getFullAndHalves();
+        for (Entry<String, String> pair : fullAndHalves.entrySet()) {
             AmmoType fullType = getAmmoType(pair.getKey());
             AmmoType halfType = getAmmoType(pair.getValue());
 
@@ -378,6 +372,18 @@ public class AmmoStorageTest {
             AmmoStorage half = new AmmoStorage(0, halfType, halfType.getShots(), mockCampaign);
             assertTrue(half.isSameAmmoType(fullType));
         }
+    }
+
+    private static Map<String, String> getFullAndHalves() {
+        Map<String, String> fullAndHalves = new HashMap<>();
+        fullAndHalves.put("IS Ammo MG - Full", "IS Machine Gun Ammo - Half");
+        fullAndHalves.put("Clan Machine Gun Ammo - Full", "Clan Machine Gun Ammo - Half");
+        fullAndHalves.put("IS Light Machine Gun Ammo - Full", "IS Light Machine Gun Ammo - Half");
+        fullAndHalves.put("Clan Light Machine Gun Ammo - Full", "Clan Light Machine Gun Ammo - Half");
+        fullAndHalves.put("IS Heavy Machine Gun Ammo - Full", "IS Heavy Machine Gun Ammo - Half");
+        fullAndHalves.put("Clan Heavy Machine Gun Ammo - Full", "Clan Heavy Machine Gun Ammo - Half");
+        fullAndHalves.put("IS Ammo Nail/Rivet - Full", "IS Ammo Nail/Rivet - Half");
+        return fullAndHalves;
     }
 
     @Test

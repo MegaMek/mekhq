@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 - Carl Spain. All Rights Reserved.
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,24 +25,31 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.universe.Factions;
-import mekhq.gui.baseComponents.SortedComboBoxModel;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JComboBox;
+import javax.swing.JList;
+
+import megamek.common.annotations.Nullable;
+import mekhq.campaign.universe.Factions;
+import mekhq.gui.baseComponents.SortedComboBoxModel;
 
 /**
- * Combo box for choosing a faction by full name that accounts for the fact that full names are not
- * always unique within the faction's era.
+ * Combo box for choosing a faction by full name that accounts for the fact that full names are not always unique within
+ * the faction's era.
  *
  * @author Neoancient
  */
@@ -51,9 +58,9 @@ public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
         setModel(new SortedComboBoxModel<>(Entry.comparingByValue()));
         setRenderer(new DefaultListCellRenderer() {
             @Override
-            public  Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                           final int index, final boolean isSelected,
-                                                           final boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                  final int index, final boolean isSelected,
+                  final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value != null) {
                     setText((String) ((Map.Entry<?, ?>) value).getValue());

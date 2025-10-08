@@ -24,8 +24,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import megamek.Version;
 import megamek.client.generator.RandomGenderGenerator;
@@ -34,10 +46,16 @@ import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.Crew;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
@@ -53,24 +71,17 @@ import org.apache.commons.math3.distribution.GammaDistribution;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.util.*;
-
 /**
- * A class that can be used to generate a random force with some parameters.
- * Provides a simpler approach
- * to opfor generation than AtBDynamicScenarioFactory. Intended for use by
- * StoryArc but written generally
- * enough to be repurposed.
- *
- * Unlike AtBDynamicScenarioFactory, the methods here are not static, but depend
- * on variables in an actual
- * BotForceRandomizer than can be added to a BotForce. If present, this
- * randomizer will be used to generate
- * forces for the BotForce through the GameThread when a game is started.
+ * A class that can be used to generate a random force with some parameters. Provides a simpler approach to op for
+ * generation than AtBDynamicScenarioFactory. Intended for use by StoryArc but written generally enough to be
+ * repurposed.
+ * <p>
+ * Unlike AtBDynamicScenarioFactory, the methods here are not static, but depend on variables in an actual
+ * BotForceRandomizer than can be added to a BotForce. If present, this randomizer will be used to generate forces for
+ * the BotForce through the GameThread when a game is started.
  */
 public class BotForceRandomizer {
-    private static final MMLogger logger = MMLogger.create(BotForceRandomizer.class);
+    private static final MMLogger LOGGER = MMLogger.create(BotForceRandomizer.class);
 
     // region Variable declarations
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
@@ -106,14 +117,12 @@ public class BotForceRandomizer {
     private int unitType;
 
     /**
-     * lance size - this is the smallest increment in which random units will be
-     * generated and added
+     * lance size - this is the smallest increment in which random units will be generated and added
      **/
     private int lanceSize;
 
     /**
-     * focal weight class - if this is missing we use the mean weight class of the
-     * players unit
+     * focal weight class - if this is missing we use the mean weight class of the players unit
      **/
     private double focalWeightClass;
 
@@ -124,14 +133,13 @@ public class BotForceRandomizer {
     private BalancingMethod balancingMethod;
 
     /**
-     * what percent of mek and aero forces should actually be conventional?
-     * (tanks and conventional aircraft respectively)
+     * what percent of mek and aero forces should actually be conventional? (tanks and conventional aircraft
+     * respectively)
      **/
     private int percentConventional;
 
     /**
-     * percent chance that a mek "lance" will come with integrated battle armor
-     * units
+     * percent chance that a mek "lance" will come with integrated battle armor units
      */
     private int baChance;
     // endregion Variable Declarations
@@ -264,32 +272,26 @@ public class BotForceRandomizer {
     // endregion Getters/Setters
 
     /**
-     * This is the primary function that generates a force of entities from the
-     * given parameters. The
-     * intent is that this function is called from GameThread when the game is
-     * started.
+     * This is the primary function that generates a force of entities from the given parameters. The intent is that
+     * this function is called from GameThread when the game is started.
      *
-     * @param playerUnits      A List of Units for the player's deployed force in
-     *                         the relevant scenario. This
-     *                         is used to determine the total points allowed for
-     *                         this force.
-     * @param botFixedEntities A List of The fixed Entities that might have also
-     *                         been declared in BotForce already.
-     *                         This is used to calculate the starting points already
-     *                         used when generating the force.
-     * @param campaign         A Campaign object which is necessary for various
-     *                         information
+     * @param playerUnits      A List of Units for the player's deployed force in the relevant scenario. This is used to
+     *                         determine the total points allowed for this force.
+     * @param botFixedEntities A List of The fixed Entities that might have also been declared in BotForce already. This
+     *                         is used to calculate the starting points already used when generating the force.
+     * @param campaign         A Campaign object which is necessary for various information
+     *
      * @return A List of Entities that will be added to the game by GameThread.
      */
     public List<Entity> generateForce(List<Unit> playerUnits, List<Entity> botFixedEntities, Campaign campaign) {
         ArrayList<Entity> entityList = new ArrayList<>();
 
         double targetPoints = calculateMaxPoints(playerUnits);
-        double currentPoints = calculateStartingPoints(botFixedEntities);
+        double currentPoints;
         // don't use actual focalWeightClass because we don't want to save changes
         double targetWeightClass = focalWeightClass;
         if ((targetWeightClass < EntityWeightClass.WEIGHT_LIGHT) ||
-                (targetWeightClass > EntityWeightClass.WEIGHT_ASSAULT)) {
+                  (targetWeightClass > EntityWeightClass.WEIGHT_ASSAULT)) {
             // if no target weight class was provided or its outside of range then use the
             // mean of the player units
             targetWeightClass = calculateMeanWeightClass(playerUnits);
@@ -320,8 +322,8 @@ public class BotForceRandomizer {
                 // original error
                 // bars will max out error bars at roughly 25%.
                 loosenError = loosenError + 0.5;
-                logger.info(
-                        "Could not find randomized forces within specified parameters. Increasing target bounds by 50%");
+                LOGGER.info(
+                      "Could not find randomized forces within specified parameters. Increasing target bounds by 50%");
             }
             highBounds = targetPoints * (1 + error * loosenError);
             lowBounds = targetPoints * (1 - error * loosenError);
@@ -336,10 +338,10 @@ public class BotForceRandomizer {
                 // unit instead
                 uType = unitType;
                 if ((unitType == UnitType.MEK) && (percentConventional > 0)
-                        && (Compute.randomInt(100) <= percentConventional)) {
+                          && (Compute.randomInt(100) <= percentConventional)) {
                     uType = UnitType.TANK;
-                } else if ((unitType == UnitType.AEROSPACEFIGHTER) && (percentConventional > 0)
-                        && (Compute.randomInt(100) <= percentConventional)) {
+                } else if ((unitType == UnitType.AEROSPACE_FIGHTER) && (percentConventional > 0)
+                                 && (Compute.randomInt(100) <= percentConventional)) {
                     uType = UnitType.CONV_FIGHTER;
                 }
                 lanceList = generateLance(lanceSize, uType, weightClass, campaign);
@@ -351,7 +353,7 @@ public class BotForceRandomizer {
             if ((currentPoints <= highBounds) || (nAttempts >= 99)) {
                 if (nAttempts >= 99) {
                     entityList = new ArrayList<>();
-                    logger.info("Could not find randomized forces after 99 attempts. No forces generated.");
+                    LOGGER.info("Could not find randomized forces after 99 attempts. No forces generated.");
                 }
                 startOver = false;
             }
@@ -361,38 +363,16 @@ public class BotForceRandomizer {
     }
 
     /**
-     * This is the primary function that generates a force of entities from the
-     * given parameters. The
-     * intent is that this function is called from GameThread when the game is
-     * started.
-     *
-     * @param playerUnits      A List of Units for the player's deployed force in
-     *                         the relevant scenario. This
-     *                         is used to determine the total points allowed for
-     *                         this force.
-     * @param botFixedEntities A List of The fixed Entities that might have also
-     *                         been declared in BotForce already.
-     *                         This is used to calculate the starting points already
-     *                         used when generating the force.
-     * @return A List of Entities that will be added to the game by GameThread.
-     */
-
-    /**
-     * Generate a "lance" of entities based on the lanceSize variable. This is not
-     * really a lance but
-     * the size of the increment in the number of entities that are part of this
-     * force. This can be set to
-     * 1 to generate entities individually. The larger this number is the greater
-     * the chance of overshooting
-     * the target number of points.
+     * Generate a "lance" of entities based on the lanceSize variable. This is not really a lance but the size of the
+     * increment in the number of entities that are part of this force. This can be set to 1 to generate entities
+     * individually. The larger this number is the greater the chance of overshooting the target number of points.
      *
      * @param size        an int giving the number of units to generate
      * @param uType       The UnitType of generated units
-     * @param weightClass an int giving the weight class of generated units. The
-     *                    function applies some randomness
-     *                    to this, so some entities within the lance may be heavier
-     *                    or lighter.
+     * @param weightClass an int giving the weight class of generated units. The function applies some randomness to
+     *                    this, so some entities within the lance may be heavier or lighter.
      * @param campaign    a Campaign object for campaign related information
+     *
      * @return A List of generated entities.
      */
     public List<Entity> generateLance(int size, int uType, int weightClass, Campaign campaign) {
@@ -407,7 +387,7 @@ public class BotForceRandomizer {
 
         // check for integrated BA support
         if ((unitType == UnitType.MEK) && (baChance > 0)
-                && (Compute.randomInt(100) <= baChance)) {
+                  && (Compute.randomInt(100) <= baChance)) {
             for (int i = 0; i < size; i++) {
                 Entity e = getEntity(UnitType.BATTLE_ARMOR, UNIT_WEIGHT_UNSPECIFIED, campaign);
                 if (null != e) {
@@ -420,14 +400,13 @@ public class BotForceRandomizer {
     }
 
     /**
-     * Determines the most appropriate RAT and uses it to generate a random Entity.
-     * This
-     * function borrows heavily from AtBDynamicScenarioFactory#getEntity
+     * Determines the most appropriate RAT and uses it to generate a random Entity. This function borrows heavily from
+     * AtBDynamicScenarioFactory#getEntity
      *
-     * @param uType       The UnitTableData constant for the type of unit to
-     *                    generate.
+     * @param uType       The UnitTableData constant for the type of unit to generate.
      * @param weightClass The weight class of the unit to generate
      * @param campaign    A campaign object
+     *
      * @return A new Entity with crew.
      */
     public Entity getEntity(int uType, int weightClass, Campaign campaign) {
@@ -459,11 +438,11 @@ public class BotForceRandomizer {
     }
 
     /**
-     * This creates the entity with a crew. Borrows heavily from
-     * AtBDynamicScenarioFactory#createEntityWithCrew
+     * This creates the entity with a crew. Borrows heavily from AtBDynamicScenarioFactory#createEntityWithCrew
      *
      * @param ms       Which entity to generate
      * @param campaign A campaign file
+     *
      * @return A crewed entity
      */
     public @Nullable Entity createEntityWithCrew(MekSummary ms, Campaign campaign) {
@@ -471,7 +450,7 @@ public class BotForceRandomizer {
         try {
             en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
         } catch (Exception ex) {
-            logger.error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName(), ex);
+            LOGGER.error("Unable to load entity: {}: {}", ms.getSourceFile(), ms.getEntryName(), ex);
             return null;
         }
         Faction faction = Factions.getInstance().getFaction(factionCode);
@@ -523,7 +502,7 @@ public class BotForceRandomizer {
                 case UnitType.BATTLE_ARMOR:
                     phenotype = Phenotype.ELEMENTAL;
                     break;
-                case UnitType.AEROSPACEFIGHTER:
+                case UnitType.AEROSPACE_FIGHTER:
                 case UnitType.CONV_FIGHTER:
                     phenotype = Phenotype.AEROSPACE;
                     break;
@@ -542,10 +521,10 @@ public class BotForceRandomizer {
             }
 
             if (!phenotype.isNone()) {
-                String bloodname = Bloodname.randomBloodname(faction.getShortName(), phenotype,
-                        campaign.getGameYear()).getName();
-                crewName += ' ' + bloodname;
-                innerMap.put(Crew.MAP_BLOODNAME, bloodname);
+                String bloodName = Bloodname.randomBloodname(faction.getShortName(), phenotype,
+                      campaign.getGameYear()).getName();
+                crewName += ' ' + bloodName;
+                innerMap.put(Crew.MAP_BLOOD_NAME, bloodName);
                 innerMap.put(Crew.MAP_PHENOTYPE, phenotype.name());
             }
         }
@@ -553,18 +532,18 @@ public class BotForceRandomizer {
         extraData.put(0, innerMap);
 
         en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
-                skills[0], skills[1], gender, faction.isClan(), extraData));
+              skills[0], skills[1], gender, faction.isClan(), extraData));
 
         en.setExternalIdAsString(UUID.randomUUID().toString());
         return en;
     }
 
     /**
-     * This function samples from the given gamma distribution to get a random
-     * weight class. Results are trimmed
-     * to reasonable values and rounded to integers.
+     * This function samples from the given gamma distribution to get a random weight class. Results are trimmed to
+     * reasonable values and rounded to integers.
      *
      * @param gamma The GammaDistribution from which a random value is drawn
+     *
      * @return and integer giving the sampled weight class
      */
     private int sampleWeightClass(GammaDistribution gamma) {
@@ -574,14 +553,12 @@ public class BotForceRandomizer {
     }
 
     /**
-     * This function calculates the maximum "points" that the generated force should
-     * be. The term "points" is abstract
-     * and can refer to different things depending on the selected BalancingMethod.
-     * The maximum points are defined by
-     * a multiple of the player unit points.
+     * This function calculates the maximum "points" that the generated force should be. The term "points" is abstract
+     * and can refer to different things depending on the selected BalancingMethod. The maximum points are defined by a
+     * multiple of the player unit points.
      *
-     * @param playerUnits A List of Units from the player's units assigned to a
-     *                    given scenario
+     * @param playerUnits A List of Units from the player's units assigned to a given scenario
+     *
      * @return a double giving the targeted maximum points for the generated force.
      */
     private double calculateMaxPoints(List<Unit> playerUnits) {
@@ -595,15 +572,12 @@ public class BotForceRandomizer {
     }
 
     /**
-     * Calculates the starting points for this force already used up by fixed
-     * entities that are part of the BotForce.
-     * The term "points" is abstract and can refer to different things depending on
-     * the selected BalancingMethod.
+     * Calculates the starting points for this force already used up by fixed entities that are part of the BotForce.
+     * The term "points" is abstract and can refer to different things depending on the selected BalancingMethod.
      *
-     * @param botEntities - A List of Entities, typically specified as fixed units
-     *                    in BotForce
-     * @return a double giving the starting points already used by the fixed units
-     *         in the BotForce
+     * @param botEntities - A List of Entities, typically specified as fixed units in BotForce
+     *
+     * @return a double giving the starting points already used by the fixed units in the BotForce
      */
     private double calculateStartingPoints(List<Entity> botEntities) {
         double startPoints = 0;
@@ -615,11 +589,11 @@ public class BotForceRandomizer {
     }
 
     /**
-     * This function calculates how many "points" a given entity counts for. The use
-     * of points is abstract and
-     * will be determined differently depending on the provided BalancingMethod
+     * This function calculates how many "points" a given entity counts for. The use of points is abstract and will be
+     * determined differently depending on the provided BalancingMethod
      *
      * @param e - an Entity
+     *
      * @return a double giving the points provided by this entity
      */
     private double calculatePoints(Entity e) {
@@ -634,51 +608,32 @@ public class BotForceRandomizer {
     }
 
     /**
-     * A static method calculating the adjusted weight of an entity for use in the
-     * WEIGHT_ADJ BalancingMethod.
-     * Units get points by weight, but a multiplier is applied to these weights by
-     * unit type.
+     * A static method calculating the adjusted weight of an entity for use in the WEIGHT_ADJ BalancingMethod. Units get
+     * points by weight, but a multiplier is applied to these weights by unit type.
      *
      * @param e an Entity
+     *
      * @return a double indicating the adjusted weight points of a unit.
      */
     private static double getAdjustedWeightPoints(Entity e) {
         double points = e.getWeight();
 
-        double multiplier;
-        switch (e.getUnitType()) {
-            case UnitType.MEK:
-            case UnitType.AEROSPACEFIGHTER:
-            case UnitType.PROTOMEK:
-                multiplier = 1.0;
-                break;
-            case UnitType.TANK:
-            case UnitType.VTOL:
-            case UnitType.NAVAL:
-                multiplier = 0.6;
-                break;
-            case UnitType.CONV_FIGHTER:
-                multiplier = 0.4;
-                break;
-            case UnitType.BATTLE_ARMOR:
+        double multiplier = switch (e.getUnitType()) {
+            case UnitType.MEK, UnitType.AEROSPACE_FIGHTER, UnitType.PROTOMEK -> 1.0;
+            case UnitType.TANK, UnitType.VTOL, UnitType.NAVAL -> 0.6;
+            case UnitType.CONV_FIGHTER -> 0.4;
+            case UnitType.BATTLE_ARMOR -> {
                 points = 10;
-                multiplier = 1;
-                break;
-            case UnitType.INFANTRY:
+                yield 1;
+            }
+            case UnitType.INFANTRY -> {
                 points = 0.5;
-                multiplier = 1;
-                break;
-            case UnitType.GUN_EMPLACEMENT:
-                multiplier = 0.2;
-                break;
-            case UnitType.DROPSHIP:
-            case UnitType.JUMPSHIP:
-            case UnitType.WARSHIP:
-                multiplier = 0.1;
-                break;
-            default:
-                multiplier = 0;
-        }
+                yield 1;
+            }
+            case UnitType.GUN_EMPLACEMENT -> 0.2;
+            case UnitType.DROPSHIP, UnitType.JUMPSHIP, UnitType.WARSHIP -> 0.1;
+            default -> 0;
+        };
 
         return points * multiplier;
 
@@ -688,6 +643,7 @@ public class BotForceRandomizer {
      * Calculates the mean weight class of a List of Units
      *
      * @param playerUnits - A List of Units
+     *
      * @return a double indicating the mean weight class
      */
     private double calculateMeanWeightClass(List<Unit> playerUnits) {
@@ -706,13 +662,11 @@ public class BotForceRandomizer {
     }
 
     public String getShortDescription() {
-        String sb = forceMultiplier + " (" + balancingMethod.toString() + ')';
-        return sb;
+        return forceMultiplier + " (" + balancingMethod.toString() + ')';
     }
 
     /**
-     * This method returns a description of the random parameters of this object
-     * that will be shown in the
+     * This method returns a description of the random parameters of this object that will be shown in the
      * ScenarioViewPanel
      *
      * @return a String giving the description.
@@ -752,7 +706,7 @@ public class BotForceRandomizer {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "botForceRandomizer");
     }
 
-    public static BotForceRandomizer generateInstanceFromXML(Node wn, Campaign c, Version version) {
+    public static BotForceRandomizer generateInstanceFromXML(Node wn, Campaign campaign, Version version) {
         BotForceRandomizer retVal = new BotForceRandomizer();
 
         try {
@@ -785,7 +739,7 @@ public class BotForceRandomizer {
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         return retVal;

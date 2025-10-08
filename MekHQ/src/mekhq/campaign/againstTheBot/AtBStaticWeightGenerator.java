@@ -24,12 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.againstTheBot;
 
-import megamek.common.Compute;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.compute.Compute;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 
@@ -38,24 +43,24 @@ public class AtBStaticWeightGenerator {
      * @param campaign the campaign to generate the unit weight based on
      * @param unitType the unit type to determine the format of weight to generate
      * @param faction  the faction to generate the weight for
+     *
      * @return the generated weight
      */
     public static int getRandomWeight(final Campaign campaign, final int unitType,
-            final Faction faction) {
+          final Faction faction) {
         return getRandomWeight(unitType, faction, campaign.getCampaignOptions().isRegionalMekVariations());
     }
 
     /**
-     * @param unitType         the unit type to determine the format of weight to
-     *                         generate
+     * @param unitType         the unit type to determine the format of weight to generate
      * @param faction          the faction to generate the weight for
-     * @param regionVariations whether to generate 'Mek weights based on hardcoded
-     *                         regional variations
+     * @param regionVariations whether to generate 'Mek weights based on hardcoded regional variations
+     *
      * @return the generated weight
      */
     private static int getRandomWeight(final int unitType, final Faction faction,
-            final boolean regionVariations) {
-        if (unitType == UnitType.AEROSPACEFIGHTER) {
+          final boolean regionVariations) {
+        if (unitType == UnitType.AEROSPACE_FIGHTER) {
             return getRandomAerospaceWeight();
         } else if ((unitType == UnitType.MEK) && regionVariations) {
             return getRegionalMekWeight(faction);
@@ -82,6 +87,7 @@ public class AtBStaticWeightGenerator {
 
     /**
      * @param faction the faction to determine the regional BattleMek weight for
+     *
      * @return the generated weight for a BattleMek
      */
     private static int getRegionalMekWeight(final Faction faction) {

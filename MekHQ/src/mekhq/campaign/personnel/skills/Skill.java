@@ -38,13 +38,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_SKILL_MODIFIER;
-import static mekhq.campaign.personnel.skills.SkillType.S_ACTING;
-import static mekhq.campaign.personnel.skills.SkillType.S_ANIMAL_HANDLING;
-import static mekhq.campaign.personnel.skills.SkillType.S_INTEREST_THEOLOGY;
-import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
-import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
-import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
-import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
+import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -55,9 +49,9 @@ import java.util.List;
 import java.util.Objects;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
-import megamek.common.TargetRoll;
+import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -74,8 +68,8 @@ import org.w3c.dom.NodeList;
  * <p>
  * Four important characteristics will determine how each skill works
  * <p>
- * level - this is the level of the skill. By default this will go from 0 to 10, but the max will be customizable. These
- * won't necessarily correspond to named levels (e.g. Green, Elite).
+ * level - this is the level of the skill. By default, this will go from 0 to 10, but the max will be customizable.
+ * These won't necessarily correspond to named levels (e.g. Green, Elite).
  * <p>
  * By assigning skill costs of 0 to some levels, these can basically be skipped and by assigning skill costs of -1, they
  * can be made inaccessible.
@@ -86,7 +80,7 @@ import org.w3c.dom.NodeList;
  * target - this is the baseline target number for the skill when level and bonus are zero.
  * <p>
  * isCountUp - this is a boolean that defines whether this skill's target is a "roll greater than or equal to" (false)
- * or an rpg-style bonus to a roll (true)
+ * or a rpg-style bonus to a roll (true)
  * <p>
  * The actual target number for a skill is given by
  * <p>
@@ -348,6 +342,34 @@ public class Skill {
             }
 
             if (characterOptions.booleanOption(ATOW_ANIMAL_EMPATHY)) {
+                modifier += 2;
+            }
+        }
+
+        // Houdini
+        if (Objects.equals(name, S_ESCAPE_ARTIST)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_HOUDINI)) {
+                modifier += 2;
+            }
+        }
+
+        // Master Impersonator
+        if (Objects.equals(name, S_DISGUISE)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_MASTER_IMPERSONATOR)) {
+                modifier += 2;
+            }
+        }
+
+        // Counterfeiter
+        if (Objects.equals(name, S_FORGERY)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_COUNTERFEITER)) {
+                modifier += 2;
+            }
+        }
+
+        // Natural Thespian
+        if (Objects.equals(name, S_ACTING)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_NATURAL_THESPIAN)) {
                 modifier += 2;
             }
         }
@@ -793,8 +815,8 @@ public class Skill {
      *   <li>Otherwise, the final skill value is suffixed with a plus sign (<code>+</code>).</li>
      * </ul>
      *
-     * @param options    The {@link PersonnelOptions} to use for calculating the final skill value.
-     * @param reputation The reputation value used in the calculation.
+     * @param options            The {@link PersonnelOptions} to use for calculating the final skill value.
+     * @param adjustedReputation The reputation value used in the calculation.
      *
      * @return A string representation of the calculated final skill value, formatted depending on the state of
      *       {@link #isCountUp()}.
@@ -802,12 +824,21 @@ public class Skill {
      * @see #isCountUp()
      * @see #getFinalSkillValue(PersonnelOptions, Attributes, int)
      */
-    public String toString(PersonnelOptions options, Attributes attributes, int reputation) {
+    public String toString(PersonnelOptions options, Attributes attributes, int adjustedReputation) {
+        String display;
+
         if (isCountUp()) {
-            return "+" + getFinalSkillValue(options, attributes, reputation);
+            display = "+" + getFinalSkillValue(options, attributes, adjustedReputation);
         } else {
-            return getFinalSkillValue(options, attributes, reputation) + "+";
+            display = getFinalSkillValue(options, attributes, adjustedReputation) + "+";
         }
+
+        if (type.isSkillLevelsMatter()) {
+            int totalSkillLevel = getTotalSkillLevel(options, attributes, adjustedReputation);
+            display += String.format(" (%d)", totalSkillLevel);
+        }
+
+        return display;
     }
 
     /**

@@ -24,11 +24,16 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.contractMarket;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.campaign.mission.enums.AtBContractType;
 
 /**
@@ -36,13 +41,13 @@ import mekhq.campaign.mission.enums.AtBContractType;
  */
 public class MissionSelector {
     /**
-     * Determines the mission from the Inner Sphere/Clan column of the Missions Table on page 40
-     * in CamOps, 4th printing. Certain rolls generate missions from other columns, i.e. Special
-     * and Covert.
+     * Determines the mission from the Inner Sphere/Clan column of the Missions Table on page 40 in CamOps, 4th
+     * printing. Certain rolls generate missions from other columns, i.e. Special and Covert.
      *
-     * @param roll The result of a 2d6 roll
+     * @param roll   The result of a 2d6 roll
      * @param margin The margin of success from a Negotiation check
      * @param isClan Whether the player unit is a Clan faction
+     *
      * @return The AtBContractType representing the type of mission for the contract
      */
     public static AtBContractType getInnerSphereClanMission(int roll, int margin, boolean isClan) {
@@ -53,7 +58,7 @@ public class MissionSelector {
                 return getInnerSphereClanMission(Compute.d6(2), margin, true);
             }
         }
-        return switch(MathUtility.clamp(roll + margin, 2, 12)) {
+        return switch (MathUtility.clamp(roll + margin, 2, 12)) {
             case 2 -> getCovertMission(Compute.d6(2), margin);
             case 3, 12 -> getSpecialMission(Compute.d6(2), margin);
             case 4 -> AtBContractType.PIRATE_HUNTING;
@@ -67,13 +72,13 @@ public class MissionSelector {
     }
 
     /**
-     * Determines the mission from the Independent column of the Missions Table on page 40 in
-     * CamOps, 4th printing. Certain rolls generate missions from other columns, i.e. Special
-     * and Covert.
+     * Determines the mission from the Independent column of the Missions Table on page 40 in CamOps, 4th printing.
+     * Certain rolls generate missions from other columns, i.e. Special and Covert.
      *
-     * @param roll The result of a 2d6 roll
+     * @param roll   The result of a 2d6 roll
      * @param margin The margin of success from a Negotiation check
      * @param isClan Whether the player unit is a Clan faction
+     *
      * @return The AtBContractType representing the type of mission for the contract
      */
     public static AtBContractType getIndependentMission(int roll, int margin, boolean isClan) {
@@ -84,7 +89,7 @@ public class MissionSelector {
                 return getInnerSphereClanMission(Compute.d6(2), margin, true);
             }
         }
-        return switch(MathUtility.clamp(roll + margin, 2, 12)) {
+        return switch (MathUtility.clamp(roll + margin, 2, 12)) {
             case 2 -> getCovertMission(Compute.d6(2), margin);
             case 3, 12 -> getSpecialMission(Compute.d6(2), margin);
             case 4 -> AtBContractType.PLANETARY_ASSAULT;
@@ -98,13 +103,13 @@ public class MissionSelector {
     }
 
     /**
-     * Determines the mission from the Corporation column of the Missions Table on page 40 in
-     * CamOps, 4th printing. Certain rolls generate missions from other columns, i.e. Special
-     * and Covert.
+     * Determines the mission from the Corporation column of the Missions Table on page 40 in CamOps, 4th printing.
+     * Certain rolls generate missions from other columns, i.e. Special and Covert.
      *
-     * @param roll The result of a 2d6 roll
+     * @param roll   The result of a 2d6 roll
      * @param margin The margin of success from a Negotiation check
      * @param isClan Whether the player unit is a Clan faction
+     *
      * @return The AtBContractType representing the type of mission for the contract
      */
     public static AtBContractType getCorporationMission(int roll, int margin, boolean isClan) {
@@ -115,7 +120,7 @@ public class MissionSelector {
                 return getInnerSphereClanMission(Compute.d6(2), margin, true);
             }
         }
-        return switch(MathUtility.clamp(roll + margin, 2, 12)) {
+        return switch (MathUtility.clamp(roll + margin, 2, 12)) {
             case 2, 3 -> getCovertMission(Compute.d6(2), margin);
             case 4, 12 -> getSpecialMission(Compute.d6(2), margin);
             case 5, 8 -> AtBContractType.OBJECTIVE_RAID;
@@ -129,11 +134,11 @@ public class MissionSelector {
     }
 
     /**
-     * Determines the mission from the Pirate column of the Missions Table on page 40 in CamOps,
-     * 4th printing.
+     * Determines the mission from the Pirate column of the Missions Table on page 40 in CamOps, 4th printing.
      *
-     * @param roll The result of a 2d6 roll
+     * @param roll   The result of a 2d6 roll
      * @param margin The margin of success from a Negotiation check
+     *
      * @return The AtBContractType representing the type of mission for the contract
      */
     public static AtBContractType getPirateMission(int roll, int margin) {
@@ -146,7 +151,7 @@ public class MissionSelector {
     }
 
     private static AtBContractType getSpecialMission(int roll, int margin) {
-        return switch(MathUtility.clamp(roll + margin, 2, 12)) {
+        return switch (MathUtility.clamp(roll + margin, 2, 12)) {
             case 2 -> getCovertMission(Compute.d6(2), margin);
             // TODO: figure out how to offer planetary assault followup contracts
             case 3, 4 -> AtBContractType.GUERRILLA_WARFARE;

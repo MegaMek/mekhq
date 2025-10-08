@@ -58,10 +58,10 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.widget.RawImagePanel;
-import megamek.common.Entity;
-import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
+import megamek.common.loaders.MekSummaryCache;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.MHQConstants;
@@ -70,10 +70,12 @@ import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
-import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
+import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
@@ -81,12 +83,11 @@ import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
-import mekhq.campaign.storyarc.StoryArc;
-import mekhq.campaign.storyarc.StoryArcStub;
+import mekhq.campaign.storyArc.StoryArc;
+import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -104,8 +105,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     private final Task task;
     private RawImagePanel splash;
     private JProgressBar progressBar;
-    private StoryArcStub storyArcStub;
-    private boolean isInAppNewCampaign;
+    private final StoryArcStub storyArcStub;
+    private final boolean isInAppNewCampaign;
 
     private final LocalDate DEFAULT_START_DATE = LocalDate.of(3051, 1, 1);
 
@@ -244,7 +245,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     /**
      * Main task. This is executed in a background thread.
      */
-    private class Task extends SwingWorker<Campaign, Campaign> {
+    public class Task extends SwingWorker<Campaign, Campaign> {
         JDialog dialog;
 
         public Task(JDialog dialog) {
@@ -270,25 +271,25 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          */
         @Override
         public Campaign doInBackground() throws Exception {
-            // region Progress 0
+            // region progress 0
             setProgress(0);
             CurrencyManager.getInstance().loadCurrencies();
             Eras.initializeEras();
             FinancialInstitutions.initializeFinancialInstitutions();
             InjuryTypes.registerAll(); // TODO : Isolate into an actual module
             Ranks.initializeRankSystems();
-            RATManager.populateCollectionNames();
             SkillType.initializeTypes();
             sort(SkillType.getSkillList()); // sort all skills alphabetically
-            SpecialAbility.initializeSPA();
+            SpecialAbility.initializeSPA(false);
+            AtBScenarioModifier.initializeScenarioModifiers(false);
             // endregion Progress 0
 
-            // region Progress 1
+            // region progress 1
             setProgress(1);
-            Factions.setInstance(Factions.loadDefault());
+            Factions.setInstance(Factions.loadDefault(false));
             // endregion Progress 1
 
-            // region Progress 2
+            // region progress 2
             setProgress(2);
             RandomNameGenerator.getInstance();
             RandomCallsignGenerator.getInstance();
@@ -296,17 +297,17 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             Bloodname.loadBloodnameData();
             // endregion Progress 2
 
-            // region Progress 3
+            // region progress 3
             setProgress(3);
             Systems.setInstance(Systems.loadDefault());
             // endregion Progress 3
 
-            // region Progress 4
+            // region progress 4
             setProgress(4);
             MHQStaticDirectoryManager.initialize();
             // endregion Progress 4
 
-            // region Progress 5
+            // region progress 5
             setProgress(5);
             while (!MekSummaryCache.getInstance().isInitialized()) {
                 try {
@@ -320,9 +321,9 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             setProgress(6);
             final Campaign campaign;
             if (getCampaignFile() == null) {
-                // region Progress 6
+                // region progress 6
                 LOGGER.info("Starting a new campaign");
-                campaign = new Campaign();
+                campaign = CampaignFactory.createCampaign();
 
                 // Campaign Preset
                 final CampaignOptionsPresetPicker campaignOptionsPresetPicker =
@@ -374,40 +375,42 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.setReputation(reputationController);
 
                 // initialize starting faction standings
-                if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+                CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                if (campaignOptions.isTrackFactionStanding()) {
                     FactionStandings factionStandings = campaign.getFactionStandings();
                     String report = factionStandings.updateClimateRegard(campaign.getFaction(),
-                          campaign.getLocalDate(), campaign.getCampaignOptions().getRegardMultiplier());
+                          campaign.getLocalDate(), campaignOptions.getRegardMultiplier(),
+                          true);
                     campaign.addReport(report);
                 }
                 // endregion Progress 6
 
-                // region Progress 7
+                // region progress 7
                 setProgress(7);
                 campaign.beginReport("<b>" +
                                            MekHQ.getMHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) +
                                            "</b>");
 
                 // Setup Personnel Modules
-                campaign.setMarriage(campaign.getCampaignOptions()
+                campaign.setMarriage(campaignOptions
                                            .getRandomMarriageMethod()
-                                           .getMethod(campaign.getCampaignOptions()));
-                campaign.setDivorce(campaign.getCampaignOptions()
+                                           .getMethod(campaignOptions));
+                campaign.setDivorce(campaignOptions
                                           .getRandomDivorceMethod()
-                                          .getMethod(campaign.getCampaignOptions()));
-                campaign.setProcreation(campaign.getCampaignOptions()
+                                          .getMethod(campaignOptions));
+                campaign.setProcreation(campaignOptions
                                               .getRandomProcreationMethod()
-                                              .getMethod(campaign.getCampaignOptions()));
+                                              .getMethod(campaignOptions));
 
                 // Setup Markets
-                campaign.refreshPersonnelMarkets();
-                ContractMarketMethod contractMarketMethod = campaign.getCampaignOptions().getContractMarketMethod();
+                campaign.refreshPersonnelMarkets(true);
+                ContractMarketMethod contractMarketMethod = campaignOptions.getContractMarketMethod();
                 campaign.setContractMarket(contractMarketMethod.getContractMarket());
                 if (!contractMarketMethod.isNone()) {
                     campaign.getContractMarket().generateContractOffers(campaign, true);
                 }
-                if (!campaign.getCampaignOptions().getUnitMarketMethod().isNone()) {
-                    campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
+                if (!campaignOptions.getUnitMarketMethod().isNone()) {
+                    campaign.setUnitMarket(campaignOptions.getUnitMarketMethod().getUnitMarket());
                     campaign.getUnitMarket().generateUnitOffers(campaign);
                 }
 
@@ -419,7 +422,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.setGMMode((preset == null) || preset.isGM());
 
                 // AtB
-                if (campaign.getCampaignOptions().isUseAtB()) {
+                if (campaignOptions.isUseAtB()) {
                     campaign.initAtB(true);
                 }
 
@@ -427,7 +430,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.initTurnover();
                 // endregion Progress 7
             } else {
-                // region Progress 6
+                // region progress 6
                 LOGGER.info("Loading campaign file from XML file {}", getCampaignFile());
 
                 // And then load the campaign object from it.
@@ -441,7 +444,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
                 // endregion Progress 6
 
-                // region Progress 7
+                // region progress 7
                 setProgress(7);
 
                 unassignCrewFromUnsupportedUnits(campaign.getUnits());

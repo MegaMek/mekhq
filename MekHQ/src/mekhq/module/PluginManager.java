@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.module;
 
@@ -38,13 +43,12 @@ import java.util.List;
 import megamek.logging.MMLogger;
 
 /**
- * Tracks which plugins are installed and which are active. Provides class
- * loader for use by ServiceLoader.
+ * Tracks which plugins are installed and which are active. Provides class loader for use by ServiceLoader.
  *
  * @author Neoancient
  */
 public class PluginManager {
-    private static final MMLogger logger = MMLogger.create(PluginManager.class);
+    private static final MMLogger LOGGER = MMLogger.create(PluginManager.class);
 
     private static PluginManager instance;
     private static final String PLUGIN_DIR = "./plugins";
@@ -60,29 +64,29 @@ public class PluginManager {
     }
 
     private PluginManager() {
-        logger.debug("Initializing plugin manager.");
+        LOGGER.debug("Initializing plugin manager.");
 
         scriptFiles = new ArrayList<>();
         File dir = new File(PLUGIN_DIR);
         if (!dir.exists()) {
-            logger.warn("Could not find plugin directory");
+            LOGGER.warn("Could not find plugin directory");
         }
         URL[] urls = new URL[0];
         if (dir.exists() && dir.isDirectory()) {
             List<URL> plugins = getPluginsFromDir(dir);
             urls = plugins.toArray(urls);
         } else {
-            logger.warn("Could not find plugin directory.");
+            LOGGER.warn("Could not find plugin directory.");
         }
-        logger.debug("Found " + urls.length + " plugins");
+        LOGGER.debug("Found {} plugins", urls.length);
         classLoader = new URLClassLoader(urls);
     }
 
     /**
-     * Recursively checks the plugin directory for jar files and adds them to the
-     * list.
+     * Recursively checks the plugin directory for jar files and adds them to the list.
      *
      * @param origin The origin file to check
+     *
      * @return A list of all jar files in the directory and subdirectories
      */
     private List<URL> getPluginsFromDir(final File origin) {
@@ -94,7 +98,7 @@ public class PluginManager {
             return new ArrayList<>();
         }
 
-        logger.debug("Now checking directory " + origin.getName());
+        LOGGER.debug("Now checking directory {}", origin.getName());
         final List<URL> plugins = new ArrayList<>();
         for (final File file : files) {
             if (file.getName().startsWith(".")) {
@@ -104,7 +108,7 @@ public class PluginManager {
             plugins.addAll(getPluginsFromDir(file));
 
             if (file.getName().toLowerCase().endsWith(".jar")) {
-                logger.debug("Now adding plugin " + file.getName() + " to class loader.");
+                LOGGER.debug("Now adding plugin {} to class loader.", file.getName());
                 try {
                     plugins.add(file.toURI().toURL());
                 } catch (MalformedURLException ignored) {

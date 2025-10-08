@@ -92,7 +92,7 @@ public class GMTools extends JDialog {
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
     protected static final int CENTER_WIDTH = scaleForGUI(450);
 
-    private Campaign campaign;
+    private final Campaign campaign;
     private ImageIcon campaignIcon;
     private final Faction campaignFaction;
     private final LocalDate today;
@@ -106,8 +106,8 @@ public class GMTools extends JDialog {
     /**
      * Constructs a new {@link GMTools} dialog window.
      *
-     * @param parent           the parent {@link JDialog} for modality
-     * @param campaign         the current campaign
+     * @param parent   the parent {@link JDialog} for modality
+     * @param campaign the current campaign
      *
      * @author Illiani
      * @since 0.50.07
@@ -379,7 +379,7 @@ public class GMTools extends JDialog {
                 case RESET_ALL_REGARD, ZERO_ALL_REGARD -> {
                     reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
                     factionStandings.resetAllFactionStandings();
-                    factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier);
+                    factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier, false);
                 }
                 case SET_SPECIFIC_REGARD -> {
                     Faction selectedFaction = factionSelectionDialog.getSelectedFaction();
@@ -395,7 +395,7 @@ public class GMTools extends JDialog {
                 case UPDATE_HISTORIC_CONTRACTS -> {
                     reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
                     factionStandings.resetAllFactionStandings();
-                    factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier);
+                    factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier, false);
                     reports.addAll(factionStandings.updateCampaignForPastMissions(missions,
                           campaignIcon,
                           campaignFaction,

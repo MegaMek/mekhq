@@ -24,23 +24,28 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
-
-import megamek.common.AmmoType;
-import megamek.common.BombType;
-import megamek.common.EquipmentType;
-import megamek.common.weapons.infantry.InfantryWeapon;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.enums.BombType;
+import megamek.common.weapons.infantry.InfantryWeapon;
+
 public class AmmoUtilities {
     /**
-     * Gets an AmmoType by name (performing any initialization required
-     * on the MM side).
+     * Gets an AmmoType by name (performing any initialization required on the MM side).
      *
      * @param name The lookup name for the AmmoType.
+     *
      * @return The ammo type for the given name.
      */
     public synchronized static AmmoType getAmmoType(String name) {
@@ -51,10 +56,10 @@ public class AmmoUtilities {
     }
 
     /**
-     * Gets a BombType by name (performing any initialization required
-     * on the MM side).
+     * Gets a BombType by name (performing any initialization required on the MM side).
      *
      * @param name The lookup name for the BombType.
+     *
      * @return The bomb type for the given name.
      */
     public synchronized static BombType getBombType(String name) {
@@ -65,10 +70,10 @@ public class AmmoUtilities {
     }
 
     /**
-     * Gets a InfantryWeapon by name (performing any initialization required
-     * on the MM side).
+     * Gets a InfantryWeapon by name (performing any initialization required on the MM side).
      *
      * @param name The lookup name for the InfantryWeapon.
+     *
      * @return The bomb type for the given name.
      */
     public synchronized static InfantryWeapon getInfantryWeapon(String name) {

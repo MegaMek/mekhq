@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.log;
 
@@ -44,30 +49,30 @@ import mekhq.campaign.personnel.Person;
  * @author Miguel Azevedo
  */
 public class AssignmentLogger {
-    private static final MMLogger logger = MMLogger.create(AssignmentLogger.class);
+    private static final MMLogger LOGGER = MMLogger.create(AssignmentLogger.class);
 
     private static final ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
           MekHQ.getMHQOptions().getLocale());
 
     public static void assignedTo(Person person, LocalDate date, String unitName) {
         String message = logEntriesResourceMap.getString("assignedTo.text");
-        person.addPersonalLogEntry(new AssignmentLogEntry(date, MessageFormat.format(message, unitName)));
+        person.addAssignmentLogEntry(new AssignmentLogEntry(date, MessageFormat.format(message, unitName)));
     }
 
     public static void reassignedTo(Person person, LocalDate date, String unitName) {
         String message = logEntriesResourceMap.getString("reassignedTo.text");
-        person.addPersonalLogEntry(new AssignmentLogEntry(date, MessageFormat.format(message, unitName)));
+        person.addAssignmentLogEntry(new AssignmentLogEntry(date, MessageFormat.format(message, unitName)));
     }
 
     public static void removedFrom(Person person, LocalDate date, String unitName) {
         String message = logEntriesResourceMap.getString("removedFrom.text");
-        person.addPersonalLogEntry(new AssignmentLogEntry(date, MessageFormat.format(message, unitName)));
+        person.addAssignmentLogEntry(new AssignmentLogEntry(date, MessageFormat.format(message, unitName)));
     }
 
     public static void addedToTOEForce(Campaign campaign, Person person, LocalDate date, Force force) {
         if (force != null) {
             String message = logEntriesResourceMap.getString("addToTOEForce.text");
-            person.addPersonalLogEntry(new AssignmentLogEntry(date,
+            person.addAssignmentLogEntry(new AssignmentLogEntry(date,
                   MessageFormat.format(message,
                         campaign.getCampaignOptions().isUseExtendedTOEForceName() ?
                               force.getFullName() :
@@ -78,7 +83,7 @@ public class AssignmentLogger {
     public static void reassignedTOEForce(final Campaign campaign, final Person person, final LocalDate date,
           final @Nullable Force oldForce, final @Nullable Force newForce) {
         if ((oldForce == null) && (newForce == null)) {
-            logger.error("Cannot reassign {} on {} because both specified forces are null",
+            LOGGER.error("Cannot reassign {} on {} because both specified forces are null",
                   person.getFullTitle(),
                   date);
             return;
@@ -86,7 +91,7 @@ public class AssignmentLogger {
 
         if ((oldForce != null) && (newForce != null)) {
             String message = logEntriesResourceMap.getString("reassignedTOEForce.text");
-            person.addPersonalLogEntry(new AssignmentLogEntry(date,
+            person.addAssignmentLogEntry(new AssignmentLogEntry(date,
                   MessageFormat.format(message,
                         campaign.getCampaignOptions().isUseExtendedTOEForceName() ?
                               oldForce.getFullName() :
@@ -104,7 +109,7 @@ public class AssignmentLogger {
     public static void removedFromTOEForce(Campaign campaign, Person person, LocalDate date, Force force) {
         if (force != null) {
             String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
-            person.addPersonalLogEntry(new AssignmentLogEntry(date,
+            person.addAssignmentLogEntry(new AssignmentLogEntry(date,
                   MessageFormat.format(message,
                         campaign.getCampaignOptions().isUseExtendedTOEForceName() ?
                               force.getFullName() :

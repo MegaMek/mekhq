@@ -34,7 +34,7 @@ package mekhq.campaign.randomEvents.personalities.enums;
 
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.REASONING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -113,8 +113,9 @@ public enum Reasoning {
     private final int level;
 
     /**
-     * Defines the number of individual description variants available for each trait.
+     * @deprecated only used in deprecated methods
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public final static int MAXIMUM_VARIATIONS = 25;
 
     /**
@@ -153,28 +154,13 @@ public enum Reasoning {
     // region Getters
     public String getLabel() {
         final String RESOURCE_KEY = name() + ".label";
-
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY) + " (" + level + ")";
     }
 
     /**
-     * Generates a localized and personalized description for the current enumeration value.
-     * <p>
-     * This method retrieves a description using the enumeration's name and a specific key suffix derived from the given
-     * ambition description index. The description is further customized using the provided gender-specific pronouns,
-     * the individual's given name, and other localized text from the resource bundle.
-     * </p>
-     *
-     * @param reasoningDescriptionIndex an index representing the type/variation of the description. This value is
-     *                                  clamped to ensure it falls within a valid range.
-     * @param gender                    the {@link Gender} of the individual, used to determine appropriate pronouns for
-     *                                  the description.
-     * @param givenName                 the given name of the person. This <b>MUST</b> use 'person.getGivenName()' and
-     *                                  <b>NOT</b> 'person.getFirstName()'
-     *
-     * @return a formatted description string based on the enum, the individual's gender, name, and aggression
-     *       description index.
+     * @deprecated No longer used.
      */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public String getDescription(int reasoningDescriptionIndex, final Gender gender, final String givenName) {
         reasoningDescriptionIndex = clamp(reasoningDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
@@ -188,7 +174,7 @@ public enum Reasoning {
         // {4} = him/her/them
         // {5} = His/Her/Their
         // {6} = his/her/their
-        // {7} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use plural case)
+        // {7} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use a plural case)
 
         return getFormattedTextAt(RESOURCE_BUNDLE,
               RESOURCE_KEY,

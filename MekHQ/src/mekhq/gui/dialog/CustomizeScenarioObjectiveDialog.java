@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -35,7 +40,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.List;
 import java.util.ResourceBundle;
-
 import javax.swing.*;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
@@ -54,8 +58,8 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class CustomizeScenarioObjectiveDialog extends JDialog {
 
-    private ScenarioObjective objective;
-    private List<String> botForceNames;
+    private final ScenarioObjective objective;
+    private final List<String> botForceNames;
     private JPanel panObjectiveType;
     private JPanel panForce;
     private JPanel panTimeLimits;
@@ -95,7 +99,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     DefaultListModel<String> detailModel = new DefaultListModel<>();
 
     public CustomizeScenarioObjectiveDialog(JFrame parent, boolean modal, ScenarioObjective objective,
-            List<String> botForceNames) {
+          List<String> botForceNames) {
         super(parent, modal);
         this.objective = objective;
         this.botForceNames = botForceNames;
@@ -144,7 +148,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private void initialize() {
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioObjectiveDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         setTitle(resourceMap.getString("dialog.title"));
         getContentPane().setLayout(new BorderLayout());
@@ -190,7 +194,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         JButton btnRemoveDetail = new JButton(resourceMap.getString("btnRemove.text"));
         btnRemoveDetail.addActionListener(e -> this.removeDetails());
         lstDetails.addListSelectionListener(
-                e -> btnRemoveDetail.setEnabled(!lstDetails.getSelectedValuesList().isEmpty()));
+              e -> btnRemoveDetail.setEnabled(!lstDetails.getSelectedValuesList().isEmpty()));
         lstDetails.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scrDetails = new JScrollPaneWithSpeed(lstDetails);
         scrDetails.setMinimumSize(new Dimension(200, 100));
@@ -361,8 +365,8 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private void initObjectiveEffectPanel(ResourceBundle resourceMap) {
         panObjectiveEffect = new JPanel(new GridBagLayout());
         panObjectiveEffect.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("panObjectiveEffect.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+              BorderFactory.createTitledBorder(resourceMap.getString("panObjectiveEffect.title")),
+              BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         GridBagConstraints gbcLeft = new GridBagConstraints();
         gbcLeft.gridx = 0;
@@ -419,10 +423,10 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
         successEffects = new JList<>(successEffectsModel);
         successEffects.addListSelectionListener(
-                e -> btnRemoveSuccess.setEnabled(!successEffects.getSelectedValuesList().isEmpty()));
+              e -> btnRemoveSuccess.setEnabled(!successEffects.getSelectedValuesList().isEmpty()));
         failureEffects = new JList<>(failureEffectsModel);
         failureEffects.addListSelectionListener(
-                e -> btnRemoveFailure.setEnabled(!failureEffects.getSelectedValuesList().isEmpty()));
+              e -> btnRemoveFailure.setEnabled(!failureEffects.getSelectedValuesList().isEmpty()));
 
         btnRemoveSuccess = new JButton(resourceMap.getString("btnRemove.text"));
         btnRemoveSuccess.addActionListener(e -> this.removeEffect(ObjectiveEffectConditionType.ObjectiveSuccess));
@@ -553,7 +557,12 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     }
 
     private void addForce() {
-        forceModel.addElement(cboForceName.getSelectedItem().toString());
+        Object object = cboForceName.getSelectedItem();
+
+        if (object instanceof String string) {
+            forceModel.addElement(string);
+        }
+
         pack();
     }
 
@@ -576,21 +585,29 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     }
 
     private void setDirectionDropdownVisibility() {
-        switch ((ObjectiveCriterion) cboObjectiveType.getSelectedItem()) {
-            case PreventReachMapEdge:
-            case ReachMapEdge:
-                cboDirection.setVisible(true);
-                break;
-            default:
-                cboDirection.setVisible(false);
-                break;
+        Object object = cboDirection.getSelectedItem();
+
+        if (object instanceof ObjectiveCriterion criterion) {
+            switch (criterion) {
+                case PreventReachMapEdge:
+                case ReachMapEdge:
+                    cboDirection.setVisible(true);
+                    break;
+                default:
+                    cboDirection.setVisible(false);
+                    break;
+            }
         }
     }
 
     private void updateTimeLimitUI() {
-        boolean enable = !cboTimeScaling.getSelectedItem().equals(TimeLimitType.None);
-        spnTimeLimit.setEnabled(enable);
-        cboTimeLimitDirection.setEnabled(enable);
+        Object object = cboTimeScaling.getSelectedItem();
+
+        if (object instanceof TimeLimitType timeLimitType) {
+            boolean enable = !timeLimitType.equals(TimeLimitType.None);
+            spnTimeLimit.setEnabled(enable);
+            cboTimeLimitDirection.setEnabled(enable);
+        }
     }
 
     public ScenarioObjective getObjective() {
@@ -601,7 +618,8 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         objective.setObjectiveCriterion((ObjectiveCriterion) cboObjectiveType.getSelectedItem());
         objective.setDescription(txtShortDescription.getText());
         int number = (int) spnAmount.getValue();
-        if (cboCountType.getSelectedItem().equals(ObjectiveAmountType.Percentage)) {
+        ObjectiveAmountType objectiveAmountType = cboCountType.getSelectedItem();
+        if (objectiveAmountType != null && objectiveAmountType.equals(ObjectiveAmountType.Percentage)) {
             objective.setPercentage(number);
             objective.setFixedAmount(null);
         } else {

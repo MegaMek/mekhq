@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2019 Vicente Cartas Espinel (vicente.cartas at outlook.com). All rights reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.finances;
@@ -37,13 +42,12 @@ import org.joda.money.format.MoneyPrintContext;
 import org.joda.money.format.MoneyPrinter;
 
 /**
- * This is the writer used to write extra currency data based
- * on the currency code.
+ * This is the writer used to write extra currency data based on the currency code.
  *
  * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
 class CurrencyDataLookupWriter implements MoneyPrinter {
-    private Map<String, String> currencyExtraData;
+    private final Map<String, String> currencyExtraData;
 
     CurrencyDataLookupWriter(Map<String, String> currencyExtraData) {
         this.currencyExtraData = currencyExtraData;

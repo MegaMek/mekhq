@@ -52,7 +52,7 @@ import mekhq.campaign.universe.Faction;
 public enum FactionCensureLevel {
     CENSURE_LEVEL_0(0, NO_ACTION, NO_ACTION, NO_ACTION, NO_ACTION),
     CENSURE_LEVEL_1(1, FORMAL_WARNING, CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL, LEGAL_CHALLENGE, BRIBE_OFFICIALS),
-    CENSURE_LEVEL_2(2, NEWS_ARTICLE, CHATTERWEB_DISCUSSION, NEWS_ARTICLE, NEWS_ARTICLE),
+    CENSURE_LEVEL_2(2, NEWS_ARTICLE, CHATTER_WEB_DISCUSSION, NEWS_ARTICLE, NEWS_ARTICLE),
     CENSURE_LEVEL_3(3,
           COMMANDER_RETIREMENT,
           CLAN_TRIAL_OF_GRIEVANCE_SUCCESSFUL,
@@ -74,11 +74,11 @@ public enum FactionCensureLevel {
     /**
      * Constructs a {@link FactionCensureLevel} with the specified severity.
      *
-     * @param severity the numeric severity level of this censure
+     * @param severity          the numeric severity level of this censure
      * @param innerSphereAction the censure action taken at this level for normal Inner Sphere factions
-     * @param clanAction the censure action taken at this level for normal Clan factions
-     * @param mercenaryAction the censure action taken at this level for Mercenary factions
-     * @param pirateAction the censure action taken at this level for the pirate factions
+     * @param clanAction        the censure action taken at this level for normal Clan factions
+     * @param mercenaryAction   the censure action taken at this level for Mercenary factions
+     * @param pirateAction      the censure action taken at this level for the pirate factions
      *
      * @author Illiani
      * @since 0.50.07

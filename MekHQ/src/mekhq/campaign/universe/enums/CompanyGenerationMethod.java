@@ -24,22 +24,30 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.enums;
+
+import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
-import mekhq.campaign.universe.generators.companyGenerators.*;
-
-import java.util.ResourceBundle;
+import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
+import mekhq.campaign.universe.generators.companyGenerators.AtBCompanyGenerator;
+import mekhq.campaign.universe.generators.companyGenerators.WindchildCompanyGenerator;
 
 /**
  * @author Justin "Windchild" Bowen
  */
 public enum CompanyGenerationMethod {
     //region Enum Declarations
-    AGAINST_THE_BOT("CompanyGenerationMethod.AGAINST_THE_BOT.text", "CompanyGenerationMethod.AGAINST_THE_BOT.toolTipText"),
+    AGAINST_THE_BOT("CompanyGenerationMethod.AGAINST_THE_BOT.text",
+          "CompanyGenerationMethod.AGAINST_THE_BOT.toolTipText"),
     WINDCHILD("CompanyGenerationMethod.WINDCHILD.text", "CompanyGenerationMethod.WINDCHILD.toolTipText");
     //endregion Enum Declarations
 
@@ -51,7 +59,7 @@ public enum CompanyGenerationMethod {
     //region Constructors
     CompanyGenerationMethod(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -74,14 +82,11 @@ public enum CompanyGenerationMethod {
     //endregion Boolean Comparison Methods
 
     public AbstractCompanyGenerator getGenerator(final Campaign campaign,
-                                                 final CompanyGenerationOptions options) {
-        switch (this) {
-            case AGAINST_THE_BOT:
-                return new AtBCompanyGenerator(campaign, options);
-            case WINDCHILD:
-            default:
-                return new WindchildCompanyGenerator(campaign, options);
-        }
+          final CompanyGenerationOptions options) {
+        return switch (this) {
+            case AGAINST_THE_BOT -> new AtBCompanyGenerator(campaign, options);
+            default -> new WindchildCompanyGenerator(campaign, options);
+        };
     }
 
     @Override

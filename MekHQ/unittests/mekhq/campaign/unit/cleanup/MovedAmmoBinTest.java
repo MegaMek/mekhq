@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,11 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.cleanup;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -37,13 +43,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
-import org.junit.jupiter.api.Test;
-
-import megamek.common.AmmoType;
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import org.junit.jupiter.api.Test;
 
 class MovedAmmoBinTest {
     @Test
@@ -76,7 +81,9 @@ class MovedAmmoBinTest {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.isDestroyed()).thenReturn(true);
-        when(mockProposal.getEquipment()).thenReturn(Collections.singletonMap(0, mockMount).entrySet());
+        doAnswer(ans -> {
+            return Collections.singletonMap(0, mockMount).entrySet();
+        }).when(mockProposal).getEquipment();
         AmmoBin mockPart = mock(AmmoBin.class);
 
         MovedAmmoBinStep step = new MovedAmmoBinStep();
@@ -91,7 +98,9 @@ class MovedAmmoBinTest {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mock(EquipmentType.class));
-        when(mockProposal.getEquipment()).thenReturn(Collections.singletonMap(0, mockMount).entrySet());
+        doAnswer(ans -> {
+            return Collections.singletonMap(0, mockMount).entrySet();
+        }).when(mockProposal).getEquipment();
         AmmoBin mockPart = mock(AmmoBin.class);
         when(mockPart.getType()).thenReturn(mock(AmmoType.class));
 
@@ -107,7 +116,9 @@ class MovedAmmoBinTest {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mock(AmmoType.class));
-        when(mockProposal.getEquipment()).thenReturn(Collections.singletonMap(0, mockMount).entrySet());
+        doAnswer(ans -> {
+            return Collections.singletonMap(0, mockMount).entrySet();
+        }).when(mockProposal).getEquipment();
         AmmoBin mockPart = mock(AmmoBin.class);
         when(mockPart.getType()).thenReturn(mock(AmmoType.class));
 
@@ -124,7 +135,9 @@ class MovedAmmoBinTest {
         AmmoType mockType = mock(AmmoType.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mockType);
-        when(mockProposal.getEquipment()).thenReturn(Collections.singletonMap(1, mockMount).entrySet());
+        doAnswer(ans -> {
+            return Collections.singletonMap(1, mockMount).entrySet();
+        }).when(mockProposal).getEquipment();
         AmmoBin mockPart = mock(AmmoBin.class);
         when(mockPart.getType()).thenReturn(mock(AmmoType.class));
         doReturn(true).when(mockPart).canChangeMunitions(mockType);

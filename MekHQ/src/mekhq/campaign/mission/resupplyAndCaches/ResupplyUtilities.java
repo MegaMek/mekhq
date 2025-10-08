@@ -34,7 +34,7 @@ package mekhq.campaign.mission.resupplyAndCaches;
 
 import static java.lang.Math.max;
 import static java.lang.Math.round;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
@@ -46,8 +46,8 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.UUID;
 
-import megamek.common.Compute;
-import megamek.common.Entity;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -78,8 +78,8 @@ public class ResupplyUtilities {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
     /**
-     * Processes an abandoned convoy, managing the removal of units and determining the fate of the
-     * convoy's crew members.
+     * Processes an abandoned convoy, managing the removal of units and determining the fate of the convoy's crew
+     * members.
      *
      * <p>This method performs the following tasks:
      * <ul>
@@ -95,7 +95,7 @@ public class ResupplyUtilities {
      * @param scenario the {@link AtBDynamicScenario} containing details of the abandoned convoy event.
      */
     public static void processAbandonedConvoy(Campaign campaign, AtBContract contract,
-                                              AtBDynamicScenario scenario) {
+          AtBDynamicScenario scenario) {
         final int scenarioId = scenario.getId();
 
         for (Force force : campaign.getAllForces()) {
@@ -137,15 +137,15 @@ public class ResupplyUtilities {
     }
 
     /**
-     * Determines the fate of a crew member based on random chance, assigning their status
-     * to either killed in action (KIA) or prisoner of war (POW).
+     * Determines the fate of a crew member based on random chance, assigning their status to either killed in action
+     * (KIA) or prisoner of war (POW).
      *
      * <p>The fate is decided randomly via a 2d6 roll:
      * <ul>
      *     <li>If the roll is greater than 7, the crew member becomes a POW.</li>
      *     <li>Otherwise, the crew member is marked as KIA.</li>
      * </ul>
-     *
+     * <p>
      * The survival chances are based on the infantry survival rules in Campaign Operations.
      *
      * @param campaign the {@link Campaign} instance for date tracking and updating crew member status.
@@ -166,9 +166,8 @@ public class ResupplyUtilities {
     }
 
     /**
-     * Estimates the total cargo requirements for a resupply operation based on the campaign
-     * and the associated contract details. These cargo requirements are specifically modified for
-     * player-owned convoys.
+     * Estimates the total cargo requirements for a resupply operation based on the campaign and the associated contract
+     * details. These cargo requirements are specifically modified for player-owned convoys.
      *
      * <p>This estimation is calculated as follows:
      * <ul>
@@ -178,6 +177,7 @@ public class ResupplyUtilities {
      *
      * @param campaign the {@link Campaign} instance to calculate cargo requirements for.
      * @param contract the {@link AtBContract} defining the parameters of the mission.
+     *
      * @return the estimated cargo requirement in tons.
      */
     public static int estimateCargoRequirements(Campaign campaign, AtBContract contract) {

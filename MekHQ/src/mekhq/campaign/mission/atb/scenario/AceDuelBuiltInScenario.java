@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,19 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
 
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
-import megamek.common.planetaryconditions.Fog;
-import megamek.common.planetaryconditions.Light;
-import megamek.common.planetaryconditions.Weather;
-import megamek.common.planetaryconditions.Wind;
+import megamek.common.compute.Compute;
+import megamek.common.planetaryConditions.Fog;
+import megamek.common.planetaryConditions.Light;
+import megamek.common.planetaryConditions.Weather;
+import megamek.common.planetaryConditions.Wind;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -54,7 +59,7 @@ public class AceDuelBuiltInScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return ACEDUEL;
+        return ACE_DUEL;
     }
 
     @Override

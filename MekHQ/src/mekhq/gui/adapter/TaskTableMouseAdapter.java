@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.adapter;
 
@@ -36,11 +41,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
-import megamek.common.TargetRoll;
+import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
-import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.PartModeChangedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
+import mekhq.campaign.events.parts.PartModeChangedEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -51,9 +56,9 @@ import mekhq.gui.model.TaskTableModel;
 
 public class TaskTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
-    private CampaignGUI gui;
-    private JTable taskTable;
-    private TaskTableModel taskModel;
+    private final CampaignGUI gui;
+    private final JTable taskTable;
+    private final TaskTableModel taskModel;
     //endregion Variable Declaration
 
     //region Constructors
@@ -90,7 +95,7 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
 
                 if (((Part) p).checkScrappable() != null) {
                     JOptionPane.showMessageDialog(gui.getFrame(), ((Part) p).checkScrappable(), "Cannot scrap part",
-                            JOptionPane.ERROR_MESSAGE);
+                          JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 Unit u = p.getUnit();
@@ -157,7 +162,7 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
         boolean isFixable = true;
         for (IPartWork p : parts) {
             canChangeMode &= p.canChangeWorkMode()
-                    && p.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS;
+                                   && p.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS;
             isScrappable &= (p instanceof Part) && !((Part) p).canNeverScrap();
             isBeingWorked |= (p instanceof Part) && p.isBeingWorkedOn();
             isFixable &= (p.checkFixable() == null);

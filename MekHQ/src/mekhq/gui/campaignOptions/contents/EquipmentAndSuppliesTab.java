@@ -81,13 +81,14 @@ import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
  * options and labels.
  */
 public class EquipmentAndSuppliesTab {
-    private CampaignOptions campaignOptions;
+    private final CampaignOptions campaignOptions;
 
     //start Acquisition Tab
     private CampaignOptionsHeaderPanel acquisitionHeader;
     private JPanel pnlAcquisitions;
     private JLabel lblChoiceAcquireSkill;
     private MMComboBox<String> choiceAcquireSkill;
+    private JCheckBox chkUseFunctionalAppraisal;
     private JLabel lblAcquireClanPenalty;
     private JLabel lblProcurementPersonnelPick;
     private MMComboBox<String> cboProcurementPersonnelPick;
@@ -159,8 +160,6 @@ public class EquipmentAndSuppliesTab {
     private JSpinner[] spnPlanetAcquireOutputBonus;
     //end Planetary Acquisition Tab
 
-    //start Tech Limits Tab
-    private CampaignOptionsHeaderPanel techLimitsHeader;
     private JCheckBox limitByYearBox;
     private JCheckBox disallowExtinctStuffBox;
     private JCheckBox allowClanPurchasesBox;
@@ -264,6 +263,8 @@ public class EquipmentAndSuppliesTab {
         pnlAcquisitions = new JPanel();
         lblChoiceAcquireSkill = new JLabel();
         choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", buildAcquireSkillComboOptions());
+
+        chkUseFunctionalAppraisal = new JCheckBox();
 
         lblProcurementPersonnelPick = new JLabel();
         cboProcurementPersonnelPick = new MMComboBox<>("procurementPersonnelPick",
@@ -379,6 +380,9 @@ public class EquipmentAndSuppliesTab {
         lblChoiceAcquireSkill = new CampaignOptionsLabel("ChoiceAcquireSkill");
         lblChoiceAcquireSkill.addMouseListener(createTipPanelUpdater(acquisitionHeader, "ChoiceAcquireSkill"));
 
+        chkUseFunctionalAppraisal = new CampaignOptionsCheckBox("UseFunctionalAppraisal");
+        chkUseFunctionalAppraisal.addMouseListener(createTipPanelUpdater(acquisitionHeader, "UseFunctionalAppraisal"));
+
         lblProcurementPersonnelPick = new CampaignOptionsLabel("ProcurementPersonnelPick");
         lblProcurementPersonnelPick.addMouseListener(createTipPanelUpdater(acquisitionHeader,
               "ProcurementPersonnelPick"));
@@ -417,6 +421,10 @@ public class EquipmentAndSuppliesTab {
         panel.add(lblChoiceAcquireSkill, layout);
         layout.gridx++;
         panel.add(choiceAcquireSkill, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseFunctionalAppraisal, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -701,7 +709,7 @@ public class EquipmentAndSuppliesTab {
         for (PlanetarySophistication sophistication : PlanetarySophistication.values()) {
             String techModifierLabel = sophistication.getName();
             lblPlanetAcquireTechBonus[i] = new JLabel(String.format("<html>%s</html>",
-                techModifierLabel));
+                  techModifierLabel));
             lblPlanetAcquireTechBonus[i].setHorizontalAlignment(SwingConstants.RIGHT);
             lblPlanetAcquireTechBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
                   "TechLabel"));
@@ -712,15 +720,12 @@ public class EquipmentAndSuppliesTab {
             i++;
         }
         i = 0;
-        for (PlanetaryRating rating : PlanetaryRating.values()) {
-            String modifierLabel = rating.getName();
-            spnPlanetAcquireIndustryBonus[i] = new JSpinner(new SpinnerNumberModel(
-                0, -12, 12, 1));
+        for (PlanetaryRating ignored : PlanetaryRating.values()) {
+            spnPlanetAcquireIndustryBonus[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
             spnPlanetAcquireIndustryBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
                   "IndustryLabel"));
             setSpinnerWidth(spnPlanetAcquireIndustryBonus[i]);
-            spnPlanetAcquireOutputBonus[i] = new JSpinner(new SpinnerNumberModel(
-                0, -12, 12, 1));
+            spnPlanetAcquireOutputBonus[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
             spnPlanetAcquireOutputBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
                   "OutputLabel"));
             setSpinnerWidth(spnPlanetAcquireOutputBonus[i]);
@@ -790,12 +795,14 @@ public class EquipmentAndSuppliesTab {
     }
 
     private int getSpinnerHeight() {
-        int spinnerHeight = 0;
-        if (spnPlanetAcquireIndustryBonus != null && spnPlanetAcquireIndustryBonus.length > 0 && spnPlanetAcquireIndustryBonus[0] != null) {
+        int spinnerHeight;
+        if (spnPlanetAcquireIndustryBonus != null &&
+                  spnPlanetAcquireIndustryBonus.length > 0 &&
+                  spnPlanetAcquireIndustryBonus[0] != null) {
             spinnerHeight = spnPlanetAcquireIndustryBonus[0].getPreferredSize().height;
         } else {
             //fallback
-            spinnerHeight = new JSpinner().getPreferredSize().height; 
+            spinnerHeight = new JSpinner().getPreferredSize().height;
         }
         return spinnerHeight;
     }
@@ -992,7 +999,8 @@ public class EquipmentAndSuppliesTab {
      */
     public JPanel createTechLimitsTab() {
         // Header
-        techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsTab",
+        //start Tech Limits Tab
+        CampaignOptionsHeaderPanel techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsTab",
               getImageDirectory() + "logo_clan_ghost_bear.png",
               3);
 
@@ -1106,6 +1114,7 @@ public class EquipmentAndSuppliesTab {
 
         // Acquisitions
         options.setAcquisitionSkill(choiceAcquireSkill.getSelectedItem());
+        options.setUseFunctionalAppraisal(chkUseFunctionalAppraisal.isSelected());
         options.setAcquisitionPersonnelCategory(ProcurementPersonnelPick.values()[cboProcurementPersonnelPick.getSelectedIndex()]);
         options.setClanAcquisitionPenalty((int) spnAcquireClanPenalty.getValue());
         options.setIsAcquisitionPenalty((int) spnAcquireIsPenalty.getValue());
@@ -1136,7 +1145,7 @@ public class EquipmentAndSuppliesTab {
         options.setDisallowClanPartsFromIS(disallowClanPartsFromIS.isSelected());
         options.setPenaltyClanPartsFromIS((int) spnPenaltyClanPartsFromIS.getValue());
         options.setPlanetAcquisitionVerboseReporting(usePlanetaryAcquisitionsVerbose.isSelected());
-        
+
         int i = 0;
         for (PlanetarySophistication sophistication : PlanetarySophistication.values()) {
             options.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getValue(), sophistication);
@@ -1149,7 +1158,7 @@ public class EquipmentAndSuppliesTab {
             i++;
         }
 
-        // Tech Limits
+        // Techlimits
         options.setLimitByYear(limitByYearBox.isSelected());
         options.setDisallowExtinctStuff(disallowExtinctStuffBox.isSelected());
         options.setAllowClanPurchases(allowClanPurchasesBox.isSelected());
@@ -1187,6 +1196,7 @@ public class EquipmentAndSuppliesTab {
 
         // Acquisitions
         choiceAcquireSkill.setSelectedItem(options.getAcquisitionSkill());
+        chkUseFunctionalAppraisal.setSelected(options.isUseFunctionalAppraisal());
         cboProcurementPersonnelPick.setSelectedItem(options.getAcquisitionPersonnelCategory().toString());
         spnAcquireClanPenalty.setValue(options.getClanAcquisitionPenalty());
         spnAcquireIsPenalty.setValue(options.getIsAcquisitionPenalty());
@@ -1217,7 +1227,7 @@ public class EquipmentAndSuppliesTab {
         disallowClanPartsFromIS.setSelected(options.isNoClanPartsFromIS());
         spnPenaltyClanPartsFromIS.setValue(options.getPenaltyClanPartsFromIS());
         usePlanetaryAcquisitionsVerbose.setSelected(options.isPlanetAcquisitionVerbose());
-        
+
         int i = 0;
         for (PlanetarySophistication sophistication : PlanetarySophistication.values()) {
             spnPlanetAcquireTechBonus[i].setValue(options.getPlanetTechAcquisitionBonus(sophistication));
@@ -1230,7 +1240,7 @@ public class EquipmentAndSuppliesTab {
             i++;
         }
 
-        // Tech Limits
+        // Techlimits
         limitByYearBox.setSelected(options.isLimitByYear());
         disallowExtinctStuffBox.setSelected(options.isDisallowExtinctStuff());
         allowClanPurchasesBox.setSelected(options.isAllowClanPurchases());

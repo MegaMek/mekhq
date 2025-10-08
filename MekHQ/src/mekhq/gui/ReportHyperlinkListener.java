@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
@@ -39,11 +44,11 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.VocationalExperienceAwardDialog;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 
-public class ReportHyperlinkListener implements HyperlinkListener {
-    private static final MMLogger logger = MMLogger.create(ReportHyperlinkListener.class);
-
-    // region Variable Declarations
-    private final CampaignGUI campaignGUI;
+/**
+ * @param campaignGUI region Variable Declarations
+ */
+public record ReportHyperlinkListener(CampaignGUI campaignGUI) implements HyperlinkListener {
+    private static final MMLogger LOGGER = MMLogger.create(ReportHyperlinkListener.class);
 
     public static final String UNIT = "UNIT";
     public static final String PERSON = "PERSON";
@@ -59,20 +64,17 @@ public class ReportHyperlinkListener implements HyperlinkListener {
     // endregion Variable Declarations
 
     // region Constructors
-    public ReportHyperlinkListener(final CampaignGUI campaignGUI) {
-        this.campaignGUI = campaignGUI;
-    }
     // endregion Constructors
 
     @Override
     public void hyperlinkUpdate(final HyperlinkEvent evt) {
         if (evt == null) {
-            logger.error("(hyperlinkUpdate) Null HyperlinkEvent.", new IllegalArgumentException());
+            LOGGER.error("(hyperlinkUpdate) Null HyperlinkEvent.", new IllegalArgumentException());
             return;
         }
 
         if (evt.getDescription() == null || evt.getDescription().isBlank()) {
-            logger.error("(hyperlinkUpdate) Null or Blank HyperlinkEvent description.",
+            LOGGER.error("(hyperlinkUpdate) Null or Blank HyperlinkEvent description.",
                   new IllegalArgumentException());
             return;
         }
@@ -86,21 +88,21 @@ public class ReportHyperlinkListener implements HyperlinkListener {
                     final UUID id = UUID.fromString(evt.getDescription().split(":")[1]);
                     campaignGUI.focusOnUnit(id);
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                 }
             } else if (evt.getDescription().startsWith(SCENARIO)) {
                 try {
                     final int id = MathUtility.parseInt(evt.getDescription().split(":")[1]);
                     campaignGUI.focusOnScenario(id);
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                 }
             } else if (evt.getDescription().startsWith(MISSION)) {
                 try {
                     final int id = MathUtility.parseInt(evt.getDescription().split(":")[1]);
                     campaignGUI.focusOnMission(id);
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                 }
             } else if (evt.getDescription().startsWith(PERSONNEL_MARKET)) { // Must come before PERSON since it starts
                 // with PERSON as well
@@ -110,26 +112,26 @@ public class ReportHyperlinkListener implements HyperlinkListener {
                     final int id = Integer.parseInt(evt.getDescription().split("\\|")[1]);
                     campaignGUI.showNews(id);
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                 }
             } else if (evt.getDescription().startsWith(MAINTENANCE)) {
                 try {
                     final UUID id = UUID.fromString(evt.getDescription().split("\\|")[1]);
                     final Unit unit = campaignGUI.getCampaign().getUnit(id);
                     if (unit == null) {
-                        logger.error("Unit id determination failure for " + id);
+                        LOGGER.error("Unit id determination failure for {}", id);
                         return;
                     }
                     new MaintenanceReportDialog(campaignGUI.getFrame(), unit).setVisible(true);
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                 }
             } else if (evt.getDescription().startsWith(REPAIR)) {
                 try {
                     final UUID id = UUID.fromString(evt.getDescription().split("\\|")[1]);
                     campaignGUI.focusOnUnitInRepairBay(id);
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                 }
             } else if (evt.getDescription().startsWith(CONTRACT_MARKET)) {
                 campaignGUI.showContractMarket();
@@ -139,14 +141,14 @@ public class ReportHyperlinkListener implements HyperlinkListener {
                 try {
                     new VocationalExperienceAwardDialog(campaignGUI.getCampaign());
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                 }
             } else if (evt.getDescription().startsWith(PERSON)) {
                 try {
                     final UUID id = UUID.fromString(evt.getDescription().split(":")[1]);
                     campaignGUI.focusOnPerson(id);
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                 }
             }
         }

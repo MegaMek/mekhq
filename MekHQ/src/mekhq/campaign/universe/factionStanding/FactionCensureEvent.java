@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
@@ -53,8 +53,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -102,8 +102,8 @@ public class FactionCensureEvent {
     /**
      * Constructs a new {@link FactionCensureEvent} for the given campaign and censure level.
      *
-     * @param campaign     the campaign in which the event takes place
-     * @param censureLevel the censure level triggering this event
+     * @param campaign         the campaign in which the event takes place
+     * @param censureLevel     the censure level triggering this event
      * @param censuringFaction the {@link Faction} performing the censure
      *
      * @author Illiani
@@ -196,7 +196,7 @@ public class FactionCensureEvent {
                  COMMANDER_IMPRISONMENT,
                  LEADERSHIP_IMPRISONED,
                  NEWS_ARTICLE,
-                 CHATTERWEB_DISCUSSION ->
+                 CHATTER_WEB_DISCUSSION ->
                   new FactionJudgmentNewsArticle(campaign, commander, secondInCommand, censureAction.getLookupName(),
                         censuringFaction, FactionStandingJudgmentType.CENSURE, false);
         }
@@ -238,8 +238,8 @@ public class FactionCensureEvent {
      * <p>This method displays the seppuku judgment scene to the player, updates the commander's status to seppuku,
      * and applies loyalty changes across the affected personnel.</p>
      *
-     * @param campaign          the current {@link Campaign} instance
-     * @param censuringFaction  the {@link Faction} initiating the censure
+     * @param campaign         the current {@link Campaign} instance
+     * @param censuringFaction the {@link Faction} initiating the censure
      *
      * @author Illiani
      * @since 0.50.07
@@ -256,9 +256,9 @@ public class FactionCensureEvent {
      *
      * <p>Presents the going rogue dialog, and if the action is canceled, falls back to a standard censure event.</p>
      *
-     * @param campaign          the current {@link Campaign} instance
-     * @param censureLevel      the {@link FactionCensureLevel} for the event
-     * @param censuringFaction  the {@link Faction} issuing the censure
+     * @param campaign         the current {@link Campaign} instance
+     * @param censureLevel     the {@link FactionCensureLevel} for the event
+     * @param censuringFaction the {@link Faction} issuing the censure
      *
      * @author Illiani
      * @since 0.50.07
@@ -279,7 +279,7 @@ public class FactionCensureEvent {
             }
             case BARRED -> new FactionJudgmentSceneDialog(campaign, commander, null,
                   FactionJudgmentSceneType.BARRED, censuringFaction);
-            case CHATTERWEB_DISCUSSION, LEGAL_CHALLENGE, NEWS_ARTICLE, FORMAL_WARNING ->
+            case CHATTER_WEB_DISCUSSION, LEGAL_CHALLENGE, NEWS_ARTICLE, FORMAL_WARNING ->
                   processMassLoyaltyChange(campaign, false, false);
             case CLAN_TRIAL_OF_GRIEVANCE_UNSUCCESSFUL -> processClanTrial(false);
             case CLAN_TRIAL_OF_GRIEVANCE_SUCCESSFUL -> processClanTrial(true);

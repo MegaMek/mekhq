@@ -24,24 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
+import java.awt.Container;
+import java.awt.Dimension;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextPane;
+
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.storyarc.StoryArcStub;
+import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panes.StoryArcSelectionPane;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
 
-import javax.swing.*;
-import java.awt.*;
-
 public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
     private StoryArcSelectionPane selectionPanel;
     private JTextPane descriptionPane;
-    private boolean startNew;
+    private final boolean startNew;
     //endregion Variable Declarations
 
     //region Constructors
@@ -95,7 +105,7 @@ public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
         descriptionPane.setContentType("text/html");
         descriptionPane.setMinimumSize(new Dimension(400, 400));
         descriptionPane.setPreferredSize(new Dimension(400, 400));
-        descriptionPane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        descriptionPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         mainPanel.add(new JScrollPaneWithSpeed(descriptionPane));
 
         return mainPanel;

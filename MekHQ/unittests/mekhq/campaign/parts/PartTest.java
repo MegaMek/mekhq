@@ -24,22 +24,37 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
-import megamek.common.Entity;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.Warehouse;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.unit.Unit;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import megamek.common.units.Entity;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.Warehouse;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.meks.MekSensor;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 public class PartTest {
     @Test
@@ -122,7 +137,7 @@ public class PartTest {
 
         int quantity = part.getQuantity();
 
-        part.incrementQuantity();
+        part.changeQuantity(1);
 
         assertEquals(quantity + 1, part.getQuantity());
     }
@@ -140,12 +155,12 @@ public class PartTest {
         // Setting the quantity specifically should work.
         assertEquals(2, part.getQuantity());
 
-        part.decrementQuantity();
+        part.changeQuantity(-1);
 
         // Quantity should now be 1
         assertEquals(1, part.getQuantity());
 
-        part.decrementQuantity();
+        part.changeQuantity(-1);
 
         // Quantity should now be 0...
         assertEquals(0, part.getQuantity());
@@ -164,12 +179,12 @@ public class PartTest {
 
         part.setQuantity(1);
 
-        part.decrementQuantity();
+        part.changeQuantity(-1);
 
         // Quantity should now be 0...
         assertEquals(0, part.getQuantity());
 
-        part.decrementQuantity();
+        part.changeQuantity(-1);
 
         // Quantity should still be 0...
         assertEquals(0, part.getQuantity());
@@ -192,7 +207,7 @@ public class PartTest {
         part.setQuantity(1);
 
         // Remove the part by decrementing its quantity to 0.
-        part.decrementQuantity();
+        part.changeQuantity(-1);
 
         ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
         verify(mockWarehouse, times(3)).removePart(partCaptor.capture());
@@ -346,7 +361,7 @@ public class PartTest {
         assertFalse(part.getChildParts().contains(childPart1));
         verify(childPart1, times(1)).setParentPart(eq(null));
 
-        // Now remove al lthe remaining parts
+        // Now remove al the remaining parts
         part.removeAllChildParts();
 
         assertFalse(part.hasChildParts());

@@ -24,32 +24,58 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign;
 
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Mek;
-import mekhq.EventSpy;
-import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.PartNewEvent;
-import mekhq.campaign.event.PartRemovedEvent;
-import mekhq.campaign.parts.*;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.unit.Unit;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
+import mekhq.EventSpy;
+import mekhq.campaign.events.parts.PartChangedEvent;
+import mekhq.campaign.events.parts.PartNewEvent;
+import mekhq.campaign.events.parts.PartRemovedEvent;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class WarehouseTest {
+
+    @BeforeAll
+    static void beforeAll() {
+        EquipmentType.initializeTypes();
+    }
+
     @Test
     public void testWarehouseSimplePartActions() {
         Warehouse warehouse = new Warehouse();
@@ -70,7 +96,7 @@ public class WarehouseTest {
 
         // forEachPart should have our part
         warehouse.forEachPart(p -> {
-            // There should only be one part in the warehouse
+            // There should only be one part in the warehouse,
             // and it should be our part
             assertEquals(mockPart, p);
         });
@@ -85,9 +111,7 @@ public class WarehouseTest {
         assertNull(warehouse.getPart(mockId));
 
         // We should not run over any part once removed
-        warehouse.forEachPart(p -> {
-            assertTrue(false);
-        });
+        warehouse.forEachPart(p -> fail());
 
         // getParts should no longer contain anything
         assertTrue(warehouse.getParts().isEmpty());
@@ -114,7 +138,7 @@ public class WarehouseTest {
 
         // forEachPart should have our part
         warehouse.forEachPart(p -> {
-            // There should only be one part in the warehouse
+            // There should only be one part in the warehouse,
             // and it should be our part
             assertEquals(mockPart, p);
         });
@@ -181,9 +205,9 @@ public class WarehouseTest {
             // This part never existed so there should be
             // a PartNewEvent fired.
             assertTrue(eventSpy.getEvents()
-                    .stream()
-                    .filter(e -> e instanceof PartNewEvent)
-                    .anyMatch(e -> mockPart == ((PartNewEvent) e).getPart()));
+                             .stream()
+                             .filter(e -> e instanceof PartNewEvent)
+                             .anyMatch(e -> mockPart == ((PartNewEvent) e).getPart()));
 
             // Add the part again, simulating being say removed from a
             // unit or something
@@ -192,11 +216,11 @@ public class WarehouseTest {
             // There should be only ONE event as we did not add
             // this part to the warehouse
             assertEquals(1,
-                    eventSpy.getEvents()
-                            .stream()
-                            .filter(e -> e instanceof PartNewEvent)
-                            .filter(e -> mockPart == ((PartNewEvent) e).getPart())
-                            .count());
+                  eventSpy.getEvents()
+                        .stream()
+                        .filter(e -> e instanceof PartNewEvent)
+                        .filter(e -> mockPart == ((PartNewEvent) e).getPart())
+                        .count());
         }
     }
 
@@ -215,8 +239,8 @@ public class WarehouseTest {
 
             // If we didn't remove a part, we should have no event
             assertFalse(eventSpy.getEvents()
-                    .stream()
-                    .anyMatch(e -> e instanceof PartRemovedEvent));
+                              .stream()
+                              .anyMatch(e -> e instanceof PartRemovedEvent));
 
             // Add the mock part to our warehouse
             warehouse.addPart(mockPart);
@@ -226,11 +250,11 @@ public class WarehouseTest {
 
             // There should be an event where we removed the mock part
             assertEquals(1,
-                    eventSpy.getEvents()
-                            .stream()
-                            .filter(e -> e instanceof PartRemovedEvent)
-                            .filter(e -> mockPart == ((PartRemovedEvent) e).getPart())
-                            .count());
+                  eventSpy.getEvents()
+                        .stream()
+                        .filter(e -> e instanceof PartRemovedEvent)
+                        .filter(e -> mockPart == ((PartRemovedEvent) e).getPart())
+                        .count());
         }
     }
 
@@ -261,10 +285,10 @@ public class WarehouseTest {
 
             // There should be three events where we removed parts
             assertEquals(3,
-                    eventSpy.getEvents()
-                            .stream()
-                            .filter(e -> e instanceof PartRemovedEvent)
-                            .count());
+                  eventSpy.getEvents()
+                        .stream()
+                        .filter(e -> e instanceof PartRemovedEvent)
+                        .count());
 
             // And the three events should correlate to the child parts being removed
             assertNotNull(eventSpy.findEvent(PartRemovedEvent.class, e -> mockParentPart == e.getPart()));
@@ -304,10 +328,10 @@ public class WarehouseTest {
 
             // There should be four events where we removed parts
             assertEquals(4,
-                    eventSpy.getEvents()
-                            .stream()
-                            .filter(e -> e instanceof PartRemovedEvent)
-                            .count());
+                  eventSpy.getEvents()
+                        .stream()
+                        .filter(e -> e instanceof PartRemovedEvent)
+                        .count());
 
             // And the four events should correlate to the child parts being removed
             assertNotNull(eventSpy.findEvent(PartRemovedEvent.class, e -> mockParentPart == e.getPart()));
@@ -465,7 +489,7 @@ public class WarehouseTest {
         assertEquals(mockArmor, addedArmor);
         assertTrue(addedArmor.isSpare());
 
-        // Double check the math from above.
+        // Double-check the math from above.
         assertEquals(3.0, addedArmor.getTonnage(), 0.000001);
         assertEquals(48, ((Armor) addedArmor).getAmount());
     }
@@ -511,7 +535,7 @@ public class WarehouseTest {
         assertEquals(mockAmmoStorage, addedAmmo);
         assertTrue(addedAmmo.isSpare());
 
-        // Double check the math from above.
+        // Double-check the math from above.
         assertEquals(3.0, addedAmmo.getTonnage(), 0.000001);
         assertEquals(60, ((AmmoStorage) addedAmmo).getShots());
     }
@@ -687,7 +711,7 @@ public class WarehouseTest {
             assertEquals(mockSpareArmor, addedArmor);
             assertTrue(addedArmor.isSpare());
 
-            // Double check the math from above.
+            // Double-check the math from above.
             assertEquals(2.0, addedArmor.getTonnage(), 0.000001);
             assertEquals(32, ((Armor) addedArmor).getAmount());
 
@@ -733,7 +757,7 @@ public class WarehouseTest {
             assertEquals(mockSpareArmor, addedArmor);
             assertTrue(addedArmor.isSpare());
 
-            // Double check the math from above.
+            // Double-check the math from above.
             assertEquals(2.0, addedArmor.getTonnage(), 0.000001);
             assertEquals(32, ((Armor) addedArmor).getAmount());
 
@@ -853,7 +877,7 @@ public class WarehouseTest {
         assertTrue(spareParts.contains(mockSpareAmmo));
 
         // Test: streamSpareParts
-        spareParts = warehouse.streamSpareParts().collect(Collectors.toList());
+        spareParts = warehouse.streamSpareParts().toList();
         assertEquals(4, spareParts.size());
         assertTrue(spareParts.contains(mockSparePart));
         assertTrue(spareParts.contains(mockSparePartUnderRepair));
@@ -918,9 +942,7 @@ public class WarehouseTest {
         List<Part> spareParts = warehouse.getSpareParts();
         assertEquals(4, spareParts.size());
 
-        warehouse.forEachSparePart(spare -> {
-            assertTrue(spareParts.contains(spare));
-        });
+        warehouse.forEachSparePart(spare -> assertTrue(spareParts.contains(spare)));
     }
 
     @Test
@@ -933,12 +955,11 @@ public class WarehouseTest {
 
         // Spare
         Part mockSparePart = spy(new MekLocation());
-        Part addedPart = warehouse.addPart(mockSparePart, true);
+        Part addedPart = warehouse.addPart(mockSparePart, true);;
         assertEquals(mockSparePart, warehouse.findSparePart(spare -> spare.getId() == mockSparePart.getId()));
 
         Part mockUnitPart = spy(new MekLocation());
         mockUnitPart.setUnit(createMockUnit());
-        addedPart = warehouse.addPart(mockUnitPart, true);
         assertNull(warehouse.findSparePart(spare -> spare.getId() == mockUnitPart.getId()));
 
         // Spare (being repaired)
@@ -946,7 +967,8 @@ public class WarehouseTest {
         mockSparePartUnderRepair.setTech(createMockTech());
         addedPart = warehouse.addPart(mockSparePartUnderRepair, true);
         assertEquals(mockSparePartUnderRepair, addedPart);
-        assertEquals(mockSparePartUnderRepair, warehouse.findSparePart(spare -> spare.getId() == mockSparePartUnderRepair.getId()));
+        assertEquals(mockSparePartUnderRepair,
+              warehouse.findSparePart(spare -> spare.getId() == mockSparePartUnderRepair.getId()));
 
         Part mockPartForRefit = spy(new MekLocation());
         mockPartForRefit.setRefitUnit(createMockUnit());
@@ -995,7 +1017,9 @@ public class WarehouseTest {
 
     /**
      * Creates a mock part with the given ID.
+     *
      * @param id The unique ID of the part.
+     *
      * @return The mocked part with the given ID.
      */
     private Part createMockPart(int id) {
@@ -1007,6 +1031,7 @@ public class WarehouseTest {
 
     /**
      * Creates a mock unit.
+     *
      * @return The mock unit.
      */
     private Unit createMockUnit() {
@@ -1021,6 +1046,7 @@ public class WarehouseTest {
 
     /**
      * Creates a mock tech.
+     *
      * @return The mock tech.
      */
     private Person createMockTech() {
@@ -1031,9 +1057,10 @@ public class WarehouseTest {
 
     /**
      * Creates mock Armor for the campaign.
-     * @param campaign The campaign to assign to the Armor.
+     *
+     * @param campaign  The campaign to assign to the Armor.
      * @param armorType The type of armor.
-     * @param points The number of points of armor.
+     * @param points    The number of points of armor.
      */
     private Armor createMockArmor(Campaign campaign, int armorType, int points) {
         return spy(new Armor(1, armorType, points, Entity.LOC_NONE, false, false, campaign));
@@ -1041,18 +1068,20 @@ public class WarehouseTest {
 
     /**
      * Creates mock AmmoStorage for the campaign.
+     *
      * @param campaign The campaign to assign to the AmmoStorage.
      * @param ammoType The type of ammo.
-     * @param shots The number of shots ammo.
+     * @param shots    The number of shots ammo.
      */
     private AmmoStorage createMockAmmoStorage(Campaign campaign, AmmoType ammoType, int shots) {
         return spy(new AmmoStorage(1, ammoType, shots, campaign));
     }
 
     /**
-     * Gets an AmmoType by name (performing any initialization required
-     * on the MM side).
+     * Gets an AmmoType by name (performing any initialization required on the MM side).
+     *
      * @param name The lookup name for the AmmoType.
+     *
      * @return The ammo type for the given name.
      */
     private synchronized static AmmoType getAmmoType(String name) {

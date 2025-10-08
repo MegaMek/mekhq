@@ -62,19 +62,25 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.ILocationExposureStatus;
-import megamek.common.LandAirMek;
-import megamek.common.Mek;
-import megamek.common.Mounted;
-import megamek.common.TargetRoll;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
+import megamek.common.interfaces.ILocationExposureStatus;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Entity;
+import megamek.common.units.LandAirMek;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.meks.MekLifeSupport;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.meks.MekSensor;
+import mekhq.campaign.parts.missing.MissingAvionics;
+import mekhq.campaign.parts.missing.MissingLandingGear;
+import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -98,7 +104,7 @@ class MekLocationTest {
     void ctorTest() {
         Campaign mockCampaign = mock(Campaign.class);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         int tonnage = 70;
         int structureType = EquipmentType.T_STRUCTURE_ENDO_STEEL;
         boolean isClan = true;
@@ -107,7 +113,7 @@ class MekLocationTest {
         boolean hasSensors = true;
         boolean hasLifeSupport = true;
         MekLocation mekLocation = new MekLocation(location, tonnage, structureType, isClan,
-                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
 
         assertEquals(location, mekLocation.getLoc());
         assertEquals(tonnage, mekLocation.getUnitTonnage());
@@ -124,7 +130,7 @@ class MekLocationTest {
     void cloneTest() {
         Campaign mockCampaign = mock(Campaign.class);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         int tonnage = 65;
         int structureType = EquipmentType.T_STRUCTURE_ENDO_STEEL;
         boolean isClan = true;
@@ -133,7 +139,7 @@ class MekLocationTest {
         boolean hasSensors = true;
         boolean hasLifeSupport = true;
         MekLocation mekLocation = new MekLocation(location, tonnage, structureType, isClan,
-                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
 
         MekLocation clone = mekLocation.clone();
 
@@ -155,7 +161,7 @@ class MekLocationTest {
     void getMissingPartTest() {
         Campaign mockCampaign = mock(Campaign.class);
 
-        int location = Mek.LOC_LT;
+        int location = Mek.LOC_LEFT_TORSO;
         int tonnage = 65;
         int structureType = EquipmentType.T_STRUCTURE_REINFORCED;
         boolean isClan = true;
@@ -164,7 +170,7 @@ class MekLocationTest {
         boolean hasSensors = false;
         boolean hasLifeSupport = false;
         MekLocation mekLocation = new MekLocation(location, tonnage, structureType, isClan,
-                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
 
         MissingMekLocation missing = mekLocation.getMissingPart();
 
@@ -181,7 +187,15 @@ class MekLocationTest {
     void cannotScrapCT() {
         Campaign mockCampaign = mock(Campaign.class);
 
-        MekLocation centerTorso = new MekLocation(Mek.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
+        MekLocation centerTorso = new MekLocation(Mek.LOC_CENTER_TORSO,
+              25,
+              0,
+              false,
+              false,
+              false,
+              false,
+              false,
+              mockCampaign);
 
         assertNotNull(centerTorso.checkScrappable());
     }
@@ -195,13 +209,21 @@ class MekLocationTest {
         when(entity.getWeight()).thenReturn(65.0);
         when(unit.getEntity()).thenReturn(entity);
 
-        MekLocation centerTorso = new MekLocation(Mek.LOC_CT, 100, 0, false, false, false, false, false, mockCampaign);
+        MekLocation centerTorso = new MekLocation(Mek.LOC_CENTER_TORSO,
+              100,
+              0,
+              false,
+              false,
+              false,
+              false,
+              false,
+              mockCampaign);
         centerTorso.setUnit(unit);
 
         assertFalse(centerTorso.isSalvaging());
 
         MekLocation otherLocation = new MekLocation(Mek.LOC_HEAD, 100, 0, false, false, false, false, false,
-                mockCampaign);
+              mockCampaign);
         otherLocation.setUnit(unit);
 
         assertTrue(otherLocation.isSalvaging());
@@ -215,7 +237,7 @@ class MekLocationTest {
         when(entity.getWeight()).thenReturn(65.0);
         when(unit.getEntity()).thenReturn(entity);
 
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         MekLocation torso = new MekLocation(location, 100, 0, false, false, false, false, false, mockCampaign);
 
         // Can't be on a bad hip or shoulder if off a unit
@@ -236,17 +258,17 @@ class MekLocationTest {
     void isSamePartTypeTest() {
         Campaign mockCampaign = mock(Campaign.class);
 
-        int location = Mek.LOC_LLEG, otherLocation = Mek.LOC_HEAD;
+        int location = Mek.LOC_LEFT_LEG, otherLocation = Mek.LOC_HEAD;
         int tonnage = 70;
         int structureType = EquipmentType.T_STRUCTURE_ENDO_STEEL,
-                otherStructureType = EquipmentType.T_STRUCTURE_REINFORCED;
+              otherStructureType = EquipmentType.T_STRUCTURE_REINFORCED;
         boolean isClan = true;
         boolean hasTSM = true;
         boolean isQuad = true;
         boolean hasSensors = true;
         boolean hasLifeSupport = true;
         MekLocation mekLocation = new MekLocation(location, tonnage, structureType, isClan,
-                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
 
         assertTrue(mekLocation.isSamePartType(mekLocation));
 
@@ -257,90 +279,90 @@ class MekLocationTest {
 
         // Same if structure type is not Endo Steel and we're clan vs not clan
         mekLocation = new MekLocation(location, tonnage, EquipmentType.T_STRUCTURE_INDUSTRIAL, isClan,
-                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
         other = new MekLocation(location, tonnage, EquipmentType.T_STRUCTURE_INDUSTRIAL, !isClan,
-                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
         assertTrue(mekLocation.isSamePartType(other));
         assertTrue(other.isSamePartType(mekLocation));
 
         // Clan and IS Endo Steel differ
         mekLocation = new MekLocation(location, tonnage, EquipmentType.T_STRUCTURE_ENDO_STEEL, isClan,
-                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
         other = new MekLocation(location, tonnage, EquipmentType.T_STRUCTURE_ENDO_STEEL, !isClan,
-                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
         assertFalse(mekLocation.isSamePartType(other));
         assertFalse(other.isSamePartType(mekLocation));
 
         // Restore the original setup
         mekLocation = new MekLocation(location, tonnage, structureType, isClan,
-                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
 
         // Different locations
         other = new MekLocation(otherLocation, tonnage, structureType, isClan,
-                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
         assertFalse(mekLocation.isSamePartType(other));
         assertFalse(other.isSamePartType(mekLocation));
 
         // Different tonnage
         other = new MekLocation(location, tonnage + 10, structureType, isClan,
-                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
         assertFalse(mekLocation.isSamePartType(other));
         assertFalse(other.isSamePartType(mekLocation));
 
         // Different structure
         other = new MekLocation(location, tonnage, otherStructureType, isClan,
-                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
         assertFalse(mekLocation.isSamePartType(other));
         assertFalse(other.isSamePartType(mekLocation));
 
         // Different TSM
         other = new MekLocation(location, tonnage, structureType, isClan,
-                !hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              !hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
         assertFalse(mekLocation.isSamePartType(other));
         assertFalse(other.isSamePartType(mekLocation));
 
         // Arms for quads must match on quad status, but others do not
-        mekLocation = new MekLocation(Mek.LOC_RARM, tonnage, structureType, isClan,
-                hasTSM, true, hasSensors, hasLifeSupport, mockCampaign);
-        other = new MekLocation(Mek.LOC_LARM, tonnage, structureType, isClan,
-                hasTSM, true, hasSensors, hasLifeSupport, mockCampaign);
+        mekLocation = new MekLocation(Mek.LOC_RIGHT_ARM, tonnage, structureType, isClan,
+              hasTSM, true, hasSensors, hasLifeSupport, mockCampaign);
+        other = new MekLocation(Mek.LOC_LEFT_ARM, tonnage, structureType, isClan,
+              hasTSM, true, hasSensors, hasLifeSupport, mockCampaign);
         assertFalse(mekLocation.isSamePartType(other));
         assertFalse(other.isSamePartType(mekLocation));
 
-        mekLocation = new MekLocation(Mek.LOC_LARM, tonnage, structureType, isClan,
-                hasTSM, true, hasSensors, hasLifeSupport, mockCampaign);
-        other = new MekLocation(Mek.LOC_LARM, tonnage, structureType, isClan,
-                hasTSM, true, hasSensors, hasLifeSupport, mockCampaign);
+        mekLocation = new MekLocation(Mek.LOC_LEFT_ARM, tonnage, structureType, isClan,
+              hasTSM, true, hasSensors, hasLifeSupport, mockCampaign);
+        other = new MekLocation(Mek.LOC_LEFT_ARM, tonnage, structureType, isClan,
+              hasTSM, true, hasSensors, hasLifeSupport, mockCampaign);
         assertTrue(mekLocation.isSamePartType(other));
         assertTrue(other.isSamePartType(mekLocation));
 
-        mekLocation = new MekLocation(Mek.LOC_LARM, tonnage, structureType, isClan,
-                hasTSM, false, hasSensors, hasLifeSupport, mockCampaign);
-        other = new MekLocation(Mek.LOC_LARM, tonnage, structureType, isClan,
-                hasTSM, false, hasSensors, hasLifeSupport, mockCampaign);
+        mekLocation = new MekLocation(Mek.LOC_LEFT_ARM, tonnage, structureType, isClan,
+              hasTSM, false, hasSensors, hasLifeSupport, mockCampaign);
+        other = new MekLocation(Mek.LOC_LEFT_ARM, tonnage, structureType, isClan,
+              hasTSM, false, hasSensors, hasLifeSupport, mockCampaign);
         assertTrue(mekLocation.isSamePartType(other));
         assertTrue(other.isSamePartType(mekLocation));
 
         mekLocation = new MekLocation(location, tonnage, structureType, isClan,
-                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
         other = new MekLocation(location, tonnage, structureType, isClan,
-                hasTSM, !isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, !isQuad, hasSensors, hasLifeSupport, mockCampaign);
         assertTrue(mekLocation.isSamePartType(other));
         assertTrue(other.isSamePartType(mekLocation));
 
         // Restore the original setup
         mekLocation = new MekLocation(location, tonnage, structureType, isClan,
-                hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
 
         // Different Sensors (off unit)
         other = new MekLocation(location, tonnage, structureType, isClan,
-                hasTSM, isQuad, !hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, !hasSensors, hasLifeSupport, mockCampaign);
         assertFalse(mekLocation.isSamePartType(other));
         assertFalse(other.isSamePartType(mekLocation));
 
         // Different Life Support (off unit)
         other = new MekLocation(location, tonnage, structureType, isClan,
-                hasTSM, isQuad, hasSensors, !hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, !hasLifeSupport, mockCampaign);
         assertFalse(mekLocation.isSamePartType(other));
         assertFalse(other.isSamePartType(mekLocation));
 
@@ -353,13 +375,13 @@ class MekLocationTest {
 
         // Different Sensors (on unit)
         other = new MekLocation(location, tonnage, structureType, isClan,
-                hasTSM, isQuad, !hasSensors, hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, !hasSensors, hasLifeSupport, mockCampaign);
         assertTrue(mekLocation.isSamePartType(other));
         assertTrue(other.isSamePartType(mekLocation));
 
         // Different Life Support (on unit)
         other = new MekLocation(location, tonnage, structureType, isClan,
-                hasTSM, isQuad, hasSensors, !hasLifeSupport, mockCampaign);
+              hasTSM, isQuad, hasSensors, !hasLifeSupport, mockCampaign);
         assertTrue(mekLocation.isSamePartType(other));
         assertTrue(other.isSamePartType(mekLocation));
     }
@@ -367,8 +389,8 @@ class MekLocationTest {
     @Test
     void mekLocationWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         Campaign mockCampaign = mock(Campaign.class);
-        MekLocation mekLocation = new MekLocation(Mek.LOC_CT, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL,
-                true, true, true, true, true, mockCampaign);
+        MekLocation mekLocation = new MekLocation(Mek.LOC_CENTER_TORSO, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL,
+              true, true, true, true, true, mockCampaign);
         mekLocation.setId(25);
 
         // Write the MekLocation XML
@@ -419,9 +441,9 @@ class MekLocationTest {
         doReturn(1).when(entity).getOInternal(anyInt());
         when(unit.getEntity()).thenReturn(entity);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL,
-                true, true, true, true, true, mockCampaign);
+              true, true, true, true, true, mockCampaign);
 
         assertFalse(mekLocation.isBlownOff());
         assertFalse(mekLocation.isBreached());
@@ -534,9 +556,9 @@ class MekLocationTest {
         doReturn(totalArmor).when(entity).getOInternal(anyInt());
         when(unit.getEntity()).thenReturn(entity);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL,
-                true, true, true, true, true, mockCampaign);
+              true, true, true, true, true, mockCampaign);
 
         // not on unit
         mekLocation.updateConditionFromPart();
@@ -571,12 +593,12 @@ class MekLocationTest {
         doReturn(totalArmor).when(entity).getOInternal(anyInt());
         when(unit.getEntity()).thenReturn(entity);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL,
-                true, true, true, true, true, mockCampaign);
+              true, true, true, true, true, mockCampaign);
         mekLocation.setUnit(unit);
 
-        doReturn(3).when(entity).getNumberOfCriticals(location);
+        doReturn(3).when(entity).getNumberOfCriticalSlots(location);
         CriticalSlot hittable = mock(CriticalSlot.class);
         when(hittable.isEverHittable()).thenReturn(true);
         doReturn(hittable).when(entity).getCritical(location, 0);
@@ -606,7 +628,7 @@ class MekLocationTest {
         when(entity.getWeight()).thenReturn(100.0);
         when(unit.getEntity()).thenReturn(entity);
 
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         MekLocation torso = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
 
         // Not on a unit
@@ -652,7 +674,15 @@ class MekLocationTest {
     @Test
     void checkFixableNoUnitTest() {
         Campaign mockCampaign = mock(Campaign.class);
-        MekLocation torso = new MekLocation(Mek.LOC_RT, 30, 0, false, false, false, false, false, mockCampaign);
+        MekLocation torso = new MekLocation(Mek.LOC_RIGHT_TORSO,
+              30,
+              0,
+              false,
+              false,
+              false,
+              false,
+              false,
+              mockCampaign);
         assertNull(torso.checkFixable());
     }
 
@@ -666,18 +696,18 @@ class MekLocationTest {
 
         // Everything but the CT is busted
         doReturn(true).when(unit).isLocationDestroyed(anyInt());
-        doReturn(false).when(unit).isLocationDestroyed(Mek.LOC_CT);
+        doReturn(false).when(unit).isLocationDestroyed(Mek.LOC_CENTER_TORSO);
 
         // Destroyed leg can be repaired even if everything else is gone
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL,
-                true, true, true, true, true, mockCampaign);
+              true, true, true, true, true, mockCampaign);
         mekLocation.setUnit(unit);
         mekLocation.setBlownOff(true);
         assertNull(mekLocation.checkFixable());
-        location = Mek.LOC_RLEG;
+        location = Mek.LOC_RIGHT_LEG;
         mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL,
-                true, true, true, true, true, mockCampaign);
+              true, true, true, true, true, mockCampaign);
         mekLocation.setUnit(unit);
         mekLocation.setBlownOff(true);
         assertNull(mekLocation.checkFixable());
@@ -685,50 +715,50 @@ class MekLocationTest {
         // Destroyed head can be repaired even if everything else is gone
         location = Mek.LOC_HEAD;
         mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL,
-                true, true, true, true, true, mockCampaign);
+              true, true, true, true, true, mockCampaign);
         mekLocation.setUnit(unit);
         mekLocation.setBlownOff(true);
         assertNull(mekLocation.checkFixable());
 
         // Destroyed torsos can be repaired
-        location = Mek.LOC_RT;
+        location = Mek.LOC_RIGHT_TORSO;
         mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL,
-                true, true, true, true, true, mockCampaign);
+              true, true, true, true, true, mockCampaign);
         mekLocation.setUnit(unit);
         mekLocation.setBlownOff(true);
         assertNull(mekLocation.checkFixable());
-        location = Mek.LOC_LT;
+        location = Mek.LOC_LEFT_TORSO;
         mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL,
-                true, true, true, true, true, mockCampaign);
+              true, true, true, true, true, mockCampaign);
         mekLocation.setUnit(unit);
         mekLocation.setBlownOff(true);
         assertNull(mekLocation.checkFixable());
 
         // Arms cannot without their respective torsos
-        location = Mek.LOC_RARM;
+        location = Mek.LOC_RIGHT_ARM;
         mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL,
-                true, true, true, true, true, mockCampaign);
+              true, true, true, true, true, mockCampaign);
         mekLocation.setUnit(unit);
         mekLocation.setBlownOff(true);
         assertNotNull(mekLocation.checkFixable());
 
         // Fix the RT ...
-        doReturn(false).when(unit).isLocationDestroyed(Mek.LOC_RT);
+        doReturn(false).when(unit).isLocationDestroyed(Mek.LOC_RIGHT_TORSO);
 
-        // ... now the RARM can be fixed.
+        // ... now the RIGHT_ARM can be fixed.
         assertNull(mekLocation.checkFixable());
 
-        location = Mek.LOC_LARM;
+        location = Mek.LOC_LEFT_ARM;
         mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL,
-                true, true, true, true, true, mockCampaign);
+              true, true, true, true, true, mockCampaign);
         mekLocation.setUnit(unit);
         mekLocation.setBlownOff(true);
         assertNotNull(mekLocation.checkFixable());
 
         // Fix the LT ...
-        doReturn(false).when(unit).isLocationDestroyed(Mek.LOC_LT);
+        doReturn(false).when(unit).isLocationDestroyed(Mek.LOC_LEFT_TORSO);
 
-        // ... now the LARM can be fixed.
+        // ... now the LEFT_ARM can be fixed.
         assertNull(mekLocation.checkFixable());
     }
 
@@ -741,7 +771,7 @@ class MekLocationTest {
         when(entity.getWeight()).thenReturn(30.0);
         doCallRealMethod().when(entity).getLocationName(any());
 
-        int location = Mek.LOC_RARM;
+        int location = Mek.LOC_RIGHT_ARM;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
@@ -765,7 +795,15 @@ class MekLocationTest {
         when(entity.getWeight()).thenReturn(30.0);
         doCallRealMethod().when(entity).getLocationName(any());
 
-        MekLocation mekLocation = new MekLocation(Mek.LOC_RARM, 30, 0, false, false, false, false, false, mockCampaign);
+        MekLocation mekLocation = new MekLocation(Mek.LOC_RIGHT_ARM,
+              30,
+              0,
+              false,
+              false,
+              false,
+              false,
+              false,
+              mockCampaign);
         mekLocation.setUnit(unit);
 
         assertNull(mekLocation.checkSalvageable());
@@ -781,7 +819,7 @@ class MekLocationTest {
         doCallRealMethod().when(entity).getLocationName(any());
         when(unit.isSalvage()).thenReturn(true);
 
-        int location = Mek.LOC_RARM;
+        int location = Mek.LOC_RIGHT_ARM;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
@@ -805,29 +843,29 @@ class MekLocationTest {
         doCallRealMethod().when(entity).getLocationName(any());
         when(unit.isSalvage()).thenReturn(true);
 
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
         // Cannot salvage a torso if the attached arm is Okay
-        doReturn(false).when(entity).isLocationBad(Mek.LOC_RARM);
+        doReturn(false).when(entity).isLocationBad(Mek.LOC_RIGHT_ARM);
         assertNotNull(mekLocation.checkSalvageable());
         assertNotNull(mekLocation.checkFixable());
 
-        doReturn(true).when(entity).isLocationBad(Mek.LOC_RARM);
+        doReturn(true).when(entity).isLocationBad(Mek.LOC_RIGHT_ARM);
         assertNull(mekLocation.checkSalvageable());
         assertNull(mekLocation.checkFixable());
 
-        location = Mek.LOC_LT;
+        location = Mek.LOC_LEFT_TORSO;
         mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
         // Cannot salvage a torso if the attached arm is Okay
-        doReturn(false).when(entity).isLocationBad(Mek.LOC_LARM);
+        doReturn(false).when(entity).isLocationBad(Mek.LOC_LEFT_ARM);
         assertNotNull(mekLocation.checkSalvageable());
         assertNotNull(mekLocation.checkFixable());
 
-        doReturn(true).when(entity).isLocationBad(Mek.LOC_LARM);
+        doReturn(true).when(entity).isLocationBad(Mek.LOC_LEFT_ARM);
         assertNull(mekLocation.checkSalvageable());
         assertNull(mekLocation.checkFixable());
     }
@@ -842,30 +880,30 @@ class MekLocationTest {
         doCallRealMethod().when(entity).getLocationName(any());
         when(unit.isSalvage()).thenReturn(true);
 
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, /* forQuad: */true, false, false,
-                mockCampaign);
+              mockCampaign);
         mekLocation.setUnit(unit);
 
         // Cannot salvage a torso if the attached arm is Okay
-        doReturn(false).when(entity).isLocationBad((Mek.LOC_RARM));
+        doReturn(false).when(entity).isLocationBad((Mek.LOC_RIGHT_ARM));
         assertNotNull(mekLocation.checkSalvageable());
         assertNotNull(mekLocation.checkFixable());
 
-        doReturn(true).when(entity).isLocationBad((Mek.LOC_RARM));
+        doReturn(true).when(entity).isLocationBad((Mek.LOC_RIGHT_ARM));
         assertNull(mekLocation.checkSalvageable());
         assertNull(mekLocation.checkFixable());
 
-        location = Mek.LOC_LT;
+        location = Mek.LOC_LEFT_TORSO;
         mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
         // Cannot salvage a torso if the attached arm is Okay
-        doReturn(false).when(entity).isLocationBad((Mek.LOC_LARM));
+        doReturn(false).when(entity).isLocationBad((Mek.LOC_LEFT_ARM));
         assertNotNull(mekLocation.checkSalvageable());
         assertNotNull(mekLocation.checkFixable());
 
-        doReturn(true).when(entity).isLocationBad((Mek.LOC_LARM));
+        doReturn(true).when(entity).isLocationBad((Mek.LOC_LEFT_ARM));
         assertNull(mekLocation.checkSalvageable());
         assertNull(mekLocation.checkFixable());
     }
@@ -880,7 +918,7 @@ class MekLocationTest {
         doCallRealMethod().when(entity).getLocationName(any());
         when(unit.isSalvage()).thenReturn(true);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
@@ -918,14 +956,14 @@ class MekLocationTest {
         doCallRealMethod().when(entity).getLocationName(any());
         when(unit.isSalvage()).thenReturn(true);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
         int[] systems = new int[] { Mek.ACTUATOR_HIP, Mek.ACTUATOR_SHOULDER,
-                Mek.SYSTEM_LIFE_SUPPORT, Mek.SYSTEM_SENSORS
+                                    Mek.SYSTEM_LIFE_SUPPORT, Mek.SYSTEM_SENSORS
         };
-        doReturn(systems.length + 1).when(entity).getNumberOfCriticals((location));
+        doReturn(systems.length + 1).when(entity).getNumberOfCriticalSlots((location));
         CriticalSlot notHittable = mock(CriticalSlot.class);
         doReturn(notHittable).when(entity).getCritical((location), (0));
 
@@ -952,11 +990,11 @@ class MekLocationTest {
         doCallRealMethod().when(entity).getLocationName(any());
         when(unit.isSalvage()).thenReturn(true);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
-        doReturn(1).when(entity).getNumberOfCriticals((location));
+        doReturn(1).when(entity).getNumberOfCriticalSlots((location));
         CriticalSlot repairable = mock(CriticalSlot.class);
         when(repairable.isEverHittable()).thenReturn(true);
         when(repairable.getType()).thenReturn(CriticalSlot.TYPE_EQUIPMENT);
@@ -988,11 +1026,11 @@ class MekLocationTest {
         doCallRealMethod().when(entity).getLocationName(any());
         when(unit.isSalvage()).thenReturn(true);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
-        doReturn(1).when(entity).getNumberOfCriticals((location));
+        doReturn(1).when(entity).getNumberOfCriticalSlots((location));
         CriticalSlot repairable = mock(CriticalSlot.class);
         when(repairable.isEverHittable()).thenReturn(true);
         when(repairable.getType()).thenReturn(CriticalSlot.TYPE_EQUIPMENT);
@@ -1035,7 +1073,15 @@ class MekLocationTest {
         when(entity.getWeight()).thenReturn(30.0);
         doCallRealMethod().when(entity).getLocationName(any());
 
-        MekLocation mekLocation = new MekLocation(Mek.LOC_CT, 30, 0, false, false, false, false, false, mockCampaign);
+        MekLocation mekLocation = new MekLocation(Mek.LOC_CENTER_TORSO,
+              30,
+              0,
+              false,
+              false,
+              false,
+              false,
+              false,
+              mockCampaign);
         mekLocation.setUnit(unit);
 
         assertNotNull(mekLocation.checkScrappable());
@@ -1051,26 +1097,26 @@ class MekLocationTest {
         doCallRealMethod().when(entity).getLocationName(any());
         when(unit.isSalvage()).thenReturn(true);
 
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
         // Cannot salvage a torso if the attached arm is Okay
-        doReturn(false).when(entity).isLocationBad((Mek.LOC_RARM));
+        doReturn(false).when(entity).isLocationBad((Mek.LOC_RIGHT_ARM));
         assertNotNull(mekLocation.checkScrappable());
 
-        doReturn(true).when(entity).isLocationBad((Mek.LOC_RARM));
+        doReturn(true).when(entity).isLocationBad((Mek.LOC_RIGHT_ARM));
         assertNull(mekLocation.checkScrappable());
 
-        location = Mek.LOC_LT;
+        location = Mek.LOC_LEFT_TORSO;
         mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
         // Cannot salvage a torso if the attached arm is Okay
-        doReturn(false).when(entity).isLocationBad((Mek.LOC_LARM));
+        doReturn(false).when(entity).isLocationBad((Mek.LOC_LEFT_ARM));
         assertNotNull(mekLocation.checkScrappable());
 
-        doReturn(true).when(entity).isLocationBad((Mek.LOC_LARM));
+        doReturn(true).when(entity).isLocationBad((Mek.LOC_LEFT_ARM));
         assertNull(mekLocation.checkScrappable());
     }
 
@@ -1084,27 +1130,27 @@ class MekLocationTest {
         doCallRealMethod().when(entity).getLocationName(any());
         when(unit.isSalvage()).thenReturn(true);
 
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, /* forQuad: */true, false, false,
-                mockCampaign);
+              mockCampaign);
         mekLocation.setUnit(unit);
 
         // Cannot salvage a torso if the attached arm is Okay
-        doReturn(false).when(entity).isLocationBad((Mek.LOC_RARM));
+        doReturn(false).when(entity).isLocationBad((Mek.LOC_RIGHT_ARM));
         assertNotNull(mekLocation.checkScrappable());
 
-        doReturn(true).when(entity).isLocationBad((Mek.LOC_RARM));
+        doReturn(true).when(entity).isLocationBad((Mek.LOC_RIGHT_ARM));
         assertNull(mekLocation.checkScrappable());
 
-        location = Mek.LOC_LT;
+        location = Mek.LOC_LEFT_TORSO;
         mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
         // Cannot salvage a torso if the attached arm is Okay
-        doReturn(false).when(entity).isLocationBad((Mek.LOC_LARM));
+        doReturn(false).when(entity).isLocationBad((Mek.LOC_LEFT_ARM));
         assertNotNull(mekLocation.checkScrappable());
 
-        doReturn(true).when(entity).isLocationBad((Mek.LOC_LARM));
+        doReturn(true).when(entity).isLocationBad((Mek.LOC_LEFT_ARM));
         assertNull(mekLocation.checkScrappable());
     }
 
@@ -1118,7 +1164,7 @@ class MekLocationTest {
         doCallRealMethod().when(entity).getLocationName(any());
         when(unit.isSalvage()).thenReturn(true);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
@@ -1152,12 +1198,12 @@ class MekLocationTest {
         doCallRealMethod().when(entity).getLocationName(any());
         when(unit.isSalvage()).thenReturn(true);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
         int[] systems = new int[] { Mek.SYSTEM_COCKPIT, Mek.ACTUATOR_HIP, Mek.ACTUATOR_SHOULDER };
-        doReturn(systems.length + 1).when(entity).getNumberOfCriticals((location));
+        doReturn(systems.length + 1).when(entity).getNumberOfCriticalSlots((location));
         CriticalSlot notHittable = mock(CriticalSlot.class);
         doReturn(notHittable).when(entity).getCritical((location), (0));
 
@@ -1183,11 +1229,11 @@ class MekLocationTest {
         doCallRealMethod().when(entity).getLocationName(any());
         when(unit.isSalvage()).thenReturn(true);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
 
-        doReturn(1).when(entity).getNumberOfCriticals((location));
+        doReturn(1).when(entity).getNumberOfCriticalSlots((location));
         CriticalSlot repairable = mock(CriticalSlot.class);
         when(repairable.isEverHittable()).thenReturn(true);
         when(repairable.getType()).thenReturn(CriticalSlot.TYPE_EQUIPMENT);
@@ -1211,7 +1257,7 @@ class MekLocationTest {
         when(entity.getWeight()).thenReturn(30.0);
         doCallRealMethod().when(entity).getLocationName(any());
 
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         MekLocation torso = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         torso.setUnit(unit);
 
@@ -1219,10 +1265,10 @@ class MekLocationTest {
         when(unit.isSalvage()).thenReturn(true);
 
         // Blow off the right arm
-        doReturn(true).when(entity).isLocationBad(Mek.LOC_RARM);
+        doReturn(true).when(entity).isLocationBad(Mek.LOC_RIGHT_ARM);
 
-        // 2 criticals
-        doReturn(2).when(entity).getNumberOfCriticals((location));
+        // 2 criticalSlots
+        doReturn(2).when(entity).getNumberOfCriticalSlots((location));
         CriticalSlot mockLandingGear = mock(CriticalSlot.class);
         when(mockLandingGear.isEverHittable()).thenReturn(true);
         when(mockLandingGear.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
@@ -1301,7 +1347,7 @@ class MekLocationTest {
         when(unit.isSalvage()).thenReturn(true);
 
         // 1 critical
-        doReturn(1).when(entity).getNumberOfCriticals((location));
+        doReturn(1).when(entity).getNumberOfCriticalSlots((location));
         CriticalSlot mockAvionics = mock(CriticalSlot.class);
         when(mockAvionics.isEverHittable()).thenReturn(true);
         when(mockAvionics.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
@@ -1342,7 +1388,7 @@ class MekLocationTest {
         when(unit.getEntity()).thenReturn(entity);
         when(entity.getWeight()).thenReturn(30.0);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
 
         // not on unit
@@ -1387,7 +1433,7 @@ class MekLocationTest {
     void removeRestoresBlownOffTest() {
         Campaign mockCampaign = mock(Campaign.class);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
 
         // Removal
@@ -1405,7 +1451,7 @@ class MekLocationTest {
     void removeRestoresBreachedTest() {
         Campaign mockCampaign = mock(Campaign.class);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
 
         // Removal
@@ -1436,7 +1482,7 @@ class MekLocationTest {
         when(unit.getEntity()).thenReturn(entity);
         when(entity.getWeight()).thenReturn(30.0);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setId(25);
         mekLocation.setUnit(unit);
@@ -1622,7 +1668,7 @@ class MekLocationTest {
         when(unit.getEntity()).thenReturn(entity);
         when(entity.getWeight()).thenReturn(30.0);
 
-        int location = Mek.LOC_CT;
+        int location = Mek.LOC_CENTER_TORSO;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setId(25);
         mekLocation.setUnit(unit);
@@ -1648,9 +1694,9 @@ class MekLocationTest {
         when(entity.getWeight()).thenReturn(100.0);
         when(unit.getEntity()).thenReturn(entity);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 100, EquipmentType.T_STRUCTURE_INDUSTRIAL,
-                true, true, true, true, true, mockCampaign);
+              true, true, true, true, true, mockCampaign);
 
         // Add the location to a unit
         mekLocation.setUnit(unit);
@@ -1665,7 +1711,7 @@ class MekLocationTest {
         verify(mockWarehouse, times(1)).removePart((mekLocation));
 
         ArgumentCaptor<Part> partCaptor = ArgumentCaptor.forClass(Part.class);
-        verify(mockQuartermaster, times(1)).addPart(partCaptor.capture(), eq(0));
+        verify(mockQuartermaster, times(1)).addPart(partCaptor.capture(), eq(0), eq(false));
 
         Part part = partCaptor.getValue();
         assertInstanceOf(MissingMekLocation.class, part);
@@ -1689,7 +1735,7 @@ class MekLocationTest {
         when(unit.getEntity()).thenReturn(entity);
         when(entity.getWeight()).thenReturn(30.0);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setId(25);
         mekLocation.setUnit(unit);
@@ -1735,7 +1781,7 @@ class MekLocationTest {
         when(unit.getEntity()).thenReturn(entity);
         when(entity.getWeight()).thenReturn(30.0);
 
-        int location = Mek.LOC_CT;
+        int location = Mek.LOC_CENTER_TORSO;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setId(25);
         mekLocation.setUnit(unit);
@@ -1759,7 +1805,7 @@ class MekLocationTest {
     void fixSimpleTest() {
         Campaign mockCampaign = mock(Campaign.class);
 
-        int location = Mek.LOC_CT;
+        int location = Mek.LOC_CENTER_TORSO;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setPercent(0.5);
 
@@ -1799,13 +1845,13 @@ class MekLocationTest {
         when(unit.getEntity()).thenReturn(entity);
         when(entity.getWeight()).thenReturn(30.0);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setBlownOff(true);
         mekLocation.setUnit(unit);
 
-        // Setup the critical slots
-        doReturn(3).when(entity).getNumberOfCriticals((location));
+        // Set up the critical slots
+        doReturn(3).when(entity).getNumberOfCriticalSlots((location));
         doReturn(null).when(entity).getCritical((location), (0)); // empty
         CriticalSlot mockSlot = mock(CriticalSlot.class);
         Mounted mounted = mock(Mounted.class);
@@ -1836,13 +1882,13 @@ class MekLocationTest {
         when(unit.getEntity()).thenReturn(entity);
         when(entity.getWeight()).thenReturn(30.0);
 
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setBreached(true);
         mekLocation.setUnit(unit);
 
-        // Setup the critical slots
-        doReturn(3).when(entity).getNumberOfCriticals((location));
+        // Set up the critical slots
+        doReturn(3).when(entity).getNumberOfCriticalSlots((location));
         doReturn(null).when(entity).getCritical((location), (0)); // empty
         CriticalSlot mockSlot = mock(CriticalSlot.class);
         Mounted mounted = mock(Mounted.class);
@@ -1874,7 +1920,7 @@ class MekLocationTest {
         when(entity.getWeight()).thenReturn(30.0);
 
         // Blown off non-head
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
         mekLocation.setBlownOff(true);
@@ -1935,7 +1981,7 @@ class MekLocationTest {
         when(entity.getWeight()).thenReturn(30.0);
 
         // Blown off non-head
-        int location = Mek.LOC_LLEG;
+        int location = Mek.LOC_LEFT_LEG;
         MekLocation mekLocation = new MekLocation(location, 30, 0, false, false, false, false, false, mockCampaign);
         mekLocation.setUnit(unit);
         mekLocation.setBlownOff(true);
@@ -1991,7 +2037,15 @@ class MekLocationTest {
     void isRightTechTypeTest() {
         Campaign mockCampaign = mock(Campaign.class);
 
-        MekLocation centerTorso = new MekLocation(Mek.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
+        MekLocation centerTorso = new MekLocation(Mek.LOC_CENTER_TORSO,
+              25,
+              0,
+              false,
+              false,
+              false,
+              false,
+              false,
+              mockCampaign);
 
         assertTrue(centerTorso.isRightTechType(SkillType.S_TECH_MEK));
         assertFalse(centerTorso.isRightTechType(SkillType.S_TECH_MECHANIC));
@@ -2002,11 +2056,26 @@ class MekLocationTest {
         Campaign mockCampaign = mock(Campaign.class);
 
         int structureType = EquipmentType.T_STRUCTURE_ENDO_STEEL;
-        MekLocation centerTorso = new MekLocation(Mek.LOC_CT, 25, structureType, true, false, false, false, false,
-                mockCampaign);
+        MekLocation centerTorso = new MekLocation(Mek.LOC_CENTER_TORSO,
+              25,
+              structureType,
+              true,
+              false,
+              false,
+              false,
+              false,
+              mockCampaign);
         assertNotNull(centerTorso.getTechAdvancement());
 
-        centerTorso = new MekLocation(Mek.LOC_CT, 25, structureType, false, false, false, false, false, mockCampaign);
+        centerTorso = new MekLocation(Mek.LOC_CENTER_TORSO,
+              25,
+              structureType,
+              false,
+              false,
+              false,
+              false,
+              false,
+              mockCampaign);
         assertNotNull(centerTorso.getTechAdvancement());
     }
 
@@ -2014,7 +2083,15 @@ class MekLocationTest {
     void getMRMSOptionTypeTest() {
         Campaign mockCampaign = mock(Campaign.class);
 
-        MekLocation centerTorso = new MekLocation(Mek.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
+        MekLocation centerTorso = new MekLocation(Mek.LOC_CENTER_TORSO,
+              25,
+              0,
+              false,
+              false,
+              false,
+              false,
+              false,
+              mockCampaign);
         assertEquals(PartRepairType.GENERAL_LOCATION, centerTorso.getMRMSOptionType());
     }
 
@@ -2022,7 +2099,15 @@ class MekLocationTest {
     void getRepairPartTypeTest() {
         Campaign mockCampaign = mock(Campaign.class);
 
-        MekLocation centerTorso = new MekLocation(Mek.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
+        MekLocation centerTorso = new MekLocation(Mek.LOC_CENTER_TORSO,
+              25,
+              0,
+              false,
+              false,
+              false,
+              false,
+              false,
+              mockCampaign);
         assertEquals(PartRepairType.MEK_LOCATION, centerTorso.getRepairPartType());
     }
 
@@ -2032,7 +2117,15 @@ class MekLocationTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
-        MekLocation mekLocation = new MekLocation(Mek.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
+        MekLocation mekLocation = new MekLocation(Mek.LOC_CENTER_TORSO,
+              25,
+              0,
+              false,
+              false,
+              false,
+              false,
+              false,
+              mockCampaign);
 
         assertNotNull(mekLocation.getDetails());
         assertTrue(mekLocation.getDetails().startsWith("25 tons"));
@@ -2080,7 +2173,7 @@ class MekLocationTest {
         when(unit.getEntity()).thenReturn(entity);
         when(entity.getWeight()).thenReturn(30.0);
 
-        int location = Mek.LOC_RARM;
+        int location = Mek.LOC_RIGHT_ARM;
         doReturn("Right Arm").when(entity).getLocationName((location));
 
         MekLocation mekLocation = new MekLocation(location, 25, 0, false, false, false, false, false, mockCampaign);
@@ -2130,7 +2223,7 @@ class MekLocationTest {
         when(unit.getEntity()).thenReturn(entity);
         when(entity.getWeight()).thenReturn(30.0);
 
-        int location = Mek.LOC_RARM;
+        int location = Mek.LOC_RIGHT_ARM;
         doReturn("Right Arm").when(entity).getLocationName((location));
 
         MekLocation mekLocation = new MekLocation(location, 25, 0, false, false, false, false, false, mockCampaign);
@@ -2152,7 +2245,7 @@ class MekLocationTest {
         when(unit.isSalvage()).thenReturn(true);
         when(entity.getWeight()).thenReturn(30.0);
 
-        int location = Mek.LOC_RARM;
+        int location = Mek.LOC_RIGHT_ARM;
         doReturn("Right Arm").when(entity).getLocationName((location));
 
         MekLocation mekLocation = new MekLocation(location, 25, 0, false, false, false, false, false, mockCampaign);
@@ -2176,7 +2269,7 @@ class MekLocationTest {
         when(unit.isSalvage()).thenReturn(true);
         when(entity.getWeight()).thenReturn(30.0);
 
-        int location = Mek.LOC_RARM;
+        int location = Mek.LOC_RIGHT_ARM;
         doReturn("Right Arm").when(entity).getLocationName((location));
 
         MekLocation mekLocation = new MekLocation(location, 25, 0, false, false, false, false, false, mockCampaign);
@@ -2206,7 +2299,7 @@ class MekLocationTest {
         when(unit.getEntity()).thenReturn(entity);
         when(entity.getWeight()).thenReturn(30.0);
 
-        int location = Mek.LOC_RARM;
+        int location = Mek.LOC_RIGHT_ARM;
         doReturn("Right Arm").when(entity).getLocationName((location));
 
         MekLocation mekLocation = new MekLocation(location, 25, 0, false, false, false, false, false, mockCampaign);

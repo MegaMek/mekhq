@@ -24,31 +24,35 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
+import megamek.common.units.Entity;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Ammo bin missing from a small support vehicle
  */
 public class MissingInfantryAmmoBin extends MissingAmmoBin {
-    private static final MMLogger logger = MMLogger.create(MissingInfantryAmmoBin.class);
+    private static final MMLogger LOGGER = MMLogger.create(MissingInfantryAmmoBin.class);
 
     private InfantryWeapon weaponType;
 
@@ -65,11 +69,11 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
      * @param equipNum   The equipment index on the unit
      * @param weaponType The weapon this ammo is for
      * @param clips      The number of clips of ammo
-     * @param omniPodded Whether the weapon is pod-mounted on an omnivehicle
+     * @param omniPodded Whether the weapon is pod-mounted on an OmniVehicle
      * @param c          The campaign instance
      */
     public MissingInfantryAmmoBin(int tonnage, @Nullable AmmoType ammoType, int equipNum,
-            @Nullable InfantryWeapon weaponType, int clips, boolean omniPodded, @Nullable Campaign c) {
+          @Nullable InfantryWeapon weaponType, int clips, boolean omniPodded, @Nullable Campaign c) {
         super(tonnage, ammoType, equipNum, false, omniPodded, c);
         this.weaponType = weaponType;
         this.size = clips;
@@ -84,7 +88,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
         if (getWeaponType() != null) {
             name = getWeaponType().getName() + " Ammo Bin";
         } else {
-            logger.error("MissingInfantryAmmoBin does not have a weapon type!");
+            LOGGER.error("MissingInfantryAmmoBin does not have a weapon type!");
         }
     }
 
@@ -127,12 +131,10 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
         // than an InfantryAmmoBin. Subclasses should use a similar check, which
         // breaks Composability to a degree but in this case we've used
         // subclasses where they're not truly composable.
-        if ((part instanceof InfantryAmmoBin)
-                && (part.getClass() == InfantryAmmoBin.class)) {
-            InfantryAmmoBin bin = (InfantryAmmoBin) part;
+        if ((part instanceof InfantryAmmoBin bin) && (part.getClass() == InfantryAmmoBin.class)) {
             return getType().equals(bin.getType())
-                    && getWeaponType().equals(bin.getWeaponType())
-                    && (getClips() == bin.getClips());
+                         && getWeaponType().equals(bin.getWeaponType())
+                         && (getClips() == bin.getClips());
         }
         return false;
     }
@@ -145,7 +147,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
     @Override
     public InfantryAmmoBin getNewPart() {
         return new InfantryAmmoBin(getUnitTonnage(), getType(), -1, getFullShots(),
-                getWeaponType(), getClips(), omniPodded, campaign);
+              getWeaponType(), getClips(), omniPodded, campaign);
     }
 
     @Override

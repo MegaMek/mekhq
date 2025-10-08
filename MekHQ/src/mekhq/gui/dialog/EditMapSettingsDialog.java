@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -50,25 +55,24 @@ import java.util.ResourceBundle;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
 import javax.swing.*;
 
-import megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility;
 import megamek.client.ui.dialogs.minimap.MinimapPanel;
-import megamek.common.Board;
-import megamek.common.BoardDimensions;
+import megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility;
 import megamek.common.Configuration;
-import megamek.common.MapSettings;
+import megamek.common.board.Board;
+import megamek.common.board.BoardDimensions;
+import megamek.common.loaders.MapSettings;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import megamek.server.ServerBoardHelper;
-import megamek.server.totalwarfare.TWGameManager;
+import megamek.server.totalWarfare.TWGameManager;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class EditMapSettingsDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(EditMapSettingsDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(EditMapSettingsDialog.class);
 
     private int mapSizeX;
     private int mapSizeY;
@@ -90,13 +94,13 @@ public class EditMapSettingsDialog extends JDialog {
     JPanel panSizeRandom;
     JPanel panSizeFixed;
 
-    private Map<String, ImageIcon> mapIcons = new HashMap<>();
-    private Map<String, Image> baseImages = new HashMap<>();
+    private final Map<String, ImageIcon> mapIcons = new HashMap<>();
+    private final Map<String, Image> baseImages = new HashMap<>();
 
-    private ImageLoader loader;
+    private final ImageLoader loader;
 
     public EditMapSettingsDialog(JFrame parent, boolean modal, int boardType, boolean usingFixedMap, String map,
-            int mapSizeX, int mapSizeY) {
+          int mapSizeX, int mapSizeY) {
 
         super(parent, modal);
         this.boardType = boardType;
@@ -134,7 +138,7 @@ public class EditMapSettingsDialog extends JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditMapSettingsDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setTitle(resourceMap.getString("dialog.title"));
 
         getContentPane().setLayout(new BorderLayout());
@@ -302,10 +306,14 @@ public class EditMapSettingsDialog extends JDialog {
         listFixedMaps.setFixedCellWidth(-1);
         MapSettings mapSettings = MapSettings.getInstance();
         BoardDimensions boardSize = (BoardDimensions) comboMapSize.getSelectedItem();
-        mapSettings.setBoardSize(boardSize.width(), boardSize.height());
-        List<String> boards = ServerBoardHelper.scanForBoards(mapSettings);
-        fixedMapModel.removeAllElements();
-        fixedMapModel.addAll(boards);
+
+        if (boardSize != null) {
+            mapSettings.setBoardSize(boardSize.width(), boardSize.height());
+            List<String> boards = ServerBoardHelper.scanForBoards(mapSettings);
+            fixedMapModel.removeAllElements();
+            fixedMapModel.addAll(boards);
+        }
+
         listFixedMaps.clearSelection();
     }
 
@@ -315,8 +323,10 @@ public class EditMapSettingsDialog extends JDialog {
         if (usingFixedMap) {
             map = listFixedMaps.getSelectedValue();
             BoardDimensions boardSize = (BoardDimensions) comboMapSize.getSelectedItem();
-            mapSizeX = boardSize.width();
-            mapSizeY = boardSize.height();
+            if (boardSize != null) {
+                mapSizeX = boardSize.width();
+                mapSizeY = boardSize.height();
+            }
         } else {
             map = listMapGenerators.getSelectedValue();
             if (listMapGenerators.getSelectedIndex() == 0) {
@@ -337,12 +347,9 @@ public class EditMapSettingsDialog extends JDialog {
      */
     private class BoardNameRenderer extends DefaultListCellRenderer {
 
-        private Image image;
-        private ImageIcon icon;
-
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value,
-                int index, boolean isSelected, boolean cellHasFocus) {
+              int index, boolean isSelected, boolean cellHasFocus) {
 
             String board = (String) value;
             // For generated boards, add the size to have different images for different
@@ -352,11 +359,12 @@ public class EditMapSettingsDialog extends JDialog {
             // }
 
             // If an icon is present for the current board, use it
-            icon = mapIcons.get(board);
+            ImageIcon icon = mapIcons.get(board);
             if (icon != null) {
                 setIcon(icon);
             } else {
                 // The icon is not present, see if there's a base image
+                Image image;
                 synchronized (baseImages) {
                     image = baseImages.get(board);
                 }
@@ -367,7 +375,7 @@ public class EditMapSettingsDialog extends JDialog {
                     loader.add(board);
                     setToolTipText(null);
                     return super.getListCellRendererComponent(list, new File(board).getName(), index, isSelected,
-                            cellHasFocus);
+                          cellHasFocus);
                 } else {
                     icon = new ImageIcon(image);
 
@@ -398,14 +406,14 @@ public class EditMapSettingsDialog extends JDialog {
 
     private class ImageLoader extends SwingWorker<Void, Image> {
 
-        private BlockingQueue<String> boards = new LinkedBlockingQueue<>();
+        private final BlockingQueue<String> boards = new LinkedBlockingQueue<>();
 
         private synchronized void add(String name) {
             if (!boards.contains(name)) {
                 try {
                     boards.put(name);
                 } catch (Exception e) {
-                    logger.error("", e);
+                    LOGGER.error("", e);
                 }
             }
         }
@@ -413,6 +421,11 @@ public class EditMapSettingsDialog extends JDialog {
         private Image prepareImage(String boardName) {
             MapSettings mapSettings = MapSettings.getInstance();
             BoardDimensions boardSize = (BoardDimensions) comboMapSize.getSelectedItem();
+
+            if (boardSize == null) {
+                return null;
+            }
+
             mapSettings.setBoardSize(boardSize.width(), boardSize.height());
             File boardFile = new MegaMekFile(Configuration.boardsDir(), boardName + ".board").getFile();
             Board board;
@@ -487,7 +500,7 @@ public class EditMapSettingsDialog extends JDialog {
         private void redrawMapTable(Image image) {
             if (image != null) {
                 if (listFixedMaps.getFixedCellHeight() != image.getHeight(null)
-                        || listFixedMaps.getFixedCellWidth() != image.getWidth(null)) {
+                          || listFixedMaps.getFixedCellWidth() != image.getWidth(null)) {
                     listFixedMaps.setFixedCellHeight(image.getHeight(null));
                     listFixedMaps.setFixedCellWidth(image.getWidth(null));
                 }

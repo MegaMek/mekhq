@@ -24,11 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
+import static java.lang.Math.min;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
+import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -40,20 +54,10 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.universe.Faction;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static java.lang.Math.min;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
-import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
-
 /**
- * This class is responsible for generating resupply contents for various drop types,
- * such as parts, armor, and ammunition, based on specified parameters. It calculates
- * the items to be included, considering available resources, negotiator skills, and
- * item value constraints.
+ * This class is responsible for generating resupply contents for various drop types, such as parts, armor, and
+ * ammunition, based on specified parameters. It calculates the items to be included, considering available resources,
+ * negotiator skills, and item value constraints.
  */
 public class GenerateResupplyContents {
     private static final MMLogger logger = MMLogger.create(GenerateResupplyContents.class);
@@ -68,22 +72,21 @@ public class GenerateResupplyContents {
 
 
     /**
-     * Enum representing different types of drops that can be generated during resupply.
-     * - `DROP_TYPE_PARTS`: Represents parts for resupply.
-     * - `DROP_TYPE_ARMOR`: Represents armor for resupply.
-     * - `DROP_TYPE_AMMO`: Represents ammunition for resupply.
+     * Enum representing different types of drops that can be generated during resupply. - `DROP_TYPE_PARTS`: Represents
+     * parts for resupply. - `DROP_TYPE_ARMOR`: Represents armor for resupply. - `DROP_TYPE_AMMO`: Represents ammunition
+     * for resupply.
      */
     public enum DropType {
         DROP_TYPE_PARTS, DROP_TYPE_ARMOR, DROP_TYPE_AMMO
     }
 
     /**
-     * Generates the resupply contents based on the given {@link Resupply}, the specified
-     * {@link DropType}, and whether player convoys should be used.
+     * Generates the resupply contents based on the given {@link Resupply}, the specified {@link DropType}, and whether
+     * player convoys should be used.
      *
-     * @param resupply        The resupply object containing relevant details like
-     *                        pools of parts, armor, ammo, and negotiator skill.
-     * @param dropType        The type of drop to generate (parts, armor, or ammunition).
+     * @param resupply         The resupply object containing relevant details like pools of parts, armor, ammo, and
+     *                         negotiator skill.
+     * @param dropType         The type of drop to generate (parts, armor, or ammunition).
      * @param usePlayerConvoys Indicates whether player convoy cargo capacity should be applied.
      */
     static void getResupplyContents(Resupply resupply, DropType dropType, boolean usePlayerConvoys) {
@@ -113,7 +116,7 @@ public class GenerateResupplyContents {
             return;
         }
 
-        List<Part> relevantPartsPool = switch(dropType) {
+        List<Part> relevantPartsPool = switch (dropType) {
             case DROP_TYPE_PARTS -> partsPool;
             case DROP_TYPE_ARMOR -> armorPool;
             case DROP_TYPE_AMMO -> ammoBinPool;
@@ -121,7 +124,7 @@ public class GenerateResupplyContents {
 
         double currentLoad = 0;
         while ((currentLoad < availableSpace) && (!relevantPartsPool.isEmpty())) {
-            Part potentialPart = switch(dropType) {
+            Part potentialPart = switch (dropType) {
                 case DROP_TYPE_PARTS -> getRandomDrop(partsPool, negotiatorSkill);
                 case DROP_TYPE_ARMOR -> getRandomDrop(armorPool, negotiatorSkill);
                 case DROP_TYPE_AMMO -> getRandomDrop(ammoBinPool, negotiatorSkill);
@@ -183,11 +186,12 @@ public class GenerateResupplyContents {
     }
 
     /**
-     * Fetches a random part from the given pool of items and assigns a quality to the part,
-     * based on the provided negotiator skill. If the pool is empty, returns {@code null}.
+     * Fetches a random part from the given pool of items and assigns a quality to the part, based on the provided
+     * negotiator skill. If the pool is empty, returns {@code null}.
      *
-     * @param dropPool       The list of potential items to choose from for resupply.
+     * @param dropPool        The list of potential items to choose from for resupply.
      * @param negotiatorSkill The skill level of the negotiator, affecting item quality.
+     *
      * @return A randomly selected part with an assigned quality, or {@code null} if the pool is empty.
      */
     private static @Nullable Part getRandomDrop(List<Part> dropPool, int negotiatorSkill) {
@@ -202,11 +206,11 @@ public class GenerateResupplyContents {
     }
 
     /**
-     * Determines a random part quality based on the input modifier.
-     * This method uses unit-level quality logic as a placeholder, with planned
-     * future integration of fame and infamy to influence quality.
+     * Determines a random part quality based on the input modifier. This method uses unit-level quality logic as a
+     * placeholder, with planned future integration of fame and infamy to influence quality.
      *
      * @param modifier The value influencing the randomness of part quality.
+     *
      * @return A randomly generated {@link PartQuality} based on the modifier.
      */
     static PartQuality getRandomPartQuality(int modifier) {
@@ -215,11 +219,10 @@ public class GenerateResupplyContents {
     }
 
     /**
-     * Calculates the worth of the convoy contents based on the resupply type and various campaign
-     * conditions.
+     * Calculates the worth of the convoy contents based on the resupply type and various campaign conditions.
      *
-     * @param resupply The {@link Resupply} object containing details about the convoy
-     *                 and associated resupply operation.
+     * @param resupply The {@link Resupply} object containing details about the convoy and associated resupply
+     *                 operation.
      */
     private static void calculateConvoyWorth(Resupply resupply) {
         List<Part> convoyContents = resupply.getConvoyContents();
@@ -240,7 +243,7 @@ public class GenerateResupplyContents {
         // Smugglers always double the cost of the supplies they're offering
         if (resupplyType.equals(ResupplyType.RESUPPLY_SMUGGLER)) {
             resupply.setConvoyContentsValueCalculated(buyValue.multipliedBy(2));
-            return ;
+            return;
         }
 
         // If the player faction matches the employer faction (and is not Mercenary, or Pirate),
@@ -252,7 +255,7 @@ public class GenerateResupplyContents {
         final Faction employerFaction = contract.getEmployerFaction();
 
         if (campaignFaction.equals(employerFaction) && !campaignFaction.isMercenary()
-            && !campaignFaction.isPirate()) {
+                  && !campaignFaction.isPirate()) {
             // convoy contents initializes with a calculated value of zero, so no need to set it here.
             return;
         }

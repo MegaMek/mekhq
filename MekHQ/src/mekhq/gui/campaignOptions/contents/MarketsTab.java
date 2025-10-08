@@ -105,25 +105,23 @@ public class MarketsTab {
     private MMComboBox<PersonnelMarketStyle> comboPersonnelMarketStyle;
     private JCheckBox chkPersonnelMarketReportRefresh;
     private JCheckBox chkUsePersonnelHireHiringHallOnly;
-    @Deprecated(since = "0.50.06", forRemoval = false)
+    @Deprecated(since = "0.50.06")
     private JLabel lblPersonnelMarketType;
-    @Deprecated(since = "0.50.06", forRemoval = false)
+    @Deprecated(since = "0.50.06")
     private MMComboBox<String> comboPersonnelMarketType;
 
-    @Deprecated(since = "0.50.06", forRemoval = false)
+    @Deprecated(since = "0.50.06")
     private JPanel pnlRemovalTargets;
-    @Deprecated(since = "0.50.06", forRemoval = false)
+    @Deprecated(since = "0.50.06")
     private JLabel lblPersonnelMarketDylansWeight;
-    @Deprecated(since = "0.50.06", forRemoval = false)
+    @Deprecated(since = "0.50.06")
     private JSpinner spnPersonnelMarketDylansWeight;
-    @Deprecated(since = "0.50.06", forRemoval = false)
+    @Deprecated(since = "0.50.06")
     private Map<SkillLevel, JLabel> lblPersonnelMarketRandomRemovalTargets;
-    @Deprecated(since = "0.50.06", forRemoval = false)
+    @Deprecated(since = "0.50.06")
     private Map<SkillLevel, JSpinner> spnPersonnelMarketRandomRemovalTargets;
     //end Personnel Market
 
-    //start Unit Market
-    private CampaignOptionsHeaderPanel unitMarketHeader;
     private JLabel lblUnitMarketMethod;
     private MMComboBox<UnitMarketMethod> comboUnitMarketMethod;
     private JCheckBox chkUnitMarketRegionalMekVariations;
@@ -146,7 +144,7 @@ public class MarketsTab {
     private JCheckBox chkVariableContractLength;
     private JCheckBox chkUseDynamicDifficulty;
     private JCheckBox chkContractMarketReportRefresh;
-    private JLabel lblCoontractMaxSalvagePercentage;
+    private JLabel lblContractMaxSalvagePercentage;
     private JSpinner spnContractMaxSalvagePercentage;
     private JLabel lblDropShipBonusPercentage;
     private JSpinner spnDropShipBonusPercentage;
@@ -226,7 +224,7 @@ public class MarketsTab {
      *
      * @return A {@link DefaultComboBoxModel} containing the personnel market type options.
      */
-    @Deprecated(since = "0.50.06", forRemoval = false)
+    @Deprecated(since = "0.50.06")
     private static DefaultComboBoxModel<String> getPersonnelMarketTypeOptions() {
         final DefaultComboBoxModel<String> personnelMarketTypeModel = new DefaultComboBoxModel<>();
         for (final PersonnelMarketMethod method : PersonnelMarketServiceManager.getInstance().getAllServices(true)) {
@@ -246,7 +244,7 @@ public class MarketsTab {
     public JPanel createPersonnelMarketTab() {
         // Header
         personnelMarketHeader = new CampaignOptionsHeaderPanel("PersonnelMarketTab",
-                getImageDirectory() + "logo_st_ives_compact.png", 11);
+              getImageDirectory() + "logo_st_ives_compact.png", 11);
 
         // Contents
         pnlPersonnelMarketGeneralOptions = createPersonnelMarketGeneralOptionsPanel();
@@ -285,7 +283,7 @@ public class MarketsTab {
         lblPersonnelMarketStyle = new CampaignOptionsLabel("PersonnelMarketStyle");
         lblPersonnelMarketStyle.addMouseListener(createTipPanelUpdater(personnelMarketHeader, "PersonnelMarketStyle"));
         comboPersonnelMarketStyle.addMouseListener(createTipPanelUpdater(personnelMarketHeader,
-                "PersonnelMarketStyle"));
+              "PersonnelMarketStyle"));
 
         lblPersonnelMarketType = new CampaignOptionsLabel("PersonnelMarketType");
         lblPersonnelMarketType.addMouseListener(createTipPanelUpdater(personnelMarketHeader, "PersonnelMarketType"));
@@ -435,13 +433,14 @@ public class MarketsTab {
     /**
      * Creates and returns the JPanel representing the Unit Market configuration tab.
      * <p>
-     * This tab includes options such as unit market methods, rarity modifiers, special unit chance settings, and more.
+     * This tab includes options such as unit market methods, rarity modifiers, special unit change settings, and more.
      *
      * @return A {@link JPanel} for the Unit Market configuration tab.
      */
     public JPanel createUnitMarketTab() {
         // Header
-        unitMarketHeader = new CampaignOptionsHeaderPanel("UnitMarketTab",
+        //start Unit Market
+        CampaignOptionsHeaderPanel unitMarketHeader = new CampaignOptionsHeaderPanel("UnitMarketTab",
               getImageDirectory() + "logo_clan_ice_hellion.png",
               5);
 
@@ -542,7 +541,7 @@ public class MarketsTab {
         chkVariableContractLength = new JCheckBox();
         chkUseDynamicDifficulty = new JCheckBox();
         chkContractMarketReportRefresh = new JCheckBox();
-        lblCoontractMaxSalvagePercentage = new JLabel();
+        lblContractMaxSalvagePercentage = new JLabel();
         spnContractMaxSalvagePercentage = new JSpinner();
         lblDropShipBonusPercentage = new JLabel();
         spnDropShipBonusPercentage = new JSpinner();
@@ -633,12 +632,12 @@ public class MarketsTab {
         chkContractMarketReportRefresh.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "ContractMarketReportRefresh"));
 
-        lblCoontractMaxSalvagePercentage = new CampaignOptionsLabel("CoontractMaxSalvagePercentage");
-        lblCoontractMaxSalvagePercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader,
-              "CoontractMaxSalvagePercentage"));
-        spnContractMaxSalvagePercentage = new CampaignOptionsSpinner("CoontractMaxSalvagePercentage", 100, 0, 100, 10);
+        lblContractMaxSalvagePercentage = new CampaignOptionsLabel("ContractMaxSalvagePercentage");
+        lblContractMaxSalvagePercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "ContractMaxSalvagePercentage"));
+        spnContractMaxSalvagePercentage = new CampaignOptionsSpinner("ContractMaxSalvagePercentage", 100, 0, 100, 10);
         spnContractMaxSalvagePercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader,
-              "CoontractMaxSalvagePercentage"));
+              "ContractMaxSalvagePercentage"));
 
         lblDropShipBonusPercentage = new CampaignOptionsLabel("DropShipBonusPercentage");
         lblDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader,
@@ -677,7 +676,7 @@ public class MarketsTab {
 
         layout.gridy++;
         layout.gridwidth = 1;
-        panel.add(lblCoontractMaxSalvagePercentage, layout);
+        panel.add(lblContractMaxSalvagePercentage, layout);
         layout.gridx++;
         panel.add(spnContractMaxSalvagePercentage, layout);
 
@@ -914,11 +913,12 @@ public class MarketsTab {
             PersonnelMarketStyle originalPersonnelMarketStyle = options.getPersonnelMarketStyle();
             if (selectedPersonnelMarketStyle != originalPersonnelMarketStyle) {
                 NewPersonnelMarket replacementMarket = switch (selectedPersonnelMarketStyle) {
-                    case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket(campaign);
-                    case MEKHQ -> new PersonnelMarketMekHQ(campaign);
-                    case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised(campaign);
-                    case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict(campaign);
+                    case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket();
+                    case MEKHQ -> new PersonnelMarketMekHQ();
+                    case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised();
+                    case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict();
                 };
+                replacementMarket.setCampaign(campaign);
                 campaign.setNewPersonnelMarket(replacementMarket);
             }
             options.setPersonnelMarketStyle(comboPersonnelMarketStyle.getSelectedItem());

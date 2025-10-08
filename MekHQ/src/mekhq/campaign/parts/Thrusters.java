@@ -25,31 +25,31 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingThrusters;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import mekhq.campaign.personnel.skills.SkillType;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -88,9 +88,9 @@ public class Thrusters extends Part {
                 hits = ((Aero) unit.getEntity()).getRightThrustHits();
             }
             if (checkForDestruction
-                    && hits > priorHits
-                    && (hits < 4 && !campaign.getCampaignOptions().isUseAeroSystemHits())
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits
+                      && (hits < 4 && !campaign.getCampaignOptions().isUseAeroSystemHits())
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             } else if (hits >= 4) {
                 remove(false);
@@ -100,16 +100,13 @@ public class Thrusters extends Part {
 
     @Override
     public int getBaseTime() {
-        int time = 0;
+        int time;
         if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
             // Test of proposed errata for repair times
             if (isSalvaging()) {
                 time = 600;
             } else {
                 time = 90;
-            }
-            if (hits == 1) {
-                time *= 1;
             }
             if (hits == 2) {
                 time *= 2;
@@ -185,13 +182,13 @@ public class Thrusters extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -210,9 +207,9 @@ public class Thrusters extends Part {
     @Override
     public boolean needsFixing() {
         if (null != getUnit() && null != getUnit().getEntity() &&
-                (getUnit().getEntity() instanceof Aero
-                        && !(getUnit().getEntity() instanceof SmallCraft
-                                || getUnit().getEntity() instanceof Jumpship))) {
+                  (getUnit().getEntity() instanceof Aero
+                         && !(getUnit().getEntity() instanceof SmallCraft
+                                    || getUnit().getEntity() instanceof Jumpship))) {
             return false;
         }
         return hits > 0;
@@ -221,9 +218,9 @@ public class Thrusters extends Part {
     @Override
     public boolean isSalvaging() {
         if (null != getUnit() && null != getUnit().getEntity() &&
-                (getUnit().getEntity() instanceof Aero
-                        && !(getUnit().getEntity() instanceof SmallCraft
-                                || getUnit().getEntity() instanceof Jumpship))) {
+                  (getUnit().getEntity() instanceof Aero
+                         && !(getUnit().getEntity() instanceof SmallCraft
+                                    || getUnit().getEntity() instanceof Jumpship))) {
             return false;
         }
         return super.isSalvaging();
@@ -242,9 +239,8 @@ public class Thrusters extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         boolean match = false;
-        if (part instanceof Thrusters) {
-            Thrusters t = (Thrusters) part;
-            if (t.isLeftThrusters() == isLeftThrusters) {
+        if (part instanceof Thrusters thrusters) {
+            if (thrusters.isLeftThrusters() == isLeftThrusters) {
                 match = true;
             }
         }

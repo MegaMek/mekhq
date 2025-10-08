@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
 
@@ -32,21 +37,27 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.common.universe.FactionTag;
+import megamek.common.universe.Factions2;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
 
 public class FactionsIntegrationTest {
+    private static Factions2 testFactions2;
+
+    @BeforeAll
+    public static void setUp() {
+        testFactions2 = new Factions2("testresources/data/universe/factions");
+        Factions.setInstance(Factions.loadDefault(true));
+    }
+
     @Test
-    public void loadDefaultTest()
-            throws DOMException, SAXException, IOException, ParserConfigurationException {
-        Factions factions = Factions.loadDefault();
+    public void loadDefaultTest() throws DOMException {
+        Factions factions = Factions.loadDefault(true);
 
         assertNotNull(factions);
 
@@ -57,7 +68,7 @@ public class FactionsIntegrationTest {
 
         for (final Faction faction : choosableFactions) {
             assertNotNull(faction,
-                    String.format("Missing faction %s in choosable faction list", faction.getShortName()));
+                  String.format("Missing faction %s in choosable faction list", faction.getShortName()));
         }
 
         Faction capellans = factions.getFaction("CC");

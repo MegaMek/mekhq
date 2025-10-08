@@ -25,25 +25,30 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.Entity;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.missing.MissingInfantryArmorPart;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Entity;
-import megamek.common.TechAdvancement;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-
 /**
- * This part represents custom armor kit settings rather than one of the formal armor kits
- * from TacOps.
+ * This part represents custom armor kit settings rather than one of the formal armor kits from TacOps.
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -60,7 +65,8 @@ public class InfantryArmorPart extends Part {
         this(0, null, 1.0, false, false, false, false, false, false);
     }
 
-    public InfantryArmorPart(int tonnage, Campaign c, double divisor, boolean enc, boolean dest, boolean camo, boolean ir, boolean ecm, boolean space) {
+    public InfantryArmorPart(int tonnage, Campaign c, double divisor, boolean enc, boolean dest, boolean camo,
+          boolean ir, boolean ecm, boolean space) {
         super(tonnage, c);
         this.damageDivisor = divisor;
         this.encumbering = enc;
@@ -154,7 +160,7 @@ public class InfantryArmorPart extends Part {
             } else if (null != spare) {
                 int number = quantity;
                 while (number > 0) {
-                    spare.incrementQuantity();
+                    spare.changeQuantity(1);
                     number--;
                 }
                 campaign.getWarehouse().removePart(this);
@@ -166,7 +172,15 @@ public class InfantryArmorPart extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingInfantryArmorPart(getUnitTonnage(), campaign, damageDivisor, encumbering, dest, sneak_camo, sneak_ecm, sneak_ir, spaceSuit);
+        return new MissingInfantryArmorPart(getUnitTonnage(),
+              campaign,
+              damageDivisor,
+              encumbering,
+              dest,
+              sneak_camo,
+              sneak_ecm,
+              sneak_ir,
+              spaceSuit);
     }
 
     @Override
@@ -226,13 +240,13 @@ public class InfantryArmorPart extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return (getClass() == part.getClass())
-                && damageDivisor == ((InfantryArmorPart) part).getDamageDivisor()
-                && dest == ((InfantryArmorPart) part).isDest()
-                && encumbering == ((InfantryArmorPart) part).isEncumbering()
-                && sneak_camo == ((InfantryArmorPart) part).isSneakCamo()
-                && sneak_ecm == ((InfantryArmorPart) part).isSneakECM()
-                && sneak_ir == ((InfantryArmorPart) part).isSneakIR()
-                && spaceSuit == ((InfantryArmorPart) part).isSpaceSuit();
+                     && damageDivisor == ((InfantryArmorPart) part).getDamageDivisor()
+                     && dest == ((InfantryArmorPart) part).isDest()
+                     && encumbering == ((InfantryArmorPart) part).isEncumbering()
+                     && sneak_camo == ((InfantryArmorPart) part).isSneakCamo()
+                     && sneak_ecm == ((InfantryArmorPart) part).isSneakECM()
+                     && sneak_ir == ((InfantryArmorPart) part).isSneakIR()
+                     && spaceSuit == ((InfantryArmorPart) part).isSpaceSuit();
     }
 
     public double getDamageDivisor() {
@@ -283,24 +297,18 @@ public class InfantryArmorPart extends Part {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("damageDivisor")) {
-                damageDivisor =Double.parseDouble(wn2.getTextContent());
-            }
-            else if (wn2.getNodeName().equalsIgnoreCase("dest")) {
+                damageDivisor = Double.parseDouble(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("dest")) {
                 dest = wn2.getTextContent().equalsIgnoreCase("true");
-            }
-            else if (wn2.getNodeName().equalsIgnoreCase("encumbering")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("encumbering")) {
                 encumbering = wn2.getTextContent().equalsIgnoreCase("true");
-            }
-            else if (wn2.getNodeName().equalsIgnoreCase("sneak_camo")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("sneak_camo")) {
                 sneak_camo = wn2.getTextContent().equalsIgnoreCase("true");
-            }
-            else if (wn2.getNodeName().equalsIgnoreCase("sneak_ecm")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("sneak_ecm")) {
                 sneak_ecm = wn2.getTextContent().equalsIgnoreCase("true");
-            }
-            else if (wn2.getNodeName().equalsIgnoreCase("sneak_ir")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("sneak_ir")) {
                 sneak_ir = wn2.getTextContent().equalsIgnoreCase("true");
-            }
-            else if (wn2.getNodeName().equalsIgnoreCase("spaceSuit")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("spaceSuit")) {
                 spaceSuit = wn2.getTextContent().equalsIgnoreCase("true");
             }
         }
@@ -308,7 +316,15 @@ public class InfantryArmorPart extends Part {
 
     @Override
     public Part clone() {
-        return new InfantryArmorPart(getUnitTonnage(), campaign, damageDivisor, encumbering, dest, sneak_camo, sneak_ecm, sneak_ir, spaceSuit);
+        return new InfantryArmorPart(getUnitTonnage(),
+              campaign,
+              damageDivisor,
+              encumbering,
+              dest,
+              sneak_camo,
+              sneak_ecm,
+              sneak_ir,
+              spaceSuit);
     }
 
     @Override

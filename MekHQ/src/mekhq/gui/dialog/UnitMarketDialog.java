@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,16 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
+
+import java.awt.Container;
+import java.awt.GridLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import megamek.client.ui.buttons.MMButton;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panes.UnitMarketPane;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class UnitMarketDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
@@ -107,21 +115,21 @@ public class UnitMarketDialog extends AbstractMHQButtonDialog {
     protected JPanel createButtonPanel() {
         final JPanel panel = new JPanel(new GridLayout(1, getCampaign().isGM() ? 4 : 2));
         setPurchaseButton(new MMButton("btnPurchase", resources.getString("Purchase.text"),
-                resources.getString("Purchase.toolTipText"), evt -> okAction()));
+              resources.getString("Purchase.toolTipText"), evt -> okAction()));
         panel.add(getPurchaseButton());
 
         if (getCampaign().isGM()) {
             setAddGMButton(new MMButton("btnAddGM", resources.getString("AddGM.text"),
-                    resources.getString("AddGM.toolTipText"), evt -> getUnitMarketPane().addSelectedOffers()));
+                  resources.getString("AddGM.toolTipText"), evt -> getUnitMarketPane().addSelectedOffers()));
             panel.add(getAddGMButton());
 
             setRemoveButton(new MMButton("btnRemove", resources.getString("Remove.text"),
-                    resources.getString("Remove.toolTipText"), evt -> getUnitMarketPane().removeSelectedOffers()));
+                  resources.getString("Remove.toolTipText"), evt -> getUnitMarketPane().removeSelectedOffers()));
             panel.add(getRemoveButton());
         }
 
         panel.add(new MMButton("btnCancel", resources.getString("Cancel.text"),
-                resources.getString("Cancel.toolTipText"), this::cancelActionPerformed));
+              resources.getString("Cancel.toolTipText"), this::cancelActionPerformed));
         return panel;
     }
     //endregion Initialization

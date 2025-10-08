@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
@@ -35,9 +40,9 @@ import java.util.List;
 
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
+import mekhq.campaign.stratCon.StratConTrackState;
 
 public class UnresolvedStratConContactsNagLogic {
     final static String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
@@ -89,8 +94,8 @@ public class UnresolvedStratConContactsNagLogic {
                 continue; // Skip contracts without a Stratcon campaign state
             }
 
-            for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
-                for (StratconScenario scenario : track.getScenarios().values()) {
+            for (StratConTrackState track : contract.getStratconCampaignState().getTracks()) {
+                for (StratConScenario scenario : track.getScenarios().values()) {
                     // Check if the scenario is unresolved and the deployment date matches the local date
                     if (scenario.getCurrentState() == ScenarioState.UNRESOLVED &&
                               today.equals(scenario.getDeploymentDate())) {

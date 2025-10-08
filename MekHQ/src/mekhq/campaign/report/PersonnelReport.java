@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.report;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import java.time.LocalDate;
 import java.util.EnumMap;
 import java.util.ResourceBundle;
@@ -42,8 +44,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * @author Jay Lawson
@@ -101,10 +101,9 @@ public class PersonnelReport extends AbstractReport {
             } else if (p.getStatus().isStudent()) {
                 countStudents++;
             }
-
         }
 
-        StringBuilder sb = new StringBuilder(resources.getString("combat.personnel.header.text")+"\n\n");
+        StringBuilder sb = new StringBuilder(resources.getString("combat.personnel.header.text") + "\n\n");
 
         sb.append(String.format("%-30s        %4s\n", resources.getString("combat.personnel.text"), countTotal));
 
@@ -146,12 +145,18 @@ public class PersonnelReport extends AbstractReport {
         int bondsmen = 0;
         int dependents = 0;
         int dependentStudents = 0;
+        int campFollowers = 0;
         int children = 0;
         int childrenStudents = 0;
         Money civilianSalaries = Money.zero();
         LocalDate today = getCampaign().getLocalDate();
 
         for (Person person : getCampaign().getPersonnel()) {
+            if (person.getStatus().isCampFollower() && !person.getPrisonerStatus().isCurrentPrisoner()) {
+                campFollowers++;
+                continue;
+            }
+
             // Add them to the total count
             final boolean primarySupport = person.getPrimaryRole().isSupport(true);
 
@@ -205,12 +210,12 @@ public class PersonnelReport extends AbstractReport {
         //Add Salaries of Temp Workers
         salary = salary.plus(getCampaign().getCampaignOptions()
                                    .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue() *
-                                   getCampaign().getAstechPool());
+                                   getCampaign().getTemporaryAsTechPool());
         salary = salary.plus(getCampaign().getCampaignOptions()
                                    .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
-                                   getCampaign().getMedicPool());
+                                   getCampaign().getTemporaryMedicPool());
 
-        StringBuilder sb = new StringBuilder(resources.getString("support.personnel.header.text")+"\n\n");
+        StringBuilder sb = new StringBuilder(resources.getString("support.personnel.header.text") + "\n\n");
 
         sb.append(String.format("%-30s           %4s\n", resources.getString("support.personnel.text"), countTotal));
 
@@ -223,8 +228,8 @@ public class PersonnelReport extends AbstractReport {
         }
 
         //Add Temp Medics and Astechs to Support List
-        sb.append(String.format("    %-30s       %4s\n", "Temp Medics", getCampaign().getMedicPool()));
-        sb.append(String.format("    %-30s       %4s\n", "Temp Astechs", getCampaign().getAstechPool()));
+        sb.append(String.format("    %-30s       %4s\n", "Temp Medics", getCampaign().getTemporaryMedicPool()));
+        sb.append(String.format("    %-30s       %4s\n", "Temp Astechs", getCampaign().getTemporaryAsTechPool()));
 
         sb.append(getSecondarySupportPersonnelDetails());
 
@@ -234,24 +239,42 @@ public class PersonnelReport extends AbstractReport {
               .append(String.format("%-30s           %4s\n", resources.getString("support.KIA.text"), countKIA))
               .append(String.format("%-30s           %4s\n", resources.getString("support.retired.text"), countRetired))
               .append(String.format("%-30s           %4s\n", resources.getString("support.dead.text"), countDead))
-              .append(String.format("%-30s           %4s\n", resources.getString("support.student.text"),
+              .append(String.format("%-30s           %4s\n",
+                    resources.getString("support.student.text"),
                     countStudents))
+              .append(String.format("%-30s           %4s\n",
+                    resources.getString("support.campFollowers.text"),
+                    campFollowers))
               .append("\n").append(resources.getString("support.salary.text")).append(": ")
               .append(salary.toAmountAndSymbolString())
-              .append((dependents == 1) ? "\n"+ getFormattedTextAt("mekhq.resources.PersonnelReport", "support.dependant.text"
-                          , dependents, dependentStudents): "\n"+ getFormattedTextAt("mekhq.resources"
-                          + ".PersonnelReport", "support.dependants.text", dependents, dependentStudents))
-              .append((children == 1) ? "\n"+ getFormattedTextAt("mekhq.resources.PersonnelReport", "support.child.text"
-                    , children, childrenStudents): "\n"+ getFormattedTextAt("mekhq.resources"
-                    + ".PersonnelReport", "support.children.text", children, childrenStudents))
+              .append((dependents == 1) ?
+                            "\n" + getFormattedTextAt("mekhq.resources.PersonnelReport", "support.dependant.text"
+                                  , dependents, dependentStudents) :
+                            "\n" + getFormattedTextAt("mekhq.resources"
+                                                            + ".PersonnelReport",
+                                  "support.dependants.text",
+                                  dependents,
+                                  dependentStudents))
+              .append((children == 1) ?
+                            "\n" + getFormattedTextAt("mekhq.resources.PersonnelReport", "support.child.text"
+                                  , children, childrenStudents) :
+                            "\n" + getFormattedTextAt("mekhq.resources"
+                                                            + ".PersonnelReport",
+                                  "support.children.text",
+                                  children,
+                                  childrenStudents))
               .append("\n").append(resources.getString("dependant.salary.text")).append(": ")
               .append(civilianSalaries.toAmountAndSymbolString())
               .append("\n").append((prisoners == 1) ? getFormattedTextAt("mekhq.resources"
-                    + ".PersonnelReport", "prisoner.text", prisoners):getFormattedTextAt("mekhq.resources"
-                    + ".PersonnelReport", "prisoners.text", prisoners)).append(": ")
+                                                                               + ".PersonnelReport",
+                    "prisoner.text",
+                    prisoners) : getFormattedTextAt("mekhq.resources"
+                                                          + ".PersonnelReport", "prisoners.text", prisoners)).append(": ")
               .append("\n").append((bondsmen == 1) ? getFormattedTextAt("mekhq.resources"
-                    + ".PersonnelReport", "bondsman.text", bondsmen):getFormattedTextAt("mekhq.resources"
-                    + ".PersonnelReport", "bondsmen.text", bondsmen)).append(": ");
+                                                                              + ".PersonnelReport",
+                    "bondsman.text",
+                    bondsmen) : getFormattedTextAt("mekhq.resources"
+                                                         + ".PersonnelReport", "bondsmen.text", bondsmen)).append(": ");
 
         return getFormattedTextAt("mekhq.resources.PersonnelReport", "secondary.support", sb.toString());
     }
@@ -267,17 +290,18 @@ public class PersonnelReport extends AbstractReport {
                 countPersonByType.put(person.getSecondaryRole(),
                       (countPersonByType.getOrDefault(person.getSecondaryRole(), 0) + 1));
                 countSecondary++;
-                }
             }
+        }
 
-        StringBuilder sb = new StringBuilder("\n" + resources.getString("secondary.support.header.text")+"\n\n");
+        StringBuilder sb = new StringBuilder("\n" + resources.getString("secondary.support.header.text") + "\n\n");
 
         sb.append(String.format("%-30s   %4s\n", resources.getString("secondary.support.text"), countSecondary));
 
         countPersonByType.forEach((role, value) ->
-            {if (role.isSupport(true) && value >= 0){
+        {
+            if (role.isSupport(true) && value >= 0) {
                 sb.append(String.format("    %-30s       %4s\n",
-                     role.getLabel(getCampaign().getFaction().isClan()),
+                      role.getLabel(getCampaign().getFaction().isClan()),
                       value));
             }
         });
@@ -300,16 +324,17 @@ public class PersonnelReport extends AbstractReport {
             }
         }
 
-        StringBuilder sb = new StringBuilder("\n" + resources.getString("secondary.combat.header.text")+"\n\n");
+        StringBuilder sb = new StringBuilder("\n" + resources.getString("secondary.combat.header.text") + "\n\n");
 
         sb.append(String.format("%-30s %4s\n", resources.getString("secondary.combat.text"), countSecondary));
 
         countPersonByType.forEach((role, value) ->
-        {if (role.isCombat() && value >= 0){
-            sb.append(String.format("    %-30s    %4s\n",
-                  role.getLabel(getCampaign().getFaction().isClan()),
-                  value));
-        }
+        {
+            if (role.isCombat() && value >= 0) {
+                sb.append(String.format("    %-30s    %4s\n",
+                      role.getLabel(getCampaign().getFaction().isClan()),
+                      value));
+            }
         });
 
         return getFormattedTextAt("mekhq.resources.PersonnelReport", "secondary.combat", sb.toString());

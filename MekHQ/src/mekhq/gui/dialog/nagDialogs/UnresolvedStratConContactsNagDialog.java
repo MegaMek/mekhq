@@ -24,10 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import static mekhq.MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS;
+import static mekhq.MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnresolvedStratConContactsNagLogic.determineUnresolvedContacts;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnresolvedStratConContactsNagLogic.hasUnresolvedContacts;
@@ -43,7 +48,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 public class UnresolvedStratConContactsNagDialog extends ImmersiveDialogNag {
     public UnresolvedStratConContactsNagDialog(final Campaign campaign) {
-        super(campaign, COMMAND, NAG_UNRESOLVED_STRATCON_CONTACTS, "UnresolvedStratConContactsNagDialog");
+        super(campaign, COMMAND, NAG_UNRESOLVED_STRAT_CON_CONTACTS, "UnresolvedStratConContactsNagDialog");
     }
 
     @Override
@@ -74,10 +79,9 @@ public class UnresolvedStratConContactsNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if all conditions are met and the nag dialog should be displayed; {@code false} otherwise.
      */
     public static boolean checkNag(boolean isUseStratCon, List<AtBContract> activeContracts, LocalDate today) {
-        final String NAG_KEY = NAG_UNRESOLVED_STRATCON_CONTACTS;
 
         return isUseStratCon &&
-                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
+                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNRESOLVED_STRAT_CON_CONTACTS) &&
                      hasUnresolvedContacts(activeContracts, today);
     }
 }

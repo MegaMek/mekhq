@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.control;
 
@@ -68,7 +73,6 @@ public class EditLogControl extends JPanel {
     private final LogType logType;
     private final LogTableModel logModel;
 
-    private JButton btnAdd;
     private JButton btnEdit;
     private JButton btnDelete;
     private JTable logsTable;
@@ -90,10 +94,14 @@ public class EditLogControl extends JPanel {
         PERSONAL_LOG,
 
         /**
-         * Medical logs record health-related events, treatments, injuries, and other medical information pertaining to
-         * the person.
+         * Medical logs record health-related events, injuries, and other medical information pertaining to the person.
          */
         MEDICAL_LOG,
+
+        /**
+         * Medical logs record health-related treatments performed by the character.
+         */
+        PATIENT_LOG,
 
         /**
          * Assignment logs track a person's positions, deployments, transfers, and other assignment-related information
@@ -106,7 +114,7 @@ public class EditLogControl extends JPanel {
          */
         PERFORMANCE_LOG
     }
-    
+
     /**
      * Constructs a new control panel for editing a person's log.
      *
@@ -123,6 +131,7 @@ public class EditLogControl extends JPanel {
         this.logModel = switch (logType) {
             case PERSONAL_LOG -> new LogTableModel(person.getPersonalLog());
             case MEDICAL_LOG -> new LogTableModel(person.getMedicalLog());
+            case PATIENT_LOG -> new LogTableModel(person.getPatientLog());
             case ASSIGNMENT_LOG -> new LogTableModel(person.getAssignmentLog());
             case PERFORMANCE_LOG -> new LogTableModel(person.getPerformanceLog());
         };
@@ -152,7 +161,7 @@ public class EditLogControl extends JPanel {
         JPanel buttonPanel = new JPanel(new GridLayout(1, 0, PADDING, 0));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, PADDING, 0));
 
-        btnAdd = createButton("logController.btnAdd.text", "btnAdd", true, this::addEntry);
+        JButton btnAdd = createButton("logController.btnAdd.text", "btnAdd", true, this::addEntry);
         btnEdit = createButton("logController.btnEdit.text", "btnEdit", false, this::editEntry);
         btnDelete = createButton("logController.btnDelete.text", "btnDelete", false, this::deleteEntry);
 
@@ -240,6 +249,7 @@ public class EditLogControl extends JPanel {
         if (dialog.showDialog().isConfirmed()) {
             switch (logType) {
                 case PERSONAL_LOG -> person.addPersonalLogEntry(dialog.getEntry());
+                case PATIENT_LOG -> person.addPatientLogEntry(dialog.getEntry());
                 case MEDICAL_LOG -> person.addMedicalLogEntry(dialog.getEntry());
                 case ASSIGNMENT_LOG -> person.addAssignmentLogEntry(dialog.getEntry());
                 case PERFORMANCE_LOG -> person.addPerformanceLogEntry(dialog.getEntry());
@@ -281,6 +291,7 @@ public class EditLogControl extends JPanel {
         switch (logType) {
             case PERSONAL_LOG -> person.getPersonalLog().remove(selectedRow);
             case MEDICAL_LOG -> person.getMedicalLog().remove(selectedRow);
+            case PATIENT_LOG -> person.getPatientLog().remove(selectedRow);
             case ASSIGNMENT_LOG -> person.getAssignmentLog().remove(selectedRow);
             case PERFORMANCE_LOG -> person.getPerformanceLog().remove(selectedRow);
         }
@@ -300,6 +311,7 @@ public class EditLogControl extends JPanel {
         switch (logType) {
             case PERSONAL_LOG -> person.getPersonalLog();
             case MEDICAL_LOG -> person.getMedicalLog();
+            case PATIENT_LOG -> person.getPatientLog();
             case ASSIGNMENT_LOG -> person.getAssignmentLog();
             case PERFORMANCE_LOG -> person.getPerformanceLog();
         }

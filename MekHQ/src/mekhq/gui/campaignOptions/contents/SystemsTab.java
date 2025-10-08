@@ -76,13 +76,9 @@ public class SystemsTab {
     // Reputation Tab
     private CampaignOptionsHeaderPanel reputationHeader;
 
-    private JPanel pnlReputationGeneralOptions;
-    private JLabel lblReputation;
     private MMComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JCheckBox chkResetCriminalRecord;
 
-    private JPanel pnlReputationSanityOptions;
-    private JLabel lblManualUnitRatingModifier;
     private JSpinner manualUnitRatingModifier;
     private JCheckBox chkClampReputationPayMultiplier;
     private JCheckBox chkReduceReputationPerformanceModifier;
@@ -91,10 +87,9 @@ public class SystemsTab {
     // Faction Standing Tab
     private CampaignOptionsHeaderPanel factionStandingHeader;
     private JCheckBox chkTrackFactionStanding;
-    private JLabel lblRegardMultiplier;
+    private JCheckBox chkTrackClimateRegardChanges;
     private JSpinner spnRegardMultiplier;
 
-    private JPanel pnlFactionStandingModifiersPanel;
     private JCheckBox chkUseFactionStandingNegotiation;
     private JCheckBox chkUseFactionStandingResupply;
     private JCheckBox chkUseFactionStandingCommandCircuit;
@@ -109,7 +104,6 @@ public class SystemsTab {
     // A Time of War Tab
     private CampaignOptionsHeaderPanel atowHeader;
 
-    private JPanel pnlATOWAttributes;
     private JCheckBox chkUseAttributes;
     private JCheckBox chkRandomizeAttributes;
     private JCheckBox chkRandomizeTraits;
@@ -145,8 +139,8 @@ public class SystemsTab {
               10);
 
         // Contents
-        pnlReputationGeneralOptions = createReputationGeneralPanel();
-        pnlReputationSanityOptions = createReputationSanityPanel();
+        JPanel pnlReputationGeneralOptions = createReputationGeneralPanel();
+        JPanel pnlReputationSanityOptions = createReputationSanityPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ReputationTab", true);
@@ -179,14 +173,14 @@ public class SystemsTab {
      */
     private JPanel createReputationGeneralPanel() {
         // Contents
-        lblReputation = new CampaignOptionsLabel("Reputation");
+        JLabel lblReputation = new CampaignOptionsLabel("Reputation");
         lblReputation.addMouseListener(createTipPanelUpdater(reputationHeader, "Reputation"));
         unitRatingMethodCombo = new MMComboBox<>("unitRatingMethodCombo", UnitRatingMethod.values());
         unitRatingMethodCombo.setToolTipText(String.format("<html>%s</html>",
               getTextAt(getCampaignOptionsResourceBundle(), "lblReputation.tooltip")));
         unitRatingMethodCombo.addMouseListener(createTipPanelUpdater(reputationHeader, "Reputation"));
 
-        lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
+        JLabel lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
         lblManualUnitRatingModifier.addMouseListener(createTipPanelUpdater(reputationHeader,
               "ManualUnitRatingModifier"));
         manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier", 0, -1000, 1000, 1);
@@ -279,12 +273,16 @@ public class SystemsTab {
         chkTrackFactionStanding = new CampaignOptionsCheckBox("TrackFactionStanding");
         chkTrackFactionStanding.addMouseListener(createTipPanelUpdater(factionStandingHeader, "TrackFactionStanding"));
 
-        lblRegardMultiplier = new CampaignOptionsLabel("RegardMultiplier");
+        chkTrackClimateRegardChanges = new CampaignOptionsCheckBox("TrackClimateRegardChanges");
+        chkTrackClimateRegardChanges.addMouseListener(createTipPanelUpdater(factionStandingHeader,
+              "TrackClimateRegardChanges"));
+
+        JLabel lblRegardMultiplier = new CampaignOptionsLabel("RegardMultiplier");
         lblRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
         spnRegardMultiplier = new CampaignOptionsSpinner("RegardMultiplier", 1.0, 0.1, 3.0, 0.1);
         spnRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
 
-        pnlFactionStandingModifiersPanel = createFactionStandingModifiersPanel();
+        JPanel pnlFactionStandingModifiersPanel = createFactionStandingModifiersPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("FactionStandingTab", true);
@@ -298,7 +296,10 @@ public class SystemsTab {
         layoutParent.gridy++;
         layoutParent.gridwidth = 1;
         panel.add(chkTrackFactionStanding, layoutParent);
+        layoutParent.gridx++;
+        panel.add(chkTrackClimateRegardChanges, layoutParent);
 
+        layoutParent.gridx = 0;
         layoutParent.gridy++;
         panel.add(lblRegardMultiplier, layoutParent);
         layoutParent.gridx++;
@@ -403,8 +404,7 @@ public class SystemsTab {
     }
 
     /**
-     * Creates the ATOW tab panel, containing grouped UI elements for configuring ATOW-related options and its
-     * header.
+     * Creates the ATOW tab panel, containing grouped UI elements for configuring ATOW-related options and its header.
      *
      * @return a {@link JPanel} component representing the entire ATOW tab UI
      *
@@ -418,7 +418,7 @@ public class SystemsTab {
               9);
 
         // Contents
-        pnlATOWAttributes = createATOWAttributesPanel();
+        JPanel pnlATOWAttributes = createATOWAttributesPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ATimeOfWarTab", true);
@@ -495,8 +495,8 @@ public class SystemsTab {
      * Loads values from the specified {@code presetCampaignOptions}, or the current campaign's options if {@code null},
      * into the UI form fields and controls.
      *
-     * @param presetCampaignOptions an alternative {@link CampaignOptions}, or {@code null} to use the current
-     *                              campaign's options
+     * @param presetCampaignOptions        an alternative {@link CampaignOptions}, or {@code null} to use the current
+     *                                     campaign's options
      * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to load values from; if
      *                                     {@code null}, values are loaded from the current skill preferences.
      *
@@ -525,6 +525,7 @@ public class SystemsTab {
 
         // Faction Standing
         chkTrackFactionStanding.setSelected(options.isTrackFactionStanding());
+        chkTrackClimateRegardChanges.setSelected(options.isTrackClimateRegardChanges());
         spnRegardMultiplier.setValue(options.getRegardMultiplier());
         chkUseFactionStandingNegotiation.setSelected(options.isUseFactionStandingNegotiation());
         chkUseFactionStandingResupply.setSelected(options.isUseFactionStandingResupply());
@@ -549,8 +550,8 @@ public class SystemsTab {
      * Applies the currently selected values in the UI controls to modify the campaign's options. If a preset is
      * provided, that preset is updated instead of the campaign's default options.
      *
-     * @param presetCampaignOptions an alternative {@link CampaignOptions} object to update, or {@code null} to update
-     *                              the campaign's own options
+     * @param presetCampaignOptions        an alternative {@link CampaignOptions} object to update, or {@code null} to
+     *                                     update the campaign's own options
      * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to set values to; if
      *                                     {@code null}, values are applied to the current skill preferences.
      *
@@ -585,6 +586,7 @@ public class SystemsTab {
 
         // Faction Standing
         options.setTrackFactionStanding(chkTrackFactionStanding.isSelected());
+        options.setTrackClimateRegardChanges(chkTrackClimateRegardChanges.isSelected());
         options.setRegardMultiplier((double) spnRegardMultiplier.getValue());
         options.setUseFactionStandingNegotiation(chkUseFactionStandingNegotiation.isSelected());
         options.setUseFactionStandingResupply(chkUseFactionStandingResupply.isSelected());

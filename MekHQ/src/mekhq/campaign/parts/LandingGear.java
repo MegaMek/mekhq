@@ -25,26 +25,29 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.LandAirMek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.enums.TechRating;
+import megamek.common.units.Aero;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.LandAirMek;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.skills.SkillType;
-import org.w3c.dom.Node;
-import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingLandingGear;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
 
@@ -79,11 +82,11 @@ public class LandingGear extends Part {
                     hits = 0;
                 }
             } else if (unit.getEntity() instanceof LandAirMek) {
-                hits = unit.getHitCriticals(CriticalSlot.TYPE_SYSTEM, LandAirMek.LAM_LANDING_GEAR);
+                hits = unit.getHitCriticalSlots(CriticalSlot.TYPE_SYSTEM, LandAirMek.LAM_LANDING_GEAR);
             }
             if (checkForDestruction
-                    && hits > priorHits
-                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && hits > priorHits
+                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
@@ -123,7 +126,7 @@ public class LandingGear extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Aero) {
-                ((Aero) unit.getEntity()).setGearHit(needsFixing());
+            ((Aero) unit.getEntity()).setGearHit(needsFixing());
         } else if (null != unit && unit.getEntity() instanceof LandAirMek) {
             if (hits == 0) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMek.LAM_LANDING_GEAR);
@@ -155,13 +158,13 @@ public class LandingGear extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);

@@ -24,11 +24,41 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
+import static mekhq.campaign.parts.equipment.EquipmentUtilities.getEquipmentType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+
 import megamek.Version;
-import megamek.common.*;
+import megamek.common.CriticalSlot;
+import megamek.common.equipment.EquipmentFlag;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.EquipmentTypeLookup;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
+import megamek.common.equipment.WeaponType;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
@@ -41,17 +71,6 @@ import org.mockito.ArgumentCaptor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import static mekhq.campaign.parts.equipment.EquipmentUtilities.getEquipmentType;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class MissingEquipmentPartTest {
     @Test
@@ -72,7 +91,13 @@ public class MissingEquipmentPartTest {
         EquipmentType type = mock(EquipmentType.class);
         doReturn(equipTonnage).when(type).getTonnage(any(), eq(size));
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(tonnage, type, equipmentNum, mockCampaign, equipTonnage, size, isOmniPodded);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(tonnage,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              isOmniPodded);
 
         assertEquals(tonnage, missingPart.getUnitTonnage());
         assertEquals(type, missingPart.getType());
@@ -83,7 +108,13 @@ public class MissingEquipmentPartTest {
         assertEquals(mockCampaign, missingPart.getCampaign());
 
         isOmniPodded = true;
-        missingPart = new MissingEquipmentPart(tonnage, type, equipmentNum, mockCampaign, equipTonnage, size, isOmniPodded);
+        missingPart = new MissingEquipmentPart(tonnage,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              isOmniPodded);
 
         assertEquals(tonnage, missingPart.getUnitTonnage());
         assertEquals(type, missingPart.getType());
@@ -105,7 +136,13 @@ public class MissingEquipmentPartTest {
         boolean isOmniPodded = false;
         EquipmentType type = mock(EquipmentType.class);
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(tonnage, type, equipmentNum, mockCampaign, equipTonnage, size, isOmniPodded);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(tonnage,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              isOmniPodded);
 
         MissingEquipmentPart clone = missingPart.clone();
 
@@ -118,7 +155,13 @@ public class MissingEquipmentPartTest {
         assertEquals(missingPart.getCampaign(), clone.getCampaign());
 
         isOmniPodded = true;
-        missingPart = new MissingEquipmentPart(tonnage, type, equipmentNum, mockCampaign, equipTonnage, size, isOmniPodded);
+        missingPart = new MissingEquipmentPart(tonnage,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              isOmniPodded);
 
         clone = missingPart.clone();
 
@@ -142,7 +185,13 @@ public class MissingEquipmentPartTest {
         boolean isOmniPodded = false;
         EquipmentType type = mock(EquipmentType.class);
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(tonnage, type, equipmentNum, mockCampaign, equipTonnage, size, isOmniPodded);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(tonnage,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              isOmniPodded);
 
         EquipmentPart equipmentPart = missingPart.getNewPart();
         assertNotNull(equipmentPart);
@@ -156,7 +205,13 @@ public class MissingEquipmentPartTest {
         assertEquals(missingPart.getCampaign(), equipmentPart.getCampaign());
 
         isOmniPodded = true;
-        missingPart = new MissingEquipmentPart(tonnage, type, equipmentNum, mockCampaign, equipTonnage, size, isOmniPodded);
+        missingPart = new MissingEquipmentPart(tonnage,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              isOmniPodded);
 
         equipmentPart = missingPart.getNewPart();
         assertNotNull(missingPart);
@@ -188,11 +243,17 @@ public class MissingEquipmentPartTest {
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
         missingPart.setUnit(unit);
 
         assertTrue(missingPart.isPartForEquipmentNum(equipmentNum, location));
-        assertFalse(missingPart.isPartForEquipmentNum(equipmentNum, Aero.LOC_RWING));
+        assertFalse(missingPart.isPartForEquipmentNum(equipmentNum, Aero.LOC_RIGHT_WING));
         assertFalse(missingPart.isPartForEquipmentNum(equipmentNum - 1, location));
     }
 
@@ -205,7 +266,13 @@ public class MissingEquipmentPartTest {
         EquipmentType type = mock(EquipmentType.class);
 
         // Not MiscType or WeaponType
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, 16, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              16,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
         assertTrue(missingPart.isOmniPoddable());
 
         // If fixed only, then we're not omnipoddable
@@ -293,7 +360,13 @@ public class MissingEquipmentPartTest {
         double unitEquipTonnage = 1.0;
         doReturn(unitEquipTonnage).when(type).getTonnage(any(), anyDouble());
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, 6, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              6,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
 
         missingPart.setUnit(unit);
 
@@ -318,7 +391,13 @@ public class MissingEquipmentPartTest {
 
         int equipmentNum = 42;
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
 
         // No unit
         assertEquals(Entity.LOC_NONE, missingPart.getLocation());
@@ -331,7 +410,7 @@ public class MissingEquipmentPartTest {
 
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -354,7 +433,13 @@ public class MissingEquipmentPartTest {
 
         int equipmentNum = 42;
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
 
         // No unit
         assertNull(missingPart.getLocationName());
@@ -368,7 +453,7 @@ public class MissingEquipmentPartTest {
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
         String locationName = "Mek Right Torso";
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(locationName).when(entity).getLocationName(eq(location));
@@ -397,7 +482,13 @@ public class MissingEquipmentPartTest {
         int equipmentNum = 42;
         String locationName = "Mek Right Torso";
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
 
         // No unit
         assertFalse(missingPart.isInLocation(locationName));
@@ -410,7 +501,7 @@ public class MissingEquipmentPartTest {
 
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -424,7 +515,7 @@ public class MissingEquipmentPartTest {
         assertFalse(missingPart.isInLocation(locationName));
 
         // Split the mount and have the second location be the one we want
-        when(mounted.getLocation()).thenReturn(Mek.LOC_RLEG);
+        when(mounted.getLocation()).thenReturn(Mek.LOC_RIGHT_LEG);
         when(mounted.isSplit()).thenReturn(true);
         when(mounted.getSecondLocation()).thenReturn(location);
 
@@ -446,7 +537,13 @@ public class MissingEquipmentPartTest {
 
         int equipmentNum = 42;
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
 
         // No unit
         assertFalse(missingPart.isRearFacing());
@@ -543,7 +640,13 @@ public class MissingEquipmentPartTest {
         Mounted mounted = mock(Mounted.class);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
         missingPart.setId(25);
         missingPart.setUnit(unit);
 
@@ -591,7 +694,13 @@ public class MissingEquipmentPartTest {
         Mounted mounted = mock(Mounted.class);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
         missingPart.setId(25);
         missingPart.setUnit(unit);
 
@@ -620,7 +729,13 @@ public class MissingEquipmentPartTest {
         EquipmentType type = mock(EquipmentType.class);
         doReturn(equipTonnage).when(type).getTonnage(any(), anyDouble());
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, 6, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              6,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
 
         // Not on a unit
         assertFalse(missingPart.needsFixing());
@@ -660,7 +775,13 @@ public class MissingEquipmentPartTest {
         doReturn(equipTonnage).when(type).getTonnage(any(), anyDouble());
 
         int equipmentNum = 42;
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
 
         // Not on unit
         assertFalse(missingPart.onBadHipOrShoulder());
@@ -671,7 +792,7 @@ public class MissingEquipmentPartTest {
 
         // Mount equipment at the index
         Mounted mounted = mock(Mounted.class);
-        int location = Mek.LOC_LARM;
+        int location = Mek.LOC_LEFT_ARM;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -685,7 +806,7 @@ public class MissingEquipmentPartTest {
 
         // Swap over to the secondary location
         doReturn(false).when(unit).hasBadHipOrShoulder(eq(location));
-        int secondLocation = Mek.LOC_LT;
+        int secondLocation = Mek.LOC_LEFT_TORSO;
         when(mounted.getSecondLocation()).thenReturn(secondLocation);
         when(mounted.isSplit()).thenReturn(true);
         doReturn(true).when(unit).hasBadHipOrShoulder(eq(secondLocation));
@@ -713,7 +834,13 @@ public class MissingEquipmentPartTest {
         doReturn(equipTonnage).when(type).getTonnage(any(), anyDouble());
 
         int equipmentNum = 42;
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
 
         // Not on unit
         assertNull(missingPart.checkFixable());
@@ -732,7 +859,7 @@ public class MissingEquipmentPartTest {
         // Mount equipment at the index
         Mounted mounted = mock(Mounted.class);
         String locationName = "Mek Left Torso";
-        int location = Mek.LOC_LT;
+        int location = Mek.LOC_LEFT_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(locationName).when(entity).getLocationName(eq(location));
@@ -751,7 +878,7 @@ public class MissingEquipmentPartTest {
         assertNotNull(missingPart.checkFixable());
 
         String secondaryLocationName = "Mek Left Arm";
-        int secondaryLocation = Mek.LOC_LARM;
+        int secondaryLocation = Mek.LOC_LEFT_ARM;
         when(mounted.getSecondLocation()).thenReturn(secondaryLocation);
         when(mounted.isSplit()).thenReturn(true);
         doReturn(secondaryLocationName).when(entity).getLocationName(secondaryLocation);
@@ -810,7 +937,13 @@ public class MissingEquipmentPartTest {
         Mounted mounted = mock(Mounted.class);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
         missingPart.setId(25);
         missingPart.setUnit(unit);
 
@@ -854,7 +987,13 @@ public class MissingEquipmentPartTest {
         Mounted mounted = mock(Mounted.class);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
         missingPart.setId(25);
         missingPart.setUnit(unit);
 
@@ -925,7 +1064,13 @@ public class MissingEquipmentPartTest {
         Mounted mounted = mock(Mounted.class);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
         missingPart.setId(25);
         missingPart.setUnit(unit);
 
@@ -982,7 +1127,13 @@ public class MissingEquipmentPartTest {
 
         int equipmentNum = 42;
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
 
         // No unit? This is a no-op
         missingPart.updateConditionFromPart();
@@ -1017,7 +1168,13 @@ public class MissingEquipmentPartTest {
         EquipmentType type = mock(EquipmentType.class);
         doReturn(equipTonnage).when(type).getTonnage(any(), anyDouble());
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, 42, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              42,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
         missingPart.setUnit(unit);
 
         // Missing parts are 120 minutes ...
@@ -1041,7 +1198,13 @@ public class MissingEquipmentPartTest {
         EquipmentType type = mock(EquipmentType.class);
         doReturn(equipTonnage).when(type).getTonnage(any(), anyDouble());
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, 42, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              42,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
         missingPart.setUnit(unit);
 
         // Missing parts are +0
@@ -1064,7 +1227,13 @@ public class MissingEquipmentPartTest {
         when(type.getRawCost()).thenReturn(cost);
         doReturn(equipTonnage).when(type).getTonnage(any(), eq(size));
 
-        MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
+        MissingEquipmentPart missingPart = new MissingEquipmentPart(75,
+              type,
+              equipmentNum,
+              mockCampaign,
+              equipTonnage,
+              size,
+              false);
 
         // We can't replace ourselves with ourselves
         assertFalse(missingPart.isAcceptableReplacement(missingPart, false));
@@ -1095,13 +1264,13 @@ public class MissingEquipmentPartTest {
 
         // We're not the same if our sticker prices differ;
 
-        // Setup a type with variable costs
+        // Set up a type with variable costs
         doReturn(true).when(type).hasFlag(eq(MiscType.F_OFF_ROAD));
         doReturn((double) EquipmentType.COST_VARIABLE).when(type).getRawCost();
 
         // Put the variable cost part back on a unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mek.LOC_CT;
+        int location = Mek.LOC_CENTER_TORSO;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(cost * 10.0).when(type).getCost(eq(entity), anyBoolean(), eq(location), eq(size));

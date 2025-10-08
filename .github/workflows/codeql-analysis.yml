@@ -2,12 +2,10 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
     paths-ignore:
-      - "**/*.mtf"
-      - "**/*.blk"
       - "**/*.pdf"
       - "**/*.xml"
 
@@ -34,12 +32,12 @@ jobs:
             echo "mmBranch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
           else
             echo "mmRepo=MegaMek/megamek" >> $GITHUB_OUTPUT
-            echo "mmBranch=master" >> $GITHUB_OUTPUT
+            echo "mmBranch=main" >> $GITHUB_OUTPUT
           fi
           exit 0
 
       - name: Checkout MegaMek
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ steps.find_mm.outputs.mmRepo }}
           ref: ${{ steps.find_mm.outputs.mmBranch }}
@@ -56,24 +54,24 @@ jobs:
             echo "mmlBranch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
           else
             echo "mmlRepo=MegaMek/megameklab" >> $GITHUB_OUTPUT
-            echo "mmlBranch=master" >> $GITHUB_OUTPUT
+            echo "mmlBranch=main" >> $GITHUB_OUTPUT
           fi
           exit 0
 
       - name: Checkout MegaMekLab
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ steps.find_mml.outputs.mmlRepo }}
           ref: ${{ steps.find_mml.outputs.mmlBranch }}
           path: megameklab
 
       - name: "Check out MekHQ"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: mekhq
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: java-kotlin
           build-mode: none
@@ -84,4 +82,4 @@ jobs:
               - mekhq
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.service;
 
@@ -32,7 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.TargetRoll;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
@@ -138,7 +143,7 @@ public class PartsAcquisitionService {
                 }
 
                 List<IAcquisitionWork> awList = acquisitionMap.computeIfAbsent(aw.getAcquisitionDisplayName(),
-                        k -> new ArrayList<>());
+                      k -> new ArrayList<>());
 
                 awList.add(aw);
             }
@@ -217,7 +222,7 @@ public class PartsAcquisitionService {
                     unavailableCount += pci.getMissingCount();
                 } else {
                     missingTotalPrice = missingTotalPrice.plus(
-                            pci.getStickerPrice().multipliedBy(pci.getMissingCount()));
+                          pci.getStickerPrice().multipliedBy(pci.getMissingCount()));
                 }
             }
 
@@ -322,16 +327,16 @@ public class PartsAcquisitionService {
         @Override
         public String toString() {
             return key + "{"
-                    + "requiredCount=" + requiredCount
-                    + ",missingCount=" + missingCount
-                    + ",inTransitCount=" + inTransitCount
-                    + ",onOrderCount=" + onOrderCount
-                    + ",omniPodCount=" + omniPodCount
-                    + ",countModifier='" + countModifier + "'"
-                    + ",stickerPrice=" + stickerPrice
-                    + ",failedMessage='" + failedMessage + "'"
-                    + ",canBeAcquired=" + canBeAcquired
-                    + "}";
+                         + "requiredCount=" + requiredCount
+                         + ",missingCount=" + missingCount
+                         + ",inTransitCount=" + inTransitCount
+                         + ",onOrderCount=" + onOrderCount
+                         + ",omniPodCount=" + omniPodCount
+                         + ",countModifier='" + countModifier + "'"
+                         + ",stickerPrice=" + stickerPrice
+                         + ",failedMessage='" + failedMessage + "'"
+                         + ",canBeAcquired=" + canBeAcquired
+                         + "}";
         }
     }
 }

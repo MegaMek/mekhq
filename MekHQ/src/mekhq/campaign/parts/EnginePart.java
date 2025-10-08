@@ -25,18 +25,35 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.*;
+import megamek.common.CriticalSlot;
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.Engine;
+import megamek.common.equipment.IArmorState;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.Tank;
+import megamek.common.verifier.Ceil;
 import megamek.common.verifier.TestEntity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.missing.MissingEnginePart;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -47,7 +64,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class EnginePart extends Part {
-    private static final MMLogger logger = MMLogger.create(EnginePart.class);
+    private static final MMLogger LOGGER = MMLogger.create(EnginePart.class);
 
     protected Engine engine;
     protected boolean forHover;
@@ -67,7 +84,7 @@ public class EnginePart extends Part {
     @Override
     public EnginePart clone() {
         EnginePart clone = new EnginePart(getUnitTonnage(),
-                new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
+              new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
         clone.copyBaseData(this);
         return clone;
     }
@@ -107,15 +124,15 @@ public class EnginePart extends Part {
             case Engine.NONE:
                 return 0;
         }
-        weight = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
+        weight = TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
 
         if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
             weight *= 1.5;
         }
-        double toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
+        double toReturn = TestEntity.ceilMaxHalf(weight, Ceil.HALF_TON);
         // hover have a minimum weight of 20%
         if (forHover) {
-            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage() / 5.0, TestEntity.Ceil.HALFTON), toReturn);
+            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage() / 5.0, Ceil.HALF_TON), toReturn);
         }
         return toReturn;
     }
@@ -156,13 +173,13 @@ public class EnginePart extends Part {
     public boolean isSamePartType(Part part) {
         int year = campaign.getGameYear();
         return part instanceof EnginePart && getName().equals(part.getName())
-                && getEngine().getEngineType() == ((EnginePart) part).getEngine().getEngineType()
-                && getEngine().getRating() == ((EnginePart) part).getEngine().getRating()
-                && getEngine().getTechType(year) == ((EnginePart) part).getEngine().getTechType(year)
-                && getEngine().hasFlag(Engine.TANK_ENGINE) == ((EnginePart) part).getEngine()
-                        .hasFlag(Engine.TANK_ENGINE)
-                && getUnitTonnage() == part.getUnitTonnage()
-                && getTonnage() == part.getTonnage();
+                     && getEngine().getEngineType() == ((EnginePart) part).getEngine().getEngineType()
+                     && getEngine().getRating() == ((EnginePart) part).getEngine().getRating()
+                     && getEngine().getTechType(year) == ((EnginePart) part).getEngine().getTechType(year)
+                     && getEngine().hasFlag(Engine.TANK_ENGINE) == ((EnginePart) part).getEngine()
+                                                                         .hasFlag(Engine.TANK_ENGINE)
+                     && getUnitTonnage() == part.getUnitTonnage()
+                     && getTonnage() == part.getTonnage();
     }
 
     @Override
@@ -196,7 +213,7 @@ public class EnginePart extends Part {
                     forHover = wn2.getTextContent().equalsIgnoreCase("true");
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
 
@@ -225,7 +242,7 @@ public class EnginePart extends Part {
     @Override
     public MissingPart getMissingPart() {
         return new MissingEnginePart(getUnitTonnage(),
-                new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
+              new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
     }
 
     @Override
@@ -247,13 +264,13 @@ public class EnginePart extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
     }
@@ -266,8 +283,8 @@ public class EnginePart extends Part {
             Entity entity = unit.getEntity();
             if (unit.getEntity() instanceof Mek) {
                 for (int i = 0; i < entity.locations(); i++) {
-                    engineHits += entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i);
-                    engineCrits += entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i);
+                    engineHits += entity.getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i);
+                    engineCrits += entity.getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i);
                 }
             }
             if (unit.getEntity() instanceof Aero) {
@@ -290,10 +307,8 @@ public class EnginePart extends Part {
             }
             if (engineHits >= engineCrits) {
                 remove(false);
-            } else if (engineHits > 0) {
-                hits = engineHits;
             } else {
-                hits = 0;
+                hits = Math.max(engineHits, 0);
             }
         }
     }
@@ -386,8 +401,8 @@ public class EnginePart extends Part {
             if (unit.isLocationBreached(i)) {
                 return unit.getEntity().getLocationName(i) + " is breached.";
             }
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
-                    && unit.isLocationDestroyed(i)) {
+            if (unit.getEntity().getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
+                      && unit.isLocationDestroyed(i)) {
                 return unit.getEntity().getLocationName(i) + " is destroyed.";
             }
         }
@@ -400,8 +415,8 @@ public class EnginePart extends Part {
             return false;
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
-                    && unit.isLocationDestroyed(i)) {
+            if (unit.getEntity().getNumberOfCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
+                      && unit.isLocationDestroyed(i)) {
                 return true;
             }
         }
@@ -418,11 +433,6 @@ public class EnginePart extends Part {
         String details = super.getDetails(includeRepairDetails);
 
         return details + (forHover ? " (hover)" : "");
-    }
-
-    @Override
-    public boolean isPartForEquipmentNum(int index, int loc) {
-        return false;
     }
 
     @Override
@@ -455,22 +465,16 @@ public class EnginePart extends Part {
         if (null == unit || null == unit.getEntity()) {
             return false;
         }
-        if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_CT) {
+        if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_CENTER_TORSO) {
             return true;
         }
-        boolean needsSideTorso = false;
-        switch (getEngine().getEngineType()) {
-            case Engine.XL_ENGINE:
-            case Engine.LIGHT_ENGINE:
-            case Engine.XXL_ENGINE:
-                needsSideTorso = true;
-                break;
-        }
-        if (needsSideTorso && (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LT
-                || unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT)) {
-            return true;
-        }
-        return false;
+        boolean needsSideTorso = switch (getEngine().getEngineType()) {
+            case Engine.XL_ENGINE, Engine.LIGHT_ENGINE, Engine.XXL_ENGINE -> true;
+            default -> false;
+        };
+
+        return needsSideTorso && (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LEFT_TORSO
+                                        || unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RIGHT_TORSO);
     }
 
     @Override

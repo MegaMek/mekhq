@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
@@ -70,16 +70,16 @@ public class ContractMarketMethodTest {
     private static final ContractMarketMethod[] methods = ContractMarketMethod.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters
     @Test
     public void testGetToolTipText() {
         assertEquals(resources.getString("ContractMarketMethod.NONE.toolTipText"),
-                ContractMarketMethod.NONE.getToolTipText());
+              ContractMarketMethod.NONE.getToolTipText());
         assertEquals(resources.getString("ContractMarketMethod.ATB_MONTHLY.toolTipText"),
-                ContractMarketMethod.ATB_MONTHLY.getToolTipText());
+              ContractMarketMethod.ATB_MONTHLY.getToolTipText());
     }
     //endregion Getters
 
@@ -107,20 +107,12 @@ public class ContractMarketMethodTest {
     }
     //endregion Boolean Comparison Methods
 
-/*
-    @Test
-    public void testGetContractMarket() {
-        assertInstanceOf(DisabledContractMarket.class, ContractMarketMethod.NONE.getContractMarket());
-        assertInstanceOf(AtBMonthlyContractMarket.class, ContractMarketMethod.ATB_MONTHLY.getContractMarket());
-    }
-*/
-
     @Test
     public void testToStringOverride() {
         assertEquals(resources.getString("ContractMarketMethod.NONE.text"),
-                ContractMarketMethod.NONE.toString());
+              ContractMarketMethod.NONE.toString());
         assertEquals(resources.getString("ContractMarketMethod.ATB_MONTHLY.text"),
-                ContractMarketMethod.ATB_MONTHLY.toString());
+              ContractMarketMethod.ATB_MONTHLY.toString());
     }
 
     @Nested
@@ -267,10 +259,10 @@ public class ContractMarketMethodTest {
          * changes that tweak the scale of this unless they're doing something wild. This test should be to ensure that
          * we are getting a spread.
          *
-         * @param combatTeams                      how many combat teams?
-         * @param unitsInCombatTeams               how many units are in those combat teams?
-         * @param requiredCombatElementsCounts  ArrayList of Integers for the required count of units in combat teams
-         *                                         at each variance roll
+         * @param combatTeams                  how many combat teams?
+         * @param unitsInCombatTeams           how many units are in those combat teams?
+         * @param requiredCombatElementsCounts ArrayList of Integers for the required count of units in combat teams at
+         *                                     each variance roll
          */
         private void assertRequiredCombatElementsResults(int combatTeams, int unitsInCombatTeams,
               ArrayList<Integer> requiredCombatElementsCounts) {

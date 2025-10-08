@@ -24,26 +24,36 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+import javax.swing.*;
+
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.common.UnitType;
+import megamek.common.units.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.ScenarioDeploymentLimit;
 import mekhq.campaign.mission.ScenarioDeploymentLimit.CountType;
 import mekhq.campaign.mission.ScenarioDeploymentLimit.QuantityType;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-
 public class EditScenarioDeploymentLimitDialog extends JDialog {
 
     private ScenarioDeploymentLimit deploymentLimit;
-    private boolean newLimit;
+    private final boolean newLimit;
 
     private JSpinner spnQuantity;
     private MMComboBox<QuantityType> choiceQuantityType;
@@ -67,7 +77,7 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditScenarioDeploymentLimitsDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("dialog.title"));
 
@@ -119,15 +129,15 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         rightGbc.gridy++;
         panMain.add(spnQuantity, rightGbc);
 
-        JPanel panAllowedUnits = new JPanel(new GridLayout(UnitType.SIZE+1, 1));
+        JPanel panAllowedUnits = new JPanel(new GridLayout(UnitType.SIZE + 1, 1));
         panAllowedUnits.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("panAllowedUnits.title"))));
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("panAllowedUnits.title"))));
         checkAllUnits = new JCheckBox(resourceMap.getString("checkAllUnits.text"));
         checkAllUnits.setSelected(deploymentLimit.getAllowedUnitTypes().isEmpty());
         checkAllUnits.addActionListener(this::checkAllUnits);
         panAllowedUnits.add(checkAllUnits);
-        checkAllowedUnits = new JCheckBox [UnitType.SIZE];
+        checkAllowedUnits = new JCheckBox[UnitType.SIZE];
         for (int i = UnitType.MEK; i < UnitType.SIZE; i++) {
             JCheckBox check = new JCheckBox(UnitType.getTypeName(i));
             check.setSelected(deploymentLimit.getAllowedUnitTypes().contains(i));

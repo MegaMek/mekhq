@@ -25,20 +25,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.unit;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 
 /**
- * This extension to units is for units that are not affiliated with the campaign and
- * so methods applied to them should not be allowed to affect the campaign structure.
+ * This extension to units is for units that are not affiliated with the campaign and so methods applied to them should
+ * not be allowed to affect the campaign structure.
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class TestUnit extends Unit  {
+public class TestUnit extends Unit {
     public TestUnit() {
         super(null, null);
     }

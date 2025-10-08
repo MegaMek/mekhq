@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.io.idReferenceClasses;
 
@@ -41,7 +46,7 @@ import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 
 public class PersonIdReference extends Person {
-    private static final MMLogger logger = MMLogger.create(PersonIdReference.class);
+    private static final MMLogger LOGGER = MMLogger.create(PersonIdReference.class);
 
     // region Constructors
     public PersonIdReference(final String text) {
@@ -56,8 +61,7 @@ public class PersonIdReference extends Person {
     }
 
     /**
-     * This fixes a person's Genealogy PersonIdReferences. It is public ONLY for
-     * unit testing
+     * This fixes a person's Genealogy PersonIdReferences. It is public ONLY for unit testing
      *
      * @param campaign the campaign the person is in
      * @param person   the person to fix genealogy for
@@ -71,8 +75,9 @@ public class PersonIdReference extends Person {
         if (person.getGenealogy().getSpouse() instanceof PersonIdReference) {
             final Person spouse = campaign.getPerson(person.getGenealogy().getSpouse().getId());
             if (spouse == null) {
-                logger.warn("Failed to find the spouse for " + person.getFullTitle()
-                        + " with id " + person.getGenealogy().getSpouse().getId());
+                LOGGER.warn("Failed to find the spouse for {} with id {}",
+                      person.getFullTitle(),
+                      person.getGenealogy().getSpouse().getId());
             }
             person.getGenealogy().setSpouse(spouse);
         }
@@ -87,7 +92,7 @@ public class PersonIdReference extends Person {
                 }
                 final Person ex = campaign.getPerson(formerSpouse.getFormerSpouse().getId());
                 if (ex == null) {
-                    logger.warn("Failed to find a person with id " + formerSpouse.getFormerSpouse().getId());
+                    LOGGER.warn("Failed to find a person with id {}", formerSpouse.getFormerSpouse().getId());
                     unknownPersonnel.add(formerSpouse.getFormerSpouse());
                 } else {
                     formerSpouse.setFormerSpouse(ex);
@@ -117,10 +122,10 @@ public class PersonIdReference extends Person {
                     continue;
                 }
                 final Person familyMember = (familyMemberReference instanceof PersonIdReference)
-                        ? campaign.getPerson(familyMemberReference.getId())
-                        : familyMemberReference;
+                                                  ? campaign.getPerson(familyMemberReference.getId())
+                                                  : familyMemberReference;
                 if (familyMember == null) {
-                    logger.warn("Failed to find a person with id " + familyMemberReference.getId());
+                    LOGGER.warn("Failed to find a person with id {}", familyMemberReference.getId());
                 } else {
                     person.getGenealogy().getFamily().putIfAbsent(entry.getKey(), new ArrayList<>());
                     person.getGenealogy().getFamily().get(entry.getKey()).add(familyMember);

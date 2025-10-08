@@ -2,7 +2,7 @@ name: JavaDoc Generation
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 env:
   GRADLE_OPTS: "-Dscan.link.VCS=${{ github.event.pull_request.html_url }}"
@@ -18,8 +18,14 @@ jobs:
       mmlBranch: ${{ steps.find_mml.outputs.mmBranch }}
 
     steps:
+      - name: Checkout Data Repo
+        uses: actions/checkout@v5
+        with:
+          repository: megamek/mm-data
+          path: mm-data
+
       - name: Checkout out MekHQ
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: mekhq
 
@@ -34,12 +40,12 @@ jobs:
             echo "mmBranch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
           else
             echo "mmRepo=MegaMek/megamek" >> $GITHUB_OUTPUT
-            echo "mmBranch=master" >> $GITHUB_OUTPUT
+            echo "mmBranch=main" >> $GITHUB_OUTPUT
           fi
           exit 0
 
       - name: Checkout MegaMek
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ steps.find_mm.outputs.mmRepo }}
           ref: ${{ steps.find_mm.outputs.mmBranch }}
@@ -56,25 +62,25 @@ jobs:
             echo "mmlBranch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
           else
             echo "mmlRepo=MegaMek/megameklab" >> $GITHUB_OUTPUT
-            echo "mmlBranch=master" >> $GITHUB_OUTPUT
+            echo "mmlBranch=main" >> $GITHUB_OUTPUT
           fi
           exit 0
 
       - name: Checkout MegaMekLab
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ steps.find_mml.outputs.mmlRepo }}
           ref: ${{ steps.find_mml.outputs.mmlBranch }}
           path: megameklab
 
       - name: Set up Temurin JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           build-scan-publish: true
           build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"

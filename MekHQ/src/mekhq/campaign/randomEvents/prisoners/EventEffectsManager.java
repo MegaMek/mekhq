@@ -37,7 +37,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
-import static megamek.common.Compute.d6;
+import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.force.ForceType.SECURITY;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
@@ -61,13 +61,15 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
-import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
@@ -77,7 +79,7 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.randomEvents.prisoners.records.EventResult;
 import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
 import mekhq.campaign.randomEvents.prisoners.records.PrisonerResponseEntry;
-import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
@@ -96,12 +98,12 @@ import mekhq.utilities.ReportingUtilities;
  * campaign.</p>
  */
 public class EventEffectsManager {
-    private static final MMLogger logger = MMLogger.create(EventEffectsManager.class);
+    private static final MMLogger LOGGER = MMLogger.create(EventEffectsManager.class);
 
     private final Campaign campaign;
 
     private String eventReport = "";
-    private Set<Person> escapees = new HashSet<>();
+    private final Set<Person> escapees = new HashSet<>();
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
@@ -288,6 +290,10 @@ public class EventEffectsManager {
 
         int priorHits = max(target.getHits(), target.getInjuries().size());
 
+        wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(target,
+              campaign.getCampaignOptions().isUseInjuryFatigue(),
+              campaign.getCampaignOptions().getFatigueRate(), wounds);
+
         if (priorHits + wounds > 5) {
             wounds = 5 - priorHits;
         }
@@ -334,12 +340,17 @@ public class EventEffectsManager {
 
         int targetCount = (int) max(1, potentialTargets.size() * magnitude);
 
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseInjuryFatigue = campaignOptions.isUseInjuryFatigue();
+        int fatigueRate = campaignOptions.getFatigueRate();
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
 
             int wounds = clamp(d6(), 1, 5);
 
             int priorHits = max(target.getHits(), target.getInjuries().size());
+
+            wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(target, isUseInjuryFatigue, fatigueRate, wounds);
 
             if (priorHits + wounds > 5) {
                 wounds = 5 - priorHits;
@@ -718,7 +729,7 @@ public class EventEffectsManager {
             allPotentialTargets.remove(target);
         }
 
-        logger.info(escapees.toString());
+        LOGGER.info(escapees.toString());
 
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
@@ -916,10 +927,10 @@ public class EventEffectsManager {
 
         final int magnitude = result.magnitude();
 
-        Map<AtBContract, StratconCampaignState> potentialTargets = new HashMap<>();
+        Map<AtBContract, StratConCampaignState> potentialTargets = new HashMap<>();
 
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            StratconCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratconCampaignState();
 
             if (campaignState != null) {
                 potentialTargets.put(contract, campaignState);
@@ -932,7 +943,7 @@ public class EventEffectsManager {
 
         AtBContract target = getRandomItem(potentialTargets.keySet());
 
-        StratconCampaignState targetState = potentialTargets.get(target);
+        StratConCampaignState targetState = potentialTargets.get(target);
         targetState.changeSupportPoints(magnitude);
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
@@ -1088,7 +1099,7 @@ public class EventEffectsManager {
 
         final int magnitude = result.magnitude();
 
-        List<Person> potentialTargets = campaign.getActivePersonnel(false);
+        List<Person> potentialTargets = campaign.getActivePersonnel(false, true);
 
         if (potentialTargets.isEmpty()) {
             return "";

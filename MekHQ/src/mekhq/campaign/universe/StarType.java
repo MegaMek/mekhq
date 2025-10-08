@@ -24,18 +24,25 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
+
+import java.util.Locale;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import megamek.codeUtilities.MathUtility;
-
-import java.util.Locale;
+import megamek.logging.MMLogger;
 
 /** A class to carry information about a star. Used in planetary system **/
 public class StarType {
+    private final static MMLogger LOGGER = MMLogger.create(StarType.class);
 
     // Star classification data and methods
     public static final int SPECTRAL_O = 0;
@@ -130,29 +137,27 @@ public class StarType {
             subtypeFormat = "%.1f";
         }
 
-        if(null == luminosity) {
+        if (null == luminosity) {
             // assume mid-range luminosity
             return String.format(Locale.ROOT, "%s" + subtypeFormat + "%s",
-                getSpectralClassName(spectralClass),
-                subtypeValue / 100.0, StarType.LUM_V);
+                  getSpectralClassName(spectralClass),
+                  subtypeValue / 100.0, StarType.LUM_V);
         }
 
-        switch(luminosity) {
-            case StarType.LUM_VI:
+        return switch (luminosity) {
+            case StarType.LUM_VI ->
                 // subdwarfs
-                return "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0);
-            case StarType.LUM_VI_PLUS:
+                  "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0);
+            case StarType.LUM_VI_PLUS ->
                 // extreme subdwarfs
-                return "esd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0);
-            case StarType.LUM_VII:
+                  "esd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0);
+            case StarType.LUM_VII ->
                 // white dwarfs
-                return String.format(Locale.ROOT, "D" + subtypeFormat, subtypeValue / 100.0);
-            default:
-                return String.format(Locale.ROOT, "%s" + subtypeFormat + "%s",
-                    getSpectralClassName(spectralClass),
-                    subtypeValue / 100.0,  luminosity);
-
-        }
+                  String.format(Locale.ROOT, "D" + subtypeFormat, subtypeValue / 100.0);
+            default -> String.format(Locale.ROOT, "%s" + subtypeFormat + "%s",
+                  getSpectralClassName(spectralClass),
+                  subtypeValue / 100.0, luminosity);
+        };
     }
 
     /** Parser for spectral type strings */
@@ -186,10 +191,6 @@ public class StarType {
             type = type.substring(3);
         }
 
-        if (type.length() < 1) {
-            // We can't parse an empty string
-            return;
-        }
         String mainClass = type.substring(0, 1);
 
         if (mainClass.equals("D") && type.length() > 1 && null == parsedLuminosity /* prevent "sdD..." */) {
@@ -200,22 +201,22 @@ public class StarType {
                 // Don't just make up D-class variants, that's silly ...
                 return;
             }
-            String subTypeString = type.substring(1 + whiteDwarfVariant.length()).replaceAll("^([0-9\\.]*).*?$", "$1");
+            String subTypeString = type.substring(1 + whiteDwarfVariant.length()).replaceAll("^([0-9.]*).*?$", "$1");
             try {
                 parsedSubtype = Double.parseDouble(subTypeString);
-            } catch (NumberFormatException nfex) {
+            } catch (NumberFormatException ignored) {
                 return;
             }
             // We're done here, white dwarfs have a special spectral class
             parsedSpectralClass = SPECTRAL_D;
         } else if (getSpectralClassFrom(mainClass) >= 0) {
             parsedSpectralClass = getSpectralClassFrom(mainClass);
-            String subTypeString = type.length() > 1 ? type.substring(1).replaceAll("^([0-9\\.]*).*?$", "$1") : "5" /*
+            String subTypeString = type.length() > 1 ? type.substring(1).replaceAll("^([0-9.]*).*?$", "$1") : "5" /*
              * default
              */;
             try {
                 parsedSubtype = Double.parseDouble(subTypeString);
-            } catch (NumberFormatException nfex) {
+            } catch (NumberFormatException ignored) {
                 return;
             }
             if (type.length() > 1 + subTypeString.length() && null == parsedLuminosity) {
@@ -235,8 +236,8 @@ public class StarType {
         int spectralTypeNumber = spectralClass * 10 + (int) subtype;
         double remainder = subtype - (int) subtype;
         return MathUtility.lerp(StarUtil.getDistanceToJumpPoint(spectralTypeNumber),
-            StarUtil.getDistanceToJumpPoint(spectralTypeNumber),
-            remainder);
+              StarUtil.getDistanceToJumpPoint(spectralTypeNumber),
+              remainder);
     }
 
     public double getSolarRechargeTime() {
@@ -247,12 +248,14 @@ public class StarType {
         int intSubtype = (int) subtype;
         if (spectralClass == SPECTRAL_T) {
             // months!
-            return MathUtility.lerp(StarUtil.RECHARGE_HOURS_CLASS_T[intSubtype], StarUtil.RECHARGE_HOURS_CLASS_T[intSubtype + 1],
-                subtype - intSubtype);
+            return MathUtility.lerp(StarUtil.RECHARGE_HOURS_CLASS_T[intSubtype],
+                  StarUtil.RECHARGE_HOURS_CLASS_T[intSubtype + 1],
+                  subtype - intSubtype);
         } else if (spectralClass == SPECTRAL_L) {
             // weeks!
-            return MathUtility.lerp(StarUtil.RECHARGE_HOURS_CLASS_L[intSubtype], StarUtil.RECHARGE_HOURS_CLASS_L[intSubtype + 1],
-                subtype - intSubtype);
+            return MathUtility.lerp(StarUtil.RECHARGE_HOURS_CLASS_L[intSubtype],
+                  StarUtil.RECHARGE_HOURS_CLASS_L[intSubtype + 1],
+                  subtype - intSubtype);
         } else {
             return 141 + 10 * spectralClass + subtype;
         }
@@ -272,63 +275,42 @@ public class StarType {
 
 
     public static int getSpectralClassFrom(String spectral) {
-        switch (spectral.trim().toUpperCase(Locale.ROOT)) {
-            case "O":
-                return SPECTRAL_O;
-            case "B":
-                return SPECTRAL_B;
-            case "A":
-                return SPECTRAL_A;
-            case "F":
-                return SPECTRAL_F;
-            case "G":
-                return SPECTRAL_G;
-            case "K":
-                return SPECTRAL_K;
-            case "M":
-                return SPECTRAL_M;
-            case "L":
-                return SPECTRAL_L;
-            case "T":
-                return SPECTRAL_T;
-            case "Y":
-                return SPECTRAL_Y;
-            default:
-                return -1;
-        }
+        return switch (spectral.trim().toUpperCase(Locale.ROOT)) {
+            case "O" -> SPECTRAL_O;
+            case "B" -> SPECTRAL_B;
+            case "A" -> SPECTRAL_A;
+            case "F" -> SPECTRAL_F;
+            case "G" -> SPECTRAL_G;
+            case "K" -> SPECTRAL_K;
+            case "M" -> SPECTRAL_M;
+            case "L" -> SPECTRAL_L;
+            case "T" -> SPECTRAL_T;
+            case "Y" -> SPECTRAL_Y;
+            default -> -1;
+        };
     }
 
     public static String getSpectralClassName(int spectral) {
-        switch (spectral) {
-            case StarType.SPECTRAL_O:
-                return "O";
-            case StarType.SPECTRAL_B:
-                return "B";
-            case StarType.SPECTRAL_A:
-                return "A";
-            case StarType.SPECTRAL_F:
-                return "F";
-            case StarType.SPECTRAL_G:
-                return "G";
-            case StarType.SPECTRAL_K:
-                return "K";
-            case StarType.SPECTRAL_M:
-                return "M";
-            case StarType.SPECTRAL_L:
-                return "L";
-            case StarType.SPECTRAL_T:
-                return "T";
-            case StarType.SPECTRAL_Y:
-                return "Y";
-            default:
-                return "?";
-        }
+        return switch (spectral) {
+            case StarType.SPECTRAL_O -> "O";
+            case StarType.SPECTRAL_B -> "B";
+            case StarType.SPECTRAL_A -> "A";
+            case StarType.SPECTRAL_F -> "F";
+            case StarType.SPECTRAL_G -> "G";
+            case StarType.SPECTRAL_K -> "K";
+            case StarType.SPECTRAL_M -> "M";
+            case StarType.SPECTRAL_L -> "L";
+            case StarType.SPECTRAL_T -> "T";
+            case StarType.SPECTRAL_Y -> "Y";
+            default -> "?";
+        };
     }
 
     /**
      * @param lc string which starts with some luminosity description
+     *
      * @return the canonical luminosity string based on how this string starts, or
-     *         <i>null</i> if it doesn't look like luminosity
+     *       <i>null</i> if it doesn't look like luminosity
      */
     private static String validateLuminosity(String lc) {
         // The order of entries here is important
@@ -427,7 +409,7 @@ public class StarType {
                 star.setValuesFromString(jsonParser.getText());
                 return star;
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error(e, "Could not deserialize StarType: {}", e.getMessage());
                 return null;
             }
         }

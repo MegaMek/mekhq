@@ -52,7 +52,12 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
  * @since 0.50.06
  */
 public enum PersonalityTraitType {
-    AGGRESSION, AMBITION, GREED, SOCIAL, REASONING, PERSONALITY_QUIRK;
+    AGGRESSION,
+    AMBITION,
+    GREED,
+    SOCIAL,
+    REASONING,
+    PERSONALITY_QUIRK;
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 

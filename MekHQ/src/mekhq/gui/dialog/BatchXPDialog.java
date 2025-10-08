@@ -66,7 +66,7 @@ import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public final class BatchXPDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(BatchXPDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(BatchXPDialog.class);
 
     private final Campaign campaign;
     private final PersonnelTableModel personnelModel;
@@ -93,7 +93,7 @@ public final class BatchXPDialog extends JDialog {
 
     private JLabel matchedPersonnelLabel;
 
-    private transient String choiceNoSkill;
+    private final transient String choiceNoSkill;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.BatchXPDialog",
           MekHQ.getMHQOptions().getLocale());
 
@@ -273,7 +273,7 @@ public final class BatchXPDialog extends JDialog {
                 final String skillName = (String) choiceSkill.getSelectedItem();
                 final SkillType skillType = SkillType.getType(skillName);
                 if (skillType == null) {
-                    logger.error("Cannot mass train unknown skill type with name " + skillName);
+                    LOGGER.error("Cannot mass train unknown skill type with name {}", skillName);
                     return;
                 }
                 personnelFilter.setSkillName(skillName);
@@ -296,7 +296,7 @@ public final class BatchXPDialog extends JDialog {
         panel.add(Box.createRigidArea(new Dimension(10, 10)));
         panel.add(new JLabel(resourceMap.getString("targetSkillLevel.text")));
 
-        skillLevel = new JSpinner(new SpinnerNumberModel(10, 1, 10, 1));
+        skillLevel = new JSpinner(new SpinnerNumberModel(10, 0, 10, 1));
         skillLevel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) skillLevel.getPreferredSize().getHeight()));
         skillLevel.addChangeListener(evt -> {
             personnelFilter.setMaxSkillLevel((Integer) skillLevel.getModel().getValue());
@@ -390,17 +390,12 @@ public final class BatchXPDialog extends JDialog {
                 person.improveSkill(skillName);
                 person.spendXP(cost);
 
-                int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
-                      campaign.isClanCampaign(),
-                      campaign.getLocalDate(),
-                      person.getRankNumeric());
-
-                PerformanceLogger.improvedSkill(campaign,
+                Skill skill = person.getSkill(skillName);
+                PerformanceLogger.improvedSkill(campaignOptions.isPersonnelLogSkillGain(),
                       person,
                       campaign.getLocalDate(),
-                      person.getSkill(skillName).getType().getName(),
-                      person.getSkill(skillName)
-                            .toString(person.getOptions(), person.getATOWAttributes(), adjustedReputation));
+                      skill.getType().getName(),
+                      skill.getLevel());
                 campaign.personUpdated(person);
             }
 
@@ -434,7 +429,7 @@ public final class BatchXPDialog extends JDialog {
         @Override
         public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
             Person person = entry.getModel().getPerson(entry.getIdentifier().intValue());
-            if (!person.getStatus().isActive()) {
+            if (!person.getStatus().isActiveFlexible()) {
                 return false;
             } else if (!prisoners && !person.getPrisonerStatus().isFree()) {
                 return false;
@@ -485,7 +480,7 @@ public final class BatchXPDialog extends JDialog {
         }
 
         /**
-         * Sets the the name of the target skill.
+         * Sets the name of the target skill.
          *
          * @param skillName the name of the skill to be set.
          */

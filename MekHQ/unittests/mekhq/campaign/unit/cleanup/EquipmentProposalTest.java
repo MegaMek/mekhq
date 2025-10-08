@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.cleanup;
 
@@ -38,13 +43,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.Map.Entry;
 
-import org.junit.jupiter.api.Test;
-
-import megamek.common.Mounted;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.Test;
 
 class EquipmentProposalTest {
 
@@ -92,7 +96,7 @@ class EquipmentProposalTest {
         assertEquals(mockMounted, proposal.getEquipment(equipmentNum));
         assertFalse(proposal.getEquipment().isEmpty());
 
-        for (Entry<Integer, Mounted> entry : proposal.getEquipment()) {
+        for (Entry<Integer, Mounted<?>> entry : proposal.getEquipment()) {
             assertEquals(equipmentNum, (int) entry.getKey());
             assertEquals(mockMounted, entry.getValue());
         }

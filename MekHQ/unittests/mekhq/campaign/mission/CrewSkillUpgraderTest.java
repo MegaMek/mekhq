@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
 
@@ -35,29 +40,28 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
 
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.enums.Gender;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.options.IOption;
+import megamek.common.options.PilotOptions;
+import megamek.common.units.*;
+import mekhq.campaign.personnel.SpecialAbility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import megamek.common.*;
-import megamek.common.enums.Gender;
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
-import megamek.common.options.PilotOptions;
-import mekhq.campaign.personnel.SpecialAbility;
 
 class CrewSkillUpgraderTest {
 
     @BeforeAll
     static void setUpAll() {
         EquipmentType.initializeTypes();
-        SpecialAbility.initializeSPA();
+        SpecialAbility.initializeSPA(true);
     }
 
-    boolean allSPAsFalse(Crew c) {
-        Enumeration<IOptionGroup> g = c.getOptions().getGroups();
-        Enumeration<IOption> o = c.getOptions(PilotOptions.LVL3_ADVANTAGES);
-        while (o.hasMoreElements()) {
-            IOption spa = o.nextElement();
+    boolean allSPAsFalse(Crew crew) {
+        Enumeration<IOption> iOptionEnumeration = crew.getOptions(PilotOptions.LVL3_ADVANTAGES);
+        while (iOptionEnumeration.hasMoreElements()) {
+            IOption spa = iOptionEnumeration.nextElement();
             if (spa.getValue() instanceof Vector) {
                 if (!((Vector<?>) spa.getValue()).isEmpty()) {
                     return false;
@@ -76,32 +80,32 @@ class CrewSkillUpgraderTest {
         CrewSkillUpgrader csu = new CrewSkillUpgrader(4);
         ArrayList<Entity> entities = new ArrayList<>();
         // Iterate over these to make units
-        ArrayList<Class> eClasses = new ArrayList<>(List.of(
-                BipedMek.class,
-                VTOL.class,
-                Tank.class,
-                TripodMek.class,
-                AeroSpaceFighter.class,
-                BattleArmor.class,
-                Infantry.class,
-                QuadMek.class,
-                Jumpship.class));
+        ArrayList<Class<?>> eClasses = new ArrayList<>(List.of(
+              BipedMek.class,
+              VTOL.class,
+              Tank.class,
+              TripodMek.class,
+              AeroSpaceFighter.class,
+              BattleArmor.class,
+              Infantry.class,
+              QuadMek.class,
+              Jumpship.class));
         ArrayList<CrewType> crewTypes = new ArrayList<>(List.of(
-                CrewType.SINGLE,
-                CrewType.DUAL,
-                CrewType.CREW,
-                CrewType.INFANTRY_CREW,
-                CrewType.TRIPOD,
-                CrewType.VESSEL,
-                CrewType.QUADVEE,
-                CrewType.COMMAND_CONSOLE,
-                CrewType.SUPERHEAVY_TRIPOD));
+              CrewType.SINGLE,
+              CrewType.DUAL,
+              CrewType.CREW,
+              CrewType.INFANTRY_CREW,
+              CrewType.TRIPOD,
+              CrewType.VESSEL,
+              CrewType.QUADVEE,
+              CrewType.COMMAND_CONSOLE,
+              CrewType.SUPERHEAVY_TRIPOD));
 
         for (int i = 0; i < 1000; i++) {
             Entity e = (Entity) eClasses.get(i % eClasses.size()).getDeclaredConstructor().newInstance();
             CrewType t = crewTypes.get(i % crewTypes.size());
-            Crew c = new Crew(t, "Pilot #" + String.valueOf(i), t.getCrewSlots(), 2, 3, Gender.RANDOMIZE, i % 2 == 0,
-                    null);
+            Crew c = new Crew(t, "Pilot #" + i, t.getCrewSlots(), 2, 3, Gender.RANDOMIZE, i % 2 == 0,
+                  null);
             assertTrue(allSPAsFalse(c));
             e.setCrew(c);
             entities.add(e);

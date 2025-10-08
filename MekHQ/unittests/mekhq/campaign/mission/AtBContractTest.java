@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission;
 
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -43,10 +44,10 @@ import java.util.Vector;
 import java.util.stream.Stream;
 
 import megamek.client.generator.RandomCallsignGenerator;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.UnitType;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Entity;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -63,6 +64,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.TestSystems;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,11 +84,11 @@ public class AtBContractTest {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         // TODO: fix this in the production code
-        RandomCallsignGenerator.getInstance(); // Required in this codepath to generate a random merc company name
-        RandomCompanyNameGenerator.getInstance(); // Required in this codepath to generate a random merc company name
+        RandomCallsignGenerator.getInstance(true); // Required in this code path to generate a random merc company name
+        RandomCompanyNameGenerator.getInstance(); // Required in this code path to generate a random merc company name
         try {
-            Factions.setInstance(Factions.loadDefault());
-            Systems.setInstance(Systems.loadDefault());
+            Factions.setInstance(Factions.loadDefault(true));
+            Systems.setInstance(TestSystems.loadDefault());
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
@@ -278,7 +280,7 @@ public class AtBContractTest {
     @Test
     public void getEnemyNameReturnsCorrectValueWhenMerc() {
         String name = "Testing Merc";
-        contract.setEnemyCode("MERC");
+        contract.setEnemyCode(MERCENARY_FACTION_CODE);
         contract.setEnemyBotName(name);
         assertEquals(name, contract.getEnemyName(3025));
     }
@@ -338,7 +340,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testNoForces(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -354,7 +356,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testOneLance(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -371,7 +373,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testThreeLances(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -390,7 +392,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testNineLances(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -409,7 +411,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testOneCompany(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -426,7 +428,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testThreeCompanies(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -445,7 +447,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testNineCompanies(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -464,7 +466,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testOneLanceAndOneCompany(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -482,7 +484,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testThreeLanceAndOneCompany(int formationSize) {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
@@ -502,7 +504,7 @@ public class AtBContractTest {
         }
 
         @ParameterizedTest
-        @MethodSource(value="getFormationSizesForTests")
+        @MethodSource(value = "getFormationSizesForTests")
         void testLancesWithTeams(int formationSize) {
             // Arrange
             int forceId = getNextForceId();
@@ -577,10 +579,11 @@ public class AtBContractTest {
         }
 
 
-
         /**
          * Lance-level formation, not necessarily a lance
+         *
          * @param formationSize number of units in the formation
+         *
          * @return A mocked CombatTeam of the desired size
          */
         private CombatTeam getMockLanceCombatTeam(int formationSize) {
@@ -596,7 +599,9 @@ public class AtBContractTest {
 
         /**
          * Lance-level formation, not necessarily a lance
+         *
          * @param formationSize number of units in the formation
+         *
          * @return A mocked Force of the desired size
          */
         private Force getMockLanceForce(int formationSize) {
@@ -635,14 +640,14 @@ public class AtBContractTest {
             int forceId = getNextForceId();
             Force mockCompany = mock(Force.class);
 
-            Vector<Object> subforces = new Vector<>();
-            subforces.add(getMockLanceForce(formationSize));
-            subforces.add(getMockLanceForce(formationSize));
-            subforces.add(getMockLanceForce(formationSize));
+            Vector<Object> subForces = new Vector<>();
+            subForces.add(getMockLanceForce(formationSize));
+            subForces.add(getMockLanceForce(formationSize));
+            subForces.add(getMockLanceForce(formationSize));
 
             Vector<UUID> mockUUIDs = new Vector<>();
-            for (Object subforce : subforces) {
-                if (subforce instanceof Force force) {
+            for (Object subForce : subForces) {
+                if (subForce instanceof Force force) {
                     mockUUIDs.addAll(force.getAllUnits(true));
                 }
             }
@@ -650,7 +655,7 @@ public class AtBContractTest {
             when(mockCompany.getId()).thenReturn(forceId);
             when(mockCompany.isForceType(ForceType.STANDARD)).thenReturn(true);
             when(mockCompany.getFormationLevel()).thenReturn(FormationLevel.COMPANY);
-            when(mockCompany.getAllChildren(mockCampaign)).thenReturn(subforces);
+            when(mockCompany.getAllChildren(mockCampaign)).thenReturn(subForces);
             when(mockCompany.getAllUnits(anyBoolean())).thenReturn(mockUUIDs);
 
             return mockCompany;

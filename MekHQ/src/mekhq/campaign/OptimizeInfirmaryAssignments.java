@@ -36,7 +36,7 @@ import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.event.PersonMedicalAssignmentEvent;
+import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.personnel.Person;
 
 /**

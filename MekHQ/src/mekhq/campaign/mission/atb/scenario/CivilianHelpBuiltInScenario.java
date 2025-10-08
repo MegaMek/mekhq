@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
 
@@ -31,19 +36,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ObjectiveEffect;
-import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.unit.Unit;
 
@@ -58,7 +63,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return CIVILIANHELP;
+        return CIVILIAN_HELP;
     }
 
     @Override
@@ -78,7 +83,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         setStartingPos(startPos[Compute.randomInt(4)]);
         int enemyStart = getStartingPos() + 4;
 
@@ -90,7 +95,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
             enemyEntities = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
                 enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-                        getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
+                      getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
             }
             getSpecialScenarioEnemies().add(enemyEntities);
         }
@@ -113,9 +118,9 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
 
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 66);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                1, 1, true);
+              1, 1, true);
         ScenarioObjective keepCiviliansAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(CIVILIAN_FORCE_ID,
-                1, 1, true);
+              1, 1, true);
 
         // not losing the scenario also gets you a "bonus"
         ObjectiveEffect bonusEffect = new ObjectiveEffect();
@@ -124,7 +129,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
         bonusEffect.howMuch = 1;
         keepCiviliansAlive.addSuccessEffect(bonusEffect);
         keepCiviliansAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"),
-                bonusEffect.howMuch));
+              bonusEffect.howMuch));
 
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);

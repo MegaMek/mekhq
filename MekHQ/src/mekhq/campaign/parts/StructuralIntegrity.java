@@ -25,48 +25,74 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Aero;
-import megamek.common.ConvFighter;
-import megamek.common.Dropship;
-import megamek.common.Entity;
 import megamek.common.SimpleTechLevel;
-import megamek.common.SmallCraft;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.units.Aero;
+import megamek.common.units.ConvFighter;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.SmallCraft;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class StructuralIntegrity extends Part {
-    private static final MMLogger logger = MMLogger.create(StructuralIntegrity.class);
+    private static final MMLogger LOGGER = MMLogger.create(StructuralIntegrity.class);
 
     // Slight variations for ASFs, CFs, and SC/DS
     static final TechAdvancement TA_ASF = new TechAdvancement(TechBase.ALL)
-            .setAdvancement(2200, 2470, 2490).setApproximate(true, false, false)
-            .setPrototypeFactions(Faction.TA).setProductionFactions(Faction.TH)
-            .setTechRating(TechRating.C).setAvailability(AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.D, AvailabilityValue.C)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+                                                .setAdvancement(2200, 2470, 2490)
+                                                .setApproximate(true, false, false)
+                                                .setPrototypeFactions(Faction.TA)
+                                                .setProductionFactions(Faction.TH)
+                                                .setTechRating(TechRating.C)
+                                                .setAvailability(AvailabilityValue.C,
+                                                      AvailabilityValue.D,
+                                                      AvailabilityValue.D,
+                                                      AvailabilityValue.C)
+                                                .setStaticTechLevel(SimpleTechLevel.STANDARD);
     static final TechAdvancement TA_CF = new TechAdvancement(TechBase.ALL)
-            .setAdvancement(DATE_PS, 2470, 2490).setProductionFactions(Faction.TH)
-            .setTechRating(TechRating.C).setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+                                               .setAdvancement(DATE_PS, 2470, 2490)
+                                               .setProductionFactions(Faction.TH)
+                                               .setTechRating(TechRating.C)
+                                               .setAvailability(AvailabilityValue.C,
+                                                     AvailabilityValue.C,
+                                                     AvailabilityValue.C,
+                                                     AvailabilityValue.C)
+                                               .setStaticTechLevel(SimpleTechLevel.STANDARD);
     static final TechAdvancement TA_DS = new TechAdvancement(TechBase.ALL)
-            .setAdvancement(2200, 2470, 2490).setApproximate(true, false, false)
-            .setPrototypeFactions(Faction.TA).setProductionFactions(Faction.TH)
-            .setTechRating(TechRating.C).setAvailability(AvailabilityValue.D, AvailabilityValue.D, AvailabilityValue.D, AvailabilityValue.D)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+                                               .setAdvancement(2200, 2470, 2490)
+                                               .setApproximate(true, false, false)
+                                               .setPrototypeFactions(Faction.TA)
+                                               .setProductionFactions(Faction.TH)
+                                               .setTechRating(TechRating.C)
+                                               .setAvailability(AvailabilityValue.D,
+                                                     AvailabilityValue.D,
+                                                     AvailabilityValue.D,
+                                                     AvailabilityValue.D)
+                                               .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private int pointsNeeded;
 
@@ -111,7 +137,7 @@ public class StructuralIntegrity extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof StructuralIntegrity) &&
-                (getUnitTonnage() == part.getUnitTonnage());
+                     (getUnitTonnage() == part.getUnitTonnage());
     }
 
     @Override
@@ -126,7 +152,7 @@ public class StructuralIntegrity extends Part {
                     pointsNeeded = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
             }
         }
     }

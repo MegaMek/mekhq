@@ -65,6 +65,7 @@ import javax.swing.ImageIcon;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -275,7 +276,8 @@ public class FactionStandings {
     /**
      * Holds information relating to faction judgment activities.
      *
-     * <p>This variable is used to store and track any actions a faction may have taken for or against the campaign.</p>
+     * <p>This variable is used to store and track any actions a faction may have taken for or against the
+     * campaign.</p>
      */
     private FactionJudgment factionJudgment = new FactionJudgment();
 
@@ -286,7 +288,7 @@ public class FactionStandings {
      * separately.</p>
      *
      * <p>If we're starting a new campaign, we should follow up object construction with a call to
-     * {@link #updateClimateRegard(Faction, LocalDate, double)}</p>
+     * {@link #updateClimateRegard(Faction, LocalDate, double, boolean)}</p>
      *
      * @author Illiani
      * @since 0.50.07
@@ -328,8 +330,8 @@ public class FactionStandings {
      * Initializes faction regard standings at the start of a campaign or when performing a full reset.
      *
      * <p>This method sets up initial Regard values for all factions relative to the given campaign faction on a
-     * specified date. Direct allies, direct enemies, and secondary relationships (such as allies of enemies) are
-     * each assigned distinct starting regard values, determined by the configuration in {@link FactionStandingLevel}.</p>
+     * specified date. Direct allies, direct enemies, and secondary relationships (such as allies of enemies) are each
+     * assigned distinct starting regard values, determined by the configuration in {@link FactionStandingLevel}.</p>
      *
      * <p>The process is performed in two passes:</p>
      * <ul>
@@ -344,9 +346,10 @@ public class FactionStandings {
      * To maintain player progress, it should not be used for incremental changes during an active campaign.</p>
      *
      * @param campaignFaction the main faction from which all relationships are evaluated
-     * @param today the current campaign date, used to determine relationships between factions
-     * @return a list of formatted report strings describing each regard value that was set during initialization;
-     *         one entry per modified faction
+     * @param today           the current campaign date, used to determine relationships between factions
+     *
+     * @return a list of formatted report strings describing each regard value that was set during initialization; one
+     *       entry per modified faction
      *
      * @author Illiani
      * @since 0.50.07
@@ -358,7 +361,7 @@ public class FactionStandings {
         int gameYear = today.getYear();
 
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
-        FactionHints factionHints = FactionHints.defaultFactionHints();
+        FactionHints factionHints = FactionHints.defaultFactionHints(false);
 
         boolean isMercenary = campaignFaction.isMercenaryOrganization();
         boolean isPirate = campaignFaction.isPirate();
@@ -435,9 +438,9 @@ public class FactionStandings {
      * Determines if the specified faction is considered "untracked."
      *
      * <p>A faction is untracked if it represents an aggregate of independent 'factions', rather than a faction we can
-     * track. For example, "PIR" (pirates) is used to abstractly represent all pirates, but individual pirate groups
-     * are not tracked. As there is no unified body to gain or loss Regard with, we choose not to track Standing with
-     * that faction.</p>
+     * track. For example, "PIR" (pirates) is used to abstractly represent all pirates, but individual pirate groups are
+     * not tracked. As there is no unified body to gain or loss Regard with, we choose not to track Standing with that
+     * faction.</p>
      *
      * <p><b>Note:</b> We're calling out the specific faction codes and not the tags to ensure that we're not
      * accidentally filtering out factions that we might want to track.</p>
@@ -517,7 +520,7 @@ public class FactionStandings {
     }
 
     /**
-     * Retrieves all current faction standings based on climate climate.
+     * Retrieves all current faction standings based on climate.
      *
      * @return a {@link Map} containing all faction codes mapped to their current regard values.
      *
@@ -546,7 +549,7 @@ public class FactionStandings {
     /**
      * Retrieves the current regard value for the specified faction.
      *
-     * @param factionCode a unique code identifying the faction
+     * @param factionCode           a unique code identifying the faction
      * @param includeCurrentClimate whether to include temporary modifiers from the current climate
      *
      * @return the regard value for the faction, or 0 if none is present
@@ -574,23 +577,25 @@ public class FactionStandings {
     }
 
     /**
-     * Sets the regard value for the specified faction, directly assigning or overwriting the value. If the faction
-     * code does not already exist, a new entry is created.
+     * Sets the regard value for the specified faction, directly assigning or overwriting the value. If the faction code
+     * does not already exist, a new entry is created.
      *
      * <p>The regard value is automatically clamped between {@code MINIMUM_REGARD} and the appropriate maximum:
-     * {@code MAXIMUM_SAME_FACTION_REGARD} if setting regard for the campaign's own code or if {@code
-     * campaignFactionCode} is {@code null}, or {@code MAXIMUM_OTHER_FACTION_REGARD} for other factions.</p>
+     * {@code MAXIMUM_SAME_FACTION_REGARD} if setting regard for the campaign's own code or if
+     * {@code campaignFactionCode} is {@code null}, or {@code MAXIMUM_OTHER_FACTION_REGARD} for other factions.</p>
      *
      * <p>If {@code includeReport} is {@code true}, a report string describing the change is generated and returned.
      * If {@code includeReport} is {@code false}, an empty string is returned.</p>
      *
      * @param campaignFactionCode the unique code identifying the campaign's main faction.
-     * @param factionCode a unique code identifying the faction whose regard value will be set
-     * @param newRegard the regard (standing) value to assign
-     * @param gameYear the current in-game year, for report generation purposes
-     * @param includeReport if {@code true}, a report string describing the change is generated and returned;
-     *                      if {@code false}, an empty string is returned
-     * @return a report string describing the change if {@code includeReport} is {@code true}; otherwise, an empty string
+     * @param factionCode         a unique code identifying the faction whose regard value will be set
+     * @param newRegard           the regard (standing) value to assign
+     * @param gameYear            the current in-game year, for report generation purposes
+     * @param includeReport       if {@code true}, a report string describing the change is generated and returned; if
+     *                            {@code false}, an empty string is returned
+     *
+     * @return a report string describing the change if {@code includeReport} is {@code true}; otherwise, an empty
+     *       string
      *
      * @author Illiani
      * @since 0.50.07
@@ -653,25 +658,27 @@ public class FactionStandings {
     }
 
     /**
-     * Adjusts the regard value for a specified faction by a given amount and generates a detailed report of any change.
+     * Adjusts the regard value for a specified faction by a given amount and generates a detailed report of any
+     * change.
      *
      * <p>Retrieves the current regard of the specified faction and alters it by {@code delta}. If the faction does not
      * exist in the standings, it is initialized with the specified delta value. The method determines if this
      * adjustment causes the faction to cross a standing milestone, as defined in {@link FactionStandingLevel}. If a
      * milestone transition occurs, the report includes a message highlighting this change. The generated report uses
-     * color formatting to indicate the direction of change (increase or decrease) and displays the faction’s full
-     * name for the current game year.</p>
+     * color formatting to indicate the direction of change (increase or decrease) and displays the faction’s full name
+     * for the current game year.</p>
      *
      * <p>If {@code delta} is zero, the method leaves regard and milestones unchanged and returns an empty string.</p>
      *
      * @param campaignFactionCode the unique code identifying the campaign's faction.
-     * @param factionCode unique identifier for the faction whose regard should be adjusted
-     * @param delta the amount to increment or decrement the faction's regard (can be positive or negative)
-     * @param gameYear the current in-game year, affecting how faction names are displayed in reports
-     * @param regardMultiplier the multiplier set in campaign options.
+     * @param factionCode         unique identifier for the faction whose regard should be adjusted
+     * @param delta               the amount to increment or decrement the faction's regard (can be positive or
+     *                            negative)
+     * @param gameYear            the current in-game year, affecting how faction names are displayed in reports
+     * @param regardMultiplier    the multiplier set in campaign options.
      *
      * @return a formatted {@link String} describing the regard change and any milestone transition, or an empty string
-     * if {@code delta} is zero
+     *       if {@code delta} is zero
      *
      * @author Illiani
      * @since 0.50.07
@@ -709,9 +716,9 @@ public class FactionStandings {
      * {@code null} is returned.
      * </p>
      *
-     * @param faction        the {@link Faction} object to check against
-     * @param today          the date to use when recording a possible censure escalation
-     * @param activeMissions a list of the campaign's current active missions
+     * @param faction           the {@link Faction} object to check against
+     * @param today             the date to use when recording a possible censure escalation
+     * @param activeMissions    a list of the campaign's current active missions
      * @param campaignInTransit {@code true} if the campaign is currently in transit
      *
      * @return the new {@link FactionCensureLevel} if a censure change occurred, or {@code null} if there was no change
@@ -764,9 +771,9 @@ public class FactionStandings {
      * accolade level will be increased for the provided date. The updated accolade level is then returned; if no change
      * is needed, {@code null} is returned.</p>
      *
-     * @param faction the {@link Faction} object to check against
-     * @param today   the date to use when recording a possible accolade improvement
-     * @param hasActiveContract          {@code true} if the campaign has an active contract, otherwise {@code false}
+     * @param faction           the {@link Faction} object to check against
+     * @param today             the date to use when recording a possible accolade improvement
+     * @param hasActiveContract {@code true} if the campaign has an active contract, otherwise {@code false}
      *
      * @return the new {@link FactionAccoladeLevel} if an accolade change occurred, or {@code null} if there was no
      *       change
@@ -798,10 +805,10 @@ public class FactionStandings {
         return null;
     }
 
-    /** Use {@link #updateClimateRegard(Faction, LocalDate, double)} instead */
+    /** Use {@link #updateClimateRegard(Faction, LocalDate, double, boolean)} instead */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public String updateClimateRegard(final Faction campaignFaction, final LocalDate today) {
-        return updateClimateRegard(campaignFaction, today, 1.0);
+        return updateClimateRegard(campaignFaction, today, 1.0, false);
     }
 
     /**
@@ -816,9 +823,11 @@ public class FactionStandings {
      * <p>After updating, this method generates and returns an HTML-formatted report summarizing the new climate
      * regard standings for all relevant factions.</p>
      *
-     * @param campaignFaction the {@link Faction} representing the campaign's primary faction
-     * @param today           the {@link LocalDate} to use for validating factions and determining relationships
-     * @param regardMultiplier    the regard multiplier set in campaign options
+     * @param campaignFaction            the {@link Faction} representing the campaign's primary faction
+     * @param today                      the {@link LocalDate} to use for validating factions and determining
+     *                                   relationships
+     * @param regardMultiplier           the regard multiplier set in campaign options
+     * @param enableVerboseClimateRegard {@code true} if the verbose climate regard campaign option is enabled
      *
      * @return an HTML-formatted {@link String} report of faction climate regard changes
      *
@@ -826,9 +835,38 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public String updateClimateRegard(final Faction campaignFaction, final LocalDate today,
-          final double regardMultiplier) {
+          final double regardMultiplier, final boolean enableVerboseClimateRegard) {
+        return updateClimateRegard(campaignFaction, today, regardMultiplier, enableVerboseClimateRegard, false);
+    }
+
+    /**
+     * Updates the internal map representing the "climate regard"—an attitude or relationship level—between the
+     * specified campaign faction and all other factions for the given date.
+     *
+     * <p>The method iterates over all factions and assigns a regard value based on alliances, wars, rivalry, and
+     * whether the faction is untracked or invalid for the specified year.</p>
+     *
+     * <p>Existing climateRegard entries are removed.</p>
+     *
+     * <p>After updating, this method generates and returns an HTML-formatted report summarizing the new climate
+     * regard standings for all relevant factions.</p>
+     *
+     * @param campaignFaction            the {@link Faction} representing the campaign's primary faction
+     * @param today                      the {@link LocalDate} to use for validating factions and determining
+     *                                   relationships
+     * @param regardMultiplier           the regard multiplier set in campaign options
+     * @param enableVerboseClimateRegard {@code true} if the verbose climate regard campaign option is enabled
+     * @param useTestDirectory           {@code true} if called from within a Unit Test
+     *
+     * @return an HTML-formatted {@link String} report of faction climate regard changes
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String updateClimateRegard(final Faction campaignFaction, final LocalDate today,
+          final double regardMultiplier, boolean enableVerboseClimateRegard, boolean useTestDirectory) {
         Collection<Faction> allFactions = Factions.getInstance().getActiveFactions(today);
-        FactionHints factionHints = FactionHints.defaultFactionHints();
+        FactionHints factionHints = FactionHints.defaultFactionHints(useTestDirectory);
         boolean isPirate = campaignFaction.isPirate();
 
         // Clear any existing climate regard entries
@@ -892,11 +930,11 @@ public class FactionStandings {
         }
 
         // If we're not handling any climate modifiers, return an empty string
-        if (climateRegard.isEmpty()) {
+        if (climateRegard.isEmpty() || !enableVerboseClimateRegard) {
             return "";
         }
 
-        return buildClimateReport(campaignFaction.isPirate(), today).toString();
+        return buildClimateReport(campaignFaction.isPirate(), campaignFaction.isClan(), today).toString();
     }
 
     /**
@@ -908,15 +946,19 @@ public class FactionStandings {
      *
      * <p>If any entries exist, an introductory line is inserted at the beginning.</p>
      *
-     * @param campaignIsPirate whether the faction is a pirate faction
-     * @param today the {@link LocalDate} used for retrieving year-specific faction names
+     * @param campaignIsPirate whether the campaign faction is a pirate faction
+     * @param campaignIsClan   whether the campaign faction is a Clan faction
+     * @param today            the {@link LocalDate} used for retrieving year-specific faction names
      *
      * @return a {@link StringBuilder} containing the formatted climate regard report
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private StringBuilder buildClimateReport(boolean campaignIsPirate, LocalDate today) {
+    private StringBuilder buildClimateReport(boolean campaignIsPirate, boolean campaignIsClan, LocalDate today) {
+        // We minus a day as otherwise this will return false if today is the first day of the First Wave
+        boolean clanInvasionHasBegun = MHQConstants.CLAN_INVASION_FIRST_WAVE_BEGINS.minusDays(1).isBefore(today);
+
         StringBuilder report = new StringBuilder();
         String factionName;
         double regard;
@@ -937,6 +979,11 @@ public class FactionStandings {
             if (faction == null) {
                 LOGGER.warn("Faction {} is missing from the Factions collection. Skipping.",
                       climateRegard.get(factionCode));
+                continue;
+            }
+
+            // If the Clan Invasion First Wave hasn't occurred
+            if (!clanInvasionHasBegun && (campaignIsClan != faction.isClan())) {
                 continue;
             }
 
@@ -976,9 +1023,9 @@ public class FactionStandings {
      *
      * <p>An additional prefix may be applied to the faction name.</p>
      *
-     * @param delta        the amount of Regard gained or lost
-     * @param gameYear     the current in-game year, used to render the appropriate faction name
-     * @param factionCode  unique identifier for the faction whose Regard should be adjusted
+     * @param delta          the amount of Regard gained or lost
+     * @param gameYear       the current in-game year, used to render the appropriate faction name
+     * @param factionCode    unique identifier for the faction whose Regard should be adjusted
      * @param newRegard      the Regard value after the delta is applied
      * @param originalRegard the Regard value before the delta is applied
      *
@@ -1077,7 +1124,8 @@ public class FactionStandings {
     }
 
     /**
-     * Gradually reduces all non-zero faction regard values toward zero by a fixed increment, simulating regard decay over time.
+     * Gradually reduces all non-zero faction regard values toward zero by a fixed increment, simulating regard decay
+     * over time.
      *
      * <p>For each faction with a non-zero regard value, the method decrements positive values and increments negative
      * values by a fixed amount. This step-wise adjustment continues regard's progression toward zero, with Regard being
@@ -1088,10 +1136,11 @@ public class FactionStandings {
      * time.</p>
      *
      * @param campaignFactionCode the unique identifier for the current campaign faction
-     * @param gameYear the current in-game year, used for proper display of faction names in reports
-     * @param regardMultiplier the multiplier set in campaign options.
+     * @param gameYear            the current in-game year, used for proper display of faction names in reports
+     * @param regardMultiplier    the multiplier set in campaign options.
+     *
      * @return a list of formatted report strings describing each regard change made during this process; one entry per
-     * modified faction, or an empty list if no changes occurred
+     *       modified faction, or an empty list if no changes occurred
      *
      * @author Illiani
      * @since 0.50.07
@@ -1152,16 +1201,19 @@ public class FactionStandings {
      *
      * <p>This method determines the correct regard penalty based on whether the enemy faction is classified as a
      * clan or not. The penalty is then applied to the regard value between the campaign's faction and the enemy
-     * faction. If the enemy faction is null or is an aggregate (grouping rather than a true faction), the method
-     * takes no action, and an appropriate report is returned or null.</p>
+     * faction. If the enemy faction is null or is an aggregate (grouping rather than a true faction), the method takes
+     * no action, and an appropriate report is returned or null.</p>
      *
      * @param campaignFactionCode the unique code for the campaign's faction
-     * @param enemyFaction the {@link Faction} representing the targeted enemy against whom the contract is accepted
-     * @param today the current in-game date of contract acceptance
-     * @param regardMultiplier the regard multiplier assigned in campaign options
-     * @param contractDuration how many months the contract is estimated to last
+     * @param enemyFaction        the {@link Faction} representing the targeted enemy against whom the contract is
+     *                            accepted
+     * @param today               the current in-game date of contract acceptance
+     * @param regardMultiplier    the regard multiplier assigned in campaign options
+     * @param contractDuration    how many months the contract is estimated to last
+     *
      * @return a summary {@link String} describing the regard changes applied, or the result from
-     * {@link #getMissingFactionReport()} if the enemy is missing, or {@code null} if the enemy faction is an aggregate
+     *       {@link #getMissingFactionReport()} if the enemy is missing, or {@code null} if the enemy faction is an
+     *       aggregate
      *
      * @author Illiani
      * @since 0.50.07
@@ -1204,8 +1256,8 @@ public class FactionStandings {
     /**
      * Processes the outcome of a contract upon its completion and updates regard standings accordingly.
      *
-     * <p>Depending on the mission status (success, partial, failure, or breach), this method determines the appropriate
-     * regard delta for the employer faction and its allies.</p>
+     * <p>Depending on the mission status (success, partial, failure, or breach), this method determines the
+     * appropriate regard delta for the employer faction and its allies.</p>
      *
      * <p>If the employer faction is missing, a report is generated and returned accordingly. This report informs the
      * player that they need to manually apply the Standing change via the Standing Report GUI.</p>
@@ -1213,13 +1265,15 @@ public class FactionStandings {
      * <p>Regard changes are applied to the employer and all allied factions, and corresponding report strings are
      * returned for each regard change applied.</p>
      *
-     * @param campaignFaction The current campaign faction.
-     * @param employerFaction The {@link Faction} that employed the contract, or {@code null} if unavailable.
-     * @param today           The {@link LocalDate} representing the date of contract completion.
-     * @param missionStatus   The {@link MissionStatus} of the contract upon completion.
-     * @param regardMultiplier  The regard gain multiplier set in campaign options
+     * @param campaignFaction  The current campaign faction.
+     * @param employerFaction  The {@link Faction} that employed the contract, or {@code null} if unavailable.
+     * @param today            The {@link LocalDate} representing the date of contract completion.
+     * @param missionStatus    The {@link MissionStatus} of the contract upon completion.
+     * @param regardMultiplier The regard gain multiplier set in campaign options
      * @param contractDuration how many months the contract is estimated to last
+     *
      * @return A {@link List} of strings summarizing any regard changes or messages relating to missing factions.
+     *
      * @author Illiani
      * @since 0.50.07
      */
@@ -1231,16 +1285,7 @@ public class FactionStandings {
             return new ArrayList<>();
         }
 
-        double regardDeltaEmployer = switch (missionStatus) {
-            case SUCCESS -> REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
-            case PARTIAL -> REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
-            case FAILED -> REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER;
-            case BREACH -> REGARD_DELTA_CONTRACT_BREACH_EMPLOYER;
-            default -> throw new IllegalStateException("Unexpected value: " + missionStatus);
-        };
-
-        double durationMultiplier = max((double) contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1.0);
-        regardDeltaEmployer *= durationMultiplier;
+        double regardDeltaEmployer = getRegardDeltaEmployer(missionStatus, contractDuration);
 
         List<String> regardChangeReports = new ArrayList<>();
 
@@ -1282,6 +1327,20 @@ public class FactionStandings {
         return regardChangeReports;
     }
 
+    private static double getRegardDeltaEmployer(MissionStatus missionStatus, double contractDuration) {
+        double regardDeltaEmployer = switch (missionStatus) {
+            case SUCCESS -> REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER;
+            case PARTIAL -> REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
+            case FAILED -> REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER;
+            case BREACH -> REGARD_DELTA_CONTRACT_BREACH_EMPLOYER;
+            default -> throw new IllegalStateException("Unexpected value: " + missionStatus);
+        };
+
+        double durationMultiplier = max(contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1.0);
+        regardDeltaEmployer *= durationMultiplier;
+        return regardDeltaEmployer;
+    }
+
     /**
      * Updates the regard for relevant mercenary organizations upon the completion of a contract.
      *
@@ -1302,7 +1361,7 @@ public class FactionStandings {
      * @param gameYear            the current game year, used to determine each organization's validity
      * @param campaignFactionCode the short code for the campaign's faction whose standing is to be updated
      * @param regardDeltaEmployer the amount to adjust the regard by (positive or negative)
-     * @param regardMultiplier the regard gain multiplier set in campaign options
+     * @param regardMultiplier    the regard gain multiplier set in campaign options
      *
      * @return the updated report {@link String}, including any log or status messages from the regard update
      *
@@ -1377,8 +1436,10 @@ public class FactionStandings {
      * on its validity in the specified game year or if it is considered "untracked."
      *
      * @param otherFaction the {@link Faction} to evaluate
-     * @param gameYear the year for which validity should be checked
-     * @return {@code true} if the faction is either invalid in the specified year or is untracked; {@code false} otherwise
+     * @param gameYear     the year for which validity should be checked
+     *
+     * @return {@code true} if the faction is either invalid in the specified year or is untracked; {@code false}
+     *       otherwise
      *
      * @author Illiani
      * @since 0.50.07
@@ -1417,17 +1478,19 @@ public class FactionStandings {
     /**
      * Processes the penalty for refusing a batchall against a specific Clan faction.
      *
-     * <p>This method applies a regard penalty to the given clan faction code for the specified year and generates a regard
-     * change report if applicable.</p>
+     * <p>This method applies a regard penalty to the given clan faction code for the specified year and generates a
+     * regard change report if applicable.</p>
      *
      * <p>This method is included as a shortcut to allow developers to call Batchall refusal changes without needing to
      * worry about setting up bespoke methods any time this could occur.</p>
      *
      * @param campaignFactionCode The code representing the current campaign faction.
-     * @param clanFactionCode The code representing the clan faction being penalized.
-     * @param gameYear        The year in which the batchall was refused.
+     * @param clanFactionCode     The code representing the clan faction being penalized.
+     * @param gameYear            The year in which the batchall was refused.
      * @param regardMultiplier    The regard gain multiplier set in campaign options
+     *
      * @return A {@link List} of regard change report strings relating to the refusal.
+     *
      * @author Illiani
      * @since 0.50.07
      */
@@ -1448,17 +1511,18 @@ public class FactionStandings {
     /**
      * Applies regard changes when the player executes prisoners of war.
      *
-     * <p>For each victim in the specified list, the method identifies their origin faction and increments a regard penalty
-     * for that faction, unless the faction is untracked. If multiple prisoners originate from the same faction, their
-     * penalties are accumulated.</p>
+     * <p>For each victim in the specified list, the method identifies their origin faction and increments a regard
+     * penalty for that faction, unless the faction is untracked. If multiple prisoners originate from the same faction,
+     * their penalties are accumulated.</p>
      *
      * <p>After processing all victims, the method applies the total regard change for each affected faction for the
      * specified game year and collects any resulting regard change reports.</p>
      *
-     * @param campaignFactionCode  the unique identifier for the current campaign faction
-     * @param victims  the list of {@link Person} prisoners executed by the player
-     * @param gameYear the year in which the executions and regard changes occur
-     * @param regardMultiplier the regard multiplier set in campaign options
+     * @param campaignFactionCode the unique identifier for the current campaign faction
+     * @param victims             the list of {@link Person} prisoners executed by the player
+     * @param gameYear            the year in which the executions and regard changes occur
+     * @param regardMultiplier    the regard multiplier set in campaign options
+     *
      * @return a {@link List} of non-blank regard change report strings for each affected faction
      */
     public List<String> executePrisonersOfWar(@Nullable String campaignFactionCode, final List<Person> victims,
@@ -1567,14 +1631,15 @@ public class FactionStandings {
     }
 
     /**
-     * Parses a node containing faction regard information and returns a mapping of faction codes to their
-     * corresponding regard values as doubles.
+     * Parses a node containing faction regard information and returns a mapping of faction codes to their corresponding
+     * regard values as doubles.
      *
      * <p>Each child element node is processed for its name and text value. If the value cannot be parsed as a
      * double, a default is used and the error is logged with the provided label.</p>
      *
      * @param childNode the XML {@link Node} containing child entries representing faction regards
-     * @param logLabel a label to help identify log messages during parsing errors
+     * @param logLabel  a label to help identify log messages during parsing errors
+     *
      * @return a {@link Map} of faction codes to parsed regard values
      *
      * @author Illiani
@@ -1612,11 +1677,11 @@ public class FactionStandings {
      * <p>The method resets all faction standings, initializes regard values, sorts missions by date and class,
      * groups them by year, and processes each mission to handle standing updates and degradation if needed.</p>
      *
-     * @param missions        the list of missions (including {@code Contract} and {@code AtBContract} types) to
-     *                        process
-     * @param campaignIcon    the icon that represents the campaign visually
-     * @param campaignFaction the main faction for the campaign
-     * @param today           the current in-campaign date
+     * @param missions         the list of missions (including {@code Contract} and {@code AtBContract} types) to
+     *                         process
+     * @param campaignIcon     the icon that represents the campaign visually
+     * @param campaignFaction  the main faction for the campaign
+     * @param today            the current in-campaign date
      * @param regardMultiplier the multiplier set in campaign options.
      *
      * @return a list of {@link String} objects representing reports or logs of actions performed during the update

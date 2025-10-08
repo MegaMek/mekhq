@@ -24,22 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.enums;
+
+import java.awt.event.KeyEvent;
+import java.util.ResourceBundle;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.gui.*;
 
-import java.awt.event.KeyEvent;
-import java.util.ResourceBundle;
-
 /**
- * Identifies the standard tabs and provides a creation method.
- * The mnemonics used in this are included in the list at {@link CampaignGUI#initMenu()}, and they
- * MUST be unique on that list.
- * The order in which the tabs appear on onthe CampaignGUI is determined by the order in which they
- * are declared here.
+ * Identifies the standard tabs and provides a creation method. The mnemonics used in this are included in the list at
+ * {@link CampaignGUI #initMenu()}, and they MUST be unique on that list. The order in which the tabs appear on the
+ * CampaignGUI is determined by the order in which they are declared here.
+ *
  * @author Neoancient
  */
 public enum MHQTabType {
@@ -66,7 +70,7 @@ public enum MHQTabType {
     //region Constructors
     MHQTabType(final String name, final int mnemonic) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.mnemonic = mnemonic;
     }
@@ -129,34 +133,20 @@ public enum MHQTabType {
     //endregion Boolean Comparison Methods
 
     public @Nullable CampaignGuiTab createTab(final CampaignGUI gui) {
-        switch (this) {
-            case COMMAND_CENTER:
-                return new CommandCenterTab(gui, toString());
-            case TOE:
-                return new TOETab(gui, toString());
-            case BRIEFING_ROOM:
-                return new BriefingTab(gui, toString());
-            case INTERSTELLAR_MAP:
-                return new MapTab(gui, toString());
-            case PERSONNEL:
-                return new PersonnelTab(gui, toString());
-            case HANGAR:
-                return new HangarTab(gui, toString());
-            case WAREHOUSE:
-                return new WarehouseTab(gui, toString());
-            case REPAIR_BAY:
-                return new RepairTab(gui, toString());
-            case INFIRMARY:
-                return new InfirmaryTab(gui, toString());
-            case FINANCES:
-                return new FinancesTab(gui, toString());
-            case MEK_LAB:
-                return new MekLabTab(gui, toString());
-            case STRAT_CON:
-                return new StratconTab(gui, toString());
-            default:
-                return null;
-        }
+        return switch (this) {
+            case COMMAND_CENTER -> new CommandCenterTab(gui, toString());
+            case TOE -> new TOETab(gui, toString());
+            case BRIEFING_ROOM -> new BriefingTab(gui, toString());
+            case INTERSTELLAR_MAP -> new MapTab(gui, toString());
+            case PERSONNEL -> new PersonnelTab(gui, toString());
+            case HANGAR -> new HangarTab(gui, toString());
+            case WAREHOUSE -> new WarehouseTab(gui, toString());
+            case REPAIR_BAY -> new RepairTab(gui, toString());
+            case INFIRMARY -> new InfirmaryTab(gui, toString());
+            case FINANCES -> new FinancesTab(gui, toString());
+            case MEK_LAB -> new MekLabTab(gui, toString());
+            case STRAT_CON -> new StratConTab(gui, toString());
+        };
     }
 
     @Override

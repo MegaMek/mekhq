@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -52,23 +51,23 @@ import mekhq.utilities.ReportingUtilities;
 /**
  * A table model for displaying work items
  */
-public class TechTableModel extends DataTableModel {
+public class TechTableModel extends DataTableModel<Person> {
 
     /** Contains the skill levels to be displayed in a tech's description */
     private static final String[] DISPLAYED_SKILL_LEVELS = new String[] {
-            SkillType.S_TECH_MEK,
-            SkillType.S_TECH_MECHANIC,
-            SkillType.S_TECH_BA,
-            SkillType.S_TECH_AERO,
-            SkillType.S_TECH_VESSEL,
-    };
+          SkillType.S_TECH_MEK,
+          SkillType.S_TECH_MECHANIC,
+          SkillType.S_TECH_BA,
+          SkillType.S_TECH_AERO,
+          SkillType.S_TECH_VESSEL,
+          };
 
-    private CampaignGUI tab;
-    private ITechWorkPanel panel;
+    private final CampaignGUI tab;
+    private final ITechWorkPanel panel;
 
     public TechTableModel(CampaignGUI tab, ITechWorkPanel panel) {
         columnNames = new String[] { "Techs" };
-        data = new ArrayList<Person>();
+        data = new ArrayList<>();
         this.tab = tab;
         this.panel = panel;
     }
@@ -79,7 +78,7 @@ public class TechTableModel extends DataTableModel {
     }
 
     public Person getTechAt(int row) {
-        return (Person) data.get(row);
+        return data.get(row);
     }
 
     public Campaign getCampaign() {
@@ -97,7 +96,7 @@ public class TechTableModel extends DataTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-                int row, int column) {
+              int row, int column) {
             Component c = this;
             int actualRow = table.convertRowIndexToModel(row);
             setOpaque(true);
@@ -142,7 +141,7 @@ public class TechTableModel extends DataTableModel {
         StringBuilder toReturn = new StringBuilder(128);
         toReturn.append("<html><font");
         if ((null != part) && (null != part.getUnit()) && tech.getTechUnits().contains(part.getUnit())) {
-            toReturn.append(" color='" + ReportingUtilities.getPositiveColor() + "'><b>@");
+            toReturn.append(" color='").append(ReportingUtilities.getPositiveColor()).append("'><b>@");
         } else {
             toReturn.append("><b>");
         }
@@ -160,14 +159,15 @@ public class TechTableModel extends DataTableModel {
             int experienceLevel = skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
 
             toReturn.append("<b>")
-                    .append(SkillType.getColoredExperienceLevelName(experienceLevel))
-                    .append("</b> ").append(skillName);
+                  .append(SkillType.getColoredExperienceLevelName(experienceLevel))
+                  .append("</b> ").append(skillName);
             first = false;
         }
 
         toReturn.append(String.format(" (%d XP", tech.getXP()));
         // if Edge usage is allowed for techs, display remaining edge in the dialogue
-        if (getCampaign().getCampaignOptions().isUseSupportEdge() && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)) {
+        if (getCampaign().getCampaignOptions().isUseSupportEdge() &&
+                  tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)) {
             toReturn.append(String.format(", %d Edge)", tech.getCurrentEdge()));
         } else {
             toReturn.append(')');

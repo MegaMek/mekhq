@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,17 +24,22 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
 import java.util.UUID;
 
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.board.Board;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -53,9 +58,9 @@ import mekhq.campaign.unit.Unit;
 
 @AtBScenarioEnabled
 public class CivilianRiotBuiltInScenario extends AtBScenario {
-    private static String RIOTER_FORCE_ID = "Rioters";
-    private static String REBEL_FORCE_ID = "Rebels";
-    private static String LOYALIST_FORCE_ID = "Loyalists";
+    private static final String RIOTER_FORCE_ID = "Rioters";
+    private static final String REBEL_FORCE_ID = "Rebels";
+    private static final String LOYALIST_FORCE_ID = "Loyalists";
 
     @Override
     public boolean isBigBattle() {
@@ -64,7 +69,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        return CIVILIANRIOT;
+        return CIVILIAN_RIOT;
     }
 
     @Override
@@ -109,7 +114,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         // north, south, east, west
         int boardEdge = (Compute.randomInt(4) + 1) * 2;
         setStartingPos(boardEdge);
@@ -117,9 +122,9 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
         // TODO: only units with machine guns, flamers, or sm lasers
         for (int i = 0; i < 4; i++) {
             getAlliesPlayer().add(getEntity(getContract(campaign).getEmployerCode(),
-                    getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(), UnitType.MEK,
-                    (Compute.randomInt(7) < 3) ? EntityWeightClass.WEIGHT_LIGHT : EntityWeightClass.WEIGHT_MEDIUM,
-                    campaign));
+                  getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(), UnitType.MEK,
+                  (Compute.randomInt(7) < 3) ? EntityWeightClass.WEIGHT_LIGHT : EntityWeightClass.WEIGHT_MEDIUM,
+                  campaign));
         }
 
         ArrayList<Entity> otherForce = new ArrayList<>();
@@ -138,13 +143,13 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
         for (int i = 0; i < 3; i++) {
             // 3 mek rebel lance, use employer RAT, enemy skill
             enemyEntities.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getEnemySkill(),
-                    IUnitRating.DRAGOON_F, UnitType.MEK,
-                    Compute.d6() < 4 ? EntityWeightClass.WEIGHT_LIGHT : EntityWeightClass.WEIGHT_MEDIUM, campaign));
+                  IUnitRating.DRAGOON_F, UnitType.MEK,
+                  Compute.d6() < 4 ? EntityWeightClass.WEIGHT_LIGHT : EntityWeightClass.WEIGHT_MEDIUM, campaign));
         }
 
         addBotForce(
-                new BotForce(REBEL_FORCE_ID, 2, AtBDynamicScenarioFactory.getOppositeEdge(boardEdge), enemyEntities),
-                campaign);
+              new BotForce(REBEL_FORCE_ID, 2, AtBDynamicScenarioFactory.getOppositeEdge(boardEdge), enemyEntities),
+              campaign);
     }
 
     @Override
@@ -154,9 +159,9 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
         ScenarioObjective destroyRioters = CommonObjectiveFactory.getDestroyEnemies(RIOTER_FORCE_ID, 1, 100);
         ScenarioObjective destroyRebels = CommonObjectiveFactory.getDestroyEnemies(REBEL_FORCE_ID, 1, 50);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                1, 50, false);
+              1, 50, false);
         ScenarioObjective keepLoyalistsAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(LOYALIST_FORCE_ID,
-                1, 1, true);
+              1, 1, true);
 
         // not losing the scenario also gets you a "bonus"
         ObjectiveEffect bonusEffect = new ObjectiveEffect();
@@ -165,7 +170,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
         bonusEffect.howMuch = 1;
         keepLoyalistsAlive.addSuccessEffect(bonusEffect);
         keepLoyalistsAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"),
-                bonusEffect.howMuch));
+              bonusEffect.howMuch));
 
         getScenarioObjectives().add(destroyRioters);
         getScenarioObjectives().add(destroyRebels);

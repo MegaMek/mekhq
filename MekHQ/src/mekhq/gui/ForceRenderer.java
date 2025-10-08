@@ -41,8 +41,8 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import megamek.client.ui.Messages;
-import megamek.common.Entity;
-import megamek.common.GunEmplacement;
+import megamek.common.equipment.GunEmplacement;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -53,7 +53,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
-    private static final MMLogger logger = MMLogger.create(ForceRenderer.class);
+    private static final MMLogger LOGGER = MMLogger.create(ForceRenderer.class);
 
     // region Constructors
     public ForceRenderer() {
@@ -63,14 +63,14 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
-            boolean expanded, boolean leaf, int row,
-            boolean hasFocus) {
+          boolean expanded, boolean leaf, int row,
+          boolean hasFocus) {
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
         setOpaque(false);
 
         if (value instanceof Unit unit) {
             String name = ReportingUtilities.messageSurroundedBySpanWithColor(
-                    ReportingUtilities.getNegativeColor(), "No Crew");
+                  ReportingUtilities.getNegativeColor(), "No Crew");
             if (unit.getEntity() instanceof GunEmplacement) {
                 name = "AutoTurret";
             }
@@ -80,16 +80,16 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             if (person != null) {
                 name = person.getFullTitle();
                 name += " (" + unit.getEntity().getCrew().getGunnery() + '/'
-                        + unit.getEntity().getCrew().getPiloting() + ')';
+                              + unit.getEntity().getCrew().getPiloting() + ')';
                 if (person.needsFixing() || (unit.getEntity().getCrew().getHits() > 0)) {
                     name = ReportingUtilities.messageSurroundedBySpanWithColor(
-                            ReportingUtilities.getNegativeColor(), name);
+                          ReportingUtilities.getNegativeColor(), name);
                 }
             }
             String unitName = "<i>" + unit.getName() + "</i>";
             if (unit.isDamaged()) {
                 unitName = ReportingUtilities.messageSurroundedBySpanWithColor(
-                    ReportingUtilities.getNegativeColor(), unitName);
+                      ReportingUtilities.getNegativeColor(), unitName);
             }
 
             Entity entity = unit.getEntity();
@@ -100,7 +100,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                     c3network += Messages.getString("ChatLounge.NC3Network") + entity.getC3NetId();
                     if (entity.calculateFreeC3Nodes() > 0) {
                         c3network += Messages.getString("ChatLounge.NC3Nodes",
-                                entity.calculateFreeC3Nodes());
+                              entity.calculateFreeC3Nodes());
                     }
                 }
             } else if (entity.hasC3i()) {
@@ -110,7 +110,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                     c3network += Messages.getString("ChatLounge.C3iNetwork") + entity.getC3NetId();
                     if (entity.calculateFreeC3Nodes() > 0) {
                         c3network += Messages.getString("ChatLounge.C3iNodes",
-                                entity.calculateFreeC3Nodes());
+                              entity.calculateFreeC3Nodes());
                     }
                 }
             } else if (entity.hasC3()) {
@@ -119,7 +119,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                     c3network += Messages.getString("ChatLounge.C3MNodes", entity.calculateFreeC3MNodes());
                     if (entity.hasC3MM()) {
                         c3network += Messages.getString("ChatLounge.C3SNodes",
-                                entity.calculateFreeC3Nodes());
+                              entity.calculateFreeC3Nodes());
                     }
                 } else if (!entity.hasC3S()) {
                     c3network += Messages.getString("ChatLounge.C3Master");
@@ -127,11 +127,11 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                     // an independent master might also be a slave to a company master
                     if (entity.getC3Master() != null) {
                         c3network += "<br>" + Messages.getString("ChatLounge.C3Slave")
-                                + entity.getC3Master().getShortName();
+                                           + entity.getC3Master().getShortName();
                     }
                 } else if (entity.getC3Master() != null) {
                     c3network += Messages.getString("ChatLounge.C3Slave")
-                            + entity.getC3Master().getShortName();
+                                       + entity.getC3Master().getShortName();
                 } else {
                     c3network += Messages.getString("ChatLounge.C3None");
                 }
@@ -143,23 +143,25 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
             if (unit.hasTransportShipAssignment()) {
                 transport.append("<br>Transported (Ship) by: ")
-                        .append(unit.getTransportShipAssignment().getTransportShip().getName());
+                      .append(unit.getTransportShipAssignment().getTransportShip().getName());
             }
             String tacticalTransport = "";
             if (unit.hasTacticalTransportAssignment()) {
                 transport.append("<br>Transported (Tactical) by: ")
-                    .append(unit.getTacticalTransportAssignment().getTransport().getName());
+                      .append(unit.getTacticalTransportAssignment().getTransport().getName());
             }
             String towTransport = "";
             if (unit.hasTransportAssignment(CampaignTransportType.TOW_TRANSPORT)) {
                 transport.append("<br>Towed by: ")
-                    .append(unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT).getTransport().getName());
+                      .append(unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT)
+                                    .getTransport()
+                                    .getName());
             }
 
             String text = name + ", " + unitName + c3network + transport + tacticalTransport + towTransport;
 
             Force force = unit.getCampaign().getForce(unit.getForceId());
-            if((null != person) && (null != force) && (person.getId().equals(force.getForceCommanderID()))) {
+            if ((null != person) && (null != force) && (person.getId().equals(force.getForceCommanderID()))) {
                 text = "<b>" + text + "</b>";
             }
             setText("<html>" + text + "</html>");
@@ -171,34 +173,38 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
         } else if (value instanceof Force force) {
             getAccessibleContext().setAccessibleName((
-                    force.isDeployed() ? "Deployed Force: " : "Force: ") + force.getFullName());
+                  force.isDeployed() ? "Deployed Force: " : "Force: ") + force.getFullName());
             if (!sel && force.isDeployed()) {
                 setForeground(MekHQ.getMHQOptions().getDeployedForeground());
                 setBackground(MekHQ.getMHQOptions().getDeployedBackground());
                 setOpaque(true);
             }
 
-            ForceType forceType = force.getForceType();
-            String typeKey = forceType.getSymbol();
-
-            String formattedForceName = String.format("<html>%s%s%s%s%s%s%s</html>",
-                  force.isCombatTeam() ? "<b>" : "",
-                  force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
-                  force.getName(),
-                  force.isCombatTeam() ? "</b>" : "",
-                  force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
-                  force.isCombatTeam() ? " <s>c</s>" : "",
-                typeKey);
+            String formattedForceName = getFormattedForceName(force);
 
             setText(formattedForceName);
         } else {
-            logger.error("Attempted to render node with unknown node class of "
-                    + ((value != null) ? value.getClass() : "null"));
+            LOGGER.error("Attempted to render node with unknown node class of {}",
+                  (value != null) ? value.getClass() : "null");
         }
 
         setIcon(getIcon(value));
 
         return this;
+    }
+
+    private static String getFormattedForceName(Force force) {
+        ForceType forceType = force.getForceType();
+        String typeKey = forceType.getSymbol();
+
+        return String.format("<html>%s%s%s%s%s%s%s</html>",
+              force.isCombatTeam() ? "<b>" : "",
+              force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
+              force.getName(),
+              force.isCombatTeam() ? "</b>" : "",
+              force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
+              force.isCombatTeam() ? " <s>c</s>" : "",
+              typeKey);
     }
 
     protected Icon getIcon(Object node) {

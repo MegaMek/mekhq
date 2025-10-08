@@ -47,9 +47,9 @@ import javax.swing.plaf.basic.BasicSliderUI;
 import megamek.client.ui.util.UIUtil;
 
 /**
- * A custom {@link JSlider} used to visually represent faction standing levels with labeled "Regard" and "Climate" slider
- * handles. The slider offers a modern, minimal style and is designed to avoid the default thumb UI for a sleeker look
- * in faction standing reports.
+ * A custom {@link JSlider} used to visually represent faction standing levels with labeled "Regard" and "Climate"
+ * slider handles. The slider offers a modern, minimal style and is designed to avoid the default thumb UI for a sleeker
+ * look in faction standing reports.
  *
  * <p>The slider supports two distinct handles, one for "Regard" (the current value) and one for "Climate" (a
  * comparison/reference value). Both are rendered as custom vertical bars with HTML labels placed above or below the
@@ -80,6 +80,7 @@ public class FactionStandingSlider extends JSlider {
      * @param maximum      the maximum value of the slider (inclusive)
      * @param regardValue  the current "Regard" standing to show (slider value)
      * @param climateValue the reference "Climate" standing to display
+     *
      * @author Illiani
      * @since 0.50.07
      */
@@ -89,7 +90,7 @@ public class FactionStandingSlider extends JSlider {
         this.climateValue = climateValue;
         setUI(new InvisibleThumbSliderUI(this));
     }
-    
+
     /**
      * Paints the custom slider component, including the bar and handles.
      *
@@ -113,7 +114,12 @@ public class FactionStandingSlider extends JSlider {
         int arc = BAR_HEIGHT;
 
         graphics2D.setColor(SLIDER_GRAY);
-        graphics2D.fill(new RoundRectangle2D.Double(trackStart, y - (double) BAR_HEIGHT / 2, barWidth, BAR_HEIGHT, arc, arc));
+        graphics2D.fill(new RoundRectangle2D.Double(trackStart,
+              y - (double) BAR_HEIGHT / 2,
+              barWidth,
+              BAR_HEIGHT,
+              arc,
+              arc));
         graphics2D.dispose();
 
         // Draw custom handles
@@ -140,10 +146,10 @@ public class FactionStandingSlider extends JSlider {
      * Paints an individual handle as a vertical rounded bar and labels it with the specified HTML string, placing the
      * label above or below.
      *
-     * @param graphics      the {@link Graphics} context
-     * @param x             the x-coordinate for the handle's center
-     * @param label         the HTML label for the handle
-     * @param isLabelAbove  true if the label should appear above the handle, false for below
+     * @param graphics     the {@link Graphics} context
+     * @param x            the x-coordinate for the handle's center
+     * @param label        the HTML label for the handle
+     * @param isLabelAbove true if the label should appear above the handle, false for below
      *
      * @author Illiani
      * @since 0.50.07
@@ -155,10 +161,9 @@ public class FactionStandingSlider extends JSlider {
         int y = getHeight() / 2;
         int handleWidth = HANDLE_WIDTH;
         int handleTop = y - HANDLE_HEIGHT / 2;
-        int arc = handleWidth;
 
         graphics2D.setColor(SLIDER_GRAY);
-        graphics2D.fillRoundRect(x, handleTop, handleWidth, HANDLE_HEIGHT, arc, arc);
+        graphics2D.fillRoundRect(x, handleTop, handleWidth, HANDLE_HEIGHT, handleWidth, handleWidth);
 
         JLabel htmlLabel = new JLabel(label);
         htmlLabel.setForeground(SLIDER_GRAY);
@@ -181,7 +186,8 @@ public class FactionStandingSlider extends JSlider {
      * Converts a standing value into its respective x-coordinate on the slider track, accounting for padding and slider
      * range.
      *
-     * @param value  the value to convert
+     * @param value the value to convert
+     *
      * @return the x-coordinate on the slider
      *
      * @author Illiani

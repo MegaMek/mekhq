@@ -25,16 +25,20 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingJumpJet extends MissingEquipmentPart {
@@ -49,7 +53,7 @@ public class MissingJumpJet extends MissingEquipmentPart {
 
     @Override
     public int getBaseTime() {
-        return isOmniPodded()? 30 : 60;
+        return isOmniPodded() ? 30 : 60;
     }
 
     @Override

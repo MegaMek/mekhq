@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -49,26 +49,18 @@ import mekhq.utilities.ReportingUtilities;
 /**
  * A table model for displaying doctors
  */
-public class DocTableModel extends DataTableModel {
+public class DocTableModel extends DataTableModel<Person> {
     private final Campaign campaign;
 
     public DocTableModel(Campaign c) {
         columnNames = new String[] { "Doctors" };
-        data = new ArrayList<Person>();
+        data = new ArrayList<>();
         campaign = c;
     }
 
     @Override
     public Object getValueAt(int row, int col) {
-        return getDoctorDescription((Person) data.get(row));
-    }
-
-    /**
-     * @deprecated Use {@link #getDoctorDescription(Person)} instead.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    private String getDocDesc(Person doc) {
-        return getDoctorDescription(doc);
+        return getDoctorDescription(data.get(row));
     }
 
     /**
@@ -92,16 +84,16 @@ public class DocTableModel extends DataTableModel {
             int experienceLevel = skill.getExperienceLevel(doctor.getOptions(), doctor.getATOWAttributes());
 
             toReturn.append("<b>").append(getColoredExperienceLevelName(experienceLevel))
-                    .append("</b> " + SkillType.S_SURGERY);
+                  .append("</b> " + SkillType.S_SURGERY);
         }
 
         toReturn.append(String.format(" (%d XP)", doctor.getXP()));
 
         if (campaign.requiresAdditionalMedics()) {
             toReturn.append("</font><font color='")
-                    .append(ReportingUtilities.getNegativeColor()).append("'>, ")
-                    .append(campaign.getMedicsPerDoctor())
-                    .append(" medics</font><font><br/>");
+                  .append(ReportingUtilities.getNegativeColor()).append("'>, ")
+                  .append(campaign.getMedicsPerDoctor())
+                  .append(" medics</font><font><br/>");
         } else {
             toReturn.append(String.format(", %d medics<br />", campaign.getMedicsPerDoctor()));
         }
@@ -112,7 +104,7 @@ public class DocTableModel extends DataTableModel {
     }
 
     public Person getDoctorAt(int row) {
-        return (Person) data.get(row);
+        return data.get(row);
     }
 
     public Campaign getCampaign() {
@@ -130,7 +122,7 @@ public class DocTableModel extends DataTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
+              boolean hasFocus, int row, int column) {
             setImage(getDoctorAt(row).getPortrait().getImage(54));
             setHtmlText(getValueAt(row, column).toString());
             if (isSelected) {

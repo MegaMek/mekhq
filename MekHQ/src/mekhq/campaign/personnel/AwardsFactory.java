@@ -24,8 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -40,19 +55,8 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
- * This class is responsible to control the awards. It loads one instance of
- * each awards, then it creates a copy of it
+ * This class is responsible to control the awards. It loads one instance of each award, then it creates a copy of it
  * once it needs to be awarded to someone.
  *
  * @author Miguel Azevedo
@@ -65,7 +69,7 @@ public class AwardsFactory {
     /**
      * Here is where the blueprints are stored, mapped by set and name.
      */
-    private Map<String, Map<String, Award>> awardsMap;
+    private final Map<String, Map<String, Award>> awardsMap;
 
     private AwardsFactory() {
         awardsMap = new HashMap<>();
@@ -93,6 +97,7 @@ public class AwardsFactory {
      * Gets a list of all awards that belong to a given Set
      *
      * @param setName is the name of the set
+     *
      * @return list with the awards belonging to that set
      */
     public List<Award> getAllAwardsForSet(String setName) {
@@ -100,12 +105,12 @@ public class AwardsFactory {
     }
 
     /**
-     * By searching the "blueprints" (i.e. awards instances that serve as data
-     * model), it generates
-     * a copy of that award in order for it to be given to someone.
+     * By searching the "blueprints" (i.e. awards instances that serve as data model), it generates a copy of that award
+     * in order for it to be given to someone.
      *
      * @param setName   the name of the set
      * @param awardName the name of the award
+     *
      * @return the copied award, or null if one cannot be copied
      */
     public @Nullable Award generateNew(final String setName, final String awardName) {
@@ -120,7 +125,8 @@ public class AwardsFactory {
     /**
      * Generates a new award from an XML entry (when loading game, for example)
      *
-     * @param node                xml node
+     * @param node xml node
+     *
      * @return an award
      */
     public @Nullable Award generateNewFromXML(final Node node) {
@@ -174,7 +180,7 @@ public class AwardsFactory {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
             awardSet = unmarshaller.unmarshal(MHQXMLUtility.createSafeXmlSource(inputStream), AwardSet.class)
-                    .getValue();
+                             .getValue();
 
             Map<String, Award> tempAwardMap = new HashMap<>();
             String currentSetName = fileName.replaceFirst("[.][^.]+$", "");

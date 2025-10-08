@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
 
@@ -36,18 +41,31 @@ public interface IPlayerSettings {
 
     // deployment information
     int getStartingPos();
+
     void setStartingPos(int i);
+
     int getStartWidth();
+
     void setStartWidth(int i);
+
     int getStartOffset();
+
     void setStartOffset(int i);
+
     int getStartingAnyNWx();
+
     void setStartingAnyNWx(int i);
+
     int getStartingAnyNWy();
+
     void setStartingAnyNWy(int i);
+
     int getStartingAnySEx();
+
     void setStartingAnySEx(int i);
+
     int getStartingAnySEy();
+
     void setStartingAnySEy(int i);
 
 }

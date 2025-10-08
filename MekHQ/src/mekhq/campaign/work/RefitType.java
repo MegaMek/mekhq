@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.work;
 
@@ -44,7 +49,8 @@ public enum RefitType {
     IMPOSSIBLE(9, "impossible", Double.POSITIVE_INFINITY, Integer.MAX_VALUE); // To mark some changes as forbidden
 
     // Initialize by-id array lookup table
-    private static RefitType[] idMap;
+    private static final RefitType[] idMap;
+
     static {
         int maxId = 0;
         for (RefitType refitType : values()) {
@@ -68,9 +74,10 @@ public enum RefitType {
     public static RefitType of(String str) {
         try {
             return of(Integer.parseInt(str));
-        } catch (NumberFormatException nfex) {
+        } catch (NumberFormatException ignored) {
             // Try something else
         }
+
         return valueOf(str.toUpperCase(Locale.ROOT));
     }
 
@@ -80,7 +87,7 @@ public enum RefitType {
     public final double timeMultiplier;
     public final int mod;
 
-    private RefitType(int id, String name, double timeMultiplier, int mod) {
+    RefitType(int id, String name, double timeMultiplier, int mod) {
         this.id = id;
         this.name = name;
         this.timeMultiplier = timeMultiplier;

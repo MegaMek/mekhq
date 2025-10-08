@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,8 +24,12 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.parts;
 
 /**
@@ -130,8 +134,7 @@ public class PartInventory {
     /**
      * Sets the modifier to display next to a count when formatted as a String.
      *
-     * @param countModifier modifier to display next to a count when formatted as a
-     *                      String.
+     * @param countModifier modifier to display next to a count when formatted as a String.
      */
     public void setCountModifier(String countModifier) {
         if (countModifier != null && !countModifier.isBlank()) {
@@ -142,23 +145,24 @@ public class PartInventory {
     /**
      * Gets the transit and ordered counts formatted as a String.
      *
-     * @return A String like, <code>&quot;X in transit, Y on order&quot;</code>,
-     *         describing the transit and ordered counts.
+     * @return A String like, <code>&quot;X in transit, Y on order&quot;</code>, describing the transit and ordered
+     *       counts.
+     *
      * @see #transitAsString()
      * @see #orderedAsString()
      */
     public String getTransitOrderedDetails() {
         StringBuilder toReturn = new StringBuilder();
-        if(transit > 0) {
+        if (transit > 0) {
             toReturn.append(transitAsString())
-                .append(" in transit");
+                  .append(" in transit");
         }
-        if(ordered > 0) {
+        if (ordered > 0) {
             if (transit > 0) {
                 toReturn.append(", ");
             }
             toReturn.append(orderedAsString())
-                .append(" on order");
+                  .append(" on order");
         }
         return toReturn.toString();
     }

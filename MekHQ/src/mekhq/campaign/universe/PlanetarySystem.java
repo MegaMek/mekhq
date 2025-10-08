@@ -56,14 +56,13 @@ import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
 /**
- * This is a PlanetarySystem object that will contain information
- * about the system as well as an ArrayList of the Planet objects
- * that make up the system
+ * This is a PlanetarySystem object that will contain information about the system as well as an ArrayList of the Planet
+ * objects that make up the system
  *
  * @author Taharqa
  */
-@JsonIgnoreProperties(ignoreUnknown=true)
-@JsonDeserialize(converter= PlanetarySystem.PlanetarySystemPostLoader.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonDeserialize(converter = PlanetarySystem.PlanetarySystemPostLoader.class)
 public class PlanetarySystem {
     private static final double COMMAND_CIRCUIT_RECHARGE_TIME_HOURS = 10;
 
@@ -81,23 +80,32 @@ public class PlanetarySystem {
         private final String name;
         private static final Map<Integer, PlanetarySophistication> INDEX_LOOKUP = new HashMap<>();
         private static final Map<String, PlanetarySophistication> NAME_LOOKUP = new HashMap<>();
+
         static {
             for (PlanetarySophistication tr : values()) {
                 INDEX_LOOKUP.put(tr.index, tr);
                 NAME_LOOKUP.put(tr.name, tr);
             }
         }
-        PlanetarySophistication(int idx, String name) { this.index = idx; this.name = name; }
-        public int getIndex() { return index; }
-        public String getName() { return name; }
+
+        PlanetarySophistication(int idx, String name) {
+            this.index = idx;
+            this.name = name;
+        }
+
+        public int getIndex() {return index;}
+
+        public String getName() {return name;}
+
         public static PlanetarySophistication fromIndex(int idx) {
             PlanetarySophistication tr = INDEX_LOOKUP.get(idx);
-            if (tr == null) throw new IllegalArgumentException("Invalid PlanetarySophistication index: " + idx);
+            if (tr == null) {throw new IllegalArgumentException("Invalid PlanetarySophistication index: " + idx);}
             return tr;
         }
+
         public static PlanetarySophistication fromName(String name) {
             PlanetarySophistication tr = NAME_LOOKUP.get(name);
-            if (tr == null) throw new IllegalArgumentException("Invalid PlanetarySophistication name: " + name);
+            if (tr == null) {throw new IllegalArgumentException("Invalid PlanetarySophistication name: " + name);}
             return tr;
         }
     }
@@ -114,23 +122,32 @@ public class PlanetarySystem {
         private final String name;
         private static final Map<Integer, PlanetaryRating> INDEX_LOOKUP = new HashMap<>();
         private static final Map<String, PlanetaryRating> NAME_LOOKUP = new HashMap<>();
+
         static {
             for (PlanetaryRating tr : values()) {
                 INDEX_LOOKUP.put(tr.index, tr);
                 NAME_LOOKUP.put(tr.name, tr);
             }
         }
-        PlanetaryRating(int idx, String name) { this.index = idx; this.name = name; }
-        public int getIndex() { return index; }
-        public String getName() { return name; }
+
+        PlanetaryRating(int idx, String name) {
+            this.index = idx;
+            this.name = name;
+        }
+
+        public int getIndex() {return index;}
+
+        public String getName() {return name;}
+
         public static PlanetaryRating fromIndex(int idx) {
             PlanetaryRating tr = INDEX_LOOKUP.get(idx);
-            if (tr == null) throw new IllegalArgumentException("Invalid PlanetaryRating index: " + idx);
+            if (tr == null) {throw new IllegalArgumentException("Invalid PlanetaryRating index: " + idx);}
             return tr;
         }
+
         public static PlanetaryRating fromName(String name) {
             PlanetaryRating tr = NAME_LOOKUP.get(name);
-            if (tr == null) throw new IllegalArgumentException("Invalid PlanetaryRating name: " + name);
+            if (tr == null) {throw new IllegalArgumentException("Invalid PlanetaryRating name: " + name);}
             return tr;
         }
     }
@@ -317,15 +334,14 @@ public class PlanetarySystem {
     }
 
     /**
-     * @return the distance to another system in light years (0 if both are in the
-     *         same system)
+     * @return the distance to another system in light years (0 if both are in the same system)
      */
     public double getDistanceTo(PlanetarySystem anotherSystem) {
         return Math.sqrt(Math.pow(x - anotherSystem.x, 2) + Math.pow(y - anotherSystem.y, 2));
     }
 
     public Boolean isNadirCharge(LocalDate when) {
-        return (null == getSourcedNadirCharge(when) ? false : getSourcedNadirCharge(when).getValue());
+        return (null != getSourcedNadirCharge(when) && getSourcedNadirCharge(when).getValue());
     }
 
     public SourceableValue<Boolean> getSourcedNadirCharge(LocalDate when) {
@@ -333,7 +349,7 @@ public class PlanetarySystem {
     }
 
     public boolean isZenithCharge(LocalDate when) {
-        return (null == getSourcedZenithCharge(when) ? false : getSourcedZenithCharge(when).getValue());
+        return (null != getSourcedZenithCharge(when) && getSourcedZenithCharge(when).getValue());
     }
 
     public SourceableValue<Boolean> getSourcedZenithCharge(LocalDate when) {
@@ -433,16 +449,16 @@ public class PlanetarySystem {
     }
 
     /**
-     * @return the average travel time from low orbit to the jump point at 1g, in
-     *         Terran days for a given planetary position
+     * @return the average travel time from low orbit to the jump point at 1g, in Terran days for a given planetary
+     *       position
      */
     public double getTimeToJumpPoint(double acceleration) {
         return getTimeToJumpPoint(acceleration, getPrimaryPlanetPosition());
     }
 
     /**
-     * @return the average travel time from low orbit to the jump point at 1g, in
-     *         Terran days for a given planetary position
+     * @return the average travel time from low orbit to the jump point at 1g, in Terran days for a given planetary
+     *       position
      */
     public double getTimeToJumpPoint(double acceleration, int sysPos) {
         return planets.get(sysPos).getTimeToJumpPoint(acceleration);
@@ -456,19 +472,18 @@ public class PlanetarySystem {
         return star;
     }
 
-    public SourceableValue<Integer> getSourcedPrimarySlot() { return primarySlot; }
+    public SourceableValue<Integer> getSourcedPrimarySlot() {return primarySlot;}
 
     /**
-     * @return the planet object identified by the primary slot.
-     *         If no primary slot is given, then this function will return the first
-     *         planet
+     * @return the planet object identified by the primary slot. If no primary slot is given, then this function will
+     *       return the first planet
      */
     public Planet getPrimaryPlanet() {
         return planets.get(getPrimaryPlanetPosition());
     }
 
     public int getPrimaryPlanetPosition() {
-        if(null == getSourcedPrimarySlot()) {
+        if (null == getSourcedPrimarySlot()) {
             // if no primary slot (i.e., an uninhabited system) then return the first planet
             return 1;
         }
@@ -545,7 +560,7 @@ public class PlanetarySystem {
         return new ArrayList<>(events.values());
     }
 
-    private interface EventGetter<T> {
+    protected interface EventGetter<T> {
         T get(PlanetarySystemEvent e);
     }
 
@@ -573,6 +588,7 @@ public class PlanetarySystem {
      * Retrieves a list of filtered academies based on the given campaign.
      *
      * @param campaign The campaign for filtering the academies.
+     *
      * @return A list of filtered academies based on the campaign.
      */
     public List<Academy> getFilteredAcademies(Campaign campaign) {
@@ -582,14 +598,16 @@ public class PlanetarySystem {
         List<String> excludedSets = List.of("Local Academies", "Unit Education");
 
         return academyFactory.getAllSetNames().stream()
-                .filter(setName -> !excludedSets.contains(setName) // Excluding certain setNames
-                        && (!setName.equalsIgnoreCase("Prestigious Academies")
-                                || campaign.getCampaignOptions().isEnablePrestigiousAcademies())) // Additional
-                                                                                                  // condition for
-                                                                                                  // "Prestigious
-                                                                                                  // Academies"
-                .flatMap(setName -> getFilteredAcademiesForSet(currentDate, setName).stream())
-                .toList();
+                     .filter(setName -> !excludedSets.contains(setName) // Excluding certain setNames
+                                              && (!setName.equalsIgnoreCase("Prestigious Academies")
+                                                        ||
+                                                        campaign.getCampaignOptions()
+                                                              .isEnablePrestigiousAcademies())) // Additional
+                     // condition for
+                     // "Prestigious
+                     // Academies"
+                     .flatMap(setName -> getFilteredAcademiesForSet(currentDate, setName).stream())
+                     .toList();
     }
 
     /**
@@ -597,24 +615,24 @@ public class PlanetarySystem {
      *
      * @param currentDate The current date to filter the academies.
      * @param setName     The set name to filter the academies.
+     *
      * @return A list of filtered academies for the given set and current date.
      */
     private List<Academy> getFilteredAcademiesForSet(LocalDate currentDate, String setName) {
         return AcademyFactory.getInstance().getAllAcademiesForSet(setName).stream()
-                .filter(academy -> academy.getLocationSystems().contains(this.getId())
-                        && !academy.isLocal()
-                        && !academy.isHomeSchool()
-                        && !academy.getName().contains("(Officer)")
-                        && currentDate.getYear() >= academy.getConstructionYear()
-                        && currentDate.getYear() < academy.getClosureYear()
-                        && currentDate.getYear() < academy.getDestructionYear())
-                .sorted()
-                .toList();
+                     .filter(academy -> academy.getLocationSystems().contains(this.getId())
+                                              && !academy.isLocal()
+                                              && !academy.isHomeSchool()
+                                              && !academy.getName().contains("(Officer)")
+                                              && currentDate.getYear() >= academy.getConstructionYear()
+                                              && currentDate.getYear() < academy.getClosureYear()
+                                              && currentDate.getYear() < academy.getDestructionYear())
+                     .sorted()
+                     .toList();
     }
 
     /**
-     * Retrieves a string representation of the prestigious academies available in
-     * the system.
+     * Retrieves a string representation of the prestigious academies available in the system.
      *
      * @return A string representation of the prestigious academies in the system.
      */
@@ -623,7 +641,7 @@ public class PlanetarySystem {
 
         for (Academy academy : filteredAcademies) { // there are not enough entries to justify a Stream
             academyString.append("<b>").append(academy.getName()).append("</b><br>")
-                .append(academy.getDescription()).append("<br><br>");
+                  .append(academy.getDescription()).append("<br><br>");
         }
 
         return academyString.toString();

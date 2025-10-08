@@ -55,7 +55,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 
-import megamek.common.TargetRoll;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -84,7 +84,7 @@ import org.mockito.Mockito;
  */
 class SkillCheckUtilityTest {
     private static final LocalDate CURRENT_DATE = LocalDate.of(3151, 1, 1);
-    
+
     @Test
     void testIsPersonNull_EdgeDisallowed() {
         SkillCheckUtility checkUtility = new SkillCheckUtility(null,

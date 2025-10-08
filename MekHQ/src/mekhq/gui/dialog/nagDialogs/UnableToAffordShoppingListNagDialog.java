@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.gui.dialog.nagDialogs;
@@ -98,9 +103,8 @@ public class UnableToAffordShoppingListNagDialog extends ImmersiveDialogNag {
      *       {@code false} otherwise.
      */
     public static boolean checkNag(Money totalBuyCost, Money currentFunds) {
-        final String NAG_KEY = NAG_UNABLE_TO_AFFORD_SHOPPING_LIST;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNABLE_TO_AFFORD_SHOPPING_LIST) &&
                      unableToAffordShoppingList(totalBuyCost, currentFunds);
     }
 

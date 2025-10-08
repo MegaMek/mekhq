@@ -38,12 +38,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.Version;
-import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.ProcurementEvent;
+import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -67,7 +67,7 @@ import org.w3c.dom.NodeList;
  * On Campaign.newDay, we also cycle through the list and check any items that have no more days to wait for the next
  * check.
  * <p>
- * Checking procedure Using a while loop, we keep checking using an acquisition roll until we fail or we hit zero
+ * Checking procedure Using a while loop, we keep checking using an acquisition roll until we fail, or we hit zero
  * quantity. If we hit zero quantity, then we can remove the item. If we fail, then we reset the dayCounter to the max.
  * <p>
  * We also now only use one person to make all checks. We allow the user to set the skill and other options for who
@@ -76,7 +76,7 @@ import org.w3c.dom.NodeList;
  * Do we use a separate shopping list for new units?
  */
 public class ShoppingList {
-    private static final MMLogger logger = MMLogger.create(ShoppingList.class);
+    private static final MMLogger LOGGER = MMLogger.create(ShoppingList.class);
 
     // region Variable Declarations
     private List<IAcquisitionWork> shoppingList;
@@ -139,6 +139,7 @@ public class ShoppingList {
                     shoppingItem.incrementQuantity();
                     quantity--;
                 }
+                MekHQ.triggerEvent(new ProcurementEvent(newWork));
                 return;
             }
         }
@@ -216,7 +217,7 @@ public class ShoppingList {
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         return retVal;
@@ -279,9 +280,7 @@ public class ShoppingList {
     private boolean isSameEquipment(Object equipment, Object newEquipment) {
         if ((newEquipment instanceof Part) && (equipment instanceof Part)) {
             return ((Part) equipment).isSamePartType((Part) newEquipment);
-        } else if ((newEquipment instanceof Entity) && (equipment instanceof Entity)) {
-            Entity entityA = (Entity) newEquipment;
-            Entity entityB = (Entity) equipment;
+        } else if ((newEquipment instanceof Entity entityA) && (equipment instanceof Entity entityB)) {
             return entityA.getChassis().equals(entityB.getChassis()) && entityA.getModel().equals(entityB.getModel());
         }
         return false;

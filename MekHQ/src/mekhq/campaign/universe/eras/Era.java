@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.eras;
 
@@ -32,16 +37,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.eras.EraFlag;
+import megamek.logging.MMLogger;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
-import mekhq.campaign.universe.enums.EraFlag;
-import mekhq.utilities.MHQXMLUtility;
-
 public class Era {
-    private static final MMLogger logger = MMLogger.create(Era.class);
+    private static final MMLogger LOGGER = MMLogger.create(Era.class);
 
     // region Variable Declarations
     private String code;
@@ -115,7 +119,7 @@ public class Era {
                         break;
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
                 return null;
             }
         }

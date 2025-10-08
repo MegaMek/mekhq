@@ -24,19 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.force;
+
+import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 
-import java.util.ResourceBundle;
-
 public enum FormationLevel {
     // region Enum Declarations
     REMOVE_OVERRIDE("FormationLevel.REMOVE_OVERRIDE.text", "FormationLevel.REMOVE_OVERRIDE.description", -1, true, true,
-            true),
+          true),
     NONE("FormationLevel.NONE.text", "FormationLevel.NONE.description", -1, true, true, true),
     INVALID("FormationLevel.INVALID.text", "FormationLevel.INVALID.description", -1, true, true, true),
 
@@ -54,14 +59,14 @@ public enum FormationLevel {
     // Clan
     STAR_OR_NOVA("FormationLevel.STAR_OR_NOVA.text", "FormationLevel.STAR_OR_NOVA.description", 0, false, true, false),
     BINARY_OR_TRINARY("FormationLevel.BINARY_OR_TRINARY.text", "FormationLevel.BINARY_OR_TRINARY.description", 1, false,
-            true, false),
+          true, false),
     CLUSTER("FormationLevel.CLUSTER.text", "FormationLevel.CLUSTER.description", 2, false, true, false),
     GALAXY("FormationLevel.GALAXY.text", "FormationLevel.GALAXY.description", 3, false, true, false),
     TOUMAN("FormationLevel.TOUMAN.text", "FormationLevel.TOUMAN.description", 4, false, true, false),
 
     // ComStar
     LEVEL_II_OR_CHOIR("FormationLevel.LEVEL_II_OR_CHOIR.text", "FormationLevel.LEVEL_II_OR_CHOIR.description", 0, false,
-            false, true),
+          false, true),
     LEVEL_III("FormationLevel.LEVEL_III.text", "FormationLevel.LEVEL_III.description", 1, false, false, true),
     LEVEL_IV("FormationLevel.LEVEL_IV.text", "FormationLevel.LEVEL_IV.description", 2, false, false, true),
     LEVEL_V("FormationLevel.LEVEL_V.text", "FormationLevel.LEVEL_V.description", 3, false, false, true),
@@ -80,7 +85,7 @@ public enum FormationLevel {
     // region Constructors
     FormationLevel(final String name, final String description, int depth, boolean isIS, boolean isClan, boolean isCS) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.FormationLevel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         this.name = resources.getString(name);
         this.description = resources.getString(description);
@@ -214,12 +219,12 @@ public enum FormationLevel {
     // region File I/O
 
     /**
-     * Parses a string representation of a formation level and returns the
-     * corresponding FormationLevel enum value.
+     * Parses a string representation of a formation level and returns the corresponding FormationLevel enum value.
      *
      * @param formationLevel the string representation of the formation level
-     * @return the FormationLevel enum value corresponding to the given formation
-     *         level string
+     *
+     * @return the FormationLevel enum value corresponding to the given formation level string
+     *
      * @throws IllegalStateException if the formation level string is not recognized
      */
 
@@ -254,22 +259,20 @@ public enum FormationLevel {
             case "20", "Level V" -> LEVEL_V;
             case "21", "Level VI" -> LEVEL_VI;
 
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/force/FormationLevel.java/parseFromString: "
-                                + formationLevel);
+            default -> throw new IllegalStateException(
+                  "Unexpected value in mekhq/campaign/force/FormationLevel.java/parseFromString: "
+                        + formationLevel);
         };
     }
 
     /**
-     * Parses an integer value representing a formation level and returns the
-     * corresponding FormationLevel enum value.
+     * Parses an integer value representing a formation level and returns the corresponding FormationLevel enum value.
      *
      * @param formationLevel The integer value representing the formation level.
-     * @return The FormationLevel enum value corresponding to the given integer
-     *         value.
-     * @throws IllegalStateException if the given formation level has no
-     *                               corresponding FormationLevel enum value.
+     *
+     * @return The FormationLevel enum value corresponding to the given integer value.
+     *
+     * @throws IllegalStateException if the given formation level has no corresponding FormationLevel enum value.
      */
 
     public static FormationLevel parseFromInt(final int formationLevel) {
@@ -303,10 +306,9 @@ public enum FormationLevel {
             case 20 -> LEVEL_V;
             case 21 -> LEVEL_VI;
 
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/force/FormationLevel.java/parseFromInt: "
-                                + formationLevel);
+            default -> throw new IllegalStateException(
+                  "Unexpected value in mekhq/campaign/force/FormationLevel.java/parseFromInt: "
+                        + formationLevel);
         };
     }
 
@@ -314,6 +316,7 @@ public enum FormationLevel {
      * Parses a FormationLevel enum value to an integer representation.
      *
      * @return The integer representation of the FormationLevel enum value.
+     *
      * @throws IllegalStateException If the given FormationLevel is unexpected.
      */
 
@@ -355,6 +358,7 @@ public enum FormationLevel {
      *
      * @param campaign The current campaign
      * @param depth    The depth of the formation
+     *
      * @return The corresponding formation level
      */
     public static FormationLevel parseFromDepth(Campaign campaign, int depth) {

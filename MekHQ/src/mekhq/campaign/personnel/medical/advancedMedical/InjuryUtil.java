@@ -43,15 +43,14 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
 
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.Mek;
+import megamek.common.compute.Compute;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
 import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.log.PerformanceLogger;
-import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.log.PatientLogger;
 import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
@@ -86,12 +85,12 @@ public final class InjuryUtil {
         // TODO: Reporting
         if ((null != doc) && doc.isDoctor()) {
             if (p.getDaysToWaitForHealing() <= 0) {
-                genMedicalTreatment(c, p, doc).stream().forEach(GameEffect::apply);
+                genMedicalTreatment(c, p, doc).forEach(GameEffect::apply);
             }
         } else {
-            genUntreatedEffects(c, p).stream().forEach(GameEffect::apply);
+            genUntreatedEffects(c, p).forEach(GameEffect::apply);
         }
-        genNaturalHealing(c, p).stream().forEach(GameEffect::apply);
+        genNaturalHealing(c, p).forEach(GameEffect::apply);
         p.decrementDaysToWaitForHealing();
     }
 
@@ -128,9 +127,9 @@ public final class InjuryUtil {
     public static Collection<Injury> genInjuries(Campaign c, Person p, int hits) {
         final Unit u = p.getUnit();
         final Entity en = (null != u) ? u.getEntity() : null;
-        final boolean mwasf = ((en instanceof Mek) || (en instanceof Aero));
-        final int critMod = mwasf ? 0 : 2;
-        final BiFunction<IntUnaryOperator, Function<BodyLocation, Boolean>, BodyLocation> generator = mwasf ?
+        final boolean mekOrAero = ((en instanceof Mek) || (en instanceof Aero));
+        final int critMod = mekOrAero ? 0 : 2;
+        final BiFunction<IntUnaryOperator, Function<BodyLocation, Boolean>, BodyLocation> generator = mekOrAero ?
                                                                                                             HitLocationGen::mekAndAsf :
                                                                                                             HitLocationGen::generic;
         final Map<BodyLocation, Integer> hitAccumulator = new HashMap<>();
@@ -169,7 +168,9 @@ public final class InjuryUtil {
             case RIGHT_FOOT:
                 switch (hits) {
                     case 1:
-                        newInjuries.add(gen.apply(Compute.randomInt(2) == 0 ? InjuryTypes.PUNCTURE : InjuryTypes.FRACTURE, 1));
+                        newInjuries.add(gen.apply(Compute.randomInt(2) == 0 ?
+                                                        InjuryTypes.PUNCTURE :
+                                                        InjuryTypes.FRACTURE, 1));
                         break;
                     case 2:
                         newInjuries.add(gen.apply(InjuryTypes.TORN_MUSCLE, 1));
@@ -202,7 +203,9 @@ public final class InjuryUtil {
             case CHEST:
                 switch (hits) {
                     case 1:
-                        newInjuries.add(gen.apply(Compute.randomInt(2) == 0 ? InjuryTypes.PUNCTURE : InjuryTypes.FRACTURE, 1));
+                        newInjuries.add(gen.apply(Compute.randomInt(2) == 0 ?
+                                                        InjuryTypes.PUNCTURE :
+                                                        InjuryTypes.FRACTURE, 1));
                         break;
                     case 2:
                         newInjuries.add(gen.apply(InjuryTypes.BROKEN_RIB, 1));
@@ -250,15 +253,15 @@ public final class InjuryUtil {
     }
 
     /** Called when creating a new injury to generate a slightly randomized healing time */
-    public static int genHealingTime(Campaign c, Person p, InjuryType itype, int severity) {
+    public static int genHealingTime(Campaign c, Person p, InjuryType injuryType, int severity) {
         int mod = 100;
         int rand = Compute.randomInt(100);
         if (rand < 5) {
             mod += (Compute.d6() < 4) ? rand : -rand;
         }
 
-        int time = itype.getRecoveryTime(severity);
-        if (itype == InjuryTypes.LACERATION) {
+        int time = injuryType.getRecoveryTime(severity);
+        if (injuryType == InjuryTypes.LACERATION) {
             time += Compute.d6();
         }
 
@@ -346,8 +349,6 @@ public final class InjuryUtil {
                         if ((taskXP > 0) && (doc.getNTasks() >= c.getCampaignOptions().getNTasksXP())) {
                             doc.awardXP(c, taskXP);
                             doc.setNTasks(0);
-
-                            PerformanceLogger.gainedXpFromMedWork(doc, c.getLocalDate(), taskXP);
                         } else {
                             doc.setNTasks(doc.getNTasks() + 1);
                         }
@@ -396,10 +397,8 @@ public final class InjuryUtil {
             result.add(new GameEffect(treatmentSummary, rnd -> {
                 if (xp > 0) {
                     doc.awardXP(c, xp);
-                    PerformanceLogger.successfullyTreatedWithXp(doc, p, c.getLocalDate(), injuries, xp);
-                } else {
-                    ServiceLogger.successfullyTreated(doc, p, c.getLocalDate(), injuries);
                 }
+                PatientLogger.successfullyTreated(doc, p, c.getLocalDate(), injuries);
                 p.setDaysToWaitForHealing(c.getCampaignOptions().getHealingWaitingPeriod());
             }));
         }
@@ -495,11 +494,6 @@ public final class InjuryUtil {
                           if (rnd.applyAsInt(100) < 30) {
                               i.setTime(i.getTime() + 1);
                               // TODO: Disabled, too much spam
-                            /*
-                            LogEntry entry = new LogEntry(c.getDate(),
-                                String.format("%s worsened its condition due to lack of proper medical attention", i.getName()), Person.LOGTYPE_MEDICAL);
-                            p.addPersonalLogEntry(entry);
-                            */
                           }
                       }));
             }

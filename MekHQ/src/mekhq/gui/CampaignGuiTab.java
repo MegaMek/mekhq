@@ -42,13 +42,13 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.gui.enums.MHQTabType;
 
 /**
- * Abstract base class for CampaignGUI tab components. Custom tabs should extend
- * CustomCampaignGuiTab instead of this one.
+ * Abstract base class for CampaignGUI tab components. Custom tabs should extend CustomCampaignGuiTab instead of this
+ * one.
  *
  * @author Neoancient
  */
 public abstract class CampaignGuiTab extends JPanel {
-    private CampaignGUI gui;
+    private final CampaignGUI gui;
 
     protected String tabName;
 

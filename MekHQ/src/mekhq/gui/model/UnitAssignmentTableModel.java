@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2015-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
@@ -31,15 +36,14 @@ import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.UUID;
-
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.UnitType;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
@@ -53,10 +57,10 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     public static final int N_COL = 3;
 
     private static final String[] colNames = {
-            "Unit", "Class", "Cost"
+          "Unit", "Class", "Cost"
     };
 
-    private Campaign campaign;
+    private final Campaign campaign;
     ArrayList<UUID> data;
 
     public UnitAssignmentTableModel(Campaign c) {
@@ -85,32 +89,19 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     }
 
     public int getColumnWidth(int c) {
-        switch (c) {
-            case COL_UNIT:
-                return 125;
-            case COL_COST:
-                return 70;
-            case COL_CLASS:
-            default:
-                return 20;
-        }
+        return switch (c) {
+            case COL_UNIT -> 125;
+            case COL_COST -> 70;
+            default -> 20;
+        };
     }
 
     public int getAlignment(int col) {
-        switch (col) {
-            case COL_UNIT:
-                return SwingConstants.LEFT;
-            case COL_COST:
-                return SwingConstants.RIGHT;
-            case COL_CLASS:
-            default:
-                return SwingConstants.CENTER;
-        }
-    }
-
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
+        return switch (col) {
+            case COL_UNIT -> SwingConstants.LEFT;
+            case COL_COST -> SwingConstants.RIGHT;
+            default -> SwingConstants.CENTER;
+        };
     }
 
     @Override
@@ -130,16 +121,12 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
             }
         }
 
-        switch (col) {
-            case COL_UNIT:
-                return u.getName();
-            case COL_CLASS:
-                return RetirementDefectionDialog.weightClassIndex(u);
-            case COL_COST:
-                return u.getBuyCost().toAmountAndSymbolString();
-            default:
-                return "?";
-        }
+        return switch (col) {
+            case COL_UNIT -> u.getName();
+            case COL_CLASS -> RetirementDefectionDialog.weightClassIndex(u);
+            case COL_COST -> u.getBuyCost().toAmountAndSymbolString();
+            default -> "?";
+        };
     }
 
     public Unit getUnit(int row) {
@@ -153,8 +140,8 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     public class TextRenderer extends MekHqTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus,
-                int row, int column) {
+              boolean isSelected, boolean hasFocus,
+              int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             int actualCol = table.convertColumnIndexToModel(column);
             setHorizontalAlignment(getAlignment(actualCol));
@@ -169,7 +156,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
+              boolean hasFocus, int row, int column) {
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
@@ -182,7 +169,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
                     if (!(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
                         desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                     }
-                    desc += "<br>" + u.getStatus() + "";
+                    desc += "<br>" + u.getStatus();
                     setText(desc);
                     Image mekImage = u.getImage(this);
                     if (null != mekImage) {

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -48,7 +53,7 @@ public enum RankSystemType {
     // region Constructors
     RankSystemType(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -75,17 +80,15 @@ public enum RankSystemType {
     // endregion Boolean Comparison Methods
 
     public String getFilePath() {
-        switch (this) {
-            case DEFAULT:
-                return MHQConstants.RANKS_FILE_PATH;
-            case USER_DATA:
-                return MHQConstants.USER_RANKS_FILE_PATH;
-            case CAMPAIGN:
-            default:
+        return switch (this) {
+            case DEFAULT -> MHQConstants.RANKS_FILE_PATH;
+            case USER_DATA -> MHQConstants.USER_RANKS_FILE_PATH;
+            default -> {
                 MMLogger.create(RankSystemType.class).error(
-                        "Attempted to load an illegal file path. Returning a blank String, which will cause the load to fail.");
-                return "";
-        }
+                      "Attempted to load an illegal file path. Returning a blank String, which will cause the load to fail.");
+                yield "";
+            }
+        };
     }
 
     @Override

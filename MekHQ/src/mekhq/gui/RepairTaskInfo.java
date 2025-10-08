@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui;
 
@@ -31,7 +36,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
-
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -42,21 +46,21 @@ import javax.swing.border.LineBorder;
 import mekhq.IconPackage;
 
 /**
- * A specialized JPanel wrapper for repair tasks. This is different from
- * BasicInfo due to the need for an extra image on the right side.
+ * A specialized JPanel wrapper for repair tasks. This is different from BasicInfo due to the need for an extra image on
+ * the right side.
  *
  * @author Cord Awtry (kipstafoo)
  */
 public class RepairTaskInfo extends JPanel {
-    private JLabel lblImage;
-    private JLabel lblSecondaryImage;
+    private final JLabel lblImage;
+    private final JLabel lblSecondaryImage;
 
-    public RepairTaskInfo(IconPackage i) {
+    public RepairTaskInfo(IconPackage iconPackage) {
         lblImage = new JLabel();
 
-        GridBagLayout gridbag = new GridBagLayout();
+        GridBagLayout gridBagLayout = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
-        setLayout(gridbag);
+        setLayout(gridBagLayout);
 
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(1, 1, 1, 1);
@@ -67,8 +71,7 @@ public class RepairTaskInfo extends JPanel {
         c.gridwidth = 1;
         c.gridheight = 1;
         c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.BOTH;
-        gridbag.setConstraints(lblImage, c);
+        gridBagLayout.setConstraints(lblImage, c);
         add(lblImage);
 
         lblSecondaryImage = new JLabel();
@@ -83,7 +86,7 @@ public class RepairTaskInfo extends JPanel {
         c.gridwidth = 1;
         c.gridheight = 1;
         c.anchor = GridBagConstraints.EAST;
-        gridbag.setConstraints(lblSecondaryImage, c);
+        gridBagLayout.setConstraints(lblSecondaryImage, c);
         add(lblSecondaryImage);
 
         this.setBorder(BorderFactory.createEmptyBorder());
@@ -95,7 +98,7 @@ public class RepairTaskInfo extends JPanel {
 
     public void highlightBorder() {
         this.setBorder(new LineBorder(
-                UIManager.getColor("Tree.selectionBorderColor"), 4, true));
+              UIManager.getColor("Tree.selectionBorderColor"), 4, true));
     }
 
     public void unhighlightBorder() {

@@ -24,45 +24,50 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.Engine;
-import megamek.common.Entity;
-import megamek.common.FuelType;
-import megamek.common.ITechnology;
-import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.TechRating;
+import megamek.common.equipment.Engine;
+import megamek.common.equipment.enums.FuelType;
+import megamek.common.units.Aero;
+import megamek.common.units.Entity;
+import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingSVEngine;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Engine for a support vehicle. An identical support vehicle engine will have
- * the same engine type,
- * unit tonnage, tech rating, and movement factor. The movement factor is the
- * vehicle's (cruise/safe thrust)^2 + 4.
- * ICEs will also have the same fuel type.
+ * Engine for a support vehicle. An identical support vehicle engine will have the same engine type, unit tonnage, tech
+ * rating, and movement factor. The movement factor is the vehicle's (cruise/safe thrust)^2 + 4. ICEs will also have the
+ * same fuel type.
  */
 public class SVEnginePart extends Part {
-    private static final MMLogger logger = MMLogger.create(SVEnginePart.class);
+    private static final MMLogger LOGGER = MMLogger.create(SVEnginePart.class);
 
     private double engineTonnage;
     private int etype;
     private TechRating techRating;
     private FuelType fuelType;
 
-    private TechAdvancement techAdvancement;
+    private final TechAdvancement techAdvancement;
 
     /**
      * Constructor used during campaign deserialization
@@ -75,18 +80,15 @@ public class SVEnginePart extends Part {
     /**
      * Creates a support vehicle engine part.
      *
-     * @param unitTonnage   The mass of the unit it is installed on/intended for, in
-     *                      tons.
+     * @param unitTonnage   The mass of the unit it is installed on/intended for, in tons.
      * @param engineTonnage The mass of the engine
      * @param etype         An {@link Engine} type constant
-     * @param techRating    The engine's tech rating, {@code TechRating.A} through
-     *                      {@code TechRating.F}
-     * @param fuelType      Needed to distinguish different types of internal
-     *                      combustion engines.
+     * @param techRating    The engine's tech rating, {@code TechRating.A} through {@code TechRating.F}
+     * @param fuelType      Needed to distinguish different types of internal combustion engines.
      * @param campaign      The campaign instance
      */
     public SVEnginePart(int unitTonnage, double engineTonnage, int etype, TechRating techRating,
-            FuelType fuelType, Campaign campaign) {
+          FuelType fuelType, Campaign campaign) {
         super(unitTonnage, campaign);
         this.engineTonnage = unitTonnage;
         this.etype = etype;
@@ -129,7 +131,7 @@ public class SVEnginePart extends Part {
     @Override
     public SVEnginePart clone() {
         SVEnginePart engine = new SVEnginePart(getUnitTonnage(), engineTonnage, etype, techRating,
-                fuelType, getCampaign());
+              fuelType, getCampaign());
         engine.copyBaseData(this);
         return engine;
     }
@@ -147,10 +149,10 @@ public class SVEnginePart extends Part {
     @Override
     public boolean isSamePartType(Part other) {
         return other instanceof SVEnginePart
-                && (engineTonnage == ((SVEnginePart) other).engineTonnage)
-                && (etype == ((SVEnginePart) other).etype)
-                && (techRating == ((SVEnginePart) other).techRating)
-                && ((etype != Engine.COMBUSTION_ENGINE) || (fuelType == ((SVEnginePart) other).fuelType));
+                     && (engineTonnage == ((SVEnginePart) other).engineTonnage)
+                     && (etype == ((SVEnginePart) other).etype)
+                     && (techRating == ((SVEnginePart) other).techRating)
+                     && ((etype != Engine.COMBUSTION_ENGINE) || (fuelType == ((SVEnginePart) other).fuelType));
     }
 
     @Override
@@ -196,7 +198,7 @@ public class SVEnginePart extends Part {
                         break;
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }
@@ -216,7 +218,7 @@ public class SVEnginePart extends Part {
     @Override
     public MissingPart getMissingPart() {
         return new MissingSVEngine(getUnitTonnage(), engineTonnage, etype, techRating,
-                fuelType, getCampaign());
+              fuelType, getCampaign());
     }
 
     @Override
@@ -231,13 +233,13 @@ public class SVEnginePart extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -316,11 +318,6 @@ public class SVEnginePart extends Part {
     @Override
     public @Nullable String checkFixable() {
         return null;
-    }
-
-    @Override
-    public boolean isMountedOnDestroyedLocation() {
-        return false;
     }
 
     @Override

@@ -67,7 +67,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  * @author Ralgith
  */
 public class EditPersonnelInjuriesDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(EditPersonnelInjuriesDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(EditPersonnelInjuriesDialog.class);
 
     private final JFrame frame;
     private final Campaign campaign;
@@ -103,22 +103,22 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         setTitle(resourceMap.getString("Form.title") + " " + person.getFullName());
         getContentPane().setLayout(new BorderLayout());
 
-        JPanel panBtns = new JPanel(new GridLayout(1, 0));
+        JPanel panButtons = new JPanel(new GridLayout(1, 0));
         btnAdd.setText(resourceMap.getString("btnAdd.text"));
         btnAdd.setName("btnAdd");
         btnAdd.addActionListener(evt -> addEntry());
-        panBtns.add(btnAdd);
+        panButtons.add(btnAdd);
         btnEdit.setText(resourceMap.getString("btnEdit.text"));
         btnEdit.setName("btnEdit");
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(evt -> editEntry());
-        panBtns.add(btnEdit);
+        panButtons.add(btnEdit);
         btnDelete.setText(resourceMap.getString("btnDelete.text"));
         btnDelete.setName("btnDelete");
         btnDelete.setEnabled(false);
         btnDelete.addActionListener(evt -> deleteEntry());
-        panBtns.add(btnDelete);
-        getContentPane().add(panBtns, BorderLayout.PAGE_START);
+        panButtons.add(btnDelete);
+        getContentPane().add(panButtons, BorderLayout.PAGE_START);
 
         injuriesTable = new JTable(injuryModel);
         injuriesTable.setName("injuriesTable");
@@ -158,7 +158,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -173,11 +173,13 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     }
 
     private void addEntry() {
-        EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, new Injury(campaign.getLocalDate()));
-        eied.setAlwaysOnTop(true);
-        eied.setVisible(true);
-        if (null != eied.getEntry()) {
-            person.addInjury(eied.getEntry());
+        EditInjuryEntryDialog editInjuryEntryDialog = new EditInjuryEntryDialog(frame,
+              true,
+              new Injury(campaign.getLocalDate()));
+        editInjuryEntryDialog.setAlwaysOnTop(true);
+        editInjuryEntryDialog.setVisible(true);
+        if (null != editInjuryEntryDialog.getEntry()) {
+            person.addInjury(editInjuryEntryDialog.getEntry());
         }
         refreshTable();
     }
@@ -185,9 +187,9 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     private void editEntry() {
         Injury entry = injuryModel.getEntryAt(injuriesTable.getSelectedRow());
         if (null != entry) {
-            EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, entry);
-            eied.setAlwaysOnTop(true);
-            eied.setVisible(true);
+            EditInjuryEntryDialog editInjuryEntryDialog = new EditInjuryEntryDialog(frame, true, entry);
+            editInjuryEntryDialog.setAlwaysOnTop(true);
+            editInjuryEntryDialog.setVisible(true);
             refreshTable();
         }
     }
@@ -225,7 +227,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         public final static int COL_FLUFF = 3;
         public final static int COL_HITS = 4;
         public final static int COL_PERMANENT = 5;
-        public final static int COL_WORKEDON = 6;
+        public final static int COL_WORK_DONE = 6;
         public final static int COL_EXTENDED = 7;
         public final static int N_COL = 8;
 
@@ -252,7 +254,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
                 case COL_FLUFF -> "Fluff Message";
                 case COL_HITS -> "Number of Hits";
                 case COL_PERMANENT -> "Is Permanent";
-                case COL_WORKEDON -> "Doctor Has Worked On";
+                case COL_WORK_DONE -> "Doctor Has Worked On";
                 case COL_EXTENDED -> "Was Extended Time";
                 default -> "?";
             };
@@ -274,7 +276,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
                 case COL_FLUFF -> entry.getFluff();
                 case COL_HITS -> Integer.toString(entry.getHits());
                 case COL_PERMANENT -> Boolean.toString(entry.isPermanent());
-                case COL_WORKEDON -> Boolean.toString(entry.isWorkedOn());
+                case COL_WORK_DONE -> Boolean.toString(entry.isWorkedOn());
                 case COL_EXTENDED -> Boolean.toString(entry.getExtended());
                 default -> "?";
             };
@@ -291,7 +293,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
 
         public int getColumnWidth(int c) {
             return switch (c) {
-                case COL_DAYS, COL_HITS, COL_PERMANENT, COL_WORKEDON, COL_EXTENDED -> 110;
+                case COL_DAYS, COL_HITS, COL_PERMANENT, COL_WORK_DONE, COL_EXTENDED -> 110;
                 case COL_TYPE -> 150;
                 case COL_FLUFF, COL_LOCATION -> 200;
                 default -> 50;
@@ -300,7 +302,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
 
         public int getAlignment(int col) {
             return switch (col) {
-                case COL_DAYS, COL_HITS, COL_PERMANENT, COL_WORKEDON, COL_EXTENDED -> SwingConstants.CENTER;
+                case COL_DAYS, COL_HITS, COL_PERMANENT, COL_WORK_DONE, COL_EXTENDED -> SwingConstants.CENTER;
                 default -> SwingConstants.LEFT;
             };
         }

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.enums;
 
@@ -37,16 +42,24 @@ import mekhq.campaign.universe.generators.battleMekWeightClassGenerators.*;
  */
 public enum BattleMekWeightClassGenerationMethod {
     //region Enum Declarations
-    AGAINST_THE_BOT("BattleMekWeightClassGenerationMethod.AGAINST_THE_BOT.text", "BattleMekWeightClassGenerationMethod.AGAINST_THE_BOT.toolTipText"),
-    WINDCHILD("BattleMekWeightClassGenerationMethod.WINDCHILD.text", "BattleMekWeightClassGenerationMethod.WINDCHILD.toolTipText"),
-    WINDCHILD_LIGHT("BattleMekWeightClassGenerationMethod.WINDCHILD_LIGHT.text", "BattleMekWeightClassGenerationMethod.WINDCHILD_LIGHT.toolTipText"),
-    WINDCHILD_MEDIUM("BattleMekWeightClassGenerationMethod.WINDCHILD_MEDIUM.text", "BattleMekWeightClassGenerationMethod.WINDCHILD_MEDIUM.toolTipText"),
-    WINDCHILD_HEAVY("BattleMekWeightClassGenerationMethod.WINDCHILD_HEAVY.text", "BattleMekWeightClassGenerationMethod.WINDCHILD_HEAVY.toolTipText"),
-    WINDCHILD_ASSAULT("BattleMekWeightClassGenerationMethod.WINDCHILD_ASSAULT.text", "BattleMekWeightClassGenerationMethod.WINDCHILD_ASSAULT.toolTipText"),
+    AGAINST_THE_BOT("BattleMekWeightClassGenerationMethod.AGAINST_THE_BOT.text",
+          "BattleMekWeightClassGenerationMethod.AGAINST_THE_BOT.toolTipText"),
+    WINDCHILD("BattleMekWeightClassGenerationMethod.WINDCHILD.text",
+          "BattleMekWeightClassGenerationMethod.WINDCHILD.toolTipText"),
+    WINDCHILD_LIGHT("BattleMekWeightClassGenerationMethod.WINDCHILD_LIGHT.text",
+          "BattleMekWeightClassGenerationMethod.WINDCHILD_LIGHT.toolTipText"),
+    WINDCHILD_MEDIUM("BattleMekWeightClassGenerationMethod.WINDCHILD_MEDIUM.text",
+          "BattleMekWeightClassGenerationMethod.WINDCHILD_MEDIUM.toolTipText"),
+    WINDCHILD_HEAVY("BattleMekWeightClassGenerationMethod.WINDCHILD_HEAVY.text",
+          "BattleMekWeightClassGenerationMethod.WINDCHILD_HEAVY.toolTipText"),
+    WINDCHILD_ASSAULT("BattleMekWeightClassGenerationMethod.WINDCHILD_ASSAULT.text",
+          "BattleMekWeightClassGenerationMethod.WINDCHILD_ASSAULT.toolTipText"),
     LIGHT("BattleMekWeightClassGenerationMethod.LIGHT.text", "BattleMekWeightClassGenerationMethod.LIGHT.toolTipText"),
-    MEDIUM("BattleMekWeightClassGenerationMethod.MEDIUM.text", "BattleMekWeightClassGenerationMethod.MEDIUM.toolTipText"),
+    MEDIUM("BattleMekWeightClassGenerationMethod.MEDIUM.text",
+          "BattleMekWeightClassGenerationMethod.MEDIUM.toolTipText"),
     HEAVY("BattleMekWeightClassGenerationMethod.HEAVY.text", "BattleMekWeightClassGenerationMethod.HEAVY.toolTipText"),
-    ASSAULT("BattleMekWeightClassGenerationMethod.ASSAULT.text", "BattleMekWeightClassGenerationMethod.ASSAULT.toolTipText");
+    ASSAULT("BattleMekWeightClassGenerationMethod.ASSAULT.text",
+          "BattleMekWeightClassGenerationMethod.ASSAULT.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -57,7 +70,7 @@ public enum BattleMekWeightClassGenerationMethod {
     //region Constructors
     BattleMekWeightClassGenerationMethod(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -112,29 +125,18 @@ public enum BattleMekWeightClassGenerationMethod {
     //endregion Boolean Comparison Methods
 
     public AbstractBattleMekWeightClassGenerator getGenerator() {
-        switch (this) {
-            case AGAINST_THE_BOT:
-                return new AtBBattleMekWeightClassGenerator();
-            case WINDCHILD_LIGHT:
-                return new WindchildLightBattleMekWeightClassGenerator();
-            case WINDCHILD_MEDIUM:
-                return new WindchildMediumBattleMekWeightClassGenerator();
-            case WINDCHILD_HEAVY:
-                return new WindchildHeavyBattleMekWeightClassGenerator();
-            case WINDCHILD_ASSAULT:
-                return new WindchildAssaultBattleMekWeightClassGenerator();
-            case LIGHT:
-                return new LightBattleMekWeightClassGenerator();
-            case MEDIUM:
-                return new MediumBattleMekWeightClassGenerator();
-            case HEAVY:
-                return new HeavyBattleMekWeightClassGenerator();
-            case ASSAULT:
-                return new AssaultBattleMekWeightClassGenerator();
-            case WINDCHILD:
-            default:
-                return new WindchildBattleMekWeightClassGenerator();
-        }
+        return switch (this) {
+            case AGAINST_THE_BOT -> new AtBBattleMekWeightClassGenerator();
+            case WINDCHILD_LIGHT -> new WindchildLightBattleMekWeightClassGenerator();
+            case WINDCHILD_MEDIUM -> new WindchildMediumBattleMekWeightClassGenerator();
+            case WINDCHILD_HEAVY -> new WindchildHeavyBattleMekWeightClassGenerator();
+            case WINDCHILD_ASSAULT -> new WindchildAssaultBattleMekWeightClassGenerator();
+            case LIGHT -> new LightBattleMekWeightClassGenerator();
+            case MEDIUM -> new MediumBattleMekWeightClassGenerator();
+            case HEAVY -> new HeavyBattleMekWeightClassGenerator();
+            case ASSAULT -> new AssaultBattleMekWeightClassGenerator();
+            default -> new WindchildBattleMekWeightClassGenerator();
+        };
     }
 
     @Override

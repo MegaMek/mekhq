@@ -25,44 +25,53 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.*;
+import megamek.common.CriticalSlot;
+import megamek.common.SimpleTechLevel;
+import megamek.common.TechAdvancement;
+import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.units.Aero;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
+import megamek.common.units.Mek;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.Warship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingSpacecraftEngine;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Aero;
-import megamek.common.CriticalSlot;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.Mek;
-import megamek.common.SimpleTechLevel;
-import megamek.common.SmallCraft;
-import megamek.common.TechAdvancement;
-import megamek.common.TechConstants;
-import megamek.common.Warship;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.skills.SkillType;
-
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SpacecraftEngine extends Part {
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
-            .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(TechRating.D)
-            .setAvailability(AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.C)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    public static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
+                                                                 .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
+                                                                 .setTechRating(TechRating.D)
+                                                                 .setAvailability(AvailabilityValue.C,
+                                                                       AvailabilityValue.D,
+                                                                       AvailabilityValue.C,
+                                                                       AvailabilityValue.C)
+                                                                 .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     double engineTonnage;
     boolean clan;
@@ -71,9 +80,9 @@ public class SpacecraftEngine extends Part {
         this(0, 0, null, false);
     }
 
-    public SpacecraftEngine(int tonnage, double etonnage, Campaign c, boolean clan) {
+    public SpacecraftEngine(int tonnage, double eTonnage, Campaign c, boolean clan) {
         super(tonnage, c);
-        this.engineTonnage = etonnage;
+        this.engineTonnage = eTonnage;
         this.clan = clan;
         this.name = "Spacecraft Engine";
     }
@@ -96,15 +105,18 @@ public class SpacecraftEngine extends Part {
             if (unit.getEntity() instanceof SmallCraft) {
                 double moveFactor = unit.getEntity().getWeight() * unit.getEntity().getOriginalWalkMP();
                 if (clan) {
-                    engineTonnage = Math.round(moveFactor * 0.061 * 2)/2f;
+                    engineTonnage = Math.round(moveFactor * 0.061 * 2) / 2f;
                 } else {
-                    engineTonnage = Math.round(moveFactor * 0.065 * 2)/2f;
+                    engineTonnage = Math.round(moveFactor * 0.065 * 2) / 2f;
                 }
             } else if (unit.getEntity() instanceof Jumpship) {
                 if (unit.getEntity() instanceof Warship) {
-                    engineTonnage = Math.round(unit.getEntity().getWeight() * 0.06 *  unit.getEntity().getOriginalWalkMP() * 2)/2f;
+                    engineTonnage = Math.round(unit.getEntity().getWeight() *
+                                                     0.06 *
+                                                     unit.getEntity().getOriginalWalkMP() *
+                                                     2) / 2f;
                 } else {
-                    engineTonnage = Math.round(unit.getEntity().getWeight() * 0.012 * 2)/2f;
+                    engineTonnage = Math.round(unit.getEntity().getWeight() * 0.012 * 2) / 2f;
                 }
             }
         }
@@ -117,13 +129,13 @@ public class SpacecraftEngine extends Part {
         if (unit != null) {
             if (unit.getEntity() instanceof Warship) {
                 return Money.of((500 * unit.getEntity().getOriginalWalkMP() * (unit.getEntity().getWeight() / 100))
-                        + (engineTonnage * 1000)
-                        + 1000);
+                                      + (engineTonnage * 1000)
+                                      + 1000);
             } else if (unit.getEntity() instanceof Jumpship) {
                 // If we're a space station or jumpship, need the station keeping thrust, which is always 0.2
                 return Money.of((500 * 0.2 * (unit.getEntity().getWeight() / 100))
-                            + (engineTonnage * 1000)
-                            + 1000);
+                                      + (engineTonnage * 1000)
+                                      + 1000);
             }
         }
         // Small craft and dropships, TM p283
@@ -133,8 +145,8 @@ public class SpacecraftEngine extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof SpacecraftEngine
-                && getName().equals(part.getName())
-                && getTonnage() == part.getTonnage();
+                     && getName().equals(part.getName())
+                     && getTonnage() == part.getTonnage();
     }
 
     @Override
@@ -196,13 +208,13 @@ public class SpacecraftEngine extends Part {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
         }
         setUnit(null);
         updateConditionFromEntity(false);
@@ -249,10 +261,10 @@ public class SpacecraftEngine extends Part {
             // Light Damage
             if (hits > 0 && hits < 3) {
                 time *= hits;
-            // Moderate damage
+                // Moderate damage
             } else if (hits > 2 && hits < 5) {
                 time *= (2 * hits);
-            // Heavy damage
+                // Heavy damage
             } else if (hits > 4) {
                 time *= (4 * hits);
             }
@@ -274,10 +286,10 @@ public class SpacecraftEngine extends Part {
             // Light Damage
             if (hits > 0 && hits < 3) {
                 return 1;
-            // Moderate damage
+                // Moderate damage
             } else if (hits > 2 && hits < 5) {
                 return 2;
-            // Heavy damage
+                // Heavy damage
             } else if (hits > 4) {
                 return 3;
             }
@@ -309,11 +321,6 @@ public class SpacecraftEngine extends Part {
             }
         }
         return null;
-    }
-
-    @Override
-    public boolean isMountedOnDestroyedLocation() {
-        return false;
     }
 
     @Override

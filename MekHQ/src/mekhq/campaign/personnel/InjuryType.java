@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel;
 
@@ -49,7 +54,7 @@ import mekhq.campaign.personnel.enums.InjuryLevel;
 @XmlJavaTypeAdapter(value = XMLAdapter.class)
 public class InjuryType {
     /** Modifier tag to use for injuries */
-    public static final String MODTAG_INJURY = "injury";
+    public static final String MOD_TAG_INJURY = "injury";
 
     // Registry methods
     private static final Map<String, InjuryType> REGISTRY = new HashMap<>();

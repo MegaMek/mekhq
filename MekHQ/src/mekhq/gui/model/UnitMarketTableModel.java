@@ -25,35 +25,40 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
-import java.awt.*;
+import java.awt.Component;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
-import javax.swing.*;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.market.unitMarket.UnitMarketOffer;
 
 /**
  * Model for displaying offers on the UnitMarket
- *
+ * <p>
  * Code borrowed heavily from PersonnelTableModel
  *
  * @author Neoancient
  */
-public class UnitMarketTableModel extends DataTableModel {
+public class UnitMarketTableModel extends DataTableModel<UnitMarketOffer> {
     //region Variable Declarations
     public static final int COL_MARKET = 0;
-    public static final int COL_UNITTYPE = 1;
-    public static final int COL_WEIGHTCLASS = 2;
+    public static final int COL_UNIT_TYPE = 1;
+    public static final int COL_WEIGHT_CLASS = 2;
     public static final int COL_UNIT = 3;
     public static final int COL_PRICE = 4;
     public static final int COL_PERCENT = 5;
@@ -61,7 +66,7 @@ public class UnitMarketTableModel extends DataTableModel {
     public static final int COL_NUM = 7;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
@@ -72,40 +77,26 @@ public class UnitMarketTableModel extends DataTableModel {
     //endregion Constructors
 
     public int getColumnWidth(final int column) {
-        switch (column) {
-            case COL_MARKET:
-            case COL_PRICE:
-                return 90;
-            case COL_UNITTYPE:
-                return 15;
-            case COL_UNIT:
-                return 175;
-            case COL_WEIGHTCLASS:
-                return 50;
-            default:
-                return 20;
-        }
+        return switch (column) {
+            case COL_MARKET, COL_PRICE -> 90;
+            case COL_UNIT_TYPE -> 15;
+            case COL_UNIT -> 175;
+            case COL_WEIGHT_CLASS -> 50;
+            default -> 20;
+        };
     }
 
     public int getAlignment(final int column) {
-        switch (column) {
-            case COL_PRICE:
-            case COL_PERCENT:
-            case COL_DELIVERY:
-                return SwingConstants.RIGHT;
-            case COL_MARKET:
-            case COL_UNITTYPE:
-            case COL_WEIGHTCLASS:
-            case COL_UNIT:
-                return SwingConstants.LEFT;
-            default:
-                return SwingConstants.CENTER;
-        }
+        return switch (column) {
+            case COL_PRICE, COL_PERCENT, COL_DELIVERY -> SwingConstants.RIGHT;
+            case COL_MARKET, COL_UNIT_TYPE, COL_WEIGHT_CLASS, COL_UNIT -> SwingConstants.LEFT;
+            default -> SwingConstants.CENTER;
+        };
     }
 
     public Optional<UnitMarketOffer> getOffer(final int row) {
         return ((row >= 0) && (row < getData().size())) ? Optional.of((UnitMarketOffer) getData().get(row))
-                : Optional.empty();
+                     : Optional.empty();
     }
 
     @Override
@@ -114,25 +105,17 @@ public class UnitMarketTableModel extends DataTableModel {
     }
 
     private Object getValueFor(final UnitMarketOffer offer, final int column) {
-        switch (column) {
-            case COL_MARKET:
-                return offer.getMarketType();
-            case COL_UNITTYPE:
-                return UnitType.getTypeName(offer.getUnitType());
-            case COL_WEIGHTCLASS:
-                return EntityWeightClass.getClassName(offer.getUnit().getWeightClass(),
-                        offer.getUnit().getUnitType(), offer.getUnit().isSupport());
-            case COL_UNIT:
-                return offer.getUnit().getName();
-            case COL_PRICE:
-                return offer.getPrice().toAmountAndSymbolString();
-            case COL_PERCENT:
-                return offer.getPercent() + "%";
-            case COL_DELIVERY:
-                return offer.getTransitDuration();
-            default:
-                return "?";
-        }
+        return switch (column) {
+            case COL_MARKET -> offer.getMarketType();
+            case COL_UNIT_TYPE -> UnitType.getTypeName(offer.getUnitType());
+            case COL_WEIGHT_CLASS -> EntityWeightClass.getClassName(offer.getUnit().getWeightClass(),
+                  offer.getUnit().getUnitType(), offer.getUnit().isSupport());
+            case COL_UNIT -> offer.getUnit().getName();
+            case COL_PRICE -> offer.getPrice().toAmountAndSymbolString();
+            case COL_PERCENT -> offer.getPercent() + "%";
+            case COL_DELIVERY -> offer.getTransitDuration();
+            default -> "?";
+        };
     }
 
     public TableCellRenderer getRenderer() {
@@ -142,8 +125,8 @@ public class UnitMarketTableModel extends DataTableModel {
     public class Renderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(final JTable table, final Object value,
-                                                       final boolean isSelected, final boolean hasFocus,
-                                                       final int row, final int column) {
+              final boolean isSelected, final boolean hasFocus,
+              final int row, final int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setHorizontalAlignment(getAlignment(table.convertColumnIndexToModel(column)));
             return this;

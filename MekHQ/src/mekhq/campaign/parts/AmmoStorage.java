@@ -36,11 +36,12 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import megamek.common.AmmoType;
-import megamek.common.ITechnology;
-import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.equipment.AmmoType;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -54,14 +55,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This will be a special type of part that will only exist as spares
- * It will determine the amount of ammo of a particular type that
- * is available
+ * This will be a special type of part that will only exist as spares It will determine the amount of ammo of a
+ * particular type that is available
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
-    private static final MMLogger logger = MMLogger.create(AmmoStorage.class);
+    private static final MMLogger LOGGER = MMLogger.create(AmmoStorage.class);
 
     protected int shots;
 
@@ -96,7 +96,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public Money getStickerPrice() {
-        // CAW: previously we went thru AmmoType::getCost, which
+        // CAW: previously we went through AmmoType::getCost, which
         // for AmmoType was the default implementation
         // that simply returned 'cost'. Avoid the hassle for
         // now and just return the raw cost as our sticker price.
@@ -121,7 +121,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         }
 
         return adjustCostsForCampaignOptions(
-                getStickerPrice().multipliedBy(shots).dividedBy(getType().getShots()));
+              getStickerPrice().multipliedBy(shots).dividedBy(getType().getShots()));
     }
 
     public int getShots() {
@@ -136,28 +136,32 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public boolean isSamePartType(@Nullable Part part) {
         return (getClass() == part.getClass())
-                && Objects.equals(getType(), ((AmmoStorage) part).getType());
+                     && Objects.equals(getType(), ((AmmoStorage) part).getType());
+    }
+
+    @Override
+    public int getTotalQuantity() {
+        return getQuantity() * getShots();
     }
 
     /**
-     * Gets a value indicating whether or an {@code AmmoType} is
-     * the same as this instance's ammo.
+     * Gets a value indicating whether or an {@code AmmoType} is the same as this instance's ammo.
      *
      * @param otherAmmoType The other {@code AmmoType}.
      */
     public boolean isSameAmmoType(AmmoType otherAmmoType) {
         return getType().equalsAmmoTypeOnly(otherAmmoType)
-                && (getType().getMunitionType().equals(otherAmmoType.getMunitionType()))
-                && (getType().getRackSize() == otherAmmoType.getRackSize());
+                     && (getType().getMunitionType().equals(otherAmmoType.getMunitionType()))
+                     && (getType().getRackSize() == otherAmmoType.getRackSize());
     }
 
     /**
-     * Gets a value indicating whether or not an {@code AmmoType}
-     * is compatible with this instance's ammo.
+     * Gets a value indicating whether an {@code AmmoType} is compatible with this instance's ammo.
      *
      * @param otherAmmoType The other {@code AmmoType}.
-     * @return False if the ammo does not support "compatibility" or is not compatible, true if the ammo type
-     * supports compatibility and is compatible
+     *
+     * @return False if the ammo does not support "compatibility" or is not compatible, true if the ammo type supports
+     *       compatibility and is compatible
      */
     public boolean isCompatibleAmmo(AmmoType otherAmmoType) {
         return getType().isCompatibleWith(otherAmmoType);
@@ -192,7 +196,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
                     shots = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception ex) {
-                logger.error("", ex);
+                LOGGER.error("", ex);
             }
         }
 
@@ -252,7 +256,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         toReturn += ">";
         toReturn += "<b>Reload " + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
-        toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+        toReturn += getTimeLeft() + " minutes" + scheduled;
         toReturn += "</font></html>";
         return toReturn;
     }
@@ -273,15 +277,15 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public String find(int transitDays) {
+    public String find(int transitDays, double valueMultiplier) {
         AmmoStorage newPart = getNewPart();
         newPart.setBrandNew(true);
-        if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
+        if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays)) {
             return "<font color='" + ReportingUtilities.getPositiveColor()
-                    + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
+                         + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
             return "<font color='" + ReportingUtilities.getNegativeColor()
-                    + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
+                         + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
 
@@ -293,7 +297,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public String failToFind() {
         return "<font color='" + ReportingUtilities.getNegativeColor()
-                + "'><b> part not found</b>.</font>";
+                     + "'><b> part not found</b>.</font>";
     }
 
     @Override
@@ -356,18 +360,15 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     public AmmoStorage getNewPart() {
-        if (getType().getKgPerShot() > 0) {
-            return new AmmoStorage(1, getType(), (int) Math.ceil(1000 / getType().getKgPerShot()), campaign);
-        }
-        return new AmmoStorage(1, getType(), getType().getShots(), campaign);
+        return new AmmoStorage(1, getType(), getShotsPerTon(), campaign);
     }
 
     @Override
     public String getQuantityName(int quan) {
         int totalShots = quan * getShots();
-        String report = "" + totalShots + " shots of " + getName();
+        String report = totalShots + " shots of " + getName();
         if (totalShots == 1) {
-            report = "" + totalShots + " shot of " + getName();
+            report = totalShots + " shot of " + getName();
         }
         return report;
     }
@@ -385,22 +386,28 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public boolean needsMaintenance() {
-        return true;
-    }
-
-    @Override
     public boolean isPriceAdjustedForAmount() {
         return true;
     }
 
     @Override
-    public boolean isIntroducedBy(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isIntroducedBy(int year, boolean clan, Faction techFaction) {
         return getIntroductionDate(clan, techFaction) <= year;
     }
 
     @Override
-    public boolean isExtinctIn(int year, boolean clan, ITechnology.Faction techFaction) {
+    public boolean isExtinctIn(int year, boolean clan, Faction techFaction) {
         return isExtinct(year, clan, techFaction);
+    }
+
+    protected int getShotsPerTon() {
+        AmmoType ammoType = getType();
+
+        if (ammoType.hasCustomKgPerShot()) {
+            return (int) Math.floor(1000.0 / ammoType.getKgPerShot());
+        }
+
+        // if not listed by kg per shot, we assume this is a single ton increment
+        return ammoType.getShots();
     }
 }

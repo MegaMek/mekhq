@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.sorter;
 
@@ -49,7 +54,7 @@ import megamek.logging.MMLogger;
  * @since 0.50.05
  */
 public class WarehouseStatusSorter implements Comparator<String> {
-    private static final MMLogger logger = MMLogger.create(WarehouseStatusSorter.class);
+    private static final MMLogger LOGGER = MMLogger.create(WarehouseStatusSorter.class);
 
     /**
      * Regular expression pattern to locate the number of "days" in a string.
@@ -127,7 +132,7 @@ public class WarehouseStatusSorter implements Comparator<String> {
 
         // This is a fallback value, in the event the Regex picks up that the String contains numbers, but for some
         // reason can't parse them. I don't expect this to ever be used, but if it is, we'll want to address the error.
-        logger.error("Matcher failed to extract Integer from String: {}", string);
+        LOGGER.error("Matcher failed to extract Integer from String: {}", string);
 
         return Integer.MAX_VALUE;
     }

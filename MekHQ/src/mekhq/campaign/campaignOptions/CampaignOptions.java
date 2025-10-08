@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -56,7 +56,7 @@ import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.campaign.RandomOriginOptions;
-import mekhq.campaign.autoresolve.AutoResolveMethod;
+import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -79,7 +79,7 @@ import org.w3c.dom.Node;
  * @author natit
  */
 public class CampaignOptions {
-    private static final MMLogger logger = MMLogger.create(CampaignOptions.class);
+    private static final MMLogger LOGGER = MMLogger.create(CampaignOptions.class);
     private static final ClientPreferences CLIENT_PREFERENCES = PreferenceManager.getClientPreferences();
     // region Magic Numbers
     public static final int TECH_INTRO = 0;
@@ -131,6 +131,7 @@ public class CampaignOptions {
     private boolean assignedTechFirst;
     private boolean resetToFirstTech;
     private boolean techsUseAdministration;
+    private boolean useUsefulAsTechs;
     private boolean useQuirks;
     private boolean useAeroSystemHits;
     private boolean destroyByMargin;
@@ -166,6 +167,7 @@ public class CampaignOptions {
     // Acquisition
     private int waitingPeriod;
     private String acquisitionSkill;
+    private boolean useFunctionalAppraisal;
     private ProcurementPersonnelPick acquisitionPersonnelCategory;
     private int clanAcquisitionPenalty;
     private int isAcquisitionPenalty;
@@ -195,7 +197,8 @@ public class CampaignOptions {
     private boolean noClanPartsFromIS;
     private int penaltyClanPartsFromIS;
     private boolean planetAcquisitionVerbose;
-    private final EnumMap<PlanetarySophistication, Integer> planetTechAcquisitionBonus = new EnumMap<>(PlanetarySophistication.class);
+    private final EnumMap<PlanetarySophistication, Integer> planetTechAcquisitionBonus = new EnumMap<>(
+          PlanetarySophistication.class);
     private final EnumMap<PlanetaryRating, Integer> planetIndustryAcquisitionBonus = new EnumMap<>(PlanetaryRating.class);
     private final EnumMap<PlanetaryRating, Integer> planetOutputAcquisitionBonus = new EnumMap<>(PlanetaryRating.class);
 
@@ -212,7 +215,7 @@ public class CampaignOptions {
     private boolean variableTechLevel;
     private boolean factionIntroDate;
     private boolean useAmmoByType; // Unofficial
-    // endregion Tech Limits Tab
+    // endregion Techlimits Tab
 
     // region Personnel Tab
     // General Personnel
@@ -237,6 +240,7 @@ public class CampaignOptions {
     private boolean displayScenarioLog;
     private boolean displayKillRecord;
     private boolean displayMedicalRecord;
+    private boolean displayPatientRecord;
     private boolean displayAssignmentRecord;
     private boolean displayPerformanceRecord;
 
@@ -262,9 +266,11 @@ public class CampaignOptions {
     private boolean tougherHealing;
     private int maximumPatients;
     private boolean doctorsUseAdministration;
+    private boolean useUsefulMedics;
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
+    private boolean useFunctionalEscapeArtist;
 
     // Dependent
     private boolean useRandomDependentAddition;
@@ -471,7 +477,7 @@ public class CampaignOptions {
     private boolean payForFood;
     private boolean payForHousing;
     private boolean useLoanLimits;
-    private boolean usePercentageMaint; // Unofficial
+    private boolean usePercentageMaintenance; // Unofficial
     private boolean infantryDontCount; // Unofficial
     private boolean usePeacetimeCost;
     private boolean useExtendedPartsModifier;
@@ -561,11 +567,14 @@ public class CampaignOptions {
     private PersonnelMarketStyle personnelMarketStyle;
     private boolean usePersonnelHireHiringHallOnly;
     private boolean personnelMarketReportRefresh;
-    @Deprecated(since = "0.50.06", forRemoval = false)
+
+    @Deprecated(since = "0.50.06")
     private String personnelMarketName;
-    @Deprecated(since = "0.50.06", forRemoval = false)
+
+    @Deprecated(since = "0.50.06")
     private Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets;
-    @Deprecated(since = "0.50.06", forRemoval = false)
+
+    @Deprecated(since = "0.50.06")
     private double personnelMarketDylansWeight;
 
     // Unit Market
@@ -586,12 +595,6 @@ public class CampaignOptions {
     private int contractMaxSalvagePercentage;
     private int dropShipBonusPercentage;
     // endregion Markets Tab
-
-    // region RATs Tab
-    private boolean useStaticRATs;
-    private String[] rats;
-    private boolean ignoreRATEra;
-    // endregion RATs Tab
 
     // region Against the Bot Tab
     private boolean useAtB;
@@ -617,7 +620,7 @@ public class CampaignOptions {
     private int opForLanceTypeMixed;
     private int opForLanceTypeVehicles;
     private boolean opForUsesVTOLs;
-    private boolean allowOpForAeros;
+    private boolean allowOpForAerospace;
     private int opForAeroChance;
     private boolean allowOpForLocalUnits;
     private int opForLocalUnitChance;
@@ -640,12 +643,13 @@ public class CampaignOptions {
     private boolean autoResolveVictoryChanceEnabled;
     private int autoResolveNumberOfScenarios;
     private boolean autoResolveExperimentalPacarGuiEnabled;
-    private boolean autoGenerateOpForCallsigns;
+    private boolean autoGenerateOpForCallSigns;
     private SkillLevel minimumCallsignSkillLevel;
     // endregion Against the Bot Tab
 
     // start region Faction Standing
     private boolean trackFactionStanding;
+    private boolean trackClimateRegardChanges;
     private boolean useFactionStandingNegotiation;
     private boolean useFactionStandingResupply;
     private boolean useFactionStandingCommandCircuit;
@@ -679,6 +683,7 @@ public class CampaignOptions {
         assignedTechFirst = false;
         resetToFirstTech = false;
         techsUseAdministration = false;
+        useUsefulAsTechs = false;
         useQuirks = false;
         useAeroSystemHits = false;
         destroyByMargin = false;
@@ -717,6 +722,7 @@ public class CampaignOptions {
         // Acquisition
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
+        useFunctionalAppraisal = false;
         acquisitionPersonnelCategory = SUPPORT;
         clanAcquisitionPenalty = 0;
         isAcquisitionPenalty = 0;
@@ -777,7 +783,7 @@ public class CampaignOptions {
         variableTechLevel = false;
         factionIntroDate = false;
         useAmmoByType = false;
-        // endregion Tech Limits Tab
+        // endregion Techlimits Tab
 
         // region Personnel Tab
         // General Personnel
@@ -802,6 +808,7 @@ public class CampaignOptions {
         setDisplayScenarioLog(false);
         setDisplayKillRecord(false);
         setDisplayMedicalRecord(false);
+        displayPatientRecord = false;
         setRewardComingOfAgeAbilities(false);
         setRewardComingOfAgeRPSkills(false);
 
@@ -827,9 +834,11 @@ public class CampaignOptions {
         setTougherHealing(false);
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
+        useUsefulMedics = false;
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
+        useFunctionalEscapeArtist = false;
 
         // Dependent
         setUseRandomDependentAddition(false);
@@ -1098,7 +1107,7 @@ public class CampaignOptions {
         payForFood = false;
         payForHousing = false;
         useLoanLimits = false;
-        usePercentageMaint = false;
+        usePercentageMaintenance = false;
         infantryDontCount = false;
         usePeacetimeCost = false;
         useExtendedPartsModifier = false;
@@ -1225,12 +1234,6 @@ public class CampaignOptions {
         setDropShipBonusPercentage(0);
         // endregion Markets Tab
 
-        // region RATs Tab
-        setUseStaticRATs(false);
-        setRATs("Xotl", "Total Warfare");
-        setIgnoreRATEra(false);
-        // endregion RATs Tab
-
         // region Against the Bot Tab
         useAtB = false;
         useStratCon = false;
@@ -1263,7 +1266,7 @@ public class CampaignOptions {
         setOpForLanceTypeMixed(2);
         setOpForLanceTypeVehicles(3);
         setOpForUsesVTOLs(true);
-        setAllowOpForAeros(false);
+        setAllowOpForAerospace(false);
         setOpForAeroChance(5);
         setAllowOpForLocalUnits(false);
         setOpForLocalUnitChance(5);
@@ -1281,7 +1284,7 @@ public class CampaignOptions {
         setScenarioModMax(3);
         setScenarioModChance(25);
         setScenarioModBV(50);
-        autoGenerateOpForCallsigns = true;
+        autoGenerateOpForCallSigns = true;
         minimumCallsignSkillLevel = SkillLevel.VETERAN;
         useFactionStandingNegotiation = true;
         useFactionStandingResupply = true;
@@ -1706,6 +1709,14 @@ public class CampaignOptions {
         this.displayMedicalRecord = displayMedicalRecord;
     }
 
+    public boolean isDisplayPatientRecord() {
+        return displayPatientRecord;
+    }
+
+    public void setDisplayPatientRecord(final boolean displayPatientRecord) {
+        this.displayPatientRecord = displayPatientRecord;
+    }
+
     public boolean isDisplayAssignmentRecord() {
         return displayAssignmentRecord;
     }
@@ -1971,6 +1982,14 @@ public class CampaignOptions {
         this.doctorsUseAdministration = doctorsUseAdministration;
     }
 
+    public boolean isUseUsefulMedics() {
+        return useUsefulMedics;
+    }
+
+    public void setIsUseUsefulMedics(final boolean useUsefulMedics) {
+        this.useUsefulMedics = useUsefulMedics;
+    }
+
     // endregion Medical
 
     // region Prisoners
@@ -1980,6 +1999,14 @@ public class CampaignOptions {
 
     public void setPrisonerCaptureStyle(final PrisonerCaptureStyle prisonerCaptureStyle) {
         this.prisonerCaptureStyle = prisonerCaptureStyle;
+    }
+
+    public boolean isUseFunctionalEscapeArtist() {
+        return useFunctionalEscapeArtist;
+    }
+
+    public void setUseFunctionalEscapeArtist(final boolean useFunctionalEscapeArtist) {
+        this.useFunctionalEscapeArtist = useFunctionalEscapeArtist;
     }
     // endregion Prisoners
 
@@ -3422,12 +3449,12 @@ public class CampaignOptions {
         this.useLoanLimits = useLoanLimits;
     }
 
-    public boolean isUsePercentageMaint() {
-        return usePercentageMaint;
+    public boolean isUsePercentageMaintenance() {
+        return usePercentageMaintenance;
     }
 
-    public void setUsePercentageMaint(final boolean usePercentageMaint) {
-        this.usePercentageMaint = usePercentageMaint;
+    public void setUsePercentageMaintenance(final boolean usePercentageMaintenance) {
+        this.usePercentageMaintenance = usePercentageMaintenance;
     }
 
     public boolean isInfantryDontCount() {
@@ -3785,28 +3812,50 @@ public class CampaignOptions {
     // endregion Markets Tab
 
     // region RATs Tab
+
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean isUseStaticRATs() {
-        return useStaticRATs;
+        return false;
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setUseStaticRATs(final boolean useStaticRATs) {
-        this.useStaticRATs = useStaticRATs;
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public String[] getRATs() {
-        return rats;
+        return new String[0];
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setRATs(final String... rats) {
-        this.rats = rats;
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean isIgnoreRATEra() {
-        return ignoreRATEra;
+        return false;
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setIgnoreRATEra(final boolean ignore) {
-        this.ignoreRATEra = ignore;
     }
     // endregion RATs Tab
 
@@ -3857,6 +3906,14 @@ public class CampaignOptions {
      */
     public void setTechsUseAdministration(final boolean techsUseAdministration) {
         this.techsUseAdministration = techsUseAdministration;
+    }
+
+    public boolean isUseUsefulAsTechs() {
+        return useUsefulAsTechs;
+    }
+
+    public void setIsUseUsefulAsTechs(final boolean useUsefulAsTechs) {
+        this.useUsefulAsTechs = useUsefulAsTechs;
     }
 
     /**
@@ -4159,6 +4216,14 @@ public class CampaignOptions {
 
     public void setAcquisitionSkill(final String acquisitionSkill) {
         this.acquisitionSkill = acquisitionSkill;
+    }
+
+    public boolean isUseFunctionalAppraisal() {
+        return useFunctionalAppraisal;
+    }
+
+    public void setUseFunctionalAppraisal(final boolean useFunctionalAppraisal) {
+        this.useFunctionalAppraisal = useFunctionalAppraisal;
     }
 
     /**
@@ -4879,12 +4944,12 @@ public class CampaignOptions {
     public void setLimitLanceNumUnits(final boolean limitLanceNumUnits) {
     }
 
-    public boolean isAllowOpForAeros() {
-        return allowOpForAeros;
+    public boolean isAllowOpForAerospace() {
+        return allowOpForAerospace;
     }
 
-    public void setAllowOpForAeros(final boolean allowOpForAeros) {
-        this.allowOpForAeros = allowOpForAeros;
+    public void setAllowOpForAerospace(final boolean allowOpForAerospace) {
+        this.allowOpForAerospace = allowOpForAerospace;
     }
 
     public boolean isAllowOpForLocalUnits() {
@@ -4987,7 +5052,7 @@ public class CampaignOptions {
             try {
                 weights[i] = Integer.parseInt(values[i]);
             } catch (Exception ex) {
-                logger.error(ex, "Unknown Exception: migrateMarriageSurnameWeights47");
+                LOGGER.error(ex, "Unknown Exception: migrateMarriageSurnameWeights47");
                 weights[i] = 0;
             }
         }
@@ -5181,8 +5246,8 @@ public class CampaignOptions {
     /**
      * Determines if faction standing batchall restriction is enabled.
      *
-     * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingBatchallRestrictionsSafe()} as
-     * that also verifies that Faction Standing is enabled.</p>
+     * <p><b>Usage:</b> for most use cases you will want to use {@link #isUseFactionStandingBatchallRestrictionsSafe()}
+     * as that also verifies that Faction Standing is enabled.</p>
      *
      * @return {@code true} if faction standing batchall restriction is enabled, {@code false} otherwise.
      */
@@ -5194,8 +5259,8 @@ public class CampaignOptions {
      * Checks whether tracking faction standing is enabled and if the use of faction standing batchall restrictions are
      * active.
      *
-     * @return {@code true} if both faction standing tracking and faction standing batchall restrictions
-     *         usage are enabled; {@code false} otherwise.
+     * @return {@code true} if both faction standing tracking and faction standing batchall restrictions usage are
+     *       enabled; {@code false} otherwise.
      */
     public boolean isUseFactionStandingBatchallRestrictionsSafe() {
         return trackFactionStanding && useFactionStandingBatchallRestrictions;
@@ -5221,8 +5286,8 @@ public class CampaignOptions {
      * Checks whether tracking faction standing is enabled and if the use of faction standing recruitment modifiers is
      * active.
      *
-     * @return {@code true} if both faction standing tracking and faction standing recruitment modifier
-     *         usage are enabled; {@code false} otherwise.
+     * @return {@code true} if both faction standing tracking and faction standing recruitment modifier usage are
+     *       enabled; {@code false} otherwise.
      */
     public boolean isUseFactionStandingRecruitmentSafe() {
         return trackFactionStanding && useFactionStandingRecruitment;
@@ -5248,8 +5313,8 @@ public class CampaignOptions {
      * Checks whether tracking faction standing is enabled and if the use of faction standing barrack cost modifiers is
      * active.
      *
-     * @return {@code true} if both faction standing tracking and faction standing barrack cost modifier
-     *         usage are enabled; {@code false} otherwise.
+     * @return {@code true} if both faction standing tracking and faction standing barrack cost modifier usage are
+     *       enabled; {@code false} otherwise.
      */
     public boolean isUseFactionStandingBarracksCostsSafe() {
         return trackFactionStanding && useFactionStandingBarracksCosts;
@@ -5275,8 +5340,8 @@ public class CampaignOptions {
      * Checks whether tracking faction standing is enabled and if the use of faction standing unit market modifiers is
      * active.
      *
-     * @return {@code true} if both faction standing tracking and faction standing unit market modifier
-     *         usage are enabled; {@code false} otherwise.
+     * @return {@code true} if both faction standing tracking and faction standing unit market modifier usage are
+     *       enabled; {@code false} otherwise.
      */
     public boolean isUseFactionStandingUnitMarketSafe() {
         return trackFactionStanding && useFactionStandingUnitMarket;
@@ -5302,8 +5367,8 @@ public class CampaignOptions {
      * Checks whether tracking faction standing is enabled and if the use of faction standing contract payment modifiers
      * is active.
      *
-     * @return {@code true} if both faction standing tracking and faction standing contract pay modifier
-     *         usage are enabled; {@code false} otherwise.
+     * @return {@code true} if both faction standing tracking and faction standing contract pay modifier usage are
+     *       enabled; {@code false} otherwise.
      */
     public boolean isUseFactionStandingContractPaySafe() {
         return trackFactionStanding && useFactionStandingContractPay;
@@ -5326,11 +5391,11 @@ public class CampaignOptions {
     }
 
     /**
-     * Checks whether tracking faction standing is enabled and if the use of faction standing support point modifiers
-     * is active.
+     * Checks whether tracking faction standing is enabled and if the use of faction standing support point modifiers is
+     * active.
      *
-     * @return {@code true} if both faction standing tracking and faction standing resupply modifier
-     *         usage are enabled; {@code false} otherwise.
+     * @return {@code true} if both faction standing tracking and faction standing resupply modifier usage are enabled;
+     *       {@code false} otherwise.
      */
     public boolean isUseFactionStandingSupportPointsSafe() {
         return trackFactionStanding && useFactionStandingSupportPoints;
@@ -5348,6 +5413,14 @@ public class CampaignOptions {
         this.trackFactionStanding = trackFactionStanding;
     }
 
+    public boolean isTrackClimateRegardChanges() {
+        return trackClimateRegardChanges;
+    }
+
+    public void setTrackClimateRegardChanges(boolean trackClimateRegardChanges) {
+        this.trackClimateRegardChanges = trackClimateRegardChanges;
+    }
+
     public double getRegardMultiplier() {
         return regardMultiplier;
     }
@@ -5355,19 +5428,19 @@ public class CampaignOptions {
     public void setRegardMultiplier(double regardMultiplier) {
         this.regardMultiplier = regardMultiplier;
     }
-    
-    public boolean isAutoGenerateOpForCallsigns() {
-        return autoGenerateOpForCallsigns;
+
+    public boolean isAutoGenerateOpForCallSigns() {
+        return autoGenerateOpForCallSigns;
     }
-    
-    public void setAutoGenerateOpForCallsigns(boolean autoGenerateOpForCallsigns) {
-        this.autoGenerateOpForCallsigns = autoGenerateOpForCallsigns;
+
+    public void setAutoGenerateOpForCallSigns(boolean autoGenerateOpForCallSigns) {
+        this.autoGenerateOpForCallSigns = autoGenerateOpForCallSigns;
     }
-    
+
     public SkillLevel getMinimumCallsignSkillLevel() {
         return minimumCallsignSkillLevel;
     }
-    
+
     public void setMinimumCallsignSkillLevel(SkillLevel skillLevel) {
         this.minimumCallsignSkillLevel = skillLevel;
     }
@@ -5394,7 +5467,7 @@ public class CampaignOptions {
         useImplants = gameOptions.getOption(RPG_MANEI_DOMINI).booleanValue();
         useQuirks = gameOptions.getOption(ADVANCED_STRATOPS_QUIRKS).booleanValue();
         allowCanonOnly = gameOptions.getOption(ALLOWED_CANON_ONLY).booleanValue();
-        techLevel = getSimpleLevel(gameOptions.getOption(ALLOWED_TECHLEVEL).stringValue());
+        techLevel = getSimpleLevel(gameOptions.getOption(ALLOWED_TECH_LEVEL).stringValue());
     }
 
     /**
@@ -5421,6 +5494,6 @@ public class CampaignOptions {
         gameOptions.getOption(ALLOWED_CANON_ONLY).setValue(allowCanonOnly);
         gameOptions.getOption(ALLOWED_CANON_ONLY).setValue(allowCanonOnly);
 
-        gameOptions.getOption(ALLOWED_TECHLEVEL).setValue(TechConstants.T_SIMPLE_NAMES[techLevel]);
+        gameOptions.getOption(ALLOWED_TECH_LEVEL).setValue(TechConstants.T_SIMPLE_NAMES[techLevel]);
     }
 }

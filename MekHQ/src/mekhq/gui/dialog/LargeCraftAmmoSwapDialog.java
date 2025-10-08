@@ -40,10 +40,10 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import megamek.client.ui.dialogs.customMek.BayMunitionsChoicePanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.dialogs.customMek.BayMunitionsChoicePanel;
-import megamek.common.Mounted;
+import megamek.common.equipment.Mounted;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;

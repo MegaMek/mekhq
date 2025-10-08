@@ -163,13 +163,6 @@ public class SalariesTab {
     }
 
     /**
-     * Initializes the components of the Salaries Tab. This includes settings for personnel salaries, such as
-     * multipliers and base salary rates.
-     */
-    private void initializeSalariesTab() {
-    }
-
-    /**
      * Creates the layout for the Salaries Tab, including components for salary multipliers and base salary settings.
      *
      * @return a {@link JPanel} representing the Salaries Tab.

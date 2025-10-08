@@ -36,9 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,9 +50,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class PercentageRandomDivorceTest {
     @Mock
     private CampaignOptions mockOptions;
-
-    @Mock
-    private Person mockPerson;
 
     @BeforeEach
     public void beforeEach() {
@@ -72,7 +68,7 @@ public class PercentageRandomDivorceTest {
 
         int diceSize = 5;
 
-        try(MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
+        try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
             compute.when(() -> Compute.randomInt(diceSize)).thenReturn(0);
             assertTrue(randomDivorce.randomDivorce());
             compute.when(() -> Compute.randomInt(diceSize)).thenReturn(1);

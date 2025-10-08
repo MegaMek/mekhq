@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.market.unitMarket;
 
@@ -38,10 +43,10 @@ import java.util.ResourceBundle;
 
 import megamek.Version;
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.Compute;
-import megamek.common.EntityMovementMode;
-import megamek.common.MekSummary;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.EntityMovementMode;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -53,7 +58,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public abstract class AbstractUnitMarket {
-    private static final MMLogger logger = MMLogger.create(AbstractUnitMarket.class);
+    private static final MMLogger LOGGER = MMLogger.create(AbstractUnitMarket.class);
 
     // region Variable Declarations
     private final UnitMarketMethod method;
@@ -244,7 +249,7 @@ public abstract class AbstractUnitMarket {
     protected int generateTransitDuration(final Campaign campaign) {
         if (campaign.getCampaignOptions().isInstantUnitMarketDelivery()) {
             return 0;
-        } 
+        }
         return campaign.calculatePartTransitTime(Compute.d6(2) - 2);
     }
 
@@ -315,7 +320,7 @@ public abstract class AbstractUnitMarket {
                 parseXMLNode(wn2, campaign, version);
             }
         } catch (Exception ex) {
-            logger.error("Failed to parse Unit Market, keeping currently parsed market", ex);
+            LOGGER.error("Failed to parse Unit Market, keeping currently parsed market", ex);
         }
     }
 

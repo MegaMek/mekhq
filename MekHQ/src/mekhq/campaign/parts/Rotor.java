@@ -25,26 +25,43 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
-import megamek.common.IArmorState;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
-import megamek.common.VTOL;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.equipment.IArmorState;
+import megamek.common.units.VTOL;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.missing.MissingRotor;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Rotor extends TankLocation {
-    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
-            .setAdvancement(2460, 2470, 2510).setApproximate(true, false, false)
-            .setPrototypeFactions(Faction.TH).setProductionFactions(Faction.TH)
-            .setTechRating(TechRating.D).setAvailability(AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.C)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    public static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
+                                                                 .setAdvancement(2460, 2470, 2510)
+                                                                 .setApproximate(true, false, false)
+                                                                 .setPrototypeFactions(Faction.TH)
+                                                                 .setProductionFactions(Faction.TH)
+                                                                 .setTechRating(TechRating.D)
+                                                                 .setAvailability(AvailabilityValue.C,
+                                                                       AvailabilityValue.D,
+                                                                       AvailabilityValue.C,
+                                                                       AvailabilityValue.C)
+                                                                 .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     public Rotor() {
         this(0, null);
@@ -70,10 +87,10 @@ public class Rotor extends TankLocation {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof Rotor
-                && getLoc() == ((Rotor) part).getLoc()
-                && getUnitTonnage() == part.getUnitTonnage()
-                && this.getDamage() == ((Rotor) part).getDamage()
-                && part.getSkillMin() == this.getSkillMin();
+                     && getLoc() == ((Rotor) part).getLoc()
+                     && getUnitTonnage() == part.getUnitTonnage()
+                     && this.getDamage() == ((Rotor) part).getDamage()
+                     && part.getSkillMin() == this.getSkillMin();
     }
 
     @Override
@@ -103,13 +120,13 @@ public class Rotor extends TankLocation {
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
             } else if (null != spare) {
-                spare.incrementQuantity();
+                spare.changeQuantity(1);
                 campaign.getWarehouse().removePart(this);
             }
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
-            campaign.getQuartermaster().addPart(missing, 0);
+            campaign.getQuartermaster().addPart(missing, 0, false);
             ((VTOL) unit.getEntity()).resetMovementDamage();
             for (Part part : unit.getParts()) {
                 if (part instanceof MotiveSystem) {

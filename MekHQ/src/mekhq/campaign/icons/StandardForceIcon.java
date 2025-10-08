@@ -24,28 +24,31 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.icons;
 
 import java.awt.Image;
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
+import org.w3c.dom.Node;
 
 /**
- * StandardForceIcon is an implementation of AbstractIcon that contains and
- * displays a
- * StandardForceIcon from the Force Icon Directory.
+ * StandardForceIcon is an implementation of AbstractIcon that contains and displays a StandardForceIcon from the Force
+ * Icon Directory.
  *
  * @see AbstractIcon
  */
 public class StandardForceIcon extends AbstractIcon {
-    private static final MMLogger logger = MMLogger.create(StandardForceIcon.class);
+    private static final MMLogger LOGGER = MMLogger.create(StandardForceIcon.class);
 
     // region Variable Declarations
     public static final String DEFAULT_FORCE_ICON_FILENAME = "empty.png";
@@ -85,10 +88,10 @@ public class StandardForceIcon extends AbstractIcon {
             forceIcon = (Image) MHQStaticDirectoryManager.getForceIcons().getItem(category, filename);
             if (forceIcon == null) {
                 forceIcon = (Image) MHQStaticDirectoryManager.getForceIcons().getItem("",
-                        DEFAULT_FORCE_ICON_FILENAME);
+                      DEFAULT_FORCE_ICON_FILENAME);
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         return forceIcon;
@@ -105,7 +108,7 @@ public class StandardForceIcon extends AbstractIcon {
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
             return new StandardForceIcon();
         }
         return icon;

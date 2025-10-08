@@ -36,6 +36,7 @@ package mekhq.campaign;
 import static mekhq.campaign.unit.enums.TransporterType.ASF_BAY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -43,9 +44,11 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.TEST_CANON_SYSTEMS_DIR;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -54,27 +57,36 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Mek;
-import megamek.common.WeaponType;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.WeaponType;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Cubicle;
+import mekhq.campaign.parts.EnginePart;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
+import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekGyro;
+import mekhq.campaign.parts.meks.MekLifeSupport;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Systems;
-import org.apache.logging.log4j.LogManager;
+import mekhq.campaign.universe.TestSystems;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -83,6 +95,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import testUtilities.MHQTestUtilities;
 
 /**
  * @author Deric Page (dericdotpageatgmaildotcom)
@@ -90,15 +103,40 @@ import org.junit.jupiter.params.provider.ValueSource;
  */
 public class CampaignTest {
 
+    private TestSystems systems;
+
     @BeforeAll
     public static void setup() {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
-        try {
-            Systems.setInstance(Systems.loadDefault());
-        } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
-        }
+    }
+
+    @BeforeEach
+    public void before() {
+        // Reset TestSystems
+        systems = TestSystems.getInstance();
+    }
+
+    @Test
+    void testCampaignConstructorWithDependencyInjection() {
+        // Example of using dependency injection to provide test data directly to a Campaign instance
+        // without mocking or spying.
+
+        // Create a test CampaignConfiguration with default values but using the above TestSystems instance
+        CampaignConfiguration config = MHQTestUtilities.buildTestConfigWithSystems(systems);
+
+        // Let's try switching the year up.
+        config.setCurrentDay(LocalDate.ofYearDay(2875, 183));
+
+        // Add a system to the systems instance; it must exist in the testresources dir
+        config.getSystemsInstance().load(TEST_CANON_SYSTEMS_DIR + "Skye.yml");
+
+        // Instantiate the campaign with the new info
+        Campaign campaign = new Campaign(config);
+
+        // Let's plot a trip from the starting location to Skye!  It should be about 6 days:
+        int travelTime = campaign.getSimplifiedTravelTime(systems.getSystemByName("Skye", config.getDate()));
+        assertEquals(6, travelTime);
     }
 
     @Test
@@ -167,7 +205,7 @@ public class CampaignTest {
 
         Campaign testCampaign = mock(Campaign.class);
         when(testCampaign.getPersonnel()).thenReturn(testPersonList);
-        when(testCampaign.getActivePersonnel(true)).thenReturn(testActivePersonList);
+        when(testCampaign.getActivePersonnel(false, false)).thenReturn(testActivePersonList);
         when(testCampaign.getTechs()).thenCallRealMethod();
         when(testCampaign.getTechs(anyBoolean())).thenCallRealMethod();
         when(testCampaign.getTechs(anyBoolean(), anyBoolean())).thenCallRealMethod();
@@ -190,7 +228,7 @@ public class CampaignTest {
     @ParameterizedTest
     @EnumSource(value = CampaignTransportType.class)
     void testTransportShips(CampaignTransportType campaignTransportType) {
-        Campaign campaign = spy(new Campaign());
+        Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
 
         // New campaigns have no transports
         assertTrue(campaign.getTransports(campaignTransportType).isEmpty());
@@ -234,26 +272,26 @@ public class CampaignTest {
     }
 
     @Test
-    void testIniative() {
-        Campaign campaign = new Campaign();
+    void testInitiative() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
 
         campaign.applyInitiativeBonus(6);
         // should increase bonus to 6 and max to 6
-        assertTrue(campaign.getInitiativeBonus() == 6);
-        assertTrue(campaign.getInitiativeMaxBonus() == 6);
+        assertEquals(6, campaign.getInitiativeBonus());
+        assertEquals(6, campaign.getInitiativeMaxBonus());
         // Should not be able to increment over max of 6
         campaign.initiativeBonusIncrement(true);
-        assertFalse(campaign.getInitiativeBonus() == 7);
+        assertNotEquals(7, campaign.getInitiativeBonus());
         campaign.applyInitiativeBonus(2);
-        assertEquals(campaign.getInitiativeBonus(), 6);
+        assertEquals(6, campaign.getInitiativeBonus());
         // But should be able to decrease below max
         campaign.initiativeBonusIncrement(false);
-        assertEquals(campaign.getInitiativeBonus(), 5);
-        // After setting lower Max Bonus any appied bonus thats less then max should set
+        assertEquals(5, campaign.getInitiativeBonus());
+        // After setting lower Max Bonus any applied bonus that's less than max should set
         // bonus to max
         campaign.setInitiativeMaxBonus(3);
         campaign.applyInitiativeBonus(2);
-        assertEquals(campaign.getInitiativeBonus(), 3);
+        assertEquals(3, campaign.getInitiativeBonus());
 
     }
 
@@ -265,7 +303,7 @@ public class CampaignTest {
         public static void beforeAll() {
             // beforeEach MUST refresh Campaign Options!
             // It is very time-consuming recreating Campaign for each test, let's try to reuse it
-            campaign = new Campaign();
+            campaign = MHQTestUtilities.getTestCampaign();
         }
 
         @Nested
@@ -446,7 +484,7 @@ public class CampaignTest {
         }
 
         /**
-         * {@link Campaign#getDefaultStockPercent} is private, so we'll need to use reflection to get the method for
+         * {@link Campaign# getDefaultStockPercent} is private, so we'll need to use reflection to get the method for
          * testing
          */
         @Nested
@@ -481,7 +519,7 @@ public class CampaignTest {
             }
 
             /**
-             * @return parts that are not explicitly handled by {@link Campaign#getDefaultStockPercent(Part)}
+             * @return parts that are not explicitly handled by {@link Campaign# getDefaultStockPercent(Part)}
              */
             public static Stream<Part> otherUnhandledDefaultStockPercentParts() {
                 return Stream.of(new MekGyro(), new Cubicle(), new MekSensor(), new MekLifeSupport());
@@ -565,7 +603,7 @@ public class CampaignTest {
             @Test
             public void testGetDefaultStockPercentCT() {
                 // Arrange
-                part = new MekLocation(Mek.LOC_CT, 1, 0, false, false, false, false, false, campaign);
+                part = new MekLocation(Mek.LOC_CENTER_TORSO, 1, 0, false, false, false, false, false, campaign);
 
                 // Act
                 try {
@@ -593,7 +631,7 @@ public class CampaignTest {
             }
 
             @ParameterizedTest
-            @ValueSource(ints = { Mek.LOC_LARM, Mek.LOC_RARM, Mek.LOC_LT, Mek.LOC_RT })
+            @ValueSource(ints = { Mek.LOC_LEFT_ARM, Mek.LOC_RIGHT_ARM, Mek.LOC_LEFT_TORSO, Mek.LOC_RIGHT_TORSO })
             public void testGetDefaultStockPercentOtherLocation(int location) {
                 // Arrange
                 part = new MekLocation(location, 1, 0, false, false, false, false, false, campaign);

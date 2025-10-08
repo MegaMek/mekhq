@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,11 +24,15 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
 import java.util.Vector;
-
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -38,9 +42,9 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
 
 public class OrgTreeModel implements TreeModel {
-    private Force rootForce;
-    private Vector<TreeModelListener> listeners = new Vector<>();
-    private Campaign campaign;
+    private final Force rootForce;
+    private final Vector<TreeModelListener> listeners = new Vector<>();
+    private final Campaign campaign;
 
     public OrgTreeModel(Campaign c) {
         campaign = c;
@@ -79,7 +83,7 @@ public class OrgTreeModel implements TreeModel {
     @Override
     public boolean isLeaf(Object node) {
         return (node instanceof Unit)
-                || ((node instanceof Force) && ((Force) node).getAllChildren(campaign).isEmpty());
+                     || ((node instanceof Force) && ((Force) node).getAllChildren(campaign).isEmpty());
     }
 
     @Override

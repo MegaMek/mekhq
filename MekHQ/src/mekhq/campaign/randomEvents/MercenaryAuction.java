@@ -33,8 +33,8 @@
 package mekhq.campaign.randomEvents;
 
 import static java.lang.Math.max;
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
@@ -42,10 +42,10 @@ import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
-import megamek.common.Entity;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.MercenaryAuctionDialog;
 
@@ -55,7 +55,7 @@ import mekhq.gui.dialog.MercenaryAuctionDialog;
  * while failures notify the player of the outcome.
  */
 public class MercenaryAuction {
-    private static final MMLogger logger = MMLogger.create(MercenaryAuction.class);
+    private static final MMLogger LOGGER = MMLogger.create(MercenaryAuction.class);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MercenaryAuctionDialog";
 
@@ -72,7 +72,7 @@ public class MercenaryAuction {
      * @param campaign The current {@link Campaign} instance where the auction takes place.
      * @param unitType The type of unit being auctioned (e.g., `MEK`, `VEHICLE`).
      */
-    public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratconCampaignState campaignState,
+    public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratConCampaignState campaignState,
           int unitType) {
         String faction = campaign.getFaction().getShortName();
 
@@ -85,7 +85,7 @@ public class MercenaryAuction {
               campaign);
 
         if (entity == null) {
-            logger.error("Unable to find entity for unit type {} in 'MercenaryAuction'", unitType);
+            LOGGER.error("Unable to find entity for unit type {} in 'MercenaryAuction'", unitType);
             return;
         }
 
@@ -129,10 +129,9 @@ public class MercenaryAuction {
               entity,
               minimumBid,
               maximumBid,
-              AUCTION_TIER_SUCCESS_PERCENT,
-              max(requiredCombatTeams, 1));
-        int bidSuccessChance = (mercenaryAuctionDialog.getSpinnerValue() / Math.max(1, minimumBid)) *
-                                          AUCTION_TIER_SUCCESS_PERCENT;
+              AUCTION_TIER_SUCCESS_PERCENT);
+        int bidSuccessChance = (mercenaryAuctionDialog.getSpinnerValue() / minimumBid) *
+                                     AUCTION_TIER_SUCCESS_PERCENT;
 
         // If the player confirmed the auction, then check whether they were successful,
         // deliver the unit, and deduct funds.

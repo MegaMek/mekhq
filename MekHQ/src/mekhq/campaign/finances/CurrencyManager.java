@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances;
 
@@ -64,7 +69,7 @@ import org.w3c.dom.NodeList;
  * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
 public class CurrencyManager extends CurrencyUnitDataProvider {
-    private static final MMLogger logger = MMLogger.create(CurrencyManager.class);
+    private static final MMLogger LOGGER = MMLogger.create(CurrencyManager.class);
 
     private static final CurrencyManager instance = new CurrencyManager();
 
@@ -83,9 +88,9 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
 
     private Campaign campaign;
 
-    private List<Currency> currencies;
-    private Map<String, String> currencyCodeToNameMap;
-    private Map<String, String> currencyCodeToSymbolMap;
+    private final List<Currency> currencies;
+    private final Map<String, String> currencyCodeToNameMap;
+    private final Map<String, String> currencyCodeToSymbolMap;
     private Currency backupCurrency;
 
     private MoneyFormatter xmlMoneyFormatter;
@@ -194,7 +199,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
 
     @Override
     protected void registerCurrencies() {
-        logger.info("Starting load currency information from XML...");
+        LOGGER.info("Starting load currency information from XML...");
 
         try {
             // Using factory get an instance of document builder
@@ -287,9 +292,9 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                 }
             }
 
-            logger.info("Load of currency information complete!");
+            LOGGER.info("Load of currency information complete!");
         } catch (Exception ex) {
-            logger.error(ex, "Unknown Exception - registerCurrencies");
+            LOGGER.error(ex, "Unknown Exception - registerCurrencies");
         }
     }
 

@@ -39,7 +39,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
@@ -55,12 +54,9 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  *
  * @since 0.50.05
  */
-public class NewYearsDayAnnouncement {
-    private static final MMLogger logger = MMLogger.create(NewYearsDayAnnouncement.class);
+public record NewYearsDayAnnouncement(Campaign campaign) {
 
-    private static String RESOURCE_BUNDLE = "mekhq.resources.NewYearsDayAnnouncement";
-
-    private final Campaign campaign;
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.NewYearsDayAnnouncement";
 
     // Constants for significant holiday-related dates.
     private final static int NEW_YEARS_MONTH = 1;
@@ -118,7 +114,7 @@ public class NewYearsDayAnnouncement {
      * @return the selected {@link Person}, or {@code null} if no suitable speaker is found
      */
     private @Nullable Person getSpeaker() {
-        List<Person> activePersonnel = campaign.getActivePersonnel(false);
+        List<Person> activePersonnel = campaign.getActivePersonnel(false, false);
 
         Person commander = campaign.getCommander();
         if (commander != null) {

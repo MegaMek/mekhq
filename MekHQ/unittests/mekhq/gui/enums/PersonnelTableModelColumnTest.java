@@ -49,11 +49,12 @@ import mekhq.campaign.Campaign;
 import mekhq.gui.sorter.AttributeScoreSorter;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.DateStringComparator;
+import mekhq.gui.sorter.EducationLevelSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
-import org.junit.jupiter.api.Disabled;
+import mekhq.gui.sorter.ReasoningSorter;
 import org.junit.jupiter.api.Test;
 
 public class PersonnelTableModelColumnTest {
@@ -749,24 +750,6 @@ public class PersonnelTableModelColumnTest {
 
     //endregion Boolean Comparison Methods
 
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGetCellValue() {
-
-    }
-
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGetDisplayText() {
-
-    }
-
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGetToolTipText() {
-
-    }
-
     @Test
     public void testGetWidth() {
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
@@ -834,18 +817,14 @@ public class PersonnelTableModelColumnTest {
         }
     }
 
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testIsVisible() {
-
-    }
-
     @Test
     public void testGetComparator() {
         final Campaign mockCampaign = mock(Campaign.class);
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             switch (personnelTableModelColumn) {
                 case RANK -> assertInstanceOf(PersonRankStringSorter.class,
+                      personnelTableModelColumn.getComparator(mockCampaign));
+                case EDUCATION -> assertInstanceOf(EducationLevelSorter.class,
                       personnelTableModelColumn.getComparator(mockCampaign));
                 case AGE, BIRTHDAY, RECRUITMENT_DATE, LAST_RANK_CHANGE_DATE, DUE_DATE, RETIREMENT_DATE, DEATH_DATE ->
                       assertInstanceOf(DateStringComparator.class,
@@ -859,19 +838,26 @@ public class PersonnelTableModelColumnTest {
                      AEROSPACE,
                      CONVENTIONAL_AIRCRAFT,
                      VESSEL,
+                     PROTOMEK,
                      BATTLE_ARMOUR,
                      SMALL_ARMS,
                      ANTI_MEK,
                      ARTILLERY,
+                     NAVIGATION,
                      TACTICS,
                      STRATEGY,
                      LEADERSHIP,
+                     ASTECH,
                      TECH_MEK,
                      TECH_AERO,
                      TECH_MECHANIC,
                      TECH_BA,
                      TECH_VESSEL,
+                     ZERO_G,
+                     MEDTECH,
                      MEDICAL,
+                     APPRAISAL,
+                     TRAINING,
                      ADMINISTRATION,
                      NEGOTIATION ->
                       assertInstanceOf(BonusSorter.class, personnelTableModelColumn.getComparator(mockCampaign));
@@ -887,8 +873,9 @@ public class PersonnelTableModelColumnTest {
                      EDGE,
                      SPA_COUNT,
                      IMPLANT_COUNT,
-                     LOYALTY,
-                     REASONING -> assertInstanceOf(IntegerStringSorter.class,
+                     LOYALTY -> assertInstanceOf(IntegerStringSorter.class,
+                      personnelTableModelColumn.getComparator(mockCampaign));
+                case REASONING -> assertInstanceOf(ReasoningSorter.class,
                       personnelTableModelColumn.getComparator(mockCampaign));
                 case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA -> assertInstanceOf(
                       AttributeScoreSorter.class,

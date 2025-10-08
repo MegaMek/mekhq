@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -72,11 +73,11 @@ import mekhq.gui.view.PersonViewPanel;
  * This dialog is used to both hire new pilots and to edit existing ones
  */
 public class NewRecruitDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(NewRecruitDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(NewRecruitDialog.class);
 
     private Person person;
 
-    private CampaignGUI hqView;
+    private final CampaignGUI hqView;
 
     private JComboBox<RankDisplay> choiceRanks;
 
@@ -120,8 +121,9 @@ public class NewRecruitDialog extends JDialog {
 
         JPanel panBottomButtons = createButtonPanel(resourceMap);
 
-        scrollView.setMinimumSize(new Dimension(450, 180));
-        scrollView.setPreferredSize(new Dimension(450, 180));
+        Dimension dimension = scaleForGUI(700, 180);
+        scrollView.setMinimumSize(dimension);
+        scrollView.setPreferredSize(dimension);
         scrollView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollView.setViewportView(null);
         refreshView();
@@ -224,7 +226,7 @@ public class NewRecruitDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 
@@ -245,7 +247,7 @@ public class NewRecruitDialog extends JDialog {
     private void createNewRecruit() {
         person = getCampaign().newPerson(person.getPrimaryRole());
         refreshRanksCombo();
-        person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
+        person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).rankNumeric());
     }
 
     private void randomName() {
@@ -301,7 +303,7 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void changeRank() {
-        person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
+        person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).rankNumeric());
         refreshView();
     }
 

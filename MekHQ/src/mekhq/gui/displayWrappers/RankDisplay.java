@@ -24,43 +24,39 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.displayWrappers;
+
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nonnull;
 
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class RankDisplay {
-    //region Variable Declarations
-    private final int rankNumeric;
-    private final String displayName;
+/**
+ * @param rankNumeric region Variable Declarations
+ */
+public record RankDisplay(int rankNumeric, String displayName) {
     //endregion Variable Declarations
 
-    //region Constructors
-    public RankDisplay(final int rankNumeric, final String displayName) {
-        this.rankNumeric = rankNumeric;
-        this.displayName = displayName;
-    }
-    //endregion Constructors
-
-    //region Getters
-    public int getRankNumeric() {
-        return rankNumeric;
-    }
-    //endregion Getters
-
     /**
-     * This creates a list of all valid rank displays, which can then be added to a checkbox or used
-     * to create menu items
-     * @param rankSystem the rank system to get all valid rank display from
+     * This creates a list of all valid rank displays, which can then be added to a checkbox or used to create menu
+     * items
+     *
+     * @param rankSystem        the rank system to get all valid rank display from
      * @param initialProfession the initial profession for the ranks
+     *
      * @return a list of all valid rank displays
      */
-    public static List<RankDisplay> getRankDisplaysForSystem(final RankSystem rankSystem, final Profession initialProfession) {
+    public static List<RankDisplay> getRankDisplaysForSystem(final RankSystem rankSystem,
+          final Profession initialProfession) {
         final List<RankDisplay> rankDisplays = new ArrayList<>();
         final Profession profession = initialProfession.getBaseProfession(rankSystem);
         for (int i = 0; i < rankSystem.getRanks().size(); i++) {
@@ -73,6 +69,7 @@ public class RankDisplay {
     }
 
     @Override
+    @Nonnull
     public String toString() {
         return displayName;
     }

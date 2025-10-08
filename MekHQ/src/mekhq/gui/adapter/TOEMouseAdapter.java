@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.adapter;
 
@@ -49,18 +54,18 @@ import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
-import megamek.common.EntityWeightClass;
-import megamek.common.GunEmplacement;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.GunEmplacement;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.event.DeploymentChangedEvent;
-import mekhq.campaign.event.NetworkChangedEvent;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.events.DeploymentChangedEvent;
+import mekhq.campaign.events.NetworkChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.force.FormationLevel;
@@ -87,7 +92,7 @@ import mekhq.gui.utilities.StaticChecks;
 import mekhq.utilities.MHQInternationalization;
 
 public class TOEMouseAdapter extends JPopupMenuAdapter {
-    private static final MMLogger logger = MMLogger.create(TOEMouseAdapter.class);
+    private static final MMLogger LOGGER = MMLogger.create(TOEMouseAdapter.class);
 
     private final CampaignGUI gui;
     private final JTree tree;
@@ -147,7 +152,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String CHANGE_ICON = "CHANGE_ICON";
     private static final String COPY_ICON = "COPY_ICON";
     private static final String PASTE_ICON = "PASTE_ICON";
-    private static final String SUBFORCES_PASTE_ICON = "SUBFORCES_PASTE_ICON";
+    private static final String SUB_FORCES_PASTE_ICON = "SUB_FORCES_PASTE_ICON";
     private static final String CHANGE_NAME = "CHANGE_NAME";
 
     private static final String COMMAND_CHANGE_FORCE_TYPE_STANDARD = "COMMAND_CHANGE_FORCE_TYPE_STANDARD|FORCE|empty|";
@@ -162,7 +167,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_CHANGE_FORCE_ICON = "CHANGE_ICON|FORCE|empty|";
     private static final String COMMAND_COPY_FORCE_ICON = "COPY_ICON|FORCE|empty|";
     private static final String COMMAND_PASTE_FORCE_ICON = "PASTE_ICON|FORCE|empty|";
-    private static final String COMMAND_SUBFORCES_PASTE_FORCE_ICON = "SUBFORCES_PASTE_ICON|FORCE|empty|";
+    private static final String COMMAND_SUB_FORCES_PASTE_FORCE_ICON = "SUB_FORCES_PASTE_ICON|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_NAME = "CHANGE_NAME|FORCE|empty|";
     private static final String COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE = "CHANGE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
     private static final String COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE = "REMOVE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
@@ -202,9 +207,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String ASSIGN_FORCE_TRN_TITLE = "Assign Force to Transport Ship";
     private static final String MEK_CARRIERS = "Mek Transports";
     private static final String PROTOMEK_CARRIERS = "ProtoMek Transports";
-    private static final String LVEE_CARRIERS = "Light Vehicle Transports";
-    private static final String HVEE_CARRIERS = "Heavy Vehicle Transports";
-    private static final String SHVEE_CARRIERS = "SuperHeavy Vehicle Transports";
+    private static final String LIGHT_VEHICLE_CARRIERS = "Light Vehicle Transports";
+    private static final String HEAVY_VEHICLE_CARRIERS = "Heavy Vehicle Transports";
+    private static final String SUPER_HEAVY_VEHICLE_CARRIERS = "SuperHeavy Vehicle Transports";
     private static final String BA_CARRIERS = "Battle Armor Transports";
     private static final String INFANTRY_CARRIERS = "Infantry Transports";
     private static final String ASF_CARRIERS = "Aerospace Fighter Transports";
@@ -404,9 +409,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 return;
             }
 
-            final boolean subforces = command.contains(SUBFORCES_PASTE_ICON);
+            final boolean subForces = command.contains(SUB_FORCES_PASTE_ICON);
             for (final Force force : forces) {
-                force.setForceIcon(gui.getCopyForceIcon().clone(), subforces);
+                force.setForceIcon(gui.getCopyForceIcon().clone(), subForces);
             }
             gui.getTOETab().refreshForceView();
         } else if (command.contains(CHANGE_CAMO)) {
@@ -934,23 +939,23 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                       UnitType.CONV_FIGHTER);
 
                 for (int i = 0; i < UnitType.SIZE; i++) {
-                    String unittype = UnitType.getTypeName(i);
+                    String unitType = UnitType.getTypeName(i);
                     String displayname = UnitType.getTypeDisplayableName(i);
-                    unitTypeMenus.put(unittype, new JMenu(displayname));
-                    unitTypeMenus.get(unittype).setName(unittype);
-                    unitTypeMenus.get(unittype).setEnabled(false);
-                    for (int j = 0; j < EntityWeightClass.getWeightLimitByType(unittype).length; j++) {
-                        double tonnage = EntityWeightClass.getWeightLimitByType(unittype)[j];
+                    unitTypeMenus.put(unitType, new JMenu(displayname));
+                    unitTypeMenus.get(unitType).setName(unitType);
+                    unitTypeMenus.get(unitType).setEnabled(false);
+                    for (int j = 0; j < EntityWeightClass.getWeightLimitByType(unitType).length; j++) {
+                        double tonnage = EntityWeightClass.getWeightLimitByType(unitType)[j];
                         // Skip over the padding 0s
                         if (tonnage == 0) {
                             continue;
                         }
 
-                        int weightClass = EntityWeightClass.getWeightClass(tonnage, unittype);
-                        String displayname2 = EntityWeightClass.getClassName(weightClass, unittype, false);
-                        String weightClassMenuName = unittype +
+                        int weightClass = EntityWeightClass.getWeightClass(tonnage, unitType);
+                        String displayname2 = EntityWeightClass.getClassName(weightClass, unitType, false);
+                        String weightClassMenuName = unitType +
                                                            '_' +
-                                                           EntityWeightClass.getClassName(weightClass, unittype, false);
+                                                           EntityWeightClass.getClassName(weightClass, unitType, false);
                         weightClassForUnitType.put(weightClassMenuName, new JMenu(displayname2));
                         weightClassForUnitType.get(weightClassMenuName).setName(weightClassMenuName);
                         weightClassForUnitType.get(weightClassMenuName).setEnabled(false);
@@ -1027,21 +1032,21 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 });
 
                 for (int i = 0; i < UnitType.SIZE; i++) {
-                    String unittype = UnitType.getTypeName(i);
+                    String unitType = UnitType.getTypeName(i);
                     JMenu tmp = unitTypeMenus.get(UnitType.getTypeName(i));
                     if (tmp.isEnabled()) {
-                        for (int j = 0; j < EntityWeightClass.getWeightLimitByType(unittype).length; j++) {
-                            double tonnage = EntityWeightClass.getWeightLimitByType(unittype)[j];
+                        for (int j = 0; j < EntityWeightClass.getWeightLimitByType(unitType).length; j++) {
+                            double tonnage = EntityWeightClass.getWeightLimitByType(unitType)[j];
                             // Skip over the padding 0s
                             if (tonnage == 0) {
                                 continue;
                             }
 
-                            int weightClass = EntityWeightClass.getWeightClass(tonnage, unittype);
-                            JMenu tmp2 = weightClassForUnitType.get(unittype +
+                            int weightClass = EntityWeightClass.getWeightClass(tonnage, unitType);
+                            JMenu tmp2 = weightClassForUnitType.get(unitType +
                                                                           '_' +
                                                                           EntityWeightClass.getClassName(weightClass,
-                                                                                unittype,
+                                                                                unitType,
                                                                                 false));
                             if (tmp2.isEnabled()) {
                                 tmp.add(tmp2);
@@ -1052,16 +1057,16 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 for (int ut : svTypes) {
-                    String unittype = UnitType.getTypeName(ut);
+                    String unitType = UnitType.getTypeName(ut);
                     JMenu tmp = unitTypeMenus.get(UnitType.getTypeName(ut));
                     if (tmp.isEnabled()) {
                         for (int wc = EntityWeightClass.WEIGHT_SMALL_SUPPORT;
                               wc <= EntityWeightClass.WEIGHT_LARGE_SUPPORT;
                               wc++) {
-                            JMenu tmp2 = weightClassForUnitType.get(unittype +
+                            JMenu tmp2 = weightClassForUnitType.get(unitType +
                                                                           '_' +
                                                                           EntityWeightClass.getClassName(wc,
-                                                                                unittype,
+                                                                                unitType,
                                                                                 true));
                             if (tmp2.isEnabled()) {
                                 tmp.add(tmp2);
@@ -1115,9 +1120,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
 
-                menuItem = new JMenuItem("Paste Force Icon to Force and Subforces");
-                menuItem.setName("miSubforcesPasteForceIcon");
-                menuItem.setActionCommand(COMMAND_SUBFORCES_PASTE_FORCE_ICON + forceIds);
+                menuItem = new JMenuItem("Paste Force Icon to Force and Sub forces");
+                menuItem.setName("miSubForcesPasteForceIcon");
+                menuItem.setActionCommand(COMMAND_SUB_FORCES_PASTE_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
             }
@@ -1168,7 +1173,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 popup.add(optionRemoveStrategicForceOverride);
             }
 
-            if (StaticChecks.areAllForcesUndeployed(gui.getCampaign(), forces) &&
+            if (StaticChecks.areAllForcesUnDeployed(gui.getCampaign(), forces) &&
                       StaticChecks.areAllStandardForces(forces)) {
                 menu = new JMenu("Deploy Force");
 
@@ -1257,7 +1262,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     try {
                         nodesFree = Integer.parseInt(network[1]);
                     } catch (Exception ex) {
-                        logger.error("", ex);
+                        LOGGER.error("", ex);
                         continue;
                     }
 
@@ -1284,7 +1289,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     try {
                         nodesFree = Integer.parseInt(network[1]);
                     } catch (Exception ex) {
-                        logger.error("", ex);
+                        LOGGER.error("", ex);
                         continue;
                     }
 
@@ -1331,7 +1336,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         try {
                             nodesFree = Integer.parseInt(network[1]);
                         } catch (Exception ex) {
-                            logger.error("", ex);
+                            LOGGER.error("", ex);
                             continue;
                         }
 
@@ -1381,7 +1386,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         try {
                             nodesFree = Integer.parseInt(network[1]);
                         } catch (Exception ex) {
-                            logger.error("", ex);
+                            LOGGER.error("", ex);
                             continue;
                         }
 
@@ -1568,9 +1573,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt(
                   "mekhq.resources.AssignForceToTransport",
                   "TOEMouseAdapter.unassign.SHIP_TRANSPORT.text"));
-            menuItem.addActionListener(evt -> {
-                unassignTransportAction(SHIP_TRANSPORT, units.toArray(new Unit[0]));
-            });
+            menuItem.addActionListener(evt -> unassignTransportAction(SHIP_TRANSPORT, units.toArray(new Unit[0])));
             menuItem.setEnabled(true);
             popup.add(menuItem);
         }
@@ -1581,9 +1584,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt(
                   "mekhq.resources.AssignForceToTransport",
                   "TOEMouseAdapter.unassign.TACTICAL_TRANSPORT.text"));
-            menuItem.addActionListener(evt -> {
-                unassignTransportAction(TACTICAL_TRANSPORT, units.toArray(new Unit[0]));
-            });
+            menuItem.addActionListener(evt -> unassignTransportAction(TACTICAL_TRANSPORT, units.toArray(new Unit[0])));
             menuItem.setEnabled(true);
             popup.add(menuItem);
         }
@@ -1595,9 +1596,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt(
                   "mekhq.resources.AssignForceToTransport",
                   "TOEMouseAdapter.unassign.TOW_TRANSPORT.text"));
-            menuItem.addActionListener(evt -> {
-                unassignTransportAction(TOW_TRANSPORT, units.toArray(new Unit[0]));
-            });
+            menuItem.addActionListener(evt -> unassignTransportAction(TOW_TRANSPORT, units.toArray(new Unit[0])));
             menuItem.setEnabled(true);
             popup.add(menuItem);
         }
@@ -1632,9 +1631,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt(
                   "mekhq.resources.AssignForceToTransport",
                   "TOEMouseAdapter.unassignFrom.SHIP_TRANSPORT.text"));
-            menuItem.addActionListener(evt -> {
-                unassignFromTransportAction(SHIP_TRANSPORT, units.toArray(new Unit[0]));
-            });
+            menuItem.addActionListener(evt -> unassignFromTransportAction(SHIP_TRANSPORT, units.toArray(new Unit[0])));
             menuItem.setEnabled(true);
             popup.add(menuItem);
         }
@@ -1645,9 +1642,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt(
                   "mekhq.resources.AssignForceToTransport",
                   "TOEMouseAdapter.unassignFrom.TACTICAL_TRANSPORT.text"));
-            menuItem.addActionListener(evt -> {
-                unassignFromTransportAction(TACTICAL_TRANSPORT, units.toArray(new Unit[0]));
-            });
+            menuItem.addActionListener(evt -> unassignFromTransportAction(TACTICAL_TRANSPORT,
+                  units.toArray(new Unit[0])));
             menuItem.setEnabled(true);
             popup.add(menuItem);
         }
@@ -1659,9 +1655,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt(
                   "mekhq.resources.AssignForceToTransport",
                   "TOEMouseAdapter.unassignFrom.TOW_TRANSPORT.text"));
-            menuItem.addActionListener(evt -> {
-                unassignTransportAction(TOW_TRANSPORT, units.toArray(new Unit[0]));
-            });
+            menuItem.addActionListener(evt -> unassignTransportAction(TOW_TRANSPORT, units.toArray(new Unit[0])));
             menuItem.setEnabled(true);
             popup.add(menuItem);
         }

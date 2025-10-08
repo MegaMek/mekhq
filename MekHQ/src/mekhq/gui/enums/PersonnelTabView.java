@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.enums;
 
@@ -37,9 +42,12 @@ public enum PersonnelTabView {
     GENERAL("PersonnelTabView.GENERAL.text", "PersonnelTabView.GENERAL.toolTipText"),
     PILOT_GUNNERY_SKILLS("PersonnelTabView.PILOT_GUNNERY_SKILLS.text",
           "PersonnelTabView.PILOT_GUNNERY_SKILLS.toolTipText"),
+    PILOT_GUNNERY_SKILLS_II("PersonnelTabView.PILOT_GUNNERY_SKILLS_II.text",
+          "PersonnelTabView.PILOT_GUNNERY_SKILLS_II.toolTipText"),
     INFANTRY_SKILLS("PersonnelTabView.INFANTRY_SKILLS.text", "PersonnelTabView.INFANTRY_SKILLS.toolTipText"),
     TACTICAL_SKILLS("PersonnelTabView.TACTICAL_SKILLS.text", "PersonnelTabView.TACTICAL_SKILLS.toolTipText"),
     TECHNICAL_SKILLS("PersonnelTabView.TECHNICAL_SKILLS.text", "PersonnelTabView.TECHNICAL_SKILLS.toolTipText"),
+    MEDICAL_SKILLS("PersonnelTabView.MEDICAL_SKILLS.text", "PersonnelTabView.MEDICAL_SKILLS.toolTipText"),
     ADMINISTRATIVE_SKILLS("PersonnelTabView.ADMINISTRATIVE_SKILLS.text",
           "PersonnelTabView.ADMINISTRATIVE_SKILLS.toolTipText"),
     TRAITS("PersonnelTabView.TRAITS.text", "PersonnelTabView.TRAITS.toolTipText"),
@@ -82,6 +90,10 @@ public enum PersonnelTabView {
         return this == GENERAL;
     }
 
+    public boolean isPilotGunnerySkillsII() {
+        return this == PILOT_GUNNERY_SKILLS_II;
+    }
+
     public boolean isPilotGunnerySkills() {
         return this == PILOT_GUNNERY_SKILLS;
     }
@@ -96,6 +108,10 @@ public enum PersonnelTabView {
 
     public boolean isTechnicalSkills() {
         return this == TECHNICAL_SKILLS;
+    }
+
+    public boolean isMedicalSkills() {
+        return this == MEDICAL_SKILLS;
     }
 
     public boolean isAdministrativeSkills() {

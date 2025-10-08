@@ -50,7 +50,6 @@ import java.awt.GridLayout;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -69,25 +68,33 @@ import megamek.client.generator.ReconfigurationParameters;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Entity;
-import megamek.common.EntityListFile;
-import megamek.common.Game;
-import megamek.common.GunEmplacement;
 import megamek.common.annotations.Nullable;
 import megamek.common.containers.MunitionTree;
 import megamek.common.enums.Gender;
+import megamek.common.equipment.GunEmplacement;
 import megamek.common.event.Subscribe;
+import megamek.common.game.Game;
 import megamek.common.options.OptionsConstants;
+import megamek.common.ui.FastJScrollPane;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityListFile;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
-import megamek.utilities.FastJScrollPane;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
-import mekhq.campaign.autoresolve.AutoResolveMethod;
+import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.event.*;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.events.GMModeEvent;
+import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.events.missions.MissionChangedEvent;
+import mekhq.campaign.events.missions.MissionCompletedEvent;
+import mekhq.campaign.events.missions.MissionNewEvent;
+import mekhq.campaign.events.missions.MissionRemovedEvent;
+import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
+import mekhq.campaign.events.scenarios.ScenarioNewEvent;
+import mekhq.campaign.events.scenarios.ScenarioRemovedEvent;
+import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -105,8 +112,8 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -458,16 +465,12 @@ public final class BriefingTab extends CampaignGuiTab {
 
         LocalDate today = getCampaign().getLocalDate();
         if (xpAward > 0) {
-            for (Person person : getCampaign().getActivePersonnel(false)) {
+            for (Person person : getCampaign().getActivePersonnel(false, false)) {
                 if (person.isChild(today)) {
                     continue;
                 }
 
                 if (person.isDependent()) {
-                    continue;
-                }
-
-                if (!person.isEmployed()) {
                     continue;
                 }
 
@@ -578,7 +581,6 @@ public final class BriefingTab extends CampaignGuiTab {
                 // This shouldn't be necessary, but now is as good a time as any to check for null scenarios
                 if (scenario == null || scenario.getMissionId() == mission.getId()) {
                     force.setScenarioId(NO_ASSIGNED_SCENARIO, getCampaign());
-                    continue;
                 }
             }
         }
@@ -646,43 +648,6 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     /**
-     * Displays a prompt asking the user if they want to ransom their prisoners or defectors.
-     *
-     * @param prisoners    The list of prisoners to be ransomed.
-     * @param resourceName The name of the resource bundle key for the prompt message.
-     * @param resources    The resource bundle containing the string resources.
-     *
-     * @return true if the user selects the "Cancel" option, false otherwise.
-     */
-    private boolean prisonerPrompt(List<Person> prisoners, String resourceName, ResourceBundle resources) {
-        Money total = Money.zero();
-        total = total.plus(prisoners.stream()
-                                 .map(person -> person.getRansomValue(getCampaign()))
-                                 .collect(Collectors.toList()));
-
-        int optionSelected = JOptionPane.showConfirmDialog(null,
-              String.format(resources.getString(resourceName), prisoners.size(), total.toAmountAndSymbolString()),
-              resources.getString("ransom.text"),
-              JOptionPane.YES_NO_CANCEL_OPTION);
-
-        switch (optionSelected) {
-            case JOptionPane.YES_OPTION -> {
-                getCampaign().addReport(String.format(resources.getString("ransomReport.format"),
-                      prisoners.size(),
-                      total.toAmountAndSymbolString()));
-                getCampaign().addFunds(TransactionType.RANSOM, total, resources.getString("ransom.text"));
-                prisoners.forEach(prisoner -> getCampaign().removePerson(prisoner, false));
-            }
-            case JOptionPane.NO_OPTION -> {
-            }
-            default -> {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Calculates the XP award for completing a mission.
      *
      * @param missionStatus The status of the mission as a MissionStatus enum.
@@ -696,7 +661,7 @@ public final class BriefingTab extends CampaignGuiTab {
             case SUCCESS, PARTIAL -> {
                 if ((getCampaign().getCampaignOptions().isUseStratCon()) &&
                           (mission instanceof AtBContract)) {
-                    StratconCampaignState stratConCampaignState = ((AtBContract) mission).getStratconCampaignState();
+                    StratConCampaignState stratConCampaignState = ((AtBContract) mission).getStratconCampaignState();
 
                     if (stratConCampaignState == null || stratConCampaignState.getVictoryPoints() < 3) {
                         yield getCampaign().getCampaignOptions().getMissionXpSuccess();
@@ -788,7 +753,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // This handles StratCon undeployment
             if (scenario instanceof AtBScenario) {
                 AtBContract contract = ((AtBScenario) scenario).getContract(getCampaign());
-                StratconScenario stratConScenario = ((AtBScenario) scenario).getStratconScenario(contract,
+                StratConScenario stratConScenario = ((AtBScenario) scenario).getStratconScenario(contract,
                       (AtBScenario) scenario);
 
                 if (stratConScenario != null) {
@@ -824,21 +789,21 @@ public final class BriefingTab extends CampaignGuiTab {
                                        .toList();
 
         final List<Entity> chosen = new ArrayList<>();
-        final StringBuilder undeployed = new StringBuilder();
+        final StringBuilder unDeployed = new StringBuilder();
 
         for (final Unit unit : units) {
             if (unit.checkDeployment() == null) {
                 unit.resetPilotAndEntity();
                 chosen.add(unit.getEntity());
             } else {
-                undeployed.append('\n').append(unit.getName()).append(" (").append(unit.checkDeployment()).append(')');
+                unDeployed.append('\n').append(unit.getName()).append(" (").append(unit.checkDeployment()).append(')');
             }
         }
 
-        if (!undeployed.isEmpty()) {
+        if (!unDeployed.isEmpty()) {
             final Object[] options = { "Continue", "Cancel" };
             if (JOptionPane.showOptionDialog(getFrame(),
-                  "The following units could not be deployed:" + undeployed,
+                  "The following units could not be deployed:" + unDeployed,
                   "Could not deploy some units",
                   JOptionPane.OK_CANCEL_OPTION,
                   JOptionPane.WARNING_MESSAGE,
@@ -929,7 +894,7 @@ public final class BriefingTab extends CampaignGuiTab {
             mission = comboMission.getSelectedItem();
         }
 
-        Person speaker = null;
+        Person speaker;
         if (mission instanceof AtBContract contract) {
             speaker = contract.getEmployerLiaison();
         } else {
@@ -1008,7 +973,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void promptAutoResolve(Scenario scenario) {
-        // the options for the auto resolve method follow a predefined order, which is the same as the order in the enum
+        // the options for the auto resolve method follow a predefined order, which is the same as the order in the enum,
         // and it uses that to preselect the option that is currently set in the campaign options
         Object[] options = new Object[] { getText("AutoResolveMethod.PRINCESS.text"),
                                           getText("AutoResolveMethod.ABSTRACT_COMBAT.text"), };
@@ -1038,7 +1003,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
 
-    private List<Unit> playerUnits(Scenario scenario, StringBuilder undeployed) {
+    private List<Unit> playerUnits(Scenario scenario, StringBuilder unDeployed) {
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(false);
         if (uids.isEmpty()) {
             return Collections.emptyList();
@@ -1053,7 +1018,7 @@ public final class BriefingTab extends CampaignGuiTab {
                     u.resetPilotAndEntity();
                     chosen.add(u);
                 } else {
-                    undeployed.append('\n').append(u.getName()).append(" (").append(u.checkDeployment()).append(')');
+                    unDeployed.append('\n').append(u.getName()).append(" (").append(u.checkDeployment()).append(')');
                 }
             }
         }
@@ -1083,8 +1048,8 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         List<Unit> chosen = new ArrayList<>();
-        List<Unit> undeployedUnits = new ArrayList<>();
-        StringBuilder undeployed = new StringBuilder();
+        List<Unit> unDeployedUnits = new ArrayList<>();
+        StringBuilder unDeployed = new StringBuilder();
 
         Map<Unit, Entity> unitEntityMap = new HashMap<>();
         for (UUID uid : uids) {
@@ -1104,8 +1069,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
             String deploymentStatus = unit.checkDeployment();
             if (deploymentStatus != null) {
-                undeployed.append('\n').append(unit.getName()).append(" (").append(unit.checkDeployment()).append(')');
-                undeployedUnits.add(unit);
+                unDeployed.append('\n').append(unit.getName()).append(" (").append(unit.checkDeployment()).append(')');
+                unDeployedUnits.add(unit);
                 continue;
             }
 
@@ -1168,7 +1133,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         for (Unit unit : unitEntityMap.keySet()) {
-            if (!undeployedUnits.contains(unit)) {
+            if (!unDeployedUnits.contains(unit)) {
                 // Make sure the unit's entity and pilot are fully up to date!
                 unit.resetPilotAndEntity();
 
@@ -1190,10 +1155,10 @@ public final class BriefingTab extends CampaignGuiTab {
             AtBDynamicScenarioFactory.setPlayerDeploymentZones(atBDynamicScenario, getCampaign());
         }
 
-        if (!undeployed.isEmpty()) {
+        if (!unDeployed.isEmpty()) {
             Object[] options = { "Continue", "Cancel" };
             int n = JOptionPane.showOptionDialog(getFrame(),
-                  "The following units could not be deployed:" + undeployed,
+                  "The following units could not be deployed:" + unDeployed,
                   "Could not deploy some units",
                   JOptionPane.OK_CANCEL_OPTION,
                   JOptionPane.WARNING_MESSAGE,
@@ -1285,16 +1250,16 @@ public final class BriefingTab extends CampaignGuiTab {
         if (mission == null) {
             mission = comboMission.getSelectedItem();
         }
-        String opforFactionCode = "IS";
+        String opForFactionCode = "IS";
         Faction enemy;
         if (mission instanceof AtBContract atBContract) {
             enemy = atBContract.getEnemy();
             if (enemy != null) {
                 return atBContract.getEnemy();
             }
-            opforFactionCode = atBContract.getEnemyCode().isBlank() ? opforFactionCode : atBContract.getEnemyCode();
+            opForFactionCode = atBContract.getEnemyCode().isBlank() ? opForFactionCode : atBContract.getEnemyCode();
         }
-        enemy = Factions.getInstance().getFaction(opforFactionCode);
+        enemy = Factions.getInstance().getFaction(opForFactionCode);
         return enemy;
     }
 
@@ -1302,8 +1267,6 @@ public final class BriefingTab extends CampaignGuiTab {
      * Designed to fully kit out all non-player-controlled forces prior to battle. Does not do any checks for supplies,
      * only for availability to each faction during the current timeframe.
      *
-     * @param scenario
-     * @param chosen
      */
     private void autoconfigureBotMunitions(AtBScenario scenario, List<Unit> chosen) {
         Game cGame = getCampaign().getGame();
@@ -1312,25 +1275,25 @@ public final class BriefingTab extends CampaignGuiTab {
         ArrayList<Entity> alliedEntities = new ArrayList<>();
 
         ArrayList<String> allyFactionCodes = new ArrayList<>();
-        ArrayList<String> opforFactionCodes = new ArrayList<>();
-        String opforFactionCode = "IS";
+        ArrayList<String> opForFactionCodes = new ArrayList<>();
+        String opForFactionCode = "IS";
         String allyFaction = "IS";
-        int opforQuality = RATING_5;
+        int opForQuality = RATING_5;
         HashMap<Integer, ArrayList<Entity>> botTeamMappings = new HashMap<>();
         int allowedYear = cGame.getOptions().intOption(OptionsConstants.ALLOWED_YEAR);
 
         // This had better be an AtB contract...
         final Mission mission = comboMission.getSelectedItem();
-        if (mission instanceof AtBContract atbc) {
-            opforFactionCode = (atbc.getEnemyCode().isBlank()) ? opforFactionCode : atbc.getEnemyCode();
-            opforQuality = atbc.getEnemyQuality();
-            allyFactionCodes.add(atbc.getEmployerCode());
-            allyFaction = atbc.getEmployerName(allowedYear);
+        if (mission instanceof AtBContract atbContract) {
+            opForFactionCode = (atbContract.getEnemyCode().isBlank()) ? opForFactionCode : atbContract.getEnemyCode();
+            opForQuality = atbContract.getEnemyQuality();
+            allyFactionCodes.add(atbContract.getEmployerCode());
+            allyFaction = atbContract.getEmployerName(allowedYear);
         } else {
             allyFactionCodes.add(allyFaction);
         }
-        Faction opforFaction = Factions.getInstance().getFaction(opforFactionCode);
-        opforFactionCodes.add(opforFactionCode);
+        Faction opforFaction = Factions.getInstance().getFaction(opForFactionCode);
+        opForFactionCodes.add(opForFactionCode);
         boolean isPirate = opforFaction.isRebelOrPirate();
 
         // Collect player units to use as configuration fodder
@@ -1360,7 +1323,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        // Configure generated units with appropriate munitions (for BV calcs)
+        // Configure generated units with appropriate munitions (for BV calculations)
         TeamLoadOutGenerator tlg = new TeamLoadOutGenerator(cGame);
 
         // Reconfigure each group separately so they only consider their own
@@ -1371,28 +1334,28 @@ public final class BriefingTab extends CampaignGuiTab {
             ReconfigurationParameters rp = TeamLoadOutGenerator.generateParameters(cGame,
                   cGame.getOptions(),
                   entityList,
-                  opforFactionCode,
+                  opForFactionCode,
                   playerEntities,
                   allyFactionCodes,
-                  opforQuality,
+                  opForQuality,
                   ((isPirate) ? TeamLoadOutGenerator.UNSET_FILL_RATIO : 1.0f));
             rp.isPirate = isPirate;
             rp.groundMap = groundMap;
             rp.spaceEnvironment = spaceMap;
             MunitionTree mt = TeamLoadOutGenerator.generateMunitionTree(rp, entityList, "");
-            tlg.reconfigureEntities(entityList, opforFactionCode, mt, rp);
+            tlg.reconfigureEntities(entityList, opForFactionCode, mt, rp);
         }
 
         // Finally, reconfigure all allies (but not player entities) as one organization
         ArrayList<Entity> allEnemyEntities = new ArrayList<>();
-        botTeamMappings.values().stream().forEach(x -> allEnemyEntities.addAll(x));
+        botTeamMappings.values().forEach(allEnemyEntities::addAll);
         ReconfigurationParameters rp = TeamLoadOutGenerator.generateParameters(cGame,
               cGame.getOptions(),
               alliedEntities,
               allyFactionCodes.get(0),
               allEnemyEntities,
-              opforFactionCodes,
-              opforQuality,
+              opForFactionCodes,
+              opForQuality,
               (getCampaign().getFaction().isPirate()) ? TeamLoadOutGenerator.UNSET_FILL_RATIO : 1.0f);
         rp.isPirate = getCampaign().getFaction().isPirate();
         rp.groundMap = groundMap;
@@ -1417,7 +1380,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         List<Unit> chosen = new ArrayList<>();
-        StringBuilder undeployed = new StringBuilder();
+        StringBuilder unDeployed = new StringBuilder();
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
@@ -1430,15 +1393,15 @@ public final class BriefingTab extends CampaignGuiTab {
                     chosen.add(u);
 
                 } else {
-                    undeployed.append('\n').append(u.getName()).append(" (").append(u.checkDeployment()).append(')');
+                    unDeployed.append('\n').append(u.getName()).append(" (").append(u.checkDeployment()).append(')');
                 }
             }
         }
 
-        if (!undeployed.isEmpty()) {
+        if (!unDeployed.isEmpty()) {
             Object[] options = { "Continue", "Cancel" };
             int n = JOptionPane.showOptionDialog(getFrame(),
-                  "The following units could not be deployed:" + undeployed,
+                  "The following units could not be deployed:" + unDeployed,
                   "Could not deploy some units",
                   JOptionPane.OK_CANCEL_OPTION,
                   JOptionPane.WARNING_MESSAGE,
@@ -1477,21 +1440,21 @@ public final class BriefingTab extends CampaignGuiTab {
                                        .toList();
 
         final ArrayList<Entity> chosen = new ArrayList<>();
-        final StringBuilder undeployed = new StringBuilder();
+        final StringBuilder unDeployed = new StringBuilder();
 
         for (final Unit unit : units) {
             if (unit.checkDeployment() == null) {
                 unit.resetPilotAndEntity();
                 chosen.add(unit.getEntity());
             } else {
-                undeployed.append('\n').append(unit.getName()).append(" (").append(unit.checkDeployment()).append(')');
+                unDeployed.append('\n').append(unit.getName()).append(" (").append(unit.checkDeployment()).append(')');
             }
         }
 
-        if (!undeployed.isEmpty()) {
+        if (!unDeployed.isEmpty()) {
             final Object[] options = { "Continue", "Cancel" };
             if (JOptionPane.showOptionDialog(getFrame(),
-                  "The following units could not be deployed:" + undeployed,
+                  "The following units could not be deployed:" + unDeployed,
                   "Could not deploy some units",
                   JOptionPane.OK_CANCEL_OPTION,
                   JOptionPane.WARNING_MESSAGE,
@@ -1702,7 +1665,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     public void refreshScenarioTableData() {
         final Mission mission = comboMission.getSelectedItem();
-        scenarioModel.setData((mission == null) ? new ArrayList<Scenario>() : mission.getVisibleScenarios());
+        scenarioModel.setData((mission == null) ? new ArrayList<>() : mission.getVisibleScenarios());
         selectedScenario = -1;
         scenarioTable.setPreferredScrollableViewportSize(scenarioTable.getPreferredSize());
         scenarioTable.setFillsViewportHeight(true);

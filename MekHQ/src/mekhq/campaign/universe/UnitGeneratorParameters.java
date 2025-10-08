@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe;
 
@@ -36,9 +41,9 @@ import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.client.ratgenerator.ModelRecord;
 import megamek.client.ratgenerator.Parameters;
-import megamek.common.EntityMovementMode;
-import megamek.common.MekSummary;
 import megamek.common.annotations.Nullable;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.EntityMovementMode;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 
@@ -98,7 +103,6 @@ public class UnitGeneratorParameters implements Cloneable {
     /**
      * Translate the contents of this data structure into a megamek.client.ratgenerator.Parameters object
      *
-     * @return
      */
     public Parameters getRATGeneratorParameters() {
         FactionRecord fRec = Factions.getInstance().getFactionRecordOrFallback(getFaction());
@@ -180,7 +184,7 @@ public class UnitGeneratorParameters implements Cloneable {
     public void setMissionRoles(Collection<MissionRole> missionRoles) {
         this.missionRoles = missionRoles;
     }
-    
+
     public void addMissionRole(MissionRole role) {
         missionRoles.add(role);
     }

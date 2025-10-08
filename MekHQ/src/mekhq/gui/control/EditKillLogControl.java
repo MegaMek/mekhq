@@ -24,8 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.control;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.util.ResourceBundle;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.TableColumn;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -35,23 +53,15 @@ import mekhq.gui.dialog.AddOrEditKillEntryDialog;
 import mekhq.gui.model.KillTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.table.TableColumn;
-import java.awt.*;
-import java.util.ResourceBundle;
-
 public class EditKillLogControl extends JPanel {
-    private JFrame parent;
-    private Campaign campaign;
-    private Person person;
-    private KillTableModel killModel;
+    private final JFrame parent;
+    private final Campaign campaign;
+    private final Person person;
+    private final KillTableModel killModel;
 
-    private JButton btnAdd;
     private JButton btnEdit;
     private JButton btnDelete;
     private JTable killTable;
-    private JScrollPane scrollKillTable;
 
     public EditKillLogControl(JFrame parent, Campaign campaign, Person person) {
         this.parent = parent;
@@ -65,33 +75,33 @@ public class EditKillLogControl extends JPanel {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditKillLogControl",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         setName(resourceMap.getString("control.name"));
         this.setLayout(new BorderLayout());
 
-        JPanel panBtns = new JPanel(new GridLayout(1,0));
+        JPanel panButtons = new JPanel(new GridLayout(1, 0));
 
-        btnAdd = new JButton();
+        JButton btnAdd = new JButton();
         btnAdd.setText(resourceMap.getString("btnAdd.text"));
         btnAdd.setName("btnAdd");
         btnAdd.addActionListener(evt -> addKill());
-        panBtns.add(btnAdd);
+        panButtons.add(btnAdd);
 
         btnEdit = new JButton();
         btnEdit.setText(resourceMap.getString("btnEdit.text"));
         btnEdit.setName("btnEdit");
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(evt -> editKill());
-        panBtns.add(btnEdit);
+        panButtons.add(btnEdit);
 
         btnDelete = new JButton();
         btnDelete.setText(resourceMap.getString("btnDelete.text"));
         btnDelete.setName("btnDelete");
         btnDelete.setEnabled(false);
         btnDelete.addActionListener(evt -> deleteKill());
-        panBtns.add(btnDelete);
-        this.add(panBtns, BorderLayout.PAGE_START);
+        panButtons.add(btnDelete);
+        this.add(panButtons, BorderLayout.PAGE_START);
 
         killTable = new JTable(killModel);
         killTable.setName("killTable");
@@ -106,7 +116,7 @@ public class EditKillLogControl extends JPanel {
         killTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         killTable.getSelectionModel().addListSelectionListener(this::killTableValueChanged);
 
-        scrollKillTable = new JScrollPaneWithSpeed();
+        JScrollPane scrollKillTable = new JScrollPaneWithSpeed();
         scrollKillTable.setName("scrollPartsTable");
         scrollKillTable.setViewportView(killTable);
         this.add(scrollKillTable, BorderLayout.CENTER);
@@ -120,7 +130,7 @@ public class EditKillLogControl extends JPanel {
 
     private void addKill() {
         AddOrEditKillEntryDialog dialog = new AddOrEditKillEntryDialog(parent, true,
-                person.getId(), "", campaign.getLocalDate(), campaign);
+              person.getId(), "", campaign.getLocalDate(), campaign);
         dialog.setVisible(true);
         if (dialog.getKill().isPresent()) {
             campaign.addKill(dialog.getKill().get());

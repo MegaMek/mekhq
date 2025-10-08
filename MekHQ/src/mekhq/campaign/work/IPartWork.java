@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,15 +33,15 @@
  */
 package mekhq.campaign.work;
 
-import megamek.common.MiscType;
-import megamek.common.TargetRoll;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.WeaponType;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
@@ -171,12 +171,12 @@ public interface IPartWork extends IWork {
 
     static PartRepairType findCorrectRepairType(IPartWork part) {
         if (((part instanceof EquipmentPart equipmentPart) && (equipmentPart.getType() instanceof WeaponType)) ||
-              ((part instanceof MissingEquipmentPart missingEquipmentPart) &&
-                     (missingEquipmentPart.getType() instanceof WeaponType))) {
+                  ((part instanceof MissingEquipmentPart missingEquipmentPart) &&
+                         (missingEquipmentPart.getType() instanceof WeaponType))) {
             return PartRepairType.WEAPON;
         } else if ((part instanceof EquipmentPart equipmentPart) &&
-              (equipmentPart.getType() instanceof MiscType miscType) &&
-              miscType.hasFlag(MiscType.F_CLUB)) {
+                         (equipmentPart.getType() instanceof MiscType miscType) &&
+                         miscType.hasFlag(MiscType.F_CLUB)) {
             return PartRepairType.PHYSICAL_WEAPON;
         } else {
             return part.getRepairPartType();

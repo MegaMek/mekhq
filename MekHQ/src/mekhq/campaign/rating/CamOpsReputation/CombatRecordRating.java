@@ -47,23 +47,19 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 
 public class CombatRecordRating {
-    private static final MMLogger logger = MMLogger.create(CombatRecordRating.class);
+    private static final MMLogger LOGGER = MMLogger.create(CombatRecordRating.class);
 
     /**
      * Calculates the combat record rating for the provided campaign.
      *
      * @param campaign the campaign for which to calculate the combat record rating
-     * @return a map containing the combat record ratings:
-     *         - "partialSuccesses": the number of missions with status "PARTIAL"
-     *         - "successes": the number of missions with status "SUCCESS"
-     *         - "failures": the number of missions with status "FAILED"
-     *         - "contractsBreached": the number of missions with status "BREACH"
-     *         - "retainerDuration": the duration of the campaign's retainer (in
-     *         years),
-     *         zero if there is no retainer
-     *         - "total": the total combat record rating calculated using the
-     *         formula:
-     *         (successes * 5) - (failures * 10) - (contractBreaches * 25)
+     *
+     * @return a map containing the combat record ratings: - "partialSuccesses": the number of missions with status
+     *       "PARTIAL" - "successes": the number of missions with status "SUCCESS" - "failures": the number of missions
+     *       with status "FAILED" - "contractsBreached": the number of missions with status "BREACH" -
+     *       "retainerDuration": the duration of the campaign's retainer (in years), zero if there is no retainer -
+     *       "total": the total combat record rating calculated using the formula: (successes * 5) - (failures * 10) -
+     *       (contractBreaches * 25)
      */
     protected static Map<String, Integer> calculateCombatRecordRating(Campaign campaign) {
         Map<String, Integer> combatRecord = new HashMap<>();
@@ -100,7 +96,7 @@ public class CombatRecordRating {
             }
 
             missionCountsByStatus.put(mission.getStatus(),
-                missionCountsByStatus.getOrDefault(mission.getStatus(), 0L) + 1);
+                  missionCountsByStatus.getOrDefault(mission.getStatus(), 0L) + 1);
         }
 
         // Assign mission counts to each category
@@ -122,13 +118,13 @@ public class CombatRecordRating {
         int breachMultiplier = usePerformanceModifierReduction ? 5 : 25;
 
         int combatRecordRating = (successes * successMultiplier)
-            - (failures * failureMultiplier)
-            - (contractBreaches * breachMultiplier);
+                                       - (failures * failureMultiplier)
+                                       - (contractBreaches * breachMultiplier);
 
         // if the campaign has a retainer, check retainer duration
         if (campaign.getRetainerStartDate() != null) {
             int retainerDuration = (int) ChronoUnit.YEARS.between(campaign.getRetainerStartDate(),
-                    campaign.getLocalDate());
+                  campaign.getLocalDate());
             combatRecord.put("retainerDuration", retainerDuration);
             combatRecordRating += retainerDuration * 5;
         } else {
@@ -139,10 +135,10 @@ public class CombatRecordRating {
         combatRecord.put("total", combatRecordRating);
 
         // post a log to aid debugging
-        logger.debug("Combat Record Rating = {}",
-                combatRecord.keySet().stream()
-                        .map(key -> String.format("%s: %d", key, combatRecord.get(key)))
-                        .collect(Collectors.joining("\n")));
+        LOGGER.debug("Combat Record Rating = {}",
+              combatRecord.keySet().stream()
+                    .map(key -> String.format("%s: %d", key, combatRecord.get(key)))
+                    .collect(Collectors.joining("\n")));
 
         // return the completed map
         return combatRecord;

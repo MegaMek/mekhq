@@ -25,22 +25,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import megamek.common.Aero;
-import megamek.common.AmmoType;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.common.equipment.AmmoType;
+import megamek.common.units.Aero;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
-
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -55,7 +59,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 
     public MissingAmmoBin(int tonnage, @Nullable AmmoType et, int equipNum, boolean singleShot,
-                          boolean omniPodded, @Nullable Campaign c) {
+          boolean omniPodded, @Nullable Campaign c) {
         super(tonnage, et, equipNum, c, 1.0, 1.0, omniPodded);
         this.oneShot = singleShot;
         if (null != name) {
@@ -68,12 +72,12 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         return (AmmoType) super.getType();
     }
 
-    /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
+    /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for OmniFighter
      * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */
     @Override
     public String getLocationName() {
         if ((null != unit) && (unit.getEntity() instanceof Aero)
-                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
+                  && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
             return "Fuselage";
         }
         return super.getLocationName();
@@ -82,7 +86,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     @Override
     public int getLocation() {
         if ((null != unit) && (unit.getEntity() instanceof Aero)
-                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
+                  && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
             return Aero.LOC_NONE;
         }
         return super.getLocation();
@@ -118,7 +122,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     public void fix() {
         AmmoBin replacement = getNewPart();
         unit.addPart(replacement);
-        campaign.getQuartermaster().addPart(replacement, 0);
+        campaign.getQuartermaster().addPart(replacement, 0, false);
 
         remove(false);
 
@@ -134,8 +138,8 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         // breaks Composability to a degree but in this case we've used
         // subclasses where they're not truly composable.
         return Objects.equals(part.getClass(), AmmoBin.class)
-                && getType().equals(((AmmoBin) part).getType())
-                && (isOneShot() == ((AmmoBin) part).isOneShot());
+                     && getType().equals(((AmmoBin) part).getType())
+                     && (isOneShot() == ((AmmoBin) part).isOneShot());
     }
 
     public boolean isOneShot() {
@@ -154,7 +158,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     @Override
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
         if (oneShot) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "oneShot", oneShot);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "oneShot", true);
         }
 
         super.writeToXMLEnd(pw, indent);

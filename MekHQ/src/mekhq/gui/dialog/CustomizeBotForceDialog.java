@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog;
 
@@ -41,8 +46,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-
 import javax.swing.*;
 
 import megamek.client.bot.princess.BehaviorSettings;
@@ -50,14 +53,14 @@ import megamek.client.bot.princess.PrincessException;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
-import megamek.common.Entity;
-import megamek.common.EntityListFile;
-import megamek.common.EntityWeightClass;
-import megamek.common.MULParser;
 import megamek.common.Player;
-import megamek.common.UnitType;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
+import megamek.common.loaders.MULParser;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityListFile;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -72,15 +75,15 @@ import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class CustomizeBotForceDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(CustomizeBotForceDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(CustomizeBotForceDialog.class);
 
-    private JFrame frame;
+    private final JFrame frame;
     private BotForce botForce;
-    private Campaign campaign;
+    private final Campaign campaign;
     private Camouflage camo;
-    private Player player;
+    private final Player player;
     private BehaviorSettings behavior;
-    private BotForceRandomizer randomizer;
+    private final BotForceRandomizer randomizer;
     private boolean useRandomUnits;
     private List<Entity> fixedEntities;
 
@@ -129,7 +132,7 @@ public class CustomizeBotForceDialog extends JDialog {
         try {
             behavior = botForce.getBehaviorSettings().getCopy();
         } catch (PrincessException ex) {
-            logger.error("Error copying princess behaviors", ex);
+            LOGGER.error("Error copying princess behaviors", ex);
         }
         useRandomUnits = botForce.getBotForceRandomizer() != null;
         if (useRandomUnits) {
@@ -137,7 +140,7 @@ public class CustomizeBotForceDialog extends JDialog {
         } else {
             randomizer = new BotForceRandomizer();
         }
-        fixedEntities = botForce.getFixedEntityListDirect().stream().collect(Collectors.toList());
+        fixedEntities = new ArrayList<>(botForce.getFixedEntityListDirect());
         initComponents();
         setLocationRelativeTo(parent);
         pack();
@@ -146,7 +149,7 @@ public class CustomizeBotForceDialog extends JDialog {
     private void initComponents() {
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeBotForceDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("title"));
 
@@ -270,8 +273,8 @@ public class CustomizeBotForceDialog extends JDialog {
         scrollFixedUnits.setMinimumSize(new Dimension(400, 200));
         scrollFixedUnits.setPreferredSize(new Dimension(400, 200));
         scrollFixedUnits.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("scrollFixedUnits.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+              BorderFactory.createTitledBorder(resourceMap.getString("scrollFixedUnits.title")),
+              BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 1.0;
@@ -285,8 +288,8 @@ public class CustomizeBotForceDialog extends JDialog {
     private void intBehaviorPanel(ResourceBundle resourceMap) {
         panBehavior = new JPanel(new GridBagLayout());
         panBehavior.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("panBehavior.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+              BorderFactory.createTitledBorder(resourceMap.getString("panBehavior.title")),
+              BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         GridBagConstraints gbcLeft = new GridBagConstraints();
         gbcLeft.gridx = 0;
@@ -351,8 +354,8 @@ public class CustomizeBotForceDialog extends JDialog {
     private void initRandomForcesPanel(ResourceBundle resourceMap) {
         panRandomUnits = new JPanel(new GridBagLayout());
         panRandomUnits.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("panRandomUnits.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+              BorderFactory.createTitledBorder(resourceMap.getString("panRandomUnits.title")),
+              BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -396,10 +399,10 @@ public class CustomizeBotForceDialog extends JDialog {
 
         DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
         factionModel.addAll(FactionDisplay.getSortedValidFactionDisplays(Factions.getInstance().getFactions(),
-                campaign.getLocalDate()));
+              campaign.getLocalDate()));
         choiceFaction = new MMComboBox<>("choiceFaction", factionModel);
         choiceFaction.setSelectedItem(new FactionDisplay(Factions.getInstance().getFaction(randomizer.getFactionCode()),
-                campaign.getLocalDate()));
+              campaign.getLocalDate()));
         choiceFaction.setEnabled(useRandomUnits);
         gbc.gridx = 0;
         gbc.gridy++;
@@ -429,9 +432,8 @@ public class CustomizeBotForceDialog extends JDialog {
         panRandomUnits.add(choiceUnitType, gbc);
 
         // leave out none as a skill option
-        ArrayList<SkillLevel> skills = Arrays.stream(SkillLevel.values()).filter(skill -> !skill.isNone())
-                .collect(Collectors.toCollection(() -> new ArrayList<>()));
-        choiceSkillLevel = new MMComboBox("choiceSkillLevel", skills.toArray());
+        choiceSkillLevel = new MMComboBox<>("choiceSkillLevel",
+              Arrays.stream(SkillLevel.values()).filter(skill -> !skill.isNone()).toList());
         choiceSkillLevel.setSelectedItem(randomizer.getSkill());
         choiceSkillLevel.setEnabled(useRandomUnits);
         gbc.gridx = 0;
@@ -468,13 +470,13 @@ public class CustomizeBotForceDialog extends JDialog {
         for (int i = EntityWeightClass.WEIGHT_LIGHT; i <= EntityWeightClass.WEIGHT_ASSAULT; i++) {
             weightClassModel.addElement(EntityWeightClass.getClassName(i));
         }
-        choiceFocalWeightClass = new MMComboBox("choiceFocalWeightClass", weightClassModel);
+        choiceFocalWeightClass = new MMComboBox<>("choiceFocalWeightClass", weightClassModel);
         if (randomizer.getFocalWeightClass() < EntityWeightClass.WEIGHT_LIGHT
-                || randomizer.getFocalWeightClass() > EntityWeightClass.WEIGHT_ASSAULT) {
+                  || randomizer.getFocalWeightClass() > EntityWeightClass.WEIGHT_ASSAULT) {
             choiceFocalWeightClass.setSelectedIndex(0);
         } else {
             choiceFocalWeightClass.setSelectedItem(EntityWeightClass
-                    .getClassName((int) Math.round(randomizer.getFocalWeightClass())));
+                                                         .getClassName((int) Math.round(randomizer.getFocalWeightClass())));
         }
         choiceFocalWeightClass.setEnabled(useRandomUnits);
         gbc.gridx = 0;
@@ -488,7 +490,7 @@ public class CustomizeBotForceDialog extends JDialog {
         panRandomUnits.add(choiceFocalWeightClass, gbc);
 
         spnForceMultiplier = new JSpinner(new SpinnerNumberModel(randomizer.getForceMultiplier(),
-                0.05, 5, 0.05));
+              0.05, 5, 0.05));
         spnForceMultiplier.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy = 1;
@@ -501,7 +503,7 @@ public class CustomizeBotForceDialog extends JDialog {
         panRandomUnits.add(spnForceMultiplier, gbc);
 
         spnPercentConventional = new JSpinner(new SpinnerNumberModel(randomizer.getPercentConventional(),
-                0, 75, 5));
+              0, 75, 5));
         spnPercentConventional.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy++;
@@ -512,7 +514,7 @@ public class CustomizeBotForceDialog extends JDialog {
         panRandomUnits.add(spnPercentConventional, gbc);
 
         spnBaChance = new JSpinner(new SpinnerNumberModel(randomizer.getBaChance(),
-                0, 100, 5));
+              0, 100, 5));
         spnBaChance.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy++;
@@ -523,7 +525,7 @@ public class CustomizeBotForceDialog extends JDialog {
         panRandomUnits.add(spnBaChance, gbc);
 
         spnLanceSize = new JSpinner(new SpinnerNumberModel(randomizer.getLanceSize(),
-                0, 6, 1));
+              0, 6, 1));
         spnLanceSize.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy++;
@@ -592,7 +594,7 @@ public class CustomizeBotForceDialog extends JDialog {
             try {
                 parser = new MULParser(units.get(), campaign.getGameOptions());
             } catch (Exception ex) {
-                logger.error("Could not parse BotForce entities", ex);
+                LOGGER.error("Could not parse BotForce entities", ex);
                 return;
             }
             fixedEntities = Collections.list(parser.getEntities().elements());
@@ -602,19 +604,19 @@ public class CustomizeBotForceDialog extends JDialog {
 
     private void saveUnits(ActionEvent evt) {
         Optional<File> saveUnits = FileDialogs.saveUnits(frame,
-                (!botForce.getName().isEmpty()) ? botForce.getName() : "BotForce");
+              (!botForce.getName().isEmpty()) ? botForce.getName() : "BotForce");
 
         if (saveUnits.isPresent()) {
             try {
                 EntityListFile.saveTo(saveUnits.get(), (ArrayList<Entity>) fixedEntities);
             } catch (Exception ex) {
-                logger.error("Could not save BotForce to file", ex);
+                LOGGER.error("Could not save BotForce to file", ex);
             }
         }
     }
 
     private void deleteUnits(ActionEvent evt) {
-        fixedEntities = new ArrayList<Entity>();
+        fixedEntities = new ArrayList<>();
         refreshFixedEntityPanel();
     }
 
@@ -644,17 +646,21 @@ public class CustomizeBotForceDialog extends JDialog {
         botForce.setFixedEntityList(fixedEntities);
         useRandomUnits = chkUseRandomUnits.isSelected();
         if (useRandomUnits) {
-            randomizer.setFactionCode(choiceFaction.getSelectedItem().getFaction().getShortName());
-            randomizer.setForceMultiplier((double) spnForceMultiplier.getValue());
-            randomizer.setPercentConventional((int) spnPercentConventional.getValue());
-            randomizer.setBaChance((int) spnBaChance.getValue());
-            randomizer.setLanceSize((int) spnLanceSize.getValue());
-            randomizer.setFocalWeightClass(choiceFocalWeightClass.getSelectedIndex());
-            randomizer.setSkill(choiceSkillLevel.getSelectedItem());
-            randomizer.setQuality(choiceQuality.getSelectedIndex());
-            randomizer.setUnitType(choiceUnitType.getSelectedIndex());
-            randomizer.setBalancingMethod(choiceBalancingMethod.getSelectedItem());
-            botForce.setBotForceRandomizer(randomizer);
+            FactionDisplay selectedFaction = choiceFaction.getSelectedItem();
+
+            if (selectedFaction != null) {
+                randomizer.setFactionCode(selectedFaction.getFaction().getShortName());
+                randomizer.setForceMultiplier((double) spnForceMultiplier.getValue());
+                randomizer.setPercentConventional((int) spnPercentConventional.getValue());
+                randomizer.setBaChance((int) spnBaChance.getValue());
+                randomizer.setLanceSize((int) spnLanceSize.getValue());
+                randomizer.setFocalWeightClass(choiceFocalWeightClass.getSelectedIndex());
+                randomizer.setSkill(choiceSkillLevel.getSelectedItem());
+                randomizer.setQuality(choiceQuality.getSelectedIndex());
+                randomizer.setUnitType(choiceUnitType.getSelectedIndex());
+                randomizer.setBalancingMethod(choiceBalancingMethod.getSelectedItem());
+                botForce.setBotForceRandomizer(randomizer);
+            }
         } else {
             botForce.setBotForceRandomizer(null);
         }

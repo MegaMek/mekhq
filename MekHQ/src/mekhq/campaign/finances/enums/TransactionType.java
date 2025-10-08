@@ -24,11 +24,17 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.finances.enums;
 
 import java.util.ResourceBundle;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 
@@ -219,7 +225,7 @@ public enum TransactionType {
         }
 
         try {
-            switch (Integer.parseInt(text)) {
+            switch (MathUtility.parseInt(text)) {
                 case 0:
                     return MISCELLANEOUS;
                 case 1:
@@ -274,7 +280,7 @@ public enum TransactionType {
         }
 
         MMLogger.create(TransactionType.class)
-              .error("Unable to parse " + text + " into a TransactionType. Returning MISCELLANEOUS.");
+              .error("Unable to parse {} into a TransactionType. Returning MISCELLANEOUS.", text);
         return MISCELLANEOUS;
     }
     // endregion File I/O

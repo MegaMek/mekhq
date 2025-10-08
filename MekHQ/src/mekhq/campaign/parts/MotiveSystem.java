@@ -25,28 +25,35 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Entity;
-import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Era;
+import megamek.common.units.Entity;
+import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MotiveSystem extends Part {
-    private static final MMLogger logger = MMLogger.create(MotiveSystem.class);
+    private static final MMLogger LOGGER = MMLogger.create(MotiveSystem.class);
 
     int damage;
     int penalty;
@@ -115,7 +122,7 @@ public class MotiveSystem extends Part {
                     penalty = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
 
@@ -161,10 +168,9 @@ public class MotiveSystem extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         // motive systems don't have to check for destruction since they
         // cannot be removed
-        if (null != unit && unit.getEntity() instanceof Tank) {
-            Tank t = (Tank) unit.getEntity();
-            damage = t.getMotiveDamage();
-            penalty = t.getMotivePenalty();
+        if (null != unit && unit.getEntity() instanceof Tank tank) {
+            damage = tank.getMotiveDamage();
+            penalty = tank.getMotivePenalty();
         }
     }
 

@@ -37,9 +37,8 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
-import static megamek.common.Compute.d6;
+import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
-import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -52,10 +51,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import megamek.common.Compute;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
@@ -97,13 +95,11 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      *
      * <p>Initializes data and behaviors for compatibility.</p>
      *
-     * @param campaign the parent campaign instance
-     *
      * @author Illiani
      * @since 0.50.06
      */
-    public PersonnelMarketMekHQ(Campaign campaign) {
-        super(campaign);
+    public PersonnelMarketMekHQ() {
+        super();
 
         setAssociatedPersonnelMarketStyle(MEKHQ);
 
@@ -135,7 +131,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             if (getCampaign().getReputation().getReputationRating() < getUnitReputationRecruitmentCutoff()) {
                 getLogger().debug(
                       "Only pirates & mercenaries will be considered for applicants, as the campaign's unit " +
-                                   "rating is below the cutoff.");
+                            "rating is below the cutoff.");
                 filterOutLegalFactions = true;
             }
         }
@@ -263,8 +259,8 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         averageSkillLevel = max(averageSkillLevel - (isOfferingGoldenHello() ? 1 : 2), 2);
 
         Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
-                                                                       getClanMarketEntries() :
-                                                                       getInnerSphereMarketEntries();
+                                                                                getClanMarketEntries() :
+                                                                                getInnerSphereMarketEntries();
         unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);
         List<PersonnelMarketEntry> orderedMarketEntries = getMarketEntriesAsList(unorderedMarketEntries);
 
@@ -304,8 +300,9 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         int dependentsCount = d6();
 
         for (int roll = 0; roll < dependentsCount; roll++) {
-            String applicantOriginFaction = getRandomItem(getApplicantOriginFactions()).getShortName();
-            Person applicant = getCampaign().newPerson(DEPENDENT, applicantOriginFaction, Gender.RANDOMIZE);
+            Faction applicantOriginFaction = getRandomItem(getApplicantOriginFactions());
+            Person applicant = getCampaign().newDependent(Gender.RANDOMIZE, applicantOriginFaction,
+                  null);
             if (applicant == null) {
                 continue;
             }

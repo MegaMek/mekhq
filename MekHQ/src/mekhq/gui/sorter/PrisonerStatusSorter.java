@@ -24,24 +24,26 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.sorter;
 
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
-
 import java.util.Comparator;
+
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 
 public class PrisonerStatusSorter implements Comparator<PrisonerStatus> {
 
     /**
-     * Order:
-     * 1) Free
-     * 2) Prisoners willing to Defect
-     * 3) Prisoners not willing to Defect
-     * 4) Bondsmen
+     * Order: 1) Free 2) Prisoners willing to Defect 3) Prisoners not willing to Defect 4) Bondsmen
      *
-     * @param o1    the first PrisonerStatus
-     * @param o2    the second PrisonerStatus
+     * @param o1 the first PrisonerStatus
+     * @param o2 the second PrisonerStatus
+     *
      * @return the sort order
      */
     @Override
@@ -52,37 +54,19 @@ public class PrisonerStatusSorter implements Comparator<PrisonerStatus> {
 
         int o1Order, o2Order;
 
-        switch (o1) {
-            case FREE:
-                o1Order = 0;
-                break;
-            case PRISONER_DEFECTOR:
-                o1Order = 1;
-                break;
-            case PRISONER:
-                o1Order = 2;
-                break;
-            case BONDSMAN:
-            default:
-                o1Order = 3;
-                break;
-        }
+        o1Order = switch (o1) {
+            case FREE -> 0;
+            case PRISONER_DEFECTOR -> 1;
+            case PRISONER -> 2;
+            default -> 3;
+        };
 
-        switch (o2) {
-            case FREE:
-                o2Order = 0;
-                break;
-            case PRISONER_DEFECTOR:
-                o2Order = 1;
-                break;
-            case PRISONER:
-                o2Order = 2;
-                break;
-            case BONDSMAN:
-            default:
-                o2Order = 3;
-                break;
-        }
+        o2Order = switch (o2) {
+            case FREE -> 0;
+            case PRISONER_DEFECTOR -> 1;
+            case PRISONER -> 2;
+            default -> 3;
+        };
 
         return o2Order - o1Order;
     }

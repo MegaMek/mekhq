@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.log;
 
@@ -31,7 +36,6 @@ import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
-import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
@@ -43,7 +47,6 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
  * @author Miguel Azevedo
  */
 public class ServiceLogger {
-    private static final MMLogger logger = MMLogger.create(ServiceLogger.class);
 
     private static final ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
           MekHQ.getMHQOptions().getLocale());
@@ -215,12 +218,6 @@ public class ServiceLogger {
           String missionName) {
         String message = logEntriesResourceMap.getString("capturedInScenarioDuringMission.text");
         person.addPersonalLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, scenarioName, missionName)));
-    }
-
-    public static void successfullyTreated(Person doctor, Person patient, LocalDate date, int injuries) {
-        String message = logEntriesResourceMap.getString("successfullyTreatedForXInjuries.text");
-        doctor.addPersonalLogEntry(new ServiceLogEntry(date,
-              MessageFormat.format(message, patient.getFullName(), injuries)));
     }
 
     /**

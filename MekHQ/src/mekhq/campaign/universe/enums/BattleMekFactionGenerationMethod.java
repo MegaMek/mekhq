@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.universe.enums;
 
@@ -39,9 +44,12 @@ import mekhq.campaign.universe.Faction;
  */
 public enum BattleMekFactionGenerationMethod {
     //region Enum Declarations
-    ORIGIN_FACTION("BattleMekFactionGenerationMethod.ORIGIN_FACTION.text", "BattleMekFactionGenerationMethod.ORIGIN_FACTION.toolTipText"),
-    CAMPAIGN_FACTION("BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.text", "BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.toolTipText"),
-    SPECIFIED_FACTION("BattleMekFactionGenerationMethod.SPECIFIED_FACTION.text", "BattleMekFactionGenerationMethod.SPECIFIED_FACTION.toolTipText");
+    ORIGIN_FACTION("BattleMekFactionGenerationMethod.ORIGIN_FACTION.text",
+          "BattleMekFactionGenerationMethod.ORIGIN_FACTION.toolTipText"),
+    CAMPAIGN_FACTION("BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.text",
+          "BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.toolTipText"),
+    SPECIFIED_FACTION("BattleMekFactionGenerationMethod.SPECIFIED_FACTION.text",
+          "BattleMekFactionGenerationMethod.SPECIFIED_FACTION.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -52,7 +60,7 @@ public enum BattleMekFactionGenerationMethod {
     //region Constructors
     BattleMekFactionGenerationMethod(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -79,16 +87,12 @@ public enum BattleMekFactionGenerationMethod {
     //endregion Boolean Comparison Methods
 
     public Faction generateFaction(final Person person, final Campaign campaign,
-                                   final Faction specifiedFaction) {
-        switch (this) {
-            case CAMPAIGN_FACTION:
-                return campaign.getFaction();
-            case SPECIFIED_FACTION:
-                return specifiedFaction;
-            case ORIGIN_FACTION:
-            default:
-                return person.getOriginFaction();
-        }
+          final Faction specifiedFaction) {
+        return switch (this) {
+            case CAMPAIGN_FACTION -> campaign.getFaction();
+            case SPECIFIED_FACTION -> specifiedFaction;
+            default -> person.getOriginFaction();
+        };
     }
 
     @Override

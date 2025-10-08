@@ -45,20 +45,16 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This is an array list of planets for a jump path, from which we can derive
- * various statistics. We can also add in details about the jump path here, like
- * if
- * the user would like to use recharge stations when available. For XML
- * serialization,
- * this object will need to spit out a list of planet names and then reconstruct
- * the planets from that.
+ * This is an array list of planets for a jump path, from which we can derive various statistics. We can also add in
+ * details about the jump path here, like if the user would like to use recharge stations when available. For XML
+ * serialization, this object will need to spit out a list of planet names and then reconstruct the planets from that.
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class JumpPath {
-    private static final MMLogger logger = MMLogger.create(JumpPath.class);
+    private static final MMLogger LOGGER = MMLogger.create(JumpPath.class);
 
-    private List<PlanetarySystem> path;
+    private final List<PlanetarySystem> path;
 
     public JumpPath() {
         path = new ArrayList<>();
@@ -150,7 +146,7 @@ public class JumpPath {
      * <p>
      * Used in Legacy AtB tests.
      */
-    @Deprecated(since = "0.50.07", forRemoval = false)
+    @Deprecated(since = "0.50.07")
     public double getTotalTime(LocalDate when, double currentTransit) {
         return getTotalTime(when, currentTransit, false);
     }
@@ -229,12 +225,12 @@ public class JumpPath {
                     if (null != p) {
                         retVal.addSystem(p);
                     } else {
-                        logger.error("Couldn't find planet named " + wn2.getTextContent());
+                        LOGGER.error("Couldn't find planet named {}", wn2.getTextContent());
                     }
                 }
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
 
         return retVal;

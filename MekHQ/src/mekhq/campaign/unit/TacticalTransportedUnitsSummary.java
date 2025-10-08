@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 
 package mekhq.campaign.unit;
@@ -33,8 +38,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.Transporter;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -43,12 +48,13 @@ import mekhq.campaign.utilities.CampaignTransportUtilities;
 
 /**
  * Tracks what units this transport is transporting, and its current capacity for its different transporter types.
+ *
  * @see AbstractTransportedUnitsSummary
  * @see CampaignTransportType#TACTICAL_TRANSPORT
  *
  */
 public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSummary {
-    private static final MMLogger logger = MMLogger.create(TacticalTransportedUnitsSummary.class);
+    private static final MMLogger LOGGER = MMLogger.create(TacticalTransportedUnitsSummary.class);
 
     public TacticalTransportedUnitsSummary(Unit transport) {
         super(transport, CampaignTransportType.TACTICAL_TRANSPORT);
@@ -60,7 +66,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
      * @param transportedUnits Units we wish to unload
      */
     @Override
-    public void unloadTransport(Set<Unit>  transportedUnits) {
+    public void unloadTransport(Set<Unit> transportedUnits) {
         super.unloadTransport(transportedUnits);
 
     }
@@ -73,38 +79,37 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
         // then update its transport  assignment (provided the
         // assignment is actually to us!).
         if (transportedUnit.hasTacticalTransportAssignment()
-            && transportedUnit.getTacticalTransportAssignment().getTransport().equals(transport)) {
+                  && transportedUnit.getTacticalTransportAssignment().getTransport().equals(transport)) {
             transportedUnit.setTacticalTransportAssignment(null);
         }
     }
 
     /**
-     * Transporter loading utility used when assigning units to transport units
-     * For each passed-in unit, this will assign the unit to the type of
-     * Transporter if one isn't provided. Once in the MM lobby,
-     * will be used to actually load the unit into a bay on the transport.
+     * Transporter loading utility used when assigning units to transport units For each passed-in unit, this will
+     * assign the unit to the type of Transporter if one isn't provided. Once in the MM lobby, will be used to actually
+     * load the unit into a bay on the transport.
      *
      * @param transporterType type (Enum) of bay or Transporter
-     * @param units units being loaded
-     * @return old transports; what were  the units' previous transport, if they had one
+     * @param units           units being loaded
      */
-    public Set<Unit> loadTransport(TransporterType transporterType, Set<Unit> units) {
-        return loadTransport(units, null, transporterType);
+    public void loadTransport(TransporterType transporterType, Set<Unit> units) {
+        loadTransport(units, null, transporterType);
     }
 
 
     /**
-     * Transporter loading utility used when assigning units to transport units
-     * For each passed-in unit, this will assign the unit to the specified bay,
-     * or the type of Transporter if one isn't provided. Once in the MM lobby,
+     * Transporter loading utility used when assigning units to transport units For each passed-in unit, this will
+     * assign the unit to the specified bay, or the type of Transporter if one isn't provided. Once in the MM lobby,
      * will be used to actually load the unit into a bay on the transport.
      *
-     * @param units units being loaded
+     * @param units               units being loaded
      * @param transportedLocation specific bay (Transporter), or null
-     * @param transporterType type (Enum) of bay or Transporter
+     * @param transporterType     type (Enum) of bay or Transporter
+     *
      * @return old transports; what were  the units' previous transport, if they had one
      */
-    public Set<Unit> loadTransport(Set<Unit> units, @Nullable Transporter transportedLocation, TransporterType transporterType) {
+    public Set<Unit> loadTransport(Set<Unit> units, @Nullable Transporter transportedLocation,
+          TransporterType transporterType) {
         Set<Unit> oldTransports = new HashSet<>();
         //Set<Entity> oldTransportedEntities = clearTransportedEntities();
         for (Unit transportedUnit : units) {
@@ -119,17 +124,18 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
 
 
     /**
-     * Transporter loading utility used when assigning units to transport units
-     * For the passed in unit, this will assign the unit to the specified bay,
-     * or the type of Transporter if one isn't provided. Once in the MM lobby,
-     * will be used to actually load the unit into a bay on the transport.
+     * Transporter loading utility used when assigning units to transport units For the passed in unit, this will assign
+     * the unit to the specified bay, or the type of Transporter if one isn't provided. Once in the MM lobby, will be
+     * used to actually load the unit into a bay on the transport.
      *
      * @param transportedLocation specific bay, or null
-     * @param transporterType type (Enum) of bay or Transporter
-     * @param transportedUnit unit being loaded
+     * @param transporterType     type (Enum) of bay or Transporter
+     * @param transportedUnit     unit being loaded
+     *
      * @return old transport; what was the unit's previous transport, if it had one
      */
-    public @Nullable Unit loadTransport(@Nullable Transporter transportedLocation, TransporterType transporterType, Unit transportedUnit) {
+    public @Nullable Unit loadTransport(@Nullable Transporter transportedLocation, TransporterType transporterType,
+          Unit transportedUnit) {
         Unit oldTransport = null;
         TransporterType oldTransporterType = null;
 
@@ -142,28 +148,30 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
         }
         if (transportedLocation != null) {
             transportedUnit.setTacticalTransportAssignment(new TransportAssignment(transport, transportedLocation));
-        }
-        else if (transporterType != null){
+        } else if (transporterType != null) {
             transportedUnit.setTacticalTransportAssignment(new TransportAssignment(transport, transporterType));
         } else {
-            logger.error(String.format("Cannot load transport (%s) with unit (%s) without a transported location or transporter!", transport.getId(), transportedUnit.getId()));
+            LOGGER.error("Cannot load transport ({}) with unit ({}) without a transported location or transporter!",
+                  transport.getId(),
+                  transportedUnit.getId());
             return oldTransport;
         }
         addTransportedUnit(Objects.requireNonNull(transportedUnit));
 
         // Update Transport Capacities
         if (!Objects.equals(oldTransport, transport)
-            && (transportedUnit.getTacticalTransportAssignment().getTransporterType() != oldTransporterType)) {
+                  && (transportedUnit.getTacticalTransportAssignment().getTransporterType() != oldTransporterType)) {
             setCurrentTransportCapacity(transporterType,
-                getCurrentTransportCapacity(transporterType) - CampaignTransportUtilities.transportCapacityUsage(transporterType,transportedUnit.getEntity()));
+                  getCurrentTransportCapacity(transporterType) -
+                        CampaignTransportUtilities.transportCapacityUsage(transporterType,
+                              transportedUnit.getEntity()));
         }
         return oldTransport;
     }
 
     /**
-     * Bay unloading utility used when removing units from bay-equipped transport
-     * units
-     * and/or moving them to a new transport
+     * Bay unloading utility used when removing units from bay-equipped transport units and/or moving them to a new
+     * transport
      *
      * @param transportedUnit The unit that we wish to unload from this transport
      */
@@ -172,10 +180,10 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
     }
 
     /**
-     * Bay unloading utility used when removing a bay-equipped Transport unit
-     * This removes all units assigned to the transport from it
+     * Bay unloading utility used when removing a bay-equipped Transport unit This removes all units assigned to the
+     * transport from it
      *
-     * @param campaign used to remove this unit as a transport from any other units in the campaign
+     * @param campaign used to remove this unit as transport from any other units in the campaign
      */
     @Override
     public void clearTransportedUnits(Campaign campaign) {
@@ -184,7 +192,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
         // And now reset the Transported values for all the units we just booted
         campaign.getHangar().forEachUnit(u -> {
             if (u.hasTacticalTransportAssignment()
-                && Objects.equals(transport, u.getTacticalTransportAssignment().getTransport())) {
+                      && Objects.equals(transport, u.getTacticalTransportAssignment().getTransport())) {
                 u.setTacticalTransportAssignment(null);
             }
         });
@@ -204,19 +212,24 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
                 Unit realUnit = campaign.getHangar().getUnit(tacticalTransportedUnit.getId());
                 if (realUnit != null) {
                     if (realUnit.hasTacticalTransportAssignment()) {
-                        loadTransport(realUnit.getTacticalTransportAssignment().getTransporterType(), new HashSet<>(Collections.singleton(realUnit)));
+                        loadTransport(realUnit.getTacticalTransportAssignment().getTransporterType(),
+                              new HashSet<>(Collections.singleton(realUnit)));
                     } else {
-                        logger.error(
-                            String.format("Unit %s ('%s') references tactical transported unit %s which has no transport assignment",
-                                unit.getId(), unit.getName(), tacticalTransportedUnit.getId()));
+                        LOGGER.error(
+                              "Unit {} ('{}') references tactical transported unit {} which has no transport assignment",
+                              unit.getId(),
+                              unit.getName(),
+                              tacticalTransportedUnit.getId());
                     }
                 } else {
-                    logger.error(
-                        String.format("Unit %s ('%s') references missing tactical transported unit %s",
-                            unit.getId(), unit.getName(), tacticalTransportedUnit.getId()));
+                    LOGGER.error("Unit {} ('{}') references missing tactical transported unit {}",
+                          unit.getId(),
+                          unit.getName(),
+                          tacticalTransportedUnit.getId());
                 }
             } else {
-                loadTransport(tacticalTransportedUnit.getTacticalTransportAssignment().getTransporterType(), new HashSet<>(Collections.singleton(tacticalTransportedUnit)));
+                loadTransport(tacticalTransportedUnit.getTacticalTransportAssignment().getTransporterType(),
+                      new HashSet<>(Collections.singleton(tacticalTransportedUnit)));
             }
         }
     }

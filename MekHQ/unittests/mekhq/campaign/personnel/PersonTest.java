@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,10 +47,10 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
 import megamek.common.TechConstants;
+import megamek.common.compute.Compute;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Warehouse;
@@ -86,26 +86,26 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
-                LocalDate.parse("3000-01-01"));
+              LocalDate.parse("3000-01-01"));
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
-                LocalDate.parse("3000-01-02"));
+              LocalDate.parse("3000-01-02"));
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 2",
-                LocalDate.parse("3000-01-01"));
+              LocalDate.parse("3000-01-01"));
 
         mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"),
-                LocalDate.parse("3000-01-02"));
+              LocalDate.parse("3000-01-02"));
 
         assertTrue(mockPerson.getAwardController().hasAwards());
         assertEquals(2, mockPerson.getAwardController().getAwards().size());
 
         mockPerson.getAwardController().removeAward("TestSet", "Test Award 2", LocalDate.parse("3000-01-01"),
-                LocalDate.parse("3000-01-02"));
+              LocalDate.parse("3000-01-02"));
 
         assertTrue(mockPerson.getAwardController().hasAwards());
         assertEquals(1, mockPerson.getAwardController().getAwards().size());
 
         mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"),
-                LocalDate.parse("3000-01-02"));
+              LocalDate.parse("3000-01-02"));
 
         assertFalse(mockPerson.getAwardController().hasAwards());
         assertEquals(0, mockPerson.getAwardController().getAwards().size());
@@ -124,21 +124,21 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
-                LocalDate.parse("3000-01-01"));
+              LocalDate.parse("3000-01-01"));
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
-                LocalDate.parse("3000-01-02"));
+              LocalDate.parse("3000-01-02"));
         mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 2",
-                LocalDate.parse("3000-01-01"));
+              LocalDate.parse("3000-01-01"));
 
         assertEquals(2, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
 
         mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"),
-                LocalDate.parse("3000-01-02"));
+              LocalDate.parse("3000-01-02"));
 
         assertEquals(1, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
 
         mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"),
-                LocalDate.parse("3000-01-02"));
+              LocalDate.parse("3000-01-02"));
 
         assertEquals(0, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
     }
@@ -155,7 +155,7 @@ public class PersonTest {
 
         Entity is1Entity = mock(Entity.class);
         when(is1Entity.isClan()).thenReturn(false);
-        when(is1Entity.getTechLevel()).thenReturn(TechConstants.T_INTRO_BOXSET);
+        when(is1Entity.getTechLevel()).thenReturn(TechConstants.T_INTRO_BOX_SET);
         when(is1Entity.getWeightClass()).thenReturn(is1WeightClass);
         when(is1.getEntity()).thenReturn(is1Entity);
 
@@ -165,12 +165,12 @@ public class PersonTest {
         assertEquals(is1Id, mockPerson.getOriginalUnitId());
 
         int[] is2Techs = new int[] {
-                TechConstants.T_IS_TW_NON_BOX,
-                TechConstants.T_IS_TW_ALL,
-                TechConstants.T_IS_ADVANCED,
-                TechConstants.T_IS_EXPERIMENTAL,
-                TechConstants.T_IS_UNOFFICIAL,
-        };
+              TechConstants.T_IS_TW_NON_BOX,
+              TechConstants.T_IS_TW_ALL,
+              TechConstants.T_IS_ADVANCED,
+              TechConstants.T_IS_EXPERIMENTAL,
+              TechConstants.T_IS_UNOFFICIAL,
+              };
         for (int is2TechLevel : is2Techs) {
             UUID is2Id = UUID.randomUUID();
             int is2WeightClass = EntityWeightClass.WEIGHT_HEAVY;
@@ -191,11 +191,11 @@ public class PersonTest {
         }
 
         int[] clanTechs = new int[] {
-                TechConstants.T_CLAN_TW,
-                TechConstants.T_CLAN_ADVANCED,
-                TechConstants.T_CLAN_EXPERIMENTAL,
-                TechConstants.T_CLAN_UNOFFICIAL,
-        };
+              TechConstants.T_CLAN_TW,
+              TechConstants.T_CLAN_ADVANCED,
+              TechConstants.T_CLAN_EXPERIMENTAL,
+              TechConstants.T_CLAN_UNOFFICIAL,
+              };
         for (int clanTech : clanTechs) {
             UUID clanId = UUID.randomUUID();
             int clanWeightClass = EntityWeightClass.WEIGHT_MEDIUM;
@@ -805,7 +805,6 @@ public class PersonTest {
         assertEquals(before.getStoredPersonalityQuirk(), after.getPersonalityQuirk());
         assertEquals(before.getStoredPersonalityQuirkDescriptionIndex(), after.getPersonalityQuirkDescriptionIndex());
         assertEquals(before.getStoredReasoning(), after.getReasoning());
-        assertEquals(before.getStoredReasoningDescriptionIndex(), after.getReasoningDescriptionIndex());
     }
 
     @Test
@@ -830,7 +829,6 @@ public class PersonTest {
         assertEquals(after.getStoredPersonalityQuirk(), before.getPersonalityQuirk());
         assertEquals(after.getStoredPersonalityQuirkDescriptionIndex(), before.getPersonalityQuirkDescriptionIndex());
         assertEquals(after.getStoredReasoning(), before.getReasoning());
-        assertEquals(after.getStoredReasoningDescriptionIndex(), before.getReasoningDescriptionIndex());
     }
 
     @Test
@@ -856,7 +854,6 @@ public class PersonTest {
         assertEquals(before.getPersonalityQuirk(), after.getPersonalityQuirk());
         assertEquals(before.getPersonalityQuirkDescriptionIndex(), after.getPersonalityQuirkDescriptionIndex());
         assertEquals(before.getReasoning(), after.getReasoning());
-        assertEquals(before.getReasoningDescriptionIndex(), after.getReasoningDescriptionIndex());
 
         assertEquals(before.getStoredGivenName(), after.getStoredGivenName());
         assertEquals(before.getStoredSurname(), after.getStoredSurname());
@@ -874,7 +871,6 @@ public class PersonTest {
         assertEquals(before.getStoredPersonalityQuirkDescriptionIndex(),
               after.getStoredPersonalityQuirkDescriptionIndex());
         assertEquals(before.getStoredReasoning(), after.getStoredReasoning());
-        assertEquals(before.getStoredReasoningDescriptionIndex(), after.getStoredReasoningDescriptionIndex());
     }
 
     private Person createPersonality() {
@@ -902,7 +898,6 @@ public class PersonTest {
         personality.setPersonalityQuirk(PersonalityQuirk.ACROPHOBIA);
         personality.setPersonalityQuirkDescriptionIndex(1);
         personality.setReasoning(Reasoning.BRAIN_DEAD);
-        personality.setReasoningDescriptionIndex(1);
 
         personality.setStoredGivenName("Mr.");
         personality.setStoredSurname("Flibble");
@@ -919,7 +914,6 @@ public class PersonTest {
         personality.setStoredPersonalityQuirk(PersonalityQuirk.AMBUSH_LOVER);
         personality.setStoredPersonalityQuirkDescriptionIndex(0);
         personality.setStoredReasoning(Reasoning.DIMWITTED);
-        personality.setStoredReasoningDescriptionIndex(0);
 
         return personality;
     }

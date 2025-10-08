@@ -63,7 +63,6 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 
-import megamek.logging.MMLogger;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -83,7 +82,6 @@ import mekhq.gui.dialog.glossary.NewGlossaryDialog;
  * @since 0.50.07
  */
 public class CampaignOptionsChangedConfirmationDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(CampaignOptionsChangedConfirmationDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
     private final int PADDING = scaleForGUI(10);
@@ -289,7 +287,7 @@ public class CampaignOptionsChangedConfirmationDialog extends JDialog {
             if (isFactionStandingEnabled) {
                 reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
                 factionStandings.resetAllFactionStandings();
-                factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier);
+                factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier, true);
                 reports.addAll(factionStandings.updateCampaignForPastMissions(missions,
                       campaignIcon,
                       campaignFaction,

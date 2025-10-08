@@ -24,14 +24,31 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.model;
 
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.UnitType;
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
+
+import java.awt.Component;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JTable;
+import javax.swing.UIManager;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+
 import megamek.common.annotations.Nullable;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -43,37 +60,29 @@ import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-
-import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
-
 /**
  * A table Model for displaying information about personnel
+ *
  * @author Jay lawson
  */
-public class PersonnelTableModel extends DataTableModel {
+public class PersonnelTableModel extends DataTableModel<Person> {
     //region Variable Declarations
     public static final PersonnelTableModelColumn[] PERSONNEL_COLUMNS = PersonnelTableModelColumn.values();
 
-    private Campaign campaign;
+    private final Campaign campaign;
     private PersonnelMarket personnelMarket;
     private boolean loadAssignmentFromMarket;
     private boolean groupByUnit;
     //endregion Variable Declarations
 
     public PersonnelTableModel(Campaign c) {
-        data = new ArrayList<Person>();
+        data = new ArrayList<>();
         campaign = c;
     }
 
     /**
-     * Gets a value indicating whether the table model should
-     * group personnel by their unit.
+     * Gets a value indicating whether the table model should group personnel by their unit.
+     *
      * @return A value indicating whether the table model groups users by their unit.
      */
     public boolean isGroupByUnit() {
@@ -81,11 +90,10 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     /**
-     * Determines whether to group personnel by their unit (if they have one).
-     * If enabled, a commanding officer's crew (or soldiers) will not be displayed
-     * in the table. Instead, an indicator will appear by the commander's name.
-     * @param groupByUnit true if personnel should be grouped under
-     *                    their commanding officer and not be displayed.
+     * Determines whether to group personnel by their unit (if they have one). If enabled, a commanding officer's crew
+     * (or soldiers) will not be displayed in the table. Instead, an indicator will appear by the commander's name.
+     *
+     * @param groupByUnit true if personnel should be grouped under their commanding officer and not be displayed.
      */
     public void setGroupByUnit(boolean groupByUnit) {
         this.groupByUnit = groupByUnit;
@@ -111,14 +119,14 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     public String getValueAt(final @Nullable Person person,
-                             final PersonnelTableModelColumn column) {
+          final PersonnelTableModelColumn column) {
         if (getData().isEmpty()) {
             return "";
         } else if (person == null) {
             return "?";
         } else {
             return column.getCellValue(getCampaign(), personnelMarket, person,
-                    loadAssignmentFromMarket, isGroupByUnit());
+                  loadAssignmentFromMarket, isGroupByUnit());
         }
     }
 
@@ -156,7 +164,7 @@ public class PersonnelTableModel extends DataTableModel {
     public class Renderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
+              boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             final int modelRow = table.convertRowIndexToModel(row);
             final PersonnelTableModelColumn personnelColumn = PERSONNEL_COLUMNS[table.convertColumnIndexToModel(column)];
@@ -175,15 +183,15 @@ public class PersonnelTableModel extends DataTableModel {
             setToolTipText(personnelColumn.getToolTipText(person, loadAssignmentFromMarket));
 
             // Colouring
-            boolean personIsDamaged = false;
+            boolean personIsDamaged;
             if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
                 personIsDamaged = person.hasInjuries(true);
             } else {
                 personIsDamaged = person.getHits() > 0;
             }
             boolean personIsFatigued = (campaign.getCampaignOptions().isUseFatigue()
-                    && (getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
-                  person.getSkillLevel(campaign, false), campaign.getFieldKitchenWithinCapacity()) >= 5));
+                                              && (getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
+                  person.getSkillLevel(campaign, false)) >= 5));
 
             if (!isSelected) {
                 if (person.getStatus().isAbsent()) {
@@ -223,7 +231,7 @@ public class PersonnelTableModel extends DataTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
+              boolean hasFocus, int row, int column) {
             final int modelRow = table.convertRowIndexToModel(row);
             final PersonnelTableModelColumn personnelColumn = PERSONNEL_COLUMNS[table.convertColumnIndexToModel(column)];
             final Person person = getPerson(modelRow);
@@ -251,7 +259,7 @@ public class PersonnelTableModel extends DataTableModel {
                             if ((!(u.getEntity() instanceof SmallCraft) || !(u.getEntity() instanceof Jumpship))) {
                                 desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                             }
-                            desc += "<br>" + u.getStatus() + "";
+                            desc += "<br>" + u.getStatus();
                             setText(desc);
                             Image mekImage = u.getImage(this);
                             if (mekImage != null) {
@@ -268,7 +276,7 @@ public class PersonnelTableModel extends DataTableModel {
                     Force force = getCampaign().getForceFor(person);
                     if (force != null) {
                         StringBuilder desc = new StringBuilder("<html><b>").append(force.getName())
-                                .append("</b>");
+                                                   .append("</b>");
                         Force parent = force.getParentForce();
                         // cut off after three lines and don't include the top level
                         int lines = 1;
@@ -307,22 +315,15 @@ public class PersonnelTableModel extends DataTableModel {
         }
 
         private @Nullable Image getHitsImage(int hits) {
-            switch (hits) {
-                case 1:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/onehit.png");
-                case 2:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/twohits.png");
-                case 3:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/threehits.png");
-                case 4:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fourhits.png");
-                case 5:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fivehits.png");
-                case 6:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/sixhits.png");
-                default:
-                    return null;
-            }
+            return switch (hits) {
+                case 1 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/onehit.png");
+                case 2 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/twohits.png");
+                case 3 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/threehits.png");
+                case 4 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fourhits.png");
+                case 5 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fivehits.png");
+                case 6 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/sixhits.png");
+                default -> null;
+            };
         }
     }
 

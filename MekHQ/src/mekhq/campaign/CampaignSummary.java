@@ -43,6 +43,7 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.calculatePrisonerCapacity;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.calculatePrisonerCapacityUsage;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.math.BigDecimal;
@@ -50,9 +51,9 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.Entity;
-import megamek.common.Infantry;
-import megamek.common.UnitType;
+import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
+import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -68,6 +69,8 @@ import mekhq.utilities.ReportingUtilities;
  * calculates and stores summary information on a campaign for use in reporting, mostly for the command center
  */
 public class CampaignSummary {
+
+    private static final String WARNING_ICON = "\u26A0";
 
     Campaign campaign;
 
@@ -100,15 +103,23 @@ public class CampaignSummary {
     private int nDS;
 
     /**
-     * @param c a {@link Campaign} for which a summary is desired
+     * Create a CampaignSummary
      */
-    public CampaignSummary(Campaign c) {
-        this.campaign = c;
+    public CampaignSummary() {
+    }
+
+    /**
+     * Link this CampaignSummary to a Campaign instance and update state with information from it.
+     *
+     * @param campaign Campaign to link
+     */
+    public void setCampaign(Campaign campaign) {
+        this.campaign = campaign;
         updateInformation();
     }
 
     /**
-     * This will update all of the values in CampaignSummary to the latest from the campaign. It should be run before
+     * This will update all the values in CampaignSummary to the latest from the campaign. It should be run before
      * pulling out any reports
      */
     public void updateInformation() {
@@ -116,10 +127,10 @@ public class CampaignSummary {
         totalCombatPersonnel = 0;
         totalSupportPersonnel = 0;
         totalInjuries = 0;
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             if (person.getPrimaryRole().isCombat()) {
                 totalCombatPersonnel++;
-            } else {
+            } else if (!person.isDependent()) {
                 totalSupportPersonnel++;
             }
 
@@ -155,7 +166,7 @@ public class CampaignSummary {
                 case UnitType.TANK:
                     veeCount++;
                     break;
-                case UnitType.AEROSPACEFIGHTER:
+                case UnitType.AEROSPACE_FIGHTER:
                 case UnitType.CONV_FIGHTER:
                     aeroCount++;
                     break;
@@ -190,7 +201,7 @@ public class CampaignSummary {
         cargoCapacity = cargoStats.getTotalCombinedCargoCapacity();
 
         double tetrisMasterMultiplier = 1.0;
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             PersonnelOptions options = person.getOptions();
             if (options.booleanOption(ADMIN_TETRIS_MASTER)) {
                 tetrisMasterMultiplier += 0.05;
@@ -207,36 +218,31 @@ public class CampaignSummary {
         HangarStatistics hangarStats = campaign.getHangarStatistics();
         int noMek = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK) -
                                    hangarStats.getOccupiedBays(Entity.ETYPE_MEK), 0);
-        int noSC = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) -
-                                  hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
-        int noCF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) -
-                                  hangarStats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER) -
-                                   hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
-        int nolv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) -
+        int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER) -
+                                   hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER), 0);
+        int noLV = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) -
                                   hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
-        int nohv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) -
+        int noHV = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) -
                                   hangarStats.getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int noinf = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) -
+        int noInf = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) -
                                    hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int noBA = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) -
                                   hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
         int noProto = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK) -
                                      hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK), 0);
-        int freehv = Math.max(hangarStats.getTotalHeavyVehicleBays() - hangarStats.getOccupiedBays(Entity.ETYPE_TANK),
+        int freeHV = Math.max(hangarStats.getTotalHeavyVehicleBays() - hangarStats.getOccupiedBays(Entity.ETYPE_TANK),
               0);
         int freeSC = Math.max(hangarStats.getTotalSmallCraftBays() -
                                     hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
 
         // check for free bays elsewhere
         noASF = Math.max(noASF - freeSC, 0);
-        nolv = Math.max(nolv - freehv, 0);
+        noLV = Math.max(noLV - freeHV, 0);
 
-        unitsOver = noMek + noASF + nolv + nohv + noinf + noBA + noProto;
+        unitsOver = noMek + noASF + noLV + noHV + noInf + noBA + noProto;
         unitsTransported = hangarStats.getOccupiedBays(Entity.ETYPE_MEK) +
                                  hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) +
-                                 hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER) +
+                                 hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER) +
                                  hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true) +
                                  hangarStats.getOccupiedBays(Entity.ETYPE_TANK) +
                                  hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY) +
@@ -380,16 +386,24 @@ public class CampaignSummary {
     public String getHRCapacityReport(Campaign campaign) {
         int combinedSkillValues = getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
-        StringBuilder hrCapacityReport = new StringBuilder().append(getHRStrain(campaign))
-                                                           .append(" / ")
-                                                           .append(campaign.getCampaignOptions()
-                                                                         .getHRCapacity() *
-                                                                         combinedSkillValues)
-                                                           .append(" personnel");
+        StringBuilder hrCapacityReport = new StringBuilder().append("<html>")
+                                               .append(getHRStrain(campaign))
+                                               .append(" / ")
+                                               .append(campaign.getCampaignOptions().getHRCapacity() *
+                                                             combinedSkillValues)
+                                               .append(" personnel");
 
         if (getHRStrainModifier(campaign) > 0) {
-            hrCapacityReport.append(" (+").append(getHRStrainModifier(campaign)).append(')');
+            hrCapacityReport.append(spanOpeningWithCustomColor(getNegativeColor()))
+                  .append(" (<b>+")
+                  .append(getHRStrainModifier(campaign))
+                  .append("</b>)")
+                  .append(CLOSING_SPAN_TAG)
+                  .append(" ")
+                  .append(WARNING_ICON);
         }
+
+        hrCapacityReport.append("</html>");
 
         return hrCapacityReport.toString();
     }
@@ -400,7 +414,7 @@ public class CampaignSummary {
      * @return A summary of fatigue related facilities.
      */
     public String getFacilityReport() {
-        final String WARNING = " \u26A0";
+        final String WARNING = " " + WARNING_ICON;
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         boolean exceedsCapacity;
@@ -415,7 +429,7 @@ public class CampaignSummary {
             List<Unit> unitsInToe = campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(), false);
 
             int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.getFieldKitchenCapacity());
-            int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false),
+            int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, true),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
             boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
 
@@ -447,7 +461,7 @@ public class CampaignSummary {
             final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
             final int maximumPatients = campaignOptions.getMaximumPatients();
             int doctorCapacity = 0;
-            for (Person person : campaign.getActivePersonnel(false)) {
+            for (Person person : campaign.getActivePersonnel(false, false)) {
                 doctorCapacity += person.getDoctorMedicalCapacity(isDoctorsUseAdministration, maximumPatients);
             }
 

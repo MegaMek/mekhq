@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,9 +43,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.WindowConstants;
 
+import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -57,26 +57,23 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  */
 @Deprecated(since = "0.50.06", forRemoval = true)
 public class MekViewDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(MekViewDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(MekViewDialog.class);
 
-    private EntityReadout mekView;
-    private JButton btnOkay;
-    private JScrollPane jScrollPane2;
-    private JTextPane txtMek;
+    private final EntityReadout mekView;
 
     /** Creates new form MekViewDialog */
-    public MekViewDialog(JFrame parent, boolean modal, EntityReadout mv) {
+    public MekViewDialog(JFrame parent, boolean modal, EntityReadout entityReadout) {
         super(parent, modal);
-        this.mekView = mv;
+        this.mekView = entityReadout;
         initComponents();
         setUserPreferences();
     }
 
     private void initComponents() {
 
-        jScrollPane2 = new JScrollPaneWithSpeed();
-        txtMek = new JTextPane();
-        btnOkay = new JButton();
+        JScrollPane jScrollPane2 = new JScrollPaneWithSpeed();
+        JTextPane txtMek = new JTextPane();
+        JButton btnOkay = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog",
               MekHQ.getMHQOptions().getLocale());
@@ -111,7 +108,7 @@ public class MekViewDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

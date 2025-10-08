@@ -129,6 +129,7 @@ public class PersonnelTab {
     private JCheckBox chkDisplayScenarioLog;
     private JCheckBox chkDisplayKillRecord;
     private JCheckBox chkDisplayMedicalRecord;
+    private JCheckBox chkDisplayPatientRecord;
     private JCheckBox chkDisplayAssignmentRecord;
     private JCheckBox chkDisplayPerformanceRecord;
     //end Personnel Logs Tab
@@ -174,8 +175,6 @@ public class PersonnelTab {
     private JTextArea txtAwardSetFilterList;
     //end Awards Tab
 
-    //start Medical Tab
-    private CampaignOptionsHeaderPanel medicalHeader;
     private JCheckBox chkUseAdvancedMedical;
     private JLabel lblHealWaitingPeriod;
     private JSpinner spnHealWaitingPeriod;
@@ -188,6 +187,7 @@ public class PersonnelTab {
     private JLabel lblMaximumPatients;
     private JSpinner spnMaximumPatients;
     private JCheckBox chkDoctorsUseAdministration;
+    private JCheckBox chkUseUsefulMedics;
     //end Medical Tab
 
     //start Prisoners and Dependents Tab
@@ -196,6 +196,7 @@ public class PersonnelTab {
     private JLabel lblPrisonerCaptureStyle;
     private MMComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
     private JCheckBox chkResetTemporaryPrisonerCapacity;
+    private JCheckBox chkUseFunctionalEscapeArtist;
 
     private JPanel dependentsPanel;
     private JCheckBox chkUseRandomDependentAddition;
@@ -240,6 +241,7 @@ public class PersonnelTab {
         lblPrisonerCaptureStyle = new JLabel();
         comboPrisonerCaptureStyle = new MMComboBox<>("comboPrisonerCaptureStyle", PrisonerCaptureStyle.values());
         chkResetTemporaryPrisonerCapacity = new JCheckBox();
+        chkUseFunctionalEscapeArtist = new JCheckBox();
 
         dependentsPanel = new JPanel();
         chkUseRandomDependentAddition = new JCheckBox();
@@ -272,6 +274,7 @@ public class PersonnelTab {
         lblMaximumPatients = new JLabel();
         spnMaximumPatients = new JSpinner();
         chkDoctorsUseAdministration = new JCheckBox();
+        chkUseUsefulMedics = new JCheckBox();
     }
 
     /**
@@ -341,6 +344,7 @@ public class PersonnelTab {
         chkDisplayScenarioLog = new JCheckBox();
         chkDisplayKillRecord = new JCheckBox();
         chkDisplayMedicalRecord = new JCheckBox();
+        chkDisplayPatientRecord = new JCheckBox();
         chkDisplayAssignmentRecord = new JCheckBox();
         chkDisplayPerformanceRecord = new JCheckBox();
     }
@@ -786,9 +790,10 @@ public class PersonnelTab {
      */
     public JPanel createMedicalTab() {
         // Header
-        medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab",
+        //start Medical Tab
+        CampaignOptionsHeaderPanel medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab",
               getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
-              3);
+              4);
 
         // Contents
         chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical");
@@ -823,6 +828,9 @@ public class PersonnelTab {
         chkDoctorsUseAdministration = new CampaignOptionsCheckBox("DoctorsUseAdministration");
         chkDoctorsUseAdministration.addMouseListener(createTipPanelUpdater(medicalHeader, "DoctorsUseAdministration"));
 
+        chkUseUsefulMedics = new CampaignOptionsCheckBox("UseUsefulMedics");
+        chkUseUsefulMedics.addMouseListener(createTipPanelUpdater(medicalHeader, "UseUsefulMedics"));
+
         final JPanel panelLeft = new CampaignOptionsStandardPanel("MedicalTabLeft");
         final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
 
@@ -836,6 +844,10 @@ public class PersonnelTab {
         layoutLeft.gridx = 0;
         layoutLeft.gridy++;
         panelLeft.add(chkDoctorsUseAdministration, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(chkUseUsefulMedics, layoutLeft);
 
         layoutLeft.gridy++;
         panelLeft.add(lblHealWaitingPeriod, layoutLeft);
@@ -1007,6 +1019,9 @@ public class PersonnelTab {
         chkDisplayMedicalRecord = new CampaignOptionsCheckBox("DisplayMedicalRecord");
         chkDisplayMedicalRecord.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
               "DisplayMedicalRecord"));
+        chkDisplayPatientRecord = new CampaignOptionsCheckBox("DisplayPatientRecord");
+        chkDisplayPatientRecord.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
+              "DisplayPatientRecord"));
         chkDisplayAssignmentRecord = new CampaignOptionsCheckBox("DisplayAssignmentRecord");
         chkDisplayAssignmentRecord.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
               "DisplayAssignmentRecord"));
@@ -1046,6 +1061,9 @@ public class PersonnelTab {
 
         layout.gridy++;
         panel.add(chkDisplayMedicalRecord, layout);
+
+        layout.gridy++;
+        panel.add(chkDisplayPatientRecord, layout);
 
         layout.gridy++;
         panel.add(chkDisplayAssignmentRecord, layout);
@@ -1120,6 +1138,10 @@ public class PersonnelTab {
         chkResetTemporaryPrisonerCapacity.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
               "ResetTemporaryPrisonerCapacity"));
 
+        chkUseFunctionalEscapeArtist = new CampaignOptionsCheckBox("UseFunctionalEscapeArtist");
+        chkUseFunctionalEscapeArtist.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
+              "UseFunctionalEscapeArtist"));
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PrisonersPanel", true, "PrisonersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -1130,6 +1152,11 @@ public class PersonnelTab {
         panel.add(lblPrisonerCaptureStyle, layout);
         layout.gridx++;
         panel.add(comboPrisonerCaptureStyle, layout);
+
+        layout.gridy++;
+        layout.gridx = 0;
+        layout.gridwidth = 2;
+        panel.add(chkUseFunctionalEscapeArtist, layout);
 
         layout.gridy++;
         layout.gridx = 0;
@@ -1201,39 +1228,8 @@ public class PersonnelTab {
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public JPanel createSalariesTab() {
-        // Header
-        //        salariesHeader = new CampaignOptionsHeaderPanel("SalariesTab", getImageDirectory() + "logo_clan_coyote.png", 2);
-        //
-        //        // Contents
-        //        chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary");
-        //        chkDisableSecondaryRoleSalary.addMouseListener(createTipPanelUpdater(salariesHeader,
-        //              "DisableSecondaryRoleSalary"));
-        //        pnlSalaryMultipliersPanel = createSalaryMultipliersPanel();
-        //        pnlSalaryExperienceMultipliersPanel = createExperienceMultipliersPanel();
-        //        pnlSalaryBaseSalaryPanel = createBaseSalariesPanel();
-
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SalariesTab", true);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        //        layout.gridwidth = 5;
-        //        layout.gridy = 0;
-        //        panel.add(salariesHeader, layout);
-        //
-        //        layout.gridx = 0;
-        //        layout.gridy++;
-        //        layout.gridwidth = 1;
-        //        panel.add(chkDisableSecondaryRoleSalary, layout);
-        //
-        //        layout.gridy++;
-        //        panel.add(pnlSalaryMultipliersPanel, layout);
-        //        layout.gridx++;
-        //        panel.add(pnlSalaryExperienceMultipliersPanel, layout);
-        //
-        //        layout.gridx = 0;
-        //        layout.gridy++;
-        //        layout.gridwidth = 2;
-        //        panel.add(pnlSalaryBaseSalaryPanel, layout);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "SalariesTab");
@@ -1306,6 +1302,7 @@ public class PersonnelTab {
         chkDisplayScenarioLog.setSelected(options.isDisplayScenarioLog());
         chkDisplayKillRecord.setSelected(options.isDisplayKillRecord());
         chkDisplayMedicalRecord.setSelected(options.isDisplayMedicalRecord());
+        chkDisplayPatientRecord.setSelected(options.isDisplayPatientRecord());
         chkDisplayAssignmentRecord.setSelected(options.isDisplayAssignmentRecord());
         chkDisplayPerformanceRecord.setSelected(options.isDisplayPerformanceRecord());
 
@@ -1348,9 +1345,11 @@ public class PersonnelTab {
         chkUseTougherHealing.setSelected(options.isTougherHealing());
         spnMaximumPatients.setValue(options.getMaximumPatients());
         chkDoctorsUseAdministration.setSelected(options.isDoctorsUseAdministration());
+        chkUseUsefulMedics.setSelected(options.isUseUsefulMedics());
 
         // Prisoners and Dependents
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
+        chkUseFunctionalEscapeArtist.setSelected(options.isUseFunctionalEscapeArtist());
         chkUseRandomDependentAddition.setSelected(options.isUseRandomDependentAddition());
         chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
         spnDependentProfessionDieSize.setValue(options.getDependentProfessionDieSize());
@@ -1398,6 +1397,7 @@ public class PersonnelTab {
         options.setDisplayScenarioLog(chkDisplayScenarioLog.isSelected());
         options.setDisplayKillRecord(chkDisplayKillRecord.isSelected());
         options.setDisplayMedicalRecord(chkDisplayMedicalRecord.isSelected());
+        options.setDisplayPatientRecord(chkDisplayPatientRecord.isSelected());
         options.setDisplayAssignmentRecord(chkDisplayAssignmentRecord.isSelected());
         options.setDisplayPerformanceRecord(chkDisplayPerformanceRecord.isSelected());
 
@@ -1440,9 +1440,11 @@ public class PersonnelTab {
         options.setTougherHealing(chkUseTougherHealing.isSelected());
         options.setMaximumPatients((int) spnMaximumPatients.getValue());
         options.setDoctorsUseAdministration(chkDoctorsUseAdministration.isSelected());
+        options.setIsUseUsefulMedics(chkUseUsefulMedics.isSelected());
 
         // Prisoners and Dependents
         options.setPrisonerCaptureStyle(comboPrisonerCaptureStyle.getSelectedItem());
+        options.setUseFunctionalEscapeArtist(chkUseFunctionalEscapeArtist.isSelected());
         if (chkResetTemporaryPrisonerCapacity.isSelected()) {
             campaign.setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
         }

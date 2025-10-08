@@ -24,19 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.cleanup;
 
 import java.util.Map.Entry;
 
-import megamek.common.Mounted;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 
 public class MovedEquipmentStep extends UnscrambleStep {
     @Override
     public void visit(final EquipmentProposal proposal, final EquipmentPart part) {
-        for (final Entry<Integer, Mounted> equipment : proposal.getEquipment()) {
+        for (final Entry<Integer, Mounted<?>> equipment : proposal.getEquipment()) {
             final Mounted<?> m = equipment.getValue();
             if (m.isDestroyed()) {
                 continue;
@@ -51,7 +56,7 @@ public class MovedEquipmentStep extends UnscrambleStep {
 
     @Override
     public void visit(final EquipmentProposal proposal, final MissingEquipmentPart part) {
-        for (final Entry<Integer, Mounted> equipment : proposal.getEquipment()) {
+        for (final Entry<Integer, Mounted<?>> equipment : proposal.getEquipment()) {
             final Mounted<?> m = equipment.getValue();
             if (m.isDestroyed()) {
                 continue;

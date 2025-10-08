@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel;
 
-import static megamek.common.Compute.d6;
+import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.finances.enums.TransactionType.WEALTH;
 import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;

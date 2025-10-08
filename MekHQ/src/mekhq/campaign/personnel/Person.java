@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,14 +39,14 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.StringUtility.isNullOrBlank;
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
+import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
+import static mekhq.campaign.log.LogEntryType.PATIENT;
 import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
-import static mekhq.campaign.log.LogEntryType.SERVICE;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
@@ -58,6 +58,7 @@ import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
@@ -80,8 +81,10 @@ import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.*;
+import megamek.common.TargetRollModifier;
+import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Portrait;
@@ -89,14 +92,16 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.event.PersonChangedEvent;
-import mekhq.campaign.event.PersonStatusChangedEvent;
+import mekhq.campaign.events.persons.PersonChangedEvent;
+import mekhq.campaign.events.persons.PersonStatusChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -224,6 +229,7 @@ public class Person {
     private LocalDate dateOfDeath;
     private List<LogEntry> personnelLog;
     private List<LogEntry> medicalLog;
+    private List<LogEntry> patientLog;
     private List<LogEntry> scenarioLog;
     private List<LogEntry> assignmentLog;
     private List<LogEntry> performanceLog;
@@ -239,6 +245,9 @@ public class Person {
     private Skills skills;
     private PersonnelOptions options;
     private int toughness;
+    private Attributes atowAttributes;
+
+    // If new Traits are added, make sure to also add them to LifePathDataTraitLookup
     private int connections;
     private int wealth;
     private boolean hasPerformedExtremeExpenditure;
@@ -246,7 +255,6 @@ public class Person {
     private int unlucky;
     private int bloodmark;
     private List<LocalDate> bloodhuntSchedule;
-    private Attributes atowAttributes;
 
     private PersonnelStatus status;
     private int xp;
@@ -338,10 +346,9 @@ public class Person {
     private int socialDescriptionIndex;
     private PersonalityQuirk personalityQuirk;
     private int personalityQuirkDescriptionIndex;
-    private Reasoning reasoning;
-    private int reasoningDescriptionIndex;
     private String personalityDescription;
     private String personalityInterviewNotes;
+    private Reasoning reasoning;
     // endregion Personality
 
     // region SPAs
@@ -360,7 +367,6 @@ public class Person {
     private PersonalityQuirk storedPersonalityQuirk;
     private int storedPersonalityQuirkDescriptionIndex;
     private Reasoning storedReasoning;
-    private int storedReasoningDescriptionIndex;
     private boolean sufferingFromClinicalParanoia;
     private boolean darkSecretRevealed;
     private LocalDate burnedConnectionsEndDate;
@@ -372,7 +378,6 @@ public class Person {
     private boolean divorceable;
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
-    private boolean employed;
     // this is a flag used in determine whether a person is a potential marriage
     // candidate provided
     // that they are not married, are old enough, etc.
@@ -523,6 +528,7 @@ public class Person {
         techUnits = new ArrayList<>();
         personnelLog = new ArrayList<>();
         medicalLog = new ArrayList<>();
+        patientLog = new ArrayList<>();
         scenarioLog = new ArrayList<>();
         assignmentLog = new ArrayList<>();
         performanceLog = new ArrayList<>();
@@ -556,7 +562,6 @@ public class Person {
         personalityQuirk = PersonalityQuirk.NONE;
         personalityQuirkDescriptionIndex = randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS);
         reasoning = Reasoning.AVERAGE;
-        reasoningDescriptionIndex = randomInt(Reasoning.MAXIMUM_VARIATIONS);
         personalityDescription = "";
         personalityInterviewNotes = "";
         storedLoyalty = 0;
@@ -571,7 +576,6 @@ public class Person {
         storedPersonalityQuirk = PersonalityQuirk.NONE;
         storedPersonalityQuirkDescriptionIndex = 0;
         storedReasoning = Reasoning.AVERAGE;
-        storedReasoningDescriptionIndex = 0;
         sufferingFromClinicalParanoia = false;
         darkSecretRevealed = false;
         burnedConnectionsEndDate = null;
@@ -594,7 +598,6 @@ public class Person {
         setDivorceable(true);
         setFounder(false);
         setImmortal(false);
-        setEmployed(true);
         setMarriageable(true);
         setTryingToConceive(true);
         // endregion Flags
@@ -995,7 +998,7 @@ public class Person {
     /**
      * Use {@link #setPrimaryRole(LocalDate, PersonnelRole)} instead
      */
-    @Deprecated(since = "0.50.07", forRemoval = false) // we need to remove the uses before removal
+    @Deprecated(since = "0.50.07") // we need to remove the uses before removal
     public void setPrimaryRole(final Campaign campaign, final PersonnelRole primaryRole) {
         // don't need to do any processing for no changes
         if (primaryRole == getPrimaryRole()) {
@@ -1051,7 +1054,6 @@ public class Person {
         // and trigger the update event
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
-
 
 
     public void setPrimaryRoleDirect(final PersonnelRole primaryRole) {
@@ -1131,7 +1133,7 @@ public class Person {
     public String getFormatedRoleDescriptions(LocalDate today) {
         StringBuilder description = new StringBuilder("<html>");
 
-        if (!employed) {
+        if (!isEmployed()) {
             description.append("\u25CF ");
         }
 
@@ -1276,6 +1278,7 @@ public class Person {
                   S_COMMUNICATIONS,
                   S_SENSOR_OPERATIONS,
                   S_ART_COOKING).anyMatch(this::hasSkill);
+            case SOLDIER -> INFANTRY_GUNNERY_SKILLS.stream().anyMatch(this::hasSkill);
             case BATTLE_ARMOUR -> hasSkill(S_GUN_BA);
             case VESSEL_CREW -> hasSkill(S_TECH_VESSEL);
             case MEK_TECH -> hasSkill(S_TECH_MEK);
@@ -1487,7 +1490,7 @@ public class Person {
             }
         }
 
-        if (status.isActive()) {
+        if (status.isActiveFlexible()) {
             // Check Pregnancy
             if (isPregnant() && getDueDate().isBefore(today)) {
                 campaign.getProcreation().birth(campaign, getDueDate(), this);
@@ -1824,7 +1827,9 @@ public class Person {
      * @param recruitment the date the entity was recruited, or {@code null} to unset
      */
     public void setRecruitment(final @Nullable LocalDate recruitment) {
-        employed = recruitment != null;
+        if (recruitment == null) {
+            status = PersonnelStatus.CAMP_FOLLOWER;
+        }
 
         this.recruitment = recruitment;
     }
@@ -2617,18 +2622,13 @@ public class Person {
         this.reasoning = reasoning;
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getReasoningDescriptionIndex() {
-        return reasoningDescriptionIndex;
+        return 0;
     }
 
-    /**
-     * Sets the index value for the {@link Reasoning} description.
-     *
-     * @param reasoningDescriptionIndex The index value to set for the Reasoning description. It will be clamped to
-     *                                  ensure it remains within the valid range.
-     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setReasoningDescriptionIndex(final int reasoningDescriptionIndex) {
-        this.reasoningDescriptionIndex = clamp(reasoningDescriptionIndex, 0, Reasoning.MAXIMUM_VARIATIONS - 1);
     }
 
     Reasoning getStoredReasoning() {
@@ -2639,12 +2639,13 @@ public class Person {
         this.storedReasoning = storedReasoning;
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     int getStoredReasoningDescriptionIndex() {
-        return storedReasoningDescriptionIndex;
+        return 0;
     }
 
+    @Deprecated(since = "0.50.07", forRemoval = true)
     void setStoredReasoningDescriptionIndex(int storedReasoningDescriptionIndex) {
-        this.storedReasoningDescriptionIndex = storedReasoningDescriptionIndex;
     }
 
     public String getPersonalityDescription() {
@@ -2735,11 +2736,7 @@ public class Person {
     }
 
     public boolean isEmployed() {
-        return employed;
-    }
-
-    public void setEmployed(final boolean employed) {
-        this.employed = employed;
+        return status != PersonnelStatus.CAMP_FOLLOWER;
     }
 
     public boolean isMarriageable() {
@@ -3015,6 +3012,14 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "medicalLog");
             }
 
+            if (!patientLog.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "patientLog");
+                for (LogEntry entry : patientLog) {
+                    entry.writeToXML(pw, indent);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "patientLog");
+            }
+
             if (!scenarioLog.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenarioLog");
                 for (LogEntry entry : scenarioLog) {
@@ -3167,8 +3172,6 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reasoning", reasoning.ordinal());
             }
 
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reasoningDescriptionIndex", reasoningDescriptionIndex);
-
             if (!isNullOrBlank(personalityDescription)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
             }
@@ -3249,13 +3252,6 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedReasoning", storedReasoning.name());
             }
 
-            if (storedReasoningDescriptionIndex != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw,
-                      indent,
-                      "storedReasoningDescriptionIndex",
-                      storedReasoningDescriptionIndex);
-            }
-
             if (sufferingFromClinicalParanoia) {
                 MHQXMLUtility.writeSimpleXMLTag(pw,
                       indent,
@@ -3283,7 +3279,6 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "divorceable", divorceable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "founder", founder);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employed", employed);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
@@ -3526,51 +3521,41 @@ public class Person {
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            // <50.05 compatibility handler
                             LogEntryType logEntryType = logEntry.getType();
                             String logEntryDescription = logEntry.getDesc();
                             if (logEntryType == MEDICAL) {
                                 person.addMedicalLogEntry(logEntry);
-                            } else if (logEntryType == SERVICE) {
-                                // < 50.05 compatibility handler
-                                List<String> assignmentTargetStrings = List.of("Assigned to",
-                                      "Reassigned from",
-                                      "Removed from",
-                                      "Added to");
-
-                                boolean shiftedLogType = false;
-                                for (String targetString : assignmentTargetStrings) {
-                                    if (logEntryDescription.startsWith(targetString)) {
-                                        logEntry.setType(ASSIGNMENT);
-                                        person.addAssignmentLogEntry(logEntry);
-                                        shiftedLogType = true;
-                                        break;
-                                    }
-                                }
-
-                                if (!shiftedLogType) {
-                                    person.addPersonalLogEntry(logEntry);
-                                }
                             } else {
-                                // < 50.05 compatibility handler
-                                List<String> performanceTargetStrings = List.of("Changed edge to",
-                                      "Gained",
-                                      "Improved",
-                                      "injuries, gaining",
-                                      "XP from successful medical work");
+                                Map<String, LogEntryType> logMap = new HashMap<>();
+                                logMap.put("Assigned to", ASSIGNMENT); // <50.07 compatibility
+                                logMap.put("Reassigned to", ASSIGNMENT); // <50.07 compatibility
+                                logMap.put("Removed from", ASSIGNMENT); // <50.07 compatibility
+                                logMap.put("Added to", ASSIGNMENT); // <50.07 compatibility
+                                logMap.put("Changed edge to", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("Gained", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("Improved", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("injuries, gaining", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("XP from successful medical work", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("Successfully treated", PATIENT); // <50.07 compatibility
 
-                                boolean foundPerformanceTarget = false;
-                                for (String targetString : performanceTargetStrings) {
-                                    if (logEntryDescription.startsWith(targetString)) {
-                                        foundPerformanceTarget = true;
+                                boolean logEntryWasReassigned = false;
+                                for (Map.Entry<String, LogEntryType> entry : logMap.entrySet()) {
+                                    if (logEntryDescription.contains(entry.getKey())) {
+                                        LogEntryType newType = entry.getValue();
+                                        logEntry.setType(newType);
+
+                                        switch (newType) {
+                                            case ASSIGNMENT -> person.addAssignmentLogEntry(logEntry);
+                                            case PERFORMANCE -> person.addPerformanceLogEntry(logEntry);
+                                            case PATIENT -> person.addPatientLogEntry(logEntry);
+                                        }
+
+                                        logEntryWasReassigned = true;
                                         break;
                                     }
                                 }
 
-                                if (foundPerformanceTarget) {
-                                    logEntry.setType(PERFORMANCE);
-                                    person.addPerformanceLogEntry(logEntry);
-                                } else {
+                                if (!logEntryWasReassigned) {
                                     person.addPersonalLogEntry(logEntry);
                                 }
                             }
@@ -3594,6 +3579,26 @@ public class Person {
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
                             person.addMedicalLogEntry(logEntry);
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("patientLog")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                            LOGGER.error("(patientLog) Unknown node type not loaded in personnel logEntry nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+
+                        final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+                        if (logEntry != null) {
+                            person.addPatientLogEntry(logEntry);
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("scenarioLog")) {
@@ -3653,7 +3658,14 @@ public class Person {
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            person.addPerformanceLogEntry(logEntry);
+                            String logEntryDescription = logEntry.getDesc();
+
+                            if (logEntryDescription.contains("Successfully treated")) {
+                                logEntry.setType(PATIENT);
+                                person.addPatientLogEntry(logEntry);
+                            } else {
+                                person.addPerformanceLogEntry(logEntry);
+                            }
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("awards")) {
@@ -3775,8 +3787,6 @@ public class Person {
                     person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
                     person.reasoning = Reasoning.fromString(wn2.getTextContent().trim());
-                } else if ((nodeName.equalsIgnoreCase("reasoningDescriptionIndex"))) {
-                    person.reasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("personalityInterviewNotes")) {
@@ -3811,8 +3821,6 @@ public class Person {
                     person.storedPersonalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("storedReasoning")) {
                     person.storedReasoning = Reasoning.fromString(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("storedReasoningDescriptionIndex")) {
-                    person.storedReasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("sufferingFromClinicalParanoia")) {
                     person.setSufferingFromClinicalParanoia(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("darkSecretRevealed")) {
@@ -3829,13 +3837,6 @@ public class Person {
                     person.setFounder(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("immortal")) {
                     person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("employed")) {
-                    // Fixes a <50.07 bug
-                    if (!person.isCivilian()) { // Non-civilians are always employed
-                        person.setEmployed(true);
-                    } else {
-                        person.setEmployed(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                    }
                 } else if (nodeName.equalsIgnoreCase("marriageable")) {
                     person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
@@ -3962,7 +3963,7 @@ public class Person {
             return Money.zero();
         }
 
-        if (!employed) {
+        if (!isEmployed()) {
             return Money.zero();
         }
 
@@ -4163,7 +4164,7 @@ public class Person {
     }
 
     /**
-     * Retrieves the character's rank <b>sub-level</b>. Predominantly used in ComStar rank styles.
+     * Retrieves the character's rank <b>sublevel</b>. Predominantly used in ComStar rank styles.
      *
      * <p><b>Important:</b> You almost always want to use {@link #getRankNumeric()} instead.</p>
      *
@@ -4422,6 +4423,23 @@ public class Person {
                       S_SENSOR_OPERATIONS);
                 int highestExperienceLevel = EXP_NONE;
                 for (String relevantSkill : relevantSkills) {
+                    Skill skill = getSkill(relevantSkill);
+
+                    if (skill == null) {
+                        continue;
+                    }
+
+                    int currentExperienceLevel = skill.getExperienceLevel(options, atowAttributes);
+                    if (currentExperienceLevel > highestExperienceLevel) {
+                        highestExperienceLevel = currentExperienceLevel;
+                    }
+                }
+
+                yield highestExperienceLevel;
+            }
+            case SOLDIER -> {
+                int highestExperienceLevel = EXP_NONE;
+                for (String relevantSkill : INFANTRY_GUNNERY_SKILLS) {
                     Skill skill = getSkill(relevantSkill);
 
                     if (skill == null) {
@@ -4937,7 +4955,7 @@ public class Person {
     }
 
     public boolean needsFixing() {
-        return ((hits > 0) || needsAMFixing()) && getStatus().isActive();
+        return ((hits > 0) || needsAMFixing()) && getStatus().isActiveFlexible();
     }
 
     /**
@@ -5160,95 +5178,115 @@ public class Person {
     // endregion edge
 
     /**
-     * Determines whether the user possesses the necessary skills to operate the given entity.
+     * Determines if the user possesses the required skills and role to operate (pilot/drive) the given entity.
      *
-     * <p>The required skills are based on the type of the provided entity. The method checks for specific piloting or
-     * gunnery skills relevant to the entity type, such as Meks, VTOLs, tanks, aerospace units, battle armor, and
-     * others.</p>
+     * <p>The method checks the type of the entity and validates whether the corresponding piloting skill and role
+     * are assigned. Supported types include Land-Air Mek, Mek, VTOL, tank (including variants for marine and ground
+     * modes), conventional fighter, small craft, jumpship, aerospace unit, battle armor, infantry, and ProtoMek.</p>
      *
-     * <p>If the appropriate skill(s) for the entity type are present, the method returns {@code true}; otherwise, it
-     * returns {@code false}.</p>
+     * @param entity the entity to check for piloting/driving capability. If {@code null}, returns {@code false}.
      *
-     * @param entity the entity to be checked for driving capability
-     *
-     * @return {@code true} if the required skill(s) to drive or operate the given entity are present; {@code false}
-     *       otherwise
+     * @return {@code true} if the user is qualified to pilot or drive the specified entity; {@code false} otherwise
      */
     public boolean canDrive(final Entity entity) {
+        if (entity == null) {
+            return false;
+        }
+
         if (entity instanceof LandAirMek) {
-            return hasSkill(S_PILOT_MEK) && hasSkill(S_PILOT_AERO);
+            return hasSkill(S_PILOT_MEK) && hasSkill(S_PILOT_AERO) && isRole(PersonnelRole.LAM_PILOT);
         } else if (entity instanceof Mek) {
-            return hasSkill(S_PILOT_MEK);
+            return hasSkill(S_PILOT_MEK) && isRole(PersonnelRole.MEKWARRIOR);
         } else if (entity instanceof VTOL) {
-            return hasSkill(S_PILOT_VTOL);
+            return hasSkill(S_PILOT_VTOL) && isRole(PersonnelRole.VTOL_PILOT);
         } else if (entity instanceof Tank) {
-            return hasSkill(entity.getMovementMode().isMarine() ? S_PILOT_NVEE : S_PILOT_GVEE);
+            if (entity.getMovementMode().isMarine()) {
+                return hasSkill(S_PILOT_NVEE) && isRole(PersonnelRole.NAVAL_VEHICLE_DRIVER);
+            } else {
+                return hasSkill(S_PILOT_GVEE) && isRole(PersonnelRole.GROUND_VEHICLE_DRIVER);
+            }
         } else if (entity instanceof ConvFighter) {
-            return hasSkill(S_PILOT_JET) || hasSkill(S_PILOT_AERO);
+            return hasSkill(S_PILOT_JET) && isRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
         } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
-            return hasSkill(S_PILOT_SPACE);
+            return hasSkill(S_PILOT_SPACE) && isRole(PersonnelRole.VESSEL_PILOT);
         } else if (entity instanceof Aero) {
-            return hasSkill(S_PILOT_AERO);
+            return hasSkill(S_PILOT_AERO) && isRole(PersonnelRole.AEROSPACE_PILOT);
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(S_GUN_BA);
+            return hasSkill(S_GUN_BA) && isRole(PersonnelRole.BATTLE_ARMOUR);
         } else if (entity instanceof Infantry) {
-            return hasSkill(S_SMALL_ARMS);
+            if (isRole(PersonnelRole.SOLDIER)) {
+                for (String skill : INFANTRY_GUNNERY_SKILLS) {
+                    if (hasSkill(skill)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         } else if (entity instanceof ProtoMek) {
-            return hasSkill(S_GUN_PROTO);
+            return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT);
         } else {
             return false;
         }
     }
 
     /**
-     * Determines whether the user possesses the necessary skills to operate weapons for the given entity.
+     * Determines if the user has the appropriate skills and role to operate the weapon systems (gun) of the given
+     * entity.
      *
-     * <p>The required gunnery skill is dependent on the type of entity provided. This method checks for the relevant
-     * gunnery or weapon skill associated with the entity type, such as Mek, tanks, aerospace units, battle armor,
-     * infantry, and others.</p>
+     * <p>This method evaluates the entity type and ensures that the required gunnery skill and role are present. It
+     * supports a range of unit types such as Land-Air Mek, Mek, tank, conventional fighter, small craft, jumpship,
+     * aerospace unit, battle armor, infantry, and ProtoMek.</p>
      *
-     * <p>Returns {@code true} if the necessary skill(s) to use the entity's weapons are present; {@code false}
-     * otherwise.</p>
+     * @param entity the entity to check for gunnery capability. If {@code null}, returns {@code false}.
      *
-     * @param entity the entity to check for gunnery capability
-     *
-     * @return {@code true} if the user is qualified to operate weapons for the given entity; {@code false} otherwise
+     * @return {@code true} if the user is qualified to operate the weapons of the specified entity; {@code false}
+     *       otherwise
      */
     public boolean canGun(final Entity entity) {
+        if (entity == null) {
+            return false;
+        }
+
         if (entity instanceof LandAirMek) {
-            return hasSkill(S_GUN_MEK) && hasSkill(S_GUN_AERO);
+            return hasSkill(S_GUN_MEK) && hasSkill(S_GUN_AERO) && isRole(PersonnelRole.LAM_PILOT);
         } else if (entity instanceof Mek) {
-            return hasSkill(S_GUN_MEK);
+            return hasSkill(S_GUN_MEK) && isRole(PersonnelRole.MEKWARRIOR);
         } else if (entity instanceof Tank) {
-            return hasSkill(S_GUN_VEE);
+            return hasSkill(S_GUN_VEE) && isRole(PersonnelRole.VEHICLE_GUNNER);
         } else if (entity instanceof ConvFighter) {
-            return hasSkill(S_GUN_JET) || hasSkill(S_GUN_AERO);
+            return hasSkill(S_GUN_JET) && isRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
         } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
-            return hasSkill(S_GUN_SPACE);
+            return hasSkill(S_GUN_SPACE) && isRole(PersonnelRole.VESSEL_GUNNER);
         } else if (entity instanceof Aero) {
-            return hasSkill(S_GUN_AERO);
+            return hasSkill(S_GUN_AERO) && isRole(PersonnelRole.AEROSPACE_PILOT);
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(S_GUN_BA);
+            return hasSkill(S_GUN_BA) && isRole(PersonnelRole.BATTLE_ARMOUR);
         } else if (entity instanceof Infantry) {
-            return hasSkill(S_SMALL_ARMS);
+            if (isRole(PersonnelRole.SOLDIER)) {
+                for (String skill : INFANTRY_GUNNERY_SKILLS) {
+                    if (hasSkill(skill)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         } else if (entity instanceof ProtoMek) {
-            return hasSkill(S_GUN_PROTO);
+            return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT);
         } else {
             return false;
         }
     }
 
     /**
-     * Determines whether the user possesses the necessary technical skills to service or repair the given entity.
+     * Determines if the user holds the necessary technical skills to service or repair the specified entity.
      *
-     * <p>The required technical skill depends on the entity type. This method checks for the appropriate technical
-     * skill based on whether the entity is a type of Mek, vessel, aerospace unit, battle armor, tank, or other
-     * supported classes.</p>
+     * <p>The method inspects the entity type and checks for the corresponding technical skills required to perform
+     * maintenance or repairs. Supported types include Mek, ProtoMek, dropship, jumpship, aerospace unit, battle armor,
+     * and tank.</p>
      *
-     * <p>Returns {@code true} if the user has the qualifying technical skill for the entity; {@code false} otherwise
-     * .</p>
-     *
-     * @param entity the entity to check for technical capability
+     * @param entity the entity to assess for technical capability. If {@code null}, returns {@code false}.
      *
      * @return {@code true} if the user is qualified to service or repair the given entity; {@code false} otherwise
      */
@@ -5256,16 +5294,17 @@ public class Person {
         if (entity == null) {
             return false;
         }
+
         if ((entity instanceof Mek) || (entity instanceof ProtoMek)) {
-            return hasSkill(S_TECH_MEK);
+            return hasSkill(S_TECH_MEK) && isTechMek();
         } else if (entity instanceof Dropship || entity instanceof Jumpship) {
-            return hasSkill(S_TECH_VESSEL);
+            return hasSkill(S_TECH_VESSEL) && isTechLargeVessel();
         } else if (entity instanceof Aero) {
-            return hasSkill(S_TECH_AERO);
+            return hasSkill(S_TECH_AERO) && isTechAero();
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(S_TECH_BA);
+            return hasSkill(S_TECH_BA) && isTechBA();
         } else if (entity instanceof Tank) {
-            return hasSkill(S_TECH_MECHANIC);
+            return hasSkill(S_TECH_MECHANIC) && isTechMechanic();
         } else {
             return false;
         }
@@ -5593,6 +5632,43 @@ public class Person {
     public boolean isTechBA() {
         boolean hasSkill = hasSkill(S_TECH_BA);
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
+    }
+
+    /**
+     * Checks whether this character satisfies the requirements for a given personnel role.
+     *
+     * <p>This method verifies that the specified role matches either the character's primary or secondary role, and
+     * ensures the character possesses all the required skills for that profession. If any required skill is missing, a
+     * warning is logged and the method returns {@code false}.</p>
+     *
+     * @param role the {@link PersonnelRole} to check against this character
+     *
+     * @return {@code true} if the character matches the specified role and has all necessary skills; {@code false}
+     *       otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public boolean isRole(PersonnelRole role) {
+        // Does the character have the appropriate role?
+        if (!role.equals(getPrimaryRole()) && !role.equals(getSecondaryRole())) {
+            return false;
+        }
+
+        // Do they have the skills for that role? This should be assumed, we include the check here as a safety net.
+        for (String skillName : role.getSkillsForProfession()) {
+            Skill skill = getSkill(skillName);
+            if (skill == null) {
+                LOGGER.warn("Unable to find skill {} needed for {} profession for {}",
+                      skillName,
+                      role.getLabel(false),
+                      getFullTitle());
+                return false;
+            }
+        }
+
+        // If everything checks out, return true
+        return true;
     }
 
     /**
@@ -6017,11 +6093,11 @@ public class Person {
         final int PATHOLOGIC_RACISM_REPUTATION_PENALTY = -2;
 
         int modifiers = isUseAgingEffects ?
-                             getReputationAgeModifier(getAge(today),
-                                   isClanCampaign,
-                                   !isNullOrBlank(bloodname),
-                                   rankNumeric) :
-                             0;
+                              getReputationAgeModifier(getAge(today),
+                                    isClanCampaign,
+                                    !isNullOrBlank(bloodname),
+                                    rankNumeric) :
+                              0;
 
         boolean hasRacism = options.booleanOption(COMPULSION_RACISM);
         modifiers -= hasRacism ? 1 : 0;
@@ -6289,6 +6365,11 @@ public class Person {
         return medicalLog;
     }
 
+    public List<LogEntry> getPatientLog() {
+        patientLog.sort(Comparator.comparing(LogEntry::getDate));
+        return patientLog;
+    }
+
     public List<LogEntry> getScenarioLog() {
         scenarioLog.sort(Comparator.comparing(LogEntry::getDate));
         return scenarioLog;
@@ -6318,6 +6399,10 @@ public class Person {
 
     public void addMedicalLogEntry(final LogEntry entry) {
         medicalLog.add(entry);
+    }
+
+    public void addPatientLogEntry(final LogEntry entry) {
+        patientLog.add(entry);
     }
 
     public void addScenarioLogEntry(final LogEntry entry) {
@@ -6476,6 +6561,22 @@ public class Person {
               isPiloting ? ModifierValue.PILOTING : ModifierValue.GUNNERY);
     }
 
+    /**
+     * Determines whether the person has any injuries, possibly filtering by permanence.
+     *
+     * <ul>
+     *     <li>If {@code permanentCheck} is {@code false}, this method returns {@code true} if the person has any
+     *     recorded injuries.</li>
+     *     <li>If {@code permanentCheck} is {@code true}, it will return {@code true} only if the person has at least
+     *     one injury that is either non-permanent or has a remaining recovery time greater than zero. Otherwise, it
+     *     returns {@code false}.</li>
+     * </ul>
+     *
+     * @param permanentCheck if {@code true}, only injuries that are not permanent or have time remaining are
+     *                       considered; if {@code false}, any injury will be counted
+     *
+     * @return {@code true} if the person has injuries matching the specified criteria; {@code false} otherwise
+     */
     public boolean hasInjuries(final boolean permanentCheck) {
         return !injuries.isEmpty() &&
                      (!permanentCheck ||
@@ -6542,7 +6643,7 @@ public class Person {
 
         if (unit.getEntity().isClan()) {
             originalUnitTech = TECH_CLAN;
-        } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET) {
+        } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOX_SET) {
             originalUnitTech = TECH_IS2;
         } else {
             originalUnitTech = TECH_IS1;
@@ -6732,7 +6833,7 @@ public class Person {
             return;
         }
 
-        if (employed) {
+        if (isEmployed()) {
             LocalDate estimatedJoinDate = null;
             for (LogEntry logEntry : getPersonalLog()) {
                 if (estimatedJoinDate == null) {
@@ -6760,10 +6861,10 @@ public class Person {
 
             if (joinedCampaign != null) {
                 if (updateRecruitment) {
-                    recruitment = estimatedJoinDate;
+                    recruitment = null;
                 }
                 if (updateLastRankChange) {
-                    lastRankChangeDate = estimatedJoinDate;
+                    lastRankChangeDate = null;
                 }
                 recruitment = joinedCampaign;
                 return;
@@ -6958,95 +7059,71 @@ public class Person {
     /**
      * Generates alternative personality traits and applies them to the stored split personality profile.
      *
-     * <p>Traits are randomly selected from
-     * {@link Aggression}, {@link Ambition}, {@link Greed}, and {@link Social}, with potential for up to four traits
-     * total. Additional characteristics such as a {@link PersonalityQuirk} trait and {@link Reasoning} characteristics
-     * are randomly determined and stored.</p>
+     * <p>Traits are randomly selected from {@link Aggression}, {@link Ambition}, {@link Greed}, and {@link Social},
+     * with potential for up to four traits total. Additional characteristics such as a {@link PersonalityQuirk} trait
+     * and {@link Reasoning} characteristics are randomly determined and stored.</p>
      *
      * @author Illiani
-     * @see PersonalityController#generatePersonality(Person, boolean)
+     * @see PersonalityController#generatePersonality(Person)
      * @since 0.50.07
      */
     private void generateSplitPersonalityPersonalityCharacteristics() {
-        List<PersonalityTraitType> possibleTraits = new ArrayList<>(Arrays.asList(PersonalityTraitType.AGGRESSION,
-              PersonalityTraitType.AMBITION,
-              PersonalityTraitType.GREED,
-              PersonalityTraitType.SOCIAL));
+        setStoredAggression(Aggression.NONE);
+        setStoredAmbition(Ambition.NONE);
+        setStoredGreed(Greed.NONE);
+        setStoredSocial(Social.NONE);
+        setStoredReasoning(Reasoning.AVERAGE);
+        setStoredPersonalityQuirk(PersonalityQuirk.NONE);
 
-        Collections.shuffle(possibleTraits);
+        // Then we generate a new personality
+        List<PersonalityTraitType> possibleTraits = new ArrayList<>();
+        possibleTraits.add(PersonalityTraitType.AGGRESSION);
+        possibleTraits.add(PersonalityTraitType.AMBITION);
+        possibleTraits.add(PersonalityTraitType.GREED);
+        possibleTraits.add(PersonalityTraitType.SOCIAL);
+        possibleTraits.add(PersonalityTraitType.PERSONALITY_QUIRK);
 
-        List<PersonalityTraitType> chosenTraits = new ArrayList<>();
+        int iterations = 2;
 
-        PersonalityTraitType firstTrait = possibleTraits.get(0);
-        possibleTraits.remove(firstTrait);
-        chosenTraits.add(firstTrait);
+        while (iterations != 0 && !possibleTraits.isEmpty()) {
+            PersonalityTraitType pickedTrait = ObjectUtility.getRandomItem(possibleTraits);
+            possibleTraits.remove(pickedTrait);
+            iterations--;
 
-        PersonalityTraitType secondTrait = possibleTraits.get(0);
-        possibleTraits.remove(secondTrait);
-        chosenTraits.add(secondTrait);
-
-        if (randomInt(4) == 0) {
-            PersonalityTraitType thirdTrait = possibleTraits.get(0);
-            possibleTraits.remove(thirdTrait);
-            chosenTraits.add(thirdTrait);
+            switch (pickedTrait) {
+                case AGGRESSION -> {
+                    String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
+                    setStoredAggression(Aggression.fromString(traitIndex));
+                    setStoredAggressionDescriptionIndex(randomInt(Aggression.MAXIMUM_VARIATIONS));
+                }
+                case AMBITION -> {
+                    String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
+                    setStoredAmbition(Ambition.fromString(traitIndex));
+                    setStoredAmbitionDescriptionIndex(randomInt(Ambition.MAXIMUM_VARIATIONS));
+                }
+                case GREED -> {
+                    String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
+                    setStoredGreed(Greed.fromString(traitIndex));
+                    setStoredGreedDescriptionIndex(randomInt(Greed.MAXIMUM_VARIATIONS));
+                }
+                case SOCIAL -> {
+                    String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
+                    setStoredSocial(Social.fromString(traitIndex));
+                    setStoredSocialDescriptionIndex(randomInt(Social.MAXIMUM_VARIATIONS));
+                }
+                case PERSONALITY_QUIRK -> {
+                    int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
+                    String traitIndex = String.valueOf(traitRoll);
+                    setStoredPersonalityQuirk(PersonalityQuirk.fromString(traitIndex));
+                    setStoredPersonalityQuirkDescriptionIndex(randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS));
+                }
+                default -> {}
+            }
         }
 
-        if (randomInt(4) == 0) {
-            PersonalityTraitType forthTrait = possibleTraits.get(0);
-            chosenTraits.add(forthTrait);
-        }
-
-        for (PersonalityTraitType traitType : chosenTraits) {
-            storeSplitPersonality(traitType);
-        }
-
-        int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
-        String traitIndex = String.valueOf(traitRoll);
-        storedPersonalityQuirk = PersonalityQuirk.fromString(traitIndex);
-        storedPersonalityQuirkDescriptionIndex = randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS);
-
+        // Always generate Reasoning
         int reasoningRoll = randomInt(8346);
         storedReasoning = generateReasoning(reasoningRoll);
-        storedReasoningDescriptionIndex = randomInt(Reasoning.MAXIMUM_VARIATIONS);
-    }
-
-    /**
-     * Stores the specified personality trait type in the split personality profile.
-     *
-     * <p>Based on the provided {@link PersonalityTraitType}, this method assigns a randomly chosen trait value and
-     * description index to the corresponding stored split personality fields (such as {@link Aggression},
-     * {@link Ambition}, {@link Greed}, or {@link Social}). If the trait type does not match any known category, no
-     * action is taken.</p>
-     *
-     * @param traitType the {@link PersonalityTraitType} to store for the split personality profile
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void storeSplitPersonality(PersonalityTraitType traitType) {
-        switch (traitType) {
-            case AGGRESSION -> {
-                String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
-                storedAggression = Aggression.fromString(traitIndex);
-                storedAggressionDescriptionIndex = randomInt(Aggression.MAXIMUM_VARIATIONS);
-            }
-            case AMBITION -> {
-                String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
-                storedAmbition = Ambition.fromString(traitIndex);
-                storedAmbitionDescriptionIndex = randomInt(Ambition.MAXIMUM_VARIATIONS);
-            }
-            case GREED -> {
-                String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
-                storedGreed = Greed.fromString(traitIndex);
-                storedGreedDescriptionIndex = randomInt(Greed.MAXIMUM_VARIATIONS);
-            }
-            case SOCIAL -> {
-                String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
-                storedSocial = Social.fromString(traitIndex);
-                storedSocialDescriptionIndex = randomInt(Social.MAXIMUM_VARIATIONS);
-            }
-            default -> {}
-        }
     }
 
     /**
@@ -7167,10 +7244,6 @@ public class Person {
         Reasoning transitionaryReasoning = reasoning;
         reasoning = storedReasoning;
         storedReasoning = transitionaryReasoning;
-
-        int transitionaryReasoningDescriptionIndex = reasoningDescriptionIndex;
-        reasoningDescriptionIndex = storedReasoningDescriptionIndex;
-        storedReasoningDescriptionIndex = transitionaryReasoningDescriptionIndex;
     }
 
     /**
@@ -7215,15 +7288,16 @@ public class Person {
      * Processes a potential catatonia episode fthe character, applying relevant effects and status changes.
      *
      * <p>If both {@code hasCatatonia} and {@code failedWillpowerCheck} are {@code true}, this method applies an
-     * injury if advanced medical is used, or increments physical trauma otherwise. If the total number of
-     * injuries or trauma exceeds a predefined death threshold, the person's status is changed to indicate medical
-     * complications. In either case, the method returns a formatted string describing the catatonia episode. If the
-     * conditions are not met, it returns an empty string.</p>
+     * injury if advanced medical is used, or increments physical trauma otherwise. If the total number of injuries or
+     * trauma exceeds a predefined death threshold, the person's status is changed to indicate medical complications. In
+     * either case, the method returns a formatted string describing the catatonia episode. If the conditions are not
+     * met, it returns an empty string.</p>
      *
      * @param campaign             the current campaign context
      * @param useAdvancedMedical   {@code true} to use advanced medical rules, {@code false} otherwise
      * @param hasCatatonia         {@code true} if the person is suffering from catatonia
      * @param failedWillpowerCheck {@code true} if the person failed their willpower check
+     *
      * @return description of the resulting catatonia episode, or an empty string if no episode occurred
      *
      * @author Illiani
@@ -7329,7 +7403,7 @@ public class Person {
 
         if (hasBerserker && failedWillpowerCheck) {
             Set<Person> victims = new HashSet<>();
-            List<Person> allActivePersonnel = campaign.getActivePersonnel(false);
+            List<Person> allActivePersonnel = campaign.getActivePersonnel(true, true);
             if (isDeployed() && unit != null) {
                 getLocalVictims(allActivePersonnel, victims);
             } else {
@@ -7350,8 +7424,8 @@ public class Person {
 
                 if ((victim.getInjuries().size() > DEATH_THRESHOLD) || (victim.getHits() > DEATH_THRESHOLD)) {
                     victim.changeStatus(campaign, campaign.getLocalDate(), victim.equals(this) ?
-                                                                          PersonnelStatus.MEDICAL_COMPLICATIONS :
-                                                                          PersonnelStatus.HOMICIDE);
+                                                                                 PersonnelStatus.MEDICAL_COMPLICATIONS :
+                                                                                 PersonnelStatus.HOMICIDE);
                 }
             }
 
@@ -7512,7 +7586,7 @@ public class Person {
     }
 
     /**
-     * Determines whether a character's dark secret is revealed based on a dice roll, configured modifiers, and campaign
+     * Determines whether a character's dark secret is revealed based on a die roll, configured modifiers, and campaign
      * options.
      *
      * <p>If the character does not have a dark secret, an empty string is returned. Otherwise, a target number is
@@ -7524,8 +7598,8 @@ public class Person {
      * <p>If the secret is not revealed, returns an empty string.</p>
      *
      * @param hasDarkSecret {@code true} if the character has a dark secret. Should be the return value of
-     * {@link #hasDarkSecret()}
-     * @param forceReveal   {@code true} if the reveal should be forced without a dice roll.
+     *                      {@link #hasDarkSecret()}
+     * @param forceReveal   {@code true} if the reveal should be forced without a die roll.
      *
      * @return a formatted HTML string with the reveal message if the secret is revealed, or an empty string otherwise
      *
@@ -7622,7 +7696,7 @@ public class Person {
             return 0;
         }
 
-        // If the character has a dark secret but it is not revealed, return a default modifier (e.g., -1)
+        // If the character has a dark secret, but it is not revealed, return a default modifier (e.g., -1)
         if (!darkSecretRevealed && hasDarkSecret()) {
             return -1; // Default modifier for unrevealed dark secrets
         }

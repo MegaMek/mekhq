@@ -24,18 +24,23 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.cleanup;
-
-import megamek.common.BattleArmor;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.unit.Unit;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import megamek.common.battleArmor.BattleArmor;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.unit.Unit;
 
 public class BattleArmorEquipmentProposal extends EquipmentProposal {
     //region Variable Declarations
@@ -68,9 +73,10 @@ public class BattleArmorEquipmentProposal extends EquipmentProposal {
 
         // Assign troopers per mount
         final Map<Integer, List<BattleArmorEquipmentPart>> baPartMap = mapped.keySet().stream()
-                .filter(part -> part instanceof BattleArmorEquipmentPart)
-                .map(part -> (BattleArmorEquipmentPart) part)
-                .collect(Collectors.groupingBy(EquipmentPart::getEquipmentNum));
+                                                                             .filter(part -> part instanceof BattleArmorEquipmentPart)
+                                                                             .map(part -> (BattleArmorEquipmentPart) part)
+                                                                             .collect(Collectors.groupingBy(
+                                                                                   EquipmentPart::getEquipmentNum));
 
         for (final List<BattleArmorEquipmentPart> parts : baPartMap.values()) {
             // Try to find one for each trooper; if the Entity has multiple pieces of equipment of

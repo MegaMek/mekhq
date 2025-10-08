@@ -33,71 +33,54 @@
 package mekhq.campaign.randomEvents.personalities.enums;
 
 import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.AVERAGE;
-import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.MAXIMUM_VARIATIONS;
+import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.OBTUSE;
+import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.UNDER_PERFORMING;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import megamek.common.enums.Gender;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.Test;
 
 public class ReasoningTest {
-    @ParameterizedTest
-    @CsvSource(value = { "UNINTELLIGENT,UNINTELLIGENT", "INVALID_STATUS,AVERAGE", "'',AVERAGE", "'null',AVERAGE",
-                         "1,UNINTELLIGENT" })
-    void testFromStringVariousInputs(String input, Reasoning expected) {
-        if ("null".equals(input)) {
-            input = null;
+    @Test
+    public void testFromString_ValidStatus() {
+        Reasoning status = Reasoning.fromString(OBTUSE.name());
+        assertEquals(OBTUSE, status);
+    }
+
+    @Test
+    public void testFromString_InvalidStatus() {
+        Reasoning status = Reasoning.fromString("INVALID_STATUS");
+
+        assertEquals(AVERAGE, status);
+    }
+
+    @Test
+    public void testFromString_NullStatus() {
+        Reasoning status = Reasoning.fromString(null);
+
+        assertEquals(AVERAGE, status);
+    }
+
+    @Test
+    public void testFromString_EmptyString() {
+        Reasoning status = Reasoning.fromString("");
+
+        assertEquals(AVERAGE, status);
+    }
+
+    @Test
+    public void testFromString_FromOrdinal() {
+        Reasoning status = Reasoning.fromString(UNDER_PERFORMING.ordinal() + "");
+
+        assertEquals(UNDER_PERFORMING, status);
+    }
+
+    @Test
+    public void testGetLabel_notInvalid() {
+        for (Reasoning status : Reasoning.values()) {
+            String label = status.getLabel();
+            assertTrue(isResourceKeyValid(label));
         }
-        Reasoning result = Reasoning.fromString(input);
-        assertEquals(expected, result);
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = Reasoning.class)
-    void testFromString_Ordinal_All(Reasoning value) {
-        Reasoning result = Reasoning.fromString(String.valueOf(value.ordinal()));
-        assertEquals(value, result);
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = Reasoning.class)
-    void testGetLabel_notInvalid(Reasoning status) {
-        String label = status.getLabel();
-        assertTrue(isResourceKeyValid(label));
-    }
-
-    static Stream<Arguments> provideReasoningAndIndices() {
-        return Arrays.stream(Reasoning.values())
-                     .flatMap(trait -> IntStream.range(0, MAXIMUM_VARIATIONS).mapToObj(i -> Arguments.of(trait, i)));
-    }
-
-    @ParameterizedTest
-    @MethodSource(value = "provideReasoningAndIndices")
-    void testGetDescription_notInvalid(Reasoning trait, int i) {
-        String description = trait.getDescription(i, Gender.MALE, "Barry");
-        assertTrue(isResourceKeyValid(description));
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = { "99", "1000", "-1" })
-    void testGetDescription_InvalidDescriptionIndex(int invalidIndex) {
-        String description = AVERAGE.getDescription(invalidIndex, Gender.MALE, "Barry");
-        assertTrue(isResourceKeyValid(description));
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = Reasoning.class)
-    void testGetPersonalityTraitTypeLabel_notInvalid(Reasoning status) {
-        String label = status.getPersonalityTraitTypeLabel();
-        assertTrue(isResourceKeyValid(label));
     }
 }

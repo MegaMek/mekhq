@@ -25,26 +25,30 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.Infantry;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingInfantryMotiveType;
+import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.Infantry;
-import megamek.common.TechAdvancement;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-
 /**
- *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class InfantryMotiveType extends Part {
@@ -118,7 +122,7 @@ public class InfantryMotiveType extends Part {
             } else if (null != spare) {
                 int number = quantity;
                 while (number > 0) {
-                    spare.incrementQuantity();
+                    spare.changeQuantity(1);
                     number--;
                 }
                 campaign.getWarehouse().removePart(this);
@@ -146,22 +150,15 @@ public class InfantryMotiveType extends Part {
 
     @Override
     public Money getStickerPrice() {
-         switch (getMovementMode()) {
-            case INF_UMU:
-                return Money.of(17888);
-            case INF_MOTORIZED:
-                return Money.of(17888.0 * 0.6);
-            case INF_JUMP:
-                return Money.of(17888.0 * 1.6);
-            case HOVER:
-                return Money.of(17888.0 * 2.2 * 5);
-            case WHEELED:
-                return Money.of(17888.0 * 2.2 * 6);
-            case TRACKED:
-                return Money.of(17888.0 * 2.2 * 7);
-            default:
-                return Money.zero();
-         }
+        return switch (getMovementMode()) {
+            case INF_UMU -> Money.of(17888);
+            case INF_MOTORIZED -> Money.of(17888.0 * 0.6);
+            case INF_JUMP -> Money.of(17888.0 * 1.6);
+            case HOVER -> Money.of(17888.0 * 2.2 * 5);
+            case WHEELED -> Money.of(17888.0 * 2.2 * 6);
+            case TRACKED -> Money.of(17888.0 * 2.2 * 7);
+            default -> Money.zero();
+        };
     }
 
     @Override

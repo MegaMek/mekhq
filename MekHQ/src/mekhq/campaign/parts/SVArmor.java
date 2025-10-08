@@ -24,20 +24,24 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
 
-import static megamek.common.EquipmentType.T_ARMOR_SV_BAR_2;
+import static megamek.common.equipment.EquipmentType.T_ARMOR_SV_BAR_2;
 
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
-import megamek.common.ITechnology.TechRating;
 import megamek.common.TechAdvancement;
+import megamek.common.enums.TechRating;
 import megamek.common.equipment.ArmorType;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -49,7 +53,7 @@ import org.w3c.dom.Node;
  * Standard support vehicle armor, which can differ by BAR and tech rating.
  */
 public class SVArmor extends Armor {
-    private static final MMLogger logger = MMLogger.create(SVArmor.class);
+    private static final MMLogger LOGGER = MMLogger.create(SVArmor.class);
 
     private int bar;
     private TechRating techRating;
@@ -102,7 +106,7 @@ public class SVArmor extends Armor {
     @Override
     public Money getActualValue() {
         return adjustCostsForCampaignOptions(
-                Money.of(amount * ArmorType.svArmor(bar).getCost()));
+              Money.of(amount * ArmorType.svArmor(bar).getCost()));
     }
 
     @Override
@@ -113,7 +117,7 @@ public class SVArmor extends Armor {
     @Override
     public Money getValueNeeded() {
         return adjustCostsForCampaignOptions(
-                Money.of(amountNeeded * ArmorType.svArmor(bar).getCost()));
+              Money.of(amountNeeded * ArmorType.svArmor(bar).getCost()));
     }
 
     @Override
@@ -133,8 +137,8 @@ public class SVArmor extends Armor {
     @Override
     public boolean isSamePartType(Part part) {
         return (getClass() == part.getClass())
-                && (bar == ((SVArmor) part).bar)
-                && (techRating == ((SVArmor) part).techRating);
+                     && (bar == ((SVArmor) part).bar)
+                     && (techRating == ((SVArmor) part).techRating);
     }
 
     @Override
@@ -173,9 +177,11 @@ public class SVArmor extends Armor {
 
     @Override
     protected int changeAmountAvailableSingle(int amount) {
-        SVArmor armor = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
-            return isSamePartType(part) && part.isPresent() && Objects.equals(getRefitUnit(), part.getRefitUnit());
-        });
+        SVArmor armor = (SVArmor) campaign.getWarehouse()
+                                        .findSparePart(part -> isSamePartType(part) &&
+                                                                     part.isPresent() &&
+                                                                     Objects.equals(getRefitUnit(),
+                                                                           part.getRefitUnit()));
 
         if (null != armor) {
             int amountRemaining = armor.getAmount() + amount;
@@ -212,14 +218,16 @@ public class SVArmor extends Armor {
                         break;
                 }
             } catch (Exception e) {
-                logger.error("", e);
+                LOGGER.error("", e);
             }
         }
     }
 
     /**
      * Not sure how true this title is, it was used in {@link SVArmor#getAmountAvailable}
+     *
      * @param part is this part the same
+     *
      * @return true if the two parts are the same, at least as far as {@link SVArmor#getAmountAvailable} is concerned
      */
     private boolean isSameSVArmorPart(Part part) {

@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.enums;
 
@@ -33,25 +38,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ResourceBundle;
 
-import org.junit.jupiter.api.Test;
-
 import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
 
 class PersonnelFilterTest {
     // region Variable Declarations
     private static final PersonnelFilter[] filters = PersonnelFilter.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Getters
     @Test
     void testGetToolTipText() {
         assertEquals(resources.getString("PersonnelFilter.ALL.toolTipText"),
-                PersonnelFilter.ALL.getToolTipText());
+              PersonnelFilter.ALL.getToolTipText());
         assertEquals(resources.getString("PersonnelFilter.PROTOMEK_PILOT.toolTipText"),
-                PersonnelFilter.PROTOMEK_PILOT.getToolTipText());
+              PersonnelFilter.PROTOMEK_PILOT.getToolTipText());
     }
     // endregion Getters
 
@@ -365,12 +369,12 @@ class PersonnelFilterTest {
     }
 
     @Test
-    void testIsAstech() {
+    void testIsAsTech() {
         for (final PersonnelFilter personnelFilter : filters) {
-            if (personnelFilter == PersonnelFilter.ASTECH) {
-                assertTrue(personnelFilter.isAstech());
+            if (personnelFilter == PersonnelFilter.AS_TECH) {
+                assertTrue(personnelFilter.isAsTech());
             } else {
-                assertFalse(personnelFilter.isAstech());
+                assertFalse(personnelFilter.isAsTech());
             }
         }
     }

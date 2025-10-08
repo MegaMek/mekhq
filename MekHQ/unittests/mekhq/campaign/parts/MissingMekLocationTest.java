@@ -24,22 +24,36 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.parts;
-
-import megamek.common.CriticalSlot;
-import megamek.common.LandAirMek;
-import megamek.common.Mek;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.Unit;
-import org.junit.jupiter.api.Test;
-
-import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.function.Predicate;
+
+import megamek.common.CriticalSlot;
+import megamek.common.units.LandAirMek;
+import megamek.common.units.Mek;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.missing.MissingAvionics;
+import mekhq.campaign.parts.missing.MissingLandingGear;
+import mekhq.campaign.parts.missing.MissingMekLocation;
+import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.Test;
 
 public class MissingMekLocationTest {
     @Test
@@ -51,12 +65,12 @@ public class MissingMekLocationTest {
         when(entity.getWeight()).thenReturn(30.0);
         doCallRealMethod().when(entity).getLocationName(any());
 
-        int location = Mek.LOC_RT;
+        int location = Mek.LOC_RIGHT_TORSO;
         MissingMekLocation missing = new MissingMekLocation(location, 30, 0, false, false, false, mockCampaign);
         missing.setUnit(unit);
 
-        // 2 criticals
-        doReturn(2).when(entity).getNumberOfCriticals(eq(location));
+        // 2 criticalSlots
+        doReturn(2).when(entity).getNumberOfCriticalSlots(eq(location));
         CriticalSlot mockLandingGear = mock(CriticalSlot.class);
         when(mockLandingGear.isEverHittable()).thenReturn(true);
         when(mockLandingGear.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
@@ -131,7 +145,7 @@ public class MissingMekLocationTest {
         missing.setUnit(unit);
 
         // 1 critical
-        doReturn(1).when(entity).getNumberOfCriticals(eq(location));
+        doReturn(1).when(entity).getNumberOfCriticalSlots(eq(location));
         CriticalSlot mockAvionics = mock(CriticalSlot.class);
         when(mockAvionics.isEverHittable()).thenReturn(true);
         when(mockAvionics.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);

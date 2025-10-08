@@ -24,14 +24,19 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.enums;
+
+import java.util.ResourceBundle;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
-
-import java.util.ResourceBundle;
 
 /**
  * This is used to determine which gender descriptor to use based on the following specified format
@@ -77,7 +82,7 @@ public enum GenderDescriptors {
 
     GenderDescriptors(final String masculine, final String feminine, final @Nullable String neutral) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.masculine = resources.getString(masculine);
         this.feminine = resources.getString(feminine);
         this.neutral = (neutral == null) ? "" : resources.getString(neutral);
@@ -126,31 +131,29 @@ public enum GenderDescriptors {
 
     /**
      * @param gender the gender to return the descriptor for
+     *
      * @return the descriptor
      */
     public String getDescriptor(final Gender gender) {
-        switch (gender) {
-            case MALE:
-                return getMasculine();
-            case FEMALE:
-                return getFeminine();
-            case OTHER_MALE:
-                return getNeutral().isBlank() ? getMasculine() : getNeutral();
-            case OTHER_FEMALE:
-                return getNeutral().isBlank() ? getFeminine() : getNeutral();
-            default:
-                return getNeutral();
-        }
+        return switch (gender) {
+            case MALE -> getMasculine();
+            case FEMALE -> getFeminine();
+            case OTHER_MALE -> getNeutral().isBlank() ? getMasculine() : getNeutral();
+            case OTHER_FEMALE -> getNeutral().isBlank() ? getFeminine() : getNeutral();
+            default -> getNeutral();
+        };
     }
 
     /**
      * This returns a descriptor with the first letter capitalized
+     *
      * @param gender the gender to return the descriptor for
+     *
      * @return the string with its first letter capitalized
      */
     public String getDescriptorCapitalized(final Gender gender) {
         final String descriptor = getDescriptor(gender).trim();
         return descriptor.isBlank() ? ""
-                : descriptor.substring(0, 1).toUpperCase() + descriptor.substring(1);
+                     : descriptor.substring(0, 1).toUpperCase() + descriptor.substring(1);
     }
 }

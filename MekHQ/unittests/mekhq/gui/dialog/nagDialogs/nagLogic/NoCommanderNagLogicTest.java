@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
@@ -45,8 +50,6 @@ import org.junit.jupiter.api.Test;
  * related to commander assignment.
  */
 class NoCommanderNagLogicTest {
-    // Mock objects for the tests
-    private Campaign campaign;
     private Person commander;
     private Person commanderNull;
 
@@ -57,7 +60,8 @@ class NoCommanderNagLogicTest {
     @BeforeEach
     void init() {
         // Initialize the mock objects
-        campaign = mock(Campaign.class);
+        //  for the tests
+        Campaign campaign = mock(Campaign.class);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);

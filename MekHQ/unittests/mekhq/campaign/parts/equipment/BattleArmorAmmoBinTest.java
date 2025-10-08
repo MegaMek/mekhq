@@ -52,9 +52,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
-import megamek.common.AmmoType;
-import megamek.common.BattleArmor;
-import megamek.common.Mounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.equipment.Mounted;
 import megamek.common.equipment.AmmoMounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
@@ -85,7 +85,7 @@ public class BattleArmorAmmoBinTest {
         int equipmentNum = 18;
         int shotsNeeded = ammoType.getShots();
         BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false,
-                mockCampaign);
+              mockCampaign);
 
         assertTrue(ammoBin.canNeverScrap());
     }
@@ -98,7 +98,7 @@ public class BattleArmorAmmoBinTest {
         int equipmentNum = 18;
         int shotsNeeded = ammoType.getShots();
         BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false,
-                mockCampaign);
+              mockCampaign);
 
         assertFalse(ammoBin.needsMaintenance());
     }
@@ -111,7 +111,7 @@ public class BattleArmorAmmoBinTest {
         int equipmentNum = 18;
         int shotsNeeded = ammoType.getShots();
         BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false,
-                mockCampaign);
+              mockCampaign);
 
         assertEquals(ammoType, ammoBin.getType());
         assertEquals(equipmentNum, ammoBin.getEquipmentNum());
@@ -128,7 +128,7 @@ public class BattleArmorAmmoBinTest {
         int equipmentNum = 18;
         int shotsNeeded = ammoType.getShots() - 1;
         BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false,
-                mockCampaign);
+              mockCampaign);
 
         // Ensure the clone has all the same stuff
         BattleArmorAmmoBin clone = ammoBin.clone();
@@ -145,7 +145,7 @@ public class BattleArmorAmmoBinTest {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
         Campaign mockCampaign = mock(Campaign.class);
         BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, isSRM2InfernoAmmo, 42, isSRM2InfernoAmmo.getShots() - 1,
-                false, mockCampaign);
+              false, mockCampaign);
         ammoBin.setId(25);
 
         // Write the BattleArmorAmmoBin XML
@@ -183,7 +183,7 @@ public class BattleArmorAmmoBinTest {
 
     @Test
     public void oneShotBattleArmorAmmoBinWriteToXmlTest()
-            throws ParserConfigurationException, SAXException, IOException {
+          throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Ammo");
         Campaign mockCampaign = mock(Campaign.class);
         BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, isSRM2InfernoAmmo, 42, 0, true, mockCampaign);
@@ -268,7 +268,7 @@ public class BattleArmorAmmoBinTest {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
         Campaign mockCampaign = mock(Campaign.class);
         BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, isSRM2InfernoAmmo, 42, isSRM2InfernoAmmo.getShots(),
-                false, mockCampaign);
+              false, mockCampaign);
         ammoBin.setId(25);
 
         // Write the BattleArmorAmmoBin XML
@@ -343,7 +343,12 @@ public class BattleArmorAmmoBinTest {
             // ARRANGE
             // Create an Ammo Bin with no ammo ...
             int shotsNeeded = ammoType.getShots() * SQUAD_SIZE;
-            BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false, mockCampaign);
+            BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0,
+                  ammoType,
+                  equipmentNum,
+                  shotsNeeded,
+                  false,
+                  mockCampaign);
 
             // ... place the ammo bin on a unit ...
             ammoBin.setUnit(mockUnit);
@@ -371,7 +376,12 @@ public class BattleArmorAmmoBinTest {
             // ARRANGE
             // Create an Ammo Bin with no ammo ...
             int shotsNeeded = ammoType.getShots() * SQUAD_SIZE;
-            BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false, mockCampaign);
+            BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0,
+                  ammoType,
+                  equipmentNum,
+                  shotsNeeded,
+                  false,
+                  mockCampaign);
 
             // ... place the ammo bin on a unit ...
             ammoBin.setUnit(mockUnit);
@@ -395,17 +405,20 @@ public class BattleArmorAmmoBinTest {
         }
 
         /**
-         * If you partially load BA's ammo and save and reload the game,
-         * it will give them a free shot at the Entity level. The BA
-         * Entity tracks the shots at a per-squad level, not per
-         * individual.
+         * If you partially load BA's ammo and save and reload the game, it will give them a free shot at the Entity
+         * level. The BA Entity tracks the shots at a per-squad level, not per individual.
          */
         @Test
         public void loadBinWithPartialSpareAmmo() {
             // ARRANGE
             // Create an Ammo Bin with no ammo ...
             int shotsNeeded = ammoType.getShots() * SQUAD_SIZE * 2;
-            BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false, mockCampaign);
+            BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0,
+                  ammoType,
+                  equipmentNum,
+                  shotsNeeded,
+                  false,
+                  mockCampaign);
 
             // ... place the ammo bin on a unit ...
             ammoBin.setUnit(mockUnit);
@@ -433,7 +446,12 @@ public class BattleArmorAmmoBinTest {
             // ARRANGE
             // Create an Ammo Bin with no ammo ...
             int shotsNeeded = ammoType.getShots() * SQUAD_SIZE;
-            BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false, mockCampaign);
+            BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0,
+                  ammoType,
+                  equipmentNum,
+                  shotsNeeded,
+                  false,
+                  mockCampaign);
 
             // ... place the ammo bin on a unit ...
             ammoBin.setUnit(mockUnit);

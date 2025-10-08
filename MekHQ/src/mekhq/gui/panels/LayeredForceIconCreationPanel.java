@@ -24,6 +24,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.gui.panels;
 
@@ -35,7 +40,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -55,13 +59,11 @@ import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 
 /**
- * This panel is used to create, display, and export a LayeredForceIcon based on
- * a tabbed pane
- * containing a ForcePieceIconChooser for every potential LayeredForceIconLayer
- * layer.
+ * This panel is used to create, display, and export a LayeredForceIcon based on a tabbed pane containing a
+ * ForcePieceIconChooser for every potential LayeredForceIconLayer layer.
  */
 public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
-    private static final MMLogger logger = MMLogger.create(LayeredForceIconCreationPanel.class);
+    private static final MMLogger LOGGER = MMLogger.create(LayeredForceIconCreationPanel.class);
 
     // region Variable Declarations
     private LayeredForceIcon forceIcon;
@@ -74,12 +76,12 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
 
     // region Constructors
     public LayeredForceIconCreationPanel(final JFrame frame,
-            final @Nullable StandardForceIcon forceIcon,
-            final boolean includeRefreshButton) {
+          final @Nullable StandardForceIcon forceIcon,
+          final boolean includeRefreshButton) {
         super(frame, "LayeredForceIconCreationPanel", new GridBagLayout());
         setForceIcon((forceIcon instanceof LayeredForceIcon)
-                ? ((LayeredForceIcon) forceIcon).clone()
-                : new LayeredForceIcon());
+                           ? ((LayeredForceIcon) forceIcon).clone()
+                           : new LayeredForceIcon());
         this.includeRefreshButton = includeRefreshButton;
         initialize();
     }
@@ -162,28 +164,28 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
         gbc.gridy++;
         gbc.gridwidth = 1;
         add(new MMButton("btnNewIcon", resources, "btnNewIcon.text",
-                "btnNewIcon.toolTipText", evt -> newIcon()), gbc);
+              "btnNewIcon.toolTipText", evt -> newIcon()), gbc);
 
         gbc.gridx++;
         add(new MMButton("btnClearCurrentTab", resources, "btnClearCurrentTab.text",
-                "btnClearCurrentTab.toolTipText", evt -> clearSelectedTab()), gbc);
+              "btnClearCurrentTab.toolTipText", evt -> clearSelectedTab()), gbc);
 
         gbc.gridx++;
         add(new MMButton("btnExport", resources, "Export.text",
-                "LayeredForceIconCreationPanel.btnExport.toolTipText", evt -> exportAction()), gbc);
+              "LayeredForceIconCreationPanel.btnExport.toolTipText", evt -> exportAction()), gbc);
 
         if (isIncludeRefreshButton()) {
             gbc.gridx++;
             add(new MMButton("btnRefreshDirectory", resources, "RefreshDirectory.text",
-                    "RefreshDirectory.toolTipText", evt -> refreshDirectory(true)), gbc);
+                  "RefreshDirectory.toolTipText", evt -> refreshDirectory(true)), gbc);
         }
 
         try {
             setPreferences();
         } catch (Exception ex) {
-            logger.error(
-                    "Error setting the Layered Force Icon Creation Panel's preferences. Keeping the created panel, but this is likely to cause some oddities.",
-                    ex);
+            LOGGER.error(
+                  "Error setting the Layered Force Icon Creation Panel's preferences. Keeping the created panel, but this is likely to cause some oddities.",
+                  ex);
         }
     }
 
@@ -195,6 +197,7 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     // endregion Initialization
 
     // region Button Actions
+
     /**
      * Creates a new LayeredForceIcon to use as both the current and original icon
      */
@@ -234,16 +237,13 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
             final BufferedImage image = (BufferedImage) getForceIcon().getImage();
             ImageIO.write(image, "png", file);
         } catch (Exception ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 
     /**
-     * @param performDirectoryRefresh whether to perform the actual refresh of the
-     *                                Force Icons
-     *                                directory or just handle the changes required
-     *                                for an already
-     *                                refreshed directory.
+     * @param performDirectoryRefresh whether to perform the actual refresh of the Force Icons directory or just handle
+     *                                the changes required for an already refreshed directory.
      */
     public void refreshDirectory(final boolean performDirectoryRefresh) {
         if (performDirectoryRefresh) {
@@ -259,9 +259,8 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     // endregion Button Actions
 
     /**
-     * Creates a force icon based on the individual selections for each piece
-     * chooser, and then
-     * sets the force icon stored in this panel to that new icon.
+     * Creates a force icon based on the individual selections for each piece chooser, and then sets the force icon
+     * stored in this panel to that new icon.
      *
      * @return the newly created force icon
      */

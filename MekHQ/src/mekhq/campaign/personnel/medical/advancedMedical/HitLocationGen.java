@@ -24,11 +24,13 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.personnel.medical.advancedMedical;
-
-import megamek.codeUtilities.ObjectUtility;
-import mekhq.campaign.personnel.BodyLocation;
 
 import java.util.Map.Entry;
 import java.util.NavigableMap;
@@ -36,13 +38,17 @@ import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
 
+import megamek.codeUtilities.ObjectUtility;
+import mekhq.campaign.personnel.BodyLocation;
+
 /**
- * Home to static methods returning a random hit location given a random integer value generator
- * and a function to check if a given {@link BodyLocation} is valid.
+ * Home to static methods returning a random hit location given a random integer value generator and a function to check
+ * if a given {@link BodyLocation} is valid.
  */
 public class HitLocationGen {
     // Roll tables
-    private static NavigableMap<Integer, BodyLocation> GENERIC_RANDOM_HIT_TABLE = new TreeMap<>();
+    private static final NavigableMap<Integer, BodyLocation> GENERIC_RANDOM_HIT_TABLE = new TreeMap<>();
+
     static {
         GENERIC_RANDOM_HIT_TABLE.put(10, BodyLocation.HEAD);
         GENERIC_RANDOM_HIT_TABLE.put(30, BodyLocation.CHEST);
@@ -63,7 +69,9 @@ public class HitLocationGen {
         GENERIC_RANDOM_HIT_TABLE.put(190, BodyLocation.CHEST);
         GENERIC_RANDOM_HIT_TABLE.put(200, BodyLocation.HEAD);
     }
-    private static NavigableMap<Integer, BodyLocation> MEK_RANDOM_HIT_TABLE = new TreeMap<>();
+
+    private static final NavigableMap<Integer, BodyLocation> MEK_RANDOM_HIT_TABLE = new TreeMap<>();
+
     static {
         MEK_RANDOM_HIT_TABLE.put(25, BodyLocation.HEAD);
         MEK_RANDOM_HIT_TABLE.put(41, BodyLocation.CHEST);
@@ -84,12 +92,13 @@ public class HitLocationGen {
     }
 
     private static BodyLocation queryRandomTable(NavigableMap<Integer, BodyLocation> table,
-        IntUnaryOperator rnd, Function<BodyLocation, Boolean> validCheck) {
+          IntUnaryOperator rnd, Function<BodyLocation, Boolean> validCheck) {
         validCheck = ObjectUtility.nonNull(validCheck, (loc) -> true);
-        Entry<Integer, BodyLocation> entry = null;
+        Entry<Integer, BodyLocation> entry;
         do {
             entry = table.ceilingEntry(rnd.applyAsInt(table.lastKey()) + 1);
         } while ((null == entry) || !validCheck.apply(entry.getValue()));
+
         return entry.getValue();
     }
 

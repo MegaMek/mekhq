@@ -103,7 +103,7 @@ public class NagController {
             }
         }
 
-        final List<Person> activePersonnel = campaign.getActivePersonnel(false);
+        final List<Person> activePersonnel = campaign.getActivePersonnel(false, false);
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final int doctorCapacity = campaignOptions.getMaximumPatients();
         final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
@@ -175,22 +175,22 @@ public class NagController {
         }
 
         // Insufficient AsTechs
-        if (InsufficientAstechsNagDialog.checkNag(campaign.getAstechNeed())) {
-            InsufficientAstechsNagDialog insufficientAstechsNagDialog = new InsufficientAstechsNagDialog(campaign);
+        if (InsufficientAsTechsNagDialog.checkNag(campaign.getAsTechNeed())) {
+            InsufficientAsTechsNagDialog insufficientAstechsNagDialog = new InsufficientAsTechsNagDialog(campaign);
             if (insufficientAstechsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
 
         // Insufficient AsTech Time
-        final int possibleAstechPoolMinutes = campaign.getPossibleAstechPoolMinutes();
+        final int possibleAsTechPoolMinutes = campaign.getPossibleAsTechPoolMinutes();
         final boolean isOvertimeAllowed = campaign.isOvertimeAllowed();
-        final int possibleAstechPoolOvertime = campaign.getPossibleAstechPoolOvertime();
+        final int possibleAsTechPoolOvertime = campaign.getPossibleAsTechPoolOvertime();
 
         if (InsufficientAstechTimeNagDialog.checkNag(units,
-              possibleAstechPoolMinutes,
+              possibleAsTechPoolMinutes,
               isOvertimeAllowed,
-              possibleAstechPoolOvertime)) {
+              possibleAsTechPoolOvertime)) {
             InsufficientAstechTimeNagDialog insufficientAstechTimeNagDialog = new InsufficientAstechTimeNagDialog(
                   campaign);
             if (insufficientAstechTimeNagDialog.shouldCancelAdvanceDay()) {
@@ -260,9 +260,7 @@ public class NagController {
         // Contract Ended
         if (EndContractNagDialog.checkNag(today, activeContracts)) {
             EndContractNagDialog endContractNagDialog = new EndContractNagDialog(campaign);
-            if (endContractNagDialog.shouldCancelAdvanceDay()) {
-                return true;
-            }
+            return endContractNagDialog.shouldCancelAdvanceDay();
         }
 
         // Player did not cancel Advance Day at any point

@@ -25,6 +25,11 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.rating;
 
@@ -41,17 +46,17 @@ import mekhq.campaign.personnel.Person;
  */
 public interface IUnitRating {
 
-    public static final int PRECISION = 5;
-    public static final RoundingMode HALF_EVEN = RoundingMode.HALF_EVEN;
-    public static final BigDecimal ONE_HUNDRED = new BigDecimal(100);
+    int PRECISION = 5;
+    RoundingMode HALF_EVEN = RoundingMode.HALF_EVEN;
+    BigDecimal ONE_HUNDRED = new BigDecimal(100);
 
     // TODO : Add an array for each level of this, then use it across MekHQ instead of a bunch of random lists
-    public static final int DRAGOON_F = ForceDescriptor.RATING_0;
-    public static final int DRAGOON_D = ForceDescriptor.RATING_1;
-    public static final int DRAGOON_C = ForceDescriptor.RATING_2;
-    public static final int DRAGOON_B = ForceDescriptor.RATING_3;
-    public static final int DRAGOON_A = ForceDescriptor.RATING_4;
-    public static final int DRAGOON_ASTAR = ForceDescriptor.RATING_5;
+    int DRAGOON_F = ForceDescriptor.RATING_0;
+    int DRAGOON_D = ForceDescriptor.RATING_1;
+    int DRAGOON_C = ForceDescriptor.RATING_2;
+    int DRAGOON_B = ForceDescriptor.RATING_3;
+    int DRAGOON_A = ForceDescriptor.RATING_4;
+    int DRAGOON_ASTAR = ForceDescriptor.RATING_5;
 
     void reInitialize();
 
@@ -61,14 +66,13 @@ public interface IUnitRating {
      * Returns the static constant representation of the passed in Unit rating.
      *
      * @param score The total Dragoon's score.
-     * @return
+     *
      */
     int getUnitRating(int score);
 
     /**
      * Returns the static constant representation of the computed Unit/Dragoon's rating as an integer.
      *
-     * @return
      */
     int getUnitRatingAsInteger();
 
@@ -80,84 +84,73 @@ public interface IUnitRating {
      * Returns the letter code of the passed in Unit rating.
      *
      * @param rating The numeric rating to be converted.
-     * @return
+     *
      */
     String getUnitRatingName(int rating);
 
     /**
      * Calculates the force's Unit rating and returns the appropriate letter code.
      *
-     * @return
      */
     String getUnitRating();
 
     /**
      * Returns the Unit Rating score for the force's average experience level.
      *
-     * @return
      */
     int getExperienceValue();
 
     /**
      * Returns the unit's average experience level.
      *
-     * @return
      */
     SkillLevel getAverageExperience();
 
     /**
      * Returns the Unit Rating score for the force's commander.
      *
-     * @return
      */
     int getCommanderValue();
 
     /**
      * Return's the commander of the force.
      *
-     * @return
      */
     Person getCommander();
 
     /**
      * Returns the Unit Rating score for the force's contract success/failure record.
      *
-     * @return
      */
     int getCombatRecordValue();
 
     /**
      * Returns the percentage of units that are properly supported.
      *
-     * @return
      */
     BigDecimal getSupportPercent();
 
     /**
      * Returns the Unit Rating score for the force's ratio of support to combat units.
      *
-     * @return
      */
     int getSupportValue();
 
     /**
      * Returns the percentage of units that can be transported without outside help.
      *
-     * @return
      */
     BigDecimal getTransportPercent();
 
     /**
      * Returns the Unit Rating score for the force's ratio of transportation available to transportation needs.
      *
-     * @return
      */
     int getTransportValue();
 
     /**
      * Returns the Unit Rating score for the percentage of combat units greater than L1 tech.
      *
-     * @return
      */
     int getTechValue();
 
@@ -165,14 +158,12 @@ public interface IUnitRating {
      * Returns the Unit Rating score for the force's financial record.  If the unit has never been in debt, a value of 0
      * is returned.  If the unit has been in debt, a negative number will be returned.
      *
-     * @return
      */
     int getFinancialValue();
 
     /**
      * Returns a text description of how the Unit rating was calculated.
      *
-     * @return
      */
     String getDetails();
 
@@ -180,13 +171,12 @@ public interface IUnitRating {
      * Returns descriptive text that should be displayed in a Help/About dialog to inform users of the means by which
      * the Unit rating is calculated.
      *
-     * @return
      */
     String getHelpText();
 
     /**
      * Returns the typs of unit rating method used.
-     * @return
+     *
      */
     UnitRatingMethod getUnitRatingMethod();
 }

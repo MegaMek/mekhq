@@ -58,9 +58,9 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.AssetChangedEvent;
-import mekhq.campaign.event.AssetNewEvent;
-import mekhq.campaign.event.AssetRemovedEvent;
+import mekhq.campaign.events.assets.AssetChangedEvent;
+import mekhq.campaign.events.assets.AssetNewEvent;
+import mekhq.campaign.events.assets.AssetRemovedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.gui.model.DataTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -69,18 +69,15 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  * @author Taharqa
  */
 public class ManageAssetsDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(ManageAssetsDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(ManageAssetsDialog.class);
 
-    private JFrame frame;
-    private Campaign campaign;
-    private AssetTableModel assetModel;
+    private final JFrame frame;
+    private final Campaign campaign;
+    private final AssetTableModel assetModel;
 
-    private JButton btnAdd;
     private JButton btnEdit;
     private JButton btnDelete;
-    private JButton btnOK;
     private JTable assetTable;
-    private JScrollPane scrollAssetTable;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ManageAssetsDialog",
           MekHQ.getMHQOptions().getLocale());
@@ -96,8 +93,8 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void initComponents() {
-        btnOK = new JButton();
-        btnAdd = new JButton();
+        JButton btnOK = new JButton();
+        JButton btnAdd = new JButton();
         btnEdit = new JButton();
         btnDelete = new JButton();
 
@@ -133,7 +130,7 @@ public class ManageAssetsDialog extends JDialog {
         assetTable.setShowGrid(false);
         assetTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         assetTable.getSelectionModel().addListSelectionListener(this::assetTableValueChanged);
-        scrollAssetTable = new JScrollPaneWithSpeed(assetTable);
+        JScrollPane scrollAssetTable = new JScrollPaneWithSpeed(assetTable);
         getContentPane().add(scrollAssetTable, BorderLayout.CENTER);
 
         btnOK.setText(resourceMap.getString("btnOK.text"));
@@ -154,7 +151,7 @@ public class ManageAssetsDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 

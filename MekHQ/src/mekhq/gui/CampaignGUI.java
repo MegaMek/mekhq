@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,10 +39,19 @@ import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
+import static mekhq.gui.enums.MHQTabType.COMMAND_CENTER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -53,7 +62,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.List;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 import javax.swing.*;
@@ -69,15 +77,15 @@ import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.Dropship;
-import megamek.common.EnhancedTabbedPane;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.MULParser;
-import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MULParser;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.ui.EnhancedTabbedPane;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
 import mekhq.IconPackage;
 import mekhq.MHQConstants;
@@ -88,7 +96,19 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.event.*;
+import mekhq.campaign.events.AsTechPoolChangedEvent;
+import mekhq.campaign.events.DayEndingEvent;
+import mekhq.campaign.events.DeploymentChangedEvent;
+import mekhq.campaign.events.LocationChangedEvent;
+import mekhq.campaign.events.MedicPoolChangedEvent;
+import mekhq.campaign.events.NewDayEvent;
+import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.events.assets.AssetEvent;
+import mekhq.campaign.events.loans.LoanEvent;
+import mekhq.campaign.events.missions.MissionEvent;
+import mekhq.campaign.events.persons.PersonEvent;
+import mekhq.campaign.events.transactions.TransactionEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.force.Force;
@@ -173,9 +193,6 @@ public class CampaignGUI extends JPanel {
     /* For the menu bar */
     private JMenuBar menuBar;
     private JMenu menuThemes;
-    private JMenuItem miPersonnelMarket;
-    private JMenuItem miContractMarket;
-    private JMenuItem miUnitMarket;
     private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
     private JMenuItem miAwardEligibilityDialog;
@@ -187,7 +204,7 @@ public class CampaignGUI extends JPanel {
     private JPanel statusPanel;
     private JLabel lblLocation;
     private JLabel lblFunds;
-    private JLabel lblTempAstechs;
+    private JLabel lblTempAsTechs;
     private JLabel lblTempMedics;
     private JLabel lblPartsAvailabilityRating;
 
@@ -282,7 +299,7 @@ public class CampaignGUI extends JPanel {
         tabMain.setMinimumSize(new Dimension(600, 200));
         tabMain.setPreferredSize(new Dimension(900, 300));
 
-        addStandardTab(MHQTabType.COMMAND_CENTER);
+        addStandardTab(COMMAND_CENTER);
         addStandardTab(MHQTabType.TOE);
         addStandardTab(MHQTabType.BRIEFING_ROOM);
         if (getCampaign().getCampaignOptions().isUseStratCon()) {
@@ -320,7 +337,7 @@ public class CampaignGUI extends JPanel {
         refreshCalendar();
         refreshFunds();
         refreshLocation();
-        refreshTempAstechs();
+        refreshTempAsTechs();
         refreshTempMedics();
         refreshPartsAvailability();
 
@@ -660,12 +677,6 @@ public class CampaignGUI extends JPanel {
         menuFile.add(menuRefresh);
         // endregion Menu Refresh
 
-        JMenuItem miMercRoster = new JMenuItem(resourceMap.getString("miMercRoster.text"));
-        miMercRoster.setMnemonic(KeyEvent.VK_U);
-        miMercRoster.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.ALT_DOWN_MASK));
-        miMercRoster.addActionListener(evt -> new MercRosterDialog(getFrame(), true, getCampaign()).setVisible(true));
-        menuFile.add(miMercRoster);
-
         JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text"));
         menuOptions.setMnemonic(KeyEvent.VK_C);
         menuOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK));
@@ -715,21 +726,21 @@ public class CampaignGUI extends JPanel {
         JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text"));
         menuMarket.setMnemonic(KeyEvent.VK_M);
 
-        miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
+        JMenuItem miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
         miPersonnelMarket.setMnemonic(KeyEvent.VK_P);
         miPersonnelMarket.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK));
         miPersonnelMarket.addActionListener(evt -> hirePersonMarket());
         miPersonnelMarket.setVisible(!getCampaign().getPersonnelMarket().isNone());
         menuMarket.add(miPersonnelMarket);
 
-        miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
+        JMenuItem miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
         miContractMarket.setMnemonic(KeyEvent.VK_C);
         miContractMarket.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK));
         miContractMarket.addActionListener(evt -> showContractMarket());
         miContractMarket.setVisible(getCampaign().getCampaignOptions().isUseAtB());
         menuMarket.add(miContractMarket);
 
-        miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
+        JMenuItem miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
         miUnitMarket.setMnemonic(KeyEvent.VK_U);
         miUnitMarket.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.ALT_DOWN_MASK));
         miUnitMarket.addActionListener(evt -> showUnitMarket());
@@ -821,55 +832,55 @@ public class CampaignGUI extends JPanel {
         // region Astech Pool
         // The Astech Pool menu uses the following Mnemonic keys as of 19-March-2020:
         // B, E, F, H
-        JMenu menuAstechPool = new JMenu(resourceMap.getString("menuAstechPool.text"));
-        menuAstechPool.setMnemonic(KeyEvent.VK_A);
+        JMenu menuAsTechPool = new JMenu(resourceMap.getString("menuAstechPool.text"));
+        menuAsTechPool.setMnemonic(KeyEvent.VK_A);
 
-        JMenuItem miHireAstechs = new JMenuItem(resourceMap.getString("miHireAstechs.text"));
-        miHireAstechs.setMnemonic(KeyEvent.VK_H);
-        miHireAstechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
-        miHireAstechs.addActionListener(evt -> {
-            PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(),
+        JMenuItem miHireAsTechs = new JMenuItem(resourceMap.getString("miHireAstechs.text"));
+        miHireAsTechs.setMnemonic(KeyEvent.VK_H);
+        miHireAsTechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
+        miHireAsTechs.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                   true,
                   resourceMap.getString("popupHireAstechsNum.text"),
                   1,
                   0,
                   CampaignGUI.MAX_QUANTITY_SPINNER);
-            pvcd.setVisible(true);
-            if (pvcd.getValue() >= 0) {
-                getCampaign().increaseAstechPool(pvcd.getValue());
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().increaseAsTechPool(popupValueChoiceDialog.getValue());
             }
         });
-        menuAstechPool.add(miHireAstechs);
+        menuAsTechPool.add(miHireAsTechs);
 
-        JMenuItem miFireAstechs = new JMenuItem(resourceMap.getString("miFireAstechs.text"));
-        miFireAstechs.setMnemonic(KeyEvent.VK_E);
-        miFireAstechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK));
-        miFireAstechs.addActionListener(evt -> {
-            PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(),
+        JMenuItem miFireAsTechs = new JMenuItem(resourceMap.getString("miFireAstechs.text"));
+        miFireAsTechs.setMnemonic(KeyEvent.VK_E);
+        miFireAsTechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK));
+        miFireAsTechs.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                   true,
                   resourceMap.getString("popupFireAstechsNum.text"),
                   1,
                   0,
-                  getCampaign().getAstechPool());
-            pvcd.setVisible(true);
-            if (pvcd.getValue() >= 0) {
-                getCampaign().decreaseAstechPool(pvcd.getValue());
+                  getCampaign().getTemporaryAsTechPool());
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().decreaseAsTechPool(popupValueChoiceDialog.getValue());
             }
         });
-        menuAstechPool.add(miFireAstechs);
+        menuAsTechPool.add(miFireAsTechs);
 
-        JMenuItem miFullStrengthAstechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
-        miFullStrengthAstechs.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthAstechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.ALT_DOWN_MASK));
-        miFullStrengthAstechs.addActionListener(evt -> getCampaign().fillAstechPool());
-        menuAstechPool.add(miFullStrengthAstechs);
+        JMenuItem miFullStrengthAsTechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
+        miFullStrengthAsTechs.setMnemonic(KeyEvent.VK_B);
+        miFullStrengthAsTechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.ALT_DOWN_MASK));
+        miFullStrengthAsTechs.addActionListener(evt -> getCampaign().resetAsTechPool());
+        menuAsTechPool.add(miFullStrengthAsTechs);
 
-        JMenuItem miFireAllAstechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
-        miFireAllAstechs.setMnemonic(KeyEvent.VK_R);
-        miFireAllAstechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
-        miFireAllAstechs.addActionListener(evt -> getCampaign().decreaseAstechPool(getCampaign().getAstechPool()));
-        menuAstechPool.add(miFireAllAstechs);
-        menuMarket.add(menuAstechPool);
+        JMenuItem miFireAllAsTechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
+        miFireAllAsTechs.setMnemonic(KeyEvent.VK_R);
+        miFireAllAsTechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
+        miFireAllAsTechs.addActionListener(evt -> getCampaign().emptyAsTechPool());
+        menuAsTechPool.add(miFireAllAsTechs);
+        menuMarket.add(menuAsTechPool);
         // endregion Astech Pool
 
         // region Medic Pool
@@ -882,15 +893,15 @@ public class CampaignGUI extends JPanel {
         miHireMedics.setMnemonic(KeyEvent.VK_H);
         miHireMedics.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
         miHireMedics.addActionListener(evt -> {
-            PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(),
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                   true,
                   resourceMap.getString("popupHireMedicsNum.text"),
                   1,
                   0,
                   CampaignGUI.MAX_QUANTITY_SPINNER);
-            pvcd.setVisible(true);
-            if (pvcd.getValue() >= 0) {
-                getCampaign().increaseMedicPool(pvcd.getValue());
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().increaseMedicPool(popupValueChoiceDialog.getValue());
             }
         });
         menuMedicPool.add(miHireMedics);
@@ -899,15 +910,15 @@ public class CampaignGUI extends JPanel {
         miFireMedics.setMnemonic(KeyEvent.VK_E);
         miFireMedics.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK));
         miFireMedics.addActionListener(evt -> {
-            PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(),
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                   true,
                   resourceMap.getString("popupFireMedicsNum.text"),
                   1,
                   0,
-                  getCampaign().getMedicPool());
-            pvcd.setVisible(true);
-            if (pvcd.getValue() >= 0) {
-                getCampaign().decreaseMedicPool(pvcd.getValue());
+                  getCampaign().getTemporaryMedicPool());
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().decreaseMedicPool(popupValueChoiceDialog.getValue());
             }
         });
         menuMedicPool.add(miFireMedics);
@@ -915,13 +926,13 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
         miFullStrengthMedics.setMnemonic(KeyEvent.VK_B);
         miFullStrengthMedics.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.ALT_DOWN_MASK));
-        miFullStrengthMedics.addActionListener(evt -> getCampaign().fillMedicPool());
+        miFullStrengthMedics.addActionListener(evt -> getCampaign().resetMedicPool());
         menuMedicPool.add(miFullStrengthMedics);
 
         JMenuItem miFireAllMedics = new JMenuItem(resourceMap.getString("miFireAllMedics.text"));
         miFireAllMedics.setMnemonic(KeyEvent.VK_R);
         miFireAllMedics.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
-        miFireAllMedics.addActionListener(evt -> getCampaign().decreaseMedicPool(getCampaign().getMedicPool()));
+        miFireAllMedics.addActionListener(evt -> getCampaign().emptyMedicPool());
         menuMedicPool.add(miFireAllMedics);
         menuMarket.add(menuMedicPool);
         // endregion Medic Pool
@@ -1150,12 +1161,12 @@ public class CampaignGUI extends JPanel {
         statusPanel.getAccessibleContext().setAccessibleName("Status Bar");
 
         lblFunds = new JLabel();
-        lblTempAstechs = new JLabel();
+        lblTempAsTechs = new JLabel();
         lblTempMedics = new JLabel();
         lblPartsAvailabilityRating = new JLabel();
 
         statusPanel.add(lblFunds);
-        statusPanel.add(lblTempAstechs);
+        statusPanel.add(lblTempAsTechs);
         statusPanel.add(lblTempMedics);
         statusPanel.add(lblPartsAvailabilityRating);
     }
@@ -1287,14 +1298,14 @@ public class CampaignGUI extends JPanel {
     public void refreshMarketButtonLabels() {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
         String labelKey = campaignOptions.getContractMarketMethod().isNone()
-              ? "manual" : "market";
+                                ? "manual" : "market";
         String label = resourceMap.getString("btnContractMarket." + labelKey);
 
         btnContractMarket.setText(label);
 
         PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
         labelKey = (marketStyle == PERSONNEL_MARKET_DISABLED && getCampaign().getPersonnelMarket().isNone())
-              ? "manual" : "market";
+                         ? "manual" : "market";
         label = resourceMap.getString("btnPersonnelMarket." + labelKey);
         btnPersonnelMarket.setText(label);
 
@@ -1439,7 +1450,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public @Nullable CommandCenterTab getCommandCenterTab() {
-        return (CommandCenterTab) getTab(MHQTabType.COMMAND_CENTER);
+        return (CommandCenterTab) getTab(COMMAND_CENTER);
     }
 
     public @Nullable TOETab getTOETab() {
@@ -1484,17 +1495,15 @@ public class CampaignGUI extends JPanel {
      */
     public void addStandardTab(MHQTabType tab) {
         if (!standardTabs.containsKey(tab)) {
-            CampaignGuiTab t = tab.createTab(this);
-            if (t != null) {
-                standardTabs.put(tab, t);
-                int index = IntStream.range(0, tabMain.getTabCount())
-                                  .filter(i -> ((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() >
-                                                     tab.ordinal())
-                                  .findFirst()
-                                  .orElse(tabMain.getTabCount());
-                tabMain.insertTab(t.getTabName(), null, t, null, index);
-                tabMain.setMnemonicAt(index, tab.getMnemonic());
-            }
+            CampaignGuiTab campaignGuiTab = tab.createTab(this);
+            standardTabs.put(tab, campaignGuiTab);
+            int index = IntStream.range(0, tabMain.getTabCount())
+                              .filter(i -> ((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() >
+                                                 tab.ordinal())
+                              .findFirst()
+                              .orElse(tabMain.getTabCount());
+            tabMain.insertTab(campaignGuiTab.getTabName(), null, campaignGuiTab, null, index);
+            tabMain.setMnemonicAt(index, tab.getMnemonic());
         }
     }
 
@@ -1723,15 +1732,7 @@ public class CampaignGUI extends JPanel {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
 
         if (campaignOptions.getContractMarketMethod().isNone()) {
-            MissionTypeDialog missionTypeDialog = new MissionTypeDialog(getFrame(), true);
-            missionTypeDialog.setVisible(true);
-
-            if (missionTypeDialog.isContract()) {
-                NewContractDialog newContractDialog = campaignOptions.isUseAtB() ?
-                      new NewAtBContractDialog(getFrame(), true, getCampaign()) :
-                      new NewContractDialog(getFrame(), true, getCampaign());
-                newContractDialog.setVisible(true);
-            }
+            MissionTypeDialog missionTypeDialog = getMissionTypeDialog(campaignOptions);
 
             if (missionTypeDialog.isMission()) {
                 CustomizeMissionDialog customizeMissionDialog =
@@ -1742,6 +1743,19 @@ public class CampaignGUI extends JPanel {
             ContractMarketDialog contractMarketDialog = new ContractMarketDialog(getFrame(), getCampaign());
             contractMarketDialog.setVisible(true);
         }
+    }
+
+    private MissionTypeDialog getMissionTypeDialog(CampaignOptions campaignOptions) {
+        MissionTypeDialog missionTypeDialog = new MissionTypeDialog(getFrame(), true);
+        missionTypeDialog.setVisible(true);
+
+        if (missionTypeDialog.isContract()) {
+            NewContractDialog newContractDialog = campaignOptions.isUseAtB() ?
+                                                        new NewAtBContractDialog(getFrame(), true, getCampaign()) :
+                                                        new NewContractDialog(getFrame(), true, getCampaign());
+            newContractDialog.setVisible(true);
+        }
+        return missionTypeDialog;
     }
 
     public void showUnitMarket() {
@@ -1846,10 +1860,8 @@ public class CampaignGUI extends JPanel {
      */
     private void menuOptionsActionPerformed(final ActionEvent evt) {
         final CampaignOptions oldOptions = getCampaign().getCampaignOptions();
-        // We need to handle it like this for now, as the options above get written to
-        // currently
+        // We need to handle it like this for now, as the options above get written to currently
         boolean atb = oldOptions.isUseAtB();
-        boolean staticRATs = oldOptions.isUseStaticRATs();
         boolean factionIntroDate = oldOptions.isFactionIntroDate();
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
         final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
@@ -1948,10 +1960,6 @@ public class CampaignGUI extends JPanel {
 
         getCampaign().initTurnover();
 
-        if (staticRATs != newOptions.isUseStaticRATs()) {
-            getCampaign().initUnitGenerator();
-        }
-
         if (factionIntroDate != newOptions.isFactionIntroDate()) {
             getCampaign().updateTechFactionCode();
         }
@@ -1970,7 +1978,7 @@ public class CampaignGUI extends JPanel {
                 return;
             }
             r.setTech(engineer);
-        } else if (getCampaign().getActivePersonnel(true).stream().anyMatch(Person::isTech)) {
+        } else if (getCampaign().getActivePersonnel(false, false).stream().anyMatch(Person::isTech)) {
             String name;
             Map<String, Person> techHash = new HashMap<>();
             List<String> techList = new ArrayList<>();
@@ -2054,15 +2062,7 @@ public class CampaignGUI extends JPanel {
         // check to see if user really wants to do it - give some info on what
         // will be done
         // TODO: better information
-        String RefitRefurbish;
-        if (r.isBeingRefurbished()) {
-            RefitRefurbish = "Refurbishment is a " +
-                                   r.getRefitClassName() +
-                                   " refit and must be done at a factory and costs 10% of the purchase price" +
-                                   ".\n Are you sure you want to refurbish ";
-        } else {
-            RefitRefurbish = "This is a " + r.getRefitClassName() + " refit. Are you sure you want to refit ";
-        }
+        String RefitRefurbish = getRefitRefurbish(r);
         if (0 !=
                   JOptionPane.showConfirmDialog(null,
                         RefitRefurbish + r.getUnit().getName() + '?',
@@ -2086,6 +2086,19 @@ public class CampaignGUI extends JPanel {
         if (hasTab(MHQTabType.MEK_LAB)) {
             ((MekLabTab) getTab(MHQTabType.MEK_LAB)).clearUnit();
         }
+    }
+
+    private static String getRefitRefurbish(Refit r) {
+        String RefitRefurbish;
+        if (r.isBeingRefurbished()) {
+            RefitRefurbish = "Refurbishment is a " +
+                                   r.getRefitClassName() +
+                                   " refit and must be done at a factory and costs 10% of the purchase price" +
+                                   ".\n Are you sure you want to refurbish ";
+        } else {
+            RefitRefurbish = "This is a " + r.getRefitClassName() + " refit. Are you sure you want to refit ";
+        }
+        return RefitRefurbish;
     }
 
     /**
@@ -2160,9 +2173,6 @@ public class CampaignGUI extends JPanel {
     /**
      * Exports Planets to a file (CSV, XML, etc.)
      *
-     * @param format
-     * @param dialogTitle
-     * @param filename
      */
     protected void exportPlanets(FileType format, String dialogTitle, String filename) {
         // TODO: Fix this
@@ -2407,7 +2417,7 @@ public class CampaignGUI extends JPanel {
             // Fix Spouse Id Information - This is required to fix spouse NPEs where one doesn't export both members
             // of the couple
             // TODO : make it so that exports will automatically include both spouses
-            for (Person p : getCampaign().getActivePersonnel(true)) {
+            for (Person p : getCampaign().getActivePersonnel(true, true)) {
                 if (p.getGenealogy().hasSpouse() &&
                           !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse())) {
                     // If this happens, we need to clear the spouse
@@ -2655,14 +2665,41 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Check to see if the command center tab is currently active and if not, color the tab. Should be called when items
-     * are added to daily report log panel and user is not on the command center tab in order to draw attention to it
+     * Checks if the user should be prompted (nagged) to view the daily log and highlights the Command Center tab if
+     * needed.
+     *
+     * <p>If the {@code logNagActive} flag is already set, the method returns immediately to prevent repeat
+     * processing. If the currently selected tab is the Command Center, no nag is performed. Otherwise, the method
+     * iterates through the tab list and highlights the Command Center tab by changing its label color and sets the
+     * {@code logNagActive} flag.</p>
+     *
+     * <p>If no tab is currently selected, a warning is logged and no action is taken.</p>
      */
     public void checkDailyLogNag() {
-        if (!logNagActive) {
-            if (tabMain.getSelectedIndex() != 0) {
-                tabMain.setBackgroundAt(0, Color.RED);
+        // If we're already nagging, no need to nag again
+        if (logNagActive) {
+            return;
+        }
+
+        final int selectedIndex = tabMain.getSelectedIndex();
+        if (selectedIndex < 0 || selectedIndex >= tabMain.getTabCount()) {
+            logger.warn("No tab selected, cannot check for daily log nag");
+            return;
+        }
+
+        // Already on the Command Center tab, no nag necessary
+        final Component selectedTab = tabMain.getComponentAt(selectedIndex);
+        if (selectedTab instanceof CommandCenterTab) {
+            return;
+        }
+
+        // Loop through the tabs until we find the Command Center tab, then color that tab's label.
+        for (int i = 0; i < tabMain.getTabCount(); i++) {
+            Component component = tabMain.getComponentAt(i);
+            if (component instanceof CommandCenterTab) {
+                tabMain.setBackgroundAt(i, UIUtil.uiDarkBlue());
                 logNagActive = true;
+                break;
             }
         }
     }
@@ -2715,15 +2752,15 @@ public class CampaignGUI extends JPanel {
         lblFunds.setText(text);
     }
 
-    private void refreshTempAstechs() {
+    private void refreshTempAsTechs() {
         // FIXME : Localize
-        String text = "<html><b>Temp Astechs</b>: " + getCampaign().getAstechPool() + "</html>";
-        lblTempAstechs.setText(text);
+        String text = "<html><b>Temp AsTechs</b>: " + getCampaign().getTemporaryAsTechPool() + "</html>";
+        lblTempAsTechs.setText(text);
     }
 
     private void refreshTempMedics() {
         // FIXME : Localize
-        String text = "<html><b>Temp Medics</b>: " + getCampaign().getMedicPool() + "</html>";
+        String text = "<html><b>Temp Medics</b>: " + getCampaign().getTemporaryMedicPool() + "</html>";
         lblTempMedics.setText(text);
     }
 
@@ -2826,10 +2863,9 @@ public class CampaignGUI extends JPanel {
      * Handles the {@link DayEndingEvent} that is published immediately before a day ends in the campaign.
      *
      * <p>This method is subscribed to day-ending events and implements logic that can block or allow the end of the
-     * day,
-     * depending on the current campaign state and conditions. If certain criteria are met (such as outstanding loans,
-     * faction issues, overdue scenarios, or random retirement prompts), the event will be cancelled—preventing day
-     * transition.</p>
+     * day, depending on the current campaign state and conditions. If certain criteria are met (such as outstanding
+     * loans, faction issues, overdue scenarios, or random retirement prompts), the event will be cancelled—preventing
+     * day transition.</p>
      *
      * <ul>
      *   <li>Checks if daily nag dialogs should be shown and blocks day end if needed.</li>
@@ -3077,7 +3113,8 @@ public class CampaignGUI extends JPanel {
      * <p>Updates the visibility and availability of UI tabs and menu items based on the new campaign settings.
      * Also triggers a refresh of all tabs and schedules updates for funds and parts availability.</p>
      *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
      *
      * @param optionsChangedEvent the event containing the updated options
      */
@@ -3103,7 +3140,8 @@ public class CampaignGUI extends JPanel {
      * <p>Schedules an update to the funds and refreshes parts availability to reflect the new state after
      * a transaction has occurred.</p>
      *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
      *
      * @param transactionEvent the event signaling the completion of a transaction
      */
@@ -3118,7 +3156,8 @@ public class CampaignGUI extends JPanel {
      *
      * <p>Schedules a funds update and refreshes parts availability after a loan transaction is processed.</p>
      *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
      *
      * @param loanEvent the event representing a loan-related action
      */
@@ -3133,7 +3172,8 @@ public class CampaignGUI extends JPanel {
      *
      * <p>Schedules a funds update to ensure the campaign's financial state is current when assets change.</p>
      *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
      *
      * @param assetEvent the event indicating a change in assets
      */
@@ -3143,17 +3183,18 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Handles updates when the pool of available astechs changes.
+     * Handles updates when the pool of available AsTechs changes.
      *
-     * <p>Refreshes the temporary astech pool, updating the related UI and game state.</p>
+     * <p>Refreshes the temporary AsTech pool, updating the related UI and game state.</p>
      *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
      *
-     * @param astechPoolChangedEvent the event indicating a change in the astech pool
+     * @param asTechPoolChangedEvent the event indicating a change in the AsTech pool
      */
     @Subscribe
-    public void handle(AstechPoolChangedEvent astechPoolChangedEvent) {
-        refreshTempAstechs();
+    public void handle(AsTechPoolChangedEvent asTechPoolChangedEvent) {
+        refreshTempAsTechs();
     }
 
     /**
@@ -3161,7 +3202,8 @@ public class CampaignGUI extends JPanel {
      *
      * <p>Refreshes the temporary medic pool, updating the related UI and game state.</p>
      *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
      *
      * @param medicPoolChangedEvent the event indicating a change in the medic pool
      */
@@ -3175,7 +3217,8 @@ public class CampaignGUI extends JPanel {
      *
      * <p>Updates the visibility of the company generator menu item according to the new option settings.</p>
      *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is wrong.</p>
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
      *
      * @param mhqOptionsChangedEvent the event containing the updated general options
      */

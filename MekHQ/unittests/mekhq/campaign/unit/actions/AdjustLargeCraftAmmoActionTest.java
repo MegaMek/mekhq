@@ -24,13 +24,34 @@
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
  */
 package mekhq.campaign.unit.actions;
 
-import megamek.common.AmmoType;
-import megamek.common.Entity;
+import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.WeaponMounted;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.parts.Part;
@@ -39,14 +60,6 @@ import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.mockito.Mockito.*;
 
 public class AdjustLargeCraftAmmoActionTest {
     @Test
@@ -65,7 +78,7 @@ public class AdjustLargeCraftAmmoActionTest {
         action.execute(campaign, unit);
 
         verify(unit, times(0)).addPart(any());
-        verify(quartermaster, times(0)).addPart(any(), anyInt());
+        verify(quartermaster, times(0)).addPart(any(), anyInt(), eq(false));
     }
 
     @Test
@@ -85,7 +98,7 @@ public class AdjustLargeCraftAmmoActionTest {
         action.execute(campaign, unit);
 
         verify(unit, times(0)).addPart(any());
-        verify(quartermaster, times(0)).addPart(any(), anyInt());
+        verify(quartermaster, times(0)).addPart(any(), anyInt(), eq(false));
     }
 
     @Test
@@ -133,7 +146,7 @@ public class AdjustLargeCraftAmmoActionTest {
         verify(unit, times(1)).addPart(partCaptor.capture());
 
         Part addedPart = partCaptor.getValue();
-        verify(quartermaster, times(1)).addPart(eq(addedPart), eq(0));
+        verify(quartermaster, times(1)).addPart(eq(addedPart), eq(0), eq(false));
 
         assertInstanceOf(LargeCraftAmmoBin.class, addedPart);
 
@@ -177,7 +190,7 @@ public class AdjustLargeCraftAmmoActionTest {
 
         // Ensure we didn't add any new parts
         verify(unit, times(0)).addPart(any());
-        verify(quartermaster, times(0)).addPart(any(), anyInt());
+        verify(quartermaster, times(0)).addPart(any(), anyInt(), eq(false));
 
         // Ensure we updated the part's type
         verify(ammoBin, times(1)).changeMunition(eq(ammoType0));
@@ -230,7 +243,7 @@ public class AdjustLargeCraftAmmoActionTest {
         verify(unit, times(1)).addPart(partCaptor.capture());
 
         Part addedPart = partCaptor.getValue();
-        verify(quartermaster, times(1)).addPart(eq(addedPart), eq(0));
+        verify(quartermaster, times(1)).addPart(eq(addedPart), eq(0), eq(false));
 
         assertInstanceOf(LargeCraftAmmoBin.class, addedPart);
 
@@ -275,7 +288,7 @@ public class AdjustLargeCraftAmmoActionTest {
 
         // Ensure we didn't add any new parts
         verify(unit, times(0)).addPart(any());
-        verify(quartermaster, times(0)).addPart(any(), anyInt());
+        verify(quartermaster, times(0)).addPart(any(), anyInt(), eq(false));
 
         // Ensure we updated the part's type
         verify(ammoBin, times(1)).changeMunition(eq(ammoType0));
