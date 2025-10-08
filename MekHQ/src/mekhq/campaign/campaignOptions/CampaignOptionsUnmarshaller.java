@@ -796,6 +796,7 @@ public class CampaignOptionsUnmarshaller {
             }
             case "useAtB" -> campaignOptions.setUseAtB(parseBoolean(nodeContents));
             case "useStratCon" -> campaignOptions.setUseStratCon(parseBoolean(nodeContents));
+            case "useAdvancedScouting" -> campaignOptions.setUseAdvancedScouting(parseBoolean(nodeContents));
             case "useAero" -> campaignOptions.setUseAero(parseBoolean(nodeContents));
             case "useVehicles" -> campaignOptions.setUseVehicles(parseBoolean(nodeContents));
             case "clanVehicles" -> campaignOptions.setClanVehicles(parseBoolean(nodeContents));
