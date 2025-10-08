@@ -131,7 +131,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     void updateAvailableSupport() {
-        for (Person p : getCampaign().getActivePersonnel(true)) {
+        for (Person p : getCampaign().getActivePersonnel(false, false)) {
             if (p.isTech()) {
                 updateTechSupportHours(p);
             } else if (p.isDoctor()) {
@@ -267,7 +267,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     // 3 + (4/5) = 3 + 0.8 = 3.8 = 4 hours.
     // total = 16 hours.
     private void calcMedicalSupportHoursNeeded() {
-        int activePersonnelCount = getCampaign().getActivePersonnel(true).size();
+        int activePersonnelCount = getCampaign().getActivePersonnel(false, false).size();
 
         // Calculated based on 7-person squads
         int numSquads = activePersonnelCount / 7; // integer division intended
@@ -285,7 +285,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private void calcAdminSupportHoursNeeded() {
-        int personnelCount = (int) getCampaign().getActivePersonnel(true)
+        int personnelCount = (int) getCampaign().getActivePersonnel(false, false)
                                          .stream()
                                          .filter(p -> !p.isAdministrator())
                                          .count();

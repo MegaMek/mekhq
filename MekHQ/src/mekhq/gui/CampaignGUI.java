@@ -1978,7 +1978,7 @@ public class CampaignGUI extends JPanel {
                 return;
             }
             r.setTech(engineer);
-        } else if (getCampaign().getActivePersonnel(true).stream().anyMatch(Person::isTech)) {
+        } else if (getCampaign().getActivePersonnel(false, false).stream().anyMatch(Person::isTech)) {
             String name;
             Map<String, Person> techHash = new HashMap<>();
             List<String> techList = new ArrayList<>();
@@ -2417,7 +2417,7 @@ public class CampaignGUI extends JPanel {
             // Fix Spouse Id Information - This is required to fix spouse NPEs where one doesn't export both members
             // of the couple
             // TODO : make it so that exports will automatically include both spouses
-            for (Person p : getCampaign().getActivePersonnel(true)) {
+            for (Person p : getCampaign().getActivePersonnel(true, true)) {
                 if (p.getGenealogy().hasSpouse() &&
                           !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse())) {
                     // If this happens, we need to clear the spouse

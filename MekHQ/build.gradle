@@ -249,7 +249,7 @@ tasks.register('stageFiles', Copy) {
     into fileStagingDir
 
     doLast {
-        mkdir "${fileStagingDir}/log"
+        mkdir "${fileStagingDir}/logs"
         mkdir "${fileStagingDir}/userdata/data/campaignPresets/"
     }
 }

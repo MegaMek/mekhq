@@ -485,7 +485,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
             // Knock out inactive doctors
             if ((patient.getDoctorId() != null) &&
                       (getCampaign().getPerson(patient.getDoctorId()) != null) &&
-                      !getCampaign().getPerson(patient.getDoctorId()).getStatus().isActive()) {
+                      !getCampaign().getPerson(patient.getDoctorId()).getStatus().isActiveFlexible()) {
                 patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
             }
             if (patient.getDoctorId() == null) {

@@ -61,6 +61,7 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_ASTAR;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_B;
@@ -786,7 +787,7 @@ public class AtBContract extends Contract {
 
                     for (int i = 0; i < number; i++) {
                         Person person = campaign.newDependent(Gender.RANDOMIZE);
-                        campaign.recruitPerson(person);
+                        campaign.recruitPerson(person, FREE, true, false, false);
                     }
                 } else {
                     campaign.addReport("Bonus: Ronin");

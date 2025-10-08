@@ -65,7 +65,6 @@ import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.universe.TestSystems;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Cubicle;
@@ -87,6 +86,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.TestSystems;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -205,7 +205,7 @@ public class CampaignTest {
 
         Campaign testCampaign = mock(Campaign.class);
         when(testCampaign.getPersonnel()).thenReturn(testPersonList);
-        when(testCampaign.getActivePersonnel(true)).thenReturn(testActivePersonList);
+        when(testCampaign.getActivePersonnel(false, false)).thenReturn(testActivePersonList);
         when(testCampaign.getTechs()).thenCallRealMethod();
         when(testCampaign.getTechs(anyBoolean())).thenCallRealMethod();
         when(testCampaign.getTechs(anyBoolean(), anyBoolean())).thenCallRealMethod();
