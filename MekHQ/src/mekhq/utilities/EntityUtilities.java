@@ -34,9 +34,12 @@ package mekhq.utilities;
 
 import java.util.UUID;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.Mounted;
+import megamek.common.equipment.Sensor;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.unit.Unit;
@@ -83,5 +86,52 @@ public class EntityUtilities {
     public static boolean isUnsupportedEntity(Entity entity) {
         return entity.getUnitType() == UnitType.GUN_EMPLACEMENT
                      || entity.hasDroneOs();
+    }
+
+    /**
+     * Determines whether the given {@link Entity} is equipped with Improved Sensors.
+     *
+     * <p>Improved Sensors are represented by the presence of a BAP (Beagle Active Probe) flag and an internal name
+     * that matches either {@link Sensor#IS_IMPROVED} or {@link Sensor#CL_IMPROVED}.</p>
+     *
+     * @param entity the {@link Entity} to check for improved sensors
+     *
+     * @return {@code true} if the entity has Improved Sensors
+     */
+    public static boolean hasImprovedSensors(Entity entity) {
+        for (Mounted<?> equip : entity.getMisc()) {
+            if (equip.getType().hasFlag(MiscType.F_BAP)) {
+                if (equip.getType().getInternalName().equals(Sensor.IS_IMPROVED)
+                          || equip.getType().getInternalName()
+                                   .equals(Sensor.CL_IMPROVED)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Determines whether the given {@link Entity} is equipped with an Active Probe (BAP) but does NOT have Improved
+     * Sensors.
+     *
+     * <p>This checks for the BAP (Beagle Active Probe) flag, but explicitly excludes internal names that match
+     * Improved Sensors (i.e., {@link Sensor#IS_IMPROVED} or {@link Sensor#CL_IMPROVED}).</p>
+     *
+     * @param entity the {@link Entity} to check for an active probe
+     *
+     * @return {@code true} if the entity has a standard active probe (but not Improved Sensors)
+     */
+    public static boolean hasActiveProbe(Entity entity) {
+        for (Mounted<?> equip : entity.getMisc()) {
+            if (equip.getType().hasFlag(MiscType.F_BAP)
+                      && !(equip.getType().getInternalName()
+                                 .equals(Sensor.IS_IMPROVED)
+                                 || equip.getType()
+                                          .getInternalName().equals(Sensor.CL_IMPROVED))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -117,6 +117,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.EntityUtilities;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.math3.util.Pair;
 
@@ -1483,10 +1484,14 @@ public class StratConRulesManager {
                             continue;
                         }
 
-                        TargetRollModifier rollModifier = getUnitWeightModifier(scoutData.entityWeight());
+                        TargetRollModifier weightModifier = getUnitWeightModifier(scoutData.entityWeight());
+                        TargetRollModifier sensorsModifier = new TargetRollModifier((scoutData.hasSensorEquipment() ?
+                                                                                           -1 :
+                                                                                           0),
+                              "Unit Sensors");
                         boolean wasScoutingSuccessful =
                               !useAdvancedScouting || SkillCheckUtility.performQuickSkillCheck(scout,
-                                    scoutData.skillName(), List.of(rollModifier), 0, false, false,
+                                    scoutData.skillName(), List.of(weightModifier, sensorsModifier), 0, false, false,
                                     campaign.getLocalDate()
                               );
 
@@ -1576,6 +1581,14 @@ public class StratConRulesManager {
     private static List<ScoutRecord> buildScoutMap(Force force, Hangar hangar) {
         List<ScoutRecord> scouts = new ArrayList<>();
         for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+            boolean hasSensorEquipment = false;
+            Entity entity = unit.getEntity();
+            if (entity != null) {
+                boolean hasImprovedSensors = EntityUtilities.hasImprovedSensors(entity);
+                boolean hasActiveProbe = EntityUtilities.hasActiveProbe(entity);
+                hasSensorEquipment = hasImprovedSensors || hasActiveProbe;
+            }
+
             List<Person> unitCrew = unit.getCrew();
             if (unitCrew.isEmpty()) {
                 LOGGER.info("No crew for unit: {} {}", unit.getName(), unit.getId());
@@ -1607,13 +1620,13 @@ public class StratConRulesManager {
                 }
             }
 
-            Entity entity = unit.getEntity();
             double weight = 200.0;
             if (entity != null) {
                 weight = entity.getWeight();
             }
 
-            ScoutRecord scoutRecord = new ScoutRecord(bestScout, bestScoutSkillName, bestScoutSkillLevel, weight);
+            ScoutRecord scoutRecord = new ScoutRecord(bestScout, bestScoutSkillName, bestScoutSkillLevel, weight,
+                  hasSensorEquipment);
             LOGGER.info("Unit {} has best scout: {} with skill {} at level {} and is weight: {}t",
                   unit.getId(), bestScout, bestScoutSkillName, bestScoutSkillLevel, weight);
             scouts.add(scoutRecord);
