@@ -69,6 +69,7 @@ import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
+import static mekhq.campaign.personnel.skills.SkillType.S_ZERO_G_OPERATIONS;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -496,37 +497,37 @@ public class Campaign implements ITechManager {
 
     public Campaign(CampaignConfiguration campConf) {
         this(
-            campConf.getGame(),
-            campConf.getPlayer(),
-            campConf.getName(),
-            campConf.getDate(),
-            campConf.getCampaignOpts(),
-            campConf.getGameOptions(),
-            campConf.getPartsStore(),
-            campConf.getNewPersonnelMarket(),
-            campConf.getRandomDeath(),
-            campConf.getCampaignSummary(),
-            campConf.getfaction(),
-            campConf.getTechFaction(),
-            campConf.getCurrencyManager(),
-            campConf.getSystemsInstance(),
-            campConf.getLocation(),
-            campConf.getReputationController(),
-            campConf.getFactionStandings(),
-            campConf.getRankSystem(),
-            campConf.getforce(),
-            campConf.getfinances(),
-            campConf.getRandomEvents(),
-            campConf.getUltimatums(),
-            campConf.getRetDefTracker(),
-            campConf.getAutosave(),
-            campConf.getBehaviorSettings(),
-            campConf.getPersonnelMarket(),
-            campConf.getAtBMonthlyContractMarket(),
-            campConf.getUnitMarket(),
-            campConf.getDivorce(),
-            campConf.getMarriage(),
-            campConf.getProcreation()
+              campConf.getGame(),
+              campConf.getPlayer(),
+              campConf.getName(),
+              campConf.getDate(),
+              campConf.getCampaignOpts(),
+              campConf.getGameOptions(),
+              campConf.getPartsStore(),
+              campConf.getNewPersonnelMarket(),
+              campConf.getRandomDeath(),
+              campConf.getCampaignSummary(),
+              campConf.getfaction(),
+              campConf.getTechFaction(),
+              campConf.getCurrencyManager(),
+              campConf.getSystemsInstance(),
+              campConf.getLocation(),
+              campConf.getReputationController(),
+              campConf.getFactionStandings(),
+              campConf.getRankSystem(),
+              campConf.getforce(),
+              campConf.getfinances(),
+              campConf.getRandomEvents(),
+              campConf.getUltimatums(),
+              campConf.getRetDefTracker(),
+              campConf.getAutosave(),
+              campConf.getBehaviorSettings(),
+              campConf.getPersonnelMarket(),
+              campConf.getAtBMonthlyContractMarket(),
+              campConf.getUnitMarket(),
+              campConf.getDivorce(),
+              campConf.getMarriage(),
+              campConf.getProcreation()
         );
     }
 
@@ -3211,8 +3212,8 @@ public class Campaign implements ITechManager {
             PartInUse newPartInUse = getPartInUse((Part) maybePart);
             if (partInUse.equals(newPartInUse)) {
                 Part newPart = (maybePart instanceof MissingPart) ?
-                                        (((MissingPart) maybePart).getNewPart())
-                                        : (Part) maybePart;
+                                     (((MissingPart) maybePart).getNewPart())
+                                     : (Part) maybePart;
                 partInUse.setPlannedCount(partInUse.getPlannedCount() + newPart.getTotalQuantity());
             }
         }
@@ -3308,8 +3309,8 @@ public class Campaign implements ITechManager {
                 inUse.put(partInUse, partInUse);
             }
             Part newPart = (maybePart instanceof MissingPart) ?
-                    (((MissingPart) maybePart).getNewPart())
-                    : (Part) maybePart;
+                                 (((MissingPart) maybePart).getNewPart())
+                                 : (Part) maybePart;
             partInUse.setPlannedCount(partInUse.getPlannedCount() + newPart.getTotalQuantity());
         }
         return inUse.keySet()
@@ -8426,11 +8427,16 @@ public class Campaign implements ITechManager {
     public TargetRoll getTargetForMaintenance(IPartWork partWork, Person tech, int asTechsUsed) {
         int value = 10;
         String skillLevel = "Unmaintained";
+        PersonnelOptions options = null;
+        Attributes attributes = null;
         if (null != tech) {
+            options = tech.getOptions();
+            attributes = tech.getATOWAttributes();
+
             Skill skill = tech.getSkillForWorkingOn(partWork);
             if (null != skill) {
-                value = skill.getFinalSkillValue(tech.getOptions(), tech.getATOWAttributes());
-                skillLevel = skill.getSkillLevel(tech.getOptions(), tech.getATOWAttributes()).toString();
+                value = skill.getFinalSkillValue(options, attributes);
+                skillLevel = skill.getSkillLevel(options, attributes).toString();
             }
         }
 
@@ -8452,12 +8458,24 @@ public class Campaign implements ITechManager {
                 megamek.common.planetaryConditions.Atmosphere planetaryConditions = planet.getPressure(getLocalDate());
                 int temperature = planet.getTemperature(getLocalDate());
 
+                Skill zeroGSkill = tech == null ? null : tech.getSkill(S_ZERO_G_OPERATIONS);
+                int zeroGSkillLevel = 0;
+                if (zeroGSkill != null) {
+                    zeroGSkillLevel = zeroGSkill.getTotalSkillLevel(options, attributes);
+                }
+
                 if (planet.getGravity() < 0.8) {
-                    target.addModifier(2, "Low Gravity");
+                    int modifier = 2;
+                    target.addModifier(modifier, "Low Gravity");
+                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
                 } else if (planet.getGravity() >= 2.0) {
-                    target.addModifier(4, "Very High Gravity");
+                    int modifier = 4;
+                    target.addModifier(modifier, "Very High Gravity");
+                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
                 } else if (planet.getGravity() > 1.2) {
-                    target.addModifier(1, "High Gravity");
+                    int modifier = 1;
+                    target.addModifier(modifier, "High Gravity");
+                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
                 }
 
                 if (atmosphere.isTainted() || atmosphere.isToxic()) {
@@ -8502,6 +8520,30 @@ public class Campaign implements ITechManager {
         }
 
         return target;
+    }
+
+    /**
+     * Applies a Zero-G Operations skill gravityModifier to the specified {@link TargetRoll}, offsetting a penalty
+     * gravityModifier.
+     *
+     * <ul>
+     *   <li>If {@code zeroGSkillLevel} >= {@code gravityModifier}, does nothing.</li>
+     *   <li>If {@code zeroGSkillLevel} < {@code gravityModifier}, applies {@code -zeroGSkillLevel}.</li>
+     * </ul>
+     *
+     * @param zeroGSkillLevel the Zero-G Operations skill level, which negates up to that much penalty from the
+     *                        gravityModifier
+     * @param gravityModifier the penalty modifier value to offset
+     * @param target          the {@link TargetRoll} instance to modify
+     */
+    private static void addZeroGOperationsModifier(int zeroGSkillLevel, int gravityModifier, TargetRoll target) {
+        if (zeroGSkillLevel > 0) {
+            int effectiveModifier = zeroGSkillLevel >= gravityModifier ? 0 : -zeroGSkillLevel;
+
+            if (effectiveModifier < 0) {
+                target.addModifier(effectiveModifier, "Zero-G Operations");
+            }
+        }
     }
 
     public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition) {
@@ -10870,6 +10912,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Now that systemsInstance is injectable and non-final, we may wish to update it on the fly.
+     *
      * @return systemsInstance Systems instance used when instantiating this Campaign instance.
      */
     public Systems getSystemsInstance() {
@@ -10877,8 +10920,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Set the systemsInstance to a new instance.  Useful for testing, or updating the set of systems
-     * within a running Campaign.
+     * Set the systemsInstance to a new instance.  Useful for testing, or updating the set of systems within a running
+     * Campaign.
+     *
      * @param systemsInstance new Systems instance that this campaign should use.
      */
     public void setSystemsInstance(Systems systemsInstance) {
