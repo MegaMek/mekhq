@@ -166,6 +166,7 @@ public class CampaignOptions {
     // Acquisition
     private int waitingPeriod;
     private String acquisitionSkill;
+    private boolean useFunctionalAppraisal;
     private ProcurementPersonnelPick acquisitionPersonnelCategory;
     private int clanAcquisitionPenalty;
     private int isAcquisitionPenalty;
@@ -317,6 +318,7 @@ public class CampaignOptions {
     private RandomOriginOptions randomOriginOptions;
     private boolean useRandomPersonalities;
     private boolean useRandomPersonalityReputation;
+    private boolean useReasoningXpMultiplier;
     private boolean useSimulatedRelationships;
 
     // Family
@@ -716,6 +718,7 @@ public class CampaignOptions {
         // Acquisition
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
+        useFunctionalAppraisal = false;
         acquisitionPersonnelCategory = SUPPORT;
         clanAcquisitionPenalty = 0;
         isAcquisitionPenalty = 0;
@@ -922,6 +925,7 @@ public class CampaignOptions {
         setRandomOriginOptions(new RandomOriginOptions(true));
         setUseRandomPersonalities(false);
         setUseRandomPersonalityReputation(true);
+        setUseReasoningXpMultiplier(true);
         setUseSimulatedRelationships(false);
 
         // Family
@@ -2027,13 +2031,12 @@ public class CampaignOptions {
         this.useRandomPersonalityReputation = useRandomPersonalityReputation;
     }
 
-    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean isUseReasoningXpMultiplier() {
-        return false;
+        return useReasoningXpMultiplier;
     }
 
-    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setUseReasoningXpMultiplier(final boolean useReasoningXpMultiplier) {
+        this.useReasoningXpMultiplier = useReasoningXpMultiplier;
     }
 
     public boolean isUseSimulatedRelationships() {
@@ -4183,6 +4186,14 @@ public class CampaignOptions {
 
     public void setAcquisitionSkill(final String acquisitionSkill) {
         this.acquisitionSkill = acquisitionSkill;
+    }
+
+    public boolean isUseFunctionalAppraisal() {
+        return useFunctionalAppraisal;
+    }
+
+    public void setUseFunctionalAppraisal(final boolean useFunctionalAppraisal) {
+        this.useFunctionalAppraisal = useFunctionalAppraisal;
     }
 
     /**

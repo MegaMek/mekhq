@@ -65,6 +65,7 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
@@ -76,6 +77,7 @@ import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
+import mekhq.gui.sorter.ReasoningSorter;
 import mekhq.utilities.ReportingUtilities;
 
 public enum PersonnelTableModelColumn {
@@ -165,7 +167,6 @@ public enum PersonnelTableModelColumn {
     AMBITION("PersonnelTableModelColumn.AMBITION.text"),
     GREED("PersonnelTableModelColumn.GREED.text"),
     SOCIAL("PersonnelTableModelColumn.SOCIAL.text"),
-    @Deprecated(since = "0.50.07", forRemoval = true)
     REASONING("PersonnelTableModelColumn.REASONING.text"),
     STRENGTH("PersonnelTableModelColumn.STRENGTH.text"),
     BODY("PersonnelTableModelColumn.BODY.text"),
@@ -534,7 +535,6 @@ public enum PersonnelTableModelColumn {
         return this == SOCIAL;
     }
 
-    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean isReasoning() {
         return this == REASONING;
     }
@@ -1063,6 +1063,9 @@ public enum PersonnelTableModelColumn {
                 sign = social.isTraitPositive() ? "+" : "-";
 
                 return social + " (" + (social.isTraitMajor() ? sign + sign : sign) + ')';
+            case REASONING:
+                Reasoning reasoning = person.getReasoning();
+                return reasoning.getLabel();
             case STRENGTH:
                 currentAttributeValue = person.getAttributeScore(SkillAttribute.STRENGTH);
                 attributeCap = person.getAttributeCap(SkillAttribute.STRENGTH);
@@ -1295,7 +1298,8 @@ public enum PersonnelTableModelColumn {
             };
             case PERSONALITY -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME -> true;
-                case AGGRESSION, AMBITION, GREED, SOCIAL -> campaign.getCampaignOptions().isUseRandomPersonalities();
+                case AGGRESSION, AMBITION, GREED, SOCIAL, REASONING ->
+                      campaign.getCampaignOptions().isUseRandomPersonalities();
                 default -> false;
             };
             case TRAITS -> switch (this) {
@@ -1379,6 +1383,7 @@ public enum PersonnelTableModelColumn {
                  IMPLANT_COUNT,
                  LOYALTY -> new IntegerStringSorter();
             case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA -> new AttributeScoreSorter();
+            case REASONING -> new ReasoningSorter();
             case SALARY -> new FormattedNumberSorter();
             default -> new NaturalOrderComparator();
         };
