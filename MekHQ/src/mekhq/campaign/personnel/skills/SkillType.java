@@ -136,6 +136,7 @@ public class SkillType {
     public static final String S_STRATEGY = "Strategy";
     public static final String S_TACTICS = "Tactics/Any";
     public static final String S_TRAINING = "Training";
+    public static final String S_ZERO_G_OPERATIONS = "Zero-G Operations";
     public static final String S_ESCAPE_ARTIST = "Escape Artist";
     public static final String S_DISGUISE = "Disguise";
     public static final String S_FORGERY = "Forgery";
@@ -211,7 +212,6 @@ public class SkillType {
     public static final String S_CAREER_ANY = "Career/Any" + RP_ONLY_TAG;
     public static final String S_RUNNING = "Running" + RP_ONLY_TAG;
     public static final String S_SWIMMING = "Swimming" + RP_ONLY_TAG;
-    public static final String S_ZERO_G_OPERATIONS = "Zero-G Operations" + RP_ONLY_TAG;
     public static final String S_MELEE_WEAPONS = "Melee Weapons" + RP_ONLY_TAG;
     public static final String S_THROWN_WEAPONS = "Thrown Weapons" + RP_ONLY_TAG;
     public static final String S_SUPPORT_WEAPONS = "Support Weapons" + RP_ONLY_TAG;
@@ -468,10 +468,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                                                                                                    Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                    SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                    SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                           </pre>
+     *                        Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                        SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                        SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                               </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -1051,6 +1051,7 @@ public class SkillType {
             case "tactics" -> "Tactics/Any"; // <50.07
             case "tracking (rp only)" -> "Tracking/Any" + RP_ONLY_TAG; // <50.07
             case "training (rp only)" -> "Training"; // <50.07
+            case "zero-g operations (rp only)" -> "Zero-G Operations"; // <50.07
             case "escape artist (rp only)" -> "Escape Artist"; // <50.07
             case "disguise (rp only)" -> "Disguise"; // <50.07
             case "forgery (rp only)" -> "Forgery"; // <50.07
@@ -1422,7 +1423,7 @@ public class SkillType {
             case S_TRAINING, "Training (RP Only)" -> createTraining();
             case S_CAREER_ANY -> createCareer();
             case S_SWIMMING -> createSwimming();
-            case S_ZERO_G_OPERATIONS -> createZeroGOperations();
+            case S_ZERO_G_OPERATIONS, "Zero-G Operations (RP Only)" -> createZeroGOperations();
             case S_MELEE_WEAPONS -> createMeleeWeapons();
             case S_THROWN_WEAPONS -> createThrownWeapons();
             case S_SUPPORT_WEAPONS -> createSupportWeapons();
@@ -3132,7 +3133,7 @@ public class SkillType {
         return new SkillType(S_ZERO_G_OPERATIONS,
               7,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               REFLEXES,
               NONE,
               null,

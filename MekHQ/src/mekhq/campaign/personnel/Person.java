@@ -45,8 +45,8 @@ import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
+import static mekhq.campaign.log.LogEntryType.PATIENT;
 import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
-import static mekhq.campaign.log.LogEntryType.SERVICE;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
@@ -227,6 +227,7 @@ public class Person {
     private LocalDate dateOfDeath;
     private List<LogEntry> personnelLog;
     private List<LogEntry> medicalLog;
+    private List<LogEntry> patientLog;
     private List<LogEntry> scenarioLog;
     private List<LogEntry> assignmentLog;
     private List<LogEntry> performanceLog;
@@ -523,6 +524,7 @@ public class Person {
         techUnits = new ArrayList<>();
         personnelLog = new ArrayList<>();
         medicalLog = new ArrayList<>();
+        patientLog = new ArrayList<>();
         scenarioLog = new ArrayList<>();
         assignmentLog = new ArrayList<>();
         performanceLog = new ArrayList<>();
@@ -1481,7 +1483,7 @@ public class Person {
             }
         }
 
-        if (status.isActive()) {
+        if (status.isActiveFlexible()) {
             // Check Pregnancy
             if (isPregnant() && getDueDate().isBefore(today)) {
                 campaign.getProcreation().birth(campaign, getDueDate(), this);
@@ -3005,6 +3007,14 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "medicalLog");
             }
 
+            if (!patientLog.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "patientLog");
+                for (LogEntry entry : patientLog) {
+                    entry.writeToXML(pw, indent);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "patientLog");
+            }
+
             if (!scenarioLog.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenarioLog");
                 for (LogEntry entry : scenarioLog) {
@@ -3498,51 +3508,41 @@ public class Person {
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            // <50.05 compatibility handler
                             LogEntryType logEntryType = logEntry.getType();
                             String logEntryDescription = logEntry.getDesc();
                             if (logEntryType == MEDICAL) {
                                 person.addMedicalLogEntry(logEntry);
-                            } else if (logEntryType == SERVICE) {
-                                // < 50.07 compatibility handler
-                                List<String> assignmentTargetStrings = List.of("Assigned to",
-                                      "Reassigned to",
-                                      "Removed from",
-                                      "Added to");
-
-                                boolean shiftedLogType = false;
-                                for (String targetString : assignmentTargetStrings) {
-                                    if (logEntryDescription.startsWith(targetString)) {
-                                        logEntry.setType(ASSIGNMENT);
-                                        person.addAssignmentLogEntry(logEntry);
-                                        shiftedLogType = true;
-                                        break;
-                                    }
-                                }
-
-                                if (!shiftedLogType) {
-                                    person.addPersonalLogEntry(logEntry);
-                                }
                             } else {
-                                // < 50.05 compatibility handler
-                                List<String> performanceTargetStrings = List.of("Changed edge to",
-                                      "Gained",
-                                      "Improved",
-                                      "injuries, gaining",
-                                      "XP from successful medical work");
+                                Map<String, LogEntryType> logMap = new HashMap<>();
+                                logMap.put("Assigned to", ASSIGNMENT); // <50.07 compatibility
+                                logMap.put("Reassigned to", ASSIGNMENT); // <50.07 compatibility
+                                logMap.put("Removed from", ASSIGNMENT); // <50.07 compatibility
+                                logMap.put("Added to", ASSIGNMENT); // <50.07 compatibility
+                                logMap.put("Changed edge to", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("Gained", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("Improved", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("injuries, gaining", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("XP from successful medical work", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("Successfully treated", PATIENT); // <50.07 compatibility
 
-                                boolean foundPerformanceTarget = false;
-                                for (String targetString : performanceTargetStrings) {
-                                    if (logEntryDescription.startsWith(targetString)) {
-                                        foundPerformanceTarget = true;
+                                boolean logEntryWasReassigned = false;
+                                for (Map.Entry<String, LogEntryType> entry : logMap.entrySet()) {
+                                    if (logEntryDescription.contains(entry.getKey())) {
+                                        LogEntryType newType = entry.getValue();
+                                        logEntry.setType(newType);
+
+                                        switch (newType) {
+                                            case ASSIGNMENT -> person.addAssignmentLogEntry(logEntry);
+                                            case PERFORMANCE -> person.addPerformanceLogEntry(logEntry);
+                                            case PATIENT -> person.addPatientLogEntry(logEntry);
+                                        }
+
+                                        logEntryWasReassigned = true;
                                         break;
                                     }
                                 }
 
-                                if (foundPerformanceTarget) {
-                                    logEntry.setType(PERFORMANCE);
-                                    person.addPerformanceLogEntry(logEntry);
-                                } else {
+                                if (!logEntryWasReassigned) {
                                     person.addPersonalLogEntry(logEntry);
                                 }
                             }
@@ -3566,6 +3566,26 @@ public class Person {
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
                             person.addMedicalLogEntry(logEntry);
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("patientLog")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                            LOGGER.error("(patientLog) Unknown node type not loaded in personnel logEntry nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+
+                        final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+                        if (logEntry != null) {
+                            person.addPatientLogEntry(logEntry);
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("scenarioLog")) {
@@ -3625,7 +3645,14 @@ public class Person {
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            person.addPerformanceLogEntry(logEntry);
+                            String logEntryDescription = logEntry.getDesc();
+
+                            if (logEntryDescription.contains("Successfully treated")) {
+                                logEntry.setType(PATIENT);
+                                person.addPatientLogEntry(logEntry);
+                            } else {
+                                person.addPerformanceLogEntry(logEntry);
+                            }
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("awards")) {
@@ -4898,7 +4925,7 @@ public class Person {
     }
 
     public boolean needsFixing() {
-        return ((hits > 0) || needsAMFixing()) && getStatus().isActive();
+        return ((hits > 0) || needsAMFixing()) && getStatus().isActiveFlexible();
     }
 
     /**
@@ -6292,6 +6319,11 @@ public class Person {
         return medicalLog;
     }
 
+    public List<LogEntry> getPatientLog() {
+        patientLog.sort(Comparator.comparing(LogEntry::getDate));
+        return patientLog;
+    }
+
     public List<LogEntry> getScenarioLog() {
         scenarioLog.sort(Comparator.comparing(LogEntry::getDate));
         return scenarioLog;
@@ -6321,6 +6353,10 @@ public class Person {
 
     public void addMedicalLogEntry(final LogEntry entry) {
         medicalLog.add(entry);
+    }
+
+    public void addPatientLogEntry(final LogEntry entry) {
+        patientLog.add(entry);
     }
 
     public void addScenarioLogEntry(final LogEntry entry) {
@@ -6479,6 +6515,22 @@ public class Person {
               isPiloting ? ModifierValue.PILOTING : ModifierValue.GUNNERY);
     }
 
+    /**
+     * Determines whether the person has any injuries, possibly filtering by permanence.
+     *
+     * <ul>
+     *     <li>If {@code permanentCheck} is {@code false}, this method returns {@code true} if the person has any
+     *     recorded injuries.</li>
+     *     <li>If {@code permanentCheck} is {@code true}, it will return {@code true} only if the person has at least
+     *     one injury that is either non-permanent or has a remaining recovery time greater than zero. Otherwise, it
+     *     returns {@code false}.</li>
+     * </ul>
+     *
+     * @param permanentCheck if {@code true}, only injuries that are not permanent or have time remaining are
+     *                       considered; if {@code false}, any injury will be counted
+     *
+     * @return {@code true} if the person has injuries matching the specified criteria; {@code false} otherwise
+     */
     public boolean hasInjuries(final boolean permanentCheck) {
         return !injuries.isEmpty() &&
                      (!permanentCheck ||
@@ -7290,7 +7342,7 @@ public class Person {
 
         if (hasBerserker && failedWillpowerCheck) {
             Set<Person> victims = new HashSet<>();
-            List<Person> allActivePersonnel = campaign.getActivePersonnel(false);
+            List<Person> allActivePersonnel = campaign.getActivePersonnel(true, true);
             if (isDeployed() && unit != null) {
                 getLocalVictims(allActivePersonnel, victims);
             } else {

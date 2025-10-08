@@ -516,7 +516,7 @@ public class AbstractMarriageTest {
         final List<Person> mockPersonnel = new ArrayList<>();
         mockPersonnel.add(mockMale);
         mockPersonnel.add(mockFemale);
-        when(mockCampaign.getActivePersonnel(false)).thenReturn(mockPersonnel);
+        when(mockCampaign.getActivePersonnel(true, true)).thenReturn(mockPersonnel);
 
         final Person mockPerson = mock(Person.class);
         when(mockPerson.getGender()).thenReturn(Gender.FEMALE);

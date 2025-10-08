@@ -699,7 +699,7 @@ public class RandomDeath {
             return PersonnelStatus.KIA;
         } else if (person.hasInjuries(false)) {
             final PersonnelStatus status = determineIfInjuriesCausedTheDeath(person);
-            if (!status.isActive()) {
+            if (status.isCauseOfDeath()) {
                 return status;
             }
         }

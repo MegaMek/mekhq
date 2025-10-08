@@ -47,6 +47,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.FlatLafStyleBuilder;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
@@ -55,7 +56,6 @@ import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * A dialog window for displaying both glossary and documentation entries in MekHQ.
@@ -151,14 +151,14 @@ public class NewGlossaryDialog extends JDialog {
 
         minimumWidth += aboutWrapper.getPreferredSize().width;
 
-        JScrollPaneWithSpeed scrollGlossary = buildGlossaryPane();
+        FastJScrollPane scrollGlossary = buildGlossaryPane();
         JPanel contentsWrapper = new JPanel(new BorderLayout());
         contentsWrapper.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         contentsWrapper.add(scrollGlossary, BorderLayout.CENTER);
 
         minimumWidth += contentsWrapper.getPreferredSize().width;
 
-        JScrollPaneWithSpeed scrollDocumentation = buildDocumentationPane();
+        FastJScrollPane scrollDocumentation = buildDocumentationPane();
         JPanel documentationWrapper = new JPanel(new BorderLayout());
         documentationWrapper.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         documentationWrapper.add(scrollDocumentation, BorderLayout.CENTER);
@@ -213,7 +213,7 @@ public class NewGlossaryDialog extends JDialog {
         aboutPanel.add(imageWrapper);
         aboutPanel.add(txtAbout);
 
-        JScrollPaneWithSpeed scrollAbout = new JScrollPaneWithSpeed(aboutPanel);
+        FastJScrollPane scrollAbout = new FastJScrollPane(aboutPanel);
         scrollAbout.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollAbout.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollAbout.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -254,18 +254,26 @@ public class NewGlossaryDialog extends JDialog {
     /**
      * Builds the scrollable glossary section, populated with clickable entry links.
      *
-     * @return a {@link JScrollPaneWithSpeed} containing the glossary links
+     * @return a {@link FastJScrollPane} containing the glossary links
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private JScrollPaneWithSpeed buildGlossaryPane() {
+    private FastJScrollPane buildGlossaryPane() {
         StringBuilder formatedGlossaryText = new StringBuilder();
         formatedGlossaryText.append(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.contentsPane.title"));
 
+        String lastFirstLetter = "";
         for (String entry : glossaryEntries) {
             GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entry);
             String title = glossaryEntry != null ? glossaryEntry.getTitle() : "-";
+
+            if (!lastFirstLetter.equals(title.substring(0, 1))) {
+                lastFirstLetter = title.substring(0, 1);
+                formatedGlossaryText.append("<h2>")
+                      .append(lastFirstLetter)
+                      .append("</h2>");
+            }
 
             formatedGlossaryText.append("<a href='GLOSSARY:")
                   .append(entry)
@@ -276,7 +284,7 @@ public class NewGlossaryDialog extends JDialog {
 
         JTextPane txtGlossary = createGlossaryDialogTextPane(formatedGlossaryText);
 
-        JScrollPaneWithSpeed scrollGlossary = new JScrollPaneWithSpeed(txtGlossary);
+        FastJScrollPane scrollGlossary = new FastJScrollPane(txtGlossary);
         scrollGlossary.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         return scrollGlossary;
@@ -313,18 +321,26 @@ public class NewGlossaryDialog extends JDialog {
     /**
      * Builds the scrollable documentation section, each entry as a clickable link.
      *
-     * @return a {@link JScrollPaneWithSpeed} containing the documentation links
+     * @return a {@link FastJScrollPane} containing the documentation links
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private JScrollPaneWithSpeed buildDocumentationPane() {
+    private FastJScrollPane buildDocumentationPane() {
         StringBuilder formatedDocumentationText = new StringBuilder();
         formatedDocumentationText.append(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.documentationPane.title"));
 
+        String lastFirstLetter = "";
         for (String entry : documentationEntries) {
             DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(entry);
             String title = documentationEntry != null ? documentationEntry.getTitle() : "-";
+
+            if (!lastFirstLetter.equals(title.substring(0, 1))) {
+                lastFirstLetter = title.substring(0, 1);
+                formatedDocumentationText.append("<h2>")
+                      .append(lastFirstLetter)
+                      .append("</h2>");
+            }
 
             formatedDocumentationText.append("<a href='DOCUMENTATION:")
                   .append(entry)
@@ -335,7 +351,7 @@ public class NewGlossaryDialog extends JDialog {
 
         JTextPane txtDocumentation = createGlossaryDialogTextPane(formatedDocumentationText);
 
-        JScrollPaneWithSpeed scrollDocumentation = new JScrollPaneWithSpeed(txtDocumentation);
+        FastJScrollPane scrollDocumentation = new FastJScrollPane(txtDocumentation);
         scrollDocumentation.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         return scrollDocumentation;
