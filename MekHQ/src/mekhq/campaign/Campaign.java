@@ -250,6 +250,7 @@ import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
+import mekhq.campaign.personnel.skills.Appraisal;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.EscapeArtist;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
@@ -4450,10 +4451,15 @@ public class Campaign implements ITechManager {
         }
         int xpGained = 0;
         if (roll >= target.getValue()) {
+            boolean useFunctionalAppraisal = campaignOptions.isUseFunctionalAppraisal();
+            double valueChange = useFunctionalAppraisal ? Appraisal.performAppraisalMultiplierCheck(person,
+                  currentDay) : 1.0;
+            String appraisalReport = useFunctionalAppraisal ? Appraisal.getAppraisalReport(valueChange) : "";
+
             if (transitDays < 0) {
                 transitDays = calculatePartTransitTime(acquisition.getAvailability());
             }
-            report = report + acquisition.find(transitDays);
+            report = report + acquisition.find(transitDays, valueChange) + ' ' + appraisalReport;
             found = true;
             if (person != null) {
                 if (roll == 12 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {

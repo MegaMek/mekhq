@@ -56,7 +56,6 @@ public enum PersonalityTraitType {
     AMBITION,
     GREED,
     SOCIAL,
-    @Deprecated(since = "0.50.07", forRemoval = true)
     REASONING,
     PERSONALITY_QUIRK;
 

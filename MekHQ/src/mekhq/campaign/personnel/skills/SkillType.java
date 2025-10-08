@@ -141,11 +141,11 @@ public class SkillType {
     public static final String S_DISGUISE = "Disguise";
     public static final String S_FORGERY = "Forgery";
     public static final String S_ACTING = "Acting";
+    public static final String S_APPRAISAL = "Appraisal";
 
     // roleplay skills
     public static final String S_ACROBATICS = "Acrobatics" + RP_ONLY_TAG;
     public static final String S_ANIMAL_HANDLING = "Animal Handling" + RP_ONLY_TAG;
-    public static final String S_APPRAISAL = "Appraisal" + RP_ONLY_TAG;
     public static final String S_ARCHERY = "Archery" + RP_ONLY_TAG;
     public static final String S_ART_DANCING = "Art/Dancing" + RP_ONLY_TAG;
     public static final String S_ART_DRAWING = "Art/Drawing" + RP_ONLY_TAG;
@@ -1056,6 +1056,7 @@ public class SkillType {
             case "disguise (rp only)" -> "Disguise"; // <50.07
             case "forgery (rp only)" -> "Forgery"; // <50.07
             case "acting (rp only)" -> "Acting"; // <50.07
+            case "appraisal (rp only)" -> "Appraisal"; // <50.07
             default -> skillName;
         };
         return skillName;
@@ -1353,7 +1354,7 @@ public class SkillType {
             case S_ACROBATICS -> createAcrobatics();
             case S_ACTING, "Acting (RP Only)" -> createActing();
             case S_ANIMAL_HANDLING -> createAnimalHandling();
-            case S_APPRAISAL -> createAppraisal();
+            case S_APPRAISAL, "Appraisal (RP Only)" -> createAppraisal();
             case S_ARCHERY -> createArchery();
             case S_ART_DANCING -> createArtDancing();
             case S_ART_DRAWING -> createArtDrawing();
@@ -2025,7 +2026,7 @@ public class SkillType {
         return new SkillType(S_APPRAISAL,
               8,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               INTELLIGENCE,
               NONE,
               null,

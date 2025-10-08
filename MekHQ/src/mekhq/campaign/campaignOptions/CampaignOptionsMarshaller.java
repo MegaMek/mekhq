@@ -146,6 +146,10 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionSkill", campaignOptions.getAcquisitionSkill());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
+              "useFunctionalAppraisal",
+              campaignOptions.isUseFunctionalAppraisal());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
               "acquisitionPersonnelCategory",
               campaignOptions.getAcquisitionPersonnelCategory().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techLevel", campaignOptions.getTechLevel());
