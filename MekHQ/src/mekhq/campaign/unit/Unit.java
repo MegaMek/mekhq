@@ -1075,6 +1075,11 @@ public class Unit implements ITechnology {
         return missingParts;
     }
 
+    /**
+	 * A method that returns the value of all missing, but not damaged parts.
+     *
+     * @return The value of all missing parts.
+     */
     public Money getValueOfAllMissingParts() {
         Money value = Money.zero();
         for (Part part : parts) {
@@ -1094,6 +1099,22 @@ public class Unit implements ITechnology {
         }
         return value;
     }
+
+    /**
+	 * A method that returns the value of all damaged, but not missing parts.
+     *
+     * @return The value of all damaged parts.
+     */
+	public Money getValueOfAllDamagedParts() {
+        Money value = Money.zero();
+
+		for (Part part: getParts()) {
+			if(part.needsFixing() && !(part instanceof Armor)) {
+				value = value.plus(part.getActualValue());
+			}
+		}
+		return value;
+	}
 
     public void removePart(Part part) {
         parts.remove(part);

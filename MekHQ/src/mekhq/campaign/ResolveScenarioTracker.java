@@ -97,6 +97,8 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ResolveScenarioTracker {
+    public static final double DAMANGED_PART_COMPENSATION_MODIFIER = 0.2;
+
     Map<UUID, Entity> entities;
     Map<UUID, List<Entity>> bayLoadedEntities;
     Map<Integer, UUID> idMap;
@@ -1706,10 +1708,16 @@ public class ResolveScenarioTracker {
                 campaign.removeUnit(unit.getId());
             } else {
                 Money currentValue = unit.getValueOfAllMissingParts();
+                Money repairBLC = Money.zero();
                 campaign.clearGameData(en);
                 // FIXME: Need to implement a "fuel" part just like the "armor" part
                 if (en.isAero()) {
                     ((IAero) en).setFuelTonnage(((IAero) unitStatus.getBaseEntity()).getFuelTonnage());
+                }
+                if (campaign.getCampaignOptions().isPayForRepairs()) {
+                    Money amount = unit.getValueOfAllDamagedParts()
+                        .multipliedBy(DAMANGED_PART_COMPENSATION_MODIFIER);
+                    repairBLC = repairBLC.minus(amount);
                 }
                 unit.setEntity(en);
                 if (en.usesWeaponBays()) {
@@ -1724,7 +1732,6 @@ public class ResolveScenarioTracker {
                 // check for BLC
                 Money newValue = unit.getValueOfAllMissingParts();
                 Money blcValue = newValue.minus(currentValue);
-                Money repairBLC = Money.zero();
                 String blcString = "battle loss compensation (parts) for " + unit.getName();
                 if (!unit.isRepairable()) {
                     // if the unit is not repairable, you should get BLC for it, but we should
@@ -1734,11 +1741,9 @@ public class ResolveScenarioTracker {
                     blcString = "battle loss compensation for " + unit.getName();
                 }
                 if (campaignOptions.isPayForRepairs()) {
-                    for (Part p : unit.getParts()) {
-                        if (p.needsFixing() && !(p instanceof Armor)) {
-                            repairBLC = repairBLC.plus(p.getActualValue().multipliedBy(0.2));
-                        }
-                    }
+                    Money amount = unit.getValueOfAllDamagedParts()
+                        .multipliedBy(DAMANGED_PART_COMPENSATION_MODIFIER);
+                    repairBLC = repairBLC.minus(amount);
                 }
                 blcValue = blcValue.plus(repairBLC);
                 if ((blc > 0) && blcValue.isPositive()) {
