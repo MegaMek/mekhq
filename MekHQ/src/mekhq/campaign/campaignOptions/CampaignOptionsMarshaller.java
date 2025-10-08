@@ -353,6 +353,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "prisonerCaptureStyle",
               campaignOptions.getPrisonerCaptureStyle().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "useFunctionalEscapeArtist",
+              campaignOptions.isUseFunctionalEscapeArtist());
         // endregion Prisoners
 
         // region Dependent

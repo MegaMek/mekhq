@@ -137,11 +137,14 @@ public class SkillType {
     public static final String S_TACTICS = "Tactics/Any";
     public static final String S_TRAINING = "Training";
     public static final String S_ZERO_G_OPERATIONS = "Zero-G Operations";
+    public static final String S_ESCAPE_ARTIST = "Escape Artist";
+    public static final String S_DISGUISE = "Disguise";
+    public static final String S_FORGERY = "Forgery";
+    public static final String S_ACTING = "Acting";
     public static final String S_APPRAISAL = "Appraisal";
 
     // roleplay skills
     public static final String S_ACROBATICS = "Acrobatics" + RP_ONLY_TAG;
-    public static final String S_ACTING = "Acting" + RP_ONLY_TAG;
     public static final String S_ANIMAL_HANDLING = "Animal Handling" + RP_ONLY_TAG;
     public static final String S_ARCHERY = "Archery" + RP_ONLY_TAG;
     public static final String S_ART_DANCING = "Art/Dancing" + RP_ONLY_TAG;
@@ -158,9 +161,6 @@ public class SkillType {
     public static final String S_COMPUTERS = "Computers" + RP_ONLY_TAG;
     public static final String S_CRYPTOGRAPHY = "Cryptography" + RP_ONLY_TAG;
     public static final String S_DEMOLITIONS = "Demolitions" + RP_ONLY_TAG;
-    public static final String S_DISGUISE = "Disguise" + RP_ONLY_TAG;
-    public static final String S_ESCAPE_ARTIST = "Escape Artist" + RP_ONLY_TAG;
-    public static final String S_FORGERY = "Forgery" + RP_ONLY_TAG;
     public static final String S_INTEREST_HISTORY = "Interest/History" + RP_ONLY_TAG;
     public static final String S_INTEREST_LITERATURE = "Interest/Literature" + RP_ONLY_TAG;
     public static final String S_INTEREST_HOLO_GAMES = "Interest/Holo-Games" + RP_ONLY_TAG;
@@ -1052,6 +1052,10 @@ public class SkillType {
             case "tracking (rp only)" -> "Tracking/Any" + RP_ONLY_TAG; // <50.07
             case "training (rp only)" -> "Training"; // <50.07
             case "zero-g operations (rp only)" -> "Zero-G Operations"; // <50.07
+            case "escape artist (rp only)" -> "Escape Artist"; // <50.07
+            case "disguise (rp only)" -> "Disguise"; // <50.07
+            case "forgery (rp only)" -> "Forgery"; // <50.07
+            case "acting (rp only)" -> "Acting"; // <50.07
             case "appraisal (rp only)" -> "Appraisal"; // <50.07
             default -> skillName;
         };
@@ -1348,7 +1352,7 @@ public class SkillType {
             case S_STRATEGY -> createStrategy();
             case S_TACTICS -> createTactics();
             case S_ACROBATICS -> createAcrobatics();
-            case S_ACTING -> createActing();
+            case S_ACTING, "Acting (RP Only)" -> createActing();
             case S_ANIMAL_HANDLING -> createAnimalHandling();
             case S_APPRAISAL, "Appraisal (RP Only)" -> createAppraisal();
             case S_ARCHERY -> createArchery();
@@ -1366,9 +1370,9 @@ public class SkillType {
             case S_COMPUTERS -> createComputers();
             case S_CRYPTOGRAPHY -> createCryptography();
             case S_DEMOLITIONS -> createDemolitions();
-            case S_DISGUISE -> createDisguise();
-            case S_ESCAPE_ARTIST -> createEscapeArtist();
-            case S_FORGERY -> createForgery();
+            case S_DISGUISE, "Disguise (RP Only)" -> createDisguise();
+            case S_ESCAPE_ARTIST, "Escape Artist (RP Only)" -> createEscapeArtist();
+            case S_FORGERY, "Forgery (RP Only)" -> createForgery();
             case S_INTEREST_HISTORY -> createInterestHistory();
             case S_INTEREST_LITERATURE -> createInterestLiterature();
             case S_INTEREST_HOLO_GAMES -> createInterestHoloGames();
@@ -1990,7 +1994,7 @@ public class SkillType {
         return new SkillType(S_ACTING,
               8,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               CHARISMA,
               NONE,
               null,
@@ -2280,7 +2284,7 @@ public class SkillType {
         return new SkillType(S_DISGUISE,
               7,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               CHARISMA,
               NONE,
               null,
@@ -2296,7 +2300,7 @@ public class SkillType {
         return new SkillType(S_ESCAPE_ARTIST,
               9,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               STRENGTH,
               DEXTERITY,
               null,
@@ -2312,7 +2316,7 @@ public class SkillType {
         return new SkillType(S_FORGERY,
               8,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               DEXTERITY,
               INTELLIGENCE,
               null,

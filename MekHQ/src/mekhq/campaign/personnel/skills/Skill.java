@@ -38,13 +38,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_SKILL_MODIFIER;
-import static mekhq.campaign.personnel.skills.SkillType.S_ACTING;
-import static mekhq.campaign.personnel.skills.SkillType.S_ANIMAL_HANDLING;
-import static mekhq.campaign.personnel.skills.SkillType.S_INTEREST_THEOLOGY;
-import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
-import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
-import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
-import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
+import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -348,6 +342,34 @@ public class Skill {
             }
 
             if (characterOptions.booleanOption(ATOW_ANIMAL_EMPATHY)) {
+                modifier += 2;
+            }
+        }
+
+        // Houdini
+        if (Objects.equals(name, S_ESCAPE_ARTIST)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_HOUDINI)) {
+                modifier += 2;
+            }
+        }
+
+        // Master Impersonator
+        if (Objects.equals(name, S_DISGUISE)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_MASTER_IMPERSONATOR)) {
+                modifier += 2;
+            }
+        }
+
+        // Counterfeiter
+        if (Objects.equals(name, S_FORGERY)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_COUNTERFEITER)) {
+                modifier += 2;
+            }
+        }
+
+        // Natural Thespian
+        if (Objects.equals(name, S_ACTING)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_NATURAL_THESPIAN)) {
                 modifier += 2;
             }
         }

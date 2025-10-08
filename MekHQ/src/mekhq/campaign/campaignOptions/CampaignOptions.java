@@ -270,6 +270,7 @@ public class CampaignOptions {
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
+    private boolean useFunctionalEscapeArtist;
 
     // Dependent
     private boolean useRandomDependentAddition;
@@ -837,6 +838,7 @@ public class CampaignOptions {
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
+        useFunctionalEscapeArtist = false;
 
         // Dependent
         setUseRandomDependentAddition(false);
@@ -1997,6 +1999,14 @@ public class CampaignOptions {
 
     public void setPrisonerCaptureStyle(final PrisonerCaptureStyle prisonerCaptureStyle) {
         this.prisonerCaptureStyle = prisonerCaptureStyle;
+    }
+
+    public boolean isUseFunctionalEscapeArtist() {
+        return useFunctionalEscapeArtist;
+    }
+
+    public void setUseFunctionalEscapeArtist(final boolean useFunctionalEscapeArtist) {
+        this.useFunctionalEscapeArtist = useFunctionalEscapeArtist;
     }
     // endregion Prisoners
 

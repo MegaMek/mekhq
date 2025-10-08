@@ -254,6 +254,7 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.skills.Appraisal;
 import mekhq.campaign.personnel.skills.Attributes;
+import mekhq.campaign.personnel.skills.EscapeArtist;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -5557,6 +5558,10 @@ public class Campaign implements ITechManager {
                     if (!report.isBlank()) {
                         addReport(report);
                     }
+                }
+
+                if (campaignOptions.isUseFunctionalEscapeArtist() && person.getStatus().isPoW()) {
+                    EscapeArtist.performEscapeArtistEscapeAttemptCheck(this, person);
                 }
             }
 

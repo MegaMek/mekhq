@@ -196,6 +196,7 @@ public class PersonnelTab {
     private JLabel lblPrisonerCaptureStyle;
     private MMComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
     private JCheckBox chkResetTemporaryPrisonerCapacity;
+    private JCheckBox chkUseFunctionalEscapeArtist;
 
     private JPanel dependentsPanel;
     private JCheckBox chkUseRandomDependentAddition;
@@ -240,6 +241,7 @@ public class PersonnelTab {
         lblPrisonerCaptureStyle = new JLabel();
         comboPrisonerCaptureStyle = new MMComboBox<>("comboPrisonerCaptureStyle", PrisonerCaptureStyle.values());
         chkResetTemporaryPrisonerCapacity = new JCheckBox();
+        chkUseFunctionalEscapeArtist = new JCheckBox();
 
         dependentsPanel = new JPanel();
         chkUseRandomDependentAddition = new JCheckBox();
@@ -1136,6 +1138,10 @@ public class PersonnelTab {
         chkResetTemporaryPrisonerCapacity.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
               "ResetTemporaryPrisonerCapacity"));
 
+        chkUseFunctionalEscapeArtist = new CampaignOptionsCheckBox("UseFunctionalEscapeArtist");
+        chkUseFunctionalEscapeArtist.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
+              "UseFunctionalEscapeArtist"));
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PrisonersPanel", true, "PrisonersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -1146,6 +1152,11 @@ public class PersonnelTab {
         panel.add(lblPrisonerCaptureStyle, layout);
         layout.gridx++;
         panel.add(comboPrisonerCaptureStyle, layout);
+
+        layout.gridy++;
+        layout.gridx = 0;
+        layout.gridwidth = 2;
+        panel.add(chkUseFunctionalEscapeArtist, layout);
 
         layout.gridy++;
         layout.gridx = 0;
@@ -1338,6 +1349,7 @@ public class PersonnelTab {
 
         // Prisoners and Dependents
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
+        chkUseFunctionalEscapeArtist.setSelected(options.isUseFunctionalEscapeArtist());
         chkUseRandomDependentAddition.setSelected(options.isUseRandomDependentAddition());
         chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
         spnDependentProfessionDieSize.setValue(options.getDependentProfessionDieSize());
@@ -1432,6 +1444,7 @@ public class PersonnelTab {
 
         // Prisoners and Dependents
         options.setPrisonerCaptureStyle(comboPrisonerCaptureStyle.getSelectedItem());
+        options.setUseFunctionalEscapeArtist(chkUseFunctionalEscapeArtist.isSelected());
         if (chkResetTemporaryPrisonerCapacity.isSelected()) {
             campaign.setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
         }

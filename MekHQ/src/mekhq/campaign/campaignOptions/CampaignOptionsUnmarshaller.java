@@ -360,6 +360,8 @@ public class CampaignOptionsUnmarshaller {
             case "useUsefulMedics" -> campaignOptions.setIsUseUsefulMedics(parseBoolean(nodeContents));
             case "prisonerCaptureStyle" -> campaignOptions.setPrisonerCaptureStyle(PrisonerCaptureStyle.fromString(
                   nodeContents));
+            case "useFunctionalEscapeArtist" -> campaignOptions.setUseFunctionalEscapeArtist(parseBoolean(
+                  nodeContents));
             case "useRandomDependentAddition" -> campaignOptions.setUseRandomDependentAddition(parseBoolean(
                   nodeContents));
             case "useRandomDependentRemoval" -> campaignOptions.setUseRandomDependentRemoval(parseBoolean(
