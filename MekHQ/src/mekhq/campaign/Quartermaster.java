@@ -546,15 +546,20 @@ public record Quartermaster(Campaign campaign) {
         MekHQ.triggerEvent(new PartArrivedEvent(part));
     }
 
+    public boolean buyUnit(Entity en, int days) {
+        return buyUnit(en, days, 1.0);
+    }
+
     /**
      * Tries to buy a unit.
      *
-     * @param en   The entity which represents the unit.
-     * @param days The number of days until the new unit arrives.
+     * @param en              The entity which represents the unit.
+     * @param days            The number of days until the new unit arrives.
+     * @param valueMultiplier A multiplier to apply to the unit's value.
      *
      * @return True if the unit was purchased, otherwise false.
      */
-    public boolean buyUnit(Entity en, int days) {
+    public boolean buyUnit(Entity en, int days, double valueMultiplier) {
         Objects.requireNonNull(en);
 
         PartQuality quality = PartQuality.QUALITY_D;
@@ -564,7 +569,7 @@ public record Quartermaster(Campaign campaign) {
         }
 
         if (getCampaignOptions().isPayForUnits()) {
-            Money cost = new Unit(en, campaign()).getBuyCost();
+            Money cost = new Unit(en, campaign()).getBuyCost().multipliedBy(valueMultiplier);
             if (campaign().getFinances().debit(TransactionType.UNIT_PURCHASE, campaign().getLocalDate(),
                   cost, "Purchased " + en.getShortName())) {
 
@@ -575,7 +580,6 @@ public record Quartermaster(Campaign campaign) {
                 return false;
             }
         } else {
-
             campaign().addNewUnit(en, false, days, quality);
             return true;
         }

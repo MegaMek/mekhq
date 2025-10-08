@@ -137,12 +137,12 @@ public class SkillType {
     public static final String S_TACTICS = "Tactics/Any";
     public static final String S_TRAINING = "Training";
     public static final String S_ZERO_G_OPERATIONS = "Zero-G Operations";
+    public static final String S_APPRAISAL = "Appraisal";
 
     // roleplay skills
     public static final String S_ACROBATICS = "Acrobatics" + RP_ONLY_TAG;
     public static final String S_ACTING = "Acting" + RP_ONLY_TAG;
     public static final String S_ANIMAL_HANDLING = "Animal Handling" + RP_ONLY_TAG;
-    public static final String S_APPRAISAL = "Appraisal" + RP_ONLY_TAG;
     public static final String S_ARCHERY = "Archery" + RP_ONLY_TAG;
     public static final String S_ART_DANCING = "Art/Dancing" + RP_ONLY_TAG;
     public static final String S_ART_DRAWING = "Art/Drawing" + RP_ONLY_TAG;
@@ -468,10 +468,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                                                                             Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                             SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                             SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                    </pre>
+     *                        Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                        SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                        SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                               </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -1052,6 +1052,7 @@ public class SkillType {
             case "tracking (rp only)" -> "Tracking/Any" + RP_ONLY_TAG; // <50.07
             case "training (rp only)" -> "Training"; // <50.07
             case "zero-g operations (rp only)" -> "Zero-G Operations"; // <50.07
+            case "appraisal (rp only)" -> "Appraisal"; // <50.07
             default -> skillName;
         };
         return skillName;
@@ -1349,7 +1350,7 @@ public class SkillType {
             case S_ACROBATICS -> createAcrobatics();
             case S_ACTING -> createActing();
             case S_ANIMAL_HANDLING -> createAnimalHandling();
-            case S_APPRAISAL -> createAppraisal();
+            case S_APPRAISAL, "Appraisal (RP Only)" -> createAppraisal();
             case S_ARCHERY -> createArchery();
             case S_ART_DANCING -> createArtDancing();
             case S_ART_DRAWING -> createArtDrawing();
@@ -2021,7 +2022,7 @@ public class SkillType {
         return new SkillType(S_APPRAISAL,
               8,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               INTELLIGENCE,
               NONE,
               null,
