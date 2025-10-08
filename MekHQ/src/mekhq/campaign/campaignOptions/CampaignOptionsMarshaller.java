@@ -108,6 +108,8 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "resetToFirstTech", campaignOptions.isResetToFirstTech());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techsUseAdministration",
               campaignOptions.isTechsUseAdministration());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUsefulAsTechs",
+              campaignOptions.isUseUsefulAsTechs());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useQuirks", campaignOptions.isUseQuirks());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "xpCostMultiplier", campaignOptions.getXpCostMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioXP", campaignOptions.getScenarioXP());
@@ -343,6 +345,7 @@ public class CampaignOptionsMarshaller {
               indent,
               "doctorsUseAdministration",
               campaignOptions.isDoctorsUseAdministration());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUsefulMedics", campaignOptions.isUseUsefulMedics());
         // endregion Medical
 
         // region Prisoners

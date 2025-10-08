@@ -68,6 +68,8 @@ import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.S_ASTECH;
+import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_ZERO_G_OPERATIONS;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
@@ -314,6 +316,11 @@ public class Campaign implements ITechManager {
     private static final MMLogger LOGGER = MMLogger.create(Campaign.class);
 
     public static final String REPORT_LINEBREAK = "<br/><br/>";
+    /**
+     * When using the 'useful assistants' campaign options, the relevant skill levels possessed by each assistant is
+     * divided by this value and then floored.\
+     */
+    private static final double ASSISTANT_SKILL_LEVEL_DIVIDER = 2.5;
 
     private UUID id;
     private Version version; // this is dynamically populated on load and doesn't need to be saved
@@ -6096,12 +6103,12 @@ public class Campaign implements ITechManager {
         turnoverRetirementInformation.clear();
 
         // Refill Automated Pools, if the options are selected
-        if (MekHQ.getMHQOptions().getNewDayAsTechPoolFill() && requiresAdditionalAsTechs()) {
-            fillAsTechPool();
+        if (MekHQ.getMHQOptions().getNewDayAsTechPoolFill()) {
+            resetAsTechPool();
         }
 
-        if (MekHQ.getMHQOptions().getNewDayMedicPoolFill() && requiresAdditionalMedics()) {
-            fillMedicPool();
+        if (MekHQ.getMHQOptions().getNewDayMedicPoolFill()) {
+            resetMedicPool();
         }
 
         // Ensure we don't have anything that would prevent the new day
@@ -8742,7 +8749,13 @@ public class Campaign implements ITechManager {
         asTechPool = size;
     }
 
+    /** @deprecated no longer in use **/
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getAsTechPool() {
+        return getTemporaryAsTechPool();
+    }
+
+    public int getTemporaryAsTechPool() {
         return asTechPool;
     }
 
@@ -8750,7 +8763,13 @@ public class Campaign implements ITechManager {
         medicPool = size;
     }
 
+    /** @deprecated no longer in use **/
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getMedicPool() {
+        return getTemporaryMedicPool();
+    }
+
+    public int getTemporaryMedicPool() {
         return medicPool;
     }
 
@@ -8769,6 +8788,16 @@ public class Campaign implements ITechManager {
         asTechPoolMinutes += (480 * i);
         asTechPoolOvertime += (240 * i);
         MekHQ.triggerEvent(new AsTechPoolChangedEvent(this, i));
+    }
+
+    public void resetAsTechPool() {
+        emptyAsTechPool();
+        fillAsTechPool();
+    }
+
+    public void emptyAsTechPool() {
+        final int currentAsTechs = getTemporaryAsTechPool();
+        decreaseAsTechPool(currentAsTechs);
     }
 
     public void fillAsTechPool() {
@@ -8791,40 +8820,86 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns the total number of primary AsTechs available.
-     * <p>
-     * This method calculates the number of AsTechs by adding the base AsTech pool to the count of active personnel
-     * whose primary role is an AsTech, who are not currently deployed, and are employed.
-     * </p>
+     * Calculates the total number of primary AsTechs available in the campaign.
      *
-     * @return the total number of primary AsTechs
+     * <p>This method iterates through all active personnel whose <b>primary role</b> is AsTech, who are not
+     * currently deployed, and are employed. For each such person, if the campaign option {@code isUseUsefulAsTechs} is
+     * enabled, their total skill level in {@link SkillType#S_ASTECH} is added; otherwise, each person simply counts as
+     * one AsTech regardless of skill.</p>
+     *
+     * @return the total number of primary AsTechs in the campaign
      */
     public int getNumberPrimaryAsTechs() {
-        int asTechs = getAsTechPool();
+        boolean isUseUsefulAsTechs = getCampaignOptions().isUseUsefulAsTechs();
+
+        int asTechs = getTemporaryAsTechPool();
+
         for (Person person : getActivePersonnel(false, false)) {
-            if (person.getPrimaryRole().isAstech() && !person.isDeployed()) {
+            if (person.getPrimaryRole().isAstech() && !person.isDeployed() && person.isEmployed()) {
+                // All skilled assistants contribute 1 to the pool, regardless of skill level
                 asTechs++;
+
+                // They then contribution additional 'assistants' to the pool based on their skill level
+                asTechs += isUseUsefulAsTechs ? getAdvancedAsTechContribution(person) : 0;
             }
         }
+
         return asTechs;
     }
 
     /**
-     * Returns the total number of secondary AsTechs available.
-     * <p>
-     * This method calculates the number of AsTechs by adding the base AsTech pool to the count of active personnel
-     * whose secondary role is an AsTech, who are not currently deployed, and are employed.
-     * </p>
+     * Calculates the individual AsTech contribution for a person based on their {@link SkillType#S_ASTECH} skill.
      *
-     * @return the total number of secondary AsTechs
+     * <p>If the person has the {@link SkillType#S_ASTECH} skill, this returns their total skill level considering
+     * all modifiers. If the skill is absent, returns {@code 0}.</p>
+     *
+     * @param person the {@link Person} whose contribution is to be calculated
+     *
+     * @return the total skill level for {@link SkillType#S_ASTECH}, or {@code 0} if not present
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static int getAdvancedAsTechContribution(Person person) {
+        Skill asTechSkill = person.getSkill(S_ASTECH);
+        if (asTechSkill != null) {
+            PersonnelOptions options = person.getOptions();
+            Attributes attributes = person.getATOWAttributes();
+
+            // It is possible for very poorly skilled characters to actually be a detriment to their teams. This is
+            // by design.
+            int totalSkillLevel = asTechSkill.getFinalSkillValue(options, attributes);
+            return (int) floor(totalSkillLevel / ASSISTANT_SKILL_LEVEL_DIVIDER);
+        }
+
+        return 0;
+    }
+
+    /**
+     * Calculates the total number of secondary AsTechs available in the campaign.
+     *
+     * <p>This method iterates through all active personnel whose <b>secondary role</b> is AsTech, who are not
+     * currently deployed, and are employed. For each such person, if the campaign option {@code isUseUsefulAsTechs} is
+     * enabled, their total skill level in {@link SkillType#S_ASTECH} is added; otherwise, each person simply counts as
+     * one AsTech regardless of skill.</p>
+     *
+     * @return the total number of secondary AsTechs in the campaign
      */
     public int getNumberSecondaryAsTechs() {
+        boolean isUseUsefulAsTechs = getCampaignOptions().isUseUsefulAsTechs();
+
         int asTechs = 0;
+
         for (Person person : getActivePersonnel(false, false)) {
-            if (person.getSecondaryRole().isAstech() && !person.isDeployed()) {
+            if (person.getSecondaryRole().isAstech() && !person.isDeployed() && person.isEmployed()) {
+                // All skilled assistants contribute 1 to the pool, regardless of skill level
                 asTechs++;
+
+                // They then contribution additional 'assistants' to the pool based on their skill level
+                asTechs += isUseUsefulAsTechs ? getAdvancedAsTechContribution(person) : 0;
             }
         }
+
         return asTechs;
     }
 
@@ -8901,15 +8976,61 @@ public class Campaign implements ITechManager {
      * @return the number of medics in the campaign including any in the temporary medic pool
      */
     public int getNumberMedics() {
-        int count = 0;
+        int permanentMedicPool = getPermanentMedicPool();
+        return getTemporaryMedicPool() + permanentMedicPool;
+    }
+
+    /**
+     * Calculates the total number of medics available in the campaign by summing the skill levels in the
+     * {@link SkillType#S_MEDTECH} skill for all eligible personnel.
+     *
+     * <p>Eligible personnel must have either a primary or secondary role as a medic, must not be currently deployed,
+     * and must be employed.</p>
+     *
+     * <p></p>For each eligible person, their total skill level in {@link SkillType#S_MEDTECH} (including all
+     * modifiers) is added to the running total.</p>
+     *
+     * @return The total number of medics available.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private int getPermanentMedicPool() {
+        final boolean isUseUsefulMedics = getCampaignOptions().isUseUsefulMedics();
+        int permanentMedicPool = 0;
+
         for (Person person : getActivePersonnel(false, false)) {
-            if ((person.getPrimaryRole().isMedic() || person.getSecondaryRole().isMedic()) &&
-                      !person.isDeployed() &&
-                      person.isEmployed()) {
-                count++;
+            if (person.getPrimaryRole().isMedic() || person.getSecondaryRole().isMedic()) {
+                if (person.isDeployed()) {
+                    continue;
+                }
+
+                if (!person.isEmployed()) {
+                    continue;
+                }
+
+                if (!isUseUsefulMedics) {
+                    permanentMedicPool++;
+                } else {
+                    Skill medicSkill = person.getSkill(S_MEDTECH);
+                    if (medicSkill != null) {
+                        PersonnelOptions options = person.getOptions();
+                        Attributes attributes = person.getATOWAttributes();
+
+                        int skillLevel = medicSkill.getTotalSkillLevel(options, attributes);
+
+                        // All skilled assistants contribute 1 to the pool, regardless of skill level
+                        permanentMedicPool++;
+
+                        // It is possible for very poorly skilled personnel to actually reduce the pool, this is by
+                        // design. Not all help is helpful.
+                        permanentMedicPool += (int) floor(skillLevel / ASSISTANT_SKILL_LEVEL_DIVIDER);
+                    }
+                }
             }
         }
-        return getMedicPool() + count;
+
+        return permanentMedicPool;
     }
 
     public boolean requiresAdditionalMedics() {
@@ -8923,6 +9044,16 @@ public class Campaign implements ITechManager {
     public void increaseMedicPool(int i) {
         medicPool += i;
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, i));
+    }
+
+    public void resetMedicPool() {
+        emptyMedicPool();
+        fillMedicPool();
+    }
+
+    public void emptyMedicPool() {
+        final int currentMedicPool = getTemporaryMedicPool();
+        decreaseMedicPool(currentMedicPool);
     }
 
     public void fillMedicPool() {

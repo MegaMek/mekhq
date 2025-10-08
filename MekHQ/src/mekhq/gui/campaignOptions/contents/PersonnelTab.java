@@ -187,6 +187,7 @@ public class PersonnelTab {
     private JLabel lblMaximumPatients;
     private JSpinner spnMaximumPatients;
     private JCheckBox chkDoctorsUseAdministration;
+    private JCheckBox chkUseUsefulMedics;
     //end Medical Tab
 
     //start Prisoners and Dependents Tab
@@ -271,6 +272,7 @@ public class PersonnelTab {
         lblMaximumPatients = new JLabel();
         spnMaximumPatients = new JSpinner();
         chkDoctorsUseAdministration = new JCheckBox();
+        chkUseUsefulMedics = new JCheckBox();
     }
 
     /**
@@ -789,7 +791,7 @@ public class PersonnelTab {
         //start Medical Tab
         CampaignOptionsHeaderPanel medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab",
               getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
-              3);
+              4);
 
         // Contents
         chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical");
@@ -824,6 +826,9 @@ public class PersonnelTab {
         chkDoctorsUseAdministration = new CampaignOptionsCheckBox("DoctorsUseAdministration");
         chkDoctorsUseAdministration.addMouseListener(createTipPanelUpdater(medicalHeader, "DoctorsUseAdministration"));
 
+        chkUseUsefulMedics = new CampaignOptionsCheckBox("UseUsefulMedics");
+        chkUseUsefulMedics.addMouseListener(createTipPanelUpdater(medicalHeader, "UseUsefulMedics"));
+
         final JPanel panelLeft = new CampaignOptionsStandardPanel("MedicalTabLeft");
         final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
 
@@ -837,6 +842,10 @@ public class PersonnelTab {
         layoutLeft.gridx = 0;
         layoutLeft.gridy++;
         panelLeft.add(chkDoctorsUseAdministration, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(chkUseUsefulMedics, layoutLeft);
 
         layoutLeft.gridy++;
         panelLeft.add(lblHealWaitingPeriod, layoutLeft);
@@ -1325,6 +1334,7 @@ public class PersonnelTab {
         chkUseTougherHealing.setSelected(options.isTougherHealing());
         spnMaximumPatients.setValue(options.getMaximumPatients());
         chkDoctorsUseAdministration.setSelected(options.isDoctorsUseAdministration());
+        chkUseUsefulMedics.setSelected(options.isUseUsefulMedics());
 
         // Prisoners and Dependents
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
@@ -1418,6 +1428,7 @@ public class PersonnelTab {
         options.setTougherHealing(chkUseTougherHealing.isSelected());
         options.setMaximumPatients((int) spnMaximumPatients.getValue());
         options.setDoctorsUseAdministration(chkDoctorsUseAdministration.isSelected());
+        options.setIsUseUsefulMedics(chkUseUsefulMedics.isSelected());
 
         // Prisoners and Dependents
         options.setPrisonerCaptureStyle(comboPrisonerCaptureStyle.getSelectedItem());
