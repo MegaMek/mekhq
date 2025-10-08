@@ -61,6 +61,7 @@ import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
+import megamek.common.util.DateUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -97,6 +98,9 @@ import mekhq.gui.displayWrappers.FactionDisplay;
  * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */
 public class GeneralTab {
+    private static final LocalDate RANDOM_DATE_EARLIEST = LocalDate.of(2470, 1, 1);
+    private static final LocalDate RANDOM_DATE_LATEST = LocalDate.of(3151, 1, 1);
+
     private final JFrame frame;
     private final Campaign campaign;
     private final CampaignOptionsDialogMode mode;
@@ -108,6 +112,7 @@ public class GeneralTab {
     private MMComboBox<FactionDisplay> comboFaction;
     private JLabel lblDate;
     private RoundedJButton btnDate;
+    private RoundedJButton btnRandomDate;
     private LocalDate date;
     private JLabel lblCamo;
     private RoundedJButton btnCamo;
@@ -199,9 +204,17 @@ public class GeneralTab {
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.addActionListener(this::btnDateActionPerformed);
 
+        // Randomize starting date
+        btnRandomDate = new CampaignOptionsButton("RandomDate");
+        btnRandomDate.addActionListener(e -> {
+            LocalDate randomDate = DateUtilities.getRandomDateBetween(RANDOM_DATE_EARLIEST, RANDOM_DATE_LATEST);
+            setDate(randomDate);
+        });
+
         if (mode != CampaignOptionsDialogMode.STARTUP && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
             lblDate.setEnabled(false);
             btnDate.setEnabled(false);
+            btnRandomDate.setEnabled(false);
         }
 
         // Camouflage
@@ -235,6 +248,7 @@ public class GeneralTab {
         layout.gridy++;
         panel.add(lblDate, layout);
         panel.add(btnDate, layout);
+        panel.add(btnRandomDate, layout);
 
         layout.gridy++;
         panel.add(lblName, layout);
@@ -341,6 +355,7 @@ public class GeneralTab {
 
         lblDate = new JLabel();
         btnDate = new RoundedJButton();
+        btnRandomDate = new RoundedJButton();
 
         lblCamo = new JLabel();
         btnCamo = new RoundedJButton() {
