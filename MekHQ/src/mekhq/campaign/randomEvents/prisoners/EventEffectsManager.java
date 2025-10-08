@@ -1088,7 +1088,7 @@ public class EventEffectsManager {
 
         final int magnitude = result.magnitude();
 
-        List<Person> potentialTargets = campaign.getActivePersonnel(false);
+        List<Person> potentialTargets = campaign.getActivePersonnel(false, true);
 
         if (potentialTargets.isEmpty()) {
             return "";

@@ -92,7 +92,7 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
      */
     @Override
     protected @Nullable Person getSpeaker(Campaign campaign, @Nullable AdministratorSpecialization specialization) {
-        List<Person> potentialSpeakers = campaign.getActivePersonnel(false);
+        List<Person> potentialSpeakers = campaign.getActivePersonnel(false, false);
 
         if (potentialSpeakers.isEmpty()) {
             return getFallbackSpeaker(campaign);

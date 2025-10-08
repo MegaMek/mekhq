@@ -465,16 +465,12 @@ public final class BriefingTab extends CampaignGuiTab {
 
         LocalDate today = getCampaign().getLocalDate();
         if (xpAward > 0) {
-            for (Person person : getCampaign().getActivePersonnel(false)) {
+            for (Person person : getCampaign().getActivePersonnel(false, false)) {
                 if (person.isChild(today)) {
                     continue;
                 }
 
                 if (person.isDependent()) {
-                    continue;
-                }
-
-                if (!person.isEmployed()) {
                     continue;
                 }
 

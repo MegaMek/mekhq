@@ -208,7 +208,7 @@ public class BirthAnnouncement {
      *       found.
      */
     private @Nullable Person getSpeaker(Campaign campaign) {
-        List<Person> potentialSpeakers = campaign.getActivePersonnel(false);
+        List<Person> potentialSpeakers = campaign.getActivePersonnel(false, false);
 
         if (potentialSpeakers.isEmpty()) {
             return getFallbackSpeaker(campaign);

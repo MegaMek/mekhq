@@ -134,7 +134,7 @@ public abstract class AbstractMarriage {
             return resources.getString("cannotMarry.AlreadyMarried.text");
         }
 
-        if (!person.getStatus().isActive()) {
+        if (!person.getStatus().isActiveFlexible()) {
             return resources.getString("cannotMarry.Inactive.text");
         }
 
@@ -387,7 +387,7 @@ public abstract class AbstractMarriage {
         Person spouse = null;
 
         if (isInterUnit) {
-            List<Person> activePersonnel = campaign.getActivePersonnel(false);
+            List<Person> activePersonnel = campaign.getActivePersonnel(true, true);
             potentialSpouses = new ArrayList<>();
 
             for (Person potentialSpouse : activePersonnel) {

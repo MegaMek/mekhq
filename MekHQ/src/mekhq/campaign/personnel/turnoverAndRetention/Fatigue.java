@@ -38,10 +38,10 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.List;
 
-import megamek.common.units.Entity;
-import megamek.common.equipment.MiscType;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.MiscMounted;
+import megamek.common.equipment.MiscType;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -112,7 +112,7 @@ public class Fatigue {
         int fieldKitchenUsage = 0;
 
         for (Person person : activePersonnel) {
-            if (person.isSupport() && isUseFieldKitchenIgnoreNonCombatants) {
+            if (!person.isCombat() && isUseFieldKitchenIgnoreNonCombatants) {
                 continue;
             }
 
@@ -158,9 +158,9 @@ public class Fatigue {
      * Processes fatigue-related actions for a given person in the campaign.
      *
      * <p>This method calculates the effective fatigue of the person, determines their fatigue
-     * state (e.g., tired, fatigued, exhausted, critical), generates reports based on their fatigue level, and
-     * updates their recovery status. If the fatigue exceeds the campaign's leave threshold, the person's status is
-     * updated to {@link PersonnelStatus#ON_LEAVE}.</p>
+     * state (e.g., tired, fatigued, exhausted, critical), generates reports based on their fatigue level, and updates
+     * their recovery status. If the fatigue exceeds the campaign's leave threshold, the person's status is updated to
+     * {@link PersonnelStatus#ON_LEAVE}.</p>
      *
      * @param campaign the campaign context in which the person operates.
      * @param person   the person whose fatigue actions are being processed.
@@ -226,9 +226,10 @@ public class Fatigue {
      *     <li>Whether field kitchens are operating within their required capacity.</li>
      * </ul>
      *
-     * @param fatigue                        the base fatigue level of the person.
-     * @param isClan                         flag indicating whether the person is Clan personnel.
-     * @param skillLevel                     the person's skill level.
+     * @param fatigue    the base fatigue level of the person.
+     * @param isClan     flag indicating whether the person is Clan personnel.
+     * @param skillLevel the person's skill level.
+     *
      * @return the calculated effective fatigue value.
      */
     public static int getEffectiveFatigue(int fatigue, boolean isClan, SkillLevel skillLevel) {
@@ -260,8 +261,8 @@ public class Fatigue {
      * zero or less, the person's recovery state is cleared, and their status may be updated to {@code ACTIVE} if they
      * were previously on leave.</p>
      *
-     * @param campaign the campaign context in which the fatigue recovery occurs.
-     * @param person   the person whose fatigue recovery is being handled.
+     * @param campaign                       the campaign context in which the fatigue recovery occurs.
+     * @param person                         the person whose fatigue recovery is being handled.
      * @param fieldKitchensAreWithinCapacity flag indicating if field kitchens are within capacity.
      */
     public static void processFatigueRecovery(Campaign campaign, Person person,
