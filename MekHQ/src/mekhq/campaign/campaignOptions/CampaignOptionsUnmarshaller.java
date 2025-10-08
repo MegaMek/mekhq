@@ -862,7 +862,7 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "factionStandingGainMultiplier" -> campaignOptions.setRegardMultiplier(parseDouble(
                   nodeContents, 1.0));
-            default -> throw new IllegalStateException("Potentially unexpected entry in campaign options: " + nodeName);
+            default -> LOGGER.warn("Potentially unexpected entry in campaign options: {}", nodeName);
         }
     }
 }
