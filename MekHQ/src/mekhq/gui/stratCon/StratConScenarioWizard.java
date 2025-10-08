@@ -57,21 +57,14 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Minefield;
 import megamek.common.rolls.TargetRoll;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
@@ -97,6 +90,8 @@ import org.apache.commons.math3.util.Pair;
  * UI for managing force/unit assignments for individual StratCon scenarios.
  */
 public class StratConScenarioWizard extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(StratConScenarioWizard.class);
+
     private StratConScenario currentScenario;
     private final Campaign campaign;
     private StratConTrackState currentTrackState;
@@ -1002,22 +997,24 @@ public class StratConScenarioWizard extends JDialog {
      */
     private void availableUnitSelectorChanged(ListSelectionEvent event, JLabel selectionCountLabel,
           JLabel unitStatusLabel, int maxSelectionSize, boolean usesBV) {
-        Object source = event.getSource();
-        Vector<Unit> unitVector = new Vector<>();
-
-        if (source instanceof JList<?> objectList) {
-            for (Object item : objectList.getSelectedValuesList()) {
-                if (item instanceof Unit unit) {
-                    unitVector.add(unit);
-                }
-            }
-        }
-
-        if (unitVector.isEmpty()) {
+        if (!(event.getSource() instanceof JList<?>)) {
             return;
         }
 
-        JList<Unit> changedList = new JList<>(unitVector);
+        JList<Unit> changedList = null;
+        Object src = event.getSource();
+        if (src instanceof JList<?> rawList) {
+            ListModel<?> model = rawList.getModel();
+            if (model.getSize() == 0 || model.getElementAt(0) instanceof Unit) {
+                // It's safe to cast
+                changedList = (JList<Unit>) rawList;
+            }
+        }
+
+        if (changedList == null) {
+            LOGGER.warn("Could not cast JList to Unit type safely in availableUnitSelectorChanged");
+            return;
+        }
 
         ListSelectionListener[] listeners = (((JList<?>) event.getSource()).getListSelectionListeners());
         ((JList<?>) event.getSource()).removeListSelectionListener(listeners[0]);
