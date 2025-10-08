@@ -119,6 +119,12 @@ public class SkillType {
     public static final String S_ARTILLERY = "Artillery";
     public static final String S_SMALL_ARMS = "Small Arms";
     public static final String S_ANTI_MEK = "Anti-Mek (Climbing)";
+    public static final String S_ARCHERY = "Archery";
+    public static final String S_DEMOLITIONS = "Demolitions";
+    public static final String S_MARTIAL_ARTS = "Martial Arts";
+    public static final String S_MELEE_WEAPONS = "Melee Weapons";
+    public static final String S_THROWN_WEAPONS = "Thrown Weapons";
+    public static final String S_SUPPORT_WEAPONS = "Support Weapons";
 
     // support skills
     public static final String S_TECH_MEK = "Tech/Mek";
@@ -146,7 +152,6 @@ public class SkillType {
     // roleplay skills
     public static final String S_ACROBATICS = "Acrobatics" + RP_ONLY_TAG;
     public static final String S_ANIMAL_HANDLING = "Animal Handling" + RP_ONLY_TAG;
-    public static final String S_ARCHERY = "Archery" + RP_ONLY_TAG;
     public static final String S_ART_DANCING = "Art/Dancing" + RP_ONLY_TAG;
     public static final String S_ART_DRAWING = "Art/Drawing" + RP_ONLY_TAG;
     public static final String S_ART_PAINTING = "Art/Painting" + RP_ONLY_TAG;
@@ -160,7 +165,6 @@ public class SkillType {
     public static final String S_COMMUNICATIONS = "Communications/Any" + RP_ONLY_TAG;
     public static final String S_COMPUTERS = "Computers" + RP_ONLY_TAG;
     public static final String S_CRYPTOGRAPHY = "Cryptography" + RP_ONLY_TAG;
-    public static final String S_DEMOLITIONS = "Demolitions" + RP_ONLY_TAG;
     public static final String S_INTEREST_HISTORY = "Interest/History" + RP_ONLY_TAG;
     public static final String S_INTEREST_LITERATURE = "Interest/Literature" + RP_ONLY_TAG;
     public static final String S_INTEREST_HOLO_GAMES = "Interest/Holo-Games" + RP_ONLY_TAG;
@@ -187,7 +191,6 @@ public class SkillType {
     public static final String S_INTERROGATION = "Interrogation" + RP_ONLY_TAG;
     public static final String S_INVESTIGATION = "Investigation" + RP_ONLY_TAG;
     public static final String S_LANGUAGES = "Language/Any" + RP_ONLY_TAG;
-    public static final String S_MARTIAL_ARTS = "Martial Arts" + RP_ONLY_TAG;
     public static final String S_PERCEPTION = "Perception" + RP_ONLY_TAG;
     public static final String S_SLEIGHT_OF_HAND = "Sleight of Hand/Any" + RP_ONLY_TAG;
     public static final String S_PROTOCOLS = "Protocols/Any" + RP_ONLY_TAG;
@@ -212,9 +215,6 @@ public class SkillType {
     public static final String S_CAREER_ANY = "Career/Any" + RP_ONLY_TAG;
     public static final String S_RUNNING = "Running" + RP_ONLY_TAG;
     public static final String S_SWIMMING = "Swimming" + RP_ONLY_TAG;
-    public static final String S_MELEE_WEAPONS = "Melee Weapons" + RP_ONLY_TAG;
-    public static final String S_THROWN_WEAPONS = "Thrown Weapons" + RP_ONLY_TAG;
-    public static final String S_SUPPORT_WEAPONS = "Support Weapons" + RP_ONLY_TAG;
 
 
     public static final int NUM_LEVELS = 11;
@@ -470,10 +470,10 @@ public class SkillType {
      *
      *                          <p>For example:</p>
      *                          <pre>
-     *                                                                                                                                Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                            </pre>
+     *                                                                                                                                                         Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                         SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                         SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                     </pre>
      * @param skillLevelsMatter if {@code true}, the skill's level will be displayed in Person View in addition to the
      *                          skill's Target Number
      *
@@ -1066,6 +1066,12 @@ public class SkillType {
             case "forgery (rp only)" -> "Forgery"; // <50.07
             case "acting (rp only)" -> "Acting"; // <50.07
             case "appraisal (rp only)" -> "Appraisal"; // <50.07
+            case "archery (rp only)" -> "Archery"; // <50.07
+            case "demolitions (rp only)" -> "Demolitions"; // <50.07
+            case "martial arts (rp only)" -> "Martial Arts"; // <50.07
+            case "melee weapons (rp only)" -> "Melee Weapons"; // <50.07
+            case "support weapons (rp only)" -> "Support Weapons"; // <50.07
+            case "thrown weapons (rp only)" -> "Thrown Weapons"; // <50.07
             default -> skillName;
         };
         return skillName;
@@ -1366,7 +1372,7 @@ public class SkillType {
             case S_ACTING, "Acting (RP Only)" -> createActing();
             case S_ANIMAL_HANDLING -> createAnimalHandling();
             case S_APPRAISAL, "Appraisal (RP Only)" -> createAppraisal();
-            case S_ARCHERY -> createArchery();
+            case S_ARCHERY, "Archery (RP Only)" -> createArchery();
             case S_ART_DANCING -> createArtDancing();
             case S_ART_DRAWING -> createArtDrawing();
             case S_ART_PAINTING -> createArtPainting();
@@ -1380,7 +1386,7 @@ public class SkillType {
             case S_COMMUNICATIONS -> createCommunications();
             case S_COMPUTERS -> createComputers();
             case S_CRYPTOGRAPHY -> createCryptography();
-            case S_DEMOLITIONS -> createDemolitions();
+            case S_DEMOLITIONS, "Demolitions (RP Only)" -> createDemolitions();
             case S_DISGUISE, "Disguise (RP Only)" -> createDisguise();
             case S_ESCAPE_ARTIST, "Escape Artist (RP Only)" -> createEscapeArtist();
             case S_FORGERY, "Forgery (RP Only)" -> createForgery();
@@ -1410,7 +1416,7 @@ public class SkillType {
             case S_INTERROGATION -> createInterrogation();
             case S_INVESTIGATION -> createInvestigation();
             case S_LANGUAGES -> createLanguage();
-            case S_MARTIAL_ARTS -> createMartialArts();
+            case S_MARTIAL_ARTS, "Martial Arts (RP Only)" -> createMartialArts();
             case S_PERCEPTION -> createPerception();
             case S_SLEIGHT_OF_HAND -> createSleightOfHand();
             case S_PROTOCOLS -> createProtocols();
@@ -1436,9 +1442,9 @@ public class SkillType {
             case S_CAREER_ANY -> createCareer();
             case S_SWIMMING -> createSwimming();
             case S_ZERO_G_OPERATIONS, "Zero-G Operations (RP Only)" -> createZeroGOperations();
-            case S_MELEE_WEAPONS -> createMeleeWeapons();
-            case S_THROWN_WEAPONS -> createThrownWeapons();
-            case S_SUPPORT_WEAPONS -> createSupportWeapons();
+            case S_MELEE_WEAPONS, "Melee Weapons (RP Only)" -> createMeleeWeapons();
+            case S_THROWN_WEAPONS, "Thrown Weapons (RP Only)" -> createThrownWeapons();
+            case S_SUPPORT_WEAPONS, "Support Weapons (RP Only)" -> createSupportWeapons();
             case S_RUNNING -> createRunning();
             default -> {
                 LOGGER.warn("Unexpected value in compatibilityHandler: {}", skillType.getName());
@@ -2090,7 +2096,7 @@ public class SkillType {
         return new SkillType(S_ARCHERY,
               7,
               false,
-              ROLEPLAY_GENERAL,
+              COMBAT_GUNNERY,
               DEXTERITY,
               NONE,
               null,
@@ -2330,7 +2336,7 @@ public class SkillType {
         return new SkillType(S_DEMOLITIONS,
               9,
               false,
-              ROLEPLAY_GENERAL,
+              COMBAT_GUNNERY,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -2840,7 +2846,7 @@ public class SkillType {
         return new SkillType(S_MARTIAL_ARTS,
               8,
               false,
-              ROLEPLAY_GENERAL,
+              COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               null,
@@ -3267,7 +3273,7 @@ public class SkillType {
         return new SkillType(S_MELEE_WEAPONS,
               8,
               false,
-              ROLEPLAY_GENERAL,
+              COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               null,
@@ -3284,7 +3290,7 @@ public class SkillType {
         return new SkillType(S_THROWN_WEAPONS,
               7,
               false,
-              ROLEPLAY_GENERAL,
+              COMBAT_GUNNERY,
               DEXTERITY,
               NONE,
               null,
@@ -3301,7 +3307,7 @@ public class SkillType {
         return new SkillType(S_SUPPORT_WEAPONS,
               7,
               false,
-              ROLEPLAY_GENERAL,
+              COMBAT_GUNNERY,
               DEXTERITY,
               NONE,
               null,
