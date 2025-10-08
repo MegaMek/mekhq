@@ -154,6 +154,7 @@ public class CampaignOptionsUnmarshaller {
             case "edgeCost" -> campaignOptions.setEdgeCost(parseInt(nodeContents));
             case "waitingPeriod" -> campaignOptions.setWaitingPeriod(parseInt(nodeContents));
             case "acquisitionSkill" -> campaignOptions.setAcquisitionSkill(nodeContents);
+            case "useFunctionalAppraisal" -> campaignOptions.setUseFunctionalAppraisal(parseBoolean(nodeContents));
             case "unitTransitTime" -> campaignOptions.setUnitTransitTime(parseInt(nodeContents));
             case "clanAcquisitionPenalty" -> campaignOptions.setClanAcquisitionPenalty(parseInt(nodeContents));
             case "isAcquisitionPenalty" -> campaignOptions.setIsAcquisitionPenalty(parseInt(nodeContents));
@@ -322,6 +323,7 @@ public class CampaignOptionsUnmarshaller {
             case "displayScenarioLog" -> campaignOptions.setDisplayScenarioLog(parseBoolean(nodeContents));
             case "displayKillRecord" -> campaignOptions.setDisplayKillRecord(parseBoolean(nodeContents));
             case "displayMedicalRecord" -> campaignOptions.setDisplayMedicalRecord(parseBoolean(nodeContents));
+            case "displayPatientRecord" -> campaignOptions.setDisplayPatientRecord(parseBoolean(nodeContents));
             case "displayAssignmentRecord" -> campaignOptions.setDisplayAssignmentRecord(parseBoolean(
                   nodeContents));
             case "displayPerformanceRecord" -> campaignOptions.setDisplayPerformanceRecord(parseBoolean(
@@ -449,6 +451,8 @@ public class CampaignOptionsUnmarshaller {
             }
             case "useRandomPersonalities" -> campaignOptions.setUseRandomPersonalities(parseBoolean(nodeContents));
             case "useRandomPersonalityReputation" -> campaignOptions.setUseRandomPersonalityReputation(parseBoolean(
+                  nodeContents));
+            case "useReasoningXpMultiplier" -> campaignOptions.setUseReasoningXpMultiplier(parseBoolean(
                   nodeContents));
             case "useSimulatedRelationships" -> campaignOptions.setUseSimulatedRelationships(parseBoolean(
                   nodeContents));
@@ -841,6 +845,8 @@ public class CampaignOptionsUnmarshaller {
             case "minimumCallsignSkillLevel" -> campaignOptions.setMinimumCallsignSkillLevel(SkillLevel.parseFromString(
                   nodeContents));
             case "trackFactionStanding" -> campaignOptions.setTrackFactionStanding(parseBoolean(nodeContents));
+            case "trackClimateRegardChanges" ->
+                  campaignOptions.setTrackClimateRegardChanges(parseBoolean(nodeContents));
             case "useFactionStandingNegotiation" -> campaignOptions.setUseFactionStandingNegotiation(parseBoolean(
                   nodeContents));
             case "useFactionStandingResupply" -> campaignOptions.setUseFactionStandingResupply(parseBoolean(
@@ -864,7 +870,7 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "factionStandingGainMultiplier" -> campaignOptions.setRegardMultiplier(parseDouble(
                   nodeContents, 1.0));
-            default -> throw new IllegalStateException("Potentially unexpected entry in campaign options: " + nodeName);
+            default -> LOGGER.warn("Potentially unexpected entry in campaign options: {}", nodeName);
         }
     }
 }

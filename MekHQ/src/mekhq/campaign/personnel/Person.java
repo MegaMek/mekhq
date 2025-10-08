@@ -45,8 +45,8 @@ import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
+import static mekhq.campaign.log.LogEntryType.PATIENT;
 import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
-import static mekhq.campaign.log.LogEntryType.SERVICE;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
@@ -59,6 +59,7 @@ import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -227,6 +228,7 @@ public class Person {
     private LocalDate dateOfDeath;
     private List<LogEntry> personnelLog;
     private List<LogEntry> medicalLog;
+    private List<LogEntry> patientLog;
     private List<LogEntry> scenarioLog;
     private List<LogEntry> assignmentLog;
     private List<LogEntry> performanceLog;
@@ -345,6 +347,7 @@ public class Person {
     private int personalityQuirkDescriptionIndex;
     private String personalityDescription;
     private String personalityInterviewNotes;
+    private Reasoning reasoning;
     // endregion Personality
 
     // region SPAs
@@ -362,6 +365,7 @@ public class Person {
     private int storedSocialDescriptionIndex;
     private PersonalityQuirk storedPersonalityQuirk;
     private int storedPersonalityQuirkDescriptionIndex;
+    private Reasoning storedReasoning;
     private boolean sufferingFromClinicalParanoia;
     private boolean darkSecretRevealed;
     private LocalDate burnedConnectionsEndDate;
@@ -523,6 +527,7 @@ public class Person {
         techUnits = new ArrayList<>();
         personnelLog = new ArrayList<>();
         medicalLog = new ArrayList<>();
+        patientLog = new ArrayList<>();
         scenarioLog = new ArrayList<>();
         assignmentLog = new ArrayList<>();
         performanceLog = new ArrayList<>();
@@ -555,6 +560,7 @@ public class Person {
         socialDescriptionIndex = randomInt(Social.MAXIMUM_VARIATIONS);
         personalityQuirk = PersonalityQuirk.NONE;
         personalityQuirkDescriptionIndex = randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS);
+        reasoning = Reasoning.AVERAGE;
         personalityDescription = "";
         personalityInterviewNotes = "";
         storedLoyalty = 0;
@@ -568,6 +574,7 @@ public class Person {
         storedSocialDescriptionIndex = 0;
         storedPersonalityQuirk = PersonalityQuirk.NONE;
         storedPersonalityQuirkDescriptionIndex = 0;
+        storedReasoning = Reasoning.AVERAGE;
         sufferingFromClinicalParanoia = false;
         darkSecretRevealed = false;
         burnedConnectionsEndDate = null;
@@ -1481,7 +1488,7 @@ public class Person {
             }
         }
 
-        if (status.isActive()) {
+        if (status.isActiveFlexible()) {
             // Check Pregnancy
             if (isPregnant() && getDueDate().isBefore(today)) {
                 campaign.getProcreation().birth(campaign, getDueDate(), this);
@@ -2605,13 +2612,12 @@ public class Person {
         this.storedPersonalityQuirkDescriptionIndex = storedPersonalityQuirkDescriptionIndex;
     }
 
-    @Deprecated(since = "0.50.07", forRemoval = true)
     public Reasoning getReasoning() {
-        return Reasoning.AVERAGE;
+        return reasoning;
     }
 
-    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setReasoning(final Reasoning reasoning) {
+        this.reasoning = reasoning;
     }
 
     @Deprecated(since = "0.50.07", forRemoval = true)
@@ -2623,13 +2629,12 @@ public class Person {
     public void setReasoningDescriptionIndex(final int reasoningDescriptionIndex) {
     }
 
-    @Deprecated(since = "0.50.07", forRemoval = true)
     Reasoning getStoredReasoning() {
-        return Reasoning.AVERAGE;
+        return storedReasoning;
     }
 
-    @Deprecated(since = "0.50.07", forRemoval = true)
     void setStoredReasoning(Reasoning storedReasoning) {
+        this.storedReasoning = storedReasoning;
     }
 
     @Deprecated(since = "0.50.07", forRemoval = true)
@@ -3005,6 +3010,14 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "medicalLog");
             }
 
+            if (!patientLog.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "patientLog");
+                for (LogEntry entry : patientLog) {
+                    entry.writeToXML(pw, indent);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "patientLog");
+            }
+
             if (!scenarioLog.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenarioLog");
                 for (LogEntry entry : scenarioLog) {
@@ -3153,6 +3166,10 @@ public class Person {
                   "personalityQuirkDescriptionIndex",
                   personalityQuirkDescriptionIndex);
 
+            if (reasoning != Reasoning.AVERAGE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reasoning", reasoning.ordinal());
+            }
+
             if (!isNullOrBlank(personalityDescription)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
             }
@@ -3227,6 +3244,10 @@ public class Person {
                       indent,
                       "storedPersonalityQuirkDescriptionIndex",
                       storedPersonalityQuirkDescriptionIndex);
+            }
+
+            if (storedReasoning != Reasoning.AVERAGE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedReasoning", storedReasoning.name());
             }
 
             if (sufferingFromClinicalParanoia) {
@@ -3498,51 +3519,41 @@ public class Person {
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            // <50.05 compatibility handler
                             LogEntryType logEntryType = logEntry.getType();
                             String logEntryDescription = logEntry.getDesc();
                             if (logEntryType == MEDICAL) {
                                 person.addMedicalLogEntry(logEntry);
-                            } else if (logEntryType == SERVICE) {
-                                // < 50.07 compatibility handler
-                                List<String> assignmentTargetStrings = List.of("Assigned to",
-                                      "Reassigned to",
-                                      "Removed from",
-                                      "Added to");
-
-                                boolean shiftedLogType = false;
-                                for (String targetString : assignmentTargetStrings) {
-                                    if (logEntryDescription.startsWith(targetString)) {
-                                        logEntry.setType(ASSIGNMENT);
-                                        person.addAssignmentLogEntry(logEntry);
-                                        shiftedLogType = true;
-                                        break;
-                                    }
-                                }
-
-                                if (!shiftedLogType) {
-                                    person.addPersonalLogEntry(logEntry);
-                                }
                             } else {
-                                // < 50.05 compatibility handler
-                                List<String> performanceTargetStrings = List.of("Changed edge to",
-                                      "Gained",
-                                      "Improved",
-                                      "injuries, gaining",
-                                      "XP from successful medical work");
+                                Map<String, LogEntryType> logMap = new HashMap<>();
+                                logMap.put("Assigned to", ASSIGNMENT); // <50.07 compatibility
+                                logMap.put("Reassigned to", ASSIGNMENT); // <50.07 compatibility
+                                logMap.put("Removed from", ASSIGNMENT); // <50.07 compatibility
+                                logMap.put("Added to", ASSIGNMENT); // <50.07 compatibility
+                                logMap.put("Changed edge to", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("Gained", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("Improved", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("injuries, gaining", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("XP from successful medical work", PERFORMANCE); // <50.07 compatibility
+                                logMap.put("Successfully treated", PATIENT); // <50.07 compatibility
 
-                                boolean foundPerformanceTarget = false;
-                                for (String targetString : performanceTargetStrings) {
-                                    if (logEntryDescription.startsWith(targetString)) {
-                                        foundPerformanceTarget = true;
+                                boolean logEntryWasReassigned = false;
+                                for (Map.Entry<String, LogEntryType> entry : logMap.entrySet()) {
+                                    if (logEntryDescription.contains(entry.getKey())) {
+                                        LogEntryType newType = entry.getValue();
+                                        logEntry.setType(newType);
+
+                                        switch (newType) {
+                                            case ASSIGNMENT -> person.addAssignmentLogEntry(logEntry);
+                                            case PERFORMANCE -> person.addPerformanceLogEntry(logEntry);
+                                            case PATIENT -> person.addPatientLogEntry(logEntry);
+                                        }
+
+                                        logEntryWasReassigned = true;
                                         break;
                                     }
                                 }
 
-                                if (foundPerformanceTarget) {
-                                    logEntry.setType(PERFORMANCE);
-                                    person.addPerformanceLogEntry(logEntry);
-                                } else {
+                                if (!logEntryWasReassigned) {
                                     person.addPersonalLogEntry(logEntry);
                                 }
                             }
@@ -3566,6 +3577,26 @@ public class Person {
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
                             person.addMedicalLogEntry(logEntry);
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("patientLog")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                            LOGGER.error("(patientLog) Unknown node type not loaded in personnel logEntry nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+
+                        final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+                        if (logEntry != null) {
+                            person.addPatientLogEntry(logEntry);
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("scenarioLog")) {
@@ -3625,7 +3656,14 @@ public class Person {
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            person.addPerformanceLogEntry(logEntry);
+                            String logEntryDescription = logEntry.getDesc();
+
+                            if (logEntryDescription.contains("Successfully treated")) {
+                                logEntry.setType(PATIENT);
+                                person.addPatientLogEntry(logEntry);
+                            } else {
+                                person.addPerformanceLogEntry(logEntry);
+                            }
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("awards")) {
@@ -3745,6 +3783,8 @@ public class Person {
                     }
                 } else if (nodeName.equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
                     person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
+                    person.reasoning = Reasoning.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("personalityInterviewNotes")) {
@@ -3777,6 +3817,8 @@ public class Person {
                     person.storedPersonalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("storedPersonalityQuirkDescriptionIndex")) {
                     person.storedPersonalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("storedReasoning")) {
+                    person.storedReasoning = Reasoning.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("sufferingFromClinicalParanoia")) {
                     person.setSufferingFromClinicalParanoia(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("darkSecretRevealed")) {
@@ -4800,11 +4842,6 @@ public class Person {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public int getCostToImprove(final String skillName, final boolean useReasoning) {
-        return getCostToImprove(skillName);
-    }
-
     /**
      * Calculates the cost to improve a specific skill, with an optional reasoning multiplier.
      *
@@ -4813,17 +4850,18 @@ public class Person {
      * <p>If the skill does not exist, the method calculates the cost using the default cost for the skill type at
      * level 0.</p>
      *
-     * @param skillName the name of the skill for which to calculate the improvement cost.
+     * @param skillName    the name of the skill for which to calculate the improvement cost.
+     * @param useReasoning a boolean indicating whether to apply {@link Reasoning} cost multipliers.
      *
      * @return the cost to improve the skill, adjusted by the reasoning multiplier if applicable, or the cost for level
      *       0 if the specified skill does not currently exist.
      */
-    public int getCostToImprove(final String skillName) {
+    public int getCostToImprove(final String skillName, final boolean useReasoning) {
         final Skill skill = getSkill(skillName);
         final SkillType skillType = getType(skillName);
         int cost = hasSkill(skillName) ? skill.getCostToImprove() : skillType.getCost(0);
 
-        double multiplier = 1.0;
+        double multiplier = getReasoningXpCostMultiplier(useReasoning);
 
         if (options.booleanOption(FLAW_SLOW_LEARNER)) {
             multiplier += 0.2;
@@ -4898,7 +4936,7 @@ public class Person {
     }
 
     public boolean needsFixing() {
-        return ((hits > 0) || needsAMFixing()) && getStatus().isActive();
+        return ((hits > 0) || needsAMFixing()) && getStatus().isActiveFlexible();
     }
 
     /**
@@ -6292,6 +6330,11 @@ public class Person {
         return medicalLog;
     }
 
+    public List<LogEntry> getPatientLog() {
+        patientLog.sort(Comparator.comparing(LogEntry::getDate));
+        return patientLog;
+    }
+
     public List<LogEntry> getScenarioLog() {
         scenarioLog.sort(Comparator.comparing(LogEntry::getDate));
         return scenarioLog;
@@ -6321,6 +6364,10 @@ public class Person {
 
     public void addMedicalLogEntry(final LogEntry entry) {
         medicalLog.add(entry);
+    }
+
+    public void addPatientLogEntry(final LogEntry entry) {
+        patientLog.add(entry);
     }
 
     public void addScenarioLogEntry(final LogEntry entry) {
@@ -6479,6 +6526,22 @@ public class Person {
               isPiloting ? ModifierValue.PILOTING : ModifierValue.GUNNERY);
     }
 
+    /**
+     * Determines whether the person has any injuries, possibly filtering by permanence.
+     *
+     * <ul>
+     *     <li>If {@code permanentCheck} is {@code false}, this method returns {@code true} if the person has any
+     *     recorded injuries.</li>
+     *     <li>If {@code permanentCheck} is {@code true}, it will return {@code true} only if the person has at least
+     *     one injury that is either non-permanent or has a remaining recovery time greater than zero. Otherwise, it
+     *     returns {@code false}.</li>
+     * </ul>
+     *
+     * @param permanentCheck if {@code true}, only injuries that are not permanent or have time remaining are
+     *                       considered; if {@code false}, any injury will be counted
+     *
+     * @return {@code true} if the person has injuries matching the specified criteria; {@code false} otherwise
+     */
     public boolean hasInjuries(final boolean permanentCheck) {
         return !injuries.isEmpty() &&
                      (!permanentCheck ||
@@ -6684,7 +6747,6 @@ public class Person {
      * @return the experience cost multiplier: - `1` if reasoning adjustment is disabled or {@link Reasoning} is
      *       neutral. - A value adjusted by the formula `1 - (score * 0.025)` otherwise.
      */
-    @Deprecated(since = "0.50.07", forRemoval = true)
     public double getReasoningXpCostMultiplier(final boolean useReasoningXpCostMultiplier) {
         Reasoning reasoning = getReasoning();
 
@@ -6963,8 +7025,8 @@ public class Person {
      * Generates alternative personality traits and applies them to the stored split personality profile.
      *
      * <p>Traits are randomly selected from {@link Aggression}, {@link Ambition}, {@link Greed}, and {@link Social},
-     * with potential for up to four traits total. Additional characteristics such as a {@link PersonalityQuirk} traits
-     * are randomly determined and stored.</p>
+     * with potential for up to four traits total. Additional characteristics such as a {@link PersonalityQuirk} trait
+     * and {@link Reasoning} characteristics are randomly determined and stored.</p>
      *
      * @author Illiani
      * @see PersonalityController#generatePersonality(Person)
@@ -6975,6 +7037,7 @@ public class Person {
         setStoredAmbition(Ambition.NONE);
         setStoredGreed(Greed.NONE);
         setStoredSocial(Social.NONE);
+        setStoredReasoning(Reasoning.AVERAGE);
         setStoredPersonalityQuirk(PersonalityQuirk.NONE);
 
         // Then we generate a new personality
@@ -6985,36 +7048,47 @@ public class Person {
         possibleTraits.add(PersonalityTraitType.SOCIAL);
         possibleTraits.add(PersonalityTraitType.PERSONALITY_QUIRK);
 
-        PersonalityTraitType pickedTrait = ObjectUtility.getRandomItem(possibleTraits);
-        switch (pickedTrait) {
-            case AGGRESSION -> {
-                String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
-                setStoredAggression(Aggression.fromString(traitIndex));
-                setStoredAggressionDescriptionIndex(randomInt(Aggression.MAXIMUM_VARIATIONS));
+        int iterations = 2;
+
+        while (iterations != 0 && !possibleTraits.isEmpty()) {
+            PersonalityTraitType pickedTrait = ObjectUtility.getRandomItem(possibleTraits);
+            possibleTraits.remove(pickedTrait);
+            iterations--;
+
+            switch (pickedTrait) {
+                case AGGRESSION -> {
+                    String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
+                    setStoredAggression(Aggression.fromString(traitIndex));
+                    setStoredAggressionDescriptionIndex(randomInt(Aggression.MAXIMUM_VARIATIONS));
+                }
+                case AMBITION -> {
+                    String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
+                    setStoredAmbition(Ambition.fromString(traitIndex));
+                    setStoredAmbitionDescriptionIndex(randomInt(Ambition.MAXIMUM_VARIATIONS));
+                }
+                case GREED -> {
+                    String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
+                    setStoredGreed(Greed.fromString(traitIndex));
+                    setStoredGreedDescriptionIndex(randomInt(Greed.MAXIMUM_VARIATIONS));
+                }
+                case SOCIAL -> {
+                    String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
+                    setStoredSocial(Social.fromString(traitIndex));
+                    setStoredSocialDescriptionIndex(randomInt(Social.MAXIMUM_VARIATIONS));
+                }
+                case PERSONALITY_QUIRK -> {
+                    int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
+                    String traitIndex = String.valueOf(traitRoll);
+                    setStoredPersonalityQuirk(PersonalityQuirk.fromString(traitIndex));
+                    setStoredPersonalityQuirkDescriptionIndex(randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS));
+                }
+                default -> {}
             }
-            case AMBITION -> {
-                String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
-                setStoredAmbition(Ambition.fromString(traitIndex));
-                setStoredAmbitionDescriptionIndex(randomInt(Ambition.MAXIMUM_VARIATIONS));
-            }
-            case GREED -> {
-                String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
-                setStoredGreed(Greed.fromString(traitIndex));
-                setStoredGreedDescriptionIndex(randomInt(Greed.MAXIMUM_VARIATIONS));
-            }
-            case SOCIAL -> {
-                String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
-                setStoredSocial(Social.fromString(traitIndex));
-                setStoredSocialDescriptionIndex(randomInt(Social.MAXIMUM_VARIATIONS));
-            }
-            case PERSONALITY_QUIRK -> {
-                int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
-                String traitIndex = String.valueOf(traitRoll);
-                setStoredPersonalityQuirk(PersonalityQuirk.fromString(traitIndex));
-                setStoredPersonalityQuirkDescriptionIndex(randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS));
-            }
-            default -> {}
         }
+
+        // Always generate Reasoning
+        int reasoningRoll = randomInt(8346);
+        storedReasoning = generateReasoning(reasoningRoll);
     }
 
     /**
@@ -7131,6 +7205,10 @@ public class Person {
         int transitionaryPersonalityQuirkDescriptionIndex = personalityQuirkDescriptionIndex;
         personalityQuirkDescriptionIndex = storedPersonalityQuirkDescriptionIndex;
         storedPersonalityQuirkDescriptionIndex = transitionaryPersonalityQuirkDescriptionIndex;
+
+        Reasoning transitionaryReasoning = reasoning;
+        reasoning = storedReasoning;
+        storedReasoning = transitionaryReasoning;
     }
 
     /**
@@ -7290,7 +7368,7 @@ public class Person {
 
         if (hasBerserker && failedWillpowerCheck) {
             Set<Person> victims = new HashSet<>();
-            List<Person> allActivePersonnel = campaign.getActivePersonnel(false);
+            List<Person> allActivePersonnel = campaign.getActivePersonnel(true, true);
             if (isDeployed() && unit != null) {
                 getLocalVictims(allActivePersonnel, victims);
             } else {

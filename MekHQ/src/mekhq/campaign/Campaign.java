@@ -71,6 +71,7 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ASTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
+import static mekhq.campaign.personnel.skills.SkillType.S_ZERO_G_OPERATIONS;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -251,6 +252,7 @@ import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
+import mekhq.campaign.personnel.skills.Appraisal;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
@@ -2813,38 +2815,61 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Retrieves a list of active personnel in the campaign, optionally including prisoners.
+     * @deprecated use {@link #getActivePersonnel(boolean, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public List<Person> getActivePersonnel(boolean includePrisoners) {
+        return getActivePersonnel(includePrisoners, false);
+    }
+
+    /**
+     * Returns a list of personnel who are considered "active" according to various status filters.
      *
-     * <p>
-     * This method iterates through all personnel and filters out inactive members. It then further filters prisoners
-     * based on the provided parameter:
-     * </p>
+     * <p>This method iterates through all personnel and includes those whose status is considered "active," then
+     * optionally excludes personnel based on the provided flags for prisoners and camp followers.</p>
+     *
      * <ul>
-     * <li>If {@code includePrisoners} is {@code true}, all active personnel,
-     * including prisoners,
-     * are included in the result.</li>
-     * <li>If {@code includePrisoners} is {@code false}, only active personnel who
-     * are either
-     * free or classified as bondsmen are included.</li>
+     *   <li>If {@code includePrisoners} is {@code false}, any personnel who are currently prisoners (not free or
+     *   bondsmen) will be excluded from the result.</li>
+     *   <li>If {@code includeCampFollowers} is {@code false}, (non-prisoner) camp followers will be excluded from the
+     *   result.</li>
+     *   <li>All included personnel are guaranteed to have a status of {@link PersonnelStatus#ACTIVE} or
+     *   {@link PersonnelStatus#CAMP_FOLLOWER} (if appropriate).</li>
      * </ul>
      *
-     * @param includePrisoners {@code true} to include all active prisoners in the result, {@code false} to exclude them
-     *                         unless they are free or bondsmen.
+     * <p><b>Notes:</b> It might be tempting to overload this method with a version that skips one of the boolean
+     * params. I strongly recommend against this. By forcing developers to explicitly dictate prisoner and follower
+     * inclusion we reduce the risk of either demographic being included/excluded by accident. As happened
+     * frequently prior to these booleans being added. - Illiani, 5th Oct 2025</p>
      *
-     * @return A {@link List} of {@link Person} objects representing the filtered active personnel.
+     * @param includePrisoners     {@code true} to include prisoners
+     * @param includeCampFollowers {@code true} to include <b>non-prisoner</b> camp followers
+     *
+     * @return a {@link List} of {@link Person} objects matching the criteria
      */
-    public List<Person> getActivePersonnel(boolean includePrisoners) {
+    public List<Person> getActivePersonnel(boolean includePrisoners, boolean includeCampFollowers) {
         List<Person> activePersonnel = new ArrayList<>();
 
         for (Person person : getPersonnel()) {
-            if (!person.getStatus().isActive()) {
+            PersonnelStatus status = person.getStatus();
+            PrisonerStatus prisonerStatus = person.getPrisonerStatus();
+            boolean isActive = status.isActiveFlexible();
+            boolean isCampFollower = prisonerStatus.isFreeOrBondsman() && status.isCampFollower();
+            boolean isActivePrisoner = person.getPrisonerStatus().isCurrentPrisoner() && isActive;
+
+            if (!isActive) {
                 continue;
             }
 
-            PrisonerStatus prisonerStatus = person.getPrisonerStatus();
-            if (includePrisoners || prisonerStatus.isFreeOrBondsman()) {
-                activePersonnel.add(person);
+            if (!includeCampFollowers && isCampFollower) {
+                continue;
             }
+
+            if (!includePrisoners && isActivePrisoner) {
+                continue;
+            }
+
+            activePersonnel.add(person);
         }
 
         return activePersonnel;
@@ -2857,7 +2882,7 @@ public class Campaign implements ITechManager {
      * @since 0.50.06
      */
     public List<Person> getSalaryEligiblePersonnel() {
-        return getActivePersonnel(false).stream()
+        return getActivePersonnel(false, false).stream()
                      .filter(person -> person.getStatus().isSalaryEligible())
                      .collect(Collectors.toList());
     }
@@ -2872,20 +2897,20 @@ public class Campaign implements ITechManager {
      * @return a {@link List} of {@link Person} objects representing combat-capable personnel
      */
     public List<Person> getActiveCombatPersonnel() {
-        return getActivePersonnel(true).stream()
+        return getActivePersonnel(false, false).stream()
                      .filter(p -> p.getPrimaryRole().isCombat() || p.getSecondaryRole().isCombat())
                      .collect(Collectors.toList());
     }
 
     /**
-     * Provides a filtered list of personnel including only active Dependents.
+     * Provides a filtered list of personnel including only active Dependents (including camp followers).
      *
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getActiveDependents() {
         return getPersonnel().stream()
                      .filter(person -> person.getPrimaryRole().isDependent())
-                     .filter(person -> person.getStatus().isActive())
+                     .filter(person -> person.getStatus().isActiveFlexible())
                      .collect(Collectors.toList());
     }
 
@@ -2895,7 +2920,7 @@ public class Campaign implements ITechManager {
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getCurrentPrisoners() {
-        return getActivePersonnel(true).stream()
+        return getActivePersonnel(true, false).stream()
                      .filter(person -> person.getPrisonerStatus().isCurrentPrisoner())
                      .collect(Collectors.toList());
     }
@@ -2906,7 +2931,7 @@ public class Campaign implements ITechManager {
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getPrisonerDefectors() {
-        return getActivePersonnel(false).stream()
+        return getActivePersonnel(true, false).stream()
                      .filter(person -> person.getPrisonerStatus().isPrisonerDefector())
                      .collect(Collectors.toList());
     }
@@ -2996,7 +3021,7 @@ public class Campaign implements ITechManager {
             if (person.needsFixing() ||
                       (getCampaignOptions().isUseAdvancedMedical() &&
                              person.hasInjuries(true) &&
-                             person.getStatus().isActive())) {
+                             person.getStatus().isActiveFlexible())) {
                 patients.add(person);
             }
         }
@@ -3375,7 +3400,7 @@ public class Campaign implements ITechManager {
         boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
         boolean isClanCampaign = isClanCampaign();
 
-        for (Person person : getActivePersonnel(false)) {
+        for (Person person : getActivePersonnel(false, false)) {
             int adjustedReputation = person.getAdjustedReputation(isUseAgingEffects,
                   isClanCampaign,
                   currentDay,
@@ -3445,7 +3470,7 @@ public class Campaign implements ITechManager {
     public @Nullable Person findBestAtSkill(String skillName) {
         Person bestAtSkill = null;
         int highest = 0;
-        for (Person person : getActivePersonnel(false)) {
+        for (Person person : getActivePersonnel(false, false)) {
             int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                   isClanCampaign(),
                   currentDay,
@@ -3518,7 +3543,7 @@ public class Campaign implements ITechManager {
      *       skill, available time, and rank as specified by the input parameters.
      */
     public List<Person> getTechsExpanded(final boolean noZeroMinute, final boolean eliteFirst, final boolean expanded) {
-        final List<Person> techs = getActivePersonnel(true).stream()
+        final List<Person> techs = getActivePersonnel(false, false).stream()
                                          .filter(person -> (expanded ? person.isTechExpanded() : person.isTech()) &&
                                                                  (!noZeroMinute || (person.getMinutesLeft() > 0)))
                                          .collect(Collectors.toList());
@@ -3557,7 +3582,7 @@ public class Campaign implements ITechManager {
 
     public List<Person> getAdmins() {
         List<Person> admins = new ArrayList<>();
-        for (Person person : getActivePersonnel(true)) {
+        for (Person person : getActivePersonnel(false, false)) {
             if (person.isAdministrator()) {
                 admins.add(person);
             }
@@ -3574,7 +3599,7 @@ public class Campaign implements ITechManager {
 
     public List<Person> getDoctors() {
         List<Person> docs = new ArrayList<>();
-        for (Person person : getActivePersonnel(true)) {
+        for (Person person : getActivePersonnel(false, false)) {
             if (person.isDoctor()) {
                 docs.add(person);
             }
@@ -3584,7 +3609,7 @@ public class Campaign implements ITechManager {
 
     public int getPatientsFor(Person doctor) {
         int patients = 0;
-        for (Person person : getActivePersonnel(true)) {
+        for (Person person : getActivePersonnel(true, true)) {
             if ((null != person.getDoctorId()) && person.getDoctorId().equals(doctor.getId())) {
                 patients++;
             }
@@ -3625,8 +3650,7 @@ public class Campaign implements ITechManager {
         if (skillName.equals(S_AUTO)) {
             return null;
         } else if (skillName.equals(S_TECH)) {
-            for (Person person : getActivePersonnel(false)) {
-
+            for (Person person : getActivePersonnel(false, false)) {
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
@@ -3654,8 +3678,7 @@ public class Campaign implements ITechManager {
                 }
             }
         } else {
-            for (Person person : getActivePersonnel(false)) {
-
+            for (Person person : getActivePersonnel(false, false)) {
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
@@ -3812,7 +3835,7 @@ public class Campaign implements ITechManager {
         Person commander = flaggedCommander;
         Person secondInCommand = null;
 
-        for (Person person : getActivePersonnel(false)) {
+        for (Person person : getActivePersonnel(false, false)) {
             // If we have a flagged commander, skip them
             if (flaggedCommander != null) {
                 if (person.equals(flaggedCommander)) {
@@ -3878,7 +3901,7 @@ public class Campaign implements ITechManager {
             final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
             List<Person> logisticsPersonnel = new ArrayList<>();
 
-            for (Person person : getActivePersonnel(true)) {
+            for (Person person : getActivePersonnel(false, false)) {
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
@@ -4434,10 +4457,15 @@ public class Campaign implements ITechManager {
         }
         int xpGained = 0;
         if (roll >= target.getValue()) {
+            boolean useFunctionalAppraisal = campaignOptions.isUseFunctionalAppraisal();
+            double valueChange = useFunctionalAppraisal ? Appraisal.performAppraisalMultiplierCheck(person,
+                  currentDay) : 1.0;
+            String appraisalReport = useFunctionalAppraisal ? Appraisal.getAppraisalReport(valueChange) : "";
+
             if (transitDays < 0) {
                 transitDays = calculatePartTransitTime(acquisition.getAvailability());
             }
-            report = report + acquisition.find(transitDays);
+            report = report + acquisition.find(transitDays, valueChange) + ' ' + appraisalReport;
             found = true;
             if (person != null) {
                 if (roll == 12 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
@@ -6289,7 +6317,8 @@ public class Campaign implements ITechManager {
         if (isFirstOfMonth) {
             String report = factionStandings.updateClimateRegard(faction,
                   currentDay,
-                  campaignOptions.getRegardMultiplier());
+                  campaignOptions.getRegardMultiplier(),
+                  campaignOptions.isTrackClimateRegardChanges());
             addReport(report);
         }
 
@@ -6530,7 +6559,7 @@ public class Campaign implements ITechManager {
         if (campaignOptions.isUseFatigue()) {
             int fieldKitchenCapacity = checkFieldKitchenCapacity(getForce(FORCE_ORIGIN).getAllUnitsAsUnits(units,
                   false), campaignOptions.getFieldKitchenCapacity());
-            int fieldKitchenUsage = checkFieldKitchenUsage(getActivePersonnel(false),
+            int fieldKitchenUsage = checkFieldKitchenUsage(getActivePersonnel(false, false),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
             fieldKitchenWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
         } else {
@@ -6661,7 +6690,7 @@ public class Campaign implements ITechManager {
     @Deprecated(since = "0.50.07", forRemoval = true)
     public Person getSeniorCommander() {
         Person commander = null;
-        for (Person person : getActivePersonnel(true)) {
+        for (Person person : getActivePersonnel(false, false)) {
             if (person.isCommander()) {
                 return person;
             }
@@ -8433,11 +8462,16 @@ public class Campaign implements ITechManager {
     public TargetRoll getTargetForMaintenance(IPartWork partWork, Person tech, int asTechsUsed) {
         int value = 10;
         String skillLevel = "Unmaintained";
+        PersonnelOptions options = null;
+        Attributes attributes = null;
         if (null != tech) {
+            options = tech.getOptions();
+            attributes = tech.getATOWAttributes();
+
             Skill skill = tech.getSkillForWorkingOn(partWork);
             if (null != skill) {
-                value = skill.getFinalSkillValue(tech.getOptions(), tech.getATOWAttributes());
-                skillLevel = skill.getSkillLevel(tech.getOptions(), tech.getATOWAttributes()).toString();
+                value = skill.getFinalSkillValue(options, attributes);
+                skillLevel = skill.getSkillLevel(options, attributes).toString();
             }
         }
 
@@ -8459,12 +8493,24 @@ public class Campaign implements ITechManager {
                 megamek.common.planetaryConditions.Atmosphere planetaryConditions = planet.getPressure(getLocalDate());
                 int temperature = planet.getTemperature(getLocalDate());
 
+                Skill zeroGSkill = tech == null ? null : tech.getSkill(S_ZERO_G_OPERATIONS);
+                int zeroGSkillLevel = 0;
+                if (zeroGSkill != null) {
+                    zeroGSkillLevel = zeroGSkill.getTotalSkillLevel(options, attributes);
+                }
+
                 if (planet.getGravity() < 0.8) {
-                    target.addModifier(2, "Low Gravity");
+                    int modifier = 2;
+                    target.addModifier(modifier, "Low Gravity");
+                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
                 } else if (planet.getGravity() >= 2.0) {
-                    target.addModifier(4, "Very High Gravity");
+                    int modifier = 4;
+                    target.addModifier(modifier, "Very High Gravity");
+                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
                 } else if (planet.getGravity() > 1.2) {
-                    target.addModifier(1, "High Gravity");
+                    int modifier = 1;
+                    target.addModifier(modifier, "High Gravity");
+                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
                 }
 
                 if (atmosphere.isTainted() || atmosphere.isToxic()) {
@@ -8509,6 +8555,30 @@ public class Campaign implements ITechManager {
         }
 
         return target;
+    }
+
+    /**
+     * Applies a Zero-G Operations skill gravityModifier to the specified {@link TargetRoll}, offsetting a penalty
+     * gravityModifier.
+     *
+     * <ul>
+     *   <li>If {@code zeroGSkillLevel} >= {@code gravityModifier}, does nothing.</li>
+     *   <li>If {@code zeroGSkillLevel} < {@code gravityModifier}, applies {@code -zeroGSkillLevel}.</li>
+     * </ul>
+     *
+     * @param zeroGSkillLevel the Zero-G Operations skill level, which negates up to that much penalty from the
+     *                        gravityModifier
+     * @param gravityModifier the penalty modifier value to offset
+     * @param target          the {@link TargetRoll} instance to modify
+     */
+    private static void addZeroGOperationsModifier(int zeroGSkillLevel, int gravityModifier, TargetRoll target) {
+        if (zeroGSkillLevel > 0) {
+            int effectiveModifier = zeroGSkillLevel >= gravityModifier ? 0 : -zeroGSkillLevel;
+
+            if (effectiveModifier < 0) {
+                target.addModifier(effectiveModifier, "Zero-G Operations");
+            }
+        }
     }
 
     public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition) {
@@ -8708,7 +8778,7 @@ public class Campaign implements ITechManager {
     }
 
     public int getAsTechNeed() {
-        return (Math.toIntExact(getActivePersonnel(true).stream().filter(Person::isTech).count()) *
+        return (Math.toIntExact(getActivePersonnel(false, false).stream().filter(Person::isTech).count()) *
                       MHQConstants.AS_TECH_TEAM_SIZE) -
                      getNumberAsTechs();
     }
@@ -8764,7 +8834,7 @@ public class Campaign implements ITechManager {
 
         int asTechs = getTemporaryAsTechPool();
 
-        for (Person person : getActivePersonnel(false)) {
+        for (Person person : getActivePersonnel(false, false)) {
             if (person.getPrimaryRole().isAstech() && !person.isDeployed() && person.isEmployed()) {
                 // All skilled assistants contribute 1 to the pool, regardless of skill level
                 asTechs++;
@@ -8820,7 +8890,7 @@ public class Campaign implements ITechManager {
 
         int asTechs = 0;
 
-        for (Person person : getActivePersonnel(false)) {
+        for (Person person : getActivePersonnel(false, false)) {
             if (person.getSecondaryRole().isAstech() && !person.isDeployed() && person.isEmployed()) {
                 // All skilled assistants contribute 1 to the pool, regardless of skill level
                 asTechs++;
@@ -8929,7 +8999,7 @@ public class Campaign implements ITechManager {
         final boolean isUseUsefulMedics = getCampaignOptions().isUseUsefulMedics();
         int permanentMedicPool = 0;
 
-        for (Person person : getActivePersonnel(false)) {
+        for (Person person : getActivePersonnel(false, false)) {
             if (person.getPrimaryRole().isMedic() || person.getSecondaryRole().isMedic()) {
                 if (person.isDeployed()) {
                     continue;

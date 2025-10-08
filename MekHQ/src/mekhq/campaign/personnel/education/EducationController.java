@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.education;
 
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -49,7 +50,6 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -65,6 +65,7 @@ import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -153,7 +154,11 @@ public class EducationController {
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
+        // Calculate the roll based on Reasoning if necessary
         int roll = d6(2);
+        if (campaignOptions.isUseRandomPersonalities()) {
+            roll += (person.getReasoning().getReasoningScore() / 4);
+        }
         // Calculate the target number based on base target number and faculty skill
         int targetNumber = campaignOptions.getEntranceExamBaseTargetNumber() - academy.getFacultySkill();
 
@@ -313,17 +318,17 @@ public class EducationController {
 
         boolean hasActiveParent = false;
         if (spouse != null) {
-            if (spouse.getStatus().isActive() && (spouse.isDependent() || !spouse.isEmployed())) {
+            if (spouse.getStatus().isActiveFlexible() && (spouse.isDependent() || !spouse.isEmployed())) {
                 person.addEduTagAlong(spouse.getId());
                 spouse.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
             }
 
-            hasActiveParent = spouse.getStatus().isActive();
+            hasActiveParent = spouse.getStatus().isActiveFlexible();
         }
 
         if (!hasActiveParent) {
             for (Person child : children) {
-                if (child.getStatus().isActive()) {
+                if (child.getStatus().isActiveFlexible()) {
                     if (child.isChild(campaign.getLocalDate())) {
                         person.addEduTagAlong(child.getId());
                         child.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
@@ -845,10 +850,10 @@ public class EducationController {
             int roll;
 
             if (militaryDiceSize > 1) {
-                roll = Compute.randomInt(militaryDiceSize);
+                roll = randomInt(militaryDiceSize);
 
                 if (academy.isHomeSchool()) {
-                    int secondRoll = Compute.randomInt(militaryDiceSize);
+                    int secondRoll = randomInt(militaryDiceSize);
 
                     if (secondRoll < roll) {
                         roll = secondRoll;
@@ -932,7 +937,7 @@ public class EducationController {
         // characters, so we treat them as children - even though at 16 they can take Roles.
         if (person.isChild(campaign.getLocalDate(), true)) {
             if (childDiceSize > 1) {
-                roll = Compute.randomInt(childDiceSize);
+                roll = randomInt(childDiceSize);
             } else {
                 roll = -1;
             }
@@ -940,7 +945,7 @@ public class EducationController {
             diceSize = childDiceSize;
         } else {
             if (adultDiceSize > 1) {
-                roll = Compute.randomInt(adultDiceSize);
+                roll = randomInt(adultDiceSize);
             } else {
                 roll = -1;
             }
@@ -1153,11 +1158,11 @@ public class EducationController {
      * @return true if the person completed their education, false otherwise
      */
     private static boolean graduateAdult(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        int graduationRoll = Compute.randomInt(100);
+        int graduationRoll = randomInt(100);
         int roll;
 
         if (academy.isHomeSchool()) {
-            int secondRoll = Compute.randomInt(100);
+            int secondRoll = randomInt(100);
 
             if (secondRoll < graduationRoll) {
                 graduationRoll = secondRoll;
@@ -1166,6 +1171,10 @@ public class EducationController {
             if (graduationRoll >= 90) {
                 graduationRoll = 89;
             }
+        }
+
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            graduationRoll += person.getReasoning().getReasoningScore();
         }
 
         // qualification failed
@@ -1450,14 +1459,18 @@ public class EducationController {
      * @param academy  the Prep School from which the person is being graduated
      */
     private static void graduateChild(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        int graduationRoll = Compute.randomInt(100);
+        int graduationRoll = randomInt(100);
 
         if (academy.isHomeSchool()) {
-            int secondRoll = Compute.randomInt(100);
+            int secondRoll = randomInt(100);
 
             if (secondRoll < graduationRoll) {
                 graduationRoll = secondRoll;
             }
+        }
+
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            graduationRoll += person.getReasoning().ordinal() - 12;
         }
 
         // We don't process the granularity of graduation events for very young children.
@@ -1714,7 +1727,7 @@ public class EducationController {
         curriculum = curriculum.stream().map(String::trim).toList();
 
         for (int i = 0; i < bonusCount; i++) {
-            int roll = Compute.randomInt(curriculum.size());
+            int roll = randomInt(curriculum.size());
 
             try {
                 String skillParsed = Academy.skillParser(curriculum.get(roll));
@@ -1756,7 +1769,7 @@ public class EducationController {
         List<String> graduationEventTable = graduationEventTable();
         Collections.shuffle(graduationEventTable);
 
-        return graduationEventTable.get(Compute.randomInt(graduationEventTable.size()));
+        return graduationEventTable.get(randomInt(graduationEventTable.size()));
     }
 
     /**
@@ -2028,9 +2041,13 @@ public class EducationController {
         final boolean isCombatRole = person.getPrimaryRole().isCombat();
 
         // We base passRate on US averages
-        int passRate = 60;
+        int passRate = 60 - (Reasoning.values().length / 2);
+        final int reasoningModifier = campaign.getCampaignOptions().isUseRandomPersonalities() ?
+                                            person.getReasoning().getReasoningScore() :
+                                            Reasoning.values().length / 2;
+        passRate += reasoningModifier;
 
-        final boolean flunked = Compute.randomInt(100) <= passRate;
+        final boolean flunked = randomInt(100) <= passRate;
 
         EducationLevel educationLevel;
         if (isCombatRole) {
@@ -2075,7 +2092,7 @@ public class EducationController {
         if (experienceLevel < EXP_REGULAR) {
             // Second-chance roll for High School
             if (flunked) {
-                flunked = Compute.randomInt(100) < passRate;
+                flunked = randomInt(100) < passRate;
             }
 
             return flunked ? EducationLevel.EARLY_CHILDHOOD : EducationLevel.HIGH_SCHOOL;
@@ -2114,7 +2131,7 @@ public class EducationController {
         if (experienceLevel < EXP_REGULAR) {
             // Second-chance roll for High School
             if (flunked) {
-                flunked = Compute.randomInt(100) < passRate;
+                flunked = randomInt(100) < passRate;
             }
 
             return flunked ? EducationLevel.EARLY_CHILDHOOD : EducationLevel.HIGH_SCHOOL;

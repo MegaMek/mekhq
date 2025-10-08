@@ -255,7 +255,20 @@ public enum PersonnelStatus {
     // region Boolean Comparison Methods
 
     /**
+     * Checks if the character has either the {@link #ACTIVE} or {@link #CAMP_FOLLOWER} personnel status.
+     *
+     * @return {@code true} if the character has the {@link #ACTIVE} personnel status {@code false} otherwise.
+     */
+    public boolean isActiveFlexible() {
+        return this == ACTIVE || this == CAMP_FOLLOWER;
+    }
+
+    /**
      * Checks if the character has the {@link #ACTIVE} personnel status.
+     *
+     * <p><b>Usage:</b> In most cases we likely want to use {@link #isActiveFlexible()} as this will also return
+     * {@code true} for 'camp follower' characters. Those characters are also 'active', just not active employees of the
+     * player's campaign.</p>
      *
      * @return {@code true} if the character has the {@link #ACTIVE} personnel status {@code false} otherwise.
      */

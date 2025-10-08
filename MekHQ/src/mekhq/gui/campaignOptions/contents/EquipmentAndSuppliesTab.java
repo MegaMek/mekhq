@@ -88,6 +88,7 @@ public class EquipmentAndSuppliesTab {
     private JPanel pnlAcquisitions;
     private JLabel lblChoiceAcquireSkill;
     private MMComboBox<String> choiceAcquireSkill;
+    private JCheckBox chkUseFunctionalAppraisal;
     private JLabel lblAcquireClanPenalty;
     private JLabel lblProcurementPersonnelPick;
     private MMComboBox<String> cboProcurementPersonnelPick;
@@ -263,6 +264,8 @@ public class EquipmentAndSuppliesTab {
         lblChoiceAcquireSkill = new JLabel();
         choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", buildAcquireSkillComboOptions());
 
+        chkUseFunctionalAppraisal = new JCheckBox();
+
         lblProcurementPersonnelPick = new JLabel();
         cboProcurementPersonnelPick = new MMComboBox<>("procurementPersonnelPick",
               buildProcurementPersonnelPickComboOptions());
@@ -377,6 +380,9 @@ public class EquipmentAndSuppliesTab {
         lblChoiceAcquireSkill = new CampaignOptionsLabel("ChoiceAcquireSkill");
         lblChoiceAcquireSkill.addMouseListener(createTipPanelUpdater(acquisitionHeader, "ChoiceAcquireSkill"));
 
+        chkUseFunctionalAppraisal = new CampaignOptionsCheckBox("UseFunctionalAppraisal");
+        chkUseFunctionalAppraisal.addMouseListener(createTipPanelUpdater(acquisitionHeader, "UseFunctionalAppraisal"));
+
         lblProcurementPersonnelPick = new CampaignOptionsLabel("ProcurementPersonnelPick");
         lblProcurementPersonnelPick.addMouseListener(createTipPanelUpdater(acquisitionHeader,
               "ProcurementPersonnelPick"));
@@ -415,6 +421,10 @@ public class EquipmentAndSuppliesTab {
         panel.add(lblChoiceAcquireSkill, layout);
         layout.gridx++;
         panel.add(choiceAcquireSkill, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseFunctionalAppraisal, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -1104,6 +1114,7 @@ public class EquipmentAndSuppliesTab {
 
         // Acquisitions
         options.setAcquisitionSkill(choiceAcquireSkill.getSelectedItem());
+        options.setUseFunctionalAppraisal(chkUseFunctionalAppraisal.isSelected());
         options.setAcquisitionPersonnelCategory(ProcurementPersonnelPick.values()[cboProcurementPersonnelPick.getSelectedIndex()]);
         options.setClanAcquisitionPenalty((int) spnAcquireClanPenalty.getValue());
         options.setIsAcquisitionPenalty((int) spnAcquireIsPenalty.getValue());
@@ -1185,6 +1196,7 @@ public class EquipmentAndSuppliesTab {
 
         // Acquisitions
         choiceAcquireSkill.setSelectedItem(options.getAcquisitionSkill());
+        chkUseFunctionalAppraisal.setSelected(options.isUseFunctionalAppraisal());
         cboProcurementPersonnelPick.setSelectedItem(options.getAcquisitionPersonnelCategory().toString());
         spnAcquireClanPenalty.setValue(options.getClanAcquisitionPenalty());
         spnAcquireIsPenalty.setValue(options.getIsAcquisitionPenalty());

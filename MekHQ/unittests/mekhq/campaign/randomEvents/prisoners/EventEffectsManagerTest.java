@@ -790,7 +790,7 @@ class EventEffectsManagerTest {
         Person soldier1 = new Person(mockCampaign);
         Person soldier2 = new Person(mockCampaign);
         List<Person> potentialTargets = List.of(soldier0, soldier1, soldier2);
-        when(mockCampaign.getActivePersonnel(false)).thenReturn(new ArrayList<>(potentialTargets));
+        when(mockCampaign.getActivePersonnel(false, true)).thenReturn(new ArrayList<>(potentialTargets));
 
         // Act
         new EventEffectsManager(mockCampaign, eventData, 0, true);

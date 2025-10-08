@@ -167,6 +167,7 @@ public class CampaignOptions {
     // Acquisition
     private int waitingPeriod;
     private String acquisitionSkill;
+    private boolean useFunctionalAppraisal;
     private ProcurementPersonnelPick acquisitionPersonnelCategory;
     private int clanAcquisitionPenalty;
     private int isAcquisitionPenalty;
@@ -239,6 +240,7 @@ public class CampaignOptions {
     private boolean displayScenarioLog;
     private boolean displayKillRecord;
     private boolean displayMedicalRecord;
+    private boolean displayPatientRecord;
     private boolean displayAssignmentRecord;
     private boolean displayPerformanceRecord;
 
@@ -318,6 +320,7 @@ public class CampaignOptions {
     private RandomOriginOptions randomOriginOptions;
     private boolean useRandomPersonalities;
     private boolean useRandomPersonalityReputation;
+    private boolean useReasoningXpMultiplier;
     private boolean useSimulatedRelationships;
 
     // Family
@@ -645,6 +648,7 @@ public class CampaignOptions {
 
     // start region Faction Standing
     private boolean trackFactionStanding;
+    private boolean trackClimateRegardChanges;
     private boolean useFactionStandingNegotiation;
     private boolean useFactionStandingResupply;
     private boolean useFactionStandingCommandCircuit;
@@ -717,6 +721,7 @@ public class CampaignOptions {
         // Acquisition
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
+        useFunctionalAppraisal = false;
         acquisitionPersonnelCategory = SUPPORT;
         clanAcquisitionPenalty = 0;
         isAcquisitionPenalty = 0;
@@ -802,6 +807,7 @@ public class CampaignOptions {
         setDisplayScenarioLog(false);
         setDisplayKillRecord(false);
         setDisplayMedicalRecord(false);
+        displayPatientRecord = false;
         setRewardComingOfAgeAbilities(false);
         setRewardComingOfAgeRPSkills(false);
 
@@ -923,6 +929,7 @@ public class CampaignOptions {
         setRandomOriginOptions(new RandomOriginOptions(true));
         setUseRandomPersonalities(false);
         setUseRandomPersonalityReputation(true);
+        setUseReasoningXpMultiplier(true);
         setUseSimulatedRelationships(false);
 
         // Family
@@ -1700,6 +1707,14 @@ public class CampaignOptions {
         this.displayMedicalRecord = displayMedicalRecord;
     }
 
+    public boolean isDisplayPatientRecord() {
+        return displayPatientRecord;
+    }
+
+    public void setDisplayPatientRecord(final boolean displayPatientRecord) {
+        this.displayPatientRecord = displayPatientRecord;
+    }
+
     public boolean isDisplayAssignmentRecord() {
         return displayAssignmentRecord;
     }
@@ -2028,13 +2043,12 @@ public class CampaignOptions {
         this.useRandomPersonalityReputation = useRandomPersonalityReputation;
     }
 
-    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean isUseReasoningXpMultiplier() {
-        return false;
+        return useReasoningXpMultiplier;
     }
 
-    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setUseReasoningXpMultiplier(final boolean useReasoningXpMultiplier) {
+        this.useReasoningXpMultiplier = useReasoningXpMultiplier;
     }
 
     public boolean isUseSimulatedRelationships() {
@@ -4194,6 +4208,14 @@ public class CampaignOptions {
         this.acquisitionSkill = acquisitionSkill;
     }
 
+    public boolean isUseFunctionalAppraisal() {
+        return useFunctionalAppraisal;
+    }
+
+    public void setUseFunctionalAppraisal(final boolean useFunctionalAppraisal) {
+        this.useFunctionalAppraisal = useFunctionalAppraisal;
+    }
+
     /**
      * Checks if the acquisition personnel category matches a specified category.
      *
@@ -5379,6 +5401,14 @@ public class CampaignOptions {
 
     public void setTrackFactionStanding(boolean trackFactionStanding) {
         this.trackFactionStanding = trackFactionStanding;
+    }
+
+    public boolean isTrackClimateRegardChanges() {
+        return trackClimateRegardChanges;
+    }
+
+    public void setTrackClimateRegardChanges(boolean trackClimateRegardChanges) {
+        this.trackClimateRegardChanges = trackClimateRegardChanges;
     }
 
     public double getRegardMultiplier() {

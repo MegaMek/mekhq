@@ -49,17 +49,6 @@ public class PerformanceLogger {
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.LogEntries",
           MekHQ.getMHQOptions().getLocale());
 
-    public static void gainedXpFromMedWork(Person doctor, LocalDate date, int taskXP) {
-        String message = resources.getString("gainedXpFromMedWork.text");
-        doctor.addPerformanceLogEntry(new PerformanceLogEntry(date, MessageFormat.format(message, taskXP)));
-    }
-
-    public static void successfullyTreatedWithXp(Person doctor, Person patient, LocalDate date, int injuries, int xp) {
-        String message = resources.getString("successfullyTreatedWithXp.text");
-        doctor.addPerformanceLogEntry(new PerformanceLogEntry(date,
-              MessageFormat.format(message, patient, injuries, xp)));
-    }
-
     /**
      * @deprecated use {@link #improvedSkill(boolean, Person, LocalDate, String, int)} instead
      */
