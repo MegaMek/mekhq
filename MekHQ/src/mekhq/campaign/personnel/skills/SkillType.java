@@ -165,10 +165,6 @@ public class SkillType {
     public static final String S_COMMUNICATIONS = "Communications/Any" + RP_ONLY_TAG;
     public static final String S_COMPUTERS = "Computers" + RP_ONLY_TAG;
     public static final String S_CRYPTOGRAPHY = "Cryptography" + RP_ONLY_TAG;
-    public static final String S_DISGUISE = "Disguise" + RP_ONLY_TAG;
-    public static final String S_ESCAPE_ARTIST = "Escape Artist" + RP_ONLY_TAG;
-    public static final String S_FORGERY = "Forgery" + RP_ONLY_TAG;
-    public static final String S_DEMOLITIONS = "Demolitions" + RP_ONLY_TAG;
     public static final String S_INTEREST_HISTORY = "Interest/History" + RP_ONLY_TAG;
     public static final String S_INTEREST_LITERATURE = "Interest/Literature" + RP_ONLY_TAG;
     public static final String S_INTEREST_HOLO_GAMES = "Interest/Holo-Games" + RP_ONLY_TAG;
@@ -474,10 +470,10 @@ public class SkillType {
      *
      *                          <p>For example:</p>
      *                          <pre>
-     *                                                                                                                                Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                            </pre>
+     *                                                                                                                                                         Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                         SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                         SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                     </pre>
      * @param skillLevelsMatter if {@code true}, the skill's level will be displayed in Person View in addition to the
      *                          skill's Target Number
      *
