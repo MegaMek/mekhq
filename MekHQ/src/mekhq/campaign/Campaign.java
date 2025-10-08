@@ -2385,7 +2385,7 @@ public class Campaign implements ITechManager {
                 asTechPoolOvertime += Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
             }
         } else {
-            person.changeStatus(this, currentDay, PersonnelStatus.CAMP_FOLLOWER);
+            person.setStatus(PersonnelStatus.CAMP_FOLLOWER);
         }
 
         person.setPrisonerStatus(this, prisonerStatus, log);
