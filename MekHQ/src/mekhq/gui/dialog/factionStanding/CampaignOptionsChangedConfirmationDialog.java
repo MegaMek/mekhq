@@ -287,7 +287,7 @@ public class CampaignOptionsChangedConfirmationDialog extends JDialog {
             if (isFactionStandingEnabled) {
                 reports.add(getTextAt(RESOURCE_BUNDLE, "gmTools.ZERO_ALL_REGARD.report"));
                 factionStandings.resetAllFactionStandings();
-                factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier);
+                factionStandings.updateClimateRegard(campaignFaction, today, regardMultiplier, true);
                 reports.addAll(factionStandings.updateCampaignForPastMissions(missions,
                       campaignIcon,
                       campaignFaction,

@@ -87,6 +87,7 @@ public class SystemsTab {
     // Faction Standing Tab
     private CampaignOptionsHeaderPanel factionStandingHeader;
     private JCheckBox chkTrackFactionStanding;
+    private JCheckBox chkTrackClimateRegardChanges;
     private JSpinner spnRegardMultiplier;
 
     private JCheckBox chkUseFactionStandingNegotiation;
@@ -272,6 +273,10 @@ public class SystemsTab {
         chkTrackFactionStanding = new CampaignOptionsCheckBox("TrackFactionStanding");
         chkTrackFactionStanding.addMouseListener(createTipPanelUpdater(factionStandingHeader, "TrackFactionStanding"));
 
+        chkTrackClimateRegardChanges = new CampaignOptionsCheckBox("TrackClimateRegardChanges");
+        chkTrackClimateRegardChanges.addMouseListener(createTipPanelUpdater(factionStandingHeader,
+              "TrackClimateRegardChanges"));
+
         JLabel lblRegardMultiplier = new CampaignOptionsLabel("RegardMultiplier");
         lblRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
         spnRegardMultiplier = new CampaignOptionsSpinner("RegardMultiplier", 1.0, 0.1, 3.0, 0.1);
@@ -291,7 +296,10 @@ public class SystemsTab {
         layoutParent.gridy++;
         layoutParent.gridwidth = 1;
         panel.add(chkTrackFactionStanding, layoutParent);
+        layoutParent.gridx++;
+        panel.add(chkTrackClimateRegardChanges, layoutParent);
 
+        layoutParent.gridx = 0;
         layoutParent.gridy++;
         panel.add(lblRegardMultiplier, layoutParent);
         layoutParent.gridx++;
@@ -517,6 +525,7 @@ public class SystemsTab {
 
         // Faction Standing
         chkTrackFactionStanding.setSelected(options.isTrackFactionStanding());
+        chkTrackClimateRegardChanges.setSelected(options.isTrackClimateRegardChanges());
         spnRegardMultiplier.setValue(options.getRegardMultiplier());
         chkUseFactionStandingNegotiation.setSelected(options.isUseFactionStandingNegotiation());
         chkUseFactionStandingResupply.setSelected(options.isUseFactionStandingResupply());
@@ -577,6 +586,7 @@ public class SystemsTab {
 
         // Faction Standing
         options.setTrackFactionStanding(chkTrackFactionStanding.isSelected());
+        options.setTrackClimateRegardChanges(chkTrackClimateRegardChanges.isSelected());
         options.setRegardMultiplier((double) spnRegardMultiplier.getValue());
         options.setUseFactionStandingNegotiation(chkUseFactionStandingNegotiation.isSelected());
         options.setUseFactionStandingResupply(chkUseFactionStandingResupply.isSelected());

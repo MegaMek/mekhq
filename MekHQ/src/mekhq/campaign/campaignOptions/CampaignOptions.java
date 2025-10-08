@@ -643,6 +643,7 @@ public class CampaignOptions {
 
     // start region Faction Standing
     private boolean trackFactionStanding;
+    private boolean trackClimateRegardChanges;
     private boolean useFactionStandingNegotiation;
     private boolean useFactionStandingResupply;
     private boolean useFactionStandingCommandCircuit;
@@ -5359,6 +5360,14 @@ public class CampaignOptions {
 
     public void setTrackFactionStanding(boolean trackFactionStanding) {
         this.trackFactionStanding = trackFactionStanding;
+    }
+
+    public boolean isTrackClimateRegardChanges() {
+        return trackClimateRegardChanges;
+    }
+
+    public void setTrackClimateRegardChanges(boolean trackClimateRegardChanges) {
+        this.trackClimateRegardChanges = trackClimateRegardChanges;
     }
 
     public double getRegardMultiplier() {

@@ -839,6 +839,8 @@ public class CampaignOptionsUnmarshaller {
             case "minimumCallsignSkillLevel" -> campaignOptions.setMinimumCallsignSkillLevel(SkillLevel.parseFromString(
                   nodeContents));
             case "trackFactionStanding" -> campaignOptions.setTrackFactionStanding(parseBoolean(nodeContents));
+            case "trackClimateRegardChanges" ->
+                  campaignOptions.setTrackClimateRegardChanges(parseBoolean(nodeContents));
             case "useFactionStandingNegotiation" -> campaignOptions.setUseFactionStandingNegotiation(parseBoolean(
                   nodeContents));
             case "useFactionStandingResupply" -> campaignOptions.setUseFactionStandingResupply(parseBoolean(

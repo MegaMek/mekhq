@@ -6283,7 +6283,8 @@ public class Campaign implements ITechManager {
         if (isFirstOfMonth) {
             String report = factionStandings.updateClimateRegard(faction,
                   currentDay,
-                  campaignOptions.getRegardMultiplier());
+                  campaignOptions.getRegardMultiplier(),
+                  campaignOptions.isTrackClimateRegardChanges());
             addReport(report);
         }
 

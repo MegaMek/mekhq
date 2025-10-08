@@ -1068,6 +1068,10 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackFactionStanding", campaignOptions.isTrackFactionStanding());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
+              "trackClimateRegardChanges",
+              campaignOptions.isTrackClimateRegardChanges());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
               "useFactionStandingNegotiation",
               campaignOptions.isUseFactionStandingNegotiation());
         MHQXMLUtility.writeSimpleXMLTag(pw,
