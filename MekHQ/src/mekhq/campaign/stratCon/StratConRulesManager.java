@@ -1455,6 +1455,7 @@ public class StratConRulesManager {
         Hangar hangar = campaign.getHangar();
         List<ScoutRecord> scouts = force == null ? new ArrayList<>() : buildScoutMap(force, hangar);
 
+        boolean useAdvancedScouting = campaign.getCampaignOptions().isUseAdvancedScouting();
         // Each scout may scan up to scanMultiplier hexes
         for (ScoutRecord scoutData : scouts) {
             Person scout = scoutData.scout();
@@ -1483,10 +1484,11 @@ public class StratConRulesManager {
                         }
 
                         TargetRollModifier rollModifier = getUnitWeightModifier(scoutData.entityWeight());
-                        boolean wasScoutingSuccessful = SkillCheckUtility.performQuickSkillCheck(
-                              scout,
-                              scoutData.skillName(), List.of(rollModifier), 0, false, false, campaign.getLocalDate()
-                        );
+                        boolean wasScoutingSuccessful =
+                              !useAdvancedScouting || SkillCheckUtility.performQuickSkillCheck(scout,
+                                    scoutData.skillName(), List.of(rollModifier), 0, false, false,
+                                    campaign.getLocalDate()
+                              );
 
                         // Mark the current coordinate as revealed (count only on success)
                         if (wasScoutingSuccessful) {
@@ -1512,7 +1514,7 @@ public class StratConRulesManager {
                         }
 
                         hexesScouted++;
-                        if (hexesScouted >= scanRangeIncrease) {
+                        if (useAdvancedScouting && (hexesScouted >= scanRangeIncrease)) {
                             break; // Stop scouting after reaching per-scout limit
                         }
                     }
