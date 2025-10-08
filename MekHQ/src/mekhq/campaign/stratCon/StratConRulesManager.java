@@ -1522,40 +1522,30 @@ public class StratConRulesManager {
     }
 
     /**
-     * Returns a {@link TargetRollModifier} based on the weight of a unit.
+     * Returns a TargetRollModifier based on the provided unit weight. Lighter units gain bonuses, heavier units gain
+     * penalties.
      *
-     * <p>The modifier decreases as unit weight increases, providing lighter units with a scouting advantage and
-     * heavier units with a penalty.</p>
+     * @param unitWeight the unit's weight in tons
      *
-     * <p>Weight brackets are compared in order, and the first matching bracket determines the returned modifier:</p>
-     * <ul>
-     *     <li>< 35 tons: -2 modifier</li>
-     *     <li>< 55 tons: 0 modifier</li>
-     *     <li>< 75 tons: +2 modifier</li>
-     *     <li>< 100 tons: +4 modifier</li>
-     *     <li>> 100 tons+: +6 modifier</li>
-     * </ul>
-     *
-     * @param unitWeight the weight of the unit in tons
-     *
-     * @return a {@link TargetRollModifier} representing the unit's weight bracket for scouting checks
+     * @return appropriate TargetRollModifier for the weight bracket
      *
      * @author Illiani
      * @since 0.50.07
      */
     private static TargetRollModifier getUnitWeightModifier(double unitWeight) {
-        final double[] unitWeightLimits = { 35, 55, 75, 100, 135 };
-        final int[] unitWeightModifiers = { -2, 0, 2, 4, 6 };
+        int modifier = 6; // default for anything greater than 100t
 
-        int unitWeightModifier = 6;
-        for (int i = 0; i < unitWeightLimits.length; i++) {
-            if (unitWeight < unitWeightLimits[i]) {
-                unitWeightModifier = unitWeightModifiers[i];
-                break;
-            }
+        if (unitWeight <= 35) {
+            modifier = -2;
+        } else if (unitWeight <= 55) {
+            modifier = 0;
+        } else if (unitWeight <= 75) {
+            modifier = 2;
+        } else if (unitWeight <= 100) {
+            modifier = 4;
         }
 
-        return new TargetRollModifier(unitWeightModifier, "Unit Weight Modifier");
+        return new TargetRollModifier(modifier, "Unit Weight Modifier");
     }
 
     /**
