@@ -52,6 +52,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.common.event.Subscribe;
+import megamek.utilities.ImageUtilities;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -179,7 +180,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblIcon = new JLabel();
         lblIcon.getAccessibleContext().setAccessibleName("Player Camouflage");
         panIcon.add(lblIcon, BorderLayout.CENTER);
-        lblIcon.setIcon(getCampaign().getUnitIcon().getImageIcon(150));
+        ImageIcon icon = getCampaign().getCampaignFactionIcon();
+        icon = ImageUtilities.scaleImageIcon(icon, 150, true);
+        lblIcon.setIcon(icon);
 
         /* Set overall layout */
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -852,7 +855,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnUnitRating.setVisible(evt.getOptions().getUnitRatingMethod().isEnabled());
         basicInfoScheduler.schedule();
         procurementListScheduler.schedule();
-        lblIcon.setIcon(getCampaign().getUnitIcon().getImageIcon(150));
+        ImageIcon icon = getCampaign().getCampaignFactionIcon();
+        icon = ImageUtilities.scaleImageIcon(icon, 150, true);
+        lblIcon.setIcon(icon);
     }
 
     @Subscribe
