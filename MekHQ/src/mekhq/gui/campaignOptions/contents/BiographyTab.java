@@ -129,6 +129,7 @@ public class BiographyTab {
     private JPanel pnlRandomBackgrounds;
     private JCheckBox chkUseRandomPersonalities;
     private JCheckBox chkUseRandomPersonalityReputation;
+    private JCheckBox chkUseReasoningXpMultiplier;
     private JCheckBox chkUseSimulatedRelationships;
     private JPanel pnlRandomOriginOptions;
     private JCheckBox chkRandomizeOrigin;
@@ -345,6 +346,7 @@ public class BiographyTab {
         pnlRandomBackgrounds = new JPanel();
         chkUseRandomPersonalities = new JCheckBox();
         chkUseRandomPersonalityReputation = new JCheckBox();
+        chkUseReasoningXpMultiplier = new JCheckBox();
         chkUseSimulatedRelationships = new JCheckBox();
 
         pnlRandomOriginOptions = new JPanel();
@@ -668,6 +670,9 @@ public class BiographyTab {
         chkUseRandomPersonalityReputation = new CampaignOptionsCheckBox("UseRandomPersonalityReputation");
         chkUseRandomPersonalityReputation.addMouseListener(createTipPanelUpdater(backgroundHeader,
               "UseRandomPersonalityReputation"));
+        chkUseReasoningXpMultiplier = new CampaignOptionsCheckBox("UseReasoningXpMultiplier");
+        chkUseReasoningXpMultiplier.addMouseListener(createTipPanelUpdater(backgroundHeader,
+              "UseReasoningXpMultiplier"));
         chkUseSimulatedRelationships = new CampaignOptionsCheckBox("UseSimulatedRelationships");
         chkUseSimulatedRelationships.addMouseListener(createTipPanelUpdater(backgroundHeader,
               "UseSimulatedRelationships"));
@@ -683,6 +688,9 @@ public class BiographyTab {
 
         layout.gridy++;
         panel.add(chkUseRandomPersonalityReputation, layout);
+
+        layout.gridy++;
+        panel.add(chkUseReasoningXpMultiplier, layout);
 
         layout.gridy++;
         panel.add(chkUseSimulatedRelationships, layout);
@@ -1533,6 +1541,7 @@ public class BiographyTab {
         // Backgrounds
         chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
         chkUseRandomPersonalityReputation.setSelected(options.isUseRandomPersonalityReputation());
+        chkUseReasoningXpMultiplier.setSelected(options.isUseReasoningXpMultiplier());
         chkUseSimulatedRelationships.setSelected(options.isUseSimulatedRelationships());
         chkRandomizeOrigin.setSelected(originOptions.isRandomizeOrigin());
         chkRandomizeDependentsOrigin.setSelected(originOptions.isRandomizeDependentOrigin());
@@ -1633,6 +1642,7 @@ public class BiographyTab {
         // Backgrounds
         options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());
         options.setUseRandomPersonalityReputation(chkUseRandomPersonalityReputation.isSelected());
+        options.setUseReasoningXpMultiplier(chkUseReasoningXpMultiplier.isSelected());
         options.setUseSimulatedRelationships(chkUseSimulatedRelationships.isSelected());
 
         originOptions.setRandomizeOrigin(chkRandomizeOrigin.isSelected());

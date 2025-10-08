@@ -97,6 +97,7 @@ import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
 import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -185,6 +186,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JSpinner spnSocial;
     private MMComboBox<PersonalityQuirk> comboPersonalityQuirk;
     private JSpinner spnPersonalityQuirk;
+    private MMComboBox<Reasoning> comboReasoning;
 
     // Other
     private JCheckBox chkDarkSecretRevealed;
@@ -1168,6 +1170,28 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             panDemographics.add(spnPersonalityQuirk, gridBagConstraints);
 
             y++;
+
+            JLabel labelReasoning = new JLabel();
+            labelReasoning.setText("Reasoning:");
+            labelReasoning.setName("labelReasoning");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemographics.add(labelReasoning, gridBagConstraints);
+
+            comboReasoning = new MMComboBox<>("comboReasoning", Reasoning.values());
+            comboReasoning.setSelectedItem(person.getReasoning());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemographics.add(comboReasoning, gridBagConstraints);
+
+            y++;
         }
 
         if (person.hasDarkSecret()) {
@@ -1532,6 +1556,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
             person.setPersonalityQuirkDescriptionIndex((int) spnPersonalityQuirk.getValue());
+            
+            person.setReasoning(comboReasoning.getSelectedItem());
 
             writePersonalityDescription(person);
             writeInterviewersNotes(person);

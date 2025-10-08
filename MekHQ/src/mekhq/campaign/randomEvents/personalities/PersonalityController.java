@@ -95,36 +95,47 @@ public class PersonalityController {
         possibleTraits.add(PersonalityTraitType.SOCIAL);
         possibleTraits.add(PersonalityTraitType.PERSONALITY_QUIRK);
 
-        PersonalityTraitType pickedTrait = ObjectUtility.getRandomItem(possibleTraits);
-        switch (pickedTrait) {
-            case AGGRESSION -> {
-                String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
-                person.setAggression(Aggression.fromString(traitIndex));
-                person.setAggressionDescriptionIndex(randomInt(Aggression.MAXIMUM_VARIATIONS));
+        int iterations = 2;
+
+        while (iterations != 0 && !possibleTraits.isEmpty()) {
+            PersonalityTraitType pickedTrait = ObjectUtility.getRandomItem(possibleTraits);
+            possibleTraits.remove(pickedTrait);
+            iterations--;
+
+            switch (pickedTrait) {
+                case AGGRESSION -> {
+                    String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
+                    person.setAggression(Aggression.fromString(traitIndex));
+                    person.setAggressionDescriptionIndex(randomInt(Aggression.MAXIMUM_VARIATIONS));
+                }
+                case AMBITION -> {
+                    String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
+                    person.setAmbition(Ambition.fromString(traitIndex));
+                    person.setAmbitionDescriptionIndex(randomInt(Ambition.MAXIMUM_VARIATIONS));
+                }
+                case GREED -> {
+                    String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
+                    person.setGreed(Greed.fromString(traitIndex));
+                    person.setGreedDescriptionIndex(randomInt(Greed.MAXIMUM_VARIATIONS));
+                }
+                case SOCIAL -> {
+                    String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
+                    person.setSocial(Social.fromString(traitIndex));
+                    person.setSocialDescriptionIndex(randomInt(Social.MAXIMUM_VARIATIONS));
+                }
+                case PERSONALITY_QUIRK -> {
+                    int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
+                    String traitIndex = String.valueOf(traitRoll);
+                    person.setPersonalityQuirk(PersonalityQuirk.fromString(traitIndex));
+                    person.setPersonalityQuirkDescriptionIndex(randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS));
+                }
+                default -> {}
             }
-            case AMBITION -> {
-                String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
-                person.setAmbition(Ambition.fromString(traitIndex));
-                person.setAmbitionDescriptionIndex(randomInt(Ambition.MAXIMUM_VARIATIONS));
-            }
-            case GREED -> {
-                String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
-                person.setGreed(Greed.fromString(traitIndex));
-                person.setGreedDescriptionIndex(randomInt(Greed.MAXIMUM_VARIATIONS));
-            }
-            case SOCIAL -> {
-                String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
-                person.setSocial(Social.fromString(traitIndex));
-                person.setSocialDescriptionIndex(randomInt(Social.MAXIMUM_VARIATIONS));
-            }
-            case PERSONALITY_QUIRK -> {
-                int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
-                String traitIndex = String.valueOf(traitRoll);
-                person.setPersonalityQuirk(PersonalityQuirk.fromString(traitIndex));
-                person.setPersonalityQuirkDescriptionIndex(randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS));
-            }
-            default -> {}
         }
+
+        // Always generate Reasoning
+        int reasoningRoll = randomInt(8346);
+        person.setReasoning(generateReasoning(reasoningRoll));
 
         // finally, write the description
         writePersonalityDescription(person);
@@ -147,6 +158,7 @@ public class PersonalityController {
         person.setAmbition(Ambition.NONE);
         person.setGreed(Greed.NONE);
         person.setSocial(Social.NONE);
+        person.setReasoning(Reasoning.AVERAGE);
         person.setPersonalityQuirk(PersonalityQuirk.NONE);
     }
 
@@ -316,7 +328,11 @@ public class PersonalityController {
 
         // Reasoning and personality quirk are handled differently to general personality traits.
         // Build the description proper
+        Reasoning reasoning = person.getReasoning();
+        String examResults = reasoning.getExamResults();
         StringBuilder interviewersNotes = new StringBuilder("<html>");
+
+        interviewersNotes.append(examResults);
 
         for (String note : notes) {
             interviewersNotes.append("<br>- ").append(note);
@@ -454,7 +470,6 @@ public class PersonalityController {
      *
      * @throws IllegalStateException if the roll exceeds the expected value range
      */
-    @Deprecated(since = "0.50.07", forRemoval = true)
     public static Reasoning generateReasoning(int roll) {
         if (roll < 1) {
             return BRAIN_DEAD;
