@@ -131,6 +131,7 @@ public class CampaignOptions {
     private boolean assignedTechFirst;
     private boolean resetToFirstTech;
     private boolean techsUseAdministration;
+    private boolean useUsefulAsTechs;
     private boolean useQuirks;
     private boolean useAeroSystemHits;
     private boolean destroyByMargin;
@@ -265,9 +266,11 @@ public class CampaignOptions {
     private boolean tougherHealing;
     private int maximumPatients;
     private boolean doctorsUseAdministration;
+    private boolean useUsefulMedics;
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
+    private boolean useFunctionalEscapeArtist;
 
     // Dependent
     private boolean useRandomDependentAddition;
@@ -680,6 +683,7 @@ public class CampaignOptions {
         assignedTechFirst = false;
         resetToFirstTech = false;
         techsUseAdministration = false;
+        useUsefulAsTechs = false;
         useQuirks = false;
         useAeroSystemHits = false;
         destroyByMargin = false;
@@ -830,9 +834,11 @@ public class CampaignOptions {
         setTougherHealing(false);
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
+        useUsefulMedics = false;
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
+        useFunctionalEscapeArtist = false;
 
         // Dependent
         setUseRandomDependentAddition(false);
@@ -1976,6 +1982,14 @@ public class CampaignOptions {
         this.doctorsUseAdministration = doctorsUseAdministration;
     }
 
+    public boolean isUseUsefulMedics() {
+        return useUsefulMedics;
+    }
+
+    public void setIsUseUsefulMedics(final boolean useUsefulMedics) {
+        this.useUsefulMedics = useUsefulMedics;
+    }
+
     // endregion Medical
 
     // region Prisoners
@@ -1985,6 +1999,14 @@ public class CampaignOptions {
 
     public void setPrisonerCaptureStyle(final PrisonerCaptureStyle prisonerCaptureStyle) {
         this.prisonerCaptureStyle = prisonerCaptureStyle;
+    }
+
+    public boolean isUseFunctionalEscapeArtist() {
+        return useFunctionalEscapeArtist;
+    }
+
+    public void setUseFunctionalEscapeArtist(final boolean useFunctionalEscapeArtist) {
+        this.useFunctionalEscapeArtist = useFunctionalEscapeArtist;
     }
     // endregion Prisoners
 
@@ -3884,6 +3906,14 @@ public class CampaignOptions {
      */
     public void setTechsUseAdministration(final boolean techsUseAdministration) {
         this.techsUseAdministration = techsUseAdministration;
+    }
+
+    public boolean isUseUsefulAsTechs() {
+        return useUsefulAsTechs;
+    }
+
+    public void setIsUseUsefulAsTechs(final boolean useUsefulAsTechs) {
+        this.useUsefulAsTechs = useUsefulAsTechs;
     }
 
     /**

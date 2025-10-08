@@ -130,6 +130,7 @@ public class CampaignOptionsUnmarshaller {
             case "assignedTechFirst" -> campaignOptions.setAssignedTechFirst(parseBoolean(nodeContents));
             case "resetToFirstTech" -> campaignOptions.setResetToFirstTech(parseBoolean(nodeContents));
             case "techsUseAdministration" -> campaignOptions.setTechsUseAdministration(parseBoolean(nodeContents));
+            case "useUsefulAsTechs" -> campaignOptions.setIsUseUsefulAsTechs(parseBoolean(nodeContents));
             case "useQuirks" -> campaignOptions.setQuirks(parseBoolean(nodeContents));
             case "xpCostMultiplier" -> campaignOptions.setXpCostMultiplier(parseDouble(nodeContents));
             case "scenarioXP" -> campaignOptions.setScenarioXP(parseInt(nodeContents));
@@ -356,7 +357,10 @@ public class CampaignOptionsUnmarshaller {
             case "maximumPatients" -> campaignOptions.setMaximumPatients(parseInt(nodeContents));
             case "doctorsUseAdministration" -> campaignOptions.setDoctorsUseAdministration(parseBoolean(
                   nodeContents));
+            case "useUsefulMedics" -> campaignOptions.setIsUseUsefulMedics(parseBoolean(nodeContents));
             case "prisonerCaptureStyle" -> campaignOptions.setPrisonerCaptureStyle(PrisonerCaptureStyle.fromString(
+                  nodeContents));
+            case "useFunctionalEscapeArtist" -> campaignOptions.setUseFunctionalEscapeArtist(parseBoolean(
                   nodeContents));
             case "useRandomDependentAddition" -> campaignOptions.setUseRandomDependentAddition(parseBoolean(
                   nodeContents));
