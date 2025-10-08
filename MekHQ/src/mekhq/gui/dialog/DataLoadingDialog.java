@@ -70,6 +70,7 @@ import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
@@ -374,10 +375,12 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.setReputation(reputationController);
 
                 // initialize starting faction standings
-                if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+                CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                if (campaignOptions.isTrackFactionStanding()) {
                     FactionStandings factionStandings = campaign.getFactionStandings();
                     String report = factionStandings.updateClimateRegard(campaign.getFaction(),
-                          campaign.getLocalDate(), campaign.getCampaignOptions().getRegardMultiplier());
+                          campaign.getLocalDate(), campaignOptions.getRegardMultiplier(),
+                          true);
                     campaign.addReport(report);
                 }
                 // endregion Progress 6
@@ -389,25 +392,25 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                                            "</b>");
 
                 // Setup Personnel Modules
-                campaign.setMarriage(campaign.getCampaignOptions()
+                campaign.setMarriage(campaignOptions
                                            .getRandomMarriageMethod()
-                                           .getMethod(campaign.getCampaignOptions()));
-                campaign.setDivorce(campaign.getCampaignOptions()
+                                           .getMethod(campaignOptions));
+                campaign.setDivorce(campaignOptions
                                           .getRandomDivorceMethod()
-                                          .getMethod(campaign.getCampaignOptions()));
-                campaign.setProcreation(campaign.getCampaignOptions()
+                                          .getMethod(campaignOptions));
+                campaign.setProcreation(campaignOptions
                                               .getRandomProcreationMethod()
-                                              .getMethod(campaign.getCampaignOptions()));
+                                              .getMethod(campaignOptions));
 
                 // Setup Markets
                 campaign.refreshPersonnelMarkets(true);
-                ContractMarketMethod contractMarketMethod = campaign.getCampaignOptions().getContractMarketMethod();
+                ContractMarketMethod contractMarketMethod = campaignOptions.getContractMarketMethod();
                 campaign.setContractMarket(contractMarketMethod.getContractMarket());
                 if (!contractMarketMethod.isNone()) {
                     campaign.getContractMarket().generateContractOffers(campaign, true);
                 }
-                if (!campaign.getCampaignOptions().getUnitMarketMethod().isNone()) {
-                    campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
+                if (!campaignOptions.getUnitMarketMethod().isNone()) {
+                    campaign.setUnitMarket(campaignOptions.getUnitMarketMethod().getUnitMarket());
                     campaign.getUnitMarket().generateUnitOffers(campaign);
                 }
 
@@ -419,7 +422,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.setGMMode((preset == null) || preset.isGM());
 
                 // AtB
-                if (campaign.getCampaignOptions().isUseAtB()) {
+                if (campaignOptions.isUseAtB()) {
                     campaign.initAtB(true);
                 }
 

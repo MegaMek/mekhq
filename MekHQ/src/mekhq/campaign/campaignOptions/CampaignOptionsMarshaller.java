@@ -275,6 +275,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayScenarioLog", campaignOptions.isDisplayScenarioLog());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayKillRecord", campaignOptions.isDisplayKillRecord());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayMedicalRecord", campaignOptions.isDisplayMedicalRecord());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayPatientRecord", campaignOptions.isDisplayPatientRecord());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "displayAssignmentRecord",
@@ -1066,6 +1067,10 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePortraitForType", campaignOptions.isUsePortraitForRoles());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackFactionStanding", campaignOptions.isTrackFactionStanding());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "trackClimateRegardChanges",
+              campaignOptions.isTrackClimateRegardChanges());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "useFactionStandingNegotiation",

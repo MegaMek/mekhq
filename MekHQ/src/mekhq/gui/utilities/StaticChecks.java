@@ -353,6 +353,10 @@ public class StaticChecks {
         return Arrays.stream(people).allMatch(p -> p.getStatus().isActive());
     }
 
+    public static boolean areAllActiveFlexible(Person... people) {
+        return Arrays.stream(people).allMatch(p -> p.getStatus().isActiveFlexible());
+    }
+
     public static boolean areAnyActive(Person... people) {
         return Stream.of(people).anyMatch(p -> p.getStatus().isActive());
     }

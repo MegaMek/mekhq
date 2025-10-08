@@ -94,7 +94,7 @@ class RandomDependentsTest {
             activeNonDependent.add(nonDependent);
         }
         activeNonDependent.addAll(activeDependents);
-        when(mockCampaign.getActivePersonnel(false)).thenReturn(activeNonDependent);
+        when(mockCampaign.getActivePersonnel(false, false)).thenReturn(activeNonDependent);
 
         // Act
         RandomDependents randomDependents = new RandomDependents(mockCampaign);
@@ -129,7 +129,7 @@ class RandomDependentsTest {
 
             activeNonDependent.add(nonDependent);
         }
-        when(mockCampaign.getActivePersonnel(true)).thenReturn(activeNonDependent);
+        when(mockCampaign.getActivePersonnel(true, true)).thenReturn(activeNonDependent);
 
         // Act
         RandomDependents randomDependents = new RandomDependents(mockCampaign);

@@ -285,7 +285,7 @@ public class DialogItinerary {
         int rationPacks = 0;
         int medicalSupplies = 0;
 
-        for (Person person : campaign.getActivePersonnel(true)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             PersonnelRole primaryRole = person.getPrimaryRole();
             PersonnelRole secondaryRole = person.getSecondaryRole();
 

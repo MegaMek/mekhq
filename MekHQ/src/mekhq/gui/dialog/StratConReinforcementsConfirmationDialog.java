@@ -181,7 +181,7 @@ public class StratConReinforcementsConfirmationDialog {
         final List<PersonnelRole> TACTICAL_PROFESSIONS = List.of(MILITARY_ANALYST, MILITARY_THEORIST,
               TACTICAL_ANALYST, INTELLIGENCE_ANALYST);
         Person speaker = null;
-        for (Person potentialSpeaker : campaign.getActivePersonnel(false)) {
+        for (Person potentialSpeaker : campaign.getActivePersonnel(false, false)) {
             if (!potentialSpeaker.isEmployed()) {
                 continue;
             }
