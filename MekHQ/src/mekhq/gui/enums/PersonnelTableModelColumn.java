@@ -60,6 +60,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
+import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
@@ -116,6 +117,7 @@ public enum PersonnelTableModelColumn {
     TACTICS("PersonnelTableModelColumn.TACTICS.text"),
     STRATEGY("PersonnelTableModelColumn.STRATEGY.text"),
     LEADERSHIP("PersonnelTableModelColumn.LEADERSHIP.text"),
+    SCOUTING("PersonnelTableModelColumn.SCOUTING.text"),
     ASTECH("PersonnelTableModelColumn.ASTECH.text"),
     TECH_MEK("PersonnelTableModelColumn.TECH_MEK.text"),
     TECH_AERO("PersonnelTableModelColumn.TECH_AERO.text"),
@@ -329,6 +331,10 @@ public enum PersonnelTableModelColumn {
 
     public boolean isLeadership() {
         return this == LEADERSHIP;
+    }
+
+    public boolean isScouting() {
+        return this == SCOUTING;
     }
 
     public boolean isAsTech() {
@@ -887,6 +893,11 @@ public enum PersonnelTableModelColumn {
                              Integer.toString(person.getSkill(SkillType.S_LEADER)
                                                     .getFinalSkillValue(options, attributes, adjustedReputation)) :
                              "-";
+            case SCOUTING:
+                String scoutingSkillName = ScoutingSkills.getBestScoutingSkill(person);
+                return scoutingSkillName == null ? "-" :
+                             Integer.toString(person.getSkill(scoutingSkillName)
+                                                    .getFinalSkillValue(options, attributes, adjustedReputation));
             case ASTECH:
                 return person.hasSkill(SkillType.S_ASTECH) ?
                              Integer.toString(person.getSkill(SkillType.S_ASTECH)
@@ -1212,7 +1223,8 @@ public enum PersonnelTableModelColumn {
                 default -> false;
             };
             case TACTICAL_SKILLS -> switch (this) {
-                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, TACTICS, STRATEGY, LEADERSHIP, NAVIGATION -> true;
+                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, TACTICS, STRATEGY, LEADERSHIP, NAVIGATION, SCOUTING ->
+                      true;
                 default -> false;
             };
             case TECHNICAL_SKILLS -> switch (this) {
@@ -1356,6 +1368,7 @@ public enum PersonnelTableModelColumn {
                  TACTICS,
                  STRATEGY,
                  LEADERSHIP,
+                 SCOUTING,
                  ASTECH,
                  TECH_MEK,
                  TECH_AERO,
