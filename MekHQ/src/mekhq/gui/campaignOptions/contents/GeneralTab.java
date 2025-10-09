@@ -45,7 +45,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
-import java.util.Random;
+import java.util.List;
 import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
@@ -60,6 +60,7 @@ import javax.swing.SwingConstants;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
 import megamek.client.ui.util.UIUtil;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.DateUtilities;
@@ -203,8 +204,10 @@ public class GeneralTab {
         // Randomize faction
         btnRandomFaction = new CampaignOptionsButton("RandomFaction");
         btnRandomFaction.addActionListener(e -> {
-            FactionDisplay factionDisplay = pickRandomFaction();
-            comboFaction.setSelectedItem(factionDisplay);
+            FactionDisplay randomFaction = pickRandomFaction();
+            if (randomFaction != null) {
+                comboFaction.setSelectedItem(randomFaction);
+            }
         });
 
         // Date
@@ -407,14 +410,9 @@ public class GeneralTab {
      * @since 0.50.07
      */
     private @Nullable FactionDisplay pickRandomFaction() {
-        DefaultComboBoxModel<FactionDisplay> model = buildFactionDisplayOptions();
-
-        if (model.getSize() > 0) {
-            int randomIndex = new Random().nextInt(model.getSize());
-            return model.getElementAt(randomIndex);
-        }
-
-        return null;
+        List<FactionDisplay> factionOptions = FactionDisplay.getSortedValidFactionDisplays(
+              Factions.getInstance().getChoosableFactions(), date);
+        return ObjectUtility.getRandomItem(factionOptions);
     }
 
     /**
