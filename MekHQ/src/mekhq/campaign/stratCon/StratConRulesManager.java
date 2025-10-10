@@ -73,6 +73,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Minefield;
 import megamek.common.event.Subscribe;
@@ -108,12 +109,15 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.EntityUtilities;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.math3.util.Pair;
 
@@ -1401,22 +1405,15 @@ public class StratConRulesManager {
         // we want to ensure we only increase Fatigue once
         boolean hasFatigueIncreased = false;
 
-        // BFS queue for coordinates, tracks distance from the starting point
-        Queue<Pair<StratConCoords, Integer>> queue = new LinkedList<>();
         // Keep a set of visited coordinates to avoid redundancy
         Set<StratConCoords> visited = new HashSet<>();
-
-        // Start with the initial deployment coordinate at distance 0
-        queue.add(new Pair<>(coords, 0));
         visited.add(coords);
 
         // Determine scan range
-        int scanRange = track.getScanRangeIncrease();
-
+        int scanRangeIncrease = track.getScanRangeIncrease();
         CombatTeam combatTeam = campaign.getCombatTeamsTable().get(forceID);
-
         if (combatTeam != null && combatTeam.getRole().isPatrol()) {
-            scanRange++;
+            scanRangeIncrease++;
         }
 
         // Process starting point
@@ -1454,43 +1451,190 @@ public class StratConRulesManager {
             return;
         }
 
-        // Traverse neighboring coordinates up to the specified distance
-        while (!queue.isEmpty()) {
-            Pair<StratConCoords, Integer> current = queue.poll();
-            StratConCoords currentCoords = current.getKey();
-            int distance = current.getValue();
+        // Build a map of scouts and whether they're in light units
+        Force force = campaign.getForce(forceID);
+        Hangar hangar = campaign.getHangar();
+        List<ScoutRecord> scouts = force == null ? new ArrayList<>() : buildScoutMap(force, hangar);
 
-            // Only process neighbors if they're within the max distance
-            if (distance < scanRange) {
-                for (int direction = 0; direction < 6; direction++) {
-                    StratConCoords checkCoords = currentCoords.translate(direction);
+        boolean useAdvancedScouting = campaign.getCampaignOptions().isUseAdvancedScouting();
+        // Each scout may scan up to scanMultiplier hexes
+        for (ScoutRecord scoutData : scouts) {
+            Person scout = scoutData.scout();
+            int hexesScouted = 0;
 
-                    // Skip already visited coordinates
-                    if (visited.contains(checkCoords)) {
-                        continue;
+            // Set up per-scout BFS structures (do not revisit global revealed or visited hexes)
+            Queue<Pair<StratConCoords, Integer>> scoutQueue = new LinkedList<>();
+            Set<StratConCoords> scoutVisited = new HashSet<>(visited);
+
+            scoutQueue.add(new Pair<>(coords, 0));
+            scoutVisited.add(coords);
+
+            while (!scoutQueue.isEmpty() && hexesScouted < scanRangeIncrease) {
+                Pair<StratConCoords, Integer> current = scoutQueue.poll();
+                StratConCoords currentCoords = current.getKey();
+                int distance = current.getValue();
+
+                // Only process neighbors if they're within the max distance
+                if (distance < scanRangeIncrease) {
+                    for (int direction = 0; direction < 6; direction++) {
+                        StratConCoords checkCoords = currentCoords.translate(direction);
+
+                        // Skip already visited coordinates (refer to per-scout AND global)
+                        if (scoutVisited.contains(checkCoords) || visited.contains(checkCoords)) {
+                            continue;
+                        }
+
+                        TargetRollModifier weightModifier = getUnitWeightModifier(scoutData.entityWeight());
+                        TargetRollModifier sensorsModifier = new TargetRollModifier((scoutData.hasSensorEquipment() ?
+                                                                                           -1 :
+                                                                                           0),
+                              "Unit Sensors");
+                        boolean wasScoutingSuccessful =
+                              !useAdvancedScouting || SkillCheckUtility.performQuickSkillCheck(scout,
+                                    scoutData.skillName(), List.of(weightModifier, sensorsModifier), 0, false, false,
+                                    campaign.getLocalDate()
+                              );
+
+                        // Mark the current coordinate as revealed (count only on success)
+                        if (wasScoutingSuccessful) {
+                            // Process facilities
+                            targetFacility = track.getFacility(checkCoords);
+                            if (targetFacility != null) {
+                                targetFacility.setVisible(true);
+                            }
+
+                            // Increase fatigue only once
+                            if (!track.getRevealedCoords().contains(checkCoords) && !hasFatigueIncreased) {
+                                increaseFatigue(forceID, campaign);
+                                hasFatigueIncreased = true;
+                            }
+
+                            track.getRevealedCoords().add(checkCoords);
+
+                            // Mark as visited in both sets
+                            scoutVisited.add(checkCoords);
+                            visited.add(checkCoords);
+                            scoutQueue.add(new Pair<>(checkCoords,
+                                  distance + 1)); // Add the neighbor with incremented distance
+                        }
+
+                        hexesScouted++;
+                        if (useAdvancedScouting && (hexesScouted >= scanRangeIncrease)) {
+                            break; // Stop scouting after reaching per-scout limit
+                        }
                     }
-
-                    // Mark as visited
-                    visited.add(checkCoords);
-                    queue.add(new Pair<>(checkCoords, distance + 1)); // Add the neighbor with incremented distance
-
-                    // Process facilities
-                    targetFacility = track.getFacility(checkCoords);
-                    if (targetFacility != null) {
-                        targetFacility.setVisible(true);
-                    }
-
-                    // Increase fatigue only once
-                    if (!track.getRevealedCoords().contains(checkCoords) && !hasFatigueIncreased) {
-                        increaseFatigue(forceID, campaign);
-                        hasFatigueIncreased = true;
-                    }
-
-                    // Mark the current coordinate as revealed
-                    track.getRevealedCoords().add(checkCoords);
                 }
             }
         }
+    }
+
+    /**
+     * Returns a TargetRollModifier based on the provided unit weight. Lighter units gain bonuses, heavier units gain
+     * penalties.
+     *
+     * @param unitWeight the unit's weight in tons
+     *
+     * @return appropriate TargetRollModifier for the weight bracket
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static TargetRollModifier getUnitWeightModifier(double unitWeight) {
+        int modifier = 6; // default for anything greater than 100t
+
+        if (unitWeight <= 35) {
+            modifier = -2;
+        } else if (unitWeight <= 55) {
+            modifier = 0;
+        } else if (unitWeight <= 75) {
+            modifier = 2;
+        } else if (unitWeight <= 100) {
+            modifier = 4;
+        }
+
+        return new TargetRollModifier(modifier, "Unit Weight Modifier");
+    }
+
+    /**
+     * Builds and returns a list of {@link ScoutRecord} instances representing the best scout for each unit in the given
+     * force.
+     *
+     * <p>For each unit retrieved from the {@code Force}, this method examines all crew members to determine which
+     * has the highest scouting-related skill (as evaluated by
+     * {@link ScoutingSkills#getBestScoutingSkill(Person)}).</p>
+     *
+     * <p>The crew member with the highest skill level becomes the designated scout for that unit. The method also
+     * determines whether each unit is a "light unit" based on its weight class.</p>
+     *
+     * <p>All such {@link ScoutRecord} entries are collected, sorted in descending order of scout skill level, and
+     * returned as a list. Units with no crew are logged and skipped.</p>
+     *
+     * @param force  the {@link Force} containing units to evaluate
+     * @param hangar the {@link Hangar} used to help retrieve units from the force
+     *
+     * @return a list of {@link ScoutRecord} objects, each representing the best scout and their skill details for a
+     *       unit, sorted from the highest to lowest scout skill level
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static List<ScoutRecord> buildScoutMap(Force force, Hangar hangar) {
+        List<ScoutRecord> scouts = new ArrayList<>();
+        for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+            boolean hasSensorEquipment = false;
+            Entity entity = unit.getEntity();
+            if (entity != null) {
+                boolean hasImprovedSensors = EntityUtilities.hasImprovedSensors(entity);
+                boolean hasActiveProbe = EntityUtilities.hasActiveProbe(entity);
+                hasSensorEquipment = hasImprovedSensors || hasActiveProbe;
+            }
+
+            List<Person> unitCrew = unit.getCrew();
+            if (unitCrew.isEmpty()) {
+                LOGGER.info("No crew for unit: {} {}", unit.getName(), unit.getId());
+                continue;
+            }
+
+            // Find the best scout in this unit, if any
+            Person bestScout = null;
+            String bestScoutSkillName = SkillType.S_SENSOR_OPERATIONS;
+            int bestScoutSkillLevel = -1;
+            for (Person crewMember : unitCrew) {
+                if (bestScout == null) {
+                    bestScout = crewMember;
+                }
+
+                String scoutSkillName = ScoutingSkills.getBestScoutingSkill(crewMember);
+                if (scoutSkillName == null) {
+                    continue;
+                }
+
+                Skill scoutSkill = crewMember.getSkill(scoutSkillName);
+                int scoutSkillLevel = (scoutSkill == null) ? -1 :
+                                            scoutSkill.getTotalSkillLevel(crewMember.getOptions(),
+                                                  crewMember.getATOWAttributes());
+                if (scoutSkillLevel > bestScoutSkillLevel) {
+                    bestScout = crewMember;
+                    bestScoutSkillName = scoutSkillName;
+                    bestScoutSkillLevel = scoutSkillLevel;
+                }
+            }
+
+            double weight = 200.0;
+            if (entity != null) {
+                weight = entity.getWeight();
+            }
+
+            ScoutRecord scoutRecord = new ScoutRecord(bestScout, bestScoutSkillName, bestScoutSkillLevel, weight,
+                  hasSensorEquipment);
+            LOGGER.info("Unit {} has best scout: {} with skill {} at level {} and is weight: {}t",
+                  unit.getId(), bestScout, bestScoutSkillName, bestScoutSkillLevel, weight);
+            scouts.add(scoutRecord);
+        }
+
+        // Sort scouts by the skill level of their best scout skill, the highest first
+        scouts.sort(Comparator.comparingInt(ScoutRecord::scoutSkillLevel).reversed());
+        return scouts;
     }
 
     /**

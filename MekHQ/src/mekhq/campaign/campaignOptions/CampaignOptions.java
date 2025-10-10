@@ -599,6 +599,7 @@ public class CampaignOptions {
     // region Against the Bot Tab
     private boolean useAtB;
     private boolean useStratCon;
+    private boolean useAdvancedScouting;
     private SkillLevel skillLevel;
 
     // Unit Administration
@@ -1237,6 +1238,7 @@ public class CampaignOptions {
         // region Against the Bot Tab
         useAtB = false;
         useStratCon = false;
+        useAdvancedScouting = false;
         setSkillLevel(SkillLevel.REGULAR);
         autoResolveMethod = AutoResolveMethod.PRINCESS;
         autoResolveVictoryChanceEnabled = false;
@@ -4587,6 +4589,14 @@ public class CampaignOptions {
 
     public void setUseStratCon(final boolean useStratCon) {
         this.useStratCon = useStratCon;
+    }
+
+    public boolean isUseAdvancedScouting() {
+        return useAdvancedScouting;
+    }
+
+    public void setUseAdvancedScouting(final boolean useAdvancedScouting) {
+        this.useAdvancedScouting = useAdvancedScouting;
     }
 
     public boolean isUseAero() {

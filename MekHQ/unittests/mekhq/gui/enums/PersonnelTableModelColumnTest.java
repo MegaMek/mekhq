@@ -847,6 +847,7 @@ public class PersonnelTableModelColumnTest {
                      TACTICS,
                      STRATEGY,
                      LEADERSHIP,
+                     SCOUTING,
                      ASTECH,
                      TECH_MEK,
                      TECH_AERO,

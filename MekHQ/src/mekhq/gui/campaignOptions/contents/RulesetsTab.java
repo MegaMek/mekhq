@@ -172,6 +172,7 @@ public class RulesetsTab {
     //end Legacy AtB
 
     private JCheckBox chkUseStratCon;
+    private JCheckBox chkUseAdvancedScouting;
     private JCheckBox chkUseGenericBattleValue;
     private JCheckBox chkUseVerboseBidding;
     //end StratCon
@@ -654,6 +655,7 @@ public class RulesetsTab {
      */
     private void initializeStratConTab() {
         chkUseStratCon = new JCheckBox();
+        chkUseAdvancedScouting = new JCheckBox();
         chkUseGenericBattleValue = new JCheckBox();
         chkUseVerboseBidding = new JCheckBox();
     }
@@ -727,6 +729,8 @@ public class RulesetsTab {
         // Content
         chkUseStratCon = new CampaignOptionsCheckBox("UseStratCon");
         chkUseStratCon.addMouseListener(createTipPanelUpdater(stratConHeader, "UseStratCon"));
+        chkUseAdvancedScouting = new CampaignOptionsCheckBox("UseAdvancedScouting");
+        chkUseAdvancedScouting.addMouseListener(createTipPanelUpdater(stratConHeader, "UseAdvancedScouting"));
         chkUseGenericBattleValue = new CampaignOptionsCheckBox("UseGenericBattleValue");
         chkUseGenericBattleValue.addMouseListener(createTipPanelUpdater(stratConHeader, "UseGenericBattleValue"));
         chkUseVerboseBidding = new CampaignOptionsCheckBox("UseVerboseBidding");
@@ -741,8 +745,11 @@ public class RulesetsTab {
         panel.add(stratConHeader, layout);
 
         layout.gridwidth = 1;
+        layout.gridx = 0;
         layout.gridy++;
         panel.add(chkUseStratCon, layout);
+        layout.gridx++;
+        panel.add(chkUseAdvancedScouting, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -1124,6 +1131,7 @@ public class RulesetsTab {
 
         // StratCon
         options.setUseStratCon(chkUseStratCon.isSelected());
+        options.setUseAdvancedScouting(chkUseAdvancedScouting.isSelected());
         options.setUseGenericBattleValue(chkUseGenericBattleValue.isSelected());
         options.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
 
@@ -1196,6 +1204,7 @@ public class RulesetsTab {
 
         // StratCon
         chkUseStratCon.setSelected(options.isUseStratCon());
+        chkUseAdvancedScouting.setSelected(options.isUseAdvancedScouting());
         chkUseGenericBattleValue.setSelected(options.isUseGenericBattleValue());
         chkUseVerboseBidding.setSelected(options.isUseVerboseBidding());
 

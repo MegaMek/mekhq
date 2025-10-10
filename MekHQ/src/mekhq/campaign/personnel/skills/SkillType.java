@@ -148,6 +148,11 @@ public class SkillType {
     public static final String S_FORGERY = "Forgery";
     public static final String S_ACTING = "Acting";
     public static final String S_APPRAISAL = "Appraisal";
+    public static final String S_COMMUNICATIONS = "Communications/Any";
+    public static final String S_PERCEPTION = "Perception";
+    public static final String S_SENSOR_OPERATIONS = "Sensor Operations";
+    public static final String S_STEALTH = "Stealth";
+    public static final String S_TRACKING = "Tracking/Any";
 
     // roleplay skills
     public static final String S_ACROBATICS = "Acrobatics" + RP_ONLY_TAG;
@@ -162,7 +167,6 @@ public class SkillType {
     public static final String S_ART_INSTRUMENT = "Art/Instrument" + RP_ONLY_TAG;
     public static final String S_ART_SINGING = "Art/Singing" + RP_ONLY_TAG;
     public static final String S_ART_OTHER = "Art/Other" + RP_ONLY_TAG;
-    public static final String S_COMMUNICATIONS = "Communications/Any" + RP_ONLY_TAG;
     public static final String S_COMPUTERS = "Computers" + RP_ONLY_TAG;
     public static final String S_CRYPTOGRAPHY = "Cryptography" + RP_ONLY_TAG;
     public static final String S_INTEREST_HISTORY = "Interest/History" + RP_ONLY_TAG;
@@ -191,7 +195,6 @@ public class SkillType {
     public static final String S_INTERROGATION = "Interrogation" + RP_ONLY_TAG;
     public static final String S_INVESTIGATION = "Investigation" + RP_ONLY_TAG;
     public static final String S_LANGUAGES = "Language/Any" + RP_ONLY_TAG;
-    public static final String S_PERCEPTION = "Perception" + RP_ONLY_TAG;
     public static final String S_SLEIGHT_OF_HAND = "Sleight of Hand/Any" + RP_ONLY_TAG;
     public static final String S_PROTOCOLS = "Protocols/Any" + RP_ONLY_TAG;
     public static final String S_SCIENCE_BIOLOGY = "Science/Biology" + RP_ONLY_TAG;
@@ -207,11 +210,8 @@ public class SkillType {
     public static final String S_SCIENCE_OTHER = "Science/Other" + RP_ONLY_TAG;
     public static final String S_SECURITY_SYSTEMS_ELECTRONIC = "Security Systems/Electronic" + RP_ONLY_TAG;
     public static final String S_SECURITY_SYSTEMS_MECHANICAL = "Security Systems/Mechanical" + RP_ONLY_TAG;
-    public static final String S_SENSOR_OPERATIONS = "Sensor Operations" + RP_ONLY_TAG;
-    public static final String S_STEALTH = "Stealth" + RP_ONLY_TAG;
     public static final String S_STREETWISE = "Streetwise/Any" + RP_ONLY_TAG;
     public static final String S_SURVIVAL = "Survival/Any" + RP_ONLY_TAG;
-    public static final String S_TRACKING = "Tracking/Any" + RP_ONLY_TAG;
     public static final String S_CAREER_ANY = "Career/Any" + RP_ONLY_TAG;
     public static final String S_RUNNING = "Running" + RP_ONLY_TAG;
     public static final String S_SWIMMING = "Swimming" + RP_ONLY_TAG;
@@ -470,10 +470,10 @@ public class SkillType {
      *
      *                          <p>For example:</p>
      *                          <pre>
-     *                                                                                                                                                         Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                         SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                         SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                     </pre>
+     *                                                                                                                                                                                                           Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                           SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                           SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                       </pre>
      * @param skillLevelsMatter if {@code true}, the skill's level will be displayed in Person View in addition to the
      *                          skill's Target Number
      *
@@ -1049,7 +1049,7 @@ public class SkillType {
             // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
             case "anti-mech" -> "Anti-Mek (Climbing)"; // <50.07
             case "medtech" -> "MedTech/Any"; // <50.07
-            case "communications (rp only)" -> "Communications/Any" + RP_ONLY_TAG; // <50.07
+            case "communications (rp only)", "communications/any (rp only)" -> "Communications/Any"; // <50.07
             case "sleight of hand (rp only)" -> "Sleight of Hand/Any" + RP_ONLY_TAG; // <50.07
             case "protocols (rp only)" -> "Protocols/Any" + RP_ONLY_TAG; // <50.07
             case "survival" -> "Survival/Any" + RP_ONLY_TAG; // <50.07
@@ -1058,7 +1058,7 @@ public class SkillType {
             case "streetwise (rp only)" -> "Streetwise/Any" + RP_ONLY_TAG; // <50.07
             case "doctor" -> "Surgery/Any"; // <50.07
             case "tactics" -> "Tactics/Any"; // <50.07
-            case "tracking (rp only)" -> "Tracking/Any" + RP_ONLY_TAG; // <50.07
+            case "tracking (rp only)" -> "Tracking/Any"; // <50.07
             case "training (rp only)" -> "Training"; // <50.07
             case "zero-g operations (rp only)" -> "Zero-G Operations"; // <50.07
             case "escape artist (rp only)" -> "Escape Artist"; // <50.07
@@ -1072,6 +1072,9 @@ public class SkillType {
             case "melee weapons (rp only)" -> "Melee Weapons"; // <50.07
             case "support weapons (rp only)" -> "Support Weapons"; // <50.07
             case "thrown weapons (rp only)" -> "Thrown Weapons"; // <50.07
+            case "perception (rp only)" -> "Perception"; // <50.07
+            case "sensor operations (rp only)" -> "Sensor Operations"; // <50.07
+            case "stealth (rp only)" -> "Stealth"; // <50.07
             default -> skillName;
         };
         return skillName;
@@ -1383,7 +1386,7 @@ public class SkillType {
             case S_ART_INSTRUMENT -> createArtInstrument();
             case S_ART_SINGING -> createArtSinging();
             case S_ART_OTHER -> createArtOther();
-            case S_COMMUNICATIONS -> createCommunications();
+            case S_COMMUNICATIONS, "Communications/Any (RP Only)" -> createCommunications();
             case S_COMPUTERS -> createComputers();
             case S_CRYPTOGRAPHY -> createCryptography();
             case S_DEMOLITIONS, "Demolitions (RP Only)" -> createDemolitions();
@@ -1417,7 +1420,7 @@ public class SkillType {
             case S_INVESTIGATION -> createInvestigation();
             case S_LANGUAGES -> createLanguage();
             case S_MARTIAL_ARTS, "Martial Arts (RP Only)" -> createMartialArts();
-            case S_PERCEPTION -> createPerception();
+            case S_PERCEPTION, "Perception (RP Only)" -> createPerception();
             case S_SLEIGHT_OF_HAND -> createSleightOfHand();
             case S_PROTOCOLS -> createProtocols();
             case S_SCIENCE_BIOLOGY -> createScienceBiology();
@@ -1433,11 +1436,11 @@ public class SkillType {
             case S_SCIENCE_OTHER -> createScienceOther();
             case S_SECURITY_SYSTEMS_ELECTRONIC -> createSecuritySystemsElectronic();
             case S_SECURITY_SYSTEMS_MECHANICAL -> createSecuritySystemsMechanical();
-            case S_SENSOR_OPERATIONS -> createSensorOperations();
-            case S_STEALTH -> createStealth();
+            case S_SENSOR_OPERATIONS, "Sensor Operations (RP Only)" -> createSensorOperations();
+            case S_STEALTH, "Stealth (RP Only)" -> createStealth();
             case S_STREETWISE -> createStreetwise();
             case S_SURVIVAL -> createSurvival();
-            case S_TRACKING -> createTracking();
+            case S_TRACKING, "Tracking/Any (RP Only)" -> createTracking();
             case S_TRAINING, "Training (RP Only)" -> createTraining();
             case S_CAREER_ANY -> createCareer();
             case S_SWIMMING -> createSwimming();
@@ -2285,7 +2288,7 @@ public class SkillType {
         return new SkillType(S_COMMUNICATIONS,
               7,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               INTELLIGENCE,
               NONE,
               null,
@@ -2863,7 +2866,7 @@ public class SkillType {
         return new SkillType(S_PERCEPTION,
               7,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               INTELLIGENCE,
               NONE,
               null,
@@ -3137,7 +3140,7 @@ public class SkillType {
         return new SkillType(S_SENSOR_OPERATIONS,
               8,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               INTELLIGENCE,
               WILLPOWER,
               null,
@@ -3154,7 +3157,7 @@ public class SkillType {
         return new SkillType(S_STEALTH,
               8,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               REFLEXES,
               INTELLIGENCE,
               null,
@@ -3205,7 +3208,7 @@ public class SkillType {
         return new SkillType(S_TRACKING,
               8,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               INTELLIGENCE,
               WILLPOWER,
               null,
