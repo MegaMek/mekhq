@@ -45,6 +45,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
+import java.util.List;
 import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
@@ -59,6 +60,7 @@ import javax.swing.SwingConstants;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
 import megamek.client.ui.util.UIUtil;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.DateUtilities;
@@ -110,6 +112,7 @@ public class GeneralTab {
     private RoundedJButton btnNameGenerator;
     private JLabel lblFaction;
     private MMComboBox<FactionDisplay> comboFaction;
+    private RoundedJButton btnRandomFaction;
     private JLabel lblDate;
     private RoundedJButton btnDate;
     private RoundedJButton btnRandomDate;
@@ -198,6 +201,15 @@ public class GeneralTab {
         comboFaction.setToolTipText(String.format("<html>%s</html>",
               getTextAt(getCampaignOptionsResourceBundle(), "lblFaction.tooltip")));
 
+        // Randomize faction
+        btnRandomFaction = new CampaignOptionsButton("RandomFaction");
+        btnRandomFaction.addActionListener(e -> {
+            FactionDisplay randomFaction = pickRandomFaction();
+            if (randomFaction != null) {
+                comboFaction.setSelectedItem(randomFaction);
+            }
+        });
+
         // Date
         lblDate = new CampaignOptionsLabel("Date");
         btnDate = new CampaignOptionsButton("Date");
@@ -245,6 +257,7 @@ public class GeneralTab {
         panel.add(headerPanel, layout);
 
         layout.gridwidth = 1;
+        layout.weightx = 1;
         layout.gridy++;
         panel.add(lblDate, layout);
         panel.add(btnDate, layout);
@@ -252,21 +265,14 @@ public class GeneralTab {
 
         layout.gridy++;
         panel.add(lblName, layout);
-
-        layout.gridwidth = 2;
-        layout.weightx = 1;
         panel.add(txtName, layout);
 
-        layout.gridwidth = 1;
-        layout.weightx = 0;
-        layout.fill = GridBagConstraints.NONE;
         panel.add(btnNameGenerator, layout);
-        layout.fill = GridBagConstraints.HORIZONTAL;
 
         layout.gridy++;
         panel.add(lblFaction, layout);
-        layout.gridwidth = 2;
         panel.add(comboFaction, layout);
+        panel.add(btnRandomFaction, layout);
 
         layout.gridy++;
         layout.gridwidth = 5;
@@ -352,6 +358,7 @@ public class GeneralTab {
 
         lblFaction = new JLabel();
         comboFaction = new MMComboBox<>("comboFaction", buildFactionDisplayOptions());
+        btnRandomFaction = new RoundedJButton();
 
         lblDate = new JLabel();
         btnDate = new RoundedJButton();
@@ -387,6 +394,25 @@ public class GeneralTab {
               date));
 
         return factionModel;
+    }
+
+    /**
+     * Picks and returns a random {@link FactionDisplay} from the available faction display options.
+     *
+     * <p>This method builds a {@link DefaultComboBoxModel} of faction options using
+     * {@link #buildFactionDisplayOptions()}. If the model contains any options, a random index is selected and the
+     * corresponding {@link FactionDisplay} is returned. If no options are available, this method returns
+     * {@code null}.</p>
+     *
+     * @return a randomly selected {@link FactionDisplay}, or {@code null} if no factions are available
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private @Nullable FactionDisplay pickRandomFaction() {
+        List<FactionDisplay> factionOptions = FactionDisplay.getSortedValidFactionDisplays(
+              Factions.getInstance().getChoosableFactions(), date);
+        return ObjectUtility.getRandomItem(factionOptions);
     }
 
     /**
