@@ -5634,6 +5634,11 @@ public class Person {
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
     }
 
+    public boolean isAsTech() {
+        boolean hasSkill = hasSkill(S_ASTECH);
+        return hasSkill && (getPrimaryRole().isAstech() || getSecondaryRole().isAstech());
+    }
+
     /**
      * Checks whether this character satisfies the requirements for a given personnel role.
      *
