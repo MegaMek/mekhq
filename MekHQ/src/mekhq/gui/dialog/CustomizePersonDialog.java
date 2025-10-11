@@ -1556,7 +1556,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
             person.setPersonalityQuirkDescriptionIndex((int) spnPersonalityQuirk.getValue());
-            
+
             person.setReasoning(comboReasoning.getSelectedItem());
 
             writePersonalityDescription(person);
@@ -1632,8 +1632,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         AgingMilestone milestone = getMilestone(person.getAge(campaign.getLocalDate()));
 
-        List<String> sortedSkillNames = getSortedSkillNames();
-
+        List<String> sortedSkillNames = getSortedSkills();
         for (int index = 0; index < sortedSkillNames.size(); index++) {
             constraints.gridy = index;
             constraints.gridx = 0;
@@ -1725,54 +1724,34 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * Returns a list of skill names sorted by category.
+     * Returns a list of skill names where the person’s owned skills are listed first in alphabetical order, followed by
+     * any remaining skills, also in alphabetical order.
      *
-     * <p>The sorting order is:</p>
-     * <ol>
-     *     <li>Combat skills</li>
-     *     <li>Support skills</li>
-     *     <li>Roleplay skills</li>
-     * </ol>
+     * <p>This method sorts the owned skill names and places them at the beginning of the returned list. It then
+     * appends any skill names that are not owned by the person.</p>
      *
-     * <p>Skill names are categorized by querying their {@code SkillType}. Any unknown skill types are ignored and a
-     * warning is logged.</p>
-     *
-     * @return a {@code List} of skill names sorted by skill category
+     * @return a {@code List<String>} of skill names, with owned skills first and all others following
      *
      * @author Illiani
-     * @since 0.50.06
+     * @since 0.50.07
      */
-    private static List<String> getSortedSkillNames() {
-        String[] unsortedSkillNames = SkillType.getSkillList();
-        List<String> sortedSkillNames = new ArrayList<>();
-        List<String> combatSkills = new ArrayList<>();
-        List<String> supportSkills = new ArrayList<>();
-        List<String> roleplaySkills = new ArrayList<>();
-        for (String skillName : unsortedSkillNames) {
-            SkillType skillType = SkillType.getType(skillName);
+    private List<String> getSortedSkills() {
+        List<String> sortedSkillNames = SkillType.getSortedSkillNames();
+        List<String> ownedSkills = person.getSkills().getSkills().stream()
+                                         .map(Skill::getType)
+                                         .filter(Objects::nonNull)
+                                         .map(SkillType::getName)
+                                         .sorted()
+                                         .toList();
 
-            if (skillType == null) {
-                LOGGER.warn("Unknown skill type: {}", skillName);
-                continue;
-            }
+        List<String> remainingSkills = new ArrayList<>(sortedSkillNames);
+        remainingSkills.removeAll(ownedSkills);
 
-            if (skillType.isRoleplaySkill()) {
-                roleplaySkills.add(skillName);
-                continue;
-            }
+        List<String> allSkillsOrdered = new ArrayList<>();
+        allSkillsOrdered.addAll(ownedSkills);
+        allSkillsOrdered.addAll(remainingSkills);
 
-            if (skillType.isSupportSkill()) {
-                supportSkills.add(skillName);
-                continue;
-            }
-
-            combatSkills.add(skillName);
-        }
-
-        sortedSkillNames.addAll(combatSkills);
-        sortedSkillNames.addAll(supportSkills);
-        sortedSkillNames.addAll(roleplaySkills);
-        return sortedSkillNames;
+        return allSkillsOrdered;
     }
 
     private void setSkills() {

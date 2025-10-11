@@ -1227,7 +1227,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         c.insets = new Insets(0, 10, 0, 0);
         c.gridx = 0;
 
-        List<String> sortedSkillNames = getSortedSkillNames();
+        List<String> sortedSkillNames = SkillType.getSortedSkillNames();
 
         SkillType skillType;
         for (int index = 0; index < sortedSkillNames.size(); index++) {
@@ -1303,57 +1303,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             c.weightx = 1.0;
             panSkills.add(spnBonus, c);
         }
-    }
-
-    /**
-     * Returns a list of skill names sorted by category.
-     *
-     * <p>The sorting order is:</p>
-     * <ol>
-     *     <li>Combat skills</li>
-     *     <li>Support skills</li>
-     *     <li>Roleplay skills</li>
-     * </ol>
-     *
-     * <p>Skill names are categorized by querying their {@code SkillType}. Any unknown skill types are ignored and a
-     * warning is logged.</p>
-     *
-     * @return a {@code List} of skill names sorted by skill category
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    private static List<String> getSortedSkillNames() {
-        String[] unsortedSkillNames = SkillType.getSkillList();
-        List<String> sortedSkillNames = new ArrayList<>();
-        List<String> combatSkills = new ArrayList<>();
-        List<String> supportSkills = new ArrayList<>();
-        List<String> roleplaySkills = new ArrayList<>();
-        for (String skillName : unsortedSkillNames) {
-            SkillType skillType = SkillType.getType(skillName);
-
-            if (skillType == null) {
-                LOGGER.warn("Unknown skill type: {}", skillName);
-                continue;
-            }
-
-            if (skillType.isRoleplaySkill()) {
-                roleplaySkills.add(skillName);
-                continue;
-            }
-
-            if (skillType.isSupportSkill()) {
-                supportSkills.add(skillName);
-                continue;
-            }
-
-            combatSkills.add(skillName);
-        }
-
-        sortedSkillNames.addAll(combatSkills);
-        sortedSkillNames.addAll(supportSkills);
-        sortedSkillNames.addAll(roleplaySkills);
-        return sortedSkillNames;
     }
 
     private void setSkills() {
