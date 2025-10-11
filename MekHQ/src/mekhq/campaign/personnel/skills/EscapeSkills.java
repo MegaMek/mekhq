@@ -63,7 +63,7 @@ import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
  * @author Illiani
  * @since 0.50.07
  */
-public class EscapeArtist {
+public class EscapeSkills {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.EscapeArtist";
 
     private final static int NO_SKILL_AVAILABLE = -1;
@@ -80,7 +80,7 @@ public class EscapeArtist {
      * @author Illiani
      * @since 0.50.07
      */
-    public static void performEscapeArtistEscapeAttemptCheck(Campaign campaign, Person person) {
+    public static void performEscapeAttemptCheck(Campaign campaign, Person person) {
         String skillToUse = getHighestEscapeSkill(person);
 
         // No attempt is made if the prisoner doesn't have any escape skills.
@@ -107,17 +107,17 @@ public class EscapeArtist {
     /**
      * Determines which escape-related skill the given {@link Person} is best at.
      *
-     * <p>This method examines the person's skill levels in Escape Artist, Disguise, and Forgery, and returns the
-     * skill type with the highest total skill level. Evaluation uses each skill's {@code getTotalSkillLevel} method,
-     * considering personnel options and ATOW attributes.</p>
+     * <p>This method examines the person's skill levels in Escape Artist, Disguise, Forgery, or Sleight of Hand, and
+     * returns the skill type with the highest total skill level. Evaluation uses each skill's
+     * {@code getTotalSkillLevel} method, considering personnel options and ATOW attributes.</p>
      *
      * <p>If the person does not possess any of these skills, the method returns an empty string.</p>
      *
      * @param person the {@link Person} whose skills will be checked
      *
      * @return the skill type constant (one of {@link SkillType#S_ACTING}, {@link SkillType#S_ESCAPE_ARTIST},
-     *       {@link SkillType#S_DISGUISE}, or {@link SkillType#S_FORGERY}) corresponding to the highest escape-related
-     *       skill level, or an empty string if none are present
+     *       {@link SkillType#S_DISGUISE}, {@link SkillType#S_FORGERY}, or {@link SkillType#S_SLEIGHT_OF_HAND})
+     *       corresponding to the highest escape-related skill level, or an empty string if none are present
      *
      * @author Illiani
      * @since 0.50.07
@@ -159,6 +159,15 @@ public class EscapeArtist {
         Skill actingSkill = person.getSkill(SkillType.S_ACTING);
         if (actingSkill != null) {
             int level = actingSkill.getTotalSkillLevel(options, attributes, 0);
+            if (level > highestSkillLevel) {
+                highestSkillLevel = level;
+                skillToUse = SkillType.S_ACTING;
+            }
+        }
+
+        Skill sleightOfHandSkill = person.getSkill(SkillType.S_SLEIGHT_OF_HAND);
+        if (sleightOfHandSkill != null) {
+            int level = sleightOfHandSkill.getTotalSkillLevel(options, attributes, 0);
             if (level > highestSkillLevel) {
                 skillToUse = SkillType.S_ACTING;
             }

@@ -374,6 +374,13 @@ public class Skill {
             }
         }
 
+        // Pick Pocket
+        if (Objects.equals(name, S_SLEIGHT_OF_HAND)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_PICK_POCKET)) {
+                modifier += 2;
+            }
+        }
+
         // Attractive, Unattractive, Freakish Strength, some compulsions
         if (type.hasAttribute(CHARISMA)) {
             if (characterOptions.booleanOption(FLAW_UNATTRACTIVE)) {
