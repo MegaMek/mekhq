@@ -201,8 +201,17 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY = applyAndDisplayAwards(awardController, pnlPortrait, gridY);
         }
 
+        JPanel pnlAttributes = null;
         if (campaignOptions.isDisplayAllAttributes()) {
-            JPanel pnlAttributes = fillAttributeScores();
+            pnlAttributes = fillAttributeScores();
+        } else {
+            Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
+            if (!relevantAttributes.isEmpty()) {
+                pnlAttributes = fillAttributeModifiers(relevantAttributes);
+            }
+        }
+
+        if (pnlAttributes != null) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -213,21 +222,6 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlAttributes, gridBagConstraints);
             gridY++;
-        } else {
-            Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
-            if (!relevantAttributes.isEmpty()) {
-                JPanel pnlAttributes = fillAttributeModifiers(relevantAttributes);
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = gridY;
-                gridBagConstraints.gridwidth = 2;
-                gridBagConstraints.weightx = 1.0;
-                gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-                gridBagConstraints.fill = GridBagConstraints.BOTH;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                add(pnlAttributes, gridBagConstraints);
-                gridY++;
-            }
         }
 
         List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING));
