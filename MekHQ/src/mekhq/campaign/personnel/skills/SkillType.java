@@ -153,6 +153,7 @@ public class SkillType {
     public static final String S_SENSOR_OPERATIONS = "Sensor Operations";
     public static final String S_STEALTH = "Stealth";
     public static final String S_TRACKING = "Tracking/Any";
+    public static final String S_SLEIGHT_OF_HAND = "Sleight of Hand/Any";
 
     // roleplay skills
     public static final String S_ACROBATICS = "Acrobatics" + RP_ONLY_TAG;
@@ -195,7 +196,6 @@ public class SkillType {
     public static final String S_INTERROGATION = "Interrogation" + RP_ONLY_TAG;
     public static final String S_INVESTIGATION = "Investigation" + RP_ONLY_TAG;
     public static final String S_LANGUAGES = "Language/Any" + RP_ONLY_TAG;
-    public static final String S_SLEIGHT_OF_HAND = "Sleight of Hand/Any" + RP_ONLY_TAG;
     public static final String S_PROTOCOLS = "Protocols/Any" + RP_ONLY_TAG;
     public static final String S_SCIENCE_BIOLOGY = "Science/Biology" + RP_ONLY_TAG;
     public static final String S_SCIENCE_CHEMISTRY = "Science/Chemistry" + RP_ONLY_TAG;
@@ -1126,6 +1126,7 @@ public class SkillType {
             case "perception (rp only)" -> "Perception"; // <50.07
             case "sensor operations (rp only)" -> "Sensor Operations"; // <50.07
             case "stealth (rp only)" -> "Stealth"; // <50.07
+            case "sleight of hand/any (rp only)" -> "Sleight of Hand/Any"; // <50.07
             default -> skillName;
         };
         return skillName;
@@ -1472,7 +1473,7 @@ public class SkillType {
             case S_LANGUAGES -> createLanguage();
             case S_MARTIAL_ARTS, "Martial Arts (RP Only)" -> createMartialArts();
             case S_PERCEPTION, "Perception (RP Only)" -> createPerception();
-            case S_SLEIGHT_OF_HAND -> createSleightOfHand();
+            case S_SLEIGHT_OF_HAND, "Sleight of Hand/Any (RP Only)" -> createSleightOfHand();
             case S_PROTOCOLS -> createProtocols();
             case S_SCIENCE_BIOLOGY -> createScienceBiology();
             case S_SCIENCE_CHEMISTRY -> createScienceChemistry();
@@ -2936,7 +2937,7 @@ public class SkillType {
         return new SkillType(S_SLEIGHT_OF_HAND,
               8,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               REFLEXES,
               DEXTERITY,
               null,
