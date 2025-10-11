@@ -34,6 +34,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -103,6 +104,8 @@ import org.w3c.dom.NodeList;
  */
 public abstract class Part implements IPartWork, ITechnology {
     private static final MMLogger LOGGER = MMLogger.create(Part.class);
+
+    private static final DecimalFormat TONNAGE_FORMATTER = new DecimalFormat("0.#");
 
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
@@ -439,7 +442,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
         if (this instanceof MekGyro gyro) {
             // We only want to display the decimal point if it's not zero
-            String tonnage = String.valueOf(gyro.getTonnage()).replace(".0", "");
+            String tonnage = TONNAGE_FORMATTER.format(gyro.getTonnage());
             toReturn.append(tonnage).append(" ton");
         }
 
@@ -1209,7 +1212,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
         if (this instanceof MekGyro gyro) {
             // We only want to display the decimal point if it's not zero
-            String tonnage = String.valueOf(gyro.getTonnage()).replace(".0", "");
+            String tonnage = TONNAGE_FORMATTER.format(gyro.getTonnage());
             details.add(tonnage + " ton");
         }
 
