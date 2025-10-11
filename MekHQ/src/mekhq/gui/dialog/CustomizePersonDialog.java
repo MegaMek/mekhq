@@ -1737,12 +1737,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
      */
     private List<String> getSortedSkills() {
         List<String> sortedSkillNames = SkillType.getSortedSkillNames();
+
         List<String> ownedSkills = person.getSkills().getSkills().stream()
                                          .map(Skill::getType)
                                          .filter(Objects::nonNull)
-                                         .map(SkillType::getName)
-                                         .sorted()
-                                         .toList();
+                                         .map(SkillType::getName).distinct().sorted().toList();
 
         List<String> remainingSkills = new ArrayList<>(sortedSkillNames);
         remainingSkills.removeAll(ownedSkills);
