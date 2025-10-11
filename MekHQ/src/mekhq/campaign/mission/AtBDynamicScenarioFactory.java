@@ -1120,7 +1120,8 @@ public class AtBDynamicScenarioFactory {
                 int playerBattleValue = calculateEffectiveBV(scenario, campaign, true);
                 int playerUnitValue = calculateEffectiveUnitCount(scenario, campaign, true);
 
-                forceBVBudget = (int) (playerBattleValue * forceMultiplier);
+                double difficultyMultiplier = getDifficultyMultiplier(campaign);
+                forceBVBudget = (int) (playerBattleValue * forceMultiplier * difficultyMultiplier);
 
                 LOGGER.info("Base bidding budget is {} BV2. This is seed force multiplied by scenario force " +
                                   "multiplier", forceBVBudget);
