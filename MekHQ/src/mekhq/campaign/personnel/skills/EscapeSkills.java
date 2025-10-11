@@ -169,7 +169,7 @@ public class EscapeSkills {
         if (sleightOfHandSkill != null) {
             int level = sleightOfHandSkill.getTotalSkillLevel(options, attributes, 0);
             if (level > highestSkillLevel) {
-                skillToUse = SkillType.S_ACTING;
+                skillToUse = SkillType.S_SLEIGHT_OF_HAND;
             }
         }
 
