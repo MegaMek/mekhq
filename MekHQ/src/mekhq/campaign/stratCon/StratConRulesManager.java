@@ -1555,7 +1555,29 @@ public class StratConRulesManager {
         return new TargetRollModifier(modifier, "Unit Weight Modifier");
     }
 
-    private static TargetRollModifier getUnitSpeedModifier(double unitSpeed) {
+    /**
+     * Determines the target roll modifier based on the given unit's speed value.
+     *
+     * <p>This method assigns a modifier according to these speed thresholds:</p>
+     *
+     * <ul>
+     *     <li>Speed ≤ 3: modifier = -1</li>
+     *     <li>Speed 4–6: modifier = 0</li>
+     *     <li>Speed 7–10: modifier = 1</li>
+     *     <li>Speed ≥ 11: modifier = 2</li>
+     * </ul>
+     *
+     * <p>The returned {@link TargetRollModifier} includes the computed modifier and the description "Unit Speed
+     * Modifier".</p>
+     *
+     * @param unitSpeed the speed of the unit to evaluate
+     *
+     * @return a {@link TargetRollModifier} representing the speed-based modifier
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static TargetRollModifier getUnitSpeedModifier(int unitSpeed) {
         int modifier;
         if (unitSpeed <= 3) {
             modifier = -1;
