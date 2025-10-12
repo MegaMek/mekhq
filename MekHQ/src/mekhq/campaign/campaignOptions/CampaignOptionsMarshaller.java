@@ -839,8 +839,11 @@ public class CampaignOptionsMarshaller {
               "newFinancialYearFinancesToCSVExport",
               campaignOptions.isNewFinancialYearFinancesToCSVExport());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulateGrayMonday", campaignOptions.isSimulateGrayMonday());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowMonthlyReinvestment",
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "allowMonthlyReinvestment",
               campaignOptions.isAllowMonthlyReinvestment());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayAllAttributes", campaignOptions.isDisplayAllAttributes());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowMonthlyConnections",
               campaignOptions.isAllowMonthlyConnections());
 

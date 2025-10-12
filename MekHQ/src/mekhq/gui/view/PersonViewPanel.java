@@ -201,6 +201,29 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY = applyAndDisplayAwards(awardController, pnlPortrait, gridY);
         }
 
+        JPanel pnlAttributes = null;
+        if (campaignOptions.isDisplayAllAttributes()) {
+            pnlAttributes = fillAttributeScores();
+        } else {
+            Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
+            if (!relevantAttributes.isEmpty()) {
+                pnlAttributes = fillAttributeModifiers(relevantAttributes);
+            }
+        }
+
+        if (pnlAttributes != null) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlAttributes, gridBagConstraints);
+            gridY++;
+        }
+
         List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING));
         if (!relevantSkills.isEmpty()) {
             JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.combat");
@@ -247,21 +270,6 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlRoleplaySkills, gridBagConstraints);
-            gridY++;
-        }
-
-        Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
-        if (!relevantAttributes.isEmpty()) {
-            JPanel pnlAttributes = fillAttributeModifiers(relevantAttributes);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlAttributes, gridBagConstraints);
             gridY++;
         }
 
@@ -1989,7 +1997,8 @@ public class PersonViewPanel extends JScrollablePanel {
      */
     private JPanel fillAttributeModifiers(Map<SkillAttribute, Integer> relevantAttributes) {
         JPanel pnlAttributes = new JPanel(new GridBagLayout());
-        pnlAttributes.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlSkills.attributes")));
+        pnlAttributes.setBorder(RoundedLineBorder.createRoundedLineBorder(
+              resourceMap.getString("pnlSkills.attributes.modifiers")));
 
         // Calculate how many rows per column for even distribution
         double numColumns = 3.0;
@@ -2006,6 +2015,83 @@ public class PersonViewPanel extends JScrollablePanel {
 
             JLabel lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), attributeName));
             JLabel lblValue = new JLabel((attributeModifier > 0 ? "+" : "") + attributeModifier);
+            lblName.setLabelFor(lblValue);
+
+            String tooltip = wordWrap(attribute.getDescription());
+            lblName.setToolTipText(tooltip);
+            lblValue.setToolTipText(tooltip);
+
+            // Name label constraints
+            GridBagConstraints nameConstraints = new GridBagConstraints();
+            nameConstraints.gridx = gridX;
+            nameConstraints.gridy = row;
+            nameConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+            // Value label constraints
+            GridBagConstraints valueConstraints = new GridBagConstraints();
+            valueConstraints.gridx = gridX + 1;
+            valueConstraints.gridy = row;
+            valueConstraints.anchor = GridBagConstraints.NORTHWEST;
+            valueConstraints.insets = new Insets(0, 5, 0, 10);
+            valueConstraints.weightx = 1;
+
+            pnlAttributes.add(lblName, nameConstraints);
+            pnlAttributes.add(lblValue, valueConstraints);
+
+            i++;
+        }
+
+        return pnlAttributes;
+    }
+
+    /**
+     * Constructs and returns a JPanel displaying the attribute scores and modifiers for a {@link Person}'s ATOW (A Time
+     * of War) attributes.
+     *
+     * <p>The attributes are displayed in three columns for even distribution, with each attribute's label and
+     * corresponding score (including modifier, if applicable). Tooltips are added to each label and value to provide
+     * attribute descriptions.</p>
+     *
+     * @return a {@link JPanel} arranged in a GridBagLayout, showing each attribute's name and value (with modifier, if
+     *       any), each with appropriate tooltips.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private JPanel fillAttributeScores() {
+        JPanel pnlAttributes = new JPanel(new GridBagLayout());
+        pnlAttributes.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+              "pnlSkills.attributes.scores")));
+
+        Attributes attributes = person.getATOWAttributes();
+
+        // Calculate how many rows per column for even distribution
+        double numColumns = 3.0;
+        SkillAttribute[] allAttributes = SkillAttribute.values();
+        int numAttributes = allAttributes.length - 1; // -1 to exclude NONE
+        int skillsPerColumn = (int) ceil(numAttributes / numColumns);
+
+        int i = 0;
+        for (SkillAttribute attribute : allAttributes) {
+            if (attribute == SkillAttribute.NONE) {
+                continue;
+            }
+
+            int column = i / skillsPerColumn; // 0, 1, 2
+            int row = i % skillsPerColumn;
+            int gridX = column * 2; // Each column takes 2 grid positions: name + value
+
+            String attributeName = attribute.getLabel();
+            int attributeScore = attributes.getAttributeScore(attribute);
+            int attributeModifier = attributes.getAttributeModifier(attribute);
+
+            JLabel lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), attributeName));
+            String value = String.valueOf(attributeScore);
+            if (attributeModifier != 0) {
+                value += " (" + (attributeModifier > 0 ? "+" : "") + attributeModifier + ")";
+            }
+
+            JLabel lblValue = new JLabel(value);
             lblName.setLabelFor(lblValue);
 
             String tooltip = wordWrap(attribute.getDescription());

@@ -106,6 +106,7 @@ public class SystemsTab {
 
     private JCheckBox chkUseAttributes;
     private JCheckBox chkRandomizeAttributes;
+    private JCheckBox chkDisplayAllAttributes;
     private JCheckBox chkRandomizeTraits;
     private JCheckBox chkAllowMonthlyReinvestment;
     private JCheckBox chkAllowMonthlyConnections;
@@ -449,6 +450,8 @@ public class SystemsTab {
         chkUseAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "UseAttributes"));
         chkRandomizeAttributes = new CampaignOptionsCheckBox("RandomizeAttributes");
         chkRandomizeAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeAttributes"));
+        chkDisplayAllAttributes = new CampaignOptionsCheckBox("DisplayAllAttributes");
+        chkDisplayAllAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "DisplayAllAttributes"));
         chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
         chkRandomizeTraits.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeTraits"));
         chkAllowMonthlyReinvestment = new CampaignOptionsCheckBox("AllowMonthlyReinvestment");
@@ -469,10 +472,12 @@ public class SystemsTab {
         layout.gridx++;
         panel.add(chkRandomizeAttributes, layout);
         layout.gridx++;
-        panel.add(chkRandomizeTraits, layout);
+        panel.add(chkDisplayAllAttributes, layout);
 
         layout.gridx = 0;
         layout.gridy++;
+        panel.add(chkRandomizeTraits, layout);
+        layout.gridx++;
         panel.add(chkAllowMonthlyReinvestment, layout);
         layout.gridx++;
         panel.add(chkAllowMonthlyConnections, layout);
@@ -541,6 +546,7 @@ public class SystemsTab {
         // A Time of War
         chkUseAttributes.setSelected(skillPreferences.isUseAttributes());
         chkRandomizeAttributes.setSelected(skillPreferences.isRandomizeAttributes());
+        chkDisplayAllAttributes.setSelected(options.isDisplayAllAttributes());
         chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
         chkAllowMonthlyReinvestment.setSelected(options.isAllowMonthlyReinvestment());
         chkAllowMonthlyConnections.setSelected(options.isAllowMonthlyConnections());
@@ -602,6 +608,7 @@ public class SystemsTab {
         // A Time of War
         skillPreferences.setUseAttributes(chkUseAttributes.isSelected());
         skillPreferences.setRandomizeAttributes(chkRandomizeAttributes.isSelected());
+        options.setDisplayAllAttributes(chkDisplayAllAttributes.isSelected());
         skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
         options.setAllowMonthlyReinvestment(chkAllowMonthlyReinvestment.isSelected());
         options.setAllowMonthlyConnections(chkAllowMonthlyConnections.isSelected());

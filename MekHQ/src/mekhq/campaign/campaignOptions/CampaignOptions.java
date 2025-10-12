@@ -485,6 +485,7 @@ public class CampaignOptions {
     private FinancialYearDuration financialYearDuration;
     private boolean newFinancialYearFinancesToCSVExport;
     private boolean simulateGrayMonday;
+    private boolean displayAllAttributes;
     private boolean allowMonthlyReinvestment;
     private boolean allowMonthlyConnections;
 
@@ -1116,6 +1117,7 @@ public class CampaignOptions {
         setFinancialYearDuration(FinancialYearDuration.ANNUAL);
         newFinancialYearFinancesToCSVExport = false;
         simulateGrayMonday = false;
+        displayAllAttributes = false;
         allowMonthlyReinvestment = false;
         allowMonthlyConnections = false;
 
@@ -3533,6 +3535,14 @@ public class CampaignOptions {
 
     public void setAllowMonthlyReinvestment(final boolean allowMonthlyReinvestment) {
         this.allowMonthlyReinvestment = allowMonthlyReinvestment;
+    }
+
+    public boolean isDisplayAllAttributes() {
+        return displayAllAttributes;
+    }
+
+    public void setDisplayAllAttributes(final boolean displayAllAttributes) {
+        this.displayAllAttributes = displayAllAttributes;
     }
 
     public boolean isAllowMonthlyConnections() {
