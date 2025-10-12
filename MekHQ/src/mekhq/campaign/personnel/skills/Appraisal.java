@@ -115,7 +115,8 @@ public class Appraisal {
         return getFormattedTextAt(RESOURCE_BUNDLE,
               reportKey,
               spanOpeningWithCustomColor(reportColor),
-              CLOSING_SPAN_TAG);
+              CLOSING_SPAN_TAG,
+              appraisalCostMultiplier * 100);
     }
 
     /**
