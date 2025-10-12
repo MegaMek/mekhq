@@ -35,6 +35,7 @@ package mekhq.campaign.universe;
 
 import static mekhq.MHQConstants.FORTRESS_REPUBLIC;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.time.LocalDate;
@@ -60,8 +61,8 @@ import mekhq.campaign.Campaign;
  *       <p>
  *       Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also
  *       finds a suitable planet for the action.
- *                                                             TODO : Account for the de facto alliance of the invading Clans and the
- *                                                             TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
+ *                                                                   TODO : Account for the de facto alliance of the invading Clans and the
+ *                                                                   TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
     private static final MMLogger LOGGER = MMLogger.create(RandomFactionGenerator.class);
@@ -294,15 +295,37 @@ public class RandomFactionGenerator {
     }
 
     /**
-     * Appends MERC faction to the given enemy map, with approximately a 10% probability
+     * Appends the mercenary faction to the given enemy map with an approximate weight equal to 10% of the total enemy
+     * weight, but only if the enemy map contains at least one non-Clan faction.
+     *
+     * <p>The method first checks if any faction in the enemy map returns {@code false} from {@link Faction#isClan()}.
+     * If all factions are Clan, no action is taken. Otherwise, the mercenary faction is added to the enemy map with a
+     * weight based on the sum of existing weights (at least 1).</p>
+     *
+     * <p>The check for non-Clan factions is to help avoid a situation where we have mercenary companies popping up
+     * in Clan-space.</p>
+     *
+     * @param enemyMap the {@link WeightedIntMap} of {@link Faction} to which the mercenary faction may be appended
      */
     protected void appendMercsToEnemyMap(WeightedIntMap<Faction> enemyMap) {
+        boolean hasNonClan = false;
+        for (Faction faction : enemyMap.values()) {
+            if (!faction.isClan()) {
+                hasNonClan = true;
+                break;
+            }
+        }
+
+        if (!hasNonClan) {
+            return;
+        }
+
         int mercWeight = 0;
         for (int key : enemyMap.keySet()) {
             mercWeight += key;
         }
 
-        enemyMap.add(Math.max(1, (mercWeight / 10)), Factions.getInstance().getFaction("MERC"));
+        enemyMap.add(Math.max(1, (mercWeight / 10)), Factions.getInstance().getFaction(MERCENARY_FACTION_CODE));
     }
 
     /**
