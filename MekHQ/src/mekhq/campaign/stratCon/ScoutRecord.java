@@ -35,5 +35,5 @@ package mekhq.campaign.stratCon;
 import mekhq.campaign.personnel.Person;
 
 public record ScoutRecord(Person scout, String skillName, int scoutSkillLevel, double entityWeight,
-      boolean hasSensorEquipment) {
+      int unitAtBSpeed, boolean hasSensorEquipment) {
 }

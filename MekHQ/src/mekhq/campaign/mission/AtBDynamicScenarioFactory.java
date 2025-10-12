@@ -4560,7 +4560,7 @@ public class AtBDynamicScenarioFactory {
      * @return The calculated walk MP value to be used for deployment purposes. Adjustments are made for jump MP,
      *       infantry units, and aerospace units.
      */
-    private static int calculateAtBSpeed(Entity entity) {
+    public static int calculateAtBSpeed(Entity entity) {
         int speed = entity.getWalkMP(); // Get the base walk MP of the entity
 
         if (entity.getAnyTypeMaxJumpMP() > 0) {
