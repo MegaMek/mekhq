@@ -327,7 +327,12 @@ public class ContractMarketDialog extends JDialog {
             Vector<String> row = new Vector<>();
             if (contract instanceof AtBContract) {
                 row.add(((AtBContract) contract).getEmployerName(campaign.getGameYear()));
-                row.add(((AtBContract) contract).getEnemyName(campaign.getGameYear()));
+
+                String enemyName = ((AtBContract) contract).getEnemyName(campaign.getGameYear());
+                if (((AtBContract) contract).getEnemy().isMercenary()) {
+                    enemyName = resourceMap.getString("lblEnemy.mercenary");
+                }
+                row.add(enemyName);
                 if (((AtBContract) contract).isSubcontract()) {
                     row.add(((AtBContract) contract).getContractType() + " (Subcontract)");
                 } else {

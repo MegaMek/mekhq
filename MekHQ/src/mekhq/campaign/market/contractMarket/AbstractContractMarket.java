@@ -529,7 +529,8 @@ public abstract class AbstractContractMarket {
 
     protected void setEnemyCode(AtBContract contract) {
         if (contract.getContractType().isPirateHunting()) {
-            contract.setEnemyCode("PIR");
+            Faction employer = contract.getEmployerFaction();
+            contract.setEnemyCode(employer.isClan() ? "BAN" : PIRATE_FACTION_CODE);
         } else if (contract.getContractType().isRiotDuty()) {
             contract.setEnemyCode("REB");
         } else if (contract.getEmployerCode().equals(PIRATE_FACTION_CODE)) {
