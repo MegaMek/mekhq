@@ -693,6 +693,8 @@ public class CampaignOptionsUnmarshaller {
             case "simulateGrayMonday" -> campaignOptions.setSimulateGrayMonday(parseBoolean(nodeContents));
             case "allowMonthlyReinvestment" -> campaignOptions.setAllowMonthlyReinvestment(parseBoolean(
                   nodeContents));
+            case "displayAllAttributes" -> campaignOptions.setDisplayAllAttributes(parseBoolean(
+                  nodeContents));
             case "allowMonthlyConnections" -> campaignOptions.setAllowMonthlyConnections(parseBoolean(
                   nodeContents));
             case "commonPartPriceMultiplier" -> campaignOptions.setCommonPartPriceMultiplier(parseDouble(

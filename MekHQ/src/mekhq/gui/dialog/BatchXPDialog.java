@@ -258,7 +258,7 @@ public final class BatchXPDialog extends JDialog {
         choiceSkill.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceSkill.getPreferredSize().getHeight()));
         DefaultComboBoxModel<String> personSkillModel = new DefaultComboBoxModel<>();
         personSkillModel.addElement(choiceNoSkill);
-        for (String skill : SkillType.getSkillList()) {
+        for (String skill : SkillType.getSortedSkillNames()) {
             personSkillModel.addElement(skill);
         }
         choiceSkill.setModel(personSkillModel);

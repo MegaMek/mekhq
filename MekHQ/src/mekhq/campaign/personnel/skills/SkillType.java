@@ -153,6 +153,7 @@ public class SkillType {
     public static final String S_SENSOR_OPERATIONS = "Sensor Operations";
     public static final String S_STEALTH = "Stealth";
     public static final String S_TRACKING = "Tracking/Any";
+    public static final String S_SLEIGHT_OF_HAND = "Sleight of Hand/Any";
 
     // roleplay skills
     public static final String S_ACROBATICS = "Acrobatics" + RP_ONLY_TAG;
@@ -195,7 +196,6 @@ public class SkillType {
     public static final String S_INTERROGATION = "Interrogation" + RP_ONLY_TAG;
     public static final String S_INVESTIGATION = "Investigation" + RP_ONLY_TAG;
     public static final String S_LANGUAGES = "Language/Any" + RP_ONLY_TAG;
-    public static final String S_SLEIGHT_OF_HAND = "Sleight of Hand/Any" + RP_ONLY_TAG;
     public static final String S_PROTOCOLS = "Protocols/Any" + RP_ONLY_TAG;
     public static final String S_SCIENCE_BIOLOGY = "Science/Biology" + RP_ONLY_TAG;
     public static final String S_SCIENCE_CHEMISTRY = "Science/Chemistry" + RP_ONLY_TAG;
@@ -406,6 +406,57 @@ public class SkillType {
     }
 
     /**
+     * Returns a list of skill names sorted by category.
+     *
+     * <p>The sorting order is:</p>
+     * <ol>
+     *     <li>Combat skills</li>
+     *     <li>Support skills</li>
+     *     <li>Roleplay skills</li>
+     * </ol>
+     *
+     * <p>Skill names are categorized by querying their {@code SkillType}. Any unknown skill types are ignored and a
+     * warning is logged.</p>
+     *
+     * @return a {@code List} of skill names sorted by skill category
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public static List<String> getSortedSkillNames() {
+        String[] unsortedSkillNames = SkillType.getSkillList();
+        List<String> sortedSkillNames = new ArrayList<>();
+        List<String> combatSkills = new ArrayList<>();
+        List<String> supportSkills = new ArrayList<>();
+        List<String> roleplaySkills = new ArrayList<>();
+        for (String skillName : unsortedSkillNames) {
+            SkillType skillType = SkillType.getType(skillName);
+
+            if (skillType == null) {
+                LOGGER.warn("Unknown skill type: {}", skillName);
+                continue;
+            }
+
+            if (skillType.isRoleplaySkill()) {
+                roleplaySkills.add(skillName);
+                continue;
+            }
+
+            if (skillType.isSupportSkill()) {
+                supportSkills.add(skillName);
+                continue;
+            }
+
+            combatSkills.add(skillName);
+        }
+
+        sortedSkillNames.addAll(combatSkills);
+        sortedSkillNames.addAll(supportSkills);
+        sortedSkillNames.addAll(roleplaySkills);
+        return sortedSkillNames;
+    }
+
+    /**
      * Default constructor for the {@code SkillType} class.
      *
      * <p>Initializes a default skill type with placeholder values, primarily for testing or fallback purposes.</p>
@@ -470,10 +521,10 @@ public class SkillType {
      *
      *                          <p>For example:</p>
      *                          <pre>
-     *                                                                                                                                                                                                           Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                           SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                           SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                       </pre>
+     *                                                                                                                                                                                                                                    Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                    SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                    SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                </pre>
      * @param skillLevelsMatter if {@code true}, the skill's level will be displayed in Person View in addition to the
      *                          skill's Target Number
      *
@@ -1075,6 +1126,7 @@ public class SkillType {
             case "perception (rp only)" -> "Perception"; // <50.07
             case "sensor operations (rp only)" -> "Sensor Operations"; // <50.07
             case "stealth (rp only)" -> "Stealth"; // <50.07
+            case "sleight of hand/any (rp only)" -> "Sleight of Hand/Any"; // <50.07
             default -> skillName;
         };
         return skillName;
@@ -1421,7 +1473,7 @@ public class SkillType {
             case S_LANGUAGES -> createLanguage();
             case S_MARTIAL_ARTS, "Martial Arts (RP Only)" -> createMartialArts();
             case S_PERCEPTION, "Perception (RP Only)" -> createPerception();
-            case S_SLEIGHT_OF_HAND -> createSleightOfHand();
+            case S_SLEIGHT_OF_HAND, "Sleight of Hand/Any (RP Only)" -> createSleightOfHand();
             case S_PROTOCOLS -> createProtocols();
             case S_SCIENCE_BIOLOGY -> createScienceBiology();
             case S_SCIENCE_CHEMISTRY -> createScienceChemistry();
@@ -2885,7 +2937,7 @@ public class SkillType {
         return new SkillType(S_SLEIGHT_OF_HAND,
               8,
               false,
-              ROLEPLAY_GENERAL,
+              SUPPORT,
               REFLEXES,
               DEXTERITY,
               null,
