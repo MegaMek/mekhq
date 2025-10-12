@@ -1558,12 +1558,12 @@ public class StratConRulesManager {
     /**
      * Determines the target roll modifier based on the given unit's speed value.
      *
-     * <p>This method assigns a modifier according to these speed thresholds:</p>
+     * <p>This method assigns a modifier according to these speed thresholds (all ranges are inclusive):</p>
      *
      * <ul>
      *     <li>Speed ≤ 3: modifier = -1</li>
-     *     <li>Speed 4–6: modifier = 0</li>
-     *     <li>Speed 7–10: modifier = 1</li>
+     *     <li>Speed 4–6 (inclusive): modifier = 0</li>
+     *     <li>Speed 7–10 (inclusive): modifier = 1</li>
      *     <li>Speed ≥ 11: modifier = 2</li>
      * </ul>
      *
