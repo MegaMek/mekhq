@@ -1,6 +1,8 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.07
+0.50.08
+
+0.50.07 (2025-10- 2130 UTC)
 * Improvement: Added Support for Command Lances in TO&E by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7001
 * Improvement: Added Utility Methods to ReportingUtilities to Allow for Easier Application of Core Colors by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7000
 * Fix: #6955 Fixed Personnel Cleanup to be More Reliable by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6980
