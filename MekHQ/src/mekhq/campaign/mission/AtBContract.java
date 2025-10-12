@@ -68,6 +68,7 @@ import static mekhq.campaign.rating.IUnitRating.DRAGOON_B;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_C;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_F;
 import static mekhq.campaign.stratCon.StratConContractDefinition.getContractDefinition;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.factionStanding.BatchallFactions.BATCHALL_FACTIONS;
 
@@ -1693,7 +1694,8 @@ public class AtBContract extends Contract {
         }
 
         if (getContractType().isPirateHunting()) {
-            enemyCode = "PIR";
+            Faction employer = getEmployerFaction();
+            enemyCode = employer.isClan() ? "BAN" : PIRATE_FACTION_CODE;
         } else if (getContractType().isRiotDuty()) {
             enemyCode = "REB";
         }

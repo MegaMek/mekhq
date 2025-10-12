@@ -61,8 +61,8 @@ import mekhq.campaign.Campaign;
  *       <p>
  *       Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also
  *       finds a suitable planet for the action.
- *                                                                   TODO : Account for the de facto alliance of the invading Clans and the
- *                                                                   TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
+ *                                                                         TODO : Account for the de facto alliance of the invading Clans and the
+ *                                                                         TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
     private static final MMLogger LOGGER = MMLogger.create(RandomFactionGenerator.class);
@@ -158,7 +158,7 @@ public class RandomFactionGenerator {
         }
         // Add rebels and pirates
         retVal.add("REB");
-        retVal.add("PIR");
+        retVal.add(PIRATE_FACTION_CODE);
         return retVal;
     }
 
@@ -235,7 +235,7 @@ public class RandomFactionGenerator {
         Faction employerFaction = Factions.getInstance().getFaction(employer);
         if (null == employerFaction) {
             LOGGER.error("Could not find enemy for employer: {}", employer);
-            return "PIR";
+            return PIRATE_FACTION_CODE;
         } else {
             return getEnemy(employerFaction, useRebels);
         }
@@ -291,7 +291,7 @@ public class RandomFactionGenerator {
         LOGGER.error("Could not find enemy for employerName {}", employerName);
 
         // Fallback; there are always pirates.
-        return "PIR";
+        return PIRATE_FACTION_CODE;
     }
 
     /**

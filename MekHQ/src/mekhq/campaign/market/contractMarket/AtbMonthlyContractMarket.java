@@ -47,6 +47,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -472,7 +473,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
               Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()));
 
         if (contract.getContractType().isPirateHunting()) {
-            contract.setEnemyCode("PIR");
+            Faction employer = contract.getEmployerFaction();
+            contract.setEnemyCode(employer.isClan() ? "BAN" : PIRATE_FACTION_CODE);
         } else if (contract.getContractType().isRiotDuty()) {
             contract.setEnemyCode("REB");
         } else {
