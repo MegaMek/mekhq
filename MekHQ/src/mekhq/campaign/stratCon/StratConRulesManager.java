@@ -1485,13 +1485,13 @@ public class StratConRulesManager {
                         }
 
                         TargetRollModifier weightModifier = getUnitWeightModifier(scoutData.entityWeight());
-                        TargetRollModifier sensorsModifier = new TargetRollModifier((scoutData.hasSensorEquipment() ?
-                                                                                           -1 :
-                                                                                           0),
-                              "Unit Sensors");
+                        TargetRollModifier speedModifier = getUnitSpeedModifier(scoutData.unitAtBSpeed());
+                        TargetRollModifier sensorsModifier = new TargetRollModifier(
+                              scoutData.hasSensorEquipment() ? -1 : 0, "Unit Sensors");
                         boolean wasScoutingSuccessful =
                               !useAdvancedScouting || SkillCheckUtility.performQuickSkillCheck(scout,
-                                    scoutData.skillName(), List.of(weightModifier, sensorsModifier), 0, false, false,
+                                    scoutData.skillName(), List.of(weightModifier, speedModifier, sensorsModifier), 0,
+                                    false, false,
                                     campaign.getLocalDate()
                               );
 
@@ -1553,6 +1553,43 @@ public class StratConRulesManager {
         }
 
         return new TargetRollModifier(modifier, "Unit Weight Modifier");
+    }
+
+    /**
+     * Determines the target roll modifier based on the given unit's speed value.
+     *
+     * <p>This method assigns a modifier according to these speed thresholds (all ranges are inclusive):</p>
+     *
+     * <ul>
+     *     <li>Speed ≤ 3: modifier = -1</li>
+     *     <li>Speed 4–6 (inclusive): modifier = 0</li>
+     *     <li>Speed 7–10 (inclusive): modifier = 1</li>
+     *     <li>Speed ≥ 11: modifier = 2</li>
+     * </ul>
+     *
+     * <p>The returned {@link TargetRollModifier} includes the computed modifier and the description "Unit Speed
+     * Modifier".</p>
+     *
+     * @param unitSpeed the speed of the unit to evaluate
+     *
+     * @return a {@link TargetRollModifier} representing the speed-based modifier
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static TargetRollModifier getUnitSpeedModifier(int unitSpeed) {
+        int modifier;
+        if (unitSpeed <= 3) {
+            modifier = -1;
+        } else if (unitSpeed <= 6) {
+            modifier = 0;
+        } else if (unitSpeed <= 10) {
+            modifier = 1;
+        } else { // speed 11+
+            modifier = 2;
+        }
+
+        return new TargetRollModifier(modifier, "Unit Speed Modifier");
     }
 
     /**
@@ -1625,8 +1662,10 @@ public class StratConRulesManager {
                 weight = entity.getWeight();
             }
 
+            int unitSpeed = entity == null ? 0 : AtBDynamicScenarioFactory.calculateAtBSpeed(entity);
+
             ScoutRecord scoutRecord = new ScoutRecord(bestScout, bestScoutSkillName, bestScoutSkillLevel, weight,
-                  hasSensorEquipment);
+                  unitSpeed, hasSensorEquipment);
             LOGGER.info("Unit {} has best scout: {} with skill {} at level {} and is weight: {}t",
                   unit.getId(), bestScout, bestScoutSkillName, bestScoutSkillLevel, weight);
             scouts.add(scoutRecord);
