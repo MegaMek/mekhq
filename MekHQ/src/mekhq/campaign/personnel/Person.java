@@ -1367,7 +1367,7 @@ public class Person {
         }
 
         switch (status) {
-            case ACTIVE:
+            case ACTIVE -> {
                 if (getStatus().isMIA()) {
                     campaign.addReport(String.format(resources.getString("recoveredMIA.report"),
                           getHyperlinkedFullTitle()));
@@ -1397,60 +1397,56 @@ public class Person {
                     ServiceLogger.rehired(this, today);
                 }
                 setRetirement(null);
-                break;
-            case RETIRED:
+            }
+            case RETIRED -> {
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.retired(this, today);
 
                 setRetirement(today);
-
-                break;
-            case RESIGNED:
+            }
+            case RESIGNED -> {
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.resigned(this, today);
 
                 setRetirement(today);
-
-                break;
-            case DESERTED:
+            }
+            case DESERTED -> {
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.deserted(this, today);
 
                 setRetirement(today);
-
-                break;
-            case DEFECTED:
+            }
+            case DEFECTED -> {
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.defected(this, today);
 
                 setRetirement(today);
-
-                break;
-            case SACKED:
+            }
+            case CAMP_FOLLOWER, SACKED -> {
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.sacked(this, today);
 
                 setRetirement(today);
-
-                break;
-            case LEFT:
+            }
+            case LEFT -> {
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.left(this, today);
 
                 setRetirement(today);
-
-                break;
-            case STUDENT:
+            }
+            case STUDENT -> {
                 // log entries and reports are handled by the education package
                 // (mekhq/campaign/personnel/education)
-                break;
-            case PREGNANCY_COMPLICATIONS:
+            }
+            case PREGNANCY_COMPLICATIONS -> {
                 campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
-                // purposeful fall through
-            default:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
-                break;
+            }
+            default -> {
+                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
+            }
         }
 
         setStatus(status);

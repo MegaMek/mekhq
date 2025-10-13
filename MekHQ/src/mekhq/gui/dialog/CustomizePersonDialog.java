@@ -1471,17 +1471,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         if (campaign.getCampaignOptions().isUseAgeEffects()) {
             updateAllSkillAgeModifiers(campaign.getLocalDate(), person);
         }
-        if (person.isEmployed()) {
-            LocalDate joinedDate = person.getJoinedCampaign();
-
-            if (recruitment != null) {
-                if (joinedDate == null || recruitment.isBefore(joinedDate)) {
-                    person.setJoinedCampaign(recruitment);
-                }
-            } else {
-                person.setRecruitment(null);
-            }
-        }
         person.setLastRankChangeDate(lastRankChangeDate);
         person.setRetirement(retirement);
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
