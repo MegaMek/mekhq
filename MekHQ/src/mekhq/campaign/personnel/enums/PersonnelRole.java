@@ -1247,7 +1247,7 @@ public enum PersonnelRole {
      *       Crew role, {@code false} otherwise.
      */
     public boolean isGroundVehicleCrew() {
-        return isGroundVehicleDriver() || isVehicleGunner() || isVehicleCrewExtended();
+        return isGroundVehicleDriver() || isVehicleGunner() || isVehicleCrew();
     }
 
     /**
@@ -1255,7 +1255,7 @@ public enum PersonnelRole {
      *       Crew role, {@code false} otherwise.
      */
     public boolean isNavalVehicleCrew() {
-        return isNavalVehicleDriver() || isVehicleGunner() || isVehicleCrewExtended();
+        return isNavalVehicleDriver() || isVehicleGunner() || isVehicleCrew();
     }
 
     /**
@@ -1263,7 +1263,7 @@ public enum PersonnelRole {
      *       {@code false} otherwise.
      */
     public boolean isVTOLCrew() {
-        return isVTOLPilot() || isVehicleGunner() || isVehicleCrewExtended();
+        return isVTOLPilot() || isVehicleGunner() || isVehicleCrew();
     }
 
     /**
