@@ -530,17 +530,6 @@ class PersonnelRoleTest {
                  NAVAL_VEHICLE_DRIVER,
                  VTOL_PILOT,
                  VEHICLE_GUNNER,
-                 MEK_TECH,
-                 AERO_TEK,
-                 MECHANIC,
-                 BA_TECH,
-                 ASTECH,
-                 DOCTOR,
-                 MEDIC,
-                 COMMS_OPERATOR,
-                 TECH_COMMUNICATIONS,
-                 SENSOR_TECHNICIAN,
-                 CHEF,
                  VEHICLE_CREW -> true;
             default -> false;
         };
