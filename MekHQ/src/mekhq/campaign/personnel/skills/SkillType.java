@@ -519,10 +519,10 @@ public class SkillType {
      *
      *                          <p>For example:</p>
      *                          <pre>
-     *                                                                                                                                                                                                                                                                                                                                                                 Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                                                                                                                                                                                 SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                                                                                                                                                                                 SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                                                                                                                                                                             </pre>
+     *                                                                                                                                                                                                                                                                                                                                                                                          Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                                                                                                                                                          SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                                                                                                                                                          SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                                                                                                                                                      </pre>
      * @param skillLevelsMatter if {@code true}, the skill's level will be displayed in Person View in addition to the
      *                          skill's Target Number
      *
@@ -1242,7 +1242,6 @@ public class SkillType {
 
     public static List<SkillType> getUtilitySkills() {
         List<SkillType> utilitySkills = new ArrayList<>();
-        List<SkillType> utilitySkillsArt = new ArrayList<>();
 
         for (SkillType type : lookupHash.values()) {
             if (type.isSubTypeOf(UTILITY)) {
