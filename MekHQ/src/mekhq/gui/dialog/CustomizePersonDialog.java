@@ -1172,7 +1172,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
 
             JLabel labelReasoning = new JLabel();
-            labelReasoning.setText("Reasoning:");
+            labelReasoning.setText("Talent:");
             labelReasoning.setName("labelReasoning");
 
             gridBagConstraints.gridx = 0;
