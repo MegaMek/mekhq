@@ -300,8 +300,9 @@ public class PersonViewPanel extends JScrollablePanel {
         add(pnlOther, gridBagConstraints);
         gridY++;
 
-        if (campaignOptions.isUseAdvancedMedical() && person.needsFixing()) {
-            JPanel pnlInjuries = fillInjuries();
+        List<Injury> injuries = person.getInjuries();
+        if (campaignOptions.isUseAdvancedMedical() && !injuries.isEmpty()) {
+            JPanel pnlInjuries = fillInjuries(injuries);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -2563,7 +2564,7 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlScenariosLog;
     }
 
-    private JPanel fillInjuries() {
+    private JPanel fillInjuries(List<Injury> injuries) {
         final String WARNING_ICON = "\u26A0";
 
         JPanel pnlInjuries = new JPanel(new BorderLayout());
@@ -2616,7 +2617,6 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlInjuryDetails.add(dummy, gridBagConstraints);
 
         JLabel lblInjury;
-        List<Injury> injuries = person.getInjuries();
         int columns = 3;
         int rowsPerColumn = (int) Math.ceil((double) injuries.size() / columns);
 
