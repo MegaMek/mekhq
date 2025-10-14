@@ -39,29 +39,35 @@ import mekhq.MekHQ;
 public enum UnitMarketRarity {
 
     // region Enum Declarations
-    VERY_RARE("UnitMarketRarity.VERY_RARE.name"),
-    RARE("UnitMarketRarity.RARE.name"),
-    UNCOMMON("UnitMarketRarity.UNCOMMON.name"),
-    COMMON("UnitMarketRarity.COMMON.name"),
-    VERY_COMMON("UnitMarketRarity.VERY_COMMON.name");
+    VERY_RARE("UnitMarketRarity.VERY_RARE.name", 0),
+    RARE("UnitMarketRarity.RARE.name", 1),
+    UNCOMMON("UnitMarketRarity.UNCOMMON.name", 2),
+    COMMON("UnitMarketRarity.COMMON.name", 3),
+    VERY_COMMON("UnitMarketRarity.VERY_COMMON.name", 4),
+    UBIQUITOUS("UnitMarketRarity.UBIQUITOUS.name", 10);
     // endregion Enum Declarations
 
     // region Variable Declarations
     private final String name;
+    private final int rarityValue;
     // endregion Variable Declarations
 
     // region Constructors
-    UnitMarketRarity(final String name) {
+    UnitMarketRarity(final String name, final int rarityValue) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
               MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
+        this.rarityValue = rarityValue;
     }
     // endregion Constructors
 
     // region Getters
-
     public String getName() {
         return name;
+    }
+
+    public int getRarityValue() {
+        return rarityValue;
     }
     // endregion Getters
 
@@ -86,6 +92,10 @@ public enum UnitMarketRarity {
     public boolean isVeryCommon() {
         return this == VERY_COMMON;
     }
+
+    public boolean isUbiquitous() {
+        return this == UBIQUITOUS;
+    }
     // endregion Boolean Comparison Methods
 
     // region File I/O
@@ -97,6 +107,7 @@ public enum UnitMarketRarity {
             case "2", "Uncommon" -> UNCOMMON;
             case "3", "Common" -> COMMON;
             case "4", "Very Common" -> VERY_COMMON;
+            case "5", "Ubiquitous" -> UBIQUITOUS;
             default -> throw new IllegalStateException(
                   "Unexpected value in mekhq/campaign/market/enums/UnitMarketRarity.java/fromString: " + text);
         };
