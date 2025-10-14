@@ -1217,7 +1217,6 @@ public class StratConRulesManager {
             if (trackState.getAssignedForceCoords().containsValue(newCoords)) {
                 continue;
             }
-            ;
 
             // This is to ensure we're not trying to place a scenario off the map
             if ((newCoords.getX() < 0) ||
