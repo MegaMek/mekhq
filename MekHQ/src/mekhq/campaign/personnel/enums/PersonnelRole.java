@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.enums;
 
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
+import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -618,9 +619,8 @@ public enum PersonnelRole {
      * @see #getSkillsForProfession(boolean, boolean, boolean, boolean)
      */
     public List<String> getSkillsForProfession() {
-        return getSkillsForProfession(false, false, false, false);
+        return getSkillsForProfession(false, false, false, false, false);
     }
-
 
     /**
      * Retrieves the list of skill names relevant to this profession, tailored according to provided campaign or
@@ -642,6 +642,33 @@ public enum PersonnelRole {
      */
     public List<String> getSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
           boolean isTechsUseAdministration, boolean isUseArtillery) {
+        return getSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration,
+              isUseArtillery, false);
+    }
+
+
+    /**
+     * Retrieves the list of skill names relevant to this profession, tailored according to provided campaign or
+     * generation options.
+     *
+     * <p>The set of returned skills may vary depending on input flags that define whether certain support or
+     * specialty skills (such as Negotiation, Administration, or Artillery) should be included for appropriate
+     * roles.</p>
+     *
+     * <p>This method is typically used during personnel creation or skill assignment to ensure each role receives a
+     * fitting skill set based on campaign rules and user preferences.</p>
+     *
+     * @param isAdminsHaveNegotiation    if {@code true}, includes Negotiation skill for administrators
+     * @param isDoctorsUseAdministration if {@code true}, includes Administration skill for medical roles
+     * @param isTechsUseAdministration   if {@code true}, includes Administration skill for technical roles
+     * @param isUseArtillery             if {@code true}, includes Artillery skills where applicable
+     * @param includeExpandedSkills      if {@code true}, includes expanded skills for conventional infantry and vehicle
+     *                                   crewmember roles
+     *
+     * @return a list of skill names representing the profession-appropriate skills
+     */
+    public List<String> getSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
+          boolean isTechsUseAdministration, boolean isUseArtillery, boolean includeExpandedSkills) {
         return switch (this) {
             case MEKWARRIOR -> {
                 if (isUseArtillery) {
@@ -662,12 +689,34 @@ public enum PersonnelRole {
                     yield List.of(SkillType.S_GUN_VEE);
                 }
             }
-            case VEHICLE_CREW, MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
+            case MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
+            case VEHICLE_CREW -> {
+                if (includeExpandedSkills) {
+                    yield List.of(S_TECH_MEK,
+                          S_TECH_AERO,
+                          S_TECH_MECHANIC,
+                          S_TECH_BA,
+                          S_SURGERY,
+                          S_MEDTECH,
+                          S_ASTECH,
+                          S_COMMUNICATIONS,
+                          S_SENSOR_OPERATIONS,
+                          S_ART_COOKING);
+                } else {
+                    yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_GUN_VEE);
+                }
+            }
             case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
             case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO);
             case BATTLE_ARMOUR -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
-            case SOLDIER -> List.of(SkillType.S_SMALL_ARMS);
+            case SOLDIER -> {
+                if (includeExpandedSkills) {
+                    yield INFANTRY_GUNNERY_SKILLS;
+                } else {
+                    yield List.of(SkillType.S_SMALL_ARMS);
+                }
+            }
             case VESSEL_PILOT -> List.of(SkillType.S_PILOT_SPACE);
             case VESSEL_GUNNER -> List.of(SkillType.S_GUN_SPACE);
             case VESSEL_CREW -> {
