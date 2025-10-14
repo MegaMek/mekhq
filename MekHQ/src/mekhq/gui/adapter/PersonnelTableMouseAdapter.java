@@ -3168,6 +3168,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             JMenu combatGunnerySkillsCurrent = new JMenu(resources.getString("combatGunnerySkills.text"));
             JMenu combatPilotingSkillsCurrent = new JMenu(resources.getString("combatPilotingSkills.text"));
             JMenu supportSkillsCurrent = new JMenu(resources.getString("supportSkills.text"));
+            JMenu utilitySkillsCurrent = new JMenu(resources.getString("utilitySkills.text"));
             JMenu roleplaySkillsCurrent = new JMenu(resources.getString("roleplaySkills.text"));
             JMenu roleplaySkillsArtCurrent = new JMenu(resources.getString("roleplaySkills.art"));
             JMenu roleplaySkillsInterestCurrent = new JMenu(resources.getString("roleplaySkills.interest"));
@@ -3177,6 +3178,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             JMenu combatGunnerySkillsNew = new JMenu(resources.getString("combatGunnerySkills.text"));
             JMenu combatPilotingSkillsNew = new JMenu(resources.getString("combatPilotingSkills.text"));
             JMenu supportSkillsNew = new JMenu(resources.getString("supportSkills.text"));
+            JMenu utilitySkillsNew = new JMenu(resources.getString("utilitySkills.text"));
             JMenu roleplaySkillsNew = new JMenu(resources.getString("roleplaySkills.text"));
             JMenu roleplaySkillsArtNew = new JMenu(resources.getString("roleplaySkills.art"));
             JMenu roleplaySkillsInterestNew = new JMenu(resources.getString("roleplaySkills.interest"));
@@ -3256,7 +3258,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 case NONE -> currentMenu.add(menuItem);
                                 case COMBAT_GUNNERY -> combatGunnerySkillsCurrent.add(menuItem);
                                 case COMBAT_PILOTING -> combatPilotingSkillsCurrent.add(menuItem);
-                                case SUPPORT, SUPPORT_COMMAND -> supportSkillsCurrent.add(menuItem);
+                                case SUPPORT -> supportSkillsCurrent.add(menuItem);
+                                case UTILITY, UTILITY_COMMAND -> utilitySkillsCurrent.add(menuItem);
                                 case ROLEPLAY_GENERAL -> roleplaySkillsCurrent.add(menuItem);
                                 case ROLEPLAY_ART -> roleplaySkillsArtCurrent.add(menuItem);
                                 case ROLEPLAY_INTEREST -> roleplaySkillsInterestCurrent.add(menuItem);
@@ -3279,7 +3282,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             case NONE -> newSkillsMenu.add(menuItem);
                             case COMBAT_GUNNERY -> combatGunnerySkillsNew.add(menuItem);
                             case COMBAT_PILOTING -> combatPilotingSkillsNew.add(menuItem);
-                            case SUPPORT, SUPPORT_COMMAND -> supportSkillsNew.add(menuItem);
+                            case SUPPORT -> supportSkillsNew.add(menuItem);
+                            case UTILITY, UTILITY_COMMAND -> utilitySkillsNew.add(menuItem);
                             case ROLEPLAY_GENERAL -> roleplaySkillsNew.add(menuItem);
                             case ROLEPLAY_ART -> roleplaySkillsArtNew.add(menuItem);
                             case ROLEPLAY_INTEREST -> roleplaySkillsInterestNew.add(menuItem);
@@ -3299,6 +3303,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             if (supportSkillsCurrent.getMenuComponentCount() > 0) {
                 currentMenu.add(supportSkillsCurrent);
+            }
+            if (utilitySkillsCurrent.getMenuComponentCount() > 0) {
+                currentMenu.add(utilitySkillsCurrent);
             }
             if (roleplaySkillsArtCurrent.getMenuComponentCount() > 0) {
                 roleplaySkillsCurrent.add(roleplaySkillsArtCurrent);
@@ -3325,6 +3332,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             if (supportSkillsNew.getMenuComponentCount() > 0) {
                 newSkillsMenu.add(supportSkillsNew);
+            }
+            if (utilitySkillsNew.getMenuComponentCount() > 0) {
+                newSkillsMenu.add(utilitySkillsNew);
             }
             if (roleplaySkillsArtNew.getMenuComponentCount() > 0) {
                 roleplaySkillsNew.add(roleplaySkillsArtNew);

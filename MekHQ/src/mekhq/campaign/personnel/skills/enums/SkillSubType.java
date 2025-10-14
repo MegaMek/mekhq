@@ -59,14 +59,25 @@ public enum SkillSubType {
     COMBAT_PILOTING,
 
     /**
-     * Represents support (non-combat) skills.
+     * Represents the primary skills used by non-combat professions.
      */
     SUPPORT,
 
     /**
-     * Represents command-related support (non-combat) skills.
+     * Use {@link #UTILITY_COMMAND} instead
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     SUPPORT_COMMAND,
+
+    /**
+     * Represents skills with mechanical effects that are not specifically profession-based skills
+     */
+    UTILITY,
+
+    /**
+     * Represents command-related utility skills.
+     */
+    UTILITY_COMMAND,
 
     /**
      * Represents roleplay or narrative-based skills.

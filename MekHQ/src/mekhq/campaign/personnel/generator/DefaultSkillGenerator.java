@@ -36,11 +36,18 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.UTILITY_COMMAND;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import megamek.common.compute.Compute;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -79,10 +86,10 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // roll small arms skill
         if (!person.getSkills().hasSkill(SkillType.S_SMALL_ARMS)) {
-            int smallArmsLevel = Utilities.generateExpLevel((primaryRole.isSupport(true) ||
-                                                                   secondaryRole.isSupport(true)) ?
-                                                                  skillPreferences.getSupportSmallArmsBonus() :
-                                                                  skillPreferences.getCombatSmallArmsBonus());
+            int smallArmsLevel = generateExpLevel((primaryRole.isSupport(true) ||
+                                                         secondaryRole.isSupport(true)) ?
+                                                        skillPreferences.getSupportSmallArmsBonus() :
+                                                        skillPreferences.getCombatSmallArmsBonus());
 
             if (primaryRole.isCivilian()) {
                 smallArmsLevel = 0;
@@ -93,25 +100,12 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             }
         }
 
-        // roll command skills
         if (primaryRole.isCombat()) {
-            int leadershipSkillLevel = Utilities.generateExpLevel(skillPreferences.getCommandSkillsModifier(expLvl));
-            if (leadershipSkillLevel > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_TACTICS, leadershipSkillLevel, skillPreferences.randomizeSkill(), 0);
-            }
-
-            leadershipSkillLevel = Utilities.generateExpLevel(skillPreferences.getCommandSkillsModifier(expLvl));
-            if (leadershipSkillLevel > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_STRATEGY, leadershipSkillLevel, skillPreferences.randomizeSkill(), 0);
-            }
-
-            leadershipSkillLevel = Utilities.generateExpLevel(skillPreferences.getCommandSkillsModifier(expLvl));
-            if (leadershipSkillLevel > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_LEADER, leadershipSkillLevel, skillPreferences.randomizeSkill(), 0);
-            }
+            generateCommandUtilitySkills(person, expLvl, skillPreferences);
         }
 
         generateRoleplaySkills(person);
+        generateUtilitySkills(person);
 
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
@@ -144,8 +138,8 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
                 SkillType type = SkillType.getType(skillType);
                 if (!person.getSkills().hasSkill(skillType)
                           && !DEPRECATED_SKILLS.contains(type)
-                          // The next two are to prevent double-dipping
-                          && !type.isSubTypeOf(SUPPORT_COMMAND)
+                          // The next lines are to prevent double-dipping
+                          && !type.isUtilitySkill()
                           && !type.isRoleplaySkill()) {
                     if (SkillType.S_ARTILLERY.equals(type.getName()) && !isUseArtillery) {
                         continue;
@@ -156,8 +150,22 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             }
 
             String selSkill = possibleSkills.get(randomInt(possibleSkills.size()));
-            int secondLvl = Utilities.generateExpLevel(skillPreferences.getSecondSkillBonus());
+            int secondLvl = generateExpLevel(skillPreferences.getSecondSkillBonus());
             addSkill(person, selSkill, secondLvl, skillPreferences.randomizeSkill(), 0);
+        }
+    }
+
+    private static void generateCommandUtilitySkills(Person person, int expLvl,
+          RandomSkillPreferences skillPreferences) {
+        for (String skillName : SkillType.getSkillsBySkillSubType(List.of(UTILITY_COMMAND))) {
+            if (person.getSkills().hasSkill(skillName)) {
+                continue;
+            }
+
+            int skillLevel = generateExpLevel(skillPreferences.getCommandSkillsModifier(expLvl));
+            if (skillLevel >= SkillType.EXP_ULTRA_GREEN) {
+                addSkill(person, skillName, skillLevel, skillPreferences.randomizeSkill(), 0);
+            }
         }
     }
 
@@ -259,5 +267,31 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         } else {
             person.setBloodmark(0);
         }
+    }
+
+    /**
+     * Generates an experience level constant based on a dice roll and a provided bonus.
+     *
+     * <p>This method rolls 2d6 (using {@link Compute#d6(int)} with argument {@code 2}), adds the specified bonus,
+     * and caps the total at 12. The result is mapped to an experience level constant.</p>
+     *
+     * @param bonus the value to add to the dice roll before determining level, capped, so the total does not exceed 12
+     *
+     * @return an experience level constant corresponding to the final (capped) roll result
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static int generateExpLevel(int bonus) {
+        int roll = Math.min(Compute.d6(2) + bonus, 12);
+
+        return switch (roll) {
+            case 1 -> EXP_ULTRA_GREEN;
+            case 2, 3, 4, 5 -> EXP_GREEN;
+            case 6, 7, 8, 9 -> EXP_REGULAR;
+            case 10, 11 -> EXP_VETERAN;
+            case 12 -> EXP_ELITE;
+            default -> EXP_NONE;
+        };
     }
 }
