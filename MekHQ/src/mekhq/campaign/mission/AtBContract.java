@@ -61,12 +61,14 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_ASTAR;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_B;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_C;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_F;
 import static mekhq.campaign.stratCon.StratConContractDefinition.getContractDefinition;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.factionStanding.BatchallFactions.BATCHALL_FACTIONS;
 
@@ -786,7 +788,7 @@ public class AtBContract extends Contract {
 
                     for (int i = 0; i < number; i++) {
                         Person person = campaign.newDependent(Gender.RANDOMIZE);
-                        campaign.recruitPerson(person);
+                        campaign.recruitPerson(person, FREE, true, false, false);
                     }
                 } else {
                     campaign.addReport("Bonus: Ronin");
@@ -1692,7 +1694,8 @@ public class AtBContract extends Contract {
         }
 
         if (getContractType().isPirateHunting()) {
-            enemyCode = "PIR";
+            Faction employer = getEmployerFaction();
+            enemyCode = employer.isClan() ? "BAN" : PIRATE_FACTION_CODE;
         } else if (getContractType().isRiotDuty()) {
             enemyCode = "REB";
         }

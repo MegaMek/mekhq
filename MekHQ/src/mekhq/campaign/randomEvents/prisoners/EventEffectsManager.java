@@ -61,6 +61,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -68,6 +69,7 @@ import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
@@ -288,6 +290,10 @@ public class EventEffectsManager {
 
         int priorHits = max(target.getHits(), target.getInjuries().size());
 
+        wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(target,
+              campaign.getCampaignOptions().isUseInjuryFatigue(),
+              campaign.getCampaignOptions().getFatigueRate(), wounds);
+
         if (priorHits + wounds > 5) {
             wounds = 5 - priorHits;
         }
@@ -334,12 +340,17 @@ public class EventEffectsManager {
 
         int targetCount = (int) max(1, potentialTargets.size() * magnitude);
 
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseInjuryFatigue = campaignOptions.isUseInjuryFatigue();
+        int fatigueRate = campaignOptions.getFatigueRate();
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
 
             int wounds = clamp(d6(), 1, 5);
 
             int priorHits = max(target.getHits(), target.getInjuries().size());
+
+            wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(target, isUseInjuryFatigue, fatigueRate, wounds);
 
             if (priorHits + wounds > 5) {
                 wounds = 5 - priorHits;
@@ -1088,7 +1099,7 @@ public class EventEffectsManager {
 
         final int magnitude = result.magnitude();
 
-        List<Person> potentialTargets = campaign.getActivePersonnel(false);
+        List<Person> potentialTargets = campaign.getActivePersonnel(false, true);
 
         if (potentialTargets.isEmpty()) {
             return "";

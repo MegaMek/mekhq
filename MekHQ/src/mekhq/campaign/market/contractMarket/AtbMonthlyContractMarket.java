@@ -46,6 +46,8 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -89,6 +91,8 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  */
 public class AtbMonthlyContractMarket extends AbstractContractMarket {
     private static final MMLogger logger = MMLogger.create(AtbMonthlyContractMarket.class);
+
+    private static final int COMSTAR_CO_OPT_CHANCE = 200;
 
     public AtbMonthlyContractMarket() {
         super(ContractMarketMethod.ATB_MONTHLY);
@@ -306,6 +310,15 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                     // contract.setDifficulty().
                     try {
                         if (contract != null) {
+                            // If ComStar is active, there is a small chance they will co-opt the contract
+                            Faction comStar = Factions.getInstance().getFaction(COMSTAR_FACTION_CODE);
+                            int currentYear = campaign.getGameYear();
+                            if (comStar.validBetween(currentYear, currentYear)) {
+                                if (Compute.randomInt(COMSTAR_CO_OPT_CHANCE) == 0) {
+                                    contract.setEmployerCode(COMSTAR_FACTION_CODE, campaign.getGameYear());
+                                }
+                            }
+
                             contract.setDifficulty(contract.calculateContractDifficulty(contract.getStartDate()
                                                                                               .getYear(),
                                   true,
@@ -460,7 +473,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
               Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()));
 
         if (contract.getContractType().isPirateHunting()) {
-            contract.setEnemyCode("PIR");
+            Faction employer = contract.getEmployerFaction();
+            contract.setEnemyCode(employer.isClan() ? "BAN" : PIRATE_FACTION_CODE);
         } else if (contract.getContractType().isRiotDuty()) {
             contract.setEnemyCode("REB");
         } else {

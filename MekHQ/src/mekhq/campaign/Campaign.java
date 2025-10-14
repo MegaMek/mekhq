@@ -56,7 +56,6 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
-import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.enums.BloodmarkLevel.BLOODMARK_ZERO;
@@ -69,7 +68,10 @@ import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.S_ASTECH;
+import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
+import static mekhq.campaign.personnel.skills.SkillType.S_ZERO_G_OPERATIONS;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -110,7 +112,6 @@ import javax.swing.JOptionPane;
 
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettings;
-import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
@@ -190,11 +191,9 @@ import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
-import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
-import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -229,7 +228,6 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
-import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
@@ -252,14 +250,13 @@ import mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
-import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
-import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
-import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.Appraisal;
 import mekhq.campaign.personnel.skills.Attributes;
+import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -308,7 +305,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.module.atb.AtBEventProcessor;
-import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.MHQXMLUtility;
@@ -323,6 +319,11 @@ public class Campaign implements ITechManager {
     private static final MMLogger LOGGER = MMLogger.create(Campaign.class);
 
     public static final String REPORT_LINEBREAK = "<br/><br/>";
+    /**
+     * When using the 'useful assistants' campaign options, the relevant skill levels possessed by each assistant is
+     * divided by this value and then floored.\
+     */
+    private static final double ASSISTANT_SKILL_LEVEL_DIVIDER = 2.5;
 
     private UUID id;
     private Version version; // this is dynamically populated on load and doesn't need to be saved
@@ -405,13 +406,14 @@ public class Campaign implements ITechManager {
 
     private Finances finances;
 
+    private Systems systemsInstance;
     private CurrentLocation location;
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
 
     private final News news;
 
-    private final PartsStore partsStore;
+    private PartsStore partsStore;
 
     private final List<String> customs;
 
@@ -453,7 +455,7 @@ public class Campaign implements ITechManager {
     private FactionStandings factionStandings;
     private int initiativeBonus;
     private int initiativeMaxBonus;
-    private final CampaignSummary campaignSummary;
+    private CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
     private BehaviorSettings autoResolveBehaviorSettings;
@@ -504,81 +506,121 @@ public class Campaign implements ITechManager {
 
     private final IAutosaveService autosaveService;
 
-    public Campaign() {
+    public Campaign(CampaignConfiguration campConf) {
+        this(
+              campConf.getGame(),
+              campConf.getPlayer(),
+              campConf.getName(),
+              campConf.getDate(),
+              campConf.getCampaignOpts(),
+              campConf.getGameOptions(),
+              campConf.getPartsStore(),
+              campConf.getNewPersonnelMarket(),
+              campConf.getRandomDeath(),
+              campConf.getCampaignSummary(),
+              campConf.getfaction(),
+              campConf.getTechFaction(),
+              campConf.getCurrencyManager(),
+              campConf.getSystemsInstance(),
+              campConf.getLocation(),
+              campConf.getReputationController(),
+              campConf.getFactionStandings(),
+              campConf.getRankSystem(),
+              campConf.getforce(),
+              campConf.getfinances(),
+              campConf.getRandomEvents(),
+              campConf.getUltimatums(),
+              campConf.getRetDefTracker(),
+              campConf.getAutosave(),
+              campConf.getBehaviorSettings(),
+              campConf.getPersonnelMarket(),
+              campConf.getAtBMonthlyContractMarket(),
+              campConf.getUnitMarket(),
+              campConf.getDivorce(),
+              campConf.getMarriage(),
+              campConf.getProcreation()
+        );
+    }
+
+    public Campaign(Game game,
+          Player player, String name, LocalDate date, CampaignOptions campaignOpts, GameOptions gameOptions,
+          PartsStore partsStore, NewPersonnelMarket newPersonnelMarket,
+          RandomDeath randomDeath, CampaignSummary campaignSummary,
+          Faction faction, megamek.common.enums.Faction techFaction, CurrencyManager currencyManager,
+          Systems systemsInstance, CurrentLocation startLocation, ReputationController reputationController,
+          FactionStandings factionStandings, RankSystem rankSystem, Force force, Finances finances,
+          RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums,
+          RetirementDefectionTracker retDefTracker, IAutosaveService autosave,
+          BehaviorSettings behaviorSettings,
+          PersonnelMarket persMarket, AbstractContractMarket atbMonthlyContractMarket,
+          AbstractUnitMarket unitMarket,
+          AbstractDivorce divorce, AbstractMarriage marriage,
+          AbstractProcreation procreation) {
+
+        // Essential state
         id = UUID.randomUUID();
-        game = new Game();
-        player = new Player(0, "self");
-        game.addPlayer(0, player);
-        currentDay = LocalDate.ofYearDay(3067, 1);
+        this.game = game;
+        this.player = player;
+        this.game.addPlayer(0, this.player);
+        this.name = name;
+        currentDay = date;
+        campaignOptions = campaignOpts;
+        this.gameOptions = gameOptions;
+        game.setOptions(gameOptions);
+        this.techFaction = techFaction;
+        this.systemsInstance = systemsInstance;
+        location = startLocation;
+        reputation = reputationController;
+        this.factionStandings = factionStandings;
+        forces = force;
+        forceIds.put(0, forces);
+        this.finances = finances;
+        randomEventLibraries = randomEvents;
+        factionStandingUltimatumsLibrary = ultimatums;
+        retirementDefectionTracker = retDefTracker;
+        autosaveService = autosave;
+        autoResolveBehaviorSettings = behaviorSettings;
+        this.partsStore = partsStore;
+        this.newPersonnelMarket = newPersonnelMarket;
+        this.randomDeath = randomDeath;
+        this.campaignSummary = campaignSummary;
+
+        // Members that take `this` as an argument
+        this.quartermaster = new Quartermaster(this);
+
+        // Primary init, sets state from passed values
+        setFaction(faction);
+        setRankSystemDirect(rankSystem);
+        setPersonnelMarket(persMarket);
+        setContractMarket(atbMonthlyContractMarket);
+        setUnitMarket(unitMarket);
+        setDivorce(divorce);
+        setMarriage(marriage);
+        setProcreation(procreation);
+
+        // Starting config / default values
         campaignStartDate = null;
-        campaignOptions = new CampaignOptions();
-        try {
-            setFaction(Factions.getInstance().getDefaultFaction());
-        } catch (Exception ex) {
-            LOGGER.error("Unable to set faction to default faction. If this wasn't during automated testing this must" +
-                               " be investigated.", ex);
-            setFaction(new Faction());
-        }
-        techFaction = megamek.common.enums.Faction.MERC;
-        CurrencyManager.getInstance().setCampaign(this);
-        try {
-            location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
-        } catch (Exception ex) {
-            LOGGER.error("Unable to set location to default galatea system. If this wasn't during automated testing " +
-                               "this must be investigated.", ex);
-            PlanetarySystem fallbackSystem = new PlanetarySystem("Galatea");
-            location = new CurrentLocation(fallbackSystem, 0);
-        }
+        shoppingList = new ShoppingList();
         isAvoidingEmptySystems = true;
         isOverridingCommandCircuitRequirements = false;
-        currentReport = new ArrayList<>();
-        currentReportHTML = "";
-        newReports = new ArrayList<>();
-        name = randomMercenaryCompanyNameGenerator(null);
         overtime = false;
         gmMode = false;
         retainerEmployerCode = null;
         retainerStartDate = null;
-        reputation = new ReputationController();
-        factionStandings = new FactionStandings();
         crimeRating = 0;
         crimePirateModifier = 0;
         dateOfLastCrime = null;
         initiativeBonus = 0;
         initiativeMaxBonus = 1;
-        setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
-        forces = new Force(name);
-        forceIds.put(0, forces);
         combatTeams = new Hashtable<>();
-        finances = new Finances();
         asTechPool = 0;
         medicPool = 0;
-        resetAsTechMinutes();
-        partsStore = new PartsStore(this);
-        gameOptions = new GameOptions();
-        gameOptions.getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
-        game.setOptions(gameOptions);
         customs = new ArrayList<>();
-        shoppingList = new ShoppingList();
-        newPersonnelMarket = new NewPersonnelMarket(this);
-        news = new News(getGameYear(), id.getLeastSignificantBits());
-        setPersonnelMarket(new PersonnelMarket());
-        setContractMarket(new AtbMonthlyContractMarket());
-        setUnitMarket(new DisabledUnitMarket());
-        randomDeath = new RandomDeath(this);
-        setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
-        setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
-        setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         personnelWhoAdvancedInXP = new ArrayList<>();
-        retirementDefectionTracker = new RetirementDefectionTracker();
         turnoverRetirementInformation = new ArrayList<>();
         atbConfig = null;
-        autosaveService = new AutosaveService();
         hasActiveContract = false;
-        campaignSummary = new CampaignSummary(this);
-        quartermaster = new Quartermaster(this);
         fieldKitchenWithinCapacity = false;
-        autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         processProcurement = true;
@@ -586,20 +628,21 @@ public class Campaign implements ITechManager {
         ignoreMothballed = true;
         ignoreSparesUnderQuality = QUALITY_A;
 
-        // Library initialization
-        try {
-            randomEventLibraries = new RandomEventLibraries();
-        } catch (Exception ex) {
-            LOGGER.error("Unable to initialize RandomEventLibraries. If this wasn't during automated testing this " +
-                               "must be investigated.", ex);
-        }
+        // Reports
+        currentReport = new ArrayList<>();
+        currentReportHTML = "";
+        newReports = new ArrayList<>();
 
-        try {
-            factionStandingUltimatumsLibrary = new FactionStandingUltimatumsLibrary();
-        } catch (Exception ex) {
-            LOGGER.error("Unable to initialize FactionStandingUltimatumsLibrary. If this wasn't during automated " +
-                               "testing this must be investigated.", ex);
-        }
+        // Secondary initialization from passed / derived values
+        news = new News(getGameYear(), id.getLeastSignificantBits());
+        resetAsTechMinutes();
+
+        // These classes require a Campaign reference to operate/initialize
+        currencyManager.setCampaign(this);
+        this.partsStore.stock(this);
+        this.newPersonnelMarket.setCampaign(this);
+        this.randomDeath.setCampaign(this);
+        this.campaignSummary.setCampaign(this);
     }
 
     /**
@@ -873,12 +916,18 @@ public class Campaign implements ITechManager {
 
     public void setNewPersonnelMarket(final NewPersonnelMarket newPersonnelMarket) {
         this.newPersonnelMarket = newPersonnelMarket;
+        this.newPersonnelMarket.setCampaign(this);
     }
     // endregion Markets
 
     // region Personnel Modules
     public void resetRandomDeath() {
-        this.randomDeath = new RandomDeath(this);
+        setRandomDeath(new RandomDeath());
+    }
+
+    public void setRandomDeath(RandomDeath randomDeath) {
+        this.randomDeath = randomDeath;
+        this.randomDeath.setCampaign(this);
     }
 
     public AbstractDivorce getDivorce() {
@@ -934,28 +983,11 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Initializes the unit generator based on the method chosen in campaignOptions. Called when the unit generator is
-     * first used or when the method has been changed in campaignOptions.
+     * Initializes the unit generator. Called when the unit generator is first used or when the method has been changed
+     * in {@link CampaignOptions}.
      */
     public void initUnitGenerator() {
-        if (unitGenerator != null && unitGenerator instanceof RATManager) {
-            MekHQ.unregisterHandler(unitGenerator);
-        }
-        if (campaignOptions.isUseStaticRATs()) {
-            RATManager rm = new RATManager();
-            while (!RandomUnitGenerator.getInstance().isInitialized()) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    LOGGER.error("", e);
-                }
-            }
-            rm.setSelectedRATs(campaignOptions.getRATs());
-            rm.setIgnoreRatEra(campaignOptions.isIgnoreRATEra());
-            unitGenerator = rm;
-        } else {
-            unitGenerator = new RATGeneratorConnector(getGameYear());
-        }
+        unitGenerator = new RATGeneratorConnector(getGameYear());
     }
 
     /**
@@ -1299,6 +1331,11 @@ public class Campaign implements ITechManager {
 
     public CampaignSummary getCampaignSummary() {
         return campaignSummary;
+    }
+
+    public void setCampaignSummary(CampaignSummary campaignSummary) {
+        this.campaignSummary = campaignSummary;
+        this.campaignSummary.setCampaign(this);
     }
 
     public News getNews() {
@@ -2350,7 +2387,7 @@ public class Campaign implements ITechManager {
                 asTechPoolOvertime += Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
             }
         } else {
-            person.changeStatus(this, currentDay, PersonnelStatus.CAMP_FOLLOWER);
+            person.setStatus(PersonnelStatus.CAMP_FOLLOWER);
         }
 
         person.setPrisonerStatus(this, prisonerStatus, log);
@@ -2781,38 +2818,61 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Retrieves a list of active personnel in the campaign, optionally including prisoners.
+     * @deprecated use {@link #getActivePersonnel(boolean, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public List<Person> getActivePersonnel(boolean includePrisoners) {
+        return getActivePersonnel(includePrisoners, false);
+    }
+
+    /**
+     * Returns a list of personnel who are considered "active" according to various status filters.
      *
-     * <p>
-     * This method iterates through all personnel and filters out inactive members. It then further filters prisoners
-     * based on the provided parameter:
-     * </p>
+     * <p>This method iterates through all personnel and includes those whose status is considered "active," then
+     * optionally excludes personnel based on the provided flags for prisoners and camp followers.</p>
+     *
      * <ul>
-     * <li>If {@code includePrisoners} is {@code true}, all active personnel,
-     * including prisoners,
-     * are included in the result.</li>
-     * <li>If {@code includePrisoners} is {@code false}, only active personnel who
-     * are either
-     * free or classified as bondsmen are included.</li>
+     *   <li>If {@code includePrisoners} is {@code false}, any personnel who are currently prisoners (not free or
+     *   bondsmen) will be excluded from the result.</li>
+     *   <li>If {@code includeCampFollowers} is {@code false}, (non-prisoner) camp followers will be excluded from the
+     *   result.</li>
+     *   <li>All included personnel are guaranteed to have a status of {@link PersonnelStatus#ACTIVE} or
+     *   {@link PersonnelStatus#CAMP_FOLLOWER} (if appropriate).</li>
      * </ul>
      *
-     * @param includePrisoners {@code true} to include all active prisoners in the result, {@code false} to exclude them
-     *                         unless they are free or bondsmen.
+     * <p><b>Notes:</b> It might be tempting to overload this method with a version that skips one of the boolean
+     * params. I strongly recommend against this. By forcing developers to explicitly dictate prisoner and follower
+     * inclusion we reduce the risk of either demographic being included/excluded by accident. As happened
+     * frequently prior to these booleans being added. - Illiani, 5th Oct 2025</p>
      *
-     * @return A {@link List} of {@link Person} objects representing the filtered active personnel.
+     * @param includePrisoners     {@code true} to include prisoners
+     * @param includeCampFollowers {@code true} to include <b>non-prisoner</b> camp followers
+     *
+     * @return a {@link List} of {@link Person} objects matching the criteria
      */
-    public List<Person> getActivePersonnel(boolean includePrisoners) {
+    public List<Person> getActivePersonnel(boolean includePrisoners, boolean includeCampFollowers) {
         List<Person> activePersonnel = new ArrayList<>();
 
         for (Person person : getPersonnel()) {
-            if (!person.getStatus().isActive()) {
+            PersonnelStatus status = person.getStatus();
+            PrisonerStatus prisonerStatus = person.getPrisonerStatus();
+            boolean isActive = status.isActiveFlexible();
+            boolean isCampFollower = prisonerStatus.isFreeOrBondsman() && status.isCampFollower();
+            boolean isActivePrisoner = person.getPrisonerStatus().isCurrentPrisoner() && isActive;
+
+            if (!isActive) {
                 continue;
             }
 
-            PrisonerStatus prisonerStatus = person.getPrisonerStatus();
-            if (includePrisoners || prisonerStatus.isFreeOrBondsman()) {
-                activePersonnel.add(person);
+            if (!includeCampFollowers && isCampFollower) {
+                continue;
             }
+
+            if (!includePrisoners && isActivePrisoner) {
+                continue;
+            }
+
+            activePersonnel.add(person);
         }
 
         return activePersonnel;
@@ -2825,7 +2885,7 @@ public class Campaign implements ITechManager {
      * @since 0.50.06
      */
     public List<Person> getSalaryEligiblePersonnel() {
-        return getActivePersonnel(false).stream()
+        return getActivePersonnel(false, false).stream()
                      .filter(person -> person.getStatus().isSalaryEligible())
                      .collect(Collectors.toList());
     }
@@ -2840,20 +2900,20 @@ public class Campaign implements ITechManager {
      * @return a {@link List} of {@link Person} objects representing combat-capable personnel
      */
     public List<Person> getActiveCombatPersonnel() {
-        return getActivePersonnel(true).stream()
+        return getActivePersonnel(false, false).stream()
                      .filter(p -> p.getPrimaryRole().isCombat() || p.getSecondaryRole().isCombat())
                      .collect(Collectors.toList());
     }
 
     /**
-     * Provides a filtered list of personnel including only active Dependents.
+     * Provides a filtered list of personnel including only active Dependents (including camp followers).
      *
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getActiveDependents() {
         return getPersonnel().stream()
                      .filter(person -> person.getPrimaryRole().isDependent())
-                     .filter(person -> person.getStatus().isActive())
+                     .filter(person -> person.getStatus().isActiveFlexible())
                      .collect(Collectors.toList());
     }
 
@@ -2863,7 +2923,7 @@ public class Campaign implements ITechManager {
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getCurrentPrisoners() {
-        return getActivePersonnel(true).stream()
+        return getActivePersonnel(true, false).stream()
                      .filter(person -> person.getPrisonerStatus().isCurrentPrisoner())
                      .collect(Collectors.toList());
     }
@@ -2874,7 +2934,7 @@ public class Campaign implements ITechManager {
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getPrisonerDefectors() {
-        return getActivePersonnel(false).stream()
+        return getActivePersonnel(true, false).stream()
                      .filter(person -> person.getPrisonerStatus().isPrisonerDefector())
                      .collect(Collectors.toList());
     }
@@ -2964,7 +3024,7 @@ public class Campaign implements ITechManager {
             if (person.needsFixing() ||
                       (getCampaignOptions().isUseAdvancedMedical() &&
                              person.hasInjuries(true) &&
-                             person.getStatus().isActive())) {
+                             person.getStatus().isActiveFlexible())) {
                 patients.add(person);
             }
         }
@@ -3185,10 +3245,10 @@ public class Campaign implements ITechManager {
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             PartInUse newPartInUse = getPartInUse((Part) maybePart);
             if (partInUse.equals(newPartInUse)) {
-                partInUse.setPlannedCount(partInUse.getPlannedCount() +
-                                                getQuantity((maybePart instanceof MissingPart) ?
-                                                                  ((MissingPart) maybePart).getNewPart() :
-                                                                  (Part) maybePart) * maybePart.getQuantity());
+                Part newPart = (maybePart instanceof MissingPart) ?
+                                     (((MissingPart) maybePart).getNewPart())
+                                     : (Part) maybePart;
+                partInUse.setPlannedCount(partInUse.getPlannedCount() + newPart.getTotalQuantity());
             }
         }
     }
@@ -3282,11 +3342,10 @@ public class Campaign implements ITechManager {
                 }
                 inUse.put(partInUse, partInUse);
             }
-            partInUse.setPlannedCount(partInUse.getPlannedCount() +
-                                            getQuantity((maybePart instanceof MissingPart) ?
-                                                              ((MissingPart) maybePart).getNewPart() :
-                                                              (Part) maybePart) * maybePart.getQuantity());
-
+            Part newPart = (maybePart instanceof MissingPart) ?
+                                 (((MissingPart) maybePart).getNewPart())
+                                 : (Part) maybePart;
+            partInUse.setPlannedCount(partInUse.getPlannedCount() + newPart.getTotalQuantity());
         }
         return inUse.keySet()
                      .stream()
@@ -3344,7 +3403,7 @@ public class Campaign implements ITechManager {
         boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
         boolean isClanCampaign = isClanCampaign();
 
-        for (Person person : getActivePersonnel(false)) {
+        for (Person person : getActivePersonnel(false, false)) {
             int adjustedReputation = person.getAdjustedReputation(isUseAgingEffects,
                   isClanCampaign,
                   currentDay,
@@ -3414,7 +3473,7 @@ public class Campaign implements ITechManager {
     public @Nullable Person findBestAtSkill(String skillName) {
         Person bestAtSkill = null;
         int highest = 0;
-        for (Person person : getActivePersonnel(false)) {
+        for (Person person : getActivePersonnel(false, false)) {
             int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
                   isClanCampaign(),
                   currentDay,
@@ -3487,7 +3546,7 @@ public class Campaign implements ITechManager {
      *       skill, available time, and rank as specified by the input parameters.
      */
     public List<Person> getTechsExpanded(final boolean noZeroMinute, final boolean eliteFirst, final boolean expanded) {
-        final List<Person> techs = getActivePersonnel(true).stream()
+        final List<Person> techs = getActivePersonnel(false, false).stream()
                                          .filter(person -> (expanded ? person.isTechExpanded() : person.isTech()) &&
                                                                  (!noZeroMinute || (person.getMinutesLeft() > 0)))
                                          .collect(Collectors.toList());
@@ -3526,7 +3585,7 @@ public class Campaign implements ITechManager {
 
     public List<Person> getAdmins() {
         List<Person> admins = new ArrayList<>();
-        for (Person person : getActivePersonnel(true)) {
+        for (Person person : getActivePersonnel(false, false)) {
             if (person.isAdministrator()) {
                 admins.add(person);
             }
@@ -3543,7 +3602,7 @@ public class Campaign implements ITechManager {
 
     public List<Person> getDoctors() {
         List<Person> docs = new ArrayList<>();
-        for (Person person : getActivePersonnel(true)) {
+        for (Person person : getActivePersonnel(false, false)) {
             if (person.isDoctor()) {
                 docs.add(person);
             }
@@ -3553,7 +3612,7 @@ public class Campaign implements ITechManager {
 
     public int getPatientsFor(Person doctor) {
         int patients = 0;
-        for (Person person : getActivePersonnel(true)) {
+        for (Person person : getActivePersonnel(true, true)) {
             if ((null != person.getDoctorId()) && person.getDoctorId().equals(doctor.getId())) {
                 patients++;
             }
@@ -3594,8 +3653,7 @@ public class Campaign implements ITechManager {
         if (skillName.equals(S_AUTO)) {
             return null;
         } else if (skillName.equals(S_TECH)) {
-            for (Person person : getActivePersonnel(false)) {
-
+            for (Person person : getActivePersonnel(false, false)) {
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
@@ -3623,8 +3681,7 @@ public class Campaign implements ITechManager {
                 }
             }
         } else {
-            for (Person person : getActivePersonnel(false)) {
-
+            for (Person person : getActivePersonnel(false, false)) {
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
@@ -3781,7 +3838,7 @@ public class Campaign implements ITechManager {
         Person commander = flaggedCommander;
         Person secondInCommand = null;
 
-        for (Person person : getActivePersonnel(false)) {
+        for (Person person : getActivePersonnel(false, false)) {
             // If we have a flagged commander, skip them
             if (flaggedCommander != null) {
                 if (person.equals(flaggedCommander)) {
@@ -3847,7 +3904,7 @@ public class Campaign implements ITechManager {
             final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
             List<Person> logisticsPersonnel = new ArrayList<>();
 
-            for (Person person : getActivePersonnel(true)) {
+            for (Person person : getActivePersonnel(false, false)) {
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
@@ -4054,7 +4111,7 @@ public class Campaign implements ITechManager {
 
         // find planets within a certain radius - the function will weed out dead
         // planets
-        List<PlanetarySystem> systems = Systems.getInstance()
+        List<PlanetarySystem> systems = this.systemsInstance
                                               .getShoppingSystems(getCurrentSystem(),
                                                     getCampaignOptions().getMaxJumpsPlanetaryAcquisition(),
                                                     currentDate);
@@ -4403,10 +4460,15 @@ public class Campaign implements ITechManager {
         }
         int xpGained = 0;
         if (roll >= target.getValue()) {
+            boolean useFunctionalAppraisal = campaignOptions.isUseFunctionalAppraisal();
+            double valueChange = useFunctionalAppraisal ? Appraisal.performAppraisalMultiplierCheck(person,
+                  currentDay) : 1.0;
+            String appraisalReport = useFunctionalAppraisal ? Appraisal.getAppraisalReport(valueChange) : "";
+
             if (transitDays < 0) {
                 transitDays = calculatePartTransitTime(acquisition.getAvailability());
             }
-            report = report + acquisition.find(transitDays);
+            report = report + acquisition.find(transitDays, valueChange) + ' ' + appraisalReport;
             found = true;
             if (person != null) {
                 if (roll == 12 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
@@ -4982,7 +5044,7 @@ public class Campaign implements ITechManager {
             addReport(article.getHeadlineForReport());
         }
 
-        for (NewsItem article : Systems.getInstance().getPlanetaryNews(getLocalDate())) {
+        for (NewsItem article : this.systemsInstance.getPlanetaryNews(getLocalDate())) {
             addReport(article.getHeadlineForReport());
         }
     }
@@ -5503,6 +5565,10 @@ public class Campaign implements ITechManager {
                     if (!report.isBlank()) {
                         addReport(report);
                     }
+                }
+
+                if (campaignOptions.isUseFunctionalEscapeArtist() && person.getStatus().isPoW()) {
+                    EscapeSkills.performEscapeAttemptCheck(this, person);
                 }
             }
 
@@ -6049,12 +6115,12 @@ public class Campaign implements ITechManager {
         turnoverRetirementInformation.clear();
 
         // Refill Automated Pools, if the options are selected
-        if (MekHQ.getMHQOptions().getNewDayAsTechPoolFill() && requiresAdditionalAsTechs()) {
-            fillAsTechPool();
+        if (MekHQ.getMHQOptions().getNewDayAsTechPoolFill()) {
+            resetAsTechPool();
         }
 
-        if (MekHQ.getMHQOptions().getNewDayMedicPoolFill() && requiresAdditionalMedics()) {
-            fillMedicPool();
+        if (MekHQ.getMHQOptions().getNewDayMedicPoolFill()) {
+            resetMedicPool();
         }
 
         // Ensure we don't have anything that would prevent the new day
@@ -6263,7 +6329,8 @@ public class Campaign implements ITechManager {
         if (isFirstOfMonth) {
             String report = factionStandings.updateClimateRegard(faction,
                   currentDay,
-                  campaignOptions.getRegardMultiplier());
+                  campaignOptions.getRegardMultiplier(),
+                  campaignOptions.isTrackClimateRegardChanges());
             addReport(report);
         }
 
@@ -6504,7 +6571,7 @@ public class Campaign implements ITechManager {
         if (campaignOptions.isUseFatigue()) {
             int fieldKitchenCapacity = checkFieldKitchenCapacity(getForce(FORCE_ORIGIN).getAllUnitsAsUnits(units,
                   false), campaignOptions.getFieldKitchenCapacity());
-            int fieldKitchenUsage = checkFieldKitchenUsage(getActivePersonnel(false),
+            int fieldKitchenUsage = checkFieldKitchenUsage(getActivePersonnel(false, false),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
             fieldKitchenWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
         } else {
@@ -6635,7 +6702,7 @@ public class Campaign implements ITechManager {
     @Deprecated(since = "0.50.07", forRemoval = true)
     public Person getSeniorCommander() {
         Person commander = null;
-        for (Person person : getActivePersonnel(true)) {
+        for (Person person : getActivePersonnel(false, false)) {
             if (person.isCommander()) {
                 return person;
             }
@@ -7634,26 +7701,26 @@ public class Campaign implements ITechManager {
 
     public ArrayList<PlanetarySystem> getSystems() {
         ArrayList<PlanetarySystem> systems = new ArrayList<>();
-        for (String key : Systems.getInstance().getSystems().keySet()) {
-            systems.add(Systems.getInstance().getSystems().get(key));
+        for (String key : this.systemsInstance.getSystems().keySet()) {
+            systems.add(this.systemsInstance.getSystems().get(key));
         }
         return systems;
     }
 
     public PlanetarySystem getSystemById(String id) {
-        return Systems.getInstance().getSystemById(id);
+        return this.systemsInstance.getSystemById(id);
     }
 
     public Vector<String> getSystemNames() {
         Vector<String> systemNames = new Vector<>();
-        for (PlanetarySystem key : Systems.getInstance().getSystems().values()) {
+        for (PlanetarySystem key : this.systemsInstance.getSystems().values()) {
             systemNames.add(key.getPrintableName(getLocalDate()));
         }
         return systemNames;
     }
 
     public PlanetarySystem getSystemByName(String name) {
-        return Systems.getInstance().getSystemByName(name, getLocalDate());
+        return this.systemsInstance.getSystemByName(name, getLocalDate());
     }
 
     // region Ranks
@@ -7799,8 +7866,7 @@ public class Campaign implements ITechManager {
         Map<String, Double> scoreG = new HashMap<>(); // Path costs from start
 
         // Precompute heuristics
-        Systems systemsInstance = Systems.getInstance();
-        Map<String, PlanetarySystem> allSystems = systemsInstance.getSystems();
+        Map<String, PlanetarySystem> allSystems = this.systemsInstance.getSystems();
 
         for (Entry<String, PlanetarySystem> entry : allSystems.entrySet()) {
             scoreH.put(entry.getKey(), end.getDistanceTo(entry.getValue()));
@@ -8408,11 +8474,16 @@ public class Campaign implements ITechManager {
     public TargetRoll getTargetForMaintenance(IPartWork partWork, Person tech, int asTechsUsed) {
         int value = 10;
         String skillLevel = "Unmaintained";
+        PersonnelOptions options = null;
+        Attributes attributes = null;
         if (null != tech) {
+            options = tech.getOptions();
+            attributes = tech.getATOWAttributes();
+
             Skill skill = tech.getSkillForWorkingOn(partWork);
             if (null != skill) {
-                value = skill.getFinalSkillValue(tech.getOptions(), tech.getATOWAttributes());
-                skillLevel = skill.getSkillLevel(tech.getOptions(), tech.getATOWAttributes()).toString();
+                value = skill.getFinalSkillValue(options, attributes);
+                skillLevel = skill.getSkillLevel(options, attributes).toString();
             }
         }
 
@@ -8434,12 +8505,24 @@ public class Campaign implements ITechManager {
                 megamek.common.planetaryConditions.Atmosphere planetaryConditions = planet.getPressure(getLocalDate());
                 int temperature = planet.getTemperature(getLocalDate());
 
+                Skill zeroGSkill = tech == null ? null : tech.getSkill(S_ZERO_G_OPERATIONS);
+                int zeroGSkillLevel = 0;
+                if (zeroGSkill != null) {
+                    zeroGSkillLevel = zeroGSkill.getTotalSkillLevel(options, attributes);
+                }
+
                 if (planet.getGravity() < 0.8) {
-                    target.addModifier(2, "Low Gravity");
+                    int modifier = 2;
+                    target.addModifier(modifier, "Low Gravity");
+                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
                 } else if (planet.getGravity() >= 2.0) {
-                    target.addModifier(4, "Very High Gravity");
+                    int modifier = 4;
+                    target.addModifier(modifier, "Very High Gravity");
+                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
                 } else if (planet.getGravity() > 1.2) {
-                    target.addModifier(1, "High Gravity");
+                    int modifier = 1;
+                    target.addModifier(modifier, "High Gravity");
+                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
                 }
 
                 if (atmosphere.isTainted() || atmosphere.isToxic()) {
@@ -8484,6 +8567,30 @@ public class Campaign implements ITechManager {
         }
 
         return target;
+    }
+
+    /**
+     * Applies a Zero-G Operations skill gravityModifier to the specified {@link TargetRoll}, offsetting a penalty
+     * gravityModifier.
+     *
+     * <ul>
+     *   <li>If {@code zeroGSkillLevel} >= {@code gravityModifier}, does nothing.</li>
+     *   <li>If {@code zeroGSkillLevel} < {@code gravityModifier}, applies {@code -zeroGSkillLevel}.</li>
+     * </ul>
+     *
+     * @param zeroGSkillLevel the Zero-G Operations skill level, which negates up to that much penalty from the
+     *                        gravityModifier
+     * @param gravityModifier the penalty modifier value to offset
+     * @param target          the {@link TargetRoll} instance to modify
+     */
+    private static void addZeroGOperationsModifier(int zeroGSkillLevel, int gravityModifier, TargetRoll target) {
+        if (zeroGSkillLevel > 0) {
+            int effectiveModifier = zeroGSkillLevel >= gravityModifier ? 0 : -zeroGSkillLevel;
+
+            if (effectiveModifier < 0) {
+                target.addModifier(effectiveModifier, "Zero-G Operations");
+            }
+        }
     }
 
     public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition) {
@@ -8654,7 +8761,13 @@ public class Campaign implements ITechManager {
         asTechPool = size;
     }
 
+    /** @deprecated no longer in use **/
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getAsTechPool() {
+        return getTemporaryAsTechPool();
+    }
+
+    public int getTemporaryAsTechPool() {
         return asTechPool;
     }
 
@@ -8662,7 +8775,13 @@ public class Campaign implements ITechManager {
         medicPool = size;
     }
 
+    /** @deprecated no longer in use **/
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public int getMedicPool() {
+        return getTemporaryMedicPool();
+    }
+
+    public int getTemporaryMedicPool() {
         return medicPool;
     }
 
@@ -8671,7 +8790,7 @@ public class Campaign implements ITechManager {
     }
 
     public int getAsTechNeed() {
-        return (Math.toIntExact(getActivePersonnel(true).stream().filter(Person::isTech).count()) *
+        return (Math.toIntExact(getActivePersonnel(false, false).stream().filter(Person::isTech).count()) *
                       MHQConstants.AS_TECH_TEAM_SIZE) -
                      getNumberAsTechs();
     }
@@ -8681,6 +8800,16 @@ public class Campaign implements ITechManager {
         asTechPoolMinutes += (480 * i);
         asTechPoolOvertime += (240 * i);
         MekHQ.triggerEvent(new AsTechPoolChangedEvent(this, i));
+    }
+
+    public void resetAsTechPool() {
+        emptyAsTechPool();
+        fillAsTechPool();
+    }
+
+    public void emptyAsTechPool() {
+        final int currentAsTechs = getTemporaryAsTechPool();
+        decreaseAsTechPool(currentAsTechs);
     }
 
     public void fillAsTechPool() {
@@ -8703,40 +8832,86 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns the total number of primary AsTechs available.
-     * <p>
-     * This method calculates the number of AsTechs by adding the base AsTech pool to the count of active personnel
-     * whose primary role is an AsTech, who are not currently deployed, and are employed.
-     * </p>
+     * Calculates the total number of primary AsTechs available in the campaign.
      *
-     * @return the total number of primary AsTechs
+     * <p>This method iterates through all active personnel whose <b>primary role</b> is AsTech, who are not
+     * currently deployed, and are employed. For each such person, if the campaign option {@code isUseUsefulAsTechs} is
+     * enabled, their total skill level in {@link SkillType#S_ASTECH} is added; otherwise, each person simply counts as
+     * one AsTech regardless of skill.</p>
+     *
+     * @return the total number of primary AsTechs in the campaign
      */
     public int getNumberPrimaryAsTechs() {
-        int asTechs = getAsTechPool();
-        for (Person person : getActivePersonnel(false)) {
-            if (person.getPrimaryRole().isAstech() && !person.isDeployed()) {
+        boolean isUseUsefulAsTechs = getCampaignOptions().isUseUsefulAsTechs();
+
+        int asTechs = getTemporaryAsTechPool();
+
+        for (Person person : getActivePersonnel(false, false)) {
+            if (person.getPrimaryRole().isAstech() && !person.isDeployed() && person.isEmployed()) {
+                // All skilled assistants contribute 1 to the pool, regardless of skill level
                 asTechs++;
+
+                // They then contribution additional 'assistants' to the pool based on their skill level
+                asTechs += isUseUsefulAsTechs ? getAdvancedAsTechContribution(person) : 0;
             }
         }
+
         return asTechs;
     }
 
     /**
-     * Returns the total number of secondary AsTechs available.
-     * <p>
-     * This method calculates the number of AsTechs by adding the base AsTech pool to the count of active personnel
-     * whose secondary role is an AsTech, who are not currently deployed, and are employed.
-     * </p>
+     * Calculates the individual AsTech contribution for a person based on their {@link SkillType#S_ASTECH} skill.
      *
-     * @return the total number of secondary AsTechs
+     * <p>If the person has the {@link SkillType#S_ASTECH} skill, this returns their total skill level considering
+     * all modifiers. If the skill is absent, returns {@code 0}.</p>
+     *
+     * @param person the {@link Person} whose contribution is to be calculated
+     *
+     * @return the total skill level for {@link SkillType#S_ASTECH}, or {@code 0} if not present
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private static int getAdvancedAsTechContribution(Person person) {
+        Skill asTechSkill = person.getSkill(S_ASTECH);
+        if (asTechSkill != null) {
+            PersonnelOptions options = person.getOptions();
+            Attributes attributes = person.getATOWAttributes();
+
+            // It is possible for very poorly skilled characters to actually be a detriment to their teams. This is
+            // by design.
+            int totalSkillLevel = asTechSkill.getFinalSkillValue(options, attributes);
+            return (int) floor(totalSkillLevel / ASSISTANT_SKILL_LEVEL_DIVIDER);
+        }
+
+        return 0;
+    }
+
+    /**
+     * Calculates the total number of secondary AsTechs available in the campaign.
+     *
+     * <p>This method iterates through all active personnel whose <b>secondary role</b> is AsTech, who are not
+     * currently deployed, and are employed. For each such person, if the campaign option {@code isUseUsefulAsTechs} is
+     * enabled, their total skill level in {@link SkillType#S_ASTECH} is added; otherwise, each person simply counts as
+     * one AsTech regardless of skill.</p>
+     *
+     * @return the total number of secondary AsTechs in the campaign
      */
     public int getNumberSecondaryAsTechs() {
+        boolean isUseUsefulAsTechs = getCampaignOptions().isUseUsefulAsTechs();
+
         int asTechs = 0;
-        for (Person person : getActivePersonnel(false)) {
-            if (person.getSecondaryRole().isAstech() && !person.isDeployed()) {
+
+        for (Person person : getActivePersonnel(false, false)) {
+            if (person.getSecondaryRole().isAstech() && !person.isDeployed() && person.isEmployed()) {
+                // All skilled assistants contribute 1 to the pool, regardless of skill level
                 asTechs++;
+
+                // They then contribution additional 'assistants' to the pool based on their skill level
+                asTechs += isUseUsefulAsTechs ? getAdvancedAsTechContribution(person) : 0;
             }
         }
+
         return asTechs;
     }
 
@@ -8813,15 +8988,61 @@ public class Campaign implements ITechManager {
      * @return the number of medics in the campaign including any in the temporary medic pool
      */
     public int getNumberMedics() {
-        int count = 0;
-        for (Person person : getActivePersonnel(false)) {
-            if ((person.getPrimaryRole().isMedic() || person.getSecondaryRole().isMedic()) &&
-                      !person.isDeployed() &&
-                      person.isEmployed()) {
-                count++;
+        int permanentMedicPool = getPermanentMedicPool();
+        return getTemporaryMedicPool() + permanentMedicPool;
+    }
+
+    /**
+     * Calculates the total number of medics available in the campaign by summing the skill levels in the
+     * {@link SkillType#S_MEDTECH} skill for all eligible personnel.
+     *
+     * <p>Eligible personnel must have either a primary or secondary role as a medic, must not be currently deployed,
+     * and must be employed.</p>
+     *
+     * <p></p>For each eligible person, their total skill level in {@link SkillType#S_MEDTECH} (including all
+     * modifiers) is added to the running total.</p>
+     *
+     * @return The total number of medics available.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private int getPermanentMedicPool() {
+        final boolean isUseUsefulMedics = getCampaignOptions().isUseUsefulMedics();
+        int permanentMedicPool = 0;
+
+        for (Person person : getActivePersonnel(false, false)) {
+            if (person.getPrimaryRole().isMedic() || person.getSecondaryRole().isMedic()) {
+                if (person.isDeployed()) {
+                    continue;
+                }
+
+                if (!person.isEmployed()) {
+                    continue;
+                }
+
+                if (!isUseUsefulMedics) {
+                    permanentMedicPool++;
+                } else {
+                    Skill medicSkill = person.getSkill(S_MEDTECH);
+                    if (medicSkill != null) {
+                        PersonnelOptions options = person.getOptions();
+                        Attributes attributes = person.getATOWAttributes();
+
+                        int skillLevel = medicSkill.getTotalSkillLevel(options, attributes);
+
+                        // All skilled assistants contribute 1 to the pool, regardless of skill level
+                        permanentMedicPool++;
+
+                        // It is possible for very poorly skilled personnel to actually reduce the pool, this is by
+                        // design. Not all help is helpful.
+                        permanentMedicPool += (int) floor(skillLevel / ASSISTANT_SKILL_LEVEL_DIVIDER);
+                    }
+                }
             }
         }
-        return getMedicPool() + count;
+
+        return permanentMedicPool;
     }
 
     public boolean requiresAdditionalMedics() {
@@ -8835,6 +9056,16 @@ public class Campaign implements ITechManager {
     public void increaseMedicPool(int i) {
         medicPool += i;
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, i));
+    }
+
+    public void resetMedicPool() {
+        emptyMedicPool();
+        fillMedicPool();
+    }
+
+    public void emptyMedicPool() {
+        final int currentMedicPool = getTemporaryMedicPool();
+        decreaseMedicPool(currentMedicPool);
     }
 
     public void fillMedicPool() {
@@ -8926,6 +9157,11 @@ public class Campaign implements ITechManager {
 
     public PartsStore getPartsStore() {
         return partsStore;
+    }
+
+    public void setPartsStore(PartsStore partsStore) {
+        this.partsStore = partsStore;
+        this.partsStore.stock(this);
     }
 
     public void addCustom(String name) {
@@ -9025,7 +9261,7 @@ public class Campaign implements ITechManager {
     public void setStartingSystem(final @Nullable Planet planet) {
         PlanetarySystem startingSystem;
         if (planet == null) {
-            final Map<String, PlanetarySystem> systemList = Systems.getInstance().getSystems();
+            final Map<String, PlanetarySystem> systemList = this.systemsInstance.getSystems();
             startingSystem = systemList.get(getFaction().getStartingPlanet(getLocalDate()));
 
             if (startingSystem == null) {
@@ -9699,21 +9935,9 @@ public class Campaign implements ITechManager {
             }
             if (part.isSamePartType(p)) {
                 if (p.isPresent()) {
-                    if (p instanceof Armor) { // ProtomekArmor and BAArmor are derived from Armor
-                        nSupply += ((Armor) p).getAmount();
-                    } else if (p instanceof AmmoStorage) {
-                        nSupply += ((AmmoStorage) p).getShots();
-                    } else {
-                        nSupply += p.getQuantity();
-                    }
+                    nSupply += p.getTotalQuantity();
                 } else {
-                    if (p instanceof Armor) { // ProtomekArmor and BAArmor are derived from Armor
-                        nTransit += ((Armor) p).getAmount();
-                    } else if (p instanceof AmmoStorage) {
-                        nTransit += ((AmmoStorage) p).getShots();
-                    } else {
-                        nTransit += p.getQuantity();
-                    }
+                    nTransit += p.getTotalQuantity();
                 }
             }
         }
@@ -9724,13 +9948,7 @@ public class Campaign implements ITechManager {
         int nOrdered = 0;
         IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
         if (null != onOrder) {
-            if (onOrder instanceof Armor) { // ProtoMek Armor and BAArmor are derived from Armor
-                nOrdered += ((Armor) onOrder).getAmount() * ((Armor) onOrder).getQuantity();
-            } else if (onOrder instanceof AmmoStorage) {
-                nOrdered += ((AmmoStorage) onOrder).getShots();
-            } else {
-                nOrdered += onOrder.getQuantity();
-            }
+            nOrdered += onOrder.getTotalQuantity();
         }
 
         inventory.setOrdered(nOrdered);
@@ -10774,7 +10992,7 @@ public class Campaign implements ITechManager {
             startingFaction = factions.getDefaultFaction();
             startingSystem = startingFaction.getStartingPlanet(this, currentDay);
             if (startingSystem == null) {
-                startingSystem = Systems.getInstance().getSystemById(TERRA_ID);
+                startingSystem = this.systemsInstance.getSystemById(TERRA_ID);
             }
         }
 
@@ -10859,7 +11077,26 @@ public class Campaign implements ITechManager {
         }
 
         // Fallback if no startingSystem
-        startingSystem = Systems.getInstance().getSystemById(TERRA_ID);
+        startingSystem = this.systemsInstance.getSystemById(TERRA_ID);
         return startingSystem != null ? startingSystem.getPrimaryPlanet() : null;
+    }
+
+    /**
+     * Now that systemsInstance is injectable and non-final, we may wish to update it on the fly.
+     *
+     * @return systemsInstance Systems instance used when instantiating this Campaign instance.
+     */
+    public Systems getSystemsInstance() {
+        return systemsInstance;
+    }
+
+    /**
+     * Set the systemsInstance to a new instance.  Useful for testing, or updating the set of systems within a running
+     * Campaign.
+     *
+     * @param systemsInstance new Systems instance that this campaign should use.
+     */
+    public void setSystemsInstance(Systems systemsInstance) {
+        this.systemsInstance = systemsInstance;
     }
 }

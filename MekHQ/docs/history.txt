@@ -1,6 +1,437 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.07
+0.50.08
+
+0.50.07 (2025-10- 2130 UTC)
+* Improvement: Added Support for Command Lances in TO&E by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7001
+* Improvement: Added Utility Methods to ReportingUtilities to Allow for Easier Application of Core Colors by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7000
+* Fix: #6955 Fixed Personnel Cleanup to be More Reliable by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6980
+* Fix: Restored Access to Units Involved in Prior Scenarios by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6942
+* Improvement: Refactored Resource Bundle Calls to Reduce Abstraction by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6897
+* Improvement: Removed 'Limit Combat Teams by Commander Strategy' Campaign Option by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6864
+* Feature: Added Monthly Food and Housing Expenses from A Time of War by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6863
+* Improvement: Improved Challenge Estimate Handling; Converted Challenge Warning Dialogs into Immersive Dialogs; Restored Difficulty Contract Pay Modifiers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6856
+* Improvement: Converted Most Convoy Dialogs into Immersive Dialogs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6855
+* Improvement: Rewrote Gray Monday Code to Be Less Fragile; Moved Gray Monday Dialog to Immersive Simple; Added New Portrait Functionality to Immersive Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6854
+* Improvement: Moved VocationalExperience Awards Dialog to Use 'Simple' Version of Immersive Dialog and not 'Full' Version by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6853
+* Improvement: Moved New Bulletins to Use 'Simple' Version of Immersive Dialog and not 'Full' Version by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6851
+* Improvement: Upgraded Contract Automation to Use the New Immersive Dialog Format by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6849
+* Improvement: Improved Personality Generation; Added 'Interview Notes' for Use During Recruitment; Improved Personality Testing by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6848
+* Improvement: Improved Speed of Log Entry Saving in Large Campaigns by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6846
+* Improvement: Stopped Administrators Double-Dipping Use of the Administration Skill By Taking Multiple Admin Roles; Improved Role Eligibility Handling by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6844
+* Fix: #6793 Fixed Maintenance Time for Battle Armor by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6809
+* Feature: Added 7 New Unofficial SPAs for Admin Characters by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6783
+* Feature: Added Externally Employed Civilians by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6961
+* Feature: Added Tracking of Heroic and Legendary Skill Levels by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6904
+* Improvement: Upgraded Prisoner Events to Use a Generic Version of Immersive Dialog Instead of a Single Use Bespoke Versions by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6850
+* Updated Gradle to 8.14. by @rjhancock in https://github.com/MegaMek/mekhq/pull/6922
+* Improvement: Moved Replacement Limb Dialog to Use 'Simple' Version of Immersive Dialog and not 'Full' Version by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6852
+* Feature: Added 254 Civilian Professions by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6920
+* Feature: Completely Rewrote and Rebalanced Recruitment for MekHQ and Campaign Operations by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6879
+* Feature: Implemented Attribute Score Modifiers to all Skills and Skill Usage by @IllianiBird in https://github.com/MegaMek/mekhq/pull/6837
+* Fix: Fix Skill Fetching in Find Best in Role Comparison by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7057
+* Fix Gradle warning due to a deprecation by @rjhancock in https://github.com/MegaMek/mekhq/pull/7058
+* Deprecation Removal from 0.50.05 and before, and legacy code. by @rjhancock in https://github.com/MegaMek/mekhq/pull/7090
+* Fix: Fixed Compatibility Handler for Removal of Scrounge by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7091
+* ENUMs by @exeea in https://github.com/MegaMek/mekhq/pull/7039
+* Jägers by @exeea in https://github.com/MegaMek/mekhq/pull/7094
+* Fix:  Ensured all properties files are UTF-8. by @rjhancock in https://github.com/MegaMek/mekhq/pull/7095
+* Fix: Restored Loading of Financial Year Duration Campaign Option by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7093
+* Improvement: Added Background Characters by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7082
+* Fix: Stopped Babies Breaking Child Labor Laws by Being Born With Jobs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7079
+* Improvement: Improved GUI Look & Feel of Campaign Options and Immersive Dialogs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7076
+* Fix: Updated Campaign Options Iconography for 50.07 by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7065
+* Fix: Updated Preset Compatibility to Match Last Milestone by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7064
+* Fix: Fixed Processing of Profession Salaries in the Event New Profession Added Since Campaign Last Loaded by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7059
+* Improvement: Separated Reputation-Related Campaign Options Into Their Own Tab by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7062
+* new rendering panel + adjusted resolution brakets by @exeea in https://github.com/MegaMek/mekhq/pull/7096
+* Feature: #4838 Added Faction Standing System by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7071
+* Improvement: Updated Campaign UI to Use New Rounded Borders and Buttons by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7097
+* Improvement: Added Faction Standing Report by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7089
+* Improvement: Added Faction Standing Support for Non-StratCon Campaigns by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7092
+* Improvement: Changed Logic for Mass Repair Mass Salvage by @Dark-Hobbit in https://github.com/MegaMek/mekhq/pull/6973
+* Feature: New Campaigns Now Start on Their Faction's Capital Planet by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7101
+* Improvement: Added Faction Standing GM Tools by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7100
+* Fix: Code and resource files for Mech -> Mek by @rjhancock in https://github.com/MegaMek/mekhq/pull/7099
+* Improvement: Added Chance for Mercenary Campaigns to Begin in Another Playable Faction's Territory by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7102
+* Refactor mek hq unit selector by @savanik in https://github.com/MegaMek/mekhq/pull/7085
+* feat: add actual board for acar by @Scoppio in https://github.com/MegaMek/mekhq/pull/6938
+* Legal: License update by @rjhancock in https://github.com/MegaMek/mekhq/pull/7109
+* fix: fixes the error where it was unable to take hex data because the board has empty by @Scoppio in https://github.com/MegaMek/mekhq/pull/7111
+* Improvement: Upgraded Batchalls to Use New Faction Standing by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7113
+* chore: fixing some words, added checkstyle by @Scoppio in https://github.com/MegaMek/mekhq/pull/7104
+* Retactor: group classes together in ui/dialog by @kuronekochomusuke in https://github.com/MegaMek/mekhq/pull/7110
+* Adaptation for multiple boards (MM PR) by @SJuliez in https://github.com/MegaMek/mekhq/pull/7107
+* Refactor: rename MinimapPanel by @kuronekochomusuke in https://github.com/MegaMek/mekhq/pull/7115
+* Fix: stops the nullpointer that was being caused by missing resource in fame an infamy by @Scoppio in https://github.com/MegaMek/mekhq/pull/7120
+* FIX: Documentation by @rjhancock in https://github.com/MegaMek/mekhq/pull/7118
+* Finance NewDay cleanup. Variable and function condensing. by @savanik in https://github.com/MegaMek/mekhq/pull/7050
+* Fix: #7081 Contracts now track required forces based on unit count by @psikomonkie in https://github.com/MegaMek/mekhq/pull/7106
+* Corrected some typos and updated skills to match current entries. by @savanik in https://github.com/MegaMek/mekhq/pull/7117
+* Fix: stop checking a misc flag against equipment class by @Scoppio in https://github.com/MegaMek/mekhq/pull/7129
+* RFE: Allow toggling OpFor callsigns on or off, or setting them to only apply to pilots at or above some skill level by @Sleet01 in https://github.com/MegaMek/mekhq/pull/7123
+* Add page to hanger to show what unit is assigned to each transport by @wildfire142 in https://github.com/MegaMek/mekhq/pull/7152
+* Simple drop-in of the new tabs by @exeea in https://github.com/MegaMek/mekhq/pull/7135
+* Quick buttons for fast marketplace by @exeea in https://github.com/MegaMek/mekhq/pull/7136
+* Fix: Updated EditorConfig File by @rjhancock in https://github.com/MegaMek/mekhq/pull/7154
+* Fix to prevent NPE when trimming in-memory Event Log for date range by @Sleet01 in https://github.com/MegaMek/mekhq/pull/7150
+* Fix incorrect boardsSelectedVector breaks passing scenario maps from MekHQ to MegaMek by @Sleet01 in https://github.com/MegaMek/mekhq/pull/7155
+* Refactor: Add safeties around failure points by @Sleet01 in https://github.com/MegaMek/mekhq/pull/7153
+* Update Campaign.java to use Constant for Astech Team Size by @wildfire142 in https://github.com/MegaMek/mekhq/pull/7148
+* AmmoTypeEnum and BombTypeEnum by @exeea in https://github.com/MegaMek/mekhq/pull/7131
+* FIX: Issue with Copy License Command. by @rjhancock in https://github.com/MegaMek/mekhq/pull/7163
+* Improvement: Added Helper Method to Make Testing Real Campaign Objects Easy by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7162
+* Fix: Removed <br> tag #7167 by @GamesByFelix in https://github.com/MegaMek/mekhq/pull/7168
+* BA tech name in reputation report by @wildfire142 in https://github.com/MegaMek/mekhq/pull/7169
+* Fix: Updated EC and Eclipse.XML file by @rjhancock in https://github.com/MegaMek/mekhq/pull/7176
+* Improvement: #4204 #6865 Improved Accessibility of Market Options by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7174
+* Fix/rolling logs by @Scoppio in https://github.com/MegaMek/mekhq/pull/7173
+* Personnel report rework for addition of secondary roles by @wildfire142 in https://github.com/MegaMek/mekhq/pull/7170
+* Fix: Adjusted to sync then copy the license files. by @rjhancock in https://github.com/MegaMek/mekhq/pull/7178
+* Fix: Adjustments and fixes for CI for OOM issues by @rjhancock in https://github.com/MegaMek/mekhq/pull/7187
+* View to show personnel assign transports by @wildfire142 in https://github.com/MegaMek/mekhq/pull/7175
+* fix: multiple small and simple fixes, reenable planet search, fix npe… by @Scoppio in https://github.com/MegaMek/mekhq/pull/7182
+* Fix: Minor tweaks and updates by @rjhancock in https://github.com/MegaMek/mekhq/pull/7188
+* Fix: #7165 Fixed Typo in Faction Standing Options Label by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7192
+* Fix: #7180 Fixed Tooltips for Personnel Generation in Campaign Options by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7190
+* Fix: #7179 Fixed Typo in Intra-Unit Marriage Campaign Option by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7191
+* Fix: #7151 Fixed Typos in Convoy Escort Scenarios by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7193
+* Fix: #7072 Corrected Tooltip Panel Size in Finance Tab by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7206
+* Fix: #7074 Corrected Typo in Briefing Room Tutorial Panel by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7205
+* Fix: #7077 Removed Duplicate 'Haunted' Personality Quirk by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7204
+* Fix: #7127 No Longer Unassign Primary Role if Secondary is Admin, Unassign Secondary Instead by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7203
+* Improvement: #7197 Added Noble & Common Criminal Civilian Professions by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7202
+* Improvement: #7199 Added Coming of Age RP Skill Generation by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7201
+* Improvement: #7196 Improved Civilian Generation to Include Better Control Over Random Profession Selection by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7200
+* Fix: #7142 Cleaned Up Profession Assignments to Prevent Invalid Assignments by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7194
+* Fix: #7185 Fixed Mothballed Units Teleporting to Already Deployed Forces by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7189
+* Improvement: #7184 Updated Campaign Options Preset Picker to Improve Visual Scaling by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7207
+* Fix: Fixed Typo in Recruiter Notes for Aggression Variant 1 Personality Trait by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7225
+* Improvement: Adjusted Order of Campaign Management Buttons by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7233
+* Improvement: Added Cancel Button to the New Player Quickstart Dialog; Allowed for Resizing of Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7230
+* Fix: Fixed Formatting of General Tab in Campaign Options by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7229
+* Improvement: Added Canon-Based Mercenary Relationships to the Faction Standing System by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7228
+* Fix: Fixed Role Filter Not Filtering When New Personnel Market Dialog is Opened Despite the Previous Filter Being Remembered Correctly by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7227
+* Fix: #7166 Fixed Displayed Applicant in New Personnel Market Lagging Behind Selection When Using Directional Keys by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7226
+* Fix: Stopped Applicants in the New Personnel Market from Forgetting their Profession by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7224
+* Fix: #7222 Stopped New Personnel Market from Thinking Nearly Every Profession was Extinct by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7223
+* Improvement: #7220 Loosened Applicant Experience Level Clamping in New Personnel Market by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7221
+* Improvement: #7218 Add Advance Days Button to New Personnel Market Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7219
+* Faction data as yml by @SJuliez in https://github.com/MegaMek/mekhq/pull/7210
+* Faction data as yaml (data) by @SJuliez in https://github.com/MegaMek/mekhq/pull/7211
+* Improvement: #7216 Added Close Dialog Button to New Personnel Market by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7217
+* Fix: #7156 Fixed Golden Hello in New Personnel Market Not Remembering Last Setting by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7215
+* Improvement: Rebranded Administrative Strain as HR Strain to Reduce Confusion by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7213
+* Improvement: #7208 Added Glossary Entry for Overriding Combat Team Status by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7212
+* Improvement: Replaced Placeholder Glossary with New Layout and Functionality by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7231
+* Improvement: Replaced Placeholder Faction Standing Effect Text with Final by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7234
+* Fix: Fixed Failing Tests Following Faction Data Overhaul by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7236
+* Improvement: New Personnel Market Dialog Will Now Remember Last Size by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7214
+* Fix: Fixed Multiple Issues Following Faction Data Overhaul by @SJuliez in https://github.com/MegaMek/mekhq/pull/7247
+* Improvement: Reorganized Faction Standing Packages by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7254
+* Improvement: Allowed Users to Resize Immersive Dialogs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7260
+* Improvement: Added Aggregate Faction Tag by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7258
+* Fix FactionRecord lookup by @SJuliez in https://github.com/MegaMek/mekhq/pull/7256
+* Personnel report typos by @wildfire142 in https://github.com/MegaMek/mekhq/pull/7264
+* Improvement: Added Rank System Code to Faction Data by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7263
+* Improvement: Depreciated BatchallFactions.java by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7240
+* Improvement: Added 'Safe' Faction Standing Getters by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7235
+* correct BLORD faction data by @SJuliez in https://github.com/MegaMek/mekhq/pull/7270
+* Improvement: Implements Faction Standing-based Batchall Modifiers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7241
+* Fix: Removed Temporary Disable Tag from Failing (Now Passing) Faction Standing Test by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7249
+* Improvement: Implemented Faction Standing-based Negotiation Modifiers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7238
+* Improvement: Implemented Faction Standing-based Resupply Weight Modifiers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7239
+* Improvement: Implements Faction Standing-based Food & Housing Cost Modifiers; Fixed Bug with Food & Housing Costs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7242
+* Improvement: Implements Faction Standing-based Contract Pay; Added Pay Modifier for Clan Campaigns Pre-Tukayyid by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7243
+* Improvement: Implements Faction Standing-based Support Point Generation Modifiers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7244
+* Improvement: Implements Faction Standing-based Unit Market Unit Type Rarity Modifiers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7245
+* Improvement: Implements Faction Standing-based Recruitment Modifiers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7246
+* Fix: Fixed a Number of Checks That Where Incorrectly Only Accounting for Dependents and Not All Civilian Roles by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7259
+* Improvement: Changed Location of Pronoun Data Class for Ease of Access by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7267
+* Fix: Fixed Multiple Finance Report Errors by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7268
+* Fix: Fixed Recruitment Report Not Showing Rank by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7269
+* Fix: Adjusted Active Faction Getter to Optionally Exclude 'Command' Factions by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7265
+* Improvement: Implemented Faction Standings and Contract Outlawing by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7252
+* Improvement: Added Faction Standing-based Employer Liaison Greeting by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7257
+* Improvement: Implemented Command Circuit Travel via GM Mode or Faction Standings by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7251
+* Improvement: Maximum Faction Standing is Now Limited by Faction by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7255
+* Improvement: Optimized Outlaw System Access by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7277
+* Improvement: Added Faction Leadership Tracking to Faction Overhaul by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7279
+* Improvement: Added Improved Ability to Fetch Commander from Campaign; Added Ability to Fetch Second in Command by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7283
+* Improvement: Updated Immersive Dialog to Better Handle Large Volumes of Text by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7282
+* Fix: Fixed a Couple of Minor Issues With News Dialogs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7281
+* Improvement: Added Faction Standing Level Descriptions for all Factions by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7278
+* Improvement: Added The MG, MRB, MRBC, and MBA Factions for Use in Faction Standing by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7276
+* Fix: Fixed a Handful of Calls to Unsafe Faction Standing Getters by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7275
+* Improvement: Numerous Faction Standing Improvements; Added Faction Standing Events by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7290
+* Fix: Fixed Start Year of the Mercenary's Guild by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7291
+* Improvement: Improved Faction Standing Defection with New Dialogs and the Ability for At Will Defection by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7292
+* Improvement: Added Missing Unique Faction Standing Labels for the Four Mercenary Organizations by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7293
+* Feature: Enabled Pirates as a Now Fully Implemented Playable Faction in StratCon by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7295
+* Improvement: Added Faction Standing Ultimatum Events for the Onset of the FedCom Civil War and ComStar Schism. by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7296
+* Improvement: Made the Arano Restoration Faction Playable in StratCon; Added Faction Standing Ultimatum for Arano Restoration War by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7297
+* Improvement: Faction Leader Data by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7298
+* Fix: Fixed Double Welcome to Faction Message for Mercenary Campaigns by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7299
+* Improvement: Updated Faction Icons for Mercenary Review Board, Mercenary Bonding Authority, Piracy Success Index Factions, and Scorpion Empire by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7300
+* Improvement: Updated Faction Starting Location Logic for Mercenary and Pirate Campaigns by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7301
+* Fix: #7287 Unable to Assign Heroic+ Personnel by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7305
+* Improvement: Added Daily Max Tech Minutes and Max Patient Count to Personnel Tab Tech Skills Display by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7306
+* Improvement: Moved Faction Standing Ultimatum Data into YAML Format by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7302
+* Don't double-count beast damage divisor by @pavelbraginskiy in https://github.com/MegaMek/mekhq/pull/7308
+* Fixed: #7088 #7266 Fixed Employment Status Resetting when Time in Service Tracking Disabled; Fixed Time in Service Resetting when Changing Profession by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7307
+* followup: Rename variables `p` and `e` to verbose names by @Abhiram98 in https://github.com/MegaMek/mekhq/pull/7337
+* Fix: #7310 Fixed Defection News Articles Showing Wrong Faction by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7312
+* Fix: #7309Fixed Civilian Professions Using MekWarrior Ranks Instead of Civilian by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7313
+* Fix: #7285 Fixed Babies Ripping Holes in the Space Time Continuum and Being Simultaneously Born Both in the Past and Future by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7314
+* Fix: #7271 Fixed Hydrogen Costs of Large and Small Craft by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7315
+* Improvement: #7262 Allowed All Tech, Medical, and select Civilian Professions to be Assigned to Support Vehicles as Vehicle Crew Without Needing to Be Assigned to the Vehicle Crew Profession by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7317
+* Fix: Fixed Crewmember Assignment Incorrectly Showing as Pilot Assignment by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7321
+* Fix: Fixed Missing 'New Option' Icon from New Personnel Market by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7322
+* Improvement: #7261 Expanded Age Notifications to Include Important Milestones by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7323
+* Fix: Stopped 'Welcome to Faction' Dialog Appearing on Every New Year for Existing Campaigns by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7324
+* Improvement: #7248 Added The GM Ability to Refund Skills by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7325
+* Fix: #7112 Added Missing Heroic & Legendary Skill Milestones by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7329
+* Improvement: Enabled the Display of ATOW Attribute Score Modifiers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7330
+* Fix: #7103 Fixed Dates Loading Incorrectly in Campaign Options Causing Faction and Aging Effects Weirdness by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7331
+* Fix: #7087 Fixed Reputation Modifiers from Aging Being Incorrectly Multiplied by 150 by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7332
+* Fix: #7328 Fixed Ronin and Mercenary Auction Events Incorrectly Scaling Off Required Elements, not Required Combat Teams by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7333
+* Fix: #7326 #7340 Fixed Non-Clan Personnel Committing Bondsref; Fixed Bondsref & Seppuku Prisoners Being Resurrected by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7334
+* Improvement: Increased Speed of Faction Standing Gain/Loss/Degradation; Increased Impact of Contract Breach by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7335
+* Fix: Stopped Personnel From Entering Play with Artillery Skills if Artillery is Disabled by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7336
+* Feature: Added ATOW Bloodmark Trait by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7341
+* Fix: Fixed Skill Check Utility Not Correctly Using Reputation Modifiers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7343
+* Feature: Added ATOW Compulsion and Madness Flaws (SPAs) by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7345
+* Improvement: Added Citizenship/Trueborn SPA by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7344
+* Fix: Fixed Multiple Incorrect Cases of `getRankLevel` vs. `getRankNumeric` by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7342
+* Fix: Fixed Minor Typo in Skill Check Utility Logging by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7361
+* Feature: #7360 Added the Ability to Perform Single-Attribute and Double-Attribute ATOW Attribute Checks by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7362
+* Improvement: Implement Unpleasant Personality Flaw by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7346
+* Improvement: Minor Edit to `getAdjustedReputation` by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7348
+* Improvement: Added `getAdjustedLoyalty` Utility Method by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7352
+* Improvement: Implement Mild Paranoia Flaw by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7347
+* Improvement: Implemented Racism Flaw by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7349
+* Improvement: Implemented Religious Fanaticism Flaw by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7350
+* Improvement: Implemented Traumatic Past Flaw by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7351
+* Improvement: Implemented Excessive Faction Pride Flaw by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7353
+* Improvement: Implemented Gambling Compulsion Flaw by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7354
+* Improvement: Implemented Hatred for Authority SPA by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7355
+* Improvement: Implemented Excessive Faction Loyalty SPA by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7356
+* Improvement: Implemented Pathologic Racism Compulsion Flaw by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7357
+* Improvement: Implemented Addiction ATOW Compulsion by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7363
+* Improvement: Implemented Xenophobia Flaw by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7358
+* Improvement: Implemented Minor Psychosis - Flashbacks by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7365
+* Improvement: Implemented Minor Psychosis - Split Personality by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7366
+* Improvement: Implemented Minor Psychosis - Confusion by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7367
+* Improvement: Implemented Minor Psychosis - Clinical Paranoia by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7368
+* Improvement: Implemented Clinical Insanity - Regression by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7369
+* Improvement: Implemented Clinical Insanity - Catatonia by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7370
+* Improvement: Implemented Clinical Insanity - Berserker by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7371
+* Improvement: Implemented Major Psychosis - Hysteria by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7372
+* Improvement: Added A Time of War Tab to Campaign Options by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7382
+* Fix: #7387 Fixed St. Ive's Compact Alliance Data by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7388
+* Improvement: Reduced Faction Clutter in Faction Standing Report Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7374
+* Fix: Fixed a Pair of Instances Where the Player Could Gain Regard with Aggregate Factions by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7376
+* Improvement: Tightened Up FactionStanding Faction Fetching Logic for Manual Mission Resolution by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7377
+* Fix: Fixed Soft-Lock in Faction Standings When Both Employer and Enemy Are Untracked Factions by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7378
+* Improvement: Added Unique 'Go Rogue' Dialog for Pirate Campaigns by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7379
+* Improvement: Added Unique Faction Greeting for Pirate Campaigns by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7380
+* Feature: Added Dark Secret SPA (ATOW) by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7381
+* Fix: #7386 Removed the Ability to Deploy to StratCon Contracts when Not In the Target System by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7389
+* Improvement: #7385 Added the Ability to Pay Additional SP for Instant Reinforcement Arrival Times; Fixed Reinforcement Target Numbers Being Too High by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7390
+* Fix: #7161 Stopped Resupply from Supplying BAR 0 Armor by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7391
+* Fix: Fixed GM and Overtime Buttons Not Being Selected on Load by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7392
+* Fix: #7338 Fixed Numerous Instances Where We Were Requesting all Units & Only Retrieving Those Units in Combat Forces by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7394
+* Fix: Fixed NPE When Exporting Campaign by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7396
+* Fix: #7172 Fixed NPE When Importing Married Personnel While Simulated Relationship Histories is Enabled by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7397
+* Improvement: Added the Ability to Only Consider the SPAs of a Unit's Commander, When Determining What SPAs a Multi-Crewed Unit Has by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7398
+* Improvement: Allowed Multiple Ultimatums Per Faction by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7400
+* Improvement: Added Faction Standing Ultimatum for Amaris Coup by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7303
+* Improvement: Added Notice to Faction Standings Report for When Faction Standings is Disabled by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7375
+* Improvement: Expanded Functionality of the Connections Trait Based on ATOW by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7383
+* Improvement: Added Faction Standing Speed Campaign Option by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7402
+* Improvement: Implemented Illiterate & Scrounge SPAs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7403
+* Feature: #7316 Removed Mid-Contract Version Change Restrictions; Added Automated Campaign Version Upgrader by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7395
+* Improvement: Added Faction Standing Ultimatum for Kerensky's Exodus by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7401
+* Fix: Fixed Moving Forces Around in TO&E Creating Illegal States by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7393
+* Fix: Fixed Faction Standing Missing Flavor Text by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7404
+* Fix: Fixed Faction Standing Command Circuit Access Not Granting Command Circuit Access by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7412
+* Improvement: Reduced How Much Clan Factions Hate Pirates by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7411
+* Improvement: Reduced How Much Clan Factions Hate Mercenaries by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7410
+* Improvement: Faction Standing Changes Now Increase Based on Contract Duration by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7409
+* Fix: Stopped CamOps Reputation from Factoring Burger Flippers into Force Reputation by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7408
+* Fix: #6787 Fixed Techs Have Administration Not Working for Large Vessels by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7407
+* Improvement: Updated Stock Presets for 50.07 by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7406
+* Improvement: Added Personnel Market Documentation and Made Final Adjustments by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7405
+* Improvement: Moved Two Large Campaign Options Utility Methods Out of Campaign Options by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7423
+* Feature: Added Dialog That Triggers on Campaign Load to Inform the Player of What Milestones the Campaign Needs to be Saved in Before it Can Be Upgraded to the Current Version by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7425
+* Improvement: Further Optimized Campaign Options Loading by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7424
+* Improvement: Added Documentation for Factions Standings & Made Final Adjustments by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7415
+* Improvement: Decreased Support Point Cost of Mercenary Auctions by 50% by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7416
+* Improvement: Decreased Support Point Cost of Ronin Hires by 50% by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7417
+* Fix: Stopped Rare Personnel in Market Alert Occurring if The Character is Removed from the Pool by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7418
+* Improvement: #7413 Added the Ability to GM-Add Applicants to the Personnel Market by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7419
+* Fix: Added Missing Label for Coming of Age Options in Campaign Options by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7421
+* Fix: Restored Missing Anniversaries Options in Campaign Options by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7422
+* Improvement: Added Version History to Campaign Save by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7426
+* Fix: Fixed Minor Bug Where Clan Faction Welcome Events Were Being Given by Merchants and Not MekWarriors by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7427
+* Fix: Removed the Ability to Skip Paying for Golden Hello in Personnel Market if Golden Hello is Disabled After New Applicants Are Generated by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7420
+* Improvement: Minor Adjustment to Preset Incompatibility Checker by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7429
+* Improvement: Expanded 'Personnel Market Updated' Report Message to Include Experience Level Report by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7428
+* Improvement: Expanded Faction Standings GM Tools to Include Manually Triggering Censures & Accolades by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7431
+* Fix: #7430 Fixed Incorrect Morale Messages While on Garrison Contracts by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7432
+* Fix: Fixed Resupplies Not Triggering Smuggler Events for Pirate Campaigns by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7433
+* Improvement: Moved Resupplies to the End of the 1st of Each Month, Rather Than End of Month by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7435
+* Improvement: Converted StratCon Reinforcement Dialog to the Immersive Format by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7436
+* Fix: Fixed Clans Incorrectly Being Considered Honor:None by Default by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7439
+* Fix: Stopped the Clans Cheating at Batchalls (Yet Again) and Other Critical Force Generation Fixes by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7440
+* Improvement: Adjusted the Force Generation Budget for 18 Scenario Types by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7441
+* Improvement: Updated Learning Ropes Campaign for 50.07 by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7442
+* Improvement: Updated Support Point Generation to be By-Weekly, Not Weekly by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7443
+* Fix: Fixed Using Campaign Updater Causing all Personnel to be Treated as 'Ancients' for the Purposes of Aging Effects by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7447
+* MM#7342 Entity Readout adaptations by @SJuliez in https://github.com/MegaMek/mekhq/pull/7446
+* Improvement: Replaced Resupply Convoy Picker Dialog with Immersive Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7434
+* Improvement: Loosened Change Faction Restrictions Based on Accolade & Censure Status by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7445
+* Removed Data. by @rjhancock in https://github.com/MegaMek/mekhq/pull/7459
+* Copyright Header Updates - MHQ by @rjhancock in https://github.com/MegaMek/mekhq/pull/7465
+* Updated Actions for master -> main by @rjhancock in https://github.com/MegaMek/mekhq/pull/7466
+* Gradle and Dependency Updates by @rjhancock in https://github.com/MegaMek/mekhq/pull/7467
+* Integrate mm data with repos by @rjhancock in https://github.com/MegaMek/mekhq/pull/7481
+* Fix for Application Run by @rjhancock in https://github.com/MegaMek/mekhq/pull/7506
+* Fixes for Build. by @rjhancock in https://github.com/MegaMek/mekhq/pull/7509
+* Data Overhaul: Fixed Failing MekHQ Tests by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7510
+* Fix: Fixed Minor Bug in Bondsref Logic by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7505
+* Fix: #7474 Fixed Tutorial Panel Scaling in the Briefing Room by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7504
+* Fix: #7475 Fixed Fatigue Gain From Training Combat Team Deployments by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7503
+* Fix: #7476 Fixed Fatigue Recovery from Field Kitchens by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7502
+* Fix: #7484 Fixed Faction Standings Error When Manually Creating Contract by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7501
+* Fix: Fixed Error in Reinforcement Dialog When User Has 0 Support Points by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7500
+* Fix: Fixed StratCon Scenarios Generating Without Seed Force by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7499
+* Fix: Fixed New Day Command Center 'Flash' Appearing on Wrong Tab by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7498
+* Improvement: Improved Resupply Contents by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7497
+* Improvement: Significantly Improved The GUI for Ronin Recruitment Events by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7496
+* Fix: Fixed Arrangement of End of Contract Ransom Response Buttons by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7495
+* Fix: Fixed Scaling of Mercenary Auction Bids by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7494
+* Fix: Stopped Characters With Incorrect Professions Crewing Units by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7493
+* Fix: #7477 Stopped Faulty Gunner References from Obstructing Campaign Load by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7479
+* Fix: Fixed Story Arcs Character Creation XP Calculator by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7492
+* Improvement: Adjusted Personality Generation to be Less Verbose; Removed Reasoning; Allowed Users to Pick Description Variant by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7491
+* Fix: Fixed Jumping to New Personnel Market During Campaign Creation Causing Crash by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7485
+* Improvement: Adjusted Person View Width in Multiple Places by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7490
+* Fix: Added Ability to Change to Pirate Faction In Response to Ultimatums; Fixed Ultimatums Incorrectly Triggering 'Welcome' and 'Departure' Message Spam by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7486
+* Improvement: Changed Advance Multiple Days Log Display to Default to Oldest Not Newest Entry by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7489
+* Improvement: Improved Display of HR Capacity Penalties to Make Them Easier to Spot by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7488
+* Fix: Fixed Display of SPAs (inc. Flaws) to No Longer Display 'None' when They Have no Prerequisites by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7487
+* Fix: Fixed Scaling of Regard in Faction Standing to Cover All Possible Values of Regard by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7478
+* Class rename codeql copyrights by @rjhancock in https://github.com/MegaMek/mekhq/pull/7511
+* Fix: Fixed Failing Faction Standing Test by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7513
+* Improvement: Advanced Character Builder Life Path Storage by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7514
+* Class rename codeql copyrights by @rjhancock in https://github.com/MegaMek/mekhq/pull/7521
+* MM Root, Moved Events to Common Event by @rjhancock in https://github.com/MegaMek/mekhq/pull/7527
+* MM Utils by @rjhancock in https://github.com/MegaMek/mekhq/pull/7528
+* Copyright and codeql updates by @rjhancock in https://github.com/MegaMek/mekhq/pull/7531
+* Final Pass through MML by @rjhancock in https://github.com/MegaMek/mekhq/pull/7532
+* Graphql and copyright checks by @rjhancock in https://github.com/MegaMek/mekhq/pull/7533
+* Codeql and copyright checks by @rjhancock in https://github.com/MegaMek/mekhq/pull/7538
+* Finish MekHQ by @rjhancock in https://github.com/MegaMek/mekhq/pull/7540
+* Action fixes by @rjhancock in https://github.com/MegaMek/mekhq/pull/7541
+* Fix Mount<?> issues by @Sleet01 in https://github.com/MegaMek/mekhq/pull/7543
+* Fix: Removed Duplicate EraFlag.java Class by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7549
+* Fix 50.07 MHQ tests part 3 by @Sleet01 in https://github.com/MegaMek/mekhq/pull/7544
+* Add handling for new exception type "InvalidPacketDataException" from MM #7420 by @Sleet01 in https://github.com/MegaMek/mekhq/pull/7545
+* Fix #7546: Multi-Level Combat Teams Can Now Deploy Leadership Units by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7547
+* Fix: Default Rank File Now Correctly Resaves with Legal Statement by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7550
+* Fix #7552: Fixed Contract Generation on New Campaign by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7554
+* Fix #7551: Restored Ability to Advance Campaign Day by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7555
+* Fix #7553: Fixed Loading of Parts by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7556
+* Fix: Fixed Random Death Test by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7557
+* Fix: Temporarily Addressed Failing Tests Causing Test Process Crash During Build by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7561
+* Fixes missing strings in Campaign Options dialog and broken Army Creator by @Sleet01 in https://github.com/MegaMek/mekhq/pull/7564
+* Fix: Addressed Rank System Loading Failure by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7569
+* Fix #7570: Fixed Failing Tests Following Data Overhaul (MekHQ Edition) by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7588
+* Improvement: Updated Faction Standing Notification Text Formatting by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7589
+* Fix #7592: Corrected Sorting of Personality Quirks in Edit Person Dialog So That 'None' is Always First in the List by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7593
+* Fix #7591: Dynamically Renamed 'Reset Roleplay Attributes' and 'Reset Roleplay Traits' GM Options to Better Reflect Their Functionality by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7595
+* Fix #7594: Added Missing Event Call When Removing All Roleplay Skills So That Character Changes Are Logged Correctly by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7596
+* Fix #7590: Corrected Errant 'XP' Label in Education Academy Curriculum Tooltips by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7597
+* Fix #7562: Corrected Missing Option Text by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7598
+* Fix #7548, #7605: Multi-Level Training Combat Teams Now Educate Properly; Training Skill Now Has a Use by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7602
+* Fix #7535: Fixed Scenario Resolution Unit Tracking Causing Scenario Resolution Dialog to Not Trigger by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7604
+* Fix #7529: Fixed Education Sorting in Personnel Tab to Order Based on Education Level and Not Alphabetically. by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7606
+* Fix #7524: Fixed Campaign Options Not Saving Edge Cost Changes by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7608
+* Fix #7607: Purchase Edge Option Will Now Remain Visible Even if Character Has Insufficient XP by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7609
+* Improvement #7520 #7522: Updated 'Not Employed by Unit' System by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7610
+* Fix #7483: Allowed Mass Training Dialog to Give Characters New Skills, Not Just Improve Existing Skills by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7611
+* Fix #7472: Fixed Execute Prisoners Message by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7612
+* Fix #7471: Fixed NPE When GM Adding Applicant to Empty Personnel Market by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7613
+* Improvement #7468: Updated Prisoner Capacity Contributions for Non-Infantry Units by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7614
+* Fix #7461: Corrected Morale Modifiers in Morale Doc by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7615
+* Improvement #7460: Improved Display of Possible Hires to Display Civilians Separately to Other Applicants by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7617
+* Fix #7616: Corrected Golden Hello Hiring to Account for Rank 0 Salary Multipliers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7618
+* Fix #7456: Corrected Math for Free Prisoners Option by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7619
+* Fix #7448: Corrected New Resupply Text to Show Right Values by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7620
+* Improvement: Graduated Training Skill from RP Only to Support by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7603
+* Fixed Personnel Market Not Generating Civilian Professions Instead of Generic Dependents by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7621
+* Fix #7518: Fixed Unit Assignments Being Placed in the Wrong Personnel Log by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7623
+* Improvement #7622: Added Skill Improvement Log Entries For Training Combat Teams & Education by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7624
+* Fix 2948: Keep ordered part numbers consistent across dialogs by @Raugharr in https://github.com/MegaMek/mekhq/pull/7463
+* Fix #7462: Removed Residual Static RAT Code by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7626
+* Make Campaign more testable with dependency injections by @Sleet01 in https://github.com/MegaMek/mekhq/pull/7566
+* Bump gradle/actions from 4 to 5 by @dependabot[bot] in https://github.com/MegaMek/mekhq/pull/7628
+* Fix 7634: Add backwards-compatibility class name handler for BaArmor -> BAArmor by @Sleet01 in https://github.com/MegaMek/mekhq/pull/7635
+* Bump github/codeql-action from 3 to 4 by @dependabot[bot] in https://github.com/MegaMek/mekhq/pull/7662
+* Fix #7640: Obfuscated Bloodmark Bounties for Children; Removed Bloodhunts for Child Characters; Updated Bloodmark Glossary Entry to Include Mechanical Information by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7642
+* Improvement: Added Letter Headers to Glossary Entries by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7644
+* Improvement #7643: Improved Personnel Tab Filters to Include Missing or Mislabeled Information & Ease of Use by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7645
+* Improvement #7641: Added the Ability to Pick a Random Date When Starting Campaign by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7646
+* Improvement #7639: Deescalated Unexpected Options from Error to Warn by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7647
+* Fix #7627: Stopped Players from Deploying More Leadership Unit BV Than Budget Allows in StratCon by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7648
+* Improvement: Added Consequences for Breaching Terms of a Batchall by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7649
+* Fix #7650: Restored Ability to View Permanent Injuries in Personnel Tab Character Sheet; Improved Visual Clarity of Injuries by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7651
+* Fix: Refactored Post-Scenario Unit Resetting Potentially Fixing the Infamous 'Ghost Meks' Bug by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7654
+* Improvement: Added ATOW Mechanical Effects to Zero-G Operations Skill by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7656
+* Improvement #7536: Added Option to Hide Monthly Climate Regard Report; Obfuscated Certain Factions from Faction Standing Report Prior to Clan Invasion by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7657
+* Improvement #7519: Added Patient Log by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7659
+* Fix #7637: Added Missing 's' to /logs in Build Directory Construction by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7660
+* Fix #7652: Updated Camp Follower Mechanic for More Consistent Functionality by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7655
+* Improvement: Added Optional Mechanical Effects to Appraisal Skill; Appraisal is No Longer Classified as 'RP Only' by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7661
+* Improvement: Restored & Updated Reasoning; Minor Personality Description Update by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7663
+* Improvement: Improved the Usefulness of Permanent AsTechs and Medics by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7629
+* Fix: Updated Glossary Entries to No Longer Claim Attribute Score Effects Are Coming in 50.07... 'Cause They're Already Here! by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7665
+* Improvement: Expanded POW Functionality to Allow Player-Owned Characters to Escape from Enemy Prisons Using the Acting, Disguise, Escape Artist, and Forgery Skills; These Skills Are No Longer RP Only by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7666
+* Fix: Restored Performance Log Entry Adding by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7664
+* Improvement: Displayed Total Skill Level For Those Skills Where Skill Level is Important by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7631
+* Improvement: Introduced the Abstract Tracking of Infantry Gunnery Skills; Those Skills are No Longer 'RP Only' by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7667
+* Fix: battle loss compensation is payed to the player for units damaged before the battle by @Raugharr in https://github.com/MegaMek/mekhq/pull/7458
+* Fix: Camp Followers Announcing Unemployment Upon Arrival by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7668
+* Fix: Corrected Iconography for Functional Appraisal in Campaign Options by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7669
+* Fix: TO&E Catching Incorrect Error by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7670
+* Improvement: Updated Learning Ropes Quickstart Campaign for 50.07 by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7671
+* Fix #7673: Updated Out-of-Date Princess Behavior File by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7674
+* Improvement: Added the Ability to Randomize Faction When Starting a Campaign by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7677
+* Improvement: Allowed AsTechs to Be Visible In Personnel Table when Filtering for Techs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7675
+* Fix: Fixed Estimated Arrival Time Displaying 1 Day Short by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7679
+* Improvement: Command Center Uses Campaign Faction Icon if No Custom Icon Set by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7676
+* Improvement: Introduced Advanced Scouting to StratCon to Encourage Use of Light Units in Patrol Forces by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7672
+* Fix: Clan Forces Now Factor in Campaign Difficulty When Bidding Away Units by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7680
+* Improvement: Added Sorting to Skills in Mass Training; Owned Skills in Edit Person Dialog Now Pinned to the Top by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7681
+* Improvement: Adds 'Sleight of Hand' to List of Skills Useable in Prison Escape Attempts by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7682
+* Fix #7678: Fixed Inability to Order Certain Gyro Weights When Multiple Units Have Same Gyro Type But Different Weight by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7685
+* Improvement #7683: Added Campaign Option to Display All Attribute Scores on a Character Sheet, Not Just Those With Modifiers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7684
+* Improvement: Improved Results Information for Functional Appraisal by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7687
+* Fix: New Player Quick Start No Longer Uses Illiani's Personal MegaMek Settings (Whoops) by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7691
+* Fix #7689: Fixed Broken Key Binds by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7690
+* Improvement: Updated Contract Generation To Include Mercenary & Bandit Caste Enemies, ComStar as an Employer, and to Boost Anti-Clan Contracts During Invasion by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7686
+* Improvement: Updated XP Gains Based on Extensive Player Feedback by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7692
+* Improvement: Factored Unit Speed into Advanced Scouting Calculations by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7693
+
+## New Contributors
+* @exeea made their first contribution in https://github.com/MegaMek/mekhq/pull/7039
+* @wildfire142 made their first contribution in https://github.com/MegaMek/mekhq/pull/7152
+* @GamesByFelix made their first contribution in https://github.com/MegaMek/mekhq/pull/7168
+* @Abhiram98 made their first contribution in https://github.com/MegaMek/mekhq/pull/7337
+* @Raugharr made their first contribution in https://github.com/MegaMek/mekhq/pull/7463
+
+**Full Changelog**: https://github.com/MegaMek/mekhq/compare/v0.50.06...v0.50.07
 
 0.50.06 (2025-05-19 1830 UTC) (MILESTONE RELEASE) - DEV NOTE - Starting with this release the History file is built on release rather than on going.
 DEV NOTE - Starting with this release the History file is built on release rather than on going.

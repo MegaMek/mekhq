@@ -35,24 +35,100 @@ package testUtilities;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.Base64;
 
+import megamek.common.Player;
+import megamek.common.game.Game;
+import megamek.common.options.GameOptions;
+import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.loaders.MekSummary;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignConfiguration;
+import mekhq.campaign.CampaignFactory;
+import mekhq.campaign.CampaignSummary;
+import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.market.PartsStore;
+import mekhq.campaign.market.TestPartsStore;
+import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
+import mekhq.campaign.universe.TestSystems;
+import mekhq.campaign.personnel.death.RandomDeath;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 
 public final class MHQTestUtilities {
     private static final String TEST_RESOURCES_DIR = "testresources/";
     private static final String TEST_DATA_DIR = TEST_RESOURCES_DIR + "data/";
 
     public static final String TEST_UNIT_DATA_DIR = TEST_DATA_DIR + "mekfiles/";
+    public static final String TEST_CANON_SYSTEMS_DIR = TEST_DATA_DIR + "universe/planetary_systems/canon_systems/";
     public static final String TEST_BLK = ".blk";
     public static final String TEST_MTF = ".mtf";
 
+
+    /**
+     * Create a Campaign Configuration partially configured from the campaign options
+     * Most dependencies are configured here with default values; for more information see
+     * {@link CampaignFactory#createPartialCampaignConfiguration}
+     *
+     * Then set the heavyweight dependencies here:
+     * 1. Systems (TestSystems for testing purposes)
+     * 2. GameOptions (required for MegaMek, may be candidate for further test class development)
+     * 3. Player instance
+     * 4. LocalDate for Campaign start day
+     * 5. CurrentLocation (created from a PlanetarySystem, which must be retrieved using Systems or TestSystems)
+     * 6. Logistical classes: parts store, new-type personnel market, random death generator, persistent campaign
+     *    summary tracker.
+     */
+    public static CampaignConfiguration buildTestConfigWithSystems(Systems systems) {
+        CampaignOptions options = new CampaignOptions();
+        CampaignConfiguration campaignConfiguration = CampaignFactory.createPartialCampaignConfiguration(options);
+
+        // Set Systems instance (may be TestSystems instance)
+        campaignConfiguration.setSystemsInstance(systems);
+
+        // Finalize config and set up game instance
+        Game game = new Game();
+        campaignConfiguration.setGame(game);
+
+        // Set gameOptions, although not necessary for testing that does not spawn a MegaMek instance
+        GameOptions gameOptions = new GameOptions();
+        gameOptions.getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaignConfiguration.getDate().getYear());
+        campaignConfiguration.setGameOptions(gameOptions);
+
+        // Player instance is required
+        Player player = new Player(0, "TestPlayer");
+        campaignConfiguration.setPlayer(player);
+
+        // Date is used for system lookups, events, valid equipment, etc.
+        LocalDate date = LocalDate.ofYearDay(3067, 1);
+        campaignConfiguration.setCurrentDay(date);
+
+        // We need one planetary system at least; load Galatea and get its location
+        systems.load(TEST_CANON_SYSTEMS_DIR + "Galatea.yml");
+        PlanetarySystem starterSystem = systems.getSystems().get("Galatea");
+        campaignConfiguration.setLocation(new CurrentLocation(starterSystem, 0));
+
+        // Create instances of various stores, markets, etc.
+        PartsStore partsStore = new TestPartsStore();
+        NewPersonnelMarket newPersonnelMarket = new NewPersonnelMarket();
+        RandomDeath randomDeath = new RandomDeath();
+        CampaignSummary campaignSummary = new CampaignSummary();
+
+        campaignConfiguration.setPartsStore(partsStore);
+        campaignConfiguration.setNewPersonnelMarket(newPersonnelMarket);
+        campaignConfiguration.setRandomDeath(randomDeath);
+        campaignConfiguration.setCampaignSummary(campaignSummary);
+
+        return campaignConfiguration;
+    }
+
     public static Campaign getTestCampaign() {
-        return new Campaign();
+        return new Campaign(buildTestConfigWithSystems(TestSystems.getInstance()));
     }
 
     public static InputStream ParseBase64XmlFile(String base64) {

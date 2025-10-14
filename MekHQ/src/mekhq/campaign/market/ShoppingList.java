@@ -139,6 +139,7 @@ public class ShoppingList {
                     shoppingItem.incrementQuantity();
                     quantity--;
                 }
+                MekHQ.triggerEvent(new ProcurementEvent(newWork));
                 return;
             }
         }

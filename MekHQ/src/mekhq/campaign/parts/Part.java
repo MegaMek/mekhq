@@ -34,6 +34,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -67,6 +68,7 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekGyro;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingMekActuator;
 import mekhq.campaign.parts.missing.MissingMekLocation;
@@ -102,6 +104,8 @@ import org.w3c.dom.NodeList;
  */
 public abstract class Part implements IPartWork, ITechnology {
     private static final MMLogger LOGGER = MMLogger.create(Part.class);
+
+    private static final DecimalFormat TONNAGE_FORMATTER = new DecimalFormat("0.#");
 
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
@@ -435,6 +439,13 @@ public abstract class Part implements IPartWork, ITechnology {
         if (isUnitTonnageMatters()) {
             toReturn.append(" (").append(getUnitTonnage()).append(" ton)");
         }
+
+        if (this instanceof MekGyro gyro) {
+            // We only want to display the decimal point if it's not zero
+            String tonnage = TONNAGE_FORMATTER.format(gyro.getTonnage());
+            toReturn.append(tonnage).append(" ton");
+        }
+
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
             toReturn.append(" - ")
                   .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
@@ -692,6 +703,7 @@ public abstract class Part implements IPartWork, ITechnology {
             case "VeeStabiliser" -> VeeStabilizer.class.getSimpleName();
             case "MissingVeeStabiliser" -> MissingVeeStabilizer.class.getSimpleName();
             // <50.07 compatibility handlers
+            case "mekhq.campaign.parts.BaArmor" -> "mekhq.campaign.parts.BAArmor";
             case "mekhq.campaign.parts.MekLocation" -> "mekhq.campaign.parts.meks.MekLocation";
             case "mekhq.campaign.parts.MekGyro" -> "mekhq.campaign.parts.meks.MekGyro";
             case "mekhq.campaign.parts.MekLifeSupport" -> "mekhq.campaign.parts.meks.MekLifeSupport";
@@ -1185,26 +1197,32 @@ public abstract class Part implements IPartWork, ITechnology {
      */
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        StringJoiner sj = new StringJoiner(", ");
+        StringJoiner details = new StringJoiner(", ");
         if (!StringUtils.isEmpty(getLocationName())) {
-            sj.add(getLocationName());
+            details.add(getLocationName());
         }
 
         if (isOmniPodded()) {
-            sj.add("OmniPod");
+            details.add("OmniPod");
         }
 
         if (isUnitTonnageMatters()) {
-            sj.add(getUnitTonnage() + " tons");
+            details.add(getUnitTonnage() + " tons");
+        }
+
+        if (this instanceof MekGyro gyro) {
+            // We only want to display the decimal point if it's not zero
+            String tonnage = TONNAGE_FORMATTER.format(gyro.getTonnage());
+            details.add(tonnage + " ton");
         }
 
         if (includeRepairDetails && hits > 0) {
-            sj.add(hits + (hits == 1 ? " hit" : " hits"));
+            details.add(hits + (hits == 1 ? " hit" : " hits"));
             if (campaign.getCampaignOptions().isPayForRepairs()) {
-                sj.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
+                details.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
             }
         }
-        return sj.toString();
+        return details.toString();
     }
 
     @Override
@@ -1356,6 +1374,10 @@ public abstract class Part implements IPartWork, ITechnology {
      */
     public int getQuantity() {
         return quantity;
+    }
+
+    public int getTotalQuantity() {
+        return getQuantity();
     }
 
     public int getSellableQuantity() {

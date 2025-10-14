@@ -57,6 +57,8 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import static org.jfree.chart.ChartColor.DARK_BLUE;
 import static org.jfree.chart.ChartColor.DARK_RED;
@@ -73,6 +75,7 @@ import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -198,6 +201,29 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY = applyAndDisplayAwards(awardController, pnlPortrait, gridY);
         }
 
+        JPanel pnlAttributes = null;
+        if (campaignOptions.isDisplayAllAttributes()) {
+            pnlAttributes = fillAttributeScores();
+        } else {
+            Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
+            if (!relevantAttributes.isEmpty()) {
+                pnlAttributes = fillAttributeModifiers(relevantAttributes);
+            }
+        }
+
+        if (pnlAttributes != null) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlAttributes, gridBagConstraints);
+            gridY++;
+        }
+
         List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING));
         if (!relevantSkills.isEmpty()) {
             JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.combat");
@@ -244,21 +270,6 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlRoleplaySkills, gridBagConstraints);
-            gridY++;
-        }
-
-        Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
-        if (!relevantAttributes.isEmpty()) {
-            JPanel pnlAttributes = fillAttributeModifiers(relevantAttributes);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlAttributes, gridBagConstraints);
             gridY++;
         }
 
@@ -429,6 +440,34 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlMedicalLogHeader, gridBagConstraints);
             add(pnlMedicalLog, gridBagConstraints);
+            gridY++;
+        }
+
+        if (!person.getPatientLog().isEmpty()) {
+            JPanel pnlPatientLogHeader = new JPanel();
+            pnlPatientLogHeader.setName("pnlPatientLogHeader");
+            pnlPatientLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+                  "pnlPatientLogHeader.title")));
+            pnlPatientLogHeader.setVisible(!campaignOptions.isDisplayPatientRecord());
+
+            JPanel pnlPatientLog = fillPatientLog();
+            pnlPatientLog.setName("pnlPatientLog");
+            pnlPatientLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+                  "pnlPatientLog.title")));
+            pnlPatientLog.setVisible(campaignOptions.isDisplayPatientRecord());
+
+            pnlPatientLogHeader.addMouseListener(getSwitchListener(pnlPatientLogHeader, pnlPatientLog));
+            pnlPatientLog.addMouseListener(getSwitchListener(pnlPatientLog, pnlPatientLogHeader));
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlPatientLogHeader, gridBagConstraints);
+            add(pnlPatientLog, gridBagConstraints);
             gridY++;
         }
 
@@ -1015,8 +1054,11 @@ public class PersonViewPanel extends JScrollablePanel {
 
         GridBagConstraints gridBagConstraints;
 
+        LocalDate today = campaign.getLocalDate();
+
         int bloodmarkLevel = person.getBloodmark();
-        if (bloodmarkLevel > BloodmarkLevel.BLOODMARK_ZERO.getLevel()) {
+        boolean isChild = person.isChild(today, true);
+        if (!isChild && (bloodmarkLevel > BloodmarkLevel.BLOODMARK_ZERO.getLevel())) {
             BloodmarkLevel bloodmark = BloodmarkLevel.parseBloodmarkLevelFromInt(bloodmarkLevel);
             Money bounty = bloodmark.getBounty();
             String bountyText = String.format(resourceMap.getString("lblBounty.text"),
@@ -1103,7 +1145,7 @@ public class PersonViewPanel extends JScrollablePanel {
             lblOrigin1.setLabelFor(lblOrigin2);
             String factionName = person.getOriginFaction().getFullName(campaign.getGameYear());
             if (person.getOriginPlanet() != null) {
-                String planetName = person.getOriginPlanet().getName(campaign.getLocalDate());
+                String planetName = person.getOriginPlanet().getName(today);
                 lblOrigin2.setText(String.format("<html><a href='#'>%s</a> (%s)</html>", planetName, factionName));
                 lblOrigin2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblOrigin2.addMouseListener(new MouseAdapter() {
@@ -1170,7 +1212,7 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlInfo.add(lblAge1, gridBagConstraints);
 
         lblAge2.setName("lblAge2");
-        lblAge2.setText(Integer.toString(person.getAge(campaign.getLocalDate())));
+        lblAge2.setText(Integer.toString(person.getAge(today)));
         lblAge1.setLabelFor(lblAge2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -1955,7 +1997,8 @@ public class PersonViewPanel extends JScrollablePanel {
      */
     private JPanel fillAttributeModifiers(Map<SkillAttribute, Integer> relevantAttributes) {
         JPanel pnlAttributes = new JPanel(new GridBagLayout());
-        pnlAttributes.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlSkills.attributes")));
+        pnlAttributes.setBorder(RoundedLineBorder.createRoundedLineBorder(
+              resourceMap.getString("pnlSkills.attributes.modifiers")));
 
         // Calculate how many rows per column for even distribution
         double numColumns = 3.0;
@@ -1972,6 +2015,83 @@ public class PersonViewPanel extends JScrollablePanel {
 
             JLabel lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), attributeName));
             JLabel lblValue = new JLabel((attributeModifier > 0 ? "+" : "") + attributeModifier);
+            lblName.setLabelFor(lblValue);
+
+            String tooltip = wordWrap(attribute.getDescription());
+            lblName.setToolTipText(tooltip);
+            lblValue.setToolTipText(tooltip);
+
+            // Name label constraints
+            GridBagConstraints nameConstraints = new GridBagConstraints();
+            nameConstraints.gridx = gridX;
+            nameConstraints.gridy = row;
+            nameConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+            // Value label constraints
+            GridBagConstraints valueConstraints = new GridBagConstraints();
+            valueConstraints.gridx = gridX + 1;
+            valueConstraints.gridy = row;
+            valueConstraints.anchor = GridBagConstraints.NORTHWEST;
+            valueConstraints.insets = new Insets(0, 5, 0, 10);
+            valueConstraints.weightx = 1;
+
+            pnlAttributes.add(lblName, nameConstraints);
+            pnlAttributes.add(lblValue, valueConstraints);
+
+            i++;
+        }
+
+        return pnlAttributes;
+    }
+
+    /**
+     * Constructs and returns a JPanel displaying the attribute scores and modifiers for a {@link Person}'s ATOW (A Time
+     * of War) attributes.
+     *
+     * <p>The attributes are displayed in three columns for even distribution, with each attribute's label and
+     * corresponding score (including modifier, if applicable). Tooltips are added to each label and value to provide
+     * attribute descriptions.</p>
+     *
+     * @return a {@link JPanel} arranged in a GridBagLayout, showing each attribute's name and value (with modifier, if
+     *       any), each with appropriate tooltips.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private JPanel fillAttributeScores() {
+        JPanel pnlAttributes = new JPanel(new GridBagLayout());
+        pnlAttributes.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+              "pnlSkills.attributes.scores")));
+
+        Attributes attributes = person.getATOWAttributes();
+
+        // Calculate how many rows per column for even distribution
+        double numColumns = 3.0;
+        SkillAttribute[] allAttributes = SkillAttribute.values();
+        int numAttributes = allAttributes.length - 1; // -1 to exclude NONE
+        int skillsPerColumn = (int) ceil(numAttributes / numColumns);
+
+        int i = 0;
+        for (SkillAttribute attribute : allAttributes) {
+            if (attribute == SkillAttribute.NONE) {
+                continue;
+            }
+
+            int column = i / skillsPerColumn; // 0, 1, 2
+            int row = i % skillsPerColumn;
+            int gridX = column * 2; // Each column takes 2 grid positions: name + value
+
+            String attributeName = attribute.getLabel();
+            int attributeScore = attributes.getAttributeScore(attribute);
+            int attributeModifier = attributes.getAttributeModifier(attribute);
+
+            JLabel lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), attributeName));
+            String value = String.valueOf(attributeScore);
+            if (attributeModifier != 0) {
+                value += " (" + (attributeModifier > 0 ? "+" : "") + attributeModifier + ")";
+            }
+
+            JLabel lblValue = new JLabel(value);
             lblName.setLabelFor(lblValue);
 
             String tooltip = wordWrap(attribute.getDescription());
@@ -2381,6 +2501,13 @@ public class PersonViewPanel extends JScrollablePanel {
         return getLogPanel(logs, "Medical log for ", person.getFullName());
     }
 
+    private JPanel fillPatientLog() {
+        List<LogEntry> logs = person.getPatientLog();
+        Collections.reverse(logs);
+
+        return getLogPanel(logs, "Patient log for ", person.getFullName());
+    }
+
     private JPanel fillAssignmentLog() {
         List<LogEntry> logs = person.getAssignmentLog();
         Collections.reverse(logs);
@@ -2437,6 +2564,8 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     private JPanel fillInjuries() {
+        final String WARNING_ICON = "\u26A0";
+
         JPanel pnlInjuries = new JPanel(new BorderLayout());
         pnlInjuries.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlInjuries.title")));
 
@@ -2452,19 +2581,19 @@ public class PersonViewPanel extends JScrollablePanel {
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInjuryDetails.add(lblAdvancedMedical1, gridBagConstraints);
 
         double vWeight = 1.0;
-        if (person.hasInjuries(false)) {
+        if (person.hasInjuries(true)) {
             vWeight = 0.0;
         }
 
         lblAdvancedMedical2.setName("lblAdvancedMedical2");
         lblAdvancedMedical2.setText(getAdvancedMedalEffectString(person));
         lblAdvancedMedical1.setLabelFor(lblAdvancedMedical2);
-        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
@@ -2474,38 +2603,42 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInjuryDetails.add(lblAdvancedMedical2, gridBagConstraints);
 
+        // This adds a dummy/invisible label to column 2, row 0 to prevent column 3 from being pushed away
+        JLabel dummy = new JLabel();
+        dummy.setPreferredSize(new Dimension(0, 0));
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlInjuryDetails.add(dummy, gridBagConstraints);
+
         JLabel lblInjury;
-        JLabel txtInjury;
-        int row = 1;
         List<Injury> injuries = person.getInjuries();
-        for (Injury injury : injuries) {
-            lblInjury = new JLabel(injury.getFluff());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = row;
+        int columns = 3;
+        int rowsPerColumn = (int) Math.ceil((double) injuries.size() / columns);
+
+        for (int i = 0; i < injuries.size(); ++i) {
+            Injury injury = injuries.get(i);
+
+            int col = i / rowsPerColumn;
+            int displayRow = (i % rowsPerColumn) + 1; // Start rows at 1 as we have a header
+
+            String durationValue = injury.isPermanent() ? WARNING_ICON : String.valueOf(injury.getTime());
+            String durationColor = injury.isPermanent() ? getNegativeColor() : getWarningColor();
+            String durationText = messageSurroundedBySpanWithColor(durationColor, durationValue);
+            String label = String.format(resourceMap.getString("format.injuryLabel"), injury.getName(), durationText);
+
+            lblInjury = new JLabel(label);
+            gridBagConstraints.gridx = col;
+            gridBagConstraints.gridy = displayRow;
             gridBagConstraints.weightx = 0.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInjuryDetails.add(lblInjury, gridBagConstraints);
-
-            String text = (injury.isPermanent() && injury.getTime() < 1) ?
-                                resourceMap.getString("lblPermanentInjury.text") :
-                                String.format(resourceMap.getString("format.injuryTime"), injury.getTime());
-            txtInjury = new JLabel("<html>" + text + "</html>");
-            lblInjury.setLabelFor(txtInjury);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = row;
-            gridBagConstraints.weightx = 1.0;
-            if (row == (injuries.size() - 1)) {
-                gridBagConstraints.weighty = 1.0;
-            }
-            gridBagConstraints.insets = new Insets(0, 20, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlInjuryDetails.add(txtInjury, gridBagConstraints);
-            row++;
         }
 
         pnlInjuries.add(pnlInjuryDetails, BorderLayout.CENTER);
@@ -2519,25 +2652,33 @@ public class PersonViewPanel extends JScrollablePanel {
      * @return an HTML encoded string of effects
      */
     private String getAdvancedMedalEffectString(Person person) {
-        StringBuilder medicalEffects = new StringBuilder("<html>");
+        StringBuilder medicalEffects = new StringBuilder();
         final int pilotingMod = person.getInjuryModifiers(true);
         final int gunneryMod = person.getInjuryModifiers(false);
+        boolean hadEffect = false;
+
         if ((pilotingMod != 0) && (pilotingMod < Integer.MAX_VALUE)) {
-            medicalEffects.append(String.format("  Piloting %+d <br>", pilotingMod));
+            medicalEffects.append(String.format("Piloting %+d", pilotingMod));
+            hadEffect = true;
         } else if (pilotingMod == Integer.MAX_VALUE) {
-            medicalEffects.append("  Piloting: <i>Impossible</i>  <br>");
+            medicalEffects.append("Piloting: Impossible");
+            hadEffect = true;
         }
 
         if ((gunneryMod != 0) && (gunneryMod < Integer.MAX_VALUE)) {
-            medicalEffects.append(String.format("  Gunnery: %+d <br>", gunneryMod));
+            if (hadEffect) {medicalEffects.append(", ");}
+            medicalEffects.append(String.format("Gunnery %+d", gunneryMod));
+            hadEffect = true;
         } else if (gunneryMod == Integer.MAX_VALUE) {
-            medicalEffects.append("  Gunnery: <i>Impossible</i>  <br>");
+            if (hadEffect) {medicalEffects.append(", ");}
+            medicalEffects.append("Gunnery: Impossible");
+            hadEffect = true;
         }
 
-        if ((gunneryMod == 0) && (pilotingMod == 0)) {
+        if (!hadEffect) {
             medicalEffects.append("None");
         }
-        return medicalEffects.append("</html>").toString();
+        return medicalEffects.toString();
     }
 
     private JPanel fillKillRecord() {

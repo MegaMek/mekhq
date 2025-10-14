@@ -98,6 +98,7 @@ import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import testUtilities.MHQTestUtilities;
 
 
 /**
@@ -231,7 +232,7 @@ public class ResolverTest {
     }
 
     Campaign createCampaign() {
-        var campaign = new Campaign();
+        var campaign = MHQTestUtilities.getTestCampaign();
         campaign.setName("Test Player");
         var reputationController = mock(ReputationController.class);
         when(reputationController.getAverageSkillLevel()).thenReturn(SkillLevel.REGULAR);

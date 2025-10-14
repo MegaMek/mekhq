@@ -138,9 +138,8 @@ public class RetirementDefectionTracker {
             getManagementSkillValues(campaign);
         }
 
-        for (Person person : campaign.getActivePersonnel(true)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             if ((person.getPrimaryRole().isCivilian()) ||
-                      (!person.getPrisonerStatus().isFree()) ||
                       (person.isDeployed())) {
                 continue;
             }
@@ -511,10 +510,8 @@ public class RetirementDefectionTracker {
      * @param campaign The Campaign object for which to calculate the management skill values.
      */
     private void getManagementSkillValues(Campaign campaign) {
-        for (Person person : campaign.getActivePersonnel(true)) {
-            if ((person.getPrimaryRole().isCivilian()) ||
-                      (person.getPrisonerStatus().isPrisoner()) ||
-                      (person.getPrisonerStatus().isPrisonerDefector())) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
+            if (person.getPrimaryRole().isCivilian()) {
                 continue;
             }
 
@@ -682,12 +679,12 @@ public class RetirementDefectionTracker {
     public static int getHRStrain(Campaign campaign) {
         double personnel = 0;
 
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             PersonnelRole primaryRole = person.getPrimaryRole();
-            if (primaryRole.isAssistant() && person.getSecondaryRole().isNone()) {
-            } else if (primaryRole.isCivilian()) {
+
+            if (primaryRole.isCivilian()) {
                 personnel += 0.1;
-            } else {
+            } else if (!(primaryRole.isAssistant() && person.getSecondaryRole().isNone())) {
                 personnel++;
             }
         }
@@ -709,7 +706,7 @@ public class RetirementDefectionTracker {
         boolean isClanCampaign = campaign.isClanCampaign();
         LocalDate today = campaign.getLocalDate();
 
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             boolean isAdmin = person.getPrimaryRole().isAdministratorHR() ||
                                     person.getSecondaryRole().isAdministratorHR();
             if (!isAdmin) {
@@ -794,7 +791,7 @@ public class RetirementDefectionTracker {
 
         Money profits = campaign.getFinances().getProfits();
 
-        int totalShares = campaign.getActivePersonnel(true)
+        int totalShares = campaign.getActivePersonnel(false, true)
                                 .stream()
                                 .mapToInt(p -> p.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll()))
                                 .sum();

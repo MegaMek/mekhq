@@ -227,7 +227,10 @@ public class ContractSummaryPanel extends JPanel {
             gridBagConstraintsLabels.gridy = ++y;
             mainPanel.add(lblEnemy, gridBagConstraintsLabels);
 
-            JLabel txtEnemy = new JLabel(((AtBContract) contract).getEnemyBotName());
+            boolean enemyIsMerc = ((AtBContract) contract).getEnemy().isMercenary();
+            String mercenaryString = enemyIsMerc ? " (" + resourceMap.getString("lblEnemy.mercenary") + ')' : "";
+            String enemyLabel = ((AtBContract) contract).getEnemyBotName() + mercenaryString;
+            JLabel txtEnemy = new JLabel(enemyLabel);
             txtEnemy.setName("txtEnemy");
             gridBagConstraintsText.gridy = y;
             mainPanel.add(txtEnemy, gridBagConstraintsText);

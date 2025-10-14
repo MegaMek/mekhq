@@ -351,6 +351,7 @@ public final class MHQConstants extends SuiteConstants {
     // endregion File Paths
 
     // startregion Important Dates
+    public static final LocalDate CLAN_INVASION_FIRST_WAVE_BEGINS = LocalDate.of(3050, 3, 7);
     public static final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
     // endregion Important Dates
 }

@@ -131,6 +131,7 @@ public class CampaignOptions {
     private boolean assignedTechFirst;
     private boolean resetToFirstTech;
     private boolean techsUseAdministration;
+    private boolean useUsefulAsTechs;
     private boolean useQuirks;
     private boolean useAeroSystemHits;
     private boolean destroyByMargin;
@@ -166,6 +167,7 @@ public class CampaignOptions {
     // Acquisition
     private int waitingPeriod;
     private String acquisitionSkill;
+    private boolean useFunctionalAppraisal;
     private ProcurementPersonnelPick acquisitionPersonnelCategory;
     private int clanAcquisitionPenalty;
     private int isAcquisitionPenalty;
@@ -238,6 +240,7 @@ public class CampaignOptions {
     private boolean displayScenarioLog;
     private boolean displayKillRecord;
     private boolean displayMedicalRecord;
+    private boolean displayPatientRecord;
     private boolean displayAssignmentRecord;
     private boolean displayPerformanceRecord;
 
@@ -263,9 +266,11 @@ public class CampaignOptions {
     private boolean tougherHealing;
     private int maximumPatients;
     private boolean doctorsUseAdministration;
+    private boolean useUsefulMedics;
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
+    private boolean useFunctionalEscapeArtist;
 
     // Dependent
     private boolean useRandomDependentAddition;
@@ -316,6 +321,7 @@ public class CampaignOptions {
     private RandomOriginOptions randomOriginOptions;
     private boolean useRandomPersonalities;
     private boolean useRandomPersonalityReputation;
+    private boolean useReasoningXpMultiplier;
     private boolean useSimulatedRelationships;
 
     // Family
@@ -479,6 +485,7 @@ public class CampaignOptions {
     private FinancialYearDuration financialYearDuration;
     private boolean newFinancialYearFinancesToCSVExport;
     private boolean simulateGrayMonday;
+    private boolean displayAllAttributes;
     private boolean allowMonthlyReinvestment;
     private boolean allowMonthlyConnections;
 
@@ -590,15 +597,10 @@ public class CampaignOptions {
     private int dropShipBonusPercentage;
     // endregion Markets Tab
 
-    // region RATs Tab
-    private boolean useStaticRATs;
-    private String[] rats;
-    private boolean ignoreRATEra;
-    // endregion RATs Tab
-
     // region Against the Bot Tab
     private boolean useAtB;
     private boolean useStratCon;
+    private boolean useAdvancedScouting;
     private SkillLevel skillLevel;
 
     // Unit Administration
@@ -649,6 +651,7 @@ public class CampaignOptions {
 
     // start region Faction Standing
     private boolean trackFactionStanding;
+    private boolean trackClimateRegardChanges;
     private boolean useFactionStandingNegotiation;
     private boolean useFactionStandingResupply;
     private boolean useFactionStandingCommandCircuit;
@@ -682,6 +685,7 @@ public class CampaignOptions {
         assignedTechFirst = false;
         resetToFirstTech = false;
         techsUseAdministration = false;
+        useUsefulAsTechs = false;
         useQuirks = false;
         useAeroSystemHits = false;
         destroyByMargin = false;
@@ -720,6 +724,7 @@ public class CampaignOptions {
         // Acquisition
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
+        useFunctionalAppraisal = false;
         acquisitionPersonnelCategory = SUPPORT;
         clanAcquisitionPenalty = 0;
         isAcquisitionPenalty = 0;
@@ -805,6 +810,7 @@ public class CampaignOptions {
         setDisplayScenarioLog(false);
         setDisplayKillRecord(false);
         setDisplayMedicalRecord(false);
+        displayPatientRecord = false;
         setRewardComingOfAgeAbilities(false);
         setRewardComingOfAgeRPSkills(false);
 
@@ -830,9 +836,11 @@ public class CampaignOptions {
         setTougherHealing(false);
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
+        useUsefulMedics = false;
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
+        useFunctionalEscapeArtist = false;
 
         // Dependent
         setUseRandomDependentAddition(false);
@@ -925,6 +933,7 @@ public class CampaignOptions {
         setRandomOriginOptions(new RandomOriginOptions(true));
         setUseRandomPersonalities(false);
         setUseRandomPersonalityReputation(true);
+        setUseReasoningXpMultiplier(true);
         setUseSimulatedRelationships(false);
 
         // Family
@@ -1108,6 +1117,7 @@ public class CampaignOptions {
         setFinancialYearDuration(FinancialYearDuration.ANNUAL);
         newFinancialYearFinancesToCSVExport = false;
         simulateGrayMonday = false;
+        displayAllAttributes = false;
         allowMonthlyReinvestment = false;
         allowMonthlyConnections = false;
 
@@ -1227,15 +1237,10 @@ public class CampaignOptions {
         setDropShipBonusPercentage(0);
         // endregion Markets Tab
 
-        // region RATs Tab
-        setUseStaticRATs(false);
-        setRATs("Xotl", "Total Warfare");
-        setIgnoreRATEra(false);
-        // endregion RATs Tab
-
         // region Against the Bot Tab
         useAtB = false;
         useStratCon = false;
+        useAdvancedScouting = false;
         setSkillLevel(SkillLevel.REGULAR);
         autoResolveMethod = AutoResolveMethod.PRINCESS;
         autoResolveVictoryChanceEnabled = false;
@@ -1708,6 +1713,14 @@ public class CampaignOptions {
         this.displayMedicalRecord = displayMedicalRecord;
     }
 
+    public boolean isDisplayPatientRecord() {
+        return displayPatientRecord;
+    }
+
+    public void setDisplayPatientRecord(final boolean displayPatientRecord) {
+        this.displayPatientRecord = displayPatientRecord;
+    }
+
     public boolean isDisplayAssignmentRecord() {
         return displayAssignmentRecord;
     }
@@ -1973,6 +1986,14 @@ public class CampaignOptions {
         this.doctorsUseAdministration = doctorsUseAdministration;
     }
 
+    public boolean isUseUsefulMedics() {
+        return useUsefulMedics;
+    }
+
+    public void setIsUseUsefulMedics(final boolean useUsefulMedics) {
+        this.useUsefulMedics = useUsefulMedics;
+    }
+
     // endregion Medical
 
     // region Prisoners
@@ -1982,6 +2003,14 @@ public class CampaignOptions {
 
     public void setPrisonerCaptureStyle(final PrisonerCaptureStyle prisonerCaptureStyle) {
         this.prisonerCaptureStyle = prisonerCaptureStyle;
+    }
+
+    public boolean isUseFunctionalEscapeArtist() {
+        return useFunctionalEscapeArtist;
+    }
+
+    public void setUseFunctionalEscapeArtist(final boolean useFunctionalEscapeArtist) {
+        this.useFunctionalEscapeArtist = useFunctionalEscapeArtist;
     }
     // endregion Prisoners
 
@@ -2028,13 +2057,12 @@ public class CampaignOptions {
         this.useRandomPersonalityReputation = useRandomPersonalityReputation;
     }
 
-    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean isUseReasoningXpMultiplier() {
-        return false;
+        return useReasoningXpMultiplier;
     }
 
-    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setUseReasoningXpMultiplier(final boolean useReasoningXpMultiplier) {
+        this.useReasoningXpMultiplier = useReasoningXpMultiplier;
     }
 
     public boolean isUseSimulatedRelationships() {
@@ -3509,6 +3537,14 @@ public class CampaignOptions {
         this.allowMonthlyReinvestment = allowMonthlyReinvestment;
     }
 
+    public boolean isDisplayAllAttributes() {
+        return displayAllAttributes;
+    }
+
+    public void setDisplayAllAttributes(final boolean displayAllAttributes) {
+        this.displayAllAttributes = displayAllAttributes;
+    }
+
     public boolean isAllowMonthlyConnections() {
         return allowMonthlyConnections;
     }
@@ -3788,28 +3824,50 @@ public class CampaignOptions {
     // endregion Markets Tab
 
     // region RATs Tab
+
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean isUseStaticRATs() {
-        return useStaticRATs;
+        return false;
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setUseStaticRATs(final boolean useStaticRATs) {
-        this.useStaticRATs = useStaticRATs;
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public String[] getRATs() {
-        return rats;
+        return new String[0];
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setRATs(final String... rats) {
-        this.rats = rats;
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public boolean isIgnoreRATEra() {
-        return ignoreRATEra;
+        return false;
     }
 
+    /**
+     * @deprecated no longer in use
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
     public void setIgnoreRATEra(final boolean ignore) {
-        this.ignoreRATEra = ignore;
     }
     // endregion RATs Tab
 
@@ -3860,6 +3918,14 @@ public class CampaignOptions {
      */
     public void setTechsUseAdministration(final boolean techsUseAdministration) {
         this.techsUseAdministration = techsUseAdministration;
+    }
+
+    public boolean isUseUsefulAsTechs() {
+        return useUsefulAsTechs;
+    }
+
+    public void setIsUseUsefulAsTechs(final boolean useUsefulAsTechs) {
+        this.useUsefulAsTechs = useUsefulAsTechs;
     }
 
     /**
@@ -4162,6 +4228,14 @@ public class CampaignOptions {
 
     public void setAcquisitionSkill(final String acquisitionSkill) {
         this.acquisitionSkill = acquisitionSkill;
+    }
+
+    public boolean isUseFunctionalAppraisal() {
+        return useFunctionalAppraisal;
+    }
+
+    public void setUseFunctionalAppraisal(final boolean useFunctionalAppraisal) {
+        this.useFunctionalAppraisal = useFunctionalAppraisal;
     }
 
     /**
@@ -4525,6 +4599,14 @@ public class CampaignOptions {
 
     public void setUseStratCon(final boolean useStratCon) {
         this.useStratCon = useStratCon;
+    }
+
+    public boolean isUseAdvancedScouting() {
+        return useAdvancedScouting;
+    }
+
+    public void setUseAdvancedScouting(final boolean useAdvancedScouting) {
+        this.useAdvancedScouting = useAdvancedScouting;
     }
 
     public boolean isUseAero() {
@@ -5349,6 +5431,14 @@ public class CampaignOptions {
 
     public void setTrackFactionStanding(boolean trackFactionStanding) {
         this.trackFactionStanding = trackFactionStanding;
+    }
+
+    public boolean isTrackClimateRegardChanges() {
+        return trackClimateRegardChanges;
+    }
+
+    public void setTrackClimateRegardChanges(boolean trackClimateRegardChanges) {
+        this.trackClimateRegardChanges = trackClimateRegardChanges;
     }
 
     public double getRegardMultiplier() {

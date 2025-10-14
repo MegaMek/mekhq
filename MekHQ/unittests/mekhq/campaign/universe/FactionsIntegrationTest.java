@@ -41,10 +41,20 @@ import java.time.LocalDate;
 import java.util.List;
 
 import megamek.common.universe.FactionTag;
+import megamek.common.universe.Factions2;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.DOMException;
 
 public class FactionsIntegrationTest {
+    private static Factions2 testFactions2;
+
+    @BeforeAll
+    public static void setUp() {
+        testFactions2 = new Factions2("testresources/data/universe/factions");
+        Factions.setInstance(Factions.loadDefault(true));
+    }
+
     @Test
     public void loadDefaultTest() throws DOMException {
         Factions factions = Factions.loadDefault(true);

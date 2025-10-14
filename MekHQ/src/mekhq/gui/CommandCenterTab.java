@@ -52,6 +52,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.common.event.Subscribe;
+import megamek.utilities.ImageUtilities;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -179,7 +180,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblIcon = new JLabel();
         lblIcon.getAccessibleContext().setAccessibleName("Player Camouflage");
         panIcon.add(lblIcon, BorderLayout.CENTER);
-        lblIcon.setIcon(getCampaign().getUnitIcon().getImageIcon(150));
+        ImageIcon icon = getAndScaleCampaignIcon();
+        lblIcon.setIcon(icon);
 
         /* Set overall layout */
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -233,6 +235,24 @@ public final class CommandCenterTab extends CampaignGuiTab {
         setLayout(new BorderLayout());
         add(panCommand, BorderLayout.CENTER);
         add(pnlTutorial, BorderLayout.SOUTH);
+    }
+
+    /**
+     * Retrieves the campaign's main faction icon and scales it to a uniform display size.
+     *
+     * <p>This method obtains the image associated with the current campaign's faction and scales it proportionally
+     * to a width or height of 150 pixels (whichever is larger), preserving aspect ratio, for consistent display in the
+     * UI.</p>
+     *
+     * @return a {@link ImageIcon} representing the scaled campaign faction icon
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private ImageIcon getAndScaleCampaignIcon() {
+        ImageIcon icon = getCampaign().getCampaignFactionIcon();
+        icon = ImageUtilities.scaleImageIcon(icon, 150, true);
+        return icon;
     }
 
     private void initInfoPanel() {
@@ -852,7 +872,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnUnitRating.setVisible(evt.getOptions().getUnitRatingMethod().isEnabled());
         basicInfoScheduler.schedule();
         procurementListScheduler.schedule();
-        lblIcon.setIcon(getCampaign().getUnitIcon().getImageIcon(150));
+        ImageIcon icon = getAndScaleCampaignIcon();
+        lblIcon.setIcon(icon);
     }
 
     @Subscribe

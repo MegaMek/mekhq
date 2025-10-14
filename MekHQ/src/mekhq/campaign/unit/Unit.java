@@ -100,6 +100,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
 import mekhq.campaign.events.persons.PersonTechAssignmentEvent;
@@ -136,6 +137,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Attributes;
+import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -1073,6 +1075,11 @@ public class Unit implements ITechnology {
         return missingParts;
     }
 
+    /**
+	 * A method that returns the value of all missing, but not damaged parts.
+     *
+     * @return The value of all missing parts.
+     */
     public Money getValueOfAllMissingParts() {
         Money value = Money.zero();
         for (Part part : parts) {
@@ -1092,6 +1099,22 @@ public class Unit implements ITechnology {
         }
         return value;
     }
+
+    /**
+	 * A method that returns the value of all damaged, but not missing parts.
+     *
+     * @return The value of all damaged parts.
+     */
+	public Money getValueOfAllDamagedParts() {
+        Money value = Money.zero();
+
+		for (Part part: getParts()) {
+			if(part.needsFixing() && !(part instanceof Armor)) {
+				value = value.plus(part.getActualValue());
+			}
+		}
+		return value;
+	}
 
     public void removePart(Part part) {
         parts.remove(part);
@@ -4416,7 +4439,31 @@ public class Unit implements ITechnology {
     }
 
     public void resetPilotAndEntity() {
+        final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+
+        // Reset transient data
+        getCampaign().clearGameData(entity);
+        entity.setCommander(false);
         entity.getCrew().resetGameState();
+        entity.getCrew().setCommandBonus(0);
+
+        // Update crew data
+        updateCrew();
+
+        // commander can be null at this point, but that's ok because both of the following calls include null
+        // handling built into their methods.
+        Person commander = getCommander();
+
+        if (campaignOptions.isUseInitiativeBonus()) {
+            setCommandBonus(commander);
+        }
+
+        if (campaignOptions.isUseAbilities() || campaignOptions.isUseEdge() || campaignOptions.isUseImplants()) {
+            processUnitSPAs(commander);
+        }
+    }
+
+    private void updateCrew() {
         if (entity.getCrew().getSlotCount() > 1) {
             final String driveType = SkillType.getDrivingSkillFor(entity);
             final String gunType = SkillType.getGunnerySkillFor(entity);
@@ -4493,208 +4540,191 @@ public class Unit implements ITechnology {
             }
             entity.getCrew().setMissing(false, 0);
         }
+    }
 
-        // Clear any stale game data that may somehow have gotten set incorrectly
-        getCampaign().clearGameData(entity);
+    private void setCommandBonus(@Nullable Person commander) {
+        // Tactics command bonus. This should actually reflect the unit's commander
+        if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
+            entity.getCrew()
+                  .setCommandBonus(commander.getSkill(SkillType.S_TACTICS)
+                                         .getTotalSkillLevel(commander.getOptions(),
+                                               commander.getATOWAttributes(),
+                                               0));
+        }
+    }
 
-        // Set up SPAs, Implants, Edge, etc.
-        // Find the unit commander
-        Person commander = getCommander();
+    private void processUnitSPAs(@Nullable Person commander) {
+        if (null == commander) {
+            // This is a legacy decision. Previously we early exited, but that caused a heap of problems. So instead
+            // we now create a temporary fake 'commander' with no PilotOptions. This allows all the code here to
+            // process, without us needing to worry about nulls or rewriting this rather large and complex piece of
+            // code. - Illiani 5th October 2025
+            commander = new Person(getCampaign());
+        }
 
-        // Set Tactics-based Commander's Initiative Bonus, if applicable
-        entity.getCrew().setCommandBonus(0);
-        if (getCampaign().getCampaignOptions().isUseTactics() ||
-                  getCampaign().getCampaignOptions().isUseInitiativeBonus()) {
-            // Tactics command bonus. This should actually reflect the unit's commander
-            if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
-                entity.getCrew()
-                      .setCommandBonus(commander.getSkill(SkillType.S_TACTICS)
-                                             .getTotalSkillLevel(commander.getOptions(),
-                                                   commander.getATOWAttributes(),
-                                                   0));
+        PilotOptions options = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
+        // This double enumeration is annoying to work with for crew-served units.
+        // Get the option names while we enumerate so they can be used later
+        List<String> optionNames = new ArrayList<>();
+        Set<String> cyberOptionNames = new HashSet<>();
+        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
+            IOptionGroup group = i.nextElement();
+            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
+                IOption option = j.nextElement();
+                if (getCampaign().getCampaignOptions().isUseImplants() &&
+                          group.getKey().equals(PersonnelOptions.MD_ADVANTAGES)) {
+                    cyberOptionNames.add(option.getName());
+                } else if (getCampaign().getCampaignOptions().isUseEdge() &&
+                                 group.getKey().equals(PersonnelOptions.EDGE_ADVANTAGES)) {
+                    optionNames.add(option.getName());
+                } else if (getCampaign().getCampaignOptions().isUseAbilities() &&
+                                 !group.getKey().equals(PersonnelOptions.EDGE_ADVANTAGES)) {
+                    optionNames.add(option.getName());
+                }
             }
         }
 
-        // Reset commander status
-        entity.setCommander(false);
+        boolean commanderOnly = campaign.getCampaignOptions().isUseCommanderAbilitiesOnly();
 
-        if (getCampaign().getCampaignOptions().isUseAbilities() ||
-                  getCampaign().getCampaignOptions().isUseEdge() ||
-                  getCampaign().getCampaignOptions().isUseImplants()) {
-            PilotOptions options = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
-            // This double enumeration is annoying to work with for crew-served units.
-            // Get the option names while we enumerate so they can be used later
-            List<String> optionNames = new ArrayList<>();
-            Set<String> cyberOptionNames = new HashSet<>();
-            for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
-                IOptionGroup group = i.nextElement();
-                for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
-                    IOption option = j.nextElement();
-                    if (getCampaign().getCampaignOptions().isUseImplants() &&
-                              group.getKey().equals(PersonnelOptions.MD_ADVANTAGES)) {
-                        cyberOptionNames.add(option.getName());
-                    } else if (getCampaign().getCampaignOptions().isUseEdge() &&
-                                     group.getKey().equals(PersonnelOptions.EDGE_ADVANTAGES)) {
-                        optionNames.add(option.getName());
-                    } else if (getCampaign().getCampaignOptions().isUseAbilities() &&
-                                     !group.getKey().equals(PersonnelOptions.EDGE_ADVANTAGES)) {
-                        optionNames.add(option.getName());
-                    }
+        // For crew-served units, let's look at the abilities of the group. If more than half the crew (gunners
+        // and pilots only, for spacecraft) have an ability, grant the benefit to the unit
+        // TODO : Mobile structures, large naval support vehicles
+        if (!commanderOnly &&
+                  (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT) ||
+                         entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP) ||
+                         entity.hasETypeFlag(Entity.ETYPE_TANK) ||
+                         entity.hasETypeFlag(Entity.ETYPE_INFANTRY) ||
+                         entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MEK))) {
+            // Combine drivers and gunners into a single list
+
+            List<Person> crew = new ArrayList<>(drivers);
+
+            // Infantry and BA troops count as both drivers and gunners
+            // only count them once.
+            if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
+                crew.addAll(gunners);
+            }
+            double crewSize = crew.size();
+
+            // This does the following:
+            // 1. For each crew member, get all of their PersonnelOptions by name
+            // 2. Flatten the crew member options into one stream
+            // 3. Group these options by their name
+            // 4. For each group, group by the object value and get the counts for each
+            // value
+            // 5. Take each group which has more than crewSize/2 values, and find the
+            // maximum value
+            Map<String, Optional<Object>> bestOptions = crew.stream()
+                                                              .flatMap(p -> optionNames.stream()
+                                                                                  .map(n -> p.getOptions()
+                                                                                                  .getOption(n)))
+                                                              .collect(Collectors.groupingBy(IOption::getName,
+                                                                    Collectors.collectingAndThen(Collectors.groupingBy(
+                                                                                IOption::getValue,
+                                                                                Collectors.counting()),
+                                                                          m -> m.entrySet()
+                                                                                     .stream()
+                                                                                     .filter(e -> (cyberOptionNames.contains(
+                                                                                           e.getKey()) ?
+                                                                                                         e.getValue() >=
+                                                                                                               crewSize :
+                                                                                                         e.getValue() >
+                                                                                                               crewSize /
+                                                                                                                     2))
+                                                                                     .max(Entry.comparingByValue())
+                                                                                     .map(Entry::getKey))));
+
+            // Go through all the options and start with the commander's value,
+            // then add any values which more than half our crew had
+            for (String optionName : optionNames) {
+                IOption option = commander.getOptions().getOption(optionName);
+                if (null != option) {
+                    options.getOption(optionName).setValue(option.getValue());
+                }
+
+                if (bestOptions.containsKey(optionName)) {
+                    Optional<Object> crewOption = bestOptions.get(optionName);
+                    crewOption.ifPresent(o -> options.getOption(optionName).setValue(o));
                 }
             }
 
-            boolean commanderOnly = campaign.getCampaignOptions().isUseCommanderAbilitiesOnly();
-
-            // For crew-served units, let's look at the abilities of the group. If more than half the crew (gunners
-            // and pilots only, for spacecraft) have an ability, grant the benefit to the unit
-            // TODO : Mobile structures, large naval support vehicles
-            if (!commanderOnly &&
-                      (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT) ||
-                             entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP) ||
-                             entity.hasETypeFlag(Entity.ETYPE_TANK) ||
-                             entity.hasETypeFlag(Entity.ETYPE_INFANTRY) ||
-                             entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MEK))) {
-                // If there is no crew, there's nothing left to do here.
-                if (null == commander) {
-                    return;
+            // Yuck. Most cybernetic implants require all members of a unit's crew to have
+            // the implant rather than half.
+            // A few just require 1/4 the crew, there's at least one commander only, some
+            // just add an effect for every
+            // trooper who has the implant...you get the idea.
+            // TODO : Revisit this once all implants are fully implemented.
+            for (String implantName : cyberOptionNames) {
+                IOption option = commander.getOptions().getOption(implantName);
+                if (null != option) {
+                    options.getOption(implantName).setValue(option.getValue());
                 }
-                // Combine drivers and gunners into a single list
 
-                List<Person> crew = new ArrayList<>(drivers);
+                if (bestOptions.containsKey(implantName)) {
+                    Optional<Object> crewOption = bestOptions.get(implantName);
+                    crewOption.ifPresent(o -> options.getOption(implantName).setValue(o));
+                }
+            }
 
-                // Infantry and BA troops count as both drivers and gunners
-                // only count them once.
+            // Assign the options to our unit
+            entity.getCrew().setOptions(options);
+
+            // Assign edge points to spacecraft and vehicle crews and infantry units
+            // This overwrites the Edge value assigned above.
+            if (getCampaign().getCampaignOptions().isUseEdge()) {
+                double sumEdge = 0;
+                for (Person p : drivers) {
+                    sumEdge += p.getCurrentEdge();
+                }
+                // Again, don't count infantrymen twice
                 if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
-                    crew.addAll(gunners);
-                }
-                double crewSize = crew.size();
-
-                // This does the following:
-                // 1. For each crew member, get all of their PersonnelOptions by name
-                // 2. Flatten the crew member options into one stream
-                // 3. Group these options by their name
-                // 4. For each group, group by the object value and get the counts for each
-                // value
-                // 5. Take each group which has more than crewSize/2 values, and find the
-                // maximum value
-                Map<String, Optional<Object>> bestOptions = crew.stream()
-                                                                  .flatMap(p -> optionNames.stream()
-                                                                                      .map(n -> p.getOptions()
-                                                                                                      .getOption(n)))
-                                                                  .collect(Collectors.groupingBy(IOption::getName,
-                                                                        Collectors.collectingAndThen(Collectors.groupingBy(
-                                                                                    IOption::getValue,
-                                                                                    Collectors.counting()),
-                                                                              m -> m.entrySet()
-                                                                                         .stream()
-                                                                                         .filter(e -> (cyberOptionNames.contains(
-                                                                                               e.getKey()) ?
-                                                                                                             e.getValue() >=
-                                                                                                                   crewSize :
-                                                                                                             e.getValue() >
-                                                                                                                   crewSize /
-                                                                                                                         2))
-                                                                                         .max(Entry.comparingByValue())
-                                                                                         .map(Entry::getKey))));
-
-                // Go through all the options and start with the commander's value,
-                // then add any values which more than half our crew had
-                for (String optionName : optionNames) {
-                    IOption option = commander.getOptions().getOption(optionName);
-                    if (null != option) {
-                        options.getOption(optionName).setValue(option.getValue());
-                    }
-
-                    if (bestOptions.containsKey(optionName)) {
-                        Optional<Object> crewOption = bestOptions.get(optionName);
-                        crewOption.ifPresent(o -> options.getOption(optionName).setValue(o));
-                    }
-                }
-
-                // Yuck. Most cybernetic implants require all members of a unit's crew to have
-                // the implant rather than half.
-                // A few just require 1/4 the crew, there's at least one commander only, some
-                // just add an effect for every
-                // trooper who has the implant...you get the idea.
-                // TODO : Revisit this once all implants are fully implemented.
-                for (String implantName : cyberOptionNames) {
-                    IOption option = commander.getOptions().getOption(implantName);
-                    if (null != option) {
-                        options.getOption(implantName).setValue(option.getValue());
-                    }
-
-                    if (bestOptions.containsKey(implantName)) {
-                        Optional<Object> crewOption = bestOptions.get(implantName);
-                        crewOption.ifPresent(o -> options.getOption(implantName).setValue(o));
-                    }
-                }
-
-                // Assign the options to our unit
-                entity.getCrew().setOptions(options);
-
-                // Assign edge points to spacecraft and vehicle crews and infantry units
-                // This overwrites the Edge value assigned above.
-                if (getCampaign().getCampaignOptions().isUseEdge()) {
-                    double sumEdge = 0;
-                    for (Person p : drivers) {
+                    for (Person p : gunners) {
                         sumEdge += p.getCurrentEdge();
                     }
-                    // Again, don't count infantrymen twice
-                    if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
-                        for (Person p : gunners) {
-                            sumEdge += p.getCurrentEdge();
-                        }
-                    }
-                    // Average the edge values of pilots and gunners. The Spacecraft Engineer
-                    // (vessel crewmembers)
-                    // handle edge solely through MHQ as noncombat personnel, so aren't considered
-                    // here
-                    int edge = (int) Math.round(sumEdge / crewSize);
-                    IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
-                    edgeOption.setValue((Integer) edge);
                 }
+                // Average the edge values of pilots and gunners. The Spacecraft Engineer
+                // (vessel crewmembers)
+                // handle edge solely through MHQ as noncombat personnel, so aren't considered
+                // here
+                int edge = (int) Math.round(sumEdge / crewSize);
+                IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
+                edgeOption.setValue((Integer) edge);
+            }
 
-                // Reset the composite technician used by spacecraft and infantry
-                // Important if you just changed technician edge options for members of either
-                // unit type
-                resetEngineer();
+            // Reset the composite technician used by spacecraft and infantry
+            // Important if you just changed technician edge options for members of either
+            // unit type
+            resetEngineer();
 
-                // TODO : Set up crew hits. This might only apply to spacecraft, and should
-                // reflect
-                // the unit's current crew size vs its required crew size. There's also the
-                // question
-                // of what to do with extra crew quarters and crewmember assignments beyond the
-                // minimum.
-            } else {
-                // For other unit types, just use the unit commander's abilities.
-                PilotOptions cdrOptions = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
-                if (null != commander) {
-                    for (String optionName : optionNames) {
-                        IOption option = commander.getOptions().getOption(optionName);
-                        if (null != option) {
-                            cdrOptions.getOption(optionName).setValue(option.getValue());
-                        }
-                    }
-                    for (String implantName : cyberOptionNames) {
-                        IOption option = commander.getOptions().getOption(implantName);
-                        if (null != option) {
-                            cdrOptions.getOption(implantName).setValue(option.getValue());
-                        }
-                    }
-                    entity.getCrew().setOptions(cdrOptions);
-
-                    if (usesSoloPilot()) {
-                        if (!commander.getStatus().isActive()) {
-                            entity.getCrew().setMissing(true, 0);
-                            return;
-                        }
-                        entity.getCrew().setHits(commander.getHits(), 0);
-                    }
+            // TODO : Set up crew hits. This might only apply to spacecraft, and should
+            // reflect
+            // the unit's current crew size vs its required crew size. There's also the
+            // question
+            // of what to do with extra crew quarters and crewmember assignments beyond the
+            // minimum.
+        } else {
+            // For other unit types, just use the unit commander's abilities.
+            PilotOptions cdrOptions = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
+            for (String optionName : optionNames) {
+                IOption option = commander.getOptions().getOption(optionName);
+                if (null != option) {
+                    cdrOptions.getOption(optionName).setValue(option.getValue());
                 }
+            }
+            for (String implantName : cyberOptionNames) {
+                IOption option = commander.getOptions().getOption(implantName);
+                if (null != option) {
+                    cdrOptions.getOption(implantName).setValue(option.getValue());
+                }
+            }
+            entity.getCrew().setOptions(cdrOptions);
 
-                // There was a resetEngineer() here. We shouldn't need it as spacecraft and
-                // infantry are handled
-                // by the preceding block
+            if (usesSoloPilot()) {
+                if (!commander.getStatus().isActive()) {
+                    entity.getCrew().setMissing(true, 0);
+                    return;
+                }
+                entity.getCrew().setHits(commander.getHits(), 0);
             }
         }
     }
@@ -4720,6 +4750,7 @@ public class Unit implements ITechnology {
         int nGunners = 0;
         int nCrew = 0;
 
+        boolean entityIsInfantry = entity.hasETypeFlag(Entity.ETYPE_INFANTRY);
         for (Person person : drivers) {
             PersonnelOptions options = person.getOptions();
             Attributes attributes = person.getATOWAttributes();
@@ -4749,8 +4780,17 @@ public class Unit implements ITechnology {
             if (person.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
-            if (person.hasSkill(gunType)) {
-                sumGunnery += person.getSkill(gunType).getFinalSkillValue(options, attributes);
+
+            String tempGunType = gunType;
+            if (entityIsInfantry) {
+                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(person);
+                if (tempGunType == null) {
+                    tempGunType = SkillType.S_SMALL_ARMS;
+                }
+            }
+
+            if (person.hasSkill(tempGunType)) {
+                sumGunnery += person.getSkill(tempGunType).getFinalSkillValue(options, attributes);
                 nGunners++;
             }
             if (person.hasSkill(SkillType.S_ARTILLERY) &&

@@ -38,13 +38,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_SKILL_MODIFIER;
-import static mekhq.campaign.personnel.skills.SkillType.S_ACTING;
-import static mekhq.campaign.personnel.skills.SkillType.S_ANIMAL_HANDLING;
-import static mekhq.campaign.personnel.skills.SkillType.S_INTEREST_THEOLOGY;
-import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
-import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
-import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
-import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
+import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -62,6 +56,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -347,6 +342,41 @@ public class Skill {
             }
 
             if (characterOptions.booleanOption(ATOW_ANIMAL_EMPATHY)) {
+                modifier += 2;
+            }
+        }
+
+        // Houdini
+        if (Objects.equals(name, S_ESCAPE_ARTIST)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_HOUDINI)) {
+                modifier += 2;
+            }
+        }
+
+        // Master Impersonator
+        if (Objects.equals(name, S_DISGUISE)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_MASTER_IMPERSONATOR)) {
+                modifier += 2;
+            }
+        }
+
+        // Counterfeiter
+        if (Objects.equals(name, S_FORGERY)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_COUNTERFEITER)) {
+                modifier += 2;
+            }
+        }
+
+        // Natural Thespian
+        if (Objects.equals(name, S_ACTING)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_NATURAL_THESPIAN)) {
+                modifier += 2;
+            }
+        }
+
+        // Pick Pocket
+        if (Objects.equals(name, S_SLEIGHT_OF_HAND)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_PICK_POCKET)) {
                 modifier += 2;
             }
         }
@@ -658,7 +688,7 @@ public class Skill {
      * the cost for the next valid level if it exists.</p>
      *
      * <p><b>Usage:</b> For most use cases you probably want to call {@code getCostToImprove(String)} from a
-     * {@link Person} object.</p>
+     * {@link Person} object, as that will factor in things like {@link Reasoning}.</p>
      *
      * @return the cost to improve the skill, or 0 if no valid level with a positive cost is found.
      */
@@ -792,8 +822,8 @@ public class Skill {
      *   <li>Otherwise, the final skill value is suffixed with a plus sign (<code>+</code>).</li>
      * </ul>
      *
-     * @param options    The {@link PersonnelOptions} to use for calculating the final skill value.
-     * @param reputation The reputation value used in the calculation.
+     * @param options            The {@link PersonnelOptions} to use for calculating the final skill value.
+     * @param adjustedReputation The reputation value used in the calculation.
      *
      * @return A string representation of the calculated final skill value, formatted depending on the state of
      *       {@link #isCountUp()}.
@@ -801,12 +831,21 @@ public class Skill {
      * @see #isCountUp()
      * @see #getFinalSkillValue(PersonnelOptions, Attributes, int)
      */
-    public String toString(PersonnelOptions options, Attributes attributes, int reputation) {
+    public String toString(PersonnelOptions options, Attributes attributes, int adjustedReputation) {
+        String display;
+
         if (isCountUp()) {
-            return "+" + getFinalSkillValue(options, attributes, reputation);
+            display = "+" + getFinalSkillValue(options, attributes, adjustedReputation);
         } else {
-            return getFinalSkillValue(options, attributes, reputation) + "+";
+            display = getFinalSkillValue(options, attributes, adjustedReputation) + "+";
         }
+
+        if (type.isSkillLevelsMatter()) {
+            int totalSkillLevel = getTotalSkillLevel(options, attributes, adjustedReputation);
+            display += String.format(" (%d)", totalSkillLevel);
+        }
+
+        return display;
     }
 
     /**

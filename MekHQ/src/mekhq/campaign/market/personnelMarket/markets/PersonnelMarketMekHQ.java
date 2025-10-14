@@ -54,7 +54,6 @@ import java.util.Set;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
@@ -96,13 +95,11 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      *
      * <p>Initializes data and behaviors for compatibility.</p>
      *
-     * @param campaign the parent campaign instance
-     *
      * @author Illiani
      * @since 0.50.06
      */
-    public PersonnelMarketMekHQ(Campaign campaign) {
-        super(campaign);
+    public PersonnelMarketMekHQ() {
+        super();
 
         setAssociatedPersonnelMarketStyle(MEKHQ);
 

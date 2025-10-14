@@ -103,10 +103,18 @@ public class CampaignSummary {
     private int nDS;
 
     /**
-     * @param c a {@link Campaign} for which a summary is desired
+     * Create a CampaignSummary
      */
-    public CampaignSummary(Campaign c) {
-        this.campaign = c;
+    public CampaignSummary() {
+    }
+
+    /**
+     * Link this CampaignSummary to a Campaign instance and update state with information from it.
+     *
+     * @param campaign Campaign to link
+     */
+    public void setCampaign(Campaign campaign) {
+        this.campaign = campaign;
         updateInformation();
     }
 
@@ -119,10 +127,10 @@ public class CampaignSummary {
         totalCombatPersonnel = 0;
         totalSupportPersonnel = 0;
         totalInjuries = 0;
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             if (person.getPrimaryRole().isCombat()) {
                 totalCombatPersonnel++;
-            } else {
+            } else if (!person.isDependent()) {
                 totalSupportPersonnel++;
             }
 
@@ -193,7 +201,7 @@ public class CampaignSummary {
         cargoCapacity = cargoStats.getTotalCombinedCargoCapacity();
 
         double tetrisMasterMultiplier = 1.0;
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             PersonnelOptions options = person.getOptions();
             if (options.booleanOption(ADMIN_TETRIS_MASTER)) {
                 tetrisMasterMultiplier += 0.05;
@@ -421,7 +429,7 @@ public class CampaignSummary {
             List<Unit> unitsInToe = campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(), false);
 
             int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.getFieldKitchenCapacity());
-            int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false),
+            int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, true),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
             boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
 
@@ -453,7 +461,7 @@ public class CampaignSummary {
             final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
             final int maximumPatients = campaignOptions.getMaximumPatients();
             int doctorCapacity = 0;
-            for (Person person : campaign.getActivePersonnel(false)) {
+            for (Person person : campaign.getActivePersonnel(false, false)) {
                 doctorCapacity += person.getDoctorMedicalCapacity(isDoctorsUseAdministration, maximumPatients);
             }
 

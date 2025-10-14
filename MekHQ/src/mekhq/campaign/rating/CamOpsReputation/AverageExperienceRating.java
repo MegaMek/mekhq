@@ -118,7 +118,7 @@ public class AverageExperienceRating {
         int personnelCount = 0;
         double totalExperience = 0.0;
 
-        for (Person person : campaign.getActivePersonnel(false)) {
+        for (Person person : campaign.getActivePersonnel(false, false)) {
             Unit unit = person.getUnit();
 
             // if the person does not belong to a unit, then skip this person

@@ -101,7 +101,6 @@ public class PersonnelReport extends AbstractReport {
             } else if (p.getStatus().isStudent()) {
                 countStudents++;
             }
-
         }
 
         StringBuilder sb = new StringBuilder(resources.getString("combat.personnel.header.text") + "\n\n");
@@ -146,12 +145,18 @@ public class PersonnelReport extends AbstractReport {
         int bondsmen = 0;
         int dependents = 0;
         int dependentStudents = 0;
+        int campFollowers = 0;
         int children = 0;
         int childrenStudents = 0;
         Money civilianSalaries = Money.zero();
         LocalDate today = getCampaign().getLocalDate();
 
         for (Person person : getCampaign().getPersonnel()) {
+            if (person.getStatus().isCampFollower() && !person.getPrisonerStatus().isCurrentPrisoner()) {
+                campFollowers++;
+                continue;
+            }
+
             // Add them to the total count
             final boolean primarySupport = person.getPrimaryRole().isSupport(true);
 
@@ -205,10 +210,10 @@ public class PersonnelReport extends AbstractReport {
         //Add Salaries of Temp Workers
         salary = salary.plus(getCampaign().getCampaignOptions()
                                    .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue() *
-                                   getCampaign().getAsTechPool());
+                                   getCampaign().getTemporaryAsTechPool());
         salary = salary.plus(getCampaign().getCampaignOptions()
                                    .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
-                                   getCampaign().getMedicPool());
+                                   getCampaign().getTemporaryMedicPool());
 
         StringBuilder sb = new StringBuilder(resources.getString("support.personnel.header.text") + "\n\n");
 
@@ -223,8 +228,8 @@ public class PersonnelReport extends AbstractReport {
         }
 
         //Add Temp Medics and Astechs to Support List
-        sb.append(String.format("    %-30s       %4s\n", "Temp Medics", getCampaign().getMedicPool()));
-        sb.append(String.format("    %-30s       %4s\n", "Temp Astechs", getCampaign().getAsTechPool()));
+        sb.append(String.format("    %-30s       %4s\n", "Temp Medics", getCampaign().getTemporaryMedicPool()));
+        sb.append(String.format("    %-30s       %4s\n", "Temp Astechs", getCampaign().getTemporaryAsTechPool()));
 
         sb.append(getSecondarySupportPersonnelDetails());
 
@@ -234,8 +239,12 @@ public class PersonnelReport extends AbstractReport {
               .append(String.format("%-30s           %4s\n", resources.getString("support.KIA.text"), countKIA))
               .append(String.format("%-30s           %4s\n", resources.getString("support.retired.text"), countRetired))
               .append(String.format("%-30s           %4s\n", resources.getString("support.dead.text"), countDead))
-              .append(String.format("%-30s           %4s\n", resources.getString("support.student.text"),
+              .append(String.format("%-30s           %4s\n",
+                    resources.getString("support.student.text"),
                     countStudents))
+              .append(String.format("%-30s           %4s\n",
+                    resources.getString("support.campFollowers.text"),
+                    campFollowers))
               .append("\n").append(resources.getString("support.salary.text")).append(": ")
               .append(salary.toAmountAndSymbolString())
               .append((dependents == 1) ?

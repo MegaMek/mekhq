@@ -500,7 +500,7 @@ public class Contract extends Mission {
             double days = Math.round(jumpPath.getTotalTime(campaign.getLocalDate(),
                   campaign.getLocation().getTransitTime(), isUseCommandCircuit) * 100.0)
                                 / 100.0;
-            return (int) Math.round(days);
+            return (int) Math.ceil(days);
         }
         return 0;
     }

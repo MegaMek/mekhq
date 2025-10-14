@@ -364,11 +364,11 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public String find(int transitDays) {
+    public String find(int transitDays, double valueMultiplier) {
         Part newPart = getNewPart();
         newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
-        if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
+        if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays)) {
             return "<font color='" +
                          ReportingUtilities.getPositiveColor() +
                          "'><b> part found</b>.</font> It will be delivered in " +
@@ -714,6 +714,11 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public boolean isPriceAdjustedForAmount() {
         return true;
+    }
+
+    @Override
+    public int getTotalQuantity() {
+        return getQuantity() * getAmount();
     }
 
     public void changeType(int ty, boolean cl) {

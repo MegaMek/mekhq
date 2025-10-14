@@ -279,7 +279,7 @@ public class CampaignExportWizard extends JDialog {
     private void setupPersonList() {
         personList = new JList<>();
         DefaultListModel<Person> personListModel = new DefaultListModel<>();
-        List<Person> people = sourceCampaign.getActivePersonnel(true);
+        List<Person> people = sourceCampaign.getActivePersonnel(true, true);
         people.sort(Comparator.comparing(Person::getPrimaryRole));
         for (Person person : people) {
             personListModel.addElement(person);
@@ -462,7 +462,7 @@ public class CampaignExportWizard extends JDialog {
 
         Campaign destinationCampaign;
         if (newCampaign) {
-            destinationCampaign = new Campaign();
+            destinationCampaign = CampaignFactory.createCampaign();
             destinationCampaign.setApp(sourceCampaign.getApp());
             destinationCampaign.setCampaignOptions(sourceCampaign.getCampaignOptions());
             destinationCampaign.setGameOptions(sourceCampaign.getGameOptions());

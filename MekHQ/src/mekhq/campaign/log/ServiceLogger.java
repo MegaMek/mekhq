@@ -220,12 +220,6 @@ public class ServiceLogger {
         person.addPersonalLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, scenarioName, missionName)));
     }
 
-    public static void successfullyTreated(Person doctor, Person patient, LocalDate date, int injuries) {
-        String message = logEntriesResourceMap.getString("successfullyTreatedForXInjuries.text");
-        doctor.addPersonalLogEntry(new ServiceLogEntry(date,
-              MessageFormat.format(message, patient.getFullName(), injuries)));
-    }
-
     /**
      * Adds a log entry to the specified {@link Person} when they become orphaned by the death of both parents.
      *

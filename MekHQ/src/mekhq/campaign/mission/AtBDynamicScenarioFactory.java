@@ -1120,7 +1120,8 @@ public class AtBDynamicScenarioFactory {
                 int playerBattleValue = calculateEffectiveBV(scenario, campaign, true);
                 int playerUnitValue = calculateEffectiveUnitCount(scenario, campaign, true);
 
-                forceBVBudget = (int) (playerBattleValue * forceMultiplier);
+                double difficultyMultiplier = getDifficultyMultiplier(campaign);
+                forceBVBudget = (int) (playerBattleValue * forceMultiplier * difficultyMultiplier);
 
                 LOGGER.info("Base bidding budget is {} BV2. This is seed force multiplied by scenario force " +
                                   "multiplier", forceBVBudget);
@@ -2867,11 +2868,15 @@ public class AtBDynamicScenarioFactory {
             }
 
             if (!phenotype.isNone()) {
-                String bloodName = Bloodname.randomBloodname(faction.getShortName(), phenotype, campaign.getGameYear())
-                                         .getName();
-                crewName += ' ' + bloodName;
-                innerMap.put(Crew.MAP_BLOOD_NAME, bloodName);
-                innerMap.put(Crew.MAP_PHENOTYPE, phenotype.name());
+                Bloodname bloodName = Bloodname.randomBloodname(faction.getShortName(),
+                      phenotype,
+                      campaign.getGameYear());
+                if (bloodName != null) {
+                    String bloodNameName = bloodName.getName();
+                    crewName += ' ' + bloodNameName;
+                    innerMap.put(Crew.MAP_BLOOD_NAME, bloodNameName);
+                    innerMap.put(Crew.MAP_PHENOTYPE, phenotype.name());
+                }
             }
         }
 
@@ -4555,7 +4560,7 @@ public class AtBDynamicScenarioFactory {
      * @return The calculated walk MP value to be used for deployment purposes. Adjustments are made for jump MP,
      *       infantry units, and aerospace units.
      */
-    private static int calculateAtBSpeed(Entity entity) {
+    public static int calculateAtBSpeed(Entity entity) {
         int speed = entity.getWalkMP(); // Get the base walk MP of the entity
 
         if (entity.getAnyTypeMaxJumpMP() > 0) {

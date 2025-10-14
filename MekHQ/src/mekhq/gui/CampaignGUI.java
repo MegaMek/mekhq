@@ -861,7 +861,7 @@ public class CampaignGUI extends JPanel {
                   resourceMap.getString("popupFireAstechsNum.text"),
                   1,
                   0,
-                  getCampaign().getAsTechPool());
+                  getCampaign().getTemporaryAsTechPool());
             popupValueChoiceDialog.setVisible(true);
             if (popupValueChoiceDialog.getValue() >= 0) {
                 getCampaign().decreaseAsTechPool(popupValueChoiceDialog.getValue());
@@ -872,13 +872,13 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFullStrengthAsTechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
         miFullStrengthAsTechs.setMnemonic(KeyEvent.VK_B);
         miFullStrengthAsTechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.ALT_DOWN_MASK));
-        miFullStrengthAsTechs.addActionListener(evt -> getCampaign().fillAsTechPool());
+        miFullStrengthAsTechs.addActionListener(evt -> getCampaign().resetAsTechPool());
         menuAsTechPool.add(miFullStrengthAsTechs);
 
         JMenuItem miFireAllAsTechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
         miFireAllAsTechs.setMnemonic(KeyEvent.VK_R);
         miFireAllAsTechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
-        miFireAllAsTechs.addActionListener(evt -> getCampaign().decreaseAsTechPool(getCampaign().getAsTechPool()));
+        miFireAllAsTechs.addActionListener(evt -> getCampaign().emptyAsTechPool());
         menuAsTechPool.add(miFireAllAsTechs);
         menuMarket.add(menuAsTechPool);
         // endregion Astech Pool
@@ -915,7 +915,7 @@ public class CampaignGUI extends JPanel {
                   resourceMap.getString("popupFireMedicsNum.text"),
                   1,
                   0,
-                  getCampaign().getMedicPool());
+                  getCampaign().getTemporaryMedicPool());
             popupValueChoiceDialog.setVisible(true);
             if (popupValueChoiceDialog.getValue() >= 0) {
                 getCampaign().decreaseMedicPool(popupValueChoiceDialog.getValue());
@@ -926,13 +926,13 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
         miFullStrengthMedics.setMnemonic(KeyEvent.VK_B);
         miFullStrengthMedics.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.ALT_DOWN_MASK));
-        miFullStrengthMedics.addActionListener(evt -> getCampaign().fillMedicPool());
+        miFullStrengthMedics.addActionListener(evt -> getCampaign().resetMedicPool());
         menuMedicPool.add(miFullStrengthMedics);
 
         JMenuItem miFireAllMedics = new JMenuItem(resourceMap.getString("miFireAllMedics.text"));
         miFireAllMedics.setMnemonic(KeyEvent.VK_R);
         miFireAllMedics.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
-        miFireAllMedics.addActionListener(evt -> getCampaign().decreaseMedicPool(getCampaign().getMedicPool()));
+        miFireAllMedics.addActionListener(evt -> getCampaign().emptyMedicPool());
         menuMedicPool.add(miFireAllMedics);
         menuMarket.add(menuMedicPool);
         // endregion Medic Pool
@@ -1860,10 +1860,8 @@ public class CampaignGUI extends JPanel {
      */
     private void menuOptionsActionPerformed(final ActionEvent evt) {
         final CampaignOptions oldOptions = getCampaign().getCampaignOptions();
-        // We need to handle it like this for now, as the options above get written to
-        // currently
+        // We need to handle it like this for now, as the options above get written to currently
         boolean atb = oldOptions.isUseAtB();
-        boolean staticRATs = oldOptions.isUseStaticRATs();
         boolean factionIntroDate = oldOptions.isFactionIntroDate();
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
         final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
@@ -1962,10 +1960,6 @@ public class CampaignGUI extends JPanel {
 
         getCampaign().initTurnover();
 
-        if (staticRATs != newOptions.isUseStaticRATs()) {
-            getCampaign().initUnitGenerator();
-        }
-
         if (factionIntroDate != newOptions.isFactionIntroDate()) {
             getCampaign().updateTechFactionCode();
         }
@@ -1984,7 +1978,7 @@ public class CampaignGUI extends JPanel {
                 return;
             }
             r.setTech(engineer);
-        } else if (getCampaign().getActivePersonnel(true).stream().anyMatch(Person::isTech)) {
+        } else if (getCampaign().getActivePersonnel(false, false).stream().anyMatch(Person::isTech)) {
             String name;
             Map<String, Person> techHash = new HashMap<>();
             List<String> techList = new ArrayList<>();
@@ -2423,7 +2417,7 @@ public class CampaignGUI extends JPanel {
             // Fix Spouse Id Information - This is required to fix spouse NPEs where one doesn't export both members
             // of the couple
             // TODO : make it so that exports will automatically include both spouses
-            for (Person p : getCampaign().getActivePersonnel(true)) {
+            for (Person p : getCampaign().getActivePersonnel(true, true)) {
                 if (p.getGenealogy().hasSpouse() &&
                           !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse())) {
                     // If this happens, we need to clear the spouse
@@ -2760,13 +2754,13 @@ public class CampaignGUI extends JPanel {
 
     private void refreshTempAsTechs() {
         // FIXME : Localize
-        String text = "<html><b>Temp AsTechs</b>: " + getCampaign().getAsTechPool() + "</html>";
+        String text = "<html><b>Temp AsTechs</b>: " + getCampaign().getTemporaryAsTechPool() + "</html>";
         lblTempAsTechs.setText(text);
     }
 
     private void refreshTempMedics() {
         // FIXME : Localize
-        String text = "<html><b>Temp Medics</b>: " + getCampaign().getMedicPool() + "</html>";
+        String text = "<html><b>Temp Medics</b>: " + getCampaign().getTemporaryMedicPool() + "</html>";
         lblTempMedics.setText(text);
     }
 

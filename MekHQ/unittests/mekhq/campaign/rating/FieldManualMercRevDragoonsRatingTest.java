@@ -83,6 +83,7 @@ import org.junit.jupiter.api.Test;
 public class FieldManualMercRevDragoonsRatingTest {
     private Campaign mockCampaign;
     private Hangar mockHangar;
+    private CampaignOptions mockCampaignOptions;
 
     private List<Person> mockPersonnelList;
     private List<Person> mockActivePersonnelList;
@@ -98,6 +99,8 @@ public class FieldManualMercRevDragoonsRatingTest {
     public void setUp() {
         mockCampaign = mock(Campaign.class);
         mockHangar = mock(Hangar.class);
+        mockCampaignOptions = mock(CampaignOptions.class);
+
         when(mockCampaign.getHangar()).thenReturn(mockHangar);
 
         mockPersonnelList = new ArrayList<>();
@@ -160,8 +163,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         mockActivePersonnelList.add(mockTech);
 
         when(mockCampaign.getPersonnel()).thenReturn(mockPersonnelList);
-        when(mockCampaign.getActivePersonnel(true)).thenReturn(mockActivePersonnelList);
-        when(mockCampaign.getActivePersonnel(false)).thenReturn(mockActivePersonnelList);
+        when(mockCampaign.getActivePersonnel(false, false)).thenReturn(mockActivePersonnelList);
         when(mockCampaign.getNumberMedics()).thenCallRealMethod();
         when(mockCampaign.getNumberAsTechs()).thenCallRealMethod();
         when(mockCampaign.getNumberPrimaryAsTechs()).thenCallRealMethod();
@@ -358,6 +360,9 @@ public class FieldManualMercRevDragoonsRatingTest {
 
     @Test
     public void testGetMedSupportAvailable() {
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaignOptions.isUseUsefulMedics()).thenReturn(false);
+
         // Test having 1 regular doctor with 4 temp medics.
         // Expected available support should be:
         // Regular Doctor = 40 hours.
@@ -367,7 +372,7 @@ public class FieldManualMercRevDragoonsRatingTest {
               mockCampaign);
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         int expectedHours = 120;
-        when(mockCampaign.getMedicPool()).thenReturn(4);
+        when(mockCampaign.getTemporaryMedicPool()).thenReturn(4);
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getMedicalSupportAvailable());
 
         // Add a mekwarrior who doubles as a back-up medic of Green skill.  This should add another 15 hours.
@@ -412,6 +417,8 @@ public class FieldManualMercRevDragoonsRatingTest {
 
     @Test
     public void testGetTechSupportAvailable() {
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaignOptions.isUseUsefulAsTechs()).thenReturn(false);
 
         // Test having 1 veteran mek tech with 6 temp astechs.
         // Expected available support should be:
@@ -422,7 +429,7 @@ public class FieldManualMercRevDragoonsRatingTest {
               mockCampaign);
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         int expectedHours = 165;
-        when(mockCampaign.getAsTechPool()).thenReturn(6);
+        when(mockCampaign.getTemporaryAsTechPool()).thenReturn(6);
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getTechSupportHours());
 
         // Add a mekwarrior who doubles as a back-up tech of Regular skill.  This should add another 20 hours.
@@ -451,10 +458,12 @@ public class FieldManualMercRevDragoonsRatingTest {
         Person mockAstech = mock(Person.class);
         when(mockAstech.isDoctor()).thenReturn(false);
         when(mockAstech.isTech()).thenReturn(false);
+        when(mockAstech.isEmployed()).thenReturn(true);
         when(mockAstech.getPrimaryRole()).thenReturn(PersonnelRole.ASTECH);
         when(mockAstech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockAstech).getStatus();
         when(mockAstech.isDeployed()).thenReturn(false);
+        when(mockAstech.isEmployed()).thenReturn(true);
         when(mockAstech.getSkill(eq(SkillType.S_ASTECH))).thenReturn(mockAstechSkill);
         when(mockAstech.hasSkill(eq(SkillType.S_ASTECH))).thenReturn(true);
         when(mockAstech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);

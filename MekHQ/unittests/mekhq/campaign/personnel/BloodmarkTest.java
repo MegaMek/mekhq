@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.personnel;
 
-import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
-import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -290,25 +288,5 @@ class BloodmarkTest {
         Bloodmark.processWounds(campaign, target, CURRENT_DATE, 6);
 
         assertTrue(target.getStatus().isDead());
-    }
-
-    @Test
-    void testAdjustmentWoundsForSPAs_NoSPAs_WoundsUnchanged() {
-        assertEquals(3, Bloodmark.adjustmentWoundsForSPAs(target, 3));
-    }
-
-    @Test
-    void testAdjustmentWoundsForSPAs_GlassJawOnly_WoundsDoubled() {
-        PersonnelOptions options = target.getOptions();
-        options.acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, FLAW_GLASS_JAW, true);
-        assertEquals(8, Bloodmark.adjustmentWoundsForSPAs(target, 4));
-    }
-
-    @Test
-    void testAdjustmentWoundsForSPAs_ToughnessOnly_WoundsReduced() {
-        PersonnelOptions options = target.getOptions();
-        options.acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, ATOW_TOUGHNESS, true);
-        assertEquals(2, Bloodmark.adjustmentWoundsForSPAs(target, 2));
-        assertEquals(4, Bloodmark.adjustmentWoundsForSPAs(target, 5)); // 5*.75=3.75->4
     }
 }

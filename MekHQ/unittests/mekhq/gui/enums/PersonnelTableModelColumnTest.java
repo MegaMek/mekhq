@@ -54,6 +54,7 @@ import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
+import mekhq.gui.sorter.ReasoningSorter;
 import org.junit.jupiter.api.Test;
 
 public class PersonnelTableModelColumnTest {
@@ -837,19 +838,27 @@ public class PersonnelTableModelColumnTest {
                      AEROSPACE,
                      CONVENTIONAL_AIRCRAFT,
                      VESSEL,
+                     PROTOMEK,
                      BATTLE_ARMOUR,
                      SMALL_ARMS,
                      ANTI_MEK,
                      ARTILLERY,
+                     NAVIGATION,
                      TACTICS,
                      STRATEGY,
                      LEADERSHIP,
+                     SCOUTING,
+                     ASTECH,
                      TECH_MEK,
                      TECH_AERO,
                      TECH_MECHANIC,
                      TECH_BA,
                      TECH_VESSEL,
+                     ZERO_G,
+                     MEDTECH,
                      MEDICAL,
+                     APPRAISAL,
+                     TRAINING,
                      ADMINISTRATION,
                      NEGOTIATION ->
                       assertInstanceOf(BonusSorter.class, personnelTableModelColumn.getComparator(mockCampaign));
@@ -867,6 +876,8 @@ public class PersonnelTableModelColumnTest {
                      SPA_COUNT,
                      IMPLANT_COUNT,
                      LOYALTY -> assertInstanceOf(IntegerStringSorter.class,
+                      personnelTableModelColumn.getComparator(mockCampaign));
+                case REASONING -> assertInstanceOf(ReasoningSorter.class,
                       personnelTableModelColumn.getComparator(mockCampaign));
                 case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA -> assertInstanceOf(
                       AttributeScoreSorter.class,

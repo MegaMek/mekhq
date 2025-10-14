@@ -396,7 +396,7 @@ public enum PersonnelFilter {
     }
 
     public boolean getFilteredInformation(final Person person, LocalDate currentDate) {
-        final boolean active = person.getStatus().isActive() && !person.getPrisonerStatus().isCurrentPrisoner();
+        final boolean active = person.getStatus().isActiveFlexible() && !person.getPrisonerStatus().isCurrentPrisoner();
         final boolean dead = person.getStatus().isDead();
 
         PersonnelStatus status = person.getStatus();
@@ -469,7 +469,8 @@ public enum PersonnelFilter {
                                                       person.getPrimaryRole().isVesselNavigator() :
                                                       person.hasRole(PersonnelRole.VESSEL_NAVIGATOR));
             case TECH -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                          person.getPrimaryRole().isTech() : person.isTech());
+                                          (person.getPrimaryRole().isTech() || person.getPrimaryRole().isAstech()) :
+                                          (person.isTech() || person.isAsTech()));
             case MEK_TECH -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                               person.getPrimaryRole().isMekTech() :
                                               person.hasRole(PersonnelRole.MEK_TECH));
@@ -515,7 +516,7 @@ public enum PersonnelFilter {
             case PRISONER -> ((!dead) &&
                                     ((person.getPrisonerStatus().isCurrentPrisoner()) ||
                                            (person.getPrisonerStatus().isBondsman())));
-            case INACTIVE -> ((!dead) && (!status.isActive()));
+            case INACTIVE -> ((!dead) && (!status.isActiveFlexible()));
             case ON_LEAVE -> status.isOnLeave() || status.isOnMaternityLeave();
             case MIA -> status.isMIA() || status.isPoW();
             case RETIRED -> status.isRetired();

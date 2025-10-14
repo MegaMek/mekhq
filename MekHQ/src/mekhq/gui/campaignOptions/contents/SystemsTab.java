@@ -87,6 +87,7 @@ public class SystemsTab {
     // Faction Standing Tab
     private CampaignOptionsHeaderPanel factionStandingHeader;
     private JCheckBox chkTrackFactionStanding;
+    private JCheckBox chkTrackClimateRegardChanges;
     private JSpinner spnRegardMultiplier;
 
     private JCheckBox chkUseFactionStandingNegotiation;
@@ -105,6 +106,7 @@ public class SystemsTab {
 
     private JCheckBox chkUseAttributes;
     private JCheckBox chkRandomizeAttributes;
+    private JCheckBox chkDisplayAllAttributes;
     private JCheckBox chkRandomizeTraits;
     private JCheckBox chkAllowMonthlyReinvestment;
     private JCheckBox chkAllowMonthlyConnections;
@@ -272,6 +274,10 @@ public class SystemsTab {
         chkTrackFactionStanding = new CampaignOptionsCheckBox("TrackFactionStanding");
         chkTrackFactionStanding.addMouseListener(createTipPanelUpdater(factionStandingHeader, "TrackFactionStanding"));
 
+        chkTrackClimateRegardChanges = new CampaignOptionsCheckBox("TrackClimateRegardChanges");
+        chkTrackClimateRegardChanges.addMouseListener(createTipPanelUpdater(factionStandingHeader,
+              "TrackClimateRegardChanges"));
+
         JLabel lblRegardMultiplier = new CampaignOptionsLabel("RegardMultiplier");
         lblRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
         spnRegardMultiplier = new CampaignOptionsSpinner("RegardMultiplier", 1.0, 0.1, 3.0, 0.1);
@@ -291,7 +297,10 @@ public class SystemsTab {
         layoutParent.gridy++;
         layoutParent.gridwidth = 1;
         panel.add(chkTrackFactionStanding, layoutParent);
+        layoutParent.gridx++;
+        panel.add(chkTrackClimateRegardChanges, layoutParent);
 
+        layoutParent.gridx = 0;
         layoutParent.gridy++;
         panel.add(lblRegardMultiplier, layoutParent);
         layoutParent.gridx++;
@@ -441,6 +450,8 @@ public class SystemsTab {
         chkUseAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "UseAttributes"));
         chkRandomizeAttributes = new CampaignOptionsCheckBox("RandomizeAttributes");
         chkRandomizeAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeAttributes"));
+        chkDisplayAllAttributes = new CampaignOptionsCheckBox("DisplayAllAttributes");
+        chkDisplayAllAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "DisplayAllAttributes"));
         chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
         chkRandomizeTraits.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeTraits"));
         chkAllowMonthlyReinvestment = new CampaignOptionsCheckBox("AllowMonthlyReinvestment");
@@ -461,10 +472,12 @@ public class SystemsTab {
         layout.gridx++;
         panel.add(chkRandomizeAttributes, layout);
         layout.gridx++;
-        panel.add(chkRandomizeTraits, layout);
+        panel.add(chkDisplayAllAttributes, layout);
 
         layout.gridx = 0;
         layout.gridy++;
+        panel.add(chkRandomizeTraits, layout);
+        layout.gridx++;
         panel.add(chkAllowMonthlyReinvestment, layout);
         layout.gridx++;
         panel.add(chkAllowMonthlyConnections, layout);
@@ -517,6 +530,7 @@ public class SystemsTab {
 
         // Faction Standing
         chkTrackFactionStanding.setSelected(options.isTrackFactionStanding());
+        chkTrackClimateRegardChanges.setSelected(options.isTrackClimateRegardChanges());
         spnRegardMultiplier.setValue(options.getRegardMultiplier());
         chkUseFactionStandingNegotiation.setSelected(options.isUseFactionStandingNegotiation());
         chkUseFactionStandingResupply.setSelected(options.isUseFactionStandingResupply());
@@ -532,6 +546,7 @@ public class SystemsTab {
         // A Time of War
         chkUseAttributes.setSelected(skillPreferences.isUseAttributes());
         chkRandomizeAttributes.setSelected(skillPreferences.isRandomizeAttributes());
+        chkDisplayAllAttributes.setSelected(options.isDisplayAllAttributes());
         chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
         chkAllowMonthlyReinvestment.setSelected(options.isAllowMonthlyReinvestment());
         chkAllowMonthlyConnections.setSelected(options.isAllowMonthlyConnections());
@@ -577,6 +592,7 @@ public class SystemsTab {
 
         // Faction Standing
         options.setTrackFactionStanding(chkTrackFactionStanding.isSelected());
+        options.setTrackClimateRegardChanges(chkTrackClimateRegardChanges.isSelected());
         options.setRegardMultiplier((double) spnRegardMultiplier.getValue());
         options.setUseFactionStandingNegotiation(chkUseFactionStandingNegotiation.isSelected());
         options.setUseFactionStandingResupply(chkUseFactionStandingResupply.isSelected());
@@ -592,6 +608,7 @@ public class SystemsTab {
         // A Time of War
         skillPreferences.setUseAttributes(chkUseAttributes.isSelected());
         skillPreferences.setRandomizeAttributes(chkRandomizeAttributes.isSelected());
+        options.setDisplayAllAttributes(chkDisplayAllAttributes.isSelected());
         skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
         options.setAllowMonthlyReinvestment(chkAllowMonthlyReinvestment.isSelected());
         options.setAllowMonthlyConnections(chkAllowMonthlyConnections.isSelected());

@@ -202,9 +202,9 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     }
 
     @Override
-    public String find(int transitDays) {
+    public String find(int transitDays, double valueMultiplier) {
         // TODO: probably get a duplicate entity
-        if (getCampaign().getQuartermaster().buyUnit((Entity) getNewEquipment(), transitDays)) {
+        if (getCampaign().getQuartermaster().buyUnit((Entity) getNewEquipment(), transitDays, valueMultiplier)) {
             return "<font color='" + ReportingUtilities.getPositiveColor()
                          + "'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {

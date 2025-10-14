@@ -33,6 +33,13 @@
 package mekhq.campaign.log;
 
 public enum LogEntryType {
-    MEDICAL, AWARD, SERVICE, PERSONAL, CUSTOM, HISTORICAL, //Used for historical daily log
-    ASSIGNMENT, PERFORMANCE
+    ASSIGNMENT,
+    AWARD,
+    CUSTOM,
+    HISTORICAL, //Used for historical daily log
+    MEDICAL,
+    PATIENT,
+    PERFORMANCE,
+    PERSONAL,
+    SERVICE
 }

@@ -65,6 +65,7 @@ import javax.swing.ImageIcon;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -287,7 +288,7 @@ public class FactionStandings {
      * separately.</p>
      *
      * <p>If we're starting a new campaign, we should follow up object construction with a call to
-     * {@link #updateClimateRegard(Faction, LocalDate, double)}</p>
+     * {@link #updateClimateRegard(Faction, LocalDate, double, boolean)}</p>
      *
      * @author Illiani
      * @since 0.50.07
@@ -804,10 +805,10 @@ public class FactionStandings {
         return null;
     }
 
-    /** Use {@link #updateClimateRegard(Faction, LocalDate, double)} instead */
+    /** Use {@link #updateClimateRegard(Faction, LocalDate, double, boolean)} instead */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public String updateClimateRegard(final Faction campaignFaction, final LocalDate today) {
-        return updateClimateRegard(campaignFaction, today, 1.0);
+        return updateClimateRegard(campaignFaction, today, 1.0, false);
     }
 
     /**
@@ -822,9 +823,11 @@ public class FactionStandings {
      * <p>After updating, this method generates and returns an HTML-formatted report summarizing the new climate
      * regard standings for all relevant factions.</p>
      *
-     * @param campaignFaction  the {@link Faction} representing the campaign's primary faction
-     * @param today            the {@link LocalDate} to use for validating factions and determining relationships
-     * @param regardMultiplier the regard multiplier set in campaign options
+     * @param campaignFaction            the {@link Faction} representing the campaign's primary faction
+     * @param today                      the {@link LocalDate} to use for validating factions and determining
+     *                                   relationships
+     * @param regardMultiplier           the regard multiplier set in campaign options
+     * @param enableVerboseClimateRegard {@code true} if the verbose climate regard campaign option is enabled
      *
      * @return an HTML-formatted {@link String} report of faction climate regard changes
      *
@@ -832,8 +835,8 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public String updateClimateRegard(final Faction campaignFaction, final LocalDate today,
-          final double regardMultiplier) {
-        return updateClimateRegard(campaignFaction, today, regardMultiplier, false);
+          final double regardMultiplier, final boolean enableVerboseClimateRegard) {
+        return updateClimateRegard(campaignFaction, today, regardMultiplier, enableVerboseClimateRegard, false);
     }
 
     /**
@@ -848,10 +851,12 @@ public class FactionStandings {
      * <p>After updating, this method generates and returns an HTML-formatted report summarizing the new climate
      * regard standings for all relevant factions.</p>
      *
-     * @param campaignFaction  the {@link Faction} representing the campaign's primary faction
-     * @param today            the {@link LocalDate} to use for validating factions and determining relationships
-     * @param regardMultiplier the regard multiplier set in campaign options
-     * @param useTestDirectory {@code true} if called from within a Unit Test
+     * @param campaignFaction            the {@link Faction} representing the campaign's primary faction
+     * @param today                      the {@link LocalDate} to use for validating factions and determining
+     *                                   relationships
+     * @param regardMultiplier           the regard multiplier set in campaign options
+     * @param enableVerboseClimateRegard {@code true} if the verbose climate regard campaign option is enabled
+     * @param useTestDirectory           {@code true} if called from within a Unit Test
      *
      * @return an HTML-formatted {@link String} report of faction climate regard changes
      *
@@ -859,7 +864,7 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public String updateClimateRegard(final Faction campaignFaction, final LocalDate today,
-          final double regardMultiplier, boolean useTestDirectory) {
+          final double regardMultiplier, boolean enableVerboseClimateRegard, boolean useTestDirectory) {
         Collection<Faction> allFactions = Factions.getInstance().getActiveFactions(today);
         FactionHints factionHints = FactionHints.defaultFactionHints(useTestDirectory);
         boolean isPirate = campaignFaction.isPirate();
@@ -925,11 +930,11 @@ public class FactionStandings {
         }
 
         // If we're not handling any climate modifiers, return an empty string
-        if (climateRegard.isEmpty()) {
+        if (climateRegard.isEmpty() || !enableVerboseClimateRegard) {
             return "";
         }
 
-        return buildClimateReport(campaignFaction.isPirate(), today).toString();
+        return buildClimateReport(campaignFaction.isPirate(), campaignFaction.isClan(), today).toString();
     }
 
     /**
@@ -941,7 +946,8 @@ public class FactionStandings {
      *
      * <p>If any entries exist, an introductory line is inserted at the beginning.</p>
      *
-     * @param campaignIsPirate whether the faction is a pirate faction
+     * @param campaignIsPirate whether the campaign faction is a pirate faction
+     * @param campaignIsClan   whether the campaign faction is a Clan faction
      * @param today            the {@link LocalDate} used for retrieving year-specific faction names
      *
      * @return a {@link StringBuilder} containing the formatted climate regard report
@@ -949,7 +955,10 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    private StringBuilder buildClimateReport(boolean campaignIsPirate, LocalDate today) {
+    private StringBuilder buildClimateReport(boolean campaignIsPirate, boolean campaignIsClan, LocalDate today) {
+        // We minus a day as otherwise this will return false if today is the first day of the First Wave
+        boolean clanInvasionHasBegun = MHQConstants.CLAN_INVASION_FIRST_WAVE_BEGINS.minusDays(1).isBefore(today);
+
         StringBuilder report = new StringBuilder();
         String factionName;
         double regard;
@@ -970,6 +979,11 @@ public class FactionStandings {
             if (faction == null) {
                 LOGGER.warn("Faction {} is missing from the Factions collection. Skipping.",
                       climateRegard.get(factionCode));
+                continue;
+            }
+
+            // If the Clan Invasion First Wave hasn't occurred
+            if (!clanInvasionHasBegun && (campaignIsClan != faction.isClan())) {
                 continue;
             }
 
