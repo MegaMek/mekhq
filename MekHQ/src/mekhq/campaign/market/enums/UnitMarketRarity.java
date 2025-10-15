@@ -44,7 +44,8 @@ public enum UnitMarketRarity {
     UNCOMMON("UnitMarketRarity.UNCOMMON.name", 2),
     COMMON("UnitMarketRarity.COMMON.name", 3),
     VERY_COMMON("UnitMarketRarity.VERY_COMMON.name", 4),
-    UBIQUITOUS("UnitMarketRarity.UBIQUITOUS.name", 10);
+    UBIQUITOUS("UnitMarketRarity.UBIQUITOUS.name", 10),
+    MYTHIC("UnitMarketRarity.MYTHIC.name", -1);
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -71,35 +72,7 @@ public enum UnitMarketRarity {
     }
     // endregion Getters
 
-    // region Boolean Comparison Methods
-
-    public boolean isVeryRare() {
-        return this == VERY_RARE;
-    }
-
-    public boolean isRare() {
-        return this == RARE;
-    }
-
-    public boolean isUncommon() {
-        return this == UNCOMMON;
-    }
-
-    public boolean isCommon() {
-        return this == COMMON;
-    }
-
-    public boolean isVeryCommon() {
-        return this == VERY_COMMON;
-    }
-
-    public boolean isUbiquitous() {
-        return this == UBIQUITOUS;
-    }
-    // endregion Boolean Comparison Methods
-
     // region File I/O
-
     public static UnitMarketRarity parseFromString(final String text) {
         return switch (text) {
             case "0", "Very Rare" -> VERY_RARE;
@@ -108,6 +81,7 @@ public enum UnitMarketRarity {
             case "3", "Common" -> COMMON;
             case "4", "Very Common" -> VERY_COMMON;
             case "5", "Ubiquitous" -> UBIQUITOUS;
+            case "6", "Mythic" -> MYTHIC;
             default -> throw new IllegalStateException(
                   "Unexpected value in mekhq/campaign/market/enums/UnitMarketRarity.java/fromString: " + text);
         };

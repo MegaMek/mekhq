@@ -62,6 +62,10 @@ public class AtBStaticWeightGenerator {
           final boolean regionVariations) {
         if (unitType == UnitType.AEROSPACE_FIGHTER) {
             return getRandomAerospaceWeight();
+        } else if (unitType == UnitType.DROPSHIP) {
+            return getRandomDropShipWeight();
+        } else if (unitType == UnitType.JUMPSHIP) {
+            return EntityWeightClass.WEIGHT_SMALL_WAR;
         } else if ((unitType == UnitType.MEK) && regionVariations) {
             return getRegionalMekWeight(faction);
         } else {
@@ -73,12 +77,12 @@ public class AtBStaticWeightGenerator {
      * @return the generated weight for a BattleMek
      */
     private static int getRandomMekWeight() {
-        final int roll = Compute.randomInt(10);
-        if (roll < 3) {
+        final int roll = Compute.d6(2);
+        if (roll < 5) {
             return EntityWeightClass.WEIGHT_LIGHT;
-        } else if (roll < 7) {
+        } else if (roll < 8) {
             return EntityWeightClass.WEIGHT_MEDIUM;
-        } else if (roll < 9) {
+        } else if (roll < 10) {
             return EntityWeightClass.WEIGHT_HEAVY;
         } else {
             return EntityWeightClass.WEIGHT_ASSAULT;
@@ -140,13 +144,24 @@ public class AtBStaticWeightGenerator {
      * @return the generated random weight for an Aerospace Fighter
      */
     private static int getRandomAerospaceWeight() {
-        final int roll = Compute.randomInt(8);
-        if (roll < 3) {
+        final int roll = Compute.d6(2);
+        if (roll < 5) {
             return EntityWeightClass.WEIGHT_LIGHT;
-        } else if (roll < 7) {
+        } else if (roll < 9) {
             return EntityWeightClass.WEIGHT_MEDIUM;
         } else {
             return EntityWeightClass.WEIGHT_HEAVY;
+        }
+    }
+
+    private static int getRandomDropShipWeight() {
+        final int roll = Compute.d6(2);
+        if (roll < 5) {
+            return EntityWeightClass.WEIGHT_SMALL_DROP;
+        } else if (roll < 9) {
+            return EntityWeightClass.WEIGHT_MEDIUM_DROP;
+        } else {
+            return EntityWeightClass.WEIGHT_LARGE_DROP;
         }
     }
 }

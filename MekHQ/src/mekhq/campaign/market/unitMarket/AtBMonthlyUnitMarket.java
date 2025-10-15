@@ -33,6 +33,7 @@
 package mekhq.campaign.market.unitMarket;
 
 import static mekhq.campaign.market.enums.UnitMarketRarity.COMMON;
+import static mekhq.campaign.market.enums.UnitMarketRarity.MYTHIC;
 import static mekhq.campaign.market.enums.UnitMarketRarity.RARE;
 import static mekhq.campaign.market.enums.UnitMarketRarity.UBIQUITOUS;
 import static mekhq.campaign.market.enums.UnitMarketRarity.UNCOMMON;
@@ -40,6 +41,11 @@ import static mekhq.campaign.market.enums.UnitMarketRarity.VERY_COMMON;
 import static mekhq.campaign.market.enums.UnitMarketRarity.VERY_RARE;
 import static mekhq.campaign.market.enums.UnitMarketType.getPricePercentage;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getAmazingColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,6 +72,8 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Market";
+
     //region Constructors
     public AtBMonthlyUnitMarket() {
         super(UnitMarketMethod.ATB_MONTHLY);
@@ -120,6 +128,12 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
 
         addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, rarityModifier),
               UnitMarketType.OPEN, UnitType.INFANTRY, faction, IUnitRating.DRAGOON_F, 1);
+
+        addOffers(campaign, getMarketItemCount(campaign, VERY_RARE, rarityModifier),
+              UnitMarketType.OPEN, UnitType.DROPSHIP, faction, IUnitRating.DRAGOON_F, 4);
+
+        addOffers(campaign, getMarketItemCount(campaign, MYTHIC, rarityModifier),
+              UnitMarketType.OPEN, UnitType.JUMPSHIP, faction, IUnitRating.DRAGOON_F, 4);
 
         if ((contract != null)
                   && (campaign.getLocalDate().isAfter(contract.getStartDate().minusDays(1)))) {
@@ -249,6 +263,12 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
 
             addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, rarityModifier),
                   UnitMarketType.FACTORY, UnitType.INFANTRY, faction, IUnitRating.DRAGOON_A, -4);
+
+            addOffers(campaign, getMarketItemCount(campaign, VERY_RARE, rarityModifier),
+                  UnitMarketType.FACTORY, UnitType.DROPSHIP, faction, IUnitRating.DRAGOON_A, 0);
+
+            addOffers(campaign, getMarketItemCount(campaign, MYTHIC, rarityModifier),
+                  UnitMarketType.FACTORY, UnitType.JUMPSHIP, faction, IUnitRating.DRAGOON_A, 0);
         }
 
         // Black Market
@@ -348,7 +368,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                 }
             }
 
-            addSingleUnit(campaign,
+            String unitName = addSingleUnit(campaign,
                   market,
                   unitType,
                   faction,
@@ -356,6 +376,19 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                   movementModes,
                   missionRoles,
                   getPricePercentage(priceModifier));
+            if (unitName != null) {
+                if (unitType == UnitType.DROPSHIP) {
+                    String key = "AtBMonthlyUnitMarket.dropShip.report";
+                    String report = getFormattedTextAt(RESOURCE_BUNDLE, key,
+                          spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG);
+                    campaign.addReport(report);
+                } else if (unitType == UnitType.JUMPSHIP) {
+                    String key = "AtBMonthlyUnitMarket.jumpShip.report";
+                    String report = getFormattedTextAt(RESOURCE_BUNDLE, key,
+                          spanOpeningWithCustomColor(getAmazingColor()), CLOSING_SPAN_TAG);
+                    campaign.addReport(report);
+                }
+            }
         }
     }
 
