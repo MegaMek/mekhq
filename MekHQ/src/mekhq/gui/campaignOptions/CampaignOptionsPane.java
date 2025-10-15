@@ -38,6 +38,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.UTILITY;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
@@ -335,7 +336,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               skillsTab.createSkillsTab(COMBAT_PILOTING),
               "2supportSkillsTab",
               skillsTab.createSkillsTab(SUPPORT),
-              "3roleplaySkillsTab",
+              "3utilitySkillsTab",
+              skillsTab.createSkillsTab(UTILITY),
+              "4roleplaySkillsTab",
               skillsTab.createSkillsTab(ROLEPLAY_GENERAL)));
         skillsTab.loadValuesFromCampaignOptions();
 

@@ -160,6 +160,22 @@ public class AdvancementTab {
     private JLabel lblCommandSkillsLegendary;
     private JSpinner spnCommandSkillsLegendary;
 
+    private JPanel pnlUtilitySkills;
+    private JLabel lblUtilitySkillsUltraGreen;
+    private JSpinner spnUtilitySkillsUltraGreen;
+    private JLabel lblUtilitySkillsGreen;
+    private JSpinner spnUtilitySkillsGreen;
+    private JLabel lblUtilitySkillsReg;
+    private JSpinner spnUtilitySkillsReg;
+    private JLabel lblUtilitySkillsVet;
+    private JSpinner spnUtilitySkillsVet;
+    private JLabel lblUtilitySkillsElite;
+    private JSpinner spnUtilitySkillsElite;
+    private JLabel lblUtilitySkillsHeroic;
+    private JSpinner spnUtilitySkillsHeroic;
+    private JLabel lblUtilitySkillsLegendary;
+    private JSpinner spnUtilitySkillsLegendary;
+
     private JPanel pnlSmallArms;
     private JLabel lblCombatSA;
     private JSpinner spnCombatSA;
@@ -586,6 +602,22 @@ public class AdvancementTab {
         lblCommandSkillsLegendary = new JLabel();
         spnCommandSkillsLegendary = new JSpinner();
 
+        pnlUtilitySkills = new JPanel();
+        lblUtilitySkillsUltraGreen = new JLabel();
+        spnUtilitySkillsUltraGreen = new JSpinner();
+        lblUtilitySkillsGreen = new JLabel();
+        spnUtilitySkillsGreen = new JSpinner();
+        lblUtilitySkillsReg = new JLabel();
+        spnUtilitySkillsReg = new JSpinner();
+        lblUtilitySkillsVet = new JLabel();
+        spnUtilitySkillsVet = new JSpinner();
+        lblUtilitySkillsElite = new JLabel();
+        spnUtilitySkillsElite = new JSpinner();
+        lblUtilitySkillsHeroic = new JLabel();
+        spnUtilitySkillsHeroic = new JSpinner();
+        lblUtilitySkillsLegendary = new JLabel();
+        spnUtilitySkillsLegendary = new JSpinner();
+
         pnlSmallArms = new JPanel();
         lblCombatSA = new JLabel();
         spnCombatSA = new JSpinner();
@@ -812,6 +844,7 @@ public class AdvancementTab {
     private JPanel createSkillGroupPanel() {
         // Contents
         pnlCommandSkills = createCommandSkillsPanel();
+        pnlUtilitySkills = createUtilitySkillsPanel();
         pnlArtillery = createArtilleryPanel();
         pnlSmallArms = createSmallArmsPanel();
         pnlSecondarySkills = createSecondarySkillPanel();
@@ -824,6 +857,10 @@ public class AdvancementTab {
         layout.gridy = 0;
         panel.add(pnlCommandSkills, layout);
         layout.gridx++;
+        panel.add(pnlUtilitySkills, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(pnlSecondarySkills, layout);
 
         layout.gridx = 0;
@@ -915,6 +952,90 @@ public class AdvancementTab {
         panel.add(lblCommandSkillsLegendary, layout);
         layout.gridx++;
         panel.add(spnCommandSkillsLegendary, layout);
+
+        return panel;
+    }
+
+    /**
+     * Creates and returns the Utility Skills panel, which allows users to configure settings for Non-Command Utility
+     * Skill modifiers for different skill levels, such as green, regular, veteran, and elite.
+     *
+     * @return A {@code JPanel} containing configuration options for Utility Skill modifiers.
+     */
+    private JPanel createUtilitySkillsPanel() {
+        // Contents
+        lblUtilitySkillsUltraGreen = new CampaignOptionsLabel("UtilitySkillsUltraGreen");
+        lblUtilitySkillsUltraGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
+              "UtilitySkillsUltraGreen"));
+        spnUtilitySkillsUltraGreen = new CampaignOptionsSpinner("UtilitySkillsUltraGreen", 0, -12, 12, 1);
+        spnUtilitySkillsUltraGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
+              "UtilitySkillsUltraGreen"));
+
+        lblUtilitySkillsGreen = new CampaignOptionsLabel("UtilitySkillsGreen");
+        lblUtilitySkillsGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsGreen"));
+        spnUtilitySkillsGreen = new CampaignOptionsSpinner("UtilitySkillsGreen", 0, -12, 12, 1);
+        spnUtilitySkillsGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsGreen"));
+
+        lblUtilitySkillsReg = new CampaignOptionsLabel("UtilitySkillsRegular");
+        lblUtilitySkillsReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsRegular"));
+        spnUtilitySkillsReg = new CampaignOptionsSpinner("UtilitySkillsRegular", 0, -12, 12, 1);
+        spnUtilitySkillsReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsRegular"));
+
+        lblUtilitySkillsVet = new CampaignOptionsLabel("UtilitySkillsVeteran");
+        lblUtilitySkillsVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsVeteran"));
+        spnUtilitySkillsVet = new CampaignOptionsSpinner("UtilitySkillsVeteran", 0, -12, 12, 1);
+        spnUtilitySkillsVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsVeteran"));
+
+        lblUtilitySkillsElite = new CampaignOptionsLabel("UtilitySkillsElite");
+        lblUtilitySkillsElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsElite"));
+        spnUtilitySkillsElite = new CampaignOptionsSpinner("UtilitySkillsElite", 0, -12, 12, 1);
+        spnUtilitySkillsElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsElite"));
+
+        lblUtilitySkillsHeroic = new CampaignOptionsLabel("UtilitySkillsHeroic");
+        spnUtilitySkillsHeroic = new CampaignOptionsSpinner("UtilitySkillsHeroic", 0, -12, 12, 1);
+
+        lblUtilitySkillsLegendary = new CampaignOptionsLabel("UtilitySkillsLegendary");
+        spnUtilitySkillsLegendary = new CampaignOptionsSpinner("UtilitySkillsLegendary", 0, -12, 12, 1);
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("UtilitySkillsPanel", true, "UtilitySkillsPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(lblUtilitySkillsUltraGreen, layout);
+        layout.gridx++;
+        panel.add(spnUtilitySkillsUltraGreen, layout);
+        layout.gridx++;
+        panel.add(lblUtilitySkillsGreen, layout);
+        layout.gridx++;
+        panel.add(spnUtilitySkillsGreen, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblUtilitySkillsReg, layout);
+        layout.gridx++;
+        panel.add(spnUtilitySkillsReg, layout);
+        layout.gridx++;
+        panel.add(lblUtilitySkillsVet, layout);
+        layout.gridx++;
+        panel.add(spnUtilitySkillsVet, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblUtilitySkillsElite, layout);
+        layout.gridx++;
+        panel.add(spnUtilitySkillsElite, layout);
+        layout.gridx++;
+        panel.add(lblUtilitySkillsHeroic, layout);
+        layout.gridx++;
+        panel.add(spnUtilitySkillsHeroic, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblUtilitySkillsLegendary, layout);
+        layout.gridx++;
+        panel.add(spnUtilitySkillsLegendary, layout);
 
         return panel;
     }
@@ -1246,6 +1367,15 @@ public class AdvancementTab {
         } catch (NullPointerException e) {
             // This is expected for campaigns <50.05. In those cases, we're just going to use the default values.
         }
+
+        spnUtilitySkillsUltraGreen.setValue(skillPreferences.getUtilitySkillsModifier(SkillType.EXP_ULTRA_GREEN));
+        spnUtilitySkillsGreen.setValue(skillPreferences.getUtilitySkillsModifier(SkillType.EXP_GREEN));
+        spnUtilitySkillsReg.setValue(skillPreferences.getUtilitySkillsModifier(SkillType.EXP_REGULAR));
+        spnUtilitySkillsVet.setValue(skillPreferences.getUtilitySkillsModifier(SkillType.EXP_VETERAN));
+        spnUtilitySkillsElite.setValue(skillPreferences.getUtilitySkillsModifier(SkillType.EXP_ELITE));
+        spnUtilitySkillsHeroic.setValue(skillPreferences.getUtilitySkillsModifier(SkillType.EXP_HEROIC));
+        spnUtilitySkillsLegendary.setValue(skillPreferences.getUtilitySkillsModifier(SkillType.EXP_LEGENDARY));
+
         spnRoleplaySkillsModifier.setValue(skillPreferences.getRoleplaySkillModifier());
         spnCombatSA.setValue(skillPreferences.getCombatSmallArmsBonus());
         spnSupportSA.setValue(skillPreferences.getSupportSmallArmsBonus());
@@ -1330,6 +1460,15 @@ public class AdvancementTab {
         skillPreferences.setCommandSkillsMod(SkillType.EXP_ELITE, (int) spnCommandSkillsElite.getValue());
         skillPreferences.setCommandSkillsMod(SkillType.EXP_HEROIC, (int) spnCommandSkillsHeroic.getValue());
         skillPreferences.setCommandSkillsMod(SkillType.EXP_LEGENDARY, (int) spnCommandSkillsLegendary.getValue());
+
+        skillPreferences.setUtilitySkillsMod(SkillType.EXP_ULTRA_GREEN, (int) spnUtilitySkillsUltraGreen.getValue());
+        skillPreferences.setUtilitySkillsMod(SkillType.EXP_GREEN, (int) spnUtilitySkillsGreen.getValue());
+        skillPreferences.setUtilitySkillsMod(SkillType.EXP_REGULAR, (int) spnUtilitySkillsReg.getValue());
+        skillPreferences.setUtilitySkillsMod(SkillType.EXP_VETERAN, (int) spnUtilitySkillsVet.getValue());
+        skillPreferences.setUtilitySkillsMod(SkillType.EXP_ELITE, (int) spnUtilitySkillsElite.getValue());
+        skillPreferences.setUtilitySkillsMod(SkillType.EXP_HEROIC, (int) spnUtilitySkillsHeroic.getValue());
+        skillPreferences.setUtilitySkillsMod(SkillType.EXP_LEGENDARY, (int) spnUtilitySkillsLegendary.getValue());
+
         skillPreferences.setRoleplaySkillModifier((int) spnRoleplaySkillsModifier.getValue());
         skillPreferences.setCombatSmallArmsBonus((int) spnCombatSA.getValue());
         skillPreferences.setSupportSmallArmsBonus((int) spnSupportSA.getValue());

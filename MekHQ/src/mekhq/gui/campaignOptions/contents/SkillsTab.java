@@ -41,15 +41,7 @@ import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static megamek.common.enums.SkillLevel.parseFromInteger;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_ART;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_INTEREST;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENCE;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -187,6 +179,11 @@ public class SkillsTab {
                       getImageDirectory() + "logo_clan_goliath_scorpion.png");
                 panelName = "SupportSkillsTab";
             }
+            case UTILITY -> {
+                headerPanel = new CampaignOptionsHeaderPanel("UtilitySkillsTab",
+                      getImageDirectory() + "logo_axumite_providence.png");
+                panelName = "UtilitySkillsTab";
+            }
             default -> { // ROLEPLAY
                 headerPanel = new CampaignOptionsHeaderPanel("RoleplaySkillsTab",
                       getImageDirectory() + "logo_clan_jade_falcon.png");
@@ -203,14 +200,16 @@ public class SkillsTab {
             boolean isCorrectType = switch (category) {
                 case NONE, COMBAT_GUNNERY -> subType == COMBAT_GUNNERY;
                 case COMBAT_PILOTING -> subType == COMBAT_PILOTING;
-                case SUPPORT -> subType == SUPPORT || subType == SUPPORT_COMMAND;
+                case SUPPORT -> subType == SUPPORT;
+                case UTILITY -> subType == UTILITY ||
+                                      subType == UTILITY_COMMAND;
                 case ROLEPLAY_GENERAL -> subType == ROLEPLAY_GENERAL ||
                                                subType == ROLEPLAY_ART ||
                                                subType == ROLEPLAY_INTEREST ||
                                                subType == ROLEPLAY_SCIENCE ||
                                                subType == ROLEPLAY_SECURITY;
                 // These next few cases shouldn't get hit, but we include them just in case
-                case SUPPORT_COMMAND -> subType == SUPPORT_COMMAND;
+                case UTILITY_COMMAND, SUPPORT_COMMAND -> subType == UTILITY_COMMAND;
                 case ROLEPLAY_ART -> subType == ROLEPLAY_ART;
                 case ROLEPLAY_INTEREST -> subType == ROLEPLAY_INTEREST;
                 case ROLEPLAY_SCIENCE -> subType == ROLEPLAY_SCIENCE;
@@ -293,7 +292,7 @@ public class SkillsTab {
         }
 
         // Create Parent Panel
-        return createParentPanel(panel, "CombatSkillsTab");
+        return createParentPanel(panel, category.name() + "SkillsTab");
     }
 
     /**

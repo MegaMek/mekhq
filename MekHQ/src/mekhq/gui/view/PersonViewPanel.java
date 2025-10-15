@@ -45,15 +45,7 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
 import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_ART;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_INTEREST;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENCE;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
@@ -229,9 +221,10 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
-        List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING));
+        List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING,
+              SUPPORT));
         if (!relevantSkills.isEmpty()) {
-            JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.combat");
+            JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.profession");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -244,9 +237,9 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
-        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(SUPPORT, SUPPORT_COMMAND));
+        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(UTILITY, UTILITY_COMMAND));
         if (!relevantSkills.isEmpty()) {
-            JPanel pnlSupportSkills = fillSkills(relevantSkills, "pnlSkills.support");
+            JPanel pnlSupportSkills = fillSkills(relevantSkills, "pnlSkills.utility");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
