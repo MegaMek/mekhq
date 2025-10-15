@@ -5174,10 +5174,9 @@ public class Unit implements ITechnology {
                 nav = 1;
             }
             return getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds() - nav;
-        } else if (entity.isSupportVehicle()) {
-            return getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds();
         }
-        return 0;
+
+        return getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds();
     }
 
     public boolean canTakeMoreDrivers() {
@@ -5188,14 +5187,13 @@ public class Unit implements ITechnology {
     public boolean canTakeMoreVesselCrew() {
         int nCrew = vesselCrew.size();
         int nav = 0;
-        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
-            if (entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
-                nav = 1;
-            }
-            return nCrew < (getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds() - nav);
-        } else {
-            return nCrew < (getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds());
+
+        if (entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
+            nav = 1;
         }
+
+        int totalNeeds = getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds() - nav;
+        return nCrew < totalNeeds;
     }
 
     public boolean canTakeNavigator() {

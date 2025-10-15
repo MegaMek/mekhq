@@ -78,13 +78,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
         // Impossible Assignments:
         // 1) All people must be active
         // 2) All people must be non-prisoners (bondsmen should be assignable to units)
-        // 3) All people must not be primary civilians
-        // 4) All people must share one of their non-civilian professions
+        // 3) All people must share one of their professions
         boolean assign = Stream.of(people)
                                .noneMatch(person -> !person.getStatus().isActive() ||
-                                                          person.getPrisonerStatus().isCurrentPrisoner() ||
-                                                          Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())
-                                                                .isCivilian());
+                                                          person.getPrisonerStatus().isCurrentPrisoner());
 
         if (assign) {
             final Profession basePrimaryProfession = Profession.getProfessionFromPersonnelRole(people[0].getPrimaryRole());
