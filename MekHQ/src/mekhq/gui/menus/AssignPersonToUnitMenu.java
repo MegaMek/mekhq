@@ -367,6 +367,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     final boolean valid;
                     if (entity instanceof Tank) {
                         valid = areAllVehicleGunners;
+                    } else if (entity instanceof ConvFighter) {
+                        valid = areAllConventionalAerospacePilots;
                     } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
                         valid = areAllVesselGunners;
                     } else if ((entity instanceof Mek) && !unit.usesSoloPilot()) {
@@ -405,7 +407,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                 // TODO : also be based on crewmembers
                 if (unit.canTakeMoreVesselCrew()) {
                     final boolean valid;
-                    if (entity instanceof Aero) {
+                    if (entity instanceof Aero && !(entity instanceof ConvFighter)) {
                         valid = areAllVesselCrew;
                     } else {
                         // TODO : Expand for Command and Control, Medical, Technician, and Salvage Assignments
