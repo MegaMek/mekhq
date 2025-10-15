@@ -237,23 +237,17 @@ public class AbilitiesTab {
         };
 
         // Contents
-        RoundedJButton btnEnableAll = new CampaignOptionsButton("AddAll");
-        btnEnableAll.addActionListener(e -> {
-            for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
-                abilityInfo.setEnabled(true);
-            }
+        RoundedJButton btnEnableCurrent = new CampaignOptionsButton("AddAllCurrent");
+        btnEnableCurrent.addActionListener(e -> toggleAbilitiesAction(abilityCategory, true));
 
-            refreshAll();
-        });
+        RoundedJButton btnRemoveCurrent = new CampaignOptionsButton("RemoveAllCurrent");
+        btnRemoveCurrent.addActionListener(e -> toggleAbilitiesAction(abilityCategory, false));
+
+        RoundedJButton btnEnableAll = new CampaignOptionsButton("AddAll");
+        btnEnableAll.addActionListener(e -> toggleAbilitiesAction(null, true));
 
         RoundedJButton btnRemoveAll = new CampaignOptionsButton("RemoveAll");
-        btnRemoveAll.addActionListener(e -> {
-            for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
-                abilityInfo.setEnabled(false);
-            }
-
-            refreshAll();
-        });
+        btnRemoveAll.addActionListener(e -> toggleAbilitiesAction(null, false));
 
         // Layout the Panels
         final JPanel panel = new CampaignOptionsStandardPanel("AbilitiesGeneralTab", true);
@@ -265,6 +259,12 @@ public class AbilitiesTab {
         panel.add(headerPanel, layout);
 
         layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(btnEnableCurrent, layout);
+        layout.gridx++;
+        panel.add(btnRemoveCurrent, layout);
+
         layout.gridx = 0;
         layout.gridy++;
         panel.add(btnEnableAll, layout);
@@ -284,7 +284,7 @@ public class AbilitiesTab {
                 JPanel abilityPanel = createSPAPanel(abilityInfo);
 
                 layout.gridx = abilityCounter % 3;
-                layout.gridy = 2 + (abilityCounter / 3);
+                layout.gridy = 3 + (abilityCounter / 3);
                 abilityCounter++;
 
                 layout.gridwidth = 1;
@@ -317,6 +317,29 @@ public class AbilitiesTab {
                 yield characterCreationOnlyTab;
             }
         };
+    }
+
+    /**
+     * Enables or disables abilities in the specified category, or all abilities if the category is {@code null}.
+     *
+     * <p>Iterates through all abilities and applies the {@code enable} status as indicated, then refreshes all ability
+     * tabs to reflect the changes.</p>
+     *
+     * @param abilityCategory the {@link AbilityCategory} to filter abilities, or {@code null} to affect all categories
+     * @param enable          {@code true} to enable the abilities; {@code false} to disable them
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void toggleAbilitiesAction(@Nullable AbilityCategory abilityCategory, boolean enable) {
+        boolean skipComparison = abilityCategory == null;
+        for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
+            if (skipComparison || abilityInfo.getCategory() == abilityCategory) {
+                abilityInfo.setEnabled(enable);
+            }
+        }
+
+        refreshAll();
     }
 
     /**
