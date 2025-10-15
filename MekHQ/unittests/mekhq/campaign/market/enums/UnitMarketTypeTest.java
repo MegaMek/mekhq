@@ -114,7 +114,7 @@ class UnitMarketTypeTest {
         assertEquals(UnitMarketType.FACTORY, UnitMarketType.parseFromString("FACTORY"));
 
         // Error Case
-        assertEquals(UnitMarketType.OPEN, UnitMarketType.parseFromString("5"));
+        assertEquals(UnitMarketType.OPEN, UnitMarketType.parseFromString("7"));
         assertEquals(UnitMarketType.OPEN, UnitMarketType.parseFromString("blah"));
     }
     // endregion File I/O
