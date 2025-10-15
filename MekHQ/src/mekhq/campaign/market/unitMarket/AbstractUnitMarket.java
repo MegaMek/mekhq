@@ -203,7 +203,7 @@ public abstract class AbstractUnitMarket {
                                                               (ms.isClan() ||
                                                                      campaign.getCampaignOptions()
                                                                            .isAllowISPurchases()));
-        LOGGER.info("Adding unit to market: {} {} {}", unitType, mekSummary, percent);
+        LOGGER.debug("Adding unit to market: {} {} {}", unitType, mekSummary, percent);
         return (mekSummary == null) ? null : addSingleUnit(campaign, market, unitType, mekSummary, percent);
     }
 
