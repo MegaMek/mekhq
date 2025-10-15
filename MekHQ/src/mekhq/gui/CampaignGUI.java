@@ -747,13 +747,6 @@ public class CampaignGUI extends JPanel {
         miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         menuMarket.add(miUnitMarket);
 
-        miShipSearch = new JMenuItem(resourceMap.getString("miShipSearch.text"));
-        miShipSearch.setMnemonic(KeyEvent.VK_S);
-        miShipSearch.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK));
-        miShipSearch.addActionListener(evt -> new ShipSearchDialog(getFrame(), this).setVisible(true));
-        miShipSearch.setVisible(getCampaign().getCampaignOptions().isUseAtB());
-        menuMarket.add(miShipSearch);
-
         JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text"));
         miPurchaseUnit.setMnemonic(KeyEvent.VK_N);
         miPurchaseUnit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK));
