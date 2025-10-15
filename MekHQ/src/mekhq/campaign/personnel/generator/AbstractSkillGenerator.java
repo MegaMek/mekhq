@@ -150,7 +150,7 @@ public abstract class AbstractSkillGenerator {
                 continue;
             }
 
-            int utilitySkillLevel = Utilities.generateExpLevel(randomSkillPreferences.getRoleplaySkillModifier());
+            int utilitySkillLevel = Utilities.generateExpLevel(randomSkillPreferences.getUtilitySkillModifier());
             if (utilitySkillLevel > SkillType.EXP_ULTRA_GREEN) {
                 addSkill(person, skillType.getName(), utilitySkillLevel, randomSkillPreferences.randomizeSkill(), 0);
             }
