@@ -1076,7 +1076,7 @@ public class Unit implements ITechnology {
     }
 
     /**
-	 * A method that returns the value of all missing, but not damaged parts.
+     * A method that returns the value of all missing, but not damaged parts.
      *
      * @return The value of all missing parts.
      */
@@ -1101,20 +1101,20 @@ public class Unit implements ITechnology {
     }
 
     /**
-	 * A method that returns the value of all damaged, but not missing parts.
+     * A method that returns the value of all damaged, but not missing parts.
      *
      * @return The value of all damaged parts.
      */
-	public Money getValueOfAllDamagedParts() {
+    public Money getValueOfAllDamagedParts() {
         Money value = Money.zero();
 
-		for (Part part: getParts()) {
-			if(part.needsFixing() && !(part instanceof Armor)) {
-				value = value.plus(part.getActualValue());
-			}
-		}
-		return value;
-	}
+        for (Part part : getParts()) {
+            if (part.needsFixing() && !(part instanceof Armor)) {
+                value = value.plus(part.getActualValue());
+            }
+        }
+        return value;
+    }
 
     public void removePart(Part part) {
         parts.remove(part);
@@ -4750,7 +4750,8 @@ public class Unit implements ITechnology {
         int nGunners = 0;
         int nCrew = 0;
 
-        boolean entityIsInfantry = entity.hasETypeFlag(Entity.ETYPE_INFANTRY);
+        boolean entityIsConventionalInfantry = entity.hasETypeFlag(Entity.ETYPE_INFANTRY) &&
+                                                     !entity.hasETypeFlag(Entity.ETYPE_BATTLEARMOR);
         for (Person person : drivers) {
             PersonnelOptions options = person.getOptions();
             Attributes attributes = person.getATOWAttributes();
@@ -4782,7 +4783,7 @@ public class Unit implements ITechnology {
             }
 
             String tempGunType = gunType;
-            if (entityIsInfantry) {
+            if (entityIsConventionalInfantry) {
                 tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(person);
                 if (tempGunType == null) {
                     tempGunType = SkillType.S_SMALL_ARMS;
