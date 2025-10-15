@@ -7621,10 +7621,6 @@ public class Campaign implements ITechManager {
                 }
                 MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "combatTeams");
             }
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "shipSearchStart", getShipSearchStart());
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "shipSearchType", shipSearchType);
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "shipSearchResult", shipSearchResult);
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "shipSearchExpiration", getShipSearchExpiration());
             MHQXMLUtility.writeSimpleXMLTag(writer,
                   indent,
                   "autoResolveBehaviorSettings",
