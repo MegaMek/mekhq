@@ -5192,11 +5192,10 @@ public class Unit implements ITechnology {
             if (entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
                 nav = 1;
             }
-            return nCrew < (getAeroCrewNeeds() - getTotalDriverNeeds() - nav);
-        } else if (entity.isSupportVehicle()) {
+            return nCrew < (getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds() - nav);
+        } else {
             return nCrew < (getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds());
         }
-        return false;
     }
 
     public boolean canTakeNavigator() {

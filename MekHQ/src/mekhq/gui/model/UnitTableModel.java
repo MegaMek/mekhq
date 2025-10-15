@@ -42,6 +42,7 @@ import javax.swing.table.TableCellRenderer;
 
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
@@ -197,12 +198,10 @@ public class UnitTableModel extends DataTableModel<Unit> {
         int navigatorsNeeded = entity instanceof Jumpship && !(entity instanceof SpaceStation) ? 1 : 0;
         int navigatorsAssigned = unit.getNavigator() == null ? 0 : 1;
 
-        int crewNeeded = unit.getTotalCrewNeeds();
+        int crewNeeded = Compute.getAdditionalNonGunner(entity);
         int crewAssigned = unit.getCrew().size() - (gunnersAssigned + driversAssigned + navigatorsAssigned);
 
         StringBuilder report = new StringBuilder("<html>");
-
-
         if (driversNeeded > 0 && soldiersNeeded == 0) {
             appendReport(report, "Drivers", driversAssigned, driversNeeded);
         }

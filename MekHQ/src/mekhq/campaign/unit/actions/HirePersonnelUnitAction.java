@@ -128,8 +128,8 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
         }
 
         while (unit.canTakeMoreVesselCrew()) {
-            Person person = campaign.newPerson(unit.getEntity().isSupportVehicle()
-                                                     ? PersonnelRole.VEHICLE_CREW : PersonnelRole.VESSEL_CREW);
+            Person person = campaign.newPerson(unit.getEntity().isLargeCraft()
+                                                     ? PersonnelRole.VESSEL_CREW : PersonnelRole.VEHICLE_CREW);
             if (person == null) {
                 break;
             }

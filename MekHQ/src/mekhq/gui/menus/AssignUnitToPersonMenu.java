@@ -480,7 +480,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         }
 
         // Crewmember Menu
-        if (units[0].canTakeMoreVesselCrew() && (isAero || units[0].getEntity().isSupportVehicle())) {
+        if (units[0].canTakeMoreVesselCrew()) {
             filteredPersonnel = personnel.stream()
                                       .filter(person -> isAero ? person.hasRole(PersonnelRole.VESSEL_CREW)
                                                               : (person.getPrimaryRole().isVehicleCrewExtended() ||

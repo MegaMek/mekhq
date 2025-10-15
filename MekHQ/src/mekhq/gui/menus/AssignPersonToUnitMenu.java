@@ -410,11 +410,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     final boolean valid;
                     if (entity instanceof Aero) {
                         valid = areAllVesselCrew;
-                    } else if (entity.isSupportVehicle()) {
+                    } else {
                         // TODO : Expand for Command and Control, Medical, Technician, and Salvage Assignments
                         valid = areAllVehicleCrew;
-                    } else {
-                        valid = false;
                     }
 
                     if (valid) {
@@ -439,6 +437,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                             }
                         });
                         crewmemberEntityWeightMenu.add(miCrewmember);
+
                     }
                 }
 
