@@ -7834,6 +7834,10 @@ public class Person {
         }
 
         Skill languages = skills.getSkill(S_LANGUAGES);
+        if (languages == null) {
+            return true;
+        }
+
         int level = languages.getLevel();
         return level < ILLITERACY_LANGUAGES_THRESHOLD;
     }
