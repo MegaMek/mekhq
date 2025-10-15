@@ -5186,14 +5186,7 @@ public class Unit implements ITechnology {
 
     public boolean canTakeMoreVesselCrew() {
         int nCrew = vesselCrew.size();
-        int nav = 0;
-
-        if (entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
-            nav = 1;
-        }
-
-        int totalNeeds = getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds() - nav;
-        return nCrew < totalNeeds;
+        return nCrew < getTotalCrewNeeds();
     }
 
     public boolean canTakeNavigator() {
@@ -5248,7 +5241,10 @@ public class Unit implements ITechnology {
         // one active suit
         return ((entity instanceof Mek) ||
                       (entity instanceof ProtoMek) ||
-                      (entity instanceof Aero && !(entity instanceof SmallCraft) && !(entity instanceof Jumpship))) &&
+                      (entity instanceof Aero &&
+                             !(entity instanceof SmallCraft) &&
+                             !(entity instanceof Jumpship) &&
+                             !(entity instanceof ConvFighter))) &&
                      (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos());
     }
 

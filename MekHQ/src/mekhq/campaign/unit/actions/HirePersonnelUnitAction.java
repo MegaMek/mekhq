@@ -117,7 +117,10 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
                 person = campaign.newPerson(PersonnelRole.VESSEL_GUNNER);
             } else if (unit.getEntity() instanceof Mek) {
                 person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+            } else if (unit.getEntity() instanceof ConvFighter) {
+                person = campaign.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
             }
+
             if (person == null) {
                 break;
             }
