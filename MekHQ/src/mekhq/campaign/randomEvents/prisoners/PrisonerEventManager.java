@@ -107,7 +107,7 @@ public class PrisonerEventManager {
     public static final int PRISONER_CAPACITY_CONVENTIONAL_INFANTRY = 5;
     public static final int PRISONER_CAPACITY_BATTLE_ARMOR = 20;
     public static final double PRISONER_CAPACITY_OTHER_UNIT_MULTIPLIER = 0.05;
-    public static final double PRISONER_CAPACITY_OTHER_UNIT_MAX_MULTIPLIER = 0.25;
+    public static final double PRISONER_CAPACITY_OTHER_UNIT_MAX_MULTIPLIER = 1.25;
     public static final int PRISONER_CAPACITY_CAM_OPS_MULTIPLIER = 3;
 
     // Fixed Dialog Options
@@ -266,7 +266,7 @@ public class PrisonerEventManager {
     List<Boolean> checkForPrisonerEvents(boolean isHeadless, int totalPrisoners, int prisonerCapacityUsage,
           int prisonerCapacity) {
         // Calculate overflow as the percentage over prisonerCapacity
-        double overflowPercentage = (double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity;
+        double overflowPercentage = ((double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity) * 100;
 
         // If no overflow and total prisoners are below the minimum count, no risk of event
         if (overflowPercentage <= 0 && totalPrisoners < MINIMUM_PRISONER_COUNT) {
@@ -689,7 +689,6 @@ public class PrisonerEventManager {
 
         int prisonerCapacity = 0;
         double otherUnitMultiplier = 1.0;
-
         for (Force force : campaign.getAllForces()) {
             if (!force.isForceType(SECURITY)) {
                 continue;
@@ -739,15 +738,13 @@ public class PrisonerEventManager {
                     otherUnitMultiplier += PRISONER_CAPACITY_OTHER_UNIT_MULTIPLIER;
                 }
             }
-
-            otherUnitMultiplier = min(PRISONER_CAPACITY_OTHER_UNIT_MAX_MULTIPLIER, otherUnitMultiplier);
-            prisonerCapacity = (int) round(prisonerCapacity * otherUnitMultiplier);
         }
 
+        otherUnitMultiplier = min(otherUnitMultiplier, PRISONER_CAPACITY_OTHER_UNIT_MAX_MULTIPLIER);
         double modifier = (double) campaign.getTemporaryPrisonerCapacity() / 100;
 
         if (isMekHQCaptureStyle) {
-            return max(0, (int) round(prisonerCapacity * modifier));
+            return max(0, (int) round(prisonerCapacity * otherUnitMultiplier * modifier));
         } else {
             return max(0, prisonerCapacity);
         }
