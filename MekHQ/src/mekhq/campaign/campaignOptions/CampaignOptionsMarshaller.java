@@ -935,8 +935,8 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isUnitMarketRegionalMekVariations());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
-              "unitMarketSpecialUnitChance",
-              campaignOptions.getUnitMarketSpecialUnitChance());
+              "unitMarketArtilleryUnitChance",
+              campaignOptions.getUnitMarketArtilleryUnitChance());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "unitMarketRarityModifier",

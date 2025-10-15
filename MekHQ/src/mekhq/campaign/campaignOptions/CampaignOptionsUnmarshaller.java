@@ -761,8 +761,8 @@ public class CampaignOptionsUnmarshaller {
             case "unitMarketMethod" -> campaignOptions.setUnitMarketMethod(UnitMarketMethod.valueOf(nodeContents));
             case "unitMarketRegionalMekVariations" -> campaignOptions.setUnitMarketRegionalMekVariations(parseBoolean(
                   nodeContents));
-            case "unitMarketSpecialUnitChance" -> campaignOptions.setUnitMarketSpecialUnitChance(parseInt(
-                  nodeContents));
+            case "unitMarketArtilleryUnitChance", "unitMarketSpecialUnitChance" ->
+                  campaignOptions.setUnitMarketArtilleryUnitChance(parseInt(nodeContents));
             case "unitMarketRarityModifier" -> campaignOptions.setUnitMarketRarityModifier(parseInt(nodeContents));
             case "instantUnitMarketDelivery" -> campaignOptions.setInstantUnitMarketDelivery(parseBoolean(
                   nodeContents));
