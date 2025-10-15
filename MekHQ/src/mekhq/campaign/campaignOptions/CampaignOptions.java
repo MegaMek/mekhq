@@ -581,7 +581,7 @@ public class CampaignOptions {
     // Unit Market
     private UnitMarketMethod unitMarketMethod;
     private boolean unitMarketRegionalMekVariations;
-    private int unitMarketSpecialUnitChance;
+    private int unitMarketArtilleryUnitChance;
     private int unitMarketRarityModifier;
     private boolean instantUnitMarketDelivery;
     private boolean mothballUnitMarketDeliveries;
@@ -1222,7 +1222,7 @@ public class CampaignOptions {
         // Unit Market
         setUnitMarketMethod(UnitMarketMethod.NONE);
         setUnitMarketRegionalMekVariations(true);
-        setUnitMarketSpecialUnitChance(30);
+        setUnitMarketArtilleryUnitChance(30);
         setUnitMarketRarityModifier(0);
         setInstantUnitMarketDelivery(false);
         setUnitMarketReportRefresh(true);
@@ -3723,12 +3723,12 @@ public class CampaignOptions {
         this.unitMarketRegionalMekVariations = unitMarketRegionalMekVariations;
     }
 
-    public int getUnitMarketSpecialUnitChance() {
-        return unitMarketSpecialUnitChance;
+    public int getUnitMarketArtilleryUnitChance() {
+        return unitMarketArtilleryUnitChance;
     }
 
-    public void setUnitMarketSpecialUnitChance(final int unitMarketSpecialUnitChance) {
-        this.unitMarketSpecialUnitChance = unitMarketSpecialUnitChance;
+    public void setUnitMarketArtilleryUnitChance(final int unitMarketSpecialUnitChance) {
+        this.unitMarketArtilleryUnitChance = unitMarketSpecialUnitChance;
     }
 
     public int getUnitMarketRarityModifier() {

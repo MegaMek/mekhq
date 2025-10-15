@@ -107,10 +107,14 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         final List<AtBContract> contracts = campaign.getActiveAtBContracts();
         final AtBContract contract = contracts.isEmpty() ? null : contracts.get(0);
 
-        // Open Market
         Faction faction = campaign.getFaction();
         int rarityModifier = campaign.getCampaignOptions().getUnitMarketRarityModifier();
 
+        // Civilian Market
+        addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, rarityModifier),
+              UnitMarketType.CIVILIAN, UnitType.TANK, faction, IUnitRating.DRAGOON_A, 2);
+
+        // Open Market
         addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
               UnitMarketType.OPEN, UnitType.MEK, faction, IUnitRating.DRAGOON_F, 1);
 
@@ -340,29 +344,19 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             final Collection<MissionRole> missionRoles = new ArrayList<>();
 
             if (unitType == UnitType.TANK) {
-                movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
-
-                // should a special unit type be picked? This allows us to force a MissionRole that would otherwise be filtered out
-                int specialUnitChance = campaign.getCampaignOptions().getUnitMarketSpecialUnitChance();
-
-                if (specialUnitChance != 0) {
-                    if ((specialUnitChance == 1) || (Compute.randomInt(specialUnitChance) == 0)) {
-                        // this will need to be incremented by 1,
-                        // whenever we add additional unit types to this special handler
-                        int roll = Compute.randomInt(6);
-
-                        // while this gives even chances for each role,
-                        // it gives greater control to the user
-                        // to define how often they want to see special units.
-                        // really, this is just a Band-Aid fix, and ideally we wouldn't be filtering out these units in the first place
-                        switch (roll) {
-                            case 0 -> missionRoles.add(MissionRole.CIVILIAN);
-                            case 1 -> missionRoles.add(MissionRole.SUPPORT);
-                            case 2 -> missionRoles.add(MissionRole.CARGO);
-                            case 3, 4, 5 -> missionRoles.add(MissionRole.ARTILLERY);
-                            default -> throw new IllegalStateException(
-                                  "Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/addOffers: "
-                                        + roll);
+                if (market.isCivilianMarket()) {
+                    int roll = Compute.randomInt(3);
+                    switch (roll) {
+                        case 0 -> missionRoles.add(MissionRole.CIVILIAN);
+                        case 1 -> missionRoles.add(MissionRole.SUPPORT);
+                        case 2 -> missionRoles.add(MissionRole.CARGO);
+                    }
+                } else {
+                    movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
+                    int specialUnitChance = campaign.getCampaignOptions().getUnitMarketArtilleryUnitChance();
+                    if (specialUnitChance != 0) {
+                        if ((specialUnitChance == 1) || (Compute.randomInt(specialUnitChance) == 0)) {
+                            missionRoles.add(MissionRole.ARTILLERY);
                         }
                     }
                 }
