@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.io;
 
-import static megamek.common.units.UnitType.DROPSHIP;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
@@ -360,14 +359,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     campaign.setPersonnelWhoAdvancedInXP(processPersonnelWhoAdvancedInXP(workingNode, campaign));
                 } else if (nodeName.equalsIgnoreCase("automatedMothballUnits")) {
                     campaign.setAutomatedMothballUnits(processAutomatedMothballNodes(workingNode));
-                } else if (nodeName.equalsIgnoreCase("shipSearchStart")) {
-                    campaign.setShipSearchStart(MHQXMLUtility.parseDate(workingNode.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("shipSearchType")) {
-                    campaign.setShipSearchType(MathUtility.parseInt(workingNode.getTextContent(), DROPSHIP));
-                } else if (nodeName.equalsIgnoreCase("shipSearchResult")) {
-                    campaign.setShipSearchResult(workingNode.getTextContent());
-                } else if (nodeName.equalsIgnoreCase("shipSearchExpiration")) {
-                    campaign.setShipSearchExpiration(MHQXMLUtility.parseDate(workingNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("autoResolveBehaviorSettings")) {
                     campaign.setAutoResolveBehaviorSettings(firstNonNull(BehaviorSettingsFactory.getInstance()
                                                                                .getBehavior(workingNode.getTextContent()),

@@ -1018,6 +1018,7 @@ public class Campaign implements ITechManager {
     /**
      * Sets the date a ship search was started, or null if no search is in progress.
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public void setShipSearchStart(@Nullable LocalDate shipSearchStart) {
         this.shipSearchStart = shipSearchStart;
     }
@@ -1025,6 +1026,7 @@ public class Campaign implements ITechManager {
     /**
      * @return The date a ship search was started, or null if none is in progress.
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public LocalDate getShipSearchStart() {
         return shipSearchStart;
     }
@@ -1032,6 +1034,7 @@ public class Campaign implements ITechManager {
     /**
      * Sets the lookup name of the available ship, or null if none were found.
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public void setShipSearchResult(@Nullable String result) {
         shipSearchResult = result;
     }
@@ -1039,6 +1042,7 @@ public class Campaign implements ITechManager {
     /**
      * @return The lookup name of the available ship, or null if none is available
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public String getShipSearchResult() {
         return shipSearchResult;
     }
@@ -1046,10 +1050,12 @@ public class Campaign implements ITechManager {
     /**
      * @return The date the ship is no longer available, if there is one.
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public LocalDate getShipSearchExpiration() {
         return shipSearchExpiration;
     }
 
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public void setShipSearchExpiration(LocalDate shipSearchExpiration) {
         this.shipSearchExpiration = shipSearchExpiration;
     }
@@ -1057,15 +1063,18 @@ public class Campaign implements ITechManager {
     /**
      * Sets the unit type to search for.
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public void setShipSearchType(int unitType) {
         shipSearchType = unitType;
     }
 
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public void startShipSearch(int unitType) {
         setShipSearchStart(getLocalDate());
         setShipSearchType(unitType);
     }
 
+    @Deprecated(since = "0.50.10", forRemoval = true)
     private void processShipSearch() {
         if (getShipSearchStart() == null) {
             return;
@@ -1126,6 +1135,7 @@ public class Campaign implements ITechManager {
         addReport(report.toString());
     }
 
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public void purchaseShipSearchResult() {
         MekSummary ms = MekSummaryCache.getInstance().getMek(getShipSearchResult());
         if (ms == null) {
@@ -7611,10 +7621,6 @@ public class Campaign implements ITechManager {
                 }
                 MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "combatTeams");
             }
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "shipSearchStart", getShipSearchStart());
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "shipSearchType", shipSearchType);
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "shipSearchResult", shipSearchResult);
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "shipSearchExpiration", getShipSearchExpiration());
             MHQXMLUtility.writeSimpleXMLTag(writer,
                   indent,
                   "autoResolveBehaviorSettings",
