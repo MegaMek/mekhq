@@ -139,7 +139,7 @@ public abstract class AbstractSkillGenerator {
         }
     }
 
-    public void generateUtilitySkills(final Person person) {
+    public void generateUtilitySkills(final Person person, final int expLvl) {
         for (SkillType skillType : getUtilitySkills()) {
             if (DEPRECATED_SKILLS.contains(skillType)) {
                 continue;
@@ -150,7 +150,7 @@ public abstract class AbstractSkillGenerator {
                 continue;
             }
 
-            int utilitySkillLevel = Utilities.generateExpLevel(randomSkillPreferences.getUtilitySkillModifier());
+            int utilitySkillLevel = Utilities.generateExpLevel(randomSkillPreferences.getUtilitySkillsModifier(expLvl));
             if (utilitySkillLevel > SkillType.EXP_ULTRA_GREEN) {
                 addSkill(person, skillType.getName(), utilitySkillLevel, randomSkillPreferences.randomizeSkill(), 0);
             }

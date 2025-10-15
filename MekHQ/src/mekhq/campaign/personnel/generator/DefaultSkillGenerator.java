@@ -105,7 +105,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         }
 
         generateRoleplaySkills(person);
-        generateUtilitySkills(person);
+        generateUtilitySkills(person, expLvl);
 
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
