@@ -213,7 +213,7 @@ public class Warehouse {
             removePart(part);
         } else {
             if (quantity > 0) {
-                part.changeQuantity(quantity);
+                part.changeQuantity(-quantity);
             }
 
             MekHQ.triggerEvent(new PartChangedEvent(part));
