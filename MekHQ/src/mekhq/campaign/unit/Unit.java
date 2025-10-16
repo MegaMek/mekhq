@@ -5173,11 +5173,10 @@ public class Unit implements ITechnology {
             if (entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
                 nav = 1;
             }
-            return getAeroCrewNeeds() - getTotalDriverNeeds() - nav;
-        } else if (entity.isSupportVehicle()) {
-            return getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds();
+            return getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds() - nav;
         }
-        return 0;
+
+        return getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds();
     }
 
     public boolean canTakeMoreDrivers() {
@@ -5187,16 +5186,7 @@ public class Unit implements ITechnology {
 
     public boolean canTakeMoreVesselCrew() {
         int nCrew = vesselCrew.size();
-        int nav = 0;
-        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
-            if (entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
-                nav = 1;
-            }
-            return nCrew < (getAeroCrewNeeds() - getTotalDriverNeeds() - nav);
-        } else if (entity.isSupportVehicle()) {
-            return nCrew < (getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds());
-        }
-        return false;
+        return nCrew < getTotalCrewNeeds();
     }
 
     public boolean canTakeNavigator() {
@@ -5251,7 +5241,10 @@ public class Unit implements ITechnology {
         // one active suit
         return ((entity instanceof Mek) ||
                       (entity instanceof ProtoMek) ||
-                      (entity instanceof Aero && !(entity instanceof SmallCraft) && !(entity instanceof Jumpship))) &&
+                      (entity instanceof Aero &&
+                             !(entity instanceof SmallCraft) &&
+                             !(entity instanceof Jumpship) &&
+                             !(entity instanceof ConvFighter))) &&
                      (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos());
     }
 

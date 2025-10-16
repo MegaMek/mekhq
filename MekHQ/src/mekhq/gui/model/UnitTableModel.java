@@ -198,7 +198,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
         int navigatorsAssigned = unit.getNavigator() == null ? 0 : 1;
 
         int crewNeeded = unit.getTotalCrewNeeds();
-        int crewAssigned = unit.getCrew().size() - (gunnersAssigned + driversAssigned + navigatorsAssigned);
+        int crewAssigned = unit.getActiveCrew().size() - (gunnersAssigned + driversAssigned + navigatorsAssigned);
 
         StringBuilder report = new StringBuilder("<html>");
 
