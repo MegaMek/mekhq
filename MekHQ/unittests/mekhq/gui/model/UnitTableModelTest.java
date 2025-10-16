@@ -96,7 +96,7 @@
          when(unit.getGunners()).thenReturn(gunners);
          when(unit.getTotalGunnerNeeds()).thenReturn(totalGunnerNeeds);
 
-         when(unit.getCrew()).thenReturn(crew);
+         when(unit.getActiveCrew()).thenReturn(crew);
          when(unit.getTotalCrewNeeds()).thenReturn(totalCrewNeeds);
 
          when(unit.getEntity()).thenReturn(entity);
