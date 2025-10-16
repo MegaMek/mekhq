@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -88,21 +88,28 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             parts[i] = partsModel.getPartAt(partsTable.convertRowIndexToModel(rows[i]));
         }
         if (command.equalsIgnoreCase("SELL")) {
-            for (Part p : parts) {
-                if (null != p) {
-                    gui.getCampaign().getQuartermaster().sellPart(p, 1);
+            for (Part part : parts) {
+                if (null != part) {
+                    gui.getCampaign().getQuartermaster().sellPart(part, 1);
                 }
             }
         } else if (command.equalsIgnoreCase("SELL_ALL")) {
-            for (Part p : parts) {
-                if (null != p) {
-                    gui.getCampaign().getQuartermaster().sellPart(p);
+            for (Part part : parts) {
+                if (null != part) {
+                    gui.getCampaign().getQuartermaster().sellPart(part);
                 }
             }
         } else if (command.equalsIgnoreCase("SELL_N")) {
             if (null != selectedPart) {
+                int n = selectedPart.getQuantity();
+                if (selectedPart instanceof AmmoStorage) {
+                    n = ((AmmoStorage) selectedPart).getShots();
+                }
+                if (selectedPart instanceof Armor) {
+                    n = ((Armor) selectedPart).getAmount();
+                }
                 PopupValueChoiceDialog popupValueChoiceDialog = getPopupValueChoiceDialog(selectedPart,
-                      "Sell How Many ");
+                      "Sell How Many " + selectedPart.getName() + "s?");
                 if (popupValueChoiceDialog.getValue() < 0) {
                     return;
                 }
@@ -141,7 +148,15 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equalsIgnoreCase("REMOVE_N")) {
             if (null != selectedPart) {
-                PopupValueChoiceDialog dialog = getPopupValueChoiceDialog(selectedPart, "Remove How Many ");
+                int n = selectedPart.getQuantity();
+                if (selectedPart instanceof AmmoStorage) {
+                    n = ((AmmoStorage) selectedPart).getShots();
+                }
+                if (selectedPart instanceof Armor) {
+                    n = ((Armor) selectedPart).getAmount();
+                }
+                PopupValueChoiceDialog dialog = getPopupValueChoiceDialog(selectedPart,
+                      "Remove How Many " + selectedPart.getName() + "s?");
                 if (dialog.getValue() < 0) {
                     return;
                 }
@@ -150,13 +165,8 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equalsIgnoreCase("ADD_N")) {
             if (null != selectedPart) {
-                PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(gui.getFrame(),
-                      true,
-                      "Add How Many " + selectedPart.getName() + "s?",
-                      0,
-                      0,
-                      9999999);
-                dialog.setVisible(true);
+                PopupValueChoiceDialog dialog = getPopupValueChoiceDialog(selectedPart,
+                      "Add How Many " + selectedPart.getName() + "s?");
                 if (dialog.getValue() < 0) {
                     return;
                 }
@@ -230,13 +240,8 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equalsIgnoreCase("DEPOD_N")) {
             if (null != selectedPart) {
                 int n = selectedPart.getQuantity();
-                PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(gui.getFrame(),
-                      true,
-                      "Remove How Many Pods" + selectedPart.getName() + "s?",
-                      1,
-                      1,
-                      n);
-                popupValueChoiceDialog.setVisible(true);
+                PopupValueChoiceDialog popupValueChoiceDialog = getPopupValueChoiceDialog(selectedPart,
+                      "Remove How Many Pods" + selectedPart.getName() + "s?");
                 if (popupValueChoiceDialog.getValue() < 0) {
                     return;
                 }
@@ -251,12 +256,8 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equalsIgnoreCase("BUY_N")) {
             if (null != selectedPart) {
-                PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(gui.getFrame(),
-                      true,
-                      "Buy How Much " + selectedPart.getName(),
-                      1,
-                      1);
-                popupValueChoiceDialog.setVisible(true);
+                PopupValueChoiceDialog popupValueChoiceDialog = getPopupValueChoiceDialog(selectedPart,
+                      "Buy How Much " + selectedPart.getName());
                 if (popupValueChoiceDialog.getValue() < 1) {
                     return;
                 }
