@@ -267,6 +267,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                               (unit.usesSoloPilot() ||
                                      (entity instanceof VTOL) ||
                                      (entity instanceof Mek) ||
+                                     (entity instanceof ConvFighter) ||
                                      entity.isSuperHeavy() ||
                                      entity.isTripodMek() ||
                                      entity.isQuadMek())) {
@@ -298,7 +299,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                     useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
 
-                                if (entity instanceof VTOL) {
+                                if (entity instanceof VTOL || entity instanceof ConvFighter) {
                                     unit.addDriver(people[0], useTransfers);
                                 } else {
                                     unit.addPilotOrSoldier(people[0], useTransfers);
