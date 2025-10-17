@@ -92,7 +92,7 @@ public class TransportCostCalculations {
     // player is always able to find a DropShip that has the exact bay types they need. Use of this magical DropShip
     // allows us to greatly simplify the amount of processing. It also helps make the logic easier for players to
     // understand.
-    private static final int BAYS_PER_DROPSHIP = 14;
+    static final int BAYS_PER_DROPSHIP = 14;
     // This value is derived from the Union (2708) (Cargo).
     private static final double CARGO_PER_DROPSHIP = 1874.5;
 
@@ -103,7 +103,7 @@ public class TransportCostCalculations {
     private static final double ASF_COST = 50000 / PER_DAY_DIVIDER;
     private static final double HEAVY_VEHICLE_COST = 50000 / PER_DAY_DIVIDER;
     private static final double LIGHT_VEHICLE_COST = 25000 / PER_DAY_DIVIDER;
-    private static final double INFANTRY_COST = 25000 / PER_DAY_DIVIDER;
+    static final double INFANTRY_COST = 25000 / PER_DAY_DIVIDER;
     private static final double BATTLE_ARMOR_COST = 25000 / PER_DAY_DIVIDER;
     private static final double PROTOMEK_COST = 20000 / PER_DAY_DIVIDER;
     private static final double OTHER_UNIT_COST = 50000 / PER_DAY_DIVIDER; // (Unofficial)
@@ -115,9 +115,9 @@ public class TransportCostCalculations {
     // passenger capacity of the Princess Luxury Liner and dividing it by the number of bays in our magical DropShip.
     // We then assume a passenger bay cost is about the same as an Infantry Platoon bay. Presumably with nice
     // accommodations, which is why fewer people can fit.
-    private static final double PASSENGERS_PER_BAY = 15;
+    static final double PASSENGERS_PER_BAY = 15;
     // Hiring a Princess for dependents proved to be insanely expensive. So we're instead assuming
-    private static final double PASSENGERS_COST = INFANTRY_COST;
+    static final double PASSENGERS_COST = INFANTRY_COST;
 
     private final Hangar hangar;
     private final Collection<Person> personnel;
@@ -168,6 +168,338 @@ public class TransportCostCalculations {
     private int otherUnitCount;
 
     private Money totalCost = Money.zero();
+
+    public int getBattleArmorCount() {
+        return battleArmorCount;
+    }
+
+    public void setBattleArmorCount(int battleArmorCount) {
+        this.battleArmorCount = battleArmorCount;
+    }
+
+    public Hangar getHangar() {
+        return hangar;
+    }
+
+    public Collection<Person> getPersonnel() {
+        return personnel;
+    }
+
+    public CargoStatistics getCargoStatistics() {
+        return cargoStatistics;
+    }
+
+    public HangarStatistics getHangarStatistics() {
+        return hangarStatistics;
+    }
+
+    public int getCrewExperienceLevel() {
+        return crewExperienceLevel;
+    }
+
+    public double getAdditionalCargoSpaceRequired() {
+        return additionalCargoSpaceRequired;
+    }
+
+    public void setAdditionalCargoSpaceRequired(double additionalCargoSpaceRequired) {
+        this.additionalCargoSpaceRequired = additionalCargoSpaceRequired;
+    }
+
+    public double getCargoBayCost() {
+        return cargoBayCost;
+    }
+
+    public void setCargoBayCost(double cargoBayCost) {
+        this.cargoBayCost = cargoBayCost;
+    }
+
+    public int getAdditionalSmallCraftBaysRequired() {
+        return additionalSmallCraftBaysRequired;
+    }
+
+    public void setAdditionalSmallCraftBaysRequired(int additionalSmallCraftBaysRequired) {
+        this.additionalSmallCraftBaysRequired = additionalSmallCraftBaysRequired;
+    }
+
+    public double getAdditionalSmallCraftBaysCost() {
+        return additionalSmallCraftBaysCost;
+    }
+
+    public void setAdditionalSmallCraftBaysCost(double additionalSmallCraftBaysCost) {
+        this.additionalSmallCraftBaysCost = additionalSmallCraftBaysCost;
+    }
+
+    public int getAdditionalASFBaysRequired() {
+        return additionalASFBaysRequired;
+    }
+
+    public void setAdditionalASFBaysRequired(int additionalASFBaysRequired) {
+        this.additionalASFBaysRequired = additionalASFBaysRequired;
+    }
+
+    public double getAdditionalASFBaysCost() {
+        return additionalASFBaysCost;
+    }
+
+    public void setAdditionalASFBaysCost(double additionalASFBaysCost) {
+        this.additionalASFBaysCost = additionalASFBaysCost;
+    }
+
+    public int getAdditionalMekBaysRequired() {
+        return additionalMekBaysRequired;
+    }
+
+    public void setAdditionalMekBaysRequired(int additionalMekBaysRequired) {
+        this.additionalMekBaysRequired = additionalMekBaysRequired;
+    }
+
+    public double getAdditionalMekBaysCost() {
+        return additionalMekBaysCost;
+    }
+
+    public void setAdditionalMekBaysCost(double additionalMekBaysCost) {
+        this.additionalMekBaysCost = additionalMekBaysCost;
+    }
+
+    public int getAdditionalSuperHeavyVehicleBaysRequired() {
+        return additionalSuperHeavyVehicleBaysRequired;
+    }
+
+    public void setAdditionalSuperHeavyVehicleBaysRequired(int additionalSuperHeavyVehicleBaysRequired) {
+        this.additionalSuperHeavyVehicleBaysRequired = additionalSuperHeavyVehicleBaysRequired;
+    }
+
+    public double getAdditionalSuperHeavyVehicleBaysCost() {
+        return additionalSuperHeavyVehicleBaysCost;
+    }
+
+    public void setAdditionalSuperHeavyVehicleBaysCost(double additionalSuperHeavyVehicleBaysCost) {
+        this.additionalSuperHeavyVehicleBaysCost = additionalSuperHeavyVehicleBaysCost;
+    }
+
+    public int getAdditionalHeavyVehicleBaysRequired() {
+        return additionalHeavyVehicleBaysRequired;
+    }
+
+    public void setAdditionalHeavyVehicleBaysRequired(int additionalHeavyVehicleBaysRequired) {
+        this.additionalHeavyVehicleBaysRequired = additionalHeavyVehicleBaysRequired;
+    }
+
+    public double getAdditionalHeavyVehicleBaysCost() {
+        return additionalHeavyVehicleBaysCost;
+    }
+
+    public void setAdditionalHeavyVehicleBaysCost(double additionalHeavyVehicleBaysCost) {
+        this.additionalHeavyVehicleBaysCost = additionalHeavyVehicleBaysCost;
+    }
+
+    public int getAdditionalLightVehicleBaysRequired() {
+        return additionalLightVehicleBaysRequired;
+    }
+
+    public void setAdditionalLightVehicleBaysRequired(int additionalLightVehicleBaysRequired) {
+        this.additionalLightVehicleBaysRequired = additionalLightVehicleBaysRequired;
+    }
+
+    public double getAdditionalLightVehicleBaysCost() {
+        return additionalLightVehicleBaysCost;
+    }
+
+    public void setAdditionalLightVehicleBaysCost(double additionalLightVehicleBaysCost) {
+        this.additionalLightVehicleBaysCost = additionalLightVehicleBaysCost;
+    }
+
+    public int getAdditionalProtoMekBaysRequired() {
+        return additionalProtoMekBaysRequired;
+    }
+
+    public void setAdditionalProtoMekBaysRequired(int additionalProtoMekBaysRequired) {
+        this.additionalProtoMekBaysRequired = additionalProtoMekBaysRequired;
+    }
+
+    public double getAdditionalProtoMekBaysCost() {
+        return additionalProtoMekBaysCost;
+    }
+
+    public void setAdditionalProtoMekBaysCost(double additionalProtoMekBaysCost) {
+        this.additionalProtoMekBaysCost = additionalProtoMekBaysCost;
+    }
+
+    public int getAdditionalBattleArmorBaysRequired() {
+        return additionalBattleArmorBaysRequired;
+    }
+
+    public void setAdditionalBattleArmorBaysRequired(int additionalBattleArmorBaysRequired) {
+        this.additionalBattleArmorBaysRequired = additionalBattleArmorBaysRequired;
+    }
+
+    public double getAdditionalBattleArmorBaysCost() {
+        return additionalBattleArmorBaysCost;
+    }
+
+    public void setAdditionalBattleArmorBaysCost(double additionalBattleArmorBaysCost) {
+        this.additionalBattleArmorBaysCost = additionalBattleArmorBaysCost;
+    }
+
+    public int getAdditionalInfantryBaysRequired() {
+        return additionalInfantryBaysRequired;
+    }
+
+    public void setAdditionalInfantryBaysRequired(int additionalInfantryBaysRequired) {
+        this.additionalInfantryBaysRequired = additionalInfantryBaysRequired;
+    }
+
+    public double getAdditionalInfantryBaysCost() {
+        return additionalInfantryBaysCost;
+    }
+
+    public void setAdditionalInfantryBaysCost(double additionalInfantryBaysCost) {
+        this.additionalInfantryBaysCost = additionalInfantryBaysCost;
+    }
+
+    public double getAdditionalOtherUnitBaysCost() {
+        return additionalOtherUnitBaysCost;
+    }
+
+    public void setAdditionalOtherUnitBaysCost(double additionalOtherUnitBaysCost) {
+        this.additionalOtherUnitBaysCost = additionalOtherUnitBaysCost;
+    }
+
+    public int getAdditionalPassengerBaysRequired() {
+        return additionalPassengerBaysRequired;
+    }
+
+    public void setAdditionalPassengerBaysRequired(int additionalPassengerBaysRequired) {
+        this.additionalPassengerBaysRequired = additionalPassengerBaysRequired;
+    }
+
+    public double getAdditionalPassengerBaysCost() {
+        return additionalPassengerBaysCost;
+    }
+
+    public void setAdditionalPassengerBaysCost(double additionalPassengerBaysCost) {
+        this.additionalPassengerBaysCost = additionalPassengerBaysCost;
+    }
+
+    public double getTotalAdditionalBaysRequired() {
+        return totalAdditionalBaysRequired;
+    }
+
+    public void setTotalAdditionalBaysRequired(double totalAdditionalBaysRequired) {
+        this.totalAdditionalBaysRequired = totalAdditionalBaysRequired;
+    }
+
+    public int getAdditionalDropShipsRequired() {
+        return additionalDropShipsRequired;
+    }
+
+    public void setAdditionalDropShipsRequired(int additionalDropShipsRequired) {
+        this.additionalDropShipsRequired = additionalDropShipsRequired;
+    }
+
+    public int getAdditionalCollarsRequired() {
+        return additionalCollarsRequired;
+    }
+
+    public void setAdditionalCollarsRequired(int additionalCollarsRequired) {
+        this.additionalCollarsRequired = additionalCollarsRequired;
+    }
+
+    public double getDockingCollarCost() {
+        return dockingCollarCost;
+    }
+
+    public void setDockingCollarCost(double dockingCollarCost) {
+        this.dockingCollarCost = dockingCollarCost;
+    }
+
+    public int getDropShipCount() {
+        return dropShipCount;
+    }
+
+    public void setDropShipCount(int dropShipCount) {
+        this.dropShipCount = dropShipCount;
+    }
+
+    public int getSmallCraftCount() {
+        return smallCraftCount;
+    }
+
+    public void setSmallCraftCount(int smallCraftCount) {
+        this.smallCraftCount = smallCraftCount;
+    }
+
+    public int getSuperHeavyVehicleCount() {
+        return superHeavyVehicleCount;
+    }
+
+    public void setSuperHeavyVehicleCount(int superHeavyVehicleCount) {
+        this.superHeavyVehicleCount = superHeavyVehicleCount;
+    }
+
+    public int getHeavyVehicleCount() {
+        return heavyVehicleCount;
+    }
+
+    public void setHeavyVehicleCount(int heavyVehicleCount) {
+        this.heavyVehicleCount = heavyVehicleCount;
+    }
+
+    public int getLightVehicleCount() {
+        return lightVehicleCount;
+    }
+
+    public void setLightVehicleCount(int lightVehicleCount) {
+        this.lightVehicleCount = lightVehicleCount;
+    }
+
+    public int getMekCount() {
+        return mekCount;
+    }
+
+    public void setMekCount(int mekCount) {
+        this.mekCount = mekCount;
+    }
+
+    public int getAsfCount() {
+        return asfCount;
+    }
+
+    public void setAsfCount(int asfCount) {
+        this.asfCount = asfCount;
+    }
+
+    public int getProtoMekCount() {
+        return protoMekCount;
+    }
+
+    public void setProtoMekCount(int protoMekCount) {
+        this.protoMekCount = protoMekCount;
+    }
+
+    public int getInfantryCount() {
+        return infantryCount;
+    }
+
+    public void setInfantryCount(int infantryCount) {
+        this.infantryCount = infantryCount;
+    }
+
+    public int getOtherUnitCount() {
+        return otherUnitCount;
+    }
+
+    public void setOtherUnitCount(int otherUnitCount) {
+        this.otherUnitCount = otherUnitCount;
+    }
+
+    public Money getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(Money totalCost) {
+        this.totalCost = totalCost;
+    }
 
     /**
      * Constructs a new TransportCostCalculations class for evaluating jump and transport costs.
@@ -470,7 +802,7 @@ public class TransportCostCalculations {
      * Calculates passenger bay requirements and costs based on the personnel list, counting only those present and
      * assigned to the force. Updates totals for passenger bay counts and costs.
      */
-    private void calculateAdditionalBayRequirementsFromPassengers() {
+    void calculateAdditionalBayRequirementsFromPassengers() {
         int passengerCount = 0;
         for (Person person : personnel) {
             if (person.getStatus().isAbsent() || person.getStatus().isDepartedUnit()) {
