@@ -86,6 +86,8 @@ public class TransportCostCalculations {
     // Collar hiring is per week. There are 7 days in a week. Therefore, the cost/day is the base cost divided by 7
     private static final double PER_DAY_WEEK = 7.0;
 
+    private static final double LEGENDARY_CREW_MULTIPLIER = 3.0; // Unofficial
+    private static final double HEROIC_CREW_MULTIPLIER = 2.5; // Unofficial
     private static final double ELITE_CREW_MULTIPLIER = 2.0;
     private static final double VETERAN_CREW_MULTIPLIER = 1.5;
     private static final double OTHER_CREW_MULTIPLIER = 1.0;
@@ -155,7 +157,6 @@ public class TransportCostCalculations {
     private double additionalBattleArmorBaysCost;
     private int additionalInfantryBaysRequired;
     private double additionalInfantryBaysCost;
-    private int additionalOtherUnitBaysRequired;
     private double additionalOtherUnitBaysCost;
     private int additionalPassengerBaysRequired;
     private double additionalPassengerBaysCost;
@@ -178,14 +179,6 @@ public class TransportCostCalculations {
     private int otherUnitCount;
 
     private Money totalCost = Money.zero();
-
-    int getCrewExperienceLevel() {
-        return crewExperienceLevel;
-    }
-
-    double getAdditionalCargoSpaceRequired() {
-        return additionalCargoSpaceRequired;
-    }
 
     double getCargoBayCost() {
         return cargoBayCost;
@@ -273,10 +266,6 @@ public class TransportCostCalculations {
 
     double getAdditionalPassengerBaysCost() {
         return additionalPassengerBaysCost;
-    }
-
-    double getTotalAdditionalBaysRequired() {
-        return totalAdditionalBaysRequired;
     }
 
     int getAdditionalDropShipsRequired() {
@@ -379,10 +368,6 @@ public class TransportCostCalculations {
         this.otherUnitCount = otherUnitCount;
     }
 
-    Money getTotalCost() {
-        return totalCost;
-    }
-
     /**
      * Constructs a new TransportCostCalculations class for evaluating jump and transport costs.
      *
@@ -481,18 +466,42 @@ public class TransportCostCalculations {
         countUnitsByType();
         calculateAdditionalBayRequirementsFromUnits();
         calculateAdditionalBayRequirementsFromPassengers();
+
         additionalDropShipsRequired += (int) ceil(totalAdditionalBaysRequired / BAYS_PER_DROPSHIP);
 
         calculateAdditionalJumpCollarsRequirements();
 
+        adjustForCrewExperienceLevel();
+
+        return totalCost;
+    }
+
+    /**
+     * Adjusts the total transport cost by applying a multiplier determined by the crew's experience level.
+     *
+     * <p>The method selects a specific multiplier based on {@link #crewExperienceLevel}:</p>
+     *
+     * <ul>
+     *   <li>{@code EXP_LEGENDARY}: uses {@code LEGENDARY_CREW_MULTIPLIER}</li>
+     *   <li>{@code EXP_HEROIC}: uses {@code HEROIC_CREW_MULTIPLIER}</li>
+     *   <li>{@code EXP_ELITE}: uses {@code ELITE_CREW_MULTIPLIER}</li>
+     *   <li>{@code EXP_VETERAN}: uses {@code VETERAN_CREW_MULTIPLIER}</li>
+     *   <li>Any other value: uses {@code OTHER_CREW_MULTIPLIER}</li>
+     * </ul>
+     *
+     * <p>This multiplier is applied to the {@code totalCost} field, updating it to reflect the adjusted cost after
+     * considering crew quality.</p>
+     */
+    private void adjustForCrewExperienceLevel() {
         double crewExperienceLevelMultiplier = switch (crewExperienceLevel) {
-            case EXP_ELITE, EXP_HEROIC, EXP_LEGENDARY -> ELITE_CREW_MULTIPLIER;
+            case EXP_LEGENDARY -> LEGENDARY_CREW_MULTIPLIER;
+            case EXP_HEROIC -> HEROIC_CREW_MULTIPLIER;
+            case EXP_ELITE -> ELITE_CREW_MULTIPLIER;
             case EXP_VETERAN -> VETERAN_CREW_MULTIPLIER;
             default -> OTHER_CREW_MULTIPLIER;
         };
-        totalCost = totalCost.multipliedBy(crewExperienceLevelMultiplier);
 
-        return totalCost;
+        totalCost = totalCost.multipliedBy(crewExperienceLevelMultiplier);
     }
 
     /**
