@@ -142,10 +142,12 @@ public class ContractAutomation {
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
             campaign.getApp().getCampaigngui().refreshAllTabs();
             campaign.getApp().getCampaigngui().refreshLocation();
+            boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
 
             // This will return an empty string if the transaction was successful
             String jumpReport = TransportCostCalculations.performJumpTransaction(campaign.getFinances(), jumpPath,
-                  campaign.getLocalDate(), contract.getTransportAmount(), campaign.getCurrentSystem());
+                  campaign.getLocalDate(), contract.getTransportAmount().dividedBy(useTwoWayPay ? 2 : 1),
+                  campaign.getCurrentSystem());
 
             if (jumpReport.isBlank()) {
                 campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,

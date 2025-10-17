@@ -278,11 +278,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
         JumpPath jumpPath = panMap.getJumpPath();
 
-        TransportCostCalculations transportCostCalculations = getCampaign().getTransportCostCalculation(EXP_REGULAR);
 
         boolean isUseCommandCircuits = getCampaign().isUseCommandCircuit();
         int duration = (int) ceil(jumpPath.getTotalTime(getCampaign().getLocalDate(),
               getCampaign().getLocation().getTransitTime(), isUseCommandCircuits));
+
+        TransportCostCalculations transportCostCalculations = getCampaign().getTransportCostCalculation(EXP_REGULAR);
         Money journeyCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration);
 
         String jumpReport = TransportCostCalculations.performJumpTransaction(getCampaign().getFinances(), jumpPath,
