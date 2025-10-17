@@ -152,6 +152,7 @@ public class TransportCostCalculations {
 
     private double totalAdditionalBaysRequired;
     private int additionalDropShipsRequired;
+    private int additionalCollarsRequired;
     private double dockingCollarCost;
 
     private int dropShipCount;
@@ -231,6 +232,7 @@ public class TransportCostCalculations {
 
         report.append("totalAdditionalBaysRequired: ").append(totalAdditionalBaysRequired).append("<br>");
         report.append("additionalDropShipsRequired: ").append(additionalDropShipsRequired).append("<br>");
+        report.append("additionalCollarsRequired: ").append(additionalCollarsRequired).append("<br>");
         report.append("dockingCollarCost: ").append(dockingCollarCost).append("<br>");
         report.append("totalCost: ").append(totalCost.toAmountString()).append("<br>");
         report.append("</html>");
@@ -238,8 +240,8 @@ public class TransportCostCalculations {
     }
 
     /**
-     * Calculates the total cost of transporting all units and personnel for a multi-day journey. Cost for each day is
-     * computed, then multiplied by the number of days in the journey. The result is stored in {@link #totalCost} and
+     * Calculates the total cost of transporting all units and personnel for a multi-day journey. The cost for each day
+     * is computed, then multiplied by the number of days in the journey. The result is stored in {@link #totalCost} and
      * also returned.
      *
      * @param days the duration of the journey in days
@@ -261,11 +263,13 @@ public class TransportCostCalculations {
      */
     public Money calculateJumpCostForEachDay() {
         calculateCargoRequirements();
+
         countUnitsByType(hangar);
         calculateAdditionalBayRequirementsFromUnits();
         calculateAdditionalBayRequirementsFromPassengers();
-
         additionalDropShipsRequired += (int) ceil(totalAdditionalBaysRequired / BAYS_PER_DROPSHIP);
+
+        calculateAdditionalJumpCollarsRequirements();
 
         dockingCollarCost = round(additionalDropShipsRequired * JUMP_SHIP_COLLAR_COST);
         totalCost = totalCost.plus(dockingCollarCost);
@@ -278,6 +282,22 @@ public class TransportCostCalculations {
         totalCost = totalCost.multipliedBy(crewExperienceLevelMultiplier);
 
         return totalCost;
+    }
+
+    /**
+     * Calculates and updates the number of additional JumpShip docking collars required for transportation based on the
+     * current number of available docking collars and DropShips present.
+     *
+     * <p>The method determines collar usage by subtracting the number of DropShips in the hangar from the total
+     * docking collars. If the number of DropShips exceeds the available collars, the shortage is recorded in
+     * {@link #additionalCollarsRequired}. Any additional DropShips required by bay requirements are also added to the
+     * total collars needed.</p>
+     */
+    private void calculateAdditionalJumpCollarsRequirements() {
+        int totalCollars = hangarStatistics.getTotalDockingCollars();
+        int collarUsage = totalCollars - dropShipCount;
+        additionalCollarsRequired = -min(0, collarUsage);
+        additionalCollarsRequired += additionalDropShipsRequired;
     }
 
     /**
