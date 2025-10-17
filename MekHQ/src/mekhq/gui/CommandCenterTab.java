@@ -32,8 +32,11 @@
  */
 package mekhq.gui;
 
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -76,6 +79,7 @@ import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
@@ -575,7 +579,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * Initialize the panel for displaying available reports
      */
     private void initReportsPanel() {
-        panReports = new JPanel(new GridLayout(6, 1, 0, 5));
+        panReports = new JPanel(new GridLayout(7, 1, 0, 5));
 
         RoundedJButton btnTransportReport = new RoundedJButton(resourceMap.getString("btnTransportReport.text"));
         btnTransportReport.addActionListener(ev -> new TransportReportDialog(getCampaignGui().getFrame(),
@@ -621,6 +625,32 @@ public final class CommandCenterTab extends CampaignGuiTab {
             }
         });
         panReports.add(btnFactionStanding);
+
+        RoundedJButton btnJumpFees = new RoundedJButton(resourceMap.getString("btnJumpFees.text"));
+        btnJumpFees.addActionListener(evt -> {
+            // TODO replace with final version
+            TransportCostCalculations transportCostCalculations =
+                  new TransportCostCalculations(getCampaign().getHangar(), getCampaign().getPersonnel(),
+                        getCampaign().getCargoStatistics(),
+                        getCampaign().getHangarStatistics(),
+                        EXP_REGULAR);
+            transportCostCalculations.calculateJumpCostForEntireJourney(37);
+            String reportString = transportCostCalculations.getJumpCostString();
+
+            // Create and show a dialog with the reportString
+            JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(btnJumpFees),
+                  "Jump Cost Report",
+                  true);
+            JLabel textArea = new JLabel(reportString);
+            JScrollPane scrollPane = new JScrollPane(textArea);
+
+            dialog.getContentPane().add(scrollPane);
+            dialog.setSize(500, 400);
+            dialog.setLocationRelativeTo(btnJumpFees);
+            dialog.setVisible(true);
+        });
+        panReports.add(btnJumpFees);
+
         panReports.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panReports.title")));
     }
 
