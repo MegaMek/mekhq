@@ -135,6 +135,7 @@ public enum GlossaryEntry {
     TURNOVER("TURNOVER"),
     UNABLE_TO_START_SCENARIO("UNABLE_TO_START_SCENARIO"),
     VOCATIONAL_XP("VOCATIONAL_XP"),
+    JUMP_COST_CALCULATIONS("JUMP_COST_CALCULATIONS"),
     WINTER_HOLIDAY("WINTER_HOLIDAY");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GlossaryEntry";
