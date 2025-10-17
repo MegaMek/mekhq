@@ -540,23 +540,26 @@ public class TransportCostCalculations {
 
         // ProtoMeks
         int protoMekBays = hangarStatistics.getTotalProtoMekBays();
-        int protoMekBayUsage = protoMekBays - protoMekCount;
-        additionalProtoMekBaysRequired = -min(0, protoMekBayUsage);
-        additionalProtoMekBaysCost = round(additionalProtoMekBaysRequired * PROTOMEK_COST);
+        double protoMekBayUsage = protoMekBays - protoMekCount;
+        int adjustedProtoMekBayUsage = (int) ceil(protoMekBayUsage / 5); // 5 ProtoMeks per bay
+        additionalProtoMekBaysRequired = -min(0, adjustedProtoMekBayUsage);
+        additionalProtoMekBaysCost = round(protoMekBayUsage * PROTOMEK_COST); // Cost is per ProtoMek
         totalCost = totalCost.plus(additionalProtoMekBaysCost);
 
         // Battle Armor
         int battleArmorBays = hangarStatistics.getTotalBattleArmorBays();
-        int battleArmorBayUsage = battleArmorBays - battleArmorCount;
-        additionalBattleArmorBaysRequired = -min(0, battleArmorBayUsage);
-        additionalBattleArmorBaysCost = round(additionalBattleArmorBaysRequired * BATTLE_ARMOR_COST);
+        double battleArmorBayUsage = battleArmorBays - battleArmorCount;
+        int adjustedBattleArmorBayUsage = (int) ceil(battleArmorBayUsage / 5); // 5 squads per bay
+        additionalBattleArmorBaysRequired = -min(0, adjustedBattleArmorBayUsage);
+        additionalBattleArmorBaysCost = round(battleArmorBayUsage * BATTLE_ARMOR_COST); // Cost is per squad
         totalCost = totalCost.plus(additionalBattleArmorBaysCost);
 
-        // Battle Armor
+        // Infantry
         int infantryBays = hangarStatistics.getTotalInfantryBays();
-        int infantryBayUsage = infantryBays - infantryCount;
-        additionalInfantryBaysRequired = -min(0, infantryBayUsage);
-        additionalInfantryBaysCost = round(additionalInfantryBaysRequired * INFANTRY_COST);
+        double infantryBayUsage = infantryBays - infantryCount;
+        int adjustedInfantryBayUsage = (int) ceil(infantryBayUsage / 3); // 3 platoons per bay
+        additionalInfantryBaysRequired = -min(0, adjustedInfantryBayUsage);
+        additionalInfantryBaysCost = round(infantryBayUsage * INFANTRY_COST); // Cost is per platoon
         totalCost = totalCost.plus(additionalInfantryBaysCost);
 
         // Other Units
