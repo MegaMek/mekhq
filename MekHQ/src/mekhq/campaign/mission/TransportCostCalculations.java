@@ -119,7 +119,7 @@ public class TransportCostCalculations {
     // Hiring a Princess for dependents proved to be insanely expensive. So we're instead assuming
     static final double PASSENGERS_COST = INFANTRY_COST;
 
-    private final Hangar hangar;
+    private final Collection<Unit> hangarContents;
     private final Collection<Person> personnel;
     private final CargoStatistics cargoStatistics;
     private final HangarStatistics hangarStatistics;
@@ -169,351 +169,180 @@ public class TransportCostCalculations {
 
     private Money totalCost = Money.zero();
 
-    public int getBattleArmorCount() {
+    int getBattleArmorCount() {
         return battleArmorCount;
     }
 
-    public void setBattleArmorCount(int battleArmorCount) {
-        this.battleArmorCount = battleArmorCount;
-    }
 
-    public Hangar getHangar() {
-        return hangar;
-    }
-
-    public Collection<Person> getPersonnel() {
-        return personnel;
-    }
-
-    public CargoStatistics getCargoStatistics() {
-        return cargoStatistics;
-    }
-
-    public HangarStatistics getHangarStatistics() {
-        return hangarStatistics;
-    }
-
-    public int getCrewExperienceLevel() {
+    int getCrewExperienceLevel() {
         return crewExperienceLevel;
     }
 
-    public double getAdditionalCargoSpaceRequired() {
+    double getAdditionalCargoSpaceRequired() {
         return additionalCargoSpaceRequired;
     }
 
-    public void setAdditionalCargoSpaceRequired(double additionalCargoSpaceRequired) {
-        this.additionalCargoSpaceRequired = additionalCargoSpaceRequired;
-    }
-
-    public double getCargoBayCost() {
+    double getCargoBayCost() {
         return cargoBayCost;
     }
 
-    public void setCargoBayCost(double cargoBayCost) {
-        this.cargoBayCost = cargoBayCost;
-    }
-
-    public int getAdditionalSmallCraftBaysRequired() {
+    int getAdditionalSmallCraftBaysRequired() {
         return additionalSmallCraftBaysRequired;
     }
 
-    public void setAdditionalSmallCraftBaysRequired(int additionalSmallCraftBaysRequired) {
-        this.additionalSmallCraftBaysRequired = additionalSmallCraftBaysRequired;
-    }
-
-    public double getAdditionalSmallCraftBaysCost() {
+    double getAdditionalSmallCraftBaysCost() {
         return additionalSmallCraftBaysCost;
     }
 
-    public void setAdditionalSmallCraftBaysCost(double additionalSmallCraftBaysCost) {
-        this.additionalSmallCraftBaysCost = additionalSmallCraftBaysCost;
-    }
-
-    public int getAdditionalASFBaysRequired() {
+    int getAdditionalASFBaysRequired() {
         return additionalASFBaysRequired;
     }
 
-    public void setAdditionalASFBaysRequired(int additionalASFBaysRequired) {
-        this.additionalASFBaysRequired = additionalASFBaysRequired;
-    }
-
-    public double getAdditionalASFBaysCost() {
+    double getAdditionalASFBaysCost() {
         return additionalASFBaysCost;
     }
 
-    public void setAdditionalASFBaysCost(double additionalASFBaysCost) {
-        this.additionalASFBaysCost = additionalASFBaysCost;
-    }
-
-    public int getAdditionalMekBaysRequired() {
+    int getAdditionalMekBaysRequired() {
         return additionalMekBaysRequired;
     }
 
-    public void setAdditionalMekBaysRequired(int additionalMekBaysRequired) {
-        this.additionalMekBaysRequired = additionalMekBaysRequired;
-    }
-
-    public double getAdditionalMekBaysCost() {
+    double getAdditionalMekBaysCost() {
         return additionalMekBaysCost;
     }
 
-    public void setAdditionalMekBaysCost(double additionalMekBaysCost) {
-        this.additionalMekBaysCost = additionalMekBaysCost;
-    }
-
-    public int getAdditionalSuperHeavyVehicleBaysRequired() {
+    int getAdditionalSuperHeavyVehicleBaysRequired() {
         return additionalSuperHeavyVehicleBaysRequired;
     }
 
-    public void setAdditionalSuperHeavyVehicleBaysRequired(int additionalSuperHeavyVehicleBaysRequired) {
-        this.additionalSuperHeavyVehicleBaysRequired = additionalSuperHeavyVehicleBaysRequired;
-    }
-
-    public double getAdditionalSuperHeavyVehicleBaysCost() {
+    double getAdditionalSuperHeavyVehicleBaysCost() {
         return additionalSuperHeavyVehicleBaysCost;
     }
 
-    public void setAdditionalSuperHeavyVehicleBaysCost(double additionalSuperHeavyVehicleBaysCost) {
-        this.additionalSuperHeavyVehicleBaysCost = additionalSuperHeavyVehicleBaysCost;
-    }
-
-    public int getAdditionalHeavyVehicleBaysRequired() {
+    int getAdditionalHeavyVehicleBaysRequired() {
         return additionalHeavyVehicleBaysRequired;
     }
 
-    public void setAdditionalHeavyVehicleBaysRequired(int additionalHeavyVehicleBaysRequired) {
-        this.additionalHeavyVehicleBaysRequired = additionalHeavyVehicleBaysRequired;
-    }
-
-    public double getAdditionalHeavyVehicleBaysCost() {
+    double getAdditionalHeavyVehicleBaysCost() {
         return additionalHeavyVehicleBaysCost;
     }
 
-    public void setAdditionalHeavyVehicleBaysCost(double additionalHeavyVehicleBaysCost) {
-        this.additionalHeavyVehicleBaysCost = additionalHeavyVehicleBaysCost;
-    }
-
-    public int getAdditionalLightVehicleBaysRequired() {
+    int getAdditionalLightVehicleBaysRequired() {
         return additionalLightVehicleBaysRequired;
     }
 
-    public void setAdditionalLightVehicleBaysRequired(int additionalLightVehicleBaysRequired) {
-        this.additionalLightVehicleBaysRequired = additionalLightVehicleBaysRequired;
-    }
-
-    public double getAdditionalLightVehicleBaysCost() {
+    double getAdditionalLightVehicleBaysCost() {
         return additionalLightVehicleBaysCost;
     }
 
-    public void setAdditionalLightVehicleBaysCost(double additionalLightVehicleBaysCost) {
-        this.additionalLightVehicleBaysCost = additionalLightVehicleBaysCost;
-    }
-
-    public int getAdditionalProtoMekBaysRequired() {
+    int getAdditionalProtoMekBaysRequired() {
         return additionalProtoMekBaysRequired;
     }
 
-    public void setAdditionalProtoMekBaysRequired(int additionalProtoMekBaysRequired) {
-        this.additionalProtoMekBaysRequired = additionalProtoMekBaysRequired;
-    }
-
-    public double getAdditionalProtoMekBaysCost() {
+    double getAdditionalProtoMekBaysCost() {
         return additionalProtoMekBaysCost;
     }
 
-    public void setAdditionalProtoMekBaysCost(double additionalProtoMekBaysCost) {
-        this.additionalProtoMekBaysCost = additionalProtoMekBaysCost;
-    }
-
-    public int getAdditionalBattleArmorBaysRequired() {
+    int getAdditionalBattleArmorBaysRequired() {
         return additionalBattleArmorBaysRequired;
     }
 
-    public void setAdditionalBattleArmorBaysRequired(int additionalBattleArmorBaysRequired) {
-        this.additionalBattleArmorBaysRequired = additionalBattleArmorBaysRequired;
-    }
-
-    public double getAdditionalBattleArmorBaysCost() {
+    double getAdditionalBattleArmorBaysCost() {
         return additionalBattleArmorBaysCost;
     }
 
-    public void setAdditionalBattleArmorBaysCost(double additionalBattleArmorBaysCost) {
-        this.additionalBattleArmorBaysCost = additionalBattleArmorBaysCost;
-    }
-
-    public int getAdditionalInfantryBaysRequired() {
+    int getAdditionalInfantryBaysRequired() {
         return additionalInfantryBaysRequired;
     }
 
-    public void setAdditionalInfantryBaysRequired(int additionalInfantryBaysRequired) {
-        this.additionalInfantryBaysRequired = additionalInfantryBaysRequired;
-    }
-
-    public double getAdditionalInfantryBaysCost() {
+    double getAdditionalInfantryBaysCost() {
         return additionalInfantryBaysCost;
     }
 
-    public void setAdditionalInfantryBaysCost(double additionalInfantryBaysCost) {
-        this.additionalInfantryBaysCost = additionalInfantryBaysCost;
-    }
-
-    public double getAdditionalOtherUnitBaysCost() {
+    double getAdditionalOtherUnitBaysCost() {
         return additionalOtherUnitBaysCost;
     }
 
-    public void setAdditionalOtherUnitBaysCost(double additionalOtherUnitBaysCost) {
-        this.additionalOtherUnitBaysCost = additionalOtherUnitBaysCost;
-    }
-
-    public int getAdditionalPassengerBaysRequired() {
+    int getAdditionalPassengerBaysRequired() {
         return additionalPassengerBaysRequired;
     }
 
-    public void setAdditionalPassengerBaysRequired(int additionalPassengerBaysRequired) {
-        this.additionalPassengerBaysRequired = additionalPassengerBaysRequired;
-    }
-
-    public double getAdditionalPassengerBaysCost() {
+    double getAdditionalPassengerBaysCost() {
         return additionalPassengerBaysCost;
     }
 
-    public void setAdditionalPassengerBaysCost(double additionalPassengerBaysCost) {
-        this.additionalPassengerBaysCost = additionalPassengerBaysCost;
-    }
-
-    public double getTotalAdditionalBaysRequired() {
+    double getTotalAdditionalBaysRequired() {
         return totalAdditionalBaysRequired;
     }
 
-    public void setTotalAdditionalBaysRequired(double totalAdditionalBaysRequired) {
-        this.totalAdditionalBaysRequired = totalAdditionalBaysRequired;
-    }
-
-    public int getAdditionalDropShipsRequired() {
+    int getAdditionalDropShipsRequired() {
         return additionalDropShipsRequired;
     }
 
-    public void setAdditionalDropShipsRequired(int additionalDropShipsRequired) {
-        this.additionalDropShipsRequired = additionalDropShipsRequired;
-    }
-
-    public int getAdditionalCollarsRequired() {
+    int getAdditionalCollarsRequired() {
         return additionalCollarsRequired;
     }
 
-    public void setAdditionalCollarsRequired(int additionalCollarsRequired) {
-        this.additionalCollarsRequired = additionalCollarsRequired;
-    }
-
-    public double getDockingCollarCost() {
+    double getDockingCollarCost() {
         return dockingCollarCost;
     }
 
-    public void setDockingCollarCost(double dockingCollarCost) {
-        this.dockingCollarCost = dockingCollarCost;
-    }
-
-    public int getDropShipCount() {
+    int getDropShipCount() {
         return dropShipCount;
     }
 
-    public void setDropShipCount(int dropShipCount) {
-        this.dropShipCount = dropShipCount;
-    }
-
-    public int getSmallCraftCount() {
+    int getSmallCraftCount() {
         return smallCraftCount;
     }
 
-    public void setSmallCraftCount(int smallCraftCount) {
-        this.smallCraftCount = smallCraftCount;
-    }
-
-    public int getSuperHeavyVehicleCount() {
+    int getSuperHeavyVehicleCount() {
         return superHeavyVehicleCount;
     }
 
-    public void setSuperHeavyVehicleCount(int superHeavyVehicleCount) {
-        this.superHeavyVehicleCount = superHeavyVehicleCount;
-    }
-
-    public int getHeavyVehicleCount() {
+    int getHeavyVehicleCount() {
         return heavyVehicleCount;
     }
 
-    public void setHeavyVehicleCount(int heavyVehicleCount) {
-        this.heavyVehicleCount = heavyVehicleCount;
-    }
-
-    public int getLightVehicleCount() {
+    int getLightVehicleCount() {
         return lightVehicleCount;
     }
 
-    public void setLightVehicleCount(int lightVehicleCount) {
-        this.lightVehicleCount = lightVehicleCount;
-    }
-
-    public int getMekCount() {
+    int getMekCount() {
         return mekCount;
     }
 
-    public void setMekCount(int mekCount) {
-        this.mekCount = mekCount;
-    }
-
-    public int getAsfCount() {
+    int getAsfCount() {
         return asfCount;
     }
 
-    public void setAsfCount(int asfCount) {
-        this.asfCount = asfCount;
-    }
-
-    public int getProtoMekCount() {
+    int getProtoMekCount() {
         return protoMekCount;
     }
 
-    public void setProtoMekCount(int protoMekCount) {
-        this.protoMekCount = protoMekCount;
-    }
-
-    public int getInfantryCount() {
+    int getInfantryCount() {
         return infantryCount;
     }
 
-    public void setInfantryCount(int infantryCount) {
-        this.infantryCount = infantryCount;
-    }
-
-    public int getOtherUnitCount() {
+    int getOtherUnitCount() {
         return otherUnitCount;
     }
 
-    public void setOtherUnitCount(int otherUnitCount) {
-        this.otherUnitCount = otherUnitCount;
-    }
-
-    public Money getTotalCost() {
+    Money getTotalCost() {
         return totalCost;
-    }
-
-    public void setTotalCost(Money totalCost) {
-        this.totalCost = totalCost;
     }
 
     /**
      * Constructs a new TransportCostCalculations class for evaluating jump and transport costs.
      *
-     * @param hangar              The {@link Hangar} containing units for transport.
+     * @param hangarContents      The contents of the campaign's {@link Hangar}
      * @param personnel           The {@link Person} list representing personnel to be transported.
      * @param cargoStatistics     The {@link CargoStatistics} describing cargo loads.
      * @param hangarStatistics    The {@link HangarStatistics} listing all available bay capacities.
      * @param crewExperienceLevel The experience level to use for crew-related cost multipliers.
      */
-    public TransportCostCalculations(final Hangar hangar, final Collection<Person> personnel,
+    public TransportCostCalculations(final Collection<Unit> hangarContents, final Collection<Person> personnel,
           final CargoStatistics cargoStatistics, final HangarStatistics hangarStatistics,
           final int crewExperienceLevel) {
-        this.hangar = hangar;
+        this.hangarContents = hangarContents;
         this.personnel = personnel;
         this.cargoStatistics = cargoStatistics;
         this.hangarStatistics = hangarStatistics;
@@ -596,7 +425,7 @@ public class TransportCostCalculations {
     public Money calculateJumpCostForEachDay() {
         calculateCargoRequirements();
 
-        countUnitsByType(hangar);
+        countUnitsByType();
         calculateAdditionalBayRequirementsFromUnits();
         calculateAdditionalBayRequirementsFromPassengers();
         additionalDropShipsRequired += (int) ceil(totalAdditionalBaysRequired / BAYS_PER_DROPSHIP);
@@ -751,11 +580,9 @@ public class TransportCostCalculations {
     /**
      * Counts units by type (vehicles by weight and non-vehicles by entity type) and updates internal counters for each
      * tracked unit category, ignoring mothballed units and skipping units lacking valid entities.
-     *
-     * @param hangar the {@link Hangar} to scan units from.
      */
-    private void countUnitsByType(Hangar hangar) {
-        List<Unit> relevantUnits = hangar.getUnits().stream().filter(unit -> !unit.isMothballed()).toList();
+    void countUnitsByType() {
+        List<Unit> relevantUnits = hangarContents.stream().filter(unit -> !unit.isMothballed()).toList();
         for (Unit unit : relevantUnits) {
             Entity entity = unit.getEntity();
             if (entity == null) {

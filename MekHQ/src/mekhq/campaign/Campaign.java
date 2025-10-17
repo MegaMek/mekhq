@@ -1823,7 +1823,7 @@ public class Campaign implements ITechManager {
     }
 
     public TransportCostCalculations getTransportCostCalculation(int crewExperienceLevel) {
-        return new TransportCostCalculations(getHangar(),
+        return new TransportCostCalculations(getHangar().getUnits(),
               getPersonnel(),
               getCargoStatistics(),
               getHangarStatistics(),

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 
-import mekhq.campaign.Hangar;
+import megamek.common.units.Entity;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
@@ -27,6 +27,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,14 +35,338 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 public class TransportCostCalculationsTest {
     private static final LocalDate today = LocalDate.of(3151, 1, 1);
+    private static final CargoStatistics mockCargoStatistics = mock(CargoStatistics.class);
+    private static final HangarStatistics mockHangarStatistics = mock(HangarStatistics.class);
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3 })
+    public void testCountUnitsByType_dropShips(int unitCount) {
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        when(mockEntity.isVehicle()).thenReturn(false);
+        when(mockEntity.isDropShip()).thenReturn(true);
+
+        Collection<Unit> units = new ArrayList<>();
+        for (int i = 0; i < unitCount; i++) {
+            units.add(mockUnit);
+        }
+
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        transportCostCalculations.countUnitsByType();
+
+        int countedUnits = transportCostCalculations.getDropShipCount();
+        assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3 })
+    public void testCountUnitsByType_smallCraft(int unitCount) {
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        when(mockEntity.isVehicle()).thenReturn(false);
+        when(mockEntity.isDropShip()).thenReturn(false);
+        when(mockEntity.isSmallCraft()).thenReturn(true);
+
+        Collection<Unit> units = new ArrayList<>();
+        for (int i = 0; i < unitCount; i++) {
+            units.add(mockUnit);
+        }
+
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        transportCostCalculations.countUnitsByType();
+
+        int countedUnits = transportCostCalculations.getSmallCraftCount();
+        assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3 })
+    public void testCountUnitsByType_mek(int unitCount) {
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        when(mockEntity.isVehicle()).thenReturn(false);
+        when(mockEntity.isDropShip()).thenReturn(false);
+        when(mockEntity.isSmallCraft()).thenReturn(false);
+        when(mockEntity.isMek()).thenReturn(true);
+
+        Collection<Unit> units = new ArrayList<>();
+        for (int i = 0; i < unitCount; i++) {
+            units.add(mockUnit);
+        }
+
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        transportCostCalculations.countUnitsByType();
+
+        int countedUnits = transportCostCalculations.getMekCount();
+        assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3 })
+    public void testCountUnitsByType_aerospaceFighter(int unitCount) {
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        when(mockEntity.isVehicle()).thenReturn(false);
+        when(mockEntity.isDropShip()).thenReturn(false);
+        when(mockEntity.isSmallCraft()).thenReturn(false);
+        when(mockEntity.isMek()).thenReturn(false);
+        when(mockEntity.isAerospaceFighter()).thenReturn(true);
+
+        Collection<Unit> units = new ArrayList<>();
+        for (int i = 0; i < unitCount; i++) {
+            units.add(mockUnit);
+        }
+
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        transportCostCalculations.countUnitsByType();
+
+        int countedUnits = transportCostCalculations.getAsfCount();
+        assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3 })
+    public void testCountUnitsByType_conventionalFighter(int unitCount) {
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        when(mockEntity.isVehicle()).thenReturn(false);
+        when(mockEntity.isDropShip()).thenReturn(false);
+        when(mockEntity.isSmallCraft()).thenReturn(false);
+        when(mockEntity.isMek()).thenReturn(false);
+        when(mockEntity.isAerospaceFighter()).thenReturn(false);
+        when(mockEntity.isConventionalFighter()).thenReturn(true);
+
+        Collection<Unit> units = new ArrayList<>();
+        for (int i = 0; i < unitCount; i++) {
+            units.add(mockUnit);
+        }
+
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        transportCostCalculations.countUnitsByType();
+
+        int countedUnits = transportCostCalculations.getAsfCount();
+        assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3 })
+    public void testCountUnitsByType_protoMek(int unitCount) {
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        when(mockEntity.isVehicle()).thenReturn(false);
+        when(mockEntity.isDropShip()).thenReturn(false);
+        when(mockEntity.isSmallCraft()).thenReturn(false);
+        when(mockEntity.isMek()).thenReturn(false);
+        when(mockEntity.isAerospaceFighter()).thenReturn(false);
+        when(mockEntity.isConventionalFighter()).thenReturn(false);
+        when(mockEntity.isProtoMek()).thenReturn(true);
+
+        Collection<Unit> units = new ArrayList<>();
+        for (int i = 0; i < unitCount; i++) {
+            units.add(mockUnit);
+        }
+
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        transportCostCalculations.countUnitsByType();
+
+        int countedUnits = transportCostCalculations.getProtoMekCount();
+        assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3 })
+    public void testCountUnitsByType_battleArmor(int unitCount) {
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        when(mockEntity.isVehicle()).thenReturn(false);
+        when(mockEntity.isDropShip()).thenReturn(false);
+        when(mockEntity.isSmallCraft()).thenReturn(false);
+        when(mockEntity.isMek()).thenReturn(false);
+        when(mockEntity.isAerospaceFighter()).thenReturn(false);
+        when(mockEntity.isConventionalFighter()).thenReturn(false);
+        when(mockEntity.isProtoMek()).thenReturn(false);
+        when(mockEntity.isBattleArmor()).thenReturn(true);
+
+        Collection<Unit> units = new ArrayList<>();
+        for (int i = 0; i < unitCount; i++) {
+            units.add(mockUnit);
+        }
+
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        transportCostCalculations.countUnitsByType();
+
+        int countedUnits = transportCostCalculations.getBattleArmorCount();
+        assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3 })
+    public void testCountUnitsByType_infantry(int unitCount) {
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        when(mockEntity.isVehicle()).thenReturn(false);
+        when(mockEntity.isDropShip()).thenReturn(false);
+        when(mockEntity.isSmallCraft()).thenReturn(false);
+        when(mockEntity.isMek()).thenReturn(false);
+        when(mockEntity.isAerospaceFighter()).thenReturn(false);
+        when(mockEntity.isConventionalFighter()).thenReturn(false);
+        when(mockEntity.isProtoMek()).thenReturn(false);
+        when(mockEntity.isBattleArmor()).thenReturn(false);
+        when(mockEntity.isInfantry()).thenReturn(true);
+
+        Collection<Unit> units = new ArrayList<>();
+        for (int i = 0; i < unitCount; i++) {
+            units.add(mockUnit);
+        }
+
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        transportCostCalculations.countUnitsByType();
+
+        int countedUnits = transportCostCalculations.getInfantryCount();
+        assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3 })
+    public void testCountUnitsByType_otherUnit(int unitCount) {
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        when(mockEntity.isVehicle()).thenReturn(false);
+        when(mockEntity.isDropShip()).thenReturn(false);
+        when(mockEntity.isSmallCraft()).thenReturn(false);
+        when(mockEntity.isMek()).thenReturn(false);
+        when(mockEntity.isAerospaceFighter()).thenReturn(false);
+        when(mockEntity.isConventionalFighter()).thenReturn(false);
+        when(mockEntity.isProtoMek()).thenReturn(false);
+        when(mockEntity.isBattleArmor()).thenReturn(false);
+        when(mockEntity.isInfantry()).thenReturn(false);
+
+        Collection<Unit> units = new ArrayList<>();
+        for (int i = 0; i < unitCount; i++) {
+            units.add(mockUnit);
+        }
+
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        transportCostCalculations.countUnitsByType();
+
+        int countedUnits = transportCostCalculations.getOtherUnitCount();
+        assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3 })
+    public void testCountUnitsByType_superHeavyVehicles(int unitCount) {
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        when(mockEntity.isVehicle()).thenReturn(true);
+        when(mockEntity.getWeight()).thenReturn(10000.0);
+
+        Collection<Unit> units = new ArrayList<>();
+        for (int i = 0; i < unitCount; i++) {
+            units.add(mockUnit);
+        }
+
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        transportCostCalculations.countUnitsByType();
+
+        int countedSuperHeavyVehicles = transportCostCalculations.getSuperHeavyVehicleCount();
+        assertEquals(unitCount, countedSuperHeavyVehicles,
+              "Expected " + unitCount + " units but was " + countedSuperHeavyVehicles);
+
+        int countedHeavyVehicles = transportCostCalculations.getHeavyVehicleCount();
+        assertEquals(0, countedHeavyVehicles,
+              "Expected " + unitCount + " units but was " + countedHeavyVehicles);
+
+        int countedLightVehicles = transportCostCalculations.getLightVehicleCount();
+        assertEquals(0, countedLightVehicles,
+              "Expected " + unitCount + " units but was " + countedLightVehicles);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3 })
+    public void testCountUnitsByType_heavyVehicles(int unitCount) {
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        when(mockEntity.isVehicle()).thenReturn(true);
+        when(mockEntity.getWeight()).thenReturn(75.0);
+
+        Collection<Unit> units = new ArrayList<>();
+        for (int i = 0; i < unitCount; i++) {
+            units.add(mockUnit);
+        }
+
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        transportCostCalculations.countUnitsByType();
+
+        int countedSuperHeavyVehicles = transportCostCalculations.getSuperHeavyVehicleCount();
+        assertEquals(0, countedSuperHeavyVehicles,
+              "Expected " + unitCount + " units but was " + countedSuperHeavyVehicles);
+
+        int countedHeavyVehicles = transportCostCalculations.getHeavyVehicleCount();
+        assertEquals(unitCount, countedHeavyVehicles,
+              "Expected " + unitCount + " units but was " + countedHeavyVehicles);
+
+        int countedLightVehicles = transportCostCalculations.getLightVehicleCount();
+        assertEquals(0, countedLightVehicles,
+              "Expected " + unitCount + " units but was " + countedLightVehicles);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3 })
+    public void testCountUnitsByType_lightVehicles(int unitCount) {
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        when(mockEntity.isVehicle()).thenReturn(true);
+        when(mockEntity.getWeight()).thenReturn(25.0);
+
+        Collection<Unit> units = new ArrayList<>();
+        for (int i = 0; i < unitCount; i++) {
+            units.add(mockUnit);
+        }
+
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        transportCostCalculations.countUnitsByType();
+
+        int countedSuperHeavyVehicles = transportCostCalculations.getSuperHeavyVehicleCount();
+        assertEquals(0, countedSuperHeavyVehicles,
+              "Expected " + unitCount + " units but was " + countedSuperHeavyVehicles);
+
+        int countedHeavyVehicles = transportCostCalculations.getHeavyVehicleCount();
+        assertEquals(0, countedHeavyVehicles,
+              "Expected " + unitCount + " units but was " + countedHeavyVehicles);
+
+        int countedLightVehicles = transportCostCalculations.getLightVehicleCount();
+        assertEquals(unitCount, countedLightVehicles,
+              "Expected " + unitCount + " units but was " + countedLightVehicles);
+    }
 
     @ParameterizedTest
     @ValueSource(ints = { 0, 1, 10, 30, 40, 50 })
     public void testCalculateAdditionalBayRequirementsFromPassengers(int passengerCount) {
-        Hangar hangar = new Hangar();
-        CargoStatistics mockCargoStatistics = mock(CargoStatistics.class);
-        HangarStatistics mockHangarStatistics = mock(HangarStatistics.class);
-
         Person person = new Person(UUID.randomUUID());
         person.setStatus(PersonnelStatus.ACTIVE);
         Collection<Person> passengers = new ArrayList<>();
@@ -49,8 +374,11 @@ public class TransportCostCalculationsTest {
             passengers.add(person);
         }
 
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(hangar, passengers,
-              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),
+              passengers,
+              mockCargoStatistics,
+              mockHangarStatistics,
+              EXP_REGULAR);
 
         double additionalPassengerBaysCost = transportCostCalculations.getAdditionalPassengerBaysCost();
         double expectedCost = round(additionalPassengerBaysCost * PASSENGERS_COST);
