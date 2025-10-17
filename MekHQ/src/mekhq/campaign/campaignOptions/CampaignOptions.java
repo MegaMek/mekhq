@@ -595,6 +595,7 @@ public class CampaignOptions {
     private boolean contractMarketReportRefresh;
     private int contractMaxSalvagePercentage;
     private int dropShipBonusPercentage;
+    private boolean isUseTwoWayPay;
     // endregion Markets Tab
 
     // region Against the Bot Tab
@@ -1235,6 +1236,7 @@ public class CampaignOptions {
         setContractMarketReportRefresh(true);
         setContractMaxSalvagePercentage(100);
         setDropShipBonusPercentage(0);
+        isUseTwoWayPay = true;
         // endregion Markets Tab
 
         // region Against the Bot Tab
@@ -3819,6 +3821,14 @@ public class CampaignOptions {
 
     public void setDropShipBonusPercentage(final int dropShipBonusPercentage) {
         this.dropShipBonusPercentage = dropShipBonusPercentage;
+    }
+
+    public boolean isUseTwoWayPay() {
+        return isUseTwoWayPay;
+    }
+
+    public void setUseTwoWayPay(final boolean isUseTwoWayPay) {
+        this.isUseTwoWayPay = isUseTwoWayPay;
     }
     // endregion Contract Market
     // endregion Markets Tab

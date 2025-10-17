@@ -757,6 +757,18 @@ public class Campaign implements ITechManager {
         this.isOverridingCommandCircuitRequirements = isOverridingCommandCircuitRequirements;
     }
 
+    public boolean isUseCommandCircuitForContract(Contract contract) {
+        if (contract instanceof AtBContract atBContract) {
+
+            return FactionStandingUtilities.isUseCommandCircuit(
+                  isOverridingCommandCircuitRequirements, gmMode,
+                  campaignOptions.isUseFactionStandingCommandCircuitSafe(),
+                  factionStandings, List.of(atBContract));
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Returns the Hiring Hall level from the force's current system on the current date. If there is no hiring hall
      * present, the level is HiringHallLevel.NONE.
