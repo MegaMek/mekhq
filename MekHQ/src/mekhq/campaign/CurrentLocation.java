@@ -33,6 +33,7 @@
  */
 package mekhq.campaign;
 
+import static java.lang.Math.ceil;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
@@ -54,6 +55,7 @@ import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Planet;
@@ -161,14 +163,6 @@ public class CurrentLocation {
     }
 
     /**
-     * Use {@link #getReport(LocalDate, Money, boolean)} instead
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public String getReport(LocalDate date, Money jumpCost) {
-        return getReport(date, jumpCost, false);
-    }
-
-    /**
      * Generates a detailed status report for the current location and travel state.
      *
      * <p>The report includes:</p>
@@ -182,12 +176,12 @@ public class CurrentLocation {
      * <p>The report is formatted as HTML suitable for display in GUI components.</p>
      *
      * @param date                the current {@link LocalDate} for context-sensitive names and status
-     * @param jumpCost            the estimated jump cost as a {@link Money} value
      * @param isUseCommandCircuit whether the command circuit option is enabled
      *
      * @return a formatted HTML string representing the travel and location status report
      */
-    public String getReport(LocalDate date, Money jumpCost, boolean isUseCommandCircuit) {
+    public String getReport(LocalDate date, boolean isUseCommandCircuit,
+          TransportCostCalculations transportCostCalculations) {
         double currentRechargeTime = currentSystem.getRechargeTime(date, isUseCommandCircuit);
 
         StringBuilder report = new StringBuilder();
@@ -218,11 +212,18 @@ public class CurrentLocation {
         report.append("<br/>");
 
         // Second Line
+        boolean hasIncludedCost = false;
         if ((null != jumpPath) && !jumpPath.isEmpty()) {
             report.append("Traveling to ").append(jumpPath.getLastSystem().getPrintableName(date)).append(": ");
             if (jumpPath.getJumps() > 0) {
                 report.append(jumpPath.getJumps())
                       .append(jumpPath.getJumps() == 1 ? " jump remaining" : " jumps remaining");
+
+                int duration = (int) ceil(jumpPath.getTotalTime(date, getTransitTime(), isUseCommandCircuit));
+                Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration);
+                report.append("<br>Estimated Jump Cost (Remaining): ").append(jumpCost.toAmountString()).append(" " +
+                                                                                                                      "C-Bills");
+                hasIncludedCost = true;
             } else {
                 report.append("In destination system");
             }
@@ -233,7 +234,14 @@ public class CurrentLocation {
         report.append("<br/>");
 
         // Third Line
-        report.append("Estimated Jump Cost: ").append(jumpCost.toAmountString()).append(" C-Bills<br><br>");
+        if (hasIncludedCost) {
+            report.append("<br><br>");
+        } else {
+            Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(7);
+            report.append("Estimated Jump Cost (per week): ")
+                  .append(jumpCost.toAmountString())
+                  .append(" C-Bills<br><br>");
+        }
 
         report.append("</html>");
         return report.toString();
@@ -320,6 +328,7 @@ public class CurrentLocation {
                 // jump
                 final CampaignOptions campaignOptions = campaign.getCampaignOptions();
                 if (campaignOptions.isPayForTransport()) {
+
                     if (!campaign.getFinances()
                                .debit(TransactionType.TRANSPORTATION,
                                      campaign.getLocalDate(),

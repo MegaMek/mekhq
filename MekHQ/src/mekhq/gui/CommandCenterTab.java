@@ -630,10 +630,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnJumpFees.addActionListener(evt -> {
             // TODO replace with final version
             TransportCostCalculations transportCostCalculations =
-                  new TransportCostCalculations(getCampaign().getHangar(), getCampaign().getPersonnel(),
-                        getCampaign().getCargoStatistics(),
-                        getCampaign().getHangarStatistics(),
-                        EXP_REGULAR);
+                  getCampaign().getTransportCostCalculation(EXP_REGULAR);
             transportCostCalculations.calculateJumpCostForEntireJourney(37);
             String reportString = transportCostCalculations.getJumpCostString();
 

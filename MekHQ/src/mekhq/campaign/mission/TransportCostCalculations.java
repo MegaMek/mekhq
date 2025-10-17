@@ -168,8 +168,8 @@ public class TransportCostCalculations {
      * @param crewExperienceLevel The experience level to use for crew-related cost multipliers.
      */
     public TransportCostCalculations(final Hangar hangar, final Collection<Person> personnel,
-          final CargoStatistics cargoStatistics,
-          final HangarStatistics hangarStatistics, final int crewExperienceLevel) {
+          final CargoStatistics cargoStatistics, final HangarStatistics hangarStatistics,
+          final int crewExperienceLevel) {
         this.hangar = hangar;
         this.personnel = personnel;
         this.cargoStatistics = cargoStatistics;
@@ -237,7 +237,7 @@ public class TransportCostCalculations {
      * @return the total {@link Money} cost for the journey
      */
     public Money calculateJumpCostForEntireJourney(final int days) {
-        calculateJumpCostForEachDay(hangar);
+        calculateJumpCostForEachDay();
         totalCost = totalCost.multipliedBy(days);
         return totalCost;
     }
@@ -247,11 +247,9 @@ public class TransportCostCalculations {
      * per-bay/per-collar costs, scaled for crew experience. The result is stored in {@link #totalCost} and also
      * returned.
      *
-     * @param hangar the {@link Hangar} containing all units for calculation.
-     *
      * @return the daily {@link Money} cost of transport.
      */
-    public Money calculateJumpCostForEachDay(final Hangar hangar) {
+    public Money calculateJumpCostForEachDay() {
         calculateCargoRequirements();
         countUnitsByType(hangar);
         calculateAdditionalBayRequirementsFromUnits();

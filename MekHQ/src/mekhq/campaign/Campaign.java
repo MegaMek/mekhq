@@ -199,6 +199,7 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.CombatRole;
@@ -1800,6 +1801,14 @@ public class Campaign implements ITechManager {
 
     public CurrentLocation getLocation() {
         return location;
+    }
+
+    public TransportCostCalculations getTransportCostCalculation(int crewExperienceLevel) {
+        return new TransportCostCalculations(getHangar(),
+              getPersonnel(),
+              getCargoStatistics(),
+              getHangarStatistics(),
+              crewExperienceLevel);
     }
 
     /**
@@ -8019,7 +8028,10 @@ public class Campaign implements ITechManager {
      * @param excludeOwnTransports If true, do not display maintenance costs in the calculated travel cost.
      * @param campaignOpsCosts     If true, use the Campaign Ops method for calculating travel cost. (DropShip monthly
      *                             fees of 0.5% of purchase cost, 100,000 C-bills per collar.)
+     *
+     * @deprecated used {@link TransportCostCalculations} instead
      */
+    @Deprecated(since = "50.10", forRemoval = true)
     public Money calculateCostPerJump(boolean excludeOwnTransports, boolean campaignOpsCosts) {
         HangarStatistics stats = getHangarStatistics();
         CargoStatistics cargoStats = getCargoStatistics();
