@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.List;
 
 import megamek.codeUtilities.MathUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Hangar;
@@ -74,8 +75,6 @@ import mekhq.campaign.universe.PlanetarySystem;
  * <p>Usage: Create an instance with the unit's hangar, relevant personnel, and statistics, then
  * call {@link #calculateJumpCostForEachDay()} or {@link #calculateJumpCostForEntireJourney(int)}.</p>
  *
- * <p>Call {@link #getJumpCostString()} for a detailed report.</p>
- *
  * @author Illiani
  * @since 50.10
  */
@@ -85,7 +84,7 @@ public class TransportCostCalculations {
 
     // Most costs are listed as per month. There are n days in the average month. Therefore, the cost/day is the base
     // cost divided by n.
-    private static final double PER_DAY_DIVIDER = 30.436875;
+    public static final double PER_DAY_DIVIDER = 30.436875;
     // Collar hiring is per week. There are 7 days in a week. Therefore, the cost/day is the base cost divided by 7
     private static final double PER_DAY_WEEK = 7.0;
 
@@ -99,7 +98,7 @@ public class TransportCostCalculations {
     // player is always able to find a DropShip that has the exact bay types they need. Use of this magical DropShip
     // allows us to greatly simplify the amount of processing. It also helps make the logic easier for players to
     // understand.
-    static final int BAYS_PER_DROPSHIP = 14;
+    static final double BAYS_PER_DROPSHIP = 14.0;
     // This value is derived from the Union (2708) (Cargo).
     static final double CARGO_PER_DROPSHIP = 1874.5;
 
@@ -141,6 +140,7 @@ public class TransportCostCalculations {
 
     private double additionalCargoSpaceRequired;
     private double cargoBayCost;
+    private int requiredCargoDropShips;
 
     private int additionalSmallCraftBaysRequired;
     private double additionalSmallCraftBaysCost;
@@ -164,7 +164,7 @@ public class TransportCostCalculations {
     private int additionalPassengerBaysRequired;
     private double additionalPassengerBaysCost;
 
-    private double totalAdditionalBaysRequired;
+    private int totalAdditionalBaysRequired;
     private int additionalDropShipsRequired;
     private int additionalCollarsRequired;
     private double dockingCollarCost;
@@ -181,105 +181,121 @@ public class TransportCostCalculations {
     private int infantryCount;
     private int otherUnitCount;
 
-    private Money totalCost = Money.zero();
+    private Money totalCost = null;
 
-    double getCargoBayCost() {
+    public @Nullable Money getTotalCost() {
+        return totalCost;
+    }
+
+    public double getAdditionalCargoSpaceRequired() {
+        return additionalCargoSpaceRequired;
+    }
+
+    public double getCargoBayCost() {
         return cargoBayCost;
     }
 
-    int getAdditionalSmallCraftBaysRequired() {
+    public int getRequiredCargoDropShips() {
+        return requiredCargoDropShips;
+    }
+
+    public int getAdditionalSmallCraftBaysRequired() {
         return additionalSmallCraftBaysRequired;
     }
 
-    double getAdditionalSmallCraftBaysCost() {
+    public double getAdditionalSmallCraftBaysCost() {
         return additionalSmallCraftBaysCost;
     }
 
-    int getAdditionalASFBaysRequired() {
+    public int getAdditionalASFBaysRequired() {
         return additionalASFBaysRequired;
     }
 
-    double getAdditionalASFBaysCost() {
+    public double getAdditionalASFBaysCost() {
         return additionalASFBaysCost;
     }
 
-    int getAdditionalMekBaysRequired() {
+    public int getAdditionalMekBaysRequired() {
         return additionalMekBaysRequired;
     }
 
-    double getAdditionalMekBaysCost() {
+    public double getAdditionalMekBaysCost() {
         return additionalMekBaysCost;
     }
 
-    int getAdditionalSuperHeavyVehicleBaysRequired() {
+    public int getAdditionalSuperHeavyVehicleBaysRequired() {
         return additionalSuperHeavyVehicleBaysRequired;
     }
 
-    double getAdditionalSuperHeavyVehicleBaysCost() {
+    public double getAdditionalSuperHeavyVehicleBaysCost() {
         return additionalSuperHeavyVehicleBaysCost;
     }
 
-    int getAdditionalHeavyVehicleBaysRequired() {
+    public int getAdditionalHeavyVehicleBaysRequired() {
         return additionalHeavyVehicleBaysRequired;
     }
 
-    double getAdditionalHeavyVehicleBaysCost() {
+    public double getAdditionalHeavyVehicleBaysCost() {
         return additionalHeavyVehicleBaysCost;
     }
 
-    int getAdditionalLightVehicleBaysRequired() {
+    public int getAdditionalLightVehicleBaysRequired() {
         return additionalLightVehicleBaysRequired;
     }
 
-    double getAdditionalLightVehicleBaysCost() {
+    public double getAdditionalLightVehicleBaysCost() {
         return additionalLightVehicleBaysCost;
     }
 
-    int getAdditionalProtoMekBaysRequired() {
+    public int getAdditionalProtoMekBaysRequired() {
         return additionalProtoMekBaysRequired;
     }
 
-    double getAdditionalProtoMekBaysCost() {
+    public double getAdditionalProtoMekBaysCost() {
         return additionalProtoMekBaysCost;
     }
 
-    int getAdditionalBattleArmorBaysRequired() {
+    public int getAdditionalBattleArmorBaysRequired() {
         return additionalBattleArmorBaysRequired;
     }
 
-    double getAdditionalBattleArmorBaysCost() {
+    public double getAdditionalBattleArmorBaysCost() {
         return additionalBattleArmorBaysCost;
     }
 
-    int getAdditionalInfantryBaysRequired() {
+    public int getAdditionalInfantryBaysRequired() {
         return additionalInfantryBaysRequired;
     }
 
-    double getAdditionalInfantryBaysCost() {
+    public double getAdditionalInfantryBaysCost() {
         return additionalInfantryBaysCost;
     }
 
-    double getAdditionalOtherUnitBaysCost() {
+    public double getAdditionalOtherUnitBaysCost() {
         return additionalOtherUnitBaysCost;
     }
 
-    int getAdditionalPassengerBaysRequired() {
+    public int getAdditionalPassengerBaysRequired() {
         return additionalPassengerBaysRequired;
     }
 
-    double getAdditionalPassengerBaysCost() {
+    public double getAdditionalPassengerBaysCost() {
         return additionalPassengerBaysCost;
     }
 
-    int getAdditionalDropShipsRequired() {
+    public int getTotalAdditionalBaysRequired() {
+        return totalAdditionalBaysRequired;
+    }
+
+    public int getAdditionalDropShipsRequired() {
         return additionalDropShipsRequired;
     }
 
-    int getAdditionalCollarsRequired() {
+    public int getAdditionalCollarsRequired() {
         return additionalCollarsRequired;
     }
 
-    double getDockingCollarCost() {
+    public double getDockingCollarCost() {
         return dockingCollarCost;
     }
 
@@ -363,7 +379,7 @@ public class TransportCostCalculations {
         this.infantryCount = infantryCount;
     }
 
-    int getOtherUnitCount() {
+    public int getOtherUnitCount() {
         return otherUnitCount;
     }
 
@@ -393,76 +409,27 @@ public class TransportCostCalculations {
         this.crewExperienceLevel = crewExperienceLevel;
     }
 
-
     /**
-     * Returns a detailed HTML-formatted report string of bay, cargo, and passenger requirements and associated costs.
+     * Calculates and returns the total cost of transporting all units and personnel over a specified number of days.
      *
-     * @return a {@code String} containing the full jump cost breakdown.
+     * <p>This method first ensures the single-day jump cost is calculated and stored in {@link #totalCost}. It then
+     * multiplies this per-day cost by the given number of days to account for the full journey duration.</p>
      *
-     * @author Illiani
-     * @since 50.10
-     */
-    public String getJumpCostString() {
-        StringBuilder report = new StringBuilder("<html>MID-DEVELOPMENT PLACEHOLDER<br>DO NOT REPORT AS BROKEN<br>");
-        report.append("additionalCargoSpaceRequired: ").append(additionalCargoSpaceRequired).append("<br>");
-        report.append("cargoBayCost: ").append(cargoBayCost).append("<br>");
-        report.append("<br>");
-
-        report.append("additionalSmallCraftBaysRequired: ").append(additionalSmallCraftBaysRequired).append("<br>");
-        report.append("additionalSmallCraftBaysCost: ").append(additionalSmallCraftBaysCost).append("<br>");
-        report.append("additionalASFBaysRequired: ").append(additionalASFBaysRequired).append("<br>");
-        report.append("additionalASFBaysCost: ").append(additionalASFBaysCost).append("<br>");
-        report.append("additionalMekBaysRequired: ").append(additionalMekBaysRequired).append("<br>");
-        report.append("additionalMekBaysCost: ").append(additionalMekBaysCost).append("<br>");
-        report.append("additionalSuperHeavyVehicleBaysRequired: ")
-              .append(additionalSuperHeavyVehicleBaysRequired)
-              .append("<br>");
-        report.append("additionalSuperHeavyVehicleBaysCost: ")
-              .append(additionalSuperHeavyVehicleBaysCost)
-              .append("<br>");
-        report.append("additionalHeavyVehicleBaysRequired: ").append(additionalHeavyVehicleBaysRequired).append("<br>");
-        report.append("additionalHeavyVehicleBaysCost: ").append(additionalHeavyVehicleBaysCost).append("<br>");
-        report.append("additionalLightVehicleBaysRequired: ").append(additionalLightVehicleBaysRequired).append("<br>");
-        report.append("additionalLightVehicleBaysCost: ").append(additionalLightVehicleBaysCost).append("<br>");
-        report.append("additionalProtoMekBaysRequired: ").append(additionalProtoMekBaysRequired).append("<br>");
-        report.append("additionalProtoMekBaysCost: ").append(additionalProtoMekBaysCost).append("<br>");
-        report.append("additionalBattleArmorBaysRequired: ").append(additionalBattleArmorBaysRequired).append("<br>");
-        report.append("additionalBattleArmorBaysCost: ").append(additionalBattleArmorBaysCost).append("<br>");
-        report.append("additionalInfantryBaysRequired: ").append(additionalInfantryBaysRequired).append("<br>");
-        report.append("additionalInfantryBaysCost: ").append(additionalInfantryBaysCost).append("<br>");
-        report.append("additionalOtherUnitBaysRequired: ").append(otherUnitCount).append("<br>");
-        report.append("additionalOtherUnitBaysCost: ").append(additionalOtherUnitBaysCost).append("<br>");
-        report.append("<br>");
-
-        report.append("additionalPassengerBaysRequired: ").append(additionalPassengerBaysRequired).append("<br>");
-        report.append("additionalPassengerBaysCost: ").append(additionalPassengerBaysCost).append("<br>");
-        report.append("<br>");
-
-        report.append("totalAdditionalBaysRequired: ").append(totalAdditionalBaysRequired).append("<br>");
-        report.append("additionalDropShipsRequired: ").append(additionalDropShipsRequired).append("<br>");
-        report.append("additionalCollarsRequired: ").append(additionalCollarsRequired).append("<br>");
-        report.append("dockingCollarCost: ").append(dockingCollarCost).append("<br>");
-        report.append("totalCost: ").append(totalCost.toAmountString()).append("<br>");
-        report.append("</html>");
-        return report.toString();
-    }
-
-    /**
-     * Calculates the total cost of transporting all units and personnel for a multi-day journey. The cost for each day
-     * is computed, then multiplied by the number of days in the journey. The result is stored in {@link #totalCost} and
-     * also returned.
+     * <p>The calculated total is also stored in {@link #totalCost} if it was previously uninitialized.</p>
      *
-     * @param days the duration of the journey in days
+     * @param days the total number of days in the journey; must be a positive integer
      *
-     * @return the total {@link Money} cost for the journey
+     * @return the total {@link Money} cost for the journey of the specified duration
      *
      * @author Illiani
      * @since 50.10
      */
     public Money calculateJumpCostForEntireJourney(final int days) {
-        calculateJumpCostForEachDay();
-        totalCost = totalCost.multipliedBy(days);
-        return totalCost;
+        if (totalCost == null) { // totalCost will be null if calculateJumpCostForEachDay hasn't yet been run
+            calculateJumpCostForEachDay();
+        }
+
+        return totalCost.multipliedBy(days);
     }
 
     /**
@@ -476,6 +443,9 @@ public class TransportCostCalculations {
      * @since 50.10
      */
     public Money calculateJumpCostForEachDay() {
+        // Initialize totalCost
+        totalCost = Money.zero();
+
         calculateCargoRequirements();
 
         countUnitsByType();
@@ -560,7 +530,9 @@ public class TransportCostCalculations {
         additionalCargoSpaceRequired = -min(0, totalCargoCapacity - totalCargoUsage);
         cargoBayCost = round(additionalCargoSpaceRequired * CARGO_PER_TON_COST);
 
-        additionalDropShipsRequired += (int) ceil(additionalCargoSpaceRequired / CARGO_PER_DROPSHIP);
+        requiredCargoDropShips = (int) ceil(additionalCargoSpaceRequired / CARGO_PER_DROPSHIP);
+
+        additionalDropShipsRequired += requiredCargoDropShips;
 
         totalCost = totalCost.plus(cargoBayCost);
     }

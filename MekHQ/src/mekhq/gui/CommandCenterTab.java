@@ -36,7 +36,6 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -91,6 +90,7 @@ import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AcquisitionsDialog;
+import mekhq.gui.dialog.JumpCostsSummary;
 import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.dialog.factionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
@@ -628,23 +628,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         RoundedJButton btnJumpFees = new RoundedJButton(resourceMap.getString("btnJumpFees.text"));
         btnJumpFees.addActionListener(evt -> {
-            // TODO replace with final version
             TransportCostCalculations transportCostCalculations =
                   getCampaign().getTransportCostCalculation(EXP_REGULAR);
-            transportCostCalculations.calculateJumpCostForEntireJourney(37);
-            String reportString = transportCostCalculations.getJumpCostString();
-
-            // Create and show a dialog with the reportString
-            JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(btnJumpFees),
-                  "Jump Cost Report",
-                  true);
-            JLabel textArea = new JLabel(reportString);
-            JScrollPane scrollPane = new JScrollPane(textArea);
-
-            dialog.getContentPane().add(scrollPane);
-            dialog.setSize(500, 400);
-            dialog.setLocationRelativeTo(btnJumpFees);
-            dialog.setVisible(true);
+            transportCostCalculations.calculateJumpCostForEachDay();
+            new JumpCostsSummary(getCampaignGui().getFrame(), transportCostCalculations);
         });
         panReports.add(btnJumpFees);
 
