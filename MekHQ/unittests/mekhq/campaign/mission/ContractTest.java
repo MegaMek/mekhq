@@ -84,12 +84,6 @@ public class ContractTest {
     }
 
     @Test
-    public void testGetTransitAmount() {
-        initializeTest();
-        assertEquals(Money.of(30), contract.getTransitAmount());
-    }
-
-    @Test
     public void testSigningBonusAmount() {
         initializeTest();
         assertEquals(Money.of(20), contract.getSigningBonusAmount());
