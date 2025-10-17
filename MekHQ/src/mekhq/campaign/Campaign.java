@@ -769,6 +769,13 @@ public class Campaign implements ITechManager {
         }
     }
 
+    public boolean isUseCommandCircuit() {
+        return FactionStandingUtilities.isUseCommandCircuit(
+              isOverridingCommandCircuitRequirements(), isGM(),
+              getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
+              getFactionStandings(), getFutureAtBContracts());
+    }
+
     /**
      * Returns the Hiring Hall level from the force's current system on the current date. If there is no hiring hall
      * present, the level is HiringHallLevel.NONE.

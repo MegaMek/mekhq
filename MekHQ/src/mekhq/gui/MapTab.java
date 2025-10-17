@@ -32,8 +32,10 @@
  */
 package mekhq.gui;
 
+import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel.abandonMissingPersonnel;
 
 import java.awt.BorderLayout;
@@ -63,10 +65,13 @@ import mekhq.MekHQ;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
+import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
@@ -264,6 +269,27 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     private void beginTransit() {
         if (panMap.getJumpPath().isEmpty()) {
             return;
+        }
+
+        ImmersiveDialogConfirmation dialog = new ImmersiveDialogConfirmation(getCampaign());
+        if (!dialog.wasConfirmed()) {
+            return;
+        }
+
+        JumpPath jumpPath = panMap.getJumpPath();
+
+        TransportCostCalculations transportCostCalculations = getCampaign().getTransportCostCalculation(EXP_REGULAR);
+
+        boolean isUseCommandCircuits = getCampaign().isUseCommandCircuit();
+        int duration = (int) ceil(jumpPath.getTotalTime(getCampaign().getLocalDate(),
+              getCampaign().getLocation().getTransitTime(), isUseCommandCircuits));
+        Money journeyCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration);
+
+        String jumpReport = TransportCostCalculations.performJumpTransaction(getCampaign().getFinances(), jumpPath,
+              getCampaign().getLocalDate(), journeyCost, getCampaign().getCurrentSystem());
+
+        if (!jumpReport.isBlank()) {
+            getCampaign().addReport(jumpReport);
         }
 
         getCampaign().getLocation().setJumpPath(panMap.getJumpPath());

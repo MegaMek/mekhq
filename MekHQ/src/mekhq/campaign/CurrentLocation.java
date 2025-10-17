@@ -53,7 +53,6 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.Injury;
@@ -64,7 +63,6 @@ import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.MHQXMLUtility;
-import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -328,21 +326,6 @@ public class CurrentLocation {
                 // jump
                 final CampaignOptions campaignOptions = campaign.getCampaignOptions();
                 if (campaignOptions.isPayForTransport()) {
-
-                    if (!campaign.getFinances()
-                               .debit(TransactionType.TRANSPORTATION,
-                                     campaign.getLocalDate(),
-                                     campaign.calculateCostPerJump(true, campaignOptions.isEquipmentContractBase()),
-                                     "Jump from " +
-                                           currentSystem.getName(campaign.getLocalDate()) +
-                                           " to " +
-                                           jumpPath.get(1).getName(campaign.getLocalDate()))) {
-                        campaign.addReport("<font color='" +
-                                                 ReportingUtilities.getNegativeColor() +
-                                                 "'><b>You cannot afford to make the jump!</b></font>");
-                        return;
-                    }
-
                     if (campaignOptions.isUseAbilities()) {
                         for (Person person : campaign.getPersonnelFilteringOutDeparted()) {
                             if (person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {

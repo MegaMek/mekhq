@@ -663,16 +663,17 @@ public class Contract extends Mission {
         if (null != getSystem() && campaign.getCampaignOptions().isPayForTransport()) {
             JumpPath jumpPath = getJumpPath(campaign);
 
-            // FM:Mercs transport payments take into account owned transports and do not use
-            // CampaignOps DropShip costs.
-            // CampaignOps doesn't care about owned transports and does use its own DropShip
-            // costs.
-            boolean campaignOps = campaign.getCampaignOptions().isEquipmentContractBase();
-            transportAmount = campaign.calculateCostPerJump(campaignOps, campaignOps)
-                                    .multipliedBy(jumpPath.getJumps())
-                                    .multipliedBy(2)
-                                    .multipliedBy(transportComp)
-                                    .dividedBy(100);
+            TransportCostCalculations transportCostCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
+            boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
+            boolean isUseCommandCircuits = campaign.isUseCommandCircuitForContract(this);
+            int duration = (int) ceil(jumpPath.getTotalTime(campaign.getLocalDate(),
+                  campaign.getLocation().getTransitTime(), isUseCommandCircuits));
+            Money transportCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration);
+            transportCost = transportCost.dividedBy(100);
+            transportCost = transportCost.multipliedBy(transportComp);
+            transportCost = transportCost.multipliedBy(useTwoWayPay ? 2 : 1);
+
+            transportAmount = transportCost;
         } else {
             transportAmount = Money.zero();
         }

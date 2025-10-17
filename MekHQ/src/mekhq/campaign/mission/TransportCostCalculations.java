@@ -39,18 +39,27 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Hangar;
+import mekhq.campaign.JumpPath;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.PlanetarySystem;
 
 /**
  * Calculates transportation costs and requirements for moving a force, based on the units, personnel, hangar space, and
@@ -61,11 +70,12 @@ import mekhq.campaign.unit.Unit;
  * multipliers based on crew experience.</p>
  *
  * <p>Usage: Create an instance with the unit's hangar, relevant personnel, and statistics, then
- * call {@link #calculateJumpCostForEachDay(Hangar)} or {@link #calculateJumpCostForEntireJourney(int)}.</p>
+ * call {@link #calculateJumpCostForEachDay()} or {@link #calculateJumpCostForEntireJourney(int)}.</p>
  *
  * <p>Call {@link #getJumpCostString()} for a detailed report.</p>
  */
 public class TransportCostCalculations {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.TransportCostCalculations";
     private static final MMLogger LOGGER = MMLogger.create(TransportCostCalculations.class);
 
     // Most costs are listed as per month. There are n days in the average month. Therefore, the cost/day is the base
@@ -452,5 +462,32 @@ public class TransportCostCalculations {
         additionalPassengerBaysCost = round(additionalPassengerBaysRequired * PASSENGERS_COST);
         totalCost = totalCost.plus(additionalPassengerBaysCost);
         totalAdditionalBaysRequired += additionalPassengerBaysRequired;
+    }
+
+    /**
+     * Executes a financial transaction for performing a jump between two planetary systems, debiting the specified
+     * journey cost from the provided finances. Generates and includes a report of the transaction outcome.
+     *
+     * <p>If the account lacks sufficient funds, returns a formatted message indicating payment failure. If the
+     * transaction succeeds, returns an empty string.</p>
+     *
+     * @param finances      The {@link Finances} object to debit the jump cost from.
+     * @param jumpPath      The {@link JumpPath} representing the journey, used to construct the report.
+     * @param today         The current {@link LocalDate}, used to date the transaction and report.
+     * @param journeyCost   The {@link Money} amount required for the jump.
+     * @param currentSystem The {@link PlanetarySystem} where the journey begins.
+     *
+     * @return An HTML-formatted report string if payment failed, or an empty string if the transaction succeeded.
+     */
+    public static String performJumpTransaction(Finances finances, JumpPath jumpPath, LocalDate today,
+          Money journeyCost, PlanetarySystem currentSystem) {
+        String jumpReport = getFormattedTextAt(RESOURCE_BUNDLE, "TransportCostCalculations.transactionReport",
+              currentSystem.getName(today), jumpPath.getLastSystem().getName(today));
+        if (!finances.debit(TransactionType.TRANSPORTATION, today, journeyCost, jumpReport)) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "TransportCostCalculations.unableToAffordJump",
+                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
+        }
+
+        return "";
     }
 }
