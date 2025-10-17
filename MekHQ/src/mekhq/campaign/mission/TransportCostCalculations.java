@@ -33,6 +33,7 @@
 package mekhq.campaign.mission;
 
 import static java.lang.Math.ceil;
+import static java.lang.Math.floor;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
@@ -48,6 +49,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Hangar;
@@ -97,17 +99,24 @@ public class TransportCostCalculations {
     private static final double CARGO_PER_DROPSHIP = 1874.5;
 
     // These values are taken from CamOps pg 43.
-    private static final double JUMP_SHIP_COLLAR_COST = 100000 / PER_DAY_WEEK; // Collar prices are per week
-    private static final double SMALL_CRAFT_OR_SUPER_HEAVY_COST = 100000 / PER_DAY_DIVIDER;
-    private static final double MEK_COST = 50000 / PER_DAY_DIVIDER;
-    private static final double ASF_COST = 50000 / PER_DAY_DIVIDER;
-    private static final double HEAVY_VEHICLE_COST = 50000 / PER_DAY_DIVIDER;
-    private static final double LIGHT_VEHICLE_COST = 25000 / PER_DAY_DIVIDER;
-    static final double INFANTRY_COST = 25000 / PER_DAY_DIVIDER;
-    private static final double BATTLE_ARMOR_COST = 25000 / PER_DAY_DIVIDER;
-    private static final double PROTOMEK_COST = 20000 / PER_DAY_DIVIDER;
-    private static final double OTHER_UNIT_COST = 50000 / PER_DAY_DIVIDER; // (Unofficial)
-    private static final double CARGO_PER_TON_COST = 100000 / 1200.0 / PER_DAY_DIVIDER;
+    static final double JUMP_SHIP_COLLAR_COST = 100000 / PER_DAY_WEEK; // Collar prices are per week
+    static final double SMALL_CRAFT_COST = 100000 / PER_DAY_DIVIDER;
+    static final double MEK_COST = 50000 / PER_DAY_DIVIDER;
+    static final double ASF_COST = 50000 / PER_DAY_DIVIDER;
+    static final double SUPER_HEAVY_VEHICLE_COST = 100000 / PER_DAY_DIVIDER;
+    static final double HEAVY_VEHICLE_COST = 50000 / PER_DAY_DIVIDER;
+    static final double LIGHT_VEHICLE_COST = 25000 / PER_DAY_DIVIDER;
+    static final double INFANTRY_COST = 100000 / PER_DAY_DIVIDER;
+    static final double BATTLE_ARMOR_COST = 100000 / PER_DAY_DIVIDER;
+    static final double PROTOMEK_COST = 100000 / PER_DAY_DIVIDER;
+    static final double OTHER_UNIT_COST = 50000 / PER_DAY_DIVIDER; // (Unofficial)
+    static final double CARGO_PER_TON_COST = 100000 / 1200.0 / PER_DAY_DIVIDER;
+
+    // Some bays can accept multiple units. These values are based on the bay sizes of various DropShips. Largely
+    // Unions and union equivalents.
+    static final int PLATOONS_PER_BAY = 4;
+    static final int BATTLE_ARMOR_SQUADS_PER_BAY = 4;
+    static final int PROTOMEKS_PER_BAY = 5;
 
     // The only canon passenger DropShip is the Princess Luxury Liner. However, hiring one using CamOps rules proves
     // unreasonably expensive. Therefore, we're instead assuming that the player can find retrofit DropShips that has
@@ -146,6 +155,7 @@ public class TransportCostCalculations {
     private double additionalBattleArmorBaysCost;
     private int additionalInfantryBaysRequired;
     private double additionalInfantryBaysCost;
+    private int additionalOtherUnitBaysRequired;
     private double additionalOtherUnitBaysCost;
     private int additionalPassengerBaysRequired;
     private double additionalPassengerBaysCost;
@@ -168,11 +178,6 @@ public class TransportCostCalculations {
     private int otherUnitCount;
 
     private Money totalCost = Money.zero();
-
-    int getBattleArmorCount() {
-        return battleArmorCount;
-    }
-
 
     int getCrewExperienceLevel() {
         return crewExperienceLevel;
@@ -294,36 +299,80 @@ public class TransportCostCalculations {
         return smallCraftCount;
     }
 
+    public void setSmallCraftCount(int smallCraftCount) {
+        this.smallCraftCount = smallCraftCount;
+    }
+
     int getSuperHeavyVehicleCount() {
         return superHeavyVehicleCount;
+    }
+
+    public void setSuperHeavyVehicleCount(int superHeavyVehicleCount) {
+        this.superHeavyVehicleCount = superHeavyVehicleCount;
     }
 
     int getHeavyVehicleCount() {
         return heavyVehicleCount;
     }
 
+    public void setHeavyVehicleCount(int heavyVehicleCount) {
+        this.heavyVehicleCount = heavyVehicleCount;
+    }
+
     int getLightVehicleCount() {
         return lightVehicleCount;
+    }
+
+    public void setLightVehicleCount(int lightVehicleCount) {
+        this.lightVehicleCount = lightVehicleCount;
     }
 
     int getMekCount() {
         return mekCount;
     }
 
+    public void setMekCount(int mekCount) {
+        this.mekCount = mekCount;
+    }
+
     int getAsfCount() {
         return asfCount;
+    }
+
+    public void setASFCount(int asfCount) {
+        this.asfCount = asfCount;
     }
 
     int getProtoMekCount() {
         return protoMekCount;
     }
 
+    public void setProtoMekCount(int protoMekCount) {
+        this.protoMekCount = protoMekCount;
+    }
+
+    int getBattleArmorCount() {
+        return battleArmorCount;
+    }
+
+    public void setBattleArmorCount(int battleArmorCount) {
+        this.battleArmorCount = battleArmorCount;
+    }
+
     int getInfantryCount() {
         return infantryCount;
     }
 
+    public void setInfantryCount(int infantryCount) {
+        this.infantryCount = infantryCount;
+    }
+
     int getOtherUnitCount() {
         return otherUnitCount;
+    }
+
+    public void setOtherUnitCount(int otherUnitCount) {
+        this.otherUnitCount = otherUnitCount;
     }
 
     Money getTotalCost() {
@@ -488,20 +537,17 @@ public class TransportCostCalculations {
      * HangarStatistics and counted unit types. Cargo and passenger bays are not included here. Updates running cost
      * totals as a side effect.
      */
-    private void calculateAdditionalBayRequirementsFromUnits() {
-        // Some unit types can fit in a bay that is ostensibly intended for other types
-        int spareCapacity;
-
+    void calculateAdditionalBayRequirementsFromUnits() {
         // Small Craft
         int smallCraftBays = hangarStatistics.getTotalSmallCraftBays();
         int smallCraftBayUsage = smallCraftBays - smallCraftCount;
         additionalSmallCraftBaysRequired = -min(0, smallCraftBayUsage);
-        additionalSmallCraftBaysCost = round(additionalSmallCraftBaysRequired * SMALL_CRAFT_OR_SUPER_HEAVY_COST);
+        additionalSmallCraftBaysCost = round(additionalSmallCraftBaysRequired * SMALL_CRAFT_COST);
         totalCost = totalCost.plus(additionalSmallCraftBaysCost);
-        spareCapacity = Math.max(0, smallCraftBayUsage);
+        int smallCraftSpareCapacity = Math.max(0, smallCraftBayUsage);
 
         // ASF (including Conv Fighters)
-        int asfBays = hangarStatistics.getTotalASFBays() + spareCapacity;
+        int asfBays = hangarStatistics.getTotalASFBays() + smallCraftSpareCapacity;
         int asfBayUsage = asfBays - asfCount;
         additionalASFBaysRequired = -min(0, asfBayUsage);
         additionalASFBaysCost = round(additionalASFBaysRequired * ASF_COST);
@@ -518,21 +564,21 @@ public class TransportCostCalculations {
         int superHeavyVehicleBays = hangarStatistics.getTotalSuperHeavyVehicleBays();
         int superHeavyVehicleBayUsage = superHeavyVehicleBays - superHeavyVehicleCount;
         additionalSuperHeavyVehicleBaysRequired = -min(0, superHeavyVehicleBayUsage);
-        spareCapacity = Math.max(0, superHeavyVehicleBayUsage);
-        additionalSuperHeavyVehicleBaysCost =
-              round(additionalSuperHeavyVehicleBaysRequired * SMALL_CRAFT_OR_SUPER_HEAVY_COST);
+        int superHeavyVehicleSpareCapacity = Math.max(0, superHeavyVehicleBayUsage);
+        additionalSuperHeavyVehicleBaysCost = round(additionalSuperHeavyVehicleBaysRequired * SUPER_HEAVY_VEHICLE_COST);
         totalCost = totalCost.plus(additionalSuperHeavyVehicleBaysCost);
 
-        // Heavy Vehicles
-        int heavyVehicleBays = hangarStatistics.getTotalHeavyVehicleBays() + spareCapacity;
+        // Heavy Vehicles`
+        int heavyVehicleBays = hangarStatistics.getTotalHeavyVehicleBays() + superHeavyVehicleSpareCapacity;
         int heavyVehicleBayUsage = heavyVehicleBays - heavyVehicleCount;
         additionalHeavyVehicleBaysRequired = -min(0, heavyVehicleBayUsage);
-        spareCapacity = Math.max(0, heavyVehicleBayUsage);
-        additionalHeavyVehicleBaysCost = round(heavyVehicleBayUsage * HEAVY_VEHICLE_COST);
+        int heavyVehicleSpareCapacity = Math.max(0, heavyVehicleBayUsage);
+        additionalHeavyVehicleBaysCost = round(additionalHeavyVehicleBaysRequired * HEAVY_VEHICLE_COST);
         totalCost = totalCost.plus(additionalHeavyVehicleBaysCost);
 
         // Light Vehicles
-        int lightVehicleBays = hangarStatistics.getTotalLightVehicleBays() + spareCapacity;
+        // heavyVehicleSpareCapacity also factors in any surplus super heavy vehicle bays
+        int lightVehicleBays = hangarStatistics.getTotalLightVehicleBays() + heavyVehicleSpareCapacity;
         int lightVehicleBayUsage = lightVehicleBays - lightVehicleCount;
         additionalLightVehicleBaysRequired = -min(0, lightVehicleBayUsage);
         additionalLightVehicleBaysCost = round(additionalLightVehicleBaysRequired * LIGHT_VEHICLE_COST);
@@ -541,25 +587,27 @@ public class TransportCostCalculations {
         // ProtoMeks
         int protoMekBays = hangarStatistics.getTotalProtoMekBays();
         double protoMekBayUsage = protoMekBays - protoMekCount;
-        int adjustedProtoMekBayUsage = (int) ceil(protoMekBayUsage / 5); // 5 ProtoMeks per bay
+        protoMekBayUsage = protoMekBayUsage / PROTOMEKS_PER_BAY;
+        int adjustedProtoMekBayUsage = MathUtility.roundAwayFromZero(protoMekBayUsage);
         additionalProtoMekBaysRequired = -min(0, adjustedProtoMekBayUsage);
-        additionalProtoMekBaysCost = round(protoMekBayUsage * PROTOMEK_COST); // Cost is per ProtoMek
+        additionalProtoMekBaysCost = round(additionalProtoMekBaysRequired * PROTOMEK_COST);
         totalCost = totalCost.plus(additionalProtoMekBaysCost);
 
         // Battle Armor
         int battleArmorBays = hangarStatistics.getTotalBattleArmorBays();
         double battleArmorBayUsage = battleArmorBays - battleArmorCount;
-        int adjustedBattleArmorBayUsage = (int) ceil(battleArmorBayUsage / 5); // 5 squads per bay
+        battleArmorBayUsage = battleArmorBayUsage / BATTLE_ARMOR_SQUADS_PER_BAY;
+        int adjustedBattleArmorBayUsage = MathUtility.roundAwayFromZero(battleArmorBayUsage);
         additionalBattleArmorBaysRequired = -min(0, adjustedBattleArmorBayUsage);
-        additionalBattleArmorBaysCost = round(battleArmorBayUsage * BATTLE_ARMOR_COST); // Cost is per squad
+        additionalBattleArmorBaysCost = round(additionalBattleArmorBaysRequired * BATTLE_ARMOR_COST);
         totalCost = totalCost.plus(additionalBattleArmorBaysCost);
 
         // Infantry
         int infantryBays = hangarStatistics.getTotalInfantryBays();
         double infantryBayUsage = infantryBays - infantryCount;
-        int adjustedInfantryBayUsage = (int) ceil(infantryBayUsage / 3); // 3 platoons per bay
+        int adjustedInfantryBayUsage = (int) floor(infantryBayUsage / PLATOONS_PER_BAY);
         additionalInfantryBaysRequired = -min(0, adjustedInfantryBayUsage);
-        additionalInfantryBaysCost = round(infantryBayUsage * INFANTRY_COST); // Cost is per platoon
+        additionalInfantryBaysCost = round(additionalInfantryBaysRequired * INFANTRY_COST);
         totalCost = totalCost.plus(additionalInfantryBaysCost);
 
         // Other Units
