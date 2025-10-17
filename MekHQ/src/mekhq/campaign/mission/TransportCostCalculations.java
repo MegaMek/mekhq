@@ -75,6 +75,9 @@ import mekhq.campaign.universe.PlanetarySystem;
  * call {@link #calculateJumpCostForEachDay()} or {@link #calculateJumpCostForEntireJourney(int)}.</p>
  *
  * <p>Call {@link #getJumpCostString()} for a detailed report.</p>
+ *
+ * @author Illiani
+ * @since 50.10
  */
 public class TransportCostCalculations {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.TransportCostCalculations";
@@ -376,6 +379,9 @@ public class TransportCostCalculations {
      * @param cargoStatistics     The {@link CargoStatistics} describing cargo loads.
      * @param hangarStatistics    The {@link HangarStatistics} listing all available bay capacities.
      * @param crewExperienceLevel The experience level to use for crew-related cost multipliers.
+     *
+     * @author Illiani
+     * @since 50.10
      */
     public TransportCostCalculations(final Collection<Unit> hangarContents, final Collection<Person> personnel,
           final CargoStatistics cargoStatistics, final HangarStatistics hangarStatistics,
@@ -392,6 +398,9 @@ public class TransportCostCalculations {
      * Returns a detailed HTML-formatted report string of bay, cargo, and passenger requirements and associated costs.
      *
      * @return a {@code String} containing the full jump cost breakdown.
+     *
+     * @author Illiani
+     * @since 50.10
      */
     public String getJumpCostString() {
         StringBuilder report = new StringBuilder("<html>MID-DEVELOPMENT PLACEHOLDER<br>DO NOT REPORT AS BROKEN<br>");
@@ -446,6 +455,9 @@ public class TransportCostCalculations {
      * @param days the duration of the journey in days
      *
      * @return the total {@link Money} cost for the journey
+     *
+     * @author Illiani
+     * @since 50.10
      */
     public Money calculateJumpCostForEntireJourney(final int days) {
         calculateJumpCostForEachDay();
@@ -459,6 +471,9 @@ public class TransportCostCalculations {
      * returned.
      *
      * @return the daily {@link Money} cost of transport.
+     *
+     * @author Illiani
+     * @since 50.10
      */
     public Money calculateJumpCostForEachDay() {
         calculateCargoRequirements();
@@ -491,6 +506,9 @@ public class TransportCostCalculations {
      *
      * <p>This multiplier is applied to the {@code totalCost} field, updating it to reflect the adjusted cost after
      * considering crew quality.</p>
+     *
+     * @author Illiani
+     * @since 50.10
      */
     private void adjustForCrewExperienceLevel() {
         double crewExperienceLevelMultiplier = switch (crewExperienceLevel) {
@@ -512,6 +530,9 @@ public class TransportCostCalculations {
      * docking collars. If the number of DropShips exceeds the available collars, the shortage is recorded in
      * {@link #additionalCollarsRequired}. Any additional DropShips required by bay requirements are also added to the
      * total collars needed.</p>
+     *
+     * @author Illiani
+     * @since 50.10
      */
     void calculateAdditionalJumpCollarsRequirements() {
         int totalCollars = hangarStatistics.getTotalDockingCollars();
@@ -526,6 +547,9 @@ public class TransportCostCalculations {
     /**
      * Calculates and updates the cargo requirements, determines additional DropShips needed, and computes the cargo bay
      * costs. Updates running cost totals as a side effect.
+     *
+     * @author Illiani
+     * @since 50.10
      */
     void calculateCargoRequirements() {
         final double totalCargoCapacity = cargoStatistics.getTotalCargoCapacity();
@@ -545,6 +569,9 @@ public class TransportCostCalculations {
      * Determines and updates the additional bay requirements and costs for each unit category, using current
      * HangarStatistics and counted unit types. Cargo and passenger bays are not included here. Updates running cost
      * totals as a side effect.
+     *
+     * @author Illiani
+     * @since 50.10
      */
     void calculateAdditionalBayRequirementsFromUnits() {
         // Small Craft
@@ -640,6 +667,9 @@ public class TransportCostCalculations {
     /**
      * Counts units by type (vehicles by weight and non-vehicles by entity type) and updates internal counters for each
      * tracked unit category, ignoring mothballed units and skipping units lacking valid entities.
+     *
+     * @author Illiani
+     * @since 50.10
      */
     void countUnitsByType() {
         List<Unit> relevantUnits = hangarContents.stream().filter(unit -> !unit.isMothballed()).toList();
@@ -688,6 +718,9 @@ public class TransportCostCalculations {
     /**
      * Calculates passenger bay requirements and costs based on the personnel list, counting only those present and
      * assigned to the force. Updates totals for passenger bay counts and costs.
+     *
+     * @author Illiani
+     * @since 50.10
      */
     void calculateAdditionalBayRequirementsFromPassengers() {
         int passengerCount = 0;
@@ -717,6 +750,9 @@ public class TransportCostCalculations {
      * @param currentSystem The {@link PlanetarySystem} where the journey begins.
      *
      * @return An HTML-formatted report string if payment failed, or an empty string if the transaction succeeded.
+     *
+     * @author Illiani
+     * @since 50.10
      */
     public static String performJumpTransaction(Finances finances, JumpPath jumpPath, LocalDate today,
           Money journeyCost, PlanetarySystem currentSystem) {
