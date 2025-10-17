@@ -295,6 +295,10 @@ public class TransportCostCalculations {
         return dropShipCount;
     }
 
+    void setDropShipCount(int dropShipCount) {
+        this.dropShipCount = dropShipCount;
+    }
+
     int getSmallCraftCount() {
         return smallCraftCount;
     }
@@ -481,9 +485,6 @@ public class TransportCostCalculations {
 
         calculateAdditionalJumpCollarsRequirements();
 
-        dockingCollarCost = round(additionalDropShipsRequired * JUMP_SHIP_COLLAR_COST);
-        totalCost = totalCost.plus(dockingCollarCost);
-
         double crewExperienceLevelMultiplier = switch (crewExperienceLevel) {
             case EXP_ELITE, EXP_HEROIC, EXP_LEGENDARY -> ELITE_CREW_MULTIPLIER;
             case EXP_VETERAN -> VETERAN_CREW_MULTIPLIER;
@@ -503,11 +504,14 @@ public class TransportCostCalculations {
      * {@link #additionalCollarsRequired}. Any additional DropShips required by bay requirements are also added to the
      * total collars needed.</p>
      */
-    private void calculateAdditionalJumpCollarsRequirements() {
+    void calculateAdditionalJumpCollarsRequirements() {
         int totalCollars = hangarStatistics.getTotalDockingCollars();
         int collarUsage = totalCollars - dropShipCount;
         additionalCollarsRequired = -min(0, collarUsage);
         additionalCollarsRequired += additionalDropShipsRequired;
+
+        dockingCollarCost = round(additionalDropShipsRequired * JUMP_SHIP_COLLAR_COST);
+        totalCost = totalCost.plus(dockingCollarCost);
     }
 
     /**

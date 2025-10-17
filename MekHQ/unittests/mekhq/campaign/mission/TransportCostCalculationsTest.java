@@ -72,6 +72,59 @@ public class TransportCostCalculationsTest {
     private static final HangarStatistics mockHangarStatistics = mock(HangarStatistics.class);
 
     @ParameterizedTest
+    @ValueSource(ints = { 0, 3, 5, 10 })
+    public void testCalculateAdditionalJumpCollarsRequirements_notEnoughCollars(int additionalDropShips) {
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),
+              new ArrayList<>(),
+              mockCargoStatistics,
+              mockHangarStatistics,
+              EXP_REGULAR);
+
+        when(mockHangarStatistics.getTotalDockingCollars()).thenReturn(0);
+        transportCostCalculations.setDropShipCount(additionalDropShips);
+
+        transportCostCalculations.calculateAdditionalJumpCollarsRequirements();
+
+        int actualCollarNeeds = transportCostCalculations.getAdditionalCollarsRequired();
+
+        assertEquals(additionalDropShips, actualCollarNeeds,
+              "Expected " + additionalDropShips + " additional collars required but was " + actualCollarNeeds);
+
+        double predictedDockingCollarCost = round(additionalDropShips * JUMP_SHIP_COLLAR_COST);
+        double actualDockingCollarCost = transportCostCalculations.getDockingCollarCost();
+
+        assertEquals(predictedDockingCollarCost, actualDockingCollarCost,
+              "Expected docking collar cost of " + predictedDockingCollarCost + " but was " + actualDockingCollarCost);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 3, 5, 10 })
+    public void testCalculateAdditionalJumpCollarsRequirements_enoughCollars(int additionalDropShips) {
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),
+              new ArrayList<>(),
+              mockCargoStatistics,
+              mockHangarStatistics,
+              EXP_REGULAR);
+
+        when(mockHangarStatistics.getTotalDockingCollars()).thenReturn(additionalDropShips);
+        transportCostCalculations.setDropShipCount(additionalDropShips);
+
+        transportCostCalculations.calculateAdditionalJumpCollarsRequirements();
+
+        int predictedCollarNeeds = 0;
+        int actualCollarNeeds = transportCostCalculations.getAdditionalCollarsRequired();
+
+        assertEquals(predictedCollarNeeds, actualCollarNeeds,
+              "Expected " + predictedCollarNeeds + " additional collars required but was " + actualCollarNeeds);
+
+        double predictedDockingCollarCost = 0;
+        double actualDockingCollarCost = transportCostCalculations.getDockingCollarCost();
+
+        assertEquals(predictedDockingCollarCost, actualDockingCollarCost,
+              "Expected docking collar cost of " + predictedDockingCollarCost + " but was " + actualDockingCollarCost);
+    }
+
+    @ParameterizedTest
     @ValueSource(ints = { 0, 3000, 5000, 10000 })
     public void testCalculateCargoRequirements_mothballedCargo_insufficientCapacity(double cargoSize) {
         TransportCostCalculations transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),
