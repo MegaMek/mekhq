@@ -3253,10 +3253,13 @@ public class Campaign implements ITechManager {
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             PartInUse newPartInUse = getPartInUse((Part) maybePart);
             if (partInUse.equals(newPartInUse)) {
-                Part newPart = (maybePart instanceof MissingPart) ?
-                                     (((MissingPart) maybePart).getNewPart())
+                Part newPart = (maybePart instanceof MissingPart)
+                                     ? ((MissingPart) maybePart).getNewPart()
                                      : (Part) maybePart;
-                partInUse.setPlannedCount(partInUse.getPlannedCount() + newPart.getTotalQuantity());
+                partInUse.setPlannedCount(
+                      partInUse.getPlannedCount() +
+                            getQuantity(newPart) * maybePart.getQuantity()
+                );
             }
         }
     }
@@ -3350,10 +3353,14 @@ public class Campaign implements ITechManager {
                 }
                 inUse.put(partInUse, partInUse);
             }
-            Part newPart = (maybePart instanceof MissingPart) ?
-                                 (((MissingPart) maybePart).getNewPart())
+
+            Part newPart = (maybePart instanceof MissingPart)
+                                 ? ((MissingPart) maybePart).getNewPart()
                                  : (Part) maybePart;
-            partInUse.setPlannedCount(partInUse.getPlannedCount() + newPart.getTotalQuantity());
+            partInUse.setPlannedCount(
+                  partInUse.getPlannedCount() +
+                        getQuantity(newPart) * maybePart.getQuantity()
+            );
         }
         return inUse.keySet()
                      .stream()
