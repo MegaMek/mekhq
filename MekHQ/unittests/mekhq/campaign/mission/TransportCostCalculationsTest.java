@@ -72,6 +72,181 @@ public class TransportCostCalculationsTest {
     private static final HangarStatistics mockHangarStatistics = mock(HangarStatistics.class);
 
     @ParameterizedTest
+    @ValueSource(ints = { 0, 3000, 5000, 10000 })
+    public void testCalculateCargoRequirements_mothballedCargo_insufficientCapacity(double cargoSize) {
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),
+              new ArrayList<>(),
+              mockCargoStatistics,
+              mockHangarStatistics,
+              EXP_REGULAR);
+
+        when(mockCargoStatistics.getTotalCargoCapacity()).thenReturn(0.0);
+
+        when(mockCargoStatistics.getCargoTonnage(false, false)).thenReturn(cargoSize);
+        when(mockCargoStatistics.getCargoTonnage(false, true)).thenReturn(cargoSize);
+        double totalCargoSize = cargoSize * 2;
+
+        transportCostCalculations.calculateCargoRequirements();
+        int additionalDropShipsRequired = transportCostCalculations.getAdditionalDropShipsRequired();
+        int predictedAdditionalDropShipsRequired = (int) ceil(totalCargoSize / CARGO_PER_DROPSHIP);
+        assertEquals(predictedAdditionalDropShipsRequired, additionalDropShipsRequired,
+              "Expected " +
+                    predictedAdditionalDropShipsRequired +
+                    " additional drop ships required but was " +
+                    additionalDropShipsRequired);
+
+        double actualCost = transportCostCalculations.getCargoBayCost();
+        double expectedCost = round(totalCargoSize * CARGO_PER_TON_COST);
+        assertEquals(expectedCost, actualCost,
+              "Expected " + expectedCost + " cargo bay cost but was " + actualCost);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 3000, 5000, 10000 })
+    public void testCalculateCargoRequirements_mothballedCargo_sufficientCapacity(double cargoSize) {
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),
+              new ArrayList<>(),
+              mockCargoStatistics,
+              mockHangarStatistics,
+              EXP_REGULAR);
+
+        when(mockCargoStatistics.getTotalCargoCapacity()).thenReturn(cargoSize * 3);
+
+        when(mockCargoStatistics.getCargoTonnage(false, false)).thenReturn(cargoSize);
+        when(mockCargoStatistics.getCargoTonnage(false, true)).thenReturn(cargoSize);
+
+        transportCostCalculations.calculateCargoRequirements();
+        int additionalDropShipsRequired = transportCostCalculations.getAdditionalDropShipsRequired();
+        int predictedAdditionalDropShipsRequired = 0;
+        assertEquals(predictedAdditionalDropShipsRequired, additionalDropShipsRequired,
+              "Expected " +
+                    predictedAdditionalDropShipsRequired +
+                    " additional drop ships required but was " +
+                    additionalDropShipsRequired);
+
+        double actualCost = transportCostCalculations.getCargoBayCost();
+        double expectedCost = 0;
+        assertEquals(expectedCost, actualCost,
+              "Expected " + expectedCost + " cargo bay cost but was " + actualCost);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 3000, 5000, 10000 })
+    public void testCalculateCargoRequirements_noMothballedCargo_insufficientCapacity(double cargoSize) {
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),
+              new ArrayList<>(),
+              mockCargoStatistics,
+              mockHangarStatistics,
+              EXP_REGULAR);
+
+        when(mockCargoStatistics.getTotalCargoCapacity()).thenReturn(0.0);
+
+        when(mockCargoStatistics.getCargoTonnage(false, false)).thenReturn(cargoSize);
+        when(mockCargoStatistics.getCargoTonnage(false, true)).thenReturn(0.0);
+
+        transportCostCalculations.calculateCargoRequirements();
+        int additionalDropShipsRequired = transportCostCalculations.getAdditionalDropShipsRequired();
+        int predictedAdditionalDropShipsRequired = (int) ceil(cargoSize / CARGO_PER_DROPSHIP);
+        assertEquals(predictedAdditionalDropShipsRequired, additionalDropShipsRequired,
+              "Expected " +
+                    predictedAdditionalDropShipsRequired +
+                    " additional drop ships required but was " +
+                    additionalDropShipsRequired);
+
+        double actualCost = transportCostCalculations.getCargoBayCost();
+        double expectedCost = round(cargoSize * CARGO_PER_TON_COST);
+        assertEquals(expectedCost, actualCost,
+              "Expected " + expectedCost + " cargo bay cost but was " + actualCost);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 3000, 5000, 10000 })
+    public void testCalculateCargoRequirements_noMothballedCargo_sufficientCapacity(double cargoSize) {
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),
+              new ArrayList<>(),
+              mockCargoStatistics,
+              mockHangarStatistics,
+              EXP_REGULAR);
+
+        when(mockCargoStatistics.getTotalCargoCapacity()).thenReturn(cargoSize * 3);
+
+        when(mockCargoStatistics.getCargoTonnage(false, false)).thenReturn(cargoSize);
+        when(mockCargoStatistics.getCargoTonnage(false, true)).thenReturn(0.0);
+
+        transportCostCalculations.calculateCargoRequirements();
+        int additionalDropShipsRequired = transportCostCalculations.getAdditionalDropShipsRequired();
+        int predictedAdditionalDropShipsRequired = 0;
+        assertEquals(predictedAdditionalDropShipsRequired, additionalDropShipsRequired,
+              "Expected " +
+                    predictedAdditionalDropShipsRequired +
+                    " additional drop ships required but was " +
+                    additionalDropShipsRequired);
+
+        double actualCost = transportCostCalculations.getCargoBayCost();
+        double expectedCost = 0;
+        assertEquals(expectedCost, actualCost,
+              "Expected " + expectedCost + " cargo bay cost but was " + actualCost);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 3000, 5000, 10000 })
+    public void testCalculateCargoRequirements_onlyMothballedCargo_insufficientCapacity(double cargoSize) {
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),
+              new ArrayList<>(),
+              mockCargoStatistics,
+              mockHangarStatistics,
+              EXP_REGULAR);
+
+        when(mockCargoStatistics.getTotalCargoCapacity()).thenReturn(0.0);
+
+        when(mockCargoStatistics.getCargoTonnage(false, false)).thenReturn(0.0);
+        when(mockCargoStatistics.getCargoTonnage(false, true)).thenReturn(cargoSize);
+
+        transportCostCalculations.calculateCargoRequirements();
+        int additionalDropShipsRequired = transportCostCalculations.getAdditionalDropShipsRequired();
+        int predictedAdditionalDropShipsRequired = (int) ceil(cargoSize / CARGO_PER_DROPSHIP);
+        assertEquals(predictedAdditionalDropShipsRequired, additionalDropShipsRequired,
+              "Expected " +
+                    predictedAdditionalDropShipsRequired +
+                    " additional drop ships required but was " +
+                    additionalDropShipsRequired);
+
+        double actualCost = transportCostCalculations.getCargoBayCost();
+        double expectedCost = round(cargoSize * CARGO_PER_TON_COST);
+        assertEquals(expectedCost, actualCost,
+              "Expected " + expectedCost + " cargo bay cost but was " + actualCost);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 3000, 5000, 10000 })
+    public void testCalculateCargoRequirements_onlyMothballedCargo_sufficientCapacity(double cargoSize) {
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),
+              new ArrayList<>(),
+              mockCargoStatistics,
+              mockHangarStatistics,
+              EXP_REGULAR);
+
+        when(mockCargoStatistics.getTotalCargoCapacity()).thenReturn(cargoSize * 3);
+
+        when(mockCargoStatistics.getCargoTonnage(false, false)).thenReturn(0.0);
+        when(mockCargoStatistics.getCargoTonnage(false, true)).thenReturn(cargoSize);
+
+        transportCostCalculations.calculateCargoRequirements();
+        int additionalDropShipsRequired = transportCostCalculations.getAdditionalDropShipsRequired();
+        int predictedAdditionalDropShipsRequired = 0;
+        assertEquals(predictedAdditionalDropShipsRequired, additionalDropShipsRequired,
+              "Expected " +
+                    predictedAdditionalDropShipsRequired +
+                    " additional drop ships required but was " +
+                    additionalDropShipsRequired);
+
+        double actualCost = transportCostCalculations.getCargoBayCost();
+        double expectedCost = 0;
+        assertEquals(expectedCost, actualCost,
+              "Expected " + expectedCost + " cargo bay cost but was " + actualCost);
+    }
+
+    @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_smallCraft_noSpareBays(int bayRequirementCount) {
         TransportCostCalculations transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),

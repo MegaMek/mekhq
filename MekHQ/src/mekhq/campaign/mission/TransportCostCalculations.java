@@ -96,7 +96,7 @@ public class TransportCostCalculations {
     // understand.
     static final int BAYS_PER_DROPSHIP = 14;
     // This value is derived from the Union (2708) (Cargo).
-    private static final double CARGO_PER_DROPSHIP = 1874.5;
+    static final double CARGO_PER_DROPSHIP = 1874.5;
 
     // These values are taken from CamOps pg 43.
     static final double JUMP_SHIP_COLLAR_COST = 100000 / PER_DAY_WEEK; // Collar prices are per week
@@ -514,20 +514,16 @@ public class TransportCostCalculations {
      * Calculates and updates the cargo requirements, determines additional DropShips needed, and computes the cargo bay
      * costs. Updates running cost totals as a side effect.
      */
-    private void calculateCargoRequirements() {
+    void calculateCargoRequirements() {
         final double totalCargoCapacity = cargoStatistics.getTotalCargoCapacity();
-        LOGGER.info("Total cargo capacity: {}", totalCargoCapacity);
 
         double totalCargoUsage = cargoStatistics.getCargoTonnage(false, false);
         totalCargoUsage += cargoStatistics.getCargoTonnage(false, true);
-        LOGGER.info("Total cargo usage: {}", totalCargoUsage);
 
         additionalCargoSpaceRequired = -min(0, totalCargoCapacity - totalCargoUsage);
-        LOGGER.info("Cargo requirements: {}", additionalCargoSpaceRequired);
         cargoBayCost = round(additionalCargoSpaceRequired * CARGO_PER_TON_COST);
 
         additionalDropShipsRequired += (int) ceil(additionalCargoSpaceRequired / CARGO_PER_DROPSHIP);
-        LOGGER.info("Additional drop ships required: {}", additionalDropShipsRequired);
 
         totalCost = totalCost.plus(cargoBayCost);
     }
