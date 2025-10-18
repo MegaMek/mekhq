@@ -45,8 +45,8 @@ import mekhq.campaign.Hangar;
  */
 public class HangarStatistics {
     private final Hangar hangar;
-    public final long LIGHT_VEHICLE_BIT = 1L << 62;
-    public final long SUPER_HEAVY_BIT = 1L << 63;
+    private final long LIGHT_VEHICLE_BIT = 1L << 62;
+    private final long SUPER_HEAVY_BIT = 1L << 63;
 
     public HangarStatistics(Hangar hangar) {
         this.hangar = hangar;
