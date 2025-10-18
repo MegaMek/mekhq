@@ -75,9 +75,9 @@ public class HangarStatistics {
      *   <li>Mothballed units are counted using the {@link Unit#ETYPE_MOTHBALLED} key.</li>
      *   <li>Tanks are tallied into three categories based on unit weight:
      *     <ul>
-     *       <li>Light Vehicles: weight ≤ 50.0 (with LIGHT_VEHICLE_BIT)</li>
-     *       <li>Heavy Vehicles: 50.0 < weight ≤ 100.0</li>
-     *       <li>Super Heavy: weight > 100.0 (with SUPER_HEAVY_BIT)</li>
+     *       <li>Light Vehicles: {@code weight ≤ 50.0 (with LIGHT_VEHICLE_BIT)}</li>
+     *       <li>Heavy Vehicles: {@code 50.0 < weight ≤ 100.0}</li>
+     *       <li>Super Heavy: {@code weight > 100.0 (with SUPER_HEAVY_BIT)}</li>
      *     </ul>
      *   </li>
      *   <li>Other unit types (Mek, DropShip, Small Craft, etc.) use their respective entity type long constants.</li>
