@@ -49,7 +49,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import megamek.common.annotations.Nullable;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.TransportCostCalculations;
@@ -86,23 +85,26 @@ public class JumpCostsSummary extends JDialog {
      * @author Illiani
      * @since 0.50.10
      */
-    public JumpCostsSummary(@Nullable Frame owner, TransportCostCalculations calculations) {
+    public JumpCostsSummary(Frame owner, TransportCostCalculations calculations) {
         super(owner, TITLE, true);
         this.calculations = calculations;
 
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
-        contentPanel.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "TransportCostCalculations.report.header.all")));
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.add(getTotalCost());
+        leftPanel.add(getCargoAndPassengersSummary());
+        leftPanel.add(getDropShipSummary());
 
-        getTotalCost(contentPanel);
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel.add(getUnitsSummary());
 
-        contentPanel.add(getCargoAndPassengersSummary());
-        contentPanel.add(getUnitsSummary());
-        contentPanel.add(getDropShipSummary());
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        mainPanel.add(leftPanel, BorderLayout.WEST);
+        mainPanel.add(rightPanel, BorderLayout.EAST);
 
-        // Put the content panel in a scroll pane
-        JScrollPane scrollPane = new FastJScrollPane(contentPanel);
+        JScrollPane scrollPane = new FastJScrollPane(mainPanel);
         scrollPane.setBorder(null);
 
         this.setLayout(new BorderLayout());
@@ -116,38 +118,47 @@ public class JumpCostsSummary extends JDialog {
 
 
     /**
-     * Adds summary labels for total cost per month, week, and day to the specified content panel. Each value is
-     * formatted and displayed in a vertically arranged, padded inner panel.
+     * Creates and returns a summary panel displaying the total transport cost per month, week, and day.
      *
-     * @param contentPanel the parent panel to which the cost summary block is added
+     * <p>Each cost value is retrieved from the {@link TransportCostCalculations} for a standard period, formatted
+     * using localized resource strings, and shown as a label in a vertically arranged panel. The summary panel includes
+     * a titled border for context and is aligned to the left.</p>
+     *
+     * @return a {@link JPanel} containing formatted labels for per-month, per-week, and per-day costs
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private void getTotalCost(JPanel contentPanel) {
-        JPanel paddedPanel = new JPanel();
-        paddedPanel.setLayout(new BoxLayout(paddedPanel, BoxLayout.Y_AXIS));
-        paddedPanel.setBorder(BorderFactory.createEmptyBorder(0, PADDING, PADDING, PADDING));
-
+    private JPanel getTotalCost() {
         Money costPerMonth = calculations.calculateJumpCostForEntireJourney(30);
         String perMonthText = getFormattedTextAt(RESOURCE_BUNDLE,
               "TransportCostCalculations.report.entry.totalCost.month",
               costPerMonth.toAmountString());
-        paddedPanel.add(new JLabel(perMonthText));
+        JLabel lblPerMonth = new JLabel(perMonthText);
 
         Money costPerWeek = calculations.calculateJumpCostForEntireJourney(7);
         String perWeekText = getFormattedTextAt(RESOURCE_BUNDLE,
               "TransportCostCalculations.report.entry.totalCost.week",
               costPerWeek.toAmountString());
-        paddedPanel.add(new JLabel(perWeekText));
+        JLabel lblPerWeek = new JLabel(perWeekText);
 
         Money costPerDay = calculations.calculateJumpCostForEntireJourney(1);
         String perDayText = getFormattedTextAt(RESOURCE_BUNDLE,
               "TransportCostCalculations.report.entry.totalCost.day",
               costPerDay.toAmountString());
-        paddedPanel.add(new JLabel(perDayText));
+        JLabel lblPerDay = new JLabel(perDayText);
 
-        contentPanel.add(paddedPanel);
+
+        JPanel summary = new JPanel();
+        summary.setLayout(new BoxLayout(summary, BoxLayout.Y_AXIS));
+        String title = getTextAt(RESOURCE_BUNDLE, "TransportCostCalculations.report.header.all");
+        summary.setBorder(RoundedLineBorder.createRoundedLineBorder(title));
+        summary.add(lblPerMonth);
+        summary.add(lblPerWeek);
+        summary.add(lblPerDay);
+        summary.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        return summary;
     }
 
     /**
