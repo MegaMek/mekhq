@@ -38,6 +38,7 @@ import java.util.Objects;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.Mounted;
 import megamek.common.units.Aero;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
@@ -180,5 +181,17 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     @Override
     public PartRepairType getMRMSOptionType() {
         return PartRepairType.AMMUNITION;
+    }
+
+    @Override
+    public @Nullable String checkFixable() {
+        final Mounted<?> m = getMounted();
+        if (m.getLocation() < 0) {
+            if ((m.getLinkedBy() != null) && !(m.getLinkedBy().isDestroyed())) {
+                return null;
+            }
+            return "No location to install part.";
+        }
+        return super.checkFixable();
     }
 }
