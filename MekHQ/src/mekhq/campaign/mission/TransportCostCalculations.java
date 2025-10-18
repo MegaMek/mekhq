@@ -187,6 +187,10 @@ public class TransportCostCalculations {
         return totalCost;
     }
 
+    void setTotalCost(Money totalCost) {
+        this.totalCost = totalCost;
+    }
+
     public double getAdditionalCargoSpaceRequired() {
         return additionalCargoSpaceRequired;
     }
@@ -289,6 +293,10 @@ public class TransportCostCalculations {
 
     public int getAdditionalDropShipsRequired() {
         return additionalDropShipsRequired;
+    }
+
+    void setAdditionalDropShipsRequired(int additionalDropShipsRequired) {
+        this.additionalDropShipsRequired = additionalDropShipsRequired;
     }
 
     public int getAdditionalCollarsRequired() {
@@ -449,7 +457,6 @@ public class TransportCostCalculations {
         countUnitsByType();
         calculateAdditionalBayRequirementsFromUnits();
         calculateAdditionalBayRequirementsFromPassengers();
-
         additionalDropShipsRequired += (int) ceil(totalAdditionalBaysRequired / BAYS_PER_DROPSHIP);
 
         calculateAdditionalJumpCollarsRequirements();
