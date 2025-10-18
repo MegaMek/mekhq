@@ -33,7 +33,6 @@
 package mekhq.campaign.mission;
 
 import static java.lang.Math.ceil;
-import static java.lang.Math.floor;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
@@ -618,7 +617,8 @@ public class TransportCostCalculations {
         // Infantry
         int infantryBays = hangarStatistics.getTotalInfantryBays();
         double infantryBayUsage = infantryBays - infantryCount;
-        int adjustedInfantryBayUsage = (int) floor(infantryBayUsage / PLATOONS_PER_BAY);
+        infantryBayUsage = infantryBayUsage / PLATOONS_PER_BAY;
+        int adjustedInfantryBayUsage = MathUtility.roundAwayFromZero(infantryBayUsage);
         additionalInfantryBaysRequired = -min(0, adjustedInfantryBayUsage);
         additionalInfantryBaysCost = round(additionalInfantryBaysRequired * INFANTRY_COST);
         totalCost = totalCost.plus(additionalInfantryBaysCost);
