@@ -42,11 +42,17 @@ public enum Atmosphere {
     TOXIC_FLAME("Toxic (Flammable)"),
     BREATHABLE("Breathable"),
     // Pre <50.07 enums. Removing these will break player customized systems
+    @Deprecated(since = "50.07", forRemoval = false)
     TAINTEDPOISON("Tainted (Poisonous)"),
+    @Deprecated(since = "50.07", forRemoval = false)
     TAINTEDCAUSTIC("Tainted (Caustic)"),
+    @Deprecated(since = "50.07", forRemoval = false)
     TAINTEDFLAME("Tainted (Flammable)"),
+    @Deprecated(since = "50.07", forRemoval = false)
     TOXICPOISON("Toxic (Poisonous)"),
+    @Deprecated(since = "50.07", forRemoval = false)
     TOXICCAUSTIC("Toxic (Caustic)"),
+    @Deprecated(since = "50.07", forRemoval = false)
     TOXICFLAME("Toxic (Flammable)");
 
     public final String name;
