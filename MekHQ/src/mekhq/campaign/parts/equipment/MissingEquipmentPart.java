@@ -289,6 +289,9 @@ public class MissingEquipmentPart extends MissingPart {
         final Mounted<?> m = getMounted();
         if ((unit != null) && (m != null)) {
             int loc = m.getLocation();
+            if (loc < 0) {
+                return "No location to install part.";
+            }
             if (unit.isLocationBreached(loc)) {
                 return unit.getEntity().getLocationName(loc) + " is breached.";
             }
