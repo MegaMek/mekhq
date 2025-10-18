@@ -1098,6 +1098,11 @@ public enum PersonnelRole {
                      this == COMMS_OPERATOR ||
                      this == TECH_COMMUNICATIONS ||
                      this == SENSOR_TECHNICIAN ||
+                     this == SOLDIER ||
+                     this == ADMINISTRATOR_COMMAND ||
+                     this == ADMINISTRATOR_TRANSPORT ||
+                     this == ADMINISTRATOR_LOGISTICS ||
+                     this == ADMINISTRATOR_HR ||
                      this == CHEF;
     }
 
