@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog;
 
+import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -342,15 +343,15 @@ public class JumpCostsSummary extends JDialog {
         JLabel lblBays = new JLabel(bayLabel);
         summary.add(lblBays);
 
-        int additionalDropShips = calculations.getAdditionalDropShipsRequired();
+        int requiredCargoDropShips = calculations.getRequiredCargoDropShips();
+        int additionalDropShips = max(0, calculations.getAdditionalDropShipsRequired() - requiredCargoDropShips);
         String dropShipLabel = getFormattedTextAt(RESOURCE_BUNDLE,
-              "TransportCostCalculations.report.entry.dropShips", additionalDropShips);
+              "TransportCostCalculations.report.entry.regularDropShips", additionalDropShips);
         JLabel lblDropShips = new JLabel(dropShipLabel);
         summary.add(lblDropShips);
 
-        int requiredCargoDropShips = calculations.getRequiredCargoDropShips();
         String cargoDropShipLabel = getFormattedTextAt(RESOURCE_BUNDLE,
-              "TransportCostCalculations.report.entry.requiredSpace", requiredCargoDropShips);
+              "TransportCostCalculations.report.entry.cargoDropShips", requiredCargoDropShips);
         JLabel lblCargoDropShips = new JLabel(cargoDropShipLabel);
         summary.add(lblCargoDropShips);
 
