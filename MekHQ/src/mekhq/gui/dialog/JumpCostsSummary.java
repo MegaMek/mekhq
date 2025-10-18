@@ -140,7 +140,7 @@ public class JumpCostsSummary extends JDialog {
               costPerWeek.toAmountString());
         paddedPanel.add(new JLabel(perWeekText));
 
-        Money costPerDay = calculations.getTotalCost();
+        Money costPerDay = calculations.calculateJumpCostForEntireJourney(1);
         String perDayText = getFormattedTextAt(RESOURCE_BUNDLE,
               "TransportCostCalculations.report.entry.totalCost.day",
               costPerDay.toAmountString());

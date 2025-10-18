@@ -429,7 +429,7 @@ public class TransportCostCalculations {
             calculateJumpCostForEachDay();
         }
 
-        return totalCost.multipliedBy(days);
+        return totalCost.multipliedBy(days).round();
     }
 
     /**
@@ -437,12 +437,10 @@ public class TransportCostCalculations {
      * per-bay/per-collar costs, scaled for crew experience. The result is stored in {@link #totalCost} and also
      * returned.
      *
-     * @return the daily {@link Money} cost of transport.
-     *
      * @author Illiani
      * @since 50.10
      */
-    public Money calculateJumpCostForEachDay() {
+    public void calculateJumpCostForEachDay() {
         // Initialize totalCost
         totalCost = Money.zero();
 
@@ -458,7 +456,7 @@ public class TransportCostCalculations {
 
         adjustForCrewExperienceLevel();
 
-        return totalCost;
+        totalCost = totalCost.round();
     }
 
     /**
