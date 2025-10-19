@@ -567,8 +567,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         boolean newIsAwardVeterancySPAs = options.isAwardVeterancySPAs();
         if (!isStartUp && newIsAwardVeterancySPAs && !oldAwardVeterancySPAs) { // Has tracking changed?
-            VeterancyAwardsCampaignOptionsChangedConfirmationDialog dialog = new VeterancyAwardsCampaignOptionsChangedConfirmationDialog(
-                  campaign);
+            new VeterancyAwardsCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
         campaign.resetRandomDeath();

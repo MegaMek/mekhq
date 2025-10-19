@@ -2289,7 +2289,7 @@ public class Person {
      * @author Illiani
      * @since 0.50.10
      */
-    public String getVeterancyAwardReport(Person person, String spaGained) {
+    public String getVeterancyAwardReport(String spaGained) {
         String spaGainedClean = spaGained.replaceAll("\\s*\\([^)]*\\)", "");
         String veteranColor = MekHQ.getMHQOptions().getFontColorSkillVeteranHexColor();
         String amazingColor = getWarningColor(); // We use warning as it can be a positive or negative event
