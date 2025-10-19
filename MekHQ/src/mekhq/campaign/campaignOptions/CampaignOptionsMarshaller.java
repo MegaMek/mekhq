@@ -292,6 +292,10 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isDisplayPerformanceRecord());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
+              "awardVeterancySPAs",
+              campaignOptions.isAwardVeterancySPAs());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
               "rewardComingOfAgeAbilities",
               campaignOptions.isRewardComingOfAgeAbilities());
         MHQXMLUtility.writeSimpleXMLTag(pw,

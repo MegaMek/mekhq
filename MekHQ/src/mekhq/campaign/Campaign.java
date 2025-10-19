@@ -5915,7 +5915,7 @@ public class Campaign implements ITechManager {
         if (isBirthday && (person.getAge(currentDay) == 16)) {
             if (campaignOptions.isRewardComingOfAgeAbilities()) {
                 SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-                singleSpecialAbilityGenerator.rollSPA(this, person);
+                singleSpecialAbilityGenerator.rollSPA(this, person, true, true);
             }
 
             if (campaignOptions.isRewardComingOfAgeRPSkills()) {
