@@ -69,7 +69,7 @@ public enum DragoonRating {
             }
         }
 
-        LOGGER.warn("Invalid dragoon rating: {}. Returning Dragoon-C", rating);
+        LOGGER.warn("Invalid dragoon rating: {}. Returning DRAGOON_C", rating);
         return DRAGOON_C;
     }
 }
