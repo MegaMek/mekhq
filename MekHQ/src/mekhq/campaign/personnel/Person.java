@@ -2281,7 +2281,6 @@ public class Person {
      * <p>Removes any specialization or extra information in parentheses from the SPA name, applies color formatting
      * to the SPA, and returns a localized report message string suitable for display in the daily report.</p>
      *
-     * @param person    the person receiving the veterancy special ability
      * @param spaGained the name of the SPA gained (may include specialization in parentheses)
      *
      * @return a formatted, localized report string announcing the award
