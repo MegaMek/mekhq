@@ -30,39 +30,39 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.rating;
+package mekhq.campaign.camOpsReputation;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Finances;
 
-public class CrimeRating {
-    private static final MMLogger LOGGER = MMLogger.create(CrimeRating.class);
+public class FinancialRating {
+    private static final MMLogger LOGGER = MMLogger.create(FinancialRating.class);
 
     /**
-     * Calculates the crime rating for a given campaign.
+     * Calculates the financial rating based on the current financial status. Negative financial status (having a loan
+     * or a negative balance) affects the rating negatively.
      *
-     * @param campaign the campaign for which to calculate the crime rating
+     * @param finances the financial status.
      *
-     * @return the calculated crime rating
+     * @return a map of the financial rating.
      */
-    protected static Map<String, Integer> calculateCrimeRating(Campaign campaign) {
-        Map<String, Integer> crimeRating = new HashMap<>();
+    protected static Map<String, Integer> calculateFinancialRating(Finances finances) {
+        boolean hasLoan = finances.isInDebt();
+        boolean inDebt = finances.getBalance().isNegative();
 
-        crimeRating.put("piracy", campaign.getCrimePirateModifier());
-        crimeRating.put("other", campaign.getRawCrimeRating());
+        Map<String, Integer> financeMap = Map.of(
+              "hasLoan", hasLoan ? 1 : 0,
+              "inDebt", inDebt ? 1 : 0,
+              "total", (hasLoan || inDebt) ? -10 : 0);
 
-        int adjustedCrimeRating = campaign.getAdjustedCrimeRating();
-        crimeRating.put("total", adjustedCrimeRating);
-
-        LOGGER.debug("Crime Rating = {}",
-              crimeRating.entrySet().stream()
+        LOGGER.debug("Financial Rating = {}",
+              financeMap.entrySet().stream()
                     .map(entry -> String.format("%s: %d\n", entry.getKey(), entry.getValue()))
                     .collect(Collectors.joining()));
 
-        return crimeRating;
+        return financeMap;
     }
 }

@@ -30,17 +30,17 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.rating;
+package mekhq.campaign.camOpsReputation;
 
-import static mekhq.campaign.rating.AverageExperienceRating.getAverageExperienceModifier;
-import static mekhq.campaign.rating.AverageExperienceRating.getSkillLevel;
-import static mekhq.campaign.rating.CombatRecordRating.calculateCombatRecordRating;
-import static mekhq.campaign.rating.CommandRating.calculateCommanderRating;
-import static mekhq.campaign.rating.CrimeRating.calculateCrimeRating;
-import static mekhq.campaign.rating.FinancialRating.calculateFinancialRating;
-import static mekhq.campaign.rating.OtherModifiers.calculateOtherModifiers;
-import static mekhq.campaign.rating.SupportRating.calculateSupportRating;
-import static mekhq.campaign.rating.TransportationRating.calculateTransportationRating;
+import static mekhq.campaign.camOpsReputation.AverageExperienceRating.getAverageExperienceModifier;
+import static mekhq.campaign.camOpsReputation.AverageExperienceRating.getSkillLevel;
+import static mekhq.campaign.camOpsReputation.CombatRecordRating.calculateCombatRecordRating;
+import static mekhq.campaign.camOpsReputation.CommandRating.calculateCommanderRating;
+import static mekhq.campaign.camOpsReputation.CrimeRating.calculateCrimeRating;
+import static mekhq.campaign.camOpsReputation.FinancialRating.calculateFinancialRating;
+import static mekhq.campaign.camOpsReputation.OtherModifiers.calculateOtherModifiers;
+import static mekhq.campaign.camOpsReputation.SupportRating.calculateSupportRating;
+import static mekhq.campaign.camOpsReputation.TransportationRating.calculateTransportationRating;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;

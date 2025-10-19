@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.rating;
+package mekhq.campaign.camOpsReputation;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
