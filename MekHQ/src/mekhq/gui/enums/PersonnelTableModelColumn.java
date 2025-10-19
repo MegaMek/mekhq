@@ -50,6 +50,7 @@ import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
 import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -188,6 +189,7 @@ public enum PersonnelTableModelColumn {
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
           MekHQ.getMHQOptions().getLocale());
+    private static final MMLogger LOGGER = MMLogger.create(PersonnelTableModelColumn.class);
     // endregion Variable Declarations
 
     // region Constructors
@@ -767,7 +769,15 @@ public enum PersonnelTableModelColumn {
                     return "-";
                 } else {
                     Scenario scenario = campaign.getScenario(unit.getScenarioId());
-                    return scenario == null ? "-" : scenario.getName();
+
+                    if (scenario == null) {
+                        LOGGER.warn("Unable to retrieve scenario for unit {} (Removing scenario assignment).",
+                              unit.getName());
+                        unit.setScenarioId(Scenario.S_DEFAULT_ID);
+                        return "-";
+                    }
+
+                    return scenario.getName();
                 }
             case MEK:
                 return (person.hasSkill(SkillType.S_GUN_MEK) ?
