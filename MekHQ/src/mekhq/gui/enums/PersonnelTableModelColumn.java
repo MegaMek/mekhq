@@ -55,6 +55,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
@@ -762,9 +763,12 @@ public enum PersonnelTableModelColumn {
                 return (force == null) ? "-" : force.getName();
             case DEPLOYED:
                 final Unit unit = person.getUnit();
-                return ((unit == null) || !unit.isDeployed()) ?
-                             "-" :
-                             campaign.getScenario(unit.getScenarioId()).getName();
+                if (unit == null || !unit.isDeployed()) {
+                    return "-";
+                } else {
+                    Scenario scenario = campaign.getScenario(unit.getScenarioId());
+                    return scenario == null ? "-" : scenario.getName();
+                }
             case MEK:
                 return (person.hasSkill(SkillType.S_GUN_MEK) ?
                               Integer.toString(person.getSkill(SkillType.S_GUN_MEK)
