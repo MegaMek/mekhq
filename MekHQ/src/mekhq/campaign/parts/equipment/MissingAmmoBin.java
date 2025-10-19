@@ -40,6 +40,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Mounted;
 import megamek.common.units.Aero;
+import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
 import mekhq.campaign.Campaign;
@@ -186,11 +187,16 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     @Override
     public @Nullable String checkFixable() {
         final Mounted<?> m = getMounted();
-        if (m.getLocation() < 0) {
-            if ((m.getLinkedBy() != null) && !(m.getLinkedBy().isDestroyed())) {
-                return null;
+        if (m != null) {
+            final int location = m.getLocation();
+            if (location == Entity.LOC_NONE) {
+                if ((m.getLinkedBy() != null) && !(m.getLinkedBy().isDestroyed())) { //OS Ammo Bins, for example
+                    return null;
+                }
+                return "No location to install part.";
+            } else if (location == Entity.LOC_DESTROYED) {
+                return "Location is destroyed.";
             }
-            return "No location to install part.";
         }
         return super.checkFixable();
     }
