@@ -30,23 +30,14 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.rating.CamOpsReputation;
+package mekhq.campaign.rating;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import megamek.common.bays.SuperHeavyVehicleBay;
-import megamek.common.bays.ASFBay;
-import megamek.common.bays.BattleArmorBay;
-import megamek.common.bays.Bay;
-import megamek.common.bays.HeavyVehicleBay;
-import megamek.common.bays.InfantryBay;
-import megamek.common.bays.LightVehicleBay;
-import megamek.common.bays.MekBay;
-import megamek.common.bays.ProtoMekBay;
-import megamek.common.bays.SmallCraftBay;
+import megamek.common.bays.*;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

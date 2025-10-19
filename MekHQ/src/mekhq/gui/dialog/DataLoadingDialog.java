@@ -82,7 +82,7 @@ import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.rating.CamOpsReputation.ReputationController;
+import mekhq.campaign.rating.ReputationController;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.campaign.unit.Unit;

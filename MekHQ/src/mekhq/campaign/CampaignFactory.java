@@ -32,6 +32,8 @@
  */
 package mekhq.campaign;
 
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,7 +71,7 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.RandomEventLibraries;
-import mekhq.campaign.rating.CamOpsReputation.ReputationController;
+import mekhq.campaign.rating.ReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -78,8 +80,6 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumsLibrary;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.dialog.CampaignHasProblemOnLoad;
 import mekhq.service.AutosaveService;
-
-import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 
 /**
  * Defines a factory API that enables {@link Campaign} instances to be created from its detected format.
@@ -157,17 +157,15 @@ public class CampaignFactory {
     }
 
     /**
-     * Creates a partially-configured CampaignConfiguration that is missing:
-     * 1. Systems (TestSystems for testing purposes)
-     * 2. GameOptions (required for MegaMek, may be candidate for further test class development)
-     * 3. Player instance
-     * 4. LocalDate for Campaign start day
-     * 5. CurrentLocation (created from a PlanetarySystem, which must be retrieved using Systems or TestSystems)
-     * 6. Logistical classes: parts store, new-type personnel market, random death generator, persistent campaign
-     *    summary tracker.
-     * Useful for testing purposes, as the missing references can be replaced with mocks or lightweight
-     * test classes.
+     * Creates a partially-configured CampaignConfiguration that is missing: 1. Systems (TestSystems for testing
+     * purposes) 2. GameOptions (required for MegaMek, may be candidate for further test class development) 3. Player
+     * instance 4. LocalDate for Campaign start day 5. CurrentLocation (created from a PlanetarySystem, which must be
+     * retrieved using Systems or TestSystems) 6. Logistical classes: parts store, new-type personnel market, random
+     * death generator, persistent campaign summary tracker. Useful for testing purposes, as the missing references can
+     * be replaced with mocks or lightweight test classes.
+     *
      * @param options CampaignOptions instance; used in Randomizer construction
+     *
      * @return campaignConfig CampaignConfiguration with the above items unset
      */
     public static @Nullable CampaignConfiguration createPartialCampaignConfiguration(CampaignOptions options) {
@@ -240,13 +238,10 @@ public class CampaignFactory {
     }
 
     /**
-     * Factory function to create an object containing all the configuration info needed
-     * to generate a Campaign instance.  Useful for tweaking some settings prior to creating the
-     * Campaign.
-     * The standard CampaignConfiguration uses all the settings that previously were generated or
-     * initialized within * `new Campaign()`.
-     * Note: this method does load all Planetary Systems and PartsStore entries, which can take several
-     * seconds
+     * Factory function to create an object containing all the configuration info needed to generate a Campaign
+     * instance.  Useful for tweaking some settings prior to creating the Campaign. The standard CampaignConfiguration
+     * uses all the settings that previously were generated or initialized within * `new Campaign()`. Note: this method
+     * does load all Planetary Systems and PartsStore entries, which can take several seconds
      *
      * @return campaignConfig CampaignConfiguration with all of the default values set
      */
@@ -301,12 +296,10 @@ public class CampaignFactory {
     }
 
     /**
-     * Create a new Campaign() instance with all of the correct default values and data providers
-     * needed to run a MekHQ game.
-     * Analogous to `new Campaign(...)` with all standard values.
-     * Note: calls `createCampaignConfiguration()` to get these values in a compact object.
-     * Note: Side effect: loads all Planetary Systems and PartsStore entries, which can take several
-     * seconds
+     * Create a new Campaign() instance with all of the correct default values and data providers needed to run a MekHQ
+     * game. Analogous to `new Campaign(...)` with all standard values. Note: calls `createCampaignConfiguration()` to
+     * get these values in a compact object. Note: Side effect: loads all Planetary Systems and PartsStore entries,
+     * which can take several seconds
      *
      * @return campaign Campaign object that is fully initialized and ready to run.
      */
