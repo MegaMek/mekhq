@@ -41,6 +41,7 @@ import mekhq.MekHQ;
  * @author Deric Page (deric (dot) page (at) usa.net)
  * @since 9/24/2013
  */
+@Deprecated(since = "0.50.10", forRemoval = true)
 public enum UnitRatingMethod {
     //region Enum Declarations
     @Deprecated(since = "0.50.10", forRemoval = true)

@@ -155,7 +155,6 @@ import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
 import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
 import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
 import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
-import mekhq.gui.dialog.reportDialogs.UnitRatingReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
@@ -942,13 +941,8 @@ public class CampaignGUI extends JPanel {
         JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text"));
         miDragoonsRating.setMnemonic(KeyEvent.VK_U);
         miDragoonsRating.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.ALT_DOWN_MASK));
-        if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
-            miDragoonsRating.addActionListener(evt -> new UnitRatingReportDialog(getFrame(), getCampaign()).setVisible(
-                  true));
-        } else {
-            miDragoonsRating.addActionListener(evt -> new ReputationReportDialog(getFrame(), getCampaign()).setVisible(
-                  true));
-        }
+        miDragoonsRating.addActionListener(evt -> new ReputationReportDialog(getFrame(), getCampaign()).setVisible(
+              true));
         menuReports.add(miDragoonsRating);
 
         JMenuItem miPersonnelReport = new JMenuItem(resourceMap.getString("miPersonnelReport.text"));

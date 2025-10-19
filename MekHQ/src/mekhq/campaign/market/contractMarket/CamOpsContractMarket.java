@@ -52,6 +52,7 @@ import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -62,7 +63,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.HiringHallLevel;
@@ -274,7 +274,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         setEnemyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
         if (contract.getContractType().isCadreDuty()) {
             contract.setAllySkill(SkillLevel.GREEN);
-            contract.setAllyQuality(IUnitRating.DRAGOON_F);
+            contract.setAllyQuality(DragoonRating.DRAGOON_F.getRating());
         }
         // Step 5: Determine the contract length (Not CamOps RAW)
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());

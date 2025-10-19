@@ -53,6 +53,7 @@ import mekhq.campaign.unit.Unit;
  * @author Deric Page (deric (dot) page (at) usa.net)
  * @since 3/12/2012
  */
+@Deprecated(since = "0.50.10", forRemoval = true)
 public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     private static final MMLogger LOGGER = MMLogger.create(FieldManualMercRevDragoonsRating.class);
 

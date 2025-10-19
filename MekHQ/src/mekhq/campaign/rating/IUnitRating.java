@@ -44,6 +44,7 @@ import mekhq.campaign.personnel.Person;
  * @author Deric Page (deric (dot) page (at) usa.net)
  * @since 3/12/2012
  */
+@Deprecated(since = "0.50.10", forRemoval = false)
 public interface IUnitRating {
 
     int PRECISION = 5;

@@ -62,11 +62,6 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_ASTAR;
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_B;
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_C;
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_F;
 import static mekhq.campaign.stratCon.StratConContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
@@ -116,6 +111,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
@@ -258,9 +254,9 @@ public class AtBContract extends Contract {
 
         setContractType(AtBContractType.GARRISON_DUTY);
         setAllySkill(REGULAR);
-        allyQuality = DRAGOON_C;
+        allyQuality = DragoonRating.DRAGOON_C.getRating();
         setEnemySkill(REGULAR);
-        enemyQuality = DRAGOON_C;
+        enemyQuality = DragoonRating.DRAGOON_C.getRating();
         allyBotName = "Ally";
         enemyBotName = "Enemy";
         setAllyCamouflage(new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.RED.name()));
@@ -547,7 +543,8 @@ public class AtBContract extends Contract {
             reliability = max(5, reliability + 1);
         }
 
-        reliability = switch (reliability) {
+        DragoonRating dragoonRating = DragoonRating.fromRating(reliability);
+        reliability = switch (dragoonRating) {
             case DRAGOON_F -> -1;
             case DRAGOON_A, DRAGOON_ASTAR -> +1;
             default -> 0; // DRAGOON_D, DRAGOON_C, DRAGOON_B
@@ -696,7 +693,7 @@ public class AtBContract extends Contract {
             repairLocation = Unit.SITE_FACILITY_MAINTENANCE;
         }
 
-        if (unitRating >= DRAGOON_B) {
+        if (unitRating >= DragoonRating.DRAGOON_B.getRating()) {
             repairLocation++;
         }
 
@@ -986,7 +983,7 @@ public class AtBContract extends Contract {
                                                                 UnitMarketType.EMPLOYER,
                                                                 MEK,
                                                                 getEmployerFaction(),
-                                                                DRAGOON_F,
+                                                                DragoonRating.DRAGOON_F.getRating(),
                                                                 50);
                             if (unitName != null) {
                                 text += String.format(

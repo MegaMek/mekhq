@@ -46,7 +46,6 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.ContractCommandRights;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.utilities.MHQXMLUtility;
@@ -643,8 +642,7 @@ public class Contract extends Mission {
         }
 
         // calculate support amount
-        if (campaign.getCampaignOptions().isUsePeacetimeCost()
-                  && campaign.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
+        if (campaign.getCampaignOptions().isUsePeacetimeCost()) {
             supportAmount = accountant.getPeacetimeCost()
                                   .multipliedBy(getLength())
                                   .multipliedBy(straightSupport)
@@ -678,8 +676,7 @@ public class Contract extends Mission {
         }
 
         // calculate transit amount for CO
-        if (campaign.getCampaignOptions().isUsePeacetimeCost()
-                  && campaign.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
+        if (campaign.getCampaignOptions().isUsePeacetimeCost()) {
             // contract base * transport period * reputation * employer modifier
             transitAmount = accountant.getContractBase()
                                   .multipliedBy(((getJumpPath(campaign).getJumps()) * 2.0) / 4.0)

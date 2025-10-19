@@ -56,13 +56,13 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.events.MarketNewPersonnelEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.module.PersonnelMarketServiceManager;
@@ -555,7 +555,7 @@ public class PersonnelMarket {
         }
 
         target.addModifier(SkillType.EXP_REGULAR - experienceLevel, "Admin/Logistics");
-        target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(), "Unit Rating");
+        target.addModifier(DragoonRating.DRAGOON_C.getRating() - campaign.getAtBUnitRatingMod(), "Unit Rating");
         return target;
     }
 }

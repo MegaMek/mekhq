@@ -51,6 +51,7 @@ import megamek.common.units.SpaceStation;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
@@ -60,6 +61,7 @@ import mekhq.campaign.unit.Unit;
  * @author Deric Page (deric (dot) page (at) usa.net)
  * @since 3/15/2012
  */
+@Deprecated(since = "0.50.10", forRemoval = true)
 @SuppressWarnings(value = "SameParameterValue")
 public abstract class AbstractUnitRating implements IUnitRating {
     private static final MMLogger logger = MMLogger.create(AbstractUnitRating.class);
@@ -343,30 +345,30 @@ public abstract class AbstractUnitRating implements IUnitRating {
     @Override
     public int getUnitRating(int score) {
         if (score < 0) {
-            return DRAGOON_F;
+            return DragoonRating.DRAGOON_F.getRating();
         } else if (score < 46) {
-            return DRAGOON_D;
+            return DragoonRating.DRAGOON_D.getRating();
         } else if (score < 86) {
-            return DRAGOON_C;
+            return DragoonRating.DRAGOON_C.getRating();
         } else if (score < 121) {
-            return DRAGOON_B;
+            return DragoonRating.DRAGOON_B.getRating();
         } else if (score < 151) {
-            return DRAGOON_A;
+            return DragoonRating.DRAGOON_A.getRating();
         } else {
-            return DRAGOON_ASTAR;
+            return DragoonRating.DRAGOON_ASTAR.getRating();
         }
     }
 
     @Override
     public String getUnitRatingName(int rating) {
-        return switch (rating) {
+        DragoonRating dragoonRating = DragoonRating.fromRating(rating);
+        return switch (dragoonRating) {
             case DRAGOON_F -> "F";
             case DRAGOON_D -> "D";
             case DRAGOON_C -> "C";
             case DRAGOON_B -> "B";
             case DRAGOON_A -> "A";
             case DRAGOON_ASTAR -> "A*";
-            default -> "Unrated";
         };
     }
 

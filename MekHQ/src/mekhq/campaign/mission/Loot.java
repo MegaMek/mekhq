@@ -58,6 +58,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.enums.ScenarioType;
@@ -65,7 +66,6 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
@@ -311,25 +311,26 @@ public class Loot {
         HashMap<String, Integer> qualityAndModifier = new HashMap<>();
 
         if (contract instanceof AtBContract) {
-            switch (((AtBContract) contract).getEnemyQuality()) {
-                case IUnitRating.DRAGOON_F:
+            DragoonRating dragoonRating = DragoonRating.fromRating(((AtBContract) contract).getEnemyQuality());
+            switch (dragoonRating) {
+                case DRAGOON_F:
                     qualityAndModifier.put("quality", PartQuality.QUALITY_A.toNumeric());
                     qualityAndModifier.put("modifier", -2);
                     break;
-                case IUnitRating.DRAGOON_D:
+                case DRAGOON_D:
                     qualityAndModifier.put("quality", PartQuality.QUALITY_B.toNumeric());
                     qualityAndModifier.put("modifier", -1);
                     break;
-                case IUnitRating.DRAGOON_C:
-                case IUnitRating.DRAGOON_B:
+                case DRAGOON_C:
+                case DRAGOON_B:
                     qualityAndModifier.put("quality", PartQuality.QUALITY_C.toNumeric());
                     qualityAndModifier.put("modifier", 0);
                     break;
-                case IUnitRating.DRAGOON_A:
+                case DRAGOON_A:
                     qualityAndModifier.put("quality", PartQuality.QUALITY_D.toNumeric());
                     qualityAndModifier.put("modifier", 1);
                     break;
-                case IUnitRating.DRAGOON_ASTAR:
+                case DRAGOON_ASTAR:
                     qualityAndModifier.put("quality", PartQuality.QUALITY_F.toNumeric());
                     qualityAndModifier.put("modifier", 2);
                     break;

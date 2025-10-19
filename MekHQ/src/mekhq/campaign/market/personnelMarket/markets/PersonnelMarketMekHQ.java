@@ -127,13 +127,11 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         ArrayList<Faction> interestedFactions = new ArrayList<>();
 
         boolean filterOutLegalFactions = false;
-        if (getCampaign().getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-            if (getCampaign().getReputation().getReputationRating() < getUnitReputationRecruitmentCutoff()) {
-                getLogger().debug(
-                      "Only pirates & mercenaries will be considered for applicants, as the campaign's unit " +
-                            "rating is below the cutoff.");
-                filterOutLegalFactions = true;
-            }
+        if (getCampaign().getReputation().getReputationRating() < getUnitReputationRecruitmentCutoff()) {
+            getLogger().debug(
+                  "Only pirates & mercenaries will be considered for applicants, as the campaign's unit " +
+                        "rating is below the cutoff.");
+            filterOutLegalFactions = true;
         }
 
         if (getCampaign().isClanCampaign()) {

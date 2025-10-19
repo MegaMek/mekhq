@@ -102,6 +102,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
@@ -502,9 +503,9 @@ public class AtBDynamicScenarioFactory {
                     };
 
                     quality = switch (randomInt) {
-                        case 2, 3 -> IUnitRating.DRAGOON_D;
-                        case 4 -> IUnitRating.DRAGOON_C;
-                        default -> IUnitRating.DRAGOON_F;
+                        case 2, 3 -> DragoonRating.DRAGOON_D.getRating();
+                        case 4 -> DragoonRating.DRAGOON_C.getRating();
+                        default -> DragoonRating.DRAGOON_F.getRating();
                     };
                 }
                 break;

@@ -55,6 +55,7 @@ import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.events.MarketNewPersonnelEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.finances.Money;
@@ -63,7 +64,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -129,7 +129,7 @@ public record AtBEventProcessor(Campaign campaign) {
             default -> 0;
         };
 
-        modifier += campaign.getAtBUnitRatingMod() - IUnitRating.DRAGOON_C;
+        modifier += campaign.getAtBUnitRatingMod() - DragoonRating.DRAGOON_C.getRating();
         if (campaign.getFinances().isInDebt()) {
             modifier -= 3;
         }
@@ -229,7 +229,7 @@ public record AtBEventProcessor(Campaign campaign) {
                                     unitType,
                                     weight,
                                     campaign.getGameYear(),
-                                    IUnitRating.DRAGOON_F,
+                                    DragoonRating.DRAGOON_F.getRating(),
                                     movementModes,
                                     missionRoles);
         Entity en;
