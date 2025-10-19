@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.camOpsReputation.CamOpsReputation;
+package mekhq.campaign.camOpsReputation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -51,32 +51,32 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 class ReputationControllerTest {
-    private mekhq.campaign.camOpsReputation.ReputationController reputation;
+    private ReputationController reputation;
     private Campaign campaign;
-    private MockedStatic<mekhq.campaign.camOpsReputation.AverageExperienceRating> averageExperienceRating;
-    private MockedStatic<mekhq.campaign.camOpsReputation.CommandRating> commandRating;
-    private MockedStatic<mekhq.campaign.camOpsReputation.CombatRecordRating> combatRecordRating;
-    private MockedStatic<mekhq.campaign.camOpsReputation.TransportationRating> transportationRating;
-    private MockedStatic<mekhq.campaign.camOpsReputation.SupportRating> supportRating;
-    private MockedStatic<mekhq.campaign.camOpsReputation.FinancialRating> financialRating;
-    private MockedStatic<mekhq.campaign.camOpsReputation.CrimeRating> crimeRating;
-    private MockedStatic<mekhq.campaign.camOpsReputation.OtherModifiers> otherModifiersRating;
+    private MockedStatic<AverageExperienceRating> averageExperienceRating;
+    private MockedStatic<CommandRating> commandRating;
+    private MockedStatic<CombatRecordRating> combatRecordRating;
+    private MockedStatic<TransportationRating> transportationRating;
+    private MockedStatic<SupportRating> supportRating;
+    private MockedStatic<FinancialRating> financialRating;
+    private MockedStatic<CrimeRating> crimeRating;
+    private MockedStatic<OtherModifiers> otherModifiersRating;
 
     @BeforeEach
     void setUp() {
-        reputation = new mekhq.campaign.camOpsReputation.ReputationController();
+        reputation = new ReputationController();
         campaign = mock(Campaign.class);
         when(campaign.getCommander()).thenReturn(null);
         when(campaign.getFinances()).thenReturn(null);
         when(campaign.getDateOfLastCrime()).thenReturn(null);
-        averageExperienceRating = mockStatic(mekhq.campaign.camOpsReputation.AverageExperienceRating.class);
-        commandRating = mockStatic(mekhq.campaign.camOpsReputation.CommandRating.class);
-        combatRecordRating = mockStatic(mekhq.campaign.camOpsReputation.CombatRecordRating.class);
-        transportationRating = mockStatic(mekhq.campaign.camOpsReputation.TransportationRating.class);
-        supportRating = mockStatic(mekhq.campaign.camOpsReputation.SupportRating.class);
-        financialRating = mockStatic(mekhq.campaign.camOpsReputation.FinancialRating.class);
-        crimeRating = mockStatic(mekhq.campaign.camOpsReputation.CrimeRating.class);
-        otherModifiersRating = mockStatic(mekhq.campaign.camOpsReputation.OtherModifiers.class);
+        averageExperienceRating = mockStatic(AverageExperienceRating.class);
+        commandRating = mockStatic(CommandRating.class);
+        combatRecordRating = mockStatic(CombatRecordRating.class);
+        transportationRating = mockStatic(TransportationRating.class);
+        supportRating = mockStatic(SupportRating.class);
+        financialRating = mockStatic(FinancialRating.class);
+        crimeRating = mockStatic(CrimeRating.class);
+        otherModifiersRating = mockStatic(OtherModifiers.class);
     }
 
     @AfterEach
@@ -94,19 +94,19 @@ class ReputationControllerTest {
     @Test
     void testGetReputationModifierShouldBeFour() {
         averageExperienceRating.when(() ->
-                                           mekhq.campaign.camOpsReputation.AverageExperienceRating.getSkillLevel(
+                                           AverageExperienceRating.getSkillLevel(
                                                  campaign,
                                                  true))
               .thenReturn(SkillLevel.VETERAN);
         averageExperienceRating.when(() ->
-                                           mekhq.campaign.camOpsReputation.AverageExperienceRating.getAverageExperienceModifier(
+                                           AverageExperienceRating.getAverageExperienceModifier(
                                                  SkillLevel.VETERAN))
               .thenReturn(20);
         commandRating.when(() ->
-                                 mekhq.campaign.camOpsReputation.CommandRating.calculateCommanderRating(campaign, null))
+                                 CommandRating.calculateCommanderRating(campaign, null))
               .thenReturn(Collections.singletonMap("total", 3));
         combatRecordRating.when(() ->
-                                      mekhq.campaign.camOpsReputation.CombatRecordRating.calculateCombatRecordRating(
+                                      CombatRecordRating.calculateCombatRecordRating(
                                             campaign))
               .thenReturn(Collections.singletonMap("total", 3));
 
@@ -115,27 +115,27 @@ class ReputationControllerTest {
         transportationData.add(Collections.singletonMap("total", 3));
         transportationData.add(Collections.singletonMap("total", 3));
         transportationRating.when(() ->
-                                        mekhq.campaign.camOpsReputation.TransportationRating.calculateTransportationRating(
+                                        TransportationRating.calculateTransportationRating(
                                               campaign))
               .thenReturn(transportationData);
 
         Map<String, Map<String, ?>> supportData = new HashMap<>();
         supportData.put("total", Collections.singletonMap("total", 3));
         supportRating.when(() ->
-                                 mekhq.campaign.camOpsReputation.SupportRating.calculateSupportRating(campaign,
+                                 SupportRating.calculateSupportRating(campaign,
                                        transportationData.get(1)))
               .thenReturn(supportData);
 
         financialRating.when(() ->
-                                   mekhq.campaign.camOpsReputation.FinancialRating.calculateFinancialRating(campaign.getFinances()))
+                                   FinancialRating.calculateFinancialRating(campaign.getFinances()))
               .thenReturn(Collections.singletonMap("total", 3));
 
         crimeRating.when(() ->
-                               mekhq.campaign.camOpsReputation.CrimeRating.calculateCrimeRating(campaign))
+                               CrimeRating.calculateCrimeRating(campaign))
               .thenReturn(Collections.singletonMap("total", 3));
 
         otherModifiersRating.when(() ->
-                                        mekhq.campaign.camOpsReputation.OtherModifiers.calculateOtherModifiers(campaign))
+                                        OtherModifiers.calculateOtherModifiers(campaign))
               .thenReturn(Collections.singletonMap("total", 3));
 
         reputation.initializeReputation(campaign);
@@ -146,19 +146,19 @@ class ReputationControllerTest {
     @Test
     void testGetReputationModifierShouldBeZero() {
         averageExperienceRating.when(() ->
-                                           mekhq.campaign.camOpsReputation.AverageExperienceRating.getSkillLevel(
+                                           AverageExperienceRating.getSkillLevel(
                                                  campaign,
                                                  true))
               .thenReturn(SkillLevel.ULTRA_GREEN);
         averageExperienceRating.when(() ->
-                                           mekhq.campaign.camOpsReputation.AverageExperienceRating.getAverageExperienceModifier(
+                                           AverageExperienceRating.getAverageExperienceModifier(
                                                  SkillLevel.ULTRA_GREEN))
               .thenReturn(5);
         commandRating.when(() ->
-                                 mekhq.campaign.camOpsReputation.CommandRating.calculateCommanderRating(campaign, null))
+                                 CommandRating.calculateCommanderRating(campaign, null))
               .thenReturn(Collections.singletonMap("total", 0));
         combatRecordRating.when(() ->
-                                      mekhq.campaign.camOpsReputation.CombatRecordRating.calculateCombatRecordRating(
+                                      CombatRecordRating.calculateCombatRecordRating(
                                             campaign))
               .thenReturn(Collections.singletonMap("total", 0));
 
@@ -167,27 +167,27 @@ class ReputationControllerTest {
         transportationData.add(Collections.singletonMap("total", 0));
         transportationData.add(Collections.singletonMap("total", 0));
         transportationRating.when(() ->
-                                        mekhq.campaign.camOpsReputation.TransportationRating.calculateTransportationRating(
+                                        TransportationRating.calculateTransportationRating(
                                               campaign))
               .thenReturn(transportationData);
 
         Map<String, Map<String, ?>> supportData = new HashMap<>();
         supportData.put("total", Collections.singletonMap("total", 0));
         supportRating.when(() ->
-                                 mekhq.campaign.camOpsReputation.SupportRating.calculateSupportRating(campaign,
+                                 SupportRating.calculateSupportRating(campaign,
                                        transportationData.get(1)))
               .thenReturn(supportData);
 
         financialRating.when(() ->
-                                   mekhq.campaign.camOpsReputation.FinancialRating.calculateFinancialRating(campaign.getFinances()))
+                                   FinancialRating.calculateFinancialRating(campaign.getFinances()))
               .thenReturn(Collections.singletonMap("total", 0));
 
         crimeRating.when(() ->
-                               mekhq.campaign.camOpsReputation.CrimeRating.calculateCrimeRating(campaign))
+                               CrimeRating.calculateCrimeRating(campaign))
               .thenReturn(Collections.singletonMap("total", 0));
 
         otherModifiersRating.when(() ->
-                                        mekhq.campaign.camOpsReputation.OtherModifiers.calculateOtherModifiers(campaign))
+                                        OtherModifiers.calculateOtherModifiers(campaign))
               .thenReturn(Collections.singletonMap("total", 0));
 
         reputation.initializeReputation(campaign);
