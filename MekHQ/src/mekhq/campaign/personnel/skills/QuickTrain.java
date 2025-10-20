@@ -46,6 +46,7 @@ import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 
 /**
  * Utility class for performing Quick Training on personnel in a campaign.
@@ -87,6 +88,11 @@ public class QuickTrain {
         LocalDate today = campaign.getLocalDate();
 
         for (Person person : targetPersonnel) {
+            PersonnelStatus status = person.getStatus();
+            if (status.isDepartedUnit() || status.isStudent()) {
+                continue;
+            }
+
             List<String> targetSkills = new ArrayList<>();
 
             PersonnelOptions options = person.getOptions();
@@ -120,11 +126,10 @@ public class QuickTrain {
      * and reporting.
      *
      * <p>Iterates through the provided list of target skill names, attempting to improve each as long as the skill is
-     * not at or above
-     * the target level, improvement is legal, and the person has sufficient XP. If continuous training is enabled,
-     * continues training as long as at least one skill is improved in the previous iteration. Generates training
-     * reports and optional logs. Trained skills are removed from the {@code targetSkills} list as they are completed or
-     * found ineligible.</p>
+     * not at or above the target level, improvement is legal, and the person has sufficient XP. If continuous training
+     * is enabled, continues training as long as at least one skill is improved in the previous iteration. Generates
+     * training reports and optional logs. Trained skills are removed from the {@code targetSkills} list as they are
+     * completed or found ineligible.</p>
      *
      * @param targetLevel              the minimum skill level to reach for each skill
      * @param campaign                 the campaign context for reporting

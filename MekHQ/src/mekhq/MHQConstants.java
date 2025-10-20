@@ -172,6 +172,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_MEDIC_POOL_FILL = "newDayMedicPoolFill";
     public static final String NEW_DAY_MRMS = "newDayMRMS";
     public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
+    public static final String NEW_DAY_QUICK_TRAIN = "NewDayQuickTrain";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS = "newDayForceIconOperationalStatus";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE = "newDayForceIconOperationalStatusStyle";
     // endregion New Day
