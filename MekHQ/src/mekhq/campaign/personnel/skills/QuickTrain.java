@@ -218,9 +218,8 @@ public class QuickTrain {
      * @since 0.50.10
      */
     private static void processSkills(Person person, boolean isAdminsHaveNegotiation,
-          boolean isDoctorsUseAdministration,
-          boolean isTechsUseAdministration, boolean isUseArtillery, List<String> targetSkills, PersonnelOptions options,
-          Attributes attributes) {
+          boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isUseArtillery,
+          List<String> targetSkills, PersonnelOptions options, Attributes attributes) {
         fetchSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
               isTechsUseAdministration, isUseArtillery, person, targetSkills,
               person.getPrimaryRole(), options, attributes);
@@ -282,6 +281,9 @@ public class QuickTrain {
                       person,
                       options,
                       attributes);
+                if (person.hasSkill(SkillType.S_ANTI_MEK)) {
+                    targetSkills.add(SkillType.S_ANTI_MEK);
+                }
 
                 if (highestSkillName == null) {
                     targetSkills.addAll(PersonnelRole.SOLDIER.getSkillsForProfession(isAdminsHaveNegotiation,
