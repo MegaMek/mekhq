@@ -2269,7 +2269,7 @@ public class Person {
             return;
         }
 
-        String spaGainedMessage = getVeterancyAwardReport(this, spaGained);
+        String spaGainedMessage = getVeterancyAwardReport(spaGained);
         campaign.addReport(spaGainedMessage);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
