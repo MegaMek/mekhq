@@ -103,7 +103,7 @@ public class PersonnelTab {
     private JCheckBox chkUseRandomToughness;
     private JCheckBox chkUseArtillery;
     private JCheckBox chkUseAbilities;
-    private JCheckBox chkUseCommanderAbilitiesOnly;
+    private JCheckBox chkOnlyCommandersMatter;
     private JCheckBox chkUseEdge;
     private JCheckBox chkUseSupportEdge;
     private JCheckBox chkUseImplants;
@@ -361,7 +361,7 @@ public class PersonnelTab {
         chkUseRandomToughness = new JCheckBox();
         chkUseArtillery = new JCheckBox();
         chkUseAbilities = new JCheckBox();
-        chkUseCommanderAbilitiesOnly = new JCheckBox();
+        chkOnlyCommandersMatter = new JCheckBox();
         chkUseEdge = new JCheckBox();
         chkUseSupportEdge = new JCheckBox();
         chkUseImplants = new JCheckBox();
@@ -444,9 +444,9 @@ public class PersonnelTab {
         chkUseArtillery.addMouseListener(createTipPanelUpdater(generalHeader, "UseArtillery"));
         chkUseAbilities = new CampaignOptionsCheckBox("UseAbilities");
         chkUseAbilities.addMouseListener(createTipPanelUpdater(generalHeader, "UseAbilities"));
-        chkUseCommanderAbilitiesOnly = new CampaignOptionsCheckBox("UseCommanderAbilitiesOnly");
-        chkUseCommanderAbilitiesOnly.addMouseListener(createTipPanelUpdater(generalHeader,
-              "UseCommanderAbilitiesOnly"));
+        chkOnlyCommandersMatter = new CampaignOptionsCheckBox("OnlyCommandersMatter");
+        chkOnlyCommandersMatter.addMouseListener(createTipPanelUpdater(generalHeader,
+              "OnlyCommandersMatter"));
         chkUseEdge = new CampaignOptionsCheckBox("UseEdge");
         chkUseEdge.addMouseListener(createTipPanelUpdater(generalHeader, "UseEdge"));
         chkUseSupportEdge = new CampaignOptionsCheckBox("UseSupportEdge");
@@ -481,7 +481,7 @@ public class PersonnelTab {
         panel.add(chkUseAbilities, layout);
 
         layout.gridy++;
-        panel.add(chkUseCommanderAbilitiesOnly, layout);
+        panel.add(chkOnlyCommandersMatter, layout);
 
         layout.gridy++;
         panel.add(chkUseEdge, layout);
@@ -1281,7 +1281,7 @@ public class PersonnelTab {
         chkUseRandomToughness.setSelected(options.isUseRandomToughness());
         chkUseArtillery.setSelected(options.isUseArtillery());
         chkUseAbilities.setSelected(options.isUseAbilities());
-        chkUseCommanderAbilitiesOnly.setSelected(options.isUseCommanderAbilitiesOnly());
+        chkOnlyCommandersMatter.setSelected(options.isOnlyCommandersMatter());
         chkUseEdge.setSelected(options.isUseEdge());
         chkUseSupportEdge.setSelected(options.isUseSupportEdge());
         chkUseImplants.setSelected(options.isUseImplants());
@@ -1376,7 +1376,7 @@ public class PersonnelTab {
         options.setUseRandomToughness(chkUseRandomToughness.isSelected());
         options.setUseArtillery(chkUseArtillery.isSelected());
         options.setUseAbilities(chkUseAbilities.isSelected());
-        options.setUseCommanderAbilitiesOnly(chkUseCommanderAbilitiesOnly.isSelected());
+        options.setOnlyCommandersMatter(chkOnlyCommandersMatter.isSelected());
         options.setUseEdge(chkUseEdge.isSelected());
         options.setUseSupportEdge(chkUseSupportEdge.isSelected());
         options.setUseImplants(chkUseImplants.isSelected());

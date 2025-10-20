@@ -225,7 +225,7 @@ public class CampaignOptions {
     private boolean useRandomToughness;
     private boolean useArtillery;
     private boolean useAbilities;
-    private boolean useCommanderAbilitiesOnly;
+    private boolean onlyCommandersMatter;
     private boolean useEdge;
     private boolean useSupportEdge;
     private boolean useImplants;
@@ -795,7 +795,7 @@ public class CampaignOptions {
         setUseRandomToughness(false);
         setUseArtillery(false);
         setUseAbilities(false);
-        setUseCommanderAbilitiesOnly(false);
+        setOnlyCommandersMatter(false);
         setUseEdge(false);
         setUseSupportEdge(false);
         setUseImplants(false);
@@ -1593,12 +1593,12 @@ public class CampaignOptions {
         this.useAbilities = useAbilities;
     }
 
-    public boolean isUseCommanderAbilitiesOnly() {
-        return useCommanderAbilitiesOnly;
+    public boolean isOnlyCommandersMatter() {
+        return onlyCommandersMatter;
     }
 
-    public void setUseCommanderAbilitiesOnly(final boolean useCommanderAbilitiesOnly) {
-        this.useCommanderAbilitiesOnly = useCommanderAbilitiesOnly;
+    public void setOnlyCommandersMatter(final boolean onlyCommandersMatter) {
+        this.onlyCommandersMatter = onlyCommandersMatter;
     }
 
     public boolean isUseEdge() {
