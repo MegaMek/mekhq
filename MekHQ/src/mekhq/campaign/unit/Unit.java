@@ -4467,7 +4467,14 @@ public class Unit implements ITechnology {
 
     public void resetPilotAndEntity() {
         final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        boolean isOnlyCommandersMatter = campaignOptions.isOnlyCommandersMatter();
+        boolean commanderOnlyVehicles = campaignOptions.isOnlyCommandersMatterVehicles() &&
+                                              (entity instanceof Tank || entity instanceof ConvFighter);
+        boolean commanderOnlyInfantry = campaignOptions.isOnlyCommandersMatterVehicles() &&
+                                              entity instanceof Infantry &&
+                                              !(entity instanceof BattleArmor);
+        boolean commanderOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterVehicles() &&
+                                                 entity instanceof BattleArmor;
+        boolean isOnlyCommandersMatter = commanderOnlyVehicles || commanderOnlyInfantry || commanderOnlyBattleArmor;
 
         // Reset transient data
         getCampaign().clearGameData(entity);
@@ -4590,6 +4597,8 @@ public class Unit implements ITechnology {
             commander = new Person(getCampaign());
         }
 
+        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+
         PilotOptions options = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
         // This double enumeration is annoying to work with for crew-served units.
         // Get the option names while we enumerate so they can be used later
@@ -4599,20 +4608,27 @@ public class Unit implements ITechnology {
             IOptionGroup group = i.nextElement();
             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
                 IOption option = j.nextElement();
-                if (getCampaign().getCampaignOptions().isUseImplants() &&
+                if (campaignOptions.isUseImplants() &&
                           group.getKey().equals(PersonnelOptions.MD_ADVANTAGES)) {
                     cyberOptionNames.add(option.getName());
-                } else if (getCampaign().getCampaignOptions().isUseEdge() &&
+                } else if (campaignOptions.isUseEdge() &&
                                  group.getKey().equals(PersonnelOptions.EDGE_ADVANTAGES)) {
                     optionNames.add(option.getName());
-                } else if (getCampaign().getCampaignOptions().isUseAbilities() &&
+                } else if (campaignOptions.isUseAbilities() &&
                                  !group.getKey().equals(PersonnelOptions.EDGE_ADVANTAGES)) {
                     optionNames.add(option.getName());
                 }
             }
         }
 
-        boolean commanderOnly = campaign.getCampaignOptions().isOnlyCommandersMatter();
+        boolean commanderOnlyVehicles = campaignOptions.isOnlyCommandersMatterVehicles() &&
+                                              (entity instanceof Tank || entity instanceof ConvFighter);
+        boolean commanderOnlyInfantry = campaignOptions.isOnlyCommandersMatterVehicles() &&
+                                              entity instanceof Infantry &&
+                                              !(entity instanceof BattleArmor);
+        boolean commanderOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterVehicles() &&
+                                                 entity instanceof BattleArmor;
+        boolean commanderOnly = commanderOnlyVehicles || commanderOnlyInfantry || commanderOnlyBattleArmor;
 
         // For crew-served units, let's look at the abilities of the group. If more than half the crew (gunners
         // and pilots only, for spacecraft) have an ability, grant the benefit to the unit
@@ -4699,7 +4715,7 @@ public class Unit implements ITechnology {
 
             // Assign edge points to spacecraft and vehicle crews and infantry units
             // This overwrites the Edge value assigned above.
-            if (getCampaign().getCampaignOptions().isUseEdge()) {
+            if (campaignOptions.isUseEdge()) {
                 double sumEdge = 0;
                 for (Person p : drivers) {
                     sumEdge += p.getCurrentEdge();

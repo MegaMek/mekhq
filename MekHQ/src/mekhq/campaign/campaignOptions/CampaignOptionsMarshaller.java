@@ -256,8 +256,16 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAbilities", campaignOptions.isUseAbilities());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
-              "onlyCommandersMatter",
-              campaignOptions.isOnlyCommandersMatter());
+              "onlyCommandersMatterVehicles",
+              campaignOptions.isOnlyCommandersMatterVehicles());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "onlyCommandersMatterVehicles",
+              campaignOptions.isOnlyCommandersMatterInfantry());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "onlyCommandersMatterBattleArmor",
+              campaignOptions.isOnlyCommandersMatterBattleArmor());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", campaignOptions.isUseEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSupportEdge", campaignOptions.isUseSupportEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", campaignOptions.isUseImplants());
