@@ -88,6 +88,10 @@ public class QuickTrain {
         LocalDate today = campaign.getLocalDate();
 
         for (Person person : targetPersonnel) {
+            if (person.isQuickTrainIgnore()) {
+                continue;
+            }
+
             PersonnelStatus status = person.getStatus();
             if (status.isDepartedUnit() || status.isStudent()) {
                 continue;

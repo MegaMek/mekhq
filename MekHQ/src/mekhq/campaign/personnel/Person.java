@@ -377,6 +377,7 @@ public class Person {
     private boolean divorceable;
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
+    private boolean quickTrainIgnore;
     // this is a flag used in determine whether a person is a potential marriage
     // candidate provided
     // that they are not married, are old enough, etc.
@@ -597,6 +598,7 @@ public class Person {
         setDivorceable(true);
         setFounder(false);
         setImmortal(false);
+        setQuickTrainIgnore(false);
         setMarriageable(true);
         setTryingToConceive(true);
         // endregion Flags
@@ -2721,6 +2723,14 @@ public class Person {
         this.immortal = immortal;
     }
 
+    public boolean isQuickTrainIgnore() {
+        return quickTrainIgnore;
+    }
+
+    public void setQuickTrainIgnore(final boolean quickTrainIgnore) {
+        this.quickTrainIgnore = quickTrainIgnore;
+    }
+
     public boolean isEmployed() {
         return status != PersonnelStatus.CAMP_FOLLOWER;
     }
@@ -3265,6 +3275,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "divorceable", divorceable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "founder", founder);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
@@ -3832,6 +3843,8 @@ public class Person {
                     person.setFounder(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("immortal")) {
                     person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("quickTrainIgnore")) {
+                    person.setQuickTrainIgnore(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageable")) {
                     person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
