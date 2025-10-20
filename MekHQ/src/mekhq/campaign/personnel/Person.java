@@ -60,6 +60,7 @@ import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.*;
+import static mekhq.campaign.personnel.skills.VehicleCrewSkills.VEHICLE_CREW_SKILLS;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -75,7 +76,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
@@ -1267,16 +1267,7 @@ public class Person {
 
         List<String> skillsForProfession = role.getSkillsForProfession();
         return switch (role) {
-            case VEHICLE_CREW -> Stream.of(S_TECH_MEK,
-                  S_TECH_AERO,
-                  S_TECH_MECHANIC,
-                  S_TECH_BA,
-                  S_SURGERY,
-                  S_MEDTECH,
-                  S_ASTECH,
-                  S_COMMUNICATIONS,
-                  S_SENSOR_OPERATIONS,
-                  S_ART_COOKING).anyMatch(this::hasSkill);
+            case VEHICLE_CREW -> VEHICLE_CREW_SKILLS.stream().anyMatch(this::hasSkill);
             case SOLDIER -> INFANTRY_GUNNERY_SKILLS.stream().anyMatch(this::hasSkill);
             case BATTLE_ARMOUR -> hasSkill(S_GUN_BA);
             case VESSEL_CREW -> hasSkill(S_TECH_VESSEL);
@@ -4415,16 +4406,7 @@ public class Person {
             case VEHICLE_CREW -> {
                 // Vehicle crew are a special case as they just need any one of the following skills to qualify,
                 // rather than needing all relevant skills
-                List<String> relevantSkills = List.of(S_TECH_MEK,
-                      S_TECH_AERO,
-                      S_TECH_MECHANIC,
-                      S_TECH_BA,
-                      S_SURGERY,
-                      S_MEDTECH,
-                      S_ASTECH,
-                      S_COMMUNICATIONS,
-                      S_ART_COOKING,
-                      S_SENSOR_OPERATIONS);
+                List<String> relevantSkills = VEHICLE_CREW_SKILLS;
                 int highestExperienceLevel = EXP_NONE;
                 for (String relevantSkill : relevantSkills) {
                     Skill skill = getSkill(relevantSkill);
