@@ -146,7 +146,6 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.MHQXMLUtility;
-import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1668,8 +1667,8 @@ public class Person {
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
             campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
-                  "<span color=" + ReportingUtilities.getWarningColor() + "'>",
-                  ReportingUtilities.CLOSING_SPAN_TAG));
+                  "<span color=" + getWarningColor() + "'>",
+                  CLOSING_SPAN_TAG));
         }
     }
 
@@ -1692,7 +1691,7 @@ public class Person {
             color = getNegativeColor();
             changeString.append(resources.getString("loyaltyChangeNegative.text"));
         } else {
-            color = ReportingUtilities.getPositiveColor();
+            color = getPositiveColor();
             changeString.append(resources.getString("loyaltyChangePositive.text"));
         }
 
@@ -3827,7 +3826,16 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("eduAcademySet")) {
                     person.eduAcademySet = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademyNameInSet")) {
-                    person.eduAcademyNameInSet = String.valueOf(wn2.getTextContent().trim());
+                    String academyNameInSet = wn2.getTextContent().trim();
+                    // Compatibility handler
+                    if (academyNameInSet != null) {
+                        person.eduAcademyNameInSet = switch (academyNameInSet) {
+                            case "Boot Camp" -> "Bootcamp"; // <50.10 compatibility handler
+                            default -> academyNameInSet;
+                        };
+                    } else {
+                        person.eduAcademyNameInSet = null;
+                    }
                 } else if (nodeName.equalsIgnoreCase("eduAcademyFaction")) {
                     person.eduAcademyFaction = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduCourseIndex")) {
@@ -5041,7 +5049,7 @@ public class Person {
     public String succeed() {
         heal();
         return " <font color='" +
-                     ReportingUtilities.getPositiveColor() +
+                     getPositiveColor() +
                      "'><b>Successfully healed one hit.</b></font>";
     }
 
