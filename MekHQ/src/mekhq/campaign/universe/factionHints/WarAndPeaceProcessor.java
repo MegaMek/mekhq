@@ -126,7 +126,7 @@ public class WarAndPeaceProcessor {
         final String buttonLabel = getTextAt(RESOURCE_BUNDLE, "WarAndPeaceProcessor.button");
         for (Map.Entry<String, Set<Faction>> entry : factionArrays.entrySet()) {
             if (!entry.getValue().isEmpty()) {
-                triggerMessage(campaignFaction, entry.getKey(), oocMessage, buttonLabel);
+                triggerMessage(campaignFaction, entry.getKey(), entry.getValue(), oocMessage, buttonLabel);
             }
         }
     }
@@ -136,18 +136,19 @@ public class WarAndPeaceProcessor {
      *
      * @param campaignFaction The player's campaign faction.
      * @param keyAffix        String key indicating the relationship type ("warStartFactions", etc.)
+     * @param factions        The factions involved in the relationship change.
      * @param oocMessage      Supplemental message to show in the dialog.
      * @param buttonLabel     Label for the confirmation button.
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private void triggerMessage(Faction campaignFaction, String keyAffix, String oocMessage, String buttonLabel) {
-        StringBuilder warStartMessage = new StringBuilder(getTextAt(RESOURCE_BUNDLE,
-              "WarAndPeaceProcessor." + keyAffix));
-        for (Faction faction : warStartFactions) {
+    private void triggerMessage(Faction campaignFaction, String keyAffix, Set<Faction> factions, String oocMessage,
+          String buttonLabel) {
+        StringBuilder message = new StringBuilder(getTextAt(RESOURCE_BUNDLE, "WarAndPeaceProcessor." + keyAffix));
+        for (Faction faction : factions) {
             String name = FactionStandingUtilities.getFactionName(faction, today.getYear());
-            warStartMessage.append("<br> - <b>").append(name).append("<b>");
+            message.append("<br> - <b>").append(name).append("<b>");
         }
 
         // We use a proxy speaker to allow us to leverage a mechanic in ImmersiveDialogSimple that shows the faction
@@ -160,7 +161,7 @@ public class WarAndPeaceProcessor {
         new ImmersiveDialogSimple(campaign,
               proxySpeaker,
               null,
-              warStartMessage.toString(),
+              message.toString(),
               List.of(buttonLabel),
               oocMessage,
               null,
