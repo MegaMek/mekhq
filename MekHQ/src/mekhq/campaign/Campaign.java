@@ -5619,7 +5619,8 @@ public class Campaign implements ITechManager {
         }
 
         if (MekHQ.getMHQOptions().getNewMonthQuickTrain()) {
-            QuickTrain.processQuickTraining(personnel, 5, this, true);
+            final int newMonthQuickTrainTargetLevel = 5;
+            QuickTrain.processQuickTraining(personnel, newMonthQuickTrainTargetLevel, this, true);
         }
     }
 
