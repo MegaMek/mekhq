@@ -50,7 +50,6 @@ import megamek.common.annotations.Nullable;
  * @since 0.50.07
  */
 public enum GlossaryEntry {
-    @Deprecated(since = "0.50.10", forRemoval = true)
     ADMIN_STRAIN("HR_STRAIN"),
     ADVANCED_SCOUTING("ADVANCED_SCOUTING"),
     AGING("AGING"),
@@ -92,7 +91,6 @@ public enum GlossaryEntry {
     HOSPITAL_BEDS("HOSPITAL_BEDS"),
     HOW_TO_DEPLOY("HOW_TO_DEPLOY"),
     HOW_TO_REINFORCE("HOW_TO_REINFORCE"),
-    HR_STRAIN("HR_STRAIN"),
     INFANTRY_GUNNERY_SKILLS("INFANTRY_GUNNERY_SKILLS"),
     LEADERSHIP_UNITS("LEADERSHIP_UNITS"),
     LINKED_ATTRIBUTES("LINKED_ATTRIBUTES"),
