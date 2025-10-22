@@ -81,15 +81,7 @@ public class FactionHints {
      * @return The singleton FactionHints instance, loaded from default data.
      */
     public static FactionHints getInstance() {
-        if (instance == null) {
-            synchronized (FactionHints.class) {
-                if (instance == null) {
-                    instance = new FactionHints();
-                    instance.loadData(false);
-                }
-            }
-        }
-        return instance;
+        return getOrInitializeInstance(false);
     }
 
     /**
@@ -97,11 +89,28 @@ public class FactionHints {
      * never in production code.
      */
     public static FactionHints initializeTestInstance() {
+        return getOrInitializeInstance(true);
+    }
+
+    /**
+     * Returns the singleton instance of {@link FactionHints}, initializing it if necessary.
+     *
+     * <p>This method ensures that the instance is fully constructed and loaded with data before being published to
+     * other threads.</p>
+     *
+     * @param useTestDirectory whether to load data from the test directory (for testing only)
+     *
+     * @return the singleton {@link FactionHints} instance, loaded from the specified data source
+     */
+    private static FactionHints getOrInitializeInstance(boolean useTestDirectory) {
         if (instance == null) {
             synchronized (FactionHints.class) {
                 if (instance == null) {
-                    instance = new FactionHints();
-                    instance.loadData(true);
+                    // The use of tempHints here ensures that the instance is never seen by any other thread until it's
+                    // fully constructed and initialized, eliminating any risk of a race condition.
+                    FactionHints tempHints = new FactionHints();
+                    tempHints.loadData(useTestDirectory);
+                    instance = tempHints;
                 }
             }
         }
