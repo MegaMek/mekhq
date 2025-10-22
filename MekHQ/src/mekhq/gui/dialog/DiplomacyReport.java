@@ -90,7 +90,12 @@ public class DiplomacyReport extends JDialog {
     private static final int[] COLUMN_WIDTHS = { COLUMN_WIDTH_NORMAL, COLUMN_WIDTH_SMALL, COLUMN_WIDTH_NORMAL,
                                                  COLUMN_WIDTH_NORMAL };
 
-    private final DefaultTableModel model = new DefaultTableModel(COLUMNS, 0);
+    private final DefaultTableModel model = new DefaultTableModel(COLUMNS, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
     private final LocalDate today;
     private final boolean isClanCampaign;
     private final boolean isBeforeClanInvasionFirstWave;
