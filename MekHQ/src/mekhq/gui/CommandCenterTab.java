@@ -626,7 +626,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         RoundedJButton btnDiplomacy = new RoundedJButton(resourceMap.getString("btnDiplomacy.text"));
         btnDiplomacy.addActionListener(evt -> {
             new DiplomacyReport(getCampaignGui().getFrame(), getCampaign().isClanCampaign(),
-                  getCampaign().getLocalDate()).setVisible(true);
+                  getCampaign().getLocalDate())
         });
         panReports.add(btnDiplomacy);
         panReports.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panReports.title")));
