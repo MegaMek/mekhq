@@ -39,6 +39,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import megamek.common.enums.TechBase;
 import megamek.common.equipment.AmmoType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingBattleArmorSuit;
@@ -47,6 +48,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 
 public class PartInUse {
     private String description;
+    private final TechBase techBase;
     private final IAcquisitionWork partToBuy;
     private int useCount;
     private int storeCount;
@@ -76,6 +78,7 @@ public class PartInUse {
         }
         part.setUnit(u);
         this.description = sb.toString();
+        this.techBase = part.getTechBase();
         this.partToBuy = part.getAcquisitionWork();
         this.tonnagePerItem = part.getTonnage();
         this.isBundle = false;
@@ -115,6 +118,10 @@ public class PartInUse {
 
     public String getDescription() {
         return description;
+    }
+
+    public TechBase getTechBase() {
+        return techBase;
     }
 
     /**
@@ -235,6 +242,7 @@ public class PartInUse {
             return false;
         }
         final PartInUse other = (PartInUse) obj;
-        return Objects.equals(description, other.description);
+        return Objects.equals(description, other.description) &&
+                     Objects.equals(techBase, other.techBase);
     }
 }
