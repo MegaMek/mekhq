@@ -141,6 +141,10 @@ public class FactionHints {
         return rivals;
     }
 
+    public Map<Faction, Map<Faction, List<FactionHint>>> getNeutralExceptions() {
+        return neutralExceptions;
+    }
+
     /**
      * @deprecated use {@link #getInstance()} instead.
      */
