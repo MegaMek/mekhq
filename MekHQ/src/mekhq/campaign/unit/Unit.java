@@ -4623,10 +4623,10 @@ public class Unit implements ITechnology {
 
         boolean commanderOnlyVehicles = campaignOptions.isOnlyCommandersMatterVehicles() &&
                                               (entity instanceof Tank || entity instanceof ConvFighter);
-        boolean commanderOnlyInfantry = campaignOptions.isOnlyCommandersMatterVehicles() &&
+        boolean commanderOnlyInfantry = campaignOptions.isOnlyCommandersMatterInfantry() &&
                                               entity instanceof Infantry &&
                                               !(entity instanceof BattleArmor);
-        boolean commanderOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterVehicles() &&
+        boolean commanderOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterBattleArmor() &&
                                                  entity instanceof BattleArmor;
         boolean commanderOnly = commanderOnlyVehicles || commanderOnlyInfantry || commanderOnlyBattleArmor;
 
