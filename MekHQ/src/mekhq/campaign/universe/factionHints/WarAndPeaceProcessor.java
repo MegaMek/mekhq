@@ -68,6 +68,8 @@ public class WarAndPeaceProcessor {
     private final String KEY_WAR_END = "warEndFactions";
     private final String KEY_RIVALRY_START = "rivalryStartFactions";
     private final String KEY_RIVALRY_END = "rivalryEndFactions";
+    private final String KEY_NEUTRAL_START = "neutralStartFactions";
+    private final String KEY_NEUTRAL_END = "neutralEndFactions";
     private final String KEY_ALLIANCE_START = "allianceStartFactions";
     private final String KEY_ALLIANCE_END = "allianceEndFactions";
 
@@ -79,6 +81,9 @@ public class WarAndPeaceProcessor {
 
     private final Set<Faction> rivalStartFactions = new HashSet<>();
     private final Set<Faction> rivalEndFactions = new HashSet<>();
+
+    private final Set<Faction> neutralStartFactions = new HashSet<>();
+    private final Set<Faction> neutralEndFactions = new HashSet<>();
 
     private final Set<Faction> allianceStartFactions = new HashSet<>();
     private final Set<Faction> allianceEndFactions = new HashSet<>();
@@ -118,6 +123,8 @@ public class WarAndPeaceProcessor {
               KEY_WAR_END, warEndFactions,
               KEY_RIVALRY_START, rivalStartFactions,
               KEY_RIVALRY_END, rivalEndFactions,
+              KEY_NEUTRAL_START, neutralStartFactions,
+              KEY_NEUTRAL_END, neutralEndFactions,
               KEY_ALLIANCE_START, allianceStartFactions,
               KEY_ALLIANCE_END, allianceEndFactions
         );
@@ -188,6 +195,10 @@ public class WarAndPeaceProcessor {
         final Map<Faction, List<FactionHint>> rivalries = factionHints.getRivals()
                                                                 .getOrDefault(campaignFaction, Map.of());
         collectionFactions(activeFactions, rivalries, rivalStartFactions, rivalEndFactions, activeOnly);
+
+        final Map<Faction, List<FactionHint>> neutrals = factionHints.getNeutralExceptions()
+                                                               .getOrDefault(campaignFaction, Map.of());
+        collectionFactions(activeFactions, neutrals, neutralStartFactions, neutralEndFactions, activeOnly);
 
         final Map<Faction, List<FactionHint>> alliances = factionHints.getAlliances()
                                                                 .getOrDefault(campaignFaction, Map.of());
