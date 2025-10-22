@@ -51,6 +51,10 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_E;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_F;
 import static mekhq.campaign.unit.enums.TransporterType.*;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -155,6 +159,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Unit implements ITechnology {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Unit";
     private static final MMLogger LOGGER = MMLogger.create(Unit.class);
 
     public static final int SITE_IMPROVISED = 0;
@@ -6996,5 +7001,63 @@ public class Unit implements ITechnology {
             default -> throw new IllegalStateException(
                   "Unexpected value in mekhq/campaign/unit/Unit.java/getRandomUnitQuality: " + roll);
         };
+    }
+
+    /**
+     * Checks for, and resolves, situations where the number of assigned personnel exceeds required crew positions
+     * (drivers, gunners, or vessel crew). For each role, if there are more personnel than needed, removes the excess,
+     * generates and collects a formatted warning report for each removed person.
+     *
+     * <p>The returned list contains the warning messages for all removed crew. Removal also invokes formatting and
+     * warning colorization for prominent display.</p>
+     *
+     * @return a list of warning message strings regarding personnel removed due to over-crewing
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public List<String> checkForOverCrewing() {
+        final String warningString = spanOpeningWithCustomColor(getWarningColor());
+        final List<String> reports = new ArrayList<>();
+
+        // Drivers (this will also remove Gunners, if Driver == Gunner)
+        int targetDriverCount = getTotalDriverNeeds();
+        while (!drivers.isEmpty() && (drivers.size() > targetDriverCount)) {
+            Person removedPerson = drivers.get(0);
+            remove(removedPerson, true);
+
+            String keyAffix = entity instanceof Infantry ? "soldier" : "driver";
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "Unit.excessCrew." + keyAffix, warningString,
+                  CLOSING_SPAN_TAG, getHyperlinkedName(), removedPerson.getHyperlinkedName());
+            reports.add(report);
+        }
+
+        // Gunners
+        int targetGunnerCount = usesSoloPilot() ? targetDriverCount : getTotalGunnerNeeds();
+        while (!gunners.isEmpty() && (gunners.size() > targetGunnerCount)) {
+            Iterator<Person> gunnersIterator = gunners.iterator();
+            if (gunnersIterator.hasNext()) {
+                Person removedPerson = gunnersIterator.next();
+                remove(removedPerson, true);
+                String report = getFormattedTextAt(RESOURCE_BUNDLE, "Unit.excessCrew.gunner", warningString,
+                      CLOSING_SPAN_TAG, getHyperlinkedName(), removedPerson.getHyperlinkedName());
+                reports.add(report);
+                reports.add(getHyperlinkedName() + ": " + targetGunnerCount);
+            }
+        }
+
+        // Vessel/Vehicle Crew
+        int targetCrewCount = getTotalCrewNeeds();
+        while (!vesselCrew.isEmpty() && (vesselCrew.size() > targetCrewCount)) {
+            Person removedPerson = vesselCrew.get(0);
+            remove(removedPerson, true);
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "Unit.excessCrew.crew", warningString,
+                  CLOSING_SPAN_TAG, getHyperlinkedName(), removedPerson.getHyperlinkedName());
+            reports.add(report);
+        }
+
+        // Other crew types are all singletons, so we shouldn't need to validate them
+
+        return reports;
     }
 }
