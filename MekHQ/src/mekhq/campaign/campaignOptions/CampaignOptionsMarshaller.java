@@ -260,7 +260,7 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isOnlyCommandersMatterVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
-              "onlyCommandersMatterVehicles",
+              "onlyCommandersMatterInfantry",
               campaignOptions.isOnlyCommandersMatterInfantry());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
