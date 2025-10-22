@@ -1,4 +1,4 @@
-package mekhq.campaign.universe.factionHints;/*
+/*
  * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -30,6 +30,7 @@ package mekhq.campaign.universe.factionHints;/*
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
+package mekhq.campaign.universe.factionHints;
 
 import static mekhq.MHQConstants.FACTION_HINTS_FILE;
 
@@ -139,6 +140,10 @@ public class FactionHints {
 
     public Map<Faction, Map<Faction, List<FactionHint>>> getRivals() {
         return rivals;
+    }
+
+    public Map<Faction, Map<Faction, List<FactionHint>>> getNeutralExceptions() {
+        return neutralExceptions;
     }
 
     /**

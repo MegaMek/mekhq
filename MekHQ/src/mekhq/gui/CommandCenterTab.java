@@ -87,6 +87,7 @@ import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AcquisitionsDialog;
+import mekhq.gui.dialog.DiplomacyReport;
 import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.dialog.factionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
@@ -575,7 +576,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * Initialize the panel for displaying available reports
      */
     private void initReportsPanel() {
-        panReports = new JPanel(new GridLayout(6, 1, 0, 5));
+        panReports = new JPanel(new GridLayout(7, 1, 0, 5));
 
         RoundedJButton btnTransportReport = new RoundedJButton(resourceMap.getString("btnTransportReport.text"));
         btnTransportReport.addActionListener(ev -> new TransportReportDialog(getCampaignGui().getFrame(),
@@ -621,6 +622,13 @@ public final class CommandCenterTab extends CampaignGuiTab {
             }
         });
         panReports.add(btnFactionStanding);
+
+        RoundedJButton btnDiplomacy = new RoundedJButton(resourceMap.getString("btnDiplomacy.text"));
+        btnDiplomacy.addActionListener(evt -> {
+            new DiplomacyReport(getCampaignGui().getFrame(),
+                  getCampaign().getLocalDate()).setVisible(true);
+        });
+        panReports.add(btnDiplomacy);
         panReports.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panReports.title")));
     }
 
