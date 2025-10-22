@@ -51,6 +51,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
+import mekhq.MHQConstants;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionHints.FactionHint;
 import mekhq.campaign.universe.factionHints.FactionHints;
@@ -91,19 +92,24 @@ public class DiplomacyReport extends JDialog {
 
     private final DefaultTableModel model = new DefaultTableModel(COLUMNS, 0);
     private final LocalDate today;
+    private final boolean isClanCampaign;
+    private final boolean isBeforeClanInvasionFirstWave;
 
     /**
      * Constructs the {@link DiplomacyReport} dialog.
      *
      * @param owner The parent frame which owns this dialog.
-     * @param date  The date for which faction relationships are reported.
+     * @param today The date for which faction relationships are reported.
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public DiplomacyReport(Frame owner, LocalDate date) {
+    public DiplomacyReport(Frame owner, boolean isClanCampaign, LocalDate today) {
         super(owner, DIALOG_TITLE, true);
-        today = date;
+        this.isClanCampaign = isClanCampaign;
+        this.today = today;
+
+        isBeforeClanInvasionFirstWave = today.isBefore(MHQConstants.CLAN_INVASION_FIRST_WAVE_BEGINS);
 
         setLayout(new BorderLayout());
 
@@ -187,6 +193,10 @@ public class DiplomacyReport extends JDialog {
         Faction primaryFaction = outerEntry.getKey();
         String primaryFactionName = primaryFaction.getFullName(currentYear);
 
+        if (shouldHideFaction(primaryFaction)) {
+            return;
+        }
+
         Map<Faction, List<FactionHint>> innerMap = outerEntry.getValue();
         for (Map.Entry<Faction, List<FactionHint>> innerEntry : innerMap.entrySet()) {
             Faction otherFaction = innerEntry.getKey();
@@ -208,5 +218,22 @@ public class DiplomacyReport extends JDialog {
                 }
             }
         }
+    }
+
+    /**
+     * Determines whether a given faction should be hidden from diplomacy reports based on campaign type and timeline.
+     *
+     * <p>If the current date is before the Clan Invasion first wave, this method will hide non-Clan factions in
+     * Clan campaigns and Clan factions in non-Clan campaigns. Otherwise, no factions are hidden.</p>
+     *
+     * @param primaryFaction the faction to test for hiding
+     *
+     * @return true if the faction should be hidden; false otherwise
+     */
+    private boolean shouldHideFaction(Faction primaryFaction) {
+        if (isBeforeClanInvasionFirstWave) {
+            return isClanCampaign != primaryFaction.isClan();
+        }
+        return false;
     }
 }
