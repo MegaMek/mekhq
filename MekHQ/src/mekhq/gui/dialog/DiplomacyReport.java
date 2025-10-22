@@ -51,6 +51,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
+import mekhq.MHQConstants;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionHints.FactionHint;
 import mekhq.campaign.universe.factionHints.FactionHints;
@@ -91,19 +92,24 @@ public class DiplomacyReport extends JDialog {
 
     private final DefaultTableModel model = new DefaultTableModel(COLUMNS, 0);
     private final LocalDate today;
+    private final boolean isClanCampaign;
+    private final boolean isBeforeClanInvasionFirstWave;
 
     /**
      * Constructs the {@link DiplomacyReport} dialog.
      *
      * @param owner The parent frame which owns this dialog.
-     * @param date  The date for which faction relationships are reported.
+     * @param today The date for which faction relationships are reported.
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public DiplomacyReport(Frame owner, LocalDate date) {
+    public DiplomacyReport(Frame owner, boolean isClanCampaign, LocalDate today) {
         super(owner, DIALOG_TITLE, true);
-        today = date;
+        this.isClanCampaign = isClanCampaign;
+        this.today = today;
+
+        isBeforeClanInvasionFirstWave = today.isBefore(MHQConstants.CLAN_INVASION_FIRST_WAVE_BEGINS);
 
         setLayout(new BorderLayout());
 
@@ -187,6 +193,10 @@ public class DiplomacyReport extends JDialog {
         Faction primaryFaction = outerEntry.getKey();
         String primaryFactionName = primaryFaction.getFullName(currentYear);
 
+        if (shouldHideFaction(primaryFaction)) {
+            return;
+        }
+
         Map<Faction, List<FactionHint>> innerMap = outerEntry.getValue();
         for (Map.Entry<Faction, List<FactionHint>> innerEntry : innerMap.entrySet()) {
             Faction otherFaction = innerEntry.getKey();
@@ -208,5 +218,14 @@ public class DiplomacyReport extends JDialog {
                 }
             }
         }
+    }
+
+    private boolean shouldHideFaction(Faction primaryFaction) {
+        if (isBeforeClanInvasionFirstWave) {
+            if (isClanCampaign != primaryFaction.isClan()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
