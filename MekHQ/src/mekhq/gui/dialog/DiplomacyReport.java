@@ -87,7 +87,7 @@ public class DiplomacyReport extends JDialog {
     private static final Dimension DEFAULT_SIZE = scaleForGUI(800, 600);
     private static final int COLUMN_WIDTH_NORMAL = scaleForGUI(100);
     private static final int COLUMN_WIDTH_SMALL = scaleForGUI(20);
-    private static final int[] COLUMN_WIDTHS = { COLUMN_WIDTH_NORMAL, COLUMN_WIDTH_NORMAL, COLUMN_WIDTH_SMALL,
+    private static final int[] COLUMN_WIDTHS = { COLUMN_WIDTH_NORMAL, COLUMN_WIDTH_SMALL, COLUMN_WIDTH_NORMAL,
                                                  COLUMN_WIDTH_NORMAL };
 
     private final DefaultTableModel model = new DefaultTableModel(COLUMNS, 0);
