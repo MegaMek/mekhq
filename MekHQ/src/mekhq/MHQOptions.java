@@ -78,6 +78,14 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).put(MHQConstants.LONG_DISPLAY_DATE_FORMAT, value);
     }
 
+    public boolean getHideUnitFluff() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.HIDE_UNIT_FLUFF, false);
+    }
+
+    public void setHideUnitFluff(boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.HIDE_UNIT_FLUFF, value);
+    }
+
     public boolean getHistoricalDailyLog() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.HISTORICAL_DAILY_LOG, false);
     }

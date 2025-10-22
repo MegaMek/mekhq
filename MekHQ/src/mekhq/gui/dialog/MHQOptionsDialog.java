@@ -87,6 +87,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JTextField optionDisplayDateFormat;
     private JTextField optionLongDisplayDateFormat;
     private final JSlider guiScale = new JSlider();
+    private JCheckBox optionHideUnitFluff;
     private JCheckBox optionHistoricalDailyLog;
     private JCheckBox chkCompanyGeneratorStartup;
     private JCheckBox chkShowCompanyGenerator;
@@ -305,6 +306,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .withLocale(MekHQ.getMHQOptions().getDateLocale())) :
                     resources.getString("invalidDateFormat.error")));
 
+        optionHideUnitFluff = new JCheckBox(resources.getString("optionHideUnitFluff.text"));
+        optionHideUnitFluff.setToolTipText(resources.getString("optionHideUnitFluff.toolTipText"));
+
         optionHistoricalDailyLog = new JCheckBox(resources.getString("optionHistoricalDailyLog.text"));
         optionHistoricalDailyLog.setToolTipText(resources.getString("optionHistoricalDailyLog.toolTipText"));
 
@@ -462,6 +466,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                       .addComponent(labelLongDisplayDateFormatExample,
                                                             Alignment.TRAILING))
                                       .addComponent(scaleLine)
+                                      .addComponent(optionHideUnitFluff)
                                       .addComponent(optionHistoricalDailyLog)
                                       .addComponent(chkCompanyGeneratorStartup)
                                       .addComponent(chkShowCompanyGenerator)
@@ -504,6 +509,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                         .addComponent(optionLongDisplayDateFormat)
                                                         .addComponent(labelLongDisplayDateFormatExample))
                                         .addComponent(scaleLine)
+                                        .addComponent(optionHideUnitFluff)
                                         .addComponent(optionHistoricalDailyLog)
                                         .addComponent(chkCompanyGeneratorStartup)
                                         .addComponent(chkShowCompanyGenerator)
@@ -1351,6 +1357,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         if (validateDateFormat(optionLongDisplayDateFormat.getText())) {
             MekHQ.getMHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
         }
+        MekHQ.getMHQOptions().setHideUnitFluff(optionHideUnitFluff.isSelected());
         MekHQ.getMHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
         MekHQ.getMHQOptions().setCompanyGeneratorStartup(chkCompanyGeneratorStartup.isSelected());
         MekHQ.getMHQOptions().setShowCompanyGenerator(chkShowCompanyGenerator.isSelected());
@@ -1508,6 +1515,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         guiScale.setValue((int) (GUIPreferences.getInstance().getGUIScale() * 10));
         optionDisplayDateFormat.setText(MekHQ.getMHQOptions().getDisplayDateFormat());
         optionLongDisplayDateFormat.setText(MekHQ.getMHQOptions().getLongDisplayDateFormat());
+        optionHideUnitFluff.setSelected(MekHQ.getMHQOptions().getHideUnitFluff());
         optionHistoricalDailyLog.setSelected(MekHQ.getMHQOptions().getHistoricalDailyLog());
         chkCompanyGeneratorStartup.setSelected(MekHQ.getMHQOptions().getCompanyGeneratorStartup());
         chkShowCompanyGenerator.setSelected(MekHQ.getMHQOptions().getShowCompanyGenerator());

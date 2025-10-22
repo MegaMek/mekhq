@@ -90,8 +90,9 @@ public class UnitViewPanel extends JScrollablePanel {
 
         setLayout(new GridBagLayout());
 
+        boolean isHideUnitFluff = MekHQ.getMHQOptions().getHideUnitFluff();
         int compWidth = 1;
-        Image image = FluffImageHelper.getFluffImage(entity);
+        Image image = isHideUnitFluff ? null : FluffImageHelper.getFluffImage(entity);
         JLabel lblImage;
         if (null != image) {
             // fluff image exists so use custom ImgLabel to get full mek porn
