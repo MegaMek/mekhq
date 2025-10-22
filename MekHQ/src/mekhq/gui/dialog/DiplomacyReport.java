@@ -228,7 +228,10 @@ public class DiplomacyReport extends JDialog {
      *
      * @param primaryFaction the faction to test for hiding
      *
-     * @return true if the faction should be hidden; false otherwise
+     * @return {@code true} if the faction should be hidden
+     *
+     * @author Illiani
+     * @since 0.50.10
      */
     private boolean shouldHideFaction(Faction primaryFaction) {
         if (isBeforeClanInvasionFirstWave) {
