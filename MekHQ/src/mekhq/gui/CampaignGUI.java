@@ -72,6 +72,7 @@ import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
+import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
 import megamek.client.ui.dialogs.buttonDialogs.GameOptionsDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -683,6 +684,14 @@ public class CampaignGUI extends JPanel {
         menuOptions.addActionListener(this::menuOptionsActionPerformed);
         menuFile.add(menuOptions);
 
+        final JMenuItem miMHQOptions = new JMenuItem(resourceMap.getString("miMHQOptions.text"));
+        miMHQOptions.setToolTipText(resourceMap.getString("miMHQOptions.toolTipText"));
+        miMHQOptions.setName("miMHQOptions");
+        miMHQOptions.setMnemonic(KeyEvent.VK_H);
+        miMHQOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
+        miMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
+        menuFile.add(miMHQOptions);
+
         final JMenuItem miGameOptions = new JMenuItem(resourceMap.getString("miGameOptions.text"));
         miGameOptions.setToolTipText(resourceMap.getString("miGameOptions.toolTipText"));
         miGameOptions.setName("miGameOptions");
@@ -698,13 +707,13 @@ public class CampaignGUI extends JPanel {
         });
         menuFile.add(miGameOptions);
 
-        final JMenuItem miMHQOptions = new JMenuItem(resourceMap.getString("miMHQOptions.text"));
-        miMHQOptions.setToolTipText(resourceMap.getString("miMHQOptions.toolTipText"));
-        miMHQOptions.setName("miMHQOptions");
-        miMHQOptions.setMnemonic(KeyEvent.VK_H);
-        miMHQOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
-        miMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
-        menuFile.add(miMHQOptions);
+        final JMenuItem miMMClientOptions = new JMenuItem(resourceMap.getString("miMMClientOptions.text"));
+        miMMClientOptions.setToolTipText(resourceMap.getString("miMMClientOptions.toolTipText"));
+        miMMClientOptions.setName("miMMClientOptions");
+        miMMClientOptions.setMnemonic(KeyEvent.VK_H);
+        miMMClientOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
+        miMMClientOptions.addActionListener(evt -> new CommonSettingsDialog(frame, null).setVisible(true));
+        menuFile.add(miMMClientOptions);
 
         menuThemes = new JMenu(resourceMap.getString("menuThemes.text"));
         menuThemes.setMnemonic(KeyEvent.VK_T);
