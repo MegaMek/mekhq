@@ -97,6 +97,10 @@ public class FactionHints {
         return rivals;
     }
 
+    public Map<Faction, Map<Faction, List<FactionHint>>> getNeutralExceptions() {
+        return neutralExceptions;
+    }
+
     /**
      * Generates the default set of {@link FactionHints} by loading relevant data using the main data directory.
      *
