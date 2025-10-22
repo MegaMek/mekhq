@@ -7853,7 +7853,7 @@ public class Campaign implements ITechManager {
 
         if (!skipAccessCheck
                   && campaignOptions.isUseFactionStandingOutlawedSafe()) {
-            FactionHints factionHints = FactionHints.defaultFactionHints();
+            FactionHints factionHints = FactionHints.getInstance();
             boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
                   getCurrentSystem(), end, currentDay, activeAtBContracts, factionHints);
             if (!canAccessSystem) {
@@ -7888,7 +7888,7 @@ public class Campaign implements ITechManager {
         scoreG.put(current, 0.0);
         closed.add(current);
 
-        FactionHints factionHints = FactionHints.defaultFactionHints();
+        FactionHints factionHints = FactionHints.getInstance();
 
         // A* search
         final int MAX_JUMPS = 10000;

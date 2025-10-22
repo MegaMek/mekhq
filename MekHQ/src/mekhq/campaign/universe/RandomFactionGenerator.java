@@ -55,14 +55,15 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.factionHints.FactionHints;
 
 /**
  * @author Neoancient
  *       <p>
  *       Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also
  *       finds a suitable planet for the action.
- *                                                                               TODO : Account for the de facto alliance of the invading Clans and the
- *                                                                               TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
+ *                                                                                     TODO : Account for the de facto alliance of the invading Clans and the
+ *                                                                                     TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
     private static final MMLogger LOGGER = MMLogger.create(RandomFactionGenerator.class);
@@ -70,21 +71,21 @@ public class RandomFactionGenerator {
     private static RandomFactionGenerator rfg = null;
 
     private FactionBorderTracker borderTracker;
-    private mekhq.campaign.universe.factionHints.FactionHints factionHints;
+    private FactionHints factionHints;
 
     public RandomFactionGenerator() {
         this(null, null);
     }
 
     public RandomFactionGenerator(FactionBorderTracker borderTracker,
-          mekhq.campaign.universe.factionHints.FactionHints factionHints) {
+          FactionHints factionHints) {
         this.borderTracker = borderTracker;
         this.factionHints = factionHints;
         if (null == borderTracker) {
             initDefaultBorderTracker();
         }
         if (null == factionHints) {
-            this.factionHints = mekhq.campaign.universe.factionHints.FactionHints.defaultFactionHints();
+            this.factionHints = FactionHints.getInstance();
         }
     }
 
@@ -126,7 +127,7 @@ public class RandomFactionGenerator {
         borderTracker.setDate(date);
     }
 
-    public mekhq.campaign.universe.factionHints.FactionHints getFactionHints() {
+    public FactionHints getFactionHints() {
         return factionHints;
     }
 
@@ -146,7 +147,7 @@ public class RandomFactionGenerator {
         Set<String> retVal = new TreeSet<>();
         for (Faction f : borderTracker.getFactionsInRegion()) {
 
-            if (mekhq.campaign.universe.factionHints.FactionHints.isEmptyFaction(f) ||
+            if (FactionHints.isEmptyFaction(f) ||
                       f.getShortName().equals("CLAN")) {
                 continue;
             }
@@ -173,7 +174,7 @@ public class RandomFactionGenerator {
         WeightedIntMap<Faction> retVal = new WeightedIntMap<>();
         for (Faction f : borderTracker.getFactionsInRegion()) {
 
-            if (f.isClan() || mekhq.campaign.universe.factionHints.FactionHints.isEmptyFaction(f)) {
+            if (f.isClan() || FactionHints.isEmptyFaction(f)) {
                 continue;
             }
             if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
@@ -344,7 +345,7 @@ public class RandomFactionGenerator {
         String employerShortName = employer.getShortName();
         if (employerShortName.equals(PIRATE_FACTION_CODE) || employerShortName.equals(COMSTAR_FACTION_CODE)) {
             for (Faction enemy : borderTracker.getFactionsInRegion()) {
-                if (mekhq.campaign.universe.factionHints.FactionHints.isEmptyFaction(enemy) ||
+                if (FactionHints.isEmptyFaction(enemy) ||
                           enemy.getShortName().equals("CLAN")) {
                     continue;
                 }
@@ -354,7 +355,7 @@ public class RandomFactionGenerator {
         }
 
         for (Faction enemy : borderTracker.getFactionsInRegion()) {
-            if (mekhq.campaign.universe.factionHints.FactionHints.isEmptyFaction(enemy) ||
+            if (FactionHints.isEmptyFaction(enemy) ||
                       enemy.getShortName().equals("CLAN")) {
                 continue;
             }
@@ -401,7 +402,7 @@ public class RandomFactionGenerator {
     public Set<String> getEmployerSet() {
         Set<String> set = new HashSet<>();
         for (Faction f : borderTracker.getFactionsInRegion()) {
-            if (!f.isClan() && !mekhq.campaign.universe.factionHints.FactionHints.isEmptyFaction(f)) {
+            if (!f.isClan() && !FactionHints.isEmptyFaction(f)) {
                 set.add(f.getShortName());
             }
             if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
@@ -444,7 +445,7 @@ public class RandomFactionGenerator {
         Set<Faction> list = new HashSet<>();
         Faction outer = factionHints.getContainedFactionHost(employer, getCurrentDate());
         for (Faction enemy : borderTracker.getFactionsInRegion()) {
-            if (mekhq.campaign.universe.factionHints.FactionHints.isEmptyFaction(enemy)) {
+            if (FactionHints.isEmptyFaction(enemy)) {
                 continue;
             }
             if (enemy.equals(employer) && !factionHints.isAtWarWith(enemy, enemy, getCurrentDate())) {

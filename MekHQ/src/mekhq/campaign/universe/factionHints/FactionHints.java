@@ -65,6 +65,8 @@ public class FactionHints {
     private static final String TEST_DIR = "testresources/" + FACTION_HINTS_FILE.replaceAll("factionhints",
           "factionhints_test");
 
+    private static volatile FactionHints instance;
+
     private final Set<Faction> neutralFactions;
 
     private final Map<Faction, Map<Faction, List<FactionHint>>> wars;
@@ -72,6 +74,39 @@ public class FactionHints {
     private final Map<Faction, Map<Faction, List<FactionHint>>> rivals;
     private final Map<Faction, Map<Faction, List<FactionHint>>> neutralExceptions;
     private final Map<Faction, Map<Faction, List<AltLocation>>> containedFactions;
+
+    /**
+     * Returns the singleton instance of {@link FactionHints}, initializing it if necessary.
+     *
+     * @return The singleton FactionHints instance, loaded from default data.
+     */
+    public static FactionHints getInstance() {
+        if (instance == null) {
+            synchronized (FactionHints.class) {
+                if (instance == null) {
+                    instance = new FactionHints();
+                    instance.loadData(false);
+                }
+            }
+        }
+        return instance;
+    }
+
+    /**
+     * For test purposes only. Loads the singleton using test directory instead of main data. Call this ONLY in tests,
+     * never in production code.
+     */
+    public static FactionHints initializeTestInstance() {
+        if (instance == null) {
+            synchronized (FactionHints.class) {
+                if (instance == null) {
+                    instance = new FactionHints();
+                    instance.loadData(true);
+                }
+            }
+        }
+        return instance;
+    }
 
     /**
      * Protected constructor that initializes empty data structures.
@@ -98,23 +133,17 @@ public class FactionHints {
     }
 
     /**
-     * Generates the default set of {@link FactionHints} by loading relevant data using the main data directory.
-     *
-     * @return A {@link FactionHints} object containing the loaded data.
+     * @deprecated use {@link #getInstance()} instead.
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public static FactionHints defaultFactionHints() {
         return defaultFactionHints(false);
     }
 
     /**
-     * Generates the default set of {@link FactionHints} by loading relevant data. This can be configured to use either
-     * the main data directory or a test data directory based on the input parameter.
-     *
-     * @param useTestDirectory A boolean indicating whether to load data from a test directory. If {@code true}, test
-     *                         data will be used; otherwise, the main data will be loaded.
-     *
-     * @return A {@link FactionHints} object containing the loaded data.
+     * @deprecated use {@link #getInstance()} instead.
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public static FactionHints defaultFactionHints(boolean useTestDirectory) {
         FactionHints hints = new FactionHints();
         hints.loadData(useTestDirectory);
