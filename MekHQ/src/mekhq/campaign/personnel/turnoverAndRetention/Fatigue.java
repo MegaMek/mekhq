@@ -34,17 +34,26 @@ package mekhq.campaign.personnel.turnoverAndRetention;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.Vector;
 
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.stratCon.StratConRulesManager;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 
@@ -206,6 +215,75 @@ public class Fatigue {
         if ((campaign.getCampaignOptions().getFatigueLeaveThreshold() != 0)
                   && (effectiveFatigue >= campaign.getCampaignOptions().getFatigueLeaveThreshold())) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
+        }
+    }
+
+    /**
+     * Processes all combat teams in the campaign to evaluate deployment fatigue responses.
+     *
+     * <p>For each combat team, this method checks whether the fatigue and deployment rules are enabled in the
+     * campaign options. If enabled, it iterates through each unit and crew member of the team's force, calculating
+     * effective fatigue. If a unit's crew contains at least one individual with effective fatigue above the
+     * undeployment threshold, that unit is counted as fatigued.</p>
+     *
+     * <p>If at least half of the units in a force are fatigued above the threshold, a formatted warning message is
+     * created to indicate that the force has reached critical fatigue levels.</p>
+     *
+     * @param campaign the campaign containing the combat teams, options, and units to be checked
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public static void processDeploymentFatigueResponses(Campaign campaign) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (!campaignOptions.isUseStratCon() || !campaignOptions.isUseFatigue()) {
+            return;
+        }
+
+        int leaveThreshold = campaignOptions.getFatigueUndeploymentThreshold();
+
+        for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
+            Force force = combatTeam.getForce(campaign);
+            if (force == null || force.isDeployed()) {
+                // 'isDeployed' will only return true if the force is deployed to a scenario. In which cases we don't
+                // want to yank the unit back until the next Monday checkpoint.
+                continue;
+            }
+
+            Vector<UUID> unitsInForce = force.getAllUnits(false);
+            int fatiguedUnits = 0;
+            for (UUID unitId : unitsInForce) {
+                Unit unit = campaign.getUnit(unitId);
+                if (unit == null || !StratConRulesManager.isUnitDeployedToStratCon(unit)) {
+                    continue;
+                }
+
+                for (Person person : unit.getCrew()) {
+                    int fatigue = person.getFatigue();
+                    boolean isClan = person.isClanPersonnel();
+                    SkillLevel experienceLevel = person.getSkillLevel(campaign, false);
+                    int effectiveFatigue = getEffectiveFatigue(fatigue, isClan, experienceLevel);
+
+                    if (effectiveFatigue >= leaveThreshold) {
+                        fatiguedUnits++;
+                        break;
+                    }
+                }
+            }
+
+            if (fatiguedUnits >= (unitsInForce.size() / 2)) {
+                for (AtBContract contract : campaign.getActiveAtBContracts()) {
+                    if (contract.getStratconCampaignState() != null) {
+                        for (StratConTrackState track : contract.getStratconCampaignState().getTracks()) {
+                            track.unassignForce(force.getId());
+                        }
+                    }
+                }
+
+                String fatigueMessage = getFormattedTextAt(RESOURCE_BUNDLE, "fatigueUndeployed.text",
+                      spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, force.getName());
+                campaign.addReport(fatigueMessage);
+            }
         }
     }
 
