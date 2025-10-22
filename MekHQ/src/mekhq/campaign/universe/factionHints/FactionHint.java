@@ -51,7 +51,7 @@ public class FactionHint {
     }
 
     public boolean isInDateRange(final LocalDate date) {
-        return ((start == null) || date.isAfter(start)) && ((end == null) || date.isBefore(end));
+        return ((start == null) || !date.isBefore(start)) && ((end == null) || !date.isAfter(end));
     }
 
     public boolean hintStartsToday(final LocalDate today) {
