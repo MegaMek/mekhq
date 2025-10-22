@@ -51,7 +51,7 @@ import megamek.common.annotations.Nullable;
  */
 public enum GlossaryEntry {
     @Deprecated(since = "0.50.10", forRemoval = true)
-    ADMIN_STRAIN("ADMIN_STRAIN"),
+    ADMIN_STRAIN("HR_STRAIN"),
     ADVANCED_SCOUTING("ADVANCED_SCOUTING"),
     AGING("AGING"),
     AREA_OF_OPERATIONS("AREA_OF_OPERATIONS"),
