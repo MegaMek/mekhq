@@ -343,8 +343,8 @@ public class Warehouse {
     public int getSparePartsCount(Part targetPart) {
         int count = 0;
         for (Part warehousePart : getParts()) {
-            if (warehousePart.isSpare() && warehousePart.isSamePartType(targetPart)) {
-                count += getPartQuantity(warehousePart);
+            if (warehousePart.isSamePartType(targetPart)) {
+                count += getPartQuantity(warehousePart, true);
             }
         }
 
@@ -352,14 +352,18 @@ public class Warehouse {
     }
 
     //TODO: getPartQuantity should be an overloaded method in Part.java, I'm just getting it out of campaign
-    public int getPartQuantity(Part p) {
-        if (p instanceof Armor) {
-            return ((Armor) p).getAmount();
+    public int getPartQuantity(Part part, boolean sparesOnly) {
+        if (sparesOnly && !part.isSpare()) {
+            return 0;
         }
-        if (p instanceof AmmoStorage) {
-            return ((AmmoStorage) p).getShots();
+
+        if (part instanceof Armor) {
+            return ((Armor) part).getAmount();
         }
-        return (p.getUnit() != null) ? 1 : p.getQuantity();
+        if (part instanceof AmmoStorage) {
+            return ((AmmoStorage) part).getShots();
+        }
+        return (part.getUnit() != null) ? 1 : part.getQuantity();
     }
 
     /**

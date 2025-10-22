@@ -3103,7 +3103,7 @@ public class Campaign implements ITechManager {
     }
 
     private int getQuantity(Part part) {
-        return getWarehouse().getPartQuantity(part);
+        return getWarehouse().getPartQuantity(part, true);
     }
 
     private PartInUse getPartInUse(Part part) {
