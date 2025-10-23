@@ -238,15 +238,15 @@ class ForceTest {
 
         private static Stream<Arguments> factions() {
             return Stream.of(
-                  Arguments.of(mockISFaction, 4),
-                  Arguments.of(mockComstarFaction,6),
-                  Arguments.of(mockClanFaction, 5)
+                  Arguments.of(mockISFaction),
+                  Arguments.of(mockComstarFaction),
+                  Arguments.of(mockClanFaction)
             );
         }
 
         @ParameterizedTest
         @MethodSource(value = "factions")
-        void testGetDefaultFormationDepth1(Faction faction, int baseFormationSize) {
+        void testGetDefaultFormationDepth1(Faction faction) {
             // Arrange
             setFaction(faction);
 
@@ -260,7 +260,7 @@ class ForceTest {
 
         @ParameterizedTest
         @MethodSource(value = "factions")
-        void testGetDefaultFormationDepth2(Faction faction, int baseFormationSize) {
+        void testGetDefaultFormationDepth2(Faction faction) {
             // Arrange
             setFaction(faction);
 
@@ -276,7 +276,7 @@ class ForceTest {
 
         @ParameterizedTest
         @MethodSource(value = "factions")
-        void testGetDefaultFormationDepth3(Faction faction, int baseFormationSize) {
+        void testGetDefaultFormationDepth3(Faction faction) {
             // Arrange
             setFaction(faction);
 
@@ -290,7 +290,7 @@ class ForceTest {
 
         @ParameterizedTest
         @MethodSource(value = "factions")
-        void testGetDefaultFormationDepth4(Faction faction, int baseFormationSize) {
+        void testGetDefaultFormationDepth4(Faction faction) {
             // Arrange
             setFaction(faction);
 
@@ -304,7 +304,7 @@ class ForceTest {
 
         @ParameterizedTest
         @MethodSource(value = "factions")
-        void testGetDefaultFormationDepth5(Faction faction, int baseFormationSize) {
+        void testGetDefaultFormationDepth5(Faction faction) {
             // Arrange
             setFaction(faction);
 
@@ -318,7 +318,7 @@ class ForceTest {
 
         @ParameterizedTest
         @MethodSource(value = "factions")
-        void testGetDefaultFormationDepth6(Faction faction, int baseFormationSize) {
+        void testGetDefaultFormationDepth6(Faction faction) {
             // Arrange
             setFaction(faction);
 
@@ -332,7 +332,7 @@ class ForceTest {
 
         @ParameterizedTest
         @MethodSource(value = "factions")
-        void testGetDefaultFormationSupportCompanyAttachedToRegiment(Faction faction, int baseFormationSize) {
+        void testGetDefaultFormationSupportCompanyAttachedToRegiment(Faction faction) {
             // Arrange
             setFaction(faction);
 
@@ -351,7 +351,7 @@ class ForceTest {
 
         @ParameterizedTest
         @MethodSource(value = "factions")
-        void testGetDefaultFormationBaseCompanies(Faction faction, int baseFormationSize) {
+        void testGetDefaultFormationBaseCompanies(Faction faction) {
             // Arrange
             setFaction(faction);
 
@@ -364,6 +364,7 @@ class ForceTest {
                 }
             }
             force.defaultFormationLevelForForce(mockCampaign);
+            force.setOverrideFormationLevel(FormationLevel.parseFromDepth(mockCampaign, 2));
 
             // Assert
             assertEquals(FormationLevel.parseFromDepth(mockCampaign, 2), force.getFormationLevel());

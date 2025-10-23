@@ -231,6 +231,12 @@ public class Force {
     }
 
     public FormationLevel getFormationLevel() {
+        return getOverrideFormationLevel() != null && getOverrideFormationLevel() != FormationLevel.NONE ?
+                     getOverrideFormationLevel() :
+                     getDefaultFormationLevel();
+    }
+
+    private FormationLevel getDefaultFormationLevel() {
         return formationLevel;
     }
 
@@ -773,7 +779,7 @@ public class Force {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "forceType", forceType.ordinal());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideCombatTeam", overrideCombatTeam);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "populateOriginNode", overrideFormationLevel.toString());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideFormationLevel", overrideFormationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "techId", techId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideForceCommanderID", overrideForceCommanderID);
@@ -824,7 +830,7 @@ public class Force {
                     force.setOverrideCombatTeam(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {
                     force.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("populateOriginNode")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("overrideFormationLevel")) {
                     force.setOverrideFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     force.scenarioId = Integer.parseInt(wn2.getTextContent());
@@ -1117,34 +1123,6 @@ public class Force {
                 return -1;
             }
         }
-
-        int nominalForceSize = baseFormationSize;
-        // If the actual unit count is 0, then this may never end
-        if (depth > 0 && actualUnitCount > 0) {
-            // Binary/Trinary Handler
-            if (depth > 1) {
-                nominalForceSize *= campaign.getFaction().isClan() ? 3 : baseFormationGrouping;
-            }
-            nominalForceSize *= MathUtility.roundAwayFromZero(Math.pow(baseFormationGrouping, (depth - 2)));
-
-            // Undersized or Oversized?
-            if (actualUnitCount >= 2 * nominalForceSize) { // Oversized
-                int increaseSize = 0;
-                while (nominalForceSize < actualUnitCount) {
-                    nominalForceSize *= baseFormationGrouping;
-                    increaseSize++;
-                }
-                return increaseSize;
-            } else if (actualUnitCount <= nominalForceSize / 2) { // Undersized
-                int decreaseSize = 0;
-                while (nominalForceSize > actualUnitCount) {
-                    nominalForceSize /= baseFormationGrouping;
-                    decreaseSize++;
-                }
-                return decreaseSize;
-            }
-        }
-
 
         return 0;
     }
