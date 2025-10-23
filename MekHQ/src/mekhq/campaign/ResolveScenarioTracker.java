@@ -76,7 +76,6 @@ import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
-import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -1716,7 +1715,7 @@ public class ResolveScenarioTracker {
                 }
                 if (campaign.getCampaignOptions().isPayForRepairs()) {
                     Money amount = unit.getValueOfAllDamagedParts()
-                        .multipliedBy(DAMANGED_PART_COMPENSATION_MODIFIER);
+                                         .multipliedBy(DAMANGED_PART_COMPENSATION_MODIFIER);
                     repairBLC = repairBLC.minus(amount);
                 }
                 unit.setEntity(en);
@@ -1742,7 +1741,7 @@ public class ResolveScenarioTracker {
                 }
                 if (campaignOptions.isPayForRepairs()) {
                     Money amount = unit.getValueOfAllDamagedParts()
-                        .multipliedBy(DAMANGED_PART_COMPENSATION_MODIFIER);
+                                         .multipliedBy(DAMANGED_PART_COMPENSATION_MODIFIER);
                     repairBLC = repairBLC.minus(amount);
                 }
                 blcValue = blcValue.plus(repairBLC);
@@ -1817,14 +1816,11 @@ public class ResolveScenarioTracker {
             }
         }
 
-        if (campaignOptions.isUseAtB() && isAtBContract) {
-            final int unitRatingMod = campaign.getAtBUnitRatingMod();
-            for (Unit unit : getUnits()) {
-                unit.setSite(((AtBContract) mission).getRepairLocation(unitRatingMod));
-            }
-            for (Unit unit : getActualSalvage()) {
-                unit.setSite(((AtBContract) mission).getRepairLocation(unitRatingMod));
-            }
+        for (Unit unit : getUnits()) {
+            unit.setSite(mission.getRepairLocation());
+        }
+        for (Unit unit : getActualSalvage()) {
+            unit.setSite(mission.getRepairLocation());
         }
 
         for (Loot loot : actualLoot) {
