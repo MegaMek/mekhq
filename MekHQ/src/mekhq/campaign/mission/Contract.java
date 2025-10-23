@@ -88,6 +88,10 @@ public class Contract extends Mission {
     private int advancePct;
     private int signBonus;
 
+    private int hospitalBedsRented;
+    private int kitchensRented;
+    private int holdingCellsRented;
+
     // this is a transient variable meant to keep track of a single jump path while
     // the contract
     // runs through initial calculations, as the same jump path is referenced
@@ -130,6 +134,9 @@ public class Contract extends Mission {
         this.mrbcFee = true;
         this.advancePct = 25;
         this.signBonus = 0;
+        this.hospitalBedsRented = 0;
+        this.kitchensRented = 0;
+        this.holdingCellsRented = 0;
     }
 
     public static String getOverheadCompName(int i) {
@@ -307,6 +314,30 @@ public class Contract extends Mission {
 
     public void setSigningBonusPct(int s) {
         signBonus = s;
+    }
+
+    public int getHospitalBedsRented() {
+        return hospitalBedsRented;
+    }
+
+    public void setHospitalBedsRented(int count) {
+        hospitalBedsRented = count;
+    }
+
+    public int getKitchensRented() {
+        return kitchensRented;
+    }
+
+    public void setKitchensRented(int count) {
+        hospitalBedsRented = count;
+    }
+
+    public int getHoldingCellsRented() {
+        return holdingCellsRented;
+    }
+
+    public void setHoldingCellsRented(int count) {
+        holdingCellsRented = count;
     }
 
     public int getAdvancePct() {
@@ -764,6 +795,9 @@ public class Contract extends Mission {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrbcFee", mrbcFee);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advancePct", advancePct);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signBonus", signBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hospitalBedsRented", hospitalBedsRented);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "kitchensRented", kitchensRented);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "holdingCellsRented", holdingCellsRented);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advanceAmount", advanceAmount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signingAmount", signingAmount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportAmount", transportAmount);
@@ -814,6 +848,12 @@ public class Contract extends Mission {
                     advancePct = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("signBonus")) {
                     signBonus = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("hospitalBedsRented")) {
+                    hospitalBedsRented = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("kitchensRented")) {
+                    kitchensRented = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("holdingCellsRented")) {
+                    holdingCellsRented = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mrbcFee")) {
                     mrbcFee = wn2.getTextContent().trim().equals("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("advanceAmount")) {
