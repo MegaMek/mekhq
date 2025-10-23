@@ -329,7 +329,7 @@ public class Contract extends Mission {
     }
 
     public void setKitchensRented(int count) {
-        hospitalBedsRented = count;
+        kitchensRented = count;
     }
 
     public int getHoldingCellsRented() {

@@ -100,11 +100,8 @@ public class FacilityRentals {
 
         if (wasRentConfirmed) {
             contract.setHospitalBedsRented(ContractStartRentalDialog.getHospitalSpinnerValue());
-            LOGGER.info("Hospital beds rented: {}", contract.getHospitalBedsRented());
             contract.setKitchensRented(ContractStartRentalDialog.getKitchensSpinnerValue());
-            LOGGER.info("Kitchens rented: {}", contract.getKitchensRented());
             contract.setHoldingCellsRented(ContractStartRentalDialog.getSecuritySpinnerValue());
-            LOGGER.info("Holding cells rented: {}", contract.getHoldingCellsRented());
         }
     }
 

@@ -113,7 +113,7 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
               getCenterMessage(campaign.getCommanderAddress(), contract, campaign.getGameYear()),
               getButtons(),
               getOutOfCharacterMessage(hospitalBedCost, kitchenCost, holdingCellCost),
-              ImmersiveDialogWidth.SMALL.getWidth(),
+              ImmersiveDialogWidth.LARGE.getWidth(),
               false,
               getSupplementalPanel(hospitalBedCost, kitchenCost, holdingCellCost),
               null,
@@ -146,7 +146,7 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
     }
 
     private static String getOutOfCharacterMessage(int hospitalBedCost, int kitchenCost, int holdingCellCost) {
-        StringBuilder outOfCharacterMessage = new StringBuilder("<html>");
+        StringBuilder outOfCharacterMessage = new StringBuilder();
         outOfCharacterMessage.append(getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.outOfCharacter.intro"));
 
         if (hospitalBedCost > 0) {
@@ -164,7 +164,6 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
                   "ContractStartRentalDialog.outOfCharacter.security", holdingCellCost));
         }
 
-        outOfCharacterMessage.append("</html>");
         return outOfCharacterMessage.toString();
     }
 
@@ -217,9 +216,10 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
         panel.add(spnSecurity, constraints);
 
         lblRentalCost = new JLabel(getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.label.total"));
+        updateTotal(hospitalBedCost, kitchenCost, holdingCellCost);
         constraints.gridx = 0;
         constraints.gridy = 4;
-        constraints.gridwidth = 1;
+        constraints.gridwidth = 2;
         constraints.fill = GridBagConstraints.NONE;
         panel.add(lblRentalCost, constraints);
 
