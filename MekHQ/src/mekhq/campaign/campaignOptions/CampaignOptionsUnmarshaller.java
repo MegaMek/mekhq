@@ -679,6 +679,14 @@ public class CampaignOptionsUnmarshaller {
             case "payForRecruitment" -> campaignOptions.setPayForRecruitment(parseBoolean(nodeContents));
             case "payForFood" -> campaignOptions.setPayForFood(parseBoolean(nodeContents));
             case "payForHousing" -> campaignOptions.setPayForHousing(parseBoolean(nodeContents));
+            case "rentedFacilitiesCostHospitalBeds" ->
+                  campaignOptions.setRentedFacilitiesCostHospitalBeds(parseInt(nodeContents));
+            case "rentedFacilitiesCostKitchens" ->
+                  campaignOptions.setRentedFacilitiesCostKitchens(parseInt(nodeContents));
+            case "rentedFacilitiesCostHoldingCells" ->
+                  campaignOptions.setRentedFacilitiesCostHoldingCells(parseInt(nodeContents));
+            case "rentedFacilitiesCostRepairBays" ->
+                  campaignOptions.setRentedFacilitiesCostRepairBays(parseInt(nodeContents));
             case "useLoanLimits" -> campaignOptions.setLoanLimits(parseBoolean(nodeContents));
             case "usePercentageMaint" -> campaignOptions.setUsePercentageMaintenance(parseBoolean(nodeContents));
             case "infantryDontCount" -> campaignOptions.setUseInfantryDontCount(parseBoolean(nodeContents));

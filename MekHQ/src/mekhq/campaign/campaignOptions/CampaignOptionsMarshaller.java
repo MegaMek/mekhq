@@ -827,6 +827,22 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForRecruitment", campaignOptions.isPayForRecruitment());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForFood", campaignOptions.isPayForFood());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForHousing", campaignOptions.isPayForHousing());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "rentedFacilitiesCostHospitalBeds",
+              campaignOptions.getRentedFacilitiesCostHospitalBeds());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "rentedFacilitiesCostKitchens",
+              campaignOptions.getRentedFacilitiesCostKitchens());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "rentedFacilitiesCostHoldingCells",
+              campaignOptions.getRentedFacilitiesCostHoldingCells());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "rentedFacilitiesCostRepairBays",
+              campaignOptions.getRentedFacilitiesCostRepairBays());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoanLimits", campaignOptions.isUseLoanLimits());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePercentageMaint", campaignOptions.isUsePercentageMaintenance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "infantryDontCount", campaignOptions.isInfantryDontCount());

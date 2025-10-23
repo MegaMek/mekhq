@@ -510,6 +510,12 @@ public class CampaignOptions {
     // Shares
     private boolean useShareSystem;
     private boolean sharesForAll;
+
+    // Rented Facilities
+    private int rentedFacilitiesCostHospitalBeds;
+    private int rentedFacilitiesCostKitchens;
+    private int rentedFacilitiesCostHoldingCells;
+    private int rentedFacilitiesCostRepairBays;
     // endregion Finance Tab
 
     // region Mercenary Tab
@@ -1144,6 +1150,16 @@ public class CampaignOptions {
         // Shares
         setUseShareSystem(false);
         setSharesForAll(true);
+
+        // Rented Facilities
+        // The comments below explain where we get the default values from. Unless otherwise stated, all values are
+        // derived from 5% of the unit's cost, divided by 4 (number of weeks in a month), with the result rounded to
+        // the nearest 50 C-Bills. The 5% comes from CamOps travel rental, where the rental cost is 5% of the unit's
+        // cost.
+        rentedFacilitiesCostHospitalBeds = 4100; // The C-Bill value of a 'Sherpa Armored Truck (MASH)'
+        rentedFacilitiesCostKitchens = 3700; // The C-Bill value of a 'Sherpa Armored Truck (Mobile Canteen)'
+        rentedFacilitiesCostHoldingCells = 6400; // The C-Bill value of 'Foot Platoon (Rifle)'
+        rentedFacilitiesCostRepairBays = 3350; // CamOps bay rental from travel/30
         // endregion Finances Tab
 
         // region Mercenary Tab
@@ -3463,6 +3479,38 @@ public class CampaignOptions {
 
     public void setPayForHousing(final boolean payForHousing) {
         this.payForHousing = payForHousing;
+    }
+
+    public int getRentedFacilitiesCostHospitalBeds() {
+        return rentedFacilitiesCostHospitalBeds;
+    }
+
+    public void setRentedFacilitiesCostHospitalBeds(final int rentedFacilitiesCostHospitalBeds) {
+        this.rentedFacilitiesCostHospitalBeds = rentedFacilitiesCostHospitalBeds;
+    }
+
+    public int getRentedFacilitiesCostKitchens() {
+        return rentedFacilitiesCostKitchens;
+    }
+
+    public void setRentedFacilitiesCostKitchens(final int rentedFacilitiesCostKitchens) {
+        this.rentedFacilitiesCostKitchens = rentedFacilitiesCostKitchens;
+    }
+
+    public int getRentedFacilitiesCostHoldingCells() {
+        return rentedFacilitiesCostHoldingCells;
+    }
+
+    public void setRentedFacilitiesCostHoldingCells(final int rentedFacilitiesCostHoldingCells) {
+        this.rentedFacilitiesCostHoldingCells = rentedFacilitiesCostHoldingCells;
+    }
+
+    public int getRentedFacilitiesCostRepairBays() {
+        return rentedFacilitiesCostRepairBays;
+    }
+
+    public void setRentedFacilitiesCostRepairBays(final int rentedFacilitiesCostRepairBays) {
+        this.rentedFacilitiesCostRepairBays = rentedFacilitiesCostRepairBays;
     }
 
     public boolean isUseLoanLimits() {
