@@ -390,6 +390,7 @@ public class Campaign implements ITechManager {
 
     private boolean fieldKitchenWithinCapacity;
     private int mashTheatreCapacity;
+    private int repairBaysRented;
 
     // this is updated and used per gaming session, it is enabled/disabled via the
     // Campaign options
@@ -622,6 +623,7 @@ public class Campaign implements ITechManager {
         hasActiveContract = false;
         fieldKitchenWithinCapacity = false;
         mashTheatreCapacity = 0;
+        repairBaysRented = 0;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         processProcurement = true;
@@ -2236,6 +2238,18 @@ public class Campaign implements ITechManager {
 
     public void setMashTheatreCapacity(int mashTheatreCapacity) {
         this.mashTheatreCapacity = mashTheatreCapacity;
+    }
+
+    public int getRepairBaysRented() {
+        return repairBaysRented;
+    }
+
+    public void setRepairBaysRented(int repairBaysRented) {
+        this.repairBaysRented = repairBaysRented;
+    }
+
+    public void changeRepairBaysRented(int delta) {
+        repairBaysRented = max(0, repairBaysRented + delta);
     }
     // endregion Person Creation
 
@@ -7558,6 +7572,7 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "medicPool", medicPool);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "fieldKitchenWithinCapacity", fieldKitchenWithinCapacity);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "mashTheatreCapacity", mashTheatreCapacity);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "repairBaysRented", repairBaysRented);
         getCamouflage().writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "colour", getColour().name());
         getUnitIcon().writeToXML(writer, indent);
