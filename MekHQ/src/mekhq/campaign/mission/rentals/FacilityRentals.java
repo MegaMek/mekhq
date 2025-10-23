@@ -96,7 +96,7 @@ public class FacilityRentals {
             return;
         }
 
-        int rentalCount = presentDialog(campaign, rentalType, rentalCost);
+        int rentalCount = presentDialog(campaign, rentalType, Money.of(rentalCost));
         if (rentalCount <= 0) { // The player chose not to rent anything
             return;
         }
@@ -136,7 +136,7 @@ public class FacilityRentals {
             baseCost *= FACTORY_CONDITIONS_MULTIPLIER;
         }
 
-        int totalCost = baseCost * unitCount;
+        Money totalCost = Money.of(baseCost * unitCount);
 
         int rentalCount = presentDialog(campaign, rentalType, totalCost);
         if (rentalCount <= 0) { // The player chose not to rent anything
@@ -146,7 +146,7 @@ public class FacilityRentals {
         // Returns false if the player cannot afford the rental
         if (!performRentalTransaction(campaign.getFinances(),
               campaign.getLocalDate(),
-              Money.of(totalCost),
+              totalCost,
               ContractRentalType.MAINTENANCE_BAYS)) {
             String report = getFormattedTextAt(RESOURCE_BUNDLE, "PLACEHOLDER");
             campaign.addReport(report);
@@ -168,7 +168,7 @@ public class FacilityRentals {
      * @author Illiani
      * @since 0.50.10
      */
-    private static int presentDialog(Campaign campaign, ContractRentalType rentalType, int rentalCost) {
+    private static int presentDialog(Campaign campaign, ContractRentalType rentalType, Money rentalCost) {
         boolean wasConfirmedOverall = false;
         ContractStartRentalDialog offerDialog = null;
         while (!wasConfirmedOverall) {
