@@ -48,11 +48,13 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -95,7 +97,10 @@ import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.rentals.ContractRentalType;
+import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -316,9 +321,35 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.contains(COMMAND_CHANGE_SITE)) {
             try {
                 int selected = Integer.parseInt(command.split(":")[1]);
-                for (Unit unit : units) {
-                    if (!unit.isDeployed()) {
-                        if ((selected > -1) && (selected < Unit.SITE_UNKNOWN)) {
+                boolean selectedIsValid = selected > -1 && selected < Unit.SITE_UNKNOWN;
+                if (!selectedIsValid) {
+                    return;
+                }
+
+                boolean wasSiteChangeSucceessful = true;
+
+                if (selected >= Unit.SITE_FACILITY_MAINTENANCE) {
+                    Campaign campaign = gui.getCampaign();
+                    List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+
+                    Predicate<Unit> eligibleForBayRental = u -> !FacilityRentals.shouldBeIgnoredByBayRentals(u);
+                    int eligibleUnitCount = (int) Arrays.stream(units)
+                                                        .filter(eligibleForBayRental)
+                                                        .count();
+
+                    ContractRentalType rentalType = switch (selected) {
+                        case Unit.SITE_FACILITY_MAINTENANCE -> ContractRentalType.MAINTENANCE_BAYS;
+                        case Unit.SITE_FACTORY_CONDITIONS -> ContractRentalType.FACTORY_CONDITIONS;
+                        default -> null; // Should never happen as we're already filtering out invalid sites
+                    };
+
+                    wasSiteChangeSucceessful = FacilityRentals.offerBayRentalOpportunity(campaign, activeContracts,
+                          eligibleUnitCount, rentalType);
+                }
+
+                if (wasSiteChangeSucceessful) {
+                    for (Unit unit : units) {
+                        if (!unit.isDeployed()) {
                             unit.setSite(selected);
                             MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
                         }
