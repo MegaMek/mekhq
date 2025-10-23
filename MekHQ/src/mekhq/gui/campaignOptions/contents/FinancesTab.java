@@ -589,7 +589,7 @@ public class FinancesTab {
         lblRentedFacilitiesCostRepairBays.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "RentedFacilitiesCostRepairBays"));
         spnRentedFacilitiesCostRepairBays = new CampaignOptionsSpinner("RentedFacilitiesCostRepairBays",
-              3350, 0, 1000000, 1);
+              25000, 0, 1000000, 1);
         spnRentedFacilitiesCostRepairBays.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "RentedFacilitiesCostRepairBays"));
 

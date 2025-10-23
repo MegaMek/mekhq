@@ -1159,7 +1159,7 @@ public class CampaignOptions {
         rentedFacilitiesCostHospitalBeds = 4100; // The C-Bill value of a 'Sherpa Armored Truck (MASH)'
         rentedFacilitiesCostKitchens = 3700; // The C-Bill value of a 'Sherpa Armored Truck (Mobile Canteen)'
         rentedFacilitiesCostHoldingCells = 6400; // The C-Bill value of 'Foot Platoon (Rifle)'
-        rentedFacilitiesCostRepairBays = 3350; // CamOps bay rental from travel/30
+        rentedFacilitiesCostRepairBays = 25000; // CamOps bay rental from travel/4
         // endregion Finances Tab
 
         // region Mercenary Tab
