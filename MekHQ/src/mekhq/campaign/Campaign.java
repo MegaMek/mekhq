@@ -205,6 +205,8 @@ import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
+import mekhq.campaign.mission.rentals.ContractRentalType;
+import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.parts.*;
@@ -6274,6 +6276,15 @@ public class Campaign implements ITechManager {
             new PrisonerEventManager(this);
         }
 
+        if (isFirstOfMonth) {
+            payForRentedFacilities();
+        }
+        
+        if (isMonday) {
+            // Bays are handled weekly, all other facilities are handled monthly
+            FacilityRentals.payForAllRentedBays(this);
+        }
+
         resetAsTechMinutes();
 
         processNewDayUnits();
@@ -6316,6 +6327,37 @@ public class Campaign implements ITechManager {
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    /**
+     * Calculates and processes payment for all types of rented facilities (hospital beds, kitchens, holding cells)
+     * based on the active contracts and current campaign options.
+     *
+     * <p>Generates reports for any failed transactions or payment issues. Adds any generated reports to the campaign
+     * log.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void payForRentedFacilities() {
+        List<Contract> activeContracts = getActiveContracts();
+        int hospitalRentalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
+        Money hospitalRentalFee = FacilityRentals.calculateContractRentalCost(hospitalRentalCost, activeContracts,
+              ContractRentalType.HOSPITAL_BEDS);
+
+        int kitchenRentalCost = campaignOptions.getRentedFacilitiesCostKitchens();
+        Money kitchenRentalFee = FacilityRentals.calculateContractRentalCost(kitchenRentalCost, activeContracts,
+              ContractRentalType.KITCHENS);
+
+        int holdingCellRentalCost = campaignOptions.getRentedFacilitiesCostHoldingCells();
+        Money holdingCellRentalFee = FacilityRentals.calculateContractRentalCost(holdingCellRentalCost, activeContracts,
+              ContractRentalType.HOLDING_CELLS);
+
+        List<String> reports = FacilityRentals.payForAllContractRentals(finances, currentDay, hospitalRentalFee,
+              kitchenRentalFee, holdingCellRentalFee);
+        for (String report : reports) { // No report is generated if the transaction is successful
+            addReport(report);
+        }
     }
 
     /**
