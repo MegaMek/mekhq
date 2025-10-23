@@ -687,8 +687,8 @@ public class CampaignGUI extends JPanel {
         final JMenuItem miMHQOptions = new JMenuItem(resourceMap.getString("miMHQOptions.text"));
         miMHQOptions.setToolTipText(resourceMap.getString("miMHQOptions.toolTipText"));
         miMHQOptions.setName("miMHQOptions");
-        miMHQOptions.setMnemonic(KeyEvent.VK_O);
-        miMHQOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_DOWN_MASK));
+        miMHQOptions.setMnemonic(KeyEvent.VK_H);
+        miMHQOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
         miMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
         menuFile.add(miMHQOptions);
 
