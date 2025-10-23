@@ -39,6 +39,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import megamek.common.enums.TechBase;
 import megamek.common.equipment.AmmoType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingBattleArmorSuit;
@@ -115,6 +116,10 @@ public class PartInUse {
 
     public String getDescription() {
         return description;
+    }
+
+    public TechBase getTechBase() {
+        return partToBuy.getTechBase();
     }
 
     /**
@@ -235,6 +240,7 @@ public class PartInUse {
             return false;
         }
         final PartInUse other = (PartInUse) obj;
-        return Objects.equals(description, other.description);
+        return Objects.equals(description, other.description) &&
+                     Objects.equals(getTechBase(), other.getTechBase());
     }
 }
