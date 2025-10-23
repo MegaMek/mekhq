@@ -48,7 +48,6 @@ import mekhq.campaign.work.IAcquisitionWork;
 
 public class PartInUse {
     private String description;
-    private final TechBase techBase;
     private final IAcquisitionWork partToBuy;
     private int useCount;
     private int storeCount;
@@ -78,7 +77,6 @@ public class PartInUse {
         }
         part.setUnit(u);
         this.description = sb.toString();
-        this.techBase = part.getTechBase();
         this.partToBuy = part.getAcquisitionWork();
         this.tonnagePerItem = part.getTonnage();
         this.isBundle = false;
@@ -121,7 +119,7 @@ public class PartInUse {
     }
 
     public TechBase getTechBase() {
-        return techBase;
+        return partToBuy.getTechBase();
     }
 
     /**
@@ -243,6 +241,6 @@ public class PartInUse {
         }
         final PartInUse other = (PartInUse) obj;
         return Objects.equals(description, other.description) &&
-                     Objects.equals(techBase, other.techBase);
+                     Objects.equals(getTechBase(), other.getTechBase());
     }
 }
