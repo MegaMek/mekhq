@@ -312,7 +312,9 @@ public class FacilityRentals {
             }
         }
 
-        performRentalTransaction(finances, today, totalCharge, ContractRentalType.MAINTENANCE_BAYS);
+        if (!totalCharge.isZero()) {
+            performRentalTransaction(finances, today, totalCharge, ContractRentalType.MAINTENANCE_BAYS);
+        }
     }
 
     /**
