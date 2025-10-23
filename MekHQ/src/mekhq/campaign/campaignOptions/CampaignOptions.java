@@ -1152,14 +1152,10 @@ public class CampaignOptions {
         setSharesForAll(true);
 
         // Rented Facilities
-        // The comments below explain where we get the default values from. Unless otherwise stated, all values are
-        // derived from 5% of the unit's cost, divided by 4 (number of weeks in a month), with the result rounded to
-        // the nearest 50 C-Bills. The 5% comes from CamOps travel rental, where the rental cost is 5% of the unit's
-        // cost.
-        rentedFacilitiesCostHospitalBeds = 4100; // The C-Bill value of a 'Sherpa Armored Truck (MASH)'
-        rentedFacilitiesCostKitchens = 3700; // The C-Bill value of a 'Sherpa Armored Truck (Mobile Canteen)'
-        rentedFacilitiesCostHoldingCells = 6400; // The C-Bill value of 'Foot Platoon (Rifle)'
-        rentedFacilitiesCostRepairBays = 25000; // CamOps bay rental from travel/4
+        rentedFacilitiesCostHospitalBeds = 0;
+        rentedFacilitiesCostKitchens = 0;
+        rentedFacilitiesCostHoldingCells = 0;
+        rentedFacilitiesCostRepairBays = 0;
         // endregion Finances Tab
 
         // region Mercenary Tab
