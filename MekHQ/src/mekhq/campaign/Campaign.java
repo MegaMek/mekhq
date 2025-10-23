@@ -3105,7 +3105,7 @@ public class Campaign implements ITechManager {
     }
 
     private int getQuantity(Part part) {
-        return getWarehouse().getPartQuantity(part);
+        return getWarehouse().getPartQuantity(part, true);
     }
 
     private PartInUse getPartInUse(Part part) {
@@ -3299,7 +3299,6 @@ public class Campaign implements ITechManager {
      *       included in the
      *       result.
      */
-
     public Set<PartInUse> getPartsInUse(boolean ignoreMothballedUnits, boolean isResupply,
           PartQuality ignoreSparesUnderQuality) {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a
@@ -3325,11 +3324,15 @@ public class Campaign implements ITechManager {
             if (null == partInUse) {
                 return;
             }
+
+            String stockKey = partInUse.getDescription();
+            stockKey += Part.getTechBaseName(partInUse.getTechBase());
+
             if (inUse.containsKey(partInUse)) {
                 partInUse = inUse.get(partInUse);
             } else {
-                if (partsInUseRequestedStockMap.containsKey(partInUse.getDescription())) {
-                    partInUse.setRequestedStock(partsInUseRequestedStockMap.get(partInUse.getDescription()));
+                if (partsInUseRequestedStockMap.containsKey(stockKey)) {
+                    partInUse.setRequestedStock(partsInUseRequestedStockMap.get(stockKey));
                 } else {
                     partInUse.setRequestedStock(getDefaultStockPercent(incomingPart));
                 }
@@ -3337,6 +3340,7 @@ public class Campaign implements ITechManager {
             }
             updatePartInUseData(partInUse, incomingPart, ignoreMothballedUnits, ignoreSparesUnderQuality);
         });
+
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             if (!(maybePart instanceof Part)) {
                 continue;
@@ -3345,11 +3349,15 @@ public class Campaign implements ITechManager {
             if (null == partInUse) {
                 continue;
             }
+
+            String stockKey = partInUse.getDescription();
+            stockKey += Part.getTechBaseName(partInUse.getTechBase());
+
             if (inUse.containsKey(partInUse)) {
                 partInUse = inUse.get(partInUse);
             } else {
-                if (partsInUseRequestedStockMap.containsKey(partInUse.getDescription())) {
-                    partInUse.setRequestedStock(partsInUseRequestedStockMap.get(partInUse.getDescription()));
+                if (partsInUseRequestedStockMap.containsKey(stockKey)) {
+                    partInUse.setRequestedStock(partsInUseRequestedStockMap.get(stockKey));
                 } else {
                     partInUse.setRequestedStock(getDefaultStockPercent((Part) maybePart));
                 }

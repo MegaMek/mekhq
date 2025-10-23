@@ -78,6 +78,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MULParser;
@@ -85,6 +86,7 @@ import megamek.common.loaders.MekSummaryCache;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
 import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
 import mekhq.IconPackage;
@@ -1961,7 +1963,9 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refitUnit(Refit r, boolean selectModelName) {
-        if (r.getOriginalEntity() instanceof Dropship || r.getOriginalEntity() instanceof Jumpship) {
+        if (r.getOriginalEntity() instanceof Infantry && !(r.getOriginalEntity() instanceof BattleArmor)) {
+            r.setTech(null);
+        } else if (r.getOriginalEntity() instanceof Dropship || r.getOriginalEntity() instanceof Jumpship) {
             Person engineer = r.getOriginalUnit().getEngineer();
             if (engineer == null) {
                 JOptionPane.showMessageDialog(frame,

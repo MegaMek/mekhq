@@ -228,7 +228,8 @@ public abstract class AbstractUnitMarket {
             }
         }
 
-        getOffers().add(new UnitMarketOffer(market, unitType, mekSummary, percent, generateTransitDuration(campaign)));
+        getOffers().add(new UnitMarketOffer(market, unitType, mekSummary, percent, generateTransitDuration(campaign),
+         campaign.getCampaignOptions()));
 
         return mekSummary.getName();
     }
