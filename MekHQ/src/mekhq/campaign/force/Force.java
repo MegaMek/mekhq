@@ -38,18 +38,11 @@ import static java.lang.Math.round;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import megamek.Version;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.units.Entity;
@@ -1037,7 +1030,9 @@ public class Force {
      * Finds the distance (depth) from the origin force
      *
      * @param force the force to get depth for
+     * @deprecated
      */
+    @Deprecated (since = "0.50.10", forRemoval = true)
     public static int getDepth(Force force) {
         int depth = 0;
 
@@ -1057,7 +1052,9 @@ public class Force {
      *
      * @param force the current force. Should always equal campaign.getForce(0), if called remotely
      * @param depth the current recursive depth.
+     * @deprecated
      */
+    @Deprecated (since = "0.50.10", forRemoval = true)
     public static int getMaximumDepth(Force force, Integer depth) {
         int maximumDepth = depth;
 
@@ -1073,22 +1070,83 @@ public class Force {
     }
 
     /**
-     * Populates the formation levels of a force hierarchy starting from the origin force. For all subForces of the
-     * given force, it sets the formation level to one level lower than the current level. If the resulting formation
-     * level is below the lower boundary determined by available formation level enums, it sets the formation level to
-     * INVALID.
-     *
-     * @param campaign the campaign to determine the lower boundary
+     * Populates the formation levels of a force hierarchy starting from the origin force. For all subforces, it will
+     * determine the smallest formations - Teams/Lances - and then parent formations will be one formation higher.
+     * @param campaign campaign that the force belongs to
      */
-    public static void populateFormationLevelsFromOrigin(Campaign campaign) {
+    public static void populateFormationLevelsFromOrigin(Campaign campaign) { //TODO
         Force force = campaign.getForce(0);
 
-        int currentFormationLevel = populateOriginNode(campaign, force);
+        recursivelyUpdateFormationLevel(campaign, force);
 
-        // we then set lower boundaries (i.e., how far we can decrease formation level)
-        int lowerBoundary = getLowerBoundary(campaign);
+        MekHQ.triggerEvent(new OrganizationChangedEvent(force));
+    }
 
-        changeFormationLevel(force, currentFormationLevel, lowerBoundary);
+    private static void recursivelyUpdateFormationLevel(Campaign campaign, Force force) {
+        for (Force subforce : force.getSubForces()) {
+            recursivelyUpdateFormationLevel(campaign, subforce);
+        }
+        force.defaultFormationLevelForForce(campaign);
+    }
+
+    /**
+     * Based on a force's subforces and units, set this unit's formation to the default.
+     * @param campaign campaign that the force belongs to
+     */
+    public void defaultFormationLevelForForce(Campaign campaign) {
+        Force largestSubForce =
+              getAllSubForces().stream().max(Comparator.comparing (f -> f.getFormationLevel().getDepth())).orElse(null);
+        if (largestSubForce == null) {
+            int depth = 1;
+            setFormationLevel(FormationLevel.parseFromDepth(campaign,depth + getOddFormationSizeModifier(campaign,
+                  depth,
+                  -1)));
+        } else {
+            int depth = largestSubForce.getFormationLevel().getDepth();
+            setFormationLevel(FormationLevel.parseFromDepth(campaign,
+                  depth + 1 + getOddFormationSizeModifier(campaign, depth + 1, depth)));
+        }
+    }
+
+    private int getOddFormationSizeModifier(Campaign campaign, int depth, int largestSubForceDepth) {
+        int actualUnitCount = getTotalUnitCount(campaign, false);
+        final int baseFormationSize = campaign.getFaction().getFormationBaseSize();
+        final int baseFormationGrouping = campaign.getFaction().getFormationGrouping();
+        if (depth == 1) {
+            if (actualUnitCount <= baseFormationSize / 2) {
+                return -1;
+            }
+        }
+
+        int nominalForceSize = baseFormationSize;
+        // If the actual unit count is 0, then this may never end
+        if (depth > 0 && actualUnitCount > 0) {
+            // Binary/Trinary Handler
+            if (depth > 1) {
+                nominalForceSize *= campaign.getFaction().isClan() ? 3 : baseFormationGrouping;
+            }
+            nominalForceSize *= MathUtility.roundAwayFromZero(Math.pow(baseFormationGrouping, (depth - 2)));
+
+            // Undersized or Oversized?
+            if (actualUnitCount >= 2 * nominalForceSize) { // Oversized
+                int increaseSize = 0;
+                while (nominalForceSize < actualUnitCount) {
+                    nominalForceSize *= baseFormationGrouping;
+                    increaseSize++;
+                }
+                return increaseSize;
+            } else if (actualUnitCount <= nominalForceSize / 2) { // Undersized
+                int decreaseSize = 0;
+                while (nominalForceSize > actualUnitCount) {
+                    nominalForceSize /= baseFormationGrouping;
+                    decreaseSize++;
+                }
+                return decreaseSize;
+            }
+        }
+
+
+        return 0;
     }
 
     /**
@@ -1097,7 +1155,9 @@ public class Force {
      * @param force                 the force whose formation level is to be changed
      * @param currentFormationLevel the current formation level of the force
      * @param lowerBoundary         the lower boundary for the formation level
+     * @deprecated See {@link Force#recursivelyUpdateFormationLevel}
      */
+    @Deprecated (since = "0.50.10", forRemoval = true)
     private static void changeFormationLevel(Force force, int currentFormationLevel, int lowerBoundary) {
         for (Force subforce : force.getSubForces()) {
             if (currentFormationLevel - 1 < lowerBoundary) {
@@ -1120,7 +1180,9 @@ public class Force {
      * @param campaign the campaign object to retrieve the lower boundary for
      *
      * @return the lower boundary value as an integer
+     * @deprecated
      */
+    @Deprecated (since = "0.50.10", forRemoval = true)
     private static int getLowerBoundary(Campaign campaign) {
         int lowerBoundary = FormationLevel.values().length;
 
@@ -1154,7 +1216,9 @@ public class Force {
      * @param origin   the origin node
      *
      * @return the parsed integer value of the origin node's formation level
+     * @deprecated See {@link Force#recursivelyUpdateFormationLevel}
      */
+    @Deprecated (since = "0.50.10", forRemoval = true)
     private static int populateOriginNode(Campaign campaign, Force origin) {
         FormationLevel overrideFormationLevel = origin.getOverrideFormationLevel();
         int maximumDepth = getMaximumDepth(origin, 0);
