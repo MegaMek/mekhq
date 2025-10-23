@@ -710,8 +710,8 @@ public class CampaignGUI extends JPanel {
         final JMenuItem miMMClientOptions = new JMenuItem(resourceMap.getString("miMMClientOptions.text"));
         miMMClientOptions.setToolTipText(resourceMap.getString("miMMClientOptions.toolTipText"));
         miMMClientOptions.setName("miMMClientOptions");
-        miMMClientOptions.setMnemonic(KeyEvent.VK_H);
-        miMMClientOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
+        miMMClientOptions.setMnemonic(KeyEvent.VK_O);
+        miMMClientOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_DOWN_MASK));
         miMMClientOptions.addActionListener(evt -> new CommonSettingsDialog(frame, null).setVisible(true));
         menuFile.add(miMMClientOptions);
 
