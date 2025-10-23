@@ -188,6 +188,9 @@ public class PersonnelTab {
     private JSpinner spnMaximumPatients;
     private JCheckBox chkDoctorsUseAdministration;
     private JCheckBox chkUseUsefulMedics;
+    private JCheckBox chkUseMASHTheatres;
+    private JLabel lblMASHTheatreCapacity;
+    private JSpinner spnMASHTheatreCapacity;
     //end Medical Tab
 
     //start Prisoners and Dependents Tab
@@ -275,6 +278,9 @@ public class PersonnelTab {
         spnMaximumPatients = new JSpinner();
         chkDoctorsUseAdministration = new JCheckBox();
         chkUseUsefulMedics = new JCheckBox();
+        chkUseMASHTheatres = new JCheckBox();
+        lblMASHTheatreCapacity = new JLabel();
+        spnMASHTheatreCapacity = new JSpinner();
     }
 
     /**
@@ -831,6 +837,14 @@ public class PersonnelTab {
         chkUseUsefulMedics = new CampaignOptionsCheckBox("UseUsefulMedics");
         chkUseUsefulMedics.addMouseListener(createTipPanelUpdater(medicalHeader, "UseUsefulMedics"));
 
+        chkUseMASHTheatres = new CampaignOptionsCheckBox("UseMASHTheatres");
+        chkUseMASHTheatres.addMouseListener(createTipPanelUpdater(medicalHeader, "UseMASHTheatres"));
+
+        lblMASHTheatreCapacity = new CampaignOptionsLabel("MASHTheatreCapacity");
+        lblMASHTheatreCapacity.addMouseListener(createTipPanelUpdater(medicalHeader, "MASHTheatreCapacity"));
+        spnMASHTheatreCapacity = new CampaignOptionsSpinner("MASHTheatreCapacity", 25, 1, 100, 1);
+        spnMASHTheatreCapacity.addMouseListener(createTipPanelUpdater(medicalHeader, "MASHTheatreCapacity"));
+
         final JPanel panelLeft = new CampaignOptionsStandardPanel("MedicalTabLeft");
         final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
 
@@ -848,6 +862,15 @@ public class PersonnelTab {
         layoutLeft.gridx = 0;
         layoutLeft.gridy++;
         panelLeft.add(chkUseUsefulMedics, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(chkUseMASHTheatres, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(lblMASHTheatreCapacity, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnMASHTheatreCapacity, layoutLeft);
 
         layoutLeft.gridy++;
         panelLeft.add(lblHealWaitingPeriod, layoutLeft);
@@ -1346,6 +1369,8 @@ public class PersonnelTab {
         spnMaximumPatients.setValue(options.getMaximumPatients());
         chkDoctorsUseAdministration.setSelected(options.isDoctorsUseAdministration());
         chkUseUsefulMedics.setSelected(options.isUseUsefulMedics());
+        chkUseMASHTheatres.setSelected(options.isUseMASHTheatres());
+        spnMASHTheatreCapacity.setValue(options.getMASHTheatreCapacity());
 
         // Prisoners and Dependents
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
@@ -1441,6 +1466,8 @@ public class PersonnelTab {
         options.setMaximumPatients((int) spnMaximumPatients.getValue());
         options.setDoctorsUseAdministration(chkDoctorsUseAdministration.isSelected());
         options.setIsUseUsefulMedics(chkUseUsefulMedics.isSelected());
+        options.setIsUseMASHTheatres(chkUseMASHTheatres.isSelected());
+        options.setMASHTheatreCapacity((int) spnMASHTheatreCapacity.getValue());
 
         // Prisoners and Dependents
         options.setPrisonerCaptureStyle(comboPrisonerCaptureStyle.getSelectedItem());

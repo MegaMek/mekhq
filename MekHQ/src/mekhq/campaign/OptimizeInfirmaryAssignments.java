@@ -117,8 +117,12 @@ public class OptimizeInfirmaryAssignments {
      * @param doctors                    The list of available doctors, ordered by priority (e.g., experience level or
      *                                   suitability). Doctors higher on the list are assigned first.
      */
-    private static void assignDoctors(final boolean isDoctorsUseAdministration, final int maximumPatients,
+    private void assignDoctors(final boolean isDoctorsUseAdministration, final int maximumPatients,
           final int healingWaitingPeriod, final List<Person> patients, List<Person> doctors) {
+        boolean useMASHTheatres = campaign.getCampaignOptions().isUseMASHTheatres();
+        int mashTheatreCapacity = useMASHTheatres ? campaign.getMashTheatreCapacity() : Integer.MAX_VALUE;
+
+        int totalPatientCounter = 0;
         int patientCounter = 0;
         int doctorCapacity = 0;
 
@@ -127,6 +131,11 @@ public class OptimizeInfirmaryAssignments {
 
             if (doctors.isEmpty()) {
                 // At this point, we're just unassigning the doctor assignments for any remaining personnel.
+                continue;
+            }
+
+            if (useMASHTheatres && totalPatientCounter >= mashTheatreCapacity) {
+                // Similar to the above, we're just unassigning doctors for any remaining patients.
                 continue;
             }
 
@@ -141,6 +150,7 @@ public class OptimizeInfirmaryAssignments {
 
             // Make the assignment
             patient.setDoctorId(doctor.getId(), healingWaitingPeriod);
+            totalPatientCounter++;
             MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
 
             // Check if the current doctor has reached their patient limit

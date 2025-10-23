@@ -32,6 +32,7 @@
  */
 package mekhq.campaign;
 
+import static java.lang.Math.min;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_TETRIS_MASTER;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
@@ -59,6 +60,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
@@ -425,9 +427,8 @@ public class CampaignSummary {
         StringBuilder report = new StringBuilder("<html>");
 
         // Field Kitchens
+        List<Unit> unitsInToe = campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(), false);
         if (campaignOptions.isUseFatigue()) {
-            List<Unit> unitsInToe = campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(), false);
-
             int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.getFieldKitchenCapacity());
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, true),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
@@ -458,12 +459,17 @@ public class CampaignSummary {
                                        .filter(patient -> patient.getDoctorId() != null)
                                        .count();
 
+            int mashTheatreCapacity = MASHCapacity.checkMASHCapacity(unitsInToe,
+                  campaignOptions.getMASHTheatreCapacity());
+
             final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
             final int maximumPatients = campaignOptions.getMaximumPatients();
             int doctorCapacity = 0;
             for (Person person : campaign.getActivePersonnel(false, false)) {
                 doctorCapacity += person.getDoctorMedicalCapacity(isDoctorsUseAdministration, maximumPatients);
             }
+
+            doctorCapacity = min(doctorCapacity, mashTheatreCapacity);
 
             exceedsCapacity = patients > doctorCapacity;
 
@@ -473,12 +479,22 @@ public class CampaignSummary {
             closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
             colorBlindWarning = exceedsCapacity ? WARNING : "";
 
-            report.append(String.format("Hospital Beds %s(%s/%s)%s%s",
-                  color,
-                  patients,
-                  doctorCapacity,
-                  closingSpan,
-                  colorBlindWarning));
+            if (campaignOptions.isUseMASHTheatres()) {
+                report.append(String.format("Hospital Beds %s(%s/%s)%s%s [MASH Capacity %s]",
+                      color,
+                      patients,
+                      doctorCapacity,
+                      closingSpan,
+                      colorBlindWarning,
+                      mashTheatreCapacity));
+            } else {
+                report.append(String.format("Hospital Beds %s(%s/%s)%s%s",
+                      color,
+                      patients,
+                      doctorCapacity,
+                      closingSpan,
+                      colorBlindWarning));
+            }
         }
 
         // Prisoners

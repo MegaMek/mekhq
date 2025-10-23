@@ -267,6 +267,8 @@ public class CampaignOptions {
     private int maximumPatients;
     private boolean doctorsUseAdministration;
     private boolean useUsefulMedics;
+    private boolean useMASHTheatres;
+    private int mashTheatreCapacity;
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
@@ -837,6 +839,8 @@ public class CampaignOptions {
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
         useUsefulMedics = false;
+        useMASHTheatres = false;
+        mashTheatreCapacity = 25;
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
@@ -1992,6 +1996,22 @@ public class CampaignOptions {
 
     public void setIsUseUsefulMedics(final boolean useUsefulMedics) {
         this.useUsefulMedics = useUsefulMedics;
+    }
+
+    public boolean isUseMASHTheatres() {
+        return useMASHTheatres;
+    }
+
+    public void setIsUseMASHTheatres(final boolean useMASHTheatres) {
+        this.useMASHTheatres = useMASHTheatres;
+    }
+
+    public int getMASHTheatreCapacity() {
+        return mashTheatreCapacity;
+    }
+
+    public void setMASHTheatreCapacity(final int mashTheatreCapacity) {
+        this.mashTheatreCapacity = mashTheatreCapacity;
     }
 
     // endregion Medical
