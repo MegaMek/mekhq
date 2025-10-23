@@ -32,6 +32,7 @@
  */
 package mekhq.gui.view;
 
+import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -42,6 +43,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 
 import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.client.ui.util.FluffImageHelper;
@@ -55,6 +57,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.ImgLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
@@ -69,6 +72,7 @@ public class UnitViewPanel extends JScrollablePanel {
     private final Campaign campaign;
 
     private JPanel pnlStats;
+    private JPanel pnlCrew;
 
     public UnitViewPanel(Unit u, Campaign c) {
         super();
@@ -84,6 +88,7 @@ public class UnitViewPanel extends JScrollablePanel {
         JTextPane txtReadout = new JTextPane();
         JTextPane txtFluff = new JTextPane();
         pnlStats = new JPanel();
+        pnlCrew = new JPanel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel",
               MekHQ.getMHQOptions().getLocale());
@@ -138,6 +143,22 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
 
+        pnlCrew.setName("pnlCrew");
+        pnlCrew.setLayout(new BorderLayout());
+        pnlCrew.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("lblCrew.text")));
+        JLabel lblCrew = new JLabel(UnitTableModel.getCrewTooltip(unit));
+        pnlCrew.add(lblCrew, BorderLayout.WEST);
+        lblCrew.setHorizontalAlignment(SwingConstants.LEFT);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        add(pnlCrew, gridBagConstraints);
+
         EntityReadout entityReadout = EntityReadout.createReadout(entity, false, true);
         txtReadout.setName("txtReadout");
         txtReadout.setContentType(resourceMap.getString("txtReadout.contentType"));
@@ -151,7 +172,7 @@ public class UnitViewPanel extends JScrollablePanel {
         txtReadout.setBorder(RoundedLineBorder.createRoundedLineBorder("Technical Readout"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.gridwidth = compWidth;
         if (unit.getHistory().isBlank()) {
