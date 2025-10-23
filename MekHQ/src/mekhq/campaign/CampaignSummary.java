@@ -32,7 +32,6 @@
  */
 package mekhq.campaign;
 
-import static java.lang.Math.min;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_TETRIS_MASTER;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
@@ -454,13 +453,10 @@ public class CampaignSummary {
                 report.append("<br>");
             }
 
-            int patients = (int) campaign.getPatients()
-                                       .stream()
-                                       .filter(patient -> patient.getDoctorId() != null)
-                                       .count();
-
-            int mashTheatreCapacity = MASHCapacity.checkMASHCapacity(unitsInToe,
-                  campaignOptions.getMASHTheatreCapacity());
+            int patients = campaign.getPatientsAssignedToDoctors().size();
+            boolean useMASHTheatres = campaignOptions.isUseMASHTheatres();
+            int mashTheatreCapacity = useMASHTheatres ? MASHCapacity.checkMASHCapacity(unitsInToe,
+                  campaignOptions.getMASHTheatreCapacity()) : Integer.MAX_VALUE;
 
             final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
             final int maximumPatients = campaignOptions.getMaximumPatients();
@@ -469,9 +465,8 @@ public class CampaignSummary {
                 doctorCapacity += person.getDoctorMedicalCapacity(isDoctorsUseAdministration, maximumPatients);
             }
 
-            doctorCapacity = min(doctorCapacity, mashTheatreCapacity);
 
-            exceedsCapacity = patients > doctorCapacity;
+            exceedsCapacity = patients > doctorCapacity || patients > mashTheatreCapacity;
 
             color = exceedsCapacity ?
                           spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
@@ -479,14 +474,14 @@ public class CampaignSummary {
             closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
             colorBlindWarning = exceedsCapacity ? WARNING : "";
 
-            if (campaignOptions.isUseMASHTheatres()) {
-                report.append(String.format("Hospital Beds %s(%s/%s)%s%s [MASH Capacity %s]",
+            if (useMASHTheatres) {
+                report.append(String.format("Hospital Beds %s(%s/%s) [MASH Capacity %s]%s%s",
                       color,
                       patients,
                       doctorCapacity,
+                      mashTheatreCapacity,
                       closingSpan,
-                      colorBlindWarning,
-                      mashTheatreCapacity));
+                      colorBlindWarning));
             } else {
                 report.append(String.format("Hospital Beds %s(%s/%s)%s%s",
                       color,

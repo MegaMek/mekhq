@@ -127,18 +127,10 @@ public class MedicalController {
             doctor = isValidDoctor(patient, doctor) ? doctor : null;
         }
 
-        if (campaign.getCampaignOptions().isUseMASHTheatres()) {
-            if (campaign.getMashTheatresWithinCapacity()) {
-                doctor = null;
-                patient.setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.overTheatreCapacity",
-                      spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG,
-                      patient.getHyperlinkedFullTitle()));
-            }
-        }
-
         // Handle non-Advanced Medical healing
         if (patient.needsFixing()) {
+            // This will trigger for both AM-enabled and AM-disabled campaigns
+            doctor = verifyTheatreAvailability(patient, doctor);
             patient.decrementDaysToWaitForHealing();
 
             if (doctor != null && patient.getDaysToWaitForHealing() <= 0) {
@@ -162,6 +154,19 @@ public class MedicalController {
                 unit.resetPilotAndEntity();
             }
         }
+    }
+
+    private Person verifyTheatreAvailability(Person patient, Person doctor) {
+        if (campaign.getCampaignOptions().isUseMASHTheatres()) {
+            if (!campaign.getMashTheatresWithinCapacity()) {
+                doctor = null;
+                patient.setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.overTheatreCapacity",
+                      spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG,
+                      patient.getHyperlinkedFullTitle()));
+            }
+        }
+        return doctor;
     }
 
     /**
