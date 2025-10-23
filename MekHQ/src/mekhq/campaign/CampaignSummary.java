@@ -475,7 +475,7 @@ public class CampaignSummary {
             colorBlindWarning = exceedsCapacity ? WARNING : "";
 
             if (useMASHTheatres) {
-                report.append(String.format("Hospital Beds %s(%s/%s) [MASH Capacity %s]%s%s",
+                report.append(String.format("Hospital Beds %s(%s/%s) (MASH Capacity %s)%s%s",
                       color,
                       patients,
                       doctorCapacity,

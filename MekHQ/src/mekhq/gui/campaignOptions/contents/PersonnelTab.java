@@ -867,11 +867,13 @@ public class PersonnelTab {
         layoutLeft.gridy++;
         panelLeft.add(chkUseMASHTheatres, layoutLeft);
 
+        layoutLeft.gridx = 0;
         layoutLeft.gridy++;
         panelLeft.add(lblMASHTheatreCapacity, layoutLeft);
         layoutLeft.gridx++;
         panelLeft.add(spnMASHTheatreCapacity, layoutLeft);
 
+        layoutLeft.gridx = 0;
         layoutLeft.gridy++;
         panelLeft.add(lblHealWaitingPeriod, layoutLeft);
         layoutLeft.gridx++;
