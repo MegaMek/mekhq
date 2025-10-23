@@ -1105,19 +1105,17 @@ public class Force {
         if (largestSubForce == null) {
             int depth = 1;
             setFormationLevel(FormationLevel.parseFromDepth(campaign,depth + getOddFormationSizeModifier(campaign,
-                  depth,
-                  -1)));
+                  depth)));
         } else {
             int depth = largestSubForce.getFormationLevel().getDepth();
             setFormationLevel(FormationLevel.parseFromDepth(campaign,
-                  depth + 1 + getOddFormationSizeModifier(campaign, depth + 1, depth)));
+                  depth + 1 + getOddFormationSizeModifier(campaign, depth + 1)));
         }
     }
 
-    private int getOddFormationSizeModifier(Campaign campaign, int depth, int largestSubForceDepth) {
+    private int getOddFormationSizeModifier(Campaign campaign, int depth) {
         int actualUnitCount = getTotalUnitCount(campaign, false);
         final int baseFormationSize = campaign.getFaction().getFormationBaseSize();
-        final int baseFormationGrouping = campaign.getFaction().getFormationGrouping();
         if (depth == 1) {
             if (actualUnitCount <= baseFormationSize / 2) {
                 return -1;
