@@ -64,7 +64,6 @@ import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_ASTAR;
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_B;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_C;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_F;
 import static mekhq.campaign.stratCon.StratConContractDefinition.getContractDefinition;
@@ -677,13 +676,20 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Retrieves the repair location based on the unit rating and contract type.
+     * Determines the repair location for the contract based on the contract type.
      *
-     * @param unitRating The rating of the unit.
+     * <p>The returned repair location corresponds to the type of operation:</p>
      *
-     * @return The repair location.
+     * <ul>
+     *   <li>Guerrilla warfare contracts: {@link Unit#SITE_IMPROVISED}</li>
+     *   <li>Raid-type contracts: {@link Unit#SITE_FIELD_WORKSHOP}</li>
+     *   <li>All other contracts: {@link Unit#SITE_FACILITY_BASIC}</li>
+     * </ul>
+     *
+     * @return the repair location constant based on the contract type
      */
-    public int getRepairLocation(final int unitRating) {
+    @Override
+    public int getRepairLocation() {
         int repairLocation = Unit.SITE_FACILITY_BASIC;
 
         AtBContractType contractType = getContractType();
@@ -692,15 +698,9 @@ public class AtBContract extends Contract {
             repairLocation = Unit.SITE_IMPROVISED;
         } else if (contractType.isRaidType()) {
             repairLocation = Unit.SITE_FIELD_WORKSHOP;
-        } else if (contractType.isGarrisonType()) {
-            repairLocation = Unit.SITE_FACILITY_MAINTENANCE;
         }
 
-        if (unitRating >= DRAGOON_B) {
-            repairLocation++;
-        }
-
-        return min(repairLocation, Unit.SITE_FACTORY_CONDITIONS);
+        return repairLocation;
     }
 
     public int getScore() {
