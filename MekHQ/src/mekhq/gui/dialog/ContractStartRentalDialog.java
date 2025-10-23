@@ -45,8 +45,10 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.rentals.ContractRentalType;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 
@@ -62,6 +64,9 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
 
     private static final int DIALOG_CONFIRM_OPTION = 1;
 
+    private static JSpinner spnHospitals;
+    private static JSpinner spnKitchens;
+    private static JSpinner spnSecurity;
     private static JLabel lblRentalCost;
 
     /**
@@ -73,37 +78,59 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
         return this.getDialogChoice() == DIALOG_CONFIRM_OPTION;
     }
 
+    /**
+     * Gets the current hospital beds spinner value.
+     *
+     * @return the selected number of hospitals as an int
+     */
+    public static int getHospitalSpinnerValue() {
+        return (int) spnHospitals.getValue();
+    }
 
     /**
-     * Constructs a new {@link ContractStartRentalDialog} for the specified campaign and rental type.
+     * Gets the current kitchens spinner value.
      *
-     * @param campaign   the {@link Campaign} the rental belongs to
-     * @param rentalType the {@link ContractRentalType} of facility being rented (label placeholder may differ)
-     * @param rentalCost the cost per unit or total cost of the rental being considered
+     * @return the selected number of kitchens as an int
      */
-    public ContractStartRentalDialog(Campaign campaign, ContractRentalType rentalType, Money rentalCost) {
+    public static int getKitchensSpinnerValue() {
+        return (int) spnKitchens.getValue();
+    }
+
+    /**
+     * Gets the current security (holding cells) spinner value.
+     *
+     * @return the selected number of security units as an int
+     */
+    public static int getSecuritySpinnerValue() {
+        return (int) spnSecurity.getValue();
+    }
+
+    public ContractStartRentalDialog(Campaign campaign, Contract contract, int hospitalBedCost, int kitchenCost,
+          int holdingCellCost) {
         super(campaign,
               campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS),
               null,
-              getCenterMessage(campaign.getCommanderAddress()),
+              getCenterMessage(campaign.getCommanderAddress(), contract, campaign.getGameYear()),
               getButtons(),
-              getOutOfCharacterMessage(),
+              getOutOfCharacterMessage(hospitalBedCost, kitchenCost, holdingCellCost),
               ImmersiveDialogWidth.SMALL.getWidth(),
               false,
-              getSupplementalPanel(),
+              getSupplementalPanel(hospitalBedCost, kitchenCost, holdingCellCost),
               null,
               true);
     }
 
-    /**
-     * Gets the formatted message to display in the center of the dialog, usually addressed to the commander.
-     *
-     * @param commanderAddress the name/address/pronoun of the commander for context
-     *
-     * @return the message string to display
-     */
-    private static String getCenterMessage(String commanderAddress) {
-        return getFormattedTextAt(RESOURCE_BUNDLE, "PLACEHOLDER_MESSAGE", commanderAddress);
+    private static String getCenterMessage(String commanderAddress, Contract contract, int currentYear) {
+        String employerName = contract.getEmployer();
+        if (contract instanceof AtBContract atBContract) {
+            Faction employerFaction = atBContract.getEmployerFaction();
+            employerName = FactionStandingUtilities.getFactionName(employerFaction, currentYear);
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "ContractStartRentalDialog.inCharacter",
+              commanderAddress,
+              employerName);
     }
 
     /**
@@ -113,58 +140,110 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
      */
     private static List<ButtonLabelTooltipPair> getButtons() {
         return List.of(
-              new ButtonLabelTooltipPair(getTextAt(RESOURCE_BUNDLE, "CANCEL"), null),
-              new ButtonLabelTooltipPair(getTextAt(RESOURCE_BUNDLE, "CONFIRM"), null)
+              new ButtonLabelTooltipPair(getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.button.cancel"), null),
+              new ButtonLabelTooltipPair(getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.button.confirm"), null)
         );
     }
 
-    /**
-     * Gets the out-of-character message (footer/help text) for instructional dialog context.
-     *
-     * @return out-of-character/informational text
-     */
-    private static String getOutOfCharacterMessage() {
-        return getFormattedTextAt(RESOURCE_BUNDLE, "PLACEHOLDER_MESSAGE");
+    private static String getOutOfCharacterMessage(int hospitalBedCost, int kitchenCost, int holdingCellCost) {
+        StringBuilder outOfCharacterMessage = new StringBuilder("<html>");
+        outOfCharacterMessage.append(getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.outOfCharacter.intro"));
+
+        if (hospitalBedCost > 0) {
+            outOfCharacterMessage.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "ContractStartRentalDialog.outOfCharacter.hospitals", hospitalBedCost));
+        }
+
+        if (kitchenCost > 0) {
+            outOfCharacterMessage.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "ContractStartRentalDialog.outOfCharacter.kitchens", kitchenCost));
+        }
+
+        if (holdingCellCost > 0) {
+            outOfCharacterMessage.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "ContractStartRentalDialog.outOfCharacter.security", holdingCellCost));
+        }
+
+        outOfCharacterMessage.append("</html>");
+        return outOfCharacterMessage.toString();
     }
 
-    /**
-     * Creates the supplemental panel for the dialog, which includes the spinner for rental count and displays the total
-     * cost.
-     *
-     * @return a {@link JPanel} containing the extra controls for the dialog
-     */
-    private static JPanel getSupplementalPanel() {
+    private static JPanel getSupplementalPanel(int hospitalBedCost, int kitchenCost, int holdingCellCost) {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(5, 5, 5, 5);
         constraints.anchor = GridBagConstraints.WEST;
 
-        // Add label for ComboBox
-        JLabel lblRentalCount = new JLabel(getTextAt(RESOURCE_BUNDLE, "PLACEHOLDER_MESSAGE"));
+        JLabel lblHospitals = new JLabel(getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.spinner.hospitals"));
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.fill = GridBagConstraints.NONE;
-        panel.add(lblRentalCount, constraints);
+        panel.add(lblHospitals, constraints);
 
-        JSpinner spnRentalCount = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
-        spnRentalCount.addChangeListener(e -> {
-            int count = (Integer) spnRentalCount.getValue();
-            lblRentalCost.setText(getFormattedTextAt(RESOURCE_BUNDLE, "PLACEHOLDER_MESSAGE"));
-        });
+        spnHospitals = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
         constraints.gridx = 1;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         constraints.fill = GridBagConstraints.NONE;
-        panel.add(lblRentalCount, constraints);
+        panel.add(spnHospitals, constraints);
 
-        lblRentalCost = new JLabel(getTextAt(RESOURCE_BUNDLE, "PLACEHOLDER_MESSAGE"));
+        JLabel lblKitchens = new JLabel(getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.spinner.kitchens"));
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        constraints.fill = GridBagConstraints.NONE;
+        panel.add(lblKitchens, constraints);
+
+        spnKitchens = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+        constraints.gridx = 1;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        constraints.fill = GridBagConstraints.NONE;
+        panel.add(spnKitchens, constraints);
+
+        JLabel lblSecurity = new JLabel(getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.spinner.security"));
         constraints.gridx = 0;
         constraints.gridy = 2;
         constraints.gridwidth = 1;
         constraints.fill = GridBagConstraints.NONE;
-        panel.add(lblRentalCount, constraints);
+        panel.add(lblSecurity, constraints);
+
+        spnSecurity = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+        constraints.gridx = 1;
+        constraints.gridy = 2;
+        constraints.gridwidth = 1;
+        constraints.fill = GridBagConstraints.NONE;
+        panel.add(spnSecurity, constraints);
+
+        lblRentalCost = new JLabel(getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.label.total"));
+        constraints.gridx = 0;
+        constraints.gridy = 4;
+        constraints.gridwidth = 1;
+        constraints.fill = GridBagConstraints.NONE;
+        panel.add(lblRentalCost, constraints);
+
+        // These need to be last to ensure that the various other components have substantiated before being accessed
+        spnHospitals.addChangeListener(e -> updateTotal(hospitalBedCost, kitchenCost, holdingCellCost));
+        spnKitchens.addChangeListener(e -> updateTotal(hospitalBedCost, kitchenCost, holdingCellCost));
+        spnSecurity.addChangeListener(e -> updateTotal(hospitalBedCost, kitchenCost, holdingCellCost));
 
         return panel;
+    }
+
+    private static void updateTotal(long hospitalBedCost, long kitchenCost, long holdingCellCost) {
+        int hospitalCount = (int) spnHospitals.getValue();
+        long hospitalMoneyCost = hospitalBedCost * hospitalCount;
+
+        int kitchenCount = (int) spnKitchens.getValue();
+        long kitchenMoneyCost = kitchenCost * kitchenCount;
+
+        int securityCount = (int) spnSecurity.getValue();
+        long securityMoneyCost = holdingCellCost * securityCount;
+
+        long totalCost = hospitalMoneyCost + kitchenMoneyCost + securityMoneyCost;
+
+        lblRentalCost.setText(getFormattedTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.label.total",
+              totalCost));
     }
 }

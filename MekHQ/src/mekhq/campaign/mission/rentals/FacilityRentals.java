@@ -33,6 +33,11 @@
 package mekhq.campaign.mission.rentals;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -40,6 +45,7 @@ import java.util.Collection;
 import java.util.List;
 
 import megamek.common.units.Entity;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -52,6 +58,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
+import mekhq.gui.dialog.BayRentalDialog;
 import mekhq.gui.dialog.ContractStartRentalDialog;
 
 /**
@@ -65,47 +72,39 @@ import mekhq.gui.dialog.ContractStartRentalDialog;
  * @since 0.50.10
  */
 public class FacilityRentals {
+    private static final MMLogger LOGGER = MMLogger.create(FacilityRentals.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FacilityRentals";
 
     private static final int FACTORY_CONDITIONS_MULTIPLIER = 20;
 
-    /**
-     * Offers the opportunity to rent a specified contract facility (hospital beds, kitchens, holding cells) to the
-     * campaign.
-     *
-     * <p>If the rental cost is not set or rental is disabled, nothing is offered.</p>
-     *
-     * @param campaign   the campaign to which the rental is being offered
-     * @param contract   the contract for which the rental applies
-     * @param rentalType the type of facility being rented
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    public static void offerContractRentalOpportunity(Campaign campaign, Contract contract,
-          ContractRentalType rentalType) {
+    public static void offerContractRentalOpportunity(Campaign campaign, Contract contract) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        int rentalCost = switch (rentalType) {
-            case HOSPITAL_BEDS -> campaignOptions.getRentedFacilitiesCostHospitalBeds();
-            case KITCHENS -> campaignOptions.getRentedFacilitiesCostKitchens();
-            case HOLDING_CELLS -> campaignOptions.getRentedFacilitiesCostHoldingCells();
-            default -> 0;
-        };
+        int hospitalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
+        int kitchenCost = campaignOptions.getRentedFacilitiesCostKitchens();
+        int holdingCellCost = campaignOptions.getRentedFacilitiesCostHoldingCells();
 
-        if (rentalCost <= 0) { // This rental option is disabled
+        // If all rentals are disabled, we're just going to back out entirely
+        if ((hospitalCost + kitchenCost + holdingCellCost) == 0) {
             return;
         }
 
-        int rentalCount = presentDialog(campaign, rentalType, Money.of(rentalCost));
-        if (rentalCount <= 0) { // The player chose not to rent anything
-            return;
+        boolean wasRentConfirmed = false;
+        boolean wasConfirmedOverall = false;
+        ContractStartRentalDialog offerDialog;
+        while (!wasConfirmedOverall) {
+            offerDialog = new ContractStartRentalDialog(campaign, contract, hospitalCost, kitchenCost, holdingCellCost);
+            wasRentConfirmed = offerDialog.wasConfirmed();
+            ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign);
+            wasConfirmedOverall = confirmation.wasConfirmed();
         }
 
-        switch (rentalType) {
-            case HOSPITAL_BEDS -> contract.setHospitalBedsRented(rentalCount);
-            case KITCHENS -> contract.setKitchensRented(rentalCount);
-            case HOLDING_CELLS -> contract.setHoldingCellsRented(rentalCount);
-            default -> {}
+        if (wasRentConfirmed) {
+            contract.setHospitalBedsRented(ContractStartRentalDialog.getHospitalSpinnerValue());
+            LOGGER.info("Hospital beds rented: {}", contract.getHospitalBedsRented());
+            contract.setKitchensRented(ContractStartRentalDialog.getKitchensSpinnerValue());
+            LOGGER.info("Kitchens rented: {}", contract.getKitchensRented());
+            contract.setHoldingCellsRented(ContractStartRentalDialog.getSecuritySpinnerValue());
+            LOGGER.info("Holding cells rented: {}", contract.getHoldingCellsRented());
         }
     }
 
@@ -137,51 +136,33 @@ public class FacilityRentals {
         }
 
         Money totalCost = Money.of(baseCost * unitCount);
-
-        int rentalCount = presentDialog(campaign, rentalType, totalCost);
-        if (rentalCount <= 0) { // The player chose not to rent anything
+        if (!presentBayRentDialog(campaign, totalCost)) { // The player chose not to rent anything
             return false;
         }
 
         // Returns false if the player cannot afford the rental
-        if (!performRentalTransaction(campaign.getFinances(),
-              campaign.getLocalDate(),
-              totalCost,
+        if (!performRentalTransaction(campaign.getFinances(), campaign.getLocalDate(), totalCost,
               ContractRentalType.MAINTENANCE_BAYS)) {
-            String report = getFormattedTextAt(RESOURCE_BUNDLE, "PLACEHOLDER");
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "FacilityRentals.bay.unableToAfford",
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG, totalCost.toAmountString());
             campaign.addReport(report);
+
             return false;
         }
 
         return true;
     }
 
-    /**
-     * Presents the rental dialog to the user for facility or bay rental.
-     *
-     * @param campaign   the current campaign for context
-     * @param rentalType the facility type being rented
-     * @param rentalCost the base cost of the rental
-     *
-     * @return spinner value for most types, or 1 if accepted for bay/factory, or 0 if canceled
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private static int presentDialog(Campaign campaign, ContractRentalType rentalType, Money rentalCost) {
+    private static boolean presentBayRentDialog(Campaign campaign, Money rentalCost) {
         boolean wasConfirmedOverall = false;
-        ContractStartRentalDialog offerDialog = null;
+        BayRentalDialog offerDialog = null;
         while (!wasConfirmedOverall) {
-            offerDialog = new ContractStartRentalDialog(campaign, rentalType, rentalCost);
+            offerDialog = new BayRentalDialog(campaign, rentalCost);
             ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign);
             wasConfirmedOverall = confirmation.wasConfirmed();
         }
 
-        if (rentalType == ContractRentalType.MAINTENANCE_BAYS || rentalType == ContractRentalType.FACTORY_CONDITIONS) {
-            return offerDialog.wasConfirmed() ? 1 : 0;
-        } else {
-            return offerDialog.getSpinnerValue();
-        }
+        return offerDialog.wasConfirmed();
     }
 
     /**
@@ -228,28 +209,46 @@ public class FacilityRentals {
      * @author Illiani
      * @since 0.50.10
      */
-    private static List<String> payForAllContractRentals(Finances finances, LocalDate today, Money hospitalCosts,
+    public static List<String> payForAllContractRentals(Finances finances, LocalDate today, Money hospitalCosts,
           Money kitchenCosts, Money holdingCellCosts) {
         List<String> reports = new ArrayList<>();
 
         // Will return false if the payment was unsuccessful
         if (!performRentalTransaction(finances, today, hospitalCosts, ContractRentalType.HOSPITAL_BEDS)) {
-            String report = getFormattedTextAt(RESOURCE_BUNDLE, "PLACEHOLDER");
+            String report = getFailedTransactionReport(ContractRentalType.HOSPITAL_BEDS, hospitalCosts);
             reports.add(report);
         }
 
         if (!performRentalTransaction(finances, today, kitchenCosts, ContractRentalType.KITCHENS)) {
-            String report = getFormattedTextAt(RESOURCE_BUNDLE, "PLACEHOLDER");
+            String report = getFailedTransactionReport(ContractRentalType.KITCHENS, kitchenCosts);
             reports.add(report);
         }
 
         if (!performRentalTransaction(finances, today, holdingCellCosts, ContractRentalType.HOLDING_CELLS)) {
-            String report = getFormattedTextAt(RESOURCE_BUNDLE, "PLACEHOLDER");
+            String report = getFailedTransactionReport(ContractRentalType.KITCHENS, holdingCellCosts);
             reports.add(report);
 
         }
 
         return reports;
+    }
+
+    /**
+     * Generates a formatted report message when a rental transaction fails due to insufficient funds.
+     *
+     * @param hospitalBeds  the type of facility (rental type) for which the transaction failed
+     * @param hospitalCosts the amount of money required for the rental
+     *
+     * @return a localized, formatted string describing the failed transaction and required cost
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static String getFailedTransactionReport(ContractRentalType hospitalBeds, Money hospitalCosts) {
+        String facilityName = getTextAt(RESOURCE_BUNDLE, "ContractRentalType." + hospitalBeds.name());
+        return getFormattedTextAt(RESOURCE_BUNDLE, "FacilityRentals.other.unableToAfford",
+              spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, facilityName,
+              hospitalCosts.toAmountString());
     }
 
     /**
@@ -341,8 +340,11 @@ public class FacilityRentals {
           Money totalAvailableFunds, int fallbackSite) {
         Money newTotalCharge = totalCharge.plus(cost);
         if (newTotalCharge.isGreaterThan(totalAvailableFunds)) {
+            String previousSiteName = unit.getCurrentSiteName();
             unit.setSite(fallbackSite);
-            String report = getFormattedTextAt(RESOURCE_BUNDLE, "PLACEHOLDER_MESSAGE", Unit.getSiteName(fallbackSite));
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "FacilityRentals.bay.unableToAffordUpkeep",
+                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, previousSiteName,
+                  unit.getHyperlinkedName(), unit.getCurrentSiteName());
             campaign.addReport(report);
 
             MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
@@ -402,9 +404,7 @@ public class FacilityRentals {
             rentalType = ContractRentalType.MAINTENANCE_BAYS; // No text differentiates Factory and Maintenance
         }
 
-        return finances.debit(TransactionType.RENT,
-              today,
-              rentalCost,
-              getFormattedTextAt(RESOURCE_BUNDLE, "PLACEHOLDER" + rentalType, rentalCost.toAmountString()));
+        return finances.debit(TransactionType.RENT, today, rentalCost,
+              getFormattedTextAt(RESOURCE_BUNDLE, "FacilityRentals.rental." + rentalType, rentalCost.toAmountString()));
     }
 }
