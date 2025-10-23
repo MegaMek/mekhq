@@ -1080,7 +1080,7 @@ public class Force {
      * determine the smallest formations - Teams/Lances - and then parent formations will be one formation higher.
      * @param campaign campaign that the force belongs to
      */
-    public static void populateFormationLevelsFromOrigin(Campaign campaign) { //TODO
+    public static void populateFormationLevelsFromOrigin(Campaign campaign) {
         Force force = campaign.getForce(0);
 
         recursivelyUpdateFormationLevel(campaign, force);
@@ -1101,7 +1101,7 @@ public class Force {
      */
     public void defaultFormationLevelForForce(Campaign campaign) {
         Force largestSubForce =
-              getAllSubForces().stream().max(Comparator.comparing (f -> f.getFormationLevel().getDepth())).orElse(null);
+              getAllSubForces().stream().max(Comparator.comparing(f -> f.getFormationLevel().getDepth())).orElse(null);
         if (largestSubForce == null) {
             int depth = 1;
             setFormationLevel(FormationLevel.parseFromDepth(campaign,depth + getOddFormationSizeModifier(campaign,

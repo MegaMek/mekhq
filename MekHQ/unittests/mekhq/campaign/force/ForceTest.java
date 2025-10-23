@@ -358,7 +358,7 @@ class ForceTest {
             // Act
             Force force = new Force("Test Company");
             for (int i = 0; i < mockFaction.getFormationGrouping(); i++) {
-                for(int j = 0; j < mockFaction.getFormationBaseSize(); j++) {
+                for (int j = 0; j < mockFaction.getFormationBaseSize(); j++) {
                     UUID unit = UUID.randomUUID();
                     force.addUnit(unit);
                 }
