@@ -255,6 +255,7 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.skills.Appraisal;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.EscapeSkills;
+import mekhq.campaign.personnel.skills.QuickTrain;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -5621,9 +5622,13 @@ public class Campaign implements ITechManager {
             new CommandersDayAnnouncement(this);
         }
 
-        // Update the force icons based on the end-of-day unit status if desired
         if (MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments()) {
             new OptimizeInfirmaryAssignments(this);
+        }
+
+        if (MekHQ.getMHQOptions().getNewMonthQuickTrain()) {
+            final int newMonthQuickTrainTargetLevel = 5;
+            QuickTrain.processQuickTraining(personnel, newMonthQuickTrainTargetLevel, this, true);
         }
     }
 
