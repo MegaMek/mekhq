@@ -1816,9 +1816,6 @@ public class ResolveScenarioTracker {
             }
         }
 
-        for (Unit unit : getUnits()) {
-            unit.setSite(mission.getRepairLocation());
-        }
         for (Unit unit : getActualSalvage()) {
             unit.setSite(mission.getRepairLocation());
         }
