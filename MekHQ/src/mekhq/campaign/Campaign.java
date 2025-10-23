@@ -6279,7 +6279,7 @@ public class Campaign implements ITechManager {
         if (isFirstOfMonth) {
             payForRentedFacilities();
         }
-        
+
         if (isMonday) {
             // Bays are handled weekly, all other facilities are handled monthly
             FacilityRentals.payForAllRentedBays(this);
@@ -6664,8 +6664,12 @@ public class Campaign implements ITechManager {
         if (campaignOptions.isUseFatigue()) {
             int fieldKitchenCapacity = checkFieldKitchenCapacity(getForce(FORCE_ORIGIN).getAllUnitsAsUnits(units,
                   false), campaignOptions.getFieldKitchenCapacity());
+            fieldKitchenCapacity += FacilityRentals.getCapacityIncreaseFromRentals(getActiveContracts(),
+                  ContractRentalType.KITCHENS);
+
             int fieldKitchenUsage = checkFieldKitchenUsage(getActivePersonnel(false, false),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
+
             fieldKitchenWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
         } else {
             fieldKitchenWithinCapacity = false;
@@ -6686,6 +6690,8 @@ public class Campaign implements ITechManager {
         if (campaignOptions.isUseMASHTheatres()) {
             mashTheatreCapacity = MASHCapacity.checkMASHCapacity(getForce(FORCE_ORIGIN).getAllUnitsAsUnits(units,
                   false), campaignOptions.getMASHTheatreCapacity());
+            mashTheatreCapacity += FacilityRentals.getCapacityIncreaseFromRentals(getActiveContracts(),
+                  ContractRentalType.HOSPITAL_BEDS);
         } else {
             mashTheatreCapacity = 0;
         }

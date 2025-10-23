@@ -76,6 +76,38 @@ public class FacilityRentals {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FacilityRentals";
 
     private static final int FACTORY_CONDITIONS_MULTIPLIER = 20;
+    private static final int CAPACITY_INCREASE_HOSPITALS = 25; // One MASH Theater
+    private static final int CAPACITY_INCREASE_KITCHENS = 150; // One Field Kitchen
+    private static final int CAPACITY_INCREASE_SECURITY = 35; // One squad of 7 soldiers
+
+    public static int getCapacityIncreaseFromRentals(List<Contract> activeContracts, ContractRentalType rentalType) {
+        if (rentalType == ContractRentalType.MAINTENANCE_BAYS || rentalType == ContractRentalType.FACTORY_CONDITIONS) {
+            return 0;
+        }
+
+        int capacityMultiplier = switch (rentalType) {
+            case HOSPITAL_BEDS -> CAPACITY_INCREASE_HOSPITALS;
+            case KITCHENS -> CAPACITY_INCREASE_KITCHENS;
+            case HOLDING_CELLS -> CAPACITY_INCREASE_SECURITY;
+            default -> 0;
+        };
+
+        int rentedFacilities = getRentedFacilities(activeContracts, rentalType);
+        return rentedFacilities * capacityMultiplier;
+    }
+
+    private static int getRentedFacilities(List<Contract> activeContracts, ContractRentalType rentalType) {
+        int rentedFacilities = 0;
+        for (Contract contract : activeContracts) {
+            rentedFacilities += switch (rentalType) {
+                case HOSPITAL_BEDS -> contract.getHospitalBedsRented();
+                case KITCHENS -> contract.getKitchensRented();
+                case HOLDING_CELLS -> contract.getHoldingCellsRented();
+                default -> 0;
+            };
+        }
+        return rentedFacilities;
+    }
 
     public static void offerContractRentalOpportunity(Campaign campaign, Contract contract) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -176,16 +208,7 @@ public class FacilityRentals {
      */
     public static Money calculateContractRentalCost(int cost, List<Contract> activeContracts,
           ContractRentalType rentalType) {
-        int rentalCount = 0;
-
-        for (Contract contract : activeContracts) {
-            rentalCount += switch (rentalType) {
-                case HOSPITAL_BEDS -> contract.getHospitalBedsRented();
-                case KITCHENS -> contract.getKitchensRented();
-                case HOLDING_CELLS -> contract.getHoldingCellsRented();
-                default -> 0; // We don't care about other types of rentals
-            };
-        }
+        int rentalCount = getRentedFacilities(activeContracts, rentalType);
 
         return Money.of(cost * rentalCount);
     }
