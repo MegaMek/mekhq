@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -124,15 +125,74 @@ class FamilyTreePanel extends JPanel {
         if (node == null) {return;}
         String name = node.person.getFullTitle();
         FontMetrics fm = g.getFontMetrics();
+
+        // Get portrait info
+        ImageIcon portraitImage = node.person.getPortraitImageIconWithFallback(true);
+        int portraitW = 0, portraitH = 0;
+        if (portraitImage != null) {
+            portraitW = portraitImage.getIconWidth();
+            portraitH = portraitImage.getIconHeight();
+        }
+
         int paddingX = 28, paddingY = 12;
-        int width = fm.stringWidth(name) + paddingX;
-        int height = fm.getHeight() + paddingY;
+        int width = Math.max(fm.stringWidth(name) + paddingX, portraitW);
+        int height = fm.getHeight() + paddingY + (portraitH > 0 ? portraitH + 6 : 0);
+
         nodeDimensions.put(node, new Dimension(width, height));
         if (width > boxWidth) {boxWidth = width;}
         if (height > boxHeight) {boxHeight = height;}
         for (TreeNodeBox child : node.children) {
             calculateNodeDimensions(child, g);
         }
+    }
+
+    // drawTree now draws portrait (if present) centered above the text box
+    private void drawTree(Graphics2D g, TreeNodeBox node) {
+        if (node == null) {return;}
+        Dimension boxDim = nodeDimensions.get(node);
+        int nodeBoxWidth = boxDim.width;
+        int nodeBoxHeight = boxDim.height;
+
+        // Draw lines to children
+        for (TreeNodeBox child : node.children) {
+            Dimension childBoxDim = nodeDimensions.get(child);
+            g.drawLine(
+                  node.x + nodeBoxWidth / 2, node.y + nodeBoxHeight,
+                  child.x + childBoxDim.width / 2, child.y
+            );
+            drawTree(g, child);
+        }
+
+        // --- Portrait drawing logic ---
+        ImageIcon portraitImage = node.person.getPortraitImageIconWithFallback(true);
+        int portraitW = 0, portraitH = 0;
+        int portraitPadBtm = 6;
+        if (portraitImage != null) {
+            portraitW = portraitImage.getIconWidth();
+            portraitH = portraitImage.getIconHeight();
+            if (portraitW > 0 && portraitH > 0) {
+                int px = node.x + (nodeBoxWidth - portraitW) / 2;
+                int py = node.y;
+                g.drawImage(portraitImage.getImage(), px, py, null);
+            }
+        }
+
+        int boxY = node.y + (portraitH > 0 ? portraitH + portraitPadBtm : 0);
+
+        // Draw person box
+        g.setColor(Color.WHITE);
+        g.fillRect(node.x, boxY, nodeBoxWidth, nodeBoxHeight - (portraitH > 0 ? portraitH + portraitPadBtm : 0));
+        g.setColor(Color.BLACK);
+        g.drawRect(node.x, boxY, nodeBoxWidth, nodeBoxHeight - (portraitH > 0 ? portraitH + portraitPadBtm : 0));
+
+        String name = node.person.getFullTitle();
+        g.drawString(
+              name,
+              node.x + 14,
+              boxY +
+                    (nodeBoxHeight - (portraitH > 0 ? portraitH + portraitPadBtm : 0)) / 2 +
+                    g.getFontMetrics().getAscent() / 3
+        );
     }
 
     private void computeSubtreeWidth(TreeNodeBox node) {
@@ -195,28 +255,5 @@ class FamilyTreePanel extends JPanel {
             }
         }
         return node;
-    }
-
-    // drawTree is unchanged from last version
-    private void drawTree(Graphics2D g, TreeNodeBox node) {
-        if (node == null) {return;}
-        Dimension boxDim = nodeDimensions.get(node);
-        int nodeBoxWidth = boxDim.width;
-        int nodeBoxHeight = boxDim.height;
-        // Draw lines to children
-        for (TreeNodeBox child : node.children) {
-            Dimension childBoxDim = nodeDimensions.get(child);
-            g.drawLine(
-                  node.x + nodeBoxWidth / 2, node.y + nodeBoxHeight,
-                  child.x + childBoxDim.width / 2, child.y
-            );
-            drawTree(g, child);
-        }
-        g.setColor(Color.WHITE);
-        g.fillRect(node.x, node.y, nodeBoxWidth, nodeBoxHeight);
-        g.setColor(Color.BLACK);
-        g.drawRect(node.x, node.y, nodeBoxWidth, nodeBoxHeight);
-        String name = node.person.getFullTitle();
-        g.drawString(name, node.x + 14, node.y + nodeBoxHeight / 2 + g.getFontMetrics().getAscent() / 3);
     }
 }
