@@ -34,9 +34,7 @@ package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.GridBagConstraints;
 import javax.swing.JCheckBox;
@@ -44,12 +42,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
-import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -76,7 +72,6 @@ public class SystemsTab {
     // Reputation Tab
     private CampaignOptionsHeaderPanel reputationHeader;
 
-    private MMComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JCheckBox chkResetCriminalRecord;
 
     private JSpinner manualUnitRatingModifier;
@@ -174,13 +169,6 @@ public class SystemsTab {
      */
     private JPanel createReputationGeneralPanel() {
         // Contents
-        JLabel lblReputation = new CampaignOptionsLabel("Reputation");
-        lblReputation.addMouseListener(createTipPanelUpdater(reputationHeader, "Reputation"));
-        unitRatingMethodCombo = new MMComboBox<>("unitRatingMethodCombo", UnitRatingMethod.values());
-        unitRatingMethodCombo.setToolTipText(String.format("<html>%s</html>",
-              getTextAt(getCampaignOptionsResourceBundle(), "lblReputation.tooltip")));
-        unitRatingMethodCombo.addMouseListener(createTipPanelUpdater(reputationHeader, "Reputation"));
-
         JLabel lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
         lblManualUnitRatingModifier.addMouseListener(createTipPanelUpdater(reputationHeader,
               "ManualUnitRatingModifier"));
@@ -197,12 +185,6 @@ public class SystemsTab {
         layout.gridy = 0;
         layout.gridx = 0;
         layout.gridwidth = 1;
-        panel.add(lblReputation, layout);
-        layout.gridx++;
-        panel.add(unitRatingMethodCombo, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
         panel.add(lblManualUnitRatingModifier, layout);
         layout.gridx++;
         panel.add(manualUnitRatingModifier, layout);
@@ -521,7 +503,6 @@ public class SystemsTab {
         }
 
         // Reputation
-        unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod());
         manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
 
         chkClampReputationPayMultiplier.setSelected(options.isClampReputationPayMultiplier());
@@ -577,7 +558,6 @@ public class SystemsTab {
         }
 
         // Reputation
-        options.setUnitRatingMethod(unitRatingMethodCombo.getSelectedItem());
         options.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());
 
         if (chkResetCriminalRecord.isSelected()) {
