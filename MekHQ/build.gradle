@@ -251,6 +251,8 @@ tasks.register('stageFiles', Copy) {
     exclude "mmconf/mm.preferences"
     exclude "mmconf/mml.preferences"
 
+    exclude("data/**/*.cache")
+
     into fileStagingDir
 
     doLast {

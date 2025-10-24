@@ -60,6 +60,7 @@ import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.*;
+import static mekhq.campaign.personnel.skills.VehicleCrewSkills.VEHICLE_CREW_SKILLS;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -75,7 +76,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
@@ -117,6 +117,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.ranks.Rank;
@@ -243,6 +244,7 @@ public class Person {
 
     private Skills skills;
     private PersonnelOptions options;
+    private boolean hasGainedVeterancySPA;
     private int toughness;
     private Attributes atowAttributes;
 
@@ -377,6 +379,7 @@ public class Person {
     private boolean divorceable;
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
+    private boolean quickTrainIgnore;
     // this is a flag used in determine whether a person is a potential marriage
     // candidate provided
     // that they are not married, are old enough, etc.
@@ -504,6 +507,7 @@ public class Person {
         hits = 0;
         hitsPrior = 0;
         toughness = 0;
+        hasGainedVeterancySPA = false;
         connections = 0;
         wealth = 0;
         hasPerformedExtremeExpenditure = false;
@@ -597,6 +601,7 @@ public class Person {
         setDivorceable(true);
         setFounder(false);
         setImmortal(false);
+        setQuickTrainIgnore(false);
         setMarriageable(true);
         setTryingToConceive(true);
         // endregion Flags
@@ -1267,16 +1272,7 @@ public class Person {
 
         List<String> skillsForProfession = role.getSkillsForProfession();
         return switch (role) {
-            case VEHICLE_CREW -> Stream.of(S_TECH_MEK,
-                  S_TECH_AERO,
-                  S_TECH_MECHANIC,
-                  S_TECH_BA,
-                  S_SURGERY,
-                  S_MEDTECH,
-                  S_ASTECH,
-                  S_COMMUNICATIONS,
-                  S_SENSOR_OPERATIONS,
-                  S_ART_COOKING).anyMatch(this::hasSkill);
+            case VEHICLE_CREW -> VEHICLE_CREW_SKILLS.stream().anyMatch(this::hasSkill);
             case SOLDIER -> INFANTRY_GUNNERY_SKILLS.stream().anyMatch(this::hasSkill);
             case BATTLE_ARMOUR -> hasSkill(S_GUN_BA);
             case VESSEL_CREW -> hasSkill(S_TECH_VESSEL);
@@ -2216,10 +2212,81 @@ public class Person {
      *
      * <p>This method decrements the current XP by the specified amount.</p>
      *
+     * <p><b>Usage:</b> this method should only be used when the act of spending XP cannot change the characters'
+     * experience level (green, veteran, etc.). In <b>all</b> other instances {@link #spendXPOnSkills(Campaign, int)}
+     * must be used.</p>
+     *
      * @param xp the amount of XP to deduct
      */
     public void spendXP(final int xp) {
         this.xp -= xp;
+    }
+
+    /**
+     * Processes spending XP on skill upgrades for the character and checks for veterancy SPA (Special Personnel
+     * Ability) gain.
+     *
+     * <p>Deducts the specified XP amount, and if campaign options and the character's veteran status allow, attempts
+     * to assign a veterancy special ability. Triggers relevant events and logs a report if a SPA is gained.</p>
+     *
+     * @param campaign the campaign context for skill and SPA gain rules
+     * @param xp       the amount of XP to spend
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public void spendXPOnSkills(final Campaign campaign, final int xp) {
+        spendXP(xp); // Process spending of XP as normal
+
+        // Check whether we need to process the veterancy SPA gain
+        processVeterancyAwards(campaign);
+    }
+
+    public void processVeterancyAwards(Campaign campaign) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseAbilities = campaignOptions.isUseAbilities();
+        boolean isUseVeterancySPA = campaignOptions.isAwardVeterancySPAs();
+        if (hasGainedVeterancySPA || !isUseAbilities || !isUseVeterancySPA) {
+            return;
+        }
+
+        // Is the character a veteran in their primary profession?
+        int experienceLevel = getExperienceLevel(campaign, false);
+        if (experienceLevel < EXP_VETERAN) {
+            return;
+        }
+
+        SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
+        String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, true);
+        if (spaGained == null) {
+            return;
+        }
+
+        String spaGainedMessage = getVeterancyAwardReport(spaGained);
+        campaign.addReport(spaGainedMessage);
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    /**
+     * Generates a formatted report string describing the veterancy SPA award for a person.
+     *
+     * <p>Removes any specialization or extra information in parentheses from the SPA name, applies color formatting
+     * to the SPA, and returns a localized report message string suitable for display in the daily report.</p>
+     *
+     * @param spaGained the name of the SPA gained (may include specialization in parentheses)
+     *
+     * @return a formatted, localized report string announcing the award
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public String getVeterancyAwardReport(String spaGained) {
+        String spaGainedClean = spaGained.replaceAll("\\s*\\([^)]*\\)", "");
+        String veteranColor = MekHQ.getMHQOptions().getFontColorSkillVeteranHexColor();
+        String amazingColor = getWarningColor(); // We use warning as it can be a positive or negative event
+        return String.format(resources.getString("Person.veterancySPA.gain"),
+              getHyperlinkedFullTitle(), spanOpeningWithCustomColor(veteranColor), CLOSING_SPAN_TAG,
+              spanOpeningWithCustomColor(amazingColor), spaGainedClean, CLOSING_SPAN_TAG);
     }
 
     /**
@@ -2730,6 +2797,14 @@ public class Person {
         this.immortal = immortal;
     }
 
+    public boolean isQuickTrainIgnore() {
+        return quickTrainIgnore;
+    }
+
+    public void setQuickTrainIgnore(final boolean quickTrainIgnore) {
+        this.quickTrainIgnore = quickTrainIgnore;
+    }
+
     public boolean isEmployed() {
         return status != PersonnelStatus.CAMP_FOLLOWER;
     }
@@ -2906,6 +2981,10 @@ public class Person {
 
             if (toughness != 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "toughness", toughness);
+            }
+
+            if (hasGainedVeterancySPA) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasGainedVeterancySPA", hasGainedVeterancySPA);
             }
 
             if (connections != 0) {
@@ -3274,6 +3353,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "divorceable", divorceable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "founder", founder);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
@@ -3446,6 +3526,8 @@ public class Person {
                     implants = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("toughness")) {
                     person.toughness = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("hasGainedVeterancySPA")) {
+                    person.hasGainedVeterancySPA = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("connections")) {
                     person.connections = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("wealth")) {
@@ -3841,6 +3923,8 @@ public class Person {
                     person.setFounder(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("immortal")) {
                     person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("quickTrainIgnore")) {
+                    person.setQuickTrainIgnore(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageable")) {
                     person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
@@ -4415,16 +4499,7 @@ public class Person {
             case VEHICLE_CREW -> {
                 // Vehicle crew are a special case as they just need any one of the following skills to qualify,
                 // rather than needing all relevant skills
-                List<String> relevantSkills = List.of(S_TECH_MEK,
-                      S_TECH_AERO,
-                      S_TECH_MECHANIC,
-                      S_TECH_BA,
-                      S_SURGERY,
-                      S_MEDTECH,
-                      S_ASTECH,
-                      S_COMMUNICATIONS,
-                      S_ART_COOKING,
-                      S_SENSOR_OPERATIONS);
+                List<String> relevantSkills = VEHICLE_CREW_SKILLS;
                 int highestExperienceLevel = EXP_NONE;
                 for (String relevantSkill : relevantSkills) {
                     Skill skill = getSkill(relevantSkill);
@@ -5964,6 +6039,14 @@ public class Person {
 
     public void setToughness(final int toughness) {
         this.toughness = toughness;
+    }
+
+    public boolean getHasGainedVeterancySPA() {
+        return hasGainedVeterancySPA;
+    }
+
+    public void setHasGainedVeterancySPA(final boolean hasGainedVeterancySPA) {
+        this.hasGainedVeterancySPA = hasGainedVeterancySPA;
     }
 
     public int getConnections() {

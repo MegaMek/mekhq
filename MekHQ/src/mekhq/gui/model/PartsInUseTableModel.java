@@ -54,6 +54,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import mekhq.MekHQ;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
@@ -67,18 +68,19 @@ public class PartsInUseTableModel extends DataTableModel<PartInUse> {
     private static final String EMPTY_CELL = "";
 
     public static final int COL_PART = 0;
-    public static final int COL_IN_USE = 1;
-    public static final int COL_STORED = 2;
-    public static final int COL_TONNAGE = 3;
-    public static final int COL_REQUESTED_STOCK = 4;
-    public static final int COL_IN_TRANSFER = 5;
-    public static final int COL_COST = 6;
-    public static final int COL_BUTTON_BUY = 7;
-    public static final int COL_BUTTON_BUY_BULK = 8;
-    public static final int COL_BUTTON_SELL = 9;
-    public static final int COL_BUTTON_SELL_BULK = 10;
-    public static final int COL_BUTTON_GM_ADD = 11;
-    public static final int COL_BUTTON_GM_ADD_BULK = 12;
+    public static final int COL_TECH_BASE = 1;
+    public static final int COL_IN_USE = 2;
+    public static final int COL_STORED = 3;
+    public static final int COL_TONNAGE = 4;
+    public static final int COL_REQUESTED_STOCK = 5;
+    public static final int COL_IN_TRANSFER = 6;
+    public static final int COL_COST = 7;
+    public static final int COL_BUTTON_BUY = 8;
+    public static final int COL_BUTTON_BUY_BULK = 9;
+    public static final int COL_BUTTON_SELL = 10;
+    public static final int COL_BUTTON_SELL_BULK = 11;
+    public static final int COL_BUTTON_GM_ADD = 12;
+    public static final int COL_BUTTON_GM_ADD_BULK = 13;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel",
           MekHQ.getMHQOptions().getLocale());
@@ -96,6 +98,7 @@ public class PartsInUseTableModel extends DataTableModel<PartInUse> {
     public String getColumnName(int column) {
         return switch (column) {
             case COL_PART -> resourceMap.getString("part.heading");
+            case COL_TECH_BASE -> resourceMap.getString("techBase.heading");
             case COL_IN_USE -> resourceMap.getString("inUse.heading");
             case COL_STORED -> resourceMap.getString("stored.heading");
             case COL_TONNAGE -> resourceMap.getString("storedTonnage.heading");
@@ -112,6 +115,8 @@ public class PartsInUseTableModel extends DataTableModel<PartInUse> {
         switch (column) {
             case COL_PART:
                 return partInUse.getDescription();
+            case COL_TECH_BASE:
+                return Part.getTechBaseName(partInUse.getTechBase());
             case COL_IN_USE:
                 return FORMATTER.format(partInUse.getUseCount());
             case COL_STORED:
@@ -191,7 +196,7 @@ public class PartsInUseTableModel extends DataTableModel<PartInUse> {
 
     public int getAlignment(int column) {
         return switch (column) {
-            case COL_PART -> SwingConstants.LEFT;
+            case COL_PART, COL_TECH_BASE -> SwingConstants.LEFT;
             case COL_IN_USE, COL_STORED, COL_TONNAGE, COL_IN_TRANSFER, COL_COST, COL_REQUESTED_STOCK ->
                   SwingConstants.RIGHT;
             default -> SwingConstants.CENTER;
@@ -201,7 +206,7 @@ public class PartsInUseTableModel extends DataTableModel<PartInUse> {
     public int getPreferredWidth(int column) {
         return switch (column) {
             case COL_PART -> 260;
-            case COL_IN_USE, COL_STORED, COL_TONNAGE, COL_IN_TRANSFER -> 15;
+            case COL_TECH_BASE, COL_IN_USE, COL_STORED, COL_TONNAGE, COL_IN_TRANSFER -> 15;
             case COL_COST -> 40;
             case COL_BUTTON_BUY, COL_BUTTON_SELL -> 25;
             case COL_BUTTON_GM_ADD, COL_BUTTON_BUY_BULK, COL_BUTTON_SELL_BULK -> 65;

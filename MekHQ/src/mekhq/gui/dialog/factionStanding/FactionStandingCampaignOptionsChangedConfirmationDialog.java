@@ -81,7 +81,7 @@ import mekhq.gui.dialog.glossary.NewGlossaryDialog;
  * @author Illiani
  * @since 0.50.07
  */
-public class CampaignOptionsChangedConfirmationDialog extends JDialog {
+public class FactionStandingCampaignOptionsChangedConfirmationDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandings";
 
     private final int PADDING = scaleForGUI(10);
@@ -117,9 +117,9 @@ public class CampaignOptionsChangedConfirmationDialog extends JDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    public CampaignOptionsChangedConfirmationDialog(JDialog parent, ImageIcon campaignIcon, Faction campaignFaction,
-          LocalDate today, FactionStandings factionStandings, Collection<Mission> missions,
-          boolean isFactionStandingEnabled, double regardMultiplier) {
+    public FactionStandingCampaignOptionsChangedConfirmationDialog(JDialog parent, ImageIcon campaignIcon, Faction campaignFaction,
+                                                                   LocalDate today, FactionStandings factionStandings, Collection<Mission> missions,
+                                                                   boolean isFactionStandingEnabled, double regardMultiplier) {
         this.campaignIcon = campaignIcon;
         this.campaignFaction = campaignFaction;
         this.today = today;

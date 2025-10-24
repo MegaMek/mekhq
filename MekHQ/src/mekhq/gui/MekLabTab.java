@@ -1308,7 +1308,7 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void refreshPreview() {
-            structureTab.refresh();
+            structureTab.refreshPreview();
         }
 
         @Override

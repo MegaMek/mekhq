@@ -33,7 +33,7 @@
 package mekhq.campaign.personnel.enums;
 
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
-import static mekhq.campaign.personnel.skills.SkillType.*;
+import static mekhq.campaign.personnel.skills.VehicleCrewSkills.VEHICLE_CREW_SKILLS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -527,17 +527,7 @@ public enum PersonnelRole {
         if (this == VEHICLE_CREW) {
             // Vehicle Crew is a bit of a special case as any of these skills makes a character eligible for
             // experience level improvements.
-            List<String> relevantSkills = List.of(SkillType.S_TECH_MEK,
-                  SkillType.S_TECH_AERO,
-                  SkillType.S_TECH_MECHANIC,
-                  SkillType.S_TECH_BA,
-                  SkillType.S_SURGERY,
-                  SkillType.S_MEDTECH,
-                  SkillType.S_ASTECH,
-                  SkillType.S_COMMUNICATIONS,
-                  SkillType.S_ART_COOKING,
-                  SkillType.S_SENSOR_OPERATIONS);
-            skills.addAll(relevantSkills);
+            skills.addAll(VEHICLE_CREW_SKILLS);
         } else if (this == SOLDIER) {
             skills.addAll(INFANTRY_GUNNERY_SKILLS);
         } else {
@@ -692,16 +682,7 @@ public enum PersonnelRole {
             case MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
             case VEHICLE_CREW -> {
                 if (includeExpandedSkills) {
-                    yield List.of(S_TECH_MEK,
-                          S_TECH_AERO,
-                          S_TECH_MECHANIC,
-                          S_TECH_BA,
-                          S_SURGERY,
-                          S_MEDTECH,
-                          S_ASTECH,
-                          S_COMMUNICATIONS,
-                          S_SENSOR_OPERATIONS,
-                          S_ART_COOKING);
+                    yield VEHICLE_CREW_SKILLS;
                 } else {
                     yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_GUN_VEE);
                 }
