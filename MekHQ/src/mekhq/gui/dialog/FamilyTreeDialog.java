@@ -1,13 +1,10 @@
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.utilities.MHQInternationalization.getText;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,12 +12,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 
 import megamek.common.enums.Gender;
 import megamek.common.ui.EnhancedTabbedPane;
@@ -30,10 +30,12 @@ import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
 public class FamilyTreeDialog extends JDialog {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FamilyTreeDialog";
+
     private final EnhancedTabbedPane tabbedPane;
 
     public FamilyTreeDialog(Frame owner, Genealogy genealogy, Collection<Person> personnel) {
-        super(owner, "Family Tree", true);
+        super(owner, getText("accessingTerminal.title"), true);
 
         tabbedPane = new EnhancedTabbedPane();
 
@@ -46,34 +48,30 @@ public class FamilyTreeDialog extends JDialog {
 
         // Create bottom panel with BoxLayout for vertical stacking
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new javax.swing.BoxLayout(buttonPanel, javax.swing.BoxLayout.Y_AXIS));
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 
         // Add label
-        JLabel infoLabel = new JLabel(
-              "<html><div style='text-align: center;'><i>A braided family tree is stronger than a bunch of loose " +
-                    "strands!</i>" +
-                    "<br>Marshal Hans 'Habsburg' Steiner-Steiner</div></html>");
-        infoLabel.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
-        infoLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        JLabel infoLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "FamilyTreeDialog.flavorText"));
+        infoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
         buttonPanel.add(infoLabel);
 
         // Add some spacing
-        buttonPanel.add(javax.swing.Box.createRigidArea(new Dimension(0, 5)));
+        buttonPanel.add(Box.createRigidArea(scaleForGUI(0, 5)));
 
         // Add close button
-        JButton closeButton = new RoundedJButton("Close");
-        closeButton.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+        JButton closeButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "FamilyTreeDialog.button"));
+        closeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         closeButton.addActionListener(e -> dispose());
         buttonPanel.add(closeButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
 
-        setPreferredSize(new Dimension(900, 700));
+        setPreferredSize(scaleForGUI(900, 700));
         pack();
         setLocationRelativeTo(owner);
     }
 
-    /** Add a new tab for the given genealogy if not already open. */
     private void addFamilyTreeTab(Genealogy genealogy, Collection<Person> personnel) {
         String title = genealogy.getOrigin().getFullTitle();
 
@@ -89,7 +87,7 @@ public class FamilyTreeDialog extends JDialog {
 
         FamilyTreePanel panel = new FamilyTreePanel(genealogy, personnel, this);
         JScrollPane scrollPane = new FastJScrollPane(panel);
-        scrollPane.setPreferredSize(new Dimension(800, 600));
+        scrollPane.setPreferredSize(scaleForGUI(800, 600));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
@@ -97,16 +95,16 @@ public class FamilyTreeDialog extends JDialog {
         tabbedPane.setSelectedComponent(scrollPane);
 
         // Center on the origin person when the tab is added and visible
-        java.awt.EventQueue.invokeLater(() -> centerTreeOnOrigin(scrollPane));
+        EventQueue.invokeLater(() -> centerTreeOnOrigin(scrollPane));
     }
 
-    /** Ensures the scroll pane is centered on the person for the current tree. */
     private void centerTreeOnOrigin(JScrollPane scrollPane) {
-        if (!(scrollPane.getViewport().getView() instanceof FamilyTreePanel)) {return;}
-        FamilyTreePanel panel = (FamilyTreePanel) scrollPane.getViewport().getView();
+        if (!(scrollPane.getViewport().getView() instanceof FamilyTreePanel panel)) {
+            return;
+        }
 
         // Use invokeLater so this runs AFTER the next layout/paint event and any scroll snaps
-        java.awt.EventQueue.invokeLater(() -> {
+        EventQueue.invokeLater(() -> {
             Rectangle box = panel.getOriginPersonBox();
             if (box != null) {
                 int panelW = panel.getPreferredSize().width;
@@ -151,12 +149,10 @@ class TreeNodeBox {
 
 class FamilyTreePanel extends JPanel {
     private final Genealogy genealogy;
-    private final Collection<Person> personnel;
-    private final FamilyTreeDialog parentDialog;
     private TreeNodeBox root;
     private final int hGap = 40, vGap = 70; // Increased for clarity
 
-    private Map<TreeNodeBox, Dimension> nodeDimensions = new HashMap<>();
+    private final Map<TreeNodeBox, Dimension> nodeDimensions = new HashMap<>();
     private int boxHeight = 0;
     private int boxWidth = 0;
 
@@ -166,8 +162,6 @@ class FamilyTreePanel extends JPanel {
 
     public FamilyTreePanel(Genealogy genealogy, Collection<Person> personnel, FamilyTreeDialog parentDialog) {
         this.genealogy = genealogy;
-        this.personnel = personnel;
-        this.parentDialog = parentDialog;
 
         setPreferredSize(new Dimension(panelWidth, panelHeight));
 
@@ -211,24 +205,23 @@ class FamilyTreePanel extends JPanel {
         computeParentTreeWidth(root);
 
         // Calculate how many ancestor generations we have to determine vertical offset
-        int ancestorDepth = calculateAncestorDepth(root);
-        int rootLevel = ancestorDepth; // Root will be at this level (0-indexed from top)
+        int rootLevel = calculateAncestorDepth(root); // Root will be at this level (0-indexed from top)
 
         // Then assign coords based on subtree widths
-        int startingX = 20; // Leftmost padding
+        int startingX = scaleForGUI(20); // Leftmost padding
 
         // Position the root at the calculated level, then descendants below
         assignCoordsWithSubtreeSpacing(root, rootLevel, startingX);
 
         // Assign coords for ancestors (going upward from root)
-        assignParentCoords(root, rootLevel - 1, startingX);
+        assignParentCoords(root, rootLevel - 1);
 
         // Calculate bounds to find if any nodes went negative
         Rectangle bounds = calculateTreeBounds(root);
 
         // If tree extends into negative X, shift everything right
         if (bounds.x < 0) {
-            int shiftX = 20 - bounds.x; // Shift to have 20px left padding
+            int shiftX = scaleForGUI(20) - bounds.x; // Shift to have 20px left padding
             shiftTreeHorizontally(root, shiftX, new HashSet<>());
 
             // Recalculate bounds after shift
@@ -236,8 +229,8 @@ class FamilyTreePanel extends JPanel {
         }
 
         // Now dynamically set preferred size to fit the tree
-        panelWidth = bounds.x + bounds.width + 40;
-        panelHeight = bounds.y + bounds.height + 40;
+        panelWidth = bounds.x + bounds.width + scaleForGUI(40);
+        panelHeight = bounds.y + bounds.height + scaleForGUI(40);
         setPreferredSize(new Dimension(panelWidth, panelHeight));
         revalidate(); // Tell scrollpane the preferred size has changed
     }
@@ -342,7 +335,7 @@ class FamilyTreePanel extends JPanel {
         }
     }
 
-    private void assignParentCoords(TreeNodeBox node, int level, int leftX) {
+    private void assignParentCoords(TreeNodeBox node, int level) {
         if (node == null || node.parents.isEmpty()) {
             return;
         }
@@ -359,9 +352,8 @@ class FamilyTreePanel extends JPanel {
 
         // Center parents above the current node
         int nodeCenter = node.x + nodeBoxWidth / 2;
-        int parentsStartX = nodeCenter - parentsWidth / 2;
 
-        int parentX = parentsStartX;
+        int parentX = nodeCenter - parentsWidth / 2;
         for (TreeNodeBox parent : node.parents) {
             Dimension parentBoxDim = nodeDimensions.get(parent);
             int parentSubtreeWidth = parent.subtreeWidth;
@@ -372,7 +364,7 @@ class FamilyTreePanel extends JPanel {
             parent.y = level * (boxHeight + vGap);
 
             // Recursively assign coords to this parent's parents
-            assignParentCoords(parent, level - 1, parentX);
+            assignParentCoords(parent, level - 1);
 
             parentX += parentSubtreeWidth + hGap;
         }
@@ -495,13 +487,13 @@ class FamilyTreePanel extends JPanel {
         int nodeBoxHeight = boxDim.height;
 
         // Enable anti-aliasing for smooth lines
-        g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
-              java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+              RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Set line thickness to 5px with rounded caps and joins
-        g.setStroke(new java.awt.BasicStroke(5,
-              java.awt.BasicStroke.CAP_ROUND,
-              java.awt.BasicStroke.JOIN_ROUND));
+        g.setStroke(new BasicStroke(5,
+              BasicStroke.CAP_ROUND,
+              BasicStroke.JOIN_ROUND));
 
         // Draw lines to children
         for (TreeNodeBox child : node.children) {
@@ -546,12 +538,12 @@ class FamilyTreePanel extends JPanel {
         int nodeBoxHeight = boxDim.height;
 
         // Enable anti-aliasing for smooth rendering
-        g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
-              java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+              RenderingHints.VALUE_ANTIALIAS_ON);
 
         // --- Portrait drawing logic ---
         ImageIcon portraitImage = node.person.getPortraitImageIconWithFallback(true);
-        int portraitW = 0, portraitH = 0;
+        int portraitW, portraitH = 0;
         int portraitPadBtm = 6;
         if (portraitImage != null) {
             portraitW = portraitImage.getIconWidth();
@@ -576,11 +568,11 @@ class FamilyTreePanel extends JPanel {
 
         // Draw rounded border
         g.setColor(Color.BLACK);
-        g.setStroke(new java.awt.BasicStroke(borderThickness));
+        g.setStroke(new BasicStroke(borderThickness));
         g.drawRoundRect(node.x, boxY, nodeBoxWidth, boxDrawHeight, arc, arc);
 
         // Reset stroke for text
-        g.setStroke(new java.awt.BasicStroke(1));
+        g.setStroke(new BasicStroke(1));
 
         // Draw name and dates text
         g.setColor(Color.BLACK);
@@ -610,7 +602,7 @@ class FamilyTreePanel extends JPanel {
               new Rectangle(node.x,
                     clickableTop,
                     nodeBoxWidth,
-                    (portraitH > 0 ? portraitH : 0) + boxDrawHeight + portraitPadBtm + 2),
+                    (Math.max(portraitH, 0)) + boxDrawHeight + portraitPadBtm + 2),
               node.person
         );
 
@@ -668,12 +660,6 @@ class FamilyTreePanel extends JPanel {
         if (node == null) {return;}
         Dimension boxDim = nodeDimensions.get(node);
         int nodeBoxWidth = boxDim.width;
-        int nodeBoxHeight = boxDim.height;
-        int childrenTotalWidth = 0;
-        for (TreeNodeBox child : node.children) {
-            childrenTotalWidth += child.subtreeWidth;
-        }
-        childrenTotalWidth += hGap * Math.max(0, node.children.size() - 1);
 
         // Center the node above its children/subtree, or just at leftX if leaf
         if (node.children.isEmpty()) {
