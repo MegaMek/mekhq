@@ -354,5 +354,14 @@ public final class MHQConstants extends SuiteConstants {
     // startregion Important Dates
     public static final LocalDate CLAN_INVASION_FIRST_WAVE_BEGINS = LocalDate.of(3050, 3, 7);
     public static final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
+    /**
+     * The invasion of Luthien kicks off the Jihad
+     */
+    public static final LocalDate JIHAD_START = LocalDate.of(3068, 1, 1);
+    /**
+     * The last WoB resistance on Terra is broken, and despite not being the formal end of the Jihad, heralds the end of
+     * the worst fighting.
+     */
+    public static final LocalDate NOMINAL_JIHAD_END = LocalDate.of(3079, 2, 1);
     // endregion Important Dates
 }
