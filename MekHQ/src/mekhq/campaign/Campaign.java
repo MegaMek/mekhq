@@ -205,6 +205,8 @@ import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
+import mekhq.campaign.mission.rentals.ContractRentalType;
+import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.parts.*;
@@ -248,6 +250,7 @@ import mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
+import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -389,7 +392,9 @@ public class Campaign implements ITechManager {
     private transient String currentReportHTML;
     private transient List<String> newReports;
 
-    private Boolean fieldKitchenWithinCapacity;
+    private boolean fieldKitchenWithinCapacity;
+    private int mashTheatreCapacity;
+    private int repairBaysRented;
 
     // this is updated and used per gaming session, it is enabled/disabled via the
     // Campaign options
@@ -621,6 +626,8 @@ public class Campaign implements ITechManager {
         atbConfig = null;
         hasActiveContract = false;
         fieldKitchenWithinCapacity = false;
+        mashTheatreCapacity = 0;
+        repairBaysRented = 0;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         processProcurement = true;
@@ -2217,8 +2224,36 @@ public class Campaign implements ITechManager {
         return person;
     }
 
-    public Boolean getFieldKitchenWithinCapacity() {
+    public boolean getFieldKitchenWithinCapacity() {
         return fieldKitchenWithinCapacity;
+    }
+
+    public void setFieldKitchenWithinCapacity(boolean fieldKitchenWithinCapacity) {
+        this.fieldKitchenWithinCapacity = fieldKitchenWithinCapacity;
+    }
+
+    public boolean getMashTheatresWithinCapacity() {
+        return mashTheatreCapacity >= getPatientsAssignedToDoctors().size();
+    }
+
+    public int getMashTheatreCapacity() {
+        return mashTheatreCapacity;
+    }
+
+    public void setMashTheatreCapacity(int mashTheatreCapacity) {
+        this.mashTheatreCapacity = mashTheatreCapacity;
+    }
+
+    public int getRepairBaysRented() {
+        return repairBaysRented;
+    }
+
+    public void setRepairBaysRented(int repairBaysRented) {
+        this.repairBaysRented = repairBaysRented;
+    }
+
+    public void changeRepairBaysRented(int delta) {
+        repairBaysRented = max(0, repairBaysRented + delta);
     }
     // endregion Person Creation
 
@@ -3039,6 +3074,13 @@ public class Campaign implements ITechManager {
             }
         }
         return patients;
+    }
+
+    public List<Person> getPatientsAssignedToDoctors() {
+        return getPatients()
+                     .stream()
+                     .filter(patient -> patient.getDoctorId() != null)
+                     .toList();
     }
 
     /**
@@ -5146,7 +5188,7 @@ public class Campaign implements ITechManager {
             }
 
             if (getLocalDate().equals(contract.getStartDate())) {
-                getUnits().forEach(unit -> unit.setSite(contract.getRepairLocation(getAtBUnitRatingMod())));
+                getUnits().forEach(unit -> unit.setSite(contract.getRepairLocation()));
             }
 
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
@@ -6201,6 +6243,7 @@ public class Campaign implements ITechManager {
         location.newDay(this);
 
         updateFieldKitchenCapacity();
+        updateMASHTheatreCapacity();
 
         processNewDayPersonnel();
 
@@ -6251,6 +6294,15 @@ public class Campaign implements ITechManager {
             new PrisonerEventManager(this);
         }
 
+        if (isFirstOfMonth) {
+            payForRentedFacilities();
+        }
+
+        if (isMonday) {
+            // Bays are handled weekly, all other facilities are handled monthly
+            FacilityRentals.payForAllRentedBays(this);
+        }
+
         resetAsTechMinutes();
 
         processNewDayUnits();
@@ -6293,6 +6345,69 @@ public class Campaign implements ITechManager {
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    /**
+     * Calculates and processes payment for all types of rented facilities (hospital beds, kitchens, holding cells)
+     * based on the active contracts and current campaign options.
+     *
+     * <p>Generates reports for any failed transactions or payment issues. Adds any generated reports to the campaign
+     * log.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void payForRentedFacilities() {
+        List<Contract> activeContracts = getActiveContracts();
+        int hospitalRentalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
+        Money hospitalRentalFee = FacilityRentals.calculateContractRentalCost(hospitalRentalCost, activeContracts,
+              ContractRentalType.HOSPITAL_BEDS);
+
+        int kitchenRentalCost = campaignOptions.getRentedFacilitiesCostKitchens();
+        Money kitchenRentalFee = FacilityRentals.calculateContractRentalCost(kitchenRentalCost, activeContracts,
+              ContractRentalType.KITCHENS);
+
+        int holdingCellRentalCost = campaignOptions.getRentedFacilitiesCostHoldingCells();
+        Money holdingCellRentalFee = FacilityRentals.calculateContractRentalCost(holdingCellRentalCost, activeContracts,
+              ContractRentalType.HOLDING_CELLS);
+
+        List<String> reports = FacilityRentals.payForAllContractRentals(finances, currentDay, hospitalRentalFee,
+              kitchenRentalFee, holdingCellRentalFee);
+        for (String report : reports) { // No report is generated if the transaction is successful
+            addReport(report);
+        }
+    }
+
+    /**
+     * Computes the total rental fees for the campaign, including all rented hospital beds, kitchens, and holding
+     * cells.
+     *
+     * <p>Fetches all active contracts and sums the rental costs for each facility type before adding any ongoing
+     * bay rental fees.</p>
+     *
+     * <p>If you want to fetch the rent due for bays use
+     * {@link FacilityRentals#getTotalRentSumFromRentedBays(Campaign, Finances)}</p>
+     *
+     * @return the combined {@link Money} amount representing all current rental fees owed
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public Money getTotalRentFeesExcludingBays() {
+        List<Contract> activeContracts = getActiveContracts();
+        int hospitalRentalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
+        Money hospitalRentalFee = FacilityRentals.calculateContractRentalCost(hospitalRentalCost, activeContracts,
+              ContractRentalType.HOSPITAL_BEDS);
+
+        int kitchenRentalCost = campaignOptions.getRentedFacilitiesCostKitchens();
+        Money kitchenRentalFee = FacilityRentals.calculateContractRentalCost(kitchenRentalCost, activeContracts,
+              ContractRentalType.KITCHENS);
+
+        int holdingCellRentalCost = campaignOptions.getRentedFacilitiesCostHoldingCells();
+        Money holdingCellRentalFee = FacilityRentals.calculateContractRentalCost(holdingCellRentalCost, activeContracts,
+              ContractRentalType.HOLDING_CELLS);
+
+        return hospitalRentalFee.plus(kitchenRentalFee).plus(holdingCellRentalFee);
     }
 
     /**
@@ -6599,11 +6714,36 @@ public class Campaign implements ITechManager {
         if (campaignOptions.isUseFatigue()) {
             int fieldKitchenCapacity = checkFieldKitchenCapacity(getForce(FORCE_ORIGIN).getAllUnitsAsUnits(units,
                   false), campaignOptions.getFieldKitchenCapacity());
+            fieldKitchenCapacity += FacilityRentals.getCapacityIncreaseFromRentals(getActiveContracts(),
+                  ContractRentalType.KITCHENS);
+
             int fieldKitchenUsage = checkFieldKitchenUsage(getActivePersonnel(false, false),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
+
             fieldKitchenWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
         } else {
             fieldKitchenWithinCapacity = false;
+        }
+    }
+
+    /**
+     * Updates the value of {@code mashTheatreCapacity} based on the current campaign options and force composition.
+     *
+     * <p>If the campaign is configured to use MASH theatres, this method calculates the available MASH theatre
+     * capacity using the current force and campaign options. If MASH theatres are not enabled, the capacity is set to
+     * zero.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void updateMASHTheatreCapacity() {
+        if (campaignOptions.isUseMASHTheatres()) {
+            mashTheatreCapacity = MASHCapacity.checkMASHCapacity(getForce(FORCE_ORIGIN).getAllUnitsAsUnits(units,
+                  false), campaignOptions.getMASHTheatreCapacity());
+            mashTheatreCapacity += FacilityRentals.getCapacityIncreaseFromRentals(getActiveContracts(),
+                  ContractRentalType.HOSPITAL_BEDS);
+        } else {
+            mashTheatreCapacity = 0;
         }
     }
 
@@ -7528,6 +7668,9 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "asTechPoolMinutes", asTechPoolMinutes);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "asTechPoolOvertime", asTechPoolOvertime);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "medicPool", medicPool);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "fieldKitchenWithinCapacity", fieldKitchenWithinCapacity);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "mashTheatreCapacity", mashTheatreCapacity);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "repairBaysRented", repairBaysRented);
         getCamouflage().writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "colour", getColour().name());
         getUnitIcon().writeToXML(writer, indent);

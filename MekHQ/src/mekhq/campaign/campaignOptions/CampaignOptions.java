@@ -268,6 +268,8 @@ public class CampaignOptions {
     private int maximumPatients;
     private boolean doctorsUseAdministration;
     private boolean useUsefulMedics;
+    private boolean useMASHTheatres;
+    private int mashTheatreCapacity;
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
@@ -510,6 +512,12 @@ public class CampaignOptions {
     // Shares
     private boolean useShareSystem;
     private boolean sharesForAll;
+
+    // Rented Facilities
+    private int rentedFacilitiesCostHospitalBeds;
+    private int rentedFacilitiesCostKitchens;
+    private int rentedFacilitiesCostHoldingCells;
+    private int rentedFacilitiesCostRepairBays;
     // endregion Finance Tab
 
     // region Mercenary Tab
@@ -839,6 +847,8 @@ public class CampaignOptions {
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
         useUsefulMedics = false;
+        useMASHTheatres = false;
+        mashTheatreCapacity = 25;
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
@@ -1143,6 +1153,12 @@ public class CampaignOptions {
         // Shares
         setUseShareSystem(false);
         setSharesForAll(true);
+
+        // Rented Facilities
+        rentedFacilitiesCostHospitalBeds = 0;
+        rentedFacilitiesCostKitchens = 0;
+        rentedFacilitiesCostHoldingCells = 0;
+        rentedFacilitiesCostRepairBays = 0;
         // endregion Finances Tab
 
         // region Mercenary Tab
@@ -2013,6 +2029,22 @@ public class CampaignOptions {
 
     public void setIsUseUsefulMedics(final boolean useUsefulMedics) {
         this.useUsefulMedics = useUsefulMedics;
+    }
+
+    public boolean isUseMASHTheatres() {
+        return useMASHTheatres;
+    }
+
+    public void setIsUseMASHTheatres(final boolean useMASHTheatres) {
+        this.useMASHTheatres = useMASHTheatres;
+    }
+
+    public int getMASHTheatreCapacity() {
+        return mashTheatreCapacity;
+    }
+
+    public void setMASHTheatreCapacity(final int mashTheatreCapacity) {
+        this.mashTheatreCapacity = mashTheatreCapacity;
     }
 
     // endregion Medical
@@ -3464,6 +3496,38 @@ public class CampaignOptions {
 
     public void setPayForHousing(final boolean payForHousing) {
         this.payForHousing = payForHousing;
+    }
+
+    public int getRentedFacilitiesCostHospitalBeds() {
+        return rentedFacilitiesCostHospitalBeds;
+    }
+
+    public void setRentedFacilitiesCostHospitalBeds(final int rentedFacilitiesCostHospitalBeds) {
+        this.rentedFacilitiesCostHospitalBeds = rentedFacilitiesCostHospitalBeds;
+    }
+
+    public int getRentedFacilitiesCostKitchens() {
+        return rentedFacilitiesCostKitchens;
+    }
+
+    public void setRentedFacilitiesCostKitchens(final int rentedFacilitiesCostKitchens) {
+        this.rentedFacilitiesCostKitchens = rentedFacilitiesCostKitchens;
+    }
+
+    public int getRentedFacilitiesCostHoldingCells() {
+        return rentedFacilitiesCostHoldingCells;
+    }
+
+    public void setRentedFacilitiesCostHoldingCells(final int rentedFacilitiesCostHoldingCells) {
+        this.rentedFacilitiesCostHoldingCells = rentedFacilitiesCostHoldingCells;
+    }
+
+    public int getRentedFacilitiesCostRepairBays() {
+        return rentedFacilitiesCostRepairBays;
+    }
+
+    public void setRentedFacilitiesCostRepairBays(final int rentedFacilitiesCostRepairBays) {
+        this.rentedFacilitiesCostRepairBays = rentedFacilitiesCostRepairBays;
     }
 
     public boolean isUseLoanLimits() {

@@ -45,6 +45,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.utilities.MHQXMLUtility;
@@ -239,6 +240,15 @@ public class Mission {
         // Missions don't have durations, so we treat it as always being 1 month long. This only really matters for
         // faction standing.
         return 1;
+    }
+
+    /**
+     * Returns the default repair location constant for the unit.
+     *
+     * @return the repair location constant {@code Unit.SITE_FACILITY_BASIC}
+     */
+    public int getRepairLocation() {
+        return Unit.SITE_FACILITY_BASIC;
     }
 
     // region File I/O
