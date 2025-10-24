@@ -48,14 +48,19 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.*;
 
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketDialog;
 
 /**
  * A dialog that displays an interactive family tree visualization.
@@ -76,6 +81,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * @since 0.50.10
  */
 public class FamilyTreeDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(FamilyTreeDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FamilyTreeDialog";
 
     private final EnhancedTabbedPane tabbedPane;
@@ -124,8 +130,22 @@ public class FamilyTreeDialog extends JDialog {
         add(buttonPanel, BorderLayout.SOUTH);
 
         setPreferredSize(scaleForGUI(900, 700));
-        pack();
         setLocationRelativeTo(owner);
+        setPreferences(this); // Must be before setVisible
+        setVisible(true); // Should always be last
+    }
+
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     */
+    private void setPreferences(JDialog dialog) {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelMarketDialog.class);
+            dialog.setName("PersonnelMarketDialog");
+            preferences.manage(new JWindowPreference(dialog));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to set user preferences", ex);
+        }
     }
 
     /**

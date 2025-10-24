@@ -1219,13 +1219,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_FAMILY_TREE: {
-                if (people.length == 1) {
-                    for (Person person : people) {
-                        new FamilyTreeDialog(null,
-                              person.getGenealogy(),
-                              getCampaign().getPersonnel()).setVisible(true);
-                    }
-                }
+                new FamilyTreeDialog(gui.getFrame(), selectedPerson.getGenealogy(), getCampaign().getPersonnel());
                 break;
             }
             case CMD_EDIT: {
@@ -2409,6 +2403,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+        }
+
+        if (oneSelected) {
+            menuItem = new JMenuItem(resources.getString("familyTree.text"));
+            menuItem.setActionCommand(CMD_FAMILY_TREE);
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
         }
 
         // region Awards Menu
@@ -4010,13 +4011,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menuItem.setActionCommand(CMD_CLAIM_BOUNTY);
         menuItem.addActionListener(this);
         popup.add(menuItem);
-
-        if (oneSelected) {
-            menuItem = new JMenuItem("SHOW FAMILY TREE");
-            menuItem.setActionCommand(CMD_FAMILY_TREE);
-            menuItem.addActionListener(this);
-            popup.add(menuItem);
-        }
 
         // region Flags Menu
         // This Menu contains the following flags, in the specified order:
