@@ -90,6 +90,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
@@ -320,10 +321,12 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
             setProgress(6);
             final Campaign campaign;
+            boolean isNewCampaign = false;
             if (getCampaignFile() == null) {
                 // region progress 6
                 LOGGER.info("Starting a new campaign");
                 campaign = CampaignFactory.createCampaign();
+                isNewCampaign = true;
 
                 // Campaign Preset
                 final CampaignOptionsPresetPicker campaignOptionsPresetPicker =
@@ -455,6 +458,11 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 }
                 // endregion Progress 7
             }
+
+            if (isNewCampaign) {
+                new WarAndPeaceProcessor(campaign, true);
+            }
+
             campaign.setApp(getApplication());
             return campaign;
         }
