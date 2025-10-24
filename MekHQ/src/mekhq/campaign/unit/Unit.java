@@ -2638,7 +2638,11 @@ public class Unit implements ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("asTechDaysMaintained")) {
                     retVal.asTechDaysMaintained = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceMultiplier")) {
-                    retVal.maintenanceMultiplier = Integer.parseInt(wn2.getTextContent());
+                    if (retVal.isSelfCrewed()) { // <50.10 compatibility handler
+                        retVal.maintenanceMultiplier = 1;
+                    } else {
+                        retVal.maintenanceMultiplier = Integer.parseInt(wn2.getTextContent());
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("driverId")) {
                     retVal.drivers.add(new UnitPersonRef(UUID.fromString(wn2.getTextContent())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("gunnerId")) {
@@ -6128,10 +6132,6 @@ public class Unit implements ITechnology {
             return 90 * maintenanceMultiplier;
         }
 
-        if (entity instanceof Warship || entity instanceof SpaceStation) {
-            return 480 * maintenanceMultiplier;
-        }
-
         // At time of writing current maintenance errata states that maintenance time is only deducted on the day in
         // which maintenance takes place. However, these two unit times have maintenance time requirements that
         // exceed the maximum of 480 minutes a team has in a single day. Making these maintenance times impossible.
@@ -6143,6 +6143,10 @@ public class Unit implements ITechnology {
         //        if (entity instanceof Warship) {
         //            return 1440 * maintenanceMultiplier;
         //        }
+
+        if (entity instanceof Warship || entity instanceof SpaceStation) {
+            return 480 * maintenanceMultiplier;
+        }
 
         if (entity instanceof Jumpship) {
             return 360 * maintenanceMultiplier;
