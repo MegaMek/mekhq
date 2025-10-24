@@ -123,6 +123,7 @@ class TreeNodeBox {
     int x, y;
     int subtreeWidth; // Dynamic width required to space children appropriately
     List<TreeNodeBox> children = new ArrayList<>();
+    List<TreeNodeBox> parents = new ArrayList<>(); // Add parents list
 
     TreeNodeBox(Person person) {this.person = person;}
 }
@@ -174,22 +175,186 @@ class FamilyTreePanel extends JPanel {
     private void buildAndLayoutTree(Graphics g) {
         nodeDimensions.clear();
         Map<Person, TreeNodeBox> nodeMap = new HashMap<>();
-        root = buildTreeRecursive(genealogy, nodeMap, new HashSet<>());
+        Set<Person> visited = new HashSet<>();
+        root = buildTreeRecursive(genealogy, nodeMap, visited);
+
+        // Build parent tree upward from root
+        buildParentTree(root, nodeMap, new HashSet<>());
+
         calculateNodeDimensions(root, g);
 
         // First, compute each node's subtree width recursively
         computeSubtreeWidth(root);
 
+        // Compute parent tree width
+        computeParentTreeWidth(root);
+
+        // Calculate how many ancestor generations we have to determine vertical offset
+        int ancestorDepth = calculateAncestorDepth(root);
+        int rootLevel = ancestorDepth; // Root will be at this level (0-indexed from top)
+
         // Then assign coords based on subtree widths
         int startingX = 20; // Leftmost padding
-        assignCoordsWithSubtreeSpacing(root, 0, startingX);
+
+        // Position the root at the calculated level, then descendants below
+        assignCoordsWithSubtreeSpacing(root, rootLevel, startingX);
+
+        // Assign coords for ancestors (going upward from root)
+        assignParentCoords(root, rootLevel - 1, startingX);
+
+        // Calculate bounds to find if any nodes went negative
+        Rectangle bounds = calculateTreeBounds(root);
+
+        // If tree extends into negative X, shift everything right
+        if (bounds.x < 0) {
+            int shiftX = 20 - bounds.x; // Shift to have 20px left padding
+            shiftTreeHorizontally(root, shiftX, new HashSet<>());
+
+            // Recalculate bounds after shift
+            bounds = calculateTreeBounds(root);
+        }
 
         // Now dynamically set preferred size to fit the tree
-        Rectangle bounds = calculateTreeBounds(root);
         panelWidth = bounds.x + bounds.width + 40;
         panelHeight = bounds.y + bounds.height + 40;
         setPreferredSize(new Dimension(panelWidth, panelHeight));
         revalidate(); // Tell scrollpane the preferred size has changed
+    }
+
+    /** Shift all nodes in the tree horizontally by the given amount. */
+    private void shiftTreeHorizontally(TreeNodeBox node, int shiftX, Set<TreeNodeBox> visited) {
+        if (node == null || visited.contains(node)) {
+            return;
+        }
+        visited.add(node);
+
+        node.x += shiftX;
+
+        for (TreeNodeBox child : node.children) {
+            shiftTreeHorizontally(child, shiftX, visited);
+        }
+
+        for (TreeNodeBox parent : node.parents) {
+            shiftTreeHorizontally(parent, shiftX, visited);
+        }
+    }
+
+    /** Calculate the depth of the ancestor tree (how many generations up). */
+    private int calculateAncestorDepth(TreeNodeBox node) {
+        if (node == null || node.parents.isEmpty()) {
+            return 0;
+        }
+        int maxDepth = 0;
+        for (TreeNodeBox parent : node.parents) {
+            maxDepth = Math.max(maxDepth, calculateAncestorDepth(parent));
+        }
+        return maxDepth + 1;
+    }
+
+    private void buildParentTree(TreeNodeBox node, Map<Person, TreeNodeBox> nodeMap, Set<Person> visited) {
+        if (node == null || visited.contains(node.person)) {
+            return;
+        }
+        visited.add(node.person);
+
+        Genealogy gen = node.person.getGenealogy();
+        if (gen != null) {
+            List<Person> parents = gen.getParents();
+            int parentCount = parents.size();
+
+            // Add mother
+            if (parentCount > 0) {
+                Person mother = parents.get(0);
+                if (mother != null && !visited.contains(mother)) {
+                    TreeNodeBox motherBox = nodeMap.computeIfAbsent(mother, TreeNodeBox::new);
+                    node.parents.add(motherBox);
+                    buildParentTree(motherBox, nodeMap, visited);
+                }
+            }
+
+            // Add father
+            if (parentCount > 1) {
+                Person father = parents.get(1);
+                if (father != null && !visited.contains(father)) {
+                    TreeNodeBox fatherBox = nodeMap.computeIfAbsent(father, TreeNodeBox::new);
+                    node.parents.add(fatherBox);
+                    buildParentTree(fatherBox, nodeMap, visited);
+                }
+            }
+        }
+    }
+
+    private void computeParentTreeWidth(TreeNodeBox node) {
+        if (node == null) {
+            return;
+        }
+
+        // First, recursively compute subtree widths for all parents and their ancestors
+        for (TreeNodeBox parent : node.parents) {
+            computeParentTreeWidth(parent);
+        }
+
+        // Now compute subtree width for each parent at this level
+        for (TreeNodeBox parent : node.parents) {
+            if (parent.parents.isEmpty()) {
+                // Leaf parent (oldest ancestor) - width is just the box width
+                parent.subtreeWidth = nodeDimensions.get(parent).width;
+            } else {
+                // Parent has parents - compute width based on their subtree widths
+                int width = 0;
+                for (TreeNodeBox grandparent : parent.parents) {
+                    width += grandparent.subtreeWidth;
+                }
+                width += hGap * Math.max(0, parent.parents.size() - 1);
+                parent.subtreeWidth = Math.max(width, nodeDimensions.get(parent).width);
+            }
+        }
+
+        // Adjust current node's subtree width to accommodate parents if needed
+        if (!node.parents.isEmpty()) {
+            int parentsWidth = 0;
+            for (TreeNodeBox parent : node.parents) {
+                parentsWidth += parent.subtreeWidth;
+            }
+            parentsWidth += hGap * Math.max(0, node.parents.size() - 1);
+            node.subtreeWidth = Math.max(node.subtreeWidth, parentsWidth);
+        }
+    }
+
+    private void assignParentCoords(TreeNodeBox node, int level, int leftX) {
+        if (node == null || node.parents.isEmpty()) {
+            return;
+        }
+
+        Dimension boxDim = nodeDimensions.get(node);
+        int nodeBoxWidth = boxDim.width;
+
+        // Calculate total width of all parents
+        int parentsWidth = 0;
+        for (TreeNodeBox parent : node.parents) {
+            parentsWidth += parent.subtreeWidth;
+        }
+        parentsWidth += hGap * Math.max(0, node.parents.size() - 1);
+
+        // Center parents above the current node
+        int nodeCenter = node.x + nodeBoxWidth / 2;
+        int parentsStartX = nodeCenter - parentsWidth / 2;
+
+        int parentX = parentsStartX;
+        for (TreeNodeBox parent : node.parents) {
+            Dimension parentBoxDim = nodeDimensions.get(parent);
+            int parentSubtreeWidth = parent.subtreeWidth;
+            int parentBoxWidth = parentBoxDim.width;
+
+            // Center parent box within its subtree
+            parent.x = parentX + parentSubtreeWidth / 2 - parentBoxWidth / 2;
+            parent.y = level * (boxHeight + vGap);
+
+            // Recursively assign coords to this parent's parents
+            assignParentCoords(parent, level - 1, parentX);
+
+            parentX += parentSubtreeWidth + hGap;
+        }
     }
 
     /** Recursively computes the bounding rectangle of the tree. */
@@ -200,6 +365,8 @@ class FamilyTreePanel extends JPanel {
         Dimension d = nodeDimensions.get(node);
         int minX = node.x, minY = node.y;
         int maxX = node.x + d.width, maxY = node.y + d.height;
+
+        // Include children
         for (TreeNodeBox child : node.children) {
             Rectangle childBounds = calculateTreeBounds(child);
             minX = Math.min(minX, childBounds.x);
@@ -207,6 +374,16 @@ class FamilyTreePanel extends JPanel {
             maxX = Math.max(maxX, childBounds.x + childBounds.width);
             maxY = Math.max(maxY, childBounds.y + childBounds.height);
         }
+
+        // Include parents
+        for (TreeNodeBox parent : node.parents) {
+            Rectangle parentBounds = calculateTreeBounds(parent);
+            minX = Math.min(minX, parentBounds.x);
+            minY = Math.min(minY, parentBounds.y);
+            maxX = Math.max(maxX, parentBounds.x + parentBounds.width);
+            maxY = Math.max(maxY, parentBounds.y + parentBounds.height);
+        }
+
         return new Rectangle(minX, minY, maxX - minX, maxY - minY);
     }
 
@@ -230,8 +407,17 @@ class FamilyTreePanel extends JPanel {
         nodeDimensions.put(node, new Dimension(width, height));
         if (width > boxWidth) {boxWidth = width;}
         if (height > boxHeight) {boxHeight = height;}
+
+        // Calculate dimensions for children
         for (TreeNodeBox child : node.children) {
             calculateNodeDimensions(child, g);
+        }
+
+        // Calculate dimensions for parents
+        for (TreeNodeBox parent : node.parents) {
+            if (!nodeDimensions.containsKey(parent)) {
+                calculateNodeDimensions(parent, g);
+            }
         }
     }
 
@@ -256,6 +442,16 @@ class FamilyTreePanel extends JPanel {
                   child.x + childBoxDim.width / 2, child.y
             );
             drawTree(g, child);
+        }
+
+        // Draw lines to parents
+        for (TreeNodeBox parent : node.parents) {
+            Dimension parentBoxDim = nodeDimensions.get(parent);
+            g.drawLine(
+                  node.x + nodeBoxWidth / 2, node.y,
+                  parent.x + parentBoxDim.width / 2, parent.y + parentBoxDim.height
+            );
+            drawTree(g, parent);
         }
 
         // --- Portrait drawing logic ---
