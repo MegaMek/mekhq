@@ -326,7 +326,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     return;
                 }
 
-                boolean wasSiteChangeSucceessful = true;
+                boolean wasSiteChangeSuccessful = true;
 
                 if (selected >= Unit.SITE_FACILITY_MAINTENANCE) {
                     Campaign campaign = gui.getCampaign();
@@ -343,11 +343,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         default -> null; // Should never happen as we're already filtering out invalid sites
                     };
 
-                    wasSiteChangeSucceessful = FacilityRentals.offerBayRentalOpportunity(campaign, activeContracts,
-                          eligibleUnitCount, rentalType);
+                    wasSiteChangeSuccessful = FacilityRentals.offerBayRentalOpportunity(campaign,
+                          eligibleUnitCount,
+                          rentalType);
                 }
 
-                if (wasSiteChangeSucceessful) {
+                if (wasSiteChangeSuccessful) {
                     for (Unit unit : units) {
                         if (!unit.isDeployed()) {
                             unit.setSite(selected);

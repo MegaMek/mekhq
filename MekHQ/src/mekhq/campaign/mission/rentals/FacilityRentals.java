@@ -53,7 +53,6 @@ import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.unit.Unit;
@@ -152,8 +151,7 @@ public class FacilityRentals {
      * @author Illiani
      * @since 0.50.10
      */
-    public static boolean offerBayRentalOpportunity(Campaign campaign, List<AtBContract> activeAtBContracts,
-          int unitCount, ContractRentalType rentalType) {
+    public static boolean offerBayRentalOpportunity(Campaign campaign, int unitCount, ContractRentalType rentalType) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int baseCost = campaignOptions.getRentedFacilitiesCostRepairBays();
         if (baseCost <= 0) { // This rental option is disabled
@@ -245,7 +243,7 @@ public class FacilityRentals {
         }
 
         if (!performRentalTransaction(finances, today, holdingCellCosts, ContractRentalType.HOLDING_CELLS)) {
-            String report = getFailedTransactionReport(ContractRentalType.KITCHENS, holdingCellCosts);
+            String report = getFailedTransactionReport(ContractRentalType.HOLDING_CELLS, holdingCellCosts);
             reports.add(report);
 
         }

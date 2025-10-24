@@ -85,7 +85,7 @@ public class UnableToAffordRentNagDialog extends ImmersiveDialogNag {
      * campaign cannot afford to pay rent.</p>
      *
      * @param campaign         the current {@link Campaign} context
-     * @param isLastDayOfMonth {@code true} is the check is on the last day of the Month
+     * @param isLastDayOfMonth {@code true} if the check is on the last day of the Month
      *
      * @return {@code true} if conditions warrant showing a rent payment nag, {@code false} otherwise
      */
