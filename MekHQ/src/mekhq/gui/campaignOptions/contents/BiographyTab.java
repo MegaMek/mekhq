@@ -120,6 +120,7 @@ public class BiographyTab {
     private JCheckBox chkShowLifeEventDialogComingOfAge;
     private JCheckBox chkShowLifeEventDialogCelebrations;
     private JPanel pnlComingOfAge;
+    private JCheckBox chkVeterancySPAs;
     private JCheckBox chkComingOfAgeSPAs;
     private JCheckBox chkRewardComingOfAgeRPSkills;
     //end General Tab
@@ -397,6 +398,7 @@ public class BiographyTab {
         chkShowLifeEventDialogCelebrations = new JCheckBox();
 
         pnlComingOfAge = new JPanel();
+        chkVeterancySPAs = new JCheckBox();
         chkComingOfAgeSPAs = new JCheckBox();
         chkRewardComingOfAgeRPSkills = new JCheckBox();
     }
@@ -428,7 +430,7 @@ public class BiographyTab {
         // Header
         generalHeader = new CampaignOptionsHeaderPanel("BiographyGeneralTab",
               getImageDirectory() + "logo_clan_blood_spirit.png",
-              7);
+              8);
 
         // Contents
         chkUseDylansRandomXP = new CampaignOptionsCheckBox("UseDylansRandomXP");
@@ -589,6 +591,9 @@ public class BiographyTab {
 
     private JPanel createComingOfAgePanel() {
         // Contents
+        chkVeterancySPAs = new CampaignOptionsCheckBox("VeterancySPAs");
+        chkVeterancySPAs.addMouseListener(createTipPanelUpdater(generalHeader, "VeterancySPAs"));
+
         chkComingOfAgeSPAs = new CampaignOptionsCheckBox("ComingOfAgeAbilities");
         chkComingOfAgeSPAs.addMouseListener(createTipPanelUpdater(generalHeader, "ComingOfAgeAbilities"));
 
@@ -603,6 +608,9 @@ public class BiographyTab {
         layoutParent.gridwidth = 1;
         layoutParent.gridx = 0;
         layoutParent.gridy = 0;
+        panel.add(chkVeterancySPAs, layoutParent);
+
+        layoutParent.gridy++;
         panel.add(chkComingOfAgeSPAs, layoutParent);
 
         layoutParent.gridy++;
@@ -1535,6 +1543,7 @@ public class BiographyTab {
         chkShowLifeEventDialogBirths.setSelected(options.isShowLifeEventDialogBirths());
         chkShowLifeEventDialogComingOfAge.setSelected(options.isShowLifeEventDialogComingOfAge());
         chkShowLifeEventDialogCelebrations.setSelected(options.isShowLifeEventDialogCelebrations());
+        chkVeterancySPAs.setSelected(options.isAwardVeterancySPAs());
         chkComingOfAgeSPAs.setSelected(options.isRewardComingOfAgeAbilities());
         chkRewardComingOfAgeRPSkills.setSelected(options.isRewardComingOfAgeRPSkills());
 
@@ -1636,6 +1645,7 @@ public class BiographyTab {
         options.setShowLifeEventDialogBirths(chkShowLifeEventDialogBirths.isSelected());
         options.setShowLifeEventDialogComingOfAge(chkShowLifeEventDialogComingOfAge.isSelected());
         options.setShowLifeEventDialogCelebrations(chkShowLifeEventDialogCelebrations.isSelected());
+        options.setAwardVeterancySPAs(chkVeterancySPAs.isSelected());
         options.setRewardComingOfAgeAbilities(chkComingOfAgeSPAs.isSelected());
         options.setRewardComingOfAgeRPSkills(chkRewardComingOfAgeRPSkills.isSelected());
 

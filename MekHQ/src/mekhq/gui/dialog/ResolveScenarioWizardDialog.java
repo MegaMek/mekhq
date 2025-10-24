@@ -1555,6 +1555,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
                         tracker.getCampaign().getLocalDate(),
                         tracker.getDropShipBonus(),
                         resourceMap.getString("dropShipBonus.text"));
+
+            campaign.addReport(String.format(resourceMap.getString("dropShipBonus.report"),
+                  tracker.getDropShipBonus().toAmountString()));
         }
 
         // now assign kills
