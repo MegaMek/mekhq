@@ -141,10 +141,9 @@ public class FacilityRentals {
      *
      * <p>Presents dialog, handles cost calculation, and attempts to debit the player's account.</p>
      *
-     * @param campaign           the active campaign
-     * @param activeAtBContracts list of active AtB contracts (used for context, if needed)
-     * @param unitCount          the number of units intended for bay rental
-     * @param rentalType         the type of bay rental (maintenance or factory conditions)
+     * @param campaign   the active campaign
+     * @param unitCount  the number of units intended for bay rental
+     * @param rentalType the type of bay rental (maintenance or factory conditions)
      *
      * @return {@code true} if the transaction completes successfully
      *

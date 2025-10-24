@@ -97,7 +97,6 @@ import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
@@ -330,7 +329,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                 if (selected >= Unit.SITE_FACILITY_MAINTENANCE) {
                     Campaign campaign = gui.getCampaign();
-                    List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
 
                     Predicate<Unit> eligibleForBayRental = u -> !FacilityRentals.shouldBeIgnoredByBayRentals(u);
                     int eligibleUnitCount = (int) Arrays.stream(units)
