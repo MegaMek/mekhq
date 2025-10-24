@@ -148,7 +148,6 @@ public class UnitViewPanel extends JScrollablePanel {
         pnlCrew.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("lblCrew.text")));
         JLabel lblCrew = new JLabel(UnitTableModel.getCrewTooltip(unit));
         pnlCrew.add(lblCrew, BorderLayout.WEST);
-        lblCrew.setHorizontalAlignment(SwingConstants.LEFT);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
