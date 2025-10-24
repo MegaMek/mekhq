@@ -52,12 +52,14 @@ import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Set;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -93,6 +95,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     private static final MMLogger logger = MMLogger.create(AtbMonthlyContractMarket.class);
 
     private static final int COMSTAR_CO_OPT_CHANCE = 200;
+    private static final int WOB_CO_OPT_CHANCE = 10;
 
     public AtbMonthlyContractMarket() {
         super(ContractMarketMethod.ATB_MONTHLY);
@@ -310,17 +313,9 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                     // contract.setDifficulty().
                     try {
                         if (contract != null) {
-                            // If ComStar is active, there is a small chance they will co-opt the contract
-                            Faction comStar = Factions.getInstance().getFaction(COMSTAR_FACTION_CODE);
-                            int currentYear = campaign.getGameYear();
-                            if (comStar.validBetween(currentYear, currentYear)) {
-                                if (Compute.randomInt(COMSTAR_CO_OPT_CHANCE) == 0) {
-                                    contract.setEmployerCode(COMSTAR_FACTION_CODE, campaign.getGameYear());
-                                }
-                            }
-
-                            contract.setDifficulty(contract.calculateContractDifficulty(contract.getStartDate()
-                                                                                              .getYear(),
+                            checkForEmployerOverride(campaign.getLocalDate(), contract, employerCode);
+                            contract.setDifficulty(contract.calculateContractDifficulty(
+                                  contract.getStartDate().getYear(),
                                   true,
                                   campaign.getAllCombatEntities()));
                         }
@@ -336,6 +331,43 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         } else {
             return generateAtBContract(campaign, campaign.getFaction().getShortName(), unitRatingMod);
+        }
+    }
+
+    /**
+     * Checks for special employer overrides on a contract.
+     *
+     * <p>There is a small randomized chance that specific factions (ComStar or Word of Blake) may co-opt a contract
+     * and become its employer, depending on the date and current employer.</p>
+     * <ul>
+     *   <li>If ComStar is active and the chance check passes, ComStar immediately becomes the employer.</li>
+     *   <li>If during the Jihad era, the Word of Blake is active, and not already the employer,
+     *       there is a randomized chance that Word of Blake becomes the employer.</li>
+     *   <li>If neither condition is met, the employer remains unchanged.</li>
+     * </ul>
+     *
+     * @param today        the current date in the campaign
+     * @param contract     the contract that may be overridden
+     * @param employerCode the faction code of the current employer
+     */
+    private static void checkForEmployerOverride(LocalDate today, AtBContract contract, String employerCode) {
+        // 1. ComStar co-opting check
+        Faction comStar = Factions.getInstance().getFaction(COMSTAR_FACTION_CODE);
+        if (comStar.validIn(today) && Compute.randomInt(COMSTAR_CO_OPT_CHANCE) == 0) {
+            contract.setEmployerCode(COMSTAR_FACTION_CODE, today.getYear());
+            return;
+        }
+
+        // 2. Word of Blake co-opting during Jihad period
+        Faction wordOfBlake = Factions.getInstance().getFaction("WOB");
+        boolean isDuringJihad = !today.isBefore(MHQConstants.JIHAD_START) &&
+                                      !today.isAfter(MHQConstants.NOMINAL_JIHAD_END);
+
+        if (isDuringJihad
+                  && wordOfBlake.validIn(today)
+                  && !Objects.equals("WOB", employerCode)
+                  && Compute.randomInt(WOB_CO_OPT_CHANCE) == 0) {
+            contract.setEmployerCode("WOB", today.getYear());
         }
     }
 

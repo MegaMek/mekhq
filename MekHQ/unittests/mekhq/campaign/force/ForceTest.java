@@ -33,11 +33,21 @@
 package mekhq.campaign.force;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 import java.util.UUID;
 import java.util.Vector;
+import java.util.stream.Stream;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.Faction;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class ForceTest {
     @Test
@@ -186,5 +196,243 @@ class ForceTest {
 
         // Assert
         assertEquals(3, allUnits.size());
+    }
+
+    @Nested
+    class TestFormationLevels {
+        static Faction mockISFaction;
+        static Faction mockComstarFaction;
+        static Faction mockClanFaction;
+
+        Campaign mockCampaign;
+        Faction mockFaction;
+
+        @BeforeAll
+        static void beforeAll() {
+            mockISFaction = mock(Faction.class);
+            when(mockISFaction.isInnerSphere()).thenReturn(true);
+            when(mockISFaction.isComStarOrWoB()).thenReturn(false);
+            when(mockISFaction.isClan()).thenReturn(false);
+            when(mockISFaction.getFormationBaseSize()).thenReturn(4);
+            when(mockISFaction.getFormationGrouping()).thenReturn(3);
+
+            mockComstarFaction = mock(Faction.class);
+            when(mockComstarFaction.isInnerSphere()).thenReturn(false);
+            when(mockComstarFaction.isComStarOrWoB()).thenReturn(true);
+            when(mockComstarFaction.isClan()).thenReturn(false);
+            when(mockComstarFaction.getFormationBaseSize()).thenReturn(6);
+            when(mockComstarFaction.getFormationGrouping()).thenReturn(6);
+
+            mockClanFaction = mock(Faction.class);
+            when(mockClanFaction.isInnerSphere()).thenReturn(false);
+            when(mockClanFaction.isComStarOrWoB()).thenReturn(false);
+            when(mockClanFaction.isClan()).thenReturn(true);
+            when(mockClanFaction.getFormationBaseSize()).thenReturn(5);
+            when(mockClanFaction.getFormationGrouping()).thenReturn(5);
+        }
+
+        @BeforeEach
+        void beforeEach() {
+            mockCampaign = mock(Campaign.class);
+        }
+
+        private static Stream<Arguments> factions() {
+            return Stream.of(
+                  Arguments.of(mockISFaction),
+                  Arguments.of(mockComstarFaction),
+                  Arguments.of(mockClanFaction)
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource(value = "factions")
+        void testGetDefaultFormationDepth1(Faction faction) {
+            // Arrange
+            setFaction(faction);
+
+            // Act
+            Force force = newLance();
+            force.defaultFormationLevelForForce(mockCampaign);
+
+            // Assert
+            assertEquals(FormationLevel.parseFromDepth(mockCampaign, 1), force.getFormationLevel());
+        }
+
+        @ParameterizedTest
+        @MethodSource(value = "factions")
+        void testGetDefaultFormationDepth2(Faction faction) {
+            // Arrange
+            setFaction(faction);
+
+            // Act
+            Force force = newCompany();
+            force.defaultFormationLevelForForce(mockCampaign);
+
+            // Assert
+            assertEquals(FormationLevel.parseFromDepth(mockCampaign, 2), force.getFormationLevel());
+        }
+
+
+
+        @ParameterizedTest
+        @MethodSource(value = "factions")
+        void testGetDefaultFormationDepth3(Faction faction) {
+            // Arrange
+            setFaction(faction);
+
+            // Act
+            Force force = newBattalion();
+            force.defaultFormationLevelForForce(mockCampaign);
+
+            // Assert
+            assertEquals(FormationLevel.parseFromDepth(mockCampaign, 3), force.getFormationLevel());
+        }
+
+        @ParameterizedTest
+        @MethodSource(value = "factions")
+        void testGetDefaultFormationDepth4(Faction faction) {
+            // Arrange
+            setFaction(faction);
+
+            // Act
+            Force force = newRegiment();
+            force.defaultFormationLevelForForce(mockCampaign);
+
+            // Assert
+            assertEquals(FormationLevel.parseFromDepth(mockCampaign, 4), force.getFormationLevel());
+        }
+
+        @ParameterizedTest
+        @MethodSource(value = "factions")
+        void testGetDefaultFormationDepth5(Faction faction) {
+            // Arrange
+            setFaction(faction);
+
+            // Act
+            Force force = newBrigade();
+            force.defaultFormationLevelForForce(mockCampaign);
+
+            // Assert
+            assertEquals(FormationLevel.parseFromDepth(mockCampaign, 5), force.getFormationLevel());
+        }
+
+        @ParameterizedTest
+        @MethodSource(value = "factions")
+        void testGetDefaultFormationDepth6(Faction faction) {
+            // Arrange
+            setFaction(faction);
+
+            // Act
+            Force force = newDivision();
+            force.defaultFormationLevelForForce(mockCampaign);
+
+            // Assert
+            assertEquals(FormationLevel.parseFromDepth(mockCampaign, 6), force.getFormationLevel());
+        }
+
+        @ParameterizedTest
+        @MethodSource(value = "factions")
+        void testGetDefaultFormationSupportCompanyAttachedToRegiment(Faction faction) {
+            // Arrange
+            setFaction(faction);
+
+            // Act
+            Force force1 = newRegiment();
+            Force force2 = newCompany();
+            force2.defaultFormationLevelForForce(mockCampaign); //Shouldn't change anything
+            force1.addSubForce(force2, true);
+            force1.defaultFormationLevelForForce(mockCampaign);
+
+
+            // Assert
+            assertEquals(FormationLevel.parseFromDepth(mockCampaign, 4), force1.getFormationLevel());
+            assertEquals(FormationLevel.parseFromDepth(mockCampaign, 2), force2.getFormationLevel());
+        }
+
+        @ParameterizedTest
+        @MethodSource(value = "factions")
+        void testGetDefaultFormationBaseCompanies(Faction faction) {
+            // Arrange
+            setFaction(faction);
+
+            // Act
+            Force force = new Force("Test Company");
+            for (int i = 0; i < mockFaction.getFormationGrouping(); i++) {
+                for (int j = 0; j < mockFaction.getFormationBaseSize(); j++) {
+                    UUID unit = UUID.randomUUID();
+                    force.addUnit(unit);
+                }
+            }
+            force.defaultFormationLevelForForce(mockCampaign);
+            force.setOverrideFormationLevel(FormationLevel.parseFromDepth(mockCampaign, 2));
+
+            // Assert
+            assertEquals(FormationLevel.parseFromDepth(mockCampaign, 2), force.getFormationLevel());
+        }
+
+        private void setFaction(Faction faction) {
+            mockFaction = faction;
+            when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        }
+
+        private Force newLance() {
+            Force force = new Force("Test Lance");
+            for(int i = 0; i < mockFaction.getFormationBaseSize(); i++) {
+                UUID unit = UUID.randomUUID();
+                force.addUnit(unit);
+            }
+            return force;
+        }
+
+        private Force newCompany() {
+            Force force = new Force("Test Company");
+            for (int i = 0; i < mockFaction.getFormationGrouping(); i++) {
+                Force newLance = newLance();
+                newLance.defaultFormationLevelForForce(mockCampaign);
+                force.addSubForce(newLance, true);
+            }
+            return force;
+        }
+
+        private Force newBattalion() {
+            Force force = new Force("Test Battalion");
+            for (int i = 0; i < mockFaction.getFormationGrouping(); i++) {
+                Force newCompany = newCompany();
+                newCompany.defaultFormationLevelForForce(mockCampaign);
+                force.addSubForce(newCompany, true);
+            }
+            return force;
+        }
+
+        private Force newRegiment() {
+            Force force = new Force("Test Regiment");
+            for (int i = 0; i < mockFaction.getFormationGrouping(); i++) {
+                Force newBattalion = newBattalion();
+                newBattalion.defaultFormationLevelForForce(mockCampaign);
+                force.addSubForce(newBattalion, true);
+            }
+            return force;
+        }
+
+        private Force newBrigade() {
+            Force force = new Force("Test Brigade");
+            for (int i = 0; i < mockFaction.getFormationGrouping(); i++) {
+                Force newRegiment = newRegiment();
+                newRegiment.defaultFormationLevelForForce(mockCampaign);
+                force.addSubForce(newRegiment, true);
+            }
+            return force;
+        }
+
+        private Force newDivision() {
+            Force force = new Force("Test Division");
+            for (int i = 0; i < mockFaction.getFormationGrouping(); i++) {
+                Force newBrigade = newBrigade();
+                newBrigade.defaultFormationLevelForForce(mockCampaign);
+                force.addSubForce(newBrigade, true);
+            }
+            return force;
+        }
+
     }
 }
