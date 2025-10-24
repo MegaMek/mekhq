@@ -61,8 +61,8 @@ import mekhq.campaign.Campaign;
  *       <p>
  *       Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also
  *       finds a suitable planet for the action.
- *                                                                         TODO : Account for the de facto alliance of the invading Clans and the
- *                                                                         TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
+ *                                                                               TODO : Account for the de facto alliance of the invading Clans and the
+ *                                                                               TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
     private static final MMLogger LOGGER = MMLogger.create(RandomFactionGenerator.class);
@@ -491,6 +491,10 @@ public class RandomFactionGenerator {
         boolean isDuringClanInvasionHeight = isBeforeTukayyid && isAfterFirstWaveBegins;
         List<String> innerSphereClanWarCombatants = List.of("FC", "FRR", "DC");
 
+        boolean isAfterJihadBegins = date.isAfter(MHQConstants.JIHAD_START);
+        boolean isBeforeJihadEnds = date.isBefore(MHQConstants.NOMINAL_JIHAD_END);
+        boolean isDuringJihad = isAfterJihadBegins && isBeforeJihadEnds;
+
         if (factionHints.isNeutral(employer, enemy, getCurrentDate()) ||
                   factionHints.isNeutral(enemy, employer, getCurrentDate())) {
             return 0;
@@ -514,6 +518,9 @@ public class RandomFactionGenerator {
         if (innerSphereClanWarCombatants.contains(employer.getShortName()) &&
                   enemy.isClan() &&
                   isDuringClanInvasionHeight) {
+            count *= 2.0;
+        }
+        if (isDuringJihad && enemy.isWoB()) {
             count *= 2.0;
         }
         /*
@@ -589,12 +596,12 @@ public class RandomFactionGenerator {
     public List<PlanetarySystem> getMissionTargetList(Faction attacker, Faction defender) {
         boolean attackerIsPirate = attacker.isPirate();
         boolean attackerIsMerc = attacker.isMercenary();
-        boolean attackerIsComStar = attacker.isComStar();
+        boolean attackerIsComStar = attacker.isComStarOrWoB();
         boolean attackerHasNoPlanets = !borderTracker.getFactionsInRegion().contains(attacker);
 
         boolean defenderIsPirate = defender.isPirate();
         boolean defenderIsMerc = defender.isMercenary();
-        boolean defenderIsComStar = defender.isComStar();
+        boolean defenderIsComStar = defender.isComStarOrWoB();
         boolean defenderHasNoPlanets = !borderTracker.getFactionsInRegion().contains(defender);
 
         // Faction host logic

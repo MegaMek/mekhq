@@ -73,7 +73,8 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
-import mekhq.gui.dialog.factionStanding.CampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.dialog.factionStanding.FactionStandingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.dialog.factionStanding.VeterancyAwardsCampaignOptionsChangedConfirmationDialog;
 
 /**
  * The {@code CampaignOptionsPane} class represents a tabbed pane used for displaying and managing various campaign
@@ -512,6 +513,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Human Resources
         personnelTab.applyCampaignOptionsToCampaign(campaign, options);
+        boolean oldAwardVeterancySPAs = options.isAwardVeterancySPAs();
         biographyTab.applyCampaignOptionsToCampaign(options);
         relationshipsTab.applyCampaignOptionsToCampaign(options);
         salariesTab.applyCampaignOptionsToCampaign(options);
@@ -545,7 +547,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         boolean newIsTrackFactionStandings = options.isTrackFactionStanding();
         if (!isStartUp && newIsTrackFactionStandings != oldIsTrackFactionStanding) { // Has tracking changed?
-            CampaignOptionsChangedConfirmationDialog dialog = new CampaignOptionsChangedConfirmationDialog(null,
+            FactionStandingCampaignOptionsChangedConfirmationDialog dialog = new FactionStandingCampaignOptionsChangedConfirmationDialog(
+                  null,
                   campaign.getCampaignFactionIcon(),
                   campaign.getFaction(),
                   campaign.getLocalDate(),
@@ -560,6 +563,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                     campaign.addReport(report);
                 }
             }
+        }
+
+        boolean newIsAwardVeterancySPAs = options.isAwardVeterancySPAs();
+        if (!isStartUp && newIsAwardVeterancySPAs && !oldAwardVeterancySPAs) { // Has tracking changed?
+            new VeterancyAwardsCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
         campaign.resetRandomDeath();

@@ -763,7 +763,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (!multipleSelection) {
-                if (force.getId() == 0) {
+                if (force.getSubForces().isEmpty()) {
                     menu = new JMenu("Override Formation Level");
                     menu.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_FORCE_NAME + forceIds);
                     menu.addActionListener(this);
