@@ -355,4 +355,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final LocalDate CLAN_INVASION_FIRST_WAVE_BEGINS = LocalDate.of(3050, 3, 7);
     public static final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
     // endregion Important Dates
+
+    // Iconography
+    public static final String ADDED_SINCE_LAST_DEVELOPMENT = "<span style='color:#C344C3;''>\u2605</span>";
+    public static final String ADDED_SINCE_LAST_MILESTONE = "<span style='color:#7FCF43;'>\u2606</span>";
 }
