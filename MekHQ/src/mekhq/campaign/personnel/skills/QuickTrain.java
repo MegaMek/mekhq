@@ -40,6 +40,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.log.PerformanceLogger;
@@ -59,6 +60,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
  * @since 0.50.10
  */
 public class QuickTrain {
+    private static final MMLogger LOGGER = MMLogger.create(QuickTrain.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.QuickTrainDialog";
 
     /**
@@ -185,6 +187,12 @@ public class QuickTrain {
 
                 // Refresh skill info after improvement
                 skill = person.getSkill(skillName);
+                if (skill == null) {
+                    // Something went wrong; the skill should have been improved
+                    LOGGER.warn("Failed to improve skill {} for person {}: skill was null after improvement", skillName,
+                          person.getHyperlinkedName());
+                    continue;
+                }
 
                 PerformanceLogger.improvedSkill(
                       isLogSkillGain, person, today, skillName, skill.getLevel());
@@ -233,7 +241,12 @@ public class QuickTrain {
 
         // Sort the skills by their total skill level (lowest -> highest)
         targetSkills.sort(
-              Comparator.comparingInt(skillName -> person.getSkill(skillName).getTotalSkillLevel(options, attributes))
+              Comparator.comparingInt(skillName -> {
+                  Skill skill = person.getSkill(skillName);
+                  return (skill == null) // The character doesn't have this skill
+                               ? Integer.MIN_VALUE // Unknown skills should always be trained first
+                               : skill.getTotalSkillLevel(options, attributes);
+              })
         );
     }
 
