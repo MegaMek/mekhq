@@ -28,6 +28,7 @@ import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 public class FamilyTreeDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FamilyTreeDialog";
@@ -87,6 +88,8 @@ public class FamilyTreeDialog extends JDialog {
 
         FamilyTreePanel panel = new FamilyTreePanel(genealogy, personnel, this);
         JScrollPane scrollPane = new FastJScrollPane(panel);
+        scrollPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        panel.setParentScrollPane(scrollPane); // Set the scroll pane reference
         scrollPane.setPreferredSize(scaleForGUI(800, 600));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -122,7 +125,7 @@ public class FamilyTreeDialog extends JDialog {
                 targetX = Math.max(0, Math.min(targetX, panelW - viewW));
                 targetY = Math.max(0, Math.min(targetY, panelH - viewH));
 
-                scrollPane.getViewport().setViewPosition(new java.awt.Point(targetX, targetY));
+                scrollPane.getViewport().setViewPosition(new Point(targetX, targetY));
             }
         });
     }
@@ -160,11 +163,20 @@ class FamilyTreePanel extends JPanel {
 
     private final Map<Rectangle, Person> rectToPerson = new HashMap<>();
 
+    // Zoom variables
+    private double zoomFactor = 1.0;
+    private static final double MIN_ZOOM = 0.25;
+    private static final double MAX_ZOOM = 3.0;
+    private static final double ZOOM_MULTIPLIER = 1.05; // 5% change per scroll notch
+
+    private JScrollPane parentScrollPane = null;
+
     public FamilyTreePanel(Genealogy genealogy, Collection<Person> personnel, FamilyTreeDialog parentDialog) {
         this.genealogy = genealogy;
 
         setPreferredSize(new Dimension(panelWidth, panelHeight));
 
+        // Mouse listener for clicking on persons
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -175,16 +187,76 @@ class FamilyTreePanel extends JPanel {
                 }
             }
         });
+
+        // Mouse wheel listener for zooming
+        addMouseWheelListener(evt -> {
+            double oldZoom = zoomFactor;
+
+            if (evt.getWheelRotation() < 0) {
+                // Zoom in - multiply by zoom factor
+                zoomFactor = Math.min(MAX_ZOOM, zoomFactor * ZOOM_MULTIPLIER);
+            } else {
+                // Zoom out - divide by zoom factor
+                zoomFactor = Math.max(MIN_ZOOM, zoomFactor / ZOOM_MULTIPLIER);
+            }
+
+            if (oldZoom != zoomFactor) {
+                // Adjust viewport to zoom toward mouse position
+                if (parentScrollPane != null) {
+                    Point viewPos = parentScrollPane.getViewport().getViewPosition();
+                    Point mousePos = evt.getPoint();
+
+                    // Calculate the mouse position relative to the content
+                    int contentX = viewPos.x + mousePos.x;
+                    int contentY = viewPos.y + mousePos.y;
+
+                    // Recalculate panel size
+                    revalidate();
+                    repaint();
+
+                    // Adjust viewport to keep same content under mouse
+                    EventQueue.invokeLater(() -> {
+                        double zoomRatio = zoomFactor / oldZoom;
+                        int newX = (int) (contentX * zoomRatio - mousePos.x);
+                        int newY = (int) (contentY * zoomRatio - mousePos.y);
+
+                        Dimension viewSize = parentScrollPane.getViewport().getExtentSize();
+                        Dimension contentSize = getPreferredSize();
+
+                        newX = Math.max(0, Math.min(newX, contentSize.width - viewSize.width));
+                        newY = Math.max(0, Math.min(newY, contentSize.height - viewSize.height));
+
+                        parentScrollPane.getViewport().setViewPosition(new Point(newX, newY));
+                    });
+                } else {
+                    revalidate();
+                    repaint();
+                }
+            }
+        });
+    }
+
+    /** Set the parent scroll pane for zoom navigation. */
+    void setParentScrollPane(JScrollPane scrollPane) {
+        this.parentScrollPane = scrollPane;
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        Graphics2D g2d = (Graphics2D) g.create();
+
+        // Apply zoom transformation
+        g2d.scale(zoomFactor, zoomFactor);
+
         rectToPerson.clear(); // Clear hitboxes before drawing
-        buildAndLayoutTree(g);
+        buildAndLayoutTree(g2d);
         if (root != null) {
-            drawTree((Graphics2D) g, root);
+            drawTree(g2d, root);
         }
+
+        g2d.dispose();
     }
 
     private void buildAndLayoutTree(Graphics g) {
@@ -228,9 +300,9 @@ class FamilyTreePanel extends JPanel {
             bounds = calculateTreeBounds(root);
         }
 
-        // Now dynamically set preferred size to fit the tree
-        panelWidth = bounds.x + bounds.width + scaleForGUI(40);
-        panelHeight = bounds.y + bounds.height + scaleForGUI(40);
+        // Now dynamically set preferred size to fit the tree (scaled by zoom)
+        panelWidth = (int) ((bounds.x + bounds.width + scaleForGUI(40)) * zoomFactor);
+        panelHeight = (int) ((bounds.y + bounds.height + scaleForGUI(40)) * zoomFactor);
         setPreferredSize(new Dimension(panelWidth, panelHeight));
         revalidate(); // Tell scrollpane the preferred size has changed
     }
@@ -630,9 +702,15 @@ class FamilyTreePanel extends JPanel {
         return new Color(135, 206, 250); // Light blue
     }
 
-    private Person getPersonAt(java.awt.Point pt) {
+    private Person getPersonAt(Point pt) {
+        // Account for zoom when checking hit detection
+        Point scaledPoint = new Point(
+              (int) (pt.x / zoomFactor),
+              (int) (pt.y / zoomFactor)
+        );
+
         for (Map.Entry<Rectangle, Person> entry : rectToPerson.entrySet()) {
-            if (entry.getKey().contains(pt)) {
+            if (entry.getKey().contains(scaledPoint)) {
                 return entry.getValue();
             }
         }
