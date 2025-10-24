@@ -7042,7 +7042,6 @@ public class Unit implements ITechnology {
                 String report = getFormattedTextAt(RESOURCE_BUNDLE, "Unit.excessCrew.gunner", warningString,
                       CLOSING_SPAN_TAG, getHyperlinkedName(), removedPerson.getHyperlinkedName());
                 reports.add(report);
-                reports.add(getHyperlinkedName() + ": " + targetGunnerCount);
             }
         }
 
