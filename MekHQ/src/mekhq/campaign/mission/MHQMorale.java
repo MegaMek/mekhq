@@ -325,12 +325,12 @@ public class MHQMorale {
 
             // Decisive Defeat or Refused Engagement always count as a defeat
             if (scenarioStatus.isDecisiveDefeat() || scenarioStatus.isRefusedEngagement()) {
-                defeats++;
+                defeats += 2;
                 continue;
             }
             // Decisive Victory counts as a victory
             if (scenarioStatus.isDecisiveVictory()) {
-                victories++;
+                victories += 2;
                 continue;
             }
             // Pyrrhic Victory reduces victory count (negative consequence)
