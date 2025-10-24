@@ -246,9 +246,9 @@ public class MHQMorale {
         } else if (performanceModifier == victoryModifier) {
             return PerformanceOutcome.VICTORY;
         } else if (performanceModifier == decisiveDefeatModifier) {
-            return PerformanceOutcome.DEFEAT;
-        } else if (performanceModifier == defeatModifier) {
             return PerformanceOutcome.DECISIVE_DEFEAT;
+        } else if (performanceModifier == defeatModifier) {
+            return PerformanceOutcome.DEFEAT;
         } else {
             return PerformanceOutcome.DRAW;
         }
