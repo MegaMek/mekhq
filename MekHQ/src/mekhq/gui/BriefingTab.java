@@ -628,8 +628,12 @@ public final class BriefingTab extends CampaignGuiTab {
         LocalDate startDate = mission instanceof Contract
                                     ? ((Contract) mission).getStartDate()
                                     : null;
+        LocalDate today = getCampaign().getLocalDate();
+        if (startDate == null) {
+            startDate = today;
+        }
 
-        if (startDate != null && startDate.equals(getCampaign().getLocalDate())) {
+        if (startDate.equals(today)) {
             for (Scenario scenario : mission.getScenarios()) {
                 LocalDate scenarioDate = scenario.getDate();
                 if (scenarioDate.isBefore(startDate)) {
