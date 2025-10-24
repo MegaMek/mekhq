@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.*;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
@@ -56,11 +57,39 @@ import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
+/**
+ * A dialog that displays an interactive family tree visualization.
+ *
+ * <p>This dialog shows a genealogical tree with the ability to:
+ * <ul>
+ *   <li>View ancestors (parents, grandparents, etc.) above the origin person</li>
+ *   <li>View descendants (children, grandchildren, etc.) below the origin person</li>
+ *   <li>Zoom in and out using the mouse wheel</li>
+ *   <li>Click on any person to open their family tree in a new tab</li>
+ *   <li>Navigate between multiple family trees via tabs</li>
+ * </ul>
+ *
+ * <p>The tree uses gender-based color coding for relationship lines: pink for female, blue for male, and green for
+ * non-binary.
+ *
+ * @author Illiani
+ * @since 0.50.10
+ */
 public class FamilyTreeDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FamilyTreeDialog";
 
     private final EnhancedTabbedPane tabbedPane;
 
+    /**
+     * Constructs a new {@link FamilyTreeDialog}.
+     *
+     * @param owner     the parent frame that owns this dialog
+     * @param genealogy the genealogy tree to display initially
+     * @param personnel the collection of all personnel in the campaign
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public FamilyTreeDialog(Frame owner, Genealogy genealogy, Collection<Person> personnel) {
         super(owner, getText("accessingTerminal.title"), true);
 
@@ -99,6 +128,17 @@ public class FamilyTreeDialog extends JDialog {
         setLocationRelativeTo(owner);
     }
 
+    /**
+     * Adds a new family tree tab for the specified genealogy.
+     *
+     * <p>If a tab for this person already exists, it will be selected instead of creating a duplicate.</p>
+     *
+     * @param genealogy the genealogy tree to display in the new tab
+     * @param personnel the collection of all personnel in the campaign
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void addFamilyTreeTab(Genealogy genealogy, Collection<Person> personnel) {
         String title = genealogy.getOrigin().getFullTitle();
 
@@ -127,6 +167,16 @@ public class FamilyTreeDialog extends JDialog {
         EventQueue.invokeLater(() -> centerTreeOnOrigin(scrollPane));
     }
 
+    /**
+     * Centers the viewport on the origin person of the family tree.
+     *
+     * <p>This is called when a tab is opened or switched to ensure the origin person is visible.</p>
+     *
+     * @param scrollPane the scroll pane containing the family tree panel
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void centerTreeOnOrigin(JScrollPane scrollPane) {
         if (!(scrollPane.getViewport().getView() instanceof FamilyTreePanel panel)) {
             return;
@@ -156,7 +206,17 @@ public class FamilyTreeDialog extends JDialog {
         });
     }
 
-    /** Package-private so the panel can call it. */
+    /**
+     * Opens a new family tree tab for the specified person.
+     *
+     * <p>Package-private to allow the {@link FamilyTreePanel} to open new tabs when clicking on persons.</p>
+     *
+     * @param person    the person whose family tree should be displayed
+     * @param personnel the collection of all personnel in the campaign
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     void openTreeFor(Person person, Collection<Person> personnel) {
         Genealogy gen = person.getGenealogy();
         if (gen != null) {
@@ -165,7 +225,14 @@ public class FamilyTreeDialog extends JDialog {
     }
 }
 
-// Helper class to store layout info
+/**
+ * Helper class to store layout information for a single person node in the family tree.
+ *
+ * <p>Contains the person, their position, calculated subtree width, and references to children and parents.</p>
+ *
+ * @author Illiani
+ * @since 0.50.10
+ */
 class TreeNodeBox {
     Person person;
     int x, y;
@@ -173,9 +240,30 @@ class TreeNodeBox {
     List<TreeNodeBox> children = new ArrayList<>();
     List<TreeNodeBox> parents = new ArrayList<>();
 
+    /**
+     * Constructs a new {@link TreeNodeBox} for the specified person.
+     *
+     * @param person the person this node represents
+     */
     TreeNodeBox(Person person) {this.person = person;}
 }
 
+/**
+ * A custom {@link JPanel} that renders an interactive family tree visualization with zoom capability.
+ *
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Displays both ancestors (upward) and descendants (downward) from an origin person</li>
+ *   <li>Mouse wheel zooming with smooth scaling (25% to 300%)</li>
+ *   <li>Click on any person to open their family tree</li>
+ *   <li>Gender-coded relationship lines (pink/blue/green)</li>
+ *   <li>Rounded corners and portraits for each person</li>
+ *   <li>Birth and death dates displayed for each person</li>
+ * </ul>
+ *
+ * @author Illiani
+ * @since 0.50.10
+ */
 class FamilyTreePanel extends JPanel {
     private final Genealogy genealogy;
     private TreeNodeBox root;
@@ -198,6 +286,16 @@ class FamilyTreePanel extends JPanel {
     private JScrollPane parentScrollPane = null;
     private Timer zoomTimer = null;
 
+    /**
+     * Constructs a new {@link FamilyTreePanel}.
+     *
+     * @param genealogy    the genealogy tree to display
+     * @param personnel    the collection of all personnel in the campaign
+     * @param parentDialog the parent dialog that owns this panel
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public FamilyTreePanel(Genealogy genealogy, Collection<Person> personnel, FamilyTreeDialog parentDialog) {
         this.genealogy = genealogy;
 
@@ -237,7 +335,7 @@ class FamilyTreePanel extends JPanel {
 
                 // Update panel size immediately
                 Rectangle bounds = calculateTreeBounds(root);
-                if (bounds != null && bounds.width > 0 && bounds.height > 0) {
+                if (bounds.width > 0 && bounds.height > 0) {
                     panelWidth = (int) ((bounds.x + bounds.width + scaleForGUI(40)) * zoomFactor);
                     panelHeight = (int) ((bounds.y + bounds.height + scaleForGUI(40)) * zoomFactor);
                     setPreferredSize(new Dimension(panelWidth, panelHeight));
@@ -273,7 +371,16 @@ class FamilyTreePanel extends JPanel {
         });
     }
 
-    /** Set the parent scroll pane for zoom navigation. */
+    /**
+     * Sets the parent scroll pane for zoom navigation.
+     *
+     * <p>Required to properly adjust the viewport position during zoom operations.</p>
+     *
+     * @param scrollPane the scroll pane that contains this panel
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     void setParentScrollPane(JScrollPane scrollPane) {
         this.parentScrollPane = scrollPane;
     }
@@ -296,7 +403,17 @@ class FamilyTreePanel extends JPanel {
         g2d.dispose();
     }
 
-    private void buildAndLayoutTree(Graphics g) {
+    /**
+     * Builds and lays out the entire family tree, calculating positions and dimensions for all nodes.
+     *
+     * <p>This includes both ancestor and descendant branches.</p>
+     *
+     * @param graphics the graphics context used for font metrics calculations
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void buildAndLayoutTree(Graphics graphics) {
         nodeDimensions.clear();
         Map<Person, TreeNodeBox> nodeMap = new HashMap<>();
         Set<Person> visited = new HashSet<>();
@@ -305,7 +422,7 @@ class FamilyTreePanel extends JPanel {
         // Build parent tree upward from root
         buildParentTree(root, nodeMap, new HashSet<>());
 
-        calculateNodeDimensions(root, g);
+        calculateNodeDimensions(root, graphics);
 
         // First, compute each node's subtree width recursively
         computeSubtreeWidth(root);
@@ -344,7 +461,18 @@ class FamilyTreePanel extends JPanel {
         revalidate(); // Tell scrollpane the preferred size has changed
     }
 
-    /** Shift all nodes in the tree horizontally by the given amount. */
+    /**
+     * Recursively shifts all nodes in the tree horizontally by the specified amount.
+     *
+     * <p>Used to ensure all nodes have positive X coordinates with proper padding.</p>
+     *
+     * @param node    the starting node for the shift operation
+     * @param shiftX  the horizontal shift amount in pixels
+     * @param visited set of already visited nodes to prevent infinite loops
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void shiftTreeHorizontally(TreeNodeBox node, int shiftX, Set<TreeNodeBox> visited) {
         if (node == null || visited.contains(node)) {
             return;
@@ -362,7 +490,16 @@ class FamilyTreePanel extends JPanel {
         }
     }
 
-    /** Calculate the depth of the ancestor tree (how many generations up). */
+    /**
+     * Calculates the depth of the ancestor tree (number of generations upward from the given node).
+     *
+     * @param node the node to calculate ancestor depth from
+     *
+     * @return the maximum number of generations of ancestors, or 0 if none
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private int calculateAncestorDepth(TreeNodeBox node) {
         if (node == null || node.parents.isEmpty()) {
             return 0;
@@ -374,6 +511,18 @@ class FamilyTreePanel extends JPanel {
         return maxDepth + 1;
     }
 
+    /**
+     * Recursively builds the parent/ancestor tree upward from the specified node.
+     *
+     * <p>Adds mother and father nodes and their ancestors to the tree structure.</p>
+     *
+     * @param node    the node to build parents for
+     * @param nodeMap map of persons to their tree nodes
+     * @param visited set of already visited persons to prevent infinite loops
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void buildParentTree(TreeNodeBox node, Map<Person, TreeNodeBox> nodeMap, Set<Person> visited) {
         if (node == null || visited.contains(node.person)) {
             return;
@@ -385,28 +534,38 @@ class FamilyTreePanel extends JPanel {
             List<Person> parents = gen.getParents();
             int parentCount = parents.size();
 
-            // Add mother
+            // Add the first parent, if any
             if (parentCount > 0) {
-                Person mother = parents.get(0);
-                if (mother != null && !visited.contains(mother)) {
-                    TreeNodeBox motherBox = nodeMap.computeIfAbsent(mother, TreeNodeBox::new);
-                    node.parents.add(motherBox);
-                    buildParentTree(motherBox, nodeMap, visited);
+                Person parent0 = parents.get(0);
+                if (parent0 != null && !visited.contains(parent0)) {
+                    TreeNodeBox parent0Box = nodeMap.computeIfAbsent(parent0, TreeNodeBox::new);
+                    node.parents.add(parent0Box);
+                    buildParentTree(parent0Box, nodeMap, visited);
                 }
             }
 
-            // Add father
+            // Add a second parent, if any
             if (parentCount > 1) {
-                Person father = parents.get(1);
-                if (father != null && !visited.contains(father)) {
-                    TreeNodeBox fatherBox = nodeMap.computeIfAbsent(father, TreeNodeBox::new);
-                    node.parents.add(fatherBox);
-                    buildParentTree(fatherBox, nodeMap, visited);
+                Person parent1 = parents.get(1);
+                if (parent1 != null && !visited.contains(parent1)) {
+                    TreeNodeBox parent1Box = nodeMap.computeIfAbsent(parent1, TreeNodeBox::new);
+                    node.parents.add(parent1Box);
+                    buildParentTree(parent1Box, nodeMap, visited);
                 }
             }
         }
     }
 
+    /**
+     * Recursively computes the width required for the parent/ancestor subtree.
+     *
+     * <p>Adjusts the node's subtreeWidth to accommodate all parent branches.</p>
+     *
+     * @param node the node to compute parent tree width for
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void computeParentTreeWidth(TreeNodeBox node) {
         if (node == null) {
             return;
@@ -444,6 +603,17 @@ class FamilyTreePanel extends JPanel {
         }
     }
 
+    /**
+     * Recursively assigns X and Y coordinates to parent/ancestor nodes.
+     *
+     * <p>Parents are centered above their children with appropriate spacing.</p>
+     *
+     * @param node  the node whose parents should be positioned
+     * @param level the vertical level (generation) to place parents at
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void assignParentCoords(TreeNodeBox node, int level) {
         if (node == null || node.parents.isEmpty()) {
             return;
@@ -479,7 +649,18 @@ class FamilyTreePanel extends JPanel {
         }
     }
 
-    /** Recursively computes the bounding rectangle of the tree. */
+    /**
+     * Recursively computes the bounding rectangle that encompasses the entire tree.
+     *
+     * <p>Includes both ancestor and descendant branches.</p>
+     *
+     * @param node the starting node for bounds calculation
+     *
+     * @return a {@link Rectangle} representing the minimum bounding box for the tree
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private Rectangle calculateTreeBounds(TreeNodeBox node) {
         if (node == null) {
             return new Rectangle(0, 0, 0, 0);
@@ -509,11 +690,22 @@ class FamilyTreePanel extends JPanel {
         return new Rectangle(minX, minY, maxX - minX, maxY - minY);
     }
 
-    private void calculateNodeDimensions(TreeNodeBox node, Graphics g) {
+    /**
+     * Recursively calculates and stores the dimensions (width and height) for each node.
+     *
+     * <p>Takes into account name text, dates, portrait size, and padding.</p>
+     *
+     * @param node     the node to calculate dimensions for
+     * @param graphics the graphics context used for font metrics
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void calculateNodeDimensions(TreeNodeBox node, Graphics graphics) {
         if (node == null) {return;}
         String name = node.person.getFullTitle();
         String dates = getDateString(node.person);
-        FontMetrics fm = g.getFontMetrics();
+        FontMetrics fontMetrics = graphics.getFontMetrics();
 
         // Get portrait info
         ImageIcon portraitImage = node.person.getPortraitImageIconWithFallback(true);
@@ -525,13 +717,13 @@ class FamilyTreePanel extends JPanel {
 
         int paddingX = 28, paddingY = 20;
         // Calculate width to fit both name and dates
-        int nameWidth = fm.stringWidth(name);
-        int datesWidth = fm.stringWidth(dates);
+        int nameWidth = fontMetrics.stringWidth(name);
+        int datesWidth = fontMetrics.stringWidth(dates);
         int textWidth = Math.max(nameWidth, datesWidth);
         int width = Math.max(textWidth + paddingX, portraitW);
 
         // Height now includes space for two lines of text
-        int lineHeight = fm.getHeight();
+        int lineHeight = fontMetrics.getHeight();
         int height = (lineHeight * 2) + paddingY + (portraitH > 0 ? portraitH + 6 : 0);
 
         nodeDimensions.put(node, new Dimension(width, height));
@@ -540,18 +732,27 @@ class FamilyTreePanel extends JPanel {
 
         // Calculate dimensions for children
         for (TreeNodeBox child : node.children) {
-            calculateNodeDimensions(child, g);
+            calculateNodeDimensions(child, graphics);
         }
 
         // Calculate dimensions for parents
         for (TreeNodeBox parent : node.parents) {
             if (!nodeDimensions.containsKey(parent)) {
-                calculateNodeDimensions(parent, g);
+                calculateNodeDimensions(parent, graphics);
             }
         }
     }
 
-    /** Format the birth and death dates for display. */
+    /**
+     * Formats the birth and death dates for display.
+     *
+     * @param person the person whose dates should be formatted
+     *
+     * @return a formatted string like "(YYYY-MM-DD - YYYY-MM-DD)" or "(YYYY-MM-DD)" for living persons
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private String getDateString(Person person) {
         String birthDate = person.getDateOfBirth() != null
                                  ? person.getDateOfBirth().toString()
@@ -567,13 +768,31 @@ class FamilyTreePanel extends JPanel {
         }
     }
 
+    /**
+     * Gets the bounding rectangle for the origin person's node.
+     *
+     * <p>Used for centering the viewport on the origin person.</p>
+     *
+     * @return a {@link Rectangle} representing the origin person's position and size, or null if no root exists
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     Rectangle getOriginPersonBox() {
         if (root == null) {return null;}
         Dimension boxDim = nodeDimensions.get(root);
         return new Rectangle(root.x, root.y, boxDim.width, boxDim.height);
     }
 
-    // drawTree now draws portrait (if present) centered above the text box
+    /**
+     * Draws the entire family tree by first drawing all connecting lines, then all person nodes.
+     *
+     * @param g2d  the graphics context to draw with
+     * @param node the root node of the tree to draw
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void drawTree(Graphics2D g2d, TreeNodeBox node) {
         if (node == null) {return;}
 
@@ -584,7 +803,18 @@ class FamilyTreePanel extends JPanel {
         drawNodes(g2d, node, new HashSet<>());
     }
 
-    /** Draw all connecting lines in the tree. */
+    /**
+     * Recursively draws all connecting lines between nodes in the tree.
+     *
+     * <p>Lines are color-coded based on the child/parent's gender.</p>
+     *
+     * @param g2d     the graphics context to draw with
+     * @param node    the current node being processed
+     * @param visited set of already visited nodes to prevent duplicate drawing
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void drawLines(Graphics2D g2d, TreeNodeBox node, Set<TreeNodeBox> visited) {
         if (node == null || visited.contains(node)) {
             return;
@@ -635,7 +865,18 @@ class FamilyTreePanel extends JPanel {
         }
     }
 
-    /** Draw all node boxes and portraits in the tree. */
+    /**
+     * Recursively draws all person nodes including portraits, boxes, names, and dates.
+     *
+     * <p>Also registers click regions for each person.</p>
+     *
+     * @param g2d     the graphics context to draw with
+     * @param node    the current node being processed
+     * @param visited set of already visited nodes to prevent duplicate drawing
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void drawNodes(Graphics2D g2d, TreeNodeBox node, Set<TreeNodeBox> visited) {
         if (node == null || visited.contains(node)) {
             return;
@@ -725,7 +966,16 @@ class FamilyTreePanel extends JPanel {
         }
     }
 
-    /** Get the color for a line based on the person's gender. */
+    /**
+     * Returns the color for a relationship line based on the person's gender.
+     *
+     * @param person the person whose gender determines the color
+     *
+     * @return light green for non-binary, pink for female, light blue for male
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private Color getGenderColor(Person person) {
         Gender gender = person.getGender();
         if (gender.isGenderNeutral()) {
@@ -739,11 +989,21 @@ class FamilyTreePanel extends JPanel {
         return new Color(135, 206, 250); // Light blue
     }
 
-    private Person getPersonAt(Point pt) {
+    /**
+     * Finds the person at the specified screen coordinates, accounting for zoom level.
+     *
+     * @param point the point to check for a person
+     *
+     * @return the Person at that location, or {@code null} if none found
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private @Nullable Person getPersonAt(Point point) {
         // Account for zoom when checking hit detection
         Point scaledPoint = new Point(
-              (int) (pt.x / zoomFactor),
-              (int) (pt.y / zoomFactor)
+              (int) (point.x / zoomFactor),
+              (int) (point.y / zoomFactor)
         );
 
         for (Map.Entry<Rectangle, Person> entry : rectToPerson.entrySet()) {
@@ -754,6 +1014,16 @@ class FamilyTreePanel extends JPanel {
         return null;
     }
 
+    /**
+     * Recursively computes the subtree width required to properly space child nodes.
+     *
+     * <p>A node's subtree width is the sum of all child subtree widths plus gaps.</p>
+     *
+     * @param node the node to compute subtree width for
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void computeSubtreeWidth(TreeNodeBox node) {
         if (node == null) {return;}
         // If leaf, subtree width is its box width
@@ -771,6 +1041,18 @@ class FamilyTreePanel extends JPanel {
         }
     }
 
+    /**
+     * Recursively assigns X and Y coordinates to nodes in the descendant tree.
+     *
+     * <p>Nodes are centered above their children with appropriate horizontal spacing.</p>
+     *
+     * @param node  the node to assign coordinates to
+     * @param level the vertical level (generation) to place this node at
+     * @param leftX the leftmost X coordinate for this node's subtree
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void assignCoordsWithSubtreeSpacing(TreeNodeBox node, int level, int leftX) {
         if (node == null) {return;}
         Dimension boxDim = nodeDimensions.get(node);
@@ -794,6 +1076,20 @@ class FamilyTreePanel extends JPanel {
         }
     }
 
+    /**
+     * Recursively builds the tree structure for descendants of the given genealogy.
+     *
+     * <p>Creates {@link TreeNodeBox} nodes for the person and all their children.</p>
+     *
+     * @param genealogy the genealogy to build from
+     * @param nodeMap   map of persons to their tree nodes
+     * @param visited   set of already visited persons to prevent infinite loops
+     *
+     * @return the {@link TreeNodeBox} for the origin person, or null if already visited
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private TreeNodeBox buildTreeRecursive(Genealogy genealogy, Map<Person, TreeNodeBox> nodeMap, Set<Person> visited) {
         Person person = genealogy.getOrigin();
         if (visited.contains(person)) {return null;}
