@@ -36,7 +36,6 @@ package mekhq.gui.model;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Objects;
-
 import javax.annotation.Nonnull;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -45,7 +44,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
-
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
@@ -320,7 +318,8 @@ public class PartsStoreModel extends AbstractTableModel {
                     shoppingItem = (IAcquisitionWork) part;
                 }
                 if (null != shoppingItem) {
-                    TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, getLogisticsPerson(), true);
+                    TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, getLogisticsPerson(), true,
+                          false);
                     targetProxy = new TargetProxy(target);
                 } else {
                     targetProxy = new TargetProxy(null);
@@ -331,8 +330,8 @@ public class PartsStoreModel extends AbstractTableModel {
         }
 
         /**
-         * Gets the part's quantity on order, suitable for use in a UI element which requires both a display value
-         * and a sortable value.
+         * Gets the part's quantity on order, suitable for use in a UI element which requires both a display value and a
+         * sortable value.
          *
          * @return The part's quantity on order as a {@link FormattedValue}
          */
@@ -347,8 +346,8 @@ public class PartsStoreModel extends AbstractTableModel {
         }
 
         /**
-         * Gets the part's quantity on hand, suitable for use in a UI element which requires both a display value
-         * and a sortable value.
+         * Gets the part's quantity on hand, suitable for use in a UI element which requires both a display value and a
+         * sortable value.
          *
          * @return The part's quantity on hand as a {@link FormattedValue}
          */
@@ -363,8 +362,8 @@ public class PartsStoreModel extends AbstractTableModel {
         }
 
         /**
-         * Gets the part's quantity in transit, suitable for use in a UI element which requires both a display value
-         * and a sortable value.
+         * Gets the part's quantity in transit, suitable for use in a UI element which requires both a display value and
+         * a sortable value.
          *
          * @return The part's quantity in transit as a {@link FormattedValue}
          */

@@ -8612,12 +8612,45 @@ public class Campaign implements ITechManager {
         }
     }
 
+    /**
+     * Calculates the target roll for acquiring the specified item or unit using the default campaign logistics person,
+     * applying all standard campaign rules and options.
+     *
+     * @param acquisition the {@link IAcquisitionWork} describing the part, supply, or unit to be acquired
+     *
+     * @return a {@link TargetRoll} indicating the outcome or difficulty of the acquisition attempt
+     */
     public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition) {
         return getTargetForAcquisition(acquisition, getLogisticsPerson());
     }
 
+    /**
+     * Calculates the target roll for acquiring the specified item or unit with the given person, using default campaign
+     * settings for other options.
+     *
+     * @param acquisition the {@link IAcquisitionWork} describing the part, supply, or unit to be acquired
+     * @param person      the {@link Person} to attempt the acquisition, or {@code null} if unavailable
+     *
+     * @return a {@link TargetRoll} indicating the outcome or difficulty of the acquisition attempt
+     */
     public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, final @Nullable Person person) {
-        return getTargetForAcquisition(acquisition, person, false);
+        return getTargetForAcquisition(acquisition, person, false, false);
+    }
+
+    /**
+     * Calculates the target roll for acquiring the specified item or unit while optionally ignoring real acquisitions
+     * personnel. A synthetic person with baseline skill is used if personnel are ignored.
+     *
+     * @param acquisition                 the {@link IAcquisitionWork} describing the part, supply, or unit to be
+     *                                    acquired
+     * @param ignoreAcquisitionsPersonnel if {@code true}, ignores available personnel and uses a synthetic baseline
+     *                                    person for the roll
+     *
+     * @return a {@link TargetRoll} indicating the outcome or difficulty of the acquisition attempt
+     */
+    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition,
+          final boolean ignoreAcquisitionsPersonnel) {
+        return getTargetForAcquisition(acquisition, null, false, ignoreAcquisitionsPersonnel);
     }
 
     public PlanetaryConditions getCurrentPlanetaryConditions(Scenario scenario) {
@@ -8648,42 +8681,61 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Determines the target roll required for successfully acquiring a specific part or unit based on various campaign
-     * settings, the acquisition details, and the person attempting the acquisition.
+     * Calculates the target roll required for successfully acquiring a specific part or unit, factoring in campaign
+     * options, acquisition details, the person attempting the acquisition, and whether acquisitions personnel should be
+     * ignored.
      *
-     * <p>
-     * This method evaluates multiple conditions and factors to calculate the target roll, returning one of the
-     * following outcomes:
+     * <p>This method evaluates a sequence of rules and conditions to determine whether the acquisition is possible,
+     * impossible, automatically successful, or automatically fails for the period due to cooldowns. Otherwise, it
+     * computes the target roll value based on the skill of the assigned (real or synthetic) person and all relevant
+     * modifiers such as item attributes, availability, campaign configuration (including AtB and "Gray Monday"
+     * effects), technical year, and extinction.</p>
+     *
+     * <p>The possible results are:</p>
      * <ul>
-     * <li>{@code TargetRoll.AUTOMATIC_SUCCESS} if acquisitions are set to be
-     * automatic in the campaign options.</li>
-     * <li>{@code TargetRoll.IMPOSSIBLE} if the acquisition is not permitted based
-     * on campaign settings,
-     * such as missing personnel, parts restrictions, or unavailable
-     * technology.</li>
-     * <li>A calculated target roll value based on the skill of the assigned person,
-     * acquisition modifiers,
-     * and adjustments for specific campaign rules (e.g., {@code AtB}
-     * restrictions).</li>
+     *   <li>{@code TargetRoll.AUTOMATIC_SUCCESS} if acquisitions are set to be automatic in the campaign options.</li>
+     *   <li>{@code TargetRoll.IMPOSSIBLE} if the acquisition is forbidden due to campaign settings, unavailable technology,
+     *   personnel limitations, date/tech restrictions, or extinct status.</li>
+     *   <li>{@code TargetRoll.AUTOMATIC_FAIL} if the item cannot be acquired this period due to prior attempts
+     *   (shopping list/cooldown restriction).</li>
+     *   <li>A regular {@link TargetRoll} with calculated difficulty, reflecting the assigned person's skill and all
+     *   item/campaign modifiers, if the acquisition is allowed and requires a roll.</li>
      * </ul>
      *
-     * @param acquisition the {@link IAcquisitionWork} object containing details about the requested part or supply,
-     *                    such as tech base, technology level, and availability.
+     * @param acquisition                 an {@link IAcquisitionWork} object describing the item or unit being requested
+     *                                    (contains info such as tech base, tech level, and availability)
+     * @param person                      the {@link Person} assigned to make the acquisition roll; may be {@code null}
+     *                                    if no one is available/allowed, or if personnel are ignored
+     * @param checkDaysToWait             if {@code true}, checks for shopping list/cooldown period before allowing the
+     *                                    roll
+     * @param ignoreAcquisitionsPersonnel if {@code true}, constructs a synthetic person with default skill for the
+     *                                    roll, ignoring actual acquisitions personnel and their availability
      *
-     * @return a {@link TargetRoll} object representing the roll required to successfully acquire the requested item, or
-     *       an impossible/automatic result under specific circumstances.
+     * @return a {@link TargetRoll} describing the acquisition result, either as a constant value
+     *       (automatic/impossible/fail) or a calculated result reflecting all applicable rules and modifiers
      */
-    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, final @Nullable Person person,
-          final boolean checkDaysToWait) {
+    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, @Nullable Person person,
+          final boolean checkDaysToWait, final boolean ignoreAcquisitionsPersonnel) {
         if (getCampaignOptions().getAcquisitionSkill().equals(S_AUTO)) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
+        }
+
+        String acquisitionsSkill = getCampaignOptions().getAcquisitionSkill();
+        if (ignoreAcquisitionsPersonnel) {
+            person = new Person(this);
+            SkillType skillType = SkillType.getType(acquisitionsSkill);
+            if (skillType != null) {
+                int regularLevel = skillType.getRegularLevel();
+                person.addSkill(acquisitionsSkill, regularLevel, 0);
+            }
         }
 
         if (null == person) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                   "Your procurement personnel have used up all their acquisition attempts for this period");
         }
-        final Skill skill = person.getSkillForWorkingOn(getCampaignOptions().getAcquisitionSkill());
+
+        final Skill skill = person.getSkillForWorkingOn(acquisitionsSkill);
         if (null != getShoppingList().getShoppingItem(acquisition.getNewEquipment()) && checkDaysToWait) {
             return new TargetRoll(TargetRoll.AUTOMATIC_FAIL,
                   "You must wait until the new cycle to check for this part. Further" +
