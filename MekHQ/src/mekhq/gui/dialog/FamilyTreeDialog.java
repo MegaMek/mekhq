@@ -37,6 +37,8 @@ import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,15 +46,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 
 import megamek.common.enums.Gender;
 import megamek.common.ui.EnhancedTabbedPane;
@@ -121,7 +115,7 @@ public class FamilyTreeDialog extends JDialog {
         FamilyTreePanel panel = new FamilyTreePanel(genealogy, personnel, this);
         JScrollPane scrollPane = new FastJScrollPane(panel);
         scrollPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        panel.setParentScrollPane(scrollPane); // Set the scroll pane reference
+        panel.setParentScrollPane(scrollPane);
         scrollPane.setPreferredSize(scaleForGUI(800, 600));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -177,7 +171,7 @@ class TreeNodeBox {
     int x, y;
     int subtreeWidth; // Dynamic width required to space children appropriately
     List<TreeNodeBox> children = new ArrayList<>();
-    List<TreeNodeBox> parents = new ArrayList<>(); // Add parents list
+    List<TreeNodeBox> parents = new ArrayList<>();
 
     TreeNodeBox(Person person) {this.person = person;}
 }
@@ -185,7 +179,7 @@ class TreeNodeBox {
 class FamilyTreePanel extends JPanel {
     private final Genealogy genealogy;
     private TreeNodeBox root;
-    private final int hGap = 40, vGap = 70; // Increased for clarity
+    private final int hGap = 40, vGap = 70;
 
     private final Map<TreeNodeBox, Dimension> nodeDimensions = new HashMap<>();
     private int boxHeight = 0;
@@ -202,6 +196,7 @@ class FamilyTreePanel extends JPanel {
     private static final double ZOOM_MULTIPLIER = 1.05; // 5% change per scroll notch
 
     private JScrollPane parentScrollPane = null;
+    private Timer zoomTimer = null;
 
     public FamilyTreePanel(Genealogy genealogy, Collection<Person> personnel, FamilyTreeDialog parentDialog) {
         this.genealogy = genealogy;
@@ -209,9 +204,9 @@ class FamilyTreePanel extends JPanel {
         setPreferredSize(new Dimension(panelWidth, panelHeight));
 
         // Mouse listener for clicking on persons
-        addMouseListener(new java.awt.event.MouseAdapter() {
+        addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
+            public void mouseClicked(MouseEvent evt) {
                 Person person = getPersonAt(evt.getPoint());
                 if (person != null) {
                     // Open new tab in dialog
@@ -225,45 +220,55 @@ class FamilyTreePanel extends JPanel {
             double oldZoom = zoomFactor;
 
             if (evt.getWheelRotation() < 0) {
-                // Zoom in - multiply by zoom factor
+                // Zoom in
                 zoomFactor = Math.min(MAX_ZOOM, zoomFactor * ZOOM_MULTIPLIER);
             } else {
-                // Zoom out - divide by zoom factor
+                // Zoom out
                 zoomFactor = Math.max(MIN_ZOOM, zoomFactor / ZOOM_MULTIPLIER);
             }
 
-            if (oldZoom != zoomFactor) {
-                // Adjust viewport to zoom toward mouse position
-                if (parentScrollPane != null) {
-                    Point viewPos = parentScrollPane.getViewport().getViewPosition();
-                    Point mousePos = evt.getPoint();
+            if (oldZoom != zoomFactor && parentScrollPane != null) {
+                Point viewPos = parentScrollPane.getViewport().getViewPosition();
+                Point mousePos = evt.getPoint();
 
-                    // Calculate the mouse position relative to the content
-                    int contentX = viewPos.x + mousePos.x;
-                    int contentY = viewPos.y + mousePos.y;
+                // Calculate the mouse position relative to the content before zoom
+                double contentX = (viewPos.x + mousePos.x) / oldZoom;
+                double contentY = (viewPos.y + mousePos.y) / oldZoom;
 
-                    // Recalculate panel size
-                    revalidate();
-                    repaint();
-
-                    // Adjust viewport to keep same content under mouse
-                    EventQueue.invokeLater(() -> {
-                        double zoomRatio = zoomFactor / oldZoom;
-                        int newX = (int) (contentX * zoomRatio - mousePos.x);
-                        int newY = (int) (contentY * zoomRatio - mousePos.y);
-
-                        Dimension viewSize = parentScrollPane.getViewport().getExtentSize();
-                        Dimension contentSize = getPreferredSize();
-
-                        newX = Math.max(0, Math.min(newX, contentSize.width - viewSize.width));
-                        newY = Math.max(0, Math.min(newY, contentSize.height - viewSize.height));
-
-                        parentScrollPane.getViewport().setViewPosition(new Point(newX, newY));
-                    });
-                } else {
-                    revalidate();
-                    repaint();
+                // Update panel size immediately
+                Rectangle bounds = calculateTreeBounds(root);
+                if (bounds != null && bounds.width > 0 && bounds.height > 0) {
+                    panelWidth = (int) ((bounds.x + bounds.width + scaleForGUI(40)) * zoomFactor);
+                    panelHeight = (int) ((bounds.y + bounds.height + scaleForGUI(40)) * zoomFactor);
+                    setPreferredSize(new Dimension(panelWidth, panelHeight));
                 }
+
+                // Calculate new viewport position to keep content under mouse
+                int newX = (int) (contentX * zoomFactor - mousePos.x);
+                int newY = (int) (contentY * zoomFactor - mousePos.y);
+
+                // Clamp to valid bounds
+                Dimension viewSize = parentScrollPane.getViewport().getExtentSize();
+                Dimension contentSize = getPreferredSize();
+
+                newX = Math.max(0, Math.min(newX, contentSize.width - viewSize.width));
+                newY = Math.max(0, Math.min(newY, contentSize.height - viewSize.height));
+
+                parentScrollPane.getViewport().setViewPosition(new Point(newX, newY));
+
+                // Batch revalidate calls with a timer to avoid excessive updates
+                if (zoomTimer != null && zoomTimer.isRunning()) {
+                    zoomTimer.restart();
+                } else {
+                    zoomTimer = new Timer(0, e -> {
+                        revalidate();
+                        ((Timer) e.getSource()).stop();
+                    });
+                    zoomTimer.setRepeats(false);
+                    zoomTimer.start();
+                }
+
+                repaint();
             }
         });
     }
@@ -569,18 +574,18 @@ class FamilyTreePanel extends JPanel {
     }
 
     // drawTree now draws portrait (if present) centered above the text box
-    private void drawTree(Graphics2D g, TreeNodeBox node) {
+    private void drawTree(Graphics2D g2d, TreeNodeBox node) {
         if (node == null) {return;}
 
         // First pass: Draw all lines with consistent stroke
-        drawLines(g, node, new HashSet<>());
+        drawLines(g2d, node, new HashSet<>());
 
         // Second pass: Draw all boxes and portraits
-        drawNodes(g, node, new HashSet<>());
+        drawNodes(g2d, node, new HashSet<>());
     }
 
     /** Draw all connecting lines in the tree. */
-    private void drawLines(Graphics2D g, TreeNodeBox node, Set<TreeNodeBox> visited) {
+    private void drawLines(Graphics2D g2d, TreeNodeBox node, Set<TreeNodeBox> visited) {
         if (node == null || visited.contains(node)) {
             return;
         }
@@ -591,11 +596,11 @@ class FamilyTreePanel extends JPanel {
         int nodeBoxHeight = boxDim.height;
 
         // Enable anti-aliasing for smooth lines
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
               RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Set line thickness to 5px with rounded caps and joins
-        g.setStroke(new BasicStroke(5,
+        g2d.setStroke(new BasicStroke(5,
               BasicStroke.CAP_ROUND,
               BasicStroke.JOIN_ROUND));
 
@@ -604,14 +609,14 @@ class FamilyTreePanel extends JPanel {
             Dimension childBoxDim = nodeDimensions.get(child);
 
             // Set color based on child's gender
-            g.setColor(getGenderColor(child.person));
+            g2d.setColor(getGenderColor(child.person));
 
-            g.drawLine(
+            g2d.drawLine(
                   node.x + nodeBoxWidth / 2, node.y + nodeBoxHeight,
                   child.x + childBoxDim.width / 2, child.y
             );
 
-            drawLines(g, child, visited);
+            drawLines(g2d, child, visited);
         }
 
         // Draw lines to parents
@@ -619,19 +624,19 @@ class FamilyTreePanel extends JPanel {
             Dimension parentBoxDim = nodeDimensions.get(parent);
 
             // Set color based on parent's gender
-            g.setColor(getGenderColor(parent.person));
+            g2d.setColor(getGenderColor(parent.person));
 
-            g.drawLine(
+            g2d.drawLine(
                   node.x + nodeBoxWidth / 2, node.y,
                   parent.x + parentBoxDim.width / 2, parent.y + parentBoxDim.height
             );
 
-            drawLines(g, parent, visited);
+            drawLines(g2d, parent, visited);
         }
     }
 
     /** Draw all node boxes and portraits in the tree. */
-    private void drawNodes(Graphics2D g, TreeNodeBox node, Set<TreeNodeBox> visited) {
+    private void drawNodes(Graphics2D g2d, TreeNodeBox node, Set<TreeNodeBox> visited) {
         if (node == null || visited.contains(node)) {
             return;
         }
@@ -642,7 +647,7 @@ class FamilyTreePanel extends JPanel {
         int nodeBoxHeight = boxDim.height;
 
         // Enable anti-aliasing for smooth rendering
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
               RenderingHints.VALUE_ANTIALIAS_ON);
 
         // --- Portrait drawing logic ---
@@ -655,7 +660,7 @@ class FamilyTreePanel extends JPanel {
             if (portraitW > 0 && portraitH > 0) {
                 int px = node.x + (nodeBoxWidth - portraitW) / 2;
                 int py = node.y;
-                g.drawImage(portraitImage.getImage(), px, py, null);
+                g2d.drawImage(portraitImage.getImage(), px, py, null);
             }
         }
 
@@ -667,20 +672,20 @@ class FamilyTreePanel extends JPanel {
         int borderThickness = 2;
 
         // Draw person box with rounded corners
-        g.setColor(new Color(230, 240, 255));
-        g.fillRoundRect(node.x, boxY, nodeBoxWidth, boxDrawHeight, arc, arc);
+        g2d.setColor(new Color(230, 240, 255));
+        g2d.fillRoundRect(node.x, boxY, nodeBoxWidth, boxDrawHeight, arc, arc);
 
         // Draw rounded border
-        g.setColor(Color.BLACK);
-        g.setStroke(new BasicStroke(borderThickness));
-        g.drawRoundRect(node.x, boxY, nodeBoxWidth, boxDrawHeight, arc, arc);
+        g2d.setColor(Color.BLACK);
+        g2d.setStroke(new BasicStroke(borderThickness));
+        g2d.drawRoundRect(node.x, boxY, nodeBoxWidth, boxDrawHeight, arc, arc);
 
         // Reset stroke for text
-        g.setStroke(new BasicStroke(1));
+        g2d.setStroke(new BasicStroke(1));
 
         // Draw name and dates text
-        g.setColor(Color.BLACK);
-        FontMetrics fm = g.getFontMetrics();
+        g2d.setColor(Color.BLACK);
+        FontMetrics fm = g2d.getFontMetrics();
         int lineHeight = fm.getHeight();
 
         String name = node.person.getFullTitle();
@@ -693,12 +698,12 @@ class FamilyTreePanel extends JPanel {
         // Draw name (centered horizontally)
         int nameWidth = fm.stringWidth(name);
         int nameX = node.x + (nodeBoxWidth - nameWidth) / 2;
-        g.drawString(name, nameX, textStartY);
+        g2d.drawString(name, nameX, textStartY);
 
         // Draw dates below name (centered horizontally)
         int datesWidth = fm.stringWidth(dates);
         int datesX = node.x + (nodeBoxWidth - datesWidth) / 2;
-        g.drawString(dates, datesX, textStartY + lineHeight);
+        g2d.drawString(dates, datesX, textStartY + lineHeight);
 
         // Create hit area that includes portrait + box + name (generously)
         int clickableTop = node.y;
@@ -712,11 +717,11 @@ class FamilyTreePanel extends JPanel {
 
         // Recursively draw children and parents
         for (TreeNodeBox child : node.children) {
-            drawNodes(g, child, visited);
+            drawNodes(g2d, child, visited);
         }
 
         for (TreeNodeBox parent : node.parents) {
-            drawNodes(g, parent, visited);
+            drawNodes(g2d, parent, visited);
         }
     }
 
