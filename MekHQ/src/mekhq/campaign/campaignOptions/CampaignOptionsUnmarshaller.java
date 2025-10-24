@@ -808,6 +808,11 @@ public class CampaignOptionsUnmarshaller {
             case "opForUsesVTOLs" -> campaignOptions.setOpForUsesVTOLs(parseBoolean(nodeContents));
             case "useDropShips" -> campaignOptions.setUseDropShips(parseBoolean(nodeContents));
             case "mercSizeLimited" -> campaignOptions.setMercSizeLimited(parseBoolean(nodeContents));
+            case "moraleVictoryEffect" -> campaignOptions.setMoraleVictoryEffect(parseInt(nodeContents));
+            case "moraleDecisiveVictoryEffect" ->
+                  campaignOptions.setMoraleDecisiveVictoryEffect(parseInt(nodeContents));
+            case "moraleDefeatEffect" -> campaignOptions.setMoraleDefeatEffect(parseInt(nodeContents));
+            case "moraleDecisiveDefeatEffect" -> campaignOptions.setMoraleDecisiveDefeatEffect(parseInt(nodeContents));
             case "regionalMekVariations" -> campaignOptions.setRegionalMekVariations(parseBoolean(nodeContents));
             case "attachedPlayerCamouflage" -> campaignOptions.setAttachedPlayerCamouflage(parseBoolean(
                   nodeContents));

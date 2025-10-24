@@ -5177,6 +5177,8 @@ public class Campaign implements ITechManager {
 
             for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
                 if ((scenario.getDate() != null) && scenario.getDate().isBefore(getLocalDate())) {
+                    boolean hasForceDeployed = isHasForceDeployedToScenario(scenario.getId());
+
                     if (getCampaignOptions().isUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
                         StratConCampaignState campaignState = contract.getStratconCampaignState();
 
@@ -5191,16 +5193,17 @@ public class Campaign implements ITechManager {
                             processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
                         }
 
-                        scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
                         scenario.clearAllForcesAndPersonnel(this);
                     } else {
-                        scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
                         contract.addPlayerMinorBreach();
 
                         addReport("Failure to deploy for " +
                                         scenario.getHyperlinkedName() +
                                         " resulted in a minor contract breach.");
                     }
+
+                    scenario.convertToStub(this,
+                          hasForceDeployed ? ScenarioStatus.FLEET_IN_BEING : ScenarioStatus.REFUSED_ENGAGEMENT);
                 }
             }
         }
@@ -5259,6 +5262,27 @@ public class Campaign implements ITechManager {
                 }
             }
         }
+    }
+
+    /**
+     * Checks whether any standard force has been deployed to the given scenario.
+     *
+     * @param scenarioId The ID of the scenario to check forces for.
+     *
+     * @return {@code true} if at least one standard force is assigned to this scenario; {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private boolean isHasForceDeployedToScenario(int scenarioId) {
+        for (Force force : getAllForces()) {
+            if (force.getScenarioId() == scenarioId) {
+                if (force.isForceType(ForceType.STANDARD)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

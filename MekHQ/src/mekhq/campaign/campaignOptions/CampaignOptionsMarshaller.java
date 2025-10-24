@@ -1022,6 +1022,16 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForUsesVTOLs", campaignOptions.isOpForUsesVTOLs());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDropShips", campaignOptions.isUseDropShips());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mercSizeLimited", campaignOptions.isMercSizeLimited());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleVictoryEffect", campaignOptions.getMoraleVictoryEffect());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "moraleDecisiveVictoryEffect",
+              campaignOptions.getMoraleDecisiveVictoryEffect());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleDefeatEffect", campaignOptions.getMoraleDefeatEffect());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "moraleDecisiveDefeatEffect",
+              campaignOptions.getMoraleDecisiveDefeatEffect());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "regionalMekVariations", campaignOptions.isRegionalMekVariations());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attachedPlayerCamouflage",
               campaignOptions.isAttachedPlayerCamouflage());
