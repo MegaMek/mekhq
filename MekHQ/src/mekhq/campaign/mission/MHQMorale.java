@@ -323,12 +323,12 @@ public class MHQMorale {
 
             ScenarioStatus scenarioStatus = scenario.getStatus();
 
-            // Decisive Defeat or Refused Engagement always count as a defeat
+            // Decisive Defeat or Refused Engagement count as 2 defeats
             if (scenarioStatus.isDecisiveDefeat() || scenarioStatus.isRefusedEngagement()) {
                 defeats += 2;
                 continue;
             }
-            // Decisive Victory counts as a victory
+            // Decisive Victory counts as 2 victories
             if (scenarioStatus.isDecisiveVictory()) {
                 victories += 2;
                 continue;
