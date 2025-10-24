@@ -87,6 +87,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JTextField optionDisplayDateFormat;
     private JTextField optionLongDisplayDateFormat;
     private final JSlider guiScale = new JSlider();
+    private JCheckBox optionHideUnitFluff;
     private JCheckBox optionHistoricalDailyLog;
     private JCheckBox chkCompanyGeneratorStartup;
     private JCheckBox chkShowCompanyGenerator;
@@ -182,6 +183,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkNewDayMedicPoolFill;
     private JCheckBox chkNewDayMRMS;
     private JCheckBox chkNewDayOptimizeMedicalAssignments;
+    private JCheckBox chkNewMonthQuickTrain;
     private JCheckBox chkNewDayForceIconOperationalStatus;
     private MMComboBox<ForceIconOperationalStatusStyle> comboNewDayForceIconOperationalStatusStyle;
     // endregion New Day
@@ -304,6 +306,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                           .format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText())
                                         .withLocale(MekHQ.getMHQOptions().getDateLocale())) :
                     resources.getString("invalidDateFormat.error")));
+
+        optionHideUnitFluff = new JCheckBox(resources.getString("optionHideUnitFluff.text"));
+        optionHideUnitFluff.setToolTipText(resources.getString("optionHideUnitFluff.toolTipText"));
 
         optionHistoricalDailyLog = new JCheckBox(resources.getString("optionHistoricalDailyLog.text"));
         optionHistoricalDailyLog.setToolTipText(resources.getString("optionHistoricalDailyLog.toolTipText"));
@@ -462,6 +467,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                       .addComponent(labelLongDisplayDateFormatExample,
                                                             Alignment.TRAILING))
                                       .addComponent(scaleLine)
+                                      .addComponent(optionHideUnitFluff)
                                       .addComponent(optionHistoricalDailyLog)
                                       .addComponent(chkCompanyGeneratorStartup)
                                       .addComponent(chkShowCompanyGenerator)
@@ -504,6 +510,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                         .addComponent(optionLongDisplayDateFormat)
                                                         .addComponent(labelLongDisplayDateFormatExample))
                                         .addComponent(scaleLine)
+                                        .addComponent(optionHideUnitFluff)
                                         .addComponent(optionHistoricalDailyLog)
                                         .addComponent(chkCompanyGeneratorStartup)
                                         .addComponent(chkShowCompanyGenerator)
@@ -935,6 +942,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "chkNewDayOptimizeMedicalAssignments.toolTipText"));
         chkNewDayOptimizeMedicalAssignments.setName("chkNewDayOptimizeMedicalAssignments.text");
 
+        chkNewMonthQuickTrain = new JCheckBox(resources.getString(
+              "chkNewMonthQuickTrain.text"));
+        chkNewMonthQuickTrain.setToolTipText(resources.getString(
+              "chkNewMonthQuickTrain.toolTipText"));
+        chkNewMonthQuickTrain.setName("chkNewMonthQuickTrain.text");
+
         chkNewDayForceIconOperationalStatus = new JCheckBox(resources.getString(
               "chkNewDayForceIconOperationalStatus.text"));
         chkNewDayForceIconOperationalStatus.setToolTipText(resources.getString(
@@ -987,6 +1000,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(chkNewDayMedicPoolFill)
                                       .addComponent(chkNewDayMRMS)
                                       .addComponent(chkNewDayOptimizeMedicalAssignments)
+                                      .addComponent(chkNewMonthQuickTrain)
                                       .addComponent(chkNewDayForceIconOperationalStatus)
                                       .addGroup(layout.createParallelGroup(Alignment.LEADING)
                                                       .addComponent(lblNewDayForceIconOperationalStatusStyle)
@@ -1000,6 +1014,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(chkNewDayMedicPoolFill)
                                         .addComponent(chkNewDayMRMS)
                                         .addComponent(chkNewDayOptimizeMedicalAssignments)
+                                        .addComponent(chkNewMonthQuickTrain)
                                         .addComponent(chkNewDayForceIconOperationalStatus)
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(lblNewDayForceIconOperationalStatusStyle)
@@ -1351,6 +1366,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         if (validateDateFormat(optionLongDisplayDateFormat.getText())) {
             MekHQ.getMHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
         }
+        MekHQ.getMHQOptions().setHideUnitFluff(optionHideUnitFluff.isSelected());
         MekHQ.getMHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
         MekHQ.getMHQOptions().setCompanyGeneratorStartup(chkCompanyGeneratorStartup.isSelected());
         MekHQ.getMHQOptions().setShowCompanyGenerator(chkShowCompanyGenerator.isSelected());
@@ -1444,6 +1460,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNewDayMedicPoolFill(chkNewDayMedicPoolFill.isSelected());
         MekHQ.getMHQOptions().setNewDayMRMS(chkNewDayMRMS.isSelected());
         MekHQ.getMHQOptions().setNewDayOptimizeMedicalAssignments(chkNewDayOptimizeMedicalAssignments.isSelected());
+        MekHQ.getMHQOptions().setNewMonthQuickTrain(chkNewMonthQuickTrain.isSelected());
         MekHQ.getMHQOptions().setNewDayForceIconOperationalStatus(chkNewDayForceIconOperationalStatus.isSelected());
         MekHQ.getMHQOptions()
               .setNewDayForceIconOperationalStatusStyle(Objects.requireNonNull(
@@ -1508,6 +1525,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         guiScale.setValue((int) (GUIPreferences.getInstance().getGUIScale() * 10));
         optionDisplayDateFormat.setText(MekHQ.getMHQOptions().getDisplayDateFormat());
         optionLongDisplayDateFormat.setText(MekHQ.getMHQOptions().getLongDisplayDateFormat());
+        optionHideUnitFluff.setSelected(MekHQ.getMHQOptions().getHideUnitFluff());
         optionHistoricalDailyLog.setSelected(MekHQ.getMHQOptions().getHistoricalDailyLog());
         chkCompanyGeneratorStartup.setSelected(MekHQ.getMHQOptions().getCompanyGeneratorStartup());
         chkShowCompanyGenerator.setSelected(MekHQ.getMHQOptions().getShowCompanyGenerator());
@@ -1606,6 +1624,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkNewDayMedicPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayMedicPoolFill());
         chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
         chkNewDayOptimizeMedicalAssignments.setSelected(MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments());
+        chkNewMonthQuickTrain.setSelected(MekHQ.getMHQOptions().getNewMonthQuickTrain());
         if (chkNewDayForceIconOperationalStatus.isSelected() !=
                   MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {
             chkNewDayForceIconOperationalStatus.doClick();
