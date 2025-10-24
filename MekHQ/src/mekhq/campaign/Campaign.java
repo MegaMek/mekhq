@@ -8711,8 +8711,10 @@ public class Campaign implements ITechManager {
         if (ignoreAcquisitionsPersonnel) {
             person = new Person(this);
             SkillType skillType = SkillType.getType(acquisitionsSkill);
-            int regularLevel = skillType.getRegularLevel();
-            person.addSkill(acquisitionsSkill, regularLevel, 0);
+            if (skillType != null) {
+                int regularLevel = skillType.getRegularLevel();
+                person.addSkill(acquisitionsSkill, regularLevel, 0);
+            }
         }
 
         if (null == person) {
