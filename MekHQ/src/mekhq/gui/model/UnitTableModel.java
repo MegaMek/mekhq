@@ -183,7 +183,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
      *
      * @return the crew tooltip as an HTML string
      */
-    static String getCrewTooltip(Unit unit) {
+    public static String getCrewTooltip(Unit unit) {
         int gunnersNeeded = unit.getTotalGunnerNeeds();
         int gunnersAssigned = unit.getGunners().size();
 
