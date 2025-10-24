@@ -109,7 +109,12 @@ public class NagController {
         final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
 
         // Untreated personnel
-        if (UntreatedPersonnelNagDialog.checkNag(activePersonnel, doctorCapacity, isDoctorsUseAdministration)) {
+        boolean isUseMASHTheatres = campaignOptions.isUseMASHTheatres();
+        int mashTheatreCapacity = isUseMASHTheatres ? campaign.getMashTheatreCapacity() : Integer.MAX_VALUE;
+        if (UntreatedPersonnelNagDialog.checkNag(activePersonnel,
+              doctorCapacity,
+              isDoctorsUseAdministration,
+              mashTheatreCapacity)) {
             UntreatedPersonnelNagDialog untreatedPersonnelNagDialog = new UntreatedPersonnelNagDialog(campaign);
             if (untreatedPersonnelNagDialog.shouldCancelAdvanceDay()) {
                 return true;
