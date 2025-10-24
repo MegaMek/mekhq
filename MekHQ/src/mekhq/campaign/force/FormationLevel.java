@@ -45,32 +45,35 @@ public enum FormationLevel {
     NONE("FormationLevel.NONE.text", "FormationLevel.NONE.description", -1, true, true, true),
     INVALID("FormationLevel.INVALID.text", "FormationLevel.INVALID.description", -1, true, true, true),
 
+    // Generic
+    TEAM("FormationLevel.TEAM.text", "FormationLevel.TEAM.description", 0, true, true, true),
+
     // Inner Sphere
-    LANCE("FormationLevel.LANCE.text", "FormationLevel.LANCE.description", 0, true, false, false),
-    COMPANY("FormationLevel.COMPANY.text", "FormationLevel.COMPANY.description", 1, true, false, false),
-    BATTALION("FormationLevel.BATTALION.text", "FormationLevel.BATTALION.description", 2, true, false, false),
-    REGIMENT("FormationLevel.REGIMENT.text", "FormationLevel.REGIMENT.description", 3, true, false, false),
-    BRIGADE("FormationLevel.BRIGADE.text", "FormationLevel.BRIGADE.description", 4, true, false, false),
-    DIVISION("FormationLevel.DIVISION.text", "FormationLevel.DIVISION.description", 5, true, false, false),
-    CORPS("FormationLevel.CORPS.text", "FormationLevel.CORPS.description", 6, true, false, false),
-    ARMY("FormationLevel.ARMY.text", "FormationLevel.ARMY.description", 7, true, false, false),
-    ARMY_GROUP("FormationLevel.ARMY_GROUP.text", "FormationLevel.ARMY_GROUP.description", 8, true, false, false),
+    LANCE("FormationLevel.LANCE.text", "FormationLevel.LANCE.description", 1, true, false, false),
+    COMPANY("FormationLevel.COMPANY.text", "FormationLevel.COMPANY.description", 2, true, false, false),
+    BATTALION("FormationLevel.BATTALION.text", "FormationLevel.BATTALION.description", 3, true, false, false),
+    REGIMENT("FormationLevel.REGIMENT.text", "FormationLevel.REGIMENT.description", 4, true, false, false),
+    BRIGADE("FormationLevel.BRIGADE.text", "FormationLevel.BRIGADE.description", 5, true, false, false),
+    DIVISION("FormationLevel.DIVISION.text", "FormationLevel.DIVISION.description", 6, true, false, false),
+    CORPS("FormationLevel.CORPS.text", "FormationLevel.CORPS.description", 7, true, false, false),
+    ARMY("FormationLevel.ARMY.text", "FormationLevel.ARMY.description", 8, true, false, false),
+    ARMY_GROUP("FormationLevel.ARMY_GROUP.text", "FormationLevel.ARMY_GROUP.description", 9, true, false, false),
 
     // Clan
-    STAR_OR_NOVA("FormationLevel.STAR_OR_NOVA.text", "FormationLevel.STAR_OR_NOVA.description", 0, false, true, false),
-    BINARY_OR_TRINARY("FormationLevel.BINARY_OR_TRINARY.text", "FormationLevel.BINARY_OR_TRINARY.description", 1, false,
+    STAR_OR_NOVA("FormationLevel.STAR_OR_NOVA.text", "FormationLevel.STAR_OR_NOVA.description", 1, false, true, false),
+    BINARY_OR_TRINARY("FormationLevel.BINARY_OR_TRINARY.text", "FormationLevel.BINARY_OR_TRINARY.description", 2, false,
           true, false),
-    CLUSTER("FormationLevel.CLUSTER.text", "FormationLevel.CLUSTER.description", 2, false, true, false),
-    GALAXY("FormationLevel.GALAXY.text", "FormationLevel.GALAXY.description", 3, false, true, false),
-    TOUMAN("FormationLevel.TOUMAN.text", "FormationLevel.TOUMAN.description", 4, false, true, false),
+    CLUSTER("FormationLevel.CLUSTER.text", "FormationLevel.CLUSTER.description", 3, false, true, false),
+    GALAXY("FormationLevel.GALAXY.text", "FormationLevel.GALAXY.description", 4, false, true, false),
+    TOUMAN("FormationLevel.TOUMAN.text", "FormationLevel.TOUMAN.description", 5, false, true, false),
 
     // ComStar
-    LEVEL_II_OR_CHOIR("FormationLevel.LEVEL_II_OR_CHOIR.text", "FormationLevel.LEVEL_II_OR_CHOIR.description", 0, false,
+    LEVEL_II_OR_CHOIR("FormationLevel.LEVEL_II_OR_CHOIR.text", "FormationLevel.LEVEL_II_OR_CHOIR.description", 1, false,
           false, true),
-    LEVEL_III("FormationLevel.LEVEL_III.text", "FormationLevel.LEVEL_III.description", 1, false, false, true),
-    LEVEL_IV("FormationLevel.LEVEL_IV.text", "FormationLevel.LEVEL_IV.description", 2, false, false, true),
-    LEVEL_V("FormationLevel.LEVEL_V.text", "FormationLevel.LEVEL_V.description", 3, false, false, true),
-    LEVEL_VI("FormationLevel.LEVEL_VI.text", "FormationLevel.LEVEL_VI.description", 4, false, false, true);
+    LEVEL_III("FormationLevel.LEVEL_III.text", "FormationLevel.LEVEL_III.description", 2, false, false, true),
+    LEVEL_IV("FormationLevel.LEVEL_IV.text", "FormationLevel.LEVEL_IV.description", 3, false, false, true),
+    LEVEL_V("FormationLevel.LEVEL_V.text", "FormationLevel.LEVEL_V.description", 4, false, false, true),
+    LEVEL_VI("FormationLevel.LEVEL_VI.text", "FormationLevel.LEVEL_VI.description", 5, false, false, true);
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -130,6 +133,8 @@ public enum FormationLevel {
     public boolean isInvalid() {
         return this == INVALID;
     }
+
+    public boolean isTeam() { return this == TEAM; }
 
     public boolean isLance() {
         return this == LANCE;
@@ -259,6 +264,8 @@ public enum FormationLevel {
             case "20", "Level V" -> LEVEL_V;
             case "21", "Level VI" -> LEVEL_VI;
 
+            case "22", "Team" -> TEAM;
+
             default -> throw new IllegalStateException(
                   "Unexpected value in mekhq/campaign/force/FormationLevel.java/parseFromString: "
                         + formationLevel);
@@ -306,6 +313,8 @@ public enum FormationLevel {
             case 20 -> LEVEL_V;
             case 21 -> LEVEL_VI;
 
+            case 22 -> TEAM;
+
             default -> throw new IllegalStateException(
                   "Unexpected value in mekhq/campaign/force/FormationLevel.java/parseFromInt: "
                         + formationLevel);
@@ -350,6 +359,9 @@ public enum FormationLevel {
             case LEVEL_IV -> 19;
             case LEVEL_V -> 20;
             case LEVEL_VI -> 21;
+
+            // Generic
+            case TEAM -> 22;
         };
     }
 
@@ -366,30 +378,33 @@ public enum FormationLevel {
 
         if (faction.isClan()) {
             return switch (depth) {
-                case 0 -> STAR_OR_NOVA;
-                case 1 -> BINARY_OR_TRINARY;
-                case 2 -> CLUSTER;
-                case 3 -> GALAXY;
+                case 0 -> TEAM;
+                case 1 -> STAR_OR_NOVA;
+                case 2 -> BINARY_OR_TRINARY;
+                case 3 -> CLUSTER;
+                case 4 -> GALAXY;
                 default -> TOUMAN;
             };
         } else if (faction.isComStarOrWoB()) {
             return switch (depth) {
-                case 0 -> LEVEL_II_OR_CHOIR;
-                case 1 -> LEVEL_III;
-                case 2 -> LEVEL_IV;
-                case 3 -> LEVEL_V;
+                case 0 -> TEAM;
+                case 1 -> LEVEL_II_OR_CHOIR;
+                case 2 -> LEVEL_III;
+                case 3 -> LEVEL_IV;
+                case 4 -> LEVEL_V;
                 default -> LEVEL_VI;
             };
         } else {
             return switch (depth) {
-                case 0 -> LANCE;
-                case 1 -> COMPANY;
-                case 2 -> BATTALION;
-                case 3 -> REGIMENT;
-                case 4 -> BRIGADE;
-                case 5 -> DIVISION;
-                case 6 -> CORPS;
-                case 7 -> ARMY;
+                case 0 -> TEAM;
+                case 1 -> LANCE;
+                case 2 -> COMPANY;
+                case 3 -> BATTALION;
+                case 4 -> REGIMENT;
+                case 5 -> BRIGADE;
+                case 6 -> DIVISION;
+                case 7 -> CORPS;
+                case 8 -> ARMY;
                 default -> ARMY_GROUP;
             };
         }

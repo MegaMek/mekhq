@@ -54,9 +54,11 @@ import mekhq.campaign.work.IAcquisitionWork;
  */
 public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
     private static final DecimalFormat FORMATTER = new DecimalFormat();
+
     static {
         FORMATTER.setMaximumFractionDigits(3);
     }
+
     //region Variable Declarations
     private final Campaign campaign;
 
@@ -129,7 +131,7 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
             case COL_TOTAL_COST:
                 return shoppingItem.getTotalBuyCost().toAmountAndSymbolString();
             case COL_TARGET:
-                final TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem);
+                final TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, true);
                 String value = target.getValueAsString();
                 if (IntStream.of(TargetRoll.IMPOSSIBLE, TargetRoll.AUTOMATIC_SUCCESS, TargetRoll.AUTOMATIC_FAIL)
                           .allMatch(i -> (target.getValue() != i))) {
@@ -140,7 +142,9 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
                 final int days = shoppingItem.getDaysToWait();
                 return String.format("%d %s", days, resources.getString((days == 1) ? "Day.text" : "Days.text"));
             case COL_QUEUE:
-                return String.format("%s [+%s]", FORMATTER.format(shoppingItem.getQuantity()), FORMATTER.format(shoppingItem.getTotalQuantity()));
+                return String.format("%s [+%s]",
+                      FORMATTER.format(shoppingItem.getQuantity()),
+                      FORMATTER.format(shoppingItem.getTotalQuantity()));
             default:
                 return "?";
 
