@@ -132,6 +132,16 @@ public class RulesetsTab {
     private JLabel lblFixedMapChance;
     private JSpinner spnFixedMapChance;
 
+    private JPanel pnlMorale;
+    private JLabel lblMoraleVictory;
+    private JSpinner spnMoraleVictory;
+    private JLabel lblMoraleDecisiveVictory;
+    private JSpinner spnMoraleDecisiveVictory;
+    private JLabel lblMoraleDefeat;
+    private JSpinner spnMoraleDefeat;
+    private JLabel lblMoraleDecisiveDefeat;
+    private JSpinner spnMoraleDecisiveDefeat;
+
     private JPanel pnlPartsPanel;
     private JCheckBox chkRestrictPartsByMission;
 
@@ -258,6 +268,17 @@ public class RulesetsTab {
         lblFixedMapChance = new JLabel();
         spnFixedMapChance = new JSpinner();
 
+        // Morale
+        pnlMorale = new JPanel();
+        lblMoraleVictory = new JLabel();
+        spnMoraleVictory = new JSpinner();
+        lblMoraleDecisiveVictory = new JLabel();
+        spnMoraleDecisiveVictory = new JSpinner();
+        lblMoraleDefeat = new JLabel();
+        spnMoraleDefeat = new JSpinner();
+        lblMoraleDecisiveDefeat = new JLabel();
+        spnMoraleDecisiveDefeat = new JSpinner();
+
         // Parts
         pnlPartsPanel = new JPanel();
         chkRestrictPartsByMission = new JCheckBox();
@@ -313,6 +334,7 @@ public class RulesetsTab {
         pnlScenarioModifiers = createUniversalModifiersPanel();
         pnlMapGenerationPanel = createUniversalMapGenerationPanel();
         pnlPartsPanel = createUniversalPartsPanel();
+        pnlMorale = createUniversalMoralePanel();
 
         pnlScenarioGenerationPanel = createUniversalScenarioGenerationPanel();
         pnlCampaignOptions = createUniversalCampaignOptionsPanel();
@@ -618,9 +640,62 @@ public class RulesetsTab {
         layout.gridwidth = 2;
         layout.gridy = 0;
         layout.gridx = 0;
+        panel.add(pnlMorale, layout);
+        layout.gridy++;
         panel.add(pnlPartsPanel, layout);
         layout.gridy++;
         panel.add(pnlMapGenerationPanel, layout);
+
+        return panel;
+    }
+
+    private JPanel createUniversalMoralePanel() {
+        // Content
+        lblMoraleDecisiveVictory = new CampaignOptionsLabel("MoraleDecisiveVictory");
+        spnMoraleDecisiveVictory = new CampaignOptionsSpinner("MoraleDecisiveVictory",
+              4, 1, 10, 1);
+
+        lblMoraleVictory = new CampaignOptionsLabel("MoraleVictory");
+        spnMoraleVictory = new CampaignOptionsSpinner("MoraleVictory",
+              2, 1, 10, 1);
+
+        lblMoraleDefeat = new CampaignOptionsLabel("MoraleDefeat");
+        spnMoraleDefeat = new CampaignOptionsSpinner("MoraleDefeat",
+              -3, -10, -1, 1);
+
+        lblMoraleDecisiveDefeat = new CampaignOptionsLabel("MoraleDecisiveDefeat");
+        spnMoraleDecisiveDefeat = new CampaignOptionsSpinner("MoraleDecisiveDefeat",
+              -5, -10, -1, 1);
+
+        // Layout the panel
+        final JPanel panel = new CampaignOptionsStandardPanel("UniversalMoralePanel", true,
+              "UniversalMoralePanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(lblMoraleDecisiveVictory, layout);
+        layout.gridx++;
+        panel.add(spnMoraleDecisiveVictory, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblMoraleVictory, layout);
+        layout.gridx++;
+        panel.add(spnMoraleVictory, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblMoraleDefeat, layout);
+        layout.gridx++;
+        panel.add(spnMoraleDefeat, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblMoraleDecisiveDefeat, layout);
+        layout.gridx++;
+        panel.add(spnMoraleDecisiveDefeat, layout);
 
         return panel;
     }
@@ -695,6 +770,14 @@ public class RulesetsTab {
               "AutoResolveVictoryChanceEnabled"));
         chkAutoResolveExperimentalPacarGuiEnabled.addMouseListener(createTipPanelUpdater(stratConHeader,
               "AutoResolveExperimentalPacarGuiEnabled"));
+        lblMoraleVictory.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleVictory"));
+        spnMoraleVictory.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleVictory"));
+        lblMoraleDecisiveVictory.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDecisiveVictory"));
+        spnMoraleDecisiveVictory.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDecisiveVictory"));
+        lblMoraleDefeat.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDefeat"));
+        spnMoraleDefeat.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDefeat"));
+        spnMoraleDecisiveDefeat.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDecisiveDefeat"));
+        spnMoraleDecisiveDefeat.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDecisiveDefeat"));
         chkRestrictPartsByMission.addMouseListener(createTipPanelUpdater(stratConHeader, "RestrictPartsByMission"));
         chkUseWeatherConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UseWeatherConditions"));
         chkUseLightConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UseLightConditions"));
@@ -1123,6 +1206,10 @@ public class RulesetsTab {
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
         options.setFixedMapChance((int) spnFixedMapChance.getValue());
         options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
+        options.setMoraleVictoryEffect((int) spnMoraleVictory.getValue());
+        options.setMoraleDecisiveVictoryEffect((int) spnMoraleDecisiveVictory.getValue());
+        options.setMoraleDefeatEffect((int) spnMoraleDefeat.getValue());
+        options.setMoraleDecisiveDefeatEffect((int) spnMoraleDecisiveDefeat.getValue());
         options.setAutoResolveMethod(comboAutoResolveMethod.getSelectedItem());
         options.setStrategicViewTheme(minimapThemeSelector.getSelectedItem());
         options.setAutoResolveVictoryChanceEnabled(chkAutoResolveVictoryChanceEnabled.isSelected());
@@ -1196,6 +1283,10 @@ public class RulesetsTab {
         chkUsePlanetaryConditions.setSelected(options.isUsePlanetaryConditions());
         spnFixedMapChance.setValue(options.getFixedMapChance());
         chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
+        spnMoraleVictory.setValue(options.getMoraleVictoryEffect());
+        spnMoraleDecisiveVictory.setValue(options.getMoraleDecisiveVictoryEffect());
+        spnMoraleDefeat.setValue(options.getMoraleDefeatEffect());
+        spnMoraleDecisiveDefeat.setValue(options.getMoraleDecisiveDefeatEffect());
         comboAutoResolveMethod.setSelectedItem(options.getAutoResolveMethod());
         minimapThemeSelector.setSelectedItem(options.getStrategicViewTheme().getName());
         chkAutoResolveVictoryChanceEnabled.setSelected(options.isAutoResolveVictoryChanceEnabled());

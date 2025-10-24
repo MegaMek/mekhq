@@ -59,7 +59,6 @@ public enum DocumentationEntry {
     ACAR("ACAR", "StratCon/ACAR-Abstract Combat Auto-Resolve documentation"),
     ADMIN_SKILLS("ADMIN_SKILLS", "StratCon/Admin Skills"),
     COMBAT_TEAMS("COMBAT_TEAMS", "StratCon/Combat Teams, Roles, Training & Reinforcements"),
-    MORALE("MORALE", "StratCon/MekHQ Morale"),
     RESUPPLY_AND_CONVOYS("RESUPPLY_AND_CONVOYS", "StratCon/Resupply & Convoys"),
     UNIT_MARKETS("UNIT_MARKETS", "StratCon/Unit Markets"),
     CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS", "MegaMek -MekHQ Chaos Campaign Guide"),
