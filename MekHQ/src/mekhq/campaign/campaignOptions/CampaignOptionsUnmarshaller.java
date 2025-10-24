@@ -662,6 +662,8 @@ public class CampaignOptionsUnmarshaller {
             case "fieldKitchenCapacity" -> campaignOptions.setFieldKitchenCapacity(parseInt(nodeContents));
             case "fieldKitchenIgnoreNonCombatants" -> campaignOptions.setFieldKitchenIgnoreNonCombatants(parseBoolean(
                   nodeContents));
+            case "fatigueUndeploymentThreshold" ->
+                  campaignOptions.setFatigueUndeploymentThreshold(parseInt(nodeContents));
             case "fatigueLeaveThreshold" -> campaignOptions.setFatigueLeaveThreshold(parseInt(nodeContents));
             case "payForParts" -> campaignOptions.setPayForParts(parseBoolean(nodeContents));
             case "payForRepairs" -> campaignOptions.setPayForRepairs(parseBoolean(nodeContents));
