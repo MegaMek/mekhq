@@ -218,7 +218,8 @@ public class CurrentLocation {
                       .append(jumpPath.getJumps() == 1 ? " jump remaining" : " jumps remaining");
 
                 int duration = (int) ceil(jumpPath.getTotalTime(date, getTransitTime(), isUseCommandCircuit));
-                Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration);
+                Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
+                      jumpPath.getJumps());
                 report.append("<br>Estimated Jump Cost (Remaining): ").append(jumpCost.toAmountString()).append(" " +
                                                                                                                       "C-Bills");
                 hasIncludedCost = true;
@@ -235,7 +236,7 @@ public class CurrentLocation {
         if (hasIncludedCost) {
             report.append("<br><br>");
         } else {
-            Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(7);
+            Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(7, 0);
             report.append("Estimated Jump Cost (per week): ")
                   .append(jumpCost.toAmountString())
                   .append(" C-Bills<br><br>");

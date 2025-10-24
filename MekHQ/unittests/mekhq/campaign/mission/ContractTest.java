@@ -86,45 +86,51 @@ public class ContractTest {
     }
 
     @Test
+    public void testGetTransitAmount() {
+        initializeTest();
+        assertEquals(Money.of(30), contract.getTransitAmount());
+    }
+
+    @Test
     public void testSigningBonusAmount() {
         initializeTest();
-        assertEquals(Money.of(15.0), contract.getSigningBonusAmount());
+        assertEquals(Money.of(18.0), contract.getSigningBonusAmount());
     }
 
     @Test
     public void testGetFeeAmount() {
         initializeTest();
-        assertEquals(Money.of(7.5), contract.getFeeAmount());
+        assertEquals(Money.of(9.0), contract.getFeeAmount());
     }
 
     @Test
     public void testGetTotalAmount() {
         initializeTest();
-        assertEquals(Money.of(150.0), contract.getTotalAmount());
+        assertEquals(Money.of(180.0), contract.getTotalAmount());
     }
 
     @Test
     public void testGetTotalAmountPlusFees() {
         initializeTest();
-        assertEquals(Money.of(142.5), contract.getTotalAmountPlusFees());
+        assertEquals(Money.of(171.0), contract.getTotalAmountPlusFees());
     }
 
     @Test
     public void testGetAdvanceAmount() {
         initializeTest();
-        assertEquals(Money.of(14.2), contract.getAdvanceAmount());
+        assertEquals(Money.of(17.1), contract.getAdvanceAmount());
     }
 
     @Test
     public void testGetTotalAmountPlusFeesAndBonuses() {
         initializeTest();
-        assertEquals(Money.of(157.5), contract.getTotalAmountPlusFeesAndBonuses());
+        assertEquals(Money.of(189.0), contract.getTotalAmountPlusFeesAndBonuses());
     }
 
     @Test
     public void testGetMonthlyPayout() {
         initializeTest();
-        assertEquals(Money.of(12.8), contract.getMonthlyPayOut());
+        assertEquals(Money.of(15.39), contract.getMonthlyPayOut());
     }
 
     @Test
@@ -195,6 +201,7 @@ public class ContractTest {
 
         TransportCostCalculations mockTransportCostCalculation = mock(TransportCostCalculations.class);
         when(mockCampaign.getTransportCostCalculation(EXP_REGULAR)).thenReturn(mockTransportCostCalculation);
-        when(mockTransportCostCalculation.calculateJumpCostForEntireJourney(any(Integer.class))).thenReturn(jumpCost);
+        when(mockTransportCostCalculation.calculateJumpCostForEntireJourney(any(Integer.class),
+              any(Integer.class))).thenReturn(jumpCost);
     }
 }

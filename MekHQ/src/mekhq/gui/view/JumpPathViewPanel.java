@@ -297,7 +297,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
             TransportCostCalculations transportCostCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
             int duration = (int) ceil(path.getTotalTime(currentDate, campaign.getLocation().getTransitTime(),
                   isUseCommandCircuit));
-            Money journeyCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration);
+            Money journeyCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration, path.getJumps());
 
             txtCost.setName("lblCost2");
             txtCost.setText("<html>" + journeyCost.toAmountAndSymbolString() + "</html>");

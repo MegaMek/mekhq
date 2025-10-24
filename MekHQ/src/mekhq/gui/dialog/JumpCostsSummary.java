@@ -130,19 +130,19 @@ public class JumpCostsSummary extends JDialog {
      * @since 0.50.10
      */
     private JPanel getTotalCost() {
-        Money costPerMonth = calculations.calculateJumpCostForEntireJourney(30);
+        Money costPerMonth = calculations.calculateJumpCostForEntireJourney(30, 0);
         String perMonthText = getFormattedTextAt(RESOURCE_BUNDLE,
               "TransportCostCalculations.report.entry.totalCost.month",
               costPerMonth.toAmountString());
         JLabel lblPerMonth = new JLabel(perMonthText);
 
-        Money costPerWeek = calculations.calculateJumpCostForEntireJourney(7);
+        Money costPerWeek = calculations.calculateJumpCostForEntireJourney(7, 0);
         String perWeekText = getFormattedTextAt(RESOURCE_BUNDLE,
               "TransportCostCalculations.report.entry.totalCost.week",
               costPerWeek.toAmountString());
         JLabel lblPerWeek = new JLabel(perWeekText);
 
-        Money costPerDay = calculations.calculateJumpCostForEntireJourney(1);
+        Money costPerDay = calculations.calculateJumpCostForEntireJourney(1, 0);
         String perDayText = getFormattedTextAt(RESOURCE_BUNDLE,
               "TransportCostCalculations.report.entry.totalCost.day",
               costPerDay.toAmountString());
@@ -373,8 +373,9 @@ public class JumpCostsSummary extends JDialog {
         summary.add(lblJumpShips);
 
         int jumpShipCost = (int) round(calculations.getDockingCollarCost());
+        int perJumpCost = (int) round(calculations.getJumpShipsRequired());
         String jumpShipCostLabel = getFormattedTextAt(RESOURCE_BUNDLE,
-              "TransportCostCalculations.report.entry.cost", jumpShipCost);
+              "TransportCostCalculations.report.entry.cost", jumpShipCost, perJumpCost);
         JLabel lblJumpShipsCost = new JLabel(jumpShipCostLabel);
         summary.add(lblJumpShipsCost);
 

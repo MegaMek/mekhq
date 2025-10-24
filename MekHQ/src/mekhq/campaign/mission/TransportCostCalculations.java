@@ -72,7 +72,7 @@ import mekhq.campaign.universe.PlanetarySystem;
  * multipliers based on crew experience.</p>
  *
  * <p>Usage: Create an instance with the unit's hangar, relevant personnel, and statistics, then
- * call {@link #calculateJumpCostForEachDay()} or {@link #calculateJumpCostForEntireJourney(int)}.</p>
+ * call {@link #calculateJumpCostForEachDay()} or {@link #calculateJumpCostForEntireJourney(int, int)}.</p>
  *
  * @author Illiani
  * @since 50.10
@@ -92,6 +92,9 @@ public class TransportCostCalculations {
     private static final double ELITE_CREW_MULTIPLIER = 2.0;
     private static final double VETERAN_CREW_MULTIPLIER = 1.5;
     private static final double OTHER_CREW_MULTIPLIER = 1.0;
+
+    static final double COLLARS_PER_JUMPSHIP = 4.0;
+    static final Money COST_PER_JUMP_PER_JUMPSHIP = Money.of(100000);
 
     // This value is derived from the Union (2708). We do make some assumptions, however. Namely, we assume that the
     // player is always able to find a DropShip that has the exact bay types they need. Use of this magical DropShip
@@ -167,6 +170,7 @@ public class TransportCostCalculations {
     private int additionalDropShipsRequired;
     private int additionalCollarsRequired;
     private double dockingCollarCost;
+    private double jumpShipsRequired;
 
     private int dropShipCount;
     private int smallCraftCount;
@@ -306,6 +310,10 @@ public class TransportCostCalculations {
         return dockingCollarCost;
     }
 
+    public double getJumpShipsRequired() {
+        return jumpShipsRequired;
+    }
+
     int getDropShipCount() {
         return dropShipCount;
     }
@@ -424,19 +432,24 @@ public class TransportCostCalculations {
      *
      * <p>The calculated total is also stored in {@link #totalCost} if it was previously uninitialized.</p>
      *
-     * @param days the total number of days in the journey; must be a positive integer
+     * @param days       the total number of days in the journey; must be a positive integer
+     * @param totalJumps the total number of jumps in the journey; must be a positive integer
      *
      * @return the total {@link Money} cost for the journey of the specified duration
      *
      * @author Illiani
      * @since 50.10
      */
-    public Money calculateJumpCostForEntireJourney(final int days) {
+    public Money calculateJumpCostForEntireJourney(final int days, final int totalJumps) {
         if (totalCost == null) { // totalCost will be null if calculateJumpCostForEachDay hasn't yet been run
             calculateJumpCostForEachDay();
         }
 
-        return totalCost.multipliedBy(days).round();
+        Money runningTotal = totalCost.multipliedBy(days);
+        Money perJumpCost = COST_PER_JUMP_PER_JUMPSHIP.multipliedBy(jumpShipsRequired);
+        Money totalJumpsCost = perJumpCost.multipliedBy(totalJumps);
+
+        return runningTotal.plus(totalJumpsCost).round();
     }
 
     /**
@@ -516,6 +529,8 @@ public class TransportCostCalculations {
 
         dockingCollarCost = round(additionalDropShipsRequired * JUMP_SHIP_COLLAR_COST);
         totalCost = totalCost.plus(dockingCollarCost);
+
+        jumpShipsRequired = ceil(additionalDropShipsRequired / COLLARS_PER_JUMPSHIP);
     }
 
     /**

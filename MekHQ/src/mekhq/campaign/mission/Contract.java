@@ -107,6 +107,7 @@ public class Contract extends Mission {
     private Money advanceAmount = Money.zero();
     private Money signingAmount = Money.zero();
     private Money transportAmount = Money.zero();
+    private Money transitAmount = Money.zero();
     private Money overheadAmount = Money.zero();
     private Money supportAmount = Money.zero();
     private Money baseAmount = Money.zero();
@@ -343,7 +344,8 @@ public class Contract extends Mission {
         return baseAmount
                      .plus(supportAmount)
                      .plus(overheadAmount)
-                     .plus(transportAmount);
+                     .plus(transportAmount)
+                     .plus(transitAmount);
     }
 
     public Money getAdvanceAmount() {
@@ -391,6 +393,14 @@ public class Contract extends Mission {
 
     protected void setSupportAmount(Money amount) {
         supportAmount = amount;
+    }
+
+    public Money getTransitAmount() {
+        return transitAmount;
+    }
+
+    public void setTransitAmount(Money amount) {
+        transitAmount = amount;
     }
 
     public Money getTransportAmount() {
@@ -565,7 +575,7 @@ public class Contract extends Mission {
             TransportCostCalculations transportCostCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
             int duration = (int) ceil(jumpPath.getTotalTime(campaign.getLocalDate(),
                   campaign.getLocation().getTransitTime(), isUseCommandCircuits));
-            Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration);
+            Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());
 
             return jumpCost.multipliedBy(useTwoWayPay ? 2 : 1);
         }
@@ -668,7 +678,8 @@ public class Contract extends Mission {
             boolean isUseCommandCircuits = campaign.isUseCommandCircuitForContract(this);
             int duration = (int) ceil(jumpPath.getTotalTime(campaign.getLocalDate(),
                   campaign.getLocation().getTransitTime(), isUseCommandCircuits));
-            Money transportCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration);
+            Money transportCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
+                  jumpPath.getJumps());
             transportCost = transportCost.dividedBy(100);
             transportCost = transportCost.multipliedBy(transportComp);
             transportCost = transportCost.multipliedBy(useTwoWayPay ? 2 : 1);
@@ -678,9 +689,24 @@ public class Contract extends Mission {
             transportAmount = Money.zero();
         }
 
+        // calculate transit amount for CO
+        if (campaign.getCampaignOptions().isUsePeacetimeCost()
+                  && campaign.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
+            // contract base * transport period * reputation * employer modifier
+
+            boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
+            transitAmount = accountant.getContractBase()
+                                  .multipliedBy(((getJumpPath(campaign).getJumps()) * (useTwoWayPay ? 2.0 : 1.0)) / 4.0)
+                                  .multipliedBy(campaign.getAtBUnitRatingMod() * 0.2 + 0.5)
+                                  .multipliedBy(1.2);
+        } else {
+            transitAmount = Money.zero();
+        }
+
         signingAmount = baseAmount
                               .plus(overheadAmount)
                               .plus(transportAmount)
+                              .plus(transitAmount)
                               .plus(supportAmount)
                               .multipliedBy(signBonus)
                               .dividedBy(100);
@@ -689,6 +715,7 @@ public class Contract extends Mission {
             feeAmount = baseAmount
                               .plus(overheadAmount)
                               .plus(transportAmount)
+                              .plus(transitAmount)
                               .plus(supportAmount)
                               .multipliedBy(getMRBCFeePercentage())
                               .dividedBy(100);
@@ -754,6 +781,7 @@ public class Contract extends Mission {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advanceAmount", advanceAmount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signingAmount", signingAmount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportAmount", transportAmount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transitAmount", transitAmount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overheadAmount", overheadAmount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportAmount", supportAmount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseAmount", baseAmount);
@@ -808,6 +836,8 @@ public class Contract extends Mission {
                     signingAmount = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportAmount")) {
                     transportAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("transitAmount")) {
+                    transitAmount = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("overheadAmount")) {
                     overheadAmount = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("supportAmount")) {
