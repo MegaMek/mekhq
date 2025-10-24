@@ -249,7 +249,11 @@ public class Force {
     }
 
     public void setOverrideFormationLevel(final FormationLevel overrideFormationLevel) {
-        this.overrideFormationLevel = overrideFormationLevel;
+        if (overrideFormationLevel == FormationLevel.REMOVE_OVERRIDE) {
+            this.overrideFormationLevel = FormationLevel.NONE;
+        } else {
+            this.overrideFormationLevel = overrideFormationLevel;
+        }
     }
 
     public int getScenarioId() {
