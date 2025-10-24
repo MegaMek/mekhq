@@ -6361,6 +6361,38 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Computes the total rental fees for the campaign, including all rented hospital beds, kitchens, and holding
+     * cells.
+     *
+     * <p>Fetches all active contracts and sums the rental costs for each facility type before adding any ongoing
+     * bay rental fees.</p>
+     *
+     * <p>If you want to fetch the rent due for bays use
+     * {@link FacilityRentals#getTotalRentSumFromRentedBays(Campaign, Finances)}</p>
+     *
+     * @return the combined {@link Money} amount representing all current rental fees owed
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public Money getTotalRentFeesExcludingBays() {
+        List<Contract> activeContracts = getActiveContracts();
+        int hospitalRentalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
+        Money hospitalRentalFee = FacilityRentals.calculateContractRentalCost(hospitalRentalCost, activeContracts,
+              ContractRentalType.HOSPITAL_BEDS);
+
+        int kitchenRentalCost = campaignOptions.getRentedFacilitiesCostKitchens();
+        Money kitchenRentalFee = FacilityRentals.calculateContractRentalCost(kitchenRentalCost, activeContracts,
+              ContractRentalType.KITCHENS);
+
+        int holdingCellRentalCost = campaignOptions.getRentedFacilitiesCostHoldingCells();
+        Money holdingCellRentalFee = FacilityRentals.calculateContractRentalCost(holdingCellRentalCost, activeContracts,
+              ContractRentalType.HOLDING_CELLS);
+
+        return hospitalRentalFee.plus(kitchenRentalFee).plus(holdingCellRentalFee);
+    }
+
+    /**
      * Checks if the commander has any burned contacts, and if so, generates and records a report.
      *
      * <p>This method is only executed if monthly connections are allowed by campaign options. If the commander

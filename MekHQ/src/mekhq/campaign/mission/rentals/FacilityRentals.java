@@ -282,15 +282,37 @@ public class FacilityRentals {
      * @since 0.50.10
      */
     public static void payForAllRentedBays(Campaign campaign) {
+        Finances finances = campaign.getFinances();
+        LocalDate today = campaign.getLocalDate();
+        Money totalCharge = getTotalRentSumFromRentedBays(campaign, finances);
+
+        if (!totalCharge.isZero()) {
+            performRentalTransaction(finances, today, totalCharge, ContractRentalType.MAINTENANCE_BAYS);
+        }
+    }
+
+    /**
+     * Calculates the total rental sum owed for all currently rented maintenance and factory bays.
+     *
+     * <p>Iterates over all units in the campaign hangar, sums the rental cost for those at qualifying repair sites,
+     * and applies fallback site logic if sufficient funds are not available.</p>
+     *
+     * @param campaign the current {@link Campaign} context
+     * @param finances the {@link Finances} object representing current campaign funds
+     *
+     * @return the total {@link Money} amount owed for rented bays, or {@code Money.zero()} if rental costs are disabled
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public static Money getTotalRentSumFromRentedBays(Campaign campaign, Finances finances) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int costPerBay = campaignOptions.getRentedFacilitiesCostRepairBays();
         if (costPerBay <= 0) { // Costs have been disabled, so we're not going to perform any actions
-            return;
+            return Money.zero();
         }
 
-        LocalDate today = campaign.getLocalDate();
         List<Mission> activeMissions = campaign.getActiveMissions(false);
-        Finances finances = campaign.getFinances();
         Money totalAvailableFunds = finances.getBalance();
         Collection<Unit> units = campaign.getHangar().getUnits();
 
@@ -312,9 +334,7 @@ public class FacilityRentals {
             }
         }
 
-        if (!totalCharge.isZero()) {
-            performRentalTransaction(finances, today, totalCharge, ContractRentalType.MAINTENANCE_BAYS);
-        }
+        return totalCharge;
     }
 
     /**
