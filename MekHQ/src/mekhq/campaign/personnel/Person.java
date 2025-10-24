@@ -60,6 +60,7 @@ import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.*;
+import static mekhq.campaign.personnel.skills.VehicleCrewSkills.VEHICLE_CREW_SKILLS;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -75,7 +76,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
@@ -379,6 +379,7 @@ public class Person {
     private boolean divorceable;
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
+    private boolean quickTrainIgnore;
     // this is a flag used in determine whether a person is a potential marriage
     // candidate provided
     // that they are not married, are old enough, etc.
@@ -600,6 +601,7 @@ public class Person {
         setDivorceable(true);
         setFounder(false);
         setImmortal(false);
+        setQuickTrainIgnore(false);
         setMarriageable(true);
         setTryingToConceive(true);
         // endregion Flags
@@ -1270,16 +1272,7 @@ public class Person {
 
         List<String> skillsForProfession = role.getSkillsForProfession();
         return switch (role) {
-            case VEHICLE_CREW -> Stream.of(S_TECH_MEK,
-                  S_TECH_AERO,
-                  S_TECH_MECHANIC,
-                  S_TECH_BA,
-                  S_SURGERY,
-                  S_MEDTECH,
-                  S_ASTECH,
-                  S_COMMUNICATIONS,
-                  S_SENSOR_OPERATIONS,
-                  S_ART_COOKING).anyMatch(this::hasSkill);
+            case VEHICLE_CREW -> VEHICLE_CREW_SKILLS.stream().anyMatch(this::hasSkill);
             case SOLDIER -> INFANTRY_GUNNERY_SKILLS.stream().anyMatch(this::hasSkill);
             case BATTLE_ARMOUR -> hasSkill(S_GUN_BA);
             case VESSEL_CREW -> hasSkill(S_TECH_VESSEL);
@@ -2804,6 +2797,14 @@ public class Person {
         this.immortal = immortal;
     }
 
+    public boolean isQuickTrainIgnore() {
+        return quickTrainIgnore;
+    }
+
+    public void setQuickTrainIgnore(final boolean quickTrainIgnore) {
+        this.quickTrainIgnore = quickTrainIgnore;
+    }
+
     public boolean isEmployed() {
         return status != PersonnelStatus.CAMP_FOLLOWER;
     }
@@ -3352,6 +3353,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "divorceable", divorceable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "founder", founder);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
@@ -3921,6 +3923,8 @@ public class Person {
                     person.setFounder(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("immortal")) {
                     person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("quickTrainIgnore")) {
+                    person.setQuickTrainIgnore(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageable")) {
                     person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
@@ -4495,16 +4499,7 @@ public class Person {
             case VEHICLE_CREW -> {
                 // Vehicle crew are a special case as they just need any one of the following skills to qualify,
                 // rather than needing all relevant skills
-                List<String> relevantSkills = List.of(S_TECH_MEK,
-                      S_TECH_AERO,
-                      S_TECH_MECHANIC,
-                      S_TECH_BA,
-                      S_SURGERY,
-                      S_MEDTECH,
-                      S_ASTECH,
-                      S_COMMUNICATIONS,
-                      S_ART_COOKING,
-                      S_SENSOR_OPERATIONS);
+                List<String> relevantSkills = VEHICLE_CREW_SKILLS;
                 int highestExperienceLevel = EXP_NONE;
                 for (String relevantSkill : relevantSkills) {
                     Skill skill = getSkill(relevantSkill);

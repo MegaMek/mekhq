@@ -4084,6 +4084,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(cbMenuItem);
         }
 
+        if (Stream.of(selected).allMatch(p -> p.isQuickTrainIgnore() == person.isQuickTrainIgnore())) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miQuickTrainIgnore.text"));
+            cbMenuItem.setToolTipText(resources.getString("miQuickTrainIgnore.toolTipText"));
+            cbMenuItem.setName("miQuickTrainIgnore");
+            cbMenuItem.setSelected(person.isQuickTrainIgnore());
+            cbMenuItem.addActionListener(evt -> {
+                final boolean quickTrainIgnore = !person.isQuickTrainIgnore();
+                Stream.of(selected).forEach(p -> p.setQuickTrainIgnore(quickTrainIgnore));
+            });
+            menu.add(cbMenuItem);
+        }
+
         if ((getCampaignOptions().isUseManualMarriages() || !getCampaignOptions().getRandomMarriageMethod().isNone()) &&
                   Stream.of(selected).allMatch(p -> p.isMarriageable() == person.isMarriageable())) {
             cbMenuItem = new JCheckBoxMenuItem(resources.getString("miMarriageable.text"));
