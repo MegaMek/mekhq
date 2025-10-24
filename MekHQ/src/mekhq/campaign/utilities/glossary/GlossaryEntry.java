@@ -90,7 +90,7 @@ public enum GlossaryEntry {
     FORCE_TYPE_SECURITY("FORCE_TYPE_SECURITY", new Version("0.50.06")),
     FORCE_TYPE_SUPPORT("FORCE_TYPE_SUPPORT", new Version("0.50.06")),
     GROUP_BY_UNIT("GROUP_BY_UNIT", new Version("0.50.06")),
-    HOSPITAL_BEDS("HOSPITAL_BEDS", new Version("0.50.06")),
+    HOSPITAL_BEDS("HOSPITAL_BEDS", new Version("0.50.10")),
     HOW_TO_DEPLOY("HOW_TO_DEPLOY", new Version("0.50.06")),
     HOW_TO_REINFORCE("HOW_TO_REINFORCE", new Version("0.50.06")),
     INFANTRY_GUNNERY_SKILLS("INFANTRY_GUNNERY_SKILLS", new Version("0.50.06")),
