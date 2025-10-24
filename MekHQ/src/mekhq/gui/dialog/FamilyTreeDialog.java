@@ -8,7 +8,6 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.Window;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,22 +20,26 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 
+import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 
 public class FamilyTreeDialog extends JDialog {
-    public FamilyTreeDialog(Frame owner, Genealogy genealogy, Collection<Person> personnel) {
-        super(owner, "Family Tree of " + genealogy.getOrigin().getFullTitle(), true);
+    private final EnhancedTabbedPane tabbedPane;
 
-        FamilyTreePanel treePanel = new FamilyTreePanel(genealogy, personnel);
-        JScrollPane scrollPane = new FastJScrollPane(treePanel);
-        scrollPane.setPreferredSize(new Dimension(800, 600));
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        add(scrollPane, BorderLayout.CENTER);
+    public FamilyTreeDialog(Frame owner, Genealogy genealogy, Collection<Person> personnel) {
+        super(owner, "Family Tree", true);
+
+        tabbedPane = new EnhancedTabbedPane();
+
+        // Add the initial tree as the first tab
+        addFamilyTreeTab(genealogy, personnel);
+
+        // Layout
+        setLayout(new BorderLayout());
+        add(tabbedPane, BorderLayout.CENTER);
 
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(e -> dispose());
@@ -44,8 +47,40 @@ public class FamilyTreeDialog extends JDialog {
         buttonPanel.add(closeButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
+        setPreferredSize(new Dimension(900, 700));
         pack();
         setLocationRelativeTo(owner);
+    }
+
+    /** Add a new tab for the given genealogy if not already open. */
+    private void addFamilyTreeTab(Genealogy genealogy, Collection<Person> personnel) {
+        // Tab title: Person's name
+        String title = genealogy.getOrigin().getFullTitle();
+
+        // Check if this person already has a tab open (by id)
+        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+            if (tabbedPane.getTitleAt(i).equals(title)) {
+                tabbedPane.setSelectedIndex(i);
+                return;
+            }
+        }
+
+        FamilyTreePanel panel = new FamilyTreePanel(genealogy, personnel, this);
+        JScrollPane scrollPane = new FastJScrollPane(panel);
+        scrollPane.setPreferredSize(new Dimension(800, 600));
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+        tabbedPane.addTab(title, scrollPane);
+        tabbedPane.setSelectedComponent(scrollPane);
+    }
+
+    /** Package-private so the panel can call it. */
+    void openTreeFor(Person person, Collection<Person> personnel) {
+        Genealogy gen = person.getGenealogy();
+        if (gen != null) {
+            addFamilyTreeTab(gen, personnel);
+        }
     }
 }
 
@@ -62,6 +97,7 @@ class TreeNodeBox {
 class FamilyTreePanel extends JPanel {
     private final Genealogy genealogy;
     private final Collection<Person> personnel;
+    private final FamilyTreeDialog parentDialog;
     private TreeNodeBox root;
     private final int hGap = 40, vGap = 70; // Increased for clarity
 
@@ -73,30 +109,20 @@ class FamilyTreePanel extends JPanel {
 
     private final Map<Rectangle, Person> rectToPerson = new HashMap<>();
 
-    public FamilyTreePanel(Genealogy genealogy, Collection<Person> personnel) {
+    public FamilyTreePanel(Genealogy genealogy, Collection<Person> personnel, FamilyTreeDialog parentDialog) {
         this.genealogy = genealogy;
         this.personnel = personnel;
+        this.parentDialog = parentDialog;
+
         setPreferredSize(new Dimension(panelWidth, panelHeight));
 
-        // Add mouse listener for click navigation
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 Person person = getPersonAt(evt.getPoint());
                 if (person != null) {
-                    // Open a new dialog for this person's tree
-                    Genealogy newGenealogy = person.getGenealogy();
-                    if (newGenealogy != null) {
-                        Window top = SwingUtilities.getWindowAncestor(FamilyTreePanel.this);
-                        if (top instanceof java.awt.Dialog) {
-                            top.dispose();
-                        }
-                        new FamilyTreeDialog(
-                              null, // Or null, or reuse as needed
-                              newGenealogy,
-                              personnel
-                        ).setVisible(true);
-                    }
+                    // Open new tab in dialog
+                    parentDialog.openTreeFor(person, personnel);
                 }
             }
         });
