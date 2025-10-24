@@ -181,7 +181,7 @@ public final class TOETab extends CampaignGuiTab {
                 scrollPerson.setBorder(null);
                 crewPanel.add(scrollPerson, BorderLayout.CENTER);
                 CrewListModel model = new CrewListModel();
-                model.setData(unit);
+                model.setData(unit, getCampaign().getCampaignOptions().isUseSmallArmsOnly());
                 /* For units with multiple crew members, present a horizontal list above the PersonViewPanel.
                  * This custom version of JList was the only way I could figure out how to limit the JList
                  * to a single row with a horizontal scrollbar.

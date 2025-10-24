@@ -4784,7 +4784,8 @@ public class Unit implements ITechnology {
 
             String tempGunType = gunType;
             if (entityIsConventionalInfantry) {
-                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(person);
+                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(person,
+                      campaign.getCampaignOptions().isUseAdvancedMedical());
                 if (tempGunType == null) {
                     tempGunType = SkillType.S_SMALL_ARMS;
                 }
