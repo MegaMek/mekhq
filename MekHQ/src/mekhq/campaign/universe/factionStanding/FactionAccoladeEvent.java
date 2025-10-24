@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.*;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getFactionName;
@@ -47,17 +46,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import megamek.common.units.Entity;
-import megamek.common.units.EntityMovementMode;
-import megamek.common.loaders.MekFileParser;
-import megamek.common.loaders.MekSummary;
-import megamek.common.units.UnitType;
 import megamek.common.enums.Gender;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.UnitType;
 import megamek.common.universe.FactionLeaderData;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
@@ -348,7 +348,7 @@ public class FactionAccoladeEvent {
                   UnitType.MEK,
                   weight,
                   gameYear,
-                  DRAGOON_A,
+                  DragoonRating.DRAGOON_A.getRating(),
                   movementModes,
                   new ArrayList<>(),
                   ms -> isSuitable(ms, gameYear, factionIsClan));

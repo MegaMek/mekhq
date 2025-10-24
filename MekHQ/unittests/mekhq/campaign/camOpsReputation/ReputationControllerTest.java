@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.rating.CamOpsReputation;
+package mekhq.campaign.camOpsReputation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -94,16 +94,20 @@ class ReputationControllerTest {
     @Test
     void testGetReputationModifierShouldBeFour() {
         averageExperienceRating.when(() ->
-                                           AverageExperienceRating.getSkillLevel(campaign, true))
+                                           AverageExperienceRating.getSkillLevel(
+                                                 campaign,
+                                                 true))
               .thenReturn(SkillLevel.VETERAN);
         averageExperienceRating.when(() ->
-                                           AverageExperienceRating.getAverageExperienceModifier(SkillLevel.VETERAN))
+                                           AverageExperienceRating.getAverageExperienceModifier(
+                                                 SkillLevel.VETERAN))
               .thenReturn(20);
         commandRating.when(() ->
                                  CommandRating.calculateCommanderRating(campaign, null))
               .thenReturn(Collections.singletonMap("total", 3));
         combatRecordRating.when(() ->
-                                      CombatRecordRating.calculateCombatRecordRating(campaign))
+                                      CombatRecordRating.calculateCombatRecordRating(
+                                            campaign))
               .thenReturn(Collections.singletonMap("total", 3));
 
         List<Map<String, Integer>> transportationData = new ArrayList<>();
@@ -111,13 +115,15 @@ class ReputationControllerTest {
         transportationData.add(Collections.singletonMap("total", 3));
         transportationData.add(Collections.singletonMap("total", 3));
         transportationRating.when(() ->
-                                        TransportationRating.calculateTransportationRating(campaign))
+                                        TransportationRating.calculateTransportationRating(
+                                              campaign))
               .thenReturn(transportationData);
 
         Map<String, Map<String, ?>> supportData = new HashMap<>();
         supportData.put("total", Collections.singletonMap("total", 3));
         supportRating.when(() ->
-                                 SupportRating.calculateSupportRating(campaign, transportationData.get(1)))
+                                 SupportRating.calculateSupportRating(campaign,
+                                       transportationData.get(1)))
               .thenReturn(supportData);
 
         financialRating.when(() ->
@@ -140,16 +146,20 @@ class ReputationControllerTest {
     @Test
     void testGetReputationModifierShouldBeZero() {
         averageExperienceRating.when(() ->
-                                           AverageExperienceRating.getSkillLevel(campaign, true))
+                                           AverageExperienceRating.getSkillLevel(
+                                                 campaign,
+                                                 true))
               .thenReturn(SkillLevel.ULTRA_GREEN);
         averageExperienceRating.when(() ->
-                                           AverageExperienceRating.getAverageExperienceModifier(SkillLevel.ULTRA_GREEN))
+                                           AverageExperienceRating.getAverageExperienceModifier(
+                                                 SkillLevel.ULTRA_GREEN))
               .thenReturn(5);
         commandRating.when(() ->
                                  CommandRating.calculateCommanderRating(campaign, null))
               .thenReturn(Collections.singletonMap("total", 0));
         combatRecordRating.when(() ->
-                                      CombatRecordRating.calculateCombatRecordRating(campaign))
+                                      CombatRecordRating.calculateCombatRecordRating(
+                                            campaign))
               .thenReturn(Collections.singletonMap("total", 0));
 
         List<Map<String, Integer>> transportationData = new ArrayList<>();
@@ -157,13 +167,15 @@ class ReputationControllerTest {
         transportationData.add(Collections.singletonMap("total", 0));
         transportationData.add(Collections.singletonMap("total", 0));
         transportationRating.when(() ->
-                                        TransportationRating.calculateTransportationRating(campaign))
+                                        TransportationRating.calculateTransportationRating(
+                                              campaign))
               .thenReturn(transportationData);
 
         Map<String, Map<String, ?>> supportData = new HashMap<>();
         supportData.put("total", Collections.singletonMap("total", 0));
         supportRating.when(() ->
-                                 SupportRating.calculateSupportRating(campaign, transportationData.get(1)))
+                                 SupportRating.calculateSupportRating(campaign,
+                                       transportationData.get(1)))
               .thenReturn(supportData);
 
         financialRating.when(() ->

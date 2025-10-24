@@ -56,12 +56,12 @@ import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
@@ -364,7 +364,7 @@ public class AtBConfiguration {
         }
 
         target.addModifier(SkillType.EXP_REGULAR - experienceLevel, "Admin/Logistics");
-        target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(), "Unit Rating");
+        target.addModifier(DragoonRating.DRAGOON_C.getRating() - campaign.getAtBUnitRatingMod(), "Unit Rating");
         return target;
     }
 

@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.universe.generators.battleMekQualityGenerators;
 
-import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.universe.enums.BattleMekQualityGenerationMethod;
 
 /**
@@ -47,6 +47,6 @@ public class ABattleMekQualityGenerator extends AbstractBattleMekQualityGenerato
 
     @Override
     public int generate(final int roll) {
-        return IUnitRating.DRAGOON_A;
+        return DragoonRating.DRAGOON_A.getRating();
     }
 }
