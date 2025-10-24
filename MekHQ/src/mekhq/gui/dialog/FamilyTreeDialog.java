@@ -54,13 +54,14 @@ public class FamilyTreeDialog extends JDialog {
 
     /** Add a new tab for the given genealogy if not already open. */
     private void addFamilyTreeTab(Genealogy genealogy, Collection<Person> personnel) {
-        // Tab title: Person's name
         String title = genealogy.getOrigin().getFullTitle();
 
         // Check if this person already has a tab open (by id)
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
             if (tabbedPane.getTitleAt(i).equals(title)) {
                 tabbedPane.setSelectedIndex(i);
+                JScrollPane existingScrollPane = (JScrollPane) tabbedPane.getComponentAt(i);
+                centerTreeOnOrigin(existingScrollPane);
                 return;
             }
         }
@@ -73,6 +74,38 @@ public class FamilyTreeDialog extends JDialog {
 
         tabbedPane.addTab(title, scrollPane);
         tabbedPane.setSelectedComponent(scrollPane);
+
+        // Center on the origin person when the tab is added and visible
+        java.awt.EventQueue.invokeLater(() -> centerTreeOnOrigin(scrollPane));
+    }
+
+    /** Ensures the scroll pane is centered on the person for the current tree. */
+    private void centerTreeOnOrigin(JScrollPane scrollPane) {
+        if (!(scrollPane.getViewport().getView() instanceof FamilyTreePanel)) {return;}
+        FamilyTreePanel panel = (FamilyTreePanel) scrollPane.getViewport().getView();
+
+        // Use invokeLater so this runs AFTER the next layout/paint event and any scroll snaps
+        java.awt.EventQueue.invokeLater(() -> {
+            Rectangle box = panel.getOriginPersonBox();
+            if (box != null) {
+                int panelW = panel.getPreferredSize().width;
+                int panelH = panel.getPreferredSize().height;
+                int viewW = scrollPane.getViewport().getWidth();
+                int viewH = scrollPane.getViewport().getHeight();
+
+                int personCenterX = box.x + box.width / 2;
+                int personCenterY = box.y + box.height / 2;
+
+                int targetX = personCenterX - viewW / 2;
+                int targetY = personCenterY - viewH / 2;
+
+                // Clamp to viewport and panel bounds for correct scrolling
+                targetX = Math.max(0, Math.min(targetX, panelW - viewW));
+                targetY = Math.max(0, Math.min(targetY, panelH - viewH));
+
+                scrollPane.getViewport().setViewPosition(new java.awt.Point(targetX, targetY));
+            }
+        });
     }
 
     /** Package-private so the panel can call it. */
@@ -200,6 +233,12 @@ class FamilyTreePanel extends JPanel {
         for (TreeNodeBox child : node.children) {
             calculateNodeDimensions(child, g);
         }
+    }
+
+    Rectangle getOriginPersonBox() {
+        if (root == null) {return null;}
+        Dimension boxDim = nodeDimensions.get(root);
+        return new Rectangle(root.x, root.y, boxDim.width, boxDim.height);
     }
 
     // drawTree now draws portrait (if present) centered above the text box
