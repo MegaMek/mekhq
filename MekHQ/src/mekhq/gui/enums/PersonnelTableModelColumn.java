@@ -50,11 +50,13 @@ import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
 import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
@@ -187,6 +189,7 @@ public enum PersonnelTableModelColumn {
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
           MekHQ.getMHQOptions().getLocale());
+    private static final MMLogger LOGGER = MMLogger.create(PersonnelTableModelColumn.class);
     // endregion Variable Declarations
 
     // region Constructors
@@ -762,9 +765,20 @@ public enum PersonnelTableModelColumn {
                 return (force == null) ? "-" : force.getName();
             case DEPLOYED:
                 final Unit unit = person.getUnit();
-                return ((unit == null) || !unit.isDeployed()) ?
-                             "-" :
-                             campaign.getScenario(unit.getScenarioId()).getName();
+                if (unit == null || !unit.isDeployed()) {
+                    return "-";
+                } else {
+                    Scenario scenario = campaign.getScenario(unit.getScenarioId());
+
+                    if (scenario == null) {
+                        LOGGER.warn("Unable to retrieve scenario for unit {} (Removing scenario assignment).",
+                              unit.getName());
+                        unit.setScenarioId(Scenario.S_DEFAULT_ID);
+                        return "-";
+                    }
+
+                    return scenario.getName();
+                }
             case MEK:
                 return (person.hasSkill(SkillType.S_GUN_MEK) ?
                               Integer.toString(person.getSkill(SkillType.S_GUN_MEK)
