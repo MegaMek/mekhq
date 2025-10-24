@@ -50,6 +50,7 @@ import megamek.client.ui.util.FluffImageHelper;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.util.ViewFormatting;
 import megamek.common.TechConstants;
+import megamek.common.preference.PreferenceManager;
 import megamek.common.units.Entity;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
@@ -95,8 +96,9 @@ public class UnitViewPanel extends JScrollablePanel {
 
         setLayout(new GridBagLayout());
 
+        boolean isSpritesOnly = PreferenceManager.getClientPreferences().getSpritesOnly();
         int compWidth = 1;
-        Image image = FluffImageHelper.getFluffImage(entity);
+        Image image = isSpritesOnly ? null : FluffImageHelper.getFluffImage(entity);
         JLabel lblImage;
         if (null != image) {
             // fluff image exists so use custom ImgLabel to get full mek porn
