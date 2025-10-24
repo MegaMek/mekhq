@@ -450,8 +450,14 @@ class FamilyTreePanel extends JPanel {
         int nodeBoxWidth = boxDim.width;
         int nodeBoxHeight = boxDim.height;
 
-        // Set line thickness to 5px
-        g.setStroke(new java.awt.BasicStroke(5));
+        // Enable anti-aliasing for smooth lines
+        g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+              java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Set line thickness to 5px with rounded caps and joins
+        g.setStroke(new java.awt.BasicStroke(5,
+              java.awt.BasicStroke.CAP_ROUND,
+              java.awt.BasicStroke.JOIN_ROUND));
 
         // Draw lines to children
         for (TreeNodeBox child : node.children) {
@@ -495,8 +501,9 @@ class FamilyTreePanel extends JPanel {
         int nodeBoxWidth = boxDim.width;
         int nodeBoxHeight = boxDim.height;
 
-        // Reset stroke to default for drawing boxes
-        g.setStroke(new java.awt.BasicStroke(1));
+        // Enable anti-aliasing for smooth rendering
+        g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+              java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
 
         // --- Portrait drawing logic ---
         ImageIcon portraitImage = node.person.getPortraitImageIconWithFallback(true);
@@ -513,32 +520,40 @@ class FamilyTreePanel extends JPanel {
         }
 
         int boxY = node.y + (portraitH > 0 ? portraitH + portraitPadBtm : 0);
+        int boxDrawHeight = nodeBoxHeight - (portraitH > 0 ? portraitH + portraitPadBtm : 0);
 
-        // Draw person box with button feel
+        // Arc radius for rounded corners
+        int arc = 16;
+        int borderThickness = 2;
+
+        // Draw person box with rounded corners
         g.setColor(new Color(230, 240, 255));
-        g.fillRect(node.x, boxY, nodeBoxWidth, nodeBoxHeight - (portraitH > 0 ? portraitH + portraitPadBtm : 0));
+        g.fillRoundRect(node.x, boxY, nodeBoxWidth, boxDrawHeight, arc, arc);
+
+        // Draw rounded border
         g.setColor(Color.BLACK);
-        g.drawRect(node.x, boxY, nodeBoxWidth, nodeBoxHeight - (portraitH > 0 ? portraitH + portraitPadBtm : 0));
+        g.setStroke(new java.awt.BasicStroke(borderThickness));
+        g.drawRoundRect(node.x, boxY, nodeBoxWidth, boxDrawHeight, arc, arc);
+
+        // Reset stroke for text
+        g.setStroke(new java.awt.BasicStroke(1));
+
+        // Draw name text
+        g.setColor(Color.BLACK);
         String name = node.person.getFullTitle();
         g.drawString(
               name,
               node.x + 14,
-              boxY +
-                    (nodeBoxHeight - (portraitH > 0 ? portraitH + portraitPadBtm : 0)) / 2 +
-                    g.getFontMetrics().getAscent() / 3
+              boxY + boxDrawHeight / 2 + g.getFontMetrics().getAscent() / 3
         );
 
         // Create hit area that includes portrait + box + name (generously)
         int clickableTop = node.y;
-        int clickableHeight = boxY + (nodeBoxHeight - (portraitH > 0 ? portraitH + portraitPadBtm : 0)) - node.y + 2;
         rectToPerson.put(
               new Rectangle(node.x,
                     clickableTop,
                     nodeBoxWidth,
-                    (portraitH > 0 ? portraitH : 0) +
-                          (boxDim.height - (portraitH > 0 ? portraitH + portraitPadBtm : 0)) +
-                          portraitPadBtm +
-                          2),
+                    (portraitH > 0 ? portraitH : 0) + boxDrawHeight + portraitPadBtm + 2),
               node.person
         );
 
