@@ -728,7 +728,7 @@ public final class MHQOptions extends SuiteOptions {
      *
      * @return the hexadecimal color representation of the font color
      */
-    public String convertFontColorToHexColor(Color color) {
+    public static String convertFontColorToHexColor(Color color) {
         int red = color.getRed();
         int green = color.getGreen();
         int blue = color.getBlue();

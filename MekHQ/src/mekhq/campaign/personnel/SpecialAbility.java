@@ -82,6 +82,7 @@ import org.w3c.dom.NodeList;
 public class SpecialAbility {
     private static final MMLogger LOGGER = MMLogger.create(SpecialAbility.class);
 
+    public static final int CHARACTER_CREATION_ONLY = -1;
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
     private static final String PREREQ_MISC_CLAN_PILOT = "clanperson";
     private static String SPA_DIRECTORY = "data/universe/defaultspa.xml";
