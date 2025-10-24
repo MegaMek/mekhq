@@ -18,6 +18,7 @@ import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -26,6 +27,7 @@ import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
 public class FamilyTreeDialog extends JDialog {
     private final EnhancedTabbedPane tabbedPane;
@@ -42,10 +44,28 @@ public class FamilyTreeDialog extends JDialog {
         setLayout(new BorderLayout());
         add(tabbedPane, BorderLayout.CENTER);
 
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> dispose());
+        // Create bottom panel with BoxLayout for vertical stacking
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new javax.swing.BoxLayout(buttonPanel, javax.swing.BoxLayout.Y_AXIS));
+
+        // Add label
+        JLabel infoLabel = new JLabel(
+              "<html><div style='text-align: center;'><i>A braided family tree is stronger than a bunch of loose " +
+                    "strands!</i>" +
+                    "<br>Marshal Hans 'Habsburg' Steiner-Steiner</div></html>");
+        infoLabel.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+        infoLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        buttonPanel.add(infoLabel);
+
+        // Add some spacing
+        buttonPanel.add(javax.swing.Box.createRigidArea(new Dimension(0, 5)));
+
+        // Add close button
+        JButton closeButton = new RoundedJButton("Close");
+        closeButton.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+        closeButton.addActionListener(e -> dispose());
         buttonPanel.add(closeButton);
+
         add(buttonPanel, BorderLayout.SOUTH);
 
         setPreferredSize(new Dimension(900, 700));
