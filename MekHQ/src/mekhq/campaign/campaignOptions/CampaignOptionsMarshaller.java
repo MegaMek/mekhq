@@ -102,7 +102,6 @@ public class CampaignOptionsMarshaller {
         // endregion Repair and Maintenance Tab
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionForNames", campaignOptions.isUseOriginFactionForNames());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitRatingMethod", campaignOptions.getUnitRatingMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEraMods", campaignOptions.isUseEraMods());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignedTechFirst", campaignOptions.isAssignedTechFirst());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "resetToFirstTech", campaignOptions.isResetToFirstTech());
@@ -298,6 +297,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "displayPerformanceRecord",
               campaignOptions.isDisplayPerformanceRecord());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "awardVeterancySPAs",
+              campaignOptions.isAwardVeterancySPAs());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "rewardComingOfAgeAbilities",

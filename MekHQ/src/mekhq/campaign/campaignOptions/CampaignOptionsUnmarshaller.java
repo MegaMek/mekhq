@@ -55,7 +55,6 @@ import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -257,9 +256,6 @@ public class CampaignOptionsUnmarshaller {
             case "variableTechLevel" -> campaignOptions.setVariableTechLevel(parseBoolean(nodeContents));
             case "factionIntroDate" -> campaignOptions.setIsUseFactionIntroDate(parseBoolean(nodeContents));
             case "techLevel" -> campaignOptions.setTechLevel(parseInt(nodeContents));
-            case "unitRatingMethod", "dragoonsRatingMethod" ->
-                  campaignOptions.setUnitRatingMethod(UnitRatingMethod.parseFromString(
-                        nodeContents));
             case "manualUnitRatingModifier" -> campaignOptions.setManualUnitRatingModifier(parseInt(nodeContents));
             case "clampReputationPayMultiplier" -> campaignOptions.setClampReputationPayMultiplier(parseBoolean(
                   nodeContents));
@@ -331,6 +327,8 @@ public class CampaignOptionsUnmarshaller {
             case "displayAssignmentRecord" -> campaignOptions.setDisplayAssignmentRecord(parseBoolean(
                   nodeContents));
             case "displayPerformanceRecord" -> campaignOptions.setDisplayPerformanceRecord(parseBoolean(
+                  nodeContents));
+            case "awardVeterancySPAs" -> campaignOptions.setAwardVeterancySPAs(parseBoolean(
                   nodeContents));
             case "rewardComingOfAgeAbilities" -> campaignOptions.setRewardComingOfAgeAbilities(parseBoolean(
                   nodeContents));

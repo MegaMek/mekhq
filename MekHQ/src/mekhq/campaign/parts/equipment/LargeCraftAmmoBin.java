@@ -167,7 +167,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
      * Gets the unused capacity of the bay, in tons.
      */
     public double getUnusedCapacity() {
-        return getCapacity() - Math.ceil(getCurrentShots() * ammoTonnage / getType().getShots());
+        return getCapacity() - (getCurrentShots() * ammoTonnage / getType().getShots());
     }
 
     @Override

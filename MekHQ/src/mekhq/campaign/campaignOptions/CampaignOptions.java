@@ -245,6 +245,7 @@ public class CampaignOptions {
     private boolean displayPatientRecord;
     private boolean displayAssignmentRecord;
     private boolean displayPerformanceRecord;
+    private boolean awardVeterancySPAs;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -1314,13 +1315,15 @@ public class CampaignOptions {
     /**
      * @return the method of unit rating to use
      */
+    @Deprecated(since = "0.50.10", forRemoval = false)
     public UnitRatingMethod getUnitRatingMethod() {
-        return unitRatingMethod;
+        return UnitRatingMethod.CAMPAIGN_OPS;
     }
 
     /**
      * @param unitRatingMethod the method of unit rating to use
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public void setUnitRatingMethod(final UnitRatingMethod unitRatingMethod) {
         this.unitRatingMethod = unitRatingMethod;
     }
@@ -1755,6 +1758,14 @@ public class CampaignOptions {
 
     public void setDisplayPerformanceRecord(final boolean displayPerformanceRecord) {
         this.displayPerformanceRecord = displayPerformanceRecord;
+    }
+
+    public boolean isAwardVeterancySPAs() {
+        return awardVeterancySPAs;
+    }
+
+    public void setAwardVeterancySPAs(final boolean awardVeterancySPAs) {
+        this.awardVeterancySPAs = awardVeterancySPAs;
     }
 
     public boolean isRewardComingOfAgeAbilities() {
