@@ -391,6 +391,7 @@ class FamilyTreePanel extends JPanel {
     private void calculateNodeDimensions(TreeNodeBox node, Graphics g) {
         if (node == null) {return;}
         String name = node.person.getFullTitle();
+        String dates = getDateString(node.person);
         FontMetrics fm = g.getFontMetrics();
 
         // Get portrait info
@@ -401,9 +402,16 @@ class FamilyTreePanel extends JPanel {
             portraitH = portraitImage.getIconHeight();
         }
 
-        int paddingX = 28, paddingY = 12;
-        int width = Math.max(fm.stringWidth(name) + paddingX, portraitW);
-        int height = fm.getHeight() + paddingY + (portraitH > 0 ? portraitH + 6 : 0);
+        int paddingX = 28, paddingY = 20;
+        // Calculate width to fit both name and dates
+        int nameWidth = fm.stringWidth(name);
+        int datesWidth = fm.stringWidth(dates);
+        int textWidth = Math.max(nameWidth, datesWidth);
+        int width = Math.max(textWidth + paddingX, portraitW);
+
+        // Height now includes space for two lines of text
+        int lineHeight = fm.getHeight();
+        int height = (lineHeight * 2) + paddingY + (portraitH > 0 ? portraitH + 6 : 0);
 
         nodeDimensions.put(node, new Dimension(width, height));
         if (width > boxWidth) {boxWidth = width;}
@@ -419,6 +427,22 @@ class FamilyTreePanel extends JPanel {
             if (!nodeDimensions.containsKey(parent)) {
                 calculateNodeDimensions(parent, g);
             }
+        }
+    }
+
+    /** Format the birth and death dates for display. */
+    private String getDateString(Person person) {
+        String birthDate = person.getDateOfBirth() != null
+                                 ? person.getDateOfBirth().toString()
+                                 : "?";
+        String deathDate = person.getDateOfDeath() != null
+                                 ? person.getDateOfDeath().toString()
+                                 : (person.getStatus().isDead() ? "?" : "");
+
+        if (deathDate.isEmpty()) {
+            return "(" + birthDate + ")";
+        } else {
+            return "(" + birthDate + " - " + deathDate + ")";
         }
     }
 
@@ -538,14 +562,27 @@ class FamilyTreePanel extends JPanel {
         // Reset stroke for text
         g.setStroke(new java.awt.BasicStroke(1));
 
-        // Draw name text
+        // Draw name and dates text
         g.setColor(Color.BLACK);
+        FontMetrics fm = g.getFontMetrics();
+        int lineHeight = fm.getHeight();
+
         String name = node.person.getFullTitle();
-        g.drawString(
-              name,
-              node.x + 14,
-              boxY + boxDrawHeight / 2 + g.getFontMetrics().getAscent() / 3
-        );
+        String dates = getDateString(node.person);
+
+        // Center the text block vertically in the box
+        int textBlockHeight = lineHeight * 2;
+        int textStartY = boxY + (boxDrawHeight - textBlockHeight) / 2 + fm.getAscent();
+
+        // Draw name (centered horizontally)
+        int nameWidth = fm.stringWidth(name);
+        int nameX = node.x + (nodeBoxWidth - nameWidth) / 2;
+        g.drawString(name, nameX, textStartY);
+
+        // Draw dates below name (centered horizontally)
+        int datesWidth = fm.stringWidth(dates);
+        int datesX = node.x + (nodeBoxWidth - datesWidth) / 2;
+        g.drawString(dates, datesX, textStartY + lineHeight);
 
         // Create hit area that includes portrait + box + name (generously)
         int clickableTop = node.y;
