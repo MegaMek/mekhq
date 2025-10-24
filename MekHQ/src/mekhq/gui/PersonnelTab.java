@@ -42,6 +42,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import javax.swing.*;
@@ -73,8 +74,11 @@ import mekhq.campaign.events.persons.PersonRemovedEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.QuickTrain;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.QuickTrainDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
@@ -98,6 +102,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     private MMComboBox<PersonnelTabView> choicePersonView;
     private JScrollPane scrollPersonnelView;
     private JCheckBox chkGroupByUnit;
+    private RoundedJButton btnQuickTrain;
 
     private PersonnelTableModel personModel;
     private TableRowSorter<PersonnelTableModel> personnelSorter;
@@ -211,6 +216,29 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(chkGroupByUnit, gridBagConstraints);
+
+        btnQuickTrain = new RoundedJButton(resourceMap.getString("btnQuickTrain.text"));
+        btnQuickTrain.setToolTipText(resourceMap.getString("btnQuickTrain.toolTipText"));
+        btnQuickTrain.addActionListener(e -> {
+            List<Person> selectedPersons = getSelectedPersons();
+            QuickTrainDialog dialog = new QuickTrainDialog(getCampaign(), selectedPersons.isEmpty());
+            if (!dialog.isCancel()) {
+                int targetSkillLevel = dialog.getSpinnerValue();
+                QuickTrain.processQuickTraining(selectedPersons,
+                      targetSkillLevel,
+                      getCampaign(),
+                      dialog.isContinuousTraining());
+            }
+        });
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        add(btnQuickTrain, gridBagConstraints);
 
         personModel = new PersonnelTableModel(getCampaign());
         personnelTable = new JTable(personModel);
@@ -418,6 +446,19 @@ public final class PersonnelTab extends CampaignGuiTab {
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere later
         SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
+    }
+
+    public List<Person> getSelectedPersons() {
+        int[] selectedRows = personnelTable.getSelectedRows();
+        List<Person> selectedPersons = new ArrayList<>();
+        for (int viewRow : selectedRows) {
+            int modelRow = personnelTable.convertRowIndexToModel(viewRow);
+            Person person = personModel.getPerson(modelRow);
+            if (person != null) {
+                selectedPersons.add(person);
+            }
+        }
+        return selectedPersons;
     }
 
     private final ActionScheduler personnelListScheduler = new ActionScheduler(this::refreshPersonnelList);
