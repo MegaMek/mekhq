@@ -54,6 +54,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
+import megamek.Version;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.UIUtil;
@@ -90,6 +91,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
@@ -320,10 +322,12 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
             setProgress(6);
             final Campaign campaign;
+            boolean isNewCampaign = false;
             if (getCampaignFile() == null) {
                 // region progress 6
                 LOGGER.info("Starting a new campaign");
                 campaign = CampaignFactory.createCampaign();
+                isNewCampaign = true;
 
                 // Campaign Preset
                 final CampaignOptionsPresetPicker campaignOptionsPresetPicker =
@@ -450,11 +454,22 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 unassignCrewFromUnsupportedUnits(campaign.getUnits());
 
                 // Campaign upgrading
-                if (campaign.getVersion().isLowerThan(MHQConstants.VERSION)) {
+                final Version campaignVersion = campaign.getVersion();
+                if (campaignVersion.isLowerThan(MHQConstants.VERSION)) {
                     handleCampaignUpgrading(campaign);
+                }
+
+                // <50.10 compatibility handler
+                if (campaignVersion.isLowerThan(new Version("0.50.10"))) {
+                    new WarAndPeaceProcessor(campaign, true);
                 }
                 // endregion Progress 7
             }
+
+            if (isNewCampaign) {
+                new WarAndPeaceProcessor(campaign, true);
+            }
+
             campaign.setApp(getApplication());
             return campaign;
         }

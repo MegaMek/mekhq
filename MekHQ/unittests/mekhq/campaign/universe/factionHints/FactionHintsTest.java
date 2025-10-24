@@ -1,4 +1,4 @@
-/*
+package mekhq.campaign.universe.factionHints;/*
  * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -30,7 +30,6 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.universe;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -42,6 +41,9 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.Collections;
 
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.RegionPerimeter;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class FactionHintsTest {
@@ -145,7 +147,7 @@ public class FactionHintsTest {
         assertTrue(hints.getContainedFactions(outer, now).contains(inner));
         assertEquals(hints.getContainedFactionHost(inner, now), outer);
         assertTrue(hints.isContainedFactionOpponent(outer, inner, opponent, now));
-        assertEquals(0.5, hints.getAltLocationFraction(outer, inner, now), RegionPerimeter.EPSILON);
+        Assertions.assertEquals(0.5, hints.getAltLocationFraction(outer, inner, now), RegionPerimeter.EPSILON);
     }
 
     @Test

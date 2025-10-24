@@ -70,20 +70,21 @@ public class RandomFactionGenerator {
     private static RandomFactionGenerator rfg = null;
 
     private FactionBorderTracker borderTracker;
-    private FactionHints factionHints;
+    private mekhq.campaign.universe.factionHints.FactionHints factionHints;
 
     public RandomFactionGenerator() {
         this(null, null);
     }
 
-    public RandomFactionGenerator(FactionBorderTracker borderTracker, FactionHints factionHints) {
+    public RandomFactionGenerator(FactionBorderTracker borderTracker,
+          mekhq.campaign.universe.factionHints.FactionHints factionHints) {
         this.borderTracker = borderTracker;
         this.factionHints = factionHints;
         if (null == borderTracker) {
             initDefaultBorderTracker();
         }
         if (null == factionHints) {
-            this.factionHints = FactionHints.defaultFactionHints();
+            this.factionHints = mekhq.campaign.universe.factionHints.FactionHints.defaultFactionHints();
         }
     }
 
@@ -125,7 +126,7 @@ public class RandomFactionGenerator {
         borderTracker.setDate(date);
     }
 
-    public FactionHints getFactionHints() {
+    public mekhq.campaign.universe.factionHints.FactionHints getFactionHints() {
         return factionHints;
     }
 
@@ -145,7 +146,8 @@ public class RandomFactionGenerator {
         Set<String> retVal = new TreeSet<>();
         for (Faction f : borderTracker.getFactionsInRegion()) {
 
-            if (FactionHints.isEmptyFaction(f) || f.getShortName().equals("CLAN")) {
+            if (mekhq.campaign.universe.factionHints.FactionHints.isEmptyFaction(f) ||
+                      f.getShortName().equals("CLAN")) {
                 continue;
             }
             if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(MHQConstants.FORTRESS_REPUBLIC)) {
@@ -171,7 +173,7 @@ public class RandomFactionGenerator {
         WeightedIntMap<Faction> retVal = new WeightedIntMap<>();
         for (Faction f : borderTracker.getFactionsInRegion()) {
 
-            if (f.isClan() || FactionHints.isEmptyFaction(f)) {
+            if (f.isClan() || mekhq.campaign.universe.factionHints.FactionHints.isEmptyFaction(f)) {
                 continue;
             }
             if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
@@ -342,7 +344,8 @@ public class RandomFactionGenerator {
         String employerShortName = employer.getShortName();
         if (employerShortName.equals(PIRATE_FACTION_CODE) || employerShortName.equals(COMSTAR_FACTION_CODE)) {
             for (Faction enemy : borderTracker.getFactionsInRegion()) {
-                if (FactionHints.isEmptyFaction(enemy) || enemy.getShortName().equals("CLAN")) {
+                if (mekhq.campaign.universe.factionHints.FactionHints.isEmptyFaction(enemy) ||
+                          enemy.getShortName().equals("CLAN")) {
                     continue;
                 }
                 enemyMap.add(1, enemy); // weight (1) can be adjusted as needed
@@ -351,7 +354,8 @@ public class RandomFactionGenerator {
         }
 
         for (Faction enemy : borderTracker.getFactionsInRegion()) {
-            if (FactionHints.isEmptyFaction(enemy) || enemy.getShortName().equals("CLAN")) {
+            if (mekhq.campaign.universe.factionHints.FactionHints.isEmptyFaction(enemy) ||
+                      enemy.getShortName().equals("CLAN")) {
                 continue;
             }
 
@@ -397,7 +401,7 @@ public class RandomFactionGenerator {
     public Set<String> getEmployerSet() {
         Set<String> set = new HashSet<>();
         for (Faction f : borderTracker.getFactionsInRegion()) {
-            if (!f.isClan() && !FactionHints.isEmptyFaction(f)) {
+            if (!f.isClan() && !mekhq.campaign.universe.factionHints.FactionHints.isEmptyFaction(f)) {
                 set.add(f.getShortName());
             }
             if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
@@ -440,7 +444,7 @@ public class RandomFactionGenerator {
         Set<Faction> list = new HashSet<>();
         Faction outer = factionHints.getContainedFactionHost(employer, getCurrentDate());
         for (Faction enemy : borderTracker.getFactionsInRegion()) {
-            if (FactionHints.isEmptyFaction(enemy)) {
+            if (mekhq.campaign.universe.factionHints.FactionHints.isEmptyFaction(enemy)) {
                 continue;
             }
             if (enemy.equals(employer) && !factionHints.isAtWarWith(enemy, enemy, getCurrentDate())) {
