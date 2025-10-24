@@ -961,9 +961,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem(resources.getString("maintenanceAdHoc.text"));
                 menuItem.setActionCommand(COMMAND_PERFORM_AD_HOC_MAINTENANCE);
                 menuItem.addActionListener(this);
-                if (oneSelected && menuItem.isEnabled()) {
-                    menuItem.setEnabled(unit.getDaysSinceMaintenance() != 0);
-                }
+                menuItem.setEnabled(oneSelected && unit.getDaysSinceMaintenance() != 0);
 
                 popup.add(menuItem);
             }
