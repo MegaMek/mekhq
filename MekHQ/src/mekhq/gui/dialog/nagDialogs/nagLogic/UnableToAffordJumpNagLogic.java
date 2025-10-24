@@ -39,6 +39,8 @@ import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Money;
 
+/** no longer in use **/
+@Deprecated(since = "50.10", forRemoval = true)
 public class UnableToAffordJumpNagLogic {
     /**
      * Determines whether the campaign's current funds are insufficient to cover the cost of the next jump.

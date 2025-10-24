@@ -600,6 +600,11 @@ public class NewAtBContractDialog extends NewContractDialog {
                     campaign.getLocalDate(),
                     contract.getTotalAdvanceAmount(),
                     "Advance funds for " + contract.getName());
+        campaign.getFinances()
+              .credit(TransactionType.CONTRACT_PAYMENT,
+                    campaign.getLocalDate(),
+                    contract.getTransportAmount(),
+                    "Transport reimbursement for " + contract.getName());
         campaign.addMission(contract);
 
         // note that the contract must be initialized after the mission is added to the

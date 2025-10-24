@@ -171,7 +171,7 @@ public class TransportReport extends AbstractReport {
         // Let's do ProtoMeks next.
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n",
               "ProtoMek Bays (Occupied):",
-              stats.getTotalProtomekBays(),
+              stats.getTotalProtoMekBays(),
               stats.getOccupiedBays(Entity.ETYPE_PROTOMEK),
               "ProtoMeks Not Transported:",
               noSC));

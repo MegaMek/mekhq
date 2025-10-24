@@ -32,6 +32,9 @@
  */
 package mekhq.gui.view;
 
+import static java.lang.Math.ceil;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -44,6 +47,8 @@ import javax.swing.JPanel;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -289,13 +294,13 @@ public class JumpPathViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblCost, gridBagConstraints);
 
+            TransportCostCalculations transportCostCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
+            int duration = (int) ceil(path.getTotalTime(currentDate, campaign.getLocation().getTransitTime(),
+                  isUseCommandCircuit));
+            Money journeyCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration, path.getJumps());
+
             txtCost.setName("lblCost2");
-            txtCost.setText("<html>" +
-                                  campaign.calculateCostPerJump(
-                                              true,
-                                              campaign.getCampaignOptions().isEquipmentContractBase())
-                                        .multipliedBy(path.getJumps())
-                                        .toAmountAndSymbolString() + "</html>");
+            txtCost.setText("<html>" + journeyCost.toAmountAndSymbolString() + "</html>");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 6;

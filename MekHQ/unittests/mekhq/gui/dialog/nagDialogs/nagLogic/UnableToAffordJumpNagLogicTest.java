@@ -46,12 +46,15 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.dialog.nagDialogs.UnableToAffordJumpNagDialog;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * This class is a test class for the {@link UnableToAffordJumpNagDialog} class. It contains tests for various scenarios
  * related to the {@code isUnableToAffordNextJump} method
  */
+@Disabled
+@Deprecated(since = "50.10", forRemoval = true)
 class UnableToAffordJumpNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;

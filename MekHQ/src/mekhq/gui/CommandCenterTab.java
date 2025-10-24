@@ -32,6 +32,8 @@
  */
 package mekhq.gui;
 
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -76,6 +78,7 @@ import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
@@ -87,6 +90,7 @@ import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AcquisitionsDialog;
+import mekhq.gui.dialog.JumpCostsSummary;
 import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.dialog.factionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
@@ -575,7 +579,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * Initialize the panel for displaying available reports
      */
     private void initReportsPanel() {
-        panReports = new JPanel(new GridLayout(6, 1, 0, 5));
+        panReports = new JPanel(new GridLayout(7, 1, 0, 5));
 
         RoundedJButton btnTransportReport = new RoundedJButton(resourceMap.getString("btnTransportReport.text"));
         btnTransportReport.addActionListener(ev -> new TransportReportDialog(getCampaignGui().getFrame(),
@@ -621,6 +625,16 @@ public final class CommandCenterTab extends CampaignGuiTab {
             }
         });
         panReports.add(btnFactionStanding);
+
+        RoundedJButton btnJumpFees = new RoundedJButton(resourceMap.getString("btnJumpFees.text"));
+        btnJumpFees.addActionListener(evt -> {
+            TransportCostCalculations transportCostCalculations =
+                  getCampaign().getTransportCostCalculation(EXP_REGULAR);
+            transportCostCalculations.calculateJumpCostForEachDay();
+            new JumpCostsSummary(getCampaignGui().getFrame(), transportCostCalculations);
+        });
+        panReports.add(btnJumpFees);
+
         panReports.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panReports.title")));
     }
 

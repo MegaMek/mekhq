@@ -710,6 +710,11 @@ public class NewContractDialog extends JDialog {
                     campaign.getLocalDate(),
                     contract.getTotalAdvanceAmount(),
                     "Advance funds for " + contract.getName());
+        campaign.getFinances()
+              .credit(TransactionType.CONTRACT_PAYMENT,
+                    campaign.getLocalDate(),
+                    contract.getTransportAmount(),
+                    "Transport reimbursement for " + contract.getName());
 
         campaign.addMission(contract);
 
