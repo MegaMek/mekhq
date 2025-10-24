@@ -641,7 +641,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 String type = data[1];
                 int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.improveSkill(type);
-                selectedPerson.spendXP(cost);
+                selectedPerson.spendXPOnSkills(getCampaign(), cost);
 
                 Skill skill = selectedPerson.getSkill(type);
                 SkillType skillType = skill.getType();
@@ -4080,6 +4080,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.addActionListener(evt -> {
                 final boolean immortal = !person.isImmortal();
                 Stream.of(selected).forEach(p -> p.setImmortal(immortal));
+            });
+            menu.add(cbMenuItem);
+        }
+
+        if (Stream.of(selected).allMatch(p -> p.isQuickTrainIgnore() == person.isQuickTrainIgnore())) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miQuickTrainIgnore.text"));
+            cbMenuItem.setToolTipText(resources.getString("miQuickTrainIgnore.toolTipText"));
+            cbMenuItem.setName("miQuickTrainIgnore");
+            cbMenuItem.setSelected(person.isQuickTrainIgnore());
+            cbMenuItem.addActionListener(evt -> {
+                final boolean quickTrainIgnore = !person.isQuickTrainIgnore();
+                Stream.of(selected).forEach(p -> p.setQuickTrainIgnore(quickTrainIgnore));
             });
             menu.add(cbMenuItem);
         }

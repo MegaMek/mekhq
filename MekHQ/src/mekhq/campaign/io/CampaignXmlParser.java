@@ -367,7 +367,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     //TODO: deal with this
                     updatePlanetaryEventsFromXML(workingNode);
                 } else if (nodeName.equalsIgnoreCase("partsInUse")) {
-                    processPartsInUse(campaign, workingNode);
+                    processPartsInUse(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("temporaryPrisonerCapacity")) {
                     campaign.setTemporaryPrisonerCapacity(MathUtility.parseInt(workingNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("processProcurement")) {
@@ -469,6 +469,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             // Also, the unit should have its campaign set.
             unit.setCampaign(campaign);
             unit.fixReferences(campaign);
+
+            List<String> reports = unit.checkForOverCrewing();
+            for (String report : reports) {
+                campaign.addReport(report);
+            }
 
             // reset the pilot and entity, to reflect newly assigned personnel
             unit.resetPilotAndEntity();
@@ -1728,7 +1733,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // will actually happen here.
     }
 
-    private static void processPartsInUse(Campaign retVal, Node wn) {
+    private static void processPartsInUse(Campaign retVal, Node wn, Version version) {
         NodeList wList = wn.getChildNodes();
 
         for (int i = 0; i < wList.getLength(); i++) {
@@ -1746,7 +1751,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 PartQuality ignoreQuality = PartQuality.valueOf(wn2.getTextContent());
                 retVal.setIgnoreSparesUnderQuality(ignoreQuality);
             } else if (wn2.getNodeName().equalsIgnoreCase("partInUseMap")) {
-                processPartsInUseRequestedStockMap(retVal, wn2);
+                if (version.isHigherThan(new Version("0.50.07"))) { // <50.10 compatibility handler
+                    processPartsInUseRequestedStockMap(retVal, wn2);
+                }
             } else {
                 LOGGER.error("Unknown node type not loaded in PartInUse nodes: {}", wn2.getNodeName());
             }

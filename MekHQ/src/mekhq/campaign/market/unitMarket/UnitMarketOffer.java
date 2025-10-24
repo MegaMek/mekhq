@@ -42,6 +42,7 @@ import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.utilities.MHQXMLUtility;
@@ -50,6 +51,8 @@ import org.w3c.dom.NodeList;
 
 public class UnitMarketOffer {
     private static final MMLogger LOGGER = MMLogger.create(UnitMarketOffer.class);
+    private final CampaignOptions campaignOptions;
+
     // region Variable Declarations
     private UnitMarketType marketType;
     private int unitType;
@@ -59,17 +62,18 @@ public class UnitMarketOffer {
     // endregion Variable Declarations
 
     // region Constructors
-    private UnitMarketOffer() {
-
+    private UnitMarketOffer(CampaignOptions campaignOptions) {
+        this.campaignOptions = campaignOptions;
     }
 
     public UnitMarketOffer(final UnitMarketType marketType, final int unitType,
-          final MekSummary unit, final int percent, final int transitDuration) {
+          final MekSummary unit, final int percent, final int transitDuration, CampaignOptions campaignOptions) {
         setMarketType(marketType);
         setUnitType(unitType);
         setUnit(unit);
         setPercent(percent);
         setTransitDuration(transitDuration);
+        this.campaignOptions = campaignOptions;
     }
     // endregion Constructors
 
@@ -133,7 +137,17 @@ public class UnitMarketOffer {
      * @return the final price of this Offer
      */
     public Money getPrice() {
-        return Money.of((double) getUnit().getCost()).multipliedBy(getPercent()).dividedBy(100);
+        Money cost = Money.of((double) getUnit().getCost()).multipliedBy(getPercent()).dividedBy(100);
+
+        if (getEntity().isMixedTech()) {
+            cost = cost.multipliedBy(campaignOptions.getMixedTechUnitPriceMultiplier());
+        } else if (getEntity().isClan()) {
+            cost = cost.multipliedBy(campaignOptions.getClanUnitPriceMultiplier());
+        } else { // Inner Sphere Entity
+            cost = cost.multipliedBy(campaignOptions.getInnerSphereUnitPriceMultiplier());
+        }
+
+        return cost;
     }
 
     // region File I/O
@@ -149,7 +163,7 @@ public class UnitMarketOffer {
 
     public static @Nullable UnitMarketOffer generateInstanceFromXML(final Node wn, final Campaign campaign,
           final Version version) {
-        UnitMarketOffer retVal = new UnitMarketOffer();
+        UnitMarketOffer retVal = new UnitMarketOffer(campaign.getCampaignOptions());
         NodeList nl = wn.getChildNodes();
 
         try {
