@@ -122,6 +122,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.ranks.Rank;
@@ -248,6 +249,7 @@ public class Person {
 
     private Skills skills;
     private PersonnelOptions options;
+    private boolean hasGainedVeterancySPA;
     private int toughness;
     private Attributes atowAttributes;
 
@@ -510,6 +512,7 @@ public class Person {
         hits = 0;
         hitsPrior = 0;
         toughness = 0;
+        hasGainedVeterancySPA = false;
         connections = 0;
         wealth = 0;
         hasPerformedExtremeExpenditure = false;
@@ -2245,10 +2248,81 @@ public class Person {
      *
      * <p>This method decrements the current XP by the specified amount.</p>
      *
+     * <p><b>Usage:</b> this method should only be used when the act of spending XP cannot change the characters'
+     * experience level (green, veteran, etc.). In <b>all</b> other instances {@link #spendXPOnSkills(Campaign, int)}
+     * must be used.</p>
+     *
      * @param xp the amount of XP to deduct
      */
     public void spendXP(final int xp) {
         this.xp -= xp;
+    }
+
+    /**
+     * Processes spending XP on skill upgrades for the character and checks for veterancy SPA (Special Personnel
+     * Ability) gain.
+     *
+     * <p>Deducts the specified XP amount, and if campaign options and the character's veteran status allow, attempts
+     * to assign a veterancy special ability. Triggers relevant events and logs a report if a SPA is gained.</p>
+     *
+     * @param campaign the campaign context for skill and SPA gain rules
+     * @param xp       the amount of XP to spend
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public void spendXPOnSkills(final Campaign campaign, final int xp) {
+        spendXP(xp); // Process spending of XP as normal
+
+        // Check whether we need to process the veterancy SPA gain
+        processVeterancyAwards(campaign);
+    }
+
+    public void processVeterancyAwards(Campaign campaign) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseAbilities = campaignOptions.isUseAbilities();
+        boolean isUseVeterancySPA = campaignOptions.isAwardVeterancySPAs();
+        if (hasGainedVeterancySPA || !isUseAbilities || !isUseVeterancySPA) {
+            return;
+        }
+
+        // Is the character a veteran in their primary profession?
+        int experienceLevel = getExperienceLevel(campaign, false);
+        if (experienceLevel < EXP_VETERAN) {
+            return;
+        }
+
+        SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
+        String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, true);
+        if (spaGained == null) {
+            return;
+        }
+
+        String spaGainedMessage = getVeterancyAwardReport(spaGained);
+        campaign.addReport(spaGainedMessage);
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    /**
+     * Generates a formatted report string describing the veterancy SPA award for a person.
+     *
+     * <p>Removes any specialization or extra information in parentheses from the SPA name, applies color formatting
+     * to the SPA, and returns a localized report message string suitable for display in the daily report.</p>
+     *
+     * @param spaGained the name of the SPA gained (may include specialization in parentheses)
+     *
+     * @return a formatted, localized report string announcing the award
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public String getVeterancyAwardReport(String spaGained) {
+        String spaGainedClean = spaGained.replaceAll("\\s*\\([^)]*\\)", "");
+        String veteranColor = MekHQ.getMHQOptions().getFontColorSkillVeteranHexColor();
+        String amazingColor = getWarningColor(); // We use warning as it can be a positive or negative event
+        return String.format(resources.getString("Person.veterancySPA.gain"),
+              getHyperlinkedFullTitle(), spanOpeningWithCustomColor(veteranColor), CLOSING_SPAN_TAG,
+              spanOpeningWithCustomColor(amazingColor), spaGainedClean, CLOSING_SPAN_TAG);
     }
 
     /**
@@ -2945,6 +3019,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "toughness", toughness);
             }
 
+            if (hasGainedVeterancySPA) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasGainedVeterancySPA", hasGainedVeterancySPA);
+            }
+
             if (connections != 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "connections", connections);
             }
@@ -3484,6 +3562,8 @@ public class Person {
                     implants = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("toughness")) {
                     person.toughness = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("hasGainedVeterancySPA")) {
+                    person.hasGainedVeterancySPA = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("connections")) {
                     person.connections = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("wealth")) {
@@ -5995,6 +6075,14 @@ public class Person {
 
     public void setToughness(final int toughness) {
         this.toughness = toughness;
+    }
+
+    public boolean getHasGainedVeterancySPA() {
+        return hasGainedVeterancySPA;
+    }
+
+    public void setHasGainedVeterancySPA(final boolean hasGainedVeterancySPA) {
+        this.hasGainedVeterancySPA = hasGainedVeterancySPA;
     }
 
     public int getConnections() {
