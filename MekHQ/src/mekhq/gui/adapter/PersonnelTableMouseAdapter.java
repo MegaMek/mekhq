@@ -681,6 +681,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     case WEALTH_LABEL -> selectedPerson.setWealth(target);
                     case UNLUCKY_LABEL -> selectedPerson.setUnlucky(target);
                     case BLOODMARK_LABEL -> selectedPerson.setBloodmark(target);
+                    case EXTRA_INCOME_LABEL -> selectedPerson.setExtraIncomeFromTraitLevel(target);
                     default -> LOGGER.error("Invalid trait type: {}", type);
                 }
 
@@ -3430,7 +3431,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setToolTipText(String.format(resources.getString("spendOnUnlucky.tooltip"), target));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
                   UNLUCKY_LABEL,
-                  String.valueOf(-traitCost),
+                  String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target <= MAXIMUM_UNLUCKY);
@@ -3441,7 +3442,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setToolTipText(String.format(resources.getString("spendOnUnlucky.tooltip"), target));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
                   UNLUCKY_LABEL,
-                  String.valueOf(traitCost),
+                  String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target >= MINIMUM_UNLUCKY && person.getXP() >= traitCost);
@@ -3455,7 +3456,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setToolTipText(String.format(resources.getString("spendOnBloodmark.tooltip"), target));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
                   BLOODMARK_LABEL,
-                  String.valueOf(-traitCost),
+                  String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target <= MAXIMUM_BLOODMARK);
@@ -3466,10 +3467,35 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setToolTipText(String.format(resources.getString("spendOnBloodmark.tooltip"), target));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
                   BLOODMARK_LABEL,
-                  String.valueOf(traitCost),
+                  String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target >= MINIMUM_BLOODMARK && person.getXP() >= traitCost);
+            traitsMenu.add(menuItem);
+
+            // Extra Income
+            int extraIncome = person.getExtraIncomeTraitLevel();
+
+            target = extraIncome + 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnExtraIncome.text"), target, -traitCost));
+            menuItem.setToolTipText(String.format(resources.getString("spendOnExtraIncome.tooltip"), target));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
+                  EXTRA_INCOME_LABEL,
+                  String.valueOf(traitCost),
+                  String.valueOf(target)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(target <= MAXIMUM_EXTRA_INCOME);
+            traitsMenu.add(menuItem);
+
+            target = extraIncome - 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnExtraIncome.text"), target, traitCost));
+            menuItem.setToolTipText(String.format(resources.getString("spendOnExtraIncome.tooltip"), target));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
+                  EXTRA_INCOME_LABEL,
+                  String.valueOf(-traitCost),
+                  String.valueOf(target)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(target >= MINIMUM_EXTRA_INCOME && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             menu.add(traitsMenu);

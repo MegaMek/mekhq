@@ -117,6 +117,7 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.Player;
 import megamek.common.SimpleTechLevel;
 import megamek.common.annotations.Nullable;
@@ -230,6 +231,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
+import mekhq.campaign.personnel.enums.ExtraIncome;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -5554,6 +5556,11 @@ public class Campaign implements ITechManager {
                     }
                 }
 
+                String report = ExtraIncome.processExtraIncome(finances, person, currentDay);
+                if (!StringUtility.isNullOrBlank(report)) {
+                    addReport(report);
+                }
+
                 person.setHasPerformedExtremeExpenditure(false);
 
                 int bloodmarkLevel = person.getBloodmark();
@@ -5568,7 +5575,7 @@ public class Campaign implements ITechManager {
 
                 if (currentDay.getMonthValue() % 3 == 0) {
                     if (person.hasDarkSecret()) {
-                        String report = person.isDarkSecretRevealed(true, false);
+                        report = person.isDarkSecretRevealed(true, false);
                         if (report != null) {
                             addReport(report);
                         }
@@ -5580,7 +5587,7 @@ public class Campaign implements ITechManager {
                 }
 
                 if (campaignOptions.isAllowMonthlyConnections()) {
-                    String report = person.performConnectionsWealthCheck(currentDay, finances);
+                    report = person.performConnectionsWealthCheck(currentDay, finances);
                     if (!report.isBlank()) {
                         addReport(report);
                     }
