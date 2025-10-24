@@ -21,6 +21,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import megamek.common.enums.Gender;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.personnel.Person;
@@ -430,29 +431,72 @@ class FamilyTreePanel extends JPanel {
     // drawTree now draws portrait (if present) centered above the text box
     private void drawTree(Graphics2D g, TreeNodeBox node) {
         if (node == null) {return;}
+
+        // First pass: Draw all lines with consistent stroke
+        drawLines(g, node, new HashSet<>());
+
+        // Second pass: Draw all boxes and portraits
+        drawNodes(g, node, new HashSet<>());
+    }
+
+    /** Draw all connecting lines in the tree. */
+    private void drawLines(Graphics2D g, TreeNodeBox node, Set<TreeNodeBox> visited) {
+        if (node == null || visited.contains(node)) {
+            return;
+        }
+        visited.add(node);
+
         Dimension boxDim = nodeDimensions.get(node);
         int nodeBoxWidth = boxDim.width;
         int nodeBoxHeight = boxDim.height;
 
+        // Set line thickness to 5px
+        g.setStroke(new java.awt.BasicStroke(5));
+
         // Draw lines to children
         for (TreeNodeBox child : node.children) {
             Dimension childBoxDim = nodeDimensions.get(child);
+
+            // Set color based on child's gender
+            g.setColor(getGenderColor(child.person));
+
             g.drawLine(
                   node.x + nodeBoxWidth / 2, node.y + nodeBoxHeight,
                   child.x + childBoxDim.width / 2, child.y
             );
-            drawTree(g, child);
+
+            drawLines(g, child, visited);
         }
 
         // Draw lines to parents
         for (TreeNodeBox parent : node.parents) {
             Dimension parentBoxDim = nodeDimensions.get(parent);
+
+            // Set color based on parent's gender
+            g.setColor(getGenderColor(parent.person));
+
             g.drawLine(
                   node.x + nodeBoxWidth / 2, node.y,
                   parent.x + parentBoxDim.width / 2, parent.y + parentBoxDim.height
             );
-            drawTree(g, parent);
+
+            drawLines(g, parent, visited);
         }
+    }
+
+    /** Draw all node boxes and portraits in the tree. */
+    private void drawNodes(Graphics2D g, TreeNodeBox node, Set<TreeNodeBox> visited) {
+        if (node == null || visited.contains(node)) {
+            return;
+        }
+        visited.add(node);
+
+        Dimension boxDim = nodeDimensions.get(node);
+        int nodeBoxWidth = boxDim.width;
+        int nodeBoxHeight = boxDim.height;
+
+        // Reset stroke to default for drawing boxes
+        g.setStroke(new java.awt.BasicStroke(1));
 
         // --- Portrait drawing logic ---
         ImageIcon portraitImage = node.person.getPortraitImageIconWithFallback(true);
@@ -497,6 +541,29 @@ class FamilyTreePanel extends JPanel {
                           2),
               node.person
         );
+
+        // Recursively draw children and parents
+        for (TreeNodeBox child : node.children) {
+            drawNodes(g, child, visited);
+        }
+
+        for (TreeNodeBox parent : node.parents) {
+            drawNodes(g, parent, visited);
+        }
+    }
+
+    /** Get the color for a line based on the person's gender. */
+    private Color getGenderColor(Person person) {
+        Gender gender = person.getGender();
+        if (gender.isGenderNeutral()) {
+            return new Color(144, 238, 144); // Light green
+        }
+
+        if (gender.isFemale()) {
+            return new Color(255, 182, 193); // Pink
+        }
+
+        return new Color(135, 206, 250); // Light blue
     }
 
     private Person getPersonAt(java.awt.Point pt) {
