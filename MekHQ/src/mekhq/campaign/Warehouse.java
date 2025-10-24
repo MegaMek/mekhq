@@ -343,23 +343,41 @@ public class Warehouse {
     public int getSparePartsCount(Part targetPart) {
         int count = 0;
         for (Part warehousePart : getParts()) {
-            if (warehousePart.isSpare() && warehousePart.isSamePartType(targetPart)) {
-                count += getPartQuantity(warehousePart);
+            if (warehousePart.isSamePartType(targetPart)) {
+                count += getPartQuantity(warehousePart, true);
             }
         }
 
         return count;
     }
 
-    //TODO: getPartQuantity should be an overloaded method in Part.java, I'm just getting it out of campaign
-    public int getPartQuantity(Part p) {
-        if (p instanceof Armor) {
-            return ((Armor) p).getAmount();
+    /**
+     * Returns the quantity of the given part according to its type and whether only spares are to be considered.
+     * <ul>
+     *     <li>If {@code sparesOnly} is {@code true} and the part is not marked as a spare, returns {@code 0}.</li>
+     *     <li>If the part is an {@link Armor}, returns its amount value.</li>
+     *     <li>If the part is an {@link AmmoStorage}, returns its shots value.</li>
+     *     <li>Otherwise, returns {@code 1} if the part is associated with a unit, or its stored quantity.</li>
+     * </ul>
+     *
+     * @param part       the {@link Part} to get the quantity for
+     * @param sparesOnly if {@code true}, only counts parts that are marked as spares
+     *
+     * @return the quantity of the part based on its type and context
+     */
+    public int getPartQuantity(Part part, boolean sparesOnly) {
+        //TODO: getPartQuantity should be an overloaded method in Part.java, I'm just getting it out of campaign
+        if (sparesOnly && !part.isSpare()) {
+            return 0;
         }
-        if (p instanceof AmmoStorage) {
-            return ((AmmoStorage) p).getShots();
+
+        if (part instanceof Armor) {
+            return ((Armor) part).getAmount();
         }
-        return (p.getUnit() != null) ? 1 : p.getQuantity();
+        if (part instanceof AmmoStorage) {
+            return ((AmmoStorage) part).getShots();
+        }
+        return (part.getUnit() != null) ? 1 : part.getQuantity();
     }
 
     /**

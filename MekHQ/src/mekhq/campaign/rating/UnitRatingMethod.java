@@ -43,8 +43,10 @@ import mekhq.MekHQ;
  */
 public enum UnitRatingMethod {
     //region Enum Declarations
+    @Deprecated(since = "0.50.10", forRemoval = true)
     NONE("UnitRatingMethod.NONE.text"),
     CAMPAIGN_OPS("UnitRatingMethod.CAMPAIGN_OPS.text"),
+    @Deprecated(since = "0.50.10", forRemoval = true)
     FLD_MAN_MERCS_REV("UnitRatingMethod.FLD_MAN_MERCS_REV.text");
     //endregion Enum Declarations
 
