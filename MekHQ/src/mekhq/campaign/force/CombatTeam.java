@@ -122,7 +122,7 @@ public class CombatTeam {
         int multiplier = faction.isComStar() ? 6 : 3;
         int base = faction.getFormationBaseSize();
 
-        return (int) (base * Math.pow(multiplier, formationLevelDepth));
+        return (int) (base * Math.pow(multiplier, formationLevelDepth - 1));
     }
 
     /**
