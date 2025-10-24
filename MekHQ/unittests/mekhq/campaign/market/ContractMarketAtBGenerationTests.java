@@ -48,8 +48,6 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
@@ -67,14 +65,12 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.FactionBorderTracker;
-import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.factionHints.FactionHints;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -511,10 +507,10 @@ public class ContractMarketAtBGenerationTests {
     }
 
     /**
-     * This appears to be a test that a Mercenary campaign faction employer
-     * allows mercenary sub-faction contracts.
+     * This appears to be a test that a Mercenary campaign faction employer allows mercenary sub-faction contracts.
      * Currently this test fails for reasons that are unclear; disabling temporarily.
-     * @param gameYear  see generateData() above
+     *
+     * @param gameYear    see generateData() above
      * @param unitRating
      * @param isClanEnemy
      */

@@ -46,8 +46,8 @@ import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
@@ -123,7 +123,7 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
         FactionStandings factionStandings = getCampaign().getFactionStandings();
 
         for (Faction faction : systemFactions) {
-            if (FactionHints.defaultFactionHints().isAtWarWith(getCampaignFaction(), faction, getToday())) {
+            if (FactionHints.getInstance().isAtWarWith(getCampaignFaction(), faction, getToday())) {
                 continue;
             }
 
@@ -135,7 +135,7 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
 
             // Allies are three times as likely to join the campaign as non-allies
             if (getCampaignFaction().equals(faction)
-                      || FactionHints.defaultFactionHints().isAlliedWith(getCampaignFaction(), faction, getToday())) {
+                      || FactionHints.getInstance().isAlliedWith(getCampaignFaction(), faction, getToday())) {
                 factionStandingMultiplier *= 3;
             }
 

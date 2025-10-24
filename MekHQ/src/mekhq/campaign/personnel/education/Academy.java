@@ -54,10 +54,10 @@ import mekhq.campaign.personnel.enums.education.EducationLevel.Adapter;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.factionHints.FactionHints;
 
 /**
  * The Academy class represents an academy with various properties and methods.

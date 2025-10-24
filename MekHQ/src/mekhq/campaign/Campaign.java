@@ -289,6 +289,8 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.factionHints.FactionHints;
+import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
 import mekhq.campaign.universe.factionStanding.*;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
@@ -6290,6 +6292,9 @@ public class Campaign implements ITechManager {
         // Faction Standing
         performFactionStandingChecks(isFirstOfMonth, isNewYear);
 
+        // War & Peace Notifications
+        new WarAndPeaceProcessor(this, false);
+
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
@@ -7866,7 +7871,7 @@ public class Campaign implements ITechManager {
 
         if (!skipAccessCheck
                   && campaignOptions.isUseFactionStandingOutlawedSafe()) {
-            FactionHints factionHints = FactionHints.defaultFactionHints();
+            FactionHints factionHints = FactionHints.getInstance();
             boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
                   getCurrentSystem(), end, currentDay, activeAtBContracts, factionHints);
             if (!canAccessSystem) {
@@ -7901,7 +7906,7 @@ public class Campaign implements ITechManager {
         scoreG.put(current, 0.0);
         closed.add(current);
 
-        FactionHints factionHints = FactionHints.defaultFactionHints();
+        FactionHints factionHints = FactionHints.getInstance();
 
         // A* search
         final int MAX_JUMPS = 10000;

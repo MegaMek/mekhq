@@ -52,7 +52,7 @@ import javax.annotation.Nonnull;
 public class RegionPerimeter {
 
     // Margin for coordinates to be considered equal
-    static final double EPSILON = 0.001;
+    public static final double EPSILON = 0.001;
 
     private final List<Point> border;
     private double boundsX1, boundsY1, boundsX2, boundsY2;
