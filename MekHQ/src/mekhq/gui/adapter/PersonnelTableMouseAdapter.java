@@ -1221,7 +1221,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_FAMILY_TREE: {
                 if (people.length == 1) {
                     for (Person person : people) {
-                        new FamilyTreeDialog(null, person.getGenealogy()).setVisible(true);
+                        new FamilyTreeDialog(null,
+                              person.getGenealogy(),
+                              getCampaign().getPersonnel()).setVisible(true);
                     }
                 }
                 break;

@@ -8,7 +8,9 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,16 +21,17 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 
 public class FamilyTreeDialog extends JDialog {
-    public FamilyTreeDialog(Frame owner, Genealogy genealogy) {
+    public FamilyTreeDialog(Frame owner, Genealogy genealogy, Collection<Person> personnel) {
         super(owner, "Family Tree of " + genealogy.getOrigin().getFullTitle(), true);
 
-        FamilyTreePanel treePanel = new FamilyTreePanel(genealogy);
+        FamilyTreePanel treePanel = new FamilyTreePanel(genealogy, personnel);
         JScrollPane scrollPane = new FastJScrollPane(treePanel);
         scrollPane.setPreferredSize(new Dimension(800, 600));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -58,6 +61,7 @@ class TreeNodeBox {
 
 class FamilyTreePanel extends JPanel {
     private final Genealogy genealogy;
+    private final Collection<Person> personnel;
     private TreeNodeBox root;
     private final int hGap = 40, vGap = 70; // Increased for clarity
 
@@ -67,15 +71,41 @@ class FamilyTreePanel extends JPanel {
 
     private int panelWidth = 1200, panelHeight = 1000; // Will be dynamically set
 
-    public FamilyTreePanel(Genealogy genealogy) {
+    private final Map<Rectangle, Person> rectToPerson = new HashMap<>();
+
+    public FamilyTreePanel(Genealogy genealogy, Collection<Person> personnel) {
         this.genealogy = genealogy;
-        // initial preferred size; will be recalculated according to layout
+        this.personnel = personnel;
         setPreferredSize(new Dimension(panelWidth, panelHeight));
+
+        // Add mouse listener for click navigation
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                Person person = getPersonAt(evt.getPoint());
+                if (person != null) {
+                    // Open a new dialog for this person's tree
+                    Genealogy newGenealogy = person.getGenealogy();
+                    if (newGenealogy != null) {
+                        Window top = SwingUtilities.getWindowAncestor(FamilyTreePanel.this);
+                        if (top instanceof java.awt.Dialog) {
+                            top.dispose();
+                        }
+                        new FamilyTreeDialog(
+                              null, // Or null, or reuse as needed
+                              newGenealogy,
+                              personnel
+                        ).setVisible(true);
+                    }
+                }
+            }
+        });
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        rectToPerson.clear(); // Clear hitboxes before drawing
         buildAndLayoutTree(g);
         if (root != null) {
             drawTree((Graphics2D) g, root);
@@ -179,12 +209,11 @@ class FamilyTreePanel extends JPanel {
 
         int boxY = node.y + (portraitH > 0 ? portraitH + portraitPadBtm : 0);
 
-        // Draw person box
-        g.setColor(Color.WHITE);
+        // Draw person box with button feel
+        g.setColor(new Color(230, 240, 255));
         g.fillRect(node.x, boxY, nodeBoxWidth, nodeBoxHeight - (portraitH > 0 ? portraitH + portraitPadBtm : 0));
         g.setColor(Color.BLACK);
         g.drawRect(node.x, boxY, nodeBoxWidth, nodeBoxHeight - (portraitH > 0 ? portraitH + portraitPadBtm : 0));
-
         String name = node.person.getFullTitle();
         g.drawString(
               name,
@@ -193,6 +222,29 @@ class FamilyTreePanel extends JPanel {
                     (nodeBoxHeight - (portraitH > 0 ? portraitH + portraitPadBtm : 0)) / 2 +
                     g.getFontMetrics().getAscent() / 3
         );
+
+        // Create hit area that includes portrait + box + name (generously)
+        int clickableTop = node.y;
+        int clickableHeight = boxY + (nodeBoxHeight - (portraitH > 0 ? portraitH + portraitPadBtm : 0)) - node.y + 2;
+        rectToPerson.put(
+              new Rectangle(node.x,
+                    clickableTop,
+                    nodeBoxWidth,
+                    (portraitH > 0 ? portraitH : 0) +
+                          (boxDim.height - (portraitH > 0 ? portraitH + portraitPadBtm : 0)) +
+                          portraitPadBtm +
+                          2),
+              node.person
+        );
+    }
+
+    private Person getPersonAt(java.awt.Point pt) {
+        for (Map.Entry<Rectangle, Person> entry : rectToPerson.entrySet()) {
+            if (entry.getKey().contains(pt)) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 
     private void computeSubtreeWidth(TreeNodeBox node) {
