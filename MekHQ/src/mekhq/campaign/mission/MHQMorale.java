@@ -350,7 +350,7 @@ public class MHQMorale {
         if (victories > defeats) {
             return (victories >= defeats * 2) ? decisiveVictoryModifier : victoryModifier;
         } else if (defeats > victories) {
-            return (defeats >= victories * 2) ? -decisiveDefeatModifier : -defeatModifier;
+            return (defeats >= victories * 2) ? decisiveDefeatModifier : defeatModifier;
         }
         return 0;
     }
