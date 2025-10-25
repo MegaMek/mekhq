@@ -2231,10 +2231,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 JMenu orphanMenu = new JMenu(resources.getString("adopt.text"));
 
                 for (final Person orphan : orphans) {
-                    String status = String.format(resources.getString("adopt.description"),
-                          orphan.getFullName(),
-                          orphan.getGender(),
-                          orphan.getAge(getCampaign().getLocalDate()));
+                    String status = getPersonOptionString(orphan);
 
                     JMenuItem orphanItem = new JMenuItem(status);
                     orphanItem.setActionCommand(makeCommand(CMD_ADOPTION, String.valueOf(orphan.getId())));
@@ -4535,10 +4532,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     potentialParents.remove(person);
 
                     for (final Person newParent : potentialParents) {
-                        String status = String.format(resources.getString("adopt.description"),
-                              newParent.getFullName(),
-                              newParent.getGender(),
-                              newParent.getAge(getCampaign().getLocalDate()));
+                        String status = getPersonOptionString(newParent);
 
                         JMenuItem newParentItem = new JMenuItem(status);
                         newParentItem.setActionCommand(makeCommand(CMD_ADD_PARENT, String.valueOf(newParent.getId())));
@@ -4552,10 +4546,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 JMenu removeParentMenu = new JMenu(resources.getString("parent.remove"));
                 for (final Person oldParent : personParents) {
-                    String status = String.format(resources.getString("adopt.description"),
-                          oldParent.getFullName(),
-                          oldParent.getGender(),
-                          oldParent.getAge(getCampaign().getLocalDate()));
+                    String status = getPersonOptionString(oldParent);
 
                     JMenuItem removeParentItem = new JMenuItem(status);
                     removeParentItem.setActionCommand(makeCommand(CMD_REMOVE_PARENT,
@@ -4570,7 +4561,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 JMenu newChildMenu = new JMenu(resources.getString("child.add"));
                 List<Person> potentialChildren = new ArrayList<>(getCampaign().getActivePersonnel(false, true)
                                                                        .stream()
-                                                                       .filter(p -> (!p.isChild(getCampaign().getLocalDate())))
                                                                        .filter(p -> (p.getGenealogy()
                                                                                            .getParents()
                                                                                            .size() < 2))
@@ -4580,10 +4570,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 potentialChildren.remove(person);
 
                 for (final Person newChild : potentialChildren) {
-                    String status = String.format(resources.getString("adopt.description"),
-                          newChild.getFullName(),
-                          newChild.getGender(),
-                          newChild.getAge(getCampaign().getLocalDate()));
+                    String status = getPersonOptionString(newChild);
 
                     JMenuItem newChildItem = new JMenuItem(status);
                     newChildItem.setActionCommand(makeCommand(CMD_ADD_CHILD, String.valueOf(newChild.getId())));
@@ -4596,10 +4583,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 JMenu removeChildMenu = new JMenu(resources.getString("child.remove"));
                 for (final Person oldChild : personGenealogy.getChildren()) {
-                    String status = String.format(resources.getString("adopt.description"),
-                          oldChild.getFullName(),
-                          oldChild.getGender(),
-                          oldChild.getAge(getCampaign().getLocalDate()));
+                    String status = getPersonOptionString(oldChild);
 
                     JMenuItem removeChildItem = new JMenuItem(status);
                     removeChildItem.setActionCommand(makeCommand(CMD_REMOVE_CHILD, String.valueOf(oldChild.getId())));
@@ -4616,6 +4600,25 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // endregion GM Menu
 
         return Optional.of(popup);
+    }
+
+    /**
+     * Generates a formatted description string for a person, typically used in adoption scenarios.
+     *
+     * <p>This method creates a localized string containing the person's full name, gender, and current age.</p>
+     *
+     * @param person The {@link Person} to generate the description for
+     *
+     * @return A formatted string describing the person with their name, gender, and age
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private String getPersonOptionString(Person person) {
+        return String.format(resources.getString("personOption.description"),
+              person.getFullName(),
+              person.getGender(),
+              person.getAge(getCampaign().getLocalDate()));
     }
 
     private static void placeInAppropriateSPASubMenu(SpecialAbility spa, JMenu specialistMenu, JMenu combatAbilityMenu,
