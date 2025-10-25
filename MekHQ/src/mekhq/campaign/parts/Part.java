@@ -1484,7 +1484,7 @@ public abstract class Part implements IPartWork, ITechnology {
      *       quantity
      */
     public int getQuantityForPartsInUse() {
-        if (isSparePartInUse()) {
+        if (!isSparePartInUse()) {
             return 0;
         }
 
