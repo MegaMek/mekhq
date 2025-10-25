@@ -461,6 +461,7 @@ public class CampaignOptions {
     private boolean useInjuryFatigue;
     private int fieldKitchenCapacity;
     private boolean fieldKitchenIgnoreNonCombatants;
+    private int fatigueUndeploymentThreshold;
     private int fatigueLeaveThreshold;
     // endregion Turnover and Retention
 
@@ -1093,6 +1094,7 @@ public class CampaignOptions {
         setUseInjuryFatigue(true);
         setFieldKitchenCapacity(150);
         setFieldKitchenIgnoreNonCombatants(true);
+        fatigueUndeploymentThreshold = 9;
         setFatigueLeaveThreshold(13);
         // endregion Turnover and Retention
 
@@ -1802,6 +1804,14 @@ public class CampaignOptions {
 
     public void setFieldKitchenIgnoreNonCombatants(final boolean fieldKitchenIgnoreNonCombatants) {
         this.fieldKitchenIgnoreNonCombatants = fieldKitchenIgnoreNonCombatants;
+    }
+
+    public Integer getFatigueUndeploymentThreshold() {
+        return fatigueUndeploymentThreshold;
+    }
+
+    public void setFatigueUndeploymentThreshold(final Integer fatigueUndeploymentThreshold) {
+        this.fatigueUndeploymentThreshold = fatigueUndeploymentThreshold;
     }
 
     public Integer getFatigueLeaveThreshold() {
