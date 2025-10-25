@@ -312,7 +312,6 @@ public class StratConCampaignState {
         for (StratConTrackState track : tracks) {
             List<StratConStrategicObjective> objectives = track.getStrategicObjectives();
             for (StratConStrategicObjective objective : objectives) {
-                LOGGER.warn("Checking objective: {}", objective.toString());
 
                 hasObjectives = true;
                 if (!objective.isObjectiveResolved(track)) {
