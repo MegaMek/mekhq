@@ -140,8 +140,8 @@ public class FamilyTreeDialog extends JDialog {
      */
     private void setPreferences(JDialog dialog) {
         try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelMarketDialog.class);
-            dialog.setName("PersonnelMarketDialog");
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(FamilyTreeDialog.class);
+            dialog.setName("FamilyTreeDialog");
             preferences.manage(new JWindowPreference(dialog));
         } catch (Exception ex) {
             LOGGER.error("Failed to set user preferences", ex);
