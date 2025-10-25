@@ -39,6 +39,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
+import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.gui.dialog.glossary.NewGlossaryDialog.DOCUMENTATION_COMMAND_STRING;
@@ -57,7 +58,6 @@ import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -841,7 +841,9 @@ public class ImmersiveDialogCore extends JDialog {
         if (campaign.getPersonnel().contains(speaker)) {
             Portrait portrait = speaker.getPortrait();
 
-            if (portrait == null || Objects.equals(portrait.getFilename(), DEFAULT_PORTRAIT_FILENAME)) {
+            if (portrait == null ||
+                      portrait.getFilename().equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
+                      portrait.getFilename().equalsIgnoreCase(NO_PORTRAIT_NAME)) {
                 return campaign.getCampaignFactionIcon();
             }
 
