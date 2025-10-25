@@ -135,7 +135,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public int getQuantityForPartsInUse() {
-        if (isSparePartInUse()) {
+        if (!isSparePartInUse()) {
             return 0;
         }
 

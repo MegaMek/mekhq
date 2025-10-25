@@ -590,7 +590,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public int getQuantityForPartsInUse() {
-        if (isSparePartInUse()) {
+        if (!isSparePartInUse()) {
             return 0;
         }
 
