@@ -265,7 +265,7 @@ class PartsInUseManagerTest {
         }
 
         /**
-         * {@link Campaign# getDefaultStockPercent} is private, so we'll need to use reflection to get the method for
+         * {@link Campaign#getDefaultStockPercent} is private, so we'll need to use reflection to get the method for
          * testing
          */
         @Nested
