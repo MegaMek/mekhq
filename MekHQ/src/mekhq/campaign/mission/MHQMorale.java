@@ -239,7 +239,7 @@ public class MHQMorale {
      * @author Illiani
      * @since 0.50.10
      */
-    private static PerformanceOutcome getOutcome(int decisiveVictoryModifier, int victoryModifier,
+    static PerformanceOutcome getOutcome(int decisiveVictoryModifier, int victoryModifier,
           int decisiveDefeatModifier, int defeatModifier, int performanceModifier) {
         if (performanceModifier == decisiveVictoryModifier) {
             return PerformanceOutcome.DECISIVE_VICTORY;
@@ -264,7 +264,7 @@ public class MHQMorale {
      * @author Illiani
      * @since 0.50.10
      */
-    private static int getReliability(AtBContract contract) {
+    static int getReliability(AtBContract contract) {
         int reliabilityModifier;
 
         int quality = contract.getEnemyQuality();
@@ -276,11 +276,7 @@ public class MHQMorale {
         }
 
         // Adjust for Dragoon ratings
-        reliabilityModifier = switch (quality) {
-            case DRAGOON_F -> -1;
-            case DRAGOON_A, DRAGOON_ASTAR -> +1;
-            default -> 0; // DRAGOON_D, DRAGOON_C, DRAGOON_B
-        };
+        reliabilityModifier = getReliabilityModifier(quality);
 
         // Adjust for special enemy traits
         if (enemy.isRebel() || enemy.isMinorPower() || enemy.isMercenary() || enemy.isPirate()) {
@@ -289,6 +285,28 @@ public class MHQMorale {
             reliabilityModifier++;
         }
 
+        return reliabilityModifier;
+    }
+
+    /**
+     * Calculates the reliability modifier based on force quality rating.
+     *
+     * @param quality the Dragoon rating of the force, using {@code ForceDescriptor} constants (RATING_0 through
+     *                RATING_5, representing F through A*)
+     *
+     * @return the reliability modifier: -1 for F-rated forces, +1 for A or A*-rated forces, and 0 for D, C, or B-rated
+     *       forces
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    static int getReliabilityModifier(int quality) {
+        int reliabilityModifier;
+        reliabilityModifier = switch (quality) {
+            case DRAGOON_F -> -1;
+            case DRAGOON_A, DRAGOON_ASTAR -> +1;
+            default -> 0; // DRAGOON_D, DRAGOON_C, DRAGOON_B
+        };
         return reliabilityModifier;
     }
 
@@ -309,7 +327,7 @@ public class MHQMorale {
      * @author Illiani
      * @since 0.50.10
      */
-    private static int getPerformanceModifier(LocalDate today, AtBContract contract, int decisiveVictoryModifier,
+    static int getPerformanceModifier(LocalDate today, AtBContract contract, int decisiveVictoryModifier,
           int victoryModifier, int decisiveDefeatModifier, int defeatModifier) {
         int victories = 0;
         int defeats = 0;
@@ -335,13 +353,13 @@ public class MHQMorale {
             }
             // Pyrrhic Victory reduces victory count (negative consequence)
             if (scenarioStatus.isPyrrhicVictory()) {
-                victories--;
+                defeats++;
                 continue;
             }
             // Overall Victory/Defeat, if not otherwise noted above
             if (scenarioStatus.isOverallVictory()) {
                 victories++;
-            } else if (scenarioStatus.isOverallDefeat()) {
+            } else if (scenarioStatus.isOverallDefeat()) { // Includes Fleet in Being
                 defeats++;
             }
         }
