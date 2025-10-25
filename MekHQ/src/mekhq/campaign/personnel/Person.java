@@ -1023,7 +1023,7 @@ public class Person {
             }
         }
 
-        return portrait.getImageIcon();
+        return (portrait == null) ? null : portrait.getImageIcon();
     }
 
     public void setPortrait(final Portrait portrait) {
