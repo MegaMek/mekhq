@@ -64,6 +64,7 @@ import mekhq.gui.CampaignGUI;
  *
  * @author Neoancient
  */
+@Deprecated(since = "0.50.10", forRemoval = true)
 public class ShipSearchDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(ShipSearchDialog.class);
 

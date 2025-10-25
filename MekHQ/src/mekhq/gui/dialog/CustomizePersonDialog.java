@@ -1196,7 +1196,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
 
             JLabel labelReasoning = new JLabel();
-            labelReasoning.setText("Reasoning:");
+            labelReasoning.setText("Talent:");
             labelReasoning.setName("labelReasoning");
 
             gridBagConstraints.gridx = 0;
@@ -1494,17 +1494,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setDateOfBirth(birthdate);
         if (campaign.getCampaignOptions().isUseAgeEffects()) {
             updateAllSkillAgeModifiers(campaign.getLocalDate(), person);
-        }
-        if (person.isEmployed()) {
-            LocalDate joinedDate = person.getJoinedCampaign();
-
-            if (recruitment != null) {
-                if (joinedDate == null || recruitment.isBefore(joinedDate)) {
-                    person.setJoinedCampaign(recruitment);
-                }
-            } else {
-                person.setRecruitment(null);
-            }
         }
         person.setLastRankChangeDate(lastRankChangeDate);
         person.setRetirement(retirement);

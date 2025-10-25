@@ -453,17 +453,6 @@ class PersonnelRoleTest {
         boolean expected = switch (personnelRole) {
             case GROUND_VEHICLE_DRIVER,
                  VEHICLE_GUNNER,
-                 MEK_TECH,
-                 AERO_TEK,
-                 MECHANIC,
-                 BA_TECH,
-                 ASTECH,
-                 DOCTOR,
-                 MEDIC,
-                 COMMS_OPERATOR,
-                 TECH_COMMUNICATIONS,
-                 SENSOR_TECHNICIAN,
-                 CHEF,
                  VEHICLE_CREW -> true;
             default -> false;
         };
@@ -478,17 +467,6 @@ class PersonnelRoleTest {
         boolean expected = switch (personnelRole) {
             case NAVAL_VEHICLE_DRIVER,
                  VEHICLE_GUNNER,
-                 MEK_TECH,
-                 AERO_TEK,
-                 MECHANIC,
-                 BA_TECH,
-                 ASTECH,
-                 DOCTOR,
-                 MEDIC,
-                 COMMS_OPERATOR,
-                 TECH_COMMUNICATIONS,
-                 SENSOR_TECHNICIAN,
-                 CHEF,
                  VEHICLE_CREW -> true;
             default -> false;
         };
@@ -503,17 +481,6 @@ class PersonnelRoleTest {
         boolean expected = switch (personnelRole) {
             case VTOL_PILOT,
                  VEHICLE_GUNNER,
-                 MEK_TECH,
-                 AERO_TEK,
-                 MECHANIC,
-                 BA_TECH,
-                 ASTECH,
-                 DOCTOR,
-                 MEDIC,
-                 COMMS_OPERATOR,
-                 TECH_COMMUNICATIONS,
-                 SENSOR_TECHNICIAN,
-                 CHEF,
                  VEHICLE_CREW -> true;
             default -> false;
         };
@@ -530,17 +497,6 @@ class PersonnelRoleTest {
                  NAVAL_VEHICLE_DRIVER,
                  VTOL_PILOT,
                  VEHICLE_GUNNER,
-                 MEK_TECH,
-                 AERO_TEK,
-                 MECHANIC,
-                 BA_TECH,
-                 ASTECH,
-                 DOCTOR,
-                 MEDIC,
-                 COMMS_OPERATOR,
-                 TECH_COMMUNICATIONS,
-                 SENSOR_TECHNICIAN,
-                 CHEF,
                  VEHICLE_CREW -> true;
             default -> false;
         };

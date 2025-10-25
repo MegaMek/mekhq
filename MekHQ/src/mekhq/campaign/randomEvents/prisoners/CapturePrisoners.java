@@ -536,7 +536,7 @@ public class CapturePrisoners {
 
         // 'Recruit' prisoner
         PrisonerStatus prisonerStatus = prisoner.getPrisonerStatus();
-        campaign.recruitPerson(prisoner, prisonerStatus, false, true, false);
+        campaign.recruitPerson(prisoner, prisonerStatus, false, true, true);
 
         if (prisonerStatus.isPrisonerDefector()) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "defection.report", prisoner.getHyperlinkedName()));

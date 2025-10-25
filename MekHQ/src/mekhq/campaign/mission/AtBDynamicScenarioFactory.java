@@ -591,12 +591,12 @@ public class AtBDynamicScenarioFactory {
                                                                                .getAtmosphere(currentDate);
 
                 switch (specific_atmosphere) {
-                    case TOXIC_POISON, TOXIC_CAUSTIC -> {
+                    case TOXIC_POISON, TOXICPOISON, TOXIC_CAUSTIC, TOXICCAUSTIC -> {
                         LOGGER.info("Atmosphere is {}, disallowing Tanks and Infantry", specific_atmosphere);
                         allowsConvInfantry = false;
                         allowsTanks = false;
                     }
-                    case TAINTED_POISON, TAINTED_CAUSTIC -> {
+                    case TAINTED_POISON, TAINTEDPOISON, TAINTED_CAUSTIC, TAINTEDCAUSTIC -> {
                         LOGGER.info("Atmosphere is {}, setting tainted flag", specific_atmosphere);
                         isTainted = true;
                     }

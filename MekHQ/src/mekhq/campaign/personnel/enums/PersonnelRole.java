@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.enums;
 
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
+import static mekhq.campaign.personnel.skills.VehicleCrewSkills.VEHICLE_CREW_SKILLS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -89,8 +90,8 @@ public enum PersonnelRole {
     // ATOW: Aerospace Pilot Archetype (most ProtoMek pilots are Aerospace Sibkbo washouts, so this made the most sense)
     PROTOMEK_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_P, 2, 3, 5, 5, 4, 4, 5),
 
-    // ATOW: Elemental Archetype
-    BATTLE_ARMOUR(PersonnelRoleSubType.COMBAT, true, KeyEvent.VK_B, 7, 6, 4, 5, 3, 4, 3),
+    // ATOW: Battle Armor Specialist Archetype
+    BATTLE_ARMOUR(PersonnelRoleSubType.COMBAT, true, KeyEvent.VK_B, 7, 6, 4, 5, 3, 4, 4),
 
     // ATOW: Renegade Warrior Archetype
     SOLDIER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_S, 5, 5, 4, 5, 4, 6, 3),
@@ -526,17 +527,7 @@ public enum PersonnelRole {
         if (this == VEHICLE_CREW) {
             // Vehicle Crew is a bit of a special case as any of these skills makes a character eligible for
             // experience level improvements.
-            List<String> relevantSkills = List.of(SkillType.S_TECH_MEK,
-                  SkillType.S_TECH_AERO,
-                  SkillType.S_TECH_MECHANIC,
-                  SkillType.S_TECH_BA,
-                  SkillType.S_SURGERY,
-                  SkillType.S_MEDTECH,
-                  SkillType.S_ASTECH,
-                  SkillType.S_COMMUNICATIONS,
-                  SkillType.S_ART_COOKING,
-                  SkillType.S_SENSOR_OPERATIONS);
-            skills.addAll(relevantSkills);
+            skills.addAll(VEHICLE_CREW_SKILLS);
         } else if (this == SOLDIER) {
             skills.addAll(INFANTRY_GUNNERY_SKILLS);
         } else {
@@ -618,9 +609,8 @@ public enum PersonnelRole {
      * @see #getSkillsForProfession(boolean, boolean, boolean, boolean)
      */
     public List<String> getSkillsForProfession() {
-        return getSkillsForProfession(false, false, false, false);
+        return getSkillsForProfession(false, false, false, false, false);
     }
-
 
     /**
      * Retrieves the list of skill names relevant to this profession, tailored according to provided campaign or
@@ -642,6 +632,33 @@ public enum PersonnelRole {
      */
     public List<String> getSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
           boolean isTechsUseAdministration, boolean isUseArtillery) {
+        return getSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration,
+              isUseArtillery, false);
+    }
+
+
+    /**
+     * Retrieves the list of skill names relevant to this profession, tailored according to provided campaign or
+     * generation options.
+     *
+     * <p>The set of returned skills may vary depending on input flags that define whether certain support or
+     * specialty skills (such as Negotiation, Administration, or Artillery) should be included for appropriate
+     * roles.</p>
+     *
+     * <p>This method is typically used during personnel creation or skill assignment to ensure each role receives a
+     * fitting skill set based on campaign rules and user preferences.</p>
+     *
+     * @param isAdminsHaveNegotiation    if {@code true}, includes Negotiation skill for administrators
+     * @param isDoctorsUseAdministration if {@code true}, includes Administration skill for medical roles
+     * @param isTechsUseAdministration   if {@code true}, includes Administration skill for technical roles
+     * @param isUseArtillery             if {@code true}, includes Artillery skills where applicable
+     * @param includeExpandedSkills      if {@code true}, includes expanded skills for conventional infantry and vehicle
+     *                                   crewmember roles
+     *
+     * @return a list of skill names representing the profession-appropriate skills
+     */
+    public List<String> getSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
+          boolean isTechsUseAdministration, boolean isUseArtillery, boolean includeExpandedSkills) {
         return switch (this) {
             case MEKWARRIOR -> {
                 if (isUseArtillery) {
@@ -662,12 +679,25 @@ public enum PersonnelRole {
                     yield List.of(SkillType.S_GUN_VEE);
                 }
             }
-            case VEHICLE_CREW, MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
+            case MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
+            case VEHICLE_CREW -> {
+                if (includeExpandedSkills) {
+                    yield VEHICLE_CREW_SKILLS;
+                } else {
+                    yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_GUN_VEE);
+                }
+            }
             case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
             case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO);
             case BATTLE_ARMOUR -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
-            case SOLDIER -> List.of(SkillType.S_SMALL_ARMS);
+            case SOLDIER -> {
+                if (includeExpandedSkills) {
+                    yield INFANTRY_GUNNERY_SKILLS;
+                } else {
+                    yield List.of(SkillType.S_SMALL_ARMS);
+                }
+            }
             case VESSEL_PILOT -> List.of(SkillType.S_PILOT_SPACE);
             case VESSEL_GUNNER -> List.of(SkillType.S_GUN_SPACE);
             case VESSEL_CREW -> {
@@ -1049,6 +1079,11 @@ public enum PersonnelRole {
                      this == COMMS_OPERATOR ||
                      this == TECH_COMMUNICATIONS ||
                      this == SENSOR_TECHNICIAN ||
+                     this == SOLDIER ||
+                     this == ADMINISTRATOR_COMMAND ||
+                     this == ADMINISTRATOR_TRANSPORT ||
+                     this == ADMINISTRATOR_LOGISTICS ||
+                     this == ADMINISTRATOR_HR ||
                      this == CHEF;
     }
 
@@ -1247,7 +1282,7 @@ public enum PersonnelRole {
      *       Crew role, {@code false} otherwise.
      */
     public boolean isGroundVehicleCrew() {
-        return isGroundVehicleDriver() || isVehicleGunner() || isVehicleCrewExtended();
+        return isGroundVehicleDriver() || isVehicleGunner() || isVehicleCrew();
     }
 
     /**
@@ -1255,7 +1290,7 @@ public enum PersonnelRole {
      *       Crew role, {@code false} otherwise.
      */
     public boolean isNavalVehicleCrew() {
-        return isNavalVehicleDriver() || isVehicleGunner() || isVehicleCrewExtended();
+        return isNavalVehicleDriver() || isVehicleGunner() || isVehicleCrew();
     }
 
     /**
@@ -1263,7 +1298,7 @@ public enum PersonnelRole {
      *       {@code false} otherwise.
      */
     public boolean isVTOLCrew() {
-        return isVTOLPilot() || isVehicleGunner() || isVehicleCrewExtended();
+        return isVTOLPilot() || isVehicleGunner() || isVehicleCrew();
     }
 
     /**

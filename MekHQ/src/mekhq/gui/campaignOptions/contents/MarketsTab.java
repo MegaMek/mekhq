@@ -125,8 +125,8 @@ public class MarketsTab {
     private JLabel lblUnitMarketMethod;
     private MMComboBox<UnitMarketMethod> comboUnitMarketMethod;
     private JCheckBox chkUnitMarketRegionalMekVariations;
-    private JLabel lblUnitMarketSpecialUnitChance;
-    private JSpinner spnUnitMarketSpecialUnitChance;
+    private JLabel lblUnitMarketArtilleryUnitChance;
+    private JSpinner spnUnitMarketArtilleryUnitChance;
     private JLabel lblUnitMarketRarityModifier;
     private JSpinner spnUnitMarketRarityModifier;
     private JCheckBox chkInstantUnitMarketDelivery;
@@ -421,8 +421,8 @@ public class MarketsTab {
         lblUnitMarketMethod = new JLabel();
         comboUnitMarketMethod = new MMComboBox<>("comboUnitMarketMethod", UnitMarketMethod.values());
         chkUnitMarketRegionalMekVariations = new JCheckBox();
-        lblUnitMarketSpecialUnitChance = new JLabel();
-        spnUnitMarketSpecialUnitChance = new JSpinner();
+        lblUnitMarketArtilleryUnitChance = new JLabel();
+        spnUnitMarketArtilleryUnitChance = new JSpinner();
         lblUnitMarketRarityModifier = new JLabel();
         spnUnitMarketRarityModifier = new JSpinner();
         chkInstantUnitMarketDelivery = new JCheckBox();
@@ -454,12 +454,12 @@ public class MarketsTab {
         chkUnitMarketRegionalMekVariations.addMouseListener(createTipPanelUpdater(unitMarketHeader,
               "UnitMarketRegionalMekVariations"));
 
-        lblUnitMarketSpecialUnitChance = new CampaignOptionsLabel("UnitMarketSpecialUnitChance");
-        lblUnitMarketSpecialUnitChance.addMouseListener(createTipPanelUpdater(unitMarketHeader,
-              "UnitMarketSpecialUnitChance"));
-        spnUnitMarketSpecialUnitChance = new CampaignOptionsSpinner("UnitMarketSpecialUnitChance", 30, 0, 100, 1);
-        spnUnitMarketSpecialUnitChance.addMouseListener(createTipPanelUpdater(unitMarketHeader,
-              "UnitMarketSpecialUnitChance"));
+        lblUnitMarketArtilleryUnitChance = new CampaignOptionsLabel("UnitMarketArtilleryUnitChance");
+        lblUnitMarketArtilleryUnitChance.addMouseListener(createTipPanelUpdater(unitMarketHeader,
+              "UnitMarketArtilleryUnitChance"));
+        spnUnitMarketArtilleryUnitChance = new CampaignOptionsSpinner("UnitMarketArtilleryUnitChance", 30, 0, 100, 1);
+        spnUnitMarketArtilleryUnitChance.addMouseListener(createTipPanelUpdater(unitMarketHeader,
+              "UnitMarketArtilleryUnitChance"));
 
         lblUnitMarketRarityModifier = new CampaignOptionsLabel("UnitMarketRarityModifier");
         lblUnitMarketRarityModifier.addMouseListener(createTipPanelUpdater(unitMarketHeader,
@@ -501,9 +501,9 @@ public class MarketsTab {
 
         layout.gridy++;
         layout.gridwidth = 1;
-        panel.add(lblUnitMarketSpecialUnitChance, layout);
+        panel.add(lblUnitMarketArtilleryUnitChance, layout);
         layout.gridx++;
-        panel.add(spnUnitMarketSpecialUnitChance, layout);
+        panel.add(spnUnitMarketArtilleryUnitChance, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -871,7 +871,7 @@ public class MarketsTab {
         // Unit Market
         comboUnitMarketMethod.setSelectedItem(options.getUnitMarketMethod());
         chkUnitMarketRegionalMekVariations.setSelected(options.isRegionalMekVariations());
-        spnUnitMarketSpecialUnitChance.setValue(options.getUnitMarketSpecialUnitChance());
+        spnUnitMarketArtilleryUnitChance.setValue(options.getUnitMarketArtilleryUnitChance());
         spnUnitMarketRarityModifier.setValue(options.getUnitMarketRarityModifier());
         chkInstantUnitMarketDelivery.setSelected(options.isInstantUnitMarketDelivery());
         chkMothballUnitMarketDeliveries.setSelected(options.isMothballUnitMarketDeliveries());
@@ -938,7 +938,7 @@ public class MarketsTab {
         // Unit Market
         options.setUnitMarketMethod(comboUnitMarketMethod.getSelectedItem());
         options.setUnitMarketRegionalMekVariations(chkUnitMarketRegionalMekVariations.isSelected());
-        options.setUnitMarketSpecialUnitChance((int) spnUnitMarketSpecialUnitChance.getValue());
+        options.setUnitMarketArtilleryUnitChance((int) spnUnitMarketArtilleryUnitChance.getValue());
         options.setUnitMarketRarityModifier((int) spnUnitMarketRarityModifier.getValue());
         options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
         options.setMothballUnitMarketDeliveries(chkMothballUnitMarketDeliveries.isSelected());

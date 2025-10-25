@@ -141,7 +141,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         final boolean isMek = entity instanceof Mek;
         final boolean isMekWithGunner = (!usesSoloPilot && isMek);
         final boolean isProtoMek = entity instanceof ProtoMek;
-        final boolean isConventionalAircraft = entity instanceof ConvFighter;
+        final boolean isConventionalAircraftCrew = entity instanceof ConvFighter;
         final boolean isSmallCraftOrJumpShip = (entity instanceof SmallCraft) || (entity instanceof Jumpship);
         final boolean isTank = entity instanceof Tank;
         final boolean canTakeMoreGunners = units[0].canTakeMoreGunners();
@@ -212,10 +212,12 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                               .filter(person -> person.getPrimaryRole().isVesselCrewMember() ||
                                                       person.getSecondaryRole().isVesselCrewMember())
                               .collect(Collectors.toList());
-        } else if (isConventionalAircraft) {
+        } else if (isConventionalAircraftCrew) {
             personnel = personnel.stream()
                               .filter(person -> person.getPrimaryRole().isConventionalAircraftPilot() ||
-                                                      person.getSecondaryRole().isConventionalAircraftPilot())
+                                                      person.getSecondaryRole().isConventionalAircraftPilot() ||
+                                                      person.getPrimaryRole().isVehicleCrewExtended() ||
+                                                      person.getSecondaryRole().isVehicleCrewExtended())
                               .collect(Collectors.toList());
         } else if (isAero) {
             personnel = personnel.stream()
@@ -246,7 +248,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // Pilot Menu
         if (canTakeMoreDrivers) {
             // Pilot Menu
-            if (isMek || usesSoloPilot || isVTOL || isSmallCraftOrJumpShip) {
+            if (isMek || usesSoloPilot || isVTOL || isSmallCraftOrJumpShip || isConventionalAircraftCrew) {
                 if (isMek) {
                     filteredPersonnel = personnel.stream()
                                               .filter(person -> person.getPrimaryRole().isMekWarriorGrouping() ||
@@ -260,7 +262,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     filteredPersonnel = personnel.stream()
                                               .filter(person -> person.hasRole(PersonnelRole.VESSEL_PILOT))
                                               .collect(Collectors.toList());
-                } else if (isConventionalAircraft) {
+                } else if (isConventionalAircraftCrew) {
                     filteredPersonnel = personnel.stream()
                                               .filter(person -> person.getPrimaryRole().isConventionalAircraftPilot() ||
                                                                       person.getSecondaryRole()
@@ -306,7 +308,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isProtoMekPilot());
                         } else if (isSmallCraftOrJumpShip) {
                             skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isVesselPilot());
-                        } else if (isConventionalAircraft) {
+                        } else if (isConventionalAircraftCrew) {
                             skillLevel = person.getSkillLevel(campaign,
                                   !person.getPrimaryRole().isConventionalAircraftPilot());
                         } else if (isAero) {
@@ -339,7 +341,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
 
                                 ensureRecruitmentDate(campaign.getLocalDate(), person);
 
-                                if (isVTOL || isSmallCraftOrJumpShip) {
+                                if (isVTOL || isSmallCraftOrJumpShip || isConventionalAircraftCrew) {
                                     units[0].addDriver(person, useTransfers);
                                 } else {
                                     units[0].addPilotOrSoldier(person, useTransfers);
@@ -415,13 +417,14 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         }
 
         // Gunners Menu
-
-        if (canTakeMoreGunners && (isTank || isSmallCraftOrJumpShip || isMekWithGunner)) {
+        if (canTakeMoreGunners && (isTank || isSmallCraftOrJumpShip || isMekWithGunner || isConventionalAircraftCrew)) {
             filteredPersonnel = personnel.stream()
                                       .filter(person -> (isSmallCraftOrJumpShip &&
                                                                person.hasRole(PersonnelRole.VESSEL_GUNNER)) ||
                                                               (isTank &&
                                                                      person.hasRole(PersonnelRole.VEHICLE_GUNNER)) ||
+                                                              (isConventionalAircraftCrew &&
+                                                                     person.hasRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT)) ||
                                                               ((isMekWithGunner) &&
                                                                      person.getPrimaryRole().isMekWarriorGrouping() ||
                                                                      person.getSecondaryRole().isMekWarriorGrouping()))
@@ -448,6 +451,9 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                         skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isVesselGunner());
                     } else if (isTank) {
                         skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isVehicleGunner());
+                    } else if (isConventionalAircraftCrew) {
+                        skillLevel = person.getSkillLevel(campaign,
+                              !person.getPrimaryRole().isConventionalAircraftPilot());
                     } else if (isMekWithGunner) {
                         skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isMekWarriorGrouping());
                     }
@@ -480,12 +486,16 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         }
 
         // Crewmember Menu
-        if (units[0].canTakeMoreVesselCrew() && (isAero || units[0].getEntity().isSupportVehicle())) {
+        if (units[0].canTakeMoreVesselCrew()) {
             filteredPersonnel = personnel.stream()
-                                      .filter(person -> isAero ? person.hasRole(PersonnelRole.VESSEL_CREW)
-                                                              : (person.getPrimaryRole().isVehicleCrewExtended() ||
-                                                                       person.getSecondaryRole()
-                                                                             .isVehicleCrewExtended()))
+                                      .filter(person -> {
+                                          if (isAero && !isConventionalAircraftCrew) {
+                                              return person.hasRole(PersonnelRole.VESSEL_CREW);
+                                          } else {
+                                              return person.getPrimaryRole().isVehicleCrewExtended() ||
+                                                           person.getSecondaryRole().isVehicleCrewExtended();
+                                          }
+                                      })
                                       .collect(Collectors.toList());
             if (!filteredPersonnel.isEmpty()) {
                 // Create the SkillLevel Submenus
@@ -501,10 +511,14 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
 
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
-                    final JScrollableMenu subMenu = switch (person.getSkillLevel(campaign,
-                          isAero ?
-                                !person.getPrimaryRole().isVesselCrew() :
-                                !person.getPrimaryRole().isVehicleCrewExtended())) {
+                    final JScrollableMenu subMenu = switch (person.getSkillLevel(
+                          campaign,
+                          isAero && !isConventionalAircraftCrew
+                                ?
+                                !person.hasRole(PersonnelRole.VESSEL_CREW)
+                                :
+                                !(person.getPrimaryRole().isVehicleCrewExtended() ||
+                                        person.getSecondaryRole().isVehicleCrewExtended()))) {
                         case LEGENDARY -> legendaryMenu;
                         case HEROIC -> heroicMenu;
                         case ELITE -> eliteMenu;

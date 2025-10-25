@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import megamek.Version;
+import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -64,6 +65,7 @@ public class RandomSkillPreferences {
     private int combatSmallArmsBonus;
     private int supportSmallArmsBonus;
     private final int[] commandSkillsModifier;
+    private final int[] utilitySkillsModifier;
     private int roleplaySkillModifier;
     private int artilleryProb;
     private int artilleryBonus;
@@ -82,7 +84,8 @@ public class RandomSkillPreferences {
         combatSmallArmsBonus = -3;
         supportSmallArmsBonus = -10;
         specialAbilityBonus = new int[] { -10, -10, -2, 0, 1, 1, 1 };
-        commandSkillsModifier = new int[] { -10, -10, -7, -4, -1, -1, -1 };
+        commandSkillsModifier = new int[] { -12, -11, -10, -9, -8, -7, -7 };
+        utilitySkillsModifier = new int[] { -12, -11, -10, -9, -8, -7, -7 };
         roleplaySkillModifier = -12;
         artilleryProb = 10;
         artilleryBonus = -2;
@@ -206,6 +209,16 @@ public class RandomSkillPreferences {
         }
     }
 
+    public int getUtilitySkillsModifier(int lvl) {
+        return utilitySkillsModifier[lvl];
+    }
+
+    public void setUtilitySkillsMod(int lvl, int bonus) {
+        if (lvl < utilitySkillsModifier.length) {
+            utilitySkillsModifier[lvl] = bonus;
+        }
+    }
+
     public int getRoleplaySkillModifier() {
         return roleplaySkillModifier;
     }
@@ -256,6 +269,7 @@ public class RandomSkillPreferences {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "recruitmentBonuses");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "specialAbilityBonus", specialAbilityBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandSkillsModifier", commandSkillsModifier);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "utilitySkillsModifier", utilitySkillsModifier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "roleplaySkillModifier", roleplaySkillModifier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeSkill", randomizeSkill);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAttributes", useAttributes);
@@ -323,6 +337,11 @@ public class RandomSkillPreferences {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
                         retVal.commandSkillsModifier[i] = Integer.parseInt(values[i]);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("utilitySkillsModifier")) {
+                    String[] values = wn2.getTextContent().split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.utilitySkillsModifier[i] = MathUtility.parseInt(values[i], -1);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("roleplaySkillModifier")) {
                     retVal.roleplaySkillModifier = Integer.parseInt(wn2.getTextContent().trim());

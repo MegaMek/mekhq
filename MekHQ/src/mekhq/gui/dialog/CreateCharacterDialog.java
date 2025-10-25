@@ -997,7 +997,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             demographicPanel.add(spnPersonalityQuirk, gridBagConstraints);
 
             JLabel labelReasoning = new JLabel();
-            labelReasoning.setText("Reasoning:");
+            labelReasoning.setText("Talent:");
             labelReasoning.setName("labelReasoning");
 
             gridBagConstraints.gridx = 0;

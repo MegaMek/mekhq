@@ -243,6 +243,7 @@ public class CampaignOptions {
     private boolean displayPatientRecord;
     private boolean displayAssignmentRecord;
     private boolean displayPerformanceRecord;
+    private boolean awardVeterancySPAs;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -460,6 +461,7 @@ public class CampaignOptions {
     private boolean useInjuryFatigue;
     private int fieldKitchenCapacity;
     private boolean fieldKitchenIgnoreNonCombatants;
+    private int fatigueUndeploymentThreshold;
     private int fatigueLeaveThreshold;
     // endregion Turnover and Retention
 
@@ -581,7 +583,7 @@ public class CampaignOptions {
     // Unit Market
     private UnitMarketMethod unitMarketMethod;
     private boolean unitMarketRegionalMekVariations;
-    private int unitMarketSpecialUnitChance;
+    private int unitMarketArtilleryUnitChance;
     private int unitMarketRarityModifier;
     private boolean instantUnitMarketDelivery;
     private boolean mothballUnitMarketDeliveries;
@@ -1092,6 +1094,7 @@ public class CampaignOptions {
         setUseInjuryFatigue(true);
         setFieldKitchenCapacity(150);
         setFieldKitchenIgnoreNonCombatants(true);
+        fatigueUndeploymentThreshold = 9;
         setFatigueLeaveThreshold(13);
         // endregion Turnover and Retention
 
@@ -1222,7 +1225,7 @@ public class CampaignOptions {
         // Unit Market
         setUnitMarketMethod(UnitMarketMethod.NONE);
         setUnitMarketRegionalMekVariations(true);
-        setUnitMarketSpecialUnitChance(30);
+        setUnitMarketArtilleryUnitChance(30);
         setUnitMarketRarityModifier(0);
         setInstantUnitMarketDelivery(false);
         setUnitMarketReportRefresh(true);
@@ -1310,13 +1313,15 @@ public class CampaignOptions {
     /**
      * @return the method of unit rating to use
      */
+    @Deprecated(since = "0.50.10", forRemoval = false)
     public UnitRatingMethod getUnitRatingMethod() {
-        return unitRatingMethod;
+        return UnitRatingMethod.CAMPAIGN_OPS;
     }
 
     /**
      * @param unitRatingMethod the method of unit rating to use
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public void setUnitRatingMethod(final UnitRatingMethod unitRatingMethod) {
         this.unitRatingMethod = unitRatingMethod;
     }
@@ -1737,6 +1742,14 @@ public class CampaignOptions {
         this.displayPerformanceRecord = displayPerformanceRecord;
     }
 
+    public boolean isAwardVeterancySPAs() {
+        return awardVeterancySPAs;
+    }
+
+    public void setAwardVeterancySPAs(final boolean awardVeterancySPAs) {
+        this.awardVeterancySPAs = awardVeterancySPAs;
+    }
+
     public boolean isRewardComingOfAgeAbilities() {
         return rewardComingOfAgeAbilities;
     }
@@ -1791,6 +1804,14 @@ public class CampaignOptions {
 
     public void setFieldKitchenIgnoreNonCombatants(final boolean fieldKitchenIgnoreNonCombatants) {
         this.fieldKitchenIgnoreNonCombatants = fieldKitchenIgnoreNonCombatants;
+    }
+
+    public Integer getFatigueUndeploymentThreshold() {
+        return fatigueUndeploymentThreshold;
+    }
+
+    public void setFatigueUndeploymentThreshold(final Integer fatigueUndeploymentThreshold) {
+        this.fatigueUndeploymentThreshold = fatigueUndeploymentThreshold;
     }
 
     public Integer getFatigueLeaveThreshold() {
@@ -3723,12 +3744,12 @@ public class CampaignOptions {
         this.unitMarketRegionalMekVariations = unitMarketRegionalMekVariations;
     }
 
-    public int getUnitMarketSpecialUnitChance() {
-        return unitMarketSpecialUnitChance;
+    public int getUnitMarketArtilleryUnitChance() {
+        return unitMarketArtilleryUnitChance;
     }
 
-    public void setUnitMarketSpecialUnitChance(final int unitMarketSpecialUnitChance) {
-        this.unitMarketSpecialUnitChance = unitMarketSpecialUnitChance;
+    public void setUnitMarketArtilleryUnitChance(final int unitMarketSpecialUnitChance) {
+        this.unitMarketArtilleryUnitChance = unitMarketSpecialUnitChance;
     }
 
     public int getUnitMarketRarityModifier() {

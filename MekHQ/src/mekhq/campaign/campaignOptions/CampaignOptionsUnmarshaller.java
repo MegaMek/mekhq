@@ -55,7 +55,6 @@ import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -257,9 +256,6 @@ public class CampaignOptionsUnmarshaller {
             case "variableTechLevel" -> campaignOptions.setVariableTechLevel(parseBoolean(nodeContents));
             case "factionIntroDate" -> campaignOptions.setIsUseFactionIntroDate(parseBoolean(nodeContents));
             case "techLevel" -> campaignOptions.setTechLevel(parseInt(nodeContents));
-            case "unitRatingMethod", "dragoonsRatingMethod" ->
-                  campaignOptions.setUnitRatingMethod(UnitRatingMethod.parseFromString(
-                        nodeContents));
             case "manualUnitRatingModifier" -> campaignOptions.setManualUnitRatingModifier(parseInt(nodeContents));
             case "clampReputationPayMultiplier" -> campaignOptions.setClampReputationPayMultiplier(parseBoolean(
                   nodeContents));
@@ -327,6 +323,8 @@ public class CampaignOptionsUnmarshaller {
             case "displayAssignmentRecord" -> campaignOptions.setDisplayAssignmentRecord(parseBoolean(
                   nodeContents));
             case "displayPerformanceRecord" -> campaignOptions.setDisplayPerformanceRecord(parseBoolean(
+                  nodeContents));
+            case "awardVeterancySPAs" -> campaignOptions.setAwardVeterancySPAs(parseBoolean(
                   nodeContents));
             case "rewardComingOfAgeAbilities" -> campaignOptions.setRewardComingOfAgeAbilities(parseBoolean(
                   nodeContents));
@@ -664,6 +662,8 @@ public class CampaignOptionsUnmarshaller {
             case "fieldKitchenCapacity" -> campaignOptions.setFieldKitchenCapacity(parseInt(nodeContents));
             case "fieldKitchenIgnoreNonCombatants" -> campaignOptions.setFieldKitchenIgnoreNonCombatants(parseBoolean(
                   nodeContents));
+            case "fatigueUndeploymentThreshold" ->
+                  campaignOptions.setFatigueUndeploymentThreshold(parseInt(nodeContents));
             case "fatigueLeaveThreshold" -> campaignOptions.setFatigueLeaveThreshold(parseInt(nodeContents));
             case "payForParts" -> campaignOptions.setPayForParts(parseBoolean(nodeContents));
             case "payForRepairs" -> campaignOptions.setPayForRepairs(parseBoolean(nodeContents));
@@ -761,8 +761,8 @@ public class CampaignOptionsUnmarshaller {
             case "unitMarketMethod" -> campaignOptions.setUnitMarketMethod(UnitMarketMethod.valueOf(nodeContents));
             case "unitMarketRegionalMekVariations" -> campaignOptions.setUnitMarketRegionalMekVariations(parseBoolean(
                   nodeContents));
-            case "unitMarketSpecialUnitChance" -> campaignOptions.setUnitMarketSpecialUnitChance(parseInt(
-                  nodeContents));
+            case "unitMarketArtilleryUnitChance", "unitMarketSpecialUnitChance" ->
+                  campaignOptions.setUnitMarketArtilleryUnitChance(parseInt(nodeContents));
             case "unitMarketRarityModifier" -> campaignOptions.setUnitMarketRarityModifier(parseInt(nodeContents));
             case "instantUnitMarketDelivery" -> campaignOptions.setInstantUnitMarketDelivery(parseBoolean(
                   nodeContents));

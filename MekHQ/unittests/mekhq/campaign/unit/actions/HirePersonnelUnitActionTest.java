@@ -322,6 +322,7 @@ public class HirePersonnelUnitActionTest {
         doReturn(false).when(mockOptions).isUseArtillery();
         Entity mockEntity = mock(Jumpship.class);
         when(mockEntity.isSupportVehicle()).thenReturn(false);
+        when(mockEntity.isLargeCraft()).thenReturn(true);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
 
         doReturn(false).when(unit).canTakeMoreDrivers();

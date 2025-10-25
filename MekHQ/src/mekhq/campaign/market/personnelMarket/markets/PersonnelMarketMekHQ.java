@@ -177,15 +177,11 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             }
         }
 
-        if (mercenaryFaction != null &&
-                  !interestedFactions.isEmpty() &&
-                  !interestedFactions.contains(mercenaryFaction)) {
+        if (mercenaryFaction != null && !interestedFactions.contains(mercenaryFaction)) {
             interestedFactions.add(mercenaryFaction);
         }
 
-        if (pirateFaction != null &&
-                  !interestedFactions.isEmpty() &&
-                  !interestedFactions.contains(pirateFaction)) {
+        if (pirateFaction != null && !interestedFactions.contains(pirateFaction)) {
             interestedFactions.add(pirateFaction);
         }
 

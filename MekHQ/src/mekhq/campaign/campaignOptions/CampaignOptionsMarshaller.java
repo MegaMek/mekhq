@@ -102,7 +102,6 @@ public class CampaignOptionsMarshaller {
         // endregion Repair and Maintenance Tab
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionForNames", campaignOptions.isUseOriginFactionForNames());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitRatingMethod", campaignOptions.getUnitRatingMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEraMods", campaignOptions.isUseEraMods());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignedTechFirst", campaignOptions.isAssignedTechFirst());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "resetToFirstTech", campaignOptions.isResetToFirstTech());
@@ -290,6 +289,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "displayPerformanceRecord",
               campaignOptions.isDisplayPerformanceRecord());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "awardVeterancySPAs",
+              campaignOptions.isAwardVeterancySPAs());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "rewardComingOfAgeAbilities",
@@ -564,6 +567,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "fieldKitchenIgnoreNonCombatants",
               campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "fatigueUndeploymentThreshold",
+              campaignOptions.getFatigueUndeploymentThreshold());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "fatigueLeaveThreshold",
@@ -935,8 +942,8 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isUnitMarketRegionalMekVariations());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
-              "unitMarketSpecialUnitChance",
-              campaignOptions.getUnitMarketSpecialUnitChance());
+              "unitMarketArtilleryUnitChance",
+              campaignOptions.getUnitMarketArtilleryUnitChance());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "unitMarketRarityModifier",

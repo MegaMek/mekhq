@@ -154,10 +154,10 @@ public class StratConReinforcementsConfirmationDialog {
 
         reinforcementDialogResponseType = switch (dialog.getDialogChoice()) {
             case 0 -> ReinforcementDialogResponseType.CANCEL;
-            case 1 -> ReinforcementDialogResponseType.REINFORCE_GM;
-            case 2 -> ReinforcementDialogResponseType.REINFORCE_GM_INSTANTLY;
-            case 3 -> ReinforcementDialogResponseType.REINFORCE;
-            case 4 -> ReinforcementDialogResponseType.REINFORCE_INSTANTLY;
+            case 1 -> ReinforcementDialogResponseType.REINFORCE;
+            case 2 -> ReinforcementDialogResponseType.REINFORCE_INSTANTLY;
+            case 3 -> ReinforcementDialogResponseType.REINFORCE_GM;
+            case 4 -> ReinforcementDialogResponseType.REINFORCE_GM_INSTANTLY;
             default -> throw new IllegalStateException("Unexpected dialog choice value: "
                                                              +
                                                              dialog.getDialogChoice()
@@ -244,16 +244,6 @@ public class StratConReinforcementsConfirmationDialog {
               "StratConReinforcementsConfirmationDialog.button.cancel");
         buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
 
-        if (isGM) {
-            label = getTextAt(RESOURCE_BUNDLE,
-                  "StratConReinforcementsConfirmationDialog.button.reinforce.gm");
-            buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
-
-            label = getTextAt(RESOURCE_BUNDLE,
-                  "StratConReinforcementsConfirmationDialog.button.reinforce.gm.instantly");
-            buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
-        }
-
         if (maximumSupportPoints > 0) {
             label = getTextAt(RESOURCE_BUNDLE,
                   "StratConReinforcementsConfirmationDialog.button.reinforce");
@@ -261,6 +251,16 @@ public class StratConReinforcementsConfirmationDialog {
 
             label = getTextAt(RESOURCE_BUNDLE,
                   "StratConReinforcementsConfirmationDialog.button.reinforce.instantly");
+            buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
+        }
+
+        if (isGM) {
+            label = getTextAt(RESOURCE_BUNDLE,
+                  "StratConReinforcementsConfirmationDialog.button.reinforce.gm");
+            buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
+
+            label = getTextAt(RESOURCE_BUNDLE,
+                  "StratConReinforcementsConfirmationDialog.button.reinforce.gm.instantly");
             buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
         }
 

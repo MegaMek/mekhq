@@ -1172,30 +1172,36 @@ public class StratConRulesManager {
     }
 
     /**
-     * Finds an unoccupied coordinates adjacent to the given origin coordinates.
+     * Finds an unoccupied coordinate adjacent to the given origin coordinate.
      *
-     * <p>Adjacent coordinates are determined based on all possible directions defined by {@code ALL_DIRECTIONS}.
-     * A coordinate is considered "unoccupied" if the following conditions are met:
+     * <p>This method examines all directions defined by {@code ALL_DIRECTIONS} around {@code originCoords} and
+     * evaluates each for suitability as an unoccupied adjacent coordinate. A coordinate is considered "unoccupied" if
+     * it meets all of the following conditions:</p>
+     *
      * <ul>
-     *     <li>No scenario is assigned to the coordinate (using {@link StratConTrackState#getScenario})</li>
-     *     <li>No facility exists at the coordinate (using {@link StratConTrackState#getFacility})</li>
-     *     <li>The coordinate is not occupied by any assigned forces (using {@link StratConTrackState#getAssignedForceCoords})</li>
-     *     <li>The coordinate is on the map</li>
+     *     <li>There is no scenario assigned to the coordinate (via {@link StratConTrackState#getScenario})</li>
+     *     <li>There is no facility present at the coordinate (via {@link StratConTrackState#getFacility})</li>
+     *     <li>The coordinate is not occupied by any assigned forces (via {@link StratConTrackState#getAssignedForceCoords})</li>
+     *     <li>The coordinate is within the boundaries of the map</li>
+     *     <li>The coordinate is among the set of revealed coordinates (via {@link StratConTrackState#getRevealedCoords})</li>
      * </ul>
-     * If multiple suitable coordinates are found, one is selected at random and returned.
-     * If no suitable coordinates are available, the method returns {@code null}.
      *
-     * @param originCoords the coordinate from which to search for unoccupied adjacent ones
-     * @param trackState   the state of the track containing information about scenarios, facilities, and forces
+     * <p>If multiple suitable coordinates are found, one is selected at random and returned. If no such coordinates
+     * are available, {@code originCoords} is returned.</p>
      *
-     * @return a randomly selected unoccupied adjacent coordinate, or {@code null} if none are available
+     * @param originCoords the starting coordinate to search around
+     * @param trackState   the track state holding map, facility, scenario, and force assignment data
+     *
+     * @return a randomly selected unoccupied and revealed adjacent coordinate, or {@code originCoords} if none are
+     *       available
      */
-    private static @Nullable StratConCoords getUnoccupiedAdjacentCoords(StratConCoords originCoords,
+    private static StratConCoords getUnoccupiedAdjacentCoords(StratConCoords originCoords,
           StratConTrackState trackState) {
         // We need to reduce width/height by one because coordinates index from 0, not 1
         final int trackWidth = trackState.getWidth() - 1;
         final int trackHeight = trackState.getHeight() - 1;
 
+        Set<StratConCoords> revealedCoords = trackState.getRevealedCoords();
         List<StratConCoords> suitableCoords = new ArrayList<>();
         for (int direction : ALL_DIRECTIONS) {
             StratConCoords newCoords = originCoords.translate(direction);
@@ -1220,11 +1226,13 @@ public class StratConRulesManager {
                 continue;
             }
 
-            suitableCoords.add(newCoords);
+            if (revealedCoords.contains(newCoords)) {
+                suitableCoords.add(newCoords);
+            }
         }
 
         if (suitableCoords.isEmpty()) {
-            return null;
+            return originCoords;
         }
 
         return getRandomItem(suitableCoords);
@@ -1558,13 +1566,11 @@ public class StratConRulesManager {
     /**
      * Determines the target roll modifier based on the given unit's speed value.
      *
-     * <p>This method assigns a modifier according to these speed thresholds (all ranges are inclusive):</p>
-     *
+     * <p>This method evaluates {@code unitSpeed} and assigns a modifier as follows (all ranges are inclusive):</p>
      * <ul>
-     *     <li>Speed ≤ 3: modifier = -1</li>
-     *     <li>Speed 4–6 (inclusive): modifier = 0</li>
-     *     <li>Speed 7–10 (inclusive): modifier = 1</li>
-     *     <li>Speed ≥ 11: modifier = 2</li>
+     *     <li>Speed ≤ 3: modifier = 1</li>
+     *     <li>Speed 4–7 (inclusive): modifier = 0</li>
+     *     <li>Speed ≥ 8: modifier = -1</li>
      * </ul>
      *
      * <p>The returned {@link TargetRollModifier} includes the computed modifier and the description "Unit Speed
@@ -1580,13 +1586,11 @@ public class StratConRulesManager {
     private static TargetRollModifier getUnitSpeedModifier(int unitSpeed) {
         int modifier;
         if (unitSpeed <= 3) {
-            modifier = -1;
-        } else if (unitSpeed <= 6) {
-            modifier = 0;
-        } else if (unitSpeed <= 10) {
             modifier = 1;
-        } else { // speed 11+
-            modifier = 2;
+        } else if (unitSpeed <= 7) {
+            modifier = 0;
+        } else { // speed 8+
+            modifier = -1;
         }
 
         return new TargetRollModifier(modifier, "Unit Speed Modifier");

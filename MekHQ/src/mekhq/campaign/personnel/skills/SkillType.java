@@ -40,15 +40,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.STRENGTH;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_ART;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_INTEREST;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENCE;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
@@ -447,6 +439,12 @@ public class SkillType {
                 continue;
             }
 
+            if (skillType.isUtilitySkill()) {
+                supportSkills.add(skillName);
+                continue;
+            }
+
+            // RP Skills
             combatSkills.add(skillName);
         }
 
@@ -521,10 +519,10 @@ public class SkillType {
      *
      *                          <p>For example:</p>
      *                          <pre>
-     *                                                                                                                                                                                                                                    Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                                                    SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                                                    SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                                                </pre>
+     *                                                                                                                                                                                                                                                                                                                                                                                                                   Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                                                                                                                                                                                   SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                                                                                                                                                                                   SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                                                                                                                                                                               </pre>
      * @param skillLevelsMatter if {@code true}, the skill's level will be displayed in Person View in addition to the
      *                          skill's Target Number
      *
@@ -682,15 +680,27 @@ public class SkillType {
     /**
      * Determines if this skill is classified as a support skill.
      *
-     * <p>Support skills include support and support command subtypes.</p>
-     *
      * @return {@code true} if the skill subtype is a support category; {@code false} otherwise
      *
      * @author Illiani
      * @since 0.50.06
      */
     public boolean isSupportSkill() {
-        return this.subType == SUPPORT || this.subType == SUPPORT_COMMAND;
+        return this.subType == SUPPORT;
+    }
+
+    /**
+     * Determines if this skill is classified as a utility skill.
+     *
+     * <p>Support skills include {@link SkillSubType#UTILITY} and {@link SkillSubType#UTILITY_COMMAND} subtypes.</p>
+     *
+     * @return {@code true} if the skill subtype is a utility category; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public boolean isUtilitySkill() {
+        return this.subType == UTILITY || this.subType == UTILITY_COMMAND;
     }
 
     /**
@@ -1230,6 +1240,23 @@ public class SkillType {
         return roleplaySkills;
     }
 
+    public static List<SkillType> getUtilitySkills() {
+        List<SkillType> utilitySkills = new ArrayList<>();
+
+        for (SkillType type : lookupHash.values()) {
+            if (type.isSubTypeOf(UTILITY)) {
+                utilitySkills.add(type);
+                continue;
+            }
+
+            if (type.isSubTypeOf(UTILITY_COMMAND)) {
+                utilitySkills.add(type);
+            }
+        }
+
+        return utilitySkills;
+    }
+
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skillType");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
@@ -1308,7 +1335,7 @@ public class SkillType {
             }
 
             // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
-            boolean preDatesLastSkillChanges = version.isLowerThan(new Version("0.50.08"));
+            boolean preDatesLastSkillChanges = version.isLowerThan(new Version("0.50.11"));
             if (preDatesLastSkillChanges) {
                 compatibilityHandler(skillType);
             }
@@ -1361,7 +1388,7 @@ public class SkillType {
             }
 
             // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
-            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.07"));
+            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.11"));
             if (preDatesSkillChanges) {
                 compatibilityHandler(skillType);
             }
@@ -1997,7 +2024,7 @@ public class SkillType {
         return new SkillType(S_TACTICS,
               9,
               false,
-              SUPPORT_COMMAND,
+              UTILITY_COMMAND,
               INTELLIGENCE,
               WILLPOWER,
               null,
@@ -2014,7 +2041,7 @@ public class SkillType {
         return new SkillType(S_STRATEGY,
               9,
               false,
-              SUPPORT_COMMAND,
+              UTILITY_COMMAND,
               INTELLIGENCE,
               WILLPOWER,
               null,
@@ -2049,7 +2076,7 @@ public class SkillType {
         return new SkillType(S_LEADER,
               8,
               false,
-              SUPPORT_COMMAND,
+              UTILITY_COMMAND,
               WILLPOWER,
               CHARISMA,
               null,
@@ -2100,7 +2127,7 @@ public class SkillType {
         return new SkillType(S_ACTING,
               8,
               false,
-              SUPPORT,
+              UTILITY,
               CHARISMA,
               NONE,
               null,
@@ -2134,7 +2161,7 @@ public class SkillType {
         return new SkillType(S_APPRAISAL,
               8,
               false,
-              SUPPORT,
+              UTILITY,
               INTELLIGENCE,
               NONE,
               null,
@@ -2340,7 +2367,7 @@ public class SkillType {
         return new SkillType(S_COMMUNICATIONS,
               7,
               false,
-              SUPPORT,
+              UTILITY,
               INTELLIGENCE,
               NONE,
               null,
@@ -2408,7 +2435,7 @@ public class SkillType {
         return new SkillType(S_DISGUISE,
               7,
               false,
-              SUPPORT,
+              UTILITY,
               CHARISMA,
               NONE,
               null,
@@ -2425,7 +2452,7 @@ public class SkillType {
         return new SkillType(S_ESCAPE_ARTIST,
               9,
               false,
-              SUPPORT,
+              UTILITY,
               STRENGTH,
               DEXTERITY,
               null,
@@ -2442,7 +2469,7 @@ public class SkillType {
         return new SkillType(S_FORGERY,
               8,
               false,
-              SUPPORT,
+              UTILITY,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -2918,7 +2945,7 @@ public class SkillType {
         return new SkillType(S_PERCEPTION,
               7,
               false,
-              SUPPORT,
+              UTILITY,
               INTELLIGENCE,
               NONE,
               null,
@@ -2937,7 +2964,7 @@ public class SkillType {
         return new SkillType(S_SLEIGHT_OF_HAND,
               8,
               false,
-              SUPPORT,
+              UTILITY,
               REFLEXES,
               DEXTERITY,
               null,
@@ -3192,7 +3219,7 @@ public class SkillType {
         return new SkillType(S_SENSOR_OPERATIONS,
               8,
               false,
-              SUPPORT,
+              UTILITY,
               INTELLIGENCE,
               WILLPOWER,
               null,
@@ -3209,7 +3236,7 @@ public class SkillType {
         return new SkillType(S_STEALTH,
               8,
               false,
-              SUPPORT,
+              UTILITY,
               REFLEXES,
               INTELLIGENCE,
               null,
@@ -3260,7 +3287,7 @@ public class SkillType {
         return new SkillType(S_TRACKING,
               8,
               false,
-              SUPPORT,
+              UTILITY,
               INTELLIGENCE,
               WILLPOWER,
               null,
@@ -3277,7 +3304,7 @@ public class SkillType {
         return new SkillType(S_TRAINING,
               9,
               false,
-              SUPPORT,
+              UTILITY_COMMAND,
               INTELLIGENCE,
               CHARISMA,
               null,
@@ -3311,7 +3338,7 @@ public class SkillType {
         return new SkillType(S_ZERO_G_OPERATIONS,
               7,
               false,
-              SUPPORT,
+              UTILITY,
               REFLEXES,
               NONE,
               null,

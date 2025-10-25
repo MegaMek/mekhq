@@ -150,7 +150,9 @@ public class CrewListModel extends AbstractListModel<Person> {
 
             String gunSkill = SkillType.getGunnerySkillFor(unit.getEntity());
             Entity entity = unit.getEntity();
-            if (entity != null && entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
+            if (entity != null &&
+                      entity.hasETypeFlag(Entity.ETYPE_INFANTRY) &&
+                      !entity.hasETypeFlag(Entity.ETYPE_BATTLEARMOR)) {
                 gunSkill = InfantryGunnerySkills.getBestInfantryGunnerySkill(person);
                 if (gunSkill == null) {
                     gunSkill = SkillType.S_SMALL_ARMS;

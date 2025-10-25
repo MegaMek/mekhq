@@ -45,18 +45,12 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
 import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_ART;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_INTEREST;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENCE;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -121,6 +115,7 @@ import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
@@ -148,6 +143,8 @@ public class PersonViewPanel extends JScrollablePanel {
     private static final MMLogger LOGGER = MMLogger.create(PersonViewPanel.class);
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 5;
+    private static final org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(
+          PersonViewPanel.class);
 
     private final CampaignGUI gui;
 
@@ -224,9 +221,10 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
-        List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING));
+        List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING,
+              SUPPORT));
         if (!relevantSkills.isEmpty()) {
-            JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.combat");
+            JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.profession");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -239,9 +237,9 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
-        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(SUPPORT, SUPPORT_COMMAND));
+        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(UTILITY, UTILITY_COMMAND));
         if (!relevantSkills.isEmpty()) {
-            JPanel pnlSupportSkills = fillSkills(relevantSkills, "pnlSkills.support");
+            JPanel pnlSupportSkills = fillSkills(relevantSkills, "pnlSkills.utility");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -300,8 +298,9 @@ public class PersonViewPanel extends JScrollablePanel {
         add(pnlOther, gridBagConstraints);
         gridY++;
 
-        if (campaignOptions.isUseAdvancedMedical() && person.needsFixing()) {
-            JPanel pnlInjuries = fillInjuries();
+        List<Injury> injuries = person.getInjuries();
+        if (campaignOptions.isUseAdvancedMedical() && !injuries.isEmpty()) {
+            JPanel pnlInjuries = fillInjuries(injuries);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -1917,10 +1916,27 @@ public class PersonViewPanel extends JScrollablePanel {
               campaign.getLocalDate(),
               person.getRankNumeric());
 
+        boolean adminsHaveNegotiation = campaignOptions.isAdminsHaveNegotiation();
+        boolean doctorsUseAdmin = campaignOptions.isDoctorsUseAdministration();
+        boolean techsUseAdmin = campaignOptions.isTechsUseAdministration();
+        boolean isUseArtillery = campaignOptions.isUseArtillery();
+        PersonnelRole primaryProfession = person.getPrimaryRole();
+        List<String> primaryProfessionSkills = primaryProfession.getSkillsForProfession(adminsHaveNegotiation,
+              doctorsUseAdmin,
+              techsUseAdmin,
+              isUseArtillery);
+
+        PersonnelRole secondaryProfession = person.getSecondaryRole();
+        List<String> secondaryProfessionSkills = new ArrayList<>(secondaryProfession.getSkillsForProfession(
+              adminsHaveNegotiation,
+              doctorsUseAdmin,
+              techsUseAdmin,
+              isUseArtillery));
+        secondaryProfessionSkills.removeAll(primaryProfessionSkills);
+
         // Calculate how many rows per column for even distribution
         double numColumns = 3.0;
         int skillsPerColumn = (int) ceil(relevantSkills.size() / numColumns);
-
         for (int i = 0; i < relevantSkills.size(); i++) {
             int column = i / skillsPerColumn; // 0, 1, 2
             int row = i % skillsPerColumn;
@@ -1928,9 +1944,21 @@ public class PersonViewPanel extends JScrollablePanel {
 
             String skillName = relevantSkills.get(i);
             Skill skill = person.getSkill(skillName);
+            String formattedSkillName = skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "");
 
-            JLabel lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"),
-                  skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "")));
+            String label;
+            if (primaryProfessionSkills.contains(skillName)) {
+                label = String.format(resourceMap.getString("format.itemHeader.profession"),
+                      ReportingUtilities.spanOpeningWithCustomColor(getAmazingColor()), CLOSING_SPAN_TAG,
+                      formattedSkillName);
+            } else if (secondaryProfessionSkills.contains(skillName)) {
+                label = String.format(resourceMap.getString("format.itemHeader.profession"),
+                      ReportingUtilities.spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG,
+                      formattedSkillName);
+            } else {
+                label = formattedSkillName;
+            }
+            JLabel lblName = new JLabel(label);
 
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
@@ -2013,7 +2041,7 @@ public class PersonViewPanel extends JScrollablePanel {
             String attributeName = attribute.getLabel();
             int attributeModifier = relevantAttributes.get(attribute);
 
-            JLabel lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), attributeName));
+            JLabel lblName = new JLabel(attributeName);
             JLabel lblValue = new JLabel((attributeModifier > 0 ? "+" : "") + attributeModifier);
             lblName.setLabelFor(lblValue);
 
@@ -2085,7 +2113,7 @@ public class PersonViewPanel extends JScrollablePanel {
             int attributeScore = attributes.getAttributeScore(attribute);
             int attributeModifier = attributes.getAttributeModifier(attribute);
 
-            JLabel lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), attributeName));
+            JLabel lblName = new JLabel(attributeName);
             String value = String.valueOf(attributeScore);
             if (attributeModifier != 0) {
                 value += " (" + (attributeModifier > 0 ? "+" : "") + attributeModifier + ")";
@@ -2563,7 +2591,7 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlScenariosLog;
     }
 
-    private JPanel fillInjuries() {
+    private JPanel fillInjuries(List<Injury> injuries) {
         final String WARNING_ICON = "\u26A0";
 
         JPanel pnlInjuries = new JPanel(new BorderLayout());
@@ -2616,7 +2644,6 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlInjuryDetails.add(dummy, gridBagConstraints);
 
         JLabel lblInjury;
-        List<Injury> injuries = person.getInjuries();
         int columns = 3;
         int rowsPerColumn = (int) Math.ceil((double) injuries.size() / columns);
 

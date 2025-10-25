@@ -82,6 +82,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     private JCheckBox chkShowVehicles;
     private JCheckBox chkShowAerospace;
     private JCheckBox chkShowConvAero;
+    private JCheckBox chkShowInfantry;
+    private JCheckBox chkShowLargeVessels;
     private JCheckBox chkFilterByPercentageOfCost;
     private JSpinner spnCostPercentageThreshold;
 
@@ -144,6 +146,22 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
     public void setChkShowConvAero(final JCheckBox chkShowConvAero) {
         this.chkShowConvAero = chkShowConvAero;
+    }
+
+    public JCheckBox getChkShowInfantry() {
+        return chkShowInfantry;
+    }
+
+    public void setChkShowInfantry(final JCheckBox chkShowInfantry) {
+        this.chkShowInfantry = chkShowInfantry;
+    }
+
+    public JCheckBox getChkShowLargeVessels() {
+        return chkShowLargeVessels;
+    }
+
+    public void setChkShowLargeVessels(final JCheckBox chkShowLargeVessels) {
+        this.chkShowLargeVessels = chkShowLargeVessels;
     }
 
     public JCheckBox getChkFilterByPercentageOfCost() {
@@ -272,6 +290,16 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         getChkShowConvAero().setName("chkShowConvAero");
         getChkShowConvAero().addActionListener(evt -> filterOffers());
 
+        setChkShowInfantry(new JCheckBox(resources.getString("chkShowInfantry.text")));
+        getChkShowInfantry().setToolTipText(resources.getString("chkShowInfantry.toolTipText"));
+        getChkShowInfantry().setName("chkShowInfantry");
+        getChkShowInfantry().addActionListener(evt -> filterOffers());
+
+        setChkShowLargeVessels(new JCheckBox(resources.getString("chkShowLargeVessels.text")));
+        getChkShowLargeVessels().setToolTipText(resources.getString("chkShowLargeVessels.toolTipText"));
+        getChkShowLargeVessels().setName("chkShowLargeVessels");
+        getChkShowLargeVessels().addActionListener(evt -> filterOffers());
+
         setChkFilterByPercentageOfCost(new JCheckBox(resources.getString("chkFilterByPercentageOfCost.text")));
         getChkFilterByPercentageOfCost().setToolTipText(resources.getString("chkFilterByPercentageOfCost.toolTipText"));
         getChkFilterByPercentageOfCost().setName("chkFilterByPercentageOfCost");
@@ -309,6 +337,9 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                                                       .addComponent(getChkShowAerospace())
                                                       .addComponent(getChkShowConvAero(), Alignment.LEADING))
                                       .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                      .addComponent(getChkShowInfantry())
+                                                      .addComponent(getChkShowLargeVessels(), Alignment.LEADING))
+                                      .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                                       .addComponent(getChkFilterByPercentageOfCost())
                                                       .addComponent(getSpnCostPercentageThreshold())
                                                       .addComponent(lblCostPercentageThreshold, Alignment.LEADING)));
@@ -319,6 +350,9 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                                                         .addComponent(getChkShowVehicles())
                                                         .addComponent(getChkShowAerospace())
                                                         .addComponent(getChkShowConvAero()))
+                                        .addGroup(layout.createSequentialGroup()
+                                                        .addComponent(getChkShowInfantry())
+                                                        .addComponent(getChkShowLargeVessels()))
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(getChkFilterByPercentageOfCost())
                                                         .addComponent(getSpnCostPercentageThreshold())
@@ -387,6 +421,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         preferences.manage(new JToggleButtonPreference(getChkShowVehicles()));
         preferences.manage(new JToggleButtonPreference(getChkShowAerospace()));
         preferences.manage(new JToggleButtonPreference(getChkShowConvAero()));
+        preferences.manage(new JToggleButtonPreference(getChkShowInfantry()));
+        preferences.manage(new JToggleButtonPreference(getChkShowLargeVessels()));
         preferences.manage(new JToggleButtonPreference(getChkFilterByPercentageOfCost()));
         preferences.manage(new JIntNumberSpinnerPreference(getSpnCostPercentageThreshold()));
         preferences.manage(new JTablePreference(getMarketTable()));
@@ -547,9 +583,12 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                 return switch (offer.get().getUnitType()) {
                     case UnitType.MEK -> getChkShowMeks().isSelected();
                     case UnitType.TANK -> getChkShowVehicles().isSelected();
-                    case UnitType.AEROSPACE_FIGHTER -> getChkShowAerospace().isSelected();
+                    case UnitType.AEROSPACE_FIGHTER, UnitType.SMALL_CRAFT -> getChkShowAerospace().isSelected();
                     case UnitType.CONV_FIGHTER -> getChkShowConvAero().isSelected();
-                    default -> false;
+                    case UnitType.INFANTRY, UnitType.BATTLE_ARMOR -> getChkShowInfantry().isSelected();
+                    case UnitType.DROPSHIP, UnitType.JUMPSHIP, UnitType.WARSHIP ->
+                          getChkShowLargeVessels().isSelected();
+                    default -> true;
                 };
             }
         });

@@ -78,13 +78,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
         // Impossible Assignments:
         // 1) All people must be active
         // 2) All people must be non-prisoners (bondsmen should be assignable to units)
-        // 3) All people must not be primary civilians
-        // 4) All people must share one of their non-civilian professions
+        // 3) All people must share one of their professions
         boolean assign = Stream.of(people)
                                .noneMatch(person -> !person.getStatus().isActive() ||
-                                                          person.getPrisonerStatus().isCurrentPrisoner() ||
-                                                          Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())
-                                                                .isCivilian());
+                                                          person.getPrisonerStatus().isCurrentPrisoner());
 
         if (assign) {
             final Profession basePrimaryProfession = Profession.getProfessionFromPersonnelRole(people[0].getPrimaryRole());
@@ -147,11 +144,11 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                                                                         .isMekWarriorGrouping());
             final boolean areAllProtoMekPilots = Stream.of(people)
                                                        .allMatch(person -> person.hasRole(PersonnelRole.PROTOMEK_PILOT));
-            final boolean areAllConventionalAerospacePilots = Stream.of(people)
-                                                                    .allMatch(person -> person.getPrimaryRole()
-                                                                                              .isConventionalAircraftPilot() ||
-                                                                                              person.getSecondaryRole()
-                                                                                                    .isConventionalAircraftPilot());
+            final boolean areAllConventionalAircraftPilots = Stream.of(people)
+                                                                   .allMatch(person -> person.getPrimaryRole()
+                                                                                             .isConventionalAircraftPilot() ||
+                                                                                             person.getSecondaryRole()
+                                                                                                   .isConventionalAircraftPilot());
             final boolean areAllAerospacePilots = Stream.of(people)
                                                         .allMatch(person -> person.getPrimaryRole()
                                                                                   .isAerospaceGrouping() ||
@@ -270,6 +267,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                               (unit.usesSoloPilot() ||
                                      (entity instanceof VTOL) ||
                                      (entity instanceof Mek) ||
+                                     (entity instanceof ConvFighter) ||
                                      entity.isSuperHeavy() ||
                                      entity.isTripodMek() ||
                                      entity.isQuadMek())) {
@@ -279,7 +277,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                         } else if (entity instanceof ProtoMek) {
                             valid = areAllProtoMekPilots;
                         } else if (entity instanceof ConvFighter) {
-                            valid = areAllConventionalAerospacePilots;
+                            valid = areAllConventionalAircraftPilots;
                         } else if (entity instanceof Aero) {
                             valid = areAllAerospacePilots;
                         } else if (entity instanceof VTOL) {
@@ -301,7 +299,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                     useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
 
-                                if (entity instanceof VTOL) {
+                                if (entity instanceof VTOL || entity instanceof ConvFighter) {
                                     unit.addDriver(people[0], useTransfers);
                                 } else {
                                     unit.addPilotOrSoldier(people[0], useTransfers);
@@ -370,6 +368,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     final boolean valid;
                     if (entity instanceof Tank) {
                         valid = areAllVehicleGunners;
+                    } else if (entity instanceof ConvFighter) {
+                        valid = areAllConventionalAircraftPilots;
                     } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
                         valid = areAllVesselGunners;
                     } else if ((entity instanceof Mek) && !unit.usesSoloPilot()) {
@@ -408,13 +408,11 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                 // TODO : also be based on crewmembers
                 if (unit.canTakeMoreVesselCrew()) {
                     final boolean valid;
-                    if (entity instanceof Aero) {
+                    if (entity instanceof Aero && !(entity instanceof ConvFighter)) {
                         valid = areAllVesselCrew;
-                    } else if (entity.isSupportVehicle()) {
+                    } else {
                         // TODO : Expand for Command and Control, Medical, Technician, and Salvage Assignments
                         valid = areAllVehicleCrew;
-                    } else {
-                        valid = false;
                     }
 
                     if (valid) {
@@ -439,6 +437,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                             }
                         });
                         crewmemberEntityWeightMenu.add(miCrewmember);
+
                     }
                 }
 
