@@ -33,7 +33,6 @@
 package mekhq.campaign.personnel.enums;
 
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
-import static mekhq.campaign.personnel.skills.VehicleCrewSkills.VEHICLE_CREW_SKILLS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -524,11 +523,7 @@ public enum PersonnelRole {
         StringBuilder tooltip = new StringBuilder(getDescription(isClan)).append("<br>");
 
         List<String> skills = new ArrayList<>();
-        if (this == VEHICLE_CREW) {
-            // Vehicle Crew is a bit of a special case as any of these skills makes a character eligible for
-            // experience level improvements.
-            skills.addAll(VEHICLE_CREW_SKILLS);
-        } else if (this == SOLDIER) {
+        if (this == SOLDIER) {
             skills.addAll(INFANTRY_GUNNERY_SKILLS);
         } else {
             skills.addAll(getSkillsForProfession());
@@ -681,10 +676,10 @@ public enum PersonnelRole {
             }
             case MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
             case VEHICLE_CREW -> {
-                if (includeExpandedSkills) {
-                    yield VEHICLE_CREW_SKILLS;
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_ADMIN);
                 } else {
-                    yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_GUN_VEE);
+                    yield List.of(SkillType.S_TECH_MECHANIC);
                 }
             }
             case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
