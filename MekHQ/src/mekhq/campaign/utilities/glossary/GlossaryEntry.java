@@ -81,6 +81,7 @@ public enum GlossaryEntry {
     EMPTY_SYSTEMS("EMPTY_SYSTEMS", new Version("0.50.06")),
     EXPERIENCE_COSTS("EXPERIENCE_COSTS", new Version("0.50.06")),
     EXPERIENCE_RATING("EXPERIENCE_RATING", new Version("0.50.06")),
+    EXTRA_INCOME("EXTRA_INCOME", new Version("0.50.10")),
     FATIGUE("FATIGUE", new Version("0.50.06")),
     FIELD_CONTROL("FIELD_CONTROL", new Version("0.50.06")),
     FIELD_KITCHENS("FIELD_KITCHENS", new Version("0.50.06")),
