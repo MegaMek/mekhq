@@ -183,16 +183,17 @@ public class QuickTrain {
                 }
 
                 person.improveSkill(skillName);
-                person.spendXP(improvementCost);
 
                 // Refresh skill info after improvement
                 skill = person.getSkill(skillName);
                 if (skill == null) {
                     // Something went wrong; the skill should have been improved
-                    LOGGER.warn("Failed to improve skill {} for person {}: skill was null after improvement", skillName,
-                          person.getHyperlinkedName());
+                    LOGGER.error("Failed to improve skill {} for person {}: skill was null after improvement",
+                          skillName, person.getFullTitle());
                     continue;
                 }
+
+                person.spendXP(improvementCost);
 
                 PerformanceLogger.improvedSkill(
                       isLogSkillGain, person, today, skillName, skill.getLevel());
