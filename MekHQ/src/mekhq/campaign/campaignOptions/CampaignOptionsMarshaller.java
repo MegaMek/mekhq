@@ -569,6 +569,10 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
+              "fatigueUndeploymentThreshold",
+              campaignOptions.getFatigueUndeploymentThreshold());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
               "fatigueLeaveThreshold",
               campaignOptions.getFatigueLeaveThreshold());
         // endregion Retirement
