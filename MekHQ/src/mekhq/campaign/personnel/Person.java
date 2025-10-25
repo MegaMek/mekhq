@@ -5414,7 +5414,7 @@ public class Person {
         } else if (entity instanceof BattleArmor) {
             return hasSkill(S_TECH_BA) && isTechBA();
         } else if (entity instanceof Tank) {
-            return hasSkill(S_TECH_MECHANIC) && isTechMechanic();
+            return hasSkill(S_TECH_MECHANIC) && (isTechMechanic() || isVehicleCrew());
         } else {
             return false;
         }
@@ -5712,7 +5712,7 @@ public class Person {
     }
 
     public boolean isTech() {
-        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA();
+        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA() || isVehicleCrew();
     }
 
     /**
@@ -5721,7 +5721,7 @@ public class Person {
      * @return true if the person is a tech
      */
     public boolean isTechExpanded() {
-        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA() || isTechLargeVessel();
+        return isTechMek() || isTechAero() || isTechMechanic() || isVehicleCrew() || isTechBA() || isTechLargeVessel();
     }
 
     public boolean isTechLargeVessel() {
@@ -5747,6 +5747,11 @@ public class Person {
     public boolean isTechBA() {
         boolean hasSkill = hasSkill(S_TECH_BA);
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
+    }
+
+    public boolean isVehicleCrew() {
+        boolean hasSkill = hasSkill(S_TECH_MECHANIC);
+        return hasSkill && (getPrimaryRole().isVehicleCrew() || getSecondaryRole().isVehicleCrew());
     }
 
     public boolean isAsTech() {

@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.enums;
 
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
+import static mekhq.campaign.personnel.skills.VehicleCrewSkills.VEHICLE_CREW_SKILLS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -523,7 +524,11 @@ public enum PersonnelRole {
         StringBuilder tooltip = new StringBuilder(getDescription(isClan)).append("<br>");
 
         List<String> skills = new ArrayList<>();
-        if (this == SOLDIER) {
+        if (this == VEHICLE_CREW) {
+            // Vehicle Crew is a bit of a special case as any of these skills makes a character eligible for
+            // experience level improvements.
+            skills.addAll(VEHICLE_CREW_SKILLS);
+        } else if (this == SOLDIER) {
             skills.addAll(INFANTRY_GUNNERY_SKILLS);
         } else {
             skills.addAll(getSkillsForProfession());
@@ -664,9 +669,27 @@ public enum PersonnelRole {
             }
             case LAM_PILOT ->
                   List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
-            case GROUND_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_GVEE);
-            case NAVAL_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_NVEE);
-            case VTOL_PILOT -> List.of(SkillType.S_PILOT_VTOL);
+            case GROUND_VEHICLE_DRIVER -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_PILOT_GVEE, SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_PILOT_GVEE, SkillType.S_GUN_VEE);
+                }
+            }
+            case NAVAL_VEHICLE_DRIVER -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_PILOT_NVEE, SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_PILOT_NVEE, SkillType.S_GUN_VEE);
+                }
+            }
+            case VTOL_PILOT -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_PILOT_VTOL, SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_PILOT_VTOL, SkillType.S_GUN_VEE);
+                }
+            }
             case VEHICLE_GUNNER -> {
                 if (isUseArtillery) {
                     yield List.of(SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
@@ -676,10 +699,10 @@ public enum PersonnelRole {
             }
             case MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
             case VEHICLE_CREW -> {
-                if (isTechsUseAdministration) {
-                    yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_ADMIN);
+                if (includeExpandedSkills) {
+                    yield VEHICLE_CREW_SKILLS;
                 } else {
-                    yield List.of(SkillType.S_TECH_MECHANIC);
+                    yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_GUN_VEE);
                 }
             }
             case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
@@ -1344,7 +1367,7 @@ public enum PersonnelRole {
      * @return {@code true} if the character is assigned to a technician role, {@code false} otherwise.
      */
     public boolean isTech() {
-        return isMekTech() || isMechanic() || isAeroTek() || isBATech() || isVesselCrew();
+        return isMekTech() || isMechanic() || isVehicleCrew() || isAeroTek() || isBATech() || isVesselCrew();
     }
 
     /**
@@ -1354,7 +1377,7 @@ public enum PersonnelRole {
      * @return {@code true} if the character is assigned to a technician role, {@code false} otherwise.
      */
     public boolean isTechSecondary() {
-        return isMekTech() || isMechanic() || isAeroTek() || isBATech();
+        return isMekTech() || isMechanic() || isVehicleCrew() || isAeroTek() || isBATech();
     }
 
     /**
