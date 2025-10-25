@@ -196,7 +196,6 @@ public class CampaignGUI extends JPanel {
     /* For the menu bar */
     private JMenuBar menuBar;
     private JMenu menuThemes;
-    private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
     private JMenuItem miAwardEligibilityDialog;
     private JMenuItem miCompanyGenerator;
@@ -1944,7 +1943,6 @@ public class CampaignGUI extends JPanel {
                 // refresh lance assignment table
                 MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getForces()));
             }
-            miShipSearch.setVisible(newOptions.isUseAtB());
             if (newOptions.isUseAtB()) {
                 int loops = 0;
                 while (!RandomUnitGenerator.getInstance().isInitialized()) {
