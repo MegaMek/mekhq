@@ -305,7 +305,7 @@ class PartsInUseManagerTest {
             }
 
             /**
-             * @return parts that are not explicitly handled by {@link Campaign# getDefaultStockPercent(Part)}
+             * @return parts that are not explicitly handled by {@link Campaign#getDefaultStockPercent(Part)}
              */
             public static Stream<Part> otherUnhandledDefaultStockPercentParts() {
                 return Stream.of(new MekGyro(), new Cubicle(), new MekSensor(), new MekLifeSupport());
