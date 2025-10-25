@@ -2514,8 +2514,8 @@ public class AtBContract extends Contract {
         transportRoll = roll;
     }
 
-    public @Nullable Money setRoutedPayout(Money routedPayout) {
-        return routedPayout;
+    public void setRoutedPayout(@Nullable Money routedPayout) {
+        this.routedPayout = routedPayout;
     }
 
     public @Nullable Money getRoutedPayout() {
