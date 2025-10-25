@@ -127,6 +127,7 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.skills.VehicleCrewSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
@@ -3985,6 +3986,15 @@ public class Person {
                 person.setJoinedCampaign(campaign.getLocalDate());
             }
 
+            // <50.10 compatibility handler
+            if (updateSkillsForVehicleCrewProfession(person, person.getPrimaryRole()) ||
+                      updateSkillsForVehicleCrewProfession(person, person.getSecondaryRole())) {
+                campaign.addReport(String.format(resources.getString("vehicleCrewProfessionSkillChange"),
+                      spanOpeningWithCustomColor(getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
+            }
+
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
             if (!person.canPerformRole(campaign.getLocalDate(), person.getSecondaryRole(), false)) {
@@ -4010,6 +4020,49 @@ public class Person {
         }
 
         return person;
+    }
+
+    /**
+     * Updates skills for personnel with the Vehicle Crew profession by ensuring they have the Mechanic skill.
+     *
+     * <p>This method is used during XML loading to migrate legacy data. If the person lacks the
+     * {@link SkillType#S_TECH_MECHANIC} skill, it will be added at a level equal to their highest existing vehicle
+     * crew-related skill (e.g., Tech Vee, Gunnery Vee, Piloting Vee, or Driving). This ensures backwards compatibility
+     * when loading older save files.</p>
+     *
+     * @param person      the person whose skills should be updated
+     * @param currentRole the role to check
+     *
+     * @return {@code true} if the Mechanic skill was added, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static boolean updateSkillsForVehicleCrewProfession(Person person, PersonnelRole currentRole) {
+        if (currentRole != PersonnelRole.VEHICLE_CREW) {
+            return false;
+        }
+
+        if (!person.hasSkill(S_TECH_MECHANIC)) {
+            int highestSkillLevel = EXP_NONE;
+            String highestSkill = null;
+            for (String skillName : VehicleCrewSkills.VEHICLE_CREW_SKILLS) {
+                if (person.hasSkill(skillName)) {
+                    int level = person.getSkill(skillName).getLevel();
+                    if (level > highestSkillLevel) {
+                        highestSkillLevel = level;
+                        highestSkill = skillName;
+                    }
+                }
+            }
+
+            if (highestSkill != null) {
+                person.addSkill(highestSkill, highestSkillLevel, 0);
+                return true;
+            }
+        }
+
+        return false;
     }
     // endregion File I/O
 
