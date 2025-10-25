@@ -265,7 +265,7 @@ class PartsInUseManagerTest {
         }
 
         /**
-         * {@link Campaign# getDefaultStockPercent} is private, so we'll need to use reflection to get the method for
+         * {@link Campaign#getDefaultStockPercent} is private, so we'll need to use reflection to get the method for
          * testing
          */
         @Nested
@@ -305,7 +305,7 @@ class PartsInUseManagerTest {
             }
 
             /**
-             * @return parts that are not explicitly handled by {@link Campaign# getDefaultStockPercent(Part)}
+             * @return parts that are not explicitly handled by {@link Campaign#getDefaultStockPercent(Part)}
              */
             public static Stream<Part> otherUnhandledDefaultStockPercentParts() {
                 return Stream.of(new MekGyro(), new Cubicle(), new MekSensor(), new MekLifeSupport());
@@ -669,7 +669,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsWeapons()).thenReturn(DESIRED_STOCK_LEVEL); //TODO
+                    when(mockCampaignOptions.getAutoLogisticsWeapons()).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
