@@ -193,7 +193,7 @@ public class QuickTrain {
                     continue;
                 }
 
-                person.spendXP(improvementCost);
+                person.spendXPOnSkills(campaign, improvementCost);
 
                 PerformanceLogger.improvedSkill(
                       isLogSkillGain, person, today, skillName, skill.getLevel());
