@@ -59,6 +59,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.market.procurement.Procurement;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.*;
@@ -551,7 +552,8 @@ public class Resupply {
      */
 
     private Map<Part, PartDetails> collectParts() {
-        Set<PartInUse> partsInUse = campaign.getPartsInUse(true, true, PartQuality.QUALITY_A);
+        PartsInUseManager partsInUseManager = new PartsInUseManager(campaign);
+        Set<PartInUse> partsInUse = partsInUseManager.getPartsInUse(true, true, PartQuality.QUALITY_A);
 
         Faction campaignFaction = campaign.getFaction();
         LocalDate today = campaign.getLocalDate();

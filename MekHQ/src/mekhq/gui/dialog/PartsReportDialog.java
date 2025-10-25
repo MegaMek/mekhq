@@ -53,9 +53,11 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.util.UIUtil;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
+import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -64,7 +66,6 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * A dialog to show parts in use, ordered, in transit with actionable buttons for buying or adding more taken from the
@@ -79,6 +80,7 @@ public class PartsReportDialog extends JDialog {
     private PartsInUseTableModel overviewPartsModel;
 
     private final Campaign campaign;
+    private final PartsInUseManager partsInUseManager;
     private final CampaignGUI gui;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
@@ -88,6 +90,7 @@ public class PartsReportDialog extends JDialog {
         super(gui.getFrame(), modal);
         this.gui = gui;
         this.campaign = gui.getCampaign();
+        this.partsInUseManager = new PartsInUseManager(campaign);
         initComponents();
         updateOverviewPartsInUse();
         pack();
@@ -278,7 +281,7 @@ public class PartsReportDialog extends JDialog {
               PartsInUseTableModel.COL_BUTTON_GM_ADD_BULK);
 
 
-        JScrollPane tableScroll = new JScrollPaneWithSpeed(overviewPartsInUseTable);
+        JScrollPane tableScroll = new FastJScrollPane(overviewPartsInUseTable);
 
         ignoreMothballedCheck = new JCheckBox(resourceMap.getString("chkIgnoreMothballed.text"));
         ignoreMothballedCheck.addActionListener(evt -> refreshOverviewPartsInUse());
@@ -401,7 +404,7 @@ public class PartsReportDialog extends JDialog {
         storePartInUseRequestedStock(partInUse);
         if (partInUse.equals(new PartInUse((Part) newPart))) {
             // Simple update
-            campaign.updatePartInUse(partInUse, ignoreMothballedCheck.isSelected(),
+            partsInUseManager.updatePartInUse(partInUse, ignoreMothballedCheck.isSelected(),
                   getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem()));
             overviewPartsModel.fireTableRowsUpdated(row, row);
         } else {
@@ -411,7 +414,7 @@ public class PartsReportDialog extends JDialog {
     }
 
     private void updateOverviewPartsInUse() {
-        overviewPartsModel.setData(campaign.getPartsInUse(ignoreMothballedCheck.isSelected(),
+        overviewPartsModel.setData(partsInUseManager.getPartsInUse(ignoreMothballedCheck.isSelected(),
               false, getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem())));
         TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
         PartsInUseTableModel.ButtonColumn column = (PartsInUseTableModel.ButtonColumn) tcm
@@ -439,13 +442,13 @@ public class PartsReportDialog extends JDialog {
     }
 
     private void topUp() {
-        campaign.stockUpPartsInUse(getPartsInUseFromTable());
+        partsInUseManager.stockUpPartsInUse(getPartsInUseFromTable());
         storePartInUseRequestedStockMap(); // This is necessary to prevent request stock values from resetting when topping up
         refreshOverviewPartsInUse();
     }
 
     private void topUpGM() {
-        campaign.stockUpPartsInUseGM(getPartsInUseFromTable());
+        partsInUseManager.stockUpPartsInUseGM(getPartsInUseFromTable());
         storePartInUseRequestedStockMap(); // This is necessary to prevent request stock values from resetting when topping up
         refreshOverviewPartsInUse();
     }

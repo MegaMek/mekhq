@@ -69,6 +69,7 @@ import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
+import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EnginePart;
@@ -239,7 +240,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panSupplies.add(btnPartsReport, gridBagConstraints);
 
-        Set<PartInUse> partsInUse = getCampaign().getPartsInUse(true, false, QUALITY_A);
+        PartsInUseManager partsInUseManager = new PartsInUseManager(getCampaign());
+        Set<PartInUse> partsInUse = partsInUseManager.getPartsInUse(true, false, QUALITY_A);
         partsModel = new PartsTableModel(partsInUse);
         partsTable = new JTable(partsModel);
         partsSorter = new TableRowSorter<>(partsModel);
