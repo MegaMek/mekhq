@@ -1012,18 +1012,40 @@ public class Person {
      *
      * @return the portrait image for the entity; if a fallback is required based on the condition, the fallback image
      *       generated from the origin faction's logo is returned
+     *
+     * @author Illiani
+     * @since 0.50.10
      */
     public ImageIcon getPortraitImageIconWithFallback(boolean useOriginFactionBackup) {
         if (useOriginFactionBackup) {
-            if (portrait == null ||
-                      portrait.getFilename().equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
-                      portrait.getFilename().equalsIgnoreCase(NO_PORTRAIT_NAME)) {
-                ImageIcon fallbackImage = Factions.getFactionLogo(birthday.getYear(), originFaction.getShortName());
-                return ImageUtilities.scaleImageIcon(fallbackImage, DEFAULT_IMAGE_WIDTH, true);
+            if (portrait == null) {
+                return getFallbackPortrait();
+            }
+
+            String portraitFilename = portrait.getFilename();
+            if (portraitFilename.equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
+                      portraitFilename.equalsIgnoreCase(NO_PORTRAIT_NAME)) {
+                return getFallbackPortrait();
             }
         }
 
         return (portrait == null) ? new ImageIcon() : portrait.getImageIcon();
+    }
+
+    /**
+     * Retrieves a fallback portrait image when no specific portrait is available.
+     *
+     * <p>This method generates a fallback image by using the faction logo corresponding to the person's origin
+     * faction and birth year. The logo is scaled to the default image width while maintaining aspect ratio.</p>
+     *
+     * @return A scaled {@link ImageIcon} containing the faction logo as a fallback portrait
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private ImageIcon getFallbackPortrait() {
+        ImageIcon fallbackImage = Factions.getFactionLogo(birthday.getYear(), originFaction.getShortName());
+        return ImageUtilities.scaleImageIcon(fallbackImage, DEFAULT_IMAGE_WIDTH, true);
     }
 
     public void setPortrait(final Portrait portrait) {
