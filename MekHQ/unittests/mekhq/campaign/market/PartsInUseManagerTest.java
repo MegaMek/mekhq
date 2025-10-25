@@ -669,7 +669,7 @@ class PartsInUseManagerTest {
                     initialAllPercents = getAllDefaultStockPercents();
 
                     // Let's change it and make sure that it uses the new value
-                    when(mockCampaignOptions.getAutoLogisticsWeapons()).thenReturn(DESIRED_STOCK_LEVEL); //TODO
+                    when(mockCampaignOptions.getAutoLogisticsWeapons()).thenReturn(DESIRED_STOCK_LEVEL);
 
                     desiredStockPercent = (int) method.invoke(partsInUseManager, part);
                     afterChangeAllPercents = getAllDefaultStockPercents();
