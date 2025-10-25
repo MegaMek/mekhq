@@ -254,6 +254,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_RECRUIT = "RECRUIT";
     private static final String CMD_ABTAKHA = "ABTAKHA";
     private static final String CMD_ADOPTION = "ADOPTION";
+    private static final String CMD_ADD_PARENT = "CMD_ADD_PARENT";
+    private static final String CMD_REMOVE_PARENT = "CMD_REMOVE_PARENT";
+    private static final String CMD_ADD_CHILD = "CMD_ADD_CHILD";
+    private static final String CMD_REMOVE_CHILD = "CMD_REMOVE_CHILD";
     private static final String CMD_RANSOM = "RANSOM";
     private static final String CMD_RANSOM_FRIENDLY = "RANSOM_FRIENDLY";
 
@@ -1006,6 +1010,70 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 MekHQ.triggerEvent(new PersonChangedEvent(orphan));
+                break;
+            }
+            case CMD_ADD_PARENT: {
+                Person newParent = getCampaign().getPerson(UUID.fromString(data[1]));
+                if (newParent == null) {
+                    LOGGER.warn("Could not find new parent with UUID {}. No changes will be made.", data[1]);
+                    return;
+                }
+
+                Genealogy newParentGenealogy = newParent.getGenealogy();
+                newParentGenealogy.addFamilyMember(FamilialRelationshipType.CHILD, selectedPerson);
+                MekHQ.triggerEvent(new PersonChangedEvent(newParent));
+
+                Genealogy selectedPersonGenealogy = selectedPerson.getGenealogy();
+                selectedPersonGenealogy.addFamilyMember(FamilialRelationshipType.PARENT, newParent);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                break;
+            }
+            case CMD_REMOVE_PARENT: {
+                Person oldParent = getCampaign().getPerson(UUID.fromString(data[1]));
+                if (oldParent == null) {
+                    LOGGER.warn("Could not find old parent with UUID {}. No changes will be made.", data[1]);
+                    return;
+                }
+
+                Genealogy oldParentGenealogy = oldParent.getGenealogy();
+                oldParentGenealogy.removeFamilyMember(FamilialRelationshipType.CHILD, selectedPerson);
+                MekHQ.triggerEvent(new PersonChangedEvent(oldParent));
+
+                Genealogy selectedPersonGenealogy = selectedPerson.getGenealogy();
+                selectedPersonGenealogy.removeFamilyMember(FamilialRelationshipType.PARENT, oldParent);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                break;
+            }
+            case CMD_ADD_CHILD: {
+                Person newChild = getCampaign().getPerson(UUID.fromString(data[1]));
+                if (newChild == null) {
+                    LOGGER.warn("Could not find new child with UUID {}. No changes will be made.", data[1]);
+                    return;
+                }
+
+                Genealogy newChildGenealogy = newChild.getGenealogy();
+                newChildGenealogy.addFamilyMember(FamilialRelationshipType.PARENT, selectedPerson);
+                MekHQ.triggerEvent(new PersonChangedEvent(newChild));
+
+                Genealogy selectedPersonGenealogy = selectedPerson.getGenealogy();
+                selectedPersonGenealogy.addFamilyMember(FamilialRelationshipType.CHILD, newChild);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                break;
+            }
+            case CMD_REMOVE_CHILD: {
+                Person oldChild = getCampaign().getPerson(UUID.fromString(data[1]));
+                if (oldChild == null) {
+                    LOGGER.warn("Could not find old child with UUID {}. No changes will be made.", data[1]);
+                    return;
+                }
+
+                Genealogy oldChildGenealogy = oldChild.getGenealogy();
+                oldChildGenealogy.removeFamilyMember(FamilialRelationshipType.PARENT, selectedPerson);
+                MekHQ.triggerEvent(new PersonChangedEvent(oldChild));
+
+                Genealogy selectedPersonGenealogy = selectedPerson.getGenealogy();
+                selectedPersonGenealogy.removeFamilyMember(FamilialRelationshipType.CHILD, oldChild);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
             }
             case CMD_RANSOM: {
@@ -4452,6 +4520,96 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             menuItem.setEnabled(getCampaign().isGM());
             menu.add(menuItem);
+
+            if (oneSelected) {
+                Genealogy personGenealogy = person.getGenealogy();
+                List<Person> personParents = personGenealogy.getParents();
+
+                if (personParents.size() < 2) {
+                    JMenu newParentMenu = new JMenu(resources.getString("parent.add"));
+                    List<Person> potentialParents = new ArrayList<>(getCampaign().getActivePersonnel(false, true)
+                                                                          .stream()
+                                                                          .filter(p -> (!p.isChild(getCampaign().getLocalDate())))
+                                                                          .toList());
+                    potentialParents.removeAll(personParents);
+                    potentialParents.remove(person);
+
+                    for (final Person newParent : potentialParents) {
+                        String status = String.format(resources.getString("adopt.description"),
+                              newParent.getFullName(),
+                              newParent.getGender(),
+                              newParent.getAge(getCampaign().getLocalDate()));
+
+                        JMenuItem newParentItem = new JMenuItem(status);
+                        newParentItem.setActionCommand(makeCommand(CMD_ADD_PARENT, String.valueOf(newParent.getId())));
+                        newParentItem.addActionListener(this);
+                        newParentMenu.add(newParentItem);
+                    }
+                    if (newParentMenu.getItemCount() > 0) {
+                        menu.add(newParentMenu);
+                    }
+                }
+
+                JMenu removeParentMenu = new JMenu(resources.getString("parent.remove"));
+                for (final Person oldParent : personParents) {
+                    String status = String.format(resources.getString("adopt.description"),
+                          oldParent.getFullName(),
+                          oldParent.getGender(),
+                          oldParent.getAge(getCampaign().getLocalDate()));
+
+                    JMenuItem removeParentItem = new JMenuItem(status);
+                    removeParentItem.setActionCommand(makeCommand(CMD_REMOVE_PARENT,
+                          String.valueOf(oldParent.getId())));
+                    removeParentItem.addActionListener(this);
+                    removeParentMenu.add(removeParentItem);
+                }
+                if (removeParentMenu.getItemCount() > 0) {
+                    menu.add(removeParentMenu);
+                }
+
+                JMenu newChildMenu = new JMenu(resources.getString("child.add"));
+                List<Person> potentialChildren = new ArrayList<>(getCampaign().getActivePersonnel(false, true)
+                                                                       .stream()
+                                                                       .filter(p -> (!p.isChild(getCampaign().getLocalDate())))
+                                                                       .filter(p -> (p.getGenealogy()
+                                                                                           .getParents()
+                                                                                           .size() < 2))
+                                                                       .toList());
+                potentialChildren.removeAll(personParents);
+                potentialChildren.removeAll(personGenealogy.getChildren());
+                potentialChildren.remove(person);
+
+                for (final Person newChild : potentialChildren) {
+                    String status = String.format(resources.getString("adopt.description"),
+                          newChild.getFullName(),
+                          newChild.getGender(),
+                          newChild.getAge(getCampaign().getLocalDate()));
+
+                    JMenuItem newChildItem = new JMenuItem(status);
+                    newChildItem.setActionCommand(makeCommand(CMD_ADD_CHILD, String.valueOf(newChild.getId())));
+                    newChildItem.addActionListener(this);
+                    newChildMenu.add(newChildItem);
+                }
+                if (newChildMenu.getItemCount() > 0) {
+                    menu.add(newChildMenu);
+                }
+
+                JMenu removeChildMenu = new JMenu(resources.getString("child.remove"));
+                for (final Person oldChild : personGenealogy.getChildren()) {
+                    String status = String.format(resources.getString("adopt.description"),
+                          oldChild.getFullName(),
+                          oldChild.getGender(),
+                          oldChild.getAge(getCampaign().getLocalDate()));
+
+                    JMenuItem removeChildItem = new JMenuItem(status);
+                    removeChildItem.setActionCommand(makeCommand(CMD_REMOVE_CHILD, String.valueOf(oldChild.getId())));
+                    removeChildItem.addActionListener(this);
+                    removeChildMenu.add(removeChildItem);
+                }
+                if (removeChildMenu.getItemCount() > 0) {
+                    menu.add(removeChildMenu);
+                }
+            }
 
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
