@@ -5652,26 +5652,31 @@ public class Person {
      *                                 calculations for technicians.
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
-        // Doctors and Technicians without adjustments
-        if (primaryRole.isDoctor() || (primaryRole.isTech() && !isTechsUseAdministration)) {
+        // Doctors
+        if (primaryRole.isDoctor()) {
             this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
             this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-        } else if (secondaryRole.isDoctor() || (secondaryRole.isTech() && !isTechsUseAdministration)) {
-            this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
-            this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
+            return;
         }
 
-        // Technicians with adjustments
+        if (secondaryRole.isDoctor()) {
+            this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
+            this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
+            return;
+        }
+
+        // Technicians
         if (primaryRole.isTech()) {
-            double techTimeMultiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
+            double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
+            this.minutesLeft = (int) Math.round(PRIMARY_ROLE_SUPPORT_TIME * multiplier);
+            this.overtimeLeft = (int) Math.round(PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * multiplier);
+            return;
+        }
 
-            this.minutesLeft = (int) round(PRIMARY_ROLE_SUPPORT_TIME * techTimeMultiplier);
-            this.overtimeLeft = (int) round(PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * techTimeMultiplier);
-        } else if (secondaryRole.isTechSecondary()) {
-            double techTimeMultiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
-
-            this.minutesLeft = (int) round(SECONDARY_ROLE_SUPPORT_TIME * techTimeMultiplier);
-            this.overtimeLeft = (int) round(SECONDARY_ROLE_OVERTIME_SUPPORT_TIME * techTimeMultiplier);
+        if (secondaryRole.isTechSecondary()) {
+            double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
+            this.minutesLeft = (int) Math.round(SECONDARY_ROLE_SUPPORT_TIME * multiplier);
+            this.overtimeLeft = (int) Math.round(SECONDARY_ROLE_OVERTIME_SUPPORT_TIME * multiplier);
         }
     }
 
