@@ -263,6 +263,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.GrayMonday;
 import mekhq.campaign.randomEvents.RandomEventLibraries;
@@ -5934,6 +5935,10 @@ public class Campaign implements ITechManager {
         updateFieldKitchenCapacity();
 
         processNewDayPersonnel();
+
+        if (isMonday) {
+            Fatigue.processDeploymentFatigueResponses(this);
+        }
 
         // Manage the Markets
         refreshPersonnelMarkets(false);
