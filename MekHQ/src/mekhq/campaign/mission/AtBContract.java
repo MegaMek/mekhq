@@ -149,6 +149,7 @@ import mekhq.campaign.universe.factionStanding.BatchallFactions;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -527,8 +528,8 @@ public class AtBContract extends Contract {
 
                 campaign.setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
             } else {
-                campaign.addReport("With the enemy routed, any remaining objectives have been" +
-                                         " successfully completed. The contract will conclude tomorrow.");
+                new ImmersiveDialogNotification(campaign,
+                      String.format(resources.getString("stratCon.earlyContractEnd.objectives"), getName()), true);
                 int remainingMonths = getMonthsLeft(campaign.getLocalDate().plusDays(1));
                 routedPayout = getMonthlyPayOut().multipliedBy(remainingMonths);
                 setEndDate(today.plusDays(1));
@@ -1290,6 +1291,11 @@ public class AtBContract extends Contract {
                     stratconCampaignState = StratConCampaignState.Deserialize(item);
                     stratconCampaignState.setContract(this);
                     this.setStratConCampaignState(stratconCampaignState);
+
+                    // <50.10 compatibility handler
+                    if (!(getContractType().isGarrisonType() || getContractType().isReliefDuty())) {
+                        stratconCampaignState.setAllowEarlyVictory(true);
+                    }
                 } else if (item.getNodeName().equalsIgnoreCase("parentContractId")) {
                     parentContract = new AtBContractRef(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("employerLiaison")) {
@@ -2506,6 +2512,10 @@ public class AtBContract extends Contract {
      */
     public void setTransportRoll(int roll) {
         transportRoll = roll;
+    }
+
+    public @Nullable Money setRoutedPayout(Money routedPayout) {
+        return routedPayout;
     }
 
     public @Nullable Money getRoutedPayout() {
