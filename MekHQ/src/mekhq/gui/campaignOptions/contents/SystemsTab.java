@@ -105,6 +105,7 @@ public class SystemsTab {
     private JCheckBox chkRandomizeTraits;
     private JCheckBox chkAllowMonthlyReinvestment;
     private JCheckBox chkAllowMonthlyConnections;
+    private JCheckBox chkUseSmallArmsOnly;
 
     /**
      * Constructs a new {@code SystemsTab} for the specified campaign.
@@ -442,6 +443,9 @@ public class SystemsTab {
         chkAllowMonthlyConnections = new CampaignOptionsCheckBox("AllowMonthlyConnections");
         chkAllowMonthlyConnections.addMouseListener(createTipPanelUpdater(atowHeader,
               "AllowMonthlyConnections"));
+        chkUseSmallArmsOnly = new CampaignOptionsCheckBox("UseSmallArmsOnly");
+        chkUseSmallArmsOnly.addMouseListener(createTipPanelUpdater(atowHeader,
+              "UseSmallArmsOnly"));
 
         final JPanel panel = new CampaignOptionsStandardPanel("ATOWAttributesPanel", true, "ATOWAttributesPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -463,6 +467,10 @@ public class SystemsTab {
         panel.add(chkAllowMonthlyReinvestment, layout);
         layout.gridx++;
         panel.add(chkAllowMonthlyConnections, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseSmallArmsOnly, layout);
 
         return panel;
     }
@@ -531,6 +539,7 @@ public class SystemsTab {
         chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
         chkAllowMonthlyReinvestment.setSelected(options.isAllowMonthlyReinvestment());
         chkAllowMonthlyConnections.setSelected(options.isAllowMonthlyConnections());
+        chkUseSmallArmsOnly.setSelected(options.isUseSmallArmsOnly());
     }
 
     /**
@@ -592,5 +601,6 @@ public class SystemsTab {
         skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
         options.setAllowMonthlyReinvestment(chkAllowMonthlyReinvestment.isSelected());
         options.setAllowMonthlyConnections(chkAllowMonthlyConnections.isSelected());
+        options.setUseSmallArmsOnly(chkUseSmallArmsOnly.isSelected());
     }
 }
