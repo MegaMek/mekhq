@@ -134,6 +134,15 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
+    public int getQuantityForPartsInUse() {
+        if (isSparePartInUse()) {
+            return 0;
+        }
+
+        return this.getShots();
+    }
+
+    @Override
     public boolean isSamePartType(@Nullable Part part) {
         return (getClass() == part.getClass())
                      && Objects.equals(getType(), ((AmmoStorage) part).getType());

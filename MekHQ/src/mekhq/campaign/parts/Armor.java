@@ -588,6 +588,15 @@ public class Armor extends Part implements IAcquisitionWork {
         return ArmorType.of(type, clan).getPointsPerTon();
     }
 
+    @Override
+    public int getQuantityForPartsInUse() {
+        if (isSparePartInUse()) {
+            return 0;
+        }
+
+        return this.getAmount();
+    }
+
     public Part getNewPart() {
         return new Armor(0, type, (int) Math.round(5 * getArmorPointsPerTon()), -1, false, clan, campaign);
     }
