@@ -34,7 +34,12 @@ package mekhq.campaign.utilities.glossary;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+
+import megamek.Version;
+import mekhq.MHQConstants;
 
 /**
  * The {@code DocumentationEntry} enum represents individual entries in the documentation glossary.
@@ -47,26 +52,31 @@ import java.util.List;
  * @since 0.50.07
  */
 public enum DocumentationEntry {
-    AGING_EFFECTS("AGING_EFFECTS", "Personnel Modules/Aging Effects"),
-    AWARDS_MODULE("AWARDS_MODULE", "Personnel Modules/Awards Module"),
-    EDUCATION_MODULE("EDUCATION_MODULE", "Personnel Modules/Education Module"),
-    RANDOM_DEATH("RANDOM_DEATH", "Personnel Modules/Random Death in MekHQ"),
-    RANDOM_DEPENDENTS("RANDOM_DEPENDENTS", "Personnel Modules/Random Dependents"),
-    RANDOM_PERSONALITIES("RANDOM_PERSONALITIES", "Personnel Modules/Random Personalities"),
-    STARTING_ATTRIBUTE_SCORES("STARTING_ATTRIBUTE_SCORES", "Personnel Modules/Starting Attribute Scores"),
-    TURNOVER_AND_RETENTION("TURNOVER_AND_RETENTION", "Personnel Modules/Turnover & Retention Module (feat. Fatigue)"),
-    PRISONERS_OF_WAR("PRISONERS_OF_WAR", "MekHQ Systems/Prisoners of War & Abstracted Search and Rescue"),
-    ACAR("ACAR", "StratCon/ACAR-Abstract Combat Auto-Resolve documentation"),
-    ADMIN_SKILLS("ADMIN_SKILLS", "StratCon/Admin Skills"),
-    COMBAT_TEAMS("COMBAT_TEAMS", "StratCon/Combat Teams, Roles, Training & Reinforcements"),
-    MORALE("MORALE", "StratCon/MekHQ Morale"),
-    RESUPPLY_AND_CONVOYS("RESUPPLY_AND_CONVOYS", "StratCon/Resupply & Convoys"),
-    UNIT_MARKETS("UNIT_MARKETS", "StratCon/Unit Markets"),
-    CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS", "MegaMek -MekHQ Chaos Campaign Guide"),
-    COOP_CAMPAIGNS("COOP_CAMPAIGNS", "MekHQ Co-Op Campaign Guide v1"),
-    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "0_MHQ New Player Guide"),
-    RECRUITMENT("RECRUITMENT", "Personnel Modules/Recruitment"),
-    FACTION_STANDINGS("FACTION_STANDINGS", "MekHQ Systems/Faction Standings");
+    ACAR("ACAR", "StratCon/ACAR-Abstract Combat Auto-Resolve documentation", new Version("0.50.06")),
+    ADMIN_SKILLS("ADMIN_SKILLS", "StratCon/Admin Skills", new Version("0.50.06")),
+    AGING_EFFECTS("AGING_EFFECTS", "Personnel Modules/Aging Effects", new Version("0.50.06")),
+    AWARDS_MODULE("AWARDS_MODULE", "Personnel Modules/Awards Module", new Version("0.50.06")),
+    CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS", "MegaMek -MekHQ Chaos Campaign Guide", new Version("0.50.06")),
+    COMBAT_TEAMS("COMBAT_TEAMS", "StratCon/Combat Teams, Roles, Training & Reinforcements", new Version("0.50.07")),
+    COOP_CAMPAIGNS("COOP_CAMPAIGNS", "MekHQ Co-Op Campaign Guide v1", new Version("0.50.06")),
+    EDUCATION_MODULE("EDUCATION_MODULE", "Personnel Modules/Education Module", new Version("0.50.06")),
+    FACTION_STANDINGS("FACTION_STANDINGS", "MekHQ Systems/Faction Standings", new Version("0.50.07")),
+    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "0_MHQ New Player Guide", new Version("0.50.06")),
+    PRISONERS_OF_WAR("PRISONERS_OF_WAR",
+          "MekHQ Systems/Prisoners of War & Abstracted Search and Rescue",
+          new Version("0.50.06")),
+    RANDOM_DEATH("RANDOM_DEATH", "Personnel Modules/Random Death in MekHQ", new Version("0.50.06")),
+    RANDOM_DEPENDENTS("RANDOM_DEPENDENTS", "Personnel Modules/Random Dependents", new Version("0.50.06")),
+    RANDOM_PERSONALITIES("RANDOM_PERSONALITIES", "Personnel Modules/Random Personalities", new Version("0.50.06")),
+    RECRUITMENT("RECRUITMENT", "Personnel Modules/Recruitment", new Version("0.50.07")),
+    RESUPPLY_AND_CONVOYS("RESUPPLY_AND_CONVOYS", "StratCon/Resupply & Convoys", new Version("0.50.06")),
+    STARTING_ATTRIBUTE_SCORES("STARTING_ATTRIBUTE_SCORES",
+          "Personnel Modules/Starting Attribute Scores",
+          new Version("0.50.10")),
+    TURNOVER_AND_RETENTION("TURNOVER_AND_RETENTION",
+          "Personnel Modules/Turnover & Retention Module (feat. Fatigue)",
+          new Version("0.50.06")),
+    UNIT_MARKETS("UNIT_MARKETS", "StratCon/Unit Markets", new Version("0.50.06"));
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DocumentationEntry";
 
@@ -75,6 +85,7 @@ public enum DocumentationEntry {
 
     private final String lookUpName;
     private final String fileAddress;
+    private final Version versionAddedOrLastUpdated;
 
     /**
      * Constructs a {@code DocumentationEntry} with the specified lookup name.
@@ -85,9 +96,10 @@ public enum DocumentationEntry {
      * @author Illiani
      * @since 0.50.07
      */
-    DocumentationEntry(String lookUpName, String fileAddress) {
+    DocumentationEntry(String lookUpName, String fileAddress, Version versionAddedOrLastUpdated) {
         this.lookUpName = lookUpName;
         this.fileAddress = fileAddress;
+        this.versionAddedOrLastUpdated = versionAddedOrLastUpdated;
     }
 
     /**
@@ -100,6 +112,37 @@ public enum DocumentationEntry {
      */
     public String getTitle() {
         return getTextAt(RESOURCE_BUNDLE, lookUpName + ".title");
+    }
+
+    /**
+     * Returns the title of this object, possibly appended with an icon/text indicating if it was added or updated since
+     * the last development or milestone version.
+     *
+     * <p>If {@link #versionAddedOrLastUpdated} is equal to or newer than the current version,
+     * an "added since last development" icon/text is appended.</p>
+     *
+     * <p>Otherwise, if {@link #versionAddedOrLastUpdated} is newer than the last milestone version,
+     * an "added since last milestone" icon/text is appended.</p>
+     *
+     * @return the title string, with an update/version icon appended if applicable
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public String getTitleWithVersionUpdateIcon() {
+        Version currentVersion = MHQConstants.VERSION;
+        Version lastMilestone = MHQConstants.LAST_MILESTONE;
+        String title = getTitle();
+
+        // We use an inverted 'isLowerThan' check as that will include instances where 'versionAddedOrLastUpdated' is
+        // the same as 'currentVersion'
+        if (!versionAddedOrLastUpdated.isLowerThan(currentVersion)) {
+            title += ' ' + MHQConstants.ADDED_SINCE_LAST_DEVELOPMENT;
+        } else if (versionAddedOrLastUpdated.isHigherThan(lastMilestone)) {
+            title += ' ' + MHQConstants.ADDED_SINCE_LAST_MILESTONE;
+        }
+
+        return title;
     }
 
     /**
@@ -124,8 +167,8 @@ public enum DocumentationEntry {
      * @since 0.50.07
      */
     public static List<String> getLookUpNamesSortedByTitle() {
-        return java.util.Arrays.stream(DocumentationEntry.values())
-                     .sorted(java.util.Comparator.comparing(DocumentationEntry::getTitle))
+        return Arrays.stream(DocumentationEntry.values())
+                     .sorted(Comparator.comparing(DocumentationEntry::getTitle))
                      .map(entry -> entry.lookUpName)
                      .toList();
     }

@@ -54,6 +54,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
+import megamek.Version;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.UIUtil;
@@ -453,8 +454,14 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 unassignCrewFromUnsupportedUnits(campaign.getUnits());
 
                 // Campaign upgrading
-                if (campaign.getVersion().isLowerThan(MHQConstants.VERSION)) {
+                final Version campaignVersion = campaign.getVersion();
+                if (campaignVersion.isLowerThan(MHQConstants.VERSION)) {
                     handleCampaignUpgrading(campaign);
+                }
+
+                // <50.10 compatibility handler
+                if (campaignVersion.isLowerThan(new Version("0.50.10"))) {
+                    new WarAndPeaceProcessor(campaign, true);
                 }
                 // endregion Progress 7
             }

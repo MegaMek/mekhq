@@ -266,7 +266,7 @@ public class NewGlossaryDialog extends JDialog {
         String lastFirstLetter = "";
         for (String entry : glossaryEntries) {
             GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entry);
-            String title = glossaryEntry != null ? glossaryEntry.getTitle() : "-";
+            String title = glossaryEntry != null ? glossaryEntry.getTitleWithVersionUpdateIcon() : "-";
 
             if (!lastFirstLetter.equals(title.substring(0, 1))) {
                 lastFirstLetter = title.substring(0, 1);
@@ -333,7 +333,7 @@ public class NewGlossaryDialog extends JDialog {
         String lastFirstLetter = "";
         for (String entry : documentationEntries) {
             DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(entry);
-            String title = documentationEntry != null ? documentationEntry.getTitle() : "-";
+            String title = documentationEntry != null ? documentationEntry.getTitleWithVersionUpdateIcon() : "-";
 
             if (!lastFirstLetter.equals(title.substring(0, 1))) {
                 lastFirstLetter = title.substring(0, 1);

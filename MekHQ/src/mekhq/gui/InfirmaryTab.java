@@ -393,20 +393,50 @@ public final class InfirmaryTab extends CampaignGuiTab {
      */
     private void updateAssignDoctorEnabled() {
         Person doctor = getSelectedDoctor();
-        final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        final int baseBedCount = campaignOptions.getMaximumPatients();
-        final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
 
         if (doctor == null) {
             btnAssignDoc.setEnabled(false);
         } else {
-            final int doctorCapacity = doctor.getDoctorMedicalCapacity(isDoctorsUseAdministration, baseBedCount);
-
-            btnAssignDoc.setEnabled((getCampaign().getPatientsFor(doctor) < doctorCapacity) &&
-                                          (unassignedPatientModel.getSize() > 0));
+            boolean canAssignToDoctor = canAssignToDoctor(doctor);
+            btnAssignDoc.setEnabled(unassignedPatientModel.getSize() > 0 && canAssignToDoctor);
         }
 
         btnUnassignDoc.setEnabled(!getSelectedAssignedPatients().isEmpty());
+    }
+
+    /**
+     * Determines if the given doctor can be assigned an additional patient.
+     *
+     * <p>This method checks whether assigning another patient to the specified doctor is within both the doctor's
+     * individual capacity and the global MASH theatre capacity (if MASH theatres are being used). The doctor's capacity
+     * is calculated based on campaign options and the doctor's qualifications. The global theatre constraint is only
+     * considered if MASH theatres are enabled.</p>
+     *
+     * @param doctor the {@link Person} representing the doctor to check for assignment eligibility
+     *
+     * @return {@code true} if the doctor can be assigned another patient according to all capacity constraints
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private boolean canAssignToDoctor(Person doctor) {
+        final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        final int baseBedCount = campaignOptions.getMaximumPatients();
+        final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
+
+        final int doctorCapacity = doctor.getDoctorMedicalCapacity(isDoctorsUseAdministration, baseBedCount);
+        final int patientsForDoctor = getCampaign().getPatientsFor(doctor);
+        final boolean isWithinDoctorCapacity = doctorCapacity > patientsForDoctor;
+
+        boolean useMASHTheatres = campaignOptions.isUseMASHTheatres();
+        boolean isWithinTheatreCapacity = !useMASHTheatres;
+        if (useMASHTheatres) {
+            final int mashTheatreCapacity = getCampaign().getMashTheatreCapacity();
+            final int patientsAssignedToDoctors = getCampaign().getPatientsAssignedToDoctors().size();
+            isWithinTheatreCapacity = mashTheatreCapacity > patientsAssignedToDoctors;
+        }
+
+        return isWithinDoctorCapacity && isWithinTheatreCapacity;
     }
 
     private void docTableValueChanged() {
@@ -421,33 +451,27 @@ public final class InfirmaryTab extends CampaignGuiTab {
         }
 
         final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
-        final int baseBedCount = campaignOptions.getMaximumPatients();
         final int healingWaitingPeriod = campaignOptions.getHealingWaitingPeriod();
-
-        final int doctorCapacity = doctor.getDoctorMedicalCapacity(isDoctorsUseAdministration, baseBedCount);
 
         Collection<Person> selectedPatients = getSelectedUnassignedPatients();
         if (selectedPatients.isEmpty()) {
             // Pick the first in the list ... if there are any
             int patientSize = unassignedPatientModel.getSize();
             for (int i = 0; i < patientSize; ++i) {
+                boolean canAssignToDoctor = canAssignToDoctor(doctor);
                 Person patient = unassignedPatientModel.getElementAt(i);
 
-                if ((null != patient) &&
-                          (patient.needsFixing()) &&
-                          (getCampaign().getPatientsFor(doctor) < doctorCapacity)) {
+                if (null != patient && patient.needsFixing() && canAssignToDoctor) {
                     patient.setDoctorId(doctor.getId(), healingWaitingPeriod);
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
                     break;
                 }
             }
-
         } else {
             for (Person patient : selectedPatients) {
-                if ((null != patient) &&
-                          (patient.needsFixing()) &&
-                          (getCampaign().getPatientsFor(doctor) < doctorCapacity)) {
+                boolean canAssignToDoctor = canAssignToDoctor(doctor);
+                
+                if (null != patient && patient.needsFixing() && canAssignToDoctor) {
                     patient.setDoctorId(doctor.getId(), healingWaitingPeriod);
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
                 }
