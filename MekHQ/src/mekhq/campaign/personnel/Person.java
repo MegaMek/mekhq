@@ -42,6 +42,9 @@ import static megamek.codeUtilities.StringUtility.isNullOrBlank;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.icons.Portrait.DEFAULT_IMAGE_WIDTH;
+import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
+import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
@@ -76,6 +79,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.swing.ImageIcon;
 
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
@@ -95,6 +99,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.*;
 import megamek.logging.MMLogger;
+import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -181,6 +186,10 @@ public class Person {
     public static final int MINIMUM_BLOODMARK = 0;
     public static final int MAXIMUM_BLOODMARK = 5;
 
+    public static final String EXTRA_INCOME_LABEL = "EXTRA_INCOME";
+    public static final int MINIMUM_EXTRA_INCOME = ExtraIncome.NEGATIVE_TEN.getTraitLevel();
+    public static final int MAXIMUM_EXTRA_INCOME = ExtraIncome.POSITIVE_TEN.getTraitLevel();
+
     public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
 
     private static final String DELIMITER = "::";
@@ -251,6 +260,7 @@ public class Person {
     // If new Traits are added, make sure to also add them to LifePathDataTraitLookup
     private int connections;
     private int wealth;
+    private ExtraIncome extraIncome;
     private boolean hasPerformedExtremeExpenditure;
     private int reputation;
     private int unlucky;
@@ -510,6 +520,7 @@ public class Person {
         hasGainedVeterancySPA = false;
         connections = 0;
         wealth = 0;
+        extraIncome = ExtraIncome.ZERO;
         hasPerformedExtremeExpenditure = false;
         reputation = 0;
         unlucky = 0;
@@ -986,8 +997,61 @@ public class Person {
     }
     // endregion Names
 
+    /**
+     * Retrieves the portrait object associated with this entity.
+     *
+     * <p>Consider using {@link #getPortraitImageIconWithFallback(boolean)}, instead.</p>
+     *
+     * @return the {@link Portrait} object representing the visual representation of this entity
+     */
     public Portrait getPortrait() {
         return portrait;
+    }
+
+    /**
+     * Retrieves the portrait image for a given entity. If the provided condition enables the use of an origin faction
+     * backup and the portrait image is unavailable or matches default filenames, a fallback image is retrieved based on
+     * the origin faction's logo.
+     *
+     * @param useOriginFactionBackup a boolean flag indicating whether to use the origin faction backup for the portrait
+     *                               image if the primary portrait is unavailable or invalid
+     *
+     * @return the portrait image for the entity; if a fallback is required based on the condition, the fallback image
+     *       generated from the origin faction's logo is returned
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public ImageIcon getPortraitImageIconWithFallback(boolean useOriginFactionBackup) {
+        if (useOriginFactionBackup) {
+            if (portrait == null) {
+                return getFallbackPortrait();
+            }
+
+            String portraitFilename = portrait.getFilename();
+            if (portraitFilename.equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
+                      portraitFilename.equalsIgnoreCase(NO_PORTRAIT_NAME)) {
+                return getFallbackPortrait();
+            }
+        }
+
+        return (portrait == null) ? new ImageIcon() : portrait.getImageIcon();
+    }
+
+    /**
+     * Retrieves a fallback portrait image when no specific portrait is available.
+     *
+     * <p>This method generates a fallback image by using the faction logo corresponding to the person's origin
+     * faction and birth year. The logo is scaled to the default image width while maintaining aspect ratio.</p>
+     *
+     * @return A scaled {@link ImageIcon} containing the faction logo as a fallback portrait
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private ImageIcon getFallbackPortrait() {
+        ImageIcon fallbackImage = Factions.getFactionLogo(birthday.getYear(), originFaction.getShortName());
+        return ImageUtilities.scaleImageIcon(fallbackImage, DEFAULT_IMAGE_WIDTH, true);
     }
 
     public void setPortrait(final Portrait portrait) {
@@ -2995,6 +3059,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wealth", wealth);
             }
 
+            if (!ExtraIncome.ZERO.equals(extraIncome)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "extraIncome", extraIncome.name());
+            }
+
             if (hasPerformedExtremeExpenditure) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasPerformedExtremeExpenditure", true);
             }
@@ -3532,6 +3600,8 @@ public class Person {
                     person.connections = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("wealth")) {
                     person.wealth = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("extraIncome")) {
+                    person.extraIncome = ExtraIncome.extraIncomeParseFromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("hasPerformedExtremeExpenditure")) {
                     person.hasPerformedExtremeExpenditure = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
@@ -3987,6 +4057,15 @@ public class Person {
                 person.setJoinedCampaign(campaign.getLocalDate());
             }
 
+            // <50.10 compatibility handler
+            if (updateSkillsForVehicleProfessions(person, person.getPrimaryRole()) ||
+                      updateSkillsForVehicleProfessions(person, person.getSecondaryRole())) {
+                campaign.addReport(String.format(resources.getString("vehicleProfessionSkillChange"),
+                      spanOpeningWithCustomColor(getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
+            }
+
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
             if (!person.canPerformRole(campaign.getLocalDate(), person.getSecondaryRole(), false)) {
@@ -4012,6 +4091,30 @@ public class Person {
         }
 
         return person;
+    }
+
+    private static boolean updateSkillsForVehicleProfessions(Person person, PersonnelRole role) {
+        String drivingSkillType = switch (role) {
+            case VTOL_PILOT -> S_PILOT_VTOL;
+            case NAVAL_VEHICLE_DRIVER -> S_PILOT_NVEE;
+            case GROUND_VEHICLE_DRIVER -> S_PILOT_GVEE;
+            default -> null;
+        };
+
+        if (drivingSkillType == null) {
+            return false;
+        }
+
+        Skill drivingSkill = person.getSkill(drivingSkillType);
+        Skill gunnerySkill = person.getSkill(S_GUN_VEE);
+
+        if (drivingSkill != null && gunnerySkill == null) {
+            int drivingLevel = drivingSkill.getLevel();
+            person.addSkill(S_GUN_VEE, drivingLevel, 0);
+            return true;
+        }
+
+        return false;
     }
     // endregion File I/O
 
@@ -5619,26 +5722,31 @@ public class Person {
      *                                 calculations for technicians.
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
-        // Doctors and Technicians without adjustments
-        if (primaryRole.isDoctor() || (primaryRole.isTech() && !isTechsUseAdministration)) {
+        // Doctors
+        if (primaryRole.isDoctor()) {
             this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
             this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-        } else if (secondaryRole.isDoctor() || (secondaryRole.isTech() && !isTechsUseAdministration)) {
-            this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
-            this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
+            return;
         }
 
-        // Technicians with adjustments
+        if (secondaryRole.isDoctor()) {
+            this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
+            this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
+            return;
+        }
+
+        // Technicians
         if (primaryRole.isTech()) {
-            double techTimeMultiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
+            double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
+            this.minutesLeft = (int) Math.round(PRIMARY_ROLE_SUPPORT_TIME * multiplier);
+            this.overtimeLeft = (int) Math.round(PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * multiplier);
+            return;
+        }
 
-            this.minutesLeft = (int) round(PRIMARY_ROLE_SUPPORT_TIME * techTimeMultiplier);
-            this.overtimeLeft = (int) round(PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * techTimeMultiplier);
-        } else if (secondaryRole.isTechSecondary()) {
-            double techTimeMultiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
-
-            this.minutesLeft = (int) round(SECONDARY_ROLE_SUPPORT_TIME * techTimeMultiplier);
-            this.overtimeLeft = (int) round(SECONDARY_ROLE_OVERTIME_SUPPORT_TIME * techTimeMultiplier);
+        if (secondaryRole.isTechSecondary()) {
+            double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
+            this.minutesLeft = (int) Math.round(SECONDARY_ROLE_SUPPORT_TIME * multiplier);
+            this.overtimeLeft = (int) Math.round(SECONDARY_ROLE_OVERTIME_SUPPORT_TIME * multiplier);
         }
     }
 
@@ -6144,6 +6252,58 @@ public class Person {
 
     public void setHasPerformedExtremeExpenditure(final boolean hasPerformedExtremeExpenditure) {
         this.hasPerformedExtremeExpenditure = hasPerformedExtremeExpenditure;
+    }
+
+    /**
+     * Returns the current {@link ExtraIncome} value.
+     *
+     * @return the {@link ExtraIncome} object representing the current extra income setting.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public ExtraIncome getExtraIncome() {
+        return extraIncome;
+    }
+
+    /**
+     * Returns the trait level associated with the current {@link ExtraIncome}.
+     *
+     * @return the integer trait level for the current extra income value.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public int getExtraIncomeTraitLevel() {
+        return extraIncome.getTraitLevel();
+    }
+
+    /**
+     * Sets the {@link ExtraIncome} value based on a specified trait level.
+     *
+     * <p>The trait level is clamped to the allowed range before being converted into an {@link ExtraIncome}
+     * object.</p>
+     *
+     * @param traitLevel the integer value representing the trait level to set for extra income.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public void setExtraIncomeFromTraitLevel(final int traitLevel) {
+        int newExtraIncomeTraitLevel = clamp(traitLevel, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME);
+        extraIncome = ExtraIncome.extraIncomeParseFromInteger(newExtraIncomeTraitLevel);
+    }
+
+    /**
+     * Directly assigns an {@link ExtraIncome} object.
+     *
+     * @param extraIncome the {@link ExtraIncome} instance to assign.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public void setExtraIncomeDirect(final ExtraIncome extraIncome) {
+        this.extraIncome = extraIncome;
     }
 
     /**
