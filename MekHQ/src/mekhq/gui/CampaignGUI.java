@@ -37,6 +37,7 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.gui.enums.MHQTabType.COMMAND_CENTER;
@@ -1197,8 +1198,8 @@ public class CampaignGUI extends JPanel {
 
         lblLocation = new JLabel(getCampaign().getLocation()
                                        .getReport(getCampaign().getLocalDate(),
-                                             getCampaign().calculateCostPerJump(false, true),
-                                             isUseCommandCircuit));
+                                             isUseCommandCircuit,
+                                             getCampaign().getTransportCostCalculation(EXP_REGULAR)));
         lblLocation.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("currentLocation.title")));
 
         pnlTop = new JPanel(new GridBagLayout());
@@ -2790,8 +2791,8 @@ public class CampaignGUI extends JPanel {
 
         lblLocation.setText(getCampaign().getLocation()
                                   .getReport(getCampaign().getLocalDate(),
-                                        getCampaign().calculateCostPerJump(false, true),
-                                        isUseCommandCircuit));
+                                        isUseCommandCircuit,
+                                        getCampaign().getTransportCostCalculation(EXP_REGULAR)));
     }
 
     public int getTabIndexByName(String tabTitle) {

@@ -437,7 +437,7 @@ public class Person {
     // endregion Variable Declarations
 
     // region Constructors
-    protected Person(final UUID id) {
+    public Person(final UUID id) {
         this.id = id;
         this.genealogy = new Genealogy(this);
     }

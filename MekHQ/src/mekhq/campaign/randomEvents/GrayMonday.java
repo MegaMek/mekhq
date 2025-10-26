@@ -98,7 +98,6 @@ public class GrayMonday {
                         contract.setBattleLossComp(0);
                         contract.setStraightSupport(0);
                         contract.setTransportComp(0);
-                        contract.setTransitAmount(Money.of(0));
                         contract.calculateContract(campaign);
 
                         contract.setSalvagePct(100);
