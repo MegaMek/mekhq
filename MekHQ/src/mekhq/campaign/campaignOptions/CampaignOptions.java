@@ -348,9 +348,6 @@ public class CampaignOptions {
     private boolean useClanPersonnelMarriages;
     private boolean usePrisonerMarriages;
     private int checkMutualAncestorsDepth;
-    private int noInterestInRelationshipsDiceSize;
-    private int interestedInBothSexesDiceSize;
-    private int interestedInSameSexDiceSize;
     private boolean logMarriageNameChanges;
     private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
     private RandomMarriageMethod randomMarriageMethod;
@@ -391,6 +388,9 @@ public class CampaignOptions {
     private boolean useRandomPrisonerProcreation;
     private int randomProcreationRelationshipDiceSize;
     private int randomProcreationRelationshiplessDiceSize;
+    private int noInterestInRelationshipsDiceSize;
+    private int interestedInBothSexesDiceSize;
+    private int interestedInSameSexDiceSize;
 
     // Education
     private boolean useEducationModule;

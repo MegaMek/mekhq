@@ -117,6 +117,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
@@ -3958,7 +3959,12 @@ public class Person {
                     person.setQuickTrainIgnore(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageable")) { // Legacy: <50.10
                     boolean marriageable = Boolean.parseBoolean(wn2.getTextContent().trim());
-                    sexualityCompatibilityHandler(campaign, marriageable, person);
+                    CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                    sexualityCompatibilityHandler(marriageable,
+                          person,
+                          campaignOptions.getNoInterestInRelationshipsDiceSize(),
+                          campaignOptions.getInterestedInSameSexDiceSize(),
+                          campaignOptions.getInterestedInBothSexesDiceSize());
                 } else if (nodeName.equalsIgnoreCase("prefersMen")) {
                     person.setPrefersMen(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("prefersWomen")) {
@@ -4051,37 +4057,43 @@ public class Person {
     }
 
     /**
-     * Configures a person's sexual orientation preferences based on their marriageability status and campaign
-     * settings.
+     * Configures a person's sexual orientation preferences based on their marriageability status and weighted random
+     * probabilities.
      *
-     * <p>For non-marriageable characters, all preferences are disabled. For marriageable characters, preferences are
-     * set based on the campaign's same-sex marriage settings:</p>
-     * <ul>
-     *     <li>Characters always prefer the opposite gender (for traditional marriages)</li>
-     *     <li>Characters also prefer the same gender if same-sex marriage is enabled in campaign options</li>
-     * </ul>
+     * <p>For non-marriageable characters, all romantic preferences are disabled. For marriageable characters,
+     * orientation is determined through sequential probability checks using the provided dice sizes, which represent
+     * the denominators for calculating the chance of each orientation (e.g., a die size of 100 means a 1% chance).</p>
      *
-     * <p><b>Migration Note:</b> Prior to version 0.50.10, all characters were marriageable regardless of gender.
-     * This method respects the player's campaign options for backward compatibility with older save files.</p>
+     * <p>The orientation determination follows this priority order:</p>
+     * <ol>
+     *     <li>Aromantic/asexual (no interest in relationships)</li>
+     *     <li>Homosexual (interested in the same sex)</li>
+     *     <li>Bisexual/pansexual (interested in both sexes)</li>
+     *     <li>Heterosexual (default if no other orientation is rolled)</li>
+     * </ol>
      *
-     * @param campaign     the {@link Campaign} containing the relevant options for same-sex marriage
-     * @param marriageable {@code true} if the person is eligible for marriage; {@code false} otherwise
-     * @param person       the {@link Person} whose sexual orientation preferences are being configured
+     * <p>Default percentile chances of each sexuality are viewable in
+     * {@link DefaultPersonnelGenerator#determineOrientation(Person, int, int, int)}</p>
+     *
+     * @param marriageable                      {@code true} if the person is eligible for romantic relationships;
+     *                                          {@code false} otherwise
+     * @param person                            the {@link Person} whose orientation preferences are being configured
+     * @param noInterestInRelationshipsDiceSize dice size for aromantic/asexual orientation (checked first)
+     * @param interestedInSameSexDiceSize       dice size for homosexual orientation (checked second)
+     * @param interestedInBothSexesDiceSize     dice size for bisexual/pansexual orientation (checked third)
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static void sexualityCompatibilityHandler(Campaign campaign, boolean marriageable, Person person) {
+    private static void sexualityCompatibilityHandler(boolean marriageable, Person person,
+          int noInterestInRelationshipsDiceSize,
+          int interestedInSameSexDiceSize, int interestedInBothSexesDiceSize) {
         if (!marriageable) {
             person.setPrefersMen(false);
             person.setPrefersWomen(false);
         } else {
-            // For characters that predate 50.10 we defer to the players' Campaign Options
-            boolean allowSameSexMarriage = campaign.getCampaignOptions().getInterestedInSameSexDiceSize() != 0;
-
-            boolean isMale = person.getGender().isMale();
-            person.setPrefersMen(allowSameSexMarriage || !isMale);
-            person.setPrefersWomen(allowSameSexMarriage || isMale);
+            DefaultPersonnelGenerator.determineOrientation(person, noInterestInRelationshipsDiceSize,
+                  interestedInSameSexDiceSize, interestedInBothSexesDiceSize);
         }
     }
     // endregion File I/O
