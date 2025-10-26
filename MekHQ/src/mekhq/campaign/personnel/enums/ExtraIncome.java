@@ -85,6 +85,8 @@ public enum ExtraIncome {
 
     final private static String RESOURCE_BUNDLE = "mekhq.resources.ExtraIncome";
 
+    final private static int BETTER_MONTHLY_INCOME_MULTIPLIER = 100;
+
     /** Lookup key for matching or identification in configs or serialization. */
     private final String lookupKey;
     /** The trait level corresponding to this extra income entry. */
@@ -135,12 +137,37 @@ public enum ExtraIncome {
     /**
      * Returns the monthly extra income or expense for this trait level.
      *
+     * <p><b>Note:</b> This fetches the monthly income directly without any adjustments. Generally you want to use
+     * {@link #getMonthlyIncomeAdjusted(boolean)} instead.</p>
+     *
      * @return a {@link Money} object representing the monthly income (or expense)
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public Money getMonthlyIncome() {
+    public Money getMonthlyIncomeDirect() {
+        return monthlyIncome;
+    }
+
+    /**
+     * Retrieves the monthly income, optionally adjusted by a multiplier.
+     *
+     * <p>When better monthly income is enabled, the base monthly income is multiplied by
+     * {@link #BETTER_MONTHLY_INCOME_MULTIPLIER} to provide an enhanced income value. Otherwise, the unadjusted base
+     * monthly income is returned.</p>
+     *
+     * @param useBetterMonthlyIncome {@code true} to apply the better monthly income multiplier; {@code false} to return
+     *                               the base monthly income
+     *
+     * @return the monthly income, either adjusted or unadjusted based on the parameter
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public Money getMonthlyIncomeAdjusted(boolean useBetterMonthlyIncome) {
+        if (useBetterMonthlyIncome) {
+            return monthlyIncome.multipliedBy(BETTER_MONTHLY_INCOME_MULTIPLIER);
+        }
         return monthlyIncome;
     }
 
@@ -218,25 +245,27 @@ public enum ExtraIncome {
      *     transaction and generates a campaign report string summarizing the financial change.</li>
      * </ul>
      *
-     * @param finances The {@link Finances} object to update with any transaction that occurs.
-     * @param person   The {@link Person} whose extra income is to be processed.
-     * @param today    The {@link LocalDate} representing the current date for this transaction.
+     * @param finances               The {@link Finances} object to update with any transaction that occurs.
+     * @param person                 The {@link Person} whose extra income is to be processed.
+     * @param today                  The {@link LocalDate} representing the current date for this transaction.
+     * @param useBetterMonthlyIncome {@code true} to apply the better monthly income multiplier.
      *
      * @return A formatted campaign report string, or an empty string if there is no relevant transaction to report.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static String processExtraIncome(Finances finances, Person person, LocalDate today) {
+    public static String processExtraIncome(Finances finances, Person person, LocalDate today,
+          boolean useBetterMonthlyIncome) {
         ExtraIncome extraIncome = person.getExtraIncome();
 
         // If the character has no extra income, can expect no financial change, or it's not the first of the month
         // then early exit.
-        if (extraIncome == null || extraIncome.getMonthlyIncome().isZero() || today.getDayOfMonth() != 1) {
+        if (extraIncome == null || extraIncome.getMonthlyIncomeDirect().isZero() || today.getDayOfMonth() != 1) {
             return "";
         }
 
-        Money financialChange = extraIncome.getMonthlyIncome();
+        Money financialChange = extraIncome.getMonthlyIncomeAdjusted(useBetterMonthlyIncome);
 
         boolean isCampaignCommander = person.isCommander();
         boolean isChild = person.isChild(today);

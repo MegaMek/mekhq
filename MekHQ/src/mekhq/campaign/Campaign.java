@@ -5483,6 +5483,7 @@ public class Campaign implements ITechManager {
         boolean isCampaignPlanetside = location.isOnPlanet();
         boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         boolean isUseFatigue = campaignOptions.isUseFatigue();
+        boolean useBetterMonthlyIncome = campaignOptions.isUseBetterExtraIncome();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
@@ -5557,7 +5558,7 @@ public class Campaign implements ITechManager {
                     }
                 }
 
-                String report = ExtraIncome.processExtraIncome(finances, person, currentDay);
+                String report = ExtraIncome.processExtraIncome(finances, person, currentDay, useBetterMonthlyIncome);
                 if (!StringUtility.isNullOrBlank(report)) {
                     addReport(report);
                 }

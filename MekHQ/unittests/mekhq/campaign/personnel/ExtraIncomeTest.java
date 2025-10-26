@@ -54,7 +54,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 class ExtraIncomeTest {
-    private static LocalDate TODAY = LocalDate.of(3151, 1, 1);
+    private static final LocalDate TODAY = LocalDate.of(3151, 1, 1);
 
     @ParameterizedTest
     @EnumSource(value = ExtraIncome.class)
@@ -109,10 +109,10 @@ class ExtraIncomeTest {
         Money priorFunds = Money.of(-100000000);
         try {
             ExtraIncome otherExtraIncome = ExtraIncome.extraIncomeParseFromString(priorTraitLevel + "");
-            priorFunds = otherExtraIncome.getMonthlyIncome();
+            priorFunds = otherExtraIncome.getMonthlyIncomeDirect();
         } catch (Exception ignored) {}
 
-        Money currentFunds = extraIncome.getMonthlyIncome();
+        Money currentFunds = extraIncome.getMonthlyIncomeDirect();
         assertTrue(currentFunds.isGreaterThan(priorFunds),
               "Expected " + extraIncome.name() + " to improve from " + priorFunds + " to " + currentFunds);
     }
@@ -187,7 +187,7 @@ class ExtraIncomeTest {
         Person person = new Person(mockCampaign);
         person.setExtraIncomeDirect(ZERO);
 
-        String result = ExtraIncome.processExtraIncome(finances, person, TODAY);
+        String result = ExtraIncome.processExtraIncome(finances, person, TODAY, false);
         assertEquals("", result, "Expected empty string for zero extra income");
     }
 
@@ -205,7 +205,7 @@ class ExtraIncomeTest {
         person.setExtraIncomeDirect(POSITIVE_TEN);
         person.setDateOfBirth(TODAY.minusYears(15));
 
-        String result = ExtraIncome.processExtraIncome(finances, person, TODAY);
+        String result = ExtraIncome.processExtraIncome(finances, person, TODAY, false);
         assertEquals("", result, "Expected empty string for child extra income, instead found: " + result);
     }
 
@@ -224,7 +224,7 @@ class ExtraIncomeTest {
         person.setDateOfBirth(TODAY.minusYears(30));
         person.setCommander(true);
 
-        String result = ExtraIncome.processExtraIncome(finances, person, LocalDate.of(3151, 1, 2));
+        String result = ExtraIncome.processExtraIncome(finances, person, LocalDate.of(3151, 1, 2), false);
         assertEquals("", result, "Expected empty string for for not first of month, instead found: " + result);
     }
 
@@ -243,7 +243,7 @@ class ExtraIncomeTest {
         person.setDateOfBirth(TODAY.minusYears(15));
         person.setCommander(true);
 
-        String result = ExtraIncome.processExtraIncome(finances, person, TODAY);
+        String result = ExtraIncome.processExtraIncome(finances, person, TODAY, false);
         assertNotEquals("", result, "Expected non-empty string for child extra income");
     }
 
@@ -261,7 +261,7 @@ class ExtraIncomeTest {
         person.setExtraIncomeDirect(POSITIVE_TEN);
         person.setDateOfBirth(TODAY.minusYears(30));
 
-        String result = ExtraIncome.processExtraIncome(finances, person, TODAY);
+        String result = ExtraIncome.processExtraIncome(finances, person, TODAY, false);
         assertEquals("", result, "Expected empty string for adult non-commander extra income");
     }
 
@@ -280,7 +280,7 @@ class ExtraIncomeTest {
         person.setDateOfBirth(TODAY.minusYears(30));
         person.setCommander(true);
 
-        String result = ExtraIncome.processExtraIncome(finances, person, TODAY);
+        String result = ExtraIncome.processExtraIncome(finances, person, TODAY, false);
         assertNotEquals("", result, "Expected non-empty string for adult commander extra income");
     }
 
@@ -301,7 +301,7 @@ class ExtraIncomeTest {
         Money campaignFinancesBefore = mockCampaign.getFinances().getBalance();
         Money personalFinancesBefore = person.getTotalEarnings();
 
-        ExtraIncome.processExtraIncome(finances, person, TODAY);
+        ExtraIncome.processExtraIncome(finances, person, TODAY, false);
 
         Money campaignFinancesAfter = mockCampaign.getFinances().getBalance();
         Money personalFinancesAfter = person.getTotalEarnings();
@@ -331,12 +331,12 @@ class ExtraIncomeTest {
         Money campaignFinancesBefore = mockCampaign.getFinances().getBalance();
         Money personalFinancesBefore = person.getTotalEarnings();
 
-        ExtraIncome.processExtraIncome(finances, person, TODAY);
+        ExtraIncome.processExtraIncome(finances, person, TODAY, false);
 
         Money campaignFinancesAfter = mockCampaign.getFinances().getBalance();
         Money personalFinancesAfter = person.getTotalEarnings();
 
-        Money campaignFinancesExpected = campaignFinancesBefore.plus(POSITIVE_TEN.getMonthlyIncome());
+        Money campaignFinancesExpected = campaignFinancesBefore.plus(POSITIVE_TEN.getMonthlyIncomeDirect());
         Money personalFinancesExpected = personalFinancesBefore.plus(Money.of(0));
 
         assertEquals(campaignFinancesExpected, campaignFinancesAfter);
@@ -360,13 +360,13 @@ class ExtraIncomeTest {
         Money campaignFinancesBefore = mockCampaign.getFinances().getBalance();
         Money personalFinancesBefore = person.getTotalEarnings();
 
-        ExtraIncome.processExtraIncome(finances, person, TODAY);
+        ExtraIncome.processExtraIncome(finances, person, TODAY, false);
 
         Money campaignFinancesAfter = mockCampaign.getFinances().getBalance();
         Money personalFinancesAfter = person.getTotalEarnings();
 
         Money campaignFinancesExpected = campaignFinancesBefore.plus(Money.of(0));
-        Money personalFinancesExpected = personalFinancesBefore.plus(POSITIVE_TEN.getMonthlyIncome());
+        Money personalFinancesExpected = personalFinancesBefore.plus(POSITIVE_TEN.getMonthlyIncomeDirect());
 
         assertEquals(campaignFinancesExpected, campaignFinancesAfter);
         assertEquals(personalFinancesExpected, personalFinancesAfter);
@@ -390,12 +390,12 @@ class ExtraIncomeTest {
         Money campaignFinancesBefore = mockCampaign.getFinances().getBalance();
         Money personalFinancesBefore = person.getTotalEarnings();
 
-        ExtraIncome.processExtraIncome(finances, person, TODAY);
+        ExtraIncome.processExtraIncome(finances, person, TODAY, false);
 
         Money campaignFinancesAfter = mockCampaign.getFinances().getBalance();
         Money personalFinancesAfter = person.getTotalEarnings();
 
-        Money campaignFinancesExpected = campaignFinancesBefore.plus(POSITIVE_TEN.getMonthlyIncome());
+        Money campaignFinancesExpected = campaignFinancesBefore.plus(POSITIVE_TEN.getMonthlyIncomeDirect());
         Money personalFinancesExpected = personalFinancesBefore.plus(Money.of(0));
 
         assertEquals(campaignFinancesExpected, campaignFinancesAfter);
