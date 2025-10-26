@@ -348,7 +348,9 @@ public class CampaignOptions {
     private boolean useClanPersonnelMarriages;
     private boolean usePrisonerMarriages;
     private int checkMutualAncestorsDepth;
-    private int noInterestInMarriageDiceSize;
+    private int noInterestInRelationshipsDiceSize;
+    private int interestedInBothSexesDiceSize;
+    private int interestedInSameSexDiceSize;
     private boolean logMarriageNameChanges;
     private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
     private RandomMarriageMethod randomMarriageMethod;
@@ -356,7 +358,6 @@ public class CampaignOptions {
     private boolean useRandomPrisonerMarriages;
     private int randomMarriageAgeRange;
     private int randomMarriageDiceSize;
-    private int randomSameSexMarriageDiceSize;
     private int randomNewDependentMarriage;
 
     // Divorce
@@ -957,7 +958,9 @@ public class CampaignOptions {
         setUseClanPersonnelMarriages(false);
         setUsePrisonerMarriages(true);
         setCheckMutualAncestorsDepth(4);
-        setNoInterestInMarriageDiceSize(10);
+        setNoInterestInRelationshipsDiceSize(100);
+        setInterestedInSameSexDiceSize(14);
+        setInterestedInBothSexesDiceSize(33);
         setLogMarriageNameChanges(false);
         setMarriageSurnameWeights(new HashMap<>());
         getMarriageSurnameWeights().put(MergingSurnameStyle.NO_CHANGE, 100);
@@ -978,7 +981,6 @@ public class CampaignOptions {
         setUseRandomPrisonerMarriages(false);
         setRandomMarriageAgeRange(10);
         setRandomMarriageDiceSize(5000);
-        setRandomSameSexMarriageDiceSize(14);
         setRandomNewDependentMarriage(20);
 
         // Divorce
@@ -2649,12 +2651,12 @@ public class CampaignOptions {
         this.checkMutualAncestorsDepth = checkMutualAncestorsDepth;
     }
 
-    public int getNoInterestInMarriageDiceSize() {
-        return noInterestInMarriageDiceSize;
+    public int getNoInterestInRelationshipsDiceSize() {
+        return noInterestInRelationshipsDiceSize;
     }
 
-    public void setNoInterestInMarriageDiceSize(final int noInterestInMarriageDiceSize) {
-        this.noInterestInMarriageDiceSize = noInterestInMarriageDiceSize;
+    public void setNoInterestInRelationshipsDiceSize(final int noInterestInRelationshipsDiceSize) {
+        this.noInterestInRelationshipsDiceSize = noInterestInRelationshipsDiceSize;
     }
 
     /**
@@ -2746,17 +2748,25 @@ public class CampaignOptions {
     /**
      * @return the number of sides on the die used to determine random same-sex marriage
      */
-    public int getRandomSameSexMarriageDiceSize() {
-        return randomSameSexMarriageDiceSize;
+    public int getInterestedInSameSexDiceSize() {
+        return interestedInSameSexDiceSize;
     }
 
     /**
      * Sets the size of the random same-sex marriage die.
      *
-     * @param randomSameSexMarriageDiceSize the size of the random same-sex marriage die
+     * @param interestedInSameSexDiceSize the size of the random same-sex marriage die
      */
-    public void setRandomSameSexMarriageDiceSize(final int randomSameSexMarriageDiceSize) {
-        this.randomSameSexMarriageDiceSize = randomSameSexMarriageDiceSize;
+    public void setInterestedInSameSexDiceSize(final int interestedInSameSexDiceSize) {
+        this.interestedInSameSexDiceSize = interestedInSameSexDiceSize;
+    }
+
+    public int getInterestedInBothSexesDiceSize() {
+        return interestedInBothSexesDiceSize;
+    }
+
+    public void setInterestedInBothSexesDiceSize(final int interestedInBothSexesDiceSize) {
+        this.interestedInBothSexesDiceSize = interestedInBothSexesDiceSize;
     }
 
     /**

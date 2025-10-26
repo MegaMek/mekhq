@@ -476,8 +476,12 @@ public class CampaignOptionsUnmarshaller {
             case "usePrisonerMarriages" -> campaignOptions.setUsePrisonerMarriages(parseBoolean(nodeContents));
             case "checkMutualAncestorsDepth" -> campaignOptions.setCheckMutualAncestorsDepth(parseInt(
                   nodeContents));
-            case "noInterestInMarriageDiceSize" -> campaignOptions.setNoInterestInMarriageDiceSize(parseInt(
-                  nodeContents));
+            case "noInterestInRelationshipsDiceSize", "noInterestInMarriageDiceSize" ->
+                  campaignOptions.setNoInterestInRelationshipsDiceSize(parseInt(nodeContents));
+            case "interestedInSameSexDiceSize", "randomSameSexMarriageDiceSize" ->
+                  campaignOptions.setInterestedInSameSexDiceSize(parseInt(nodeContents));
+            case "interestedInBothSexesDiceSize" ->
+                  campaignOptions.setInterestedInBothSexesDiceSize(parseInt(nodeContents));
             case "logMarriageNameChanges" -> campaignOptions.setLogMarriageNameChanges(parseBoolean(nodeContents));
             case "marriageSurnameWeights" -> {
                 if (!childNode.hasChildNodes()) {
@@ -502,8 +506,6 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "randomMarriageAgeRange" -> campaignOptions.setRandomMarriageAgeRange(parseInt(nodeContents));
             case "randomMarriageDiceSize" -> campaignOptions.setRandomMarriageDiceSize(parseInt(nodeContents));
-            case "randomSameSexMarriageDiceSize" -> campaignOptions.setRandomSameSexMarriageDiceSize(parseInt(
-                  nodeContents));
             case "randomNewDependentMarriage" -> campaignOptions.setRandomNewDependentMarriage(parseInt(
                   nodeContents));
             case "useManualDivorce" -> campaignOptions.setUseManualDivorce(parseBoolean(nodeContents));

@@ -885,7 +885,7 @@ public class RelationshipsTab {
         chkUseManualMarriages.setSelected(options.isUseManualMarriages());
         chkUseClanPersonnelMarriages.setSelected(options.isUseClanPersonnelMarriages());
         chkUsePrisonerMarriages.setSelected(options.isUsePrisonerMarriages());
-        spnNoInterestInMarriageDiceSize.setValue(options.getNoInterestInMarriageDiceSize());
+        spnNoInterestInMarriageDiceSize.setValue(options.getNoInterestInRelationshipsDiceSize());
         spnCheckMutualAncestorsDepth.setValue(options.getCheckMutualAncestorsDepth());
         chkLogMarriageNameChanges.setSelected(options.isLogMarriageNameChanges());
         comboRandomMarriageMethod.setSelectedItem(options.getRandomMarriageMethod());
@@ -893,7 +893,7 @@ public class RelationshipsTab {
         chkUseRandomPrisonerMarriages.setSelected(options.isUseRandomPrisonerMarriages());
         spnRandomMarriageAgeRange.setValue(options.getRandomMarriageAgeRange());
         spnRandomMarriageDiceSize.setValue(options.getRandomMarriageDiceSize());
-        spnRandomSameSexMarriageDiceSize.setValue(options.getRandomSameSexMarriageDiceSize());
+        spnRandomSameSexMarriageDiceSize.setValue(options.getInterestedInSameSexDiceSize());
         spnRandomNewDependentMarriage.setValue(options.getRandomNewDependentMarriage());
 
         // Divorce
@@ -945,7 +945,7 @@ public class RelationshipsTab {
         options.setUseManualMarriages(chkUseManualMarriages.isSelected());
         options.setUseClanPersonnelMarriages(chkUseClanPersonnelMarriages.isSelected());
         options.setUsePrisonerMarriages(chkUsePrisonerMarriages.isSelected());
-        options.setNoInterestInMarriageDiceSize((int) spnNoInterestInMarriageDiceSize.getValue());
+        options.setNoInterestInRelationshipsDiceSize((int) spnNoInterestInMarriageDiceSize.getValue());
         options.setCheckMutualAncestorsDepth((int) spnCheckMutualAncestorsDepth.getValue());
         options.setLogMarriageNameChanges(chkLogMarriageNameChanges.isSelected());
         options.setRandomMarriageMethod(comboRandomMarriageMethod.getSelectedItem());
@@ -953,7 +953,7 @@ public class RelationshipsTab {
         options.setUseRandomPrisonerMarriages(chkUseRandomPrisonerMarriages.isSelected());
         options.setRandomMarriageAgeRange((int) spnRandomMarriageAgeRange.getValue());
         options.setRandomMarriageDiceSize((int) spnRandomMarriageDiceSize.getValue());
-        options.setRandomSameSexMarriageDiceSize((int) spnRandomSameSexMarriageDiceSize.getValue());
+        options.setInterestedInSameSexDiceSize((int) spnRandomSameSexMarriageDiceSize.getValue());
         options.setRandomNewDependentMarriage((int) spnRandomNewDependentMarriage.getValue());
 
         // Divorce

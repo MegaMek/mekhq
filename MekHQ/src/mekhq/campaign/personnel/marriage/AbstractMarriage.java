@@ -303,7 +303,7 @@ public abstract class AbstractMarriage {
         if (randomMarriage()) {
             boolean isSameSex = false;
 
-            int sameSexDiceSize = campaign.getCampaignOptions().getRandomSameSexMarriageDiceSize();
+            int sameSexDiceSize = campaign.getCampaignOptions().getInterestedInSameSexDiceSize();
 
             if (sameSexDiceSize == 1) {
                 isSameSex = true;
@@ -340,7 +340,7 @@ public abstract class AbstractMarriage {
         if (randomMarriage()) {
             boolean isSameSex = false;
 
-            int sameSexDiceSize = campaign.getCampaignOptions().getRandomSameSexMarriageDiceSize();
+            int sameSexDiceSize = campaign.getCampaignOptions().getInterestedInSameSexDiceSize();
 
             if (sameSexDiceSize == 1) {
                 isSameSex = true;

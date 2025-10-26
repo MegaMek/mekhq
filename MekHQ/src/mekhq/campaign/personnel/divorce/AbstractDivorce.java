@@ -261,11 +261,13 @@ public abstract class AbstractDivorce {
 
         // roll for removal of marriageable flag
         if (Compute.d6(1) <= 2) {
-            origin.setMarriageable(false);
+            origin.setPrefersWomen(false);
+            origin.setPrefersMen(false);
         }
 
         if (Compute.d6(1) <= 2) {
-            spouse.setMarriageable(false);
+            spouse.setPrefersWomen(false);
+            spouse.setPrefersMen(false);
         }
 
         List<Person> departingPartners = new ArrayList<>();
@@ -344,7 +346,8 @@ public abstract class AbstractDivorce {
 
         // roll for removal of marriageable flag
         if (Compute.d6(1) <= 2) {
-            origin.setMarriageable(false);
+            origin.setPrefersWomen(false);
+            origin.setPrefersMen(false);
         }
     }
 

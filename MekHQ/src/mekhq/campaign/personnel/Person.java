@@ -380,9 +380,9 @@ public class Person {
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
     private boolean quickTrainIgnore;
-    // this is a flag used in determine whether a person is a potential marriage
-    // candidate provided
-    // that they are not married, are old enough, etc.
+    // this is a flag used in determine whether a person is a potential marriage candidate provided that they are not
+    // married, are old enough, etc.
+    @Deprecated(since = "0.50.10", forRemoval = true)
     private boolean marriageable;
     // this is a flag used in random procreation to determine whether to attempt to
     // procreate
@@ -602,7 +602,8 @@ public class Person {
         setFounder(false);
         setImmortal(false);
         setQuickTrainIgnore(false);
-        setMarriageable(true);
+        setPrefersMen(false);
+        setPrefersWomen(false);
         setTryingToConceive(true);
         // endregion Flags
 
@@ -2809,12 +2810,30 @@ public class Person {
         return status != PersonnelStatus.CAMP_FOLLOWER;
     }
 
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public boolean isMarriageable() {
         return marriageable;
     }
 
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public void setMarriageable(final boolean marriageable) {
         this.marriageable = marriageable;
+    }
+
+    public boolean isPrefersMen() {
+        return prefersMen;
+    }
+
+    public void setPrefersMen(final boolean prefersMen) {
+        this.prefersMen = prefersMen;
+    }
+
+    public boolean isPrefersWomen() {
+        return prefersWomen;
+    }
+
+    public void setPrefersWomen(final boolean prefersWomen) {
+        this.prefersWomen = prefersWomen;
     }
 
     public boolean isTryingToConceive() {
@@ -3355,6 +3374,8 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersMen", prefersMen);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersWomen", prefersWomen);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
             // endregion Flags
@@ -3925,8 +3946,13 @@ public class Person {
                     person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("quickTrainIgnore")) {
                     person.setQuickTrainIgnore(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("marriageable")) {
-                    person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("marriageable")) { // Legacy: <50.10
+                    boolean marriageable = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    sexualityCompatibilityHandler(campaign, marriageable, person);
+                } else if (nodeName.equalsIgnoreCase("prefersMen")) {
+                    person.setPrefersMen(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("prefersWomen")) {
+                    person.setPrefersWomen(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
                     person.setTryingToConceive(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("hidePersonality")) {
@@ -4012,6 +4038,41 @@ public class Person {
         }
 
         return person;
+    }
+
+    /**
+     * Configures a person's sexual orientation preferences based on their marriageability status and campaign
+     * settings.
+     *
+     * <p>For non-marriageable characters, all preferences are disabled. For marriageable characters, preferences are
+     * set based on the campaign's same-sex marriage settings:</p>
+     * <ul>
+     *     <li>Characters always prefer the opposite gender (for traditional marriages)</li>
+     *     <li>Characters also prefer the same gender if same-sex marriage is enabled in campaign options</li>
+     * </ul>
+     *
+     * <p><b>Migration Note:</b> Prior to version 0.50.10, all characters were marriageable regardless of gender.
+     * This method respects the player's campaign options for backward compatibility with older save files.</p>
+     *
+     * @param campaign     the {@link Campaign} containing the relevant options for same-sex marriage
+     * @param marriageable {@code true} if the person is eligible for marriage; {@code false} otherwise
+     * @param person       the {@link Person} whose sexual orientation preferences are being configured
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void sexualityCompatibilityHandler(Campaign campaign, boolean marriageable, Person person) {
+        if (!marriageable) {
+            person.setPrefersMen(false);
+            person.setPrefersWomen(false);
+        } else {
+            // For characters that predate 50.10 we defer to the players' Campaign Options
+            boolean allowSameSexMarriage = campaign.getCampaignOptions().getInterestedInSameSexDiceSize() != 0;
+
+            boolean isMale = person.getGender().isMale();
+            person.setPrefersMen(allowSameSexMarriage || !isMale);
+            person.setPrefersWomen(allowSameSexMarriage || isMale);
+        }
     }
     // endregion File I/O
 
