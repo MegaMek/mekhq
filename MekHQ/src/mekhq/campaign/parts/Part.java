@@ -1114,6 +1114,15 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     /**
+     * Gets the team member who has reserved this part for overnight work.
+     *
+     * @return the {@link Person} who reserved this part, or {@code null} if the part is not reserved
+     */
+    public Person getReservedBy() {
+        return reservedBy;
+    }
+
+    /**
      * Sets the team member who has reserved this part for work they are performing overnight.
      *
      * @param tech The team member.
@@ -1439,6 +1448,48 @@ public abstract class Part implements IPartWork, ITechnology {
      */
     public boolean isSpare() {
         return (unit == null) && (parentPart == null) && (refitUnit == null) && (reservedBy == null);
+    }
+
+    /**
+     * Determines whether this part is currently in use or reserved, making it unavailable as a spare.
+     *
+     * <p>A part is considered used or reserved if it meets any of the following conditions:</p>
+     * <ul>
+     *     <li>It has a parent part (is installed in another part or unit)</li>
+     *     <li>It is reserved for a refit</li>
+     *     <li>It is reserved by a technician</li>
+     * </ul>
+     *
+     * <p>This method uses less restrictive criteria than {@link #isSpare()}, which also checks whether
+     * the part is assigned to a unit.</p>
+     *
+     * @return {@code true} if this part is in use or reserved; {@code false} if it is available as a spare
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public boolean isPartUsedOrReserved() {
+        return !((parentPart == null) && (refitUnit == null) && (reservedBy == null));
+    }
+
+    /**
+     * Gets the quantity of this part if it is currently in use (not available as a spare).
+     *
+     * <p>This method returns {@code 0} if the part is available as a spare (determined by
+     * {@link #isPartUsedOrReserved()}).</p>
+     *
+     * <p>Otherwise, it returns {@code 1} if the part is assigned to a unit, or the part's stored quantity if it is
+     * not.</p>
+     *
+     * @return {@code 0} if the part is available as a spare, {@code 1} if assigned to a unit, otherwise the part's
+     *       quantity
+     */
+    public int getQuantityForPartsInUse() {
+        if (isPartUsedOrReserved()) {
+            return 0;
+        }
+
+        return (this.getUnit() != null) ? 1 : this.getQuantity();
     }
 
     @Override

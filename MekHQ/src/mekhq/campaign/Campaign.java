@@ -50,7 +50,6 @@ import static mekhq.campaign.market.contractMarket.ContractAutomation.performAut
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
@@ -125,11 +124,8 @@ import megamek.common.enums.Gender;
 import megamek.common.enums.TechBase;
 import megamek.common.equipment.BombLoadout;
 import megamek.common.equipment.BombMounted;
-import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.EquipmentTypeLookup;
-import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
-import megamek.common.equipment.WeaponType;
 import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
@@ -186,6 +182,7 @@ import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -207,14 +204,19 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
-import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.BAArmor;
+import mekhq.campaign.parts.OmniPod;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInUse;
+import mekhq.campaign.parts.PartInventory;
+import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.SpacecraftCoolingSystem;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.HeatSink;
-import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
-import mekhq.campaign.parts.meks.MekActuator;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.protomeks.ProtoMekArmor;
@@ -3104,279 +3106,9 @@ public class Campaign implements ITechManager {
         return parts.getParts();
     }
 
+    @Deprecated(since = "0.50.10", forRemoval = true)
     private int getQuantity(Part part) {
         return getWarehouse().getPartQuantity(part, true);
-    }
-
-    private PartInUse getPartInUse(Part part) {
-        // SI isn't a proper "part"
-        if (part instanceof StructuralIntegrity) {
-            return null;
-        }
-        // Skip out on "not armor" (as in 0 point armer on men or field guns)
-        if ((part instanceof Armor armor) && (armor.getType() == EquipmentType.T_ARMOR_UNKNOWN)) {
-            return null;
-        }
-        // Makes no sense buying those separately from the chasis
-        if ((part instanceof EquipmentPart equipmentPart) &&
-                  (equipmentPart.getType() instanceof MiscType miscType) &&
-                  (miscType.hasFlag(MiscType.F_CHASSIS_MODIFICATION))) {
-            return null;
-        }
-        // Replace a "missing" part with a corresponding "new" one.
-        if (part instanceof MissingPart missingPart) {
-            part = missingPart.getNewPart();
-        }
-        PartInUse result = new PartInUse(part);
-        result.setRequestedStock(getDefaultStockPercent(part));
-        return (null != result.getPartToBuy()) ? result : null;
-    }
-
-    /**
-     * Determines the default stock percentage for a given part type.
-     *
-     * <p>
-     * This method uses the type of the provided {@link Part} to decide which default stock percentage to return. The
-     * values for each part type are retrieved from the campaign options.
-     * </p>
-     *
-     * @param part The {@link Part} for which the default stock percentage is to be determined. The part must not be
-     *             {@code null}.
-     *
-     * @return An {@code int} representing the default stock percentage for the given part type, as defined in the
-     *       campaign options.
-     */
-    private int getDefaultStockPercent(Part part) {
-        if (part instanceof HeatSink) {
-            return campaignOptions.getAutoLogisticsHeatSink();
-        } else if (part instanceof MekLocation) {
-            if (((MekLocation) part).getLoc() == Mek.LOC_HEAD) {
-                return campaignOptions.getAutoLogisticsMekHead();
-            }
-
-            if (((MekLocation) part).getLoc() == Mek.LOC_CENTER_TORSO) {
-                return campaignOptions.getAutoLogisticsNonRepairableLocation();
-            }
-
-            return campaignOptions.getAutoLogisticsMekLocation();
-        } else if (part instanceof TankLocation) {
-            return campaignOptions.getAutoLogisticsNonRepairableLocation();
-        } else if (part instanceof AmmoBin || part instanceof AmmoStorage) {
-            return campaignOptions.getAutoLogisticsAmmunition();
-        } else if (part instanceof Armor) {
-            return campaignOptions.getAutoLogisticsArmor();
-        } else if (part instanceof MekActuator) {
-            return campaignOptions.getAutoLogisticsActuators();
-        } else if (part instanceof JumpJet) {
-            return campaignOptions.getAutoLogisticsJumpJets();
-        } else if (part instanceof EnginePart) {
-            return campaignOptions.getAutoLogisticsEngines();
-        } else if (part instanceof EquipmentPart equipmentPart) {
-            if (equipmentPart.getType() instanceof WeaponType) {
-                return campaignOptions.getAutoLogisticsWeapons();
-            }
-        }
-
-        return campaignOptions.getAutoLogisticsOther();
-    }
-
-    /**
-     * Updates a {@link PartInUse} record with data from an incoming {@link Part}.
-     *
-     * <p>
-     * This method processes the incoming part to update the usage, storage, or transfer count of the specified part in
-     * use, based on the type, quality, and associated unit of the incoming part. Certain parts are ignored based on
-     * their state or configuration, such as being part of conventional infantry, salvage, or mothballed units.
-     * </p>
-     *
-     * @param partInUse                the {@link PartInUse} record to update.
-     * @param incomingPart             the new {@link Part} that is being processed for this record.
-     * @param ignoreMothballedUnits    if {@code true}, parts belonging to mothballed units are excluded.
-     * @param ignoreSparesUnderQuality spares with a quality lower than this threshold are excluded from counting.
-     */
-    private void updatePartInUseData(PartInUse partInUse, Part incomingPart, boolean ignoreMothballedUnits,
-          PartQuality ignoreSparesUnderQuality) {
-        Unit unit = incomingPart.getUnit();
-        if (unit != null) {
-            // Ignore conventional infantry
-            if (unit.isConventionalInfantry()) {
-                return;
-            }
-
-            // Ignore parts if they are from mothballed units and the flag is set
-            if (ignoreMothballedUnits && incomingPart.getUnit() != null && incomingPart.getUnit().isMothballed()) {
-                return;
-            }
-
-            // Ignore units set to salvage
-            if (unit.isSalvage()) {
-                return;
-            }
-        }
-
-        // Case 1: Part is associated with a unit or is a MissingPart
-        if ((unit != null) || (incomingPart instanceof MissingPart)) {
-            partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
-            return;
-        }
-
-        // Case 2: Part is present and meets quality requirements
-        if (incomingPart.isPresent()) {
-            if (incomingPart.getQuality().toNumeric() >= ignoreSparesUnderQuality.toNumeric()) {
-                partInUse.setStoreCount(partInUse.getStoreCount() + getQuantity(incomingPart));
-                partInUse.addSpare(incomingPart);
-            }
-            return;
-        }
-
-        // Case 3: Part is not present, update transfer count
-        partInUse.setTransferCount(partInUse.getTransferCount() + getQuantity(incomingPart));
-    }
-
-    /**
-     * Find all the parts that match this PartInUse and update their data
-     *
-     * @param partInUse                part in use record to update
-     * @param ignoreMothballedUnits    don't count parts in mothballed units
-     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
-     */
-    public void updatePartInUse(PartInUse partInUse, boolean ignoreMothballedUnits,
-          PartQuality ignoreSparesUnderQuality) {
-        partInUse.setUseCount(0);
-        partInUse.setStoreCount(0);
-        partInUse.setTransferCount(0);
-        partInUse.setPlannedCount(0);
-        getWarehouse().forEachPart(incomingPart -> {
-            PartInUse newPartInUse = getPartInUse(incomingPart);
-            if (partInUse.equals(newPartInUse)) {
-                updatePartInUseData(partInUse, incomingPart, ignoreMothballedUnits, ignoreSparesUnderQuality);
-            }
-        });
-        for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
-            PartInUse newPartInUse = getPartInUse((Part) maybePart);
-            if (partInUse.equals(newPartInUse)) {
-                Part newPart = (maybePart instanceof MissingPart)
-                                     ? ((MissingPart) maybePart).getNewPart()
-                                     : (Part) maybePart;
-                partInUse.setPlannedCount(
-                      partInUse.getPlannedCount() +
-                            getQuantity(newPart) * maybePart.getQuantity()
-                );
-            }
-        }
-    }
-
-    /**
-     * Analyzes the warehouse inventory and returns a data set that summarizes the usage state of all parts, including
-     * their use counts, store counts, and planned counts, while filtering based on specific conditions.
-     *
-     * <p>
-     * This method aggregates all parts currently in use or available as spares, while taking into account constraints
-     * like ignoring mothballed units or filtering spares below a specific quality. It uses a map structure to
-     * efficiently track and update parts during processing.
-     * </p>
-     *
-     * @param ignoreMothballedUnits    If {@code true}, parts from mothballed units will not be included in the
-     *                                 results.
-     * @param isResupply               If {@code true}, specific units (e.g., prohibited unit types) are skipped based
-     *                                 on the current context as defined in {@code Resupply.isProhibitedUnitType()}.
-     * @param ignoreSparesUnderQuality Spare parts of a lower quality than the specified value will be excluded from the
-     *                                 results.
-     *
-     * @return A {@link Set} of {@link PartInUse} objects detailing the state of each relevant part, including:
-     *       <ul>
-     *       <li>Use count: How many of this part are currently in use.</li>
-     *       <li>Store count: How many of this part are available as spares in the
-     *       warehouse.</li>
-     *       <li>Planned count: The quantity of this part included in acquisition
-     *       orders or
-     *       planned procurement.</li>
-     *       <li>Requested stock: The target or default quantity to maintain, as
-     *       derived from
-     *       settings or requests.</li>
-     *       </ul>
-     *       Only parts with non-zero counts (use, store, or planned) will be
-     *       included in the
-     *       result.
-     */
-    public Set<PartInUse> getPartsInUse(boolean ignoreMothballedUnits, boolean isResupply,
-          PartQuality ignoreSparesUnderQuality) {
-        // java.util.Set doesn't supply a get(Object) method, so we have to use a
-        // java.util.Map
-        Map<PartInUse, PartInUse> inUse = new HashMap<>();
-        getWarehouse().forEachPart(incomingPart -> {
-            if (isResupply) {
-                Unit unit = incomingPart.getUnit();
-
-                Entity entity = null;
-                if (unit != null) {
-                    entity = unit.getEntity();
-                }
-
-                if (entity != null) {
-                    if (isProhibitedUnitType(entity, false, false)) {
-                        return;
-                    }
-                }
-            }
-
-            PartInUse partInUse = getPartInUse(incomingPart);
-            if (null == partInUse) {
-                return;
-            }
-
-            String stockKey = partInUse.getDescription();
-            stockKey += Part.getTechBaseName(partInUse.getTechBase());
-
-            if (inUse.containsKey(partInUse)) {
-                partInUse = inUse.get(partInUse);
-            } else {
-                if (partsInUseRequestedStockMap.containsKey(stockKey)) {
-                    partInUse.setRequestedStock(partsInUseRequestedStockMap.get(stockKey));
-                } else {
-                    partInUse.setRequestedStock(getDefaultStockPercent(incomingPart));
-                }
-                inUse.put(partInUse, partInUse);
-            }
-            updatePartInUseData(partInUse, incomingPart, ignoreMothballedUnits, ignoreSparesUnderQuality);
-        });
-
-        for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
-            if (!(maybePart instanceof Part)) {
-                continue;
-            }
-            PartInUse partInUse = getPartInUse((Part) maybePart);
-            if (null == partInUse) {
-                continue;
-            }
-
-            String stockKey = partInUse.getDescription();
-            stockKey += Part.getTechBaseName(partInUse.getTechBase());
-
-            if (inUse.containsKey(partInUse)) {
-                partInUse = inUse.get(partInUse);
-            } else {
-                if (partsInUseRequestedStockMap.containsKey(stockKey)) {
-                    partInUse.setRequestedStock(partsInUseRequestedStockMap.get(stockKey));
-                } else {
-                    partInUse.setRequestedStock(getDefaultStockPercent((Part) maybePart));
-                }
-                inUse.put(partInUse, partInUse);
-            }
-
-            Part newPart = (maybePart instanceof MissingPart)
-                                 ? ((MissingPart) maybePart).getNewPart()
-                                 : (Part) maybePart;
-            partInUse.setPlannedCount(
-                  partInUse.getPlannedCount() +
-                        getQuantity(newPart) * maybePart.getQuantity()
-            );
-        }
-        return inUse.keySet()
-                     .stream()
-                     // Hacky but otherwise we end up with zero lines when filtering things out
-                     .filter(p -> p.getUseCount() != 0 || p.getStoreCount() != 0 || p.getPlannedCount() != 0)
-                     .collect(Collectors.toSet());
     }
 
     public Part getPart(int id) {
@@ -6278,7 +6010,11 @@ public class Campaign implements ITechManager {
         }
 
         if (topUpWeekly && isMonday) {
-            int bought = stockUpPartsInUse(getPartsInUse(ignoreMothballed, false, ignoreSparesUnderQuality));
+            PartsInUseManager partsInUseManager = new PartsInUseManager(this);
+            Set<PartInUse> actualPartsInUse = partsInUseManager.getPartsInUse(ignoreMothballed,
+                  false,
+                  ignoreSparesUnderQuality);
+            int bought = partsInUseManager.stockUpPartsInUse(actualPartsInUse);
             addReport(String.format(resources.getString("weeklyStockCheck.text"), bought));
         }
 
@@ -10868,44 +10604,6 @@ public class Campaign implements ITechManager {
         }
 
         return commanderRank;
-    }
-
-    public int stockUpPartsInUse(Set<PartInUse> partsInUse) {
-        int bought = 0;
-        for (PartInUse partInUse : partsInUse) {
-            int toBuy = findStockUpAmount(partInUse);
-            if (toBuy > 0) {
-                IAcquisitionWork partToBuy = partInUse.getPartToBuy();
-                getShoppingList().addShoppingItem(partToBuy, toBuy, this);
-                bought += 1;
-            }
-        }
-        return bought;
-    }
-
-    public void stockUpPartsInUseGM(Set<PartInUse> partsInUse) {
-        for (PartInUse partInUse : partsInUse) {
-            int toBuy = findStockUpAmount(partInUse);
-            while (toBuy > 0) {
-                IAcquisitionWork partToBuy = partInUse.getPartToBuy();
-                getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0, true);
-                --toBuy;
-            }
-        }
-    }
-
-    private int findStockUpAmount(PartInUse PartInUse) {
-        int inventory = PartInUse.getStoreCount() + PartInUse.getTransferCount() + PartInUse.getPlannedCount();
-        int needed = (int) Math.ceil(PartInUse.getRequestedStock() / 100.0 * PartInUse.getUseCount());
-        int toBuy = needed - inventory;
-
-        if (PartInUse.getIsBundle()) {
-            toBuy = (int) Math.ceil((float) toBuy * PartInUse.getTonnagePerItem() / 5);
-            // special case for armor only, as it's bought in 5 ton blocks. Armor is the
-            // only kind of item that's assigned isBundle()
-        }
-
-        return toBuy;
     }
 
     public boolean isProcessProcurement() {
