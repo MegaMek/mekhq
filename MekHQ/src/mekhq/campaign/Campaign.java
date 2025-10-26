@@ -4822,6 +4822,23 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Advances the campaign by one day, processing all daily events and updates.
+     *
+     * <p>This method delegates to {@link CampaignNewDayManager} to handle all new day processing,
+     * including personnel updates, contract management, financial transactions, maintenance tasks, and other
+     * time-dependent campaign events.</p>
+     *
+     * @return {@code true} if the new day processing completed successfully; {@code false} if it was cancelled or
+     *       failed
+     *
+     * @see CampaignNewDayManager#newDay()
+     */
+    public boolean newDay() {
+        CampaignNewDayManager manager = new CampaignNewDayManager(this);
+        return manager.newDay();
+    }
+
+    /**
      * Computes the total rental fees for the campaign, including all rented hospital beds, kitchens, and holding
      * cells.
      *
@@ -4921,7 +4938,6 @@ public class Campaign implements ITechManager {
         }
     }
 
-
     /** Use {@link #refreshPersonnelMarkets(boolean)} instead */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public void refreshPersonnelMarkets() {
@@ -4945,10 +4961,9 @@ public class Campaign implements ITechManager {
     public void refreshPersonnelMarkets(boolean isCampaignStart) {
         PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
         if (marketStyle == PERSONNEL_MARKET_DISABLED) {
-            getPersonnelMarket().generatePersonnelForDay(this);
+            personnelMarket.generatePersonnelForDay(this);
         } else {
             if (currentDay.getDayOfMonth() == 1) {
-                NewPersonnelMarket newPersonnelMarket = getNewPersonnelMarket();
                 newPersonnelMarket.gatherApplications();
 
                 if (newPersonnelMarket.getHasRarePersonnel()) {
@@ -4968,7 +4983,7 @@ public class Campaign implements ITechManager {
                     }
 
                     ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(this,
-                          getSeniorAdminPerson(Campaign.AdministratorSpecialization.HR),
+                          getSeniorAdminPerson(AdministratorSpecialization.HR),
                           null,
                           resources.getString("personnelMarket.rareProfession.inCharacter"),
                           buttons,
