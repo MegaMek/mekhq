@@ -103,7 +103,9 @@ public class PersonnelTab {
     private JCheckBox chkUseRandomToughness;
     private JCheckBox chkUseArtillery;
     private JCheckBox chkUseAbilities;
-    private JCheckBox chkUseCommanderAbilitiesOnly;
+    private JCheckBox chkOnlyCommandersMatterVehicles;
+    private JCheckBox chkOnlyCommandersMatterInfantry;
+    private JCheckBox chkOnlyCommandersMatterBattleArmor;
     private JCheckBox chkUseEdge;
     private JCheckBox chkUseSupportEdge;
     private JCheckBox chkUseImplants;
@@ -367,7 +369,9 @@ public class PersonnelTab {
         chkUseRandomToughness = new JCheckBox();
         chkUseArtillery = new JCheckBox();
         chkUseAbilities = new JCheckBox();
-        chkUseCommanderAbilitiesOnly = new JCheckBox();
+        chkOnlyCommandersMatterVehicles = new JCheckBox();
+        chkOnlyCommandersMatterInfantry = new JCheckBox();
+        chkOnlyCommandersMatterBattleArmor = new JCheckBox();
         chkUseEdge = new JCheckBox();
         chkUseSupportEdge = new JCheckBox();
         chkUseImplants = new JCheckBox();
@@ -450,9 +454,15 @@ public class PersonnelTab {
         chkUseArtillery.addMouseListener(createTipPanelUpdater(generalHeader, "UseArtillery"));
         chkUseAbilities = new CampaignOptionsCheckBox("UseAbilities");
         chkUseAbilities.addMouseListener(createTipPanelUpdater(generalHeader, "UseAbilities"));
-        chkUseCommanderAbilitiesOnly = new CampaignOptionsCheckBox("UseCommanderAbilitiesOnly");
-        chkUseCommanderAbilitiesOnly.addMouseListener(createTipPanelUpdater(generalHeader,
-              "UseCommanderAbilitiesOnly"));
+        chkOnlyCommandersMatterVehicles = new CampaignOptionsCheckBox("OnlyCommandersMatterVehicles");
+        chkOnlyCommandersMatterVehicles.addMouseListener(createTipPanelUpdater(generalHeader,
+              "OnlyCommandersMatterVehicles"));
+        chkOnlyCommandersMatterInfantry = new CampaignOptionsCheckBox("OnlyCommandersMatterInfantry");
+        chkOnlyCommandersMatterInfantry.addMouseListener(createTipPanelUpdater(generalHeader,
+              "OnlyCommandersMatterInfantry"));
+        chkOnlyCommandersMatterBattleArmor = new CampaignOptionsCheckBox("OnlyCommandersMatterBattleArmor");
+        chkOnlyCommandersMatterBattleArmor.addMouseListener(createTipPanelUpdater(generalHeader,
+              "OnlyCommandersMatterBattleArmor"));
         chkUseEdge = new CampaignOptionsCheckBox("UseEdge");
         chkUseEdge.addMouseListener(createTipPanelUpdater(generalHeader, "UseEdge"));
         chkUseSupportEdge = new CampaignOptionsCheckBox("UseSupportEdge");
@@ -487,7 +497,13 @@ public class PersonnelTab {
         panel.add(chkUseAbilities, layout);
 
         layout.gridy++;
-        panel.add(chkUseCommanderAbilitiesOnly, layout);
+        panel.add(chkOnlyCommandersMatterVehicles, layout);
+
+        layout.gridy++;
+        panel.add(chkOnlyCommandersMatterInfantry, layout);
+
+        layout.gridy++;
+        panel.add(chkOnlyCommandersMatterBattleArmor, layout);
 
         layout.gridy++;
         panel.add(chkUseEdge, layout);
@@ -1306,7 +1322,9 @@ public class PersonnelTab {
         chkUseRandomToughness.setSelected(options.isUseRandomToughness());
         chkUseArtillery.setSelected(options.isUseArtillery());
         chkUseAbilities.setSelected(options.isUseAbilities());
-        chkUseCommanderAbilitiesOnly.setSelected(options.isUseCommanderAbilitiesOnly());
+        chkOnlyCommandersMatterVehicles.setSelected(options.isOnlyCommandersMatterVehicles());
+        chkOnlyCommandersMatterInfantry.setSelected(options.isOnlyCommandersMatterInfantry());
+        chkOnlyCommandersMatterBattleArmor.setSelected(options.isOnlyCommandersMatterBattleArmor());
         chkUseEdge.setSelected(options.isUseEdge());
         chkUseSupportEdge.setSelected(options.isUseSupportEdge());
         chkUseImplants.setSelected(options.isUseImplants());
@@ -1403,7 +1421,9 @@ public class PersonnelTab {
         options.setUseRandomToughness(chkUseRandomToughness.isSelected());
         options.setUseArtillery(chkUseArtillery.isSelected());
         options.setUseAbilities(chkUseAbilities.isSelected());
-        options.setUseCommanderAbilitiesOnly(chkUseCommanderAbilitiesOnly.isSelected());
+        options.setOnlyCommandersMatterVehicles(chkOnlyCommandersMatterVehicles.isSelected());
+        options.setOnlyCommandersMatterInfantry(chkOnlyCommandersMatterInfantry.isSelected());
+        options.setOnlyCommandersMatterBattleArmor(chkOnlyCommandersMatterBattleArmor.isSelected());
         options.setUseEdge(chkUseEdge.isSelected());
         options.setUseSupportEdge(chkUseSupportEdge.isSelected());
         options.setUseImplants(chkUseImplants.isSelected());

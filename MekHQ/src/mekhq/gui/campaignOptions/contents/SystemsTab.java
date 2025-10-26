@@ -105,6 +105,7 @@ public class SystemsTab {
     private JCheckBox chkRandomizeTraits;
     private JCheckBox chkAllowMonthlyReinvestment;
     private JCheckBox chkAllowMonthlyConnections;
+    private JCheckBox chkUseBetterExtraIncome;
 
     /**
      * Constructs a new {@code SystemsTab} for the specified campaign.
@@ -442,6 +443,9 @@ public class SystemsTab {
         chkAllowMonthlyConnections = new CampaignOptionsCheckBox("AllowMonthlyConnections");
         chkAllowMonthlyConnections.addMouseListener(createTipPanelUpdater(atowHeader,
               "AllowMonthlyConnections"));
+        chkUseBetterExtraIncome = new CampaignOptionsCheckBox("UseBetterExtraIncome");
+        chkUseBetterExtraIncome.addMouseListener(createTipPanelUpdater(atowHeader,
+              "UseBetterExtraIncome"));
 
         final JPanel panel = new CampaignOptionsStandardPanel("ATOWAttributesPanel", true, "ATOWAttributesPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -455,14 +459,16 @@ public class SystemsTab {
         panel.add(chkRandomizeAttributes, layout);
         layout.gridx++;
         panel.add(chkDisplayAllAttributes, layout);
+        layout.gridx++;
+        panel.add(chkRandomizeTraits, layout);
 
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(chkRandomizeTraits, layout);
-        layout.gridx++;
         panel.add(chkAllowMonthlyReinvestment, layout);
         layout.gridx++;
         panel.add(chkAllowMonthlyConnections, layout);
+        layout.gridx++;
+        panel.add(chkUseBetterExtraIncome, layout);
 
         return panel;
     }
@@ -531,6 +537,7 @@ public class SystemsTab {
         chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
         chkAllowMonthlyReinvestment.setSelected(options.isAllowMonthlyReinvestment());
         chkAllowMonthlyConnections.setSelected(options.isAllowMonthlyConnections());
+        chkUseBetterExtraIncome.setSelected(options.isUseBetterExtraIncome());
     }
 
     /**
@@ -592,5 +599,6 @@ public class SystemsTab {
         skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
         options.setAllowMonthlyReinvestment(chkAllowMonthlyReinvestment.isSelected());
         options.setAllowMonthlyConnections(chkAllowMonthlyConnections.isSelected());
+        options.setUseBetterExtraIncome(chkUseBetterExtraIncome.isSelected());
     }
 }

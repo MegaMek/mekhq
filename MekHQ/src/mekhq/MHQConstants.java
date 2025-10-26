@@ -366,4 +366,8 @@ public final class MHQConstants extends SuiteConstants {
      */
     public static final LocalDate NOMINAL_JIHAD_END = LocalDate.of(3079, 2, 1);
     // endregion Important Dates
+
+    // Iconography
+    public static final String ADDED_SINCE_LAST_DEVELOPMENT = "<span style='color:#C344C3;'>\u2605</span>";
+    public static final String ADDED_SINCE_LAST_MILESTONE = "<span style='color:#7FCF43;'>\u2606</span>";
 }

@@ -453,12 +453,12 @@ public final class InfirmaryTab extends CampaignGuiTab {
         final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
         final int healingWaitingPeriod = campaignOptions.getHealingWaitingPeriod();
 
-        boolean canAssignToDoctor = canAssignToDoctor(doctor);
         Collection<Person> selectedPatients = getSelectedUnassignedPatients();
         if (selectedPatients.isEmpty()) {
             // Pick the first in the list ... if there are any
             int patientSize = unassignedPatientModel.getSize();
             for (int i = 0; i < patientSize; ++i) {
+                boolean canAssignToDoctor = canAssignToDoctor(doctor);
                 Person patient = unassignedPatientModel.getElementAt(i);
 
                 if (null != patient && patient.needsFixing() && canAssignToDoctor) {
@@ -469,6 +469,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
             }
         } else {
             for (Person patient : selectedPatients) {
+                boolean canAssignToDoctor = canAssignToDoctor(doctor);
+                
                 if (null != patient && patient.needsFixing() && canAssignToDoctor) {
                     patient.setDoctorId(doctor.getId(), healingWaitingPeriod);
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
