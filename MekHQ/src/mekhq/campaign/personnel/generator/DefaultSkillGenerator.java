@@ -278,14 +278,18 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         person.setConnections(clamp(performTraitRoll(), MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
         person.setReputation(clamp(performTraitRoll(), MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
         person.setWealth(clamp(performTraitRoll(), MINIMUM_WEALTH, MAXIMUM_WEALTH));
-        person.setUnlucky(clamp(performTraitRoll(), MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
 
+        int baseUnluckyDiceSize = 5;
+        int unluckyRoll = randomInt(baseUnluckyDiceSize);
+        if (unluckyRoll == 0) { // 5% chance of positive value
+            person.setUnlucky(clamp(performTraitRoll(), MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
+        }
         // We want the chance of a Bloodmark to be low as it can be quite disruptive
-        int baseDiceSize = person.getOriginFaction().isPirate() ? 5 : 50;
+        int baseBloodmarkDiceSize = person.getOriginFaction().isPirate() ? 5 : 50;
         // pirates = approx 11.11% chance of a bloodmark
         // non-pirates = approx 1.11% chance of a bloodmark
-        int roll = randomInt(baseDiceSize);
-        if (roll == 0) {
+        int bloodmarkRoll = randomInt(baseBloodmarkDiceSize);
+        if (bloodmarkRoll == 0) {
             person.setBloodmark(clamp(performBloodmarkRoll(), MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
         }
     }
