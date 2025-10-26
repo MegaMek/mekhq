@@ -490,6 +490,7 @@ public class CampaignOptions {
     private boolean displayAllAttributes;
     private boolean allowMonthlyReinvestment;
     private boolean allowMonthlyConnections;
+    private boolean useBetterExtraIncome;
 
     // Price Multipliers
     private double commonPartPriceMultiplier;
@@ -1123,6 +1124,7 @@ public class CampaignOptions {
         displayAllAttributes = false;
         allowMonthlyReinvestment = false;
         allowMonthlyConnections = false;
+        useBetterExtraIncome = false;
 
         // Price Multipliers
         setCommonPartPriceMultiplier(1.0);
@@ -3572,6 +3574,14 @@ public class CampaignOptions {
 
     public void setAllowMonthlyConnections(final boolean allowMonthlyConnections) {
         this.allowMonthlyConnections = allowMonthlyConnections;
+    }
+
+    public boolean isUseBetterExtraIncome() {
+        return useBetterExtraIncome;
+    }
+
+    public void setUseBetterExtraIncome(final boolean useBetterExtraIncome) {
+        this.useBetterExtraIncome = useBetterExtraIncome;
     }
 
     // region Price Multipliers

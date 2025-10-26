@@ -697,6 +697,8 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "allowMonthlyConnections" -> campaignOptions.setAllowMonthlyConnections(parseBoolean(
                   nodeContents));
+            case "useBetterExtraIncome" -> campaignOptions.setUseBetterExtraIncome(parseBoolean(
+                  nodeContents));
             case "commonPartPriceMultiplier" -> campaignOptions.setCommonPartPriceMultiplier(parseDouble(
                   nodeContents));
             case "innerSphereUnitPriceMultiplier" -> campaignOptions.setInnerSphereUnitPriceMultiplier(parseDouble(
