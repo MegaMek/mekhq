@@ -1452,11 +1452,17 @@ public class CampaignNewDayManager {
 
     /**
      * Processes the resupply operation for a given contract.
-     * <p>This method checks if the contract type is not Guerrilla Warfare or if randomInt(4) == 0. If any of
-     * these conditions is met, it calculates the maximum resupply size based on the contract's required lances, creates
-     * an instance of the {@link Resupply} class, and initiates a resupply action.</p>
      *
-     * @param contract The relevant {@link AtBContract}
+     * <p>For regular contracts, resupply always occurs. For guerrilla warfare contracts or contracts with pirate
+     * employers, resupply occurs only 25% of the time (1 in 4 chance).</p>
+     *
+     * <p>The resupply type is determined by the contract nature:</p>
+     * <ul>
+     *     <li><b>Smuggler resupply:</b> Used for guerrilla warfare or pirate contracts</li>
+     *     <li><b>Normal resupply:</b> Used for all other contract types</li>
+     * </ul>
+     *
+     * @param contract the {@link AtBContract} for which resupply is being processed
      */
     private void processResupply(AtBContract contract) {
         boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare()
