@@ -129,6 +129,7 @@ import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
+import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -2325,14 +2326,19 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 LocalDate today = getCampaign().getLocalDate();
 
                 // Get all safe potential spouses sorted by age and then by surname
-                final List<Person> personnel = getCampaign().getPersonnel()
+                final Campaign campaign = getCampaign();
+                final AbstractMarriage marriage = campaign.getMarriage();
+
+                final List<Person> personnel = campaign.getPersonnel()
                                                      .stream()
-                                                     .filter(potentialSpouse -> getCampaign().getMarriage()
-                                                                                      .safeSpouse(getCampaign(),
-                                                                                            getCampaign().getLocalDate(),
-                                                                                            person,
-                                                                                            potentialSpouse,
-                                                                                            false))
+                                                     .filter(potentialSpouse -> marriage.safeSpouse(campaign,
+                                                           today,
+                                                           person,
+                                                           potentialSpouse,
+                                                           false))
+                                                     .filter(potentialSpouse -> AbstractMarriage.isGenderCompatible(
+                                                           person,
+                                                           potentialSpouse))
                                                      .sorted(Comparator.comparing((Person p) -> p.getAge(today))
                                                                    .thenComparing(Person::getSurname))
                                                      .toList();

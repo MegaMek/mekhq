@@ -384,6 +384,8 @@ public class Person {
     // married, are old enough, etc.
     @Deprecated(since = "0.50.10", forRemoval = true)
     private boolean marriageable;
+    private boolean prefersMen;
+    private boolean prefersWomen;
     // this is a flag used in random procreation to determine whether to attempt to
     // procreate
     private boolean tryingToConceive;

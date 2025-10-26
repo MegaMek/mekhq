@@ -494,4 +494,20 @@ public abstract class AbstractMarriage {
     }
     //endregion Random Marriage
     //endregion New Day
+
+    /**
+     * Determines if two people are romantically compatible based on their gender preferences.
+     *
+     * @param person          the person seeking a spouse
+     * @param potentialSpouse the potential romantic partner
+     *
+     * @return {@code true} if their orientations are compatible; {@code false} otherwise
+     */
+    public static boolean isGenderCompatible(Person person, Person potentialSpouse) {
+        boolean spouseIsMale = potentialSpouse.getGender().isMale();
+        boolean spouseIsFemale = potentialSpouse.getGender().isFemale();
+
+        return (person.isPrefersMen() && spouseIsMale)
+                     || (person.isPrefersWomen() && spouseIsFemale);
+    }
 }
