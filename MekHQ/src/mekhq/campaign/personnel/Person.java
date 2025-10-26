@@ -42,6 +42,9 @@ import static megamek.codeUtilities.StringUtility.isNullOrBlank;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.icons.Portrait.DEFAULT_IMAGE_WIDTH;
+import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
+import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
@@ -60,7 +63,6 @@ import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.*;
-import static mekhq.campaign.personnel.skills.VehicleCrewSkills.VEHICLE_CREW_SKILLS;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -76,6 +78,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.swing.ImageIcon;
 
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
@@ -95,6 +98,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.*;
 import megamek.logging.MMLogger;
+import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -117,6 +121,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
@@ -128,6 +133,7 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.skills.VehicleCrewSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
@@ -180,6 +186,10 @@ public class Person {
     public static final String BLOODMARK_LABEL = "BLOODMARK";
     public static final int MINIMUM_BLOODMARK = 0;
     public static final int MAXIMUM_BLOODMARK = 5;
+
+    public static final String EXTRA_INCOME_LABEL = "EXTRA_INCOME";
+    public static final int MINIMUM_EXTRA_INCOME = ExtraIncome.NEGATIVE_TEN.getTraitLevel();
+    public static final int MAXIMUM_EXTRA_INCOME = ExtraIncome.POSITIVE_TEN.getTraitLevel();
 
     public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
 
@@ -251,6 +261,7 @@ public class Person {
     // If new Traits are added, make sure to also add them to LifePathDataTraitLookup
     private int connections;
     private int wealth;
+    private ExtraIncome extraIncome;
     private boolean hasPerformedExtremeExpenditure;
     private int reputation;
     private int unlucky;
@@ -380,10 +391,12 @@ public class Person {
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
     private boolean quickTrainIgnore;
-    // this is a flag used in determine whether a person is a potential marriage
-    // candidate provided
-    // that they are not married, are old enough, etc.
+    // this is a flag used in determine whether a person is a potential marriage candidate provided that they are not
+    // married, are old enough, etc.
+    @Deprecated(since = "0.50.10", forRemoval = true)
     private boolean marriageable;
+    private boolean prefersMen;
+    private boolean prefersWomen;
     // this is a flag used in random procreation to determine whether to attempt to
     // procreate
     private boolean tryingToConceive;
@@ -427,7 +440,7 @@ public class Person {
     // endregion Variable Declarations
 
     // region Constructors
-    protected Person(final UUID id) {
+    public Person(final UUID id) {
         this.id = id;
         this.genealogy = new Genealogy(this);
     }
@@ -510,6 +523,7 @@ public class Person {
         hasGainedVeterancySPA = false;
         connections = 0;
         wealth = 0;
+        extraIncome = ExtraIncome.ZERO;
         hasPerformedExtremeExpenditure = false;
         reputation = 0;
         unlucky = 0;
@@ -602,7 +616,8 @@ public class Person {
         setFounder(false);
         setImmortal(false);
         setQuickTrainIgnore(false);
-        setMarriageable(true);
+        setPrefersMen(false);
+        setPrefersWomen(false);
         setTryingToConceive(true);
         // endregion Flags
 
@@ -986,8 +1001,61 @@ public class Person {
     }
     // endregion Names
 
+    /**
+     * Retrieves the portrait object associated with this entity.
+     *
+     * <p>Consider using {@link #getPortraitImageIconWithFallback(boolean)}, instead.</p>
+     *
+     * @return the {@link Portrait} object representing the visual representation of this entity
+     */
     public Portrait getPortrait() {
         return portrait;
+    }
+
+    /**
+     * Retrieves the portrait image for a given entity. If the provided condition enables the use of an origin faction
+     * backup and the portrait image is unavailable or matches default filenames, a fallback image is retrieved based on
+     * the origin faction's logo.
+     *
+     * @param useOriginFactionBackup a boolean flag indicating whether to use the origin faction backup for the portrait
+     *                               image if the primary portrait is unavailable or invalid
+     *
+     * @return the portrait image for the entity; if a fallback is required based on the condition, the fallback image
+     *       generated from the origin faction's logo is returned
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public ImageIcon getPortraitImageIconWithFallback(boolean useOriginFactionBackup) {
+        if (useOriginFactionBackup) {
+            if (portrait == null) {
+                return getFallbackPortrait();
+            }
+
+            String portraitFilename = portrait.getFilename();
+            if (portraitFilename.equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
+                      portraitFilename.equalsIgnoreCase(NO_PORTRAIT_NAME)) {
+                return getFallbackPortrait();
+            }
+        }
+
+        return (portrait == null) ? new ImageIcon() : portrait.getImageIcon();
+    }
+
+    /**
+     * Retrieves a fallback portrait image when no specific portrait is available.
+     *
+     * <p>This method generates a fallback image by using the faction logo corresponding to the person's origin
+     * faction and birth year. The logo is scaled to the default image width while maintaining aspect ratio.</p>
+     *
+     * @return A scaled {@link ImageIcon} containing the faction logo as a fallback portrait
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private ImageIcon getFallbackPortrait() {
+        ImageIcon fallbackImage = Factions.getFactionLogo(birthday.getYear(), originFaction.getShortName());
+        return ImageUtilities.scaleImageIcon(fallbackImage, DEFAULT_IMAGE_WIDTH, true);
     }
 
     public void setPortrait(final Portrait portrait) {
@@ -1272,7 +1340,6 @@ public class Person {
 
         List<String> skillsForProfession = role.getSkillsForProfession();
         return switch (role) {
-            case VEHICLE_CREW -> VEHICLE_CREW_SKILLS.stream().anyMatch(this::hasSkill);
             case SOLDIER -> INFANTRY_GUNNERY_SKILLS.stream().anyMatch(this::hasSkill);
             case BATTLE_ARMOUR -> hasSkill(S_GUN_BA);
             case VESSEL_CREW -> hasSkill(S_TECH_VESSEL);
@@ -2809,12 +2876,38 @@ public class Person {
         return status != PersonnelStatus.CAMP_FOLLOWER;
     }
 
+    /**
+     * Determines whether this person is open to marriage or romantic relationships.
+     *
+     * <p>A person is considered marriageable if they have romantic interest in at least one gender (men, women, or
+     * both). Aromantic/asexual individuals who prefer neither gender are not marriageable.</p>
+     *
+     * @return {@code true} if the person has romantic interest in men, women, or both; {@code false} if
+     *       aromantic/asexual
+     */
     public boolean isMarriageable() {
-        return marriageable;
+        return isPrefersMen() || isPrefersWomen();
     }
 
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public void setMarriageable(final boolean marriageable) {
         this.marriageable = marriageable;
+    }
+
+    public boolean isPrefersMen() {
+        return prefersMen;
+    }
+
+    public void setPrefersMen(final boolean prefersMen) {
+        this.prefersMen = prefersMen;
+    }
+
+    public boolean isPrefersWomen() {
+        return prefersWomen;
+    }
+
+    public void setPrefersWomen(final boolean prefersWomen) {
+        this.prefersWomen = prefersWomen;
     }
 
     public boolean isTryingToConceive() {
@@ -2993,6 +3086,10 @@ public class Person {
 
             if (wealth != 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wealth", wealth);
+            }
+
+            if (!ExtraIncome.ZERO.equals(extraIncome)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "extraIncome", extraIncome.name());
             }
 
             if (hasPerformedExtremeExpenditure) {
@@ -3355,6 +3452,8 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersMen", prefersMen);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersWomen", prefersWomen);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
             // endregion Flags
@@ -3532,6 +3631,8 @@ public class Person {
                     person.connections = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("wealth")) {
                     person.wealth = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("extraIncome")) {
+                    person.extraIncome = ExtraIncome.extraIncomeParseFromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("hasPerformedExtremeExpenditure")) {
                     person.hasPerformedExtremeExpenditure = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
@@ -3925,8 +4026,18 @@ public class Person {
                     person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("quickTrainIgnore")) {
                     person.setQuickTrainIgnore(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("marriageable")) {
-                    person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("marriageable")) { // Legacy: <50.10
+                    boolean marriageable = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                    sexualityCompatibilityHandler(marriageable,
+                          person,
+                          campaignOptions.getNoInterestInRelationshipsDiceSize(),
+                          campaignOptions.getInterestedInSameSexDiceSize(),
+                          campaignOptions.getInterestedInBothSexesDiceSize());
+                } else if (nodeName.equalsIgnoreCase("prefersMen")) {
+                    person.setPrefersMen(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("prefersWomen")) {
+                    person.setPrefersWomen(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
                     person.setTryingToConceive(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("hidePersonality")) {
@@ -3987,6 +4098,24 @@ public class Person {
                 person.setJoinedCampaign(campaign.getLocalDate());
             }
 
+            // <50.10 compatibility handler
+            if (updateSkillsForVehicleProfessions(person, person.getPrimaryRole()) ||
+                      updateSkillsForVehicleProfessions(person, person.getSecondaryRole())) {
+                campaign.addReport(String.format(resources.getString("vehicleProfessionSkillChange"),
+                      spanOpeningWithCustomColor(getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
+            }
+
+            // <50.10 compatibility handler
+            if (updateSkillsForVehicleCrewProfession(person, person.getPrimaryRole()) ||
+                      updateSkillsForVehicleCrewProfession(person, person.getSecondaryRole())) {
+                campaign.addReport(String.format(resources.getString("vehicleCrewProfessionSkillChange"),
+                      spanOpeningWithCustomColor(getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
+            }
+
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
             if (!person.canPerformRole(campaign.getLocalDate(), person.getSecondaryRole(), false)) {
@@ -4012,6 +4141,114 @@ public class Person {
         }
 
         return person;
+    }
+
+    private static boolean updateSkillsForVehicleProfessions(Person person, PersonnelRole role) {
+        String drivingSkillType = switch (role) {
+            case VTOL_PILOT -> S_PILOT_VTOL;
+            case NAVAL_VEHICLE_DRIVER -> S_PILOT_NVEE;
+            case GROUND_VEHICLE_DRIVER -> S_PILOT_GVEE;
+            default -> null;
+        };
+
+        if (drivingSkillType == null) {
+            return false;
+        }
+
+        Skill drivingSkill = person.getSkill(drivingSkillType);
+        Skill gunnerySkill = person.getSkill(S_GUN_VEE);
+
+        if (drivingSkill != null && gunnerySkill == null) {
+            int drivingLevel = drivingSkill.getLevel();
+            person.addSkill(S_GUN_VEE, drivingLevel, 0);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Updates skills for personnel with the Vehicle Crew profession by ensuring they have the Mechanic skill.
+     *
+     * <p>This method is used during XML loading to migrate legacy data. If the person lacks the
+     * {@link SkillType#S_TECH_MECHANIC} skill, it will be added at a level equal to their highest existing vehicle
+     * crew-related skill (e.g., Tech Vee, Gunnery Vee, Piloting Vee, or Driving). This ensures backwards compatibility
+     * when loading older save files.</p>
+     *
+     * @param person      the person whose skills should be updated
+     * @param currentRole the role to check
+     *
+     * @return {@code true} if the Mechanic skill was added, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static boolean updateSkillsForVehicleCrewProfession(Person person, PersonnelRole currentRole) {
+        if (currentRole != PersonnelRole.VEHICLE_CREW) {
+            return false;
+        }
+
+        if (!person.hasSkill(S_TECH_MECHANIC)) {
+            int highestSkillLevel = EXP_NONE;
+            String highestSkill = null;
+            for (String skillName : VehicleCrewSkills.VEHICLE_CREW_SKILLS) {
+                if (person.hasSkill(skillName)) {
+                    int level = person.getSkill(skillName).getLevel();
+                    if (level > highestSkillLevel) {
+                        highestSkillLevel = level;
+                        highestSkill = skillName;
+                    }
+                }
+            }
+
+            if (highestSkill != null) {
+                person.addSkill(highestSkill, highestSkillLevel, 0);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Configures a person's sexual orientation preferences based on their marriageability status and weighted random
+     * probabilities.
+     *
+     * <p>For non-marriageable characters, all romantic preferences are disabled. For marriageable characters,
+     * orientation is determined through sequential probability checks using the provided dice sizes, which represent
+     * the denominators for calculating the chance of each orientation (e.g., a die size of 100 means a 1% chance).</p>
+     *
+     * <p>The orientation determination follows this priority order:</p>
+     * <ol>
+     *     <li>Aromantic/asexual (no interest in relationships)</li>
+     *     <li>Homosexual (interested in the same sex)</li>
+     *     <li>Bisexual/pansexual (interested in both sexes)</li>
+     *     <li>Heterosexual (default if no other orientation is rolled)</li>
+     * </ol>
+     *
+     * <p>Default percentile chances of each sexuality are viewable in
+     * {@link DefaultPersonnelGenerator#determineOrientation(Person, int, int, int)}</p>
+     *
+     * @param marriageable                      {@code true} if the person is eligible for romantic relationships;
+     *                                          {@code false} otherwise
+     * @param person                            the {@link Person} whose orientation preferences are being configured
+     * @param noInterestInRelationshipsDiceSize dice size for aromantic/asexual orientation (checked first)
+     * @param interestedInSameSexDiceSize       dice size for homosexual orientation (checked second)
+     * @param interestedInBothSexesDiceSize     dice size for bisexual/pansexual orientation (checked third)
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void sexualityCompatibilityHandler(boolean marriageable, Person person,
+          int noInterestInRelationshipsDiceSize,
+          int interestedInSameSexDiceSize, int interestedInBothSexesDiceSize) {
+        if (!marriageable) {
+            person.setPrefersMen(false);
+            person.setPrefersWomen(false);
+        } else {
+            DefaultPersonnelGenerator.determineOrientation(person, noInterestInRelationshipsDiceSize,
+                  interestedInSameSexDiceSize, interestedInBothSexesDiceSize);
+        }
     }
     // endregion File I/O
 
@@ -4495,26 +4732,6 @@ public class Person {
                         yield EXP_NONE;
                     }
                 }
-            }
-            case VEHICLE_CREW -> {
-                // Vehicle crew are a special case as they just need any one of the following skills to qualify,
-                // rather than needing all relevant skills
-                List<String> relevantSkills = VEHICLE_CREW_SKILLS;
-                int highestExperienceLevel = EXP_NONE;
-                for (String relevantSkill : relevantSkills) {
-                    Skill skill = getSkill(relevantSkill);
-
-                    if (skill == null) {
-                        continue;
-                    }
-
-                    int currentExperienceLevel = skill.getExperienceLevel(options, atowAttributes);
-                    if (currentExperienceLevel > highestExperienceLevel) {
-                        highestExperienceLevel = currentExperienceLevel;
-                    }
-                }
-
-                yield highestExperienceLevel;
             }
             case SOLDIER -> {
                 int highestExperienceLevel = EXP_NONE;
@@ -5383,7 +5600,7 @@ public class Person {
         } else if (entity instanceof BattleArmor) {
             return hasSkill(S_TECH_BA) && isTechBA();
         } else if (entity instanceof Tank) {
-            return hasSkill(S_TECH_MECHANIC) && isTechMechanic();
+            return hasSkill(S_TECH_MECHANIC) && (isTechMechanic() || isVehicleCrew());
         } else {
             return false;
         }
@@ -5681,7 +5898,7 @@ public class Person {
     }
 
     public boolean isTech() {
-        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA();
+        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA() || isVehicleCrew();
     }
 
     /**
@@ -5690,7 +5907,7 @@ public class Person {
      * @return true if the person is a tech
      */
     public boolean isTechExpanded() {
-        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA() || isTechLargeVessel();
+        return isTechMek() || isTechAero() || isTechMechanic() || isVehicleCrew() || isTechBA() || isTechLargeVessel();
     }
 
     public boolean isTechLargeVessel() {
@@ -5716,6 +5933,11 @@ public class Person {
     public boolean isTechBA() {
         boolean hasSkill = hasSkill(S_TECH_BA);
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
+    }
+
+    public boolean isVehicleCrew() {
+        boolean hasSkill = hasSkill(S_TECH_MECHANIC);
+        return hasSkill && (getPrimaryRole().isVehicleCrew() || getSecondaryRole().isVehicleCrew());
     }
 
     public boolean isAsTech() {
@@ -6149,6 +6371,58 @@ public class Person {
 
     public void setHasPerformedExtremeExpenditure(final boolean hasPerformedExtremeExpenditure) {
         this.hasPerformedExtremeExpenditure = hasPerformedExtremeExpenditure;
+    }
+
+    /**
+     * Returns the current {@link ExtraIncome} value.
+     *
+     * @return the {@link ExtraIncome} object representing the current extra income setting.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public ExtraIncome getExtraIncome() {
+        return extraIncome;
+    }
+
+    /**
+     * Returns the trait level associated with the current {@link ExtraIncome}.
+     *
+     * @return the integer trait level for the current extra income value.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public int getExtraIncomeTraitLevel() {
+        return extraIncome.getTraitLevel();
+    }
+
+    /**
+     * Sets the {@link ExtraIncome} value based on a specified trait level.
+     *
+     * <p>The trait level is clamped to the allowed range before being converted into an {@link ExtraIncome}
+     * object.</p>
+     *
+     * @param traitLevel the integer value representing the trait level to set for extra income.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public void setExtraIncomeFromTraitLevel(final int traitLevel) {
+        int newExtraIncomeTraitLevel = clamp(traitLevel, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME);
+        extraIncome = ExtraIncome.extraIncomeParseFromInteger(newExtraIncomeTraitLevel);
+    }
+
+    /**
+     * Directly assigns an {@link ExtraIncome} object.
+     *
+     * @param extraIncome the {@link ExtraIncome} instance to assign.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public void setExtraIncomeDirect(final ExtraIncome extraIncome) {
+        this.extraIncome = extraIncome;
     }
 
     /**

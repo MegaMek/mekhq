@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.generator;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
@@ -56,6 +57,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
@@ -128,6 +130,18 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         if (campaignOptions.isDoctorsUseAdministration() && (primaryRole.isDoctor())) {
             addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+        }
+
+        // roll Infantry Gunnery Skills
+        if (!campaignOptions.isUseSmallArmsOnly()) {
+            if (primaryRole.isSoldier() || secondaryRole.isSoldier()) {
+                Skills skills = person.getSkills();
+                for (String skillName : INFANTRY_GUNNERY_SKILLS) {
+                    if (!skills.hasSkill(skillName) && (d6(1) == 1)) {
+                        addSkill(person, skillName, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+                    }
+                }
+            }
         }
 
         // roll random secondary skill
@@ -249,6 +263,14 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             person.setWealth(roll == 6 ? 1 : -1);
         } else {
             person.setWealth(0);
+        }
+
+        // Extra Income
+        roll = d6();
+        if (roll == 6 || roll == 1) {
+            person.setExtraIncomeFromTraitLevel(roll == 6 ? 1 : -1);
+        } else {
+            person.setExtraIncomeFromTraitLevel(0);
         }
 
         // Unlucky

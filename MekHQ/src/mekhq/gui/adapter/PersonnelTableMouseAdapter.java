@@ -129,6 +129,7 @@ import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
+import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -218,6 +219,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_EMPLOY = "EMPLOY";
     private static final String CMD_SPENDING_SPREE = "SPENDING_SPREE";
     private static final String CMD_CLAIM_BOUNTY = "CLAIM_BOUNTY";
+    private static final String CMD_FAMILY_TREE = "CMD_FAMILY_TREE";
     private static final String CMD_REMOVE = "REMOVE";
     private static final String CMD_EDGE_TRIGGER = "EDGE";
     private static final String CMD_CHANGE_PRISONER_STATUS = "PRISONER_STATUS";
@@ -254,6 +256,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_RECRUIT = "RECRUIT";
     private static final String CMD_ABTAKHA = "ABTAKHA";
     private static final String CMD_ADOPTION = "ADOPTION";
+    private static final String CMD_ADD_PARENT = "CMD_ADD_PARENT";
+    private static final String CMD_REMOVE_PARENT = "CMD_REMOVE_PARENT";
+    private static final String CMD_ADD_CHILD = "CMD_ADD_CHILD";
+    private static final String CMD_REMOVE_CHILD = "CMD_REMOVE_CHILD";
     private static final String CMD_RANSOM = "RANSOM";
     private static final String CMD_RANSOM_FRIENDLY = "RANSOM_FRIENDLY";
 
@@ -681,6 +687,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     case WEALTH_LABEL -> selectedPerson.setWealth(target);
                     case UNLUCKY_LABEL -> selectedPerson.setUnlucky(target);
                     case BLOODMARK_LABEL -> selectedPerson.setBloodmark(target);
+                    case EXTRA_INCOME_LABEL -> selectedPerson.setExtraIncomeFromTraitLevel(target);
                     default -> LOGGER.error("Invalid trait type: {}", type);
                 }
 
@@ -1008,6 +1015,70 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 MekHQ.triggerEvent(new PersonChangedEvent(orphan));
                 break;
             }
+            case CMD_ADD_PARENT: {
+                Person newParent = getCampaign().getPerson(UUID.fromString(data[1]));
+                if (newParent == null) {
+                    LOGGER.warn("Could not find new parent with UUID {}. No changes will be made.", data[1]);
+                    return;
+                }
+
+                Genealogy newParentGenealogy = newParent.getGenealogy();
+                newParentGenealogy.addFamilyMember(FamilialRelationshipType.CHILD, selectedPerson);
+                MekHQ.triggerEvent(new PersonChangedEvent(newParent));
+
+                Genealogy selectedPersonGenealogy = selectedPerson.getGenealogy();
+                selectedPersonGenealogy.addFamilyMember(FamilialRelationshipType.PARENT, newParent);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                break;
+            }
+            case CMD_REMOVE_PARENT: {
+                Person oldParent = getCampaign().getPerson(UUID.fromString(data[1]));
+                if (oldParent == null) {
+                    LOGGER.warn("Could not find old parent with UUID {}. No changes will be made.", data[1]);
+                    return;
+                }
+
+                Genealogy oldParentGenealogy = oldParent.getGenealogy();
+                oldParentGenealogy.removeFamilyMember(FamilialRelationshipType.CHILD, selectedPerson);
+                MekHQ.triggerEvent(new PersonChangedEvent(oldParent));
+
+                Genealogy selectedPersonGenealogy = selectedPerson.getGenealogy();
+                selectedPersonGenealogy.removeFamilyMember(FamilialRelationshipType.PARENT, oldParent);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                break;
+            }
+            case CMD_ADD_CHILD: {
+                Person newChild = getCampaign().getPerson(UUID.fromString(data[1]));
+                if (newChild == null) {
+                    LOGGER.warn("Could not find new child with UUID {}. No changes will be made.", data[1]);
+                    return;
+                }
+
+                Genealogy newChildGenealogy = newChild.getGenealogy();
+                newChildGenealogy.addFamilyMember(FamilialRelationshipType.PARENT, selectedPerson);
+                MekHQ.triggerEvent(new PersonChangedEvent(newChild));
+
+                Genealogy selectedPersonGenealogy = selectedPerson.getGenealogy();
+                selectedPersonGenealogy.addFamilyMember(FamilialRelationshipType.CHILD, newChild);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                break;
+            }
+            case CMD_REMOVE_CHILD: {
+                Person oldChild = getCampaign().getPerson(UUID.fromString(data[1]));
+                if (oldChild == null) {
+                    LOGGER.warn("Could not find old child with UUID {}. No changes will be made.", data[1]);
+                    return;
+                }
+
+                Genealogy oldChildGenealogy = oldChild.getGenealogy();
+                oldChildGenealogy.removeFamilyMember(FamilialRelationshipType.PARENT, selectedPerson);
+                MekHQ.triggerEvent(new PersonChangedEvent(oldChild));
+
+                Genealogy selectedPersonGenealogy = selectedPerson.getGenealogy();
+                selectedPersonGenealogy.removeFamilyMember(FamilialRelationshipType.CHILD, oldChild);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                break;
+            }
             case CMD_RANSOM: {
                 // ask the user if they want to sell off their prisoners. If yes, then add a
                 // daily report entry, add the money and remove them all.
@@ -1215,6 +1286,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (validBounty) {
                     performMassForcedDirectionLoyaltyChange(getCampaign(), false, false);
                 }
+                break;
+            }
+            case CMD_FAMILY_TREE: {
+                new FamilyTreeDialog(gui.getFrame(), selectedPerson.getGenealogy(), getCampaign().getPersonnel());
                 break;
             }
             case CMD_EDIT: {
@@ -2163,10 +2238,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 JMenu orphanMenu = new JMenu(resources.getString("adopt.text"));
 
                 for (final Person orphan : orphans) {
-                    String status = String.format(resources.getString("adopt.description"),
-                          orphan.getFullName(),
-                          orphan.getGender(),
-                          orphan.getAge(getCampaign().getLocalDate()));
+                    String status = getPersonOptionString(orphan);
 
                     JMenuItem orphanItem = new JMenuItem(status);
                     orphanItem.setActionCommand(makeCommand(CMD_ADOPTION, String.valueOf(orphan.getId())));
@@ -2325,14 +2397,19 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 LocalDate today = getCampaign().getLocalDate();
 
                 // Get all safe potential spouses sorted by age and then by surname
-                final List<Person> personnel = getCampaign().getPersonnel()
+                final Campaign campaign = getCampaign();
+                final AbstractMarriage marriage = campaign.getMarriage();
+
+                final List<Person> personnel = campaign.getPersonnel()
                                                      .stream()
-                                                     .filter(potentialSpouse -> getCampaign().getMarriage()
-                                                                                      .safeSpouse(getCampaign(),
-                                                                                            getCampaign().getLocalDate(),
-                                                                                            person,
-                                                                                            potentialSpouse,
-                                                                                            false))
+                                                     .filter(potentialSpouse -> marriage.safeSpouse(campaign,
+                                                           today,
+                                                           person,
+                                                           potentialSpouse,
+                                                           false))
+                                                     .filter(potentialSpouse -> AbstractMarriage.isGenderCompatible(
+                                                           person,
+                                                           potentialSpouse))
                                                      .sorted(Comparator.comparing((Person p) -> p.getAge(today))
                                                                    .thenComparing(Person::getSurname))
                                                      .toList();
@@ -2398,6 +2475,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+        }
+
+        if (oneSelected) {
+            menuItem = new JMenuItem(resources.getString("familyTree.text"));
+            menuItem.setActionCommand(CMD_FAMILY_TREE);
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
         }
 
         // region Awards Menu
@@ -3472,6 +3556,31 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setEnabled(target >= MINIMUM_BLOODMARK && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
+            // Extra Income
+            int extraIncome = person.getExtraIncomeTraitLevel();
+
+            target = extraIncome + 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnExtraIncome.text"), target, -traitCost));
+            menuItem.setToolTipText(String.format(resources.getString("spendOnExtraIncome.tooltip"), target));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
+                  EXTRA_INCOME_LABEL,
+                  String.valueOf(traitCost),
+                  String.valueOf(target)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(target <= MAXIMUM_EXTRA_INCOME);
+            traitsMenu.add(menuItem);
+
+            target = extraIncome - 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnExtraIncome.text"), target, traitCost));
+            menuItem.setToolTipText(String.format(resources.getString("spendOnExtraIncome.tooltip"), target));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
+                  EXTRA_INCOME_LABEL,
+                  String.valueOf(-traitCost),
+                  String.valueOf(target)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(target >= MINIMUM_EXTRA_INCOME && person.getXP() >= traitCost);
+            traitsMenu.add(menuItem);
+
             menu.add(traitsMenu);
 
             JMenu attributesMenuIncrease = new JMenu(resources.getString("spendOnAttributes.increase"));
@@ -4096,15 +4205,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(cbMenuItem);
         }
 
-        if ((getCampaignOptions().isUseManualMarriages() || !getCampaignOptions().getRandomMarriageMethod().isNone()) &&
-                  Stream.of(selected).allMatch(p -> p.isMarriageable() == person.isMarriageable())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miMarriageable.text"));
-            cbMenuItem.setToolTipText(wordWrap(resources.getString("miMarriageable.toolTipText")));
-            cbMenuItem.setName("miMarriageable");
-            cbMenuItem.setSelected(person.isMarriageable());
+        if (getCampaignOptions().isUseManualMarriages() || !getCampaignOptions().getRandomMarriageMethod().isNone()) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersMen.text"));
+            cbMenuItem.setToolTipText(wordWrap(resources.getString("miPrefersMen.toolTipText")));
+            cbMenuItem.setName("miPrefersMen");
+            cbMenuItem.setSelected(selected.length == 1 && person.isPrefersMen());
             cbMenuItem.addActionListener(evt -> {
-                final boolean marriageable = !person.isMarriageable();
-                Stream.of(selected).forEach(p -> p.setMarriageable(marriageable));
+                Stream.of(selected).forEach(p -> p.setPrefersMen(!p.isPrefersMen()));
+            });
+            menu.add(cbMenuItem);
+
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersWomen.text"));
+            cbMenuItem.setToolTipText(wordWrap(resources.getString("miPrefersWomen.toolTipText")));
+            cbMenuItem.setName("miPrefersWomen");
+            cbMenuItem.setSelected(selected.length == 1 && person.isPrefersWomen());
+            cbMenuItem.addActionListener(evt -> {
+                Stream.of(selected).forEach(p -> p.setPrefersWomen(!p.isPrefersWomen()));
             });
             menu.add(cbMenuItem);
         }
@@ -4453,11 +4569,107 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setEnabled(getCampaign().isGM());
             menu.add(menuItem);
 
+            if (oneSelected) {
+                Genealogy personGenealogy = person.getGenealogy();
+                List<Person> personParents = personGenealogy.getParents();
+
+                if (personParents.size() < 2) {
+                    JMenu newParentMenu = new JMenu(resources.getString("parent.add"));
+                    List<Person> potentialParents = new ArrayList<>(getCampaign().getActivePersonnel(false, true)
+                                                                          .stream()
+                                                                          .filter(p -> (!p.isChild(getCampaign().getLocalDate())))
+                                                                          .toList());
+                    potentialParents.removeAll(personParents);
+                    potentialParents.remove(person);
+
+                    for (final Person newParent : potentialParents) {
+                        String status = getPersonOptionString(newParent);
+
+                        JMenuItem newParentItem = new JMenuItem(status);
+                        newParentItem.setActionCommand(makeCommand(CMD_ADD_PARENT, String.valueOf(newParent.getId())));
+                        newParentItem.addActionListener(this);
+                        newParentMenu.add(newParentItem);
+                    }
+                    if (newParentMenu.getItemCount() > 0) {
+                        menu.add(newParentMenu);
+                    }
+                }
+
+                JMenu removeParentMenu = new JMenu(resources.getString("parent.remove"));
+                for (final Person oldParent : personParents) {
+                    String status = getPersonOptionString(oldParent);
+
+                    JMenuItem removeParentItem = new JMenuItem(status);
+                    removeParentItem.setActionCommand(makeCommand(CMD_REMOVE_PARENT,
+                          String.valueOf(oldParent.getId())));
+                    removeParentItem.addActionListener(this);
+                    removeParentMenu.add(removeParentItem);
+                }
+                if (removeParentMenu.getItemCount() > 0) {
+                    menu.add(removeParentMenu);
+                }
+
+                JMenu newChildMenu = new JMenu(resources.getString("child.add"));
+                List<Person> potentialChildren = new ArrayList<>(getCampaign().getActivePersonnel(false, true)
+                                                                       .stream()
+                                                                       .filter(p -> (p.getGenealogy()
+                                                                                           .getParents()
+                                                                                           .size() < 2))
+                                                                       .toList());
+                potentialChildren.removeAll(personParents);
+                potentialChildren.removeAll(personGenealogy.getChildren());
+                potentialChildren.remove(person);
+
+                for (final Person newChild : potentialChildren) {
+                    String status = getPersonOptionString(newChild);
+
+                    JMenuItem newChildItem = new JMenuItem(status);
+                    newChildItem.setActionCommand(makeCommand(CMD_ADD_CHILD, String.valueOf(newChild.getId())));
+                    newChildItem.addActionListener(this);
+                    newChildMenu.add(newChildItem);
+                }
+                if (newChildMenu.getItemCount() > 0) {
+                    menu.add(newChildMenu);
+                }
+
+                JMenu removeChildMenu = new JMenu(resources.getString("child.remove"));
+                for (final Person oldChild : personGenealogy.getChildren()) {
+                    String status = getPersonOptionString(oldChild);
+
+                    JMenuItem removeChildItem = new JMenuItem(status);
+                    removeChildItem.setActionCommand(makeCommand(CMD_REMOVE_CHILD, String.valueOf(oldChild.getId())));
+                    removeChildItem.addActionListener(this);
+                    removeChildMenu.add(removeChildItem);
+                }
+                if (removeChildMenu.getItemCount() > 0) {
+                    menu.add(removeChildMenu);
+                }
+            }
+
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
         // endregion GM Menu
 
         return Optional.of(popup);
+    }
+
+    /**
+     * Generates a formatted description string for a person, typically used in adoption scenarios.
+     *
+     * <p>This method creates a localized string containing the person's full name, gender, and current age.</p>
+     *
+     * @param person The {@link Person} to generate the description for
+     *
+     * @return A formatted string describing the person with their name, gender, and age
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private String getPersonOptionString(Person person) {
+        return String.format(resources.getString("personOption.description"),
+              person.getFullName(),
+              person.getGender(),
+              person.getAge(getCampaign().getLocalDate()));
     }
 
     private static void placeInAppropriateSPASubMenu(SpecialAbility spa, JMenu specialistMenu, JMenu combatAbilityMenu,

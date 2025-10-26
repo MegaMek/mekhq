@@ -57,8 +57,11 @@ import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.rentals.ContractRentalType;
+import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
@@ -425,14 +428,16 @@ public class CampaignSummary {
         StringBuilder report = new StringBuilder("<html>");
 
         // Field Kitchens
+        List<Unit> unitsInToe = campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(), false);
         if (campaignOptions.isUseFatigue()) {
-            List<Unit> unitsInToe = campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(), false);
-
             int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.getFieldKitchenCapacity());
+            fieldKitchenCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
+                  ContractRentalType.KITCHENS);
+
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, true),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
-            boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
 
+            boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
             color = isWithinCapacity ?
                           "" :
                           spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
@@ -453,10 +458,10 @@ public class CampaignSummary {
                 report.append("<br>");
             }
 
-            int patients = (int) campaign.getPatients()
-                                       .stream()
-                                       .filter(patient -> patient.getDoctorId() != null)
-                                       .count();
+            int patients = campaign.getPatientsAssignedToDoctors().size();
+            boolean useMASHTheatres = campaignOptions.isUseMASHTheatres();
+            int mashTheatreCapacity = useMASHTheatres ? MASHCapacity.checkMASHCapacity(unitsInToe,
+                  campaignOptions.getMASHTheatreCapacity()) : Integer.MAX_VALUE;
 
             final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
             final int maximumPatients = campaignOptions.getMaximumPatients();
@@ -465,7 +470,8 @@ public class CampaignSummary {
                 doctorCapacity += person.getDoctorMedicalCapacity(isDoctorsUseAdministration, maximumPatients);
             }
 
-            exceedsCapacity = patients > doctorCapacity;
+
+            exceedsCapacity = patients > doctorCapacity || patients > mashTheatreCapacity;
 
             color = exceedsCapacity ?
                           spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
@@ -473,12 +479,22 @@ public class CampaignSummary {
             closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
             colorBlindWarning = exceedsCapacity ? WARNING : "";
 
-            report.append(String.format("Hospital Beds %s(%s/%s)%s%s",
-                  color,
-                  patients,
-                  doctorCapacity,
-                  closingSpan,
-                  colorBlindWarning));
+            if (useMASHTheatres) {
+                report.append(String.format("Hospital Beds %s(%s/%s) (MASH Capacity %s)%s%s",
+                      color,
+                      patients,
+                      doctorCapacity,
+                      mashTheatreCapacity,
+                      closingSpan,
+                      colorBlindWarning));
+            } else {
+                report.append(String.format("Hospital Beds %s(%s/%s)%s%s",
+                      color,
+                      patients,
+                      doctorCapacity,
+                      closingSpan,
+                      colorBlindWarning));
+            }
         }
 
         // Prisoners

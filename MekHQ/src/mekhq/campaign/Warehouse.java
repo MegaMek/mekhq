@@ -365,8 +365,8 @@ public class Warehouse {
      *
      * @return the quantity of the part based on its type and context
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public int getPartQuantity(Part part, boolean sparesOnly) {
-        //TODO: getPartQuantity should be an overloaded method in Part.java, I'm just getting it out of campaign
         if (sparesOnly && !part.isSpare()) {
             return 0;
         }

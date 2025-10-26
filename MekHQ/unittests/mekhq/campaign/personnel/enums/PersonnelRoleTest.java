@@ -560,6 +560,7 @@ class PersonnelRoleTest {
                 case AERO_TEK:
                 case BA_TECH:
                 case VESSEL_CREW:
+                case VEHICLE_CREW:
                     assertTrue(personnelRole.isTech());
                     break;
                 default:
@@ -577,6 +578,7 @@ class PersonnelRoleTest {
                 case MECHANIC:
                 case AERO_TEK:
                 case BA_TECH:
+                case VEHICLE_CREW:
                     assertTrue(personnelRole.isTechSecondary());
                     break;
                 default:
@@ -682,6 +684,7 @@ class PersonnelRoleTest {
     @Test
     void testGetTechRoles() {
         final List<PersonnelRole> expected = new ArrayList<>();
+        expected.add(PersonnelRole.VEHICLE_CREW);
         expected.add(PersonnelRole.VESSEL_CREW);
         expected.add(PersonnelRole.MEK_TECH);
         expected.add(PersonnelRole.MECHANIC);

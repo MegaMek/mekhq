@@ -158,6 +158,7 @@ public enum PersonnelTableModelColumn {
     TOUGHNESS("PersonnelTableModelColumn.TOUGHNESS.text"),
     CONNECTIONS("PersonnelTableModelColumn.CONNECTIONS.text"),
     WEALTH("PersonnelTableModelColumn.WEALTH.text"),
+    EXTRA_INCOME("PersonnelTableModelColumn.EXTRA_INCOME.text"),
     REPUTATION("PersonnelTableModelColumn.REPUTATION.text"),
     UNLUCKY("PersonnelTableModelColumn.UNLUCKY.text"),
     BLOODMARK("PersonnelTableModelColumn.BLOODMARK.text"),
@@ -490,6 +491,10 @@ public enum PersonnelTableModelColumn {
 
     public boolean isWealth() {
         return this == WEALTH;
+    }
+
+    public boolean isExtraIncome() {
+        return this == EXTRA_INCOME;
     }
 
     public boolean isReputation() {
@@ -879,7 +884,8 @@ public enum PersonnelTableModelColumn {
                                                     .getFinalSkillValue(options, attributes, adjustedReputation)) :
                              "-";
             case SMALL_ARMS:
-                String skillName = InfantryGunnerySkills.getBestInfantryGunnerySkill(person);
+                String skillName = InfantryGunnerySkills.getBestInfantryGunnerySkill(person,
+                      campaignOptions.isUseSmallArmsOnly());
                 return skillName == null ? "-" :
                              Integer.toString(person.getSkill(skillName).getFinalSkillValue(options, attributes));
             case ARTILLERY:
@@ -1048,6 +1054,8 @@ public enum PersonnelTableModelColumn {
                 return Integer.toString(person.getAdjustedConnections());
             case WEALTH:
                 return Integer.toString(person.getWealth());
+            case EXTRA_INCOME:
+                return Integer.toString(person.getExtraIncomeTraitLevel());
             case REPUTATION:
                 return Integer.toString(adjustedReputation);
             case UNLUCKY:
@@ -1329,7 +1337,8 @@ public enum PersonnelTableModelColumn {
                 default -> false;
             };
             case TRAITS -> switch (this) {
-                case RANK, FIRST_NAME, LAST_NAME, CONNECTIONS, WEALTH, REPUTATION, UNLUCKY, BLOODMARK -> true;
+                case RANK, FIRST_NAME, LAST_NAME, CONNECTIONS, WEALTH, EXTRA_INCOME, REPUTATION, UNLUCKY, BLOODMARK ->
+                      true;
                 case EDGE -> campaign.getCampaignOptions().isUseEdge();
                 default -> false;
             };
@@ -1402,6 +1411,7 @@ public enum PersonnelTableModelColumn {
                  TOUGHNESS,
                  CONNECTIONS,
                  WEALTH,
+                 EXTRA_INCOME,
                  REPUTATION,
                  UNLUCKY,
                  BLOODMARK,

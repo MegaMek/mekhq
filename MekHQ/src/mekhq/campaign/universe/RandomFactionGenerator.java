@@ -55,6 +55,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.factionHints.FactionHints;
 
 /**
  * @author Neoancient
@@ -76,14 +77,15 @@ public class RandomFactionGenerator {
         this(null, null);
     }
 
-    public RandomFactionGenerator(FactionBorderTracker borderTracker, FactionHints factionHints) {
+    public RandomFactionGenerator(FactionBorderTracker borderTracker,
+          FactionHints factionHints) {
         this.borderTracker = borderTracker;
         this.factionHints = factionHints;
         if (null == borderTracker) {
             initDefaultBorderTracker();
         }
         if (null == factionHints) {
-            this.factionHints = FactionHints.defaultFactionHints();
+            this.factionHints = FactionHints.getInstance();
         }
     }
 
@@ -145,7 +147,8 @@ public class RandomFactionGenerator {
         Set<String> retVal = new TreeSet<>();
         for (Faction f : borderTracker.getFactionsInRegion()) {
 
-            if (FactionHints.isEmptyFaction(f) || f.getShortName().equals("CLAN")) {
+            if (FactionHints.isEmptyFaction(f) ||
+                      f.getShortName().equals("CLAN")) {
                 continue;
             }
             if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(MHQConstants.FORTRESS_REPUBLIC)) {
@@ -342,7 +345,8 @@ public class RandomFactionGenerator {
         String employerShortName = employer.getShortName();
         if (employerShortName.equals(PIRATE_FACTION_CODE) || employerShortName.equals(COMSTAR_FACTION_CODE)) {
             for (Faction enemy : borderTracker.getFactionsInRegion()) {
-                if (FactionHints.isEmptyFaction(enemy) || enemy.getShortName().equals("CLAN")) {
+                if (FactionHints.isEmptyFaction(enemy) ||
+                          enemy.getShortName().equals("CLAN")) {
                     continue;
                 }
                 enemyMap.add(1, enemy); // weight (1) can be adjusted as needed
@@ -351,7 +355,8 @@ public class RandomFactionGenerator {
         }
 
         for (Faction enemy : borderTracker.getFactionsInRegion()) {
-            if (FactionHints.isEmptyFaction(enemy) || enemy.getShortName().equals("CLAN")) {
+            if (FactionHints.isEmptyFaction(enemy) ||
+                      enemy.getShortName().equals("CLAN")) {
                 continue;
             }
 

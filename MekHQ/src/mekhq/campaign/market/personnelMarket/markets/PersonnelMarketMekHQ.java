@@ -63,10 +63,10 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.HiringHallLevel;
+import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
@@ -156,7 +156,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
                 }
             }
 
-            if (FactionHints.defaultFactionHints().isAtWarWith(getCampaignFaction(), faction, getToday())) {
+            if (FactionHints.getInstance().isAtWarWith(getCampaignFaction(), faction, getToday())) {
                 continue;
             }
 
@@ -168,7 +168,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
             // Allies are three times as likely to join the campaign as non-allies
             if (getCampaignFaction().equals(faction)
-                      || FactionHints.defaultFactionHints().isAlliedWith(getCampaignFaction(), faction, getToday())) {
+                      || FactionHints.getInstance().isAlliedWith(getCampaignFaction(), faction, getToday())) {
                 factionStandingMultiplier *= 3;
             }
 

@@ -255,8 +255,16 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAbilities", campaignOptions.isUseAbilities());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
-              "useCommanderAbilitiesOnly",
-              campaignOptions.isUseCommanderAbilitiesOnly());
+              "onlyCommandersMatterVehicles",
+              campaignOptions.isOnlyCommandersMatterVehicles());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "onlyCommandersMatterInfantry",
+              campaignOptions.isOnlyCommandersMatterInfantry());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "onlyCommandersMatterBattleArmor",
+              campaignOptions.isOnlyCommandersMatterBattleArmor());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", campaignOptions.isUseEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSupportEdge", campaignOptions.isUseSupportEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", campaignOptions.isUseImplants());
@@ -349,6 +357,8 @@ public class CampaignOptionsMarshaller {
               "doctorsUseAdministration",
               campaignOptions.isDoctorsUseAdministration());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUsefulMedics", campaignOptions.isUseUsefulMedics());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMASHTheatres", campaignOptions.isUseMASHTheatres());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mashTheatreCapacity", campaignOptions.getMASHTheatreCapacity());
         // endregion Medical
 
         // region Prisoners
@@ -626,7 +636,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "noInterestInMarriageDiceSize",
-              campaignOptions.getNoInterestInMarriageDiceSize());
+              campaignOptions.getNoInterestInRelationshipsDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "logMarriageNameChanges",
@@ -659,7 +669,11 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "randomSameSexMarriageDiceSize",
-              campaignOptions.getRandomSameSexMarriageDiceSize());
+              campaignOptions.getInterestedInSameSexDiceSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "interestedInBothSexesDiceSize",
+              campaignOptions.getInterestedInBothSexesDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "randomNewDependentMarriage",
@@ -832,6 +846,22 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForRecruitment", campaignOptions.isPayForRecruitment());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForFood", campaignOptions.isPayForFood());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForHousing", campaignOptions.isPayForHousing());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "rentedFacilitiesCostHospitalBeds",
+              campaignOptions.getRentedFacilitiesCostHospitalBeds());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "rentedFacilitiesCostKitchens",
+              campaignOptions.getRentedFacilitiesCostKitchens());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "rentedFacilitiesCostHoldingCells",
+              campaignOptions.getRentedFacilitiesCostHoldingCells());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "rentedFacilitiesCostRepairBays",
+              campaignOptions.getRentedFacilitiesCostRepairBays());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoanLimits", campaignOptions.isUseLoanLimits());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePercentageMaint", campaignOptions.isUsePercentageMaintenance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "infantryDontCount", campaignOptions.isInfantryDontCount());
@@ -853,6 +883,10 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayAllAttributes", campaignOptions.isDisplayAllAttributes());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowMonthlyConnections",
               campaignOptions.isAllowMonthlyConnections());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBetterExtraIncome",
+              campaignOptions.isUseBetterExtraIncome());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSmallArmsOnly",
+              campaignOptions.isUseSmallArmsOnly());
 
         // region Price Multipliers
         MHQXMLUtility.writeSimpleXMLTag(pw,
@@ -985,6 +1019,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "dropShipBonusPercentage",
               campaignOptions.getDropShipBonusPercentage());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "isUseTwoWayPay",
+              campaignOptions.isUseTwoWayPay());
         // endregion Contract Market
         // endregion Markets Tab
 
@@ -1030,6 +1068,16 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForUsesVTOLs", campaignOptions.isOpForUsesVTOLs());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDropShips", campaignOptions.isUseDropShips());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mercSizeLimited", campaignOptions.isMercSizeLimited());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleVictoryEffect", campaignOptions.getMoraleVictoryEffect());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "moraleDecisiveVictoryEffect",
+              campaignOptions.getMoraleDecisiveVictoryEffect());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleDefeatEffect", campaignOptions.getMoraleDefeatEffect());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "moraleDecisiveDefeatEffect",
+              campaignOptions.getMoraleDecisiveDefeatEffect());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "regionalMekVariations", campaignOptions.isRegionalMekVariations());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attachedPlayerCamouflage",
               campaignOptions.isAttachedPlayerCamouflage());
