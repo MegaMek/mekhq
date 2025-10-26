@@ -343,7 +343,7 @@ public class RetirementDefectionTracker {
                 }
 
                 // wartime modifier
-                if (FactionHints.defaultFactionHints()
+                if (FactionHints.getInstance()
                           .isAtWarWith(campaign.getFaction(), person.getOriginFaction(), campaign.getLocalDate())) {
                     targetNumber.addModifier(4, resources.getString("factionEnemy.text"));
                 }

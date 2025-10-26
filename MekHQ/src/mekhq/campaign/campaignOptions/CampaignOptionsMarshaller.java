@@ -1013,6 +1013,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "dropShipBonusPercentage",
               campaignOptions.getDropShipBonusPercentage());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "isUseTwoWayPay",
+              campaignOptions.isUseTwoWayPay());
         // endregion Contract Market
         // endregion Markets Tab
 

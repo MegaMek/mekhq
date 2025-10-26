@@ -142,6 +142,7 @@ public class MarketsTab {
     private JLabel lblContractSearchRadius;
     private JSpinner spnContractSearchRadius;
     private JCheckBox chkVariableContractLength;
+    private JCheckBox chkUseTwoWayPay;
     private JCheckBox chkUseDynamicDifficulty;
     private JCheckBox chkContractMarketReportRefresh;
     private JLabel lblContractMaxSalvagePercentage;
@@ -539,6 +540,7 @@ public class MarketsTab {
         lblContractSearchRadius = new JLabel();
         spnContractSearchRadius = new JSpinner();
         chkVariableContractLength = new JCheckBox();
+        chkUseTwoWayPay = new JCheckBox();
         chkUseDynamicDifficulty = new JCheckBox();
         chkContractMarketReportRefresh = new JCheckBox();
         lblContractMaxSalvagePercentage = new JLabel();
@@ -625,6 +627,10 @@ public class MarketsTab {
         chkVariableContractLength.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "VariableContractLength"));
 
+        chkUseTwoWayPay = new CampaignOptionsCheckBox("UseTwoWayPay");
+        chkUseTwoWayPay.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "UseTwoWayPay"));
+
         chkUseDynamicDifficulty = new CampaignOptionsCheckBox("UseDynamicDifficulty");
         chkUseDynamicDifficulty.addMouseListener(createTipPanelUpdater(contractMarketHeader, "UseDynamicDifficulty"));
 
@@ -667,6 +673,9 @@ public class MarketsTab {
         layout.gridy++;
         layout.gridwidth = 2;
         panel.add(chkVariableContractLength, layout);
+
+        layout.gridy++;
+        panel.add(chkUseTwoWayPay, layout);
 
         layout.gridy++;
         panel.add(chkUseDynamicDifficulty, layout);
@@ -881,6 +890,7 @@ public class MarketsTab {
         comboContractMarketMethod.setSelectedItem(options.getContractMarketMethod());
         spnContractSearchRadius.setValue(options.getContractSearchRadius());
         chkVariableContractLength.setSelected(options.isVariableContractLength());
+        chkUseTwoWayPay.setSelected(options.isUseTwoWayPay());
         chkUseDynamicDifficulty.setSelected(options.isUseDynamicDifficulty());
         chkContractMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
         spnContractMaxSalvagePercentage.setValue(options.getContractMaxSalvagePercentage());
@@ -948,6 +958,7 @@ public class MarketsTab {
         options.setContractMarketMethod(comboContractMarketMethod.getSelectedItem());
         options.setContractSearchRadius((int) spnContractSearchRadius.getValue());
         options.setVariableContractLength(chkVariableContractLength.isSelected());
+        options.setUseTwoWayPay(chkUseTwoWayPay.isSelected());
         options.setUseDynamicDifficulty(chkUseDynamicDifficulty.isSelected());
         options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
         options.setContractMaxSalvagePercentage((int) spnContractMaxSalvagePercentage.getValue());

@@ -185,7 +185,7 @@ public class WarAndPeaceProcessor {
      * @since 0.50.10
      */
     private void processFactionHints(final Faction campaignFaction, boolean activeOnly) {
-        FactionHints factionHints = FactionHints.defaultFactionHints();
+        FactionHints factionHints = FactionHints.getInstance();
         Collection<Faction> activeFactions = Factions.getInstance().getActiveFactions(today);
 
         final Map<Faction, List<FactionHint>> wars = factionHints.getWars()

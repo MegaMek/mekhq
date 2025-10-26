@@ -603,6 +603,11 @@ public class ContractMarketDialog extends JDialog {
                         campaign.getLocalDate(),
                         selectedContract.getTotalAdvanceAmount(),
                         "Advance funds for " + selectedContract.getName());
+            campaign.getFinances()
+                  .credit(TransactionType.CONTRACT_PAYMENT,
+                        campaign.getLocalDate(),
+                        selectedContract.getTransportAmount(),
+                        "Transport reimbursement for " + selectedContract.getName());
             campaign.addMission(selectedContract);
             // must be invoked after campaign.addMission to ensure presence of mission ID
             selectedContract.acceptContract(campaign);
