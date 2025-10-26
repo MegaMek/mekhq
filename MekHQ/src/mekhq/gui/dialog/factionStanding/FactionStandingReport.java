@@ -624,7 +624,7 @@ public class FactionStandingReport extends JDialog {
         String factionStandingLabel = factionStanding.getLabel(faction);
         String factionStandingDescription = factionStanding.getDescription(faction);
 
-        FactionHints factionHints = FactionHints.defaultFactionHints();
+        FactionHints factionHints = FactionHints.getInstance();
         LocalDate firstOfMonth = today.withDayOfMonth(1); // Climate states update on the 1st in Faction Standing
         boolean isAtWar = factionHints.isAtWarWith(campaignFaction, faction, firstOfMonth);
         boolean isAllied = factionHints.isAlliedWith(campaignFaction, faction, firstOfMonth);

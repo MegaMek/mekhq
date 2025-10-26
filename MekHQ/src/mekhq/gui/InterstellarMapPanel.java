@@ -739,7 +739,7 @@ public class InterstellarMapPanel extends JPanel {
                 LocalDate today = campaign.getLocalDate();
                 List<AtBContract> activeAtBContracts = campaign.getActiveAtBContracts();
 
-                FactionHints factionHints = FactionHints.defaultFactionHints();
+                FactionHints factionHints = FactionHints.getInstance();
 
                 for (PlanetarySystem system : systems) {
                     if (isSystemVisible(system, false)) {

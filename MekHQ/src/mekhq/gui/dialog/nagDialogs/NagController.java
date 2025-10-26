@@ -130,14 +130,6 @@ public class NagController {
             }
         }
 
-        // Unable to afford next jump
-        if (UnableToAffordJumpNagDialog.checkNag(campaign)) {
-            UnableToAffordJumpNagDialog unableToAffordJumpNagDialog = new UnableToAffordJumpNagDialog(campaign);
-            if (unableToAffordJumpNagDialog.shouldCancelAdvanceDay()) {
-                return true;
-            }
-        }
-
         // Unable to afford next loan payment
         final Finances finances = campaign.getFinances();
 

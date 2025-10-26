@@ -65,6 +65,8 @@ public class FactionHints {
     private static final String TEST_DIR = "testresources/" + FACTION_HINTS_FILE.replaceAll("factionhints",
           "factionhints_test");
 
+    private static volatile FactionHints instance;
+
     private final Set<Faction> neutralFactions;
 
     private final Map<Faction, Map<Faction, List<FactionHint>>> wars;
@@ -72,6 +74,48 @@ public class FactionHints {
     private final Map<Faction, Map<Faction, List<FactionHint>>> rivals;
     private final Map<Faction, Map<Faction, List<FactionHint>>> neutralExceptions;
     private final Map<Faction, Map<Faction, List<AltLocation>>> containedFactions;
+
+    /**
+     * Returns the singleton instance of {@link FactionHints}, initializing it if necessary.
+     *
+     * @return The singleton FactionHints instance, loaded from default data.
+     */
+    public static FactionHints getInstance() {
+        return getOrInitializeInstance(false);
+    }
+
+    /**
+     * For test purposes only. Loads the singleton using test directory instead of main data. Call this ONLY in tests,
+     * never in production code.
+     */
+    public static FactionHints initializeTestInstance() {
+        return getOrInitializeInstance(true);
+    }
+
+    /**
+     * Returns the singleton instance of {@link FactionHints}, initializing it if necessary.
+     *
+     * <p>This method ensures that the instance is fully constructed and loaded with data before being published to
+     * other threads.</p>
+     *
+     * @param useTestDirectory whether to load data from the test directory (for testing only)
+     *
+     * @return the singleton {@link FactionHints} instance, loaded from the specified data source
+     */
+    private static FactionHints getOrInitializeInstance(boolean useTestDirectory) {
+        if (instance == null) {
+            synchronized (FactionHints.class) {
+                if (instance == null) {
+                    // The use of tempHints here ensures that the instance is never seen by any other thread until it's
+                    // fully constructed and initialized, eliminating any risk of a race condition.
+                    FactionHints tempHints = new FactionHints();
+                    tempHints.loadData(useTestDirectory);
+                    instance = tempHints;
+                }
+            }
+        }
+        return instance;
+    }
 
     /**
      * Protected constructor that initializes empty data structures.
@@ -102,23 +146,17 @@ public class FactionHints {
     }
 
     /**
-     * Generates the default set of {@link FactionHints} by loading relevant data using the main data directory.
-     *
-     * @return A {@link FactionHints} object containing the loaded data.
+     * @deprecated use {@link #getInstance()} instead.
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public static FactionHints defaultFactionHints() {
         return defaultFactionHints(false);
     }
 
     /**
-     * Generates the default set of {@link FactionHints} by loading relevant data. This can be configured to use either
-     * the main data directory or a test data directory based on the input parameter.
-     *
-     * @param useTestDirectory A boolean indicating whether to load data from a test directory. If {@code true}, test
-     *                         data will be used; otherwise, the main data will be loaded.
-     *
-     * @return A {@link FactionHints} object containing the loaded data.
+     * @deprecated use {@link #getInstance()} instead.
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public static FactionHints defaultFactionHints(boolean useTestDirectory) {
         FactionHints hints = new FactionHints();
         hints.loadData(useTestDirectory);

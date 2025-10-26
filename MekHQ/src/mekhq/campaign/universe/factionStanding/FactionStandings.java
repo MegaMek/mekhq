@@ -361,7 +361,7 @@ public class FactionStandings {
         int gameYear = today.getYear();
 
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
-        FactionHints factionHints = FactionHints.defaultFactionHints(false);
+        FactionHints factionHints = FactionHints.getInstance();
 
         boolean isMercenary = campaignFaction.isMercenaryOrganization();
         boolean isPirate = campaignFaction.isPirate();
@@ -866,7 +866,9 @@ public class FactionStandings {
     public String updateClimateRegard(final Faction campaignFaction, final LocalDate today,
           final double regardMultiplier, boolean enableVerboseClimateRegard, boolean useTestDirectory) {
         Collection<Faction> allFactions = Factions.getInstance().getActiveFactions(today);
-        FactionHints factionHints = FactionHints.defaultFactionHints(useTestDirectory);
+        FactionHints factionHints = useTestDirectory ?
+                                          FactionHints.initializeTestInstance() :
+                                          FactionHints.getInstance();
         boolean isPirate = campaignFaction.isPirate();
 
         // Clear any existing climate regard entries

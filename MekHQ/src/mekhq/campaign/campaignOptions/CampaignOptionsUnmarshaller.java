@@ -790,6 +790,7 @@ public class CampaignOptionsUnmarshaller {
             case "contractMaxSalvagePercentage" -> campaignOptions.setContractMaxSalvagePercentage(parseInt(
                   nodeContents));
             case "dropShipBonusPercentage" -> campaignOptions.setDropShipBonusPercentage(parseInt(nodeContents));
+            case "isUseTwoWayPay" -> campaignOptions.setUseTwoWayPay(parseBoolean(nodeContents));
             case "skillLevel" -> campaignOptions.setSkillLevel(SkillLevel.parseFromString(nodeContents));
             case "autoResolveMethod" -> campaignOptions.setAutoResolveMethod(AutoResolveMethod.valueOf(nodeContents));
             case "autoResolveVictoryChanceEnabled" -> campaignOptions.setAutoResolveVictoryChanceEnabled(parseBoolean(
