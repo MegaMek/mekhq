@@ -636,7 +636,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "noInterestInMarriageDiceSize",
-              campaignOptions.getNoInterestInMarriageDiceSize());
+              campaignOptions.getNoInterestInRelationshipsDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "logMarriageNameChanges",
@@ -669,7 +669,11 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "randomSameSexMarriageDiceSize",
-              campaignOptions.getRandomSameSexMarriageDiceSize());
+              campaignOptions.getInterestedInSameSexDiceSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "interestedInBothSexesDiceSize",
+              campaignOptions.getInterestedInBothSexesDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "randomNewDependentMarriage",

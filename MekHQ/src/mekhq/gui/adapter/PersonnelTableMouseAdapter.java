@@ -129,6 +129,7 @@ import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
+import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -2396,14 +2397,19 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 LocalDate today = getCampaign().getLocalDate();
 
                 // Get all safe potential spouses sorted by age and then by surname
-                final List<Person> personnel = getCampaign().getPersonnel()
+                final Campaign campaign = getCampaign();
+                final AbstractMarriage marriage = campaign.getMarriage();
+
+                final List<Person> personnel = campaign.getPersonnel()
                                                      .stream()
-                                                     .filter(potentialSpouse -> getCampaign().getMarriage()
-                                                                                      .safeSpouse(getCampaign(),
-                                                                                            getCampaign().getLocalDate(),
-                                                                                            person,
-                                                                                            potentialSpouse,
-                                                                                            false))
+                                                     .filter(potentialSpouse -> marriage.safeSpouse(campaign,
+                                                           today,
+                                                           person,
+                                                           potentialSpouse,
+                                                           false))
+                                                     .filter(potentialSpouse -> AbstractMarriage.isGenderCompatible(
+                                                           person,
+                                                           potentialSpouse))
                                                      .sorted(Comparator.comparing((Person p) -> p.getAge(today))
                                                                    .thenComparing(Person::getSurname))
                                                      .toList();
@@ -4199,15 +4205,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(cbMenuItem);
         }
 
-        if ((getCampaignOptions().isUseManualMarriages() || !getCampaignOptions().getRandomMarriageMethod().isNone()) &&
-                  Stream.of(selected).allMatch(p -> p.isMarriageable() == person.isMarriageable())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miMarriageable.text"));
-            cbMenuItem.setToolTipText(wordWrap(resources.getString("miMarriageable.toolTipText")));
-            cbMenuItem.setName("miMarriageable");
-            cbMenuItem.setSelected(person.isMarriageable());
+        if (getCampaignOptions().isUseManualMarriages() || !getCampaignOptions().getRandomMarriageMethod().isNone()) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersMen.text"));
+            cbMenuItem.setToolTipText(wordWrap(resources.getString("miPrefersMen.toolTipText")));
+            cbMenuItem.setName("miPrefersMen");
+            cbMenuItem.setSelected(selected.length == 1 && person.isPrefersMen());
             cbMenuItem.addActionListener(evt -> {
-                final boolean marriageable = !person.isMarriageable();
-                Stream.of(selected).forEach(p -> p.setMarriageable(marriageable));
+                Stream.of(selected).forEach(p -> p.setPrefersMen(!p.isPrefersMen()));
+            });
+            menu.add(cbMenuItem);
+
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersWomen.text"));
+            cbMenuItem.setToolTipText(wordWrap(resources.getString("miPrefersWomen.toolTipText")));
+            cbMenuItem.setName("miPrefersWomen");
+            cbMenuItem.setSelected(selected.length == 1 && person.isPrefersWomen());
+            cbMenuItem.addActionListener(evt -> {
+                Stream.of(selected).forEach(p -> p.setPrefersWomen(!p.isPrefersWomen()));
             });
             menu.add(cbMenuItem);
         }

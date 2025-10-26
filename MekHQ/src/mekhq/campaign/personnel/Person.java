@@ -121,6 +121,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
@@ -390,10 +391,12 @@ public class Person {
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
     private boolean quickTrainIgnore;
-    // this is a flag used in determine whether a person is a potential marriage
-    // candidate provided
-    // that they are not married, are old enough, etc.
+    // this is a flag used in determine whether a person is a potential marriage candidate provided that they are not
+    // married, are old enough, etc.
+    @Deprecated(since = "0.50.10", forRemoval = true)
     private boolean marriageable;
+    private boolean prefersMen;
+    private boolean prefersWomen;
     // this is a flag used in random procreation to determine whether to attempt to
     // procreate
     private boolean tryingToConceive;
@@ -613,7 +616,8 @@ public class Person {
         setFounder(false);
         setImmortal(false);
         setQuickTrainIgnore(false);
-        setMarriageable(true);
+        setPrefersMen(false);
+        setPrefersWomen(false);
         setTryingToConceive(true);
         // endregion Flags
 
@@ -2872,12 +2876,38 @@ public class Person {
         return status != PersonnelStatus.CAMP_FOLLOWER;
     }
 
+    /**
+     * Determines whether this person is open to marriage or romantic relationships.
+     *
+     * <p>A person is considered marriageable if they have romantic interest in at least one gender (men, women, or
+     * both). Aromantic/asexual individuals who prefer neither gender are not marriageable.</p>
+     *
+     * @return {@code true} if the person has romantic interest in men, women, or both; {@code false} if
+     *       aromantic/asexual
+     */
     public boolean isMarriageable() {
-        return marriageable;
+        return isPrefersMen() || isPrefersWomen();
     }
 
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public void setMarriageable(final boolean marriageable) {
         this.marriageable = marriageable;
+    }
+
+    public boolean isPrefersMen() {
+        return prefersMen;
+    }
+
+    public void setPrefersMen(final boolean prefersMen) {
+        this.prefersMen = prefersMen;
+    }
+
+    public boolean isPrefersWomen() {
+        return prefersWomen;
+    }
+
+    public void setPrefersWomen(final boolean prefersWomen) {
+        this.prefersWomen = prefersWomen;
     }
 
     public boolean isTryingToConceive() {
@@ -3422,6 +3452,8 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersMen", prefersMen);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersWomen", prefersWomen);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
             // endregion Flags
@@ -3994,8 +4026,18 @@ public class Person {
                     person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("quickTrainIgnore")) {
                     person.setQuickTrainIgnore(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("marriageable")) {
-                    person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("marriageable")) { // Legacy: <50.10
+                    boolean marriageable = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                    sexualityCompatibilityHandler(marriageable,
+                          person,
+                          campaignOptions.getNoInterestInRelationshipsDiceSize(),
+                          campaignOptions.getInterestedInSameSexDiceSize(),
+                          campaignOptions.getInterestedInBothSexesDiceSize());
+                } else if (nodeName.equalsIgnoreCase("prefersMen")) {
+                    person.setPrefersMen(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("prefersWomen")) {
+                    person.setPrefersWomen(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
                     person.setTryingToConceive(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("hidePersonality")) {
@@ -4166,6 +4208,47 @@ public class Person {
         }
 
         return false;
+    }
+
+    /**
+     * Configures a person's sexual orientation preferences based on their marriageability status and weighted random
+     * probabilities.
+     *
+     * <p>For non-marriageable characters, all romantic preferences are disabled. For marriageable characters,
+     * orientation is determined through sequential probability checks using the provided dice sizes, which represent
+     * the denominators for calculating the chance of each orientation (e.g., a die size of 100 means a 1% chance).</p>
+     *
+     * <p>The orientation determination follows this priority order:</p>
+     * <ol>
+     *     <li>Aromantic/asexual (no interest in relationships)</li>
+     *     <li>Homosexual (interested in the same sex)</li>
+     *     <li>Bisexual/pansexual (interested in both sexes)</li>
+     *     <li>Heterosexual (default if no other orientation is rolled)</li>
+     * </ol>
+     *
+     * <p>Default percentile chances of each sexuality are viewable in
+     * {@link DefaultPersonnelGenerator#determineOrientation(Person, int, int, int)}</p>
+     *
+     * @param marriageable                      {@code true} if the person is eligible for romantic relationships;
+     *                                          {@code false} otherwise
+     * @param person                            the {@link Person} whose orientation preferences are being configured
+     * @param noInterestInRelationshipsDiceSize dice size for aromantic/asexual orientation (checked first)
+     * @param interestedInSameSexDiceSize       dice size for homosexual orientation (checked second)
+     * @param interestedInBothSexesDiceSize     dice size for bisexual/pansexual orientation (checked third)
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void sexualityCompatibilityHandler(boolean marriageable, Person person,
+          int noInterestInRelationshipsDiceSize,
+          int interestedInSameSexDiceSize, int interestedInBothSexesDiceSize) {
+        if (!marriageable) {
+            person.setPrefersMen(false);
+            person.setPrefersWomen(false);
+        } else {
+            DefaultPersonnelGenerator.determineOrientation(person, noInterestInRelationshipsDiceSize,
+                  interestedInSameSexDiceSize, interestedInBothSexesDiceSize);
+        }
     }
     // endregion File I/O
 
