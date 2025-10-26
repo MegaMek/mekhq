@@ -218,6 +218,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_EMPLOY = "EMPLOY";
     private static final String CMD_SPENDING_SPREE = "SPENDING_SPREE";
     private static final String CMD_CLAIM_BOUNTY = "CLAIM_BOUNTY";
+    private static final String CMD_FAMILY_TREE = "CMD_FAMILY_TREE";
     private static final String CMD_REMOVE = "REMOVE";
     private static final String CMD_EDGE_TRIGGER = "EDGE";
     private static final String CMD_CHANGE_PRISONER_STATUS = "PRISONER_STATUS";
@@ -1284,6 +1285,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (validBounty) {
                     performMassForcedDirectionLoyaltyChange(getCampaign(), false, false);
                 }
+                break;
+            }
+            case CMD_FAMILY_TREE: {
+                new FamilyTreeDialog(gui.getFrame(), selectedPerson.getGenealogy(), getCampaign().getPersonnel());
                 break;
             }
             case CMD_EDIT: {
@@ -2464,6 +2469,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+        }
+
+        if (oneSelected) {
+            menuItem = new JMenuItem(resources.getString("familyTree.text"));
+            menuItem.setActionCommand(CMD_FAMILY_TREE);
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
         }
 
         // region Awards Menu
