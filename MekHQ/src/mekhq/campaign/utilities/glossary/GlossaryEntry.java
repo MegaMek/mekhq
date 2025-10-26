@@ -95,6 +95,7 @@ public enum GlossaryEntry {
     HOW_TO_DEPLOY("HOW_TO_DEPLOY", new Version("0.50.06")),
     HOW_TO_REINFORCE("HOW_TO_REINFORCE", new Version("0.50.06")),
     INFANTRY_GUNNERY_SKILLS("INFANTRY_GUNNERY_SKILLS", new Version("0.50.06")),
+    JUMP_COST_CALCULATIONS("JUMP_COST_CALCULATIONS", new Version("0.50.10")),
     LEADERSHIP_UNITS("LEADERSHIP_UNITS", new Version("0.50.06")),
     LINKED_ATTRIBUTES("LINKED_ATTRIBUTES", new Version("0.50.06")),
     LOYALTY("LOYALTY", new Version("0.50.06")),
