@@ -307,6 +307,7 @@ import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
 import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -5139,7 +5140,9 @@ public class Campaign implements ITechManager {
 
         processNewDayATBScenarios();
 
+        // Daily events
         for (AtBContract contract : getActiveAtBContracts()) {
+            // Batchalls
             if (campaignOptions.isUseGenericBattleValue() &&
                       !contract.getContractType().isGarrisonType() &&
                       contract.getStartDate().equals(currentDay)) {
@@ -5168,6 +5171,23 @@ public class Campaign implements ITechManager {
                             addReport(report);
                         }
                     }
+                }
+            }
+
+            // Early Contract End (StratCon Only)
+            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            if (campaignState != null && !contract.getEndingDate().equals(currentDay)) {
+                if (campaignState.canEndContractEarly()) {
+                    new ImmersiveDialogNotification(this,
+                          String.format(resources.getString("stratCon.earlyContractEnd.objectives"),
+                                contract.getHyperlinkedName()), true);
+
+                    // This ensures any outstanding payout is paid out before the contract ends
+                    LocalDate adjustedDate = currentDay.plusDays(1);
+                    int remainingMonths = contract.getMonthsLeft(adjustedDate);
+                    Money finalPayout = contract.getMonthlyPayOut().multipliedBy(remainingMonths);
+                    contract.setRoutedPayout(finalPayout);
+                    contract.setEndDate(adjustedDate);
                 }
             }
         }
