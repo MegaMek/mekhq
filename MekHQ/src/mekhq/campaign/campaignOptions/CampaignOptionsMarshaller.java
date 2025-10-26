@@ -255,8 +255,16 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAbilities", campaignOptions.isUseAbilities());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
-              "useCommanderAbilitiesOnly",
-              campaignOptions.isUseCommanderAbilitiesOnly());
+              "onlyCommandersMatterVehicles",
+              campaignOptions.isOnlyCommandersMatterVehicles());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "onlyCommandersMatterInfantry",
+              campaignOptions.isOnlyCommandersMatterInfantry());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "onlyCommandersMatterBattleArmor",
+              campaignOptions.isOnlyCommandersMatterBattleArmor());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", campaignOptions.isUseEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSupportEdge", campaignOptions.isUseSupportEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", campaignOptions.isUseImplants());
@@ -349,6 +357,8 @@ public class CampaignOptionsMarshaller {
               "doctorsUseAdministration",
               campaignOptions.isDoctorsUseAdministration());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUsefulMedics", campaignOptions.isUseUsefulMedics());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMASHTheatres", campaignOptions.isUseMASHTheatres());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mashTheatreCapacity", campaignOptions.getMASHTheatreCapacity());
         // endregion Medical
 
         // region Prisoners
@@ -567,6 +577,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "fieldKitchenIgnoreNonCombatants",
               campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "fatigueUndeploymentThreshold",
+              campaignOptions.getFatigueUndeploymentThreshold());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "fatigueLeaveThreshold",
@@ -849,6 +863,8 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayAllAttributes", campaignOptions.isDisplayAllAttributes());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowMonthlyConnections",
               campaignOptions.isAllowMonthlyConnections());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBetterExtraIncome",
+              campaignOptions.isUseBetterExtraIncome());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSmallArmsOnly",
               campaignOptions.isUseSmallArmsOnly());
 
@@ -1028,6 +1044,16 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForUsesVTOLs", campaignOptions.isOpForUsesVTOLs());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDropShips", campaignOptions.isUseDropShips());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mercSizeLimited", campaignOptions.isMercSizeLimited());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleVictoryEffect", campaignOptions.getMoraleVictoryEffect());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "moraleDecisiveVictoryEffect",
+              campaignOptions.getMoraleDecisiveVictoryEffect());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleDefeatEffect", campaignOptions.getMoraleDefeatEffect());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "moraleDecisiveDefeatEffect",
+              campaignOptions.getMoraleDecisiveDefeatEffect());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "regionalMekVariations", campaignOptions.isRegionalMekVariations());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attachedPlayerCamouflage",
               campaignOptions.isAttachedPlayerCamouflage());

@@ -633,7 +633,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     continue;
                 }
 
-                int time = tech.getDailyAvailableTechTime(techsUseAdmin);
+                int time = tech.getMinutesLeft();
                 int maintenanceTime = unit.getMaintenanceTime();
 
                 if ((time - maintenanceTime) >= 0) {
@@ -952,6 +952,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                     maintenanceMultiplierItem.setActionCommand(COMMAND_CHANGE_MAINTENANCE_MULTI + ':' + x);
                     maintenanceMultiplierItem.addActionListener(this);
+                    maintenanceMultiplierItem.setEnabled(!(oneSelected && unit.isSelfCrewed()));
                     menuItem.add(maintenanceMultiplierItem);
                 }
 
@@ -960,10 +961,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem(resources.getString("maintenanceAdHoc.text"));
                 menuItem.setActionCommand(COMMAND_PERFORM_AD_HOC_MAINTENANCE);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().getCampaignOptions().isCheckMaintenance());
-                if (oneSelected && menuItem.isEnabled()) {
-                    menuItem.setEnabled(unit.getDaysSinceMaintenance() != 0);
-                }
+                menuItem.setEnabled(oneSelected && unit.getDaysSinceMaintenance() != 0);
 
                 popup.add(menuItem);
             }

@@ -33,9 +33,11 @@
  */
 package mekhq.campaign.personnel.turnoverAndRetention;
 
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_MEDIATOR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 
 import java.io.PrintWriter;
@@ -64,7 +66,7 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.FactionHints;
+import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -181,21 +183,19 @@ public class RetirementDefectionTracker {
             // Desirability modifier
             if ((campaign.getCampaignOptions().isUseSkillModifiers()) &&
                       (person.getAge(campaign.getLocalDate()) < RETIREMENT_AGE)) {
-                targetNumber.addModifier(person.getExperienceLevel(campaign, false) - 2,
+                targetNumber.addModifier(min(EXP_ELITE - 2, person.getExperienceLevel(campaign, false) - 2),
                       resources.getString("desirability.text"));
             }
 
             // Recent Promotion Modifier
-            if (campaign.getCampaignOptions().isUseSkillModifiers()) {
-                LocalDate today = campaign.getLocalDate();
-                LocalDate lastPromotionDate = person.getLastRankChangeDate();
+            LocalDate today = campaign.getLocalDate();
+            LocalDate lastPromotionDate = person.getLastRankChangeDate();
 
-                if (lastPromotionDate != null) {
-                    long monthsBetween = ChronoUnit.MONTHS.between(lastPromotionDate, today);
+            if (lastPromotionDate != null) {
+                long monthsBetween = ChronoUnit.MONTHS.between(lastPromotionDate, today);
 
-                    if (monthsBetween <= 6) {
-                        targetNumber.addModifier(-1, resources.getString("recentPromotion.text"));
-                    }
+                if (monthsBetween <= 6) {
+                    targetNumber.addModifier(-1, resources.getString("recentPromotion.text"));
                 }
             }
 
