@@ -156,7 +156,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
                 }
             }
 
-            if (FactionHints.defaultFactionHints().isAtWarWith(getCampaignFaction(), faction, getToday())) {
+            if (FactionHints.getInstance().isAtWarWith(getCampaignFaction(), faction, getToday())) {
                 continue;
             }
 
@@ -168,7 +168,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
             // Allies are three times as likely to join the campaign as non-allies
             if (getCampaignFaction().equals(faction)
-                      || FactionHints.defaultFactionHints().isAlliedWith(getCampaignFaction(), faction, getToday())) {
+                      || FactionHints.getInstance().isAlliedWith(getCampaignFaction(), faction, getToday())) {
                 factionStandingMultiplier *= 3;
             }
 
