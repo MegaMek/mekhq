@@ -34,7 +34,7 @@ Ground Vehicle Driver:			/Vehicle Driver
 Naval Vehicle Driver:			/Naval Driver
 VTOL Pilot:						/VTOL Pilot
 Vehicle Gunner:					/Vehicle Gunner
-Vehicle Crew:					/Vehicle Crewmember
+Combat Technician:			    /Vehicle Crewmember
 Aerospace Pilot:				/Aerospace Pilot
 Conventional Aircraft Pilot:	/Conventional Aircraft Pilot
 ProtoMek Pilot:				/ProtoMek Pilot

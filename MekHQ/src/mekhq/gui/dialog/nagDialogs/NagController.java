@@ -34,6 +34,7 @@ package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getHRStrainModifier;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -87,6 +88,8 @@ public class NagController {
     public static boolean triggerDailyNags(Campaign campaign) {
         // Invalid Faction
         final LocalDate today = campaign.getLocalDate();
+        final boolean isSunday = today.getDayOfWeek() == DayOfWeek.SUNDAY;
+        final boolean isLastDayOfMonth = today.getDayOfMonth() == today.lengthOfMonth();
 
         if (InvalidFactionNagDialog.checkNag(campaign.getFaction(), today)) {
             InvalidFactionNagDialog invalidFactionNagDialog = new InvalidFactionNagDialog(campaign);
@@ -130,10 +133,11 @@ public class NagController {
             }
         }
 
-        // Unable to afford next jump
-        if (UnableToAffordJumpNagDialog.checkNag(campaign)) {
-            UnableToAffordJumpNagDialog unableToAffordJumpNagDialog = new UnableToAffordJumpNagDialog(campaign);
-            if (unableToAffordJumpNagDialog.shouldCancelAdvanceDay()) {
+        // Unable to rent
+        if (UnableToAffordRentNagDialog.checkNag(campaign, isSunday, isLastDayOfMonth)) {
+            UnableToAffordRentNagDialog unableToAffordRentNagDialog = new UnableToAffordRentNagDialog(
+                  campaign);
+            if (unableToAffordRentNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }

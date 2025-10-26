@@ -884,7 +884,8 @@ public enum PersonnelTableModelColumn {
                                                     .getFinalSkillValue(options, attributes, adjustedReputation)) :
                              "-";
             case SMALL_ARMS:
-                String skillName = InfantryGunnerySkills.getBestInfantryGunnerySkill(person);
+                String skillName = InfantryGunnerySkills.getBestInfantryGunnerySkill(person,
+                      campaignOptions.isUseSmallArmsOnly());
                 return skillName == null ? "-" :
                              Integer.toString(person.getSkill(skillName).getFinalSkillValue(options, attributes));
             case ARTILLERY:

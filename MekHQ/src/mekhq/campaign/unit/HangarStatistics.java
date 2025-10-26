@@ -65,8 +65,31 @@ public class HangarStatistics {
     }
 
     /**
-     * Tally all used bay types and return a hashmap of ETYPE : Count
+     * Tallies the number of units in the hangar by their entity type or bay category.
      *
+     * <p>The returned {@code HashMap} maps entity type identifiers (or entity type plus vehicle bitmask) to the
+     * count of units of that type currently in the hangar.</p>
+     *
+     * <ul>
+     *   <li>If {@code inTransit} is false, only present (not in-transit) units are considered.</li>
+     *   <li>Mothballed units are counted using the {@link Unit#ETYPE_MOTHBALLED} key.</li>
+     *   <li>Tanks are tallied into three categories based on unit weight:
+     *     <ul>
+     *       <li>Light Vehicles: {@code weight ≤ 50.0 (with LIGHT_VEHICLE_BIT)}</li>
+     *       <li>Heavy Vehicles: {@code 50.0 < weight ≤ 100.0}</li>
+     *       <li>Super Heavy: {@code weight > 100.0 (with SUPER_HEAVY_BIT)}</li>
+     *     </ul>
+     *   </li>
+     *   <li>Other unit types (Mek, DropShip, Small Craft, etc.) use their respective entity type long constants.</li>
+     *   <li>Infantry and BattleArmor are separated; only true Infantry (not BattleArmor) are counted under
+     *   {@link Entity#ETYPE_INFANTRY}.</li>
+     *   <li>Types not covered by the checked entity classes are not included in the result.</li>
+     * </ul>
+     *
+     * @param inTransit if true, includes units that are in transit; if false, only includes units that are present
+     *
+     * @return a {@code HashMap} mapping entity type (or bay type) keys to the number of distinct units of that type in
+     *       the hangar
      */
     public HashMap<Long, Integer> tallyBaysByType(boolean inTransit) {
         HashMap<Long, Integer> hashMap = new HashMap<>();
@@ -170,7 +193,7 @@ public class HangarStatistics {
         }
 
         if (type == Entity.ETYPE_PROTOMEK) {
-            return Math.min(getTotalProtomekBays(), num);
+            return Math.min(getTotalProtoMekBays(), num);
         }
 
         if (type == Entity.ETYPE_DROPSHIP) {
@@ -216,13 +239,19 @@ public class HangarStatistics {
                                       .sum());
     }
 
+    public int getTotalSuperHeavyVehicleBays() {
+        return (int) Math.round(getHangar().getUnitsStream()
+                                      .mapToDouble(Unit::getSuperHeavyVehicleCapacity)
+                                      .sum());
+    }
+
     public int getTotalLightVehicleBays() {
         return (int) Math.round(getHangar().getUnitsStream()
                                       .mapToDouble(Unit::getLightVehicleCapacity)
                                       .sum());
     }
 
-    public int getTotalProtomekBays() {
+    public int getTotalProtoMekBays() {
         return (int) Math.round(getHangar().getUnitsStream()
                                       .mapToDouble(Unit::getProtoMekCapacity)
                                       .sum());

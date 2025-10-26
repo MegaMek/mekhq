@@ -47,6 +47,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
@@ -63,6 +64,7 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import megamek.common.enums.TechBase;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
@@ -680,6 +682,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Reset Random Death to match current campaign options
         campaign.resetRandomDeath();
 
+        // Fix sexual preferences
+        if (version.isLowerThan(new Version("0.50.10"))) {
+            correctSexualPreferencesForCurrentSpouse(campaign.getPersonnel());
+        }
+
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;
@@ -860,6 +867,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     campaign.setFieldKitchenWithinCapacity(Boolean.parseBoolean(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("mashTheatreCapacity")) {
                     campaign.setMashTheatreCapacity(MathUtility.parseInt(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("repairBaysRented")) {
+                    campaign.setRepairBaysRented(MathUtility.parseInt(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("id")) {
                     campaign.setId(UUID.fromString(childNode.getTextContent().trim()));
                 }
@@ -1072,6 +1081,41 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
         LOGGER.info("Load Personnel Nodes Complete!");
+    }
+
+    /**
+     * Ensures that married personnel have sexual preferences compatible with their current spouse.
+     *
+     * <p>This method iterates through all personnel and, for those who are married, updates their romantic
+     * preferences to include their spouse's gender. This is used to bring campaigns older than 0.50.10 up to date with
+     * the new sexuality tracking.</p>
+     *
+     * <p><b>Note A:</b> This method adds to existing preferences rather than replacing them, allowing characters
+     * to remain bisexual if they were previously attracted to multiple genders.</p>
+     *
+     * <p><b>Note B:</b> This approach has to be used, rather than self-correcting during person-load, as the spouse
+     * may not have been substantiated when person is loaded.</p>
+     * </p>
+     *
+     * @param personnel the collection of {@link Person} objects to process
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void correctSexualPreferencesForCurrentSpouse(Collection<Person> personnel) {
+        for (Person person : personnel) {
+            Person spouse = person.getGenealogy().getSpouse();
+
+            if (spouse != null) {
+                Gender spouseGender = spouse.getGender();
+
+                if (spouseGender.isMale()) { // the Male/Female checks include n.b. persons
+                    person.setPrefersMen(true);
+                } else if (spouseGender.isFemale()) {
+                    person.setPrefersWomen(true);
+                }
+            }
+        }
     }
 
     private static void processSkillTypeNodes(Node wn, Version version) {

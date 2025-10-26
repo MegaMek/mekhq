@@ -352,7 +352,6 @@ public class CampaignOptions {
     private boolean useClanPersonnelMarriages;
     private boolean usePrisonerMarriages;
     private int checkMutualAncestorsDepth;
-    private int noInterestInMarriageDiceSize;
     private boolean logMarriageNameChanges;
     private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
     private RandomMarriageMethod randomMarriageMethod;
@@ -360,7 +359,6 @@ public class CampaignOptions {
     private boolean useRandomPrisonerMarriages;
     private int randomMarriageAgeRange;
     private int randomMarriageDiceSize;
-    private int randomSameSexMarriageDiceSize;
     private int randomNewDependentMarriage;
 
     // Divorce
@@ -394,6 +392,9 @@ public class CampaignOptions {
     private boolean useRandomPrisonerProcreation;
     private int randomProcreationRelationshipDiceSize;
     private int randomProcreationRelationshiplessDiceSize;
+    private int noInterestInRelationshipsDiceSize;
+    private int interestedInBothSexesDiceSize;
+    private int interestedInSameSexDiceSize;
 
     // Education
     private boolean useEducationModule;
@@ -495,6 +496,7 @@ public class CampaignOptions {
     private boolean allowMonthlyReinvestment;
     private boolean allowMonthlyConnections;
     private boolean useBetterExtraIncome;
+    private boolean useSmallArmsOnly;
 
     // Price Multipliers
     private double commonPartPriceMultiplier;
@@ -515,6 +517,12 @@ public class CampaignOptions {
     // Shares
     private boolean useShareSystem;
     private boolean sharesForAll;
+
+    // Rented Facilities
+    private int rentedFacilitiesCostHospitalBeds;
+    private int rentedFacilitiesCostKitchens;
+    private int rentedFacilitiesCostHoldingCells;
+    private int rentedFacilitiesCostRepairBays;
     // endregion Finance Tab
 
     // region Mercenary Tab
@@ -602,6 +610,7 @@ public class CampaignOptions {
     private boolean contractMarketReportRefresh;
     private int contractMaxSalvagePercentage;
     private int dropShipBonusPercentage;
+    private boolean isUseTwoWayPay;
     // endregion Markets Tab
 
     // region Against the Bot Tab
@@ -970,7 +979,9 @@ public class CampaignOptions {
         setUseClanPersonnelMarriages(false);
         setUsePrisonerMarriages(true);
         setCheckMutualAncestorsDepth(4);
-        setNoInterestInMarriageDiceSize(10);
+        setNoInterestInRelationshipsDiceSize(100);
+        setInterestedInSameSexDiceSize(14);
+        setInterestedInBothSexesDiceSize(33);
         setLogMarriageNameChanges(false);
         setMarriageSurnameWeights(new HashMap<>());
         getMarriageSurnameWeights().put(MergingSurnameStyle.NO_CHANGE, 100);
@@ -991,7 +1002,6 @@ public class CampaignOptions {
         setUseRandomPrisonerMarriages(false);
         setRandomMarriageAgeRange(10);
         setRandomMarriageDiceSize(5000);
-        setRandomSameSexMarriageDiceSize(14);
         setRandomNewDependentMarriage(20);
 
         // Divorce
@@ -1137,6 +1147,7 @@ public class CampaignOptions {
         allowMonthlyReinvestment = false;
         allowMonthlyConnections = false;
         useBetterExtraIncome = false;
+        useSmallArmsOnly = false;
 
         // Price Multipliers
         setCommonPartPriceMultiplier(1.0);
@@ -1157,6 +1168,12 @@ public class CampaignOptions {
         // Shares
         setUseShareSystem(false);
         setSharesForAll(true);
+
+        // Rented Facilities
+        rentedFacilitiesCostHospitalBeds = 0;
+        rentedFacilitiesCostKitchens = 0;
+        rentedFacilitiesCostHoldingCells = 0;
+        rentedFacilitiesCostRepairBays = 0;
         // endregion Finances Tab
 
         // region Mercenary Tab
@@ -1252,6 +1269,7 @@ public class CampaignOptions {
         setContractMarketReportRefresh(true);
         setContractMaxSalvagePercentage(100);
         setDropShipBonusPercentage(0);
+        isUseTwoWayPay = true;
         // endregion Markets Tab
 
         // region Against the Bot Tab
@@ -2701,12 +2719,12 @@ public class CampaignOptions {
         this.checkMutualAncestorsDepth = checkMutualAncestorsDepth;
     }
 
-    public int getNoInterestInMarriageDiceSize() {
-        return noInterestInMarriageDiceSize;
+    public int getNoInterestInRelationshipsDiceSize() {
+        return noInterestInRelationshipsDiceSize;
     }
 
-    public void setNoInterestInMarriageDiceSize(final int noInterestInMarriageDiceSize) {
-        this.noInterestInMarriageDiceSize = noInterestInMarriageDiceSize;
+    public void setNoInterestInRelationshipsDiceSize(final int noInterestInRelationshipsDiceSize) {
+        this.noInterestInRelationshipsDiceSize = noInterestInRelationshipsDiceSize;
     }
 
     /**
@@ -2798,17 +2816,25 @@ public class CampaignOptions {
     /**
      * @return the number of sides on the die used to determine random same-sex marriage
      */
-    public int getRandomSameSexMarriageDiceSize() {
-        return randomSameSexMarriageDiceSize;
+    public int getInterestedInSameSexDiceSize() {
+        return interestedInSameSexDiceSize;
     }
 
     /**
      * Sets the size of the random same-sex marriage die.
      *
-     * @param randomSameSexMarriageDiceSize the size of the random same-sex marriage die
+     * @param interestedInSameSexDiceSize the size of the random same-sex marriage die
      */
-    public void setRandomSameSexMarriageDiceSize(final int randomSameSexMarriageDiceSize) {
-        this.randomSameSexMarriageDiceSize = randomSameSexMarriageDiceSize;
+    public void setInterestedInSameSexDiceSize(final int interestedInSameSexDiceSize) {
+        this.interestedInSameSexDiceSize = interestedInSameSexDiceSize;
+    }
+
+    public int getInterestedInBothSexesDiceSize() {
+        return interestedInBothSexesDiceSize;
+    }
+
+    public void setInterestedInBothSexesDiceSize(final int interestedInBothSexesDiceSize) {
+        this.interestedInBothSexesDiceSize = interestedInBothSexesDiceSize;
     }
 
     /**
@@ -3518,6 +3544,38 @@ public class CampaignOptions {
         this.payForHousing = payForHousing;
     }
 
+    public int getRentedFacilitiesCostHospitalBeds() {
+        return rentedFacilitiesCostHospitalBeds;
+    }
+
+    public void setRentedFacilitiesCostHospitalBeds(final int rentedFacilitiesCostHospitalBeds) {
+        this.rentedFacilitiesCostHospitalBeds = rentedFacilitiesCostHospitalBeds;
+    }
+
+    public int getRentedFacilitiesCostKitchens() {
+        return rentedFacilitiesCostKitchens;
+    }
+
+    public void setRentedFacilitiesCostKitchens(final int rentedFacilitiesCostKitchens) {
+        this.rentedFacilitiesCostKitchens = rentedFacilitiesCostKitchens;
+    }
+
+    public int getRentedFacilitiesCostHoldingCells() {
+        return rentedFacilitiesCostHoldingCells;
+    }
+
+    public void setRentedFacilitiesCostHoldingCells(final int rentedFacilitiesCostHoldingCells) {
+        this.rentedFacilitiesCostHoldingCells = rentedFacilitiesCostHoldingCells;
+    }
+
+    public int getRentedFacilitiesCostRepairBays() {
+        return rentedFacilitiesCostRepairBays;
+    }
+
+    public void setRentedFacilitiesCostRepairBays(final int rentedFacilitiesCostRepairBays) {
+        this.rentedFacilitiesCostRepairBays = rentedFacilitiesCostRepairBays;
+    }
+
     public boolean isUseLoanLimits() {
         return useLoanLimits;
     }
@@ -3632,6 +3690,14 @@ public class CampaignOptions {
 
     public void setUseBetterExtraIncome(final boolean useBetterExtraIncome) {
         this.useBetterExtraIncome = useBetterExtraIncome;
+    }
+
+    public boolean isUseSmallArmsOnly() {
+        return useSmallArmsOnly;
+    }
+
+    public void setUseSmallArmsOnly(final boolean useSmallArmsOnly) {
+        this.useSmallArmsOnly = useSmallArmsOnly;
     }
 
     // region Price Multipliers
@@ -3900,6 +3966,14 @@ public class CampaignOptions {
 
     public void setDropShipBonusPercentage(final int dropShipBonusPercentage) {
         this.dropShipBonusPercentage = dropShipBonusPercentage;
+    }
+
+    public boolean isUseTwoWayPay() {
+        return isUseTwoWayPay;
+    }
+
+    public void setUseTwoWayPay(final boolean isUseTwoWayPay) {
+        this.isUseTwoWayPay = isUseTwoWayPay;
     }
     // endregion Contract Market
     // endregion Markets Tab

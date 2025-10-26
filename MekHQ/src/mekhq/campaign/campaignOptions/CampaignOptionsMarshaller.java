@@ -636,7 +636,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "noInterestInMarriageDiceSize",
-              campaignOptions.getNoInterestInMarriageDiceSize());
+              campaignOptions.getNoInterestInRelationshipsDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "logMarriageNameChanges",
@@ -669,7 +669,11 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "randomSameSexMarriageDiceSize",
-              campaignOptions.getRandomSameSexMarriageDiceSize());
+              campaignOptions.getInterestedInSameSexDiceSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "interestedInBothSexesDiceSize",
+              campaignOptions.getInterestedInBothSexesDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "randomNewDependentMarriage",
@@ -842,6 +846,22 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForRecruitment", campaignOptions.isPayForRecruitment());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForFood", campaignOptions.isPayForFood());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForHousing", campaignOptions.isPayForHousing());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "rentedFacilitiesCostHospitalBeds",
+              campaignOptions.getRentedFacilitiesCostHospitalBeds());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "rentedFacilitiesCostKitchens",
+              campaignOptions.getRentedFacilitiesCostKitchens());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "rentedFacilitiesCostHoldingCells",
+              campaignOptions.getRentedFacilitiesCostHoldingCells());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "rentedFacilitiesCostRepairBays",
+              campaignOptions.getRentedFacilitiesCostRepairBays());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoanLimits", campaignOptions.isUseLoanLimits());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePercentageMaint", campaignOptions.isUsePercentageMaintenance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "infantryDontCount", campaignOptions.isInfantryDontCount());
@@ -865,6 +885,8 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isAllowMonthlyConnections());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBetterExtraIncome",
               campaignOptions.isUseBetterExtraIncome());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSmallArmsOnly",
+              campaignOptions.isUseSmallArmsOnly());
 
         // region Price Multipliers
         MHQXMLUtility.writeSimpleXMLTag(pw,
@@ -997,6 +1019,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "dropShipBonusPercentage",
               campaignOptions.getDropShipBonusPercentage());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "isUseTwoWayPay",
+              campaignOptions.isUseTwoWayPay());
         // endregion Contract Market
         // endregion Markets Tab
 

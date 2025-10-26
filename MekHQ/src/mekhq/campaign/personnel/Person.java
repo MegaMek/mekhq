@@ -63,7 +63,6 @@ import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.*;
-import static mekhq.campaign.personnel.skills.VehicleCrewSkills.VEHICLE_CREW_SKILLS;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -122,6 +121,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
@@ -133,6 +133,7 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.skills.VehicleCrewSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
@@ -390,10 +391,12 @@ public class Person {
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
     private boolean quickTrainIgnore;
-    // this is a flag used in determine whether a person is a potential marriage
-    // candidate provided
-    // that they are not married, are old enough, etc.
+    // this is a flag used in determine whether a person is a potential marriage candidate provided that they are not
+    // married, are old enough, etc.
+    @Deprecated(since = "0.50.10", forRemoval = true)
     private boolean marriageable;
+    private boolean prefersMen;
+    private boolean prefersWomen;
     // this is a flag used in random procreation to determine whether to attempt to
     // procreate
     private boolean tryingToConceive;
@@ -437,7 +440,7 @@ public class Person {
     // endregion Variable Declarations
 
     // region Constructors
-    protected Person(final UUID id) {
+    public Person(final UUID id) {
         this.id = id;
         this.genealogy = new Genealogy(this);
     }
@@ -613,7 +616,8 @@ public class Person {
         setFounder(false);
         setImmortal(false);
         setQuickTrainIgnore(false);
-        setMarriageable(true);
+        setPrefersMen(false);
+        setPrefersWomen(false);
         setTryingToConceive(true);
         // endregion Flags
 
@@ -1336,7 +1340,6 @@ public class Person {
 
         List<String> skillsForProfession = role.getSkillsForProfession();
         return switch (role) {
-            case VEHICLE_CREW -> VEHICLE_CREW_SKILLS.stream().anyMatch(this::hasSkill);
             case SOLDIER -> INFANTRY_GUNNERY_SKILLS.stream().anyMatch(this::hasSkill);
             case BATTLE_ARMOUR -> hasSkill(S_GUN_BA);
             case VESSEL_CREW -> hasSkill(S_TECH_VESSEL);
@@ -2873,12 +2876,38 @@ public class Person {
         return status != PersonnelStatus.CAMP_FOLLOWER;
     }
 
+    /**
+     * Determines whether this person is open to marriage or romantic relationships.
+     *
+     * <p>A person is considered marriageable if they have romantic interest in at least one gender (men, women, or
+     * both). Aromantic/asexual individuals who prefer neither gender are not marriageable.</p>
+     *
+     * @return {@code true} if the person has romantic interest in men, women, or both; {@code false} if
+     *       aromantic/asexual
+     */
     public boolean isMarriageable() {
-        return marriageable;
+        return isPrefersMen() || isPrefersWomen();
     }
 
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public void setMarriageable(final boolean marriageable) {
         this.marriageable = marriageable;
+    }
+
+    public boolean isPrefersMen() {
+        return prefersMen;
+    }
+
+    public void setPrefersMen(final boolean prefersMen) {
+        this.prefersMen = prefersMen;
+    }
+
+    public boolean isPrefersWomen() {
+        return prefersWomen;
+    }
+
+    public void setPrefersWomen(final boolean prefersWomen) {
+        this.prefersWomen = prefersWomen;
     }
 
     public boolean isTryingToConceive() {
@@ -3423,6 +3452,8 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersMen", prefersMen);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersWomen", prefersWomen);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
             // endregion Flags
@@ -3995,8 +4026,18 @@ public class Person {
                     person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("quickTrainIgnore")) {
                     person.setQuickTrainIgnore(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("marriageable")) {
-                    person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("marriageable")) { // Legacy: <50.10
+                    boolean marriageable = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                    sexualityCompatibilityHandler(marriageable,
+                          person,
+                          campaignOptions.getNoInterestInRelationshipsDiceSize(),
+                          campaignOptions.getInterestedInSameSexDiceSize(),
+                          campaignOptions.getInterestedInBothSexesDiceSize());
+                } else if (nodeName.equalsIgnoreCase("prefersMen")) {
+                    person.setPrefersMen(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("prefersWomen")) {
+                    person.setPrefersWomen(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
                     person.setTryingToConceive(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("hidePersonality")) {
@@ -4066,6 +4107,15 @@ public class Person {
                       person.getHyperlinkedFullTitle()));
             }
 
+            // <50.10 compatibility handler
+            if (updateSkillsForVehicleCrewProfession(person, person.getPrimaryRole()) ||
+                      updateSkillsForVehicleCrewProfession(person, person.getSecondaryRole())) {
+                campaign.addReport(String.format(resources.getString("vehicleCrewProfessionSkillChange"),
+                      spanOpeningWithCustomColor(getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
+            }
+
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
             if (!person.canPerformRole(campaign.getLocalDate(), person.getSecondaryRole(), false)) {
@@ -4115,6 +4165,90 @@ public class Person {
         }
 
         return false;
+    }
+
+    /**
+     * Updates skills for personnel with the Vehicle Crew profession by ensuring they have the Mechanic skill.
+     *
+     * <p>This method is used during XML loading to migrate legacy data. If the person lacks the
+     * {@link SkillType#S_TECH_MECHANIC} skill, it will be added at a level equal to their highest existing vehicle
+     * crew-related skill (e.g., Tech Vee, Gunnery Vee, Piloting Vee, or Driving). This ensures backwards compatibility
+     * when loading older save files.</p>
+     *
+     * @param person      the person whose skills should be updated
+     * @param currentRole the role to check
+     *
+     * @return {@code true} if the Mechanic skill was added, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static boolean updateSkillsForVehicleCrewProfession(Person person, PersonnelRole currentRole) {
+        if (currentRole != PersonnelRole.VEHICLE_CREW) {
+            return false;
+        }
+
+        if (!person.hasSkill(S_TECH_MECHANIC)) {
+            int highestSkillLevel = EXP_NONE;
+            String highestSkill = null;
+            for (String skillName : VehicleCrewSkills.VEHICLE_CREW_SKILLS) {
+                if (person.hasSkill(skillName)) {
+                    int level = person.getSkill(skillName).getLevel();
+                    if (level > highestSkillLevel) {
+                        highestSkillLevel = level;
+                        highestSkill = skillName;
+                    }
+                }
+            }
+
+            if (highestSkill != null) {
+                person.addSkill(highestSkill, highestSkillLevel, 0);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Configures a person's sexual orientation preferences based on their marriageability status and weighted random
+     * probabilities.
+     *
+     * <p>For non-marriageable characters, all romantic preferences are disabled. For marriageable characters,
+     * orientation is determined through sequential probability checks using the provided dice sizes, which represent
+     * the denominators for calculating the chance of each orientation (e.g., a die size of 100 means a 1% chance).</p>
+     *
+     * <p>The orientation determination follows this priority order:</p>
+     * <ol>
+     *     <li>Aromantic/asexual (no interest in relationships)</li>
+     *     <li>Homosexual (interested in the same sex)</li>
+     *     <li>Bisexual/pansexual (interested in both sexes)</li>
+     *     <li>Heterosexual (default if no other orientation is rolled)</li>
+     * </ol>
+     *
+     * <p>Default percentile chances of each sexuality are viewable in
+     * {@link DefaultPersonnelGenerator#determineOrientation(Person, int, int, int)}</p>
+     *
+     * @param marriageable                      {@code true} if the person is eligible for romantic relationships;
+     *                                          {@code false} otherwise
+     * @param person                            the {@link Person} whose orientation preferences are being configured
+     * @param noInterestInRelationshipsDiceSize dice size for aromantic/asexual orientation (checked first)
+     * @param interestedInSameSexDiceSize       dice size for homosexual orientation (checked second)
+     * @param interestedInBothSexesDiceSize     dice size for bisexual/pansexual orientation (checked third)
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void sexualityCompatibilityHandler(boolean marriageable, Person person,
+          int noInterestInRelationshipsDiceSize,
+          int interestedInSameSexDiceSize, int interestedInBothSexesDiceSize) {
+        if (!marriageable) {
+            person.setPrefersMen(false);
+            person.setPrefersWomen(false);
+        } else {
+            DefaultPersonnelGenerator.determineOrientation(person, noInterestInRelationshipsDiceSize,
+                  interestedInSameSexDiceSize, interestedInBothSexesDiceSize);
+        }
     }
     // endregion File I/O
 
@@ -4598,26 +4732,6 @@ public class Person {
                         yield EXP_NONE;
                     }
                 }
-            }
-            case VEHICLE_CREW -> {
-                // Vehicle crew are a special case as they just need any one of the following skills to qualify,
-                // rather than needing all relevant skills
-                List<String> relevantSkills = VEHICLE_CREW_SKILLS;
-                int highestExperienceLevel = EXP_NONE;
-                for (String relevantSkill : relevantSkills) {
-                    Skill skill = getSkill(relevantSkill);
-
-                    if (skill == null) {
-                        continue;
-                    }
-
-                    int currentExperienceLevel = skill.getExperienceLevel(options, atowAttributes);
-                    if (currentExperienceLevel > highestExperienceLevel) {
-                        highestExperienceLevel = currentExperienceLevel;
-                    }
-                }
-
-                yield highestExperienceLevel;
             }
             case SOLDIER -> {
                 int highestExperienceLevel = EXP_NONE;
@@ -5486,7 +5600,7 @@ public class Person {
         } else if (entity instanceof BattleArmor) {
             return hasSkill(S_TECH_BA) && isTechBA();
         } else if (entity instanceof Tank) {
-            return hasSkill(S_TECH_MECHANIC) && isTechMechanic();
+            return hasSkill(S_TECH_MECHANIC) && (isTechMechanic() || isVehicleCrew());
         } else {
             return false;
         }
@@ -5784,7 +5898,7 @@ public class Person {
     }
 
     public boolean isTech() {
-        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA();
+        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA() || isVehicleCrew();
     }
 
     /**
@@ -5793,7 +5907,7 @@ public class Person {
      * @return true if the person is a tech
      */
     public boolean isTechExpanded() {
-        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA() || isTechLargeVessel();
+        return isTechMek() || isTechAero() || isTechMechanic() || isVehicleCrew() || isTechBA() || isTechLargeVessel();
     }
 
     public boolean isTechLargeVessel() {
@@ -5819,6 +5933,11 @@ public class Person {
     public boolean isTechBA() {
         boolean hasSkill = hasSkill(S_TECH_BA);
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
+    }
+
+    public boolean isVehicleCrew() {
+        boolean hasSkill = hasSkill(S_TECH_MECHANIC);
+        return hasSkill && (getPrimaryRole().isVehicleCrew() || getSecondaryRole().isVehicleCrew());
     }
 
     public boolean isAsTech() {
