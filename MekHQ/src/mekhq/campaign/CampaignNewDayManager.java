@@ -164,7 +164,7 @@ import mekhq.utilities.ReportingUtilities;
  * and checks are performed for all entities and features tied to the campaign state.</p>
  *
  * <p><b>Note:</b> prior to 0.50.10 all the code in this class lived in {@link Campaign}. It was moved as part of an
- * effect to reduce code bloat in that class.</p>
+ * effort to reduce code bloat in that class.</p>
  *
  * @since 0.50.10
  */
