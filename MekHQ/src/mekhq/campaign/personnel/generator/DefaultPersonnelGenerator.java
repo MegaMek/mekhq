@@ -199,7 +199,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
      * @param interestedInSameSexDiceSize       dice size for homosexual orientation (rolled second)
      * @param interestedInBothSexesDiceSize     dice size for bisexual/pansexual orientation (rolled third)
      */
-    private static void determineOrientation(Person person, int noInterestInRelationshipsDiceSize,
+    public static void determineOrientation(Person person, int noInterestInRelationshipsDiceSize,
           int interestedInSameSexDiceSize, int interestedInBothSexesDiceSize) {
         boolean isMale = person.getGender().isMale();
 
