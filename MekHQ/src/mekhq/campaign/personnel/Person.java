@@ -2810,9 +2810,17 @@ public class Person {
         return status != PersonnelStatus.CAMP_FOLLOWER;
     }
 
-    @Deprecated(since = "0.50.10", forRemoval = true)
+    /**
+     * Determines whether this person is open to marriage or romantic relationships.
+     *
+     * <p>A person is considered marriageable if they have romantic interest in at least one gender (men, women, or
+     * both). Aromantic/asexual individuals who prefer neither gender are not marriageable.</p>
+     *
+     * @return {@code true} if the person has romantic interest in men, women, or both; {@code false} if
+     *       aromantic/asexual
+     */
     public boolean isMarriageable() {
-        return marriageable;
+        return isPrefersMen() || isPrefersWomen();
     }
 
     @Deprecated(since = "0.50.10", forRemoval = true)
