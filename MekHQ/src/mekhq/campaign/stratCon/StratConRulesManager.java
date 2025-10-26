@@ -1488,7 +1488,9 @@ public class StratConRulesManager {
                         StratConCoords checkCoords = currentCoords.translate(direction);
 
                         // Skip already visited coordinates (refer to per-scout AND global)
-                        if (scoutVisited.contains(checkCoords) || visited.contains(checkCoords)) {
+                        if (scoutVisited.contains(checkCoords) ||
+                                  visited.contains(checkCoords) ||
+                                  track.getRevealedCoords().contains(checkCoords)) {
                             continue;
                         }
 
