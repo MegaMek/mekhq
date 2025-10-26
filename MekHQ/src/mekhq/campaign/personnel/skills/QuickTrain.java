@@ -276,20 +276,6 @@ public class QuickTrain {
         }
 
         switch (profession) {
-            case VEHICLE_CREW -> {
-                String highestSkillName = getHighestSkill(VehicleCrewSkills.VEHICLE_CREW_SKILLS,
-                      person,
-                      options,
-                      attributes);
-
-                if (highestSkillName == null) {
-                    targetSkills.addAll(PersonnelRole.VEHICLE_CREW.getSkillsForProfession(
-                          isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration,
-                          isUseArtillery, false));
-                } else {
-                    targetSkills.add(highestSkillName);
-                }
-            }
             case SOLDIER -> {
                 String highestSkillName = getHighestSkill(InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS,
                       person,

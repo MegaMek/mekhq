@@ -39,6 +39,7 @@ import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
@@ -61,6 +62,7 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
@@ -133,6 +135,18 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         if (campaignOptions.isDoctorsUseAdministration() && (primaryRole.isDoctor())) {
             addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+        }
+
+        // roll Infantry Gunnery Skills
+        if (!campaignOptions.isUseSmallArmsOnly()) {
+            if (primaryRole.isSoldier() || secondaryRole.isSoldier()) {
+                Skills skills = person.getSkills();
+                for (String skillName : INFANTRY_GUNNERY_SKILLS) {
+                    if (!skills.hasSkill(skillName) && (d6(1) == 1)) {
+                        addSkill(person, skillName, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+                    }
+                }
+            }
         }
 
         // roll random secondary skill
@@ -278,6 +292,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         person.setConnections(clamp(performTraitRoll(), MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
         person.setReputation(clamp(performTraitRoll(), MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
         person.setWealth(clamp(performTraitRoll(), MINIMUM_WEALTH, MAXIMUM_WEALTH));
+        person.setExtraIncomeFromTraitLevel(clamp(performTraitRoll(), MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
 
         int baseUnluckyDiceSize = 5;
         int unluckyRoll = randomInt(baseUnluckyDiceSize);

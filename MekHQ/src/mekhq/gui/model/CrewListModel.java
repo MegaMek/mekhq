@@ -112,11 +112,13 @@ public class CrewListModel extends AbstractListModel<Person> {
 
     Unit unit;
     List<Person> crew;
+    boolean soldiersUseSmallArmsOnly;
 
-    public void setData(final Unit u) {
-        this.unit = u;
-        this.crew = new ArrayList<>(u.getCrew());
-        crew.sort(Comparator.comparingInt(p -> CrewRole.getCrewRole(p, u).getSortOrder()));
+    public void setData(final Unit unit, final boolean soldiersUseSmallArmsOnly) {
+        this.unit = unit;
+        this.crew = new ArrayList<>(unit.getCrew());
+        this.soldiersUseSmallArmsOnly = soldiersUseSmallArmsOnly;
+        crew.sort(Comparator.comparingInt(p -> CrewRole.getCrewRole(p, unit).getSortOrder()));
         fireContentsChanged(this, 0, crew.size());
     }
 
@@ -153,7 +155,7 @@ public class CrewListModel extends AbstractListModel<Person> {
             if (entity != null &&
                       entity.hasETypeFlag(Entity.ETYPE_INFANTRY) &&
                       !entity.hasETypeFlag(Entity.ETYPE_BATTLEARMOR)) {
-                gunSkill = InfantryGunnerySkills.getBestInfantryGunnerySkill(person);
+                gunSkill = InfantryGunnerySkills.getBestInfantryGunnerySkill(person, soldiersUseSmallArmsOnly);
                 if (gunSkill == null) {
                     gunSkill = SkillType.S_SMALL_ARMS;
                 }
@@ -167,14 +169,13 @@ public class CrewListModel extends AbstractListModel<Person> {
                               "</b><br/>" +
                               CrewRole.getCrewRole(person, unit).getDisplayName() +
                               " ("
-                              // Shooting and driving don't benefit from Reputation, so no need to pass that in.
                               +
                               (person.hasSkill(gunSkill) ?
-                                     person.getSkill(gunSkill).getFinalSkillValue(options, attributes, 0) :
+                                     person.getSkill(gunSkill).getFinalSkillValue(options, attributes) :
                                      "-") +
                               '/' +
                               (person.hasSkill(driveSkill) ?
-                                     person.getSkill(driveSkill).getFinalSkillValue(options, attributes, 0) :
+                                     person.getSkill(driveSkill).getFinalSkillValue(options, attributes) :
                                      "-") +
                               ")</font></html>";
             setHtmlText(sb);

@@ -103,7 +103,9 @@ public class PersonnelTab {
     private JCheckBox chkUseRandomToughness;
     private JCheckBox chkUseArtillery;
     private JCheckBox chkUseAbilities;
-    private JCheckBox chkUseCommanderAbilitiesOnly;
+    private JCheckBox chkOnlyCommandersMatterVehicles;
+    private JCheckBox chkOnlyCommandersMatterInfantry;
+    private JCheckBox chkOnlyCommandersMatterBattleArmor;
     private JCheckBox chkUseEdge;
     private JCheckBox chkUseSupportEdge;
     private JCheckBox chkUseImplants;
@@ -188,6 +190,9 @@ public class PersonnelTab {
     private JSpinner spnMaximumPatients;
     private JCheckBox chkDoctorsUseAdministration;
     private JCheckBox chkUseUsefulMedics;
+    private JCheckBox chkUseMASHTheatres;
+    private JLabel lblMASHTheatreCapacity;
+    private JSpinner spnMASHTheatreCapacity;
     //end Medical Tab
 
     //start Prisoners and Dependents Tab
@@ -275,6 +280,9 @@ public class PersonnelTab {
         spnMaximumPatients = new JSpinner();
         chkDoctorsUseAdministration = new JCheckBox();
         chkUseUsefulMedics = new JCheckBox();
+        chkUseMASHTheatres = new JCheckBox();
+        lblMASHTheatreCapacity = new JLabel();
+        spnMASHTheatreCapacity = new JSpinner();
     }
 
     /**
@@ -361,7 +369,9 @@ public class PersonnelTab {
         chkUseRandomToughness = new JCheckBox();
         chkUseArtillery = new JCheckBox();
         chkUseAbilities = new JCheckBox();
-        chkUseCommanderAbilitiesOnly = new JCheckBox();
+        chkOnlyCommandersMatterVehicles = new JCheckBox();
+        chkOnlyCommandersMatterInfantry = new JCheckBox();
+        chkOnlyCommandersMatterBattleArmor = new JCheckBox();
         chkUseEdge = new JCheckBox();
         chkUseSupportEdge = new JCheckBox();
         chkUseImplants = new JCheckBox();
@@ -444,9 +454,15 @@ public class PersonnelTab {
         chkUseArtillery.addMouseListener(createTipPanelUpdater(generalHeader, "UseArtillery"));
         chkUseAbilities = new CampaignOptionsCheckBox("UseAbilities");
         chkUseAbilities.addMouseListener(createTipPanelUpdater(generalHeader, "UseAbilities"));
-        chkUseCommanderAbilitiesOnly = new CampaignOptionsCheckBox("UseCommanderAbilitiesOnly");
-        chkUseCommanderAbilitiesOnly.addMouseListener(createTipPanelUpdater(generalHeader,
-              "UseCommanderAbilitiesOnly"));
+        chkOnlyCommandersMatterVehicles = new CampaignOptionsCheckBox("OnlyCommandersMatterVehicles");
+        chkOnlyCommandersMatterVehicles.addMouseListener(createTipPanelUpdater(generalHeader,
+              "OnlyCommandersMatterVehicles"));
+        chkOnlyCommandersMatterInfantry = new CampaignOptionsCheckBox("OnlyCommandersMatterInfantry");
+        chkOnlyCommandersMatterInfantry.addMouseListener(createTipPanelUpdater(generalHeader,
+              "OnlyCommandersMatterInfantry"));
+        chkOnlyCommandersMatterBattleArmor = new CampaignOptionsCheckBox("OnlyCommandersMatterBattleArmor");
+        chkOnlyCommandersMatterBattleArmor.addMouseListener(createTipPanelUpdater(generalHeader,
+              "OnlyCommandersMatterBattleArmor"));
         chkUseEdge = new CampaignOptionsCheckBox("UseEdge");
         chkUseEdge.addMouseListener(createTipPanelUpdater(generalHeader, "UseEdge"));
         chkUseSupportEdge = new CampaignOptionsCheckBox("UseSupportEdge");
@@ -481,7 +497,13 @@ public class PersonnelTab {
         panel.add(chkUseAbilities, layout);
 
         layout.gridy++;
-        panel.add(chkUseCommanderAbilitiesOnly, layout);
+        panel.add(chkOnlyCommandersMatterVehicles, layout);
+
+        layout.gridy++;
+        panel.add(chkOnlyCommandersMatterInfantry, layout);
+
+        layout.gridy++;
+        panel.add(chkOnlyCommandersMatterBattleArmor, layout);
 
         layout.gridy++;
         panel.add(chkUseEdge, layout);
@@ -831,6 +853,14 @@ public class PersonnelTab {
         chkUseUsefulMedics = new CampaignOptionsCheckBox("UseUsefulMedics");
         chkUseUsefulMedics.addMouseListener(createTipPanelUpdater(medicalHeader, "UseUsefulMedics"));
 
+        chkUseMASHTheatres = new CampaignOptionsCheckBox("UseMASHTheatres");
+        chkUseMASHTheatres.addMouseListener(createTipPanelUpdater(medicalHeader, "UseMASHTheatres"));
+
+        lblMASHTheatreCapacity = new CampaignOptionsLabel("MASHTheatreCapacity");
+        lblMASHTheatreCapacity.addMouseListener(createTipPanelUpdater(medicalHeader, "MASHTheatreCapacity"));
+        spnMASHTheatreCapacity = new CampaignOptionsSpinner("MASHTheatreCapacity", 25, 1, 100, 1);
+        spnMASHTheatreCapacity.addMouseListener(createTipPanelUpdater(medicalHeader, "MASHTheatreCapacity"));
+
         final JPanel panelLeft = new CampaignOptionsStandardPanel("MedicalTabLeft");
         final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
 
@@ -849,6 +879,17 @@ public class PersonnelTab {
         layoutLeft.gridy++;
         panelLeft.add(chkUseUsefulMedics, layoutLeft);
 
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(chkUseMASHTheatres, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(lblMASHTheatreCapacity, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnMASHTheatreCapacity, layoutLeft);
+
+        layoutLeft.gridx = 0;
         layoutLeft.gridy++;
         panelLeft.add(lblHealWaitingPeriod, layoutLeft);
         layoutLeft.gridx++;
@@ -1281,7 +1322,9 @@ public class PersonnelTab {
         chkUseRandomToughness.setSelected(options.isUseRandomToughness());
         chkUseArtillery.setSelected(options.isUseArtillery());
         chkUseAbilities.setSelected(options.isUseAbilities());
-        chkUseCommanderAbilitiesOnly.setSelected(options.isUseCommanderAbilitiesOnly());
+        chkOnlyCommandersMatterVehicles.setSelected(options.isOnlyCommandersMatterVehicles());
+        chkOnlyCommandersMatterInfantry.setSelected(options.isOnlyCommandersMatterInfantry());
+        chkOnlyCommandersMatterBattleArmor.setSelected(options.isOnlyCommandersMatterBattleArmor());
         chkUseEdge.setSelected(options.isUseEdge());
         chkUseSupportEdge.setSelected(options.isUseSupportEdge());
         chkUseImplants.setSelected(options.isUseImplants());
@@ -1346,6 +1389,8 @@ public class PersonnelTab {
         spnMaximumPatients.setValue(options.getMaximumPatients());
         chkDoctorsUseAdministration.setSelected(options.isDoctorsUseAdministration());
         chkUseUsefulMedics.setSelected(options.isUseUsefulMedics());
+        chkUseMASHTheatres.setSelected(options.isUseMASHTheatres());
+        spnMASHTheatreCapacity.setValue(options.getMASHTheatreCapacity());
 
         // Prisoners and Dependents
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
@@ -1376,7 +1421,9 @@ public class PersonnelTab {
         options.setUseRandomToughness(chkUseRandomToughness.isSelected());
         options.setUseArtillery(chkUseArtillery.isSelected());
         options.setUseAbilities(chkUseAbilities.isSelected());
-        options.setUseCommanderAbilitiesOnly(chkUseCommanderAbilitiesOnly.isSelected());
+        options.setOnlyCommandersMatterVehicles(chkOnlyCommandersMatterVehicles.isSelected());
+        options.setOnlyCommandersMatterInfantry(chkOnlyCommandersMatterInfantry.isSelected());
+        options.setOnlyCommandersMatterBattleArmor(chkOnlyCommandersMatterBattleArmor.isSelected());
         options.setUseEdge(chkUseEdge.isSelected());
         options.setUseSupportEdge(chkUseSupportEdge.isSelected());
         options.setUseImplants(chkUseImplants.isSelected());
@@ -1441,6 +1488,8 @@ public class PersonnelTab {
         options.setMaximumPatients((int) spnMaximumPatients.getValue());
         options.setDoctorsUseAdministration(chkDoctorsUseAdministration.isSelected());
         options.setIsUseUsefulMedics(chkUseUsefulMedics.isSelected());
+        options.setIsUseMASHTheatres(chkUseMASHTheatres.isSelected());
+        options.setMASHTheatreCapacity((int) spnMASHTheatreCapacity.getValue());
 
         // Prisoners and Dependents
         options.setPrisonerCaptureStyle(comboPrisonerCaptureStyle.getSelectedItem());

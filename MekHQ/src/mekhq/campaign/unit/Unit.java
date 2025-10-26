@@ -142,6 +142,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -2643,7 +2644,11 @@ public class Unit implements ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("asTechDaysMaintained")) {
                     retVal.asTechDaysMaintained = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceMultiplier")) {
-                    retVal.maintenanceMultiplier = Integer.parseInt(wn2.getTextContent());
+                    if (retVal.isSelfCrewed()) { // <50.10 compatibility handler
+                        retVal.maintenanceMultiplier = 1;
+                    } else {
+                        retVal.maintenanceMultiplier = Integer.parseInt(wn2.getTextContent());
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("driverId")) {
                     retVal.drivers.add(new UnitPersonRef(UUID.fromString(wn2.getTextContent())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("gunnerId")) {
@@ -4407,6 +4412,32 @@ public class Unit implements ITechnology {
         if (entity == null) {
             return null;
         }
+        Person commander = null;
+
+        // Vehicles are handled differently, the driver is always the commander. This decision was made because it
+        // tracks with lore - there are plenty of examples of the driver being the commander - but also because
+        // drivers are the only profession where they have both gunnery and piloting skills which is necessary for
+        // the 'Only Commanders Matter' Campaign Option
+        if (entity.isVehicle()) {
+            for (Person person : drivers) {
+                if (commander == null) {
+                    commander = person;
+                    continue;
+                }
+
+                // Compare person with the current commander
+                if (person.outRanks(commander) || (person.getRankNumeric() == commander.getRankNumeric())) {
+                    commander = person;
+                }
+            }
+
+            if (commander != null) {
+                return commander;
+            }
+        }
+
+        // For all other units we're going to merge the crew into a single list and then find the highest ranked
+        // among them.
 
         // Merge all crew into a single list,
         // lists retain the order in which elements are added to them,
@@ -4425,7 +4456,7 @@ public class Unit implements ITechnology {
         }
 
         // Initialize the commander as the first person
-        Person commander = allCrew.get(0);
+        commander = allCrew.get(0);
 
         // Iterate over all crew
         for (Person person : allCrew) {
@@ -4445,6 +4476,14 @@ public class Unit implements ITechnology {
 
     public void resetPilotAndEntity() {
         final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        boolean commanderOnlyVehicles = campaignOptions.isOnlyCommandersMatterVehicles() &&
+                                              (entity instanceof Tank || entity instanceof ConvFighter);
+        boolean commanderOnlyInfantry = campaignOptions.isOnlyCommandersMatterInfantry() &&
+                                              entity instanceof Infantry &&
+                                              !(entity instanceof BattleArmor);
+        boolean commanderOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterBattleArmor() &&
+                                                 entity instanceof BattleArmor;
+        boolean isOnlyCommandersMatter = commanderOnlyVehicles || commanderOnlyInfantry || commanderOnlyBattleArmor;
 
         // Reset transient data
         getCampaign().clearGameData(entity);
@@ -4453,7 +4492,7 @@ public class Unit implements ITechnology {
         entity.getCrew().setCommandBonus(0);
 
         // Update crew data
-        updateCrew();
+        updateCrew(isOnlyCommandersMatter);
 
         // commander can be null at this point, but that's ok because both of the following calls include null
         // handling built into their methods.
@@ -4468,7 +4507,7 @@ public class Unit implements ITechnology {
         }
     }
 
-    private void updateCrew() {
+    private void updateCrew(boolean isOnlyCommandersMatter) {
         if (entity.getCrew().getSlotCount() > 1) {
             final String driveType = SkillType.getDrivingSkillFor(entity);
             final String gunType = SkillType.getGunnerySkillFor(entity);
@@ -4520,7 +4559,7 @@ public class Unit implements ITechnology {
             }
         } else {
             if ((entity.getEntityType() & Entity.ETYPE_LAND_AIR_MEK) == 0) {
-                calcCompositeCrew();
+                calcCompositeCrew(isOnlyCommandersMatter);
             } else {
                 refreshLAMPilot();
             }
@@ -4567,6 +4606,8 @@ public class Unit implements ITechnology {
             commander = new Person(getCampaign());
         }
 
+        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+
         PilotOptions options = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
         // This double enumeration is annoying to work with for crew-served units.
         // Get the option names while we enumerate so they can be used later
@@ -4576,20 +4617,27 @@ public class Unit implements ITechnology {
             IOptionGroup group = i.nextElement();
             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
                 IOption option = j.nextElement();
-                if (getCampaign().getCampaignOptions().isUseImplants() &&
+                if (campaignOptions.isUseImplants() &&
                           group.getKey().equals(PersonnelOptions.MD_ADVANTAGES)) {
                     cyberOptionNames.add(option.getName());
-                } else if (getCampaign().getCampaignOptions().isUseEdge() &&
+                } else if (campaignOptions.isUseEdge() &&
                                  group.getKey().equals(PersonnelOptions.EDGE_ADVANTAGES)) {
                     optionNames.add(option.getName());
-                } else if (getCampaign().getCampaignOptions().isUseAbilities() &&
+                } else if (campaignOptions.isUseAbilities() &&
                                  !group.getKey().equals(PersonnelOptions.EDGE_ADVANTAGES)) {
                     optionNames.add(option.getName());
                 }
             }
         }
 
-        boolean commanderOnly = campaign.getCampaignOptions().isUseCommanderAbilitiesOnly();
+        boolean commanderOnlyVehicles = campaignOptions.isOnlyCommandersMatterVehicles() &&
+                                              (entity instanceof Tank || entity instanceof ConvFighter);
+        boolean commanderOnlyInfantry = campaignOptions.isOnlyCommandersMatterInfantry() &&
+                                              entity instanceof Infantry &&
+                                              !(entity instanceof BattleArmor);
+        boolean commanderOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterBattleArmor() &&
+                                                 entity instanceof BattleArmor;
+        boolean commanderOnly = commanderOnlyVehicles || commanderOnlyInfantry || commanderOnlyBattleArmor;
 
         // For crew-served units, let's look at the abilities of the group. If more than half the crew (gunners
         // and pilots only, for spacecraft) have an ability, grant the benefit to the unit
@@ -4676,7 +4724,7 @@ public class Unit implements ITechnology {
 
             // Assign edge points to spacecraft and vehicle crews and infantry units
             // This overwrites the Edge value assigned above.
-            if (getCampaign().getCampaignOptions().isUseEdge()) {
+            if (campaignOptions.isUseEdge()) {
                 double sumEdge = 0;
                 for (Person p : drivers) {
                     sumEdge += p.getCurrentEdge();
@@ -4737,7 +4785,7 @@ public class Unit implements ITechnology {
     /**
      * For vehicles, infantry, and naval vessels, compute the piloting and gunnery skills based on the crew as a whole.
      */
-    private void calcCompositeCrew() {
+    private void calcCompositeCrew(boolean isOnlyCommandersMatter) {
         if (drivers.isEmpty() && gunners.isEmpty()) {
             entity.getCrew().setMissing(true, 0);
             entity.getCrew().setSize(0);
@@ -4780,6 +4828,7 @@ public class Unit implements ITechnology {
                 sumPiloting += person.getInjuryModifiers(true);
             }
         }
+        boolean smallArmsOnly = campaign.getCampaignOptions().isUseSmallArmsOnly();
         for (Person person : gunners) {
             PersonnelOptions options = person.getOptions();
             Attributes attributes = person.getATOWAttributes();
@@ -4789,7 +4838,7 @@ public class Unit implements ITechnology {
 
             String tempGunType = gunType;
             if (entityIsConventionalInfantry) {
-                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(person);
+                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(person, smallArmsOnly);
                 if (tempGunType == null) {
                     tempGunType = SkillType.S_SMALL_ARMS;
                 }
@@ -4835,6 +4884,29 @@ public class Unit implements ITechnology {
         if (nGunners > 0) {
             gunnery = (int) Math.round(((double) sumGunnery) / nGunners);
         }
+
+        if (isOnlyCommandersMatter && getCommander() != null) {
+            PersonnelOptions options = getCommander().getOptions();
+            Attributes attributes = getCommander().getATOWAttributes();
+
+            Skill drivingSkill = getCommander().getSkill(driveType);
+            piloting = drivingSkill == null ? 13 : drivingSkill.getFinalSkillValue(options, attributes);
+            if (entity instanceof Infantry && drivingSkill == null) {
+                piloting = 8;
+            }
+
+            String tempGunType = gunType;
+            if (entityIsConventionalInfantry) {
+                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(getCommander(), smallArmsOnly);
+                if (tempGunType == null) {
+                    tempGunType = SkillType.S_SMALL_ARMS;
+                }
+            }
+
+            Skill gunnerySkill = getCommander().getSkill(tempGunType);
+            gunnery = gunnerySkill == null ? 13 : gunnerySkill.getFinalSkillValue(options, attributes);
+        }
+
         if (entity instanceof Infantry) {
             if (entity instanceof BattleArmor) {
                 int numTroopers = 0;
@@ -6133,10 +6205,6 @@ public class Unit implements ITechnology {
             return 90 * maintenanceMultiplier;
         }
 
-        if (entity instanceof Warship || entity instanceof SpaceStation) {
-            return 480 * maintenanceMultiplier;
-        }
-
         // At time of writing current maintenance errata states that maintenance time is only deducted on the day in
         // which maintenance takes place. However, these two unit times have maintenance time requirements that
         // exceed the maximum of 480 minutes a team has in a single day. Making these maintenance times impossible.
@@ -6148,6 +6216,10 @@ public class Unit implements ITechnology {
         //        if (entity instanceof Warship) {
         //            return 1440 * maintenanceMultiplier;
         //        }
+
+        if (entity instanceof Warship || entity instanceof SpaceStation) {
+            return 480 * maintenanceMultiplier;
+        }
 
         if (entity instanceof Jumpship) {
             return 360 * maintenanceMultiplier;

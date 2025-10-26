@@ -46,6 +46,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import mekhq.campaign.universe.factionHints.FactionHints;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

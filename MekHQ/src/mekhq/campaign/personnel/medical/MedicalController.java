@@ -35,6 +35,9 @@ package mekhq.campaign.personnel.medical;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil.resolveDailyHealing;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -126,6 +129,8 @@ public class MedicalController {
 
         // Handle non-Advanced Medical healing
         if (patient.needsFixing()) {
+            // This will trigger for both AM-enabled and AM-disabled campaigns
+            doctor = verifyTheatreAvailability(patient, doctor);
             patient.decrementDaysToWaitForHealing();
 
             if (doctor != null && patient.getDaysToWaitForHealing() <= 0) {
@@ -149,6 +154,19 @@ public class MedicalController {
                 unit.resetPilotAndEntity();
             }
         }
+    }
+
+    private Person verifyTheatreAvailability(Person patient, Person doctor) {
+        if (campaign.getCampaignOptions().isUseMASHTheatres()) {
+            if (!campaign.getMashTheatresWithinCapacity()) {
+                doctor = null;
+                patient.setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.overTheatreCapacity",
+                      spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG,
+                      patient.getHyperlinkedFullTitle()));
+            }
+        }
+        return doctor;
     }
 
     /**

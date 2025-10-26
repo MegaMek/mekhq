@@ -48,6 +48,7 @@ public enum ScenarioStatus {
     MARGINAL_DEFEAT("ScenarioStatus.MARGINAL_DEFEAT.text", "ScenarioStatus.MARGINAL_DEFEAT.toolTipText"),
     DEFEAT("ScenarioStatus.DEFEAT.text", "ScenarioStatus.DEFEAT.toolTipText"),
     DECISIVE_DEFEAT("ScenarioStatus.DECISIVE_DEFEAT.text", "ScenarioStatus.DECISIVE_DEFEAT.toolTipText"),
+    FLEET_IN_BEING("ScenarioStatus.FLEET_IN_BEING.text", "ScenarioStatus.FLEET_IN_BEING.toolTipText"),
     REFUSED_ENGAGEMENT("ScenarioStatus.REFUSED_ENGAGEMENT.text", "ScenarioStatus.REFUSED_ENGAGEMENT.toolTipText");
     // endregion Enum Declarations
 
@@ -112,12 +113,16 @@ public enum ScenarioStatus {
         return this == REFUSED_ENGAGEMENT;
     }
 
+    public boolean isFleetInBeing() {
+        return this == FLEET_IN_BEING;
+    }
+
     public boolean isOverallVictory() {
         return isDecisiveVictory() || isVictory() || isMarginalVictory() || isPyrrhicVictory();
     }
 
     public boolean isOverallDefeat() {
-        return isDecisiveDefeat() || isDefeat() || isMarginalDefeat() || isRefusedEngagement();
+        return isDecisiveDefeat() || isDefeat() || isMarginalDefeat() || isRefusedEngagement() || isFleetInBeing();
     }
     // endregion Boolean Comparison Methods
 

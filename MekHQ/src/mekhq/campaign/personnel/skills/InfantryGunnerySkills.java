@@ -60,9 +60,14 @@ public class InfantryGunnerySkills {
      *
      * <p>Iterates through all skills in {@link #INFANTRY_GUNNERY_SKILLS}, and finds the skill that the person
      * possesses with the highest skill level (according to {@code getTotalSkillLevel}). If the person does not possess
-     * any of these skills, {@code null} is returned.
+     * any of these skills, {@code null} is returned.</p>
      *
-     * @param person the {@link Person} whose infantry gunnery skills to search
+     * <p>If {@code useSmallArmsOnly} is {@code true}, only the Small Arms skill is considered. Otherwise, all
+     * available infantry gunnery skills are evaluated.</p>
+     *
+     * @param person           the {@link Person} whose infantry gunnery skills to search
+     * @param useSmallArmsOnly {@code true} if only the Small Arms skill should be considered; {@code false} if all
+     *                         infantry gunnery skills should be evaluated
      *
      * @return the skill name (as defined in {@link SkillType}) for the person's best infantry gunnery skill, or
      *       {@code null} if no such skill is present
@@ -70,12 +75,32 @@ public class InfantryGunnerySkills {
      * @author Illiani
      * @since 0.50.07
      */
-    public static @Nullable String getBestInfantryGunnerySkill(Person person) {
-        String bestSkill = null;
-        int highestLevel = -1;
+    public static @Nullable String getBestInfantryGunnerySkill(Person person, boolean useSmallArmsOnly) {
+        if (useSmallArmsOnly) {
+            String skillName = SkillType.S_SMALL_ARMS;
+            return person.hasSkill(skillName) ? skillName : null;
+        }
 
+        return getGunnerySkill(person);
+    }
+
+    /**
+     * Searches all infantry gunnery skills for the given person and returns the name of the skill with the highest
+     * total skill level.
+     *
+     * @param person the {@link Person} to examine
+     *
+     * @return the name of the best infantry gunnery skill, or {@code null} if none is present
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static String getGunnerySkill(Person person) {
         PersonnelOptions options = person.getOptions();
         Attributes attributes = person.getATOWAttributes();
+
+        int highestLevel = Integer.MIN_VALUE;
+        String bestSkill = null;
         for (String skillName : INFANTRY_GUNNERY_SKILLS) {
             if (person.hasSkill(skillName)) {
                 int skillLevel = person.getSkill(skillName).getTotalSkillLevel(options, attributes);

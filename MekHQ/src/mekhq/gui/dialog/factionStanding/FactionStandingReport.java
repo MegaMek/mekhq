@@ -72,8 +72,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.campaign.universe.factionStanding.FactionStandingLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -624,7 +624,7 @@ public class FactionStandingReport extends JDialog {
         String factionStandingLabel = factionStanding.getLabel(faction);
         String factionStandingDescription = factionStanding.getDescription(faction);
 
-        FactionHints factionHints = FactionHints.defaultFactionHints();
+        FactionHints factionHints = FactionHints.getInstance();
         LocalDate firstOfMonth = today.withDayOfMonth(1); // Climate states update on the 1st in Faction Standing
         boolean isAtWar = factionHints.isAtWarWith(campaignFaction, faction, firstOfMonth);
         boolean isAllied = factionHints.isAlliedWith(campaignFaction, faction, firstOfMonth);

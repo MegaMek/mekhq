@@ -48,11 +48,13 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -96,6 +98,8 @@ import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.rentals.ContractRentalType;
+import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -316,9 +320,35 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.contains(COMMAND_CHANGE_SITE)) {
             try {
                 int selected = Integer.parseInt(command.split(":")[1]);
-                for (Unit unit : units) {
-                    if (!unit.isDeployed()) {
-                        if ((selected > -1) && (selected < Unit.SITE_UNKNOWN)) {
+                boolean selectedIsValid = selected > -1 && selected < Unit.SITE_UNKNOWN;
+                if (!selectedIsValid) {
+                    return;
+                }
+
+                boolean wasSiteChangeSuccessful = true;
+
+                if (selected >= Unit.SITE_FACILITY_MAINTENANCE) {
+                    Campaign campaign = gui.getCampaign();
+
+                    Predicate<Unit> eligibleForBayRental = u -> !FacilityRentals.shouldBeIgnoredByBayRentals(u);
+                    int eligibleUnitCount = (int) Arrays.stream(units)
+                                                        .filter(eligibleForBayRental)
+                                                        .count();
+
+                    ContractRentalType rentalType = switch (selected) {
+                        case Unit.SITE_FACILITY_MAINTENANCE -> ContractRentalType.MAINTENANCE_BAYS;
+                        case Unit.SITE_FACTORY_CONDITIONS -> ContractRentalType.FACTORY_CONDITIONS;
+                        default -> null; // Should never happen as we're already filtering out invalid sites
+                    };
+
+                    wasSiteChangeSuccessful = FacilityRentals.offerBayRentalOpportunity(campaign,
+                          eligibleUnitCount,
+                          rentalType);
+                }
+
+                if (wasSiteChangeSuccessful) {
+                    for (Unit unit : units) {
+                        if (!unit.isDeployed()) {
                             unit.setSite(selected);
                             MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
                         }
@@ -633,7 +663,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     continue;
                 }
 
-                int time = tech.getDailyAvailableTechTime(techsUseAdmin);
+                int time = tech.getMinutesLeft();
                 int maintenanceTime = unit.getMaintenanceTime();
 
                 if ((time - maintenanceTime) >= 0) {
@@ -952,6 +982,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                     maintenanceMultiplierItem.setActionCommand(COMMAND_CHANGE_MAINTENANCE_MULTI + ':' + x);
                     maintenanceMultiplierItem.addActionListener(this);
+                    maintenanceMultiplierItem.setEnabled(!(oneSelected && unit.isSelfCrewed()));
                     menuItem.add(maintenanceMultiplierItem);
                 }
 
@@ -960,10 +991,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem(resources.getString("maintenanceAdHoc.text"));
                 menuItem.setActionCommand(COMMAND_PERFORM_AD_HOC_MAINTENANCE);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().getCampaignOptions().isCheckMaintenance());
-                if (oneSelected && menuItem.isEnabled()) {
-                    menuItem.setEnabled(unit.getDaysSinceMaintenance() != 0);
-                }
+                menuItem.setEnabled(oneSelected && unit.getDaysSinceMaintenance() != 0);
 
                 popup.add(menuItem);
             }
