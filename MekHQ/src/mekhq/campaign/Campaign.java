@@ -5558,9 +5558,10 @@ public class Campaign implements ITechManager {
                     }
                 }
 
-                String report = ExtraIncome.processExtraIncome(finances, person, currentDay, useBetterMonthlyIncome);
-                if (!StringUtility.isNullOrBlank(report)) {
-                    addReport(report);
+                String extraIncomeReport = ExtraIncome.processExtraIncome(finances, person, currentDay,
+                      useBetterMonthlyIncome);
+                if (!StringUtility.isNullOrBlank(extraIncomeReport)) {
+                    addReport(extraIncomeReport);
                 }
 
                 person.setHasPerformedExtremeExpenditure(false);
@@ -5577,9 +5578,9 @@ public class Campaign implements ITechManager {
 
                 if (currentDay.getMonthValue() % 3 == 0) {
                     if (person.hasDarkSecret()) {
-                        report = person.isDarkSecretRevealed(true, false);
-                        if (report != null) {
-                            addReport(report);
+                        String darkSecretReport = person.isDarkSecretRevealed(true, false);
+                        if (!StringUtility.isNullOrBlank(darkSecretReport)) {
+                            addReport(darkSecretReport);
                         }
                     }
                 }
@@ -5589,9 +5590,9 @@ public class Campaign implements ITechManager {
                 }
 
                 if (campaignOptions.isAllowMonthlyConnections()) {
-                    report = person.performConnectionsWealthCheck(currentDay, finances);
-                    if (!report.isBlank()) {
-                        addReport(report);
+                    String connectionsReport = person.performConnectionsWealthCheck(currentDay, finances);
+                    if (!StringUtility.isNullOrBlank(connectionsReport)) {
+                        addReport(connectionsReport);
                     }
                 }
 

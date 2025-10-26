@@ -57,7 +57,7 @@ import mekhq.campaign.personnel.Person;
  * resolving instances by their lookup key, enum name, or trait level.</p>
  *
  * @author Illiani
- * @since 0.50.07
+ * @since 0.50.10
  */
 public enum ExtraIncome {
     // These values are copied from those found in A Time of War
@@ -102,7 +102,7 @@ public enum ExtraIncome {
      * @param monthlyIncome the associated monthly income or expense
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.10
      */
     ExtraIncome(String lookupKey, int traitLevel, Money monthlyIncome) {
         this.lookupKey = lookupKey;
@@ -116,7 +116,7 @@ public enum ExtraIncome {
      * @return the lookup key string
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.10
      */
     public String getLookupKey() {
         return lookupKey;
@@ -128,7 +128,7 @@ public enum ExtraIncome {
      * @return the trait level (-10 to +10)
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.10
      */
     public int getTraitLevel() {
         return traitLevel;
@@ -143,7 +143,7 @@ public enum ExtraIncome {
      * @return a {@link Money} object representing the monthly income (or expense)
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.10
      */
     public Money getMonthlyIncomeDirect() {
         return monthlyIncome;
@@ -183,7 +183,7 @@ public enum ExtraIncome {
      *
      * @throws IllegalArgumentException if no matching entry is found
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.10
      */
     public static ExtraIncome extraIncomeParseFromInteger(Integer entry) {
         return extraIncomeParseFromString(entry.toString());
@@ -209,7 +209,7 @@ public enum ExtraIncome {
      *
      * @throws IllegalArgumentException if no matching entry is found
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.10
      */
     public static ExtraIncome extraIncomeParseFromString(String entry) throws IllegalArgumentException {
         for (ExtraIncome extraIncome : values()) {
@@ -253,7 +253,7 @@ public enum ExtraIncome {
      * @return A formatted campaign report string, or an empty string if there is no relevant transaction to report.
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.10
      */
     public static String processExtraIncome(Finances finances, Person person, LocalDate today,
           boolean useBetterMonthlyIncome) {

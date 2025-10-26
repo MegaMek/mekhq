@@ -3431,7 +3431,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setToolTipText(String.format(resources.getString("spendOnUnlucky.tooltip"), target));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
                   UNLUCKY_LABEL,
-                  String.valueOf(traitCost),
+                  String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target <= MAXIMUM_UNLUCKY);
@@ -3442,7 +3442,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setToolTipText(String.format(resources.getString("spendOnUnlucky.tooltip"), target));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
                   UNLUCKY_LABEL,
-                  String.valueOf(-traitCost),
+                  String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target >= MINIMUM_UNLUCKY && person.getXP() >= traitCost);
@@ -3456,7 +3456,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setToolTipText(String.format(resources.getString("spendOnBloodmark.tooltip"), target));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
                   BLOODMARK_LABEL,
-                  String.valueOf(traitCost),
+                  String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target <= MAXIMUM_BLOODMARK);
@@ -3467,7 +3467,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setToolTipText(String.format(resources.getString("spendOnBloodmark.tooltip"), target));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
                   BLOODMARK_LABEL,
-                  String.valueOf(-traitCost),
+                  String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target >= MINIMUM_BLOODMARK && person.getXP() >= traitCost);

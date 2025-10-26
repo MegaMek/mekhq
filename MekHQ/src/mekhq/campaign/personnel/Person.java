@@ -6169,7 +6169,7 @@ public class Person {
      * @return the {@link ExtraIncome} object representing the current extra income setting.
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.10
      */
     public ExtraIncome getExtraIncome() {
         return extraIncome;
@@ -6181,7 +6181,7 @@ public class Person {
      * @return the integer trait level for the current extra income value.
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.10
      */
     public int getExtraIncomeTraitLevel() {
         return extraIncome.getTraitLevel();
@@ -6196,7 +6196,7 @@ public class Person {
      * @param traitLevel the integer value representing the trait level to set for extra income.
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.10
      */
     public void setExtraIncomeFromTraitLevel(final int traitLevel) {
         int newExtraIncomeTraitLevel = clamp(traitLevel, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME);
@@ -6209,7 +6209,7 @@ public class Person {
      * @param extraIncome the {@link ExtraIncome} instance to assign.
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.10
      */
     public void setExtraIncomeDirect(final ExtraIncome extraIncome) {
         this.extraIncome = extraIncome;
