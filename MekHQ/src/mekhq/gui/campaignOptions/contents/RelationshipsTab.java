@@ -875,11 +875,11 @@ public class RelationshipsTab {
               "PrefersSameSexDiceSize"));
 
         lblPrefersBothSexesDiceSize = new CampaignOptionsLabel("PrefersBothSexesDiceSize");
-        lblPrefersBothSexesDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
+        lblPrefersBothSexesDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
               "PrefersBothSexesDiceSize"));
         spnPrefersBothSexesDiceSize = new CampaignOptionsSpinner("PrefersBothSexesDiceSize",
               20, 0, 100000, 1);
-        spnPrefersBothSexesDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
+        spnPrefersBothSexesDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
               "PrefersBothSexesDiceSize"));
 
         // Layout the Panel
