@@ -669,9 +669,27 @@ public enum PersonnelRole {
             }
             case LAM_PILOT ->
                   List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
-            case GROUND_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_GVEE);
-            case NAVAL_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_NVEE);
-            case VTOL_PILOT -> List.of(SkillType.S_PILOT_VTOL);
+            case GROUND_VEHICLE_DRIVER -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_PILOT_GVEE, SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_PILOT_GVEE, SkillType.S_GUN_VEE);
+                }
+            }
+            case NAVAL_VEHICLE_DRIVER -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_PILOT_NVEE, SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_PILOT_NVEE, SkillType.S_GUN_VEE);
+                }
+            }
+            case VTOL_PILOT -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_PILOT_VTOL, SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_PILOT_VTOL, SkillType.S_GUN_VEE);
+                }
+            }
             case VEHICLE_GUNNER -> {
                 if (isUseArtillery) {
                     yield List.of(SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
@@ -679,12 +697,18 @@ public enum PersonnelRole {
                     yield List.of(SkillType.S_GUN_VEE);
                 }
             }
-            case MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
+            case MECHANIC -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_MECHANIC);
+                }
+            }
             case VEHICLE_CREW -> {
                 if (includeExpandedSkills) {
                     yield VEHICLE_CREW_SKILLS;
                 } else {
-                    yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_GUN_VEE);
+                    yield List.of(SkillType.S_TECH_MECHANIC);
                 }
             }
             case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);

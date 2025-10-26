@@ -74,6 +74,7 @@ public class StratConCampaignState {
     private int supportPoints;
     private int victoryPoints;
     private String briefingText;
+    @XmlElement(required = true, defaultValue = "false")
     private boolean allowEarlyVictory;
 
     // these are applied to any scenario generated in the campaign; use sparingly
@@ -285,6 +286,41 @@ public class StratConCampaignState {
         }
 
         return null;
+    }
+
+    /**
+     * Determines whether the contract can be ended early based on strategic objective completion.
+     *
+     * <p>A contract can be ended early only if:</p>
+     * <ul>
+     *   <li>The base contract allows early termination</li>
+     *   <li>There is at least one strategic objective defined</li>
+     *   <li>All strategic objectives across all tracks have been resolved (completed or failed)</li>
+     * </ul>
+     *
+     * @return {@code true} if the contract can be ended early, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public boolean canEndContractEarly() {
+        if (!allowEarlyVictory()) {
+            return false;
+        }
+
+        boolean hasObjectives = false;
+        for (StratConTrackState track : tracks) {
+            List<StratConStrategicObjective> objectives = track.getStrategicObjectives();
+            for (StratConStrategicObjective objective : objectives) {
+
+                hasObjectives = true;
+                if (!objective.isObjectiveResolved(track)) {
+                    return false;
+                }
+            }
+        }
+
+        return hasObjectives;
     }
 
     /**

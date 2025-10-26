@@ -225,7 +225,9 @@ public class CampaignOptions {
     private boolean useRandomToughness;
     private boolean useArtillery;
     private boolean useAbilities;
-    private boolean useCommanderAbilitiesOnly;
+    private boolean onlyCommandersMatterVehicles;
+    private boolean onlyCommandersMatterInfantry;
+    private boolean onlyCommandersMatterBattleArmor;
     private boolean useEdge;
     private boolean useSupportEdge;
     private boolean useImplants;
@@ -268,6 +270,8 @@ public class CampaignOptions {
     private int maximumPatients;
     private boolean doctorsUseAdministration;
     private boolean useUsefulMedics;
+    private boolean useMASHTheatres;
+    private int mashTheatreCapacity;
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
@@ -612,6 +616,10 @@ public class CampaignOptions {
     private boolean clanVehicles;
 
     // Contract Operations
+    private int moraleVictoryEffect;
+    private int moraleDecisiveVictoryEffect;
+    private int moraleDefeatEffect;
+    private int moraleDecisiveDefeatEffect;
     private boolean mercSizeLimited;
     private boolean restrictPartsByMission;
     private final int[] atbBattleChance;
@@ -798,7 +806,9 @@ public class CampaignOptions {
         setUseRandomToughness(false);
         setUseArtillery(false);
         setUseAbilities(false);
-        setUseCommanderAbilitiesOnly(false);
+        setOnlyCommandersMatterVehicles(false);
+        setOnlyCommandersMatterInfantry(false);
+        setOnlyCommandersMatterBattleArmor(false);
         setUseEdge(false);
         setUseSupportEdge(false);
         setUseImplants(false);
@@ -840,6 +850,8 @@ public class CampaignOptions {
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
         useUsefulMedics = false;
+        useMASHTheatres = false;
+        mashTheatreCapacity = 25;
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
@@ -1257,6 +1269,12 @@ public class CampaignOptions {
         useVehicles = true;
         clanVehicles = false;
 
+        // Morale
+        moraleDecisiveVictoryEffect = 2;
+        moraleVictoryEffect = 1;
+        moraleDefeatEffect = -2;
+        moraleDecisiveDefeatEffect = -3;
+
         // Contract Operations
         mercSizeLimited = false;
         restrictPartsByMission = true;
@@ -1600,12 +1618,28 @@ public class CampaignOptions {
         this.useAbilities = useAbilities;
     }
 
-    public boolean isUseCommanderAbilitiesOnly() {
-        return useCommanderAbilitiesOnly;
+    public boolean isOnlyCommandersMatterVehicles() {
+        return onlyCommandersMatterVehicles;
     }
 
-    public void setUseCommanderAbilitiesOnly(final boolean useCommanderAbilitiesOnly) {
-        this.useCommanderAbilitiesOnly = useCommanderAbilitiesOnly;
+    public void setOnlyCommandersMatterVehicles(final boolean onlyCommandersMatterVehicles) {
+        this.onlyCommandersMatterVehicles = onlyCommandersMatterVehicles;
+    }
+
+    public boolean isOnlyCommandersMatterInfantry() {
+        return onlyCommandersMatterInfantry;
+    }
+
+    public void setOnlyCommandersMatterInfantry(final boolean onlyCommandersMatterInfantry) {
+        this.onlyCommandersMatterInfantry = onlyCommandersMatterInfantry;
+    }
+
+    public boolean isOnlyCommandersMatterBattleArmor() {
+        return onlyCommandersMatterBattleArmor;
+    }
+
+    public void setOnlyCommandersMatterBattleArmor(final boolean onlyCommandersMatterBattleArmor) {
+        this.onlyCommandersMatterBattleArmor = onlyCommandersMatterBattleArmor;
     }
 
     public boolean isUseEdge() {
@@ -2015,6 +2049,22 @@ public class CampaignOptions {
 
     public void setIsUseUsefulMedics(final boolean useUsefulMedics) {
         this.useUsefulMedics = useUsefulMedics;
+    }
+
+    public boolean isUseMASHTheatres() {
+        return useMASHTheatres;
+    }
+
+    public void setIsUseMASHTheatres(final boolean useMASHTheatres) {
+        this.useMASHTheatres = useMASHTheatres;
+    }
+
+    public int getMASHTheatreCapacity() {
+        return mashTheatreCapacity;
+    }
+
+    public void setMASHTheatreCapacity(final int mashTheatreCapacity) {
+        this.mashTheatreCapacity = mashTheatreCapacity;
     }
 
     // endregion Medical
@@ -4794,6 +4844,38 @@ public class CampaignOptions {
 
     public void setTrackOriginalUnit(final boolean trackOriginalUnit) {
         this.trackOriginalUnit = trackOriginalUnit;
+    }
+
+    public int getMoraleVictoryEffect() {
+        return moraleVictoryEffect;
+    }
+
+    public void setMoraleVictoryEffect(final int moraleVictoryEffect) {
+        this.moraleVictoryEffect = moraleVictoryEffect;
+    }
+
+    public int getMoraleDecisiveVictoryEffect() {
+        return moraleDecisiveVictoryEffect;
+    }
+
+    public void setMoraleDecisiveVictoryEffect(final int moraleDecisiveVictoryEffect) {
+        this.moraleDecisiveVictoryEffect = moraleDecisiveVictoryEffect;
+    }
+
+    public int getMoraleDefeatEffect() {
+        return moraleDefeatEffect;
+    }
+
+    public void setMoraleDefeatEffect(final int moraleDefeatEffect) {
+        this.moraleDefeatEffect = moraleDefeatEffect;
+    }
+
+    public int getMoraleDecisiveDefeatEffect() {
+        return moraleDecisiveDefeatEffect;
+    }
+
+    public void setMoraleDecisiveDefeatEffect(final int moraleDecisiveDefeatEffect) {
+        this.moraleDecisiveDefeatEffect = moraleDecisiveDefeatEffect;
     }
 
     public boolean isMercSizeLimited() {

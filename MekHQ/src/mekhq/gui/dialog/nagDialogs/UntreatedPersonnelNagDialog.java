@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
+import static java.lang.Math.min;
 import static mekhq.MHQConstants.NAG_UNTREATED_PERSONNEL;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
@@ -143,11 +144,12 @@ public class UntreatedPersonnelNagDialog extends ImmersiveDialogNag {
      *
      * @return {@code true} if the nag dialog should be displayed due to untreated injuries, {@code false} otherwise.
      */
-    public static boolean checkNag(List<Person> activePersonnel, int baseBedCount, boolean isDoctorsUseAdministration) {
-
+    public static boolean checkNag(List<Person> activePersonnel, int baseBedCount, boolean isDoctorsUseAdministration,
+          int mashTheatreCapacity) {
         int totalDoctorCapacity = calculateTotalDoctorCapacity(activePersonnel,
               isDoctorsUseAdministration,
               baseBedCount);
+        totalDoctorCapacity = min(mashTheatreCapacity, totalDoctorCapacity);
 
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNTREATED_PERSONNEL) &&
                      campaignHasUntreatedInjuries(activePersonnel, totalDoctorCapacity);

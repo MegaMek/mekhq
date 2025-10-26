@@ -199,6 +199,8 @@ import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
+import mekhq.campaign.personnel.medical.MASHCapacity;
+import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -230,6 +232,9 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.factionHints.FactionHints;
+import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
+import mekhq.campaign.universe.factionStanding.*;
 import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
 import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumsLibrary;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
@@ -243,6 +248,7 @@ import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -332,6 +338,7 @@ public class Campaign implements ITechManager {
     private transient List<String> newReports;
 
     private boolean fieldKitchenWithinCapacity;
+    private int mashTheatreCapacity;
 
     // this is updated and used per gaming session, it is enabled/disabled via the
     // Campaign options
@@ -563,6 +570,7 @@ public class Campaign implements ITechManager {
         atbConfig = null;
         hasActiveContract = false;
         fieldKitchenWithinCapacity = false;
+        mashTheatreCapacity = 0;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         processProcurement = true;
@@ -2126,6 +2134,18 @@ public class Campaign implements ITechManager {
     public void setFieldKitchenWithinCapacity(boolean fieldKitchenWithinCapacity) {
         this.fieldKitchenWithinCapacity = fieldKitchenWithinCapacity;
     }
+
+    public boolean getMashTheatresWithinCapacity() {
+        return mashTheatreCapacity >= getPatientsAssignedToDoctors().size();
+    }
+
+    public int getMashTheatreCapacity() {
+        return mashTheatreCapacity;
+    }
+
+    public void setMashTheatreCapacity(int mashTheatreCapacity) {
+        this.mashTheatreCapacity = mashTheatreCapacity;
+    }
     // endregion Person Creation
 
     // region Personnel Recruitment
@@ -2945,6 +2965,13 @@ public class Campaign implements ITechManager {
             }
         }
         return patients;
+    }
+
+    public List<Person> getPatientsAssignedToDoctors() {
+        return getPatients()
+                     .stream()
+                     .filter(patient -> patient.getDoctorId() != null)
+                     .toList();
     }
 
     /**
@@ -5756,6 +5783,8 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "asTechPoolMinutes", asTechPoolMinutes);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "asTechPoolOvertime", asTechPoolOvertime);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "medicPool", medicPool);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "fieldKitchenWithinCapacity", fieldKitchenWithinCapacity);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "mashTheatreCapacity", mashTheatreCapacity);
         getCamouflage().writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "colour", getColour().name());
         getUnitIcon().writeToXML(writer, indent);
