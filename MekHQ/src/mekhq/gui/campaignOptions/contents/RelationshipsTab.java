@@ -85,8 +85,6 @@ public class RelationshipsTab {
     private JCheckBox chkUseManualMarriages;
     private JCheckBox chkUseClanPersonnelMarriages;
     private JCheckBox chkUsePrisonerMarriages;
-    private JLabel lblNoInterestInMarriageDiceSize;
-    private JSpinner spnNoInterestInMarriageDiceSize;
     private JLabel lblCheckMutualAncestorsDepth;
     private JSpinner spnCheckMutualAncestorsDepth;
     private JCheckBox chkLogMarriageNameChanges;
@@ -100,8 +98,6 @@ public class RelationshipsTab {
     private JSpinner spnRandomMarriageAgeRange;
     private JLabel lblRandomMarriageOppositeSexDiceSize;
     private JSpinner spnRandomMarriageDiceSize;
-    private JLabel lblRandomSameSexMarriageDiceSize;
-    private JSpinner spnRandomSameSexMarriageDiceSize;
     private JLabel lblRandomNewDependentMarriage;
     private JSpinner spnRandomNewDependentMarriage;
     //end Marriage Tab
@@ -152,6 +148,14 @@ public class RelationshipsTab {
     private JSpinner spnRandomProcreationRelationshipDiceSize;
     private JLabel lblRandomProcreationRelationshiplessDiceSize;
     private JSpinner spnRandomProcreationRelationshiplessDiceSize;
+
+    private JPanel pnlRandomSexualityPanel;
+    private JLabel lblNoInterestInRelationshipsDiceSize;
+    private JSpinner spnNoInterestInRelationshipsDiceSize;
+    private JLabel lblPrefersSameSexDiceSize;
+    private JSpinner spnPrefersSameSexDiceSize;
+    private JLabel lblPrefersBothSexesDiceSize;
+    private JSpinner spnPrefersBothSexesDiceSize;
     //end Procreation Tab
 
     /**
@@ -238,8 +242,6 @@ public class RelationshipsTab {
         chkUseManualMarriages = new JCheckBox();
         chkUseClanPersonnelMarriages = new JCheckBox();
         chkUsePrisonerMarriages = new JCheckBox();
-        lblNoInterestInMarriageDiceSize = new JLabel();
-        spnNoInterestInMarriageDiceSize = new JSpinner();
         lblCheckMutualAncestorsDepth = new JLabel();
         spnCheckMutualAncestorsDepth = new JSpinner();
         chkLogMarriageNameChanges = new JCheckBox();
@@ -259,10 +261,16 @@ public class RelationshipsTab {
 
         lblRandomMarriageOppositeSexDiceSize = new JLabel();
         spnRandomMarriageDiceSize = new JSpinner();
-        lblRandomSameSexMarriageDiceSize = new JLabel();
-        spnRandomSameSexMarriageDiceSize = new JSpinner();
         lblRandomNewDependentMarriage = new JLabel();
         spnRandomNewDependentMarriage = new JSpinner();
+
+        pnlRandomSexualityPanel = new JPanel();
+        lblNoInterestInRelationshipsDiceSize = new JLabel();
+        spnNoInterestInRelationshipsDiceSize = new JSpinner();
+        lblPrefersSameSexDiceSize = new JLabel();
+        spnPrefersSameSexDiceSize = new JSpinner();
+        lblPrefersBothSexesDiceSize = new JLabel();
+        spnPrefersBothSexesDiceSize = new JSpinner();
     }
 
     /**
@@ -316,14 +324,6 @@ public class RelationshipsTab {
         chkUsePrisonerMarriages = new CampaignOptionsCheckBox("UsePrisonerMarriages");
         chkUsePrisonerMarriages.addMouseListener(createTipPanelUpdater(marriageHeader, "UsePrisonerMarriages"));
 
-        lblNoInterestInMarriageDiceSize = new CampaignOptionsLabel("NoInterestInMarriageDiceSize");
-        lblNoInterestInMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
-              "NoInterestInMarriageDiceSize"));
-        spnNoInterestInMarriageDiceSize = new CampaignOptionsSpinner("NoInterestInMarriageDiceSize",
-              10, 1, 100000, 1);
-        spnNoInterestInMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
-              "NoInterestInMarriageDiceSize"));
-
         lblCheckMutualAncestorsDepth = new CampaignOptionsLabel("CheckMutualAncestorsDepth");
         lblCheckMutualAncestorsDepth.addMouseListener(createTipPanelUpdater(marriageHeader,
               "CheckMutualAncestorsDepth"));
@@ -349,11 +349,6 @@ public class RelationshipsTab {
 
         layout.gridy++;
         panel.add(chkUsePrisonerMarriages, layout);
-
-        layout.gridy++;
-        panel.add(lblNoInterestInMarriageDiceSize, layout);
-        layout.gridx++;
-        panel.add(spnNoInterestInMarriageDiceSize, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -413,14 +408,6 @@ public class RelationshipsTab {
         spnRandomMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
               "RandomMarriageOppositeSexDiceSize"));
 
-        lblRandomSameSexMarriageDiceSize = new CampaignOptionsLabel("RandomSameSexMarriageDiceSize");
-        lblRandomSameSexMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
-              "RandomSameSexMarriageDiceSize"));
-        spnRandomSameSexMarriageDiceSize = new CampaignOptionsSpinner("RandomSameSexMarriageDiceSize",
-              14, 0, 100000, 1);
-        spnRandomSameSexMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
-              "RandomSameSexMarriageDiceSize"));
-
         lblRandomNewDependentMarriage = new CampaignOptionsLabel("RandomNewDependentMarriage");
         lblRandomNewDependentMarriage.addMouseListener(createTipPanelUpdater(marriageHeader,
               "RandomNewDependentMarriage"));
@@ -464,9 +451,9 @@ public class RelationshipsTab {
 
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(lblRandomSameSexMarriageDiceSize, layout);
+        panel.add(lblPrefersSameSexDiceSize, layout);
         layout.gridx++;
-        panel.add(spnRandomSameSexMarriageDiceSize, layout);
+        panel.add(spnPrefersSameSexDiceSize, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -618,11 +605,12 @@ public class RelationshipsTab {
         // Header
         procreationHeader = new CampaignOptionsHeaderPanel("ProcreationTab",
               getImageDirectory() + "logo_hanseatic_league.png",
-              6);
+              9);
 
         // Contents
         pnlProcreationGeneralOptionsPanel = createProcreationGeneralOptionsPanel();
         pnlRandomProcreationPanel = createRandomProcreationPanel();
+        pnlRandomSexualityPanel = createRandomSexualityPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ProcreationTab", true);
@@ -632,13 +620,21 @@ public class RelationshipsTab {
         layoutParent.gridx = 0;
         layoutParent.gridy = 0;
         panel.add(procreationHeader, layoutParent);
+        layoutParent.gridy++;
 
         layoutParent.gridy++;
         layoutParent.gridwidth = 1;
+        layoutParent.gridheight = 2;  // Span 2 rows vertically
+        layoutParent.fill = GridBagConstraints.BOTH;
         panel.add(pnlProcreationGeneralOptionsPanel, layoutParent);
 
         layoutParent.gridx++;
+        layoutParent.gridheight = 1;  // Reset to single row
+        layoutParent.weighty = 0.5;   // Give equal vertical space
         panel.add(pnlRandomProcreationPanel, layoutParent);
+
+        layoutParent.gridy++;  // Move down one row
+        panel.add(pnlRandomSexualityPanel, layoutParent);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "ProcreationTab");
@@ -860,6 +856,59 @@ public class RelationshipsTab {
         return panel;
     }
 
+    private JPanel createRandomSexualityPanel() {
+        // Contents
+        lblNoInterestInRelationshipsDiceSize = new CampaignOptionsLabel("NoInterestInRelationshipsDiceSize");
+        lblNoInterestInRelationshipsDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
+              "NoInterestInRelationshipsDiceSize"));
+        spnNoInterestInRelationshipsDiceSize = new CampaignOptionsSpinner("NoInterestInRelationshipsDiceSize",
+              10, 1, 100000, 1);
+        spnNoInterestInRelationshipsDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
+              "NoInterestInRelationshipsDiceSize"));
+
+        lblPrefersSameSexDiceSize = new CampaignOptionsLabel("PrefersSameSexDiceSize");
+        lblPrefersSameSexDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
+              "PrefersSameSexDiceSize"));
+        spnPrefersSameSexDiceSize = new CampaignOptionsSpinner("PrefersSameSexDiceSize",
+              14, 0, 100000, 1);
+        spnPrefersSameSexDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
+              "PrefersSameSexDiceSize"));
+
+        lblPrefersBothSexesDiceSize = new CampaignOptionsLabel("PrefersBothSexesDiceSize");
+        lblPrefersBothSexesDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
+              "PrefersBothSexesDiceSize"));
+        spnPrefersBothSexesDiceSize = new CampaignOptionsSpinner("PrefersBothSexesDiceSize",
+              20, 0, 100000, 1);
+        spnPrefersBothSexesDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
+              "PrefersBothSexesDiceSize"));
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("RandomSexualityPanel", true,
+              "RandomSexualityPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(lblNoInterestInRelationshipsDiceSize, layout);
+        layout.gridx++;
+        panel.add(spnNoInterestInRelationshipsDiceSize, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblPrefersSameSexDiceSize, layout);
+        layout.gridx++;
+        panel.add(spnPrefersSameSexDiceSize, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblPrefersBothSexesDiceSize, layout);
+        layout.gridx++;
+        panel.add(spnPrefersBothSexesDiceSize, layout);
+
+        return panel;
+    }
+
     /**
      * Loads the default {@link CampaignOptions} values into the RelationshipsTab components. This is a shortcut for
      * calling {@link #loadValuesFromCampaignOptions(CampaignOptions)} with {@code null}.
@@ -885,7 +934,6 @@ public class RelationshipsTab {
         chkUseManualMarriages.setSelected(options.isUseManualMarriages());
         chkUseClanPersonnelMarriages.setSelected(options.isUseClanPersonnelMarriages());
         chkUsePrisonerMarriages.setSelected(options.isUsePrisonerMarriages());
-        spnNoInterestInMarriageDiceSize.setValue(options.getNoInterestInRelationshipsDiceSize());
         spnCheckMutualAncestorsDepth.setValue(options.getCheckMutualAncestorsDepth());
         chkLogMarriageNameChanges.setSelected(options.isLogMarriageNameChanges());
         comboRandomMarriageMethod.setSelectedItem(options.getRandomMarriageMethod());
@@ -893,7 +941,6 @@ public class RelationshipsTab {
         chkUseRandomPrisonerMarriages.setSelected(options.isUseRandomPrisonerMarriages());
         spnRandomMarriageAgeRange.setValue(options.getRandomMarriageAgeRange());
         spnRandomMarriageDiceSize.setValue(options.getRandomMarriageDiceSize());
-        spnRandomSameSexMarriageDiceSize.setValue(options.getInterestedInSameSexDiceSize());
         spnRandomNewDependentMarriage.setValue(options.getRandomNewDependentMarriage());
 
         // Divorce
@@ -926,6 +973,9 @@ public class RelationshipsTab {
         chkUseRandomPrisonerProcreation.setSelected(options.isUseRandomPrisonerProcreation());
         spnRandomProcreationRelationshipDiceSize.setValue(options.getRandomProcreationRelationshipDiceSize());
         spnRandomProcreationRelationshiplessDiceSize.setValue(options.getRandomProcreationRelationshiplessDiceSize());
+        spnNoInterestInRelationshipsDiceSize.setValue(options.getNoInterestInRelationshipsDiceSize());
+        spnPrefersSameSexDiceSize.setValue(options.getInterestedInSameSexDiceSize());
+        spnPrefersBothSexesDiceSize.setValue(options.getInterestedInBothSexesDiceSize());
     }
 
     /**
@@ -945,7 +995,6 @@ public class RelationshipsTab {
         options.setUseManualMarriages(chkUseManualMarriages.isSelected());
         options.setUseClanPersonnelMarriages(chkUseClanPersonnelMarriages.isSelected());
         options.setUsePrisonerMarriages(chkUsePrisonerMarriages.isSelected());
-        options.setNoInterestInRelationshipsDiceSize((int) spnNoInterestInMarriageDiceSize.getValue());
         options.setCheckMutualAncestorsDepth((int) spnCheckMutualAncestorsDepth.getValue());
         options.setLogMarriageNameChanges(chkLogMarriageNameChanges.isSelected());
         options.setRandomMarriageMethod(comboRandomMarriageMethod.getSelectedItem());
@@ -953,7 +1002,6 @@ public class RelationshipsTab {
         options.setUseRandomPrisonerMarriages(chkUseRandomPrisonerMarriages.isSelected());
         options.setRandomMarriageAgeRange((int) spnRandomMarriageAgeRange.getValue());
         options.setRandomMarriageDiceSize((int) spnRandomMarriageDiceSize.getValue());
-        options.setInterestedInSameSexDiceSize((int) spnRandomSameSexMarriageDiceSize.getValue());
         options.setRandomNewDependentMarriage((int) spnRandomNewDependentMarriage.getValue());
 
         // Divorce
@@ -986,5 +1034,8 @@ public class RelationshipsTab {
         options.setUseRandomPrisonerProcreation(chkUseRandomPrisonerProcreation.isSelected());
         options.setRandomProcreationRelationshipDiceSize((int) spnRandomProcreationRelationshipDiceSize.getValue());
         options.setRandomProcreationRelationshiplessDiceSize((int) spnRandomProcreationRelationshiplessDiceSize.getValue());
+        options.setInterestedInSameSexDiceSize((int) spnPrefersSameSexDiceSize.getValue());
+        options.setNoInterestInRelationshipsDiceSize((int) spnNoInterestInRelationshipsDiceSize.getValue());
+        options.setInterestedInBothSexesDiceSize((int) spnPrefersBothSexesDiceSize.getValue());
     }
 }
