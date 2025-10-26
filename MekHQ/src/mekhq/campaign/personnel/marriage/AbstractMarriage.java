@@ -460,13 +460,12 @@ public abstract class AbstractMarriage {
     protected boolean isPotentialRandomSpouse(final Campaign campaign, final LocalDate today, final Person person,
           final Person potentialSpouse, final boolean prefersMen, final boolean prefersWomen) {
         // A Potential Spouse must:
-        // 1. Be the specified gender
+        // 1. Be a compatible gender
         Gender potentialSpouseGender = potentialSpouse.getGender();
-        if (prefersMen && !potentialSpouseGender.isMale()) {
-            return false;
-        }
+        boolean isCompatibleGender = (prefersMen && potentialSpouseGender.isMale())
+                                           || (prefersWomen && potentialSpouseGender.isFemale());
 
-        if (prefersWomen && !potentialSpouseGender.isFemale()) {
+        if (!isCompatibleGender) {
             return false;
         }
 
