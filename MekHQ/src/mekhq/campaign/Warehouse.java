@@ -344,14 +344,14 @@ public class Warehouse {
         int count = 0;
         for (Part warehousePart : getParts()) {
             if (warehousePart.isSpare() && warehousePart.isSamePartType(targetPart)) {
-                count += getPartQuantity(warehousePart);
+                count += warehousePart.getQuantity();
             }
         }
 
         return count;
     }
 
-    //TODO: getPartQuantity should be an overloaded method in Part.java, I'm just getting it out of campaign
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public int getPartQuantity(Part p) {
         if (p instanceof Armor) {
             return ((Armor) p).getAmount();
