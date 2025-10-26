@@ -3999,6 +3999,15 @@ public class Person {
                 person.setJoinedCampaign(campaign.getLocalDate());
             }
 
+            // <50.10 compatibility handler
+            if (updateSkillsForVehicleProfessions(person, person.getPrimaryRole()) ||
+                      updateSkillsForVehicleProfessions(person, person.getSecondaryRole())) {
+                campaign.addReport(String.format(resources.getString("vehicleProfessionSkillChange"),
+                      spanOpeningWithCustomColor(getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
+            }
+
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
             if (!person.canPerformRole(campaign.getLocalDate(), person.getSecondaryRole(), false)) {
@@ -4024,6 +4033,30 @@ public class Person {
         }
 
         return person;
+    }
+
+    private static boolean updateSkillsForVehicleProfessions(Person person, PersonnelRole role) {
+        String drivingSkillType = switch (role) {
+            case VTOL_PILOT -> S_PILOT_VTOL;
+            case NAVAL_VEHICLE_DRIVER -> S_PILOT_NVEE;
+            case GROUND_VEHICLE_DRIVER -> S_PILOT_GVEE;
+            default -> null;
+        };
+
+        if (drivingSkillType == null) {
+            return false;
+        }
+
+        Skill drivingSkill = person.getSkill(drivingSkillType);
+        Skill gunnerySkill = person.getSkill(S_GUN_VEE);
+
+        if (drivingSkill != null && gunnerySkill == null) {
+            int drivingLevel = drivingSkill.getLevel();
+            person.addSkill(S_GUN_VEE, drivingLevel, 0);
+            return true;
+        }
+
+        return false;
     }
     // endregion File I/O
 

@@ -300,7 +300,11 @@ public class CampaignOptionsUnmarshaller {
             case "useRandomToughness" -> campaignOptions.setUseRandomToughness(parseBoolean(nodeContents));
             case "useArtillery" -> campaignOptions.setUseArtillery(parseBoolean(nodeContents));
             case "useAbilities" -> campaignOptions.setUseAbilities(parseBoolean(nodeContents));
-            case "useCommanderAbilitiesOnly" -> campaignOptions.setUseCommanderAbilitiesOnly(parseBoolean(
+            case "onlyCommandersMatterVehicles" -> campaignOptions.setOnlyCommandersMatterVehicles(parseBoolean(
+                  nodeContents));
+            case "onlyCommandersMatterInfantry" -> campaignOptions.setOnlyCommandersMatterInfantry(parseBoolean(
+                  nodeContents));
+            case "onlyCommandersMatterBattleArmor" -> campaignOptions.setOnlyCommandersMatterBattleArmor(parseBoolean(
                   nodeContents));
             case "useEdge" -> campaignOptions.setUseEdge(parseBoolean(nodeContents));
             case "useSupportEdge" -> campaignOptions.setUseSupportEdge(parseBoolean(nodeContents));

@@ -225,7 +225,9 @@ public class CampaignOptions {
     private boolean useRandomToughness;
     private boolean useArtillery;
     private boolean useAbilities;
-    private boolean useCommanderAbilitiesOnly;
+    private boolean onlyCommandersMatterVehicles;
+    private boolean onlyCommandersMatterInfantry;
+    private boolean onlyCommandersMatterBattleArmor;
     private boolean useEdge;
     private boolean useSupportEdge;
     private boolean useImplants;
@@ -798,7 +800,9 @@ public class CampaignOptions {
         setUseRandomToughness(false);
         setUseArtillery(false);
         setUseAbilities(false);
-        setUseCommanderAbilitiesOnly(false);
+        setOnlyCommandersMatterVehicles(false);
+        setOnlyCommandersMatterInfantry(false);
+        setOnlyCommandersMatterBattleArmor(false);
         setUseEdge(false);
         setUseSupportEdge(false);
         setUseImplants(false);
@@ -1600,12 +1604,28 @@ public class CampaignOptions {
         this.useAbilities = useAbilities;
     }
 
-    public boolean isUseCommanderAbilitiesOnly() {
-        return useCommanderAbilitiesOnly;
+    public boolean isOnlyCommandersMatterVehicles() {
+        return onlyCommandersMatterVehicles;
     }
 
-    public void setUseCommanderAbilitiesOnly(final boolean useCommanderAbilitiesOnly) {
-        this.useCommanderAbilitiesOnly = useCommanderAbilitiesOnly;
+    public void setOnlyCommandersMatterVehicles(final boolean onlyCommandersMatterVehicles) {
+        this.onlyCommandersMatterVehicles = onlyCommandersMatterVehicles;
+    }
+
+    public boolean isOnlyCommandersMatterInfantry() {
+        return onlyCommandersMatterInfantry;
+    }
+
+    public void setOnlyCommandersMatterInfantry(final boolean onlyCommandersMatterInfantry) {
+        this.onlyCommandersMatterInfantry = onlyCommandersMatterInfantry;
+    }
+
+    public boolean isOnlyCommandersMatterBattleArmor() {
+        return onlyCommandersMatterBattleArmor;
+    }
+
+    public void setOnlyCommandersMatterBattleArmor(final boolean onlyCommandersMatterBattleArmor) {
+        this.onlyCommandersMatterBattleArmor = onlyCommandersMatterBattleArmor;
     }
 
     public boolean isUseEdge() {
