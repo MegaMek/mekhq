@@ -3108,7 +3108,7 @@ public class Campaign implements ITechManager {
 
     @Deprecated(since = "0.50.10", forRemoval = true)
     private int getQuantity(Part part) {
-        return getWarehouse().getPartQuantity(part);
+        return getWarehouse().getPartQuantity(part, true);
     }
 
     public Part getPart(int id) {
