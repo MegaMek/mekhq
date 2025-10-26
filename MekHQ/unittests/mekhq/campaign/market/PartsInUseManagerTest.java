@@ -84,6 +84,7 @@ class PartsInUseManagerTest {
         @BeforeAll
         public static void beforeAll() {
             Ranks.initializeRankSystems();
+            campaign = MHQTestUtilities.getTestCampaign();
         }
 
         @Nested
@@ -94,7 +95,6 @@ class PartsInUseManagerTest {
             @BeforeEach
             public void beforeEach() {
                 // beforeEach MUST refresh Campaign Options!
-                campaign = MHQTestUtilities.getTestCampaign();
                 campaign.setCampaignOptions(new CampaignOptions());
             }
 
@@ -265,8 +265,8 @@ class PartsInUseManagerTest {
         }
 
         /**
-         * {@link Campaign#getDefaultStockPercent} is private, so we'll need to use reflection to get the method for
-         * testing
+         * {@code PartsInUseManager#getDefaultStockPercent(Part)} is private, so we'll need to use reflection to get the
+         * method for testing
          */
         @Nested
         public class TestAutoLogisticsDefaultStockPercent {
@@ -305,7 +305,7 @@ class PartsInUseManagerTest {
             }
 
             /**
-             * @return parts that are not explicitly handled by {@link Campaign#getDefaultStockPercent(Part)}
+             * @return parts that are not explicitly handled by {@code PartsInUseManager#getDefaultStockPercent(Part)}
              */
             public static Stream<Part> otherUnhandledDefaultStockPercentParts() {
                 return Stream.of(new MekGyro(), new Cubicle(), new MekSensor(), new MekLifeSupport());
