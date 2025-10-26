@@ -43,58 +43,29 @@ import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_MONTH;
 import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_WEEK;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
-import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.force.ForceType.STANDARD;
-import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
-import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
-import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
-import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
-import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
-import static mekhq.campaign.personnel.PersonnelOptions.*;
-import static mekhq.campaign.personnel.education.EducationController.getAcademy;
-import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
-import static mekhq.campaign.personnel.enums.BloodmarkLevel.BLOODMARK_ZERO;
-import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCommandersDay;
-import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreedomDay;
-import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
-import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
-import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
-import static mekhq.campaign.personnel.skills.Aging.getMilestone;
-import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
-import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ASTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_ZERO_G_OPERATIONS;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
-import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
-import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
-import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
-import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.processFatigueRecovery;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.RETIREMENT_AGE;
-import static mekhq.campaign.randomEvents.GrayMonday.GRAY_MONDAY_EVENTS_BEGIN;
-import static mekhq.campaign.randomEvents.GrayMonday.GRAY_MONDAY_EVENTS_END;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
-import static mekhq.campaign.stratCon.StratConRulesManager.processIgnoredDynamicScenario;
-import static mekhq.campaign.stratCon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
-import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.isIneligibleToPerformProcurement;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
 import java.text.MessageFormat;
@@ -116,7 +87,6 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.codeUtilities.StringUtility;
 import megamek.common.Player;
 import megamek.common.SimpleTechLevel;
 import megamek.common.annotations.Nullable;
@@ -183,7 +153,6 @@ import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -197,20 +166,13 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.mission.enums.ScenarioStatus;
-import mekhq.campaign.mission.enums.ScenarioType;
-import mekhq.campaign.mission.resupplyAndCaches.Resupply;
-import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.BAArmor;
 import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.SpacecraftCoolingSystem;
@@ -221,63 +183,38 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.protomeks.ProtoMekArmor;
-import mekhq.campaign.personnel.Bloodmark;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.RandomDependents;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
-import mekhq.campaign.personnel.education.Academy;
-import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.BloodmarkLevel;
-import mekhq.campaign.personnel.enums.ExtraIncome;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
-import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
-import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
-import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
-import mekhq.campaign.personnel.lifeEvents.ComingOfAgeAnnouncement;
-import mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement;
-import mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement;
-import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
-import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
-import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.skills.Appraisal;
 import mekhq.campaign.personnel.skills.Attributes;
-import mekhq.campaign.personnel.skills.EscapeSkills;
-import mekhq.campaign.personnel.skills.QuickTrain;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.personnel.skills.enums.AgingMilestone;
-import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.randomEvents.GrayMonday;
 import mekhq.campaign.randomEvents.RandomEventLibraries;
-import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
-import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.storyArc.StoryArc;
-import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConContractInitializer;
 import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.stratCon.StratConTrackState;
@@ -293,7 +230,10 @@ import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
-import mekhq.campaign.universe.factionStanding.*;
+import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
+import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumsLibrary;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
@@ -301,7 +241,6 @@ import mekhq.campaign.universe.selectors.factionSelectors.RangedFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
-import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -310,7 +249,6 @@ import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.IAutosaveService;
-import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 
@@ -393,7 +331,7 @@ public class Campaign implements ITechManager {
     private transient String currentReportHTML;
     private transient List<String> newReports;
 
-    private Boolean fieldKitchenWithinCapacity;
+    private boolean fieldKitchenWithinCapacity;
 
     // this is updated and used per gaming session, it is enabled/disabled via the
     // Campaign options
@@ -485,7 +423,7 @@ public class Campaign implements ITechManager {
      * <p>This includes the first day of the week set to Monday and the minimal number of days in the first week of
      * the year set to 4.</p>
      */
-    private static final WeekFields WEEK_FIELDS = WeekFields.ISO;
+    public static final WeekFields WEEK_FIELDS = WeekFields.ISO;
 
     /**
      * Represents the different types of administrative specializations. Each specialization corresponds to a distinct
@@ -649,6 +587,10 @@ public class Campaign implements ITechManager {
         this.campaignSummary.setCampaign(this);
     }
 
+    public IAutosaveService getAutosaveService() {
+        return autosaveService;
+    }
+
     /**
      * @return the app
      */
@@ -788,6 +730,10 @@ public class Campaign implements ITechManager {
         return new ArrayList<>(forceIds.values());
     }
 
+    public TreeMap<Integer, Force> getForceIds() {
+        return forceIds;
+    }
+
     /**
      * Retrieves all units in the Table of Organization and Equipment (TOE).
      *
@@ -925,6 +871,10 @@ public class Campaign implements ITechManager {
     // endregion Markets
 
     // region Personnel Modules
+    public RandomDeath getRandomDeath() {
+        return randomDeath;
+    }
+
     public void resetRandomDeath() {
         setRandomDeath(new RandomDeath());
     }
@@ -1066,6 +1016,11 @@ public class Campaign implements ITechManager {
         this.shipSearchExpiration = shipSearchExpiration;
     }
 
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    public int getShipSearchType() {
+        return shipSearchType;
+    }
+
     /**
      * Sets the unit type to search for.
      */
@@ -1078,67 +1033,6 @@ public class Campaign implements ITechManager {
     public void startShipSearch(int unitType) {
         setShipSearchStart(getLocalDate());
         setShipSearchType(unitType);
-    }
-
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    private void processShipSearch() {
-        if (getShipSearchStart() == null) {
-            return;
-        }
-
-        StringBuilder report = new StringBuilder();
-        if (getFinances().debit(TransactionType.UNIT_PURCHASE,
-              getLocalDate(),
-              getAtBConfig().shipSearchCostPerWeek(),
-              "Ship Search")) {
-            report.append(getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString())
-                  .append(" deducted for ship search.");
-        } else {
-            addReport("<font color=" +
-                            ReportingUtilities.getNegativeColor() +
-                            ">Insufficient funds for ship search.</font>");
-            setShipSearchStart(null);
-            return;
-        }
-
-        long numDays = ChronoUnit.DAYS.between(getShipSearchStart(), getLocalDate());
-        if (numDays > 21) {
-            int roll = d6(2);
-            TargetRoll target = getAtBConfig().shipSearchTargetRoll(shipSearchType, this);
-            setShipSearchStart(null);
-            report.append("<br/>Ship search target: ").append(target.getValueAsString()).append(" roll: ").append(roll);
-            // TODO : mos zero should make ship available on retainer
-            if (roll >= target.getValue()) {
-                report.append("<br/>Search successful. ");
-
-                MekSummary ms = getUnitGenerator().generate(getFaction().getShortName(),
-                      shipSearchType,
-                      -1,
-                      getGameYear(),
-                      getAtBUnitRatingMod());
-
-                if (ms == null) {
-                    ms = getAtBConfig().findShip(shipSearchType);
-                }
-
-                if (ms != null) {
-                    setShipSearchResult(ms.getName());
-                    setShipSearchExpiration(getLocalDate().plusDays(31));
-                    report.append(getShipSearchResult())
-                          .append(" is available for purchase for ")
-                          .append(Money.of(ms.getCost()).toAmountAndSymbolString())
-                          .append(" until ")
-                          .append(MekHQ.getMHQOptions().getDisplayFormattedDate(getShipSearchExpiration()));
-                } else {
-                    report.append(" <font color=")
-                          .append(ReportingUtilities.getNegativeColor())
-                          .append(">Could not determine ship type.</font>");
-                }
-            } else {
-                report.append("<br/>Ship search unsuccessful.");
-            }
-        }
-        addReport(report.toString());
     }
 
     @Deprecated(since = "0.50.10", forRemoval = true)
@@ -1808,6 +1702,10 @@ public class Campaign implements ITechManager {
         return location;
     }
 
+    public List<String> getTurnoverRetirementInformation() {
+        return turnoverRetirementInformation;
+    }
+
     /**
      * Imports a {@link Unit} into a campaign.
      *
@@ -2221,8 +2119,12 @@ public class Campaign implements ITechManager {
         return person;
     }
 
-    public Boolean getFieldKitchenWithinCapacity() {
+    public boolean getFieldKitchenWithinCapacity() {
         return fieldKitchenWithinCapacity;
+    }
+
+    public void setFieldKitchenWithinCapacity(boolean fieldKitchenWithinCapacity) {
+        this.fieldKitchenWithinCapacity = fieldKitchenWithinCapacity;
     }
     // endregion Person Creation
 
@@ -3132,6 +3034,10 @@ public class Campaign implements ITechManager {
 
     public String getCurrentReportHTML() {
         return currentReportHTML;
+    }
+
+    public List<String> getNewReports() {
+        return newReports;
     }
 
     public void setNewReports(List<String> reports) {
@@ -4849,1310 +4755,21 @@ public class Campaign implements ITechManager {
         return Math.abs(Math.min(total, role));
     }
 
-    private void processNewDayATBScenarios() {
-        // First, we get the list of all active AtBContracts
-        List<AtBContract> contracts = getActiveAtBContracts(true);
-
-        // Second, we process them and any already generated scenarios
-        for (AtBContract contract : contracts) {
-            /*
-             * Situations like a delayed start or running out of funds during transit can
-             * delay arrival until after the contract start. In that case, shift the
-             * starting and ending dates before making any battle rolls. We check that the
-             * unit is actually on route to the planet in case the user is using a custom
-             * system for transport or splitting the unit, etc.
-             */
-            if (!getLocation().isOnPlanet() &&
-                      !getLocation().getJumpPath().isEmpty() &&
-                      getLocation().getJumpPath().getLastSystem().getId().equals(contract.getSystemId())) {
-                // transitTime is measured in days; so we round up to the next whole day
-                contract.setStartAndEndDate(getLocalDate().plusDays((int) Math.ceil(getLocation().getTransitTime())));
-                addReport("The start and end dates of " +
-                                contract.getHyperlinkedName() +
-                                " have been shifted to reflect the current ETA.");
-
-                if (campaignOptions.isUseStratCon() && contract.getMoraleLevel().isRouted()) {
-                    LocalDate newRoutEndDate = contract.getStartDate().plusMonths(max(1, d6() - 3)).minusDays(1);
-                    contract.setRoutEndDate(newRoutEndDate);
-                }
-
-                continue;
-            }
-
-            if (getLocalDate().equals(contract.getStartDate())) {
-                getUnits().forEach(unit -> unit.setSite(contract.getRepairLocation(getAtBUnitRatingMod())));
-            }
-
-            if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                int deficit = getDeploymentDeficit(contract);
-                StratConCampaignState campaignState = contract.getStratconCampaignState();
-
-                if (campaignState != null && deficit > 0) {
-                    addReport(String.format(resources.getString("contractBreach.text"),
-                          contract.getHyperlinkedName(),
-                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
-                          CLOSING_SPAN_TAG));
-
-                    campaignState.updateVictoryPoints(-1);
-                } else if (deficit > 0) {
-                    contract.addPlayerMinorBreaches(deficit);
-                    addReport("Failure to meet " +
-                                    contract.getHyperlinkedName() +
-                                    " requirements resulted in " +
-                                    deficit +
-                                    ((deficit == 1) ? " minor contract breach" : " minor contract breaches"));
-                }
-            }
-
-            if (Objects.equals(location.getCurrentSystem(), contract.getSystem())) {
-                if (!automatedMothballUnits.isEmpty()) {
-                    performAutomatedActivation(this);
-                }
-            }
-
-            for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
-                if ((scenario.getDate() != null) && scenario.getDate().isBefore(getLocalDate())) {
-                    if (getCampaignOptions().isUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
-                        StratConCampaignState campaignState = contract.getStratconCampaignState();
-
-                        if (campaignState == null) {
-                            return;
-                        }
-
-                        processIgnoredDynamicScenario(scenario.getId(), campaignState);
-
-                        ScenarioType scenarioType = scenario.getStratConScenarioType();
-                        if (scenarioType.isResupply()) {
-                            processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
-                        }
-
-                        scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
-                        scenario.clearAllForcesAndPersonnel(this);
-                    } else {
-                        scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
-                        contract.addPlayerMinorBreach();
-
-                        addReport("Failure to deploy for " +
-                                        scenario.getHyperlinkedName() +
-                                        " resulted in a minor contract breach.");
-                    }
-                }
-            }
-        }
-
-        // Third, on Mondays we generate new scenarios for the week
-        if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-            AtBScenarioFactory.createScenariosForNewWeek(this);
-        }
-
-        // Fourth, we look at deployments for pre-existing and new scenarios
-        for (AtBContract contract : contracts) {
-            contract.checkEvents(this);
-
-            // If there is a standard battle set for today, deploy the lance.
-            for (final AtBScenario atBScenario : contract.getCurrentAtBScenarios()) {
-                if ((atBScenario.getDate() != null) && atBScenario.getDate().equals(getLocalDate())) {
-                    int forceId = atBScenario.getCombatTeamId();
-                    if ((combatTeams.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
-                        // If any unit in the force is under repair, don't deploy the force
-                        // Merely removing the unit from deployment would break with user expectation
-                        boolean forceUnderRepair = false;
-                        for (UUID uid : forceIds.get(forceId).getAllUnits(false)) {
-                            Unit u = getHangar().getUnit(uid);
-                            if ((u != null) && u.isUnderRepair()) {
-                                forceUnderRepair = true;
-                                break;
-                            }
-                        }
-
-                        if (!forceUnderRepair) {
-                            forceIds.get(forceId).setScenarioId(atBScenario.getId(), this);
-                            atBScenario.addForces(forceId);
-
-                            addReport(MessageFormat.format(resources.getString("atbScenarioTodayWithForce.format"),
-                                  atBScenario.getHyperlinkedName(),
-                                  forceIds.get(forceId).getName()));
-                            MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), atBScenario));
-                        } else {
-                            if (atBScenario.getHasTrack()) {
-                                addReport(MessageFormat.format(resources.getString("atbScenarioToday.stratCon"),
-                                      atBScenario.getHyperlinkedName()));
-                            } else {
-                                addReport(MessageFormat.format(resources.getString("atbScenarioToday.atb"),
-                                      atBScenario.getHyperlinkedName()));
-                            }
-                        }
-                    } else {
-                        if (atBScenario.getHasTrack()) {
-                            addReport(MessageFormat.format(resources.getString("atbScenarioToday.stratCon"),
-                                  atBScenario.getHyperlinkedName()));
-                        } else {
-                            addReport(MessageFormat.format(resources.getString("atbScenarioToday.atb"),
-                                  atBScenario.getHyperlinkedName()));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     /**
-     * Processes the new day actions for various AtB systems
-     * <p>
-     * It generates contract offers in the contract market, updates ship search expiration and results, processes ship
-     * search on Mondays, awards training experience to eligible training lances on active contracts on Mondays, adds or
-     * removes dependents at the start of the year if the options are enabled, rolls for morale at the start of the
-     * month, and processes ATB scenarios.
-     */
-    private void processNewDayATB() {
-        contractMarket.generateContractOffers(this);
-
-        if ((getShipSearchExpiration() != null) && !getShipSearchExpiration().isAfter(getLocalDate())) {
-            setShipSearchExpiration(null);
-            if (getShipSearchResult() != null) {
-                addReport("Opportunity for purchase of " + getShipSearchResult() + " has expired.");
-                setShipSearchResult(null);
-            }
-        }
-
-        if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-            processShipSearch();
-            processTrainingCombatTeams(this);
-        }
-
-        if (getLocalDate().getDayOfMonth() == 1) {
-            /*
-             * First of the month; roll Morale.
-             */
-            if (campaignOptions.getUnitRatingMethod().isFMMR()) {
-                IUnitRating rating = getUnitRating();
-                rating.reInitialize();
-            }
-
-            for (AtBContract contract : getActiveAtBContracts()) {
-                AtBMoraleLevel oldMorale = contract.getMoraleLevel();
-
-                contract.checkMorale(this, getLocalDate());
-                AtBMoraleLevel newMorale = contract.getMoraleLevel();
-
-                String report = "";
-                if (contract.isPeaceful()) {
-                    report = resources.getString("garrisonDutyRouted.text");
-                } else if (oldMorale != newMorale) {
-                    report = String.format(resources.getString("contractMoraleReport.text"),
-                          newMorale,
-                          contract.getHyperlinkedName(),
-                          newMorale.getToolTipText());
-                }
-
-                if (!report.isBlank()) {
-                    addReport(report);
-                }
-            }
-        }
-
-        // Resupply
-        if (currentDay.getDayOfMonth() == 2) {
-            // This occurs at the end of the 1st day, each month to avoid an awkward mechanics interaction where
-            // personnel might quit or get taken out of fatigue without the player having any opportunity to
-            // intervene before their resupply attempt becomes active.
-            List<AtBContract> activeContracts = getActiveAtBContracts();
-            AtBContract firstNonSubcontract = null;
-            for (AtBContract contract : activeContracts) {
-                if (!contract.isSubcontract()) {
-                    firstNonSubcontract = contract;
-                    break;
-                }
-            }
-
-            if (firstNonSubcontract != null) {
-                if (campaignOptions.isUseStratCon()) {
-                    boolean inLocation = location.isOnPlanet() &&
-                                               location.getCurrentSystem().equals(firstNonSubcontract.getSystem());
-
-                    if (inLocation) {
-                        processResupply(firstNonSubcontract);
-                    }
-                }
-            }
-        }
-
-        int weekOfYear = currentDay.get(WEEK_FIELDS.weekOfYear());
-        boolean isOddWeek = (weekOfYear % 2 == 1);
-        if (campaignOptions.isUseStratCon()
-                  && (currentDay.getDayOfWeek() == DayOfWeek.MONDAY)
-                  && isOddWeek) {
-            negotiateAdditionalSupportPoints(this);
-        }
-
-        processNewDayATBScenarios();
-
-        for (AtBContract contract : getActiveAtBContracts()) {
-            if (campaignOptions.isUseGenericBattleValue() &&
-                      !contract.getContractType().isGarrisonType() &&
-                      contract.getStartDate().equals(currentDay)) {
-                Faction enemyFaction = contract.getEnemy();
-                String enemyFactionCode = contract.getEnemyCode();
-
-                boolean allowBatchalls = true;
-                if (campaignOptions.isUseFactionStandingBatchallRestrictionsSafe()) {
-                    double regard = factionStandings.getRegardForFaction(enemyFactionCode, true);
-                    allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
-                }
-
-                if (enemyFaction.performsBatchalls() && allowBatchalls) {
-                    PerformBatchall batchallDialog = new PerformBatchall(this,
-                          contract.getClanOpponent(),
-                          contract.getEnemyCode());
-
-                    boolean batchallAccepted = batchallDialog.isBatchallAccepted();
-                    contract.setBatchallAccepted(batchallAccepted);
-
-                    if (!batchallAccepted && campaignOptions.isTrackFactionStanding()) {
-                        List<String> reports = factionStandings.processRefusedBatchall(faction.getShortName(),
-                              enemyFactionCode, currentDay.getYear(), campaignOptions.getRegardMultiplier());
-
-                        for (String report : reports) {
-                            addReport(report);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Processes the resupply operation for a given contract.
-     * <p>This method checks if the contract type is not Guerrilla Warfare or if randomInt(4) == 0. If any of
-     * these conditions is met, it calculates the maximum resupply size based on the contract's required lances, creates
-     * an instance of the {@link Resupply} class, and initiates a resupply action.</p>
+     * Advances the campaign by one day, processing all daily events and updates.
      *
-     * @param contract The relevant {@link AtBContract}
-     */
-    private void processResupply(AtBContract contract) {
-        boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare()
-                                    || PIRATE_FACTION_CODE.equals(contract.getEmployerCode());
-
-        if (!isGuerrilla || randomInt(4) == 0) {
-            ResupplyType resupplyType = isGuerrilla ? ResupplyType.RESUPPLY_SMUGGLER : ResupplyType.RESUPPLY_NORMAL;
-            Resupply resupply = new Resupply(this, contract, resupplyType);
-            performResupply(resupply, contract);
-        }
-    }
-
-    /**
-     * Processes the daily activities and updates for all personnel that haven't already left the campaign.
-     * <p>
-     * This method iterates through all personnel and performs various daily updates, including health checks, status
-     * updates, relationship events, and other daily or periodic tasks.
-     * <p>
-     * The following tasks are performed for each person:
-     * <ul>
-     * <li><b>Death Handling:</b> If the person has died, their processing is
-     * skipped for the day.</li>
-     * <li><b>Relationship Events:</b> Processes relationship-related events, such
-     * as marriage or divorce.</li>
-     * <li><b>Reset Actions:</b> Resets the person's minutes left for work and sets
-     * acquisitions made to 0.</li>
-     * <li><b>Medical Events:</b></li>
-     * <li>- If advanced medical care is available, processes the person's daily
-     * healing.</li>
-     * <li>- If advanced medical care is unavailable, decreases the healing wait
-     * time and
-     * applies natural or doctor-assisted healing.</li>
-     * <li><b>Weekly Edge Resets:</b> Resets edge points to their purchased value
-     * weekly (applies
-     * to support personnel).</li>
-     * <li><b>Vocational XP:</b> Awards monthly vocational experience points to the
-     * person where
-     * applicable.</li>
-     * <li><b>Anniversaries:</b> Checks for birthdays or significant anniversaries
-     * and announces
-     * them as needed.</li>
-     * <li><b>autoAwards:</b> On the first day of every month, calculates and awards
-     * support
-     * points based on roles and experience levels.</li>
-     * </ul>
-     * <p>
-     * <b>Concurrency Note:</b>
-     * A separate filtered list of personnel is used to avoid concurrent
-     * modification issues during iteration.
-     * <p>
-     * This method relies on several helper methods to perform specific tasks for
-     * each person,
-     * separating the responsibilities for modularity and readability.
+     * <p>This method delegates to {@link CampaignNewDayManager} to handle all new day processing,
+     * including personnel updates, contract management, financial transactions, maintenance tasks, and other
+     * time-dependent campaign events.</p>
      *
-     * @see #getPersonnelFilteringOutDeparted() Filters out departed personnel before daily processing
-     */
-    public void processNewDayPersonnel() {
-        RecoverMIAPersonnel recovery = new RecoverMIAPersonnel(this, faction, getAtBUnitRatingMod());
-        MedicalController medicalController = new MedicalController(this);
-
-        // This list ensures we don't hit a concurrent modification error
-        List<Person> personnel = getPersonnelFilteringOutDeparted();
-
-        // Prep some data for vocational xp
-        int vocationalXpRate = campaignOptions.getVocationalXP();
-        if (hasActiveContract) {
-            if (campaignOptions.isUseAtB()) {
-                for (AtBContract contract : getActiveAtBContracts()) {
-                    if (!contract.getContractType().isGarrisonType()) {
-                        vocationalXpRate *= 2;
-                        break;
-                    }
-                }
-            } else {
-                vocationalXpRate *= 2;
-            }
-        }
-
-        // Process personnel
-        int peopleWhoCelebrateCommandersDay = 0;
-        int commanderDayTargetNumber = 5;
-        boolean isCommandersDay = isCommandersDay(currentDay) &&
-                                        getCommander() != null &&
-                                        campaignOptions.isShowLifeEventDialogCelebrations();
-        boolean isCampaignPlanetside = location.isOnPlanet();
-        boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
-        boolean isUseFatigue = campaignOptions.isUseFatigue();
-        boolean useBetterMonthlyIncome = campaignOptions.isUseBetterExtraIncome();
-        for (Person person : personnel) {
-            if (person.getStatus().isDepartedUnit()) {
-                continue;
-            }
-
-            PersonnelOptions personnelOptions = person.getOptions();
-
-            // Daily events
-            if (person.getStatus().isMIA()) {
-                recovery.attemptRescueOfPlayerCharacter(person);
-            }
-
-            if (person.getPrisonerStatus().isBecomingBondsman()) {
-                // We use 'isAfter' to avoid situations where we somehow manage to miss the
-                // date.
-                // This shouldn't be necessary, but a safety net never hurt
-                if (currentDay.isAfter(person.getBecomingBondsmanEndDate().minusDays(1))) {
-                    person.setPrisonerStatus(this, BONDSMAN, true);
-                    addReport(String.format(resources.getString("becomeBondsman.text"),
-                          person.getHyperlinkedName(),
-                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
-                          CLOSING_SPAN_TAG));
-                }
-            }
-
-            person.getATOWAttributes().setIlliterate(person.isIlliterate());
-
-            person.resetMinutesLeft(campaignOptions.isTechsUseAdministration());
-            person.setAcquisition(0);
-
-            medicalController.processMedicalEvents(person,
-                  campaignOptions.isUseAgeEffects(),
-                  isClanCampaign(),
-                  currentDay);
-
-            processAnniversaries(person);
-
-            // Weekly events
-            if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
-                if (!randomDeath.processNewWeek(this, getLocalDate(), person)) {
-                    // If the character has died, we don't need to process relationship events
-                    processWeeklyRelationshipEvents(person);
-                }
-
-                person.resetCurrentEdge();
-
-                if (!person.getStatus().isMIA()) {
-                    processFatigueRecovery(this, person, fieldKitchenWithinCapacity);
-                }
-
-                processCompulsionsAndMadness(person, personnelOptions, isUseAdvancedMedical, isUseFatigue);
-            }
-
-            // Monthly events
-            if (currentDay.getDayOfMonth() == 1) {
-                processMonthlyAutoAwards(person);
-
-                if (vocationalXpRate > 0) {
-                    if (processMonthlyVocationalXp(person, vocationalXpRate)) {
-                        personnelWhoAdvancedInXP.add(person);
-                    }
-                }
-
-                if (person.isCommander() &&
-                          campaignOptions.isAllowMonthlyReinvestment() &&
-                          !person.isHasPerformedExtremeExpenditure()) {
-                    String reportString = performDiscretionarySpending(person, finances, currentDay);
-                    if (reportString != null) {
-                        addReport(reportString);
-                    } else {
-                        LOGGER.error("Unable to process discretionary spending for {}", person.getFullTitle());
-                    }
-                }
-
-                String extraIncomeReport = ExtraIncome.processExtraIncome(finances, person, currentDay,
-                      useBetterMonthlyIncome);
-                if (!StringUtility.isNullOrBlank(extraIncomeReport)) {
-                    addReport(extraIncomeReport);
-                }
-
-                person.setHasPerformedExtremeExpenditure(false);
-
-                int bloodmarkLevel = person.getBloodmark();
-                if (bloodmarkLevel > BLOODMARK_ZERO.getLevel()) {
-                    BloodmarkLevel bloodmark = BloodmarkLevel.parseBloodmarkLevelFromInt(bloodmarkLevel);
-                    boolean hasAlternativeID = person.getOptions().booleanOption(ATOW_ALTERNATE_ID);
-                    List<LocalDate> bloodmarkSchedule = getBloodhuntSchedule(bloodmark, currentDay, hasAlternativeID);
-                    for (LocalDate assassinationAttempt : bloodmarkSchedule) {
-                        person.addBloodhuntDate(assassinationAttempt);
-                    }
-                }
-
-                if (currentDay.getMonthValue() % 3 == 0) {
-                    if (person.hasDarkSecret()) {
-                        String darkSecretReport = person.isDarkSecretRevealed(true, false);
-                        if (!StringUtility.isNullOrBlank(darkSecretReport)) {
-                            addReport(darkSecretReport);
-                        }
-                    }
-                }
-
-                if (person.getBurnedConnectionsEndDate() != null) {
-                    person.checkForConnectionsReestablishContact(currentDay);
-                }
-
-                if (campaignOptions.isAllowMonthlyConnections()) {
-                    String connectionsReport = person.performConnectionsWealthCheck(currentDay, finances);
-                    if (!StringUtility.isNullOrBlank(connectionsReport)) {
-                        addReport(connectionsReport);
-                    }
-                }
-
-                if (campaignOptions.isUseFunctionalEscapeArtist() && person.getStatus().isPoW()) {
-                    EscapeSkills.performEscapeAttemptCheck(this, person);
-                }
-            }
-
-            if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
-                int age = person.getAge(currentDay);
-                if (age >= 6 && age <= 12) {
-                    peopleWhoCelebrateCommandersDay++;
-                }
-            }
-
-            List<LocalDate> scheduledBloodHunts = person.getBloodhuntSchedule();
-            if (!scheduledBloodHunts.isEmpty()) {
-                boolean isDayOfBloodHunt = Bloodmark.checkForAssassinationAttempt(person,
-                      currentDay,
-                      isCampaignPlanetside);
-
-                if (isDayOfBloodHunt) {
-                    Bloodmark.performAssassinationAttempt(this, person, currentDay);
-                }
-            }
-        }
-
-        if (!personnelWhoAdvancedInXP.isEmpty()) {
-            addReport(String.format(resources.getString("gainedExperience.text"),
-                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
-                  personnelWhoAdvancedInXP.size(),
-                  CLOSING_SPAN_TAG));
-        }
-
-        // Commander's Day!
-        if (isCommandersDay && (peopleWhoCelebrateCommandersDay >= commanderDayTargetNumber)) {
-            new CommandersDayAnnouncement(this);
-        }
-
-        if (MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments()) {
-            new OptimizeInfirmaryAssignments(this);
-        }
-
-        if (MekHQ.getMHQOptions().getNewMonthQuickTrain()) {
-            final int newMonthQuickTrainTargetLevel = 5;
-            QuickTrain.processQuickTraining(personnel, newMonthQuickTrainTargetLevel, this, true);
-        }
-    }
-
-    /**
-     * Processes all compulsions and madness-related effects for a given person, adjusting their status and generating
-     * reports as needed.
+     * @return {@code true} if the new day processing completed successfully; {@code false} if it was cancelled or
+     *       failed
      *
-     * <p>This method checks for various mental conditions or compulsions that a person might suffer from, such as
-     * addiction, flashbacks, split personality, paranoia, regression, catatonia, berserker rage, or hysteria. For each
-     * condition the person possesses, the relevant check is performed and any resulting effects—such as status changes,
-     * injuries, or event reports—are handled accordingly.</p>
-     *
-     * <p>The results of these checks may also generate narrative or status reports, which are added to the campaign
-     * as appropriate. If certain conditions are no longer present, some status flags (such as clinical paranoia) may be
-     * reset.</p>
-     *
-     * @param person               the person whose conditions are being processed
-     * @param personnelOptions     the set of personnel options or traits affecting which conditions are relevant
-     * @param isUseAdvancedMedical {@code true} if advanced medical rules are applied, {@code false} otherwise
-     * @param isUseFatigue         {@code true} if fatigue rules are applied, {@code false} otherwise
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void processCompulsionsAndMadness(Person person, PersonnelOptions personnelOptions,
-          boolean isUseAdvancedMedical, boolean isUseFatigue) {
-        String gamblingReport = person.gambleWealth();
-        if (!gamblingReport.isBlank()) {
-            addReport(gamblingReport);
-        }
-
-        if (personnelOptions.booleanOption(COMPULSION_ADDICTION)) {
-            int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            person.processDiscontinuationSyndrome(this,
-                  isUseAdvancedMedical,
-                  isUseFatigue,
-                  true,
-                  failedWillpowerCheck);
-        }
-
-        if (personnelOptions.booleanOption(MADNESS_FLASHBACKS)) {
-            int modifier = getCompulsionCheckModifier(MADNESS_FLASHBACKS);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            person.processCripplingFlashbacks(this,
-                  isUseAdvancedMedical,
-                  true,
-                  failedWillpowerCheck);
-        }
-
-        if (personnelOptions.booleanOption(MADNESS_SPLIT_PERSONALITY)) {
-            int modifier = getCompulsionCheckModifier(MADNESS_SPLIT_PERSONALITY);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            String report = person.processSplitPersonality(true,
-                  failedWillpowerCheck);
-            if (!report.isBlank()) {
-                addReport(report);
-            }
-        }
-
-        boolean resetClinicalParanoia = true;
-        if (personnelOptions.booleanOption(MADNESS_CLINICAL_PARANOIA)) {
-            int modifier = getCompulsionCheckModifier(MADNESS_CLINICAL_PARANOIA);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            String report = person.processClinicalParanoia(true,
-                  failedWillpowerCheck);
-            if (!report.isBlank()) {
-                addReport(report);
-            }
-
-            resetClinicalParanoia = false;
-        }
-
-        if (personnelOptions.booleanOption(MADNESS_REGRESSION)) {
-            int modifier = getCompulsionCheckModifier(MADNESS_REGRESSION);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            String report = person.processChildlikeRegression(this,
-                  isUseAdvancedMedical,
-                  true,
-                  failedWillpowerCheck);
-            if (!report.isBlank()) {
-                addReport(report);
-            }
-        }
-
-        if (personnelOptions.booleanOption(MADNESS_CATATONIA)) {
-            int modifier = getCompulsionCheckModifier(MADNESS_CATATONIA);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            String report = person.processCatatonia(this,
-                  isUseAdvancedMedical,
-                  true,
-                  failedWillpowerCheck);
-            if (!report.isBlank()) {
-                addReport(report);
-            }
-        }
-
-        if (personnelOptions.booleanOption(MADNESS_BERSERKER)) {
-            int modifier = getCompulsionCheckModifier(MADNESS_BERSERKER);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            String report = person.processBerserkerFrenzy(this,
-                  isUseAdvancedMedical,
-                  true,
-                  failedWillpowerCheck);
-            if (!report.isBlank()) {
-                addReport(report);
-            }
-        }
-
-        if (personnelOptions.booleanOption(MADNESS_HYSTERIA)) {
-            int modifier = getCompulsionCheckModifier(MADNESS_HYSTERIA);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            String report = person.processHysteria(this, true, isUseAdvancedMedical, failedWillpowerCheck);
-            if (!report.isBlank()) {
-                addReport(report);
-            }
-
-            resetClinicalParanoia = false;
-        }
-
-        // This is necessary to stop a character from getting permanently locked in a paranoia state if the
-        // relevant madness are removed.
-        if (resetClinicalParanoia) {
-            person.setSufferingFromClinicalParanoia(false);
-        }
-    }
-
-    /**
-     * Processes the monthly vocational experience (XP) gain for a given person based on their eligibility and the
-     * vocational experience rules defined in campaign options.
-     *
-     * <p>
-     * Eligibility for receiving vocational XP is determined by checking the following conditions:
-     * <ul>
-     * <li>The person must have an <b>active status</b> (e.g., not retired,
-     * deceased, or in education).</li>
-     * <li>The person must not be a <b>child</b> as of the current date.</li>
-     * <li>The person must not be categorized as a <b>dependent</b>.</li>
-     * <li>The person must not have the status of a <b>prisoner</b>.</li>
-     * <b>Note:</b> Bondsmen are exempt from this restriction and are eligible for
-     * vocational XP.
-     * </ul>
-     *
-     * @param person           the {@link Person} whose monthly vocational XP is to be processed
-     * @param vocationalXpRate the amount of XP awarded on a successful roll
-     *
-     * @return {@code true} if XP was successfully awarded during the process, {@code false} otherwise
-     */
-    private boolean processMonthlyVocationalXp(Person person, int vocationalXpRate) {
-        if (!person.getStatus().isActive()) {
-            return false;
-        }
-
-        if (person.isChild(currentDay)) {
-            return false;
-        }
-
-        if (person.isDependent()) {
-            return false;
-        }
-
-        if (person.getPrisonerStatus().isCurrentPrisoner()) {
-            // Prisoners can't gain vocational XP, while Bondsmen can
-            return false;
-        }
-
-        int checkFrequency = campaignOptions.getVocationalXPCheckFrequency();
-        int targetNumber = campaignOptions.getVocationalXPTargetNumber();
-
-        person.setVocationalXPTimer(person.getVocationalXPTimer() + 1);
-        if (person.getVocationalXPTimer() >= checkFrequency) {
-            if (d6(2) >= targetNumber) {
-                person.awardXP(this, vocationalXpRate);
-                person.setVocationalXPTimer(0);
-                return true;
-            } else {
-                person.setVocationalXPTimer(0);
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Process weekly relationship events for a given {@link Person} on Monday. This method triggers specific events
-     * related to divorce, marriage, procreation, and maternity leave.
-     *
-     * @param person The {@link Person} for which to process weekly relationship events
-     */
-    private void processWeeklyRelationshipEvents(Person person) {
-        if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
-            getDivorce().processNewWeek(this, getLocalDate(), person, false);
-            getMarriage().processNewWeek(this, getLocalDate(), person, false);
-            getProcreation().processNewWeek(this, getLocalDate(), person);
-        }
-    }
-
-    /**
-     * Process anniversaries for a given person, including birthdays and recruitment anniversaries.
-     *
-     * @param person The {@link Person} for whom the anniversaries will be processed
-     */
-    private void processAnniversaries(Person person) {
-        LocalDate birthday = person.getBirthday(getGameYear());
-        boolean isBirthday = birthday != null && birthday.equals(currentDay);
-        int age = person.getAge(currentDay);
-
-        boolean isUseEducation = campaignOptions.isUseEducationModule();
-        boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
-        boolean isUseTurnover = campaignOptions.isUseRandomRetirement();
-
-        final int JUNIOR_SCHOOL_AGE = 3;
-        final int HIGH_SCHOOL_AGE = 10;
-        final int EMPLOYMENT_AGE = 16;
-
-        if ((person.getRank().isOfficer()) || (!campaignOptions.isAnnounceOfficersOnly())) {
-            if (isBirthday && campaignOptions.isAnnounceBirthdays()) {
-                String report = String.format(resources.getString("anniversaryBirthday.text"),
-                      person.getHyperlinkedFullTitle(),
-                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
-                      age,
-                      CLOSING_SPAN_TAG);
-
-                // Aging Effects
-                AgingMilestone milestone = getMilestone(age);
-                String milestoneText = "";
-                if (isUseAgingEffects && milestone.getMinimumAge() == age) {
-                    String milestoneLabel = milestone.getLabel();
-                    milestoneText = String.format(resources.getString("anniversaryBirthday.milestone"), milestoneLabel);
-                }
-                if (!milestoneText.isBlank()) {
-                    report += " " + milestoneText;
-                }
-
-                // Special Ages
-                String addendum = "";
-                if (isUseEducation && age == JUNIOR_SCHOOL_AGE) {
-                    addendum = resources.getString("anniversaryBirthday.third");
-                } else if (isUseEducation && age == HIGH_SCHOOL_AGE) {
-                    addendum = resources.getString("anniversaryBirthday.tenth");
-                } else if (age == EMPLOYMENT_AGE) { // This age is always relevant
-                    addendum = resources.getString("anniversaryBirthday.sixteenth");
-                }
-
-                if (!addendum.isBlank()) {
-                    report += " " + addendum;
-                }
-
-                // Retirement
-                if (isUseTurnover && age >= RETIREMENT_AGE) {
-                    report += " " + resources.getString("anniversaryBirthday.retirement");
-                }
-
-                addReport(report);
-            }
-
-            LocalDate recruitmentDate = person.getRecruitment();
-            if (recruitmentDate != null) {
-                LocalDate recruitmentAnniversary = recruitmentDate.withYear(getGameYear());
-                int yearsOfEmployment = (int) ChronoUnit.YEARS.between(recruitmentDate, currentDay);
-
-                if ((recruitmentAnniversary.isEqual(currentDay)) &&
-                          (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
-                    addReport(String.format(resources.getString("anniversaryRecruitment.text"),
-                          person.getHyperlinkedFullTitle(),
-                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
-                          yearsOfEmployment,
-                          CLOSING_SPAN_TAG,
-                          name));
-                }
-            }
-        } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
-            if (isBirthday) {
-                addReport(String.format(resources.getString("anniversaryBirthday.text"),
-                      person.getHyperlinkedFullTitle(),
-                      spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
-                      person.getAge(getLocalDate()),
-                      CLOSING_SPAN_TAG));
-            }
-        }
-
-        if (campaignOptions.isUseAgeEffects() && isBirthday) {
-            // This is where we update all the aging modifiers for the character.
-            updateAllSkillAgeModifiers(currentDay, person);
-            applyAgingSPA(age, person);
-        }
-
-        // Coming of Age Events
-        if (isBirthday && (person.getAge(currentDay) == 16)) {
-            if (campaignOptions.isRewardComingOfAgeAbilities()) {
-                SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-                singleSpecialAbilityGenerator.rollSPA(this, person, true, true);
-            }
-
-            if (campaignOptions.isRewardComingOfAgeRPSkills()) {
-                AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(randomSkillPreferences);
-                skillGenerator.generateRoleplaySkills(person);
-            }
-
-            // We want the event trigger to fire before the dialog is shown, so that the character will have finished
-            // updating in the gui before the player has a chance to jump to them
-            MekHQ.triggerEvent(new PersonChangedEvent(person));
-
-            if (campaignOptions.isShowLifeEventDialogComingOfAge()) {
-                new ComingOfAgeAnnouncement(this, person);
-            }
-        }
-    }
-
-    /**
-     * Process monthly auto awards for a given person based on their roles and experience level.
-     *
-     * @param person the person for whom the monthly auto awards are being processed
-     */
-    private void processMonthlyAutoAwards(Person person) {
-        double multiplier = 0;
-
-        int score = 0;
-
-        if (person.getPrimaryRole().isSupport(true)) {
-            int dice = person.getExperienceLevel(this, false);
-
-            if (dice > 0) {
-                score = d6(dice);
-            }
-
-            multiplier += 0.5;
-        }
-
-        if (person.getSecondaryRole().isSupport(true)) {
-            int dice = person.getExperienceLevel(this, true);
-
-            if (dice > 0) {
-                score += d6(dice);
-            }
-
-            multiplier += 0.5;
-        } else if (person.getSecondaryRole().isNone()) {
-            multiplier += 0.5;
-        }
-
-        person.changeAutoAwardSupportPoints((int) (score * multiplier));
-    }
-
-    public void processNewDayUnits() {
-        // need to loop through units twice, the first time to do all maintenance and
-        // the second time to do whatever else. Otherwise, maintenance minutes might
-        // get sucked up by other stuff. This is also a good place to ensure that a
-        // unit's engineer gets reset and updated.
-        for (Unit unit : getUnits()) {
-            // do maintenance checks
-            try {
-                unit.resetEngineer();
-                if (null != unit.getEngineer()) {
-                    unit.getEngineer().resetMinutesLeft(campaignOptions.isTechsUseAdministration());
-                }
-
-                doMaintenance(unit);
-            } catch (Exception ex) {
-                LOGGER.error(ex,
-                      "Unable to perform maintenance on {} ({}) due to an error",
-                      unit.getName(),
-                      unit.getId().toString());
-                addReport(String.format("ERROR: An error occurred performing maintenance on %s, check the log",
-                      unit.getName()));
-            }
-        }
-
-        // need to check for assigned tasks in two steps to avoid
-        // concurrent modification problems
-        List<Part> assignedParts = new ArrayList<>();
-        List<Part> arrivedParts = new ArrayList<>();
-        getWarehouse().forEachPart(part -> {
-            if (part instanceof Refit) {
-                return;
-            }
-
-            if (part.getTech() != null) {
-                assignedParts.add(part);
-            }
-
-            // If the part is currently in-transit...
-            if (!part.isPresent()) {
-                // ... decrement the number of days until it arrives...
-                part.setDaysToArrival(part.getDaysToArrival() - 1);
-
-                if (part.isPresent()) {
-                    // ... and mark the part as arrived if it is now here.
-                    arrivedParts.add(part);
-                }
-            }
-        });
-
-        // arrive parts before attempting refit or parts will not get reserved that day
-        for (Part part : arrivedParts) {
-            getQuartermaster().arrivePart(part);
-        }
-
-        // finish up any overnight assigned tasks
-        for (Part part : assignedParts) {
-            Person tech;
-            if ((part.getUnit() != null) && (part.getUnit().getEngineer() != null)) {
-                tech = part.getUnit().getEngineer();
-            } else {
-                tech = part.getTech();
-            }
-
-            if (null != tech) {
-                if (null != tech.getSkillForWorkingOn(part)) {
-                    try {
-                        fixPart(part, tech);
-                    } catch (Exception ex) {
-                        LOGGER.error(ex,
-                              "Could not perform overnight maintenance on {} ({}) due to an error",
-                              part.getName(),
-                              part.getId());
-                        addReport(String.format(
-                              "ERROR: an error occurred performing overnight maintenance on %s, check the log",
-                              part.getName()));
-                    }
-                } else {
-                    addReport(String.format(
-                          "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
-                          tech.getHyperlinkedFullTitle(),
-                          part.getName()));
-                    part.cancelAssignment(false);
-                }
-            } else {
-                JOptionPane.showMessageDialog(null,
-                      "Could not find tech for part: " +
-                            part.getName() +
-                            " on unit: " +
-                            part.getUnit().getHyperlinkedName(),
-                      "Invalid Auto-continue",
-                      JOptionPane.ERROR_MESSAGE);
-            }
-
-            // check to see if this part can now be combined with other spare parts
-            if (part.isSpare() && (part.getQuantity() > 0)) {
-                getQuartermaster().addPart(part, 0, false);
-            }
-        }
-
-        // ok now we can check for other stuff we might need to do to units
-        List<UUID> unitsToRemove = new ArrayList<>();
-        for (Unit unit : getUnits()) {
-            if (unit.isRefitting()) {
-                refit(unit.getRefit());
-            }
-            if (unit.isMothballing()) {
-                workOnMothballingOrActivation(unit);
-            }
-            if (!unit.isPresent()) {
-                unit.checkArrival();
-
-                // Has unit just been delivered?
-                if (unit.isPresent()) {
-                    addReport(String.format(resources.getString("unitArrived.text"),
-                          unit.getHyperlinkedName(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                          CLOSING_SPAN_TAG));
-                }
-            }
-
-            if (!unit.isRepairable() && !unit.hasSalvageableParts()) {
-                unitsToRemove.add(unit.getId());
-            }
-        }
-        // Remove any unrepairable, unsalvageable units
-        unitsToRemove.forEach(this::removeUnit);
-
-        // Finally, run Mass Repair Mass Salvage if desired
-        if (MekHQ.getMHQOptions().getNewDayMRMS()) {
-            try {
-                MRMSService.mrmsAllUnits(this);
-            } catch (Exception ex) {
-                LOGGER.error("Could not perform mass repair/salvage on units due to an error", ex);
-                addReport("ERROR: an error occurred performing mass repair/salvage on units, check the log");
-            }
-        }
-    }
-
-    private void processNewDayForces() {
-        // update formation levels
-        Force.populateFormationLevelsFromOrigin(this);
-        recalculateCombatTeams(this);
-
-        // Update the force icons based on the end-of-day unit status if desired
-        if (MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {
-            getForces().updateForceIconOperationalStatus(this);
-        }
-    }
-
-    /**
-     * @return <code>true</code> if the new day arrived
+     * @see CampaignNewDayManager#newDay()
      */
     public boolean newDay() {
-        // clear previous retirement information
-        turnoverRetirementInformation.clear();
-
-        // Refill Automated Pools, if the options are selected
-        if (MekHQ.getMHQOptions().getNewDayAsTechPoolFill()) {
-            resetAsTechPool();
-        }
-
-        if (MekHQ.getMHQOptions().getNewDayMedicPoolFill()) {
-            resetMedicPool();
-        }
-
-        // Ensure we don't have anything that would prevent the new day
-        if (MekHQ.triggerEvent(new DayEndingEvent(this))) {
-            return false;
-        }
-
-        // Autosave based on the previous day's information
-        autosaveService.requestDayAdvanceAutosave(this);
-
-        // Advance the day by one
-        final LocalDate yesterday = currentDay;
-        currentDay = currentDay.plusDays(1);
-        boolean isMonday = currentDay.getDayOfWeek() == DayOfWeek.MONDAY;
-        boolean isFirstOfMonth = currentDay.getDayOfMonth() == 1;
-        boolean isNewYear = currentDay.getDayOfYear() == 1;
-
-        // Check for important dates
-        if (campaignOptions.isShowLifeEventDialogCelebrations()) {
-            fetchCelebrationDialogs();
-        }
-
-        // Determine if we have an active contract or not, as this can get used
-        // elsewhere before we actually hit the AtB new day (e.g., personnel market)
-        if (campaignOptions.isUseAtB()) {
-            setHasActiveContract();
-        }
-
-        // Clear Reports
-        currentReport.clear();
-        currentReportHTML = "";
-        newReports.clear();
-        personnelWhoAdvancedInXP.clear();
-        beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
-
-        // New Year Changes
-        if (isNewYear) {
-            // News is reloaded
-            reloadNews();
-
-            // Change Year Game Option
-            getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(getGameYear());
-
-            // Degrade Regard
-            List<String> degradedRegardReports = factionStandings.processRegardDegradation(faction.getShortName(),
-                  currentDay.getYear(), campaignOptions.getRegardMultiplier());
-            for (String report : degradedRegardReports) {
-                addReport(report);
-            }
-        }
-
-        readNews();
-
-        location.newDay(this);
-
-        updateFieldKitchenCapacity();
-
-        processNewDayPersonnel();
-
-        if (isMonday) {
-            Fatigue.processDeploymentFatigueResponses(this);
-        }
-
-        // Manage the Markets
-        refreshPersonnelMarkets(false);
-
-        // TODO : AbstractContractMarket : Uncomment
-        // getContractMarket().processNewDay(this);
-        unitMarket.processNewDay(this);
-
-        // This needs to be after both personnel and markets
-        if (campaignOptions.isAllowMonthlyConnections() && isFirstOfMonth) {
-            checkForBurnedContacts();
-        }
-
-        // Needs to be before 'processNewDayATB' so that Dependents can't leave the
-        // moment they arrive via AtB Bonus Events
-        if (location.isOnPlanet() && isFirstOfMonth) {
-            RandomDependents randomDependents = new RandomDependents(this);
-            randomDependents.processMonthlyRemovalAndAddition();
-        }
-
-        // Process New Day for AtB
-        if (campaignOptions.isUseAtB()) {
-            processNewDayATB();
-        }
-
-        if (campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
-            processReputationChanges();
-        }
-
-        if (campaignOptions.isUseEducationModule()) {
-            processEducationNewDay();
-        }
-
-        if (campaignOptions.isEnableAutoAwards() && isFirstOfMonth) {
-            AutoAwardsController autoAwardsController = new AutoAwardsController();
-            autoAwardsController.ManualController(this, false);
-        }
-
-        // Prisoner events can occur on Monday or the 1st of the month depending on the
-        // type of event
-        if (isMonday || isFirstOfMonth) {
-            new PrisonerEventManager(this);
-        }
-
-        resetAsTechMinutes();
-
-        processNewDayUnits();
-
-        processNewDayForces();
-
-        if (processProcurement) {
-            setShoppingList(goShopping(getShoppingList()));
-        }
-
-        // check for anything in finances
-        finances.newDay(this, yesterday, getLocalDate());
-
-        // process removal of old personnel data on the first day of each month
-        if (campaignOptions.isUsePersonnelRemoval() && isFirstOfMonth) {
-            performPersonnelCleanUp();
-        }
-
-        // this duplicates any turnover information so that it is still available on the
-        // new day. otherwise, it's only available if the user inspects history records
-        if (!turnoverRetirementInformation.isEmpty()) {
-            for (String entry : turnoverRetirementInformation) {
-                addReport(entry);
-            }
-        }
-
-        if (topUpWeekly && isMonday) {
-            PartsInUseManager partsInUseManager = new PartsInUseManager(this);
-            Set<PartInUse> actualPartsInUse = partsInUseManager.getPartsInUse(ignoreMothballed,
-                  false,
-                  ignoreSparesUnderQuality);
-            int bought = partsInUseManager.stockUpPartsInUse(actualPartsInUse);
-            addReport(String.format(resources.getString("weeklyStockCheck.text"), bought));
-        }
-
-        // Random Events
-        if (currentDay.isAfter(GRAY_MONDAY_EVENTS_BEGIN) && currentDay.isBefore(GRAY_MONDAY_EVENTS_END)) {
-            new GrayMonday(this, currentDay);
-        }
-
-        // Faction Standing
-        performFactionStandingChecks(isFirstOfMonth, isNewYear);
-
-        // This must be the last step before returning true
-        MekHQ.triggerEvent(new NewDayEvent(this));
-        return true;
-    }
-
-    /**
-     * Checks if the commander has any burned contacts, and if so, generates and records a report.
-     *
-     * <p>This method is only executed if monthly connections are allowed by campaign options. If the commander
-     * exists and their burned connections end date has not been set, it invokes the commander's check for burned
-     * contacts on the current day. If a non-blank report is returned, the report is added to the campaign logs.</p>
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void checkForBurnedContacts() {
-        if (campaignOptions.isAllowMonthlyConnections()) {
-            Person commander = getCommander();
-            if (commander != null && commander.getBurnedConnectionsEndDate() == null) {
-                String report = commander.checkForBurnedContacts(currentDay);
-                if (!report.isBlank()) {
-                    addReport(report);
-                }
-            }
-        }
-    }
-
-    /**
-     * Performs all daily and periodic standing checks for factions relevant to this campaign.
-     *
-     * <p>On the first day of the month, this method updates the climate regard for the active campaign faction,
-     * storing a summary report. It then iterates once through all faction standings and, for each faction:</p>
-     *
-     * <ul>
-     *     <li>Checks for new ultimatum events.</li>
-     *     <li>Checks for new censure actions and handles the creation of related events.</li>
-     *     <li>Evaluates for new accolade levels, creating corresponding events.</li>
-     *     <li>Warns if any referenced faction cannot be resolved.</li>
-     * </ul>
-     *
-     * <p>Finally, at the end of the checks, it processes censure degradation for all factions.</p>
-     *
-     * @param isFirstOfMonth {@code true} if called on the first day of the month.
-     * @param isNewYear      {@code true} if called on the first day of a new year
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private void performFactionStandingChecks(boolean isFirstOfMonth, boolean isNewYear) {
-        String campaignFactionCode = faction.getShortName();
-        if (isNewYear && campaignFactionCode.equals(MERCENARY_FACTION_CODE)) {
-            checkForNewMercenaryOrganizationStartUp(false, false);
-        }
-
-        if (!campaignOptions.isTrackFactionStanding()) {
-            return;
-        }
-
-        if (FactionStandingUltimatum.checkUltimatumForDate(currentDay,
-              campaignFactionCode,
-              factionStandingUltimatumsLibrary)) {
-            new FactionStandingUltimatum(currentDay, this, factionStandingUltimatumsLibrary);
-        }
-
-        if (isFirstOfMonth) {
-            String report = factionStandings.updateClimateRegard(faction,
-                  currentDay,
-                  campaignOptions.getRegardMultiplier(),
-                  campaignOptions.isTrackClimateRegardChanges());
-            addReport(report);
-        }
-
-        List<Mission> activeMissions = getActiveMissions(false);
-        boolean isInTransit = !location.isOnPlanet();
-        Factions factions = Factions.getInstance();
-
-        for (Entry<String, Double> standing : new HashMap<>(factionStandings.getAllFactionStandings()).entrySet()) {
-            String relevantFactionCode = standing.getKey();
-            Faction relevantFaction = factions.getFaction(relevantFactionCode);
-            if (relevantFaction == null) {
-                LOGGER.warn("Unable to fetch faction standing for faction: {}", relevantFactionCode);
-                continue;
-            }
-
-            // Censure check
-            boolean isMercenarySpecialCase = campaignFactionCode.equals(MERCENARY_FACTION_CODE) &&
-                                                   relevantFaction.isMercenaryOrganization();
-            boolean isPirateSpecialCase = isPirateCampaign() &&
-                                                relevantFactionCode.equals(PIRACY_SUCCESS_INDEX_FACTION_CODE);
-            if (relevantFaction.equals(faction) || isMercenarySpecialCase || isPirateSpecialCase) {
-                FactionCensureLevel newCensureLevel = factionStandings.checkForCensure(
-                      relevantFaction, currentDay, activeMissions, isInTransit);
-                if (newCensureLevel != null) {
-                    new FactionCensureEvent(this, newCensureLevel, relevantFaction);
-                }
-            }
-
-            // Accolade check
-            boolean ignoreEmployer = relevantFaction.isMercenaryOrganization();
-            boolean isOnMission = FactionStandingUtilities.isIsOnMission(
-                  !isInTransit,
-                  getActiveAtBContracts(),
-                  activeMissions,
-                  relevantFactionCode,
-                  location.getCurrentSystem(),
-                  ignoreEmployer);
-
-            FactionAccoladeLevel newAccoladeLevel = factionStandings.checkForAccolade(
-                  relevantFaction, currentDay, isOnMission);
-
-            if (newAccoladeLevel != null) {
-                new FactionAccoladeEvent(this, relevantFaction, newAccoladeLevel,
-                      faction.equals(relevantFaction));
-            }
-        }
-
-        // Censure degradation
-        factionStandings.processCensureDegradation(currentDay);
+        CampaignNewDayManager manager = new CampaignNewDayManager(this);
+        return manager.newDay();
     }
 
     /**
@@ -6238,7 +4855,7 @@ public class Campaign implements ITechManager {
      * <p>If rare professions are present, presents a dialog with options regarding these rare personnel. Optionally,
      * allowing the user to view the new personnel market dialog immediately.</p>
      *
-     * @param isCampaignStart {@code true} if this method is being called at the start of the campaign
+     * @param isCampaignStart {@code true} if campaign method is being called at the start of the campaign
      *
      * @author Illiani
      * @since 0.50.06
@@ -6246,9 +4863,10 @@ public class Campaign implements ITechManager {
     public void refreshPersonnelMarkets(boolean isCampaignStart) {
         PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
         if (marketStyle == PERSONNEL_MARKET_DISABLED) {
-            personnelMarket.generatePersonnelForDay(this);
+            getPersonnelMarket().generatePersonnelForDay(this);
         } else {
             if (currentDay.getDayOfMonth() == 1) {
+                NewPersonnelMarket newPersonnelMarket = getNewPersonnelMarket();
                 newPersonnelMarket.gatherApplications();
 
                 if (newPersonnelMarket.getHasRarePersonnel()) {
@@ -6268,7 +4886,7 @@ public class Campaign implements ITechManager {
                     }
 
                     ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(this,
-                          getSeniorAdminPerson(AdministratorSpecialization.HR),
+                          getSeniorAdminPerson(Campaign.AdministratorSpecialization.HR),
                           null,
                           resources.getString("personnelMarket.rareProfession.inCharacter"),
                           buttons,
@@ -6281,107 +4899,6 @@ public class Campaign implements ITechManager {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Performs cleanup of departed personnel by identifying and removing eligible personnel records.
-     *
-     * <p>This method uses the {@link AutomatedPersonnelCleanUp} utility to determine which {@link Person}
-     * objects should be removed from the campaign based on current date and campaign configuration options. Identified
-     * personnel are then removed, and a report entry is generated if any removals occur.</p>
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    private void performPersonnelCleanUp() {
-        AutomatedPersonnelCleanUp removal = new AutomatedPersonnelCleanUp(currentDay,
-              getPersonnel(),
-              campaignOptions.isUseRemovalExemptRetirees(),
-              campaignOptions.isUseRemovalExemptCemetery());
-
-        List<Person> personnelToRemove = removal.getPersonnelToCleanUp();
-        for (Person person : personnelToRemove) {
-            removePerson(person, false);
-        }
-
-        if (!personnelToRemove.isEmpty()) {
-            addReport(resources.getString("personnelRemoval.text"));
-        }
-    }
-
-    /**
-     * Fetches and handles the celebration dialogs specific to the current day.
-     *
-     * <p><b>Note:</b> Commanders day is handled as a part of the personnel processing, so we don't need to parse
-     * personnel twice.</p>
-     */
-    private void fetchCelebrationDialogs() {
-        if (!faction.isClan()) {
-            if (isWinterHolidayMajorDay(currentDay)) {
-                new WinterHolidayAnnouncement(this);
-            }
-
-            if (isFreedomDay(currentDay)) {
-                new FreedomDayAnnouncement(this);
-            }
-        }
-
-        if (isNewYear(currentDay)) {
-            new NewYearsDayAnnouncement(this);
-        }
-    }
-
-    /**
-     * Updates the status of whether field kitchens are operating within their required capacity.
-     *
-     * <p>If fatigue is enabled in the campaign options, this method calculates the total available
-     * field kitchen capacity and the required field kitchen usage, then updates the {@code fieldKitchenWithinCapacity}
-     * flag to reflect whether the capacity meets the demand. If fatigue is disabled, the capacity is automatically set
-     * to {@code false}.</p>
-     */
-    private void updateFieldKitchenCapacity() {
-        if (campaignOptions.isUseFatigue()) {
-            int fieldKitchenCapacity = checkFieldKitchenCapacity(getForce(FORCE_ORIGIN).getAllUnitsAsUnits(units,
-                  false), campaignOptions.getFieldKitchenCapacity());
-            int fieldKitchenUsage = checkFieldKitchenUsage(getActivePersonnel(false, false),
-                  campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
-            fieldKitchenWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
-        } else {
-            fieldKitchenWithinCapacity = false;
-        }
-    }
-
-    /**
-     * Processes reputation changes based on various conditions.
-     */
-    private void processReputationChanges() {
-        if (faction.isPirate()) {
-            dateOfLastCrime = currentDay;
-            crimePirateModifier = -100;
-        }
-
-        if (currentDay.getDayOfMonth() == 1) {
-            if (dateOfLastCrime != null) {
-                long yearsBetween = ChronoUnit.YEARS.between(currentDay, dateOfLastCrime);
-
-                int remainingCrimeChange = 2;
-
-                if (yearsBetween >= 1) {
-                    if (crimePirateModifier < 0) {
-                        remainingCrimeChange = max(0, 2 + crimePirateModifier);
-                        changeCrimePirateModifier(2); // this is the amount of change specified by CamOps
-                    }
-
-                    if (crimeRating < 0 && remainingCrimeChange > 0) {
-                        changeCrimeRating(remainingCrimeChange);
-                    }
-                }
-            }
-        }
-
-        if (currentDay.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
-            reputation.initializeReputation(this);
         }
     }
 
@@ -6423,40 +4940,6 @@ public class Campaign implements ITechManager {
         initiativeMaxBonus = bonus;
     }
 
-    /**
-     * This method checks if any students in the academy should graduate, and updates their attributes and status
-     * accordingly. If any students do graduate, it sends the graduation information to autoAwards.
-     */
-    private void processEducationNewDay() {
-        List<UUID> graduatingPersonnel = new ArrayList<>();
-        HashMap<UUID, List<Object>> academyAttributesMap = new HashMap<>();
-
-        for (Person person : getStudents()) {
-            List<Object> individualAcademyAttributes = new ArrayList<>();
-
-            if (EducationController.processNewDay(this, person, false)) {
-                Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
-
-                if (academy == null) {
-                    LOGGER.debug("Found null academy for {} skipping", person.getFullTitle());
-                    continue;
-                }
-
-                graduatingPersonnel.add(person.getId());
-
-                individualAcademyAttributes.add(academy.getEducationLevel(person));
-                individualAcademyAttributes.add(academy.getType());
-                individualAcademyAttributes.add(academy.getName());
-
-                academyAttributesMap.put(person.getId(), individualAcademyAttributes);
-            }
-        }
-
-        if (!graduatingPersonnel.isEmpty()) {
-            AutoAwardsController autoAwardsController = new AutoAwardsController();
-            autoAwardsController.PostGraduationController(this, graduatingPersonnel, academyAttributesMap);
-        }
-    }
 
     /**
      * Retrieves the flagged commander from the personnel list. If no flagged commander is found returns {@code null}.
