@@ -713,6 +713,7 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "useBetterExtraIncome" -> campaignOptions.setUseBetterExtraIncome(parseBoolean(
                   nodeContents));
+            case "useSmallArmsOnly" -> campaignOptions.setUseSmallArmsOnly(parseBoolean(nodeContents));
             case "commonPartPriceMultiplier" -> campaignOptions.setCommonPartPriceMultiplier(parseDouble(
                   nodeContents));
             case "innerSphereUnitPriceMultiplier" -> campaignOptions.setInnerSphereUnitPriceMultiplier(parseDouble(

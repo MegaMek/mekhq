@@ -881,6 +881,8 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isAllowMonthlyConnections());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBetterExtraIncome",
               campaignOptions.isUseBetterExtraIncome());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSmallArmsOnly",
+              campaignOptions.isUseSmallArmsOnly());
 
         // region Price Multipliers
         MHQXMLUtility.writeSimpleXMLTag(pw,

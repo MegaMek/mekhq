@@ -4828,6 +4828,7 @@ public class Unit implements ITechnology {
                 sumPiloting += person.getInjuryModifiers(true);
             }
         }
+        boolean smallArmsOnly = campaign.getCampaignOptions().isUseSmallArmsOnly();
         for (Person person : gunners) {
             PersonnelOptions options = person.getOptions();
             Attributes attributes = person.getATOWAttributes();
@@ -4837,7 +4838,7 @@ public class Unit implements ITechnology {
 
             String tempGunType = gunType;
             if (entityIsConventionalInfantry) {
-                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(person);
+                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(person, smallArmsOnly);
                 if (tempGunType == null) {
                     tempGunType = SkillType.S_SMALL_ARMS;
                 }
@@ -4896,7 +4897,7 @@ public class Unit implements ITechnology {
 
             String tempGunType = gunType;
             if (entityIsConventionalInfantry) {
-                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(getCommander());
+                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(getCommander(), smallArmsOnly);
                 if (tempGunType == null) {
                     tempGunType = SkillType.S_SMALL_ARMS;
                 }
