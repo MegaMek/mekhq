@@ -45,7 +45,6 @@ import java.util.Collection;
 import java.util.List;
 
 import megamek.common.units.Entity;
-import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -71,7 +70,6 @@ import mekhq.gui.dialog.ContractStartRentalDialog;
  * @since 0.50.10
  */
 public class FacilityRentals {
-    private static final MMLogger LOGGER = MMLogger.create(FacilityRentals.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FacilityRentals";
 
     private static final int FACTORY_CONDITIONS_MULTIPLIER = 20;
@@ -179,6 +177,24 @@ public class FacilityRentals {
         return true;
     }
 
+    /**
+     * Presents a dialog to the user for confirming bay rental costs, with immersive confirmation workflow.
+     *
+     * <p>This method displays a {@link BayRentalDialog} showing the rental cost and repeatedly prompts
+     * the user through an {@link ImmersiveDialogConfirmation} workflow until the overall confirmation process is
+     * complete. The user may need to confirm multiple times depending on the immersive dialog's requirements.</p>
+     *
+     * <p><b>Note:</b> The method loops until the immersive confirmation workflow is satisfied,
+     * which may involve multiple user interactions.</p>
+     *
+     * @param campaign   the {@link Campaign} context for the rental operation
+     * @param rentalCost the {@link Money} amount representing the bay rental cost to display
+     *
+     * @return {@code true} if the user confirmed the bay rental in the final dialog; {@code false} if declined
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private static boolean presentBayRentDialog(Campaign campaign, Money rentalCost) {
         boolean wasConfirmedOverall = false;
         BayRentalDialog offerDialog = null;

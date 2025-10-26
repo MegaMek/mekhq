@@ -104,12 +104,15 @@ import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
+import mekhq.campaign.mission.rentals.ContractRentalType;
+import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
@@ -146,6 +149,7 @@ import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeEvent;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
 import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
@@ -317,6 +321,15 @@ public class CampaignNewDayManager {
             new PrisonerEventManager(campaign);
         }
 
+        if (isFirstOfMonth) {
+            payForRentedFacilities();
+        }
+
+        if (isMonday) {
+            // Bays are handled weekly, all other facilities are handled monthly
+            FacilityRentals.payForAllRentedBays(campaign);
+        }
+
         campaign.resetAsTechMinutes();
 
         processNewDayUnits();
@@ -358,6 +371,9 @@ public class CampaignNewDayManager {
         // Faction Standing
         performFactionStandingChecks(isFirstOfMonth, isNewYear);
 
+        // War & Peace Notifications
+        new WarAndPeaceProcessor(campaign, false);
+
         // campaign must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(campaign));
         return true;
@@ -378,9 +394,7 @@ public class CampaignNewDayManager {
      */
     private void updateFacilities() {
         updateFieldKitchenCapacity();
-        List<Unit> unitsInToe = campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(hangar, false);
-        int capacity = MASHCapacity.checkMASHCapacity(unitsInToe, campaignOptions.getMASHTheatreCapacity());
-        campaign.setMashTheatreCapacity(capacity);
+        updateMASHTheatreCapacity();
     }
 
     /**
@@ -1621,8 +1635,7 @@ public class CampaignNewDayManager {
             }
 
             if (today.equals(contract.getStartDate())) {
-                hangar.getUnits()
-                      .forEach(unit -> unit.setSite(contract.getRepairLocation(campaign.getAtBUnitRatingMod())));
+                hangar.getUnits().forEach(unit -> unit.setSite(contract.getRepairLocation()));
             }
 
             if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
@@ -1738,6 +1751,60 @@ public class CampaignNewDayManager {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Calculates and processes payment for all types of rented facilities (hospital beds, kitchens, holding cells)
+     * based on the active contracts and current campaign options.
+     *
+     * <p>Generates reports for any failed transactions or payment issues. Adds any generated reports to the campaign
+     * log.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void payForRentedFacilities() {
+        List<Contract> activeContracts = campaign.getActiveContracts();
+        int hospitalRentalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
+        Money hospitalRentalFee = FacilityRentals.calculateContractRentalCost(hospitalRentalCost, activeContracts,
+              ContractRentalType.HOSPITAL_BEDS);
+
+        int kitchenRentalCost = campaignOptions.getRentedFacilitiesCostKitchens();
+        Money kitchenRentalFee = FacilityRentals.calculateContractRentalCost(kitchenRentalCost, activeContracts,
+              ContractRentalType.KITCHENS);
+
+        int holdingCellRentalCost = campaignOptions.getRentedFacilitiesCostHoldingCells();
+        Money holdingCellRentalFee = FacilityRentals.calculateContractRentalCost(holdingCellRentalCost, activeContracts,
+              ContractRentalType.HOLDING_CELLS);
+
+        List<String> reports = FacilityRentals.payForAllContractRentals(finances, today, hospitalRentalFee,
+              kitchenRentalFee, holdingCellRentalFee);
+        for (String report : reports) { // No report is generated if the transaction is successful
+            campaign.addReport(report);
+        }
+    }
+
+    /**
+     * Updates the value of {@code mashTheatreCapacity} based on the current campaign options and force composition.
+     *
+     * <p>If the campaign is configured to use MASH theatres, this method calculates the available MASH theatre
+     * capacity using the current force and campaign options. If MASH theatres are not enabled, the capacity is set to
+     * zero.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void updateMASHTheatreCapacity() {
+        if (campaignOptions.isUseMASHTheatres()) {
+            int mashTheatreCapacity =
+                  MASHCapacity.checkMASHCapacity(campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(hangar,
+                        false), campaignOptions.getMASHTheatreCapacity());
+            mashTheatreCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
+                  ContractRentalType.HOSPITAL_BEDS);
+            campaign.setMashTheatreCapacity(mashTheatreCapacity);
+        } else {
+            campaign.setMashTheatreCapacity(0);
         }
     }
 }
