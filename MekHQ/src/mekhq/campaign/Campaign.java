@@ -252,6 +252,7 @@ import mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
+import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -395,7 +396,8 @@ public class Campaign implements ITechManager {
     private transient String currentReportHTML;
     private transient List<String> newReports;
 
-    private Boolean fieldKitchenWithinCapacity;
+    private boolean fieldKitchenWithinCapacity;
+    private int mashTheatreCapacity;
 
     // this is updated and used per gaming session, it is enabled/disabled via the
     // Campaign options
@@ -627,6 +629,7 @@ public class Campaign implements ITechManager {
         atbConfig = null;
         hasActiveContract = false;
         fieldKitchenWithinCapacity = false;
+        mashTheatreCapacity = 0;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         processProcurement = true;
@@ -2223,8 +2226,24 @@ public class Campaign implements ITechManager {
         return person;
     }
 
-    public Boolean getFieldKitchenWithinCapacity() {
+    public boolean getFieldKitchenWithinCapacity() {
         return fieldKitchenWithinCapacity;
+    }
+
+    public void setFieldKitchenWithinCapacity(boolean fieldKitchenWithinCapacity) {
+        this.fieldKitchenWithinCapacity = fieldKitchenWithinCapacity;
+    }
+
+    public boolean getMashTheatresWithinCapacity() {
+        return mashTheatreCapacity >= getPatientsAssignedToDoctors().size();
+    }
+
+    public int getMashTheatreCapacity() {
+        return mashTheatreCapacity;
+    }
+
+    public void setMashTheatreCapacity(int mashTheatreCapacity) {
+        this.mashTheatreCapacity = mashTheatreCapacity;
     }
     // endregion Person Creation
 
@@ -3045,6 +3064,13 @@ public class Campaign implements ITechManager {
             }
         }
         return patients;
+    }
+
+    public List<Person> getPatientsAssignedToDoctors() {
+        return getPatients()
+                     .stream()
+                     .filter(patient -> patient.getDoctorId() != null)
+                     .toList();
     }
 
     /**
@@ -5944,6 +5970,7 @@ public class Campaign implements ITechManager {
         location.newDay(this);
 
         updateFieldKitchenCapacity();
+        updateMASHTheatreCapacity();
 
         processNewDayPersonnel();
 
@@ -6354,6 +6381,25 @@ public class Campaign implements ITechManager {
             fieldKitchenWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
         } else {
             fieldKitchenWithinCapacity = false;
+        }
+    }
+
+    /**
+     * Updates the value of {@code mashTheatreCapacity} based on the current campaign options and force composition.
+     *
+     * <p>If the campaign is configured to use MASH theatres, this method calculates the available MASH theatre
+     * capacity using the current force and campaign options. If MASH theatres are not enabled, the capacity is set to
+     * zero.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void updateMASHTheatreCapacity() {
+        if (campaignOptions.isUseMASHTheatres()) {
+            mashTheatreCapacity = MASHCapacity.checkMASHCapacity(getForce(FORCE_ORIGIN).getAllUnitsAsUnits(units,
+                  false), campaignOptions.getMASHTheatreCapacity());
+        } else {
+            mashTheatreCapacity = 0;
         }
     }
 
@@ -7278,6 +7324,8 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "asTechPoolMinutes", asTechPoolMinutes);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "asTechPoolOvertime", asTechPoolOvertime);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "medicPool", medicPool);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "fieldKitchenWithinCapacity", fieldKitchenWithinCapacity);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "mashTheatreCapacity", mashTheatreCapacity);
         getCamouflage().writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "colour", getColour().name());
         getUnitIcon().writeToXML(writer, indent);
