@@ -126,4 +126,21 @@ public class StratConStrategicObjective {
                   false;
         };
     }
+
+    /**
+     * Determines whether a StratCon objective has been resolved (either completed or failed).
+     *
+     * <p>An objective is considered resolved if it has reached a terminal state, meaning it is no longer active and
+     * requires no further player action.</p>
+     *
+     * @param trackState the current state of the StratCon track containing the objective
+     *
+     * @return {@code true} if the objective is completed or failed, {@code false} if it is still active
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public boolean isObjectiveResolved(StratConTrackState trackState) {
+        return isObjectiveCompleted(trackState) || isObjectiveFailed(trackState);
+    }
 }

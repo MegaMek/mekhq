@@ -61,7 +61,6 @@ public enum DocumentationEntry {
     COOP_CAMPAIGNS("COOP_CAMPAIGNS", "MekHQ Co-Op Campaign Guide v1", new Version("0.50.06")),
     EDUCATION_MODULE("EDUCATION_MODULE", "Personnel Modules/Education Module", new Version("0.50.06")),
     FACTION_STANDINGS("FACTION_STANDINGS", "MekHQ Systems/Faction Standings", new Version("0.50.07")),
-    MORALE("MORALE", "StratCon/MekHQ Morale", new Version("0.50.06")),
     NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "0_MHQ New Player Guide", new Version("0.50.06")),
     PRISONERS_OF_WAR("PRISONERS_OF_WAR",
           "MekHQ Systems/Prisoners of War & Abstracted Search and Rescue",
