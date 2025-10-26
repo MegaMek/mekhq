@@ -131,6 +131,7 @@ import mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
+import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.QuickTrain;
@@ -264,7 +265,8 @@ public class CampaignNewDayManager {
         campaign.getLocation().newDay(campaign);
         updatedLocation = campaign.getLocation();
 
-        updateFieldKitchenCapacity();
+
+        updateFacilities();
 
         processNewDayPersonnel();
 
@@ -359,6 +361,26 @@ public class CampaignNewDayManager {
         // campaign must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(campaign));
         return true;
+    }
+
+    /**
+     * Updates the campaign's facility capacities and validates against operational limits.
+     *
+     * <p>This method performs the following facility updates:</p>
+     * <ol>
+     *     <li>Recalculates the field kitchen capacity based on current campaign state</li>
+     *     <li>Validates MASH (Mobile Army Surgical Hospital) capacity against configured theater limits,
+     *         considering only units assigned to the force's table of organization</li>
+     * </ol>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void updateFacilities() {
+        updateFieldKitchenCapacity();
+        List<Unit> unitsInToe = campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(hangar, false);
+        int capacity = MASHCapacity.checkMASHCapacity(unitsInToe, campaignOptions.getMASHTheatreCapacity());
+        campaign.setMashTheatreCapacity(capacity);
     }
 
     /**
