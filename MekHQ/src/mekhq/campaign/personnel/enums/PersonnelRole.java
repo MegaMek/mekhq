@@ -1373,7 +1373,7 @@ public enum PersonnelRole {
      * @return {@code true} if the character is assigned to a technician role, {@code false} otherwise.
      */
     public boolean isTech() {
-        return isMekTech() || isMechanic() || isAeroTek() || isBATech() || isVesselCrew();
+        return isMekTech() || isMechanic() || isVehicleCrew() || isAeroTek() || isBATech() || isVesselCrew();
     }
 
     /**
@@ -1383,7 +1383,7 @@ public enum PersonnelRole {
      * @return {@code true} if the character is assigned to a technician role, {@code false} otherwise.
      */
     public boolean isTechSecondary() {
-        return isMekTech() || isMechanic() || isAeroTek() || isBATech();
+        return isMekTech() || isMechanic() || isVehicleCrew() || isAeroTek() || isBATech();
     }
 
     /**

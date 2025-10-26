@@ -63,7 +63,6 @@ import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.*;
-import static mekhq.campaign.personnel.skills.VehicleCrewSkills.VEHICLE_CREW_SKILLS;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -133,6 +132,7 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.skills.VehicleCrewSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
@@ -1336,7 +1336,6 @@ public class Person {
 
         List<String> skillsForProfession = role.getSkillsForProfession();
         return switch (role) {
-            case VEHICLE_CREW -> VEHICLE_CREW_SKILLS.stream().anyMatch(this::hasSkill);
             case SOLDIER -> INFANTRY_GUNNERY_SKILLS.stream().anyMatch(this::hasSkill);
             case BATTLE_ARMOUR -> hasSkill(S_GUN_BA);
             case VESSEL_CREW -> hasSkill(S_TECH_VESSEL);
@@ -4066,6 +4065,15 @@ public class Person {
                       person.getHyperlinkedFullTitle()));
             }
 
+            // <50.10 compatibility handler
+            if (updateSkillsForVehicleCrewProfession(person, person.getPrimaryRole()) ||
+                      updateSkillsForVehicleCrewProfession(person, person.getSecondaryRole())) {
+                campaign.addReport(String.format(resources.getString("vehicleCrewProfessionSkillChange"),
+                      spanOpeningWithCustomColor(getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
+            }
+
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
             if (!person.canPerformRole(campaign.getLocalDate(), person.getSecondaryRole(), false)) {
@@ -4112,6 +4120,49 @@ public class Person {
             int drivingLevel = drivingSkill.getLevel();
             person.addSkill(S_GUN_VEE, drivingLevel, 0);
             return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Updates skills for personnel with the Vehicle Crew profession by ensuring they have the Mechanic skill.
+     *
+     * <p>This method is used during XML loading to migrate legacy data. If the person lacks the
+     * {@link SkillType#S_TECH_MECHANIC} skill, it will be added at a level equal to their highest existing vehicle
+     * crew-related skill (e.g., Tech Vee, Gunnery Vee, Piloting Vee, or Driving). This ensures backwards compatibility
+     * when loading older save files.</p>
+     *
+     * @param person      the person whose skills should be updated
+     * @param currentRole the role to check
+     *
+     * @return {@code true} if the Mechanic skill was added, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static boolean updateSkillsForVehicleCrewProfession(Person person, PersonnelRole currentRole) {
+        if (currentRole != PersonnelRole.VEHICLE_CREW) {
+            return false;
+        }
+
+        if (!person.hasSkill(S_TECH_MECHANIC)) {
+            int highestSkillLevel = EXP_NONE;
+            String highestSkill = null;
+            for (String skillName : VehicleCrewSkills.VEHICLE_CREW_SKILLS) {
+                if (person.hasSkill(skillName)) {
+                    int level = person.getSkill(skillName).getLevel();
+                    if (level > highestSkillLevel) {
+                        highestSkillLevel = level;
+                        highestSkill = skillName;
+                    }
+                }
+            }
+
+            if (highestSkill != null) {
+                person.addSkill(highestSkill, highestSkillLevel, 0);
+                return true;
+            }
         }
 
         return false;
@@ -4598,26 +4649,6 @@ public class Person {
                         yield EXP_NONE;
                     }
                 }
-            }
-            case VEHICLE_CREW -> {
-                // Vehicle crew are a special case as they just need any one of the following skills to qualify,
-                // rather than needing all relevant skills
-                List<String> relevantSkills = VEHICLE_CREW_SKILLS;
-                int highestExperienceLevel = EXP_NONE;
-                for (String relevantSkill : relevantSkills) {
-                    Skill skill = getSkill(relevantSkill);
-
-                    if (skill == null) {
-                        continue;
-                    }
-
-                    int currentExperienceLevel = skill.getExperienceLevel(options, atowAttributes);
-                    if (currentExperienceLevel > highestExperienceLevel) {
-                        highestExperienceLevel = currentExperienceLevel;
-                    }
-                }
-
-                yield highestExperienceLevel;
             }
             case SOLDIER -> {
                 int highestExperienceLevel = EXP_NONE;
@@ -5486,7 +5517,7 @@ public class Person {
         } else if (entity instanceof BattleArmor) {
             return hasSkill(S_TECH_BA) && isTechBA();
         } else if (entity instanceof Tank) {
-            return hasSkill(S_TECH_MECHANIC) && isTechMechanic();
+            return hasSkill(S_TECH_MECHANIC) && (isTechMechanic() || isVehicleCrew());
         } else {
             return false;
         }
@@ -5784,7 +5815,7 @@ public class Person {
     }
 
     public boolean isTech() {
-        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA();
+        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA() || isVehicleCrew();
     }
 
     /**
@@ -5793,7 +5824,7 @@ public class Person {
      * @return true if the person is a tech
      */
     public boolean isTechExpanded() {
-        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA() || isTechLargeVessel();
+        return isTechMek() || isTechAero() || isTechMechanic() || isVehicleCrew() || isTechBA() || isTechLargeVessel();
     }
 
     public boolean isTechLargeVessel() {
@@ -5819,6 +5850,11 @@ public class Person {
     public boolean isTechBA() {
         boolean hasSkill = hasSkill(S_TECH_BA);
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
+    }
+
+    public boolean isVehicleCrew() {
+        boolean hasSkill = hasSkill(S_TECH_MECHANIC);
+        return hasSkill && (getPrimaryRole().isVehicleCrew() || getSecondaryRole().isVehicleCrew());
     }
 
     public boolean isAsTech() {

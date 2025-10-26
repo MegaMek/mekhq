@@ -36,6 +36,7 @@ import static mekhq.campaign.personnel.skills.SkillType.*;
 
 import java.util.List;
 
+@Deprecated(since = "0.50.10", forRemoval = true)
 public class VehicleCrewSkills {
     /**
      * Unmodifiable list of all skill type strings considered to be vehicle crew skills.
