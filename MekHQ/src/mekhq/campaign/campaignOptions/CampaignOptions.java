@@ -1037,7 +1037,7 @@ public class CampaignOptions {
         setUseRelationshiplessRandomProcreation(false);
         setUseRandomClanPersonnelProcreation(false);
         setUseRandomPrisonerProcreation(true);
-        setRandomProcreationRelationshipDiceSize(500);
+        setRandomProcreationRelationshipDiceSize(150);
         setRandomProcreationRelationshiplessDiceSize(2000);
 
         // Education
