@@ -35,8 +35,8 @@ package mekhq.campaign.universe.generators.companyGenerators;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekSummary;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.personnel.ranks.Rank;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.AtBRandomMekParameters;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
@@ -97,19 +97,23 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
             if (faction.isClan()) {
                 // Clan Pilots generate using the Keshik Table if they roll A*, otherwise they roll on
                 // the Front Line tables
-                parameters.setQuality((parameters.getQuality() == IUnitRating.DRAGOON_ASTAR)
-                                            ? IUnitRating.DRAGOON_ASTAR : IUnitRating.DRAGOON_B);
+                parameters.setQuality((parameters.getQuality() == DragoonRating.DRAGOON_ASTAR.getRating())
+                                            ?
+                                            DragoonRating.DRAGOON_ASTAR.getRating() :
+                                            DragoonRating.DRAGOON_B.getRating());
                 return generateMekSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
             } else {
                 // Roll on the Star League Royal table if you get an SL mek with A* Rating
-                final String factionCode = (parameters.getQuality() == IUnitRating.DRAGOON_ASTAR) ? "SL.R" : "SL";
+                final String factionCode = (parameters.getQuality() == DragoonRating.DRAGOON_ASTAR.getRating()) ?
+                                                 "SL.R" :
+                                                 "SL";
                 return generateMekSummary(campaign, parameters, factionCode, getOptions().getStarLeagueYear());
             }
         } else {
             // Clan Pilots Generate from 2nd Line (or lesser) Tables (core AtB is just 2nd Line,
             // but this is more interesting)
-            if (faction.isClan() && (parameters.getQuality() > IUnitRating.DRAGOON_C)) {
-                parameters.setQuality(IUnitRating.DRAGOON_C);
+            if (faction.isClan() && (parameters.getQuality() > DragoonRating.DRAGOON_C.getRating())) {
+                parameters.setQuality(DragoonRating.DRAGOON_C.getRating());
             }
             return generateMekSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
         }

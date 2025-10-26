@@ -41,6 +41,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
@@ -53,7 +54,6 @@ import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 
 @AtBScenarioEnabled
@@ -143,7 +143,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
         for (int i = 0; i < 3; i++) {
             // 3 mek rebel lance, use employer RAT, enemy skill
             enemyEntities.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getEnemySkill(),
-                  IUnitRating.DRAGOON_F, UnitType.MEK,
+                  DragoonRating.DRAGOON_F.getRating(), UnitType.MEK,
                   Compute.d6() < 4 ? EntityWeightClass.WEIGHT_LIGHT : EntityWeightClass.WEIGHT_MEDIUM, campaign));
         }
 

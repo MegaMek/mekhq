@@ -77,7 +77,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -94,7 +93,6 @@ import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
 import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
 import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
 import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
-import mekhq.gui.dialog.reportDialogs.UnitRatingReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
@@ -262,7 +260,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         /* Unit Rating */
         lblRatingHead = new JLabel(resourceMap.getString("lblRating.text"));
-        lblRatingHead.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
@@ -272,7 +269,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panInfo.add(lblRatingHead, gridBagConstraints);
         lblRating = new JLabel(getCampaign().getUnitRatingText());
         lblRatingHead.setLabelFor(lblRating);
-        lblRating.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblRating, gridBagConstraints);
@@ -287,16 +283,12 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panInfo.add(lblExperienceHead, gridBagConstraints);
 
         lblExperience = new JLabel();
-        if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
-            lblExperience.setText(getCampaign().getUnitRating().getAverageExperience().toString());
-        } else {
-            // This seems to be overwritten completely and immediately by refresh
-            String experienceString = "<html><b>" +
-                                            SkillType.getColoredExperienceLevelName(getCampaign().getReputation()
-                                                                                          .getAverageSkillLevel()) +
-                                            "</b></html>";
-            lblExperience.setText(experienceString);
-        }
+        // This seems to be overwritten completely and immediately by refresh
+        String experienceString = "<html><b>" +
+                                        SkillType.getColoredExperienceLevelName(getCampaign().getReputation()
+                                                                                      .getAverageSkillLevel()) +
+                                        "</b></html>";
+        lblExperience.setText(experienceString);
 
         lblExperienceHead.setLabelFor(lblExperience);
         gridBagConstraints.gridx = 1;
@@ -598,15 +590,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panReports.add(btnCargoCapacity);
 
         btnUnitRating = new RoundedJButton(resourceMap.getString("btnUnitRating.text"));
-        btnUnitRating.setEnabled(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
-
-        if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
-            btnUnitRating.addActionListener(evt -> new UnitRatingReportDialog(getCampaignGui().getFrame(),
-                  getCampaign()).setVisible(true));
-        } else {
-            btnUnitRating.addActionListener(evt -> new ReputationReportDialog(getCampaignGui().getFrame(),
-                  getCampaign()).setVisible(true));
-        }
+        btnUnitRating.addActionListener(evt -> new ReputationReportDialog(getCampaignGui().getFrame(),
+              getCampaign()).setVisible(true));
         panReports.add(btnUnitRating);
 
         RoundedJButton btnFactionStanding = new RoundedJButton(resourceMap.getString("btnFactionStanding.text"));
@@ -646,7 +631,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private void refreshBasicInfo() {
         final Campaign campaign = getCampaign();
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        final UnitRatingMethod unitRatingMethod = campaignOptions.getUnitRatingMethod();
         final CampaignSummary campaignSummary = campaign.getCampaignSummary();
 
         if (panInfo.getBorder() instanceof TitledBorder titledBorder) {
@@ -654,16 +638,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
             panInfo.repaint();
         }
 
-        if (unitRatingMethod.isFMMR()) {
-            campaign.getUnitRating().reInitialize();
-            lblExperience.setText(campaign.getUnitRating().getAverageExperience().toString());
-        } else if (unitRatingMethod.isCampaignOperations()) {
-            String experienceString = "<html><b>" +
-                                            SkillType.getColoredExperienceLevelName(campaign.getReputation()
-                                                                                          .getAverageSkillLevel()) +
-                                            "</b></html>";
-            lblExperience.setText(experienceString);
-        }
+        String experienceString = "<html><b>" +
+                                        SkillType.getColoredExperienceLevelName(campaign.getReputation()
+                                                                                      .getAverageSkillLevel()) +
+                                        "</b></html>";
+        lblExperience.setText(experienceString);
 
         campaignSummary.updateInformation();
         lblRating.setText(campaign.getUnitRatingText());
@@ -867,9 +846,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(final OptionsChangedEvent evt) {
-        lblRatingHead.setVisible(evt.getOptions().getUnitRatingMethod().isEnabled());
-        lblRating.setVisible(evt.getOptions().getUnitRatingMethod().isEnabled());
-        btnUnitRating.setVisible(evt.getOptions().getUnitRatingMethod().isEnabled());
         basicInfoScheduler.schedule();
         procurementListScheduler.schedule();
         ImageIcon icon = getAndScaleCampaignIcon();
