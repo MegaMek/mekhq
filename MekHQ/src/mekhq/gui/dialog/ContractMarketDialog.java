@@ -66,6 +66,7 @@ import mekhq.campaign.market.contractMarket.ContractAutomation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
@@ -639,6 +640,7 @@ public class ContractMarketDialog extends JDialog {
             }
 
             ContractAutomation.contractStartPrompt(campaign, selectedContract);
+            FacilityRentals.offerContractRentalOpportunity(campaign, selectedContract);
 
             contractMarket.removeContract(selectedContract);
             ((DefaultTableModel) tableContracts.getModel()).removeRow(tableContracts.convertRowIndexToModel(
