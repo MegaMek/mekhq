@@ -616,6 +616,10 @@ public class CampaignOptions {
     private boolean clanVehicles;
 
     // Contract Operations
+    private int moraleVictoryEffect;
+    private int moraleDecisiveVictoryEffect;
+    private int moraleDefeatEffect;
+    private int moraleDecisiveDefeatEffect;
     private boolean mercSizeLimited;
     private boolean restrictPartsByMission;
     private final int[] atbBattleChance;
@@ -1264,6 +1268,12 @@ public class CampaignOptions {
         useAero = false;
         useVehicles = true;
         clanVehicles = false;
+
+        // Morale
+        moraleDecisiveVictoryEffect = 2;
+        moraleVictoryEffect = 1;
+        moraleDefeatEffect = -2;
+        moraleDecisiveDefeatEffect = -3;
 
         // Contract Operations
         mercSizeLimited = false;
@@ -4834,6 +4844,38 @@ public class CampaignOptions {
 
     public void setTrackOriginalUnit(final boolean trackOriginalUnit) {
         this.trackOriginalUnit = trackOriginalUnit;
+    }
+
+    public int getMoraleVictoryEffect() {
+        return moraleVictoryEffect;
+    }
+
+    public void setMoraleVictoryEffect(final int moraleVictoryEffect) {
+        this.moraleVictoryEffect = moraleVictoryEffect;
+    }
+
+    public int getMoraleDecisiveVictoryEffect() {
+        return moraleDecisiveVictoryEffect;
+    }
+
+    public void setMoraleDecisiveVictoryEffect(final int moraleDecisiveVictoryEffect) {
+        this.moraleDecisiveVictoryEffect = moraleDecisiveVictoryEffect;
+    }
+
+    public int getMoraleDefeatEffect() {
+        return moraleDefeatEffect;
+    }
+
+    public void setMoraleDefeatEffect(final int moraleDefeatEffect) {
+        this.moraleDefeatEffect = moraleDefeatEffect;
+    }
+
+    public int getMoraleDecisiveDefeatEffect() {
+        return moraleDecisiveDefeatEffect;
+    }
+
+    public void setMoraleDecisiveDefeatEffect(final int moraleDecisiveDefeatEffect) {
+        this.moraleDecisiveDefeatEffect = moraleDecisiveDefeatEffect;
     }
 
     public boolean isMercSizeLimited() {
