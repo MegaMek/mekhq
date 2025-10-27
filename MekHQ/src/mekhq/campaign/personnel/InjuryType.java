@@ -126,7 +126,7 @@ public class InjuryType {
         BAD_HEALTH.recoveryTime = 7;
         BAD_HEALTH.fluffText = "Damaged health";
         BAD_HEALTH.maxSeverity = 5;
-        BAD_HEALTH.allowedLocations = EnumSet.of(BodyLocation.GENERIC);
+        BAD_HEALTH.allowedLocations = EnumSet.of(mekhq.campaign.personnel.medical.BodyLocation.GENERIC);
         register("bad_health", BAD_HEALTH);
     }
 
@@ -137,7 +137,7 @@ public class InjuryType {
     protected String fluffText = "";
     protected String simpleName = "injured";
     protected InjuryLevel level = InjuryLevel.MINOR;
-    protected Set<BodyLocation> allowedLocations = null;
+    protected Set<mekhq.campaign.personnel.medical.BodyLocation> allowedLocations = null;
 
     protected InjuryType() {
 
@@ -151,9 +151,9 @@ public class InjuryType {
         return InjuryType.REV_REGISTRY.get(this);
     }
 
-    public boolean isValidInLocation(BodyLocation loc) {
+    public boolean isValidInLocation(mekhq.campaign.personnel.medical.BodyLocation loc) {
         if (null == allowedLocations) {
-            allowedLocations = EnumSet.allOf(BodyLocation.class);
+            allowedLocations = EnumSet.allOf(mekhq.campaign.personnel.medical.BodyLocation.class);
         }
         return allowedLocations.contains(loc);
     }
@@ -164,7 +164,7 @@ public class InjuryType {
     }
 
     /** Does having this injury in this location imply the character is dead? */
-    public boolean impliesDead(BodyLocation loc) {
+    public boolean impliesDead(mekhq.campaign.personnel.medical.BodyLocation loc) {
         return false;
     }
 
@@ -200,11 +200,11 @@ public class InjuryType {
         return simpleName;
     }
 
-    public String getName(BodyLocation loc, int severity) {
+    public String getName(mekhq.campaign.personnel.medical.BodyLocation loc, int severity) {
         return Utilities.capitalize(fluffText);
     }
 
-    public String getFluffText(BodyLocation loc, int severity, Gender gender) {
+    public String getFluffText(mekhq.campaign.personnel.medical.BodyLocation loc, int severity, Gender gender) {
         return fluffText;
     }
 
@@ -212,7 +212,8 @@ public class InjuryType {
         return level;
     }
 
-    public Injury newInjury(Campaign campaign, Person person, BodyLocation bodyLocation, int severity) {
+    public Injury newInjury(Campaign campaign, Person person,
+          mekhq.campaign.personnel.medical.BodyLocation bodyLocation, int severity) {
         if (!isValidInLocation(bodyLocation)) {
             return null;
         }

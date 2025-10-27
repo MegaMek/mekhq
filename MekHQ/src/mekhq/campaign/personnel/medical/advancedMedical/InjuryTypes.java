@@ -50,7 +50,6 @@ import mekhq.campaign.GameEffect;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.MedicalLogEntry;
 import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Modifier;
@@ -59,6 +58,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.enums.ModifierValue;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.medical.BodyLocation;
 
 /** Advanced Medical sub-system injury types */
 public final class InjuryTypes {

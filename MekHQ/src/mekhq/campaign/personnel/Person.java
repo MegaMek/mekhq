@@ -50,9 +50,9 @@ import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
 import static mekhq.campaign.log.LogEntryType.PATIENT;
 import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
-import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CATATONIA;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CHILDLIKE_REGRESSION;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CRIPPLING_FLASHBACKS;
@@ -5236,7 +5236,7 @@ public class Person {
      *       tell that they should be missing from the parent being severed, like a hand is missing if the corresponding
      *       arms is.
      */
-    public boolean isLocationMissing(final @Nullable BodyLocation location) {
+    public boolean isLocationMissing(final @Nullable mekhq.campaign.personnel.medical.BodyLocation location) {
         return (location != null) &&
                      (getInjuriesByLocation(location).stream()
                             .anyMatch(injury -> injury.getType().impliesMissingLocation()) ||
@@ -6841,7 +6841,7 @@ public class Person {
         return modifier;
     }
 
-    public boolean hasInjury(final BodyLocation location) {
+    public boolean hasInjury(final mekhq.campaign.personnel.medical.BodyLocation location) {
         return getInjuryByLocation(location) != null;
     }
 
@@ -6893,11 +6893,13 @@ public class Person {
             boolean isLeftSide = false;
             boolean isRightSide = false;
             if (isAmbidextrous && injury.getType().impliesMissingLocation()) {
-                BodyLocation location = injury.getLocation();
+                mekhq.campaign.personnel.medical.BodyLocation location = injury.getLocation();
                 if (location.isLimb()) {
-                    if (location == BodyLocation.LEFT_ARM || location == BodyLocation.LEFT_HAND) {
+                    if (location == mekhq.campaign.personnel.medical.BodyLocation.LEFT_ARM ||
+                              location == mekhq.campaign.personnel.medical.BodyLocation.LEFT_HAND) {
                         isLeftSide = true;
-                    } else if (location == BodyLocation.RIGHT_ARM || location == BodyLocation.RIGHT_HAND) {
+                    } else if (location == mekhq.campaign.personnel.medical.BodyLocation.RIGHT_ARM ||
+                                     location == mekhq.campaign.personnel.medical.BodyLocation.RIGHT_HAND) {
                         isRightSide = true;
                     }
                 }
@@ -6959,12 +6961,12 @@ public class Person {
                      injuries.stream().noneMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0));
     }
 
-    public List<Injury> getInjuriesByLocation(final BodyLocation location) {
+    public List<Injury> getInjuriesByLocation(final mekhq.campaign.personnel.medical.BodyLocation location) {
         return injuries.stream().filter(injury -> (injury.getLocation() == location)).collect(Collectors.toList());
     }
 
     // Returns only the first injury in a location
-    public @Nullable Injury getInjuryByLocation(final BodyLocation location) {
+    public @Nullable Injury getInjuryByLocation(final mekhq.campaign.personnel.medical.BodyLocation location) {
         return injuries.stream().filter(injury -> (injury.getLocation() == location)).findFirst().orElse(null);
     }
 

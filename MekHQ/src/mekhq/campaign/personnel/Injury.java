@@ -77,7 +77,9 @@ public class Injury {
 
     static {
         try {
-            JAXBContext context = JAXBContext.newInstance(Injury.class, BodyLocation.class, InjuryType.class);
+            JAXBContext context = JAXBContext.newInstance(Injury.class,
+                  mekhq.campaign.personnel.medical.BodyLocation.class,
+                  InjuryType.class);
             marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
             // marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
@@ -111,7 +113,7 @@ public class Injury {
     private LocalDate start;
     /** 0 = past injury, for scars, 1 = default, max depends on type */
     private int hits;
-    private BodyLocation location;
+    private mekhq.campaign.personnel.medical.BodyLocation location;
     private InjuryType type;
     private boolean permanent;
     /** Flag to indicate someone capable successfully treated this injury. */
@@ -129,29 +131,48 @@ public class Injury {
      * This should never be used, but is required for the Unmarshaller
      */
     public Injury() {
-        this(0, "", BodyLocation.GENERIC, InjuryType.BAD_HEALTH, 1, LocalDate.now(), false, false, false);
+        this(0,
+              "",
+              mekhq.campaign.personnel.medical.BodyLocation.GENERIC,
+              InjuryType.BAD_HEALTH,
+              1,
+              LocalDate.now(),
+              false,
+              false,
+              false);
     }
 
     public Injury(LocalDate start) {
-        this(0, "", BodyLocation.GENERIC, InjuryType.BAD_HEALTH, 1, start, false, false, false);
+        this(0,
+              "",
+              mekhq.campaign.personnel.medical.BodyLocation.GENERIC,
+              InjuryType.BAD_HEALTH,
+              1,
+              start,
+              false,
+              false,
+              false);
     }
 
     // Normal constructor for a new injury that has not been treated by a doctor &
     // does not have extended time
-    public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, LocalDate start, boolean perm) {
+    public Injury(int time, String text, mekhq.campaign.personnel.medical.BodyLocation loc, InjuryType type, int num,
+          LocalDate start, boolean perm) {
         this(time, text, loc, type, num, start, perm, false, false);
     }
 
     // Constructor if this injury has been treated by a doctor, but without extended
     // time
-    public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, LocalDate start, boolean perm,
+    public Injury(int time, String text, mekhq.campaign.personnel.medical.BodyLocation loc, InjuryType type, int num,
+          LocalDate start, boolean perm,
           boolean workedOn) {
         this(time, text, loc, type, num, start, perm, workedOn, false);
     }
 
     // Constructor for when this injury has extended time, full options including
     // worked on by a doctor
-    public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, LocalDate start,
+    public Injury(int time, String text, mekhq.campaign.personnel.medical.BodyLocation loc, InjuryType type, int num,
+          LocalDate start,
           boolean perm, boolean workedOn, boolean extended) {
         setTime(time);
         setOriginalTime(time);
@@ -211,11 +232,11 @@ public class Injury {
         fluff = text;
     }
 
-    public BodyLocation getLocation() {
+    public mekhq.campaign.personnel.medical.BodyLocation getLocation() {
         return location;
     }
 
-    public void setLocation(BodyLocation loc) {
+    public void setLocation(mekhq.campaign.personnel.medical.BodyLocation loc) {
         location = loc;
     }
 
@@ -339,10 +360,10 @@ public class Injury {
         if (fluff.endsWith(" hand")) {
             switch (location) {
                 case LEFT_ARM:
-                    location = BodyLocation.LEFT_HAND;
+                    location = mekhq.campaign.personnel.medical.BodyLocation.LEFT_HAND;
                     break;
                 case RIGHT_ARM:
-                    location = BodyLocation.RIGHT_HAND;
+                    location = mekhq.campaign.personnel.medical.BodyLocation.RIGHT_HAND;
                     break;
                 default: // do nothing
             }
@@ -350,10 +371,10 @@ public class Injury {
         if (fluff.endsWith(" foot")) {
             switch (location) {
                 case LEFT_LEG:
-                    location = BodyLocation.LEFT_FOOT;
+                    location = mekhq.campaign.personnel.medical.BodyLocation.LEFT_FOOT;
                     break;
                 case RIGHT_LEG:
-                    location = BodyLocation.RIGHT_FOOT;
+                    location = mekhq.campaign.personnel.medical.BodyLocation.RIGHT_FOOT;
                     break;
                 default: // do nothing
             }
