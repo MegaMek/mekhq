@@ -56,6 +56,7 @@ import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.skills.Skill;
@@ -175,9 +176,12 @@ public class InjuryUtil {
         boolean hasNewInjuries = false;
         List<Injury> currentInjuries = person.getInjuries();
         for (Injury injury : newInjuries) {
-            if (currentInjuries.contains(injury)) {
+            if (!hasNewInjuries && currentInjuries.contains(injury)) {
                 hasNewInjuries = true;
-                break;
+            }
+
+            if (injury.getType().impliesDead(injury.getLocation())) {
+                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
         }
 
