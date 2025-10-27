@@ -46,6 +46,8 @@ import mekhq.campaign.GameEffect;
 import mekhq.campaign.personnel.InjuryType.XMLAdapter;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.medical.BodyLocation;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 
 /**
  * Flyweight design pattern implementation. InjuryType instances should be singletons and never hold any data related to
@@ -138,6 +140,7 @@ public class InjuryType {
     protected String fluffText = "";
     protected String simpleName = "injured";
     protected InjuryLevel level = InjuryLevel.MINOR;
+    protected InjuryEffect injuryEffect = InjuryEffect.NONE;
     protected Set<BodyLocation> allowedLocations = null;
 
     protected InjuryType() {
@@ -213,12 +216,16 @@ public class InjuryType {
         return level;
     }
 
+    public InjuryEffect getInjuryEffect() {
+        return injuryEffect;
+    }
+
     public Injury newInjury(Campaign campaign, Person person, BodyLocation bodyLocation, int severity) {
         if (!isValidInLocation(bodyLocation)) {
             return null;
         }
 
-        int recoveryTime = getRecoveryTime(severity);
+        int recoveryTime = InjuryUtil.genHealingTime(campaign, person, this, severity);
         if (person.getOptions().booleanOption(MUTATION_EXCEPTIONAL_IMMUNE_SYSTEM)) {
             recoveryTime = recoveryTime / 2;
         }

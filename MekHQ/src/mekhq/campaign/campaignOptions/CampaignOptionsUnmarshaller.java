@@ -356,6 +356,8 @@ public class CampaignOptionsUnmarshaller {
             case "useRandomHitsForVehicles" -> campaignOptions.setUseRandomHitsForVehicles(parseBoolean(
                   nodeContents));
             case "tougherHealing" -> campaignOptions.setTougherHealing(parseBoolean(nodeContents));
+            case "useAlternativeAdvancedMedical" ->
+                  campaignOptions.setUseAlternativeAdvancedMedical(parseBoolean(nodeContents));
             case "maximumPatients" -> campaignOptions.setMaximumPatients(parseInt(nodeContents));
             case "doctorsUseAdministration" -> campaignOptions.setDoctorsUseAdministration(parseBoolean(
                   nodeContents));
