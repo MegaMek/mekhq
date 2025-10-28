@@ -3473,6 +3473,7 @@ public class Person {
 
     public static Person generateInstanceFromXML(Node wn, Campaign campaign, Version version) {
         Person person = new Person(campaign);
+        LocalDate today = campaign.getLocalDate();
 
         try {
             // Okay, now load Person-specific fields!
@@ -3881,10 +3882,9 @@ public class Person {
                         }
                         person.injuries.add(Injury.generateInstanceFromXML(wn3));
                     }
-                    LocalDate now = campaign.getLocalDate();
                     person.injuries.stream()
                           .filter(inj -> (null == inj.getStart()))
-                          .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
+                          .forEach(inj -> inj.setStart(today.minusDays(inj.getOriginalTime() - inj.getTime())));
                 } else if (nodeName.equalsIgnoreCase("originalUnitWeight")) {
                     person.originalUnitWeight = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("originalUnitTech")) {
@@ -4098,23 +4098,13 @@ public class Person {
             }
 
             if (person.getJoinedCampaign() == null) {
-                person.setJoinedCampaign(campaign.getLocalDate());
+                person.setJoinedCampaign(today);
             }
 
             // <50.10 compatibility handler
-            if (updateSkillsForVehicleProfessions(campaign, person, person.getPrimaryRole(), true) ||
-                      updateSkillsForVehicleProfessions(campaign, person, person.getSecondaryRole(), false)) {
+            if (updateSkillsForVehicleProfessions(today, person, person.getPrimaryRole(), true) ||
+                      updateSkillsForVehicleProfessions(today, person, person.getSecondaryRole(), false)) {
                 String report = getFormattedTextAt(RESOURCE_BUNDLE, "vehicleProfessionSkillChange",
-                      spanOpeningWithCustomColor(getWarningColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle());
-                campaign.addReport(report);
-            }
-
-            // <50.10 compatibility handler
-            if (updateSkillsForVehicleCrewProfession(campaign, person, person.getPrimaryRole(), true) ||
-                      updateSkillsForVehicleCrewProfession(campaign, person, person.getSecondaryRole(), false)) {
-                String report = getFormattedTextAt(RESOURCE_BUNDLE, "vehicleCrewProfessionSkillChange",
                       spanOpeningWithCustomColor(getWarningColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle());
@@ -4123,7 +4113,7 @@ public class Person {
 
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
-            if (!person.canPerformRole(campaign.getLocalDate(), person.getSecondaryRole(), false)) {
+            if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
                 person.setSecondaryRole(PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
@@ -4132,7 +4122,7 @@ public class Person {
                       person.getHyperlinkedFullTitle()));
             }
 
-            if (!person.canPerformRole(campaign.getLocalDate(), person.getPrimaryRole(), true)) {
+            if (!person.canPerformRole(today, person.getPrimaryRole(), true)) {
                 person.setPrimaryRole(campaign, PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
@@ -4166,7 +4156,7 @@ public class Person {
      * <p>Skills are added at level 3 if the complementary skill is missing, otherwise they are added at the same
      * level as the existing complementary skill.</p>
      *
-     * @param campaign  the current campaign
+     * @param today     the current date
      * @param person    the person whose skills and role should be updated
      * @param role      the deprecated role to migrate from
      * @param isPrimary whether this is the person's primary role (true) or secondary role (false)
@@ -4176,10 +4166,10 @@ public class Person {
      * @author Illiani
      * @since 0.50.10
      */
-    private static boolean updateSkillsForVehicleProfessions(Campaign campaign, Person person, PersonnelRole role,
+    private static boolean updateSkillsForVehicleProfessions(LocalDate today, Person person, PersonnelRole role,
           boolean isPrimary) {
         if (role == PersonnelRole.VEHICLE_CREW) { // The old vehicle crew profession is handled differently
-            return updateSkillsForVehicleCrewProfession(campaign, person, role, isPrimary);
+            return updateSkillsForVehicleCrewProfession(today, person, role, isPrimary);
         }
 
         PersonnelRole newProfession = null;
@@ -4242,7 +4232,7 @@ public class Person {
         }
 
         if (isPrimary) {
-            person.setPrimaryRole(campaign, newProfession);
+            person.setPrimaryRole(today, newProfession);
         } else {
             person.setSecondaryRole(newProfession);
         }
@@ -4258,6 +4248,7 @@ public class Person {
      * crew-related skill (e.g., Tech Vee, Gunnery Vee, Piloting Vee, or Driving). This ensures backwards compatibility
      * when loading older save files.</p>
      *
+     * @param today       the current date
      * @param person      the person whose skills should be updated
      * @param currentRole the role to check
      * @param isPrimary   if the role is the characters' primary profession
@@ -4267,7 +4258,7 @@ public class Person {
      * @author Illiani
      * @since 0.50.10
      */
-    private static boolean updateSkillsForVehicleCrewProfession(Campaign campaign, Person person,
+    private static boolean updateSkillsForVehicleCrewProfession(LocalDate today, Person person,
           PersonnelRole currentRole,
           boolean isPrimary) {
         if (currentRole != PersonnelRole.VEHICLE_CREW) {
@@ -4280,7 +4271,7 @@ public class Person {
         }
 
         if (isPrimary) {
-            person.setPrimaryRole(campaign, PersonnelRole.COMBAT_TECHNICIAN);
+            person.setPrimaryRole(today, PersonnelRole.COMBAT_TECHNICIAN);
         } else {
             person.setSecondaryRole(PersonnelRole.COMBAT_TECHNICIAN);
         }
