@@ -58,6 +58,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
@@ -447,8 +448,10 @@ public class AtBDynamicScenario extends AtBScenario {
 
         if ((commander != null) &&
                   commander.hasSkill(skillType)) {
-            skillValue = commander.getSkill(skillType)
-                               .getTotalSkillLevel(commander.getOptions(), commander.getATOWAttributes());
+            SkillModifierData skillModifierData = commander.getSkillModifierData(campaign.getCampaignOptions()
+                                                                                       .isUseAgeEffects(),
+                  campaign.isClanCampaign(), campaign.getLocalDate());
+            skillValue = commander.getSkill(skillType).getTotalSkillLevel(skillModifierData);
         }
 
         return skillValue;

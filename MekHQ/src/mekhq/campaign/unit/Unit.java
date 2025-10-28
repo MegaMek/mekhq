@@ -140,9 +140,9 @@ import mekhq.campaign.parts.protomeks.ProtoMekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -4589,11 +4589,11 @@ public class Unit implements ITechnology {
     private void setCommandBonus(@Nullable Person commander) {
         // Tactics command bonus. This should actually reflect the unit's commander
         if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
+            SkillModifierData skillModifierData = commander.getSkillModifierData();
+
             entity.getCrew()
                   .setCommandBonus(commander.getSkill(SkillType.S_TACTICS)
-                                         .getTotalSkillLevel(commander.getOptions(),
-                                               commander.getATOWAttributes(),
-                                               0));
+                                         .getTotalSkillLevel(skillModifierData));
         }
     }
 
@@ -4806,13 +4806,14 @@ public class Unit implements ITechnology {
         boolean entityIsConventionalInfantry = entity.hasETypeFlag(Entity.ETYPE_INFANTRY) &&
                                                      !entity.hasETypeFlag(Entity.ETYPE_BATTLEARMOR);
         for (Person person : drivers) {
-            PersonnelOptions options = person.getOptions();
-            Attributes attributes = person.getATOWAttributes();
             if (person.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
+
+            SkillModifierData skillModifierData = person.getSkillModifierData();
+
             if (person.hasSkill(driveType)) {
-                sumPiloting += person.getSkill(driveType).getFinalSkillValue(options, attributes);
+                sumPiloting += person.getSkill(driveType).getFinalSkillValue(skillModifierData);
                 nDrivers++;
             } else if (entity instanceof Infantry) {
                 // For infantry, we need to assign an 8 if they have no anti-mek skill
@@ -4821,7 +4822,7 @@ public class Unit implements ITechnology {
             }
 
             if (entity instanceof Tank && Compute.getFullCrewSize(entity) == 1 && person.hasSkill(gunType)) {
-                sumGunnery += person.getSkill(gunType).getFinalSkillValue(options, attributes);
+                sumGunnery += person.getSkill(gunType).getFinalSkillValue(skillModifierData);
                 nGunners++;
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -4830,11 +4831,11 @@ public class Unit implements ITechnology {
         }
         boolean smallArmsOnly = campaign.getCampaignOptions().isUseSmallArmsOnly();
         for (Person person : gunners) {
-            PersonnelOptions options = person.getOptions();
-            Attributes attributes = person.getATOWAttributes();
             if (person.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
+
+            SkillModifierData skillModifierData = person.getSkillModifierData();
 
             String tempGunType = gunType;
             if (entityIsConventionalInfantry) {
@@ -4845,12 +4846,12 @@ public class Unit implements ITechnology {
             }
 
             if (person.hasSkill(tempGunType)) {
-                sumGunnery += person.getSkill(tempGunType).getFinalSkillValue(options, attributes);
+                sumGunnery += person.getSkill(tempGunType).getFinalSkillValue(skillModifierData);
                 nGunners++;
             }
             if (person.hasSkill(SkillType.S_ARTILLERY) &&
-                      person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes) < artillery) {
-                artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes);
+                      person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData) < artillery) {
+                artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData);
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
                 sumGunnery += person.getInjuryModifiers(false);
@@ -4886,11 +4887,10 @@ public class Unit implements ITechnology {
         }
 
         if (isOnlyCommandersMatter && getCommander() != null) {
-            PersonnelOptions options = getCommander().getOptions();
-            Attributes attributes = getCommander().getATOWAttributes();
+            SkillModifierData skillModifierData = getCommander().getSkillModifierData();
 
             Skill drivingSkill = getCommander().getSkill(driveType);
-            piloting = drivingSkill == null ? 13 : drivingSkill.getFinalSkillValue(options, attributes);
+            piloting = drivingSkill == null ? 13 : drivingSkill.getFinalSkillValue(skillModifierData);
             if (entity instanceof Infantry && drivingSkill == null) {
                 piloting = 8;
             }
@@ -4904,7 +4904,7 @@ public class Unit implements ITechnology {
             }
 
             Skill gunnerySkill = getCommander().getSkill(tempGunType);
-            gunnery = gunnerySkill == null ? 13 : gunnerySkill.getFinalSkillValue(options, attributes);
+            gunnery = gunnerySkill == null ? 13 : gunnerySkill.getFinalSkillValue(skillModifierData);
         }
 
         if (entity instanceof Infantry) {
@@ -4990,28 +4990,28 @@ public class Unit implements ITechnology {
             return;
         }
 
+        SkillModifierData skillModifierData = pilot.getSkillModifierData();
+
         int pilotingMek = 13;
         int gunneryMek = 13;
         int pilotingAero = 13;
         int gunneryAero = 13;
         int artillery = 13;
 
-        PersonnelOptions options = pilot.getOptions();
-        Attributes attributes = pilot.getATOWAttributes();
         if (pilot.hasSkill(SkillType.S_PILOT_MEK)) {
-            pilotingMek = pilot.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue(options, attributes);
+            pilotingMek = pilot.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue(skillModifierData);
         }
         if (pilot.hasSkill(SkillType.S_GUN_MEK)) {
-            gunneryMek = pilot.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue(options, attributes);
+            gunneryMek = pilot.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue(skillModifierData);
         }
         if (pilot.hasSkill(SkillType.S_PILOT_AERO)) {
-            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue(options, attributes);
+            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue(skillModifierData);
         }
         if (pilot.hasSkill(SkillType.S_GUN_AERO)) {
-            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue(options, attributes);
+            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue(skillModifierData);
         }
         if (pilot.hasSkill(SkillType.S_ARTILLERY)) {
-            artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes);
+            artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData);
         }
 
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -5036,8 +5036,8 @@ public class Unit implements ITechnology {
      *
      */
     private void assignToCrewSlot(Person person, int slot, String gunType, String driveType) {
-        PersonnelOptions options = person.getOptions();
-        Attributes attributes = person.getATOWAttributes();
+        SkillModifierData skillModifierData = person.getSkillModifierData();
+
         entity.getCrew().setName(person.getFullTitle(), slot);
         entity.getCrew().setNickname(person.getCallsign(), slot);
         entity.getCrew().setGender(person.getGender(), slot);
@@ -5048,17 +5048,17 @@ public class Unit implements ITechnology {
         int artillery = 7;
         int piloting = 8;
         if (person.hasSkill(gunType)) {
-            gunnery = person.getSkill(gunType).getFinalSkillValue(options, attributes);
+            gunnery = person.getSkill(gunType).getFinalSkillValue(skillModifierData);
         }
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
             gunnery += person.getInjuryModifiers(false);
         }
         if (person.hasSkill(driveType)) {
-            piloting = person.getSkill(driveType).getFinalSkillValue(options, attributes);
+            piloting = person.getSkill(driveType).getFinalSkillValue(skillModifierData);
         }
         if (person.hasSkill(SkillType.S_ARTILLERY) &&
-                  person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes) < artillery) {
-            artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options, attributes);
+                  person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData) < artillery) {
+            artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData);
         }
         entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), slot);
         entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 8), slot);

@@ -71,8 +71,8 @@ import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
@@ -799,42 +799,29 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (adminCommand != null) {
             Skill skill = adminCommand.getSkill(S_NEGOTIATION);
             if (skill != null) {
-                PersonnelOptions options = adminCommand.getOptions();
-                Attributes attributes = adminCommand.getATOWAttributes();
-                int adjustedReputation = adminCommand.getAdjustedReputation(isUseAgeEffects,
-                      isClanCampaign,
-                      today,
-                      adminCommand.getRankNumeric());
-
-                adminCommandExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
+                SkillModifierData skillModifierData = adminCommand.getSkillModifierData(isUseAgeEffects,
+                      isClanCampaign, today);
+                adminCommandExp = skill.getExperienceLevel(skillModifierData);
             }
         }
         int adminTransportExp = SkillType.EXP_NONE;
         if (adminTransport != null) {
             Skill skill = adminTransport.getSkill(S_NEGOTIATION);
             if (skill != null) {
-                PersonnelOptions options = adminTransport.getOptions();
-                Attributes attributes = adminTransport.getATOWAttributes();
-                int adjustedReputation = adminTransport.getAdjustedReputation(isUseAgeEffects,
-                      isClanCampaign,
-                      today,
-                      adminTransport.getRankNumeric());
+                SkillModifierData skillModifierData = adminTransport.getSkillModifierData(isUseAgeEffects,
+                      isClanCampaign, today);
 
-                adminTransportExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
+                adminTransportExp = skill.getExperienceLevel(skillModifierData);
             }
         }
         int adminLogisticsExp = SkillType.EXP_NONE;
         if (adminLogistics != null) {
             Skill skill = adminLogistics.getSkill(S_NEGOTIATION);
             if (skill != null) {
-                PersonnelOptions options = adminLogistics.getOptions();
-                Attributes attributes = adminLogistics.getATOWAttributes();
-                int adjustedReputation = adminLogistics.getAdjustedReputation(isUseAgeEffects,
-                      isClanCampaign,
-                      today,
-                      adminLogistics.getRankNumeric());
+                SkillModifierData skillModifierData = adminLogistics.getSkillModifierData(isUseAgeEffects,
+                      isClanCampaign, today);
 
-                adminLogisticsExp = skill.getExperienceLevel(options, attributes, adjustedReputation);
+                adminLogisticsExp = skill.getExperienceLevel(skillModifierData);
             }
         }
 

@@ -85,6 +85,7 @@ import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratCon.StratConBiomeManifest;
@@ -379,7 +380,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             return;
         }
 
-        rerollsRemaining = tactics.getTotalSkillLevel(commander.getOptions(), commander.getATOWAttributes());
+        SkillModifierData skillModifierData = commander.getSkillModifierData();
+        rerollsRemaining = tactics.getTotalSkillLevel(skillModifierData);
     }
 
     public int getModifiedTemperature() {

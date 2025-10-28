@@ -92,6 +92,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
@@ -1253,6 +1254,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         List<String> sortedSkillNames = SkillType.getSortedSkillNames();
 
+        SkillModifierData skillModifierData = person.getSkillModifierData(campaign.getCampaignOptions()
+                                                                                .isUseAgeEffects(),
+              campaign.isClanCampaign(), campaign.getLocalDate());
         SkillType skillType;
         for (int index = 0; index < sortedSkillNames.size(); index++) {
             c.gridy = index;
@@ -1270,9 +1274,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             lblValue = new JLabel();
             if (person.hasSkill(type)) {
                 lblValue.setText(person.getSkill(type)
-                                       .toString(person.getOptions(),
-                                             person.getATOWAttributes(),
-                                             person.getReputation()));
+                                       .toString(skillModifierData));
             } else {
                 lblValue.setText("-");
             }

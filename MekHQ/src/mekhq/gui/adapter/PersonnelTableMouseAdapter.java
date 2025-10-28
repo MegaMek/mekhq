@@ -139,6 +139,7 @@ import mekhq.campaign.personnel.skills.Aging;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillDeprecationTool;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -1862,10 +1863,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         for (Person person : campaign.getActivePersonnel(false, false)) {
             if (person.isDoctor()) {
+                SkillModifierData skillModifierData = person.getSkillModifierData();
                 Skill skill = person.getSkill(S_SURGERY);
 
                 if (skill != null &&
-                          skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()) >=
+                          skill.getFinalSkillValue(skillModifierData) >=
                                 REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
                     suitableDoctors.add(person);
                 }
@@ -3319,6 +3321,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         description = String.format(resources.getString("skillDesc.format"), typeName, cost);
                     }
 
+                    SkillModifierData skillModifierData =
+                          person.getSkillModifierData(getCampaignOptions().isUseAgeEffects(),
+                                getCampaign().isClanCampaign(), getCampaign().getLocalDate());
+
                     menuItem = new JMenuItem(description);
                     menuItem.setActionCommand(makeCommand(CMD_IMPROVE, typeName, String.valueOf(cost)));
                     menuItem.addActionListener(this);
@@ -3332,9 +3338,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 continue;
                             }
 
-                            String tooltip = wordWrap(skill.getTooltip(person.getOptions(),
-                                  person.getATOWAttributes(),
-                                  adjustedReputation));
+                            String tooltip = wordWrap(skill.getTooltip(skillModifierData));
                             menuItem.setToolTipText(tooltip);
 
                             SkillSubType subType = skillType.getSubType();

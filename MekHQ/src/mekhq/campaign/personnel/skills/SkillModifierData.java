@@ -32,34 +32,8 @@
  */
 package mekhq.campaign.personnel.skills;
 
-import java.util.List;
+import mekhq.campaign.personnel.PersonnelOptions;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.personnel.Person;
-
-public class ScoutingSkills {
-    /**
-     * Unmodifiable list of all skill type strings considered to be scouting skills.
-     */
-    public static final List<String> SCOUTING_SKILLS = List.of(SkillType.S_COMMUNICATIONS,
-          SkillType.S_PERCEPTION, SkillType.S_SENSOR_OPERATIONS, SkillType.S_STEALTH, SkillType.S_TRACKING);
-
-    public static @Nullable String getBestScoutingSkill(Person person) {
-        String bestSkill = null;
-        int highestLevel = -1;
-
-        SkillModifierData skillModifierData = person.getSkillModifierData();
-        for (String skillName : SCOUTING_SKILLS) {
-            if (person.hasSkill(skillName)) {
-                int skillLevel = person.getSkill(skillName).getTotalSkillLevel(skillModifierData);
-
-                if (skillLevel > highestLevel) {
-                    highestLevel = skillLevel;
-                    bestSkill = skillName;
-                }
-            }
-        }
-
-        return bestSkill;
-    }
+public record SkillModifierData(PersonnelOptions characterOptions, Attributes attributes, int adjustedReputation,
+      boolean isIlliterate) {
 }

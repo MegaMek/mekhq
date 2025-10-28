@@ -112,6 +112,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
@@ -1652,10 +1653,10 @@ public class StratConRulesManager {
                     continue;
                 }
 
+                SkillModifierData skillModifierData = crewMember.getSkillModifierData();
+
                 Skill scoutSkill = crewMember.getSkill(scoutSkillName);
-                int scoutSkillLevel = (scoutSkill == null) ? -1 :
-                                            scoutSkill.getTotalSkillLevel(crewMember.getOptions(),
-                                                  crewMember.getATOWAttributes());
+                int scoutSkillLevel = (scoutSkill == null) ? -1 : scoutSkill.getTotalSkillLevel(skillModifierData);
                 if (scoutSkillLevel > bestScoutSkillLevel) {
                     bestScout = crewMember;
                     bestScoutSkillName = scoutSkillName;
@@ -1998,8 +1999,8 @@ public class StratConRulesManager {
         if (skill == null) {
             skillModifier = 0;
         } else {
-            skillModifier = REGULAR.getExperienceLevel() - skill.getExperienceLevel(commandLiaison.getOptions(),
-                  commandLiaison.getATOWAttributes());
+            SkillModifierData skillModifierData = commandLiaison.getSkillModifierData();
+            skillModifier = REGULAR.getExperienceLevel() - skill.getExperienceLevel(skillModifierData);
         }
 
         // Admin Skill Modifier

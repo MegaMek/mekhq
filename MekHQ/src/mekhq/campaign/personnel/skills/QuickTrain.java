@@ -45,7 +45,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 
@@ -86,6 +85,8 @@ public class QuickTrain {
         boolean isUseReasoningMultiplier = campaignOptions.isUseReasoningXpMultiplier();
         double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
         boolean isLogSkillGain = campaignOptions.isPersonnelLogSkillGain();
+        boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
+        boolean isClanCampaign = campaign.isClanCampaign();
 
         LocalDate today = campaign.getLocalDate();
 
@@ -101,11 +102,9 @@ public class QuickTrain {
 
             List<String> targetSkills = new ArrayList<>();
 
-            PersonnelOptions options = person.getOptions();
-            Attributes attributes = person.getATOWAttributes();
-
+            SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign, today);
             processSkills(person, isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration,
-                  isUseArtillery, targetSkills, options, attributes);
+                  isUseArtillery, targetSkills, skillModifierData);
 
             if (targetSkills.isEmpty()) {
                 continue;
@@ -116,8 +115,6 @@ public class QuickTrain {
                   isContinuousTraining,
                   person,
                   targetSkills,
-                  options,
-                  attributes,
                   isUseReasoningMultiplier,
                   xpCostMultiplier,
                   isLogSkillGain,
@@ -144,8 +141,6 @@ public class QuickTrain {
      * @param person                   the person undergoing training
      * @param targetSkills             a list of skill names to train; skills are removed from this list as they are
      *                                 completed or ineligible
-     * @param options                  the personnel options affecting skill calculations
-     * @param attributes               the person's attributes relevant to skill calculation
      * @param isUseReasoningMultiplier whether the reasoning XP cost multiplier applies
      * @param xpCostMultiplier         an absolute multiplier applied to all skill XP costs
      * @param isLogSkillGain           whether skill gains should be logged via the performance logger
@@ -155,9 +150,8 @@ public class QuickTrain {
      * @since 0.50.10
      */
     private static void handleSkillTraining(int targetLevel, Campaign campaign, boolean isContinuousTraining,
-          Person person,
-          List<String> targetSkills, PersonnelOptions options, Attributes attributes, boolean isUseReasoningMultiplier,
-          double xpCostMultiplier, boolean isLogSkillGain, LocalDate today) {
+          Person person, List<String> targetSkills, boolean isUseReasoningMultiplier, double xpCostMultiplier,
+          boolean isLogSkillGain, LocalDate today) {
         do {
             boolean skillImproved = false;
             Iterator<String> targetSkillIterator = targetSkills.iterator();
@@ -165,7 +159,7 @@ public class QuickTrain {
                 String skillName = targetSkillIterator.next();
                 Skill skill = person.getSkill(skillName);
 
-                if (skill == null || skill.getTotalSkillLevel(options, attributes) >= targetLevel) {
+                if (skill == null || skill.getLevel() >= targetLevel) {
                     targetSkillIterator.remove();
                     continue;
                 }
@@ -220,21 +214,19 @@ public class QuickTrain {
      * @param isTechsUseAdministration   campaign option: techs substitute administration
      * @param isUseArtillery             campaign option: include artillery skills
      * @param targetSkills               (output) list of skill names eligible for training, will be filled and sorted
-     * @param options                    the person's skill-related options
-     * @param attributes                 any relevant person attributes
      *
      * @author Illiani
      * @since 0.50.10
      */
     private static void processSkills(Person person, boolean isAdminsHaveNegotiation,
           boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isUseArtillery,
-          List<String> targetSkills, PersonnelOptions options, Attributes attributes) {
+          List<String> targetSkills, SkillModifierData skillModifierData) {
         fetchSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
               isTechsUseAdministration, isUseArtillery, person, targetSkills,
-              person.getPrimaryRole(), options, attributes);
+              person.getPrimaryRole(), skillModifierData);
         fetchSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
               isTechsUseAdministration, isUseArtillery, person, targetSkills,
-              person.getSecondaryRole(), options, attributes);
+              person.getSecondaryRole(), skillModifierData);
 
         if (!person.hasSkill(SkillType.S_ARTILLERY)) {
             targetSkills.remove(SkillType.S_ARTILLERY);
@@ -246,7 +238,7 @@ public class QuickTrain {
                   Skill skill = person.getSkill(skillName);
                   return (skill == null) // The character doesn't have this skill
                                ? Integer.MIN_VALUE // Unknown skills should always be trained first
-                               : skill.getTotalSkillLevel(options, attributes);
+                               : skill.getTotalSkillLevel(skillModifierData);
               })
         );
     }
@@ -262,15 +254,13 @@ public class QuickTrain {
      * @param person                     the person whose skills are being evaluated
      * @param targetSkills               (output) list to add eligible skill names to
      * @param profession                 the personnel role/profession to check
-     * @param options                    the person's skill-related options
-     * @param attributes                 any relevant person attributes
      *
      * @author Illiani
      * @since 0.50.10
      */
     private static void fetchSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
           boolean isTechsUseAdministration, boolean isUseArtillery, Person person, List<String> targetSkills,
-          PersonnelRole profession, PersonnelOptions options, Attributes attributes) {
+          PersonnelRole profession, SkillModifierData skillModifierData) {
         if (profession.isNone() || profession.isDependent()) {
             return;
         }
@@ -278,9 +268,7 @@ public class QuickTrain {
         switch (profession) {
             case SOLDIER -> {
                 String highestSkillName = getHighestSkill(InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS,
-                      person,
-                      options,
-                      attributes);
+                      person, skillModifierData);
                 if (person.hasSkill(SkillType.S_ANTI_MEK)) {
                     targetSkills.add(SkillType.S_ANTI_MEK);
                 }
@@ -302,22 +290,19 @@ public class QuickTrain {
      *
      * @param skillNames a list of skill names to search
      * @param person     the person whose skill levels are being inspected
-     * @param options    the person's skill options
-     * @param attributes relevant person attributes
      *
      * @return the name of the skill with the highest level found in the person, or {@code null} if none are found
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static String getHighestSkill(List<String> skillNames, Person person, PersonnelOptions options,
-          Attributes attributes) {
+    private static String getHighestSkill(List<String> skillNames, Person person, SkillModifierData skillModifierData) {
         String highestSkillName = null;
         int highestSkillLevel = -1;
         for (String skillName : skillNames) {
             Skill skill = person.getSkill(skillName);
-            if (skill != null && skill.getLevel() > highestSkillLevel) {
-                highestSkillLevel = skill.getTotalSkillLevel(options, attributes);
+            if (skill != null && skill.getTotalSkillLevel(skillModifierData) > highestSkillLevel) {
+                highestSkillLevel = skill.getTotalSkillLevel(skillModifierData);
                 highestSkillName = skillName;
             }
         }

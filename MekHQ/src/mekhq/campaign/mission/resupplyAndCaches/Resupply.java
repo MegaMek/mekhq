@@ -74,6 +74,7 @@ import mekhq.campaign.parts.meks.MekGyro;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -819,13 +820,10 @@ public class Resupply {
             Skill skill = negotiator.getSkill(SkillType.S_NEGOTIATION);
 
             if (skill != null) {
-                int reputation = negotiator.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
-                      campaign.isClanCampaign(),
-                      campaign.getLocalDate(),
-                      negotiator.getRankNumeric());
-                int skillLevel = skill.getFinalSkillValue(negotiator.getOptions(),
-                      negotiator.getATOWAttributes(),
-                      reputation);
+                SkillModifierData skillModifierData = negotiator.getSkillModifierData(campaign.getCampaignOptions()
+                                                                                            .isUseAgeEffects(),
+                      campaign.isClanCampaign(), campaign.getLocalDate());
+                int skillLevel = skill.getFinalSkillValue(skillModifierData);
                 negotiatorSkill = skill.getType().getExperienceLevel(skillLevel);
             }
         }

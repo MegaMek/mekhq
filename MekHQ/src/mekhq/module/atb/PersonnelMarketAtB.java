@@ -44,6 +44,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.module.api.PersonnelMarketMethod;
 
@@ -133,8 +134,8 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 int adminExperienceLevel = EXP_NONE;
                 if (adminHR != null && adminHR.hasSkill(S_ADMIN)) {
                     Skill adminSkill = adminHR.getSkill(S_ADMIN);
-                    adminExperienceLevel = adminSkill.getExperienceLevel(adminHR.getOptions(),
-                          adminHR.getATOWAttributes());
+                    SkillModifierData skillModifierData = adminHR.getSkillModifierData();
+                    adminExperienceLevel = adminSkill.getExperienceLevel(skillModifierData);
                 }
 
                 int gunneryMod = 0;

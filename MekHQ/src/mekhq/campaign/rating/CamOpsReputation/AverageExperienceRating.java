@@ -47,9 +47,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 
@@ -155,6 +154,7 @@ public class AverageExperienceRating {
             }
 
             Crew crew = entity.getCrew();
+            SkillModifierData skillModifierData = person.getSkillModifierData();
 
             // Experience calculation varies depending on the type of entity
             if (entity instanceof Infantry) {
@@ -173,7 +173,7 @@ public class AverageExperienceRating {
                 if (person.hasSkill(SkillType.S_GUN_PROTO)) {
                     totalExperience += max(0,
                           person.getSkill(SkillType.S_GUN_PROTO)
-                                .getFinalSkillValue(person.getOptions(), person.getATOWAttributes()));
+                                .getFinalSkillValue(skillModifierData));
                 }
 
                 personnelCount++;
@@ -247,14 +247,13 @@ public class AverageExperienceRating {
         int skillValue = 0;
         int skillCount = 0;
 
-        PersonnelOptions options = person.getOptions();
-        Attributes attributes = person.getATOWAttributes();
+        SkillModifierData skillModifierData = person.getSkillModifierData();
         if (unit.isDriver(person)) {
             skillType = SkillType.getDrivingSkillFor(entity);
             Skill skill = person.getSkill(skillType);
 
             if (skill != null) {
-                skillValue += max(0, skill.getFinalSkillValue(options, attributes));
+                skillValue += max(0, skill.getFinalSkillValue(skillModifierData));
                 skillCount++;
             } else {
                 LOGGER.warn("(calculateRegularExperience) unable to fetch diving skill {} for {}. Skipping",
@@ -268,7 +267,7 @@ public class AverageExperienceRating {
 
             Skill skill = person.getSkill(skillType);
             if (skill != null) {
-                skillValue += max(0, skill.getFinalSkillValue(options, attributes));
+                skillValue += max(0, skill.getFinalSkillValue(skillModifierData));
                 skillCount++;
             } else {
                 LOGGER.warn("(calculateRegularExperience) unable to fetch gunnery skill {} for {}. Skipping",

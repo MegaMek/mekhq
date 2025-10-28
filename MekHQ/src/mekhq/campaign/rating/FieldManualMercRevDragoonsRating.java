@@ -46,6 +46,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 
@@ -312,7 +313,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         int highestSkill = SkillType.EXP_ULTRA_GREEN;
         for (String skillName : skillNames) {
             if (tech.hasSkill(skillName)) {
-                int rank = tech.getSkill(skillName).getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
+                SkillModifierData skillModifierData = tech.getSkillModifierData();
+                int rank = tech.getSkill(skillName).getExperienceLevel(skillModifierData);
                 if (rank > highestSkill) {
                     highestSkill = rank;
                 }
@@ -334,7 +336,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         if (doctorSkill == null) {
             return;
         }
-        int hours = getSupportHours(doctorSkill.getExperienceLevel(doctor.getOptions(), doctor.getATOWAttributes()));
+        SkillModifierData skillModifierData = doctor.getSkillModifierData();
+        int hours = getSupportHours(doctorSkill.getExperienceLevel(skillModifierData));
         if (doctor.getSecondaryRole().isDoctor()) {
             hours = (int) Math.floor(hours / 2.0);
         }
@@ -348,8 +351,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         if (adminSkill == null) {
             return;
         }
-        int hours = getSupportHours(adminSkill.getExperienceLevel(administrator.getOptions(),
-              administrator.getATOWAttributes()));
+        SkillModifierData skillModifierData = administrator.getSkillModifierData();
+        int hours = getSupportHours(adminSkill.getExperienceLevel(skillModifierData));
         if (administrator.getSecondaryRole().isAdministrator()) {
             hours = (int) Math.floor(hours / 2.0);
         }
