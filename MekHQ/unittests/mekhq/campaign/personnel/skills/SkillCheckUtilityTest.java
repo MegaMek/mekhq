@@ -50,6 +50,8 @@ import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -307,12 +309,18 @@ class SkillCheckUtilityTest {
                   DEFAULT_ATTRIBUTE_SCORE,
                   DEFAULT_ATTRIBUTE_SCORE);
 
+            SkillModifierData skillModifierData = new SkillModifierData(new PersonnelOptions(), characterAttributes,
+                  0, false);
+
             Person mockPerson = mock(Person.class);
             when(mockPerson.hasSkill("MISSING_NAME")).thenReturn(true);
             when(mockPerson.getSkill("MISSING_NAME")).thenReturn(skill);
             when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
             when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
             when(mockPerson.getReputation()).thenReturn(0);
+            when(mockPerson.getSkillModifierData(anyBoolean(), anyBoolean(), any(LocalDate.class))).thenReturn(
+                  skillModifierData);
+
 
             try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
                 mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
@@ -326,7 +334,7 @@ class SkillCheckUtilityTest {
                       CURRENT_DATE);
 
                 // Assert
-                int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), characterAttributes);
+                int skillTargetNumber = skill.getFinalSkillValue(skillModifierData);
 
                 assertEquals(skillTargetNumber, targetNumber.getValue(), "Attribute Score: " + attributeScore);
             }
@@ -349,12 +357,17 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE);
 
+        SkillModifierData skillModifierData = new SkillModifierData(new PersonnelOptions(), characterAttributes,
+              0, false);
+
         Person mockPerson = mock(Person.class);
         when(mockPerson.hasSkill("MISSING_NAME")).thenReturn(true);
         when(mockPerson.getSkill("MISSING_NAME")).thenReturn(skill);
         when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
         when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
         when(mockPerson.getReputation()).thenReturn(0);
+        when(mockPerson.getSkillModifierData(anyBoolean(), anyBoolean(), any(LocalDate.class))).thenReturn(
+              skillModifierData);
 
         try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
             mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
@@ -363,7 +376,7 @@ class SkillCheckUtilityTest {
             TargetRoll targetNumber = determineTargetNumber(mockPerson, testSkillType, 0, false, false, CURRENT_DATE);
 
             // Assert
-            int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), characterAttributes);
+            int skillTargetNumber = skill.getFinalSkillValue(skillModifierData);
             assertEquals(skillTargetNumber, targetNumber.getValue(), targetNumber.toString());
         }
     }
@@ -384,12 +397,17 @@ class SkillCheckUtilityTest {
                   DEFAULT_ATTRIBUTE_SCORE,
                   DEFAULT_ATTRIBUTE_SCORE);
 
+            SkillModifierData skillModifierData = new SkillModifierData(new PersonnelOptions(), characterAttributes,
+                  0, false);
+
             Person mockPerson = mock(Person.class);
             when(mockPerson.hasSkill("MISSING_NAME")).thenReturn(true);
             when(mockPerson.getSkill("MISSING_NAME")).thenReturn(skill);
             when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
             when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
             when(mockPerson.getReputation()).thenReturn(0);
+            when(mockPerson.getSkillModifierData(anyBoolean(), anyBoolean(), any(LocalDate.class))).thenReturn(
+                  skillModifierData);
 
             try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
                 mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
@@ -403,7 +421,7 @@ class SkillCheckUtilityTest {
                       CURRENT_DATE);
 
                 // Assert
-                int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), characterAttributes);
+                int skillTargetNumber = skill.getFinalSkillValue(skillModifierData);
 
                 assertEquals(skillTargetNumber, targetNumber.getValue(),
                       targetNumber + " [Attribute Score: " + attributeScore + ']');
