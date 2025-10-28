@@ -133,7 +133,6 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
-import mekhq.campaign.personnel.skills.VehicleCrewSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
@@ -4171,14 +4170,14 @@ public class Person {
      * Updates skills for personnel with the Vehicle Crew profession by ensuring they have the Mechanic skill.
      *
      * <p>This method is used during XML loading to migrate legacy data. If the person lacks the
-     * {@link SkillType#S_TECH_MECHANIC} skill, it will be added at a level equal to their highest existing vehicle
-     * crew-related skill (e.g., Tech Vee, Gunnery Vee, Piloting Vee, or Driving). This ensures backwards compatibility
-     * when loading older save files.</p>
+     * {@link SkillType#S_TECH_MECHANIC} skill, it will be added at level 4 with 0 experience. This ensures backwards
+     * compatibility when loading older save files.</p>
      *
      * @param person      the person whose skills should be updated
      * @param currentRole the role to check
      *
-     * @return {@code true} if the Mechanic skill was added, {@code false} otherwise
+     * @return {@code true} if the Mechanic skill was added, {@code false} if the person already had the skill or is not
+     *       in the Vehicle Crew role
      *
      * @author Illiani
      * @since 0.50.10
@@ -4189,22 +4188,8 @@ public class Person {
         }
 
         if (!person.hasSkill(S_TECH_MECHANIC)) {
-            int highestSkillLevel = EXP_NONE;
-            String highestSkill = null;
-            for (String skillName : VehicleCrewSkills.VEHICLE_CREW_SKILLS) {
-                if (person.hasSkill(skillName)) {
-                    int level = person.getSkill(skillName).getLevel();
-                    if (level > highestSkillLevel) {
-                        highestSkillLevel = level;
-                        highestSkill = skillName;
-                    }
-                }
-            }
-
-            if (highestSkill != null) {
-                person.addSkill(highestSkill, highestSkillLevel, 0);
-                return true;
-            }
+            person.addSkill(S_TECH_MECHANIC, 3, 0);
+            return true;
         }
 
         return false;
