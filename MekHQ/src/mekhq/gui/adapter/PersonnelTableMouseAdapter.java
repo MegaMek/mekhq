@@ -2827,6 +2827,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (!spa.isEligible(person)) {
                         continue;
                     }
+                    if (spa.getOriginOnly()) {
+                        continue;
+                    }
 
                     // Reasoning cost changes should always take place before global changes
                     int baseCost = spa.getCost();
