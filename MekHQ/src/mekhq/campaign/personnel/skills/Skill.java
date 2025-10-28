@@ -45,6 +45,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -255,9 +256,9 @@ public class Skill {
      *
      * <p>The reputation value is included as part of the modifiers to the skill value.</p>
      *
-     * @param characterOptions the {@link PersonnelOptions} that define modifiers and SPA specifics for the character
-     * @param attributes       the {@link Attributes} object providing attribute values for the character
-     * @param reputation       a numeric value influencing the skill, positive to improve or negative to penalize it
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return the calculated final skill value, after applying all modifiers and bounds
      */
@@ -554,14 +555,6 @@ public class Skill {
     }
 
     /**
-     * @deprecated use {@link #getTotalSkillLevel(PersonnelOptions, Attributes, int)} instead.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public int getTotalSkillLevel() {
-        return level + bonus + agingModifier;
-    }
-
-    /**
      * Calculates the total skill level for a character, factoring in the level, bonuses, aging modifiers, SPA
      * modifiers, and attribute modifiers.
      *
@@ -572,9 +565,9 @@ public class Skill {
      *   <li>Attribute-based modifiers relevant to the skill type derived from the character's attributes.</li>
      * </ul>
      *
-     * @param characterOptions the {@link PersonnelOptions} defining character-specific modifiers, including SPAs
-     * @param attributes       the {@link Attributes} representing the character's current attribute values
-     * @param reputation       a numerical modifier for reputation affecting skill level (positive or negative)
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return the complete skill level after all relevant modifiers have been applied
      *
@@ -593,9 +586,9 @@ public class Skill {
      * Calculates the total modifiers for a character based on their SPA (Special Pilot Abilities), attributes, possible
      * illiteracy penalty, and reputation.
      *
-     * @param characterOptions the {@link PersonnelOptions} containing the character's options and SPAs
-     * @param attributes       the {@link Attributes} object representing the character's attributes
-     * @param reputation       the character's reputation value
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return the sum of SPA modifiers, attribute-based modifiers, and any additional penalty (such as for illiteracy)
      *
@@ -657,9 +650,9 @@ public class Skill {
      * {@link Skills#SKILL_LEVELS} array. The returned value represents the skill proficiency tier for the given
      * parameters.</p>
      *
-     * @param characterOptions the SPAs specific to the character
-     * @param attributes       the character's attributes used in skill evaluation
-     * @param reputation       the reputation value influencing skill evaluation
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return the corresponding {@link SkillLevel} for the evaluated experience level
      */
@@ -676,9 +669,9 @@ public class Skill {
      * determine the total skill level and then delegates to the skill type to derive the corresponding experience
      * level.</p>
      *
-     * @param characterOptions the {@link PersonnelOptions} representing character-specific options
-     * @param attributes       the {@link Attributes} possessed by the character
-     * @param reputation       the reputation value to factor into the skill calculation
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return the computed experience level as determined by the underlying skill type
      *
@@ -693,7 +686,7 @@ public class Skill {
     /**
      * Returns a string representation of the object using default parameters.
      *
-     * <p>This method calls {@link #toString(PersonnelOptions, Attributes, int)} with a default
+     * <p>This method calls {@link #toString(SkillModifierData)} with a default
      * {@link PersonnelOptions} instance and a reputation value of {@code 0}.</p>
      *
      * <p><b>Usage:</b> Generally you want to use the above-cited method, and pass in the character's SPAs and
@@ -717,14 +710,15 @@ public class Skill {
      *   <li>Otherwise, the final skill value is suffixed with a plus sign (<code>+</code>).</li>
      * </ul>
      *
-     * @param options            The {@link PersonnelOptions} to use for calculating the final skill value.
-     * @param adjustedReputation The reputation value used in the calculation.
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return A string representation of the calculated final skill value, formatted depending on the state of
      *       {@link #isCountUp()}.
      *
      * @see #isCountUp()
-     * @see #getFinalSkillValue(PersonnelOptions, Attributes, int)
+     * @see #getFinalSkillValue(SkillModifierData)
      */
     public String toString(SkillModifierData skillModifierData) {
         String display;
@@ -748,9 +742,9 @@ public class Skill {
      * modifiers, and linked attribute modifiers. The content is constructed using resource bundle formatting and the
      * provided personnel options, attribute values, and reputation adjustment.
      *
-     * @param options            the personnel options affecting SPA calculation
-     * @param attributes         the set of attributes used to determine modifier values
-     * @param adjustedReputation the reputation value impacting the tooltip details
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return an HTML-formatted string representing the generated skill tooltip
      *
