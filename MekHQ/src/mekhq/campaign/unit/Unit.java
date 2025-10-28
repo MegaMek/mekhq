@@ -4398,75 +4398,39 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Returns the commander of the entity.
-     * <p>
-     * The commander is determined based on the merged list of all crew members, prioritizing certain roles over others.
-     * The commander is initialized as the first person in the merged list and then updated by iterating over all crew
-     * members and comparing their rank with the current commander. If a crew member outranks the current commander or
-     * has the same rank, they are considered as the new commander.
+     * Gets the commander of this unit based on rank and skill tiebreaker.
      *
-     * @return the commander of the entity, or null if the entity is null or if there are no crew members
+     * <p>The commander is determined by comparing all crew members and selecting the one with the highest rank. If
+     * multiple crew members have the same rank, skill level is used as a tiebreaker via
+     * {@link Person#outRanksUsingSkillTiebreaker}.</p>
+     *
+     * <p>Returns {@code null} if:</p>
+     * <ul>
+     *   <li>The unit has no associated entity</li>
+     *   <li>The unit has no crew members</li>
+     * </ul>
+     *
+     * @return the crew member with the highest rank (and skill if tied), or {@code null} if no commander can be
+     *       determined
      */
     public @Nullable Person getCommander() {
         // quick safety check
         if (entity == null) {
             return null;
         }
+
         Person commander = null;
-
-        // Vehicles are handled differently, the driver is always the commander. This decision was made because it
-        // tracks with lore - there are plenty of examples of the driver being the commander - but also because
-        // drivers are the only profession where they have both gunnery and piloting skills which is necessary for
-        // the 'Only Commanders Matter' Campaign Option
-        if (entity.isVehicle()) {
-            for (Person person : drivers) {
-                if (commander == null) {
-                    commander = person;
-                    continue;
-                }
-
-                // Compare person with the current commander
-                if (person.outRanks(commander) || (person.getRankNumeric() == commander.getRankNumeric())) {
-                    commander = person;
-                }
+        for (Person potentialCommander : getCrew()) {
+            if (commander == null) {
+                commander = potentialCommander;
+                continue;
             }
 
-            if (commander != null) {
-                return commander;
+            if (potentialCommander.outRanksUsingSkillTiebreaker(campaign, commander)) {
+                commander = potentialCommander;
             }
         }
 
-        // For all other units we're going to merge the crew into a single list and then find the highest ranked
-        // among them.
-
-        // Merge all crew into a single list,
-        // lists retain the order in which elements are added to them,
-        // so this allows us to prioritize certain roles over others
-        List<Person> allCrew = new ArrayList<>();
-        allCrew.addAll(vesselCrew);
-        allCrew.addAll(gunners);
-        allCrew.addAll(drivers);
-
-        if (navigator != null) {
-            allCrew.add(navigator);
-        }
-
-        if (allCrew.isEmpty()) {
-            return null;
-        }
-
-        // Initialize the commander as the first person
-        commander = allCrew.get(0);
-
-        // Iterate over all crew
-        for (Person person : allCrew) {
-            // Compare person with the current commander
-            if (person.outRanks(commander) || (person.getRankNumeric() == commander.getRankNumeric())) {
-                commander = person;
-            }
-        }
-
-        // Return the final commander
         return commander;
     }
 
