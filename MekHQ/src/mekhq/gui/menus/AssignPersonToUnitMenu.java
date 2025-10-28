@@ -154,16 +154,14 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                                                                   .isAerospaceGrouping() ||
                                                                                   person.getSecondaryRole()
                                                                                         .isAerospaceGrouping());
-            final boolean areAllVTOLPilots = Stream.of(people)
-                                                   .allMatch(person -> person.hasRole(PersonnelRole.VTOL_PILOT));
+            final boolean areAllVTOLCrew = Stream.of(people)
+                                                 .allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_CREW_VTOL));
             final boolean areAllVesselPilots = Stream.of(people)
                                                      .allMatch(person -> person.hasRole(PersonnelRole.VESSEL_PILOT));
-            final boolean areAllNavalVehicleDrivers = Stream.of(people)
-                                                            .allMatch(person -> person.hasRole(PersonnelRole.NAVAL_VEHICLE_DRIVER));
-            final boolean areAllGroundVehicleDrivers = Stream.of(people)
-                                                             .allMatch(person -> person.hasRole(PersonnelRole.GROUND_VEHICLE_DRIVER));
-            final boolean areAllVehicleGunners = Stream.of(people)
-                                                       .allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_GUNNER));
+            final boolean areAllNavalVehicleCrew = Stream.of(people)
+                                                         .allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_CREW_NAVAL));
+            final boolean areAllGroundVehicleCrew = Stream.of(people)
+                                                          .allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_CREW_GROUND));
             final boolean areAllVesselGunners = Stream.of(people)
                                                       .allMatch(person -> person.hasRole(PersonnelRole.VESSEL_GUNNER));
             final boolean areAllVesselCrew = Stream.of(people)
@@ -281,7 +279,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                         } else if (entity instanceof Aero) {
                             valid = areAllAerospacePilots;
                         } else if (entity instanceof VTOL) {
-                            valid = areAllVTOLPilots;
+                            valid = areAllVTOLCrew;
                         } else {
                             valid = false;
                         }
@@ -340,8 +338,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     // Driver Menu - Non-VTOL Tank Driver Assignments
                     if (singlePerson && (entity instanceof Tank) && !(entity instanceof VTOL)) {
                         if (entity.getMovementMode().isMarine() ?
-                                  areAllNavalVehicleDrivers :
-                                  areAllGroundVehicleDrivers) {
+                                  areAllNavalVehicleCrew :
+                                  areAllGroundVehicleCrew) {
                             final JMenuItem miDriver = new JMenuItem(unit.getName());
                             miDriver.setName("miDriver");
                             miDriver.setForeground(unit.determineForegroundColor("Menu"));
@@ -366,8 +364,15 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                 // Gunnery Menu
                 if (unit.canTakeMoreGunners()) {
                     final boolean valid;
+
                     if (entity instanceof Tank) {
-                        valid = areAllVehicleGunners;
+                        if (entity instanceof VTOL) {
+                            valid = areAllVTOLCrew;
+                        } else if (entity.getMovementMode().isMarine()) {
+                            valid = areAllNavalVehicleCrew;
+                        } else {
+                            valid = areAllVehicleCrew;
+                        }
                     } else if (entity instanceof ConvFighter) {
                         valid = areAllConventionalAircraftPilots;
                     } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
