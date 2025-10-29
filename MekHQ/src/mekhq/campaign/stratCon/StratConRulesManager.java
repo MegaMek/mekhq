@@ -1084,7 +1084,7 @@ public class StratConRulesManager {
      */
     public static void deployForceToCoords(StratConCoords coords, int forceID, Campaign campaign, AtBContract contract,
           StratConTrackState track, boolean sticky) {
-        CombatTeam combatTeam = campaign.getCombatTeamsTable().get(forceID);
+        CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(forceID);
 
         // This shouldn't be possible, but never hurts to have a little insurance
         if (combatTeam == null) {
@@ -1153,7 +1153,7 @@ public class StratConRulesManager {
                 // If the player doesn't have any available forces, we grab a force at random to
                 // seed the scenario
                 if (availableForceIDs.isEmpty()) {
-                    ArrayList<CombatTeam> combatTeams = campaign.getAllCombatTeams();
+                    ArrayList<CombatTeam> combatTeams = campaign.getCombatTeamsAsList();
                     if (!combatTeams.isEmpty()) {
                         combatTeam = getRandomItem(combatTeams);
 
@@ -1419,7 +1419,7 @@ public class StratConRulesManager {
 
         // Determine scan range
         int scanRangeIncrease = track.getScanRangeIncrease();
-        CombatTeam combatTeam = campaign.getCombatTeamsTable().get(forceID);
+        CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(forceID);
         if (combatTeam != null && combatTeam.getRole().isPatrol()) {
             scanRangeIncrease++;
         }
@@ -2111,7 +2111,7 @@ public class StratConRulesManager {
         if (lanceCommander != null) {
             Unit commanderUnit = lanceCommander.getUnit();
             if (commanderUnit != null) {
-                CombatTeam lance = campaign.getCombatTeamsTable().get(commanderUnit.getForceId());
+                CombatTeam lance = campaign.getCombatTeamsAsMap().get(commanderUnit.getForceId());
 
                 return (lance != null) && lance.getRole().isFrontline();
             }
@@ -2484,7 +2484,7 @@ public class StratConRulesManager {
     public static List<Integer> getAvailableForceIDs(Campaign campaign, AtBContract contract,
           boolean bypassRoleRestrictions) {
         // First, build a list of all combat teams in the campaign
-        ArrayList<CombatTeam> combatTeams = campaign.getAllCombatTeams();
+        ArrayList<CombatTeam> combatTeams = campaign.getCombatTeamsAsList();
 
         if (combatTeams.isEmpty()) {
             // If we don't have any combat teams, there is no point in continuing, so we exit early
@@ -2585,7 +2585,7 @@ public class StratConRulesManager {
             forcesInTracks.addAll(currentScenario.getFailedReinforcements());
         }
 
-        for (CombatTeam formation : campaign.getCombatTeamsTable().values()) {
+        for (CombatTeam formation : campaign.getCombatTeamsAsMap().values()) {
             Force force = campaign.getForce(formation.getForceId());
 
             if (force == null) {
@@ -2738,7 +2738,7 @@ public class StratConRulesManager {
         }
 
         // Check the associated combat team and its role
-        CombatTeam combatTeam = force.isCombatTeam() ? campaign.getCombatTeamsTable().get(forceId) : null;
+        CombatTeam combatTeam = force.isCombatTeam() ? campaign.getCombatTeamsAsMap().get(forceId) : null;
 
         if (combatTeam == null) {
             return false;
@@ -2931,8 +2931,8 @@ public class StratConRulesManager {
         // it can deploy "for free" (ReinforcementEligibilityType.ChainedScenario)
 
         // if the force is in 'fight' stance, it'll be able to deploy using 'fight lance' rules
-        if (campaign.getCombatTeamsTable().containsKey(forceID)) {
-            Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsTable();
+        if (campaign.getCombatTeamsAsMap().containsKey(forceID)) {
+            Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsAsMap();
             CombatTeam formation = combatTeamsTable.get(forceID);
 
             if (formation == null) {

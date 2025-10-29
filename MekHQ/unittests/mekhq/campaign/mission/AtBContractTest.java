@@ -345,7 +345,7 @@ public class AtBContractTest {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
 
-            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
@@ -362,7 +362,7 @@ public class AtBContractTest {
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
             mockedCombatTeams.add(getMockLanceCombatTeam(formationSize));
 
-            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
@@ -381,7 +381,7 @@ public class AtBContractTest {
                 mockedCombatTeams.add(getMockLanceCombatTeam(formationSize));
             }
 
-            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
@@ -400,7 +400,7 @@ public class AtBContractTest {
                 mockedCombatTeams.add(getMockLanceCombatTeam(formationSize));
             }
 
-            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
@@ -417,7 +417,7 @@ public class AtBContractTest {
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
             mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
 
-            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
@@ -436,7 +436,7 @@ public class AtBContractTest {
                 mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
             }
 
-            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
@@ -455,7 +455,7 @@ public class AtBContractTest {
                 mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
             }
 
-            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
@@ -473,7 +473,7 @@ public class AtBContractTest {
             mockedCombatTeams.add(getMockLanceCombatTeam(formationSize));
             mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
 
-            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
@@ -493,7 +493,7 @@ public class AtBContractTest {
             }
             mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
 
-            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
@@ -568,7 +568,7 @@ public class AtBContractTest {
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
             mockedCombatTeams.add(mockLanceCombatTeam);
 
-            when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
