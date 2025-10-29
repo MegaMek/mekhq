@@ -82,7 +82,6 @@ import org.w3c.dom.NodeList;
 public class SpecialAbility {
     private static final MMLogger LOGGER = MMLogger.create(SpecialAbility.class);
 
-    public static final int CHARACTER_CREATION_ONLY = -1;
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
     private static final String PREREQ_MISC_CLAN_PILOT = "clanperson";
     private static String SPA_DIRECTORY = "data/universe/defaultspa.xml";
@@ -96,6 +95,7 @@ public class SpecialAbility {
     private String desc;
 
     private int xpCost;
+    private boolean originOnly; // This determines if the SPA is excluded from post-character creation award generation
 
     // this determines how much weight to give this SPA when creating new personnel
     private int weight;
@@ -136,6 +136,7 @@ public class SpecialAbility {
         prereqSkills = new Vector<>();
         prereqMisc = new HashMap<>();
         xpCost = 1;
+        originOnly = false;
         weight = 1;
     }
 
@@ -146,6 +147,7 @@ public class SpecialAbility {
         clone.displayName = this.displayName;
         clone.desc = this.desc;
         clone.xpCost = this.xpCost;
+        clone.originOnly = this.originOnly;
         clone.weight = this.weight;
         clone.prereqAbilities = (Vector<String>) this.prereqAbilities.clone();
         clone.invalidAbilities = (Vector<String>) this.invalidAbilities.clone();
@@ -230,6 +232,14 @@ public class SpecialAbility {
         xpCost = cost;
     }
 
+    public boolean getOriginOnly() {
+        return originOnly;
+    }
+
+    public void setOriginOnly(boolean originOnly) {
+        originOnly = originOnly;
+    }
+
     public int getWeight() {
         return weight;
     }
@@ -280,6 +290,7 @@ public class SpecialAbility {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lookupName", lookupName);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "desc", desc);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "xpCost", xpCost);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "originOnly", originOnly);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weight", weight);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prereqAbilities", Utilities.combineString(prereqAbilities, "::"));
         MHQXMLUtility.writeSimpleXMLTag(pw,
@@ -313,6 +324,8 @@ public class SpecialAbility {
                     retVal.lookupName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("xpCost")) {
                     retVal.xpCost = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("originOnly")) {
+                    retVal.originOnly = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("weight")) {
                     retVal.weight = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("prereqAbilities")) {
@@ -370,6 +383,8 @@ public class SpecialAbility {
                     retVal.lookupName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("xpCost")) {
                     retVal.xpCost = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("originOnly")) {
+                    retVal.originOnly = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("weight")) {
                     retVal.weight = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("prereqAbilities")) {
