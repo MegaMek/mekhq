@@ -831,9 +831,9 @@ public class CampaignNewDayManager {
             // Early Contract End (StratCon Only)
             StratConCampaignState campaignState = contract.getStratconCampaignState();
             if (campaignState != null && !contract.getEndingDate().equals(today)) {
-                int victoryPoints = campaignState.getVictoryPoints();
-                int requiredVictoryPoints = campaignOptions.isUseStratConMaplessMode() ?
-                                                  contract.getRequiredCombatTeams() * 10 : 1;
+                boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
+                int victoryPoints = contract.getContractScore(isUseMaplessMode);
+                int requiredVictoryPoints = isUseMaplessMode ? contract.getRequiredCombatTeams() * 10 : 1;
 
                 if (campaignState.canEndContractEarly() && victoryPoints >= requiredVictoryPoints) {
                     new ImmersiveDialogNotification(campaign,
