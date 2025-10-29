@@ -133,7 +133,10 @@ public class CombatTeam {
 
     public CombatTeam(int forceId, Campaign campaign) {
         this.forceId = forceId;
-        role = CombatRole.RESERVE;
+
+        Force force = campaign.getForce(forceId);
+        role = force != null ? force.getCombatRoleInMemory() : CombatRole.FRONTLINE;
+
         missionId = -1;
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
             missionId = ((contract.getParentContract() == null) ? contract : contract.getParentContract()).getId();
