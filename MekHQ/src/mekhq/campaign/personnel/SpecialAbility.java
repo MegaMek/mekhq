@@ -238,7 +238,7 @@ public class SpecialAbility {
     }
 
     public void setOriginOnly(boolean originOnly) {
-        originOnly = originOnly;
+        this.originOnly = originOnly;
     }
 
     public int getWeight() {
