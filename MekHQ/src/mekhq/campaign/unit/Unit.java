@@ -4769,7 +4769,11 @@ public class Unit implements ITechnology {
 
         boolean entityIsConventionalInfantry = entity.hasETypeFlag(Entity.ETYPE_INFANTRY) &&
                                                      !entity.hasETypeFlag(Entity.ETYPE_BATTLEARMOR);
-        for (Person person : drivers) {
+        boolean isTank = entity instanceof Tank; // Includes Wet Naval and VTOLs
+
+        // For Tanks-type entities both drivers and gunners contribute to gunnery & piloting
+        List<Person> crew = getCompositeCrew(isTank);
+        for (Person person : crew) {
             PersonnelOptions options = person.getOptions();
             Attributes attributes = person.getATOWAttributes();
             if (person.getHits() > 0 && !usesSoloPilot()) {
@@ -4792,8 +4796,10 @@ public class Unit implements ITechnology {
                 sumPiloting += person.getInjuryModifiers(true);
             }
         }
+
+        crew = getCompositeCrew(isTank);
         boolean smallArmsOnly = campaign.getCampaignOptions().isUseSmallArmsOnly();
-        for (Person person : gunners) {
+        for (Person person : crew) {
             PersonnelOptions options = person.getOptions();
             Attributes attributes = person.getATOWAttributes();
             if (person.getHits() > 0 && !usesSoloPilot()) {
@@ -4829,13 +4835,10 @@ public class Unit implements ITechnology {
         if ((getNavigator() != null) && (getNavigator().getHits() == 0)) {
             nCrew++;
         }
-        // Using the tech officer field for the secondary commander; if nobody assigned
-        // to the command
-        // console we will flag the entity as using the console commander, which has the
-        // effect of limiting
-        // the tank to a single commander. As the console commander is not counted
-        // against crew requirements,
-        // we do not increase nCrew if present.
+        // Using the tech officer field for the secondary commander; if nobody assigned to the command
+        // console we will flag the entity as using the console commander, which has the effect of limiting the tank
+        // to a single commander. As the console commander is not counted against crew requirements, we do not
+        // increase nCrew if present.
         if ((entity instanceof Tank) && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
             if ((techOfficer == null) || (techOfficer.getHits() > 0)) {
                 ((Tank) entity).setUsingConsoleCommander(true);
@@ -4874,11 +4877,9 @@ public class Unit implements ITechnology {
         if (entity instanceof Infantry) {
             if (entity instanceof BattleArmor) {
                 int numTroopers = 0;
-                // OK, we want to reorder the way we move through suits, so that we always put
-                // BA
-                // in the suits with more armor. Otherwise, we may put a soldier in a suit with
-                // no
-                // armor when a perfectly good suit is waiting further down the line.
+                // OK, we want to reorder the way we move through suits, so that we always put BA in the suits with
+                // more armor. Otherwise, we may put a soldier in a suit with no armor when a perfectly good suit is
+                // waiting further down the line.
                 Map<String, Integer> bestSuits = new HashMap<>();
                 for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getTroopers(); i++) {
                     bestSuits.put(Integer.toString(i), entity.getArmorForReal(i));
@@ -4920,10 +4921,8 @@ public class Unit implements ITechnology {
                 return;
             }
         }
-        // TODO: For the moment we need to max these out at 8 so people don't get errors
-        // when they customize in MM but we should put an option in MM to ignore those
-        // limits
-        // and set it to true when we start up through MHQ
+        // TODO: For the moment we need to max these out at 8 so people don't get errors when they customize in MM
+        //  but we should put an option in MM to ignore those limits and set it to true when we start up through MHQ
         entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), 0);
         entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 8), 0);
         entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), 0);
@@ -4941,6 +4940,14 @@ public class Unit implements ITechnology {
             entity.getCrew().setSize(nCrew + nGunners + nDrivers);
         }
         entity.getCrew().setMissing(false, 0);
+    }
+
+    private List<Person> getCompositeCrew(boolean isTank) {
+        if (isTank) {
+            return getCrew();
+        } else {
+            return drivers;
+        }
     }
 
     /**
