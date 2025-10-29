@@ -182,6 +182,7 @@ public class RulesetsTab {
     //end Legacy AtB
 
     private JCheckBox chkUseStratCon;
+    private JCheckBox chkUseStratConMaplessMode;
     private JCheckBox chkUseAdvancedScouting;
     private JCheckBox chkUseGenericBattleValue;
     private JCheckBox chkUseVerboseBidding;
@@ -730,6 +731,7 @@ public class RulesetsTab {
      */
     private void initializeStratConTab() {
         chkUseStratCon = new JCheckBox();
+        chkUseStratConMaplessMode = new JCheckBox();
         chkUseAdvancedScouting = new JCheckBox();
         chkUseGenericBattleValue = new JCheckBox();
         chkUseVerboseBidding = new JCheckBox();
@@ -812,6 +814,8 @@ public class RulesetsTab {
         // Content
         chkUseStratCon = new CampaignOptionsCheckBox("UseStratCon");
         chkUseStratCon.addMouseListener(createTipPanelUpdater(stratConHeader, "UseStratCon"));
+        chkUseStratConMaplessMode = new CampaignOptionsCheckBox("UseStratConMaplessMode");
+        chkUseStratConMaplessMode.addMouseListener(createTipPanelUpdater(stratConHeader, "UseStratConMaplessMode"));
         chkUseAdvancedScouting = new CampaignOptionsCheckBox("UseAdvancedScouting");
         chkUseAdvancedScouting.addMouseListener(createTipPanelUpdater(stratConHeader, "UseAdvancedScouting"));
         chkUseGenericBattleValue = new CampaignOptionsCheckBox("UseGenericBattleValue");
@@ -833,6 +837,8 @@ public class RulesetsTab {
         panel.add(chkUseStratCon, layout);
         layout.gridx++;
         panel.add(chkUseAdvancedScouting, layout);
+        layout.gridx++;
+        panel.add(chkUseStratConMaplessMode, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -844,17 +850,25 @@ public class RulesetsTab {
         layout.gridx++;
         panel.add(chkUseVerboseBidding, layout);
 
-        layout.gridwidth = 2;
+        layout.gridwidth = 3;
         layout.gridx = 0;
         layout.gridy++;
+        layout.anchor = GridBagConstraints.NORTHWEST;
+        layout.fill = GridBagConstraints.BOTH;
+        layout.gridheight = 2;
         panel.add(pnlScenarioGenerationPanel, layout);
 
-        layout.gridwidth = 2;
-        layout.gridx = 2;
+        layout.gridwidth = 1;
+        layout.gridheight = 1;
+        layout.gridx = 3;
         panel.add(pnlCampaignOptions, layout);
 
-        layout.gridwidth = 1;
+        layout.gridy++;
+        panel.add(pnlMorale, layout);
+
         layout.gridx = 4;
+        layout.gridy -= 1;
+        layout.gridheight = 2;
         panel.add(pnlAutoResolve, layout);
 
         // Create panel and return
@@ -1218,6 +1232,7 @@ public class RulesetsTab {
 
         // StratCon
         options.setUseStratCon(chkUseStratCon.isSelected());
+        options.setUseStratConMaplessMode(chkUseStratConMaplessMode.isSelected());
         options.setUseAdvancedScouting(chkUseAdvancedScouting.isSelected());
         options.setUseGenericBattleValue(chkUseGenericBattleValue.isSelected());
         options.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
@@ -1295,6 +1310,7 @@ public class RulesetsTab {
 
         // StratCon
         chkUseStratCon.setSelected(options.isUseStratCon());
+        chkUseStratConMaplessMode.setSelected(options.isUseStratConMaplessMode());
         chkUseAdvancedScouting.setSelected(options.isUseAdvancedScouting());
         chkUseGenericBattleValue.setSelected(options.isUseGenericBattleValue());
         chkUseVerboseBidding.setSelected(options.isUseVerboseBidding());

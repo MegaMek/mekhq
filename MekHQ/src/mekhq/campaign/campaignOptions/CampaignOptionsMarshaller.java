@@ -1051,6 +1051,7 @@ public class CampaignOptionsMarshaller {
               campaignOptions.getPhenotypeProbabilities());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtB", campaignOptions.isUseAtB());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStratCon", campaignOptions.isUseStratCon());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMaplessStratCon", campaignOptions.isUseStratConMaplessMode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedScouting", campaignOptions.isUseAdvancedScouting());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAero", campaignOptions.isUseAero());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useVehicles", campaignOptions.isUseVehicles());
