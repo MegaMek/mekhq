@@ -176,6 +176,7 @@ public class RulesetsTab {
     private JLabel lblDefendChance;
     private JLabel lblScoutChance;
     private JLabel lblTrainingChance;
+    private JLabel lblCadreChance;
     private JSpinner[] spnAtBBattleChance;
     private JButton btnIntensityUpdate;
     private JCheckBox chkGenerateChases;
@@ -887,6 +888,7 @@ public class RulesetsTab {
         lblDefendChance = new JLabel();
         lblScoutChance = new JLabel();
         lblTrainingChance = new JLabel();
+        lblCadreChance = new JLabel();
         spnAtBBattleChance = new JSpinner[CombatRole.values().length - 1];
         btnIntensityUpdate = new JButton();
     }
@@ -1017,6 +1019,7 @@ public class RulesetsTab {
         lblDefendChance = new JLabel(CombatRole.FRONTLINE.toString());
         lblScoutChance = new JLabel(CombatRole.PATROL.toString());
         lblTrainingChance = new JLabel(CombatRole.TRAINING.toString());
+        lblCadreChance = new JLabel(CombatRole.CADRE.toString());
         spnAtBBattleChance = new JSpinner[CombatRole.values().length - 1];
 
         for (int i = 0; i < spnAtBBattleChance.length; i++) {
@@ -1059,8 +1062,10 @@ public class RulesetsTab {
         layoutBattleChance.gridx = 0;
         layoutBattleChance.gridy++;
         panelBattleChance.add(lblTrainingChance, layoutBattleChance);
+        layoutBattleChance.gridy++;
+        panelBattleChance.add(lblCadreChance, layoutBattleChance);
         layoutBattleChance.gridx++;
-        panelBattleChance.add(spnAtBBattleChance[CombatRole.TRAINING.ordinal()], layoutBattleChance);
+        panelBattleChance.add(spnAtBBattleChance[CombatRole.CADRE.ordinal()], layoutBattleChance);
 
         final JPanel panel = new CampaignOptionsStandardPanel("LegacyScenarioGenerationPanel", true,
               "LegacyScenarioGenerationPanel");
@@ -1114,6 +1119,9 @@ public class RulesetsTab {
         x = (int) spnAtBBattleChance[CombatRole.TRAINING.ordinal()].getValue();
         intensity += ((-9.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
+        x = (int) spnAtBBattleChance[CombatRole.CADRE.ordinal()].getValue();
+        intensity += ((-9.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
+
         intensity = intensity / 4.0;
 
         if (intensity > 100.0) {
@@ -1158,11 +1166,13 @@ public class RulesetsTab {
                 spnAtBBattleChance[CombatRole.PATROL.ordinal()].setValue(value);
                 value = (int) Math.min(Math.round(100.0 * intensity / (intensity + 9.0) + 0.05), 100);
                 spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(value);
+                spnAtBBattleChance[CombatRole.CADRE.ordinal()].setValue(value);
             } else {
                 spnAtBBattleChance[CombatRole.MANEUVER.ordinal()].setValue(0);
                 spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].setValue(0);
                 spnAtBBattleChance[CombatRole.PATROL.ordinal()].setValue(0);
                 spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(0);
+                spnAtBBattleChance[CombatRole.CADRE.ordinal()].setValue(0);
             }
         }
     }
@@ -1309,7 +1319,7 @@ public class RulesetsTab {
         chkAdjustPlayerVehicles.setSelected(options.isAdjustPlayerVehicles());
         chkGenerateChases.setSelected(options.isGenerateChases());
         for (CombatRole role : CombatRole.values()) {
-            if (role.ordinal() <= CombatRole.TRAINING.ordinal()) {
+            if (role.ordinal() <= CombatRole.CADRE.ordinal()) {
                 spnAtBBattleChance[role.ordinal()].setValue(options.getAtBBattleChance(role));
             }
         }

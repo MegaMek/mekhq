@@ -2516,8 +2516,10 @@ public class StratConRulesManager {
             if (bypassRoleRestrictions) {
                 suitableForces.add(combatTeam.getForceId());
             } else if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
-                if (!combatRole.isTraining() || contract.getContractType().isCadreDuty()) {
-                    suitableForces.add(combatTeam.getForceId());
+                if (!combatRole.isTraining()) {
+                    if (!combatRole.isCadre() || contract.getContractType().isCadreDuty()) {
+                        suitableForces.add(combatTeam.getForceId());
+                    }
                 }
             }
         }

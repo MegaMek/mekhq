@@ -4804,8 +4804,10 @@ public class Campaign implements ITechManager {
 
             if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
                 if ((combatTeam.getMissionId() == contract.getId())) {
-                    if (!combatRole.isTraining() || contract.getContractType().isCadreDuty()) {
-                        total += combatTeam.getSize(this);
+                    if (!combatRole.isTraining()) {
+                        if (!combatRole.isCadre() || contract.getContractType().isCadreDuty()) {
+                            total += combatTeam.getSize(this);
+                        }
                     }
                 }
 

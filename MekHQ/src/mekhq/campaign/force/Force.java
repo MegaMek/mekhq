@@ -42,7 +42,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import megamek.Version;
-import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.units.Entity;
@@ -58,6 +57,7 @@ import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -100,6 +100,7 @@ public class Force {
     private int overrideCombatTeam;
     private FormationLevel formationLevel;
     private FormationLevel overrideFormationLevel;
+    private CombatRole combatRoleInMemory;
     private Force parentForce;
     private final Vector<Force> subForces;
     private final Vector<UUID> units;
@@ -123,6 +124,7 @@ public class Force {
         this.overrideCombatTeam = COMBAT_TEAM_OVERRIDE_NONE;
         this.formationLevel = FormationLevel.NONE;
         this.overrideFormationLevel = FormationLevel.NONE;
+        this.combatRoleInMemory = CombatRole.FRONTLINE;
         this.parentForce = null;
         this.subForces = new Vector<>();
         this.units = new Vector<>();
@@ -254,6 +256,14 @@ public class Force {
         } else {
             this.overrideFormationLevel = overrideFormationLevel;
         }
+    }
+
+    public CombatRole getCombatRoleInMemory() {
+        return combatRoleInMemory;
+    }
+
+    public void setCombatRoleInMemory(final CombatRole combatRoleInMemory) {
+        this.combatRoleInMemory = combatRoleInMemory;
     }
 
     public int getScenarioId() {
@@ -784,6 +794,7 @@ public class Force {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideCombatTeam", overrideCombatTeam);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideFormationLevel", overrideFormationLevel.toString());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "preferredRole", combatRoleInMemory.name());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "techId", techId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideForceCommanderID", overrideForceCommanderID);
@@ -836,6 +847,8 @@ public class Force {
                     force.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("overrideFormationLevel")) {
                     force.setOverrideFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("preferredRole")) {
+                    force.setCombatRoleInMemory(CombatRole.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     force.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
@@ -1040,9 +1053,10 @@ public class Force {
      * Finds the distance (depth) from the origin force
      *
      * @param force the force to get depth for
+     *
      * @deprecated
      */
-    @Deprecated (since = "0.50.10", forRemoval = true)
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public static int getDepth(Force force) {
         int depth = 0;
 
@@ -1062,9 +1076,10 @@ public class Force {
      *
      * @param force the current force. Should always equal campaign.getForce(0), if called remotely
      * @param depth the current recursive depth.
+     *
      * @deprecated
      */
-    @Deprecated (since = "0.50.10", forRemoval = true)
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public static int getMaximumDepth(Force force, Integer depth) {
         int maximumDepth = depth;
 
@@ -1082,6 +1097,7 @@ public class Force {
     /**
      * Populates the formation levels of a force hierarchy starting from the origin force. For all subforces, it will
      * determine the smallest formations - Teams/Lances - and then parent formations will be one formation higher.
+     *
      * @param campaign campaign that the force belongs to
      */
     public static void populateFormationLevelsFromOrigin(Campaign campaign) {
@@ -1101,6 +1117,7 @@ public class Force {
 
     /**
      * Based on a force's subforces and units, set this unit's formation to the default.
+     *
      * @param campaign campaign that the force belongs to
      */
     public void defaultFormationLevelForForce(Campaign campaign) {
@@ -1108,7 +1125,7 @@ public class Force {
               getAllSubForces().stream().max(Comparator.comparing(f -> f.getFormationLevel().getDepth())).orElse(null);
         if (largestSubForce == null) {
             int depth = 1;
-            setFormationLevel(FormationLevel.parseFromDepth(campaign,depth + getOddFormationSizeModifier(campaign,
+            setFormationLevel(FormationLevel.parseFromDepth(campaign, depth + getOddFormationSizeModifier(campaign,
                   depth)));
         } else {
             int depth = largestSubForce.getFormationLevel().getDepth();
@@ -1135,9 +1152,10 @@ public class Force {
      * @param force                 the force whose formation level is to be changed
      * @param currentFormationLevel the current formation level of the force
      * @param lowerBoundary         the lower boundary for the formation level
+     *
      * @deprecated See {@link Force#recursivelyUpdateFormationLevel}
      */
-    @Deprecated (since = "0.50.10", forRemoval = true)
+    @Deprecated(since = "0.50.10", forRemoval = true)
     private static void changeFormationLevel(Force force, int currentFormationLevel, int lowerBoundary) {
         for (Force subforce : force.getSubForces()) {
             if (currentFormationLevel - 1 < lowerBoundary) {
@@ -1160,9 +1178,10 @@ public class Force {
      * @param campaign the campaign object to retrieve the lower boundary for
      *
      * @return the lower boundary value as an integer
+     *
      * @deprecated
      */
-    @Deprecated (since = "0.50.10", forRemoval = true)
+    @Deprecated(since = "0.50.10", forRemoval = true)
     private static int getLowerBoundary(Campaign campaign) {
         int lowerBoundary = FormationLevel.values().length;
 
@@ -1196,9 +1215,10 @@ public class Force {
      * @param origin   the origin node
      *
      * @return the parsed integer value of the origin node's formation level
+     *
      * @deprecated See {@link Force#recursivelyUpdateFormationLevel}
      */
-    @Deprecated (since = "0.50.10", forRemoval = true)
+    @Deprecated(since = "0.50.10", forRemoval = true)
     private static int populateOriginNode(Campaign campaign, Force origin) {
         FormationLevel overrideFormationLevel = origin.getOverrideFormationLevel();
         int maximumDepth = getMaximumDepth(origin, 0);
