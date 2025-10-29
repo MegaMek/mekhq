@@ -1262,7 +1262,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 LOGGER.error("Unknown node type not loaded in Special Ability nodes: {}", wn2.getNodeName());
                 continue;
             }
-            SpecialAbility.generateInstanceFromXML(wn2, options, version);
+            SpecialAbility.generateInstanceFromCampaignXML(wn2, options, version);
         }
 
         LOGGER.info("Load Special Ability Nodes Complete!");
