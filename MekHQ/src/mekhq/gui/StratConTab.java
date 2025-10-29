@@ -102,6 +102,10 @@ public class StratConTab extends CampaignGuiTab {
      */
     public StratConTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
+
+        if (gui.getCampaign().getCampaignOptions().isUseStratConMaplessMode()) {
+            setVisible(false);
+        }
     }
     //endregion Constructors
 
