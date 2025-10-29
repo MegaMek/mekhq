@@ -102,12 +102,13 @@ public class StratConTab extends CampaignGuiTab {
      */
     public StratConTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
-
-        if (gui.getCampaign().getCampaignOptions().isUseStratConMaplessMode()) {
-            setVisible(false);
-        }
+        setEnabled(!gui.getCampaign().getCampaignOptions().isUseStratConMaplessMode());
     }
     //endregion Constructors
+
+    public StratConPanel getStratconPanel() {
+        return stratconPanel;
+    }
 
     /**
      * Override of the base initTab method. Populates the tab.
