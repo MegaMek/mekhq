@@ -425,6 +425,71 @@ public class SpecialAbility {
         }
     }
 
+    public static void generateInstanceFromCampaignXML(Node wn, PersonnelOptions options, Version v) {
+        try {
+            SpecialAbility specialAbility = new SpecialAbility();
+            NodeList nl = wn.getChildNodes();
+
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+                if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
+                    specialAbility.lookupName = wn2.getTextContent().trim();
+                }
+            }
+
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+                String textContent = wn2.getTextContent().trim();
+
+                if (wn2.getNodeName().equalsIgnoreCase("xpCost")) {
+                    specialAbility.xpCost = MathUtility.parseInt(textContent);
+                } else if (wn2.getNodeName().equalsIgnoreCase("prereqAbilities")) {
+                    specialAbility.prereqAbilities = Utilities.splitString(textContent, "::");
+                } else if (wn2.getNodeName().equalsIgnoreCase("invalidAbilities")) {
+                    specialAbility.invalidAbilities = Utilities.splitString(textContent, "::");
+                } else if (wn2.getNodeName().equalsIgnoreCase("removeAbilities")) {
+                    specialAbility.choiceValues = Utilities.splitString(textContent, "::");
+                } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
+                    SkillPrerequisite skill = SkillPrerequisite.generateInstanceFromXML(wn2);
+                    if (!skill.isEmpty()) {
+                        specialAbility.prereqSkills.add(skill);
+                    }
+                }
+            }
+
+            SpecialAbility defaultAbility = getDefaultSpecialAbilities().get(specialAbility.lookupName);
+            if (null != defaultAbility) {
+                specialAbility.displayName = defaultAbility.displayName;
+                specialAbility.desc = defaultAbility.desc;
+                specialAbility.originOnly = defaultAbility.originOnly;
+                specialAbility.weight = defaultAbility.weight;
+                specialAbility.choiceValues = defaultAbility.choiceValues;
+                specialAbility.prereqMisc = defaultAbility.prereqMisc;
+            } else {
+                LOGGER.warn("Unable to find default ability for {}. It may have been removed. Skipping",
+                      specialAbility.lookupName);
+            }
+
+            if (specialAbility.displayName.isEmpty()) {
+                IOption option = options.getOption(specialAbility.lookupName);
+                if (null != option) {
+                    specialAbility.displayName = option.getDisplayableName();
+                }
+            }
+
+            if (specialAbility.desc.isEmpty()) {
+                IOption option = options.getOption(specialAbility.lookupName);
+                if (null != option) {
+                    specialAbility.desc = option.getDescription();
+                }
+            }
+
+            specialAbilities.put(specialAbility.lookupName, specialAbility);
+        } catch (Exception ex) {
+            LOGGER.error("", ex);
+        }
+    }
+
     public static void generateSeparateInstanceFromXML(Node wn, Map<String, SpecialAbility> spHash,
           PersonnelOptions options) {
         try {
