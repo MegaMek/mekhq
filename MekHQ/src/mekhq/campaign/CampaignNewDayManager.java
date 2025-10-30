@@ -1708,7 +1708,7 @@ public class CampaignNewDayManager {
             for (final AtBScenario atBScenario : contract.getCurrentAtBScenarios()) {
                 if ((atBScenario.getDate() != null) && atBScenario.getDate().equals(today)) {
                     int forceId = atBScenario.getCombatTeamId();
-                    if ((campaign.getAllCombatTeams().get(forceId) != null) &&
+                    if ((campaign.getCombatTeamsAsMap().get(forceId) != null) &&
                               !campaign.getForceIds().get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation

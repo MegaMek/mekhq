@@ -795,7 +795,7 @@ public class CombatTeam {
      * @param campaign the current campaign.
      */
     public static void recalculateCombatTeams(Campaign campaign) {
-        Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsTable();
+        Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsAsMap();
         CombatTeam combatTeam = combatTeamsTable.get(0); // This is the origin node
         Force force = campaign.getForce(0);
 
@@ -822,7 +822,7 @@ public class CombatTeam {
 
         // Update the TO&E and then begin recursively walking it
         MekHQ.triggerEvent(new OrganizationChangedEvent(force));
-        recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsTable(), force);
+        recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsAsMap(), force);
     }
 
     /**
@@ -865,7 +865,7 @@ public class CombatTeam {
 
             // Update the TO&E and then continue recursively walking it
             MekHQ.triggerEvent(new OrganizationChangedEvent(force));
-            recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsTable(), force);
+            recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsAsMap(), force);
         }
     }
 

@@ -232,7 +232,7 @@ public class LanceAssignmentView extends JPanel {
             cbContract.addItem(contract);
         }
         AtBContract defaultContract = activeContracts.isEmpty() ? null : activeContracts.get(0);
-        for (CombatTeam combatTeam : campaign.getCombatTeamsTable().values()) {
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsMap().values()) {
             if ((combatTeam.getContract(campaign) == null) ||
                       !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
                 combatTeam.setContract(defaultContract);
@@ -240,7 +240,7 @@ public class LanceAssignmentView extends JPanel {
         }
 
         ((DataTableModel<AtBContract>) tblRequiredLances.getModel()).setData(activeContracts);
-        ((DataTableModel<CombatTeam>) tblAssignments.getModel()).setData(campaign.getAllCombatTeams());
+        ((DataTableModel<CombatTeam>) tblAssignments.getModel()).setData(campaign.getCombatTeamsAsList());
         panRequiredLances.setVisible(tblRequiredLances.getRowCount() > 0);
     }
 

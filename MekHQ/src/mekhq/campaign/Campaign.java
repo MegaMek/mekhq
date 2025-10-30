@@ -804,7 +804,7 @@ public class Campaign implements ITechManager {
      *
      * @return the sanitized {@link Hashtable} of {@link CombatTeam} objects stored in the current campaign.
      */
-    public Hashtable<Integer, CombatTeam> getCombatTeamsTable() {
+    public Hashtable<Integer, CombatTeam> getCombatTeamsAsMap() {
         // Here we sanitize the list, ensuring ineligible formations have been removed
         // before
         // returning the hashtable. In theory, this shouldn't be necessary, however,
@@ -842,11 +842,10 @@ public class Campaign implements ITechManager {
      *
      * @return an {@link ArrayList} of all the {@link CombatTeam} objects in the {@code combatTeams} {@link Hashtable}
      */
-    public ArrayList<CombatTeam> getAllCombatTeams() {
-        // This call allows us to utilize the self-sanitizing feature of
-        // getCombatTeamsTable(),
-        // without needing to directly include the code here, too.
-        combatTeams = getCombatTeamsTable();
+    public ArrayList<CombatTeam> getCombatTeamsAsList() {
+        // This call allows us to utilize the self-sanitizing feature of getCombatTeamsTable(), without needing to
+        // directly include the code here, too.
+        combatTeams = getCombatTeamsAsMap();
 
         return combatTeams.values()
                      .stream()
