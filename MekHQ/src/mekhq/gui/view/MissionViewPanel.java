@@ -1057,7 +1057,8 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblScore, gridBagConstraints);
 
         txtScore.setName("txtScore");
-        txtScore.setText(Integer.toString(contract.getContractScore()));
+        txtScore.setText(Integer.toString(contract.getContractScore(campaign.getCampaignOptions()
+                                                                          .isUseStratConMaplessMode())));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
