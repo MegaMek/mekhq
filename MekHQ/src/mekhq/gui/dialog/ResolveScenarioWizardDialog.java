@@ -617,7 +617,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             pnlSalvageValue.add(lblSalvageValueEmployer2, gridBagConstraints);
 
             JLabel lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvagePct1.text"));
-            gridBagConstraints.gridx = gridx;
+            gridBagConstraints.gridx = gridx++;
             gridBagConstraints.gridy = gridY++;
             pnlSalvageValue.add(lblSalvagePct1, gridBagConstraints);
 
@@ -635,7 +635,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                                        maxSalvagePct +
                                        "%)</span></html>";
             lblSalvagePct2 = new JLabel(salvageUsed);
-            gridBagConstraints.gridx = gridx + 1;
+            gridBagConstraints.gridx = gridx;
             pnlSalvageValue.add(lblSalvagePct2, gridBagConstraints);
 
             gridBagConstraints = new GridBagConstraints();
@@ -658,9 +658,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-
-        gridBagConstraints.gridx = gridx++;
-        pnlSalvage.add(new JLabel(resourceMap.getString("lblSalvageTime.label")), gridBagConstraints);
 
         gridBagConstraints.gridx = gridx++;
         pnlSalvage.add(new JLabel(resourceMap.getString("lblSalvage.text")), gridBagConstraints);
@@ -705,6 +702,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             salvaged.setName("salvaged");
             salvaged.getAccessibleContext().setAccessibleName(resourceMap.getString("lblSalvage.text"));
             salvaged.setEnabled(!tracker.usesSalvageExchange());
+            salvaged.setSelected(!tracker.usesSalvageExchange() && (maxSalvagePct >= 100));
             salvaged.addItemListener(evt -> checkSalvageRights());
             salvageBoxes.add(salvaged);
             gridBagConstraints.anchor = GridBagConstraints.NORTH;
@@ -1811,15 +1809,15 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
 
             // always eligible with 100% salvage rights even when current == max
-            if ((currentSalvagePct > maxSalvagePct) && (maxSalvagePct < 100)) {
-                if (!salvageBoxes.get(i).isSelected()) {
-                    salvageBoxes.get(i).setEnabled(false);
-                }
-
-                if (!soldUnitBoxes.get(i).isSelected()) {
-                    soldUnitBoxes.get(i).setEnabled(false);
-                }
-            }
+            //            if ((currentSalvagePct > maxSalvagePct) && (maxSalvagePct < 100)) {
+            //                if (!salvageBoxes.get(i).isSelected()) {
+            //                    salvageBoxes.get(i).setEnabled(false);
+            //                }
+            //
+            //                if (!soldUnitBoxes.get(i).isSelected()) {
+            //                    soldUnitBoxes.get(i).setEnabled(false);
+            //                }
+            //            }
         }
         lblSalvageValueUnit2.setText(salvageUnit.toAmountAndSymbolString());
         lblSalvageValueEmployer2.setText(salvageEmployer.toAmountAndSymbolString());
@@ -1835,6 +1833,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                                    "<span>(max " +
                                    maxSalvagePct +
                                    "%)</span></html>";
+
         lblSalvagePct2.setText(salvageUsed);
     }
 

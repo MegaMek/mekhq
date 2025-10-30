@@ -62,6 +62,7 @@ import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.finances.Money;
@@ -83,7 +84,6 @@ public class PostSalvagePicker {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CamOpsSalvage";
 
     private final static int PADDING = scaleForGUI(10);
-    private final static Dimension DIMENSION = scaleForGUI(800, 600);
 
     private final boolean isInSpace;
     private int maximumSalvageTime = 0;
@@ -96,7 +96,7 @@ public class PostSalvagePicker {
     private final List<TestUnit> actualSalvage;
     private final List<TestUnit> soldSalvage;
     private final List<TestUnit> employerSalvage = new ArrayList<>();
-    private Map<String, Unit> unitNameMap = new HashMap<>();
+    private final Map<String, Unit> unitNameMap = new HashMap<>();
     private Map<UUID, RecoveryTimeData> recoveryTimeData;
 
     public PostSalvagePicker(Campaign campaign, Mission mission, Scenario scenario, List<TestUnit> actualSalvage,
@@ -124,7 +124,7 @@ public class PostSalvagePicker {
 
             List<ComboBoxGroup> selectedGroups = showSalvageDialog(isContract);
             if (selectedGroups != null) {
-                processSalvageAssignments(selectedGroups, unitNameMap);
+                processSalvageAssignments(selectedGroups);
             }
         } else if (playerGetsNoSalvage) {
             actualSalvage.clear();
@@ -189,7 +189,7 @@ public class PostSalvagePicker {
         }
     }
 
-    private void processSalvageAssignments(List<ComboBoxGroup> comboBoxGroups, Map<String, Unit> unitNameMap) {
+    private void processSalvageAssignments(List<ComboBoxGroup> comboBoxGroups) {
         List<TestUnit> unitsToMoveToEmployer = new ArrayList<>();
 
         for (ComboBoxGroup group : comboBoxGroups) {
@@ -222,7 +222,6 @@ public class PostSalvagePicker {
     private List<ComboBoxGroup> showSalvageDialog(boolean isContract) {
         JDialog dialog = new JDialog((Frame) null, getText("accessingTerminal.title"), true);
         dialog.setLayout(new BorderLayout());
-        dialog.setPreferredSize(DIMENSION);
         dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // We don't want the player to cancel out
 
         // Info panel at the top (only for contracts)
@@ -274,7 +273,7 @@ public class PostSalvagePicker {
         JButton confirmButton = new JButton(getText("Confirm.text"));
 
         final boolean[] confirmed = { false };
-        final List<ComboBoxGroup>[] resultGroups = new List[] { null };
+        final ResultHolder resultHolder = new ResultHolder();
 
         // Add all units to single column
         for (TestUnit unit : allUnits) {
@@ -288,9 +287,9 @@ public class PostSalvagePicker {
 
             JLabel unitLabel = new JLabel();
             if (soldSalvage.contains(unit)) {
-                unitLabel.setText(unitName + " - " + unit.getSellValue().toAmountString() + "C-Bills <b><s>C</s><b>");
+                unitLabel.setText(unitName + " - " + sellValue.toAmountString() + "C-Bills <b><s>C</s><b>");
             } else {
-                unitLabel.setText(unitName + " - " + unit.getSellValue().toAmountString() + "C-Bills <b>\u267B</b>");
+                unitLabel.setText(unitName + " - " + sellValue.toAmountString() + "C-Bills <b>\u267B</b>");
             }
 
             RecoveryTimeData data = recoveryTimeData.get(unit.getId());
@@ -319,27 +318,11 @@ public class PostSalvagePicker {
             ComboBoxGroup group = new ComboBoxGroup(comboBox1, comboBox2, validationLabel, unitLabel, unit);
             comboBoxGroups.add(group);
 
-            // Add listeners to update available options, validation, and salvage allocation
-            comboBox1.addActionListener(e -> {
-                updateComboBoxOptions(comboBoxGroups, unitNameMap);
-                updateValidation(group, unitNameMap);
-                updateSalvageAllocation(comboBoxGroups,
-                      unitNameMap,
-                      finalEmployerSalvageLabel,
-                      finalUnitSalvageLabel,
-                      finalAvailableTimeLabel);
-                updateConfirmButtonState(comboBoxGroups, unitNameMap, confirmButton, finalUnitSalvageLabel, isContract);
-            });
-            comboBox2.addActionListener(e -> {
-                updateComboBoxOptions(comboBoxGroups, unitNameMap);
-                updateValidation(group, unitNameMap);
-                updateSalvageAllocation(comboBoxGroups,
-                      unitNameMap,
-                      finalEmployerSalvageLabel,
-                      finalUnitSalvageLabel,
-                      finalAvailableTimeLabel);
-                updateConfirmButtonState(comboBoxGroups, unitNameMap, confirmButton, finalUnitSalvageLabel, isContract);
-            });
+            // These need to be after the above lines, as we're going to use 'group' in the listeners.
+            comboBox1.addActionListener(e -> performComboChangeAction(isContract, comboBoxGroups, group,
+                  finalEmployerSalvageLabel, finalUnitSalvageLabel, finalAvailableTimeLabel, confirmButton));
+            comboBox2.addActionListener(e -> performComboChangeAction(isContract, comboBoxGroups, group,
+                  finalEmployerSalvageLabel, finalUnitSalvageLabel, finalAvailableTimeLabel, confirmButton));
 
             rowPanel.add(unitLabel);
             rowPanel.add(comboBox1);
@@ -360,7 +343,7 @@ public class PostSalvagePicker {
 
         confirmButton.addActionListener(e -> {
             confirmed[0] = true;
-            resultGroups[0] = comboBoxGroups;
+            resultHolder.groups = comboBoxGroups;
             dialog.dispose();
         });
 
@@ -369,13 +352,30 @@ public class PostSalvagePicker {
         dialog.add(buttonPanel, BorderLayout.SOUTH);
 
         // Initial button state check
-        updateConfirmButtonState(comboBoxGroups, unitNameMap, confirmButton, finalUnitSalvageLabel, isContract);
+        updateConfirmButtonState(comboBoxGroups, confirmButton, finalUnitSalvageLabel, isContract);
 
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
-        return confirmed[0] ? resultGroups[0] : null;
+        return confirmed[0] ? resultHolder.groups : null;
+    }
+
+    static class ResultHolder {
+        List<ComboBoxGroup> groups = null;
+    }
+
+    private void performComboChangeAction(boolean isContract, List<ComboBoxGroup> comboBoxGroups, ComboBoxGroup group,
+          JLabel finalEmployerSalvageLabel, JLabel finalUnitSalvageLabel, JLabel finalAvailableTimeLabel,
+          JButton confirmButton) {
+        updateComboBoxOptions(comboBoxGroups, unitNameMap);
+        updateValidation(group, unitNameMap);
+        updateSalvageAllocation(comboBoxGroups,
+              unitNameMap,
+              finalEmployerSalvageLabel,
+              finalUnitSalvageLabel,
+              finalAvailableTimeLabel);
+        updateConfirmButtonState(comboBoxGroups, confirmButton, finalUnitSalvageLabel, isContract);
     }
 
     /**
@@ -385,8 +385,8 @@ public class PostSalvagePicker {
      * @param confirmButton  the confirm button to enable/disable
      * @param isContract     whether this is a contract mission
      */
-    private void updateConfirmButtonState(List<ComboBoxGroup> comboBoxGroups, Map<String, Unit> unitNameMap,
-          JButton confirmButton, JLabel unitSalvageLabel, boolean isContract) {
+    private void updateConfirmButtonState(List<ComboBoxGroup> comboBoxGroups, JButton confirmButton,
+          JLabel unitSalvageLabel, boolean isContract) {
         // Check for any invalid units
         for (ComboBoxGroup group : comboBoxGroups) {
             String unitName1 = (String) group.comboBox1.getSelectedItem();
@@ -400,7 +400,6 @@ public class PostSalvagePicker {
         }
 
         // Check salvage percentage if this is a contract
-        boolean exceedsSalvagePercent = false;
         if (isContract) {
             Money totalSalvage = employerSalvageMoney.plus(unitSalvageMoney);
 
@@ -412,7 +411,7 @@ public class PostSalvagePicker {
                 if (currentPercent > salvagePercent) {
                     confirmButton.setEnabled(false);
                     if (unitSalvageLabel != null) {
-                        unitSalvageLabel.setForeground(java.awt.Color.RED);
+                        unitSalvageLabel.setForeground(MekHQ.getMHQOptions().getFontColorNegative());
                     }
                     return;
                 }
@@ -496,31 +495,9 @@ public class PostSalvagePicker {
         }
     }
 
-    /**
-     * Helper class to group combo boxes with their validation label and associated unit.
-     */
-    private static class ComboBoxGroup {
-        final JComboBox<String> comboBox1;
-        final JComboBox<String> comboBox2;
-        final JLabel validationLabel;
-        final JLabel unitLabel;
-        final TestUnit targetUnit;
+    private record ComboBoxGroup(JComboBox<String> comboBox1, JComboBox<String> comboBox2, JLabel validationLabel,
+          JLabel unitLabel, TestUnit targetUnit) {}
 
-        ComboBoxGroup(JComboBox<String> comboBox1, JComboBox<String> comboBox2, JLabel validationLabel,
-              JLabel unitLabel, TestUnit targetUnit) {
-            this.comboBox1 = comboBox1;
-            this.comboBox2 = comboBox2;
-            this.validationLabel = validationLabel;
-            this.unitLabel = unitLabel;
-            this.targetUnit = targetUnit;
-        }
-    }
-
-    /**
-     * Updates all combo boxes to ensure each salvage unit can only be selected once.
-     *
-     * @param comboBoxGroups list of all combo box groups in the dialog
-     */
     private void updateComboBoxOptions(List<ComboBoxGroup> comboBoxGroups, Map<String, Unit> unitNameMap) {
         // Collect all currently selected unit names
         List<String> selectedUnitNames = new ArrayList<>();
@@ -559,11 +536,6 @@ public class PostSalvagePicker {
         comboBox.setSelectedItem(currentSelection);
     }
 
-    /**
-     * Updates the validation label based on the selected salvage units.
-     *
-     * @param group the combo box group to validate
-     */
     private void updateValidation(ComboBoxGroup group, Map<String, Unit> unitNameMap) {
         String unitName1 = (String) group.comboBox1.getSelectedItem();
         String unitName2 = (String) group.comboBox2.getSelectedItem();
@@ -575,7 +547,7 @@ public class PostSalvagePicker {
         // If no units selected, clear validation and reset color
         if (unit1 == null && unit2 == null) {
             group.validationLabel.setText("");
-            group.unitLabel.setForeground(null);  // Reset to default color
+            group.unitLabel.setForeground(null); // Reset to default color
             return;
         }
 
@@ -595,7 +567,7 @@ public class PostSalvagePicker {
                                         (unit2Entity != null && CamOpsSalvageUtilities.hasNavalTug(unit2Entity));
             if (!hasNavalTug) {
                 group.validationLabel.setText("No Naval Tug");
-                group.unitLabel.setForeground(java.awt.Color.RED);
+                group.unitLabel.setForeground(MekHQ.getMHQOptions().getFontColorNegative());
                 return;
             }
         }
@@ -611,7 +583,7 @@ public class PostSalvagePicker {
 
         if (!hasCargoCapacity && !hasTowageCapacity) {
             group.validationLabel.setText("Insufficient Towage or Cargo");
-            group.unitLabel.setForeground(java.awt.Color.RED);
+            group.unitLabel.setForeground(MekHQ.getMHQOptions().getFontColorNegative());
             return;
         }
 
