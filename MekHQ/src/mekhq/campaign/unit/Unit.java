@@ -4398,75 +4398,39 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Returns the commander of the entity.
-     * <p>
-     * The commander is determined based on the merged list of all crew members, prioritizing certain roles over others.
-     * The commander is initialized as the first person in the merged list and then updated by iterating over all crew
-     * members and comparing their rank with the current commander. If a crew member outranks the current commander or
-     * has the same rank, they are considered as the new commander.
+     * Gets the commander of this unit based on rank and skill tiebreaker.
      *
-     * @return the commander of the entity, or null if the entity is null or if there are no crew members
+     * <p>The commander is determined by comparing all crew members and selecting the one with the highest rank. If
+     * multiple crew members have the same rank, skill level is used as a tiebreaker via
+     * {@link Person#outRanksUsingSkillTiebreaker}.</p>
+     *
+     * <p>Returns {@code null} if:</p>
+     * <ul>
+     *   <li>The unit has no associated entity</li>
+     *   <li>The unit has no crew members</li>
+     * </ul>
+     *
+     * @return the crew member with the highest rank (and skill if tied), or {@code null} if no commander can be
+     *       determined
      */
     public @Nullable Person getCommander() {
         // quick safety check
         if (entity == null) {
             return null;
         }
+
         Person commander = null;
-
-        // Vehicles are handled differently, the driver is always the commander. This decision was made because it
-        // tracks with lore - there are plenty of examples of the driver being the commander - but also because
-        // drivers are the only profession where they have both gunnery and piloting skills which is necessary for
-        // the 'Only Commanders Matter' Campaign Option
-        if (entity.isVehicle()) {
-            for (Person person : drivers) {
-                if (commander == null) {
-                    commander = person;
-                    continue;
-                }
-
-                // Compare person with the current commander
-                if (person.outRanks(commander) || (person.getRankNumeric() == commander.getRankNumeric())) {
-                    commander = person;
-                }
+        for (Person potentialCommander : getCrew()) {
+            if (commander == null) {
+                commander = potentialCommander;
+                continue;
             }
 
-            if (commander != null) {
-                return commander;
+            if (potentialCommander.outRanksUsingSkillTiebreaker(campaign, commander)) {
+                commander = potentialCommander;
             }
         }
 
-        // For all other units we're going to merge the crew into a single list and then find the highest ranked
-        // among them.
-
-        // Merge all crew into a single list,
-        // lists retain the order in which elements are added to them,
-        // so this allows us to prioritize certain roles over others
-        List<Person> allCrew = new ArrayList<>();
-        allCrew.addAll(vesselCrew);
-        allCrew.addAll(gunners);
-        allCrew.addAll(drivers);
-
-        if (navigator != null) {
-            allCrew.add(navigator);
-        }
-
-        if (allCrew.isEmpty()) {
-            return null;
-        }
-
-        // Initialize the commander as the first person
-        commander = allCrew.get(0);
-
-        // Iterate over all crew
-        for (Person person : allCrew) {
-            // Compare person with the current commander
-            if (person.outRanks(commander) || (person.getRankNumeric() == commander.getRankNumeric())) {
-                commander = person;
-            }
-        }
-
-        // Return the final commander
         return commander;
     }
 
@@ -4805,7 +4769,11 @@ public class Unit implements ITechnology {
 
         boolean entityIsConventionalInfantry = entity.hasETypeFlag(Entity.ETYPE_INFANTRY) &&
                                                      !entity.hasETypeFlag(Entity.ETYPE_BATTLEARMOR);
-        for (Person person : drivers) {
+        boolean isTank = entity instanceof Tank; // Includes Wet Naval and VTOLs
+
+        // For Tanks-type entities both drivers and gunners contribute to gunnery & piloting
+        List<Person> crew = getCompositeCrew(isTank);
+        for (Person person : crew) {
             PersonnelOptions options = person.getOptions();
             Attributes attributes = person.getATOWAttributes();
             if (person.getHits() > 0 && !usesSoloPilot()) {
@@ -4828,8 +4796,10 @@ public class Unit implements ITechnology {
                 sumPiloting += person.getInjuryModifiers(true);
             }
         }
+
+        crew = getCompositeCrew(isTank);
         boolean smallArmsOnly = campaign.getCampaignOptions().isUseSmallArmsOnly();
-        for (Person person : gunners) {
+        for (Person person : crew) {
             PersonnelOptions options = person.getOptions();
             Attributes attributes = person.getATOWAttributes();
             if (person.getHits() > 0 && !usesSoloPilot()) {
@@ -4865,13 +4835,10 @@ public class Unit implements ITechnology {
         if ((getNavigator() != null) && (getNavigator().getHits() == 0)) {
             nCrew++;
         }
-        // Using the tech officer field for the secondary commander; if nobody assigned
-        // to the command
-        // console we will flag the entity as using the console commander, which has the
-        // effect of limiting
-        // the tank to a single commander. As the console commander is not counted
-        // against crew requirements,
-        // we do not increase nCrew if present.
+        // Using the tech officer field for the secondary commander; if nobody assigned to the command
+        // console we will flag the entity as using the console commander, which has the effect of limiting the tank
+        // to a single commander. As the console commander is not counted against crew requirements, we do not
+        // increase nCrew if present.
         if ((entity instanceof Tank) && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
             if ((techOfficer == null) || (techOfficer.getHits() > 0)) {
                 ((Tank) entity).setUsingConsoleCommander(true);
@@ -4910,11 +4877,9 @@ public class Unit implements ITechnology {
         if (entity instanceof Infantry) {
             if (entity instanceof BattleArmor) {
                 int numTroopers = 0;
-                // OK, we want to reorder the way we move through suits, so that we always put
-                // BA
-                // in the suits with more armor. Otherwise, we may put a soldier in a suit with
-                // no
-                // armor when a perfectly good suit is waiting further down the line.
+                // OK, we want to reorder the way we move through suits, so that we always put BA in the suits with
+                // more armor. Otherwise, we may put a soldier in a suit with no armor when a perfectly good suit is
+                // waiting further down the line.
                 Map<String, Integer> bestSuits = new HashMap<>();
                 for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getTroopers(); i++) {
                     bestSuits.put(Integer.toString(i), entity.getArmorForReal(i));
@@ -4956,10 +4921,8 @@ public class Unit implements ITechnology {
                 return;
             }
         }
-        // TODO: For the moment we need to max these out at 8 so people don't get errors
-        // when they customize in MM but we should put an option in MM to ignore those
-        // limits
-        // and set it to true when we start up through MHQ
+        // TODO: For the moment we need to max these out at 8 so people don't get errors when they customize in MM
+        //  but we should put an option in MM to ignore those limits and set it to true when we start up through MHQ
         entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), 0);
         entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 8), 0);
         entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), 0);
@@ -4977,6 +4940,14 @@ public class Unit implements ITechnology {
             entity.getCrew().setSize(nCrew + nGunners + nDrivers);
         }
         entity.getCrew().setMissing(false, 0);
+    }
+
+    private List<Person> getCompositeCrew(boolean isTank) {
+        if (isTank) {
+            return getCrew();
+        } else {
+            return drivers;
+        }
     }
 
     /**

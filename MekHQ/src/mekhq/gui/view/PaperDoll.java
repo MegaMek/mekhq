@@ -64,7 +64,7 @@ import jakarta.xml.bind.annotation.XmlValue;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.logging.MMLogger;
-import mekhq.campaign.personnel.BodyLocation;
+import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.gui.utilities.MultiplyComposite;
 import mekhq.utilities.MHQXMLUtility;
 

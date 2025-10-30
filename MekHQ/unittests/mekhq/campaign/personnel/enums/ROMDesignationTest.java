@@ -40,9 +40,9 @@ import static org.mockito.Mockito.when;
 
 import java.util.ResourceBundle;
 
+import megamek.common.equipment.EquipmentType;
 import megamek.common.units.BipedMek;
 import megamek.common.units.Dropship;
-import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Jumpship;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
@@ -250,23 +250,19 @@ class ROMDesignationTest {
         assertEquals(" " + ROMDesignation.EPSILON, ROMDesignation.getComStarBranchDesignation(mockPerson));
 
         // Ground Vehicle Driver - Expect " Lambda"
-        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.GROUND_VEHICLE_DRIVER);
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_CREW_GROUND);
         assertEquals(" " + ROMDesignation.LAMBDA, ROMDesignation.getComStarBranchDesignation(mockPerson));
 
         // Naval Vehicle Driver - Expect " Lambda"
-        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.NAVAL_VEHICLE_DRIVER);
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_CREW_NAVAL);
         assertEquals(" " + ROMDesignation.LAMBDA, ROMDesignation.getComStarBranchDesignation(mockPerson));
 
         // VTOL Pilot - Expect " Lambda"
-        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VTOL_PILOT);
-        assertEquals(" " + ROMDesignation.LAMBDA, ROMDesignation.getComStarBranchDesignation(mockPerson));
-
-        // Vehicle Gunner - Expect " Lambda"
-        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_CREW_VTOL);
         assertEquals(" " + ROMDesignation.LAMBDA, ROMDesignation.getComStarBranchDesignation(mockPerson));
 
         // Vehicle Crew - Expect " Lambda"
-        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_CREW);
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.COMBAT_TECHNICIAN);
         assertEquals(" " + ROMDesignation.LAMBDA, ROMDesignation.getComStarBranchDesignation(mockPerson));
 
         // Conventional Aircraft Pilot - Expect " Lambda"

@@ -71,7 +71,7 @@ public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
         } else if (roll == 4 || roll == 10) { // MW
             p = c.newPerson(PersonnelRole.MEKWARRIOR);
         } else if (roll == 5 || roll == 9) { // Vehicle Crews
-            p = c.newPerson((Compute.d6() < 3) ? PersonnelRole.GROUND_VEHICLE_DRIVER : PersonnelRole.VEHICLE_GUNNER);
+            p = c.newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
         } else if (roll == 6 || roll == 8) { // Infantry
             p = c.newPerson((c.getFaction().isClan() && Compute.d6(2) > 3)
                                   ? PersonnelRole.BATTLE_ARMOUR : PersonnelRole.SOLDIER);

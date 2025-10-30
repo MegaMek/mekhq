@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.personnel;
+package mekhq.campaign.personnel.medical;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -42,7 +42,7 @@ import java.util.Set;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.BodyLocation.XMLAdapter;
+import mekhq.campaign.personnel.medical.BodyLocation.XMLAdapter;
 
 @XmlJavaTypeAdapter(value = XMLAdapter.class)
 public enum BodyLocation {

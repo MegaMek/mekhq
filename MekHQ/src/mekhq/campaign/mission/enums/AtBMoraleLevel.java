@@ -42,17 +42,18 @@ import mekhq.MekHQ;
  */
 public enum AtBMoraleLevel {
     // region Enum Declarations
-    ROUTED(-3, "AtBMoraleLevel.ROUTED.text", "AtBMoraleLevel.ROUTED.toolTipText"),
-    CRITICAL(-2, "AtBMoraleLevel.CRITICAL.text", "AtBMoraleLevel.CRITICAL.toolTipText"),
-    WEAKENED(-1, "AtBMoraleLevel.WEAKENED.text", "AtBMoraleLevel.WEAKENED.toolTipText"),
-    STALEMATE(0, "AtBMoraleLevel.STALEMATE.text", "AtBMoraleLevel.STALEMATE.toolTipText"),
-    ADVANCING(1, "AtBMoraleLevel.ADVANCING.text", "AtBMoraleLevel.ADVANCING.toolTipText"),
-    DOMINATING(2, "AtBMoraleLevel.DOMINATING.text", "AtBMoraleLevel.DOMINATING.toolTipText"),
-    OVERWHELMING(3, "AtBMoraleLevel.OVERWHELMING.text", "AtBMoraleLevel.OVERWHELMING.toolTipText");
+    ROUTED(-3, 7, "AtBMoraleLevel.ROUTED.text", "AtBMoraleLevel.ROUTED.toolTipText"),
+    CRITICAL(-2, 6, "AtBMoraleLevel.CRITICAL.text", "AtBMoraleLevel.CRITICAL.toolTipText"),
+    WEAKENED(-1, 5, "AtBMoraleLevel.WEAKENED.text", "AtBMoraleLevel.WEAKENED.toolTipText"),
+    STALEMATE(0, 4, "AtBMoraleLevel.STALEMATE.text", "AtBMoraleLevel.STALEMATE.toolTipText"),
+    ADVANCING(1, 3, "AtBMoraleLevel.ADVANCING.text", "AtBMoraleLevel.ADVANCING.toolTipText"),
+    DOMINATING(2, 2, "AtBMoraleLevel.DOMINATING.text", "AtBMoraleLevel.DOMINATING.toolTipText"),
+    OVERWHELMING(3, 1, "AtBMoraleLevel.OVERWHELMING.text", "AtBMoraleLevel.OVERWHELMING.toolTipText");
     // endregion Enum Declarations
 
     // region Variable Declarations
     private final int level;
+    private final int crisisDieSize;
     private final String name;
     private final String toolTipText;
     // endregion Variable Declarations
@@ -60,15 +61,18 @@ public enum AtBMoraleLevel {
     /**
      * Initializes a new {@link AtBMoraleLevel} object with the specified name and tooltip text.
      *
-     * @param level       the severity of the morale level
-     * @param name        the resource key for the name of the Morale Level
-     * @param toolTipText the resource key for the tooltip text of the Morale Level
+     * @param level         the severity of the morale level
+     * @param crisisDieSize the number of sides on the die rolled to determine if a scenario is classified as a
+     *                      'crisis'
+     * @param name          the resource key for the name of the Morale Level
+     * @param toolTipText   the resource key for the tooltip text of the Morale Level
      */
     // region Constructors
-    AtBMoraleLevel(final int level, final String name, final String toolTipText) {
+    AtBMoraleLevel(final int level, final int crisisDieSize, final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
               MekHQ.getMHQOptions().getLocale());
         this.level = level;
+        this.crisisDieSize = crisisDieSize;
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -76,6 +80,10 @@ public enum AtBMoraleLevel {
 
     public int getLevel() {
         return level;
+    }
+
+    public int getCrisisDieSize() {
+        return crisisDieSize;
     }
 
     /**

@@ -104,7 +104,7 @@ public class SpaUtilities {
     public static AbilityCategory getSpaCategory(final SpecialAbility ability) {
         int cost = ability.getCost();
         // is the ability classified as Character Creation only?
-        boolean isCharacterCreationOnly = cost == -1;
+        boolean isCharacterCreationOnly = ability.getOriginOnly();
 
         if (isCharacterCreationOnly) {
             return CHARACTER_CREATION_ONLY;
