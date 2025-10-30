@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities.getSalvageTooltip;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -53,16 +54,11 @@ import javax.swing.ScrollPaneConstants;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.ui.FastJScrollPane;
-import megamek.common.units.Dropship;
-import megamek.common.units.Entity;
-import megamek.common.units.Mek;
-import megamek.common.units.Warship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -288,57 +284,5 @@ public class SalvageForcePicker extends ImmersiveDialogCore {
         panel.add(scrollPane, constraints);
 
         return panel;
-    }
-
-    /**
-     * Generates a tooltip string describing the salvage capabilities of units in a force.
-     *
-     * <p>For each unit capable of salvage, the tooltip includes:</p>
-     * <ul>
-     *   <li>Unit name</li>
-     *   <li>Drag/tow capacity in tons (for non-large vessels)</li>
-     *   <li>Cargo capacity in tons (for non-Mek units)</li>
-     *   <li>Naval tug status (for large vessels like DropShips and WarShips)</li>
-     * </ul>
-     *
-     * @param unitsInForce the list of units to analyze for salvage capabilities
-     * @param isInSpace    {@code true} if checking space salvage capabilities, {@code false} for ground operations
-     *
-     * @return an HTML-formatted string describing each salvage-capable unit's capabilities
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private static String getSalvageTooltip(List<Unit> unitsInForce, boolean isInSpace) {
-        StringBuilder tooltip = new StringBuilder();
-
-        for (Unit unit : unitsInForce) {
-            if (unit.canSalvage(isInSpace)) {
-                Entity entity = unit.getEntity();
-                if (entity != null) {
-                    boolean isLargeVessel = entity instanceof Dropship || entity instanceof Warship;
-                    tooltip.append(unit.getName());
-
-                    if (!isLargeVessel) {
-                        tooltip.append(" (").append(entity.getTonnage()).append(" tons drag/tow)");
-                    }
-
-                    double cargoCapacity = unit.getCargoCapacity();
-                    if (!(entity instanceof Mek)) {
-                        tooltip.append(" (").append(cargoCapacity).append(" tons cargo)");
-
-                        if (isLargeVessel) {
-                            if (CamOpsSalvageUtilities.hasNavalTug(entity)) {
-                                tooltip.append(" (Has Naval Tug)");
-                            }
-                        }
-                    }
-                }
-
-                tooltip.append("<br>");
-            }
-        }
-
-        return tooltip.toString();
     }
 }
