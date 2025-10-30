@@ -1,5 +1,38 @@
+/*
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
 package mekhq.gui.dialog;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -17,6 +50,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
@@ -32,6 +66,19 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
+/**
+ * A dialog that allows the user to select forces for salvage operations before starting a scenario.
+ *
+ * <p>This dialog presents the user with a list of available forces that can perform salvage operations, displaying
+ * each force's name and the number of units capable of salvage. The forces are presented as checkboxes arranged in a
+ * three-column layout.</p>
+ *
+ * <p>The dialog provides context-appropriate messaging based on whether forces are available, and only allows
+ * confirmation if at least one force is available for selection.</p>
+ *
+ * @author Illiani
+ * @since 0.50.10
+ */
 public class SalvageForcePicker extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SalvageForcePicker";
     private static final int NUM_COLUMNS = 3;
@@ -79,13 +126,24 @@ public class SalvageForcePicker extends ImmersiveDialogCore {
         return selectedForces;
     }
 
+
+    /**
+     * Creates a new salvage force picker dialog.
+     *
+     * @param campaign the current campaign
+     * @param scenario the scenario for which salvage forces are being selected
+     * @param forces   the list of available forces that can perform salvage operations
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public SalvageForcePicker(Campaign campaign, Scenario scenario, List<Force> forces) {
         super(campaign,
               campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND),
               null,
               getInCharacterMessage(campaign.getCommanderAddress(), !forces.isEmpty()),
               getButtons(!forces.isEmpty()),
-              null,
+              getOutOfCharacterMessage(),
               ImmersiveDialogWidth.SMALL.getWidth(),
               false,
               getSupplementalPanel(scenario.getBoardType() == AtBScenario.T_SPACE, campaign.getHangar(), forces),
@@ -109,6 +167,20 @@ public class SalvageForcePicker extends ImmersiveDialogCore {
     private static String getInCharacterMessage(String commanderAddress, boolean hasForces) {
         String key = "SalvageForcePicker.inCharacterMessage." + (hasForces ? "normal" : "noForces");
         return getFormattedTextAt(RESOURCE_BUNDLE, key, commanderAddress);
+    }
+
+
+    /**
+     * Generates the out-of-character message displayed in the dialog.
+     *
+     * @return the out-of-character message string
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static String getOutOfCharacterMessage() {
+        String key = "SalvageForcePicker.inCharacterMessage.salvage";
+        return getTextAt(RESOURCE_BUNDLE, key);
     }
 
     /**
@@ -150,7 +222,11 @@ public class SalvageForcePicker extends ImmersiveDialogCore {
      * @author Illiani
      * @since 0.50.10
      */
-    protected static JPanel getSupplementalPanel(boolean isInSpace, Hangar hangar, List<Force> forces) {
+    protected static @Nullable JPanel getSupplementalPanel(boolean isInSpace, Hangar hangar, List<Force> forces) {
+        if (forces.isEmpty()) {
+            return null;
+        }
+
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.anchor = GridBagConstraints.WEST;
@@ -180,7 +256,7 @@ public class SalvageForcePicker extends ImmersiveDialogCore {
             List<Unit> allUnitsInForce = force.getAllUnitsAsUnits(hangar, false);
             JCheckBox checkbox =
                   new JCheckBox(force.getFullName() + " (" + force.getSalvageUnitCount(hangar, isInSpace) + ")");
-            checkbox.setToolTipText(getSalvageTooltip(allUnitsInForce, isInSpace));
+            checkbox.setToolTipText(wordWrap(getSalvageTooltip(allUnitsInForce, isInSpace)));
             checkbox.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
             checkboxForceMap.put(checkbox, force);
@@ -207,6 +283,26 @@ public class SalvageForcePicker extends ImmersiveDialogCore {
         return panel;
     }
 
+
+    /**
+     * Generates a tooltip string describing the salvage capabilities of units in a force.
+     *
+     * <p>For each unit capable of salvage, the tooltip includes:</p>
+     * <ul>
+     *   <li>Unit name</li>
+     *   <li>Drag/tow capacity in tons (for non-large vessels)</li>
+     *   <li>Cargo capacity in tons (for non-Mek units)</li>
+     *   <li>Naval tug status (for large vessels like DropShips and WarShips)</li>
+     * </ul>
+     *
+     * @param unitsInForce the list of units to analyze for salvage capabilities
+     * @param isInSpace    {@code true} if checking space salvage capabilities, {@code false} for ground operations
+     *
+     * @return an HTML-formatted string describing each salvage-capable unit's capabilities
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private static String getSalvageTooltip(List<Unit> unitsInForce, boolean isInSpace) {
         StringBuilder tooltip = new StringBuilder();
 

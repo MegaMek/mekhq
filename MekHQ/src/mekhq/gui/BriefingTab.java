@@ -875,14 +875,62 @@ public final class BriefingTab extends CampaignGuiTab {
         startScenario(scenario, null);
     }
 
+    /**
+     * Displays a dialog allowing the player to select forces for salvage operations.
+     *
+     * <p>This method gathers all available salvage-capable forces from the campaign and presents
+     * them to the player via a {@link SalvageForcePicker} dialog. Forces are filtered based on their salvage
+     * capabilities and whether they are deployed.</p>
+     *
+     * @param scenario the scenario for which salvage forces are being selected
+     *
+     * @return {@code true} if the player confirmed their force selection, {@code false} if they canceled
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private boolean displaySalvageForcePicker(Scenario scenario) {
         Hangar hangar = getCampaign().getHangar();
         boolean isSpaceScenario = scenario.getBoardType() == AtBScenario.T_SPACE;
 
-        List<Force> salvageForceOptions = new ArrayList<>();
-        List<Integer> visitedForceIds = new ArrayList<>();
+        List<Force> salvageForceOptions = getSalvageForces(hangar, isSpaceScenario);
+        SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), scenario, salvageForceOptions);
 
-        // Collect Combat Teams
+        return forcePicker.wasConfirmed();
+    }
+
+    /**
+     * Retrieves all available forces capable of performing salvage operations.
+     *
+     * <p>This method collects forces in two passes:</p>
+     * <ol>
+     *   <li>First, it examines all combat teams and their parent forces, adding any undeployed forces
+     *       with salvage-capable units. It tracks visited force IDs to avoid duplication.</li>
+     *   <li>Second, it searches for dedicated salvage forces (non-combat team forces with salvage type)
+     *       that weren't already visited in the first pass.</li>
+     * </ol>
+     *
+     * <p>Forces are filtered to include only those that:</p>
+     * <ul>
+     *   <li>Are not currently deployed</li>
+     *   <li>Have at least one unit capable of salvage operations</li>
+     *   <li>Meet the scenario environment requirements (ground or space)</li>
+     * </ul>
+     *
+     * <p>The returned list is sorted alphabetically by force name.</p>
+     *
+     * @param hangar          the campaign hangar containing all units
+     * @param isSpaceScenario {@code true} if checking for space salvage capabilities, {@code false} for ground
+     *
+     * @return a sorted list of forces capable of salvage operations
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private List<Force> getSalvageForces(Hangar hangar, boolean isSpaceScenario) {
+        List<Integer> visitedForceIds = new ArrayList<>();
+        List<Force> salvageForceOptions = new ArrayList<>();
+
         for (CombatTeam combatTeam : getCampaign().getCombatTeamsAsList()) {
             int forceId = combatTeam.getForceId();
             Force force = getCampaign().getForce(forceId);
@@ -903,16 +951,19 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Collect non-Combat Teams
         for (Force force : getCampaign().getAllForces()) {
-            if (!force.getUnits().isEmpty() && force.getForceType().isSalvage()) {
-                salvageForceOptions.add(force);
+            if (visitedForceIds.contains(force.getId())) {
+                continue;
+            }
+
+            if (force.getForceType().isSalvage() && !force.getUnits().isEmpty()) {
+                if (force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
+                    salvageForceOptions.add(force);
+                }
             }
         }
 
         salvageForceOptions.sort(Comparator.comparing(Force::getFullName));
-
-        SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), scenario, salvageForceOptions);
-
-        return forcePicker.wasConfirmed();
+        return salvageForceOptions;
     }
 
     /**
@@ -1020,6 +1071,10 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void runAbstractCombatAutoResolve(Scenario scenario) {
+        if (!displaySalvageForcePicker(scenario)) {
+            return;
+        }
+
         List<Unit> chosen = playerUnits(scenario, new StringBuilder());
         if (chosen.isEmpty()) {
             return;
