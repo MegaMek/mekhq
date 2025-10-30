@@ -60,6 +60,11 @@ public enum ForceType {
     CONVOY(true, true),
 
     /**
+     * Salvage force type, typically used in post-scenario salvage operations
+     */
+    SALVAGE(true, true),
+
+    /**
      * Security force type, typically used by the Prisoner Events module.
      */
     SECURITY(true, true);
@@ -174,6 +179,14 @@ public enum ForceType {
         return this == CONVOY;
     }
 
+    /**
+     * Checks if this force type is {@code SALVAGE}.
+     *
+     * @return {@code true} if this is the {@code SALVAGE} type; otherwise, {@code false}.
+     */
+    public boolean isSalvage() {
+        return this == SALVAGE;
+    }
 
     /**
      * Checks if this force type is {@code SECURITY}.
