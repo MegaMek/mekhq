@@ -125,15 +125,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.CompleteMissionDialog;
-import mekhq.gui.dialog.CustomizeAtBContractDialog;
-import mekhq.gui.dialog.CustomizeMissionDialog;
-import mekhq.gui.dialog.CustomizeScenarioDialog;
-import mekhq.gui.dialog.MissionTypeDialog;
-import mekhq.gui.dialog.NewAtBContractDialog;
-import mekhq.gui.dialog.NewContractDialog;
-import mekhq.gui.dialog.RetirementDefectionDialog;
-import mekhq.gui.dialog.SalvageForcePicker;
+import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog;
 import mekhq.gui.enums.MHQTabType;
@@ -872,6 +864,10 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
+        if (!displaySalvageTechPicker(scenario)) {
+            return;
+        }
+
         startScenario(scenario, null);
     }
 
@@ -891,11 +887,9 @@ public final class BriefingTab extends CampaignGuiTab {
      */
     private boolean displaySalvageForcePicker(Scenario scenario) {
         scenario.getSalvageForces().clear(); // reset, in case we've previously canceled out of the dialog
+        List<Force> salvageForceOptions = getSalvageForces(getCampaign().getHangar(),
+              scenario.getBoardType() == AtBScenario.T_SPACE);
 
-        Hangar hangar = getCampaign().getHangar();
-        boolean isSpaceScenario = scenario.getBoardType() == AtBScenario.T_SPACE;
-
-        List<Force> salvageForceOptions = getSalvageForces(hangar, isSpaceScenario);
         SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), scenario, salvageForceOptions);
         boolean wasConfirmed = forcePicker.wasConfirmed();
         if (wasConfirmed) {
@@ -906,6 +900,39 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         return forcePicker.wasConfirmed();
+    }
+
+    private boolean displaySalvageTechPicker(Scenario scenario) {
+        scenario.getSalvageTechs().clear(); // reset, in case we've previously canceled out of the dialog
+        List<Person> availableTechs = getAvailableTechs();
+
+        SalvageTechPicker techPicker = new SalvageTechPicker(getCampaign(), availableTechs);
+        boolean wasConfirmed = techPicker.wasConfirmed();
+        if (wasConfirmed) {
+            List<Person> selectedTechs = techPicker.getSelectedTechs();
+            for (Person tech : selectedTechs) {
+                scenario.addSalvageTech(tech.getId());
+            }
+        }
+
+        return techPicker.wasConfirmed();
+    }
+
+    private List<Person> getAvailableTechs() {
+        List<Person> availableTechs = new ArrayList<>();
+        for (Person tech : getCampaign().getTechs()) {
+            if (!tech.isDeployed() && tech.getMinutesLeft() > 0) {
+                availableTechs.add(tech);
+            }
+        }
+
+        // experienceLevel lowest -> highest, minutes highest -> lowest, rank lowest -> highest, full name a -> x
+        availableTechs.sort(Comparator.comparing((Person p) -> p.getExperienceLevel(getCampaign(),
+                    p.getPrimaryRole().isTech()))
+                                  .thenComparing(Comparator.comparing(Person::getMinutesLeft).reversed())
+                                  .thenComparing(Person::getRankNumeric)
+                                  .thenComparing(Person::getFullName));
+        return availableTechs;
     }
 
     /**
@@ -1085,6 +1112,10 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
+        if (!displaySalvageTechPicker(scenario)) {
+            return;
+        }
+
         List<Unit> chosen = playerUnits(scenario, new StringBuilder());
         if (chosen.isEmpty()) {
             return;
@@ -1099,6 +1130,10 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         if (!displaySalvageForcePicker(scenario)) {
+            return;
+        }
+
+        if (!displaySalvageTechPicker(scenario)) {
             return;
         }
 

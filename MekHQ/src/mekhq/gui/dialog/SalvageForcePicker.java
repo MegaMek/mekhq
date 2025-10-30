@@ -49,8 +49,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.ScrollPaneConstants;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
@@ -179,7 +181,7 @@ public class SalvageForcePicker extends ImmersiveDialogCore {
      * @since 0.50.10
      */
     private static String getOutOfCharacterMessage() {
-        String key = "SalvageForcePicker.inCharacterMessage.salvage";
+        String key = "SalvageForcePicker.outOfCharacterMessage.salvage";
         return getTextAt(RESOURCE_BUNDLE, key);
     }
 
@@ -222,7 +224,7 @@ public class SalvageForcePicker extends ImmersiveDialogCore {
      * @author Illiani
      * @since 0.50.10
      */
-    protected static @Nullable JPanel getSupplementalPanel(boolean isInSpace, Hangar hangar, List<Force> forces) {
+    private static @Nullable JPanel getSupplementalPanel(boolean isInSpace, Hangar hangar, List<Force> forces) {
         if (forces.isEmpty()) {
             return null;
         }
@@ -275,14 +277,18 @@ public class SalvageForcePicker extends ImmersiveDialogCore {
         checkboxPanel.add(middleColumn);
         checkboxPanel.add(rightColumn);
 
+        FastJScrollPane scrollPane = new FastJScrollPane(checkboxPanel);
+        scrollPane.setBorder(null);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
         constraints.gridy = 1;
         constraints.weighty = 1.0;
         constraints.fill = GridBagConstraints.BOTH;
-        panel.add(checkboxPanel, constraints);
+        panel.add(scrollPane, constraints);
 
         return panel;
     }
-
 
     /**
      * Generates a tooltip string describing the salvage capabilities of units in a force.
