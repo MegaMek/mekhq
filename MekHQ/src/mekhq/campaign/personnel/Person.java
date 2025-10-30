@@ -65,6 +65,7 @@ import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUN
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
@@ -134,7 +135,6 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
-import mekhq.campaign.personnel.skills.VehicleCrewSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
@@ -407,8 +407,11 @@ public class Person {
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData;
 
+    /** @deprecated Use {@link #RESOURCE_BUNDLE} instead for all new strings */
+    @Deprecated(since = "0.50.10", forRemoval = false)
     private final static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
           MekHQ.getMHQOptions().getLocale());
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Personnel";
     private static final MMLogger LOGGER = MMLogger.create(Person.class);
 
     // initializes the AtB ransom values
@@ -3473,6 +3476,7 @@ public class Person {
 
     public static Person generateInstanceFromXML(Node wn, Campaign campaign, Version version) {
         Person person = new Person(campaign);
+        LocalDate today = campaign.getLocalDate();
 
         try {
             // Okay, now load Person-specific fields!
@@ -3881,10 +3885,9 @@ public class Person {
                         }
                         person.injuries.add(Injury.generateInstanceFromXML(wn3));
                     }
-                    LocalDate now = campaign.getLocalDate();
                     person.injuries.stream()
                           .filter(inj -> (null == inj.getStart()))
-                          .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
+                          .forEach(inj -> inj.setStart(today.minusDays(inj.getOriginalTime() - inj.getTime())));
                 } else if (nodeName.equalsIgnoreCase("originalUnitWeight")) {
                     person.originalUnitWeight = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("originalUnitTech")) {
@@ -4098,30 +4101,22 @@ public class Person {
             }
 
             if (person.getJoinedCampaign() == null) {
-                person.setJoinedCampaign(campaign.getLocalDate());
+                person.setJoinedCampaign(today);
             }
 
             // <50.10 compatibility handler
-            if (updateSkillsForVehicleProfessions(person, person.getPrimaryRole()) ||
-                      updateSkillsForVehicleProfessions(person, person.getSecondaryRole())) {
-                campaign.addReport(String.format(resources.getString("vehicleProfessionSkillChange"),
+            if (updateSkillsForVehicleProfessions(today, person, person.getPrimaryRole(), true) ||
+                      updateSkillsForVehicleProfessions(today, person, person.getSecondaryRole(), false)) {
+                String report = getFormattedTextAt(RESOURCE_BUNDLE, "vehicleProfessionSkillChange",
                       spanOpeningWithCustomColor(getWarningColor()),
                       CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
-            }
-
-            // <50.10 compatibility handler
-            if (updateSkillsForVehicleCrewProfession(person, person.getPrimaryRole()) ||
-                      updateSkillsForVehicleCrewProfession(person, person.getSecondaryRole())) {
-                campaign.addReport(String.format(resources.getString("vehicleCrewProfessionSkillChange"),
-                      spanOpeningWithCustomColor(getWarningColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
+                      person.getHyperlinkedFullTitle());
+                campaign.addReport(report);
             }
 
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
-            if (!person.canPerformRole(campaign.getLocalDate(), person.getSecondaryRole(), false)) {
+            if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
                 person.setSecondaryRole(PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
@@ -4130,7 +4125,7 @@ public class Person {
                       person.getHyperlinkedFullTitle()));
             }
 
-            if (!person.canPerformRole(campaign.getLocalDate(), person.getPrimaryRole(), true)) {
+            if (!person.canPerformRole(today, person.getPrimaryRole(), true)) {
                 person.setPrimaryRole(campaign, PersonnelRole.NONE);
 
                 campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
@@ -4146,28 +4141,106 @@ public class Person {
         return person;
     }
 
-    private static boolean updateSkillsForVehicleProfessions(Person person, PersonnelRole role) {
-        String drivingSkillType = switch (role) {
-            case VTOL_PILOT -> S_PILOT_VTOL;
-            case NAVAL_VEHICLE_DRIVER -> S_PILOT_NVEE;
-            case GROUND_VEHICLE_DRIVER -> S_PILOT_GVEE;
-            default -> null;
-        };
+    /**
+     * Updates skills and role for personnel with deprecated vehicle professions.
+     *
+     * <p>This method is used during XML loading to migrate legacy vehicle roles to the new vehicle crew system.</p>
+     *
+     * <p>It...</p>
+     * <ul>
+     *   <li>Determines the appropriate new vehicle crew role based on the old role</li>
+     *   <li>Adds missing driving and gunnery skills at appropriate levels</li>
+     *   <li>Updates the person's role (primary or secondary) to the new profession</li>
+     * </ul>
+     *
+     * <p>For {@link PersonnelRole#VEHICLE_GUNNER}, the new role is determined by examining the person's currently
+     * assigned entity. If no entity is assigned, defaults to ground vehicle crew.</p>
+     *
+     * <p>Skills are added at level 3 if the complementary skill is missing, otherwise they are added at the same
+     * level as the existing complementary skill.</p>
+     *
+     * @param today     the current date
+     * @param person    the person whose skills and role should be updated
+     * @param role      the deprecated role to migrate from
+     * @param isPrimary whether this is the person's primary role (true) or secondary role (false)
+     *
+     * @return {@code true} if skills or profession was updated, {@code false} if no update was needed
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static boolean updateSkillsForVehicleProfessions(LocalDate today, Person person, PersonnelRole role,
+          boolean isPrimary) {
+        if (role == PersonnelRole.VEHICLE_CREW) { // The old vehicle crew profession is handled differently
+            return updateSkillsForVehicleCrewProfession(today, person, role, isPrimary);
+        }
 
-        if (drivingSkillType == null) {
-            return false;
+        PersonnelRole newProfession = null;
+        String drivingSkillType = null;
+        String gunnerySkillType = S_GUN_VEE;
+
+        switch (role) {
+            case VTOL_PILOT -> {
+                newProfession = PersonnelRole.VEHICLE_CREW_VTOL;
+                drivingSkillType = S_PILOT_VTOL;
+            }
+            case NAVAL_VEHICLE_DRIVER -> {
+                newProfession = PersonnelRole.VEHICLE_CREW_NAVAL;
+                drivingSkillType = S_PILOT_NVEE;
+            }
+            case GROUND_VEHICLE_DRIVER -> {
+                newProfession = PersonnelRole.VEHICLE_CREW_GROUND;
+                drivingSkillType = S_PILOT_GVEE;
+            }
+            case VEHICLE_GUNNER -> {
+                // Vehicle gunners need special handling to guesstimate what they should be. We base this on the unit
+                // they are currently assigned to.
+                Entity assignedEntity = person.getEntity();
+                if (assignedEntity != null) {
+                    if (assignedEntity instanceof VTOL) {
+                        newProfession = PersonnelRole.VEHICLE_CREW_VTOL;
+                        drivingSkillType = S_PILOT_VTOL;
+                    } else if (assignedEntity.getMovementMode().isMarine()) {
+                        newProfession = PersonnelRole.VEHICLE_CREW_NAVAL;
+                        drivingSkillType = S_PILOT_NVEE;
+                    } else {
+                        newProfession = PersonnelRole.VEHICLE_CREW_GROUND;
+                        drivingSkillType = S_PILOT_GVEE;
+                    }
+                }
+
+                // Fallback
+                if (newProfession == null) {
+                    newProfession = PersonnelRole.VEHICLE_CREW_GROUND;
+                    drivingSkillType = S_PILOT_GVEE;
+                }
+            }
+            default -> { // Not a vehicle profession
+                return false;
+            }
         }
 
         Skill drivingSkill = person.getSkill(drivingSkillType);
-        Skill gunnerySkill = person.getSkill(S_GUN_VEE);
+        Skill gunnerySkill = person.getSkill(gunnerySkillType);
 
-        if (drivingSkill != null && gunnerySkill == null) {
-            int drivingLevel = drivingSkill.getLevel();
-            person.addSkill(S_GUN_VEE, drivingLevel, 0);
-            return true;
+        int drivingTargetLevel = gunnerySkill == null ? 3 : gunnerySkill.getLevel();
+        int gunneryTargetLevel = drivingSkill == null ? 3 : drivingSkill.getLevel();
+
+        if (gunnerySkill == null) {
+            person.addSkill(gunnerySkillType, gunneryTargetLevel, 0);
         }
 
-        return false;
+        if (drivingSkill == null) {
+            person.addSkill(drivingSkillType, drivingTargetLevel, 0);
+        }
+
+        if (isPrimary) {
+            person.setPrimaryRole(today, newProfession);
+        } else {
+            person.setSecondaryRole(newProfession);
+        }
+
+        return true;
     }
 
     /**
@@ -4178,36 +4251,32 @@ public class Person {
      * crew-related skill (e.g., Tech Vee, Gunnery Vee, Piloting Vee, or Driving). This ensures backwards compatibility
      * when loading older save files.</p>
      *
+     * @param today       the current date
      * @param person      the person whose skills should be updated
      * @param currentRole the role to check
+     * @param isPrimary   if the role is the characters' primary profession
      *
      * @return {@code true} if the Mechanic skill was added, {@code false} otherwise
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static boolean updateSkillsForVehicleCrewProfession(Person person, PersonnelRole currentRole) {
+    private static boolean updateSkillsForVehicleCrewProfession(LocalDate today, Person person,
+          PersonnelRole currentRole,
+          boolean isPrimary) {
         if (currentRole != PersonnelRole.VEHICLE_CREW) {
             return false;
         }
 
         if (!person.hasSkill(S_TECH_MECHANIC)) {
-            int highestSkillLevel = EXP_NONE;
-            String highestSkill = null;
-            for (String skillName : VehicleCrewSkills.VEHICLE_CREW_SKILLS) {
-                if (person.hasSkill(skillName)) {
-                    int level = person.getSkill(skillName).getLevel();
-                    if (level > highestSkillLevel) {
-                        highestSkillLevel = level;
-                        highestSkill = skillName;
-                    }
-                }
-            }
+            person.addSkill(S_TECH_MECHANIC, 3, 0);
+            return true;
+        }
 
-            if (highestSkill != null) {
-                person.addSkill(highestSkill, highestSkillLevel, 0);
-                return true;
-            }
+        if (isPrimary) {
+            person.setPrimaryRole(today, PersonnelRole.COMBAT_TECHNICIAN);
+        } else {
+            person.setSecondaryRole(PersonnelRole.COMBAT_TECHNICIAN);
         }
 
         return false;
@@ -4718,22 +4787,29 @@ public class Person {
         List<String> associatedSkillNames = role.getSkillsForProfession();
 
         return switch (role) {
-            case VEHICLE_GUNNER -> {
+            case VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL -> {
                 if (!isUseArtillery) {
                     yield calculateExperienceLevelForProfession(associatedSkillNames,
                           isAlternativeQualityAveraging,
                           adjustedReputation);
                 } else {
-                    if ((hasSkill(S_GUN_VEE)) && (hasSkill(S_ARTILLERY))) {
-                        yield Math.max((getSkill(S_GUN_VEE).getExperienceLevel(options, atowAttributes)),
-                              (getSkill(S_ARTILLERY).getExperienceLevel(options, atowAttributes)));
-                    } else if (hasSkill(S_GUN_VEE)) {
-                        yield getSkill(S_GUN_VEE).getExperienceLevel(options, atowAttributes);
-                    } else if (hasSkill(S_ARTILLERY)) {
-                        yield getSkill(S_ARTILLERY).getExperienceLevel(options, atowAttributes);
-                    } else {
-                        yield EXP_NONE;
+                    Skill gunnery = getSkill(S_GUN_VEE);
+                    int gunneryExperienceLevel = gunnery == null ?
+                                                       EXP_NONE :
+                                                       gunnery.getExperienceLevel(options, atowAttributes);
+                    Skill artillery = getSkill(S_ARTILLERY);
+                    int artilleryExperienceLevel = gunnery == null ?
+                                                         EXP_NONE :
+                                                         artillery.getExperienceLevel(options, atowAttributes);
+
+                    if (artilleryExperienceLevel > gunneryExperienceLevel) {
+                        associatedSkillNames.remove(S_GUN_VEE);
+                        associatedSkillNames.add(S_ARTILLERY);
                     }
+
+                    yield calculateExperienceLevelForProfession(associatedSkillNames,
+                          isAlternativeQualityAveraging,
+                          adjustedReputation);
                 }
             }
             case SOLDIER -> {
@@ -5497,12 +5573,12 @@ public class Person {
         } else if (entity instanceof Mek) {
             return hasSkill(S_PILOT_MEK) && isRole(PersonnelRole.MEKWARRIOR);
         } else if (entity instanceof VTOL) {
-            return hasSkill(S_PILOT_VTOL) && isRole(PersonnelRole.VTOL_PILOT);
+            return hasSkill(S_PILOT_VTOL) && isRole(PersonnelRole.VEHICLE_CREW_VTOL);
         } else if (entity instanceof Tank) {
             if (entity.getMovementMode().isMarine()) {
-                return hasSkill(S_PILOT_NVEE) && isRole(PersonnelRole.NAVAL_VEHICLE_DRIVER);
+                return hasSkill(S_PILOT_NVEE) && isRole(PersonnelRole.VEHICLE_CREW_NAVAL);
             } else {
-                return hasSkill(S_PILOT_GVEE) && isRole(PersonnelRole.GROUND_VEHICLE_DRIVER);
+                return hasSkill(S_PILOT_GVEE) && isRole(PersonnelRole.VEHICLE_CREW_GROUND);
             }
         } else if (entity instanceof ConvFighter) {
             return hasSkill(S_PILOT_JET) && isRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
@@ -5552,7 +5628,13 @@ public class Person {
         } else if (entity instanceof Mek) {
             return hasSkill(S_GUN_MEK) && isRole(PersonnelRole.MEKWARRIOR);
         } else if (entity instanceof Tank) {
-            return hasSkill(S_GUN_VEE) && isRole(PersonnelRole.VEHICLE_GUNNER);
+            if (entity.getMovementMode().isMarine()) {
+                return hasSkill(S_GUN_VEE) && isRole(PersonnelRole.VEHICLE_CREW_NAVAL);
+            } else if (entity.getMovementMode().isVTOL()) {
+                return hasSkill(S_GUN_VEE) && isRole(PersonnelRole.VEHICLE_CREW_VTOL);
+            } else {
+                return hasSkill(S_GUN_VEE) && isRole(PersonnelRole.VEHICLE_CREW_GROUND);
+            }
         } else if (entity instanceof ConvFighter) {
             return hasSkill(S_GUN_JET) && isRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
         } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
@@ -5725,6 +5807,14 @@ public class Person {
 
     public @Nullable Unit getUnit() {
         return unit;
+    }
+
+    public @Nullable Entity getEntity() {
+        if (unit == null) {
+            return null;
+        }
+
+        return unit.getEntity();
     }
 
     public void setUnit(final @Nullable Unit unit) {
@@ -5940,7 +6030,7 @@ public class Person {
 
     public boolean isVehicleCrew() {
         boolean hasSkill = hasSkill(S_TECH_MECHANIC);
-        return hasSkill && (getPrimaryRole().isVehicleCrew() || getSecondaryRole().isVehicleCrew());
+        return hasSkill && (getPrimaryRole().isCombatTechnician() || getSecondaryRole().isCombatTechnician());
     }
 
     public boolean isAsTech() {

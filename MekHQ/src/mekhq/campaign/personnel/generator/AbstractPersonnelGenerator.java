@@ -189,58 +189,48 @@ public abstract class AbstractPersonnelGenerator {
         //check for clan phenotypes
         if (person.isClanPersonnel()) {
             switch (person.getPrimaryRole()) {
-                case MEKWARRIOR:
-                case LAM_PILOT:
+                case MEKWARRIOR, LAM_PILOT -> {
                     if (Utilities.rollProbability(campaign.getCampaignOptions()
                                                         .getPhenotypeProbability(Phenotype.MEKWARRIOR))) {
                         person.setPhenotype(Phenotype.MEKWARRIOR);
                     }
-                    break;
-                case GROUND_VEHICLE_DRIVER:
-                case NAVAL_VEHICLE_DRIVER:
-                case VTOL_PILOT:
-                case VEHICLE_GUNNER:
-                case VEHICLE_CREW:
+                }
+                case VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL, COMBAT_TECHNICIAN -> {
                     if (person.getOriginFaction().getShortName().equalsIgnoreCase("CHH") &&
                               (campaign.getGameYear() >= 3100) &&
                               Utilities.rollProbability(campaign.getCampaignOptions()
                                                               .getPhenotypeProbability(Phenotype.VEHICLE))) {
                         person.setPhenotype(Phenotype.VEHICLE);
                     }
-                    break;
-                case AEROSPACE_PILOT:
-                case CONVENTIONAL_AIRCRAFT_PILOT:
+                }
+                case AEROSPACE_PILOT, CONVENTIONAL_AIRCRAFT_PILOT -> {
                     if (Utilities.rollProbability(campaign.getCampaignOptions()
                                                         .getPhenotypeProbability(Phenotype.AEROSPACE))) {
                         person.setPhenotype(Phenotype.AEROSPACE);
                     }
-                    break;
-                case PROTOMEK_PILOT:
+                }
+                case PROTOMEK_PILOT -> {
                     if ((campaign.getGameYear() > 3060) &&
                               Utilities.rollProbability(campaign.getCampaignOptions()
                                                               .getPhenotypeProbability(Phenotype.PROTOMEK))) {
                         person.setPhenotype(Phenotype.PROTOMEK);
                     }
-                    break;
-                case BATTLE_ARMOUR:
+                }
+                case BATTLE_ARMOUR -> {
                     if (Utilities.rollProbability(campaign.getCampaignOptions()
                                                         .getPhenotypeProbability(Phenotype.ELEMENTAL))) {
                         person.setPhenotype(Phenotype.ELEMENTAL);
                     }
-                    break;
-                case VESSEL_PILOT:
-                case VESSEL_GUNNER:
-                case VESSEL_CREW:
-                case VESSEL_NAVIGATOR:
+                }
+                case VESSEL_PILOT, VESSEL_GUNNER, VESSEL_CREW, VESSEL_NAVIGATOR -> {
                     if ((person.getOriginFaction().getShortName().equalsIgnoreCase("CSR") ||
                                person.getOriginFaction().getShortName().equalsIgnoreCase("RA")) &&
                               Utilities.rollProbability(campaign.getCampaignOptions()
                                                               .getPhenotypeProbability(Phenotype.NAVAL))) {
                         person.setPhenotype(Phenotype.NAVAL);
                     }
-                    break;
-                default:
-                    break;
+                }
+                default -> {}
             }
         }
     }

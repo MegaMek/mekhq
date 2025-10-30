@@ -92,8 +92,7 @@ public class PersonnelMarketDylan extends PersonnelMarketRandom {
                 if (choice == Entity.ETYPE_MEK) {
                     p = c.newPerson(PersonnelRole.MEKWARRIOR);
                 } else if (choice == Entity.ETYPE_TANK) {
-                    p = c.newPerson((Compute.d6() < 3) ? PersonnelRole.GROUND_VEHICLE_DRIVER
-                                          : PersonnelRole.VEHICLE_GUNNER);
+                    p = c.newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
                 } else if (choice == Entity.ETYPE_AEROSPACE_FIGHTER) {
                     p = c.newPerson(PersonnelRole.AEROSPACE_PILOT);
                 } else if (choice == Entity.ETYPE_BATTLEARMOR) {
