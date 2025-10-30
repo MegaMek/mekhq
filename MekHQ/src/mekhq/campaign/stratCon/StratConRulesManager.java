@@ -459,13 +459,14 @@ public class StratConRulesManager {
                 randomForceID = availableForceIDs.get(randomForceIndex);
             }
 
+
             scenario = setupScenario(scenarioCoords,
                   randomForceID,
                   campaign,
                   contract,
                   track,
                   template,
-                  false,
+                  campaign.getCampaignOptions().isUseStratConMaplessMode(),
                   daysTilDeployment);
         }
 
@@ -1046,7 +1047,7 @@ public class StratConRulesManager {
                       contract,
                       track,
                       template,
-                      false,
+                      campaign.getCampaignOptions().isUseStratConMaplessMode(),
                       daysTilDeployment);
                 firstForce = false;
 
@@ -1275,7 +1276,14 @@ public class StratConRulesManager {
      */
     public static @Nullable StratConScenario setupScenario(StratConCoords coords, int forceID, Campaign campaign,
           AtBContract contract, StratConTrackState track) {
-        return setupScenario(coords, forceID, campaign, contract, track, null, false, null);
+        return setupScenario(coords,
+              forceID,
+              campaign,
+              contract,
+              track,
+              null,
+              campaign.getCampaignOptions().isUseStratConMaplessMode(),
+              null);
     }
 
     /**
@@ -1324,13 +1332,15 @@ public class StratConRulesManager {
 
             // we may generate a facility scenario randomly - if so, do the facility-related
             // stuff and add a new facility to the track
-            if (scenario.getBackingScenario().getTemplate().isFacilityScenario()) {
-                StratConFacility facility = scenario.getBackingScenario().getTemplate().isHostileFacility() ?
-                                                  StratConFacilityFactory.getRandomHostileFacility() :
-                                                  StratConFacilityFactory.getRandomAlliedFacility();
-                facility.setVisible(true);
-                track.addFacility(coords, facility);
-                setupFacilityScenario(scenario, facility);
+            if (!campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+                if (scenario.getBackingScenario().getTemplate().isFacilityScenario()) {
+                    StratConFacility facility = scenario.getBackingScenario().getTemplate().isHostileFacility() ?
+                                                      StratConFacilityFactory.getRandomHostileFacility() :
+                                                      StratConFacilityFactory.getRandomAlliedFacility();
+                    facility.setVisible(true);
+                    track.addFacility(coords, facility);
+                    setupFacilityScenario(scenario, facility);
+                }
             }
         }
 
@@ -2312,7 +2322,9 @@ public class StratConRulesManager {
         scenario.setRequiredPlayerLances(1);
 
         // do any facility or global modifiers
-        applyFacilityModifiers(scenario, track, coords);
+        if (!campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+            applyFacilityModifiers(scenario, track, coords);
+        }
         applyGlobalModifiers(scenario, contract.getStratconCampaignState());
 
         AtBDynamicScenarioFactory.setScenarioModifiers(campaign.getCampaignOptions(), scenario.getBackingScenario());
@@ -3400,7 +3412,9 @@ public class StratConRulesManager {
                     // 0-deployment-length tracks
                     processTrackForceReturnDates(track, campaign);
 
-                    processFacilityEffects(track, campaignState, isStartOfMonth);
+                    if (!campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+                        processFacilityEffects(track, campaignState, isStartOfMonth);
+                    }
 
                     // loop through scenarios - if we haven't deployed in time,
                     // fail it and apply consequences

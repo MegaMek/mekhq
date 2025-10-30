@@ -616,6 +616,7 @@ public class CampaignOptions {
     // region Against the Bot Tab
     private boolean useAtB;
     private boolean useStratCon;
+    private boolean useMaplessStratCon;
     private boolean useAdvancedScouting;
     private SkillLevel skillLevel;
 
@@ -1274,6 +1275,7 @@ public class CampaignOptions {
         // region Against the Bot Tab
         useAtB = false;
         useStratCon = false;
+        useMaplessStratCon = false;
         useAdvancedScouting = false;
         setSkillLevel(SkillLevel.REGULAR);
         autoResolveMethod = AutoResolveMethod.PRINCESS;
@@ -4754,6 +4756,14 @@ public class CampaignOptions {
 
     public void setUseStratCon(final boolean useStratCon) {
         this.useStratCon = useStratCon;
+    }
+
+    public boolean isUseStratConMaplessMode() {
+        return useMaplessStratCon;
+    }
+
+    public void setUseStratConMaplessMode(boolean useMaplessStratCon) {
+        this.useMaplessStratCon = useMaplessStratCon;
     }
 
     public boolean isUseAdvancedScouting() {

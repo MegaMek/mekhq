@@ -1013,17 +1013,19 @@ public class AtBDynamicScenarioFactory {
                         int baseFighterCount = getAeroLanceSize(faction);
                         int fighterMultiplier = 0;
 
-                        try {
-                            StratConTrackState scenarioHomeTrack = getStratconTrackState(scenario, contract);
+                        if (!campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+                            try {
+                                StratConTrackState scenarioHomeTrack = getStratconTrackState(scenario, contract);
 
-                            if (scenarioHomeTrack != null) {
-                                for (StratConFacility facility : scenarioHomeTrack.getFacilities().values()) {
-                                    if (facility.getFacilityType().equals(FacilityType.AirBase)) {
-                                        fighterMultiplier++;
+                                if (scenarioHomeTrack != null) {
+                                    for (StratConFacility facility : scenarioHomeTrack.getFacilities().values()) {
+                                        if (facility.getFacilityType().equals(FacilityType.AirBase)) {
+                                            fighterMultiplier++;
+                                        }
                                     }
                                 }
+                            } catch (Exception ignored) {
                             }
-                        } catch (Exception ignored) {
                         }
 
                         boolean allowConventionalAircraft = scenario.getTemplate().mapParameters.getMapLocation() !=
