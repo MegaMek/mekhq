@@ -57,6 +57,7 @@ import mekhq.campaign.force.ForceType;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.mission.AtBContract.AtBContractRef;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -626,6 +627,8 @@ public class AtBContractTest {
 
         private CombatTeam getMockCompanyCombatTeam(int formationSize) {
             Force mockForce = getMockCompanyForce(formationSize);
+            when(mockForce.getCombatRoleInMemory()).thenReturn(CombatRole.FRONTLINE);
+
             int forceId = mockForce.getId();
             CombatTeam mockCompany = mock(CombatTeam.class);
 
