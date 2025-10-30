@@ -1047,33 +1047,25 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtCargoRequirement, gridBagConstraints);
         }
 
-        // for StratCon, contract score is irrelevant and only leads to confusion, so we
-        // do not display it in that situation
-        boolean showContractScore = !gui.getCampaign().getCampaignOptions().isUseStratCon()
-                                          && (mission instanceof AtBContract)
-                                          && (((AtBContract) mission).getStratconCampaignState() == null);
+        lblScore.setName("lblScore");
+        lblScore.setText(resourceMap.getString("lblScore.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblScore, gridBagConstraints);
 
-        if (showContractScore) {
-            lblScore.setName("lblScore");
-            lblScore.setText(resourceMap.getString("lblScore.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblScore, gridBagConstraints);
-
-            txtScore.setName("txtScore");
-            txtScore.setText(Integer.toString(contract.getScore()));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(txtScore, gridBagConstraints);
-        }
+        txtScore.setName("txtScore");
+        txtScore.setText(Integer.toString(contract.getContractScore()));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(txtScore, gridBagConstraints);
 
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(false);

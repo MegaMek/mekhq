@@ -105,6 +105,10 @@ public class StratConTab extends CampaignGuiTab {
     }
     //endregion Constructors
 
+    public StratConPanel getStratconPanel() {
+        return stratconPanel;
+    }
+
     /**
      * Override of the base initTab method. Populates the tab.
      */

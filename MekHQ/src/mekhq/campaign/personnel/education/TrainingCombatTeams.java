@@ -109,7 +109,7 @@ public class TrainingCombatTeams {
      */
     public static void processTrainingCombatTeams(final Campaign campaign) {
         final LocalDate today = campaign.getLocalDate();
-        final List<CombatTeam> combatTeams = campaign.getAllCombatTeams();
+        final List<CombatTeam> combatTeams = campaign.getCombatTeamsAsList();
 
         for (CombatTeam combatTeam : combatTeams) {
             if (!combatTeam.getRole().isTraining()) {

@@ -242,7 +242,7 @@ public class Fatigue {
 
         int leaveThreshold = campaignOptions.getFatigueUndeploymentThreshold();
 
-        for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
             Force force = combatTeam.getForce(campaign);
             if (force == null || force.isDeployed()) {
                 // 'isDeployed' will only return true if the force is deployed to a scenario. In which cases we don't
