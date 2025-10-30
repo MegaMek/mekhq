@@ -223,7 +223,7 @@ public class WarAndPeaceProcessor {
         for (Faction faction : activeFactions) {
             List<FactionHint> hints = factionHints.getOrDefault(faction, List.of());
             for (FactionHint hint : hints) {
-                if (hint.hintStartsToday(today)) {
+                if (!activeOnly && hint.hintStartsToday(today)) {
                     startFactions.add(faction);
                 } else if (activeOnly && hint.isInDateRange(today)) {
                     startFactions.add(faction);
