@@ -34,7 +34,6 @@ package mekhq.campaign.stratCon;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.lang.Math.round;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.board.Coords.ALL_DIRECTIONS;
 import static megamek.common.compute.Compute.d6;
@@ -72,7 +71,6 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Minefield;
@@ -208,17 +206,6 @@ public class StratConRulesManager {
           AtBContract contract, StratConTrackState track) {
         // maps scenarios to force IDs
         int scenarioRolls = track.getRequiredLanceCount();
-
-        AtBMoraleLevel moraleLevel = contract.getMoraleLevel();
-
-        switch (moraleLevel) {
-            case ADVANCING -> scenarioRolls = (int) round(scenarioRolls * 1.33);
-            case DOMINATING -> scenarioRolls = (int) round(scenarioRolls * 1.66);
-            case OVERWHELMING -> scenarioRolls = scenarioRolls * 2;
-            default -> {
-            }
-        }
-
         for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
             int targetNum = calculateScenarioOdds(track, contract, false);
             int roll = randomInt(100);
@@ -299,7 +286,7 @@ public class StratConRulesManager {
                       track);
                 // otherwise, pick a random force from the avail
             } else {
-                int randomForceID = ObjectUtility.getRandomItem(availableForceIDs);
+                int randomForceID = getRandomItem(availableForceIDs);
 
                 // two scenarios on the same coordinates wind up increasing in size
                 if (track.getScenarios().containsKey(scenarioCoords)) {
@@ -645,6 +632,9 @@ public class StratConRulesManager {
 
         // First determine if the scenario is a Turning Point (that win/lose will affect CVP)
         determineIfTurningPointScenario(contract, scenario);
+        if (!scenario.isTurningPoint()) {
+            determineIfCrisisScenario(contract.getMoraleLevel(), backingScenario);
+        }
 
         // Then add any Cadre Duty units
         if (contract.getContractType().isCadreDuty()) {
@@ -756,6 +746,40 @@ public class StratConRulesManager {
                 }
             }
         }
+    }
+
+    /**
+     * Determines whether a scenario should be marked as a crisis scenario based on morale level and random chance.
+     *
+     * <p>This method evaluates whether a given scenario should be flagged as a "crisis" by performing a random roll
+     * based on the current morale level. Crisis scenarios represent critical situations that require immediate
+     * attention and may have significant consequences.</p>
+     *
+     * <p>The determination follows these rules:</p>
+     * <ul>
+     *   <li>If the scenario is already marked as a "special" scenario type (via {@link ScenarioType#isSpecial()}),
+     *       the method returns immediately without making any changes. Special scenarios cannot be crisis scenarios.</li>
+     *   <li>Otherwise, a random roll is performed using a die size determined by the current morale level
+     *       (via {@link AtBMoraleLevel#getCrisisDieSize()}).</li>
+     *   <li>If the roll results in {@code 0} (the minimum value), the scenario is marked as a crisis scenario.</li>
+     *   <li>If the roll results in any other value, the scenario is not marked as a crisis.</li>
+     * </ul>
+     *
+     * @param morale          The {@link AtBMoraleLevel} representing the current morale state, which determines the
+     *                        size of the die used for the crisis check.
+     * @param backingScenario The {@link AtBDynamicScenario} being evaluated. This scenario will be marked as a crisis
+     *                        if the conditions are met.
+     */
+    private static void determineIfCrisisScenario(AtBMoraleLevel morale, AtBDynamicScenario backingScenario) {
+        ScenarioType scenarioType = backingScenario.getStratConScenarioType();
+        boolean isSpecial = scenarioType.isSpecial();
+        if (isSpecial) {
+            return;
+        }
+
+        int crisisDieSize = morale.getCrisisDieSize();
+        int roll = randomInt(crisisDieSize);
+        backingScenario.setIsCrisis(roll == 0);
     }
 
     /**
@@ -1084,7 +1108,7 @@ public class StratConRulesManager {
      */
     public static void deployForceToCoords(StratConCoords coords, int forceID, Campaign campaign, AtBContract contract,
           StratConTrackState track, boolean sticky) {
-        CombatTeam combatTeam = campaign.getCombatTeamsTable().get(forceID);
+        CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(forceID);
 
         // This shouldn't be possible, but never hurts to have a little insurance
         if (combatTeam == null) {
@@ -1153,7 +1177,7 @@ public class StratConRulesManager {
                 // If the player doesn't have any available forces, we grab a force at random to
                 // seed the scenario
                 if (availableForceIDs.isEmpty()) {
-                    ArrayList<CombatTeam> combatTeams = campaign.getAllCombatTeams();
+                    ArrayList<CombatTeam> combatTeams = campaign.getCombatTeamsAsList();
                     if (!combatTeams.isEmpty()) {
                         combatTeam = getRandomItem(combatTeams);
 
@@ -1419,7 +1443,7 @@ public class StratConRulesManager {
 
         // Determine scan range
         int scanRangeIncrease = track.getScanRangeIncrease();
-        CombatTeam combatTeam = campaign.getCombatTeamsTable().get(forceID);
+        CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(forceID);
         if (combatTeam != null && combatTeam.getRole().isPatrol()) {
             scanRangeIncrease++;
         }
@@ -2111,7 +2135,7 @@ public class StratConRulesManager {
         if (lanceCommander != null) {
             Unit commanderUnit = lanceCommander.getUnit();
             if (commanderUnit != null) {
-                CombatTeam lance = campaign.getCombatTeamsTable().get(commanderUnit.getForceId());
+                CombatTeam lance = campaign.getCombatTeamsAsMap().get(commanderUnit.getForceId());
 
                 return (lance != null) && lance.getRole().isFrontline();
             }
@@ -2484,7 +2508,7 @@ public class StratConRulesManager {
     public static List<Integer> getAvailableForceIDs(Campaign campaign, AtBContract contract,
           boolean bypassRoleRestrictions) {
         // First, build a list of all combat teams in the campaign
-        ArrayList<CombatTeam> combatTeams = campaign.getAllCombatTeams();
+        ArrayList<CombatTeam> combatTeams = campaign.getCombatTeamsAsList();
 
         if (combatTeams.isEmpty()) {
             // If we don't have any combat teams, there is no point in continuing, so we exit early
@@ -2585,7 +2609,7 @@ public class StratConRulesManager {
             forcesInTracks.addAll(currentScenario.getFailedReinforcements());
         }
 
-        for (CombatTeam formation : campaign.getCombatTeamsTable().values()) {
+        for (CombatTeam formation : campaign.getCombatTeamsAsMap().values()) {
             Force force = campaign.getForce(formation.getForceId());
 
             if (force == null) {
@@ -2738,7 +2762,7 @@ public class StratConRulesManager {
         }
 
         // Check the associated combat team and its role
-        CombatTeam combatTeam = force.isCombatTeam() ? campaign.getCombatTeamsTable().get(forceId) : null;
+        CombatTeam combatTeam = force.isCombatTeam() ? campaign.getCombatTeamsAsMap().get(forceId) : null;
 
         if (combatTeam == null) {
             return false;
@@ -2931,8 +2955,8 @@ public class StratConRulesManager {
         // it can deploy "for free" (ReinforcementEligibilityType.ChainedScenario)
 
         // if the force is in 'fight' stance, it'll be able to deploy using 'fight lance' rules
-        if (campaign.getCombatTeamsTable().containsKey(forceID)) {
-            Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsTable();
+        if (campaign.getCombatTeamsAsMap().containsKey(forceID)) {
+            Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsAsMap();
             CombatTeam formation = combatTeamsTable.get(forceID);
 
             if (formation == null) {
@@ -2969,40 +2993,62 @@ public class StratConRulesManager {
     }
 
     /**
-     * Given a track and the current campaign state, and if the player is deploying a force or not, figure out the odds
-     * of a scenario occurring.
+     * Calculates the scenario odds for a given StratCon track and contract.
+     *
+     * <p>This method computes the likelihood of a scenario occurring by combining the base scenario odds from the
+     * track with modifiers based on the contract's morale level and data center adjustments.</p>
+     *
+     * <p>The calculation follows these rules:</p>
+     * <ul>
+     *   <li>If the contract's morale level is {@link AtBMoraleLevel#ROUTED}, the method immediately returns {@code
+     *   -1}, indicating that no scenarios can occur.</li>
+     *   <li>If {@code isReinforcements} is {@code true}, a morale-based modifier is applied:
+     *       <ul>
+     *         <li>{@link AtBMoraleLevel#CRITICAL}: -10 penalty</li>
+     *         <li>{@link AtBMoraleLevel#WEAKENED}: -5 penalty</li>
+     *         <li>{@link AtBMoraleLevel#ADVANCING}: +5 bonus</li>
+     *         <li>{@link AtBMoraleLevel#DOMINATING}: +20 bonus</li>
+     *         <li>{@link AtBMoraleLevel#OVERWHELMING}: +50 bonus</li>
+     *         <li>All other morale levels: no modifier</li>
+     *       </ul>
+     *   </li>
+     *   <li>The track's data center modifier is retrieved and applied to the final calculation.</li>
+     * </ul>
+     *
+     * <p>The final scenario odds value is calculated as:</p>
+     * <pre>
+     *     base scenario odds + morale modifier + data center modifier
+     * </pre>
+     *
+     * @param track            The {@link StratConTrackState} containing the base scenario odds and data center modifier
+     *                         information.
+     * @param contract         The {@link AtBContract} containing the morale level information that affects scenario
+     *                         odds.
+     * @param isReinforcements A flag indicating whether this calculation is for reinforcement scenarios. When
+     *                         {@code true}, morale modifiers are applied; when {@code false}, morale has no effect on
+     *                         the calculation.
+     *
+     * @return The calculated scenario odds value. Returns {@code -1} if the contract's morale level is
+     *       {@link AtBMoraleLevel#ROUTED}, indicating no scenarios should occur. Otherwise, returns the sum of the base
+     *       scenario odds, morale modifier (if applicable), and data center modifier.
      */
     public static int calculateScenarioOdds(StratConTrackState track, AtBContract contract, boolean isReinforcements) {
         if (contract.getMoraleLevel().isRouted()) {
             return -1;
         }
 
-        int moraleModifier = switch (contract.getMoraleLevel()) {
-            case CRITICAL -> {
-                if (isReinforcements) {
-                    yield -10;
-                } else {
-                    yield 0;
-                }
-            }
-            case WEAKENED -> -5;
-            case ADVANCING -> 5;
-            case DOMINATING -> {
-                if (isReinforcements) {
-                    yield 20;
-                } else {
-                    yield 10;
-                }
-            }
-            case OVERWHELMING -> {
-                if (isReinforcements) {
-                    yield 50;
-                } else {
-                    yield 25;
-                }
-            }
-            default -> 0;
-        };
+        int moraleModifier = 0;
+
+        if (isReinforcements) {
+            moraleModifier += switch (contract.getMoraleLevel()) {
+                case CRITICAL -> -10;
+                case WEAKENED -> -5;
+                case ADVANCING -> 5;
+                case DOMINATING -> 20;
+                case OVERWHELMING -> 50;
+                default -> 0;
+            };
+        }
 
         int dataCenterModifier = track.getScenarioOddsAdjustment();
 
@@ -3085,11 +3131,10 @@ public class StratConRulesManager {
                     }
 
                     ScenarioType scenarioType = backingScenario.getStratConScenarioType();
-                    if (scenarioType.isSpecial()) {
+                    if (scenarioType.isSpecial() || backingScenario.isCrisis()) {
                         if (!backingScenario.getStatus().isOverallVictory()) {
-                            // If the player loses this scenario, they lose -1 CVP. This represents
-                            // the importance of the intel the prisoners hold, or the penalty for
-                            // allowing an enemy force free rein in the player's logistics line.
+                            // If the player loses this scenario, they lose -1 CVP. This represents the importance of
+                            // the crisis.
                             campaignState.updateVictoryPoints(-1);
                         }
                     }
@@ -3296,8 +3341,11 @@ public class StratConRulesManager {
      */
     public static void processIgnoredStratConScenario(StratConScenario scenario, StratConTrackState track,
           StratConCampaignState campaignState) {
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        boolean isCrisis = backingScenario != null && backingScenario.isCrisis();
+
         // Update victory points if the scenario is marked as "special" or "turning point"
-        if (scenario.isSpecial() || scenario.isTurningPoint()) {
+        if (scenario.isSpecial() || scenario.isTurningPoint() || isCrisis) {
             campaignState.updateVictoryPoints(-1);
         }
 

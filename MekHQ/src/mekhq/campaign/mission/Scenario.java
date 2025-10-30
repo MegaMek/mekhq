@@ -95,6 +95,7 @@ public class Scenario implements IPlayerSettings {
     private String desc;
     private String report;
     private ScenarioStatus status;
+    private boolean isCrisis;
     private LocalDate date;
     private List<Integer> subForceIds;
     private List<UUID> unitIds;
@@ -168,6 +169,7 @@ public class Scenario implements IPlayerSettings {
         desc = "";
         report = "";
         setStatus(ScenarioStatus.CURRENT);
+        isCrisis = false;
         date = null;
         subForceIds = new ArrayList<>();
         unitIds = new ArrayList<>();
@@ -258,6 +260,14 @@ public class Scenario implements IPlayerSettings {
 
     public void setStatus(final ScenarioStatus status) {
         this.status = status;
+    }
+
+    public boolean isCrisis() {
+        return isCrisis;
+    }
+
+    public void setIsCrisis(final boolean isCrisis) {
+        this.isCrisis = isCrisis;
     }
 
     public @Nullable LocalDate getDate() {
@@ -946,6 +956,7 @@ public class Scenario implements IPlayerSettings {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingAnySEx", startingAnySEx);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingAnySEy", startingAnySEy);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "status", getStatus().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isCrisis", isCrisis);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "linkedScenarioID", linkedScenarioID);
         if (null != stub) {
@@ -1075,6 +1086,8 @@ public class Scenario implements IPlayerSettings {
                     retVal.setStratConScenarioType(ScenarioType.parseFromString(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
                     retVal.setStatus(ScenarioStatus.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("isCrisis")) {
+                    retVal.setIsCrisis(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.id = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {

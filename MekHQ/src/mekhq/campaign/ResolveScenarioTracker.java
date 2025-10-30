@@ -1101,11 +1101,12 @@ public class ResolveScenarioTracker {
             if (entity instanceof Tank) {
                 // Prefer gunner to driver, as in Unit::getCommander
                 for (Person p : crew) {
-                    if (p.getPrimaryRole().isVehicleGunner()) {
+                    boolean isGunner = unit.isGunner(p);
+                    if (isGunner) {
                         commander = p;
-                    } else if (p.getPrimaryRole().isGroundVehicleDriver() ||
-                                     p.getPrimaryRole().isNavalVehicleDriver() ||
-                                     p.getPrimaryRole().isVTOLPilot()) {
+                    } else if (p.getPrimaryRole().isVehicleCrewGround() ||
+                                     p.getPrimaryRole().isVehicleCrewNaval() ||
+                                     p.getPrimaryRole().isVehicleCrewVTOL()) {
                         driver = p;
                     }
                 }
