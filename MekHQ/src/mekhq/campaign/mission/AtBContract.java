@@ -365,7 +365,7 @@ public class AtBContract extends Contract {
      *
      * @return The number of lances required.
      *
-     * @deprecated use {@link ContractUtilities#calculateBaseNumberOfRequiredLances(Campaign)}
+     * @deprecated use {@link ContractUtilities#calculateBaseNumberOfRequiredLances(Campaign, boolean)}
      *       <p>
      *       Calculates the number of lances required for this contract, based on [campaign].
      */
