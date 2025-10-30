@@ -57,6 +57,7 @@ import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -99,6 +100,7 @@ public class Force {
     private int overrideCombatTeam;
     private FormationLevel formationLevel;
     private FormationLevel overrideFormationLevel;
+    private CombatRole combatRoleInMemory;
     private Force parentForce;
     private final Vector<Force> subForces;
     private final Vector<UUID> units;
@@ -122,6 +124,7 @@ public class Force {
         this.overrideCombatTeam = COMBAT_TEAM_OVERRIDE_NONE;
         this.formationLevel = FormationLevel.NONE;
         this.overrideFormationLevel = FormationLevel.NONE;
+        this.combatRoleInMemory = CombatRole.FRONTLINE;
         this.parentForce = null;
         this.subForces = new Vector<>();
         this.units = new Vector<>();
@@ -253,6 +256,14 @@ public class Force {
         } else {
             this.overrideFormationLevel = overrideFormationLevel;
         }
+    }
+
+    public CombatRole getCombatRoleInMemory() {
+        return combatRoleInMemory;
+    }
+
+    public void setCombatRoleInMemory(final CombatRole combatRoleInMemory) {
+        this.combatRoleInMemory = combatRoleInMemory;
     }
 
     public int getScenarioId() {
@@ -783,6 +794,7 @@ public class Force {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideCombatTeam", overrideCombatTeam);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideFormationLevel", overrideFormationLevel.toString());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "preferredRole", combatRoleInMemory.name());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "techId", techId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideForceCommanderID", overrideForceCommanderID);
@@ -835,6 +847,8 @@ public class Force {
                     force.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("overrideFormationLevel")) {
                     force.setOverrideFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("preferredRole")) {
+                    force.setCombatRoleInMemory(CombatRole.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     force.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
