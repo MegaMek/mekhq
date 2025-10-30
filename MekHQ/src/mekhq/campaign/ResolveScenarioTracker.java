@@ -89,6 +89,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.FileDialogs;
+import mekhq.gui.dialog.PostSalvagePicker;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -1778,65 +1779,7 @@ public class ResolveScenarioTracker {
             }
         }
 
-        // now lets take care of salvage
-        for (TestUnit salvageUnit : getActualSalvage()) {
-            UnitStatus salvageStatus = new UnitStatus(salvageUnit);
-            // FIXME: Need to implement a "fuel" part just like the "armor" part
-            if (salvageUnit.getEntity() instanceof Aero) {
-                ((Aero) salvageUnit.getEntity()).setFuelTonnage(((Aero) salvageStatus.getBaseEntity()).getFuelTonnage());
-            }
-            campaign.clearGameData(salvageUnit.getEntity());
-            campaign.addTestUnit(salvageUnit);
-            // if this is a contract, add to the salvaged value
-            if (isContract) {
-                ((Contract) mission).addSalvageByUnit(salvageUnit.getSellValue());
-            }
-        }
-
-        // And any ransomed salvaged units
-        if (!getSoldSalvage().isEmpty()) {
-            for (Unit ransomedUnit : getSoldSalvage()) {
-                unitRansoms = unitRansoms.plus(ransomedUnit.getSellValue());
-            }
-
-            if (unitRansoms.isGreaterThan(Money.zero())) {
-                getCampaign().getFinances()
-                      .credit(TransactionType.SALVAGE,
-                            getCampaign().getLocalDate(),
-                            unitRansoms,
-                            "Unit sales for " + getScenario().getName());
-                getCampaign().addReport(unitRansoms.toAmountAndSymbolString() +
-                                              " has been credited to your account from unit salvage sold following " +
-                                              getScenario().getHyperlinkedName() +
-                                              '.');
-                if (isContract) {
-                    ((Contract) mission).addSalvageByUnit(unitRansoms);
-                }
-            }
-        }
-
-        if (isContract) {
-            Money value = Money.zero();
-            for (Unit salvageUnit : getLeftoverSalvage()) {
-                value = value.plus(salvageUnit.getSellValue());
-            }
-            if (usesSalvageExchange()) {
-                value = value.multipliedBy(((Contract) mission).getSalvagePct()).dividedBy(100);
-                campaign.getFinances()
-                      .credit(TransactionType.SALVAGE_EXCHANGE,
-                            getCampaign().getLocalDate(),
-                            value,
-                            "Salvage exchange for " + scenario.getName());
-                campaign.addReport(value.toAmountAndSymbolString() +
-                                         " have been credited to your account for salvage exchange.");
-            } else {
-                ((Contract) mission).addSalvageByEmployer(value);
-            }
-        }
-
-        for (Unit unit : getActualSalvage()) {
-            unit.setSite(mission.getRepairLocation());
-        }
+        new PostSalvagePicker(campaign, mission, scenario, getActualSalvage(), getSoldSalvage(), getLeftoverSalvage());
 
         for (Loot loot : actualLoot) {
             loot.getLoot(campaign, scenario, unitsStatus);

@@ -1827,6 +1827,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
         salvageEmployer = ((Contract) tracker.getMission()).getSalvagedByEmployer();
         salvageUnit = ((Contract) tracker.getMission()).getSalvagedByUnit();
+        salvagePicksUsed = 0;
+        salvageTimeUsed = 0;
         for (int i = 0; i < salvageBoxes.size(); i++) {
             // Skip the escaping units
             if (escapeBoxes.get(i).isSelected()) {
