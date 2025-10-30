@@ -57,9 +57,9 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
+import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.gui.model.FilterableComboBoxModel;
 
 /**
