@@ -365,13 +365,13 @@ public class AtBContract extends Contract {
      *
      * @return The number of lances required.
      *
-     * @deprecated use {@link ContractUtilities#calculateBaseNumberOfRequiredLances(Campaign)}
+     * @deprecated use {@link ContractUtilities#calculateBaseNumberOfRequiredLances(Campaign, boolean)}
      *       <p>
      *       Calculates the number of lances required for this contract, based on [campaign].
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static int calculateBaseNumberOfRequiredLances(Campaign campaign) {
-        return ContractUtilities.calculateBaseNumberOfRequiredLances(campaign);
+        return ContractUtilities.calculateBaseNumberOfRequiredLances(campaign, false);
     }
 
     /**
@@ -1566,7 +1566,8 @@ public class AtBContract extends Contract {
             enemyCode = "REB";
         }
 
-        setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
+        setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
+              contractType.isCadreDuty()));
         setRequiredCombatElements(ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(campaign));
 
         setPartsAvailabilityLevel(getContractType().calculatePartsAvailabilityLevel());

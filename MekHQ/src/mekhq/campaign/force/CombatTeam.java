@@ -647,7 +647,7 @@ public class CombatTeam {
                           getBattleDate(campaign.getLocalDate()));
                 }
             }
-            case TRAINING: {
+            case TRAINING, CADRE: {
                 roll = Compute.randomInt(10) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(campaign,

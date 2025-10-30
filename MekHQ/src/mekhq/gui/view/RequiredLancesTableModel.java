@@ -33,10 +33,10 @@
  */
 package mekhq.gui.view;
 
+import static mekhq.campaign.mission.enums.CombatRole.CADRE;
 import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
 import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
 import static mekhq.campaign.mission.enums.CombatRole.PATROL;
-import static mekhq.campaign.mission.enums.CombatRole.TRAINING;
 
 import java.util.ArrayList;
 import javax.swing.SwingConstants;
@@ -62,7 +62,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
         this.campaign = campaign;
         data = new ArrayList<>();
         columnNames = new String[] { "Contract", "Total", MANEUVER.toString(), FRONTLINE.toString(), PATROL.toString(),
-                                     TRAINING.toString() };
+                                     CADRE.toString() };
     }
 
     @Override
@@ -118,7 +118,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
                 AtBContract assignedContract = combatTeam.getContract(campaign);
                 boolean isCadreDuty = assignedContract.getContractType().isCadreDuty();
                 CombatRole role = combatTeam.getRole();
-                boolean isRoleSuitable = (isCadreDuty && role.isTraining()) || role.isCombatRole();
+                boolean isRoleSuitable = (isCadreDuty && role.isCadre()) || role.isCombatRole();
                 boolean isDeploymentEligible = combatTeam.isEligible(campaign);
 
                 if ((data.get(row).equals(assignedContract)) && isRoleSuitable && isDeploymentEligible) {

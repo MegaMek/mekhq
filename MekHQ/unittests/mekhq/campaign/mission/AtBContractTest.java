@@ -57,6 +57,7 @@ import mekhq.campaign.force.ForceType;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.mission.AtBContract.AtBContractRef;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -348,7 +349,7 @@ public class AtBContractTest {
             when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(1, teams);
@@ -365,7 +366,7 @@ public class AtBContractTest {
             when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(1, teams);
@@ -384,7 +385,7 @@ public class AtBContractTest {
             when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(3, teams);
@@ -403,7 +404,7 @@ public class AtBContractTest {
             when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(9, teams);
@@ -420,7 +421,7 @@ public class AtBContractTest {
             when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(1, teams);
@@ -439,7 +440,7 @@ public class AtBContractTest {
             when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(3, teams);
@@ -458,7 +459,7 @@ public class AtBContractTest {
             when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(9, teams);
@@ -476,7 +477,7 @@ public class AtBContractTest {
             when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(2, teams);
@@ -496,7 +497,7 @@ public class AtBContractTest {
             when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(4, teams);
@@ -523,6 +524,7 @@ public class AtBContractTest {
             when(mockForce.getFormationLevel()).thenReturn(FormationLevel.INVALID);
             when(mockForce.getAllChildren(mockCampaign)).thenReturn(mockUnits);
             when(mockForce.getAllUnits(anyBoolean())).thenReturn(mockUUIDs);
+            when(mockForce.getCombatRoleInMemory()).thenReturn(CombatRole.FRONTLINE);
 
             forceId = getNextForceId();
 
@@ -540,6 +542,7 @@ public class AtBContractTest {
             when(mockForce2.getFormationLevel()).thenReturn(FormationLevel.INVALID);
             when(mockForce2.getAllChildren(mockCampaign)).thenReturn(mockUnits2);
             when(mockForce2.getAllUnits(anyBoolean())).thenReturn(mockUUIDs2);
+            when(mockForce2.getCombatRoleInMemory()).thenReturn(CombatRole.FRONTLINE);
 
             forceId = getNextForceId();
 
@@ -557,6 +560,7 @@ public class AtBContractTest {
             when(finalForce.getFormationLevel()).thenReturn(FormationLevel.LANCE);
             when(finalForce.getAllChildren(mockCampaign)).thenReturn(allForces);
             when(finalForce.getAllUnits(anyBoolean())).thenReturn(allMockUUIDs);
+            when(finalForce.getCombatRoleInMemory()).thenReturn(CombatRole.FRONTLINE);
 
             forceId = getNextForceId();
 
@@ -571,7 +575,7 @@ public class AtBContractTest {
             when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(1, teams);
@@ -589,6 +593,8 @@ public class AtBContractTest {
         private CombatTeam getMockLanceCombatTeam(int formationSize) {
             Force mockForce = getMockLanceForce(formationSize);
             int forceId = mockForce.getId();
+
+            when(mockForce.getCombatRoleInMemory()).thenReturn(CombatRole.FRONTLINE);
 
             CombatTeam mockLance = mock(CombatTeam.class);
             when(mockLance.getSize(mockCampaign)).thenReturn(formationSize);
@@ -631,6 +637,7 @@ public class AtBContractTest {
 
             when(mockCompany.getSize(mockCampaign)).thenReturn(formationSize * 3);
             when(mockCompany.getForce(mockCampaign)).thenReturn(mockForce);
+            when(mockForce.getCombatRoleInMemory()).thenReturn(CombatRole.FRONTLINE);
             when(mockCompany.getForceId()).thenReturn(forceId);
 
             return mockCompany;
@@ -657,6 +664,7 @@ public class AtBContractTest {
             when(mockCompany.getFormationLevel()).thenReturn(FormationLevel.COMPANY);
             when(mockCompany.getAllChildren(mockCampaign)).thenReturn(subForces);
             when(mockCompany.getAllUnits(anyBoolean())).thenReturn(mockUUIDs);
+            when(mockCompany.getCombatRoleInMemory()).thenReturn(CombatRole.FRONTLINE);
 
             return mockCompany;
         }

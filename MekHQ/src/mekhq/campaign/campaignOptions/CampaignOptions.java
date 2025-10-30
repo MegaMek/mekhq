@@ -1302,6 +1302,7 @@ public class CampaignOptions {
         atbBattleChance[CombatRole.FRONTLINE.ordinal()] = 20;
         atbBattleChance[CombatRole.PATROL.ordinal()] = 60;
         atbBattleChance[CombatRole.TRAINING.ordinal()] = 10;
+        atbBattleChance[CombatRole.CADRE.ordinal()] = 10;
         generateChases = true;
 
         // Scenarios
