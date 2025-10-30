@@ -477,7 +477,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(contract, unitRatingMod, campaign);
 
-        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
+        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
+              contract.getContractType().isCadreDuty()));
         contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
 
@@ -576,7 +577,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         contract.setTransportComp(100);
 
-        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
+        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
+              contract.getContractType().isCadreDuty()));
         contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
@@ -649,7 +651,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.setAllyQuality(contract.getAllyQuality());
         followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(followup, campaign.getAtBUnitRatingMod(), campaign);
-        followup.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
+        followup.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
+              contract.getContractType().isCadreDuty()));
         contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false));
         followup.setMultiplier(calculatePaymentMultiplier(campaign, followup));
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());

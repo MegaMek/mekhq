@@ -348,7 +348,7 @@ public class AtBContractTest {
             when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(1, teams);
@@ -365,7 +365,7 @@ public class AtBContractTest {
             when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(1, teams);
@@ -384,7 +384,7 @@ public class AtBContractTest {
             when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(3, teams);
@@ -403,7 +403,7 @@ public class AtBContractTest {
             when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(9, teams);
@@ -420,7 +420,7 @@ public class AtBContractTest {
             when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(1, teams);
@@ -439,7 +439,7 @@ public class AtBContractTest {
             when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(3, teams);
@@ -458,7 +458,7 @@ public class AtBContractTest {
             when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(9, teams);
@@ -476,7 +476,7 @@ public class AtBContractTest {
             when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(2, teams);
@@ -496,7 +496,7 @@ public class AtBContractTest {
             when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(4, teams);
@@ -571,7 +571,7 @@ public class AtBContractTest {
             when(mockCampaign.getAllCombatTeams()).thenReturn(mockedCombatTeams);
 
             // Act
-            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign);
+            int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false);
             int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
             // Assert
             assertEquals(1, teams);

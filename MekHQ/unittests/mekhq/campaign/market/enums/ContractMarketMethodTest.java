@@ -162,7 +162,7 @@ public class ContractMarketMethodTest {
             try (MockedStatic<ContractUtilities> contractUtilities = Mockito.mockStatic(ContractUtilities.class)) {
                 contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(
                       mockCampaign)).thenReturn(UNITS_IN_COMBAT_TEAMS);
-                contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign))
+                contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false))
                       .thenReturn(COMBAT_TEAMS);
                 // Act
                 teams = contractMarket.calculateRequiredCombatElements(mockCampaign, mockAtBContract, true);
@@ -234,7 +234,7 @@ public class ContractMarketMethodTest {
             try (MockedStatic<ContractUtilities> contractUtilities = Mockito.mockStatic(ContractUtilities.class)) {
                 contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(
                       mockCampaign)).thenReturn(Math.max(UNITS_IN_COMBAT_TEAMS, 1));
-                contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign))
+                contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false))
                       .thenReturn(Math.max(COMBAT_TEAMS, 1));
                 try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
                     // Let's go from the lowest possible roll to the highest and collect all the required unit counts
