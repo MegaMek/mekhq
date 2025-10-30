@@ -606,10 +606,12 @@ public class AtBContract extends Contract {
      * <p>For standard contracts, this aggregates scores from all completed scenarios and applies any arbitrary
      * modifiers that have been set for this contract.</p>
      *
+     * @param isUseMaplessMode {@code true} if mapless mode is enabled in StratCon
+     *
      * @return the total contract score, including victory points or scenario scores plus modifiers
      */
-    public int getContractScore() {
-        if (stratconCampaignState != null) {
+    public int getContractScore(boolean isUseMaplessMode) {
+        if (!isUseMaplessMode && stratconCampaignState != null) {
             return stratconCampaignState.getVictoryPoints();
         }
 
