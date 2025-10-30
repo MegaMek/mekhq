@@ -2328,6 +2328,8 @@ public class Person {
         String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, true);
         if (spaGained == null) {
             return;
+        } else {
+            hasGainedVeterancySPA = true;
         }
 
         String spaGainedMessage = getVeterancyAwardReport(spaGained);
