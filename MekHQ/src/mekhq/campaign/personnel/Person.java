@@ -2328,7 +2328,7 @@ public class Person {
         }
 
         SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-        String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, true);
+        String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, true, true);
         if (spaGained == null) {
             return;
         } else {

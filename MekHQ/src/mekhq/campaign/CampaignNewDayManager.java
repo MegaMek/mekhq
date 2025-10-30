@@ -1261,7 +1261,7 @@ public class CampaignNewDayManager {
         if (isBirthday && (person.getAge(today) == 16)) {
             if (campaignOptions.isRewardComingOfAgeAbilities()) {
                 SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-                singleSpecialAbilityGenerator.rollSPA(campaign, person, true, true);
+                singleSpecialAbilityGenerator.rollSPA(campaign, person, true, true, false);
             }
 
             if (campaignOptions.isRewardComingOfAgeRPSkills()) {
