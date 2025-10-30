@@ -33,6 +33,7 @@
  */
 package mekhq.gui.dialog;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.RESUPPLY_LOOT_BOX_NAME;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
@@ -82,6 +83,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjectiveProcessor;
+import mekhq.campaign.mission.camOpsSalvage.RecoveryTimeData;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
@@ -161,11 +163,17 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JLabel lblSalvageValueUnit2;
     private JLabel lblSalvageValueEmployer2;
     private JLabel lblSalvagePct2;
+    private JLabel lblSalvageTime2;
+    private JLabel lblSalvagePicks2;
 
     private Money salvageEmployer = Money.zero();
     private Money salvageUnit = Money.zero();
     private int currentSalvagePct;
     private int maxSalvagePct;
+    private final int salvagePicksMaximum;
+    private int salvagePicksUsed;
+    private final int salvageTimeMaximum;
+    private int salvageTimeUsed;
     // endregion Salvage Panel Components
 
     /*
@@ -208,10 +216,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
         objectiveProcessor = new ScenarioObjectiveProcessor();
         loots = tracker.getPotentialLoot();
         salvageableUnites = new ArrayList<>();
-        if (tracker.getMission() instanceof Contract) {
-            salvageEmployer = ((Contract) tracker.getMission()).getSalvagedByEmployer();
-            salvageUnit = ((Contract) tracker.getMission()).getSalvagedByUnit();
-            maxSalvagePct = ((Contract) tracker.getMission()).getSalvagePct();
+        if (tracker.getMission() instanceof Contract contract) {
+            salvageEmployer = contract.getSalvagedByEmployer();
+            salvageUnit = contract.getSalvagedByUnit();
+            maxSalvagePct = contract.getSalvagePct();
 
             currentSalvagePct = 0;
             if (salvageUnit.plus(salvageEmployer).isPositive()) {
@@ -221,6 +229,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
                                           .intValue();
             }
         }
+
+        salvageTimeMaximum = 480;
+        salvageTimeUsed = 0;
+
+        salvagePicksMaximum = 6; // TODO introduce salvage crews MUHAHAHAHAAAA
+        salvagePicksUsed = 0;
+
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
@@ -616,7 +631,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             pnlSalvageValue.add(lblSalvageValueEmployer2, gridBagConstraints);
 
             JLabel lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvagePct1.text"));
-            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridx = gridx;
             gridBagConstraints.gridy = gridY++;
             pnlSalvageValue.add(lblSalvagePct1, gridBagConstraints);
 
@@ -634,8 +649,28 @@ public class ResolveScenarioWizardDialog extends JDialog {
                                        maxSalvagePct +
                                        "%)</span></html>";
             lblSalvagePct2 = new JLabel(salvageUsed);
-            gridBagConstraints.gridx = gridx;
+            gridBagConstraints.gridx = gridx + 1;
             pnlSalvageValue.add(lblSalvagePct2, gridBagConstraints);
+
+            JLabel lblSalvageTime1 = new JLabel(resourceMap.getString("lblSalvageTime.text"));
+            gridBagConstraints.gridx = gridx;
+            gridBagConstraints.gridy = gridY++;
+            pnlSalvageValue.add(lblSalvageTime1, gridBagConstraints);
+
+            lblSalvageTime2 = new JLabel(String.format(resourceMap.getString("lblSalvageTime.format"),
+                  salvageTimeUsed, salvageTimeMaximum));
+            gridBagConstraints.gridx = gridx + 1;
+            pnlSalvageValue.add(lblSalvageTime2, gridBagConstraints);
+
+            JLabel lblSalvagePicks1 = new JLabel(resourceMap.getString("lblSalvagePicks.text"));
+            gridBagConstraints.gridx = gridx;
+            gridBagConstraints.gridy = gridY++;
+            pnlSalvageValue.add(lblSalvagePicks1, gridBagConstraints);
+
+            lblSalvagePicks2 = new JLabel(String.format(resourceMap.getString("lblSalvagePicks.format"),
+                  salvagePicksUsed, salvagePicksMaximum));
+            gridBagConstraints.gridx = gridx + 1;
+            pnlSalvageValue.add(lblSalvagePicks2, gridBagConstraints);
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -657,6 +692,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+
+        gridBagConstraints.gridx = gridx++;
+        pnlSalvage.add(new JLabel(resourceMap.getString("lblSalvageTime.label")), gridBagConstraints);
 
         gridBagConstraints.gridx = gridx++;
         pnlSalvage.add(new JLabel(resourceMap.getString("lblSalvage.text")), gridBagConstraints);
@@ -697,11 +735,23 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = gridx++;
             pnlSalvage.add(salvageUnit, gridBagConstraints);
 
+            int timeToSalvage = 0;
+            RecoveryTimeData recoveredUnit = tracker.getRecoveryTime().get(unit.getId());
+            if (recoveredUnit != null) {
+                timeToSalvage = recoveredUnit.totalRecoveryTime();
+            }
+            JLabel timeToSalvageLabel = new JLabel(timeToSalvage + " (?)");
+            if (recoveredUnit != null) {
+                timeToSalvageLabel.setToolTipText(wordWrap(recoveredUnit.getRecoveryTimeBreakdownString(false)));
+            }
+            salvageUnitLabel.add(salvageUnit);
+            gridBagConstraints.gridx = gridx++;
+            pnlSalvage.add(timeToSalvageLabel, gridBagConstraints);
+
             JCheckBox salvaged = new JCheckBox("");
             salvaged.setName("salvaged");
             salvaged.getAccessibleContext().setAccessibleName(resourceMap.getString("lblSalvage.text"));
             salvaged.setEnabled(!tracker.usesSalvageExchange());
-            salvaged.setSelected(!tracker.usesSalvageExchange() && (maxSalvagePct >= 100));
             salvaged.addItemListener(evt -> checkSalvageRights());
             salvageBoxes.add(salvaged);
             gridBagConstraints.anchor = GridBagConstraints.NORTH;
@@ -1786,6 +1836,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
             // Set up the values
             if (salvageBoxes.get(i).isSelected() || soldUnitBoxes.get(i).isSelected()) {
                 salvageUnit = salvageUnit.plus(salvageableUnites.get(i).getSellValue());
+                salvagePicksUsed++;
+                salvageTimeUsed += tracker.getRecoveryTime().get(salvageableUnites.get(i).getId()).totalRecoveryTime();
             } else {
                 salvageEmployer = salvageEmployer.plus(salvageableUnites.get(i).getSellValue());
             }
@@ -1815,6 +1867,16 @@ public class ResolveScenarioWizardDialog extends JDialog {
                     soldUnitBoxes.get(i).setEnabled(false);
                 }
             }
+
+            if (salvagePicksUsed >= salvagePicksMaximum || salvageTimeUsed >= salvageTimeMaximum) {
+                if (!salvageBoxes.get(i).isSelected()) {
+                    salvageBoxes.get(i).setEnabled(false);
+                }
+
+                if (!soldUnitBoxes.get(i).isSelected()) {
+                    soldUnitBoxes.get(i).setEnabled(false);
+                }
+            }
         }
         lblSalvageValueUnit2.setText(salvageUnit.toAmountAndSymbolString());
         lblSalvageValueEmployer2.setText(salvageEmployer.toAmountAndSymbolString());
@@ -1830,8 +1892,15 @@ public class ResolveScenarioWizardDialog extends JDialog {
                                    "<span>(max " +
                                    maxSalvagePct +
                                    "%)</span></html>";
-
         lblSalvagePct2.setText(salvageUsed);
+
+        String picksUsed = String.format(resourceMap.getString("lblSalvagePicks.format"), salvagePicksUsed,
+              salvagePicksMaximum);
+        lblSalvagePicks2.setText(picksUsed);
+
+        String timeUsed = String.format(resourceMap.getString("lblSalvageTime.format"), salvageTimeUsed,
+              salvageTimeMaximum);
+        lblSalvageTime2.setText(timeUsed);
     }
 
     /**

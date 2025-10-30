@@ -75,6 +75,8 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.camOpsSalvage.RecoveryTimeCalculations;
+import mekhq.campaign.mission.camOpsSalvage.RecoveryTimeData;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -103,6 +105,7 @@ public class ResolveScenarioTracker {
     Map<Integer, UUID> idMap;
     Hashtable<UUID, UnitStatus> unitsStatus;
     Hashtable<UUID, UnitStatus> salvageStatus;
+    Hashtable<UUID, RecoveryTimeData> recoveryTime;
     Hashtable<UUID, Crew> pilots;
     Hashtable<UUID, Crew> mia;
     List<TestUnit> potentialSalvage;
@@ -140,6 +143,7 @@ public class ResolveScenarioTracker {
         this.control = ctrl;
         unitsStatus = new Hashtable<>();
         salvageStatus = new Hashtable<>();
+        recoveryTime = new Hashtable<>();
         potentialSalvage = new ArrayList<>();
         dropShipBonus = Money.zero();
         alliedUnits = new ArrayList<>();
@@ -305,6 +309,11 @@ public class ResolveScenarioTracker {
                     unitStatus.setTotalLoss(false);
                     salvageStatus.put(newUnit.getId(), unitStatus);
                     potentialSalvage.add(newUnit);
+
+                    RecoveryTimeData recoveryTimeData = RecoveryTimeCalculations.calculateRecoveryTimeForEntity(
+                          entity.getDisplayName(), entity.getRecoveryTime(), scenario,
+                          getCampaign().getLocation().getPlanet());
+                    recoveryTime.put(newUnit.getId(), recoveryTimeData);
                 }
             }
             // Kill credit automatically assigned only if they can't escape
@@ -462,6 +471,11 @@ public class ResolveScenarioTracker {
                     us.setTotalLoss(false);
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
+
+                    RecoveryTimeData recoveryTimeData = RecoveryTimeCalculations.calculateRecoveryTimeForEntity(
+                          wreck.getDisplayName(), wreck.getRecoveryTime(), scenario,
+                          getCampaign().getLocation().getPlanet());
+                    recoveryTime.put(nu.getId(), recoveryTimeData);
                 }
             }
 
@@ -1414,6 +1428,10 @@ public class ResolveScenarioTracker {
                     us.setTotalLoss(false);
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
+
+                    RecoveryTimeData recoveryTimeData = RecoveryTimeCalculations.calculateRecoveryTimeForEntity(
+                          e.getDisplayName(), e.getRecoveryTime(), scenario, getCampaign().getLocation().getPlanet());
+                    recoveryTime.put(nu.getId(), recoveryTimeData);
                 }
             }
         }
@@ -1890,6 +1908,10 @@ public class ResolveScenarioTracker {
 
     public Hashtable<UUID, UnitStatus> getSalvageStatus() {
         return salvageStatus;
+    }
+
+    public Hashtable<UUID, RecoveryTimeData> getRecoveryTime() {
+        return recoveryTime;
     }
 
     public Map<UUID, Entity> getAllInvolvedUnits() {

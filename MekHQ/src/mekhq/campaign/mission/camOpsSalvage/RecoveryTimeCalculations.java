@@ -107,14 +107,14 @@ public class RecoveryTimeCalculations {
      *       minutes.
      */
     public static RecoveryTimeData calculateRecoveryTimeForEntity(String entityName, int baseRecoveryTime,
-          Scenario scenario, Planet currentPlanet) {
+          Scenario scenario, @Nullable Planet currentPlanet) {
         // Multipliers
         double weatherMultiplier = getWeatherMultiplier(scenario.getWeather());
         double windMultiplier = getWindMultiplier(scenario.getWind());
         double temperatureMultiplier = getTemperatureMultiplier(scenario.getTemperature());
         double gravityMultiplier = getGravityMultiplier(scenario.getGravity());
         double atmosphereMultiplier = getAtmosphereMultiplier(scenario.getAtmosphere(),
-              currentPlanet.getAtmosphere(scenario.getDate()));
+              currentPlanet == null ? null : currentPlanet.getAtmosphere(scenario.getDate()));
         double lightMultiplier = getLightMultiplier(scenario.getLight());
 
         // Total

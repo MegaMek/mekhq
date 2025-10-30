@@ -66,7 +66,7 @@ public record RecoveryTimeData(
       double atmosphereMultiplier,
       double lightMultiplier,
       double baseRecoveryTime,
-      double totalRecoveryTime
+      int totalRecoveryTime
 ) {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CamOpsSalvage";
 
