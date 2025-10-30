@@ -458,7 +458,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
             CombatRole combatRole = CombatRole.parseFromString(st.nextToken());
             singleForce.setCombatRoleInMemory(combatRole);
-            CombatTeam team = gui.getCampaign().getCombatTeamsTable().get(singleForce.getId());
+            CombatTeam team = gui.getCampaign().getCombatTeamsAsMap().get(singleForce.getId());
             if (team != null) {
                 team.setRole(combatRole);
                 gui.refreshAllTabs();
