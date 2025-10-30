@@ -890,11 +890,20 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private boolean displaySalvageForcePicker(Scenario scenario) {
+        scenario.getSalvageForces().clear(); // reset, in case we've previously canceled out of the dialog
+
         Hangar hangar = getCampaign().getHangar();
         boolean isSpaceScenario = scenario.getBoardType() == AtBScenario.T_SPACE;
 
         List<Force> salvageForceOptions = getSalvageForces(hangar, isSpaceScenario);
         SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), scenario, salvageForceOptions);
+        boolean wasConfirmed = forcePicker.wasConfirmed();
+        if (wasConfirmed) {
+            List<Force> selectedForces = forcePicker.getSelectedForces();
+            for (Force force : selectedForces) {
+                scenario.addSalvageForce(force.getId());
+            }
+        }
 
         return forcePicker.wasConfirmed();
     }
@@ -931,34 +940,35 @@ public final class BriefingTab extends CampaignGuiTab {
         List<Integer> visitedForceIds = new ArrayList<>();
         List<Force> salvageForceOptions = new ArrayList<>();
 
+        // Collect Combat Teams
         for (CombatTeam combatTeam : getCampaign().getCombatTeamsAsList()) {
-            int forceId = combatTeam.getForceId();
-            Force force = getCampaign().getForce(forceId);
-            if (force != null) {
-                visitedForceIds.add(forceId);
+            Force force = getCampaign().getForce(combatTeam.getForceId());
+            if (force == null) {
+                continue;
+            }
 
-                for (Force subForce : force.getSubForces()) {
-                    visitedForceIds.add(subForce.getId());
-                }
+            visitedForceIds.add(force.getId());
+            force.getSubForces().forEach(subForce -> visitedForceIds.add(subForce.getId()));
 
-                if (!force.isDeployed()) {
-                    if (force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
-                        salvageForceOptions.add(force);
-                    }
-                }
+            if (!force.isDeployed() && force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
+                salvageForceOptions.add(force);
             }
         }
 
-        // Collect non-Combat Teams
+        // Collect non-Combat Team salvage forces
         for (Force force : getCampaign().getAllForces()) {
             if (visitedForceIds.contains(force.getId())) {
                 continue;
             }
 
-            if (force.getForceType().isSalvage() && !force.getUnits().isEmpty()) {
-                if (force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
-                    salvageForceOptions.add(force);
-                }
+            Force parentForce = force.getParentForce();
+            if (parentForce != null && parentForce.getForceType().isSalvage()) {
+                continue;
+            }
+
+            if (force.getForceType().isSalvage() && force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
+                salvageForceOptions.add(force);
+                visitedForceIds.add(force.getId());
             }
         }
 

@@ -99,6 +99,8 @@ public class Scenario implements IPlayerSettings {
     private LocalDate date;
     private List<Integer> subForceIds;
     private List<UUID> unitIds;
+    private final List<Integer> salvageForces; // Not serialized
+    private final List<UUID> salvageTechs; // Not serialized
     private int id = S_DEFAULT_ID;
     private int missionId;
     private ForceStub stub;
@@ -173,6 +175,8 @@ public class Scenario implements IPlayerSettings {
         date = null;
         subForceIds = new ArrayList<>();
         unitIds = new ArrayList<>();
+        salvageForces = new ArrayList<>();
+        salvageTechs = new ArrayList<>();
         loots = new ArrayList<>();
         scenarioObjectives = new ArrayList<>();
         playerTransportLinkages = new HashMap<>();
@@ -636,6 +640,22 @@ public class Scenario implements IPlayerSettings {
             force.addUnit(uid);
         }
         return force;
+    }
+
+    public List<Integer> getSalvageForces() {
+        return salvageForces;
+    }
+
+    public void addSalvageForce(int forceId) {
+        salvageForces.add(forceId);
+    }
+
+    public List<UUID> getSalvageTechs() {
+        return salvageTechs;
+    }
+
+    public void addSalvageTech(UUID personId) {
+        salvageTechs.add(personId);
     }
 
     /**
