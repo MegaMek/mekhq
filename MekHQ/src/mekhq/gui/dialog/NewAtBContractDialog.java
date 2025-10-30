@@ -568,7 +568,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setDesc(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
 
-        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
+        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
+              contract.getContractType().isCadreDuty()));
 
         AbstractContractMarket contractMarket = campaign.getContractMarket();
         if (contractMarket != null) {

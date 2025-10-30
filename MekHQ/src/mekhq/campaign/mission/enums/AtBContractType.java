@@ -202,7 +202,7 @@ public enum AtBContractType {
      */
     public CombatRole getRequiredCombatRole() {
         return switch (this) {
-            case CADRE_DUTY -> CombatRole.TRAINING;
+            case CADRE_DUTY -> CombatRole.CADRE;
             case GARRISON_DUTY, SECURITY_DUTY, RIOT_DUTY -> CombatRole.MANEUVER;
             case GUERRILLA_WARFARE, PIRATE_HUNTING, PLANETARY_ASSAULT, RELIEF_DUTY -> CombatRole.FRONTLINE;
             case DIVERSIONARY_RAID, EXTRACTION_RAID, OBJECTIVE_RAID, RECON_RAID -> CombatRole.PATROL;

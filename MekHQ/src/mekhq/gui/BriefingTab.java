@@ -106,6 +106,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -119,6 +120,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -573,7 +575,14 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // Undeploy forces
+        boolean isCadreDuty = mission instanceof AtBContract && ((AtBContract) mission).getContractType().isCadreDuty();
+        boolean hadCadreForces = false;
         for (Force force : getCampaign().getAllForces()) {
+            if (isCadreDuty && force.getCombatRoleInMemory().isCadre()) {
+                force.setCombatRoleInMemory(CombatRole.FRONTLINE);
+                hadCadreForces = true;
+            }
+
             int scenarioAssignment = force.getScenarioId();
             if (scenarioAssignment != NO_ASSIGNED_SCENARIO) {
                 Scenario scenario = getCampaign().getScenario(force.getScenarioId());
@@ -583,6 +592,11 @@ public final class BriefingTab extends CampaignGuiTab {
                     force.setScenarioId(NO_ASSIGNED_SCENARIO, getCampaign());
                 }
             }
+        }
+
+        if (hadCadreForces) {
+            new ImmersiveDialogNotification(getCampaign(), resourceMap.getString("cadreReassignment.text"),
+                  true);
         }
 
         // Resolve any outstanding scenarios
