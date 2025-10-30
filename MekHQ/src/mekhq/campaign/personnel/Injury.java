@@ -56,6 +56,7 @@ import mekhq.adapter.DateAdapter;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.personnel.enums.InjuryHiding;
 import mekhq.campaign.personnel.enums.InjuryLevel;
+import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import org.w3c.dom.Node;
 

@@ -264,30 +264,30 @@ public record AtBEventProcessor(Campaign campaign) {
                           en.getMovementMode() == EntityMovementMode.WHEELED ||
                           en.getMovementMode() == EntityMovementMode.HOVER ||
                           en.getMovementMode() == EntityMovementMode.WIGE) {
-                    if (p.getPrimaryRole().isVTOLPilot()) {
+                    if (p.getPrimaryRole().isVehicleCrewVTOL()) {
                         swapSkills(p, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_GVEE);
-                        p.setPrimaryRoleDirect(PersonnelRole.GROUND_VEHICLE_DRIVER);
-                    } else if (p.getPrimaryRole().isNavalVehicleDriver()) {
+                        p.setPrimaryRoleDirect(PersonnelRole.VEHICLE_CREW_GROUND);
+                    } else if (p.getPrimaryRole().isVehicleCrewNaval()) {
                         swapSkills(p, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_GVEE);
-                        p.setPrimaryRoleDirect(PersonnelRole.GROUND_VEHICLE_DRIVER);
+                        p.setPrimaryRoleDirect(PersonnelRole.VEHICLE_CREW_GROUND);
                     }
                 } else if (en.getMovementMode() == EntityMovementMode.VTOL) {
-                    if (p.getPrimaryRole().isGroundVehicleDriver()) {
+                    if (p.getPrimaryRole().isVehicleCrewGround()) {
                         swapSkills(p, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_VTOL);
-                        p.setPrimaryRoleDirect(PersonnelRole.VTOL_PILOT);
-                    } else if (p.getPrimaryRole().isNavalVehicleDriver()) {
+                        p.setPrimaryRoleDirect(PersonnelRole.VEHICLE_CREW_VTOL);
+                    } else if (p.getPrimaryRole().isVehicleCrewNaval()) {
                         swapSkills(p, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_VTOL);
-                        p.setPrimaryRoleDirect(PersonnelRole.VTOL_PILOT);
+                        p.setPrimaryRoleDirect(PersonnelRole.VEHICLE_CREW_VTOL);
                     }
                 } else if (en.getMovementMode() == EntityMovementMode.NAVAL ||
                                  en.getMovementMode() == EntityMovementMode.HYDROFOIL ||
                                  en.getMovementMode() == EntityMovementMode.SUBMARINE) {
-                    if (p.getPrimaryRole().isGroundVehicleDriver()) {
+                    if (p.getPrimaryRole().isVehicleCrewGround()) {
                         swapSkills(p, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_NVEE);
-                        p.setPrimaryRoleDirect(PersonnelRole.NAVAL_VEHICLE_DRIVER);
-                    } else if (p.getPrimaryRole().isVTOLPilot()) {
+                        p.setPrimaryRoleDirect(PersonnelRole.VEHICLE_CREW_NAVAL);
+                    } else if (p.getPrimaryRole().isVehicleCrewVTOL()) {
                         swapSkills(p, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_NVEE);
-                        p.setPrimaryRoleDirect(PersonnelRole.NAVAL_VEHICLE_DRIVER);
+                        p.setPrimaryRoleDirect(PersonnelRole.VEHICLE_CREW_NAVAL);
                     }
                 }
             }

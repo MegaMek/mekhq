@@ -149,6 +149,14 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     private boolean commitForces = false;
 
+    public StratConScenarioWizard getStratConScenarioWizard() {
+        return scenarioWizard;
+    }
+
+    public TrackForceAssignmentUI getAssignmentUI() {
+        return assignmentUI;
+    }
+
     /**
      * Constructs a StratConPanel instance, given a parent campaign GUI and a pointer to an info area.
      */
@@ -886,8 +894,16 @@ public class StratConPanel extends JPanel implements ActionListener {
         return currentTrack;
     }
 
+    public void setCurrentTrack(StratConTrackState track) {
+        currentTrack = track;
+    }
+
     public StratConCoords getSelectedCoords() {
         return boardState.getSelectedCoords();
+    }
+
+    public void setSelectedCoords(StratConCoords coords) {
+        boardState.setSelectedCoords(coords);
     }
 
     /**
@@ -988,6 +1004,11 @@ public class StratConPanel extends JPanel implements ActionListener {
             } else {
                 return new StratConCoords(selectedX, selectedY);
             }
+        }
+
+        public void setSelectedCoords(StratConCoords coords) {
+            selectedX = coords.getX();
+            selectedY = coords.getY();
         }
     }
 

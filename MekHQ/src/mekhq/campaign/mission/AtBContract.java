@@ -598,60 +598,22 @@ public class AtBContract extends Contract {
         return repairLocation;
     }
 
-    public int getScore() {
-        int score = employerMinorBreaches - playerMinorBreaches;
-        int battles = 0;
-        boolean earlySuccess = false;
-        for (Scenario scenario : getCompletedScenarios()) {
-            // Special Scenarios get no points for victory and only -1 for defeat.
-            if ((scenario instanceof AtBScenario) && ((AtBScenario) scenario).isSpecialScenario()) {
-                if (scenario.getStatus().isOverallDefeat() ||
-                          scenario.getStatus().isRefusedEngagement() ||
-                          scenario.getStatus().isFleetInBeing()) {
-                    score--;
-                }
-            } else {
-                switch (scenario.getStatus()) {
-                    case DECISIVE_VICTORY:
-                    case VICTORY:
-                    case MARGINAL_VICTORY:
-                    case PYRRHIC_VICTORY:
-                        score++;
-                        battles++;
-                        break;
-                    case DECISIVE_DEFEAT:
-                    case DEFEAT:
-                        score -= 2;
-                        battles++;
-                        break;
-                    case MARGINAL_DEFEAT:
-                        // special scenario defeat
-                        score--;
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if ((scenario instanceof AtBScenario atBScenario) &&
-                      (atBScenario.getScenarioType() == AtBScenario.BASE_ATTACK) &&
-                      atBScenario.isAttacker() &&
-                      scenario.getStatus().isOverallVictory()) {
-                earlySuccess = true;
-            } else if (getMoraleLevel().isRouted() && !getContractType().isGarrisonType()) {
-                earlySuccess = true;
-            }
+    /**
+     * Calculates the overall contract score based on scenario outcomes and modifiers.
+     *
+     * <p>For StratCon campaigns, this returns the current victory points from the campaign state.</p>
+     *
+     * <p>For standard contracts, this aggregates scores from all completed scenarios and applies any arbitrary
+     * modifiers that have been set for this contract.</p>
+     *
+     * @return the total contract score, including victory points or scenario scores plus modifiers
+     */
+    public int getContractScore() {
+        if (stratconCampaignState != null) {
+            return stratconCampaignState.getVictoryPoints();
         }
 
-        if (battles == 0) {
-            score++;
-        }
-
-        if (earlySuccess) {
-            score += 4;
-        }
-        score += contractScoreArbitraryModifier;
-        return score;
+        return ContractScore.getContractScore(getCompletedScenarios()) + contractScoreArbitraryModifier;
     }
 
     public int getContractScoreArbitraryModifier() {

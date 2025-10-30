@@ -50,16 +50,46 @@ public class FactionHint {
         this.end = end;
     }
 
+    /**
+     * Checks if a given date falls within this object's date range.
+     *
+     * <p>The date is considered in range if:</p>
+     *
+     * <ul>
+     *   <li>It is on or after the start date (or start is null)</li>
+     *   <li>AND it is on or before the end date (or end is null)</li>
+     * </ul>
+     *
+     * <p>A {@code null} start or end date means that bound is unbounded (open-ended).</p>
+     *
+     * @param date the date to check
+     *
+     * @return {@code true} if the date is within the range (inclusive)
+     */
     public boolean isInDateRange(final LocalDate date) {
         return ((start == null) || !date.isBefore(start)) && ((end == null) || !date.isAfter(end));
     }
 
+    /**
+     * Checks if this object's start date is today.
+     *
+     * @param today the current date to check against
+     *
+     * @return {@code true} if the start date is defined and equals today
+     */
     public boolean hintStartsToday(final LocalDate today) {
-        return (start == null) || start.isEqual(today);
+        return (start != null) && start.isEqual(today);
     }
 
+    /**
+     * Checks if this object's end date is today.
+     *
+     * @param today the current date to check against
+     *
+     * @return {@code true} if the end date is defined and equals today
+     */
     public boolean hintEndsToday(final LocalDate today) {
-        return (end == null) || end.isEqual(today);
+        return (end != null) && end.isEqual(today);
     }
 
     @Override

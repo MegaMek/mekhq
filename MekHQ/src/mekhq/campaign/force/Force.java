@@ -704,7 +704,7 @@ public class Force {
 
     private void updateCombatTeamCommanderIfCombatTeam(Campaign campaign) {
         if (isCombatTeam()) {
-            CombatTeam combatTeam = campaign.getCombatTeamsTable().getOrDefault(getId(), null);
+            CombatTeam combatTeam = campaign.getCombatTeamsAsMap().getOrDefault(getId(), null);
             if (combatTeam != null) {
                 combatTeam.setCommander(getForceCommanderID());
             }

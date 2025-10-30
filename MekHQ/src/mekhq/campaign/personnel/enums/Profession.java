@@ -259,7 +259,7 @@ public enum Profession {
     public static Profession getProfessionFromPersonnelRole(final PersonnelRole role) {
         return switch (role) {
             case AEROSPACE_PILOT, CONVENTIONAL_AIRCRAFT_PILOT -> AEROSPACE;
-            case GROUND_VEHICLE_DRIVER, NAVAL_VEHICLE_DRIVER, VTOL_PILOT, VEHICLE_GUNNER, VEHICLE_CREW -> VEHICLE;
+            case VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL -> VEHICLE;
             case BATTLE_ARMOUR, SOLDIER -> INFANTRY;
             case VESSEL_PILOT, VESSEL_CREW, VESSEL_GUNNER, VESSEL_NAVIGATOR -> NAVAL;
             case MEK_TECH, MECHANIC, AERO_TEK, BA_TECH, ASTECH -> TECH;

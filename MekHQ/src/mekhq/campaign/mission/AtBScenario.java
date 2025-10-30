@@ -2204,7 +2204,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             return null;
         }
 
-        return campaign.getCombatTeamsTable().get(combatTeamId);
+        return campaign.getCombatTeamsAsMap().get(combatTeamId);
     }
 
     public void setCombatTeam(CombatTeam combatTeam) {

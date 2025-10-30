@@ -50,6 +50,7 @@ import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -391,81 +392,103 @@ public record Accountant(Campaign campaign) {
     }
 
     /**
-     * Calculates the total monetary value of all units in the current campaign's forces, applying specific percentage
-     * adjustments based on unit types. Units such as DropShips, WarShips, JumpShips, Space Stations, infantry, and
-     * others are calculated according to the provided contract percentages and rules.
+     * Calculates the total monetary value of all units assigned to combat roles in the campaign's forces, applying
+     * specific percentage adjustments and exclusion rules based on unit types.
      *
-     * <p>This method iterates over all units in the campaign's forces and computes their
-     * total value by checking each unit's type and applying the appropriate adjustments.</p>
+     * <p>This method iterates over all forces in the campaign that are standard force types with combat roles. For
+     * each unit within these forces, it computes their total value by checking each unit's type and applying the
+     * appropriate adjustments or exclusions.</p>
      *
-     * <p>The value of each unit is based on the {@code useEquipmentSaleValue} flag, which
-     * determines whether to use the equipment's sale value during the calculation.</p>
+     * <p>The following unit types are handled with specific rules:</p>
+     * <ul>
+     *   <li><b>Conventional Infantry:</b> Excluded if {@code excludeInfantry} is {@code true}</li>
+     *   <li><b>DropShips and SmallCraft:</b> Excluded if {@code dropShipContractPercent} is {@code 0}</li>
+     *   <li><b>WarShips:</b> Excluded if {@code warShipContractPercent} is {@code 0}</li>
+     *   <li><b>JumpShips and Space Stations:</b> Excluded if {@code jumpShipContractPercent} is {@code 0}</li>
+     *   <li><b>All Other Units:</b> Always included in the calculation</li>
+     * </ul>
      *
-     * @param excludeInfantry         A {@code boolean} flag specifying whether conventional infantry units (non-Battle
-     *                                Armor) should be excluded.
-     * @param dropShipContractPercent The percentage adjustment applied specifically to DropShips. If set to {@code 0},
-     *                                DropShips are excluded from the calculation.
-     * @param warShipContractPercent  The percentage adjustment applied specifically to WarShips. If set to {@code 0},
-     *                                WarShips are excluded from the calculation.
-     * @param jumpShipContractPercent The percentage adjustment applied specifically to JumpShips and Space Stations. If
-     *                                set to {@code 0}, these units are excluded.
-     * @param useEquipmentSaleValue   A {@code boolean} flag that determines whether to use the equipment's sale value
-     *                                in the calculation.
+     * <p>The value of each unit is calculated using {@link #getEquipmentContractValue(Unit, boolean)}, which
+     * respects the {@code useEquipmentSaleValue} flag to determine whether to use equipment sale values or standard
+     * values.</p>
      *
-     * @return A {@link Money} object representing the total force value of the campaign's units after applying the
-     *       provided rules and percentages.
+     * <p><b>Note:</b> Forces that are not standard force types or do not have combat-preferred roles are excluded
+     * from the calculation.</p>
+     *
+     * @param excludeInfantry         if {@code true}, conventional infantry units (non-Battle Armor) are excluded from
+     *                                the calculation
+     * @param dropShipContractPercent the percentage adjustment for DropShips and SmallCraft; if {@code 0}, these units
+     *                                are excluded
+     * @param warShipContractPercent  the percentage adjustment for WarShips; if {@code 0}, WarShips are excluded
+     * @param jumpShipContractPercent the percentage adjustment for JumpShips and Space Stations; if {@code 0}, these
+     *                                units are excluded
+     * @param useEquipmentSaleValue   if {@code true}, uses equipment sale values; if {@code false}, uses standard
+     *                                values
+     *
+     * @return a {@link Money} object representing the total force value of combat-assigned units after applying the
+     *       specified rules and exclusions
      */
     public Money getForceValue(boolean excludeInfantry, double dropShipContractPercent, double warShipContractPercent,
           double jumpShipContractPercent, boolean useEquipmentSaleValue) {
         Money value = Money.zero();
 
-        for (UUID uuid : campaign().getAllUnitsInTheTOE(true)) {
-            Unit unit = getHangar().getUnit(uuid);
-
-            if (unit == null) {
+        for (Force force : campaign().getAllForces()) {
+            if (!force.getForceType().isStandard()) {
                 continue;
             }
 
-            Entity entity = unit.getEntity();
-
-            if (entity == null) {
+            if (!force.getCombatRoleInMemory().isCombatRole()) {
                 continue;
             }
 
-            // Infantry
-            if (unit.isConventionalInfantry() && excludeInfantry) {
-                continue;
-            }
+            for (UUID uuid : force.getUnits()) {
+                Unit unit = getHangar().getUnit(uuid);
 
-            // DropShips
-            if (entity.isDropShip() || entity.isSmallCraft()) {
-                if (dropShipContractPercent != 0) {
-                    value = value.plus(getEquipmentContractValue(unit, useEquipmentSaleValue));
+                if (unit == null) {
+                    continue;
                 }
 
-                continue;
-            }
+                Entity entity = unit.getEntity();
 
-            // WarShips
-            if (entity.isWarShip()) {
-                if (warShipContractPercent != 0) {
-                    value = value.plus(getEquipmentContractValue(unit, useEquipmentSaleValue));
+                if (entity == null) {
+                    continue;
                 }
 
-                continue;
-            }
-
-            // JumpShips
-            if (entity.isJumpShip() || entity.isSpaceStation()) {
-                if (jumpShipContractPercent != 0) {
-                    value = value.plus(getEquipmentContractValue(unit, useEquipmentSaleValue));
+                // Infantry
+                if (unit.isConventionalInfantry() && excludeInfantry) {
+                    continue;
                 }
 
-                continue;
-            }
+                // DropShips
+                if (entity.isDropShip() || entity.isSmallCraft()) {
+                    if (dropShipContractPercent != 0) {
+                        value = value.plus(getEquipmentContractValue(unit, useEquipmentSaleValue));
+                    }
 
-            // Other
-            value = value.plus(getEquipmentContractValue(unit, useEquipmentSaleValue));
+                    continue;
+                }
+
+                // WarShips
+                if (entity.isWarShip()) {
+                    if (warShipContractPercent != 0) {
+                        value = value.plus(getEquipmentContractValue(unit, useEquipmentSaleValue));
+                    }
+
+                    continue;
+                }
+
+                // JumpShips
+                if (entity.isJumpShip() || entity.isSpaceStation()) {
+                    if (jumpShipContractPercent != 0) {
+                        value = value.plus(getEquipmentContractValue(unit, useEquipmentSaleValue));
+                    }
+
+                    continue;
+                }
+
+                // Other
+                value = value.plus(getEquipmentContractValue(unit, useEquipmentSaleValue));
+            }
         }
 
         return value;

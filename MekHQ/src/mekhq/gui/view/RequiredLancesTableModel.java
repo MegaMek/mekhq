@@ -114,7 +114,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
 
         if (column == COL_TOTAL) {
             int t = 0;
-            for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
+            for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
                 AtBContract assignedContract = combatTeam.getContract(campaign);
                 boolean isCadreDuty = assignedContract.getContractType().isCadreDuty();
                 CombatRole role = combatTeam.getRole();
@@ -131,7 +131,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
             return Integer.toString(contract.getRequiredCombatElements());
         } else if (contract.getContractType().getRequiredCombatRole().ordinal() == column - 2) {
             int t = 0;
-            for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
+            for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
                 if (data.get(row).equals(combatTeam.getContract(campaign)) &&
                           (combatTeam.getRole() ==
                                  combatTeam.getContract(campaign).getContractType().getRequiredCombatRole()) &&

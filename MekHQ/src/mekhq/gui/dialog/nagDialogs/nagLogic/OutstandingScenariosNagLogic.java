@@ -111,7 +111,8 @@ public class OutstandingScenariosNagLogic {
 
                         // Determine if the scenario is special or a turning point
                         boolean isCrisis = backingScenario != null &&
-                                                 backingScenario.getStratConScenarioType().isSpecial();
+                                                 (backingScenario.getStratConScenarioType().isSpecial() ||
+                                                        backingScenario.isCrisis());
                         boolean isTurningPoint = stratconScenario.isTurningPoint();
 
                         // Define the addendum text based on StratCon scenario type
