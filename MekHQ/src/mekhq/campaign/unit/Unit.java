@@ -115,6 +115,7 @@ import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.*;
@@ -7101,5 +7102,27 @@ public class Unit implements ITechnology {
         // Other crew types are all singletons, so we shouldn't need to validate them
 
         return reports;
+    }
+
+    public boolean canSalvage(boolean isInSpace) {
+        if (entity == null) {
+            return false;
+        }
+
+        boolean canSalvage = isInSpace ?
+                                   entity.canPerformSpaceSalvageOperations() :
+                                   entity.canPerformGroundSalvageOperations();
+        if (!canSalvage) {
+            return false;
+        }
+
+        boolean isMek = entity instanceof Mek;
+        if (!isMek) {
+            boolean hasCargoCapacity = getCargoCapacity() > 0;
+            boolean hasNavalTugAdaptor = isInSpace && CamOpsSalvageUtilities.hasNavalTug(entity);
+            canSalvage = hasCargoCapacity || hasNavalTugAdaptor;
+        }
+
+        return canSalvage && entity.getDamageLevel(true) < Entity.DMG_CRIPPLED;
     }
 }

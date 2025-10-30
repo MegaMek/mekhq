@@ -379,12 +379,14 @@ public class Force {
     }
 
     /**
-     * @return the full hierarchical name of the force, including all parents
+     * @return the full hierarchical name of the force, including all parents (except the origin force)
      */
     public String getFullName() {
         String toReturn = getName();
         if (null != parentForce) {
-            toReturn += ", " + parentForce.getFullName();
+            if (parentForce.getId() != FORCE_ORIGIN) {
+                toReturn += ", " + parentForce.getFullName();
+            }
         }
         return toReturn;
     }
@@ -840,7 +842,7 @@ public class Force {
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
                     force.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceType")) {
-                    force.setForceType(ForceType.fromOrdinal(Integer.parseInt(wn2.getTextContent().trim())), false);
+                    force.setForceType(ForceType.fromKey(Integer.parseInt(wn2.getTextContent().trim())), false);
                 } else if (wn2.getNodeName().equalsIgnoreCase("overrideCombatTeam")) {
                     force.setOverrideCombatTeam(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {
@@ -1364,5 +1366,19 @@ public class Force {
         }
 
         return true;
+    }
+
+    public int getSalvageUnitCount(Hangar hangar, boolean isInSpace) {
+        List<Unit> unitsInForce = getAllUnitsAsUnits(hangar, false);
+
+        int unitCount = 0;
+
+        for (Unit unit : unitsInForce) {
+            if (unit.canSalvage(isInSpace)) {
+                unitCount++;
+            }
+        }
+
+        return unitCount;
     }
 }

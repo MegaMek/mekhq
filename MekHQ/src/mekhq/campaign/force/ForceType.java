@@ -47,29 +47,30 @@ public enum ForceType {
     /**
      * Standard force type, typically used for combat.
      */
-    STANDARD(true, false),
+    STANDARD(0, true, false),
 
     /**
      * Support force type, used by forces that should be deployed in StratCon but not involved in combat.
      */
-    SUPPORT(false, false),
+    SUPPORT(1, false, false),
 
     /**
      * Convoy force type, typically used by the Resupply module.
      */
-    CONVOY(true, true),
-
-    /**
-     * Salvage force type, typically used in post-scenario salvage operations
-     */
-    SALVAGE(true, true),
+    CONVOY(2, true, true),
 
     /**
      * Security force type, typically used by the Prisoner Events module.
      */
-    SECURITY(true, true);
+    SECURITY(3, true, true),
+
+    /**
+     * Salvage force type, typically used in post-scenario salvage operations
+     */
+    SALVAGE(4, true, true);
 
     // region Fields
+    private final int key;
     private final boolean standardizeParents;
     private final boolean childrenInherit;
 
@@ -78,12 +79,14 @@ public enum ForceType {
     /**
      * Constructor for the {@code ForceType} enum.
      *
+     * @param key                The unique integer used to identify the ForceType.
      * @param standardizeParents Whether changing to this ForceType changes the ForceType in all parent forces to
      *                           STANDARD
      * @param childrenInherit    Whether changing to this ForceType changes the ForceType in all child forces to this
      *                           ForceType.
      */
-    ForceType(boolean standardizeParents, boolean childrenInherit) {
+    ForceType(final int key, boolean standardizeParents, boolean childrenInherit) {
+        this.key = key;
         this.standardizeParents = standardizeParents;
         this.childrenInherit = childrenInherit;
     }
@@ -201,15 +204,17 @@ public enum ForceType {
     // region File I/O
 
     /**
-     * Retrieves a {@code ForceType} based on its ordinal value.
+     * Retrieves a {@code ForceType} based on its key value.
      *
-     * @param ordinal the ordinal index of the force type.
+     * @param ordinal the key value of the force type.
      *
-     * @return the corresponding {@code ForceType} if the ordinal is valid; otherwise, defaults to {@code STANDARD}.
+     * @return the corresponding {@code ForceType} if the key is valid; otherwise, defaults to {@code STANDARD}.
      */
-    public static ForceType fromOrdinal(int ordinal) {
-        if ((ordinal >= 0) && (ordinal < values().length)) {
-            return values()[ordinal];
+    public static ForceType fromKey(int ordinal) {
+        for (ForceType type : values()) {
+            if (type.key == ordinal) {
+                return type;
+            }
         }
 
         MMLogger logger = MMLogger.create(ForceType.class);

@@ -82,6 +82,7 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.GMModeEvent;
@@ -132,6 +133,7 @@ import mekhq.gui.dialog.MissionTypeDialog;
 import mekhq.gui.dialog.NewAtBContractDialog;
 import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.dialog.SalvageForcePicker;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog;
 import mekhq.gui.enums.MHQTabType;
@@ -761,9 +763,7 @@ public final class BriefingTab extends CampaignGuiTab {
                         "Do you really want to remove all units from this scenario?",
                         "Clear Units?",
                         JOptionPane.YES_NO_OPTION)) {
-            int row = scenarioTable.getSelectedRow();
-            Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-
+            Scenario scenario = getScenario();
             if (scenario == null) {
                 return;
             }
@@ -786,11 +786,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void printRecordSheets() {
-        final int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        final Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        final Scenario scenario = getScenario();
         if (scenario == null) {
             return;
         }
@@ -849,11 +845,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void loadScenario() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        Scenario scenario = getScenario();
         if (null != scenario) {
             getCampaignGui().getApplication().startHost(scenario, true, new ArrayList<>());
         }
@@ -864,14 +856,63 @@ public final class BriefingTab extends CampaignGuiTab {
      *
      * <p>This method first presents the scenario briefing dialog to the user via {@link #createBriefingDialog()}. If
      * the user cancels or does not accept the briefing, the method returns and does not proceed further. If accepted,
-     * it calls {@link #startScenario(BehaviorSettings)} to begin the scenario.</p>
+     * it calls {@link #startScenario(Scenario, BehaviorSettings)} to begin the scenario.</p>
      */
     private void startScenario() {
         if (!createBriefingDialog()) {
             return;
         }
 
-        startScenario(null);
+        Scenario scenario = getScenario();
+        if (scenario == null) {
+            return;
+        }
+
+        if (!displaySalvageForcePicker(scenario)) {
+            return;
+        }
+
+        startScenario(scenario, null);
+    }
+
+    private boolean displaySalvageForcePicker(Scenario scenario) {
+        Hangar hangar = getCampaign().getHangar();
+        boolean isSpaceScenario = scenario.getBoardType() == AtBScenario.T_SPACE;
+
+        List<Force> salvageForceOptions = new ArrayList<>();
+        List<Integer> visitedForceIds = new ArrayList<>();
+
+        // Collect Combat Teams
+        for (CombatTeam combatTeam : getCampaign().getCombatTeamsAsList()) {
+            int forceId = combatTeam.getForceId();
+            Force force = getCampaign().getForce(forceId);
+            if (force != null) {
+                visitedForceIds.add(forceId);
+
+                for (Force subForce : force.getSubForces()) {
+                    visitedForceIds.add(subForce.getId());
+                }
+
+                if (!force.isDeployed()) {
+                    if (force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
+                        salvageForceOptions.add(force);
+                    }
+                }
+            }
+        }
+
+        // Collect non-Combat Teams
+        for (Force force : getCampaign().getAllForces()) {
+            if (!force.getUnits().isEmpty() && force.getForceType().isSalvage()) {
+                salvageForceOptions.add(force);
+            }
+        }
+
+        salvageForceOptions.sort(Comparator.comparing(Force::getFullName));
+
+        SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), scenario, salvageForceOptions);
+
+        return forcePicker.wasConfirmed();
     }
 
     /**
@@ -987,7 +1028,24 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void runPrincessAutoResolve() {
-        startScenario(getCampaign().getAutoResolveBehaviorSettings());
+        Scenario scenario = getScenario();
+        if (scenario == null) {
+            return;
+        }
+
+        if (!displaySalvageForcePicker(scenario)) {
+            return;
+        }
+
+        startScenario(scenario, getCampaign().getAutoResolveBehaviorSettings());
+    }
+
+    private @Nullable Scenario getScenario() {
+        int row = scenarioTable.getSelectedRow();
+        if (row < 0) {
+            return null;
+        }
+        return scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
     }
 
     private void promptAutoResolve(Scenario scenario) {
@@ -1051,15 +1109,7 @@ public final class BriefingTab extends CampaignGuiTab {
         return scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
     }
 
-    private void startScenario(BehaviorSettings autoResolveBehaviorSettings) {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-        if (scenario == null) {
-            return;
-        }
+    private void startScenario(Scenario scenario, BehaviorSettings autoResolveBehaviorSettings) {
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(false);
         if (uids.isEmpty()) {
             return;
@@ -1384,11 +1434,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void joinScenario() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        Scenario scenario = getScenario();
         if (scenario == null) {
             return;
         }
@@ -1437,11 +1483,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void deployListFile() {
-        final int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        final Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        final Scenario scenario = getScenario();
         if (scenario == null) {
             return;
         }
