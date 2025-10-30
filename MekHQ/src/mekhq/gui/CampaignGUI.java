@@ -316,6 +316,13 @@ public class CampaignGUI extends JPanel {
         addStandardTab(MHQTabType.INFIRMARY);
         addStandardTab(MHQTabType.MEK_LAB);
         addStandardTab(MHQTabType.FINANCES);
+        
+        boolean isMaplessMode = getCampaign().getCampaignOptions().isUseStratConMaplessMode();
+        int stratConTabIndex = tabMain.indexOfTab(MHQTabType.STRAT_CON.toString());
+
+        if (stratConTabIndex != -1) {
+            tabMain.setEnabledAt(stratConTabIndex, !isMaplessMode);
+        }
 
         // check to see if we just selected the command center tab
         // and if so change its color to standard
@@ -3137,6 +3144,13 @@ public class CampaignGUI extends JPanel {
 
         miRetirementDefectionDialog.setVisible(optionsChangedEvent.getOptions().isUseRandomRetirement());
         miAwardEligibilityDialog.setVisible((optionsChangedEvent.getOptions().isEnableAutoAwards()));
+
+        boolean isMaplessMode = getCampaign().getCampaignOptions().isUseStratConMaplessMode();
+        int stratConTabIndex = tabMain.indexOfTab(MHQTabType.STRAT_CON.toString());
+
+        if (stratConTabIndex != -1) {
+            tabMain.setEnabledAt(stratConTabIndex, !isMaplessMode);
+        }
     }
 
     /**

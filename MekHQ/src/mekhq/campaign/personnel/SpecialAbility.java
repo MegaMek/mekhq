@@ -46,6 +46,7 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 import megamek.Version;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
@@ -286,25 +287,17 @@ public class SpecialAbility {
 
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "ability");
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayName", displayName);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lookupName", lookupName);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "desc", desc);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "xpCost", xpCost);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "originOnly", originOnly);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weight", weight);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prereqAbilities", Utilities.combineString(prereqAbilities, "::"));
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "invalidAbilities",
               Utilities.combineString(invalidAbilities, "::"));
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "removeAbilities", Utilities.combineString(removeAbilities, "::"));
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "choiceValues", Utilities.combineString(choiceValues, "::"));
         for (SkillPrerequisite skillPrerequisite : prereqSkills) {
             skillPrerequisite.writeToXML(pw, indent);
-        }
-
-        for (String pre : prereqMisc.keySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "miscPrereq", pre + ":" + prereqMisc.get(pre));
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ability");
     }
@@ -367,59 +360,131 @@ public class SpecialAbility {
         }
     }
 
-    public static void generateSeparateInstanceFromXML(Node wn, Map<String, SpecialAbility> spHash,
-          PersonnelOptions options) {
+    public static void generateInstanceFromCampaignXML(Node wn, PersonnelOptions options, Version v) {
         try {
-            SpecialAbility retVal = new SpecialAbility();
+            SpecialAbility specialAbility = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
-                if (wn2.getNodeName().equalsIgnoreCase("displayName")) {
-                    retVal.displayName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-                    retVal.desc = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
-                    retVal.lookupName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("xpCost")) {
-                    retVal.xpCost = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("originOnly")) {
-                    retVal.originOnly = Boolean.parseBoolean(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("weight")) {
-                    retVal.weight = Integer.parseInt(wn2.getTextContent());
+                if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
+                    specialAbility.lookupName = wn2.getTextContent().trim();
+                }
+            }
+
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+                String textContent = wn2.getTextContent().trim();
+
+                if (wn2.getNodeName().equalsIgnoreCase("xpCost")) {
+                    specialAbility.xpCost = MathUtility.parseInt(textContent);
                 } else if (wn2.getNodeName().equalsIgnoreCase("prereqAbilities")) {
-                    retVal.prereqAbilities = Utilities.splitString(wn2.getTextContent(), "::");
+                    specialAbility.prereqAbilities = Utilities.splitString(textContent, "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("invalidAbilities")) {
-                    retVal.invalidAbilities = Utilities.splitString(wn2.getTextContent(), "::");
+                    specialAbility.invalidAbilities = Utilities.splitString(textContent, "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("removeAbilities")) {
-                    retVal.removeAbilities = Utilities.splitString(wn2.getTextContent(), "::");
-                } else if (wn2.getNodeName().equalsIgnoreCase("choiceValues")) {
-                    retVal.choiceValues = Utilities.splitString(wn2.getTextContent(), "::");
+                    specialAbility.choiceValues = Utilities.splitString(textContent, "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
                     SkillPrerequisite skill = SkillPrerequisite.generateInstanceFromXML(wn2);
                     if (!skill.isEmpty()) {
-                        retVal.prereqSkills.add(skill);
+                        specialAbility.prereqSkills.add(skill);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("miscPrereq")) {
-                    String[] fields = wn2.getTextContent().split(":");
-                    retVal.prereqMisc.put(fields[0], fields[1]);
                 }
             }
 
-            if (retVal.displayName.isEmpty()) {
-                IOption option = options.getOption(retVal.lookupName);
+            SpecialAbility defaultAbility = getDefaultSpecialAbilities().get(specialAbility.lookupName);
+            if (null != defaultAbility) {
+                specialAbility.displayName = defaultAbility.displayName;
+                specialAbility.desc = defaultAbility.desc;
+                specialAbility.originOnly = defaultAbility.originOnly;
+                specialAbility.weight = defaultAbility.weight;
+                specialAbility.choiceValues = defaultAbility.choiceValues;
+                specialAbility.prereqMisc = defaultAbility.prereqMisc;
+            } else {
+                LOGGER.warn("Unable to find default ability for {}. It may have been removed. Skipping",
+                      specialAbility.lookupName);
+            }
+
+            if (specialAbility.displayName.isEmpty()) {
+                IOption option = options.getOption(specialAbility.lookupName);
                 if (null != option) {
-                    retVal.displayName = option.getDisplayableName();
+                    specialAbility.displayName = option.getDisplayableName();
                 }
             }
 
-            if (retVal.desc.isEmpty()) {
-                IOption option = options.getOption(retVal.lookupName);
+            if (specialAbility.desc.isEmpty()) {
+                IOption option = options.getOption(specialAbility.lookupName);
                 if (null != option) {
-                    retVal.desc = option.getDescription();
+                    specialAbility.desc = option.getDescription();
                 }
             }
-            spHash.put(retVal.lookupName, retVal);
+
+            specialAbilities.put(specialAbility.lookupName, specialAbility);
+        } catch (Exception ex) {
+            LOGGER.error("", ex);
+        }
+    }
+
+    public static void generateSeparateInstanceFromXML(Node wn, Map<String, SpecialAbility> spHash,
+          PersonnelOptions options) {
+        try {
+            SpecialAbility specialAbility = new SpecialAbility();
+            NodeList nl = wn.getChildNodes();
+
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+                if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
+                    specialAbility.lookupName = wn2.getTextContent().trim();
+                }
+            }
+
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+                String textContent = wn2.getTextContent().trim();
+
+                if (wn2.getNodeName().equalsIgnoreCase("xpCost")) {
+                    specialAbility.xpCost = MathUtility.parseInt(textContent);
+                } else if (wn2.getNodeName().equalsIgnoreCase("prereqAbilities")) {
+                    specialAbility.prereqAbilities = Utilities.splitString(textContent, "::");
+                } else if (wn2.getNodeName().equalsIgnoreCase("invalidAbilities")) {
+                    specialAbility.invalidAbilities = Utilities.splitString(textContent, "::");
+                } else if (wn2.getNodeName().equalsIgnoreCase("removeAbilities")) {
+                    specialAbility.choiceValues = Utilities.splitString(textContent, "::");
+                } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
+                    SkillPrerequisite skill = SkillPrerequisite.generateInstanceFromXML(wn2);
+                    if (!skill.isEmpty()) {
+                        specialAbility.prereqSkills.add(skill);
+                    }
+                }
+            }
+
+            SpecialAbility defaultAbility = getDefaultSpecialAbilities().get(specialAbility.lookupName);
+            if (null != defaultAbility) {
+                specialAbility.displayName = defaultAbility.displayName;
+                specialAbility.desc = defaultAbility.desc;
+                specialAbility.originOnly = defaultAbility.originOnly;
+                specialAbility.weight = defaultAbility.weight;
+                specialAbility.choiceValues = defaultAbility.choiceValues;
+                specialAbility.prereqMisc = defaultAbility.prereqMisc;
+            } else {
+                LOGGER.warn("Unable to find default ability for {}. It may have been removed. Skipping",
+                      specialAbility.lookupName);
+            }
+
+            if (specialAbility.displayName.isEmpty()) {
+                IOption option = options.getOption(specialAbility.lookupName);
+                if (null != option) {
+                    specialAbility.displayName = option.getDisplayableName();
+                }
+            }
+
+            if (specialAbility.desc.isEmpty()) {
+                IOption option = options.getOption(specialAbility.lookupName);
+                if (null != option) {
+                    specialAbility.desc = option.getDescription();
+                }
+            }
+            spHash.put(specialAbility.lookupName, specialAbility);
         } catch (Exception ex) {
             LOGGER.error("", ex);
         }
