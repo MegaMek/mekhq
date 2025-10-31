@@ -913,24 +913,27 @@ public final class BriefingTab extends CampaignGuiTab {
             return true;
         }
 
-        scenario.resetSalvageForces(); // reset, in case we've previously canceled out of the dialog
-        List<Force> salvageForceOptions = getSalvageForces(getCampaign().getHangar(),
-              scenario.getBoardType() == AtBScenario.T_SPACE);
+        if (scenario.getSalvageForces().isEmpty()) {
+            List<Force> salvageForceOptions = getSalvageForces(getCampaign().getHangar(),
+                  scenario.getBoardType() == AtBScenario.T_SPACE);
 
-        SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), scenario, salvageForceOptions);
-        boolean wasConfirmed = forcePicker.wasConfirmed();
-        if (wasConfirmed) {
-            List<Force> selectedForces = forcePicker.getSelectedForces();
-            for (Force force : selectedForces) {
-                scenario.addSalvageForce(force.getId());
+            SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), scenario, salvageForceOptions);
+            boolean wasConfirmed = forcePicker.wasConfirmed();
+            if (wasConfirmed) {
+                List<Force> selectedForces = forcePicker.getSelectedForces();
+                for (Force force : selectedForces) {
+                    scenario.addSalvageForce(force.getId());
+                }
+
+                if (getCampaign().getCampaignOptions().isUseStratCon()) {
+                    CamOpsSalvageUtilities.deploySalvageTeams(getCampaign(), scenario);
+                }
             }
 
-            if (getCampaign().getCampaignOptions().isUseStratCon()) {
-                CamOpsSalvageUtilities.deploySalvageTeams(getCampaign(), scenario);
-            }
+            return forcePicker.wasConfirmed();
         }
 
-        return forcePicker.wasConfirmed();
+        return true;
     }
 
 
@@ -952,19 +955,22 @@ public final class BriefingTab extends CampaignGuiTab {
             return true;
         }
 
-        scenario.resetSalvageTechs(); // reset, in case we've previously canceled out of the dialog
-        List<Person> availableTechs = getAvailableTechs();
+        if (scenario.getSalvageTechs().isEmpty()) {
+            List<Person> availableTechs = getAvailableTechs();
 
-        SalvageTechPicker techPicker = new SalvageTechPicker(getCampaign(), availableTechs);
-        boolean wasConfirmed = techPicker.wasConfirmed();
-        if (wasConfirmed) {
-            List<Person> selectedTechs = techPicker.getSelectedTechs();
-            for (Person tech : selectedTechs) {
-                scenario.addSalvageTech(tech.getId());
+            SalvageTechPicker techPicker = new SalvageTechPicker(getCampaign(), availableTechs);
+            boolean wasConfirmed = techPicker.wasConfirmed();
+            if (wasConfirmed) {
+                List<Person> selectedTechs = techPicker.getSelectedTechs();
+                for (Person tech : selectedTechs) {
+                    scenario.addSalvageTech(tech.getId());
+                }
             }
+
+            return techPicker.wasConfirmed();
         }
 
-        return techPicker.wasConfirmed();
+        return true;
     }
 
     private List<Person> getAvailableTechs() {
