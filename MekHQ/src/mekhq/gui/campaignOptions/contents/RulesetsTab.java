@@ -176,12 +176,14 @@ public class RulesetsTab {
     private JLabel lblDefendChance;
     private JLabel lblScoutChance;
     private JLabel lblTrainingChance;
+    private JLabel lblCadreChance;
     private JSpinner[] spnAtBBattleChance;
     private JButton btnIntensityUpdate;
     private JCheckBox chkGenerateChases;
     //end Legacy AtB
 
     private JCheckBox chkUseStratCon;
+    private JCheckBox chkUseStratConMaplessMode;
     private JCheckBox chkUseAdvancedScouting;
     private JCheckBox chkUseGenericBattleValue;
     private JCheckBox chkUseVerboseBidding;
@@ -730,6 +732,7 @@ public class RulesetsTab {
      */
     private void initializeStratConTab() {
         chkUseStratCon = new JCheckBox();
+        chkUseStratConMaplessMode = new JCheckBox();
         chkUseAdvancedScouting = new JCheckBox();
         chkUseGenericBattleValue = new JCheckBox();
         chkUseVerboseBidding = new JCheckBox();
@@ -812,6 +815,8 @@ public class RulesetsTab {
         // Content
         chkUseStratCon = new CampaignOptionsCheckBox("UseStratCon");
         chkUseStratCon.addMouseListener(createTipPanelUpdater(stratConHeader, "UseStratCon"));
+        chkUseStratConMaplessMode = new CampaignOptionsCheckBox("UseStratConMaplessMode");
+        chkUseStratConMaplessMode.addMouseListener(createTipPanelUpdater(stratConHeader, "UseStratConMaplessMode"));
         chkUseAdvancedScouting = new CampaignOptionsCheckBox("UseAdvancedScouting");
         chkUseAdvancedScouting.addMouseListener(createTipPanelUpdater(stratConHeader, "UseAdvancedScouting"));
         chkUseGenericBattleValue = new CampaignOptionsCheckBox("UseGenericBattleValue");
@@ -833,6 +838,8 @@ public class RulesetsTab {
         panel.add(chkUseStratCon, layout);
         layout.gridx++;
         panel.add(chkUseAdvancedScouting, layout);
+        layout.gridx++;
+        panel.add(chkUseStratConMaplessMode, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -844,17 +851,25 @@ public class RulesetsTab {
         layout.gridx++;
         panel.add(chkUseVerboseBidding, layout);
 
-        layout.gridwidth = 2;
+        layout.gridwidth = 3;
         layout.gridx = 0;
         layout.gridy++;
+        layout.anchor = GridBagConstraints.NORTHWEST;
+        layout.fill = GridBagConstraints.BOTH;
+        layout.gridheight = 2;
         panel.add(pnlScenarioGenerationPanel, layout);
 
-        layout.gridwidth = 2;
-        layout.gridx = 2;
+        layout.gridwidth = 1;
+        layout.gridheight = 1;
+        layout.gridx = 3;
         panel.add(pnlCampaignOptions, layout);
 
-        layout.gridwidth = 1;
+        layout.gridy++;
+        panel.add(pnlMorale, layout);
+
         layout.gridx = 4;
+        layout.gridy -= 1;
+        layout.gridheight = 2;
         panel.add(pnlAutoResolve, layout);
 
         // Create panel and return
@@ -887,6 +902,7 @@ public class RulesetsTab {
         lblDefendChance = new JLabel();
         lblScoutChance = new JLabel();
         lblTrainingChance = new JLabel();
+        lblCadreChance = new JLabel();
         spnAtBBattleChance = new JSpinner[CombatRole.values().length - 1];
         btnIntensityUpdate = new JButton();
     }
@@ -1017,6 +1033,7 @@ public class RulesetsTab {
         lblDefendChance = new JLabel(CombatRole.FRONTLINE.toString());
         lblScoutChance = new JLabel(CombatRole.PATROL.toString());
         lblTrainingChance = new JLabel(CombatRole.TRAINING.toString());
+        lblCadreChance = new JLabel(CombatRole.CADRE.toString());
         spnAtBBattleChance = new JSpinner[CombatRole.values().length - 1];
 
         for (int i = 0; i < spnAtBBattleChance.length; i++) {
@@ -1059,8 +1076,10 @@ public class RulesetsTab {
         layoutBattleChance.gridx = 0;
         layoutBattleChance.gridy++;
         panelBattleChance.add(lblTrainingChance, layoutBattleChance);
+        layoutBattleChance.gridy++;
+        panelBattleChance.add(lblCadreChance, layoutBattleChance);
         layoutBattleChance.gridx++;
-        panelBattleChance.add(spnAtBBattleChance[CombatRole.TRAINING.ordinal()], layoutBattleChance);
+        panelBattleChance.add(spnAtBBattleChance[CombatRole.CADRE.ordinal()], layoutBattleChance);
 
         final JPanel panel = new CampaignOptionsStandardPanel("LegacyScenarioGenerationPanel", true,
               "LegacyScenarioGenerationPanel");
@@ -1114,6 +1133,9 @@ public class RulesetsTab {
         x = (int) spnAtBBattleChance[CombatRole.TRAINING.ordinal()].getValue();
         intensity += ((-9.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
+        x = (int) spnAtBBattleChance[CombatRole.CADRE.ordinal()].getValue();
+        intensity += ((-9.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
+
         intensity = intensity / 4.0;
 
         if (intensity > 100.0) {
@@ -1158,11 +1180,13 @@ public class RulesetsTab {
                 spnAtBBattleChance[CombatRole.PATROL.ordinal()].setValue(value);
                 value = (int) Math.min(Math.round(100.0 * intensity / (intensity + 9.0) + 0.05), 100);
                 spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(value);
+                spnAtBBattleChance[CombatRole.CADRE.ordinal()].setValue(value);
             } else {
                 spnAtBBattleChance[CombatRole.MANEUVER.ordinal()].setValue(0);
                 spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].setValue(0);
                 spnAtBBattleChance[CombatRole.PATROL.ordinal()].setValue(0);
                 spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(0);
+                spnAtBBattleChance[CombatRole.CADRE.ordinal()].setValue(0);
             }
         }
     }
@@ -1218,6 +1242,7 @@ public class RulesetsTab {
 
         // StratCon
         options.setUseStratCon(chkUseStratCon.isSelected());
+        options.setUseStratConMaplessMode(chkUseStratConMaplessMode.isSelected());
         options.setUseAdvancedScouting(chkUseAdvancedScouting.isSelected());
         options.setUseGenericBattleValue(chkUseGenericBattleValue.isSelected());
         options.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
@@ -1295,6 +1320,7 @@ public class RulesetsTab {
 
         // StratCon
         chkUseStratCon.setSelected(options.isUseStratCon());
+        chkUseStratConMaplessMode.setSelected(options.isUseStratConMaplessMode());
         chkUseAdvancedScouting.setSelected(options.isUseAdvancedScouting());
         chkUseGenericBattleValue.setSelected(options.isUseGenericBattleValue());
         chkUseVerboseBidding.setSelected(options.isUseVerboseBidding());
@@ -1309,7 +1335,7 @@ public class RulesetsTab {
         chkAdjustPlayerVehicles.setSelected(options.isAdjustPlayerVehicles());
         chkGenerateChases.setSelected(options.isGenerateChases());
         for (CombatRole role : CombatRole.values()) {
-            if (role.ordinal() <= CombatRole.TRAINING.ordinal()) {
+            if (role.ordinal() <= CombatRole.CADRE.ordinal()) {
                 spnAtBBattleChance[role.ordinal()].setValue(options.getAtBBattleChance(role));
             }
         }

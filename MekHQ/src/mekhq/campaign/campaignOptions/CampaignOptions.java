@@ -617,6 +617,7 @@ public class CampaignOptions {
     // region Against the Bot Tab
     private boolean useAtB;
     private boolean useStratCon;
+    private boolean useMaplessStratCon;
     private boolean useAdvancedScouting;
     private SkillLevel skillLevel;
 
@@ -898,11 +899,10 @@ public class CampaignOptions {
         }
         setRoleBaseSalary(PersonnelRole.MEKWARRIOR, 1500);
         setRoleBaseSalary(PersonnelRole.LAM_PILOT, 2250);
-        setRoleBaseSalary(PersonnelRole.GROUND_VEHICLE_DRIVER, 900);
-        setRoleBaseSalary(PersonnelRole.NAVAL_VEHICLE_DRIVER, 900);
-        setRoleBaseSalary(PersonnelRole.VTOL_PILOT, 900);
-        setRoleBaseSalary(PersonnelRole.VEHICLE_GUNNER, 900);
-        setRoleBaseSalary(PersonnelRole.VEHICLE_CREW, 900);
+        setRoleBaseSalary(PersonnelRole.VEHICLE_CREW_GROUND, 900);
+        setRoleBaseSalary(PersonnelRole.VEHICLE_CREW_NAVAL, 900);
+        setRoleBaseSalary(PersonnelRole.VEHICLE_CREW_VTOL, 900);
+        setRoleBaseSalary(PersonnelRole.COMBAT_TECHNICIAN, 900);
         setRoleBaseSalary(PersonnelRole.AEROSPACE_PILOT, 1500);
         setRoleBaseSalary(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT, 900);
         setRoleBaseSalary(PersonnelRole.PROTOMEK_PILOT, 960);
@@ -1277,6 +1277,7 @@ public class CampaignOptions {
         // region Against the Bot Tab
         useAtB = false;
         useStratCon = false;
+        useMaplessStratCon = false;
         useAdvancedScouting = false;
         setSkillLevel(SkillLevel.REGULAR);
         autoResolveMethod = AutoResolveMethod.PRINCESS;
@@ -1303,6 +1304,7 @@ public class CampaignOptions {
         atbBattleChance[CombatRole.FRONTLINE.ordinal()] = 20;
         atbBattleChance[CombatRole.PATROL.ordinal()] = 60;
         atbBattleChance[CombatRole.TRAINING.ordinal()] = 10;
+        atbBattleChance[CombatRole.CADRE.ordinal()] = 10;
         generateChases = true;
 
         // Scenarios
@@ -4764,6 +4766,14 @@ public class CampaignOptions {
 
     public void setUseStratCon(final boolean useStratCon) {
         this.useStratCon = useStratCon;
+    }
+
+    public boolean isUseStratConMaplessMode() {
+        return useMaplessStratCon;
+    }
+
+    public void setUseStratConMaplessMode(boolean useMaplessStratCon) {
+        this.useMaplessStratCon = useMaplessStratCon;
     }
 
     public boolean isUseAdvancedScouting() {

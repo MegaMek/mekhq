@@ -420,7 +420,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // determine if we've missed any lances and add those back into the campaign
         if (options.isUseAtB()) {
-            Hashtable<Integer, CombatTeam> lances = campaign.getCombatTeamsTable();
+            Hashtable<Integer, CombatTeam> lances = campaign.getCombatTeamsAsMap();
             for (Force f : campaign.getAllForces()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
                     lances.put(f.getId(), new CombatTeam(f.getId(), campaign));
@@ -1262,7 +1262,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 LOGGER.error("Unknown node type not loaded in Special Ability nodes: {}", wn2.getNodeName());
                 continue;
             }
-            SpecialAbility.generateInstanceFromXML(wn2, options, version);
+            SpecialAbility.generateInstanceFromCampaignXML(wn2, options, version);
         }
 
         LOGGER.info("Load Special Ability Nodes Complete!");

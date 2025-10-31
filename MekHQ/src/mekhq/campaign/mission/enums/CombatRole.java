@@ -44,6 +44,7 @@ public enum CombatRole {
     PATROL("CombatRole.PATROL.text", "CombatRole.PATROL.toolTipText"),
     TRAINING("CombatRole.TRAINING.text", "CombatRole.TRAINING.toolTipText"),
     AUXILIARY("CombatRole.AUXILIARY.text", "CombatRole.AUXILIARY.toolTipText"),
+    CADRE("CombatRole.CADRE.text", "CombatRole.CADRE.toolTipText"),
     RESERVE("CombatRole.RESERVE.text", "CombatRole.RESERVE.toolTipText");
     // endregion Enum Declarations
 
@@ -82,6 +83,10 @@ public enum CombatRole {
 
     public boolean isTraining() {
         return this == TRAINING;
+    }
+
+    public boolean isCadre() {
+        return this == CADRE;
     }
 
     public boolean isAuxiliary() {
