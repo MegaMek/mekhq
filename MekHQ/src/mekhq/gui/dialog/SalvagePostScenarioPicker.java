@@ -447,7 +447,7 @@ public class SalvagePostScenarioPicker {
         // Build the mapping and populate salvage unit options ONCE, outside the loop
         unitNameMap.clear();
         for (Unit salvageUnit : salvageUnits) {
-            String displayName = salvageUnit.getName(); // Use just the name
+            String displayName = CamOpsSalvageUtilities.getSalvageTooltip(List.of(salvageUnit), false);
             unitNameMap.put(displayName, salvageUnit);
         }
 
