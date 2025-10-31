@@ -104,7 +104,7 @@ public class SalvagePostScenarioPicker {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CamOpsSalvage";
 
     private final static int PADDING = scaleForGUI(10);
-    private final static Dimension DEFAULT_SIZE = scaleForGUI(1000, 600);
+    private final static Dimension DEFAULT_SIZE = scaleForGUI(1200, 600);
 
     private final boolean isInSpace;
     private int maximumSalvageTime = 0;
@@ -439,8 +439,11 @@ public class SalvagePostScenarioPicker {
         JLabel availableTimeLabel = null;
 
         if (isContract) {
+            JPanel infoContainer = new JPanel(new BorderLayout());
+            infoContainer.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+
+            // Left column (existing info labels)
             JPanel infoPanel = new JPanel(new GridLayout(4, 1, 5, 5));
-            infoPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
             JLabel salvagePercentLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
                   "SalvagePostScenarioPicker.salvagePercent", salvagePercent));
@@ -456,7 +459,24 @@ public class SalvagePostScenarioPicker {
             infoPanel.add(unitSalvageLabel);
             infoPanel.add(availableTimeLabel);
 
-            dialog.add(infoPanel, BorderLayout.NORTH);
+            // Right column (tutorial text)
+            JEditorPane tutorialPane = new JEditorPane();
+            tutorialPane.setContentType("text/html");
+            tutorialPane.setEditable(false);
+            tutorialPane.setOpaque(false);
+            tutorialPane.setText(getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.tutorial"));
+            tutorialPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
+            int preferredWidth = scaleForGUI(700);
+            tutorialPane.setSize(preferredWidth, Short.MAX_VALUE);
+            Dimension preferredSize = tutorialPane.getPreferredSize();
+            preferredSize.width = preferredWidth;
+            tutorialPane.setPreferredSize(preferredSize);
+
+            // Add both to container
+            infoContainer.add(infoPanel, BorderLayout.CENTER);
+            infoContainer.add(tutorialPane, BorderLayout.EAST);
+
+            dialog.add(infoContainer, BorderLayout.NORTH);
         }
 
         // Final references for use in lambdas
