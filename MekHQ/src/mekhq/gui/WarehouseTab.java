@@ -84,6 +84,7 @@ import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
@@ -552,9 +553,10 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 } else if (tech.getMinutesLeft() <= 0) {
                     return false;
                 } else {
+                    SkillModifierData skillModifierData = tech.getSkillModifierData();
                     return getCampaign().getCampaignOptions().isDestroyByMargin() ||
                                  (part.getSkillMin() <=
-                                        (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) -
+                                        (skill.getExperienceLevel(skillModifierData) -
                                                modePenalty));
                 }
             }

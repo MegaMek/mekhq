@@ -36,7 +36,6 @@ import java.util.List;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
 
 /**
  * Utility class for working with infantry gunnery-related skills.
@@ -96,14 +95,13 @@ public class InfantryGunnerySkills {
      * @since 0.50.10
      */
     private static String getGunnerySkill(Person person) {
-        PersonnelOptions options = person.getOptions();
-        Attributes attributes = person.getATOWAttributes();
+        SkillModifierData skillModifierData = person.getSkillModifierData();
 
         int highestLevel = Integer.MIN_VALUE;
         String bestSkill = null;
         for (String skillName : INFANTRY_GUNNERY_SKILLS) {
             if (person.hasSkill(skillName)) {
-                int skillLevel = person.getSkill(skillName).getTotalSkillLevel(options, attributes);
+                int skillLevel = person.getSkill(skillName).getTotalSkillLevel(skillModifierData);
 
                 if (skillLevel > highestLevel) {
                     highestLevel = skillLevel;

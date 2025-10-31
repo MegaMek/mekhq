@@ -125,6 +125,7 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedical
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
@@ -1966,12 +1967,16 @@ public class PersonViewPanel extends JScrollablePanel {
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
             String adjustment = getAdjustment(skill, attributeModifier, spaModifier);
+            boolean isIlliterate = person.isIlliterate();
+
+            SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
+                  isIlliterate);
 
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
-                  skill.toString(options, attributes, adjustedReputation),
+                  skill.toString(skillModifierData),
                   adjustment));
             lblName.setLabelFor(lblValue);
-            String tooltip = wordWrap(skill.getTooltip(options, attributes, adjustedReputation));
+            String tooltip = wordWrap(skill.getTooltip(skillModifierData));
             lblName.setToolTipText(tooltip);
             lblValue.setToolTipText(tooltip);
 
