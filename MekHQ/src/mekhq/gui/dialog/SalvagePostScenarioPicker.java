@@ -47,6 +47,7 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -116,7 +117,7 @@ public class SalvagePostScenarioPicker {
     private final List<TestUnit> actualSalvage;
     private final List<TestUnit> soldSalvage;
     private final List<TestUnit> employerSalvage = new ArrayList<>();
-    private final Map<String, Unit> unitNameMap = new HashMap<>();
+    private final Map<String, Unit> unitNameMap = new LinkedHashMap<>();
     private Map<UUID, RecoveryTimeData> recoveryTimeData;
     private boolean isExchangeRights = false;
 
@@ -320,7 +321,8 @@ public class SalvagePostScenarioPicker {
                 continue;
             }
 
-            maximumSalvageTime += tech.getMinutesLeft();
+            // I don't expect we'll have negative tech minutes, but you never know
+            maximumSalvageTime += Math.max(0, tech.getMinutesLeft());
         }
     }
 
@@ -447,8 +449,13 @@ public class SalvagePostScenarioPicker {
         // Build the mapping and populate salvage unit options ONCE, outside the loop
         unitNameMap.clear();
         for (Unit salvageUnit : salvageUnits) {
-            String displayName = CamOpsSalvageUtilities.getSalvageTooltip(List.of(salvageUnit), false);
-            unitNameMap.put(displayName, salvageUnit);
+            String base = CamOpsSalvageUtilities.getSalvageTooltip(List.of(salvageUnit), false);
+            String key = base;
+            int duplicate = 2;
+            while (unitNameMap.containsKey(key)) {
+                key = base + " [" + duplicate++ + "]";
+            }
+            unitNameMap.put(key, salvageUnit);
         }
 
         // Add all units to single column
@@ -910,7 +917,7 @@ public class SalvagePostScenarioPicker {
         double cargo1 = unit1 != null ? unit1.getCargoCapacity() : 0;
         double cargo2 = unit2 != null ? unit2.getCargoCapacity() : 0;
         double weight1 = unit1Entity != null ? unit1Entity.getWeight() : 0;
-        double weight2 = unit2 != null ? unit2Entity.getWeight() : 0;
+        double weight2 = unit2Entity != null ? unit2Entity.getWeight() : 0;
 
         boolean hasCargoCapacity = cargo1 >= targetWeight || cargo2 >= targetWeight;
         boolean hasTowageCapacity = (weight1 + weight2) >= targetWeight;
