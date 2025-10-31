@@ -1372,9 +1372,13 @@ public class Force {
         List<Unit> unitsInForce = getAllUnitsAsUnits(hangar, false);
 
         int unitCount = 0;
-
         for (Unit unit : unitsInForce) {
-            if (unit.canSalvage(isInSpace)) {
+            boolean canSurviveInSpace = false;
+            Entity entity = unit.getEntity();
+            if (entity != null) {
+                canSurviveInSpace = !entity.doomedInSpace();
+            }
+            if (unit.canSalvage(isInSpace) && (!isInSpace || canSurviveInSpace)) {
                 unitCount++;
             }
         }
