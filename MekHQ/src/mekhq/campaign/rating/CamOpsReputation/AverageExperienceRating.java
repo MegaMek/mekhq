@@ -176,13 +176,13 @@ public class AverageExperienceRating {
                     String gunnerySkill = SkillType.getGunnerySkillFor(entity);
                     if (person.hasSkill(gunnerySkill)) {
                         Skill skill = person.getSkill(gunnerySkill);
-                        gunnery = max(0, skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()));
+                        gunnery = max(0, skill.getFinalSkillValue(skillModifierData));
                     }
 
                     String piloting = SkillType.getDrivingSkillFor(entity);
                     if (person.hasSkill(piloting)) {
                         Skill skill = person.getSkill(piloting);
-                        antiMek = max(0, skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()));
+                        antiMek = max(0, skill.getFinalSkillValue(skillModifierData));
                     }
 
                     totalExperience += (double) (gunnery + antiMek) / 2;

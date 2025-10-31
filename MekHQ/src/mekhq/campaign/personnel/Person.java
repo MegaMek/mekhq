@@ -4796,11 +4796,11 @@ public class Person {
                     Skill gunnery = getSkill(S_GUN_VEE);
                     int gunneryExperienceLevel = gunnery == null ?
                                                        EXP_NONE :
-                                                       gunnery.getExperienceLevel(options, atowAttributes);
+                                                       gunnery.getExperienceLevel(skillModifierData);
                     Skill artillery = getSkill(S_ARTILLERY);
                     int artilleryExperienceLevel = gunnery == null ?
                                                          EXP_NONE :
-                                                         artillery.getExperienceLevel(options, atowAttributes);
+                                                         artillery.getExperienceLevel(skillModifierData);
 
                     if (artilleryExperienceLevel > gunneryExperienceLevel) {
                         associatedSkillNames.remove(S_GUN_VEE);
@@ -4809,7 +4809,7 @@ public class Person {
 
                     yield calculateExperienceLevelForProfession(associatedSkillNames,
                           isAlternativeQualityAveraging,
-                          adjustedReputation);
+                          skillModifierData);
                 }
             }
             case SOLDIER -> {
