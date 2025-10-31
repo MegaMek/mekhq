@@ -36,11 +36,18 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.Advanced
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import megamek.common.enums.Gender;
 import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.GameEffect;
+import mekhq.campaign.log.MedicalLogger;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.medical.BodyLocation;
 
@@ -295,6 +302,15 @@ public class AlternateInjuries {
                   InjuryEffect.INTERNAL_BLEEDING, Set.of(BodyLocation.HEART));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEART_TRAUMA.simpleName");
         }
+
+        @Override
+        public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
+            return Collections.singletonList(new GameEffect("Blood Loss", operator -> {
+                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, BodyLocation.INTERNAL, 1);
+                person.addInjury(bleeding);
+                MedicalLogger.internalBleedingWorsened(person, campaign.getLocalDate());
+            }));
+        }
     }
 
     public static final class AbdominalBurn extends SimpleBurn {
@@ -317,6 +333,15 @@ public class AlternateInjuries {
                   InjuryEffect.INTERNAL_BLEEDING, Set.of(BodyLocation.CHEST));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ORGAN_TRAUMA.simpleName");
         }
+
+        @Override
+        public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
+            return Collections.singletonList(new GameEffect("Blood Loss", operator -> {
+                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, BodyLocation.INTERNAL, 1);
+                person.addInjury(bleeding);
+                MedicalLogger.internalBleedingWorsened(person, campaign.getLocalDate());
+            }));
+        }
     }
 
     public static final class FracturedGroin extends BaseInjury {
@@ -332,6 +357,15 @@ public class AlternateInjuries {
             super(DISEMBOWELED_HEALING_DAYS, false, InjuryLevel.DEADLY,
                   InjuryEffect.INTERNAL_BLEEDING, Set.of(BodyLocation.ABDOMEN));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DISEMBOWELED.simpleName");
+        }
+
+        @Override
+        public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
+            return Collections.singletonList(new GameEffect("Blood Loss", operator -> {
+                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, BodyLocation.INTERNAL, 1);
+                person.addInjury(bleeding);
+                MedicalLogger.internalBleedingWorsened(person, campaign.getLocalDate());
+            }));
         }
     }
 
@@ -516,7 +550,6 @@ public class AlternateInjuries {
             super(BLOOD_LOSS_HEALING_DAYS, false, InjuryLevel.MAJOR,
                   InjuryEffect.NONE, Set.of(BodyLocation.INTERNAL));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BLOOD_LOSS.simpleName");
-            ;
             this.fluffText = simpleName;
         }
     }
