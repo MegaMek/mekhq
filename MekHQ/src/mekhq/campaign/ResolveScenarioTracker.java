@@ -87,7 +87,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.dialog.PostSalvagePicker;
+import mekhq.gui.dialog.SalvagePostScenarioPicker;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -1762,7 +1762,7 @@ public class ResolveScenarioTracker {
             }
         }
 
-        new PostSalvagePicker(campaign, mission, scenario, getActualSalvage(), getSoldSalvage());
+        new SalvagePostScenarioPicker(campaign, mission, scenario, getActualSalvage(), getSoldSalvage());
 
         for (Loot loot : actualLoot) {
             loot.getLoot(campaign, scenario, unitsStatus);

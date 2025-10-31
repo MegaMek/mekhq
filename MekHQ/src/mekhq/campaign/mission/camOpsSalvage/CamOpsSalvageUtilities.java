@@ -56,17 +56,21 @@ public class CamOpsSalvageUtilities {
                     boolean isLargeVessel = entity instanceof Dropship || entity instanceof Warship;
                     tooltip.append(unit.getName());
 
+                    double tonnage = entity.getTonnage();
                     if (!isLargeVessel) {
-                        tooltip.append(" (").append(entity.getTonnage()).append(" tons drag/tow)");
+                        tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
+                              "PostSalvagePicker.tooltip.drag", tonnage)).append(")");
                     }
 
                     double cargoCapacity = unit.getCargoCapacity();
                     if (!(entity instanceof Mek)) {
-                        tooltip.append(" (").append(cargoCapacity).append(" tons cargo)");
+                        tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
+                              "PostSalvagePicker.tooltip.cargo", cargoCapacity)).append(")");
 
                         if (isLargeVessel) {
                             if (CamOpsSalvageUtilities.hasNavalTug(entity)) {
-                                tooltip.append(" (Has Naval Tug)");
+                                tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
+                                      "PostSalvagePicker.tooltip.tug")).append(")");
                             }
                         }
                     }
@@ -142,8 +146,8 @@ public class CamOpsSalvageUtilities {
                       .credit(TransactionType.SALVAGE,
                             campaign.getLocalDate(),
                             unitRansoms,
-                            getFormattedTextAt(RESOURCE_BUNDLE, "PostSalvagePicker.unitSale", scenario.getName()));
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "PostSalvagePicker.unitSale.report",
+                            getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.unitSale", scenario.getName()));
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.unitSale.report",
                       unitRansoms.toAmountString(), scenario.getHyperlinkedName()));
                 if (isContract) {
                     ((Contract) mission).addSalvageByUnit(unitRansoms);
@@ -162,8 +166,8 @@ public class CamOpsSalvageUtilities {
                       .credit(TransactionType.SALVAGE_EXCHANGE,
                             campaign.getLocalDate(),
                             value,
-                            getFormattedTextAt(RESOURCE_BUNDLE, "PostSalvagePicker.exchange", scenario.getName()));
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "PostSalvagePicker.exchange.report",
+                            getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.exchange", scenario.getName()));
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.exchange.report",
                       unitRansoms.toAmountString(), scenario.getHyperlinkedName()));
             } else {
                 ((Contract) mission).addSalvageByEmployer(value);

@@ -34,7 +34,9 @@ package mekhq.gui.dialog;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -101,8 +103,8 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * @author Illiani
  * @since 0.50.10
  */
-public class PostSalvagePicker {
-    private static final MMLogger LOGGER = MMLogger.create(PostSalvagePicker.class);
+public class SalvagePostScenarioPicker {
+    private static final MMLogger LOGGER = MMLogger.create(SalvagePostScenarioPicker.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CamOpsSalvage";
 
     private final static int PADDING = scaleForGUI(10);
@@ -134,8 +136,7 @@ public class PostSalvagePicker {
      * @since 0.50.10
      */
     private record SalvageComboBoxGroup(JComboBox<String> comboBox1, JComboBox<String> comboBox2,
-          JLabel validationLabel,
-          JLabel unitLabel, TestUnit targetUnit) {}
+          JLabel validationLabel, JLabel unitLabel, TestUnit targetUnit) {}
 
     /**
      * Creates a new post-salvage picker dialog and processes the selected salvage.
@@ -156,7 +157,8 @@ public class PostSalvagePicker {
      * @author Illiani
      * @since 0.50.10
      */
-    public PostSalvagePicker(Campaign campaign, Mission mission, Scenario scenario, List<TestUnit> actualSalvage,
+    public SalvagePostScenarioPicker(Campaign campaign, Mission mission, Scenario scenario,
+          List<TestUnit> actualSalvage,
           List<TestUnit> soldSalvage) {
         this.actualSalvage = actualSalvage;
         this.soldSalvage = soldSalvage;
@@ -363,16 +365,14 @@ public class PostSalvagePicker {
             JPanel infoPanel = new JPanel(new GridLayout(4, 1, 5, 5));
             infoPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
-            JLabel salvagePercentLabel = new JLabel("Salvage Percent: " + salvagePercent + "%");
-            employerSalvageLabel = new JLabel("Employer Salvage: " +
-                                                    employerSalvageMoney.toAmountString() +
-                                                    " C-Bills");
-            unitSalvageLabel = new JLabel("Unit Salvage: " + unitSalvageMoney.toAmountString() + " C-Bills");
-            availableTimeLabel = new JLabel("Available Time: " +
-                                                  usedSalvageTime +
-                                                  " / " +
-                                                  maximumSalvageTime +
-                                                  " minutes");
+            JLabel salvagePercentLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.salvagePercent", salvagePercent));
+            employerSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.employerSalvage", employerSalvageMoney.toAmountString()));
+            unitSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.unitSalvage", unitSalvageMoney.toAmountString()));
+            availableTimeLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.time", usedSalvageTime, maximumSalvageTime));
 
             infoPanel.add(salvagePercentLabel);
             infoPanel.add(employerSalvageLabel);
@@ -416,11 +416,14 @@ public class PostSalvagePicker {
             rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
             JLabel unitLabel = new JLabel();
+            String iconography;
             if (soldSalvage.contains(unit)) {
-                unitLabel.setText(unitName + " - " + sellValue.toAmountString() + "C-Bills <b><s>C</s><b>");
+                iconography = getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.unitLabel.sale");
             } else {
-                unitLabel.setText(unitName + " - " + sellValue.toAmountString() + "C-Bills <b>\u267B</b>");
+                iconography = getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.unitLabel.salvage");
             }
+            unitLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.unitLabel.unit",
+                  unitName, sellValue, iconography));
 
             RecoveryTimeData data = recoveryTimeData.get(unit.getId());
             if (data != null) {
@@ -469,7 +472,7 @@ public class PostSalvagePicker {
         JScrollPane scrollPane = new JScrollPane(column);
         scrollPane.setBorder(null);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
@@ -531,9 +534,8 @@ public class PostSalvagePicker {
      * @since 0.50.10
      */
     private void performComboChangeAction(boolean isContract, List<SalvageComboBoxGroup> salvageComboBoxGroups,
-          SalvageComboBoxGroup group,
-          JLabel finalEmployerSalvageLabel, JLabel finalUnitSalvageLabel, JLabel finalAvailableTimeLabel,
-          JButton confirmButton) {
+          SalvageComboBoxGroup group, JLabel finalEmployerSalvageLabel, JLabel finalUnitSalvageLabel,
+          JLabel finalAvailableTimeLabel, JButton confirmButton) {
         updateComboBoxOptions(salvageComboBoxGroups, unitNameMap);
         updateValidation(group, unitNameMap);
         updateSalvageAllocation(salvageComboBoxGroups,
@@ -617,7 +619,8 @@ public class PostSalvagePicker {
      */
     private boolean isValidationValid(SalvageComboBoxGroup group) {
         String validationText = group.validationLabel.getText();
-        return validationText.isEmpty() || validationText.equals("Valid");
+        return validationText.isEmpty() ||
+                     validationText.equals(getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.valid"));
     }
 
     /**
@@ -680,13 +683,16 @@ public class PostSalvagePicker {
 
         // Update labels if they exist
         if (employerSalvageLabel != null) {
-            employerSalvageLabel.setText("Employer Salvage: " + employerSalvageMoney.toAmountString() + " C-Bills");
+            employerSalvageLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.employerSalvage", employerSalvageMoney.toAmountString()));
         }
         if (unitSalvageLabel != null) {
-            unitSalvageLabel.setText("Unit Salvage: " + unitSalvageMoney.toAmountString() + " C-Bills");
+            unitSalvageLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.unitSalvage", unitSalvageMoney.toAmountString()));
         }
         if (availableTimeLabel != null) {
-            availableTimeLabel.setText("Available Time: " + usedSalvageTime + " / " + maximumSalvageTime + " minutes");
+            availableTimeLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.time", usedSalvageTime, maximumSalvageTime));
         }
     }
 
@@ -802,7 +808,7 @@ public class PostSalvagePicker {
             boolean hasNavalTug = (unit1Entity != null && CamOpsSalvageUtilities.hasNavalTug(unit1Entity)) ||
                                         (unit2Entity != null && CamOpsSalvageUtilities.hasNavalTug(unit2Entity));
             if (!hasNavalTug) {
-                group.validationLabel.setText("No Naval Tug");
+                group.validationLabel.setText(getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.noTug"));
                 group.unitLabel.setForeground(MekHQ.getMHQOptions().getFontColorNegative());
                 return;
             }
@@ -818,12 +824,13 @@ public class PostSalvagePicker {
         boolean hasTowageCapacity = (weight1 + weight2) >= targetWeight;
 
         if (!hasCargoCapacity && !hasTowageCapacity) {
-            group.validationLabel.setText("Insufficient Towage or Cargo");
+            group.validationLabel.setText(getTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.validation.noCapacity"));
             group.unitLabel.setForeground(MekHQ.getMHQOptions().getFontColorNegative());
             return;
         }
 
-        group.validationLabel.setText("Valid");
-        group.unitLabel.setForeground(null);  // Reset to default color
+        group.validationLabel.setText(getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.valid"));
+        group.unitLabel.setForeground(null); // Reset to default color
     }
 }
