@@ -197,27 +197,21 @@ public class SalvagePostScenarioPicker {
         arrangeUnits();
         setRecoveryTimeDataMap(campaign, scenario);
 
-        // If the player has 100% (or 0%) salvage, skip the salvage selection dialog entirely.
-        boolean playerGetsAllSalvage = mission instanceof Contract contract && contract.getSalvagePct() >= 100;
-        boolean playerGetsNoSalvage = mission instanceof Contract contract && contract.getSalvagePct() <= 0;
-
         boolean isContract = mission instanceof Contract;
-        if (!playerGetsAllSalvage && !playerGetsNoSalvage) {
-            if (isContract) {
-                salvagePercent = ((Contract) mission).getSalvagePct();
-                employerSalvageMoney = ((Contract) mission).getSalvagedByEmployer();
-                unitSalvageMoney = ((Contract) mission).getSalvagedByUnit();
-            }
+        boolean playerGetsNoSalvage = isContract && ((Contract) mission).getSalvagePct() <= 0;
+        if (playerGetsNoSalvage) {
+            return; // There isn't going to be anything to process
+        }
 
-            List<SalvageComboBoxGroup> selectedGroups = showSalvageDialog(isContract);
-            if (selectedGroups != null) {
-                processSalvageAssignments(selectedGroups);
-            }
-        } else if (playerGetsNoSalvage) {
-            employerSalvage.addAll(actualSalvage);
-            employerSalvage.addAll(soldSalvage);
-            actualSalvage.clear();
-            soldSalvage.clear();
+        if (isContract) {
+            salvagePercent = ((Contract) mission).getSalvagePct();
+            employerSalvageMoney = ((Contract) mission).getSalvagedByEmployer();
+            unitSalvageMoney = ((Contract) mission).getSalvagedByUnit();
+        }
+
+        List<SalvageComboBoxGroup> selectedGroups = showSalvageDialog(isContract);
+        if (selectedGroups != null) {
+            processSalvageAssignments(selectedGroups);
         }
 
         // Process selected units
@@ -342,11 +336,22 @@ public class SalvagePostScenarioPicker {
             String unitName1 = (String) group.comboBox1.getSelectedItem();
             String unitName2 = (String) group.comboBox2.getSelectedItem();
 
-            // If no units are assigned to salvage this unit
-            if (unitName1 == null && unitName2 == null) {
+            // Check if player has claimed this salvage
+            boolean hasClaimed = group.claimedSalvageForKeeps.isSelected() ||
+                                       group.claimedSalvageForSale.isSelected();
+
+            // If no units are assigned to salvage this unit AND player hasn't claimed it
+            if (unitName1 == null && unitName2 == null && !hasClaimed) {
                 unitsToMoveToEmployer.add(group.targetUnit);
             }
         }
+
+        JCheckBox claimedSalvageForKeeps = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
+              "SalvagePostScenarioPicker.unitLabel.salvage"));
+        claimedSalvageForKeeps.setEnabled(false);
+        JCheckBox claimedSalvageForSale = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
+              "SalvagePostScenarioPicker.unitLabel.sale"));
+        claimedSalvageForSale.setEnabled(false);
 
         // Move units from actualSalvage to employerSalvage
         for (TestUnit unit : unitsToMoveToEmployer) {
@@ -451,7 +456,6 @@ public class SalvagePostScenarioPicker {
             rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
             JLabel unitLabel = new JLabel();
-            String iconography;
             unitLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.unitLabel.unit",
                   unitName, sellValue.toAmountString()));
 
@@ -492,10 +496,16 @@ public class SalvagePostScenarioPicker {
             salvageComboBoxGroups.add(group);
 
             // These need to be after the above lines, as we're going to use 'group' in the listeners.
-            comboBox1.addActionListener(e -> performComboChangeAction(isContract, salvageComboBoxGroups, group,
-                  finalEmployerSalvageLabel, finalUnitSalvageLabel, finalAvailableTimeLabel, confirmButton));
-            comboBox2.addActionListener(e -> performComboChangeAction(isContract, salvageComboBoxGroups, group,
-                  finalEmployerSalvageLabel, finalUnitSalvageLabel, finalAvailableTimeLabel, confirmButton));
+            comboBox1.addActionListener(e -> performComboChangeAction(isContract, salvageComboBoxGroups,
+                  group, finalEmployerSalvageLabel, finalUnitSalvageLabel, finalAvailableTimeLabel, confirmButton));
+            comboBox2.addActionListener(e -> performComboChangeAction(isContract, salvageComboBoxGroups,
+                  group, finalEmployerSalvageLabel, finalUnitSalvageLabel, finalAvailableTimeLabel, confirmButton));
+            claimedSalvageForKeeps.addActionListener(e -> performComboChangeAction(isContract,
+                  salvageComboBoxGroups, group, finalEmployerSalvageLabel, finalUnitSalvageLabel,
+                  finalAvailableTimeLabel, confirmButton));
+            claimedSalvageForSale.addActionListener(e -> performComboChangeAction(isContract,
+                  salvageComboBoxGroups, group, finalEmployerSalvageLabel, finalUnitSalvageLabel,
+                  finalAvailableTimeLabel, confirmButton));
 
             rowPanel.add(claimedSalvageForKeeps);
             rowPanel.add(claimedSalvageForSale);
@@ -693,8 +703,8 @@ public class SalvagePostScenarioPicker {
      * @since 0.50.10
      */
     private void updateSalvageAllocation(List<SalvageComboBoxGroup> salvageComboBoxGroups,
-          Map<String, Unit> unitNameMap,
-          JLabel employerSalvageLabel, JLabel unitSalvageLabel, JLabel availableTimeLabel) {
+          Map<String, Unit> unitNameMap, JLabel employerSalvageLabel, JLabel unitSalvageLabel,
+          JLabel availableTimeLabel) {
         // Reset tracking values
         usedSalvageTime = 0;
         Money tempEmployerSalvage = Money.zero();
@@ -709,14 +719,18 @@ public class SalvagePostScenarioPicker {
             TestUnit targetUnit = group.targetUnit;
 
             boolean hasAssignedUnits = (unit1 != null) || (unit2 != null);
+            boolean hasClaimed = group.claimedSalvageForKeeps.isSelected() ||
+                                       group.claimedSalvageForSale.isSelected();
 
+            // Add recovery time only if units are assigned
             if (hasAssignedUnits) {
-                // Add recovery time
                 RecoveryTimeData timeData = recoveryTimeData.get(targetUnit.getId());
                 if (timeData != null) {
                     usedSalvageTime += timeData.totalRecoveryTime();
                 }
+            }
 
+            if (hasClaimed) {
                 // Add to unit salvage
                 tempUnitSalvage = tempUnitSalvage.plus(targetUnit.getSellValue());
             } else {
@@ -906,5 +920,7 @@ public class SalvagePostScenarioPicker {
 
         group.validationLabel.setText(getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.valid"));
         group.unitLabel.setForeground(null); // Reset to default color
+        group.claimedSalvageForKeeps.setEnabled(true);
+        group.claimedSalvageForSale.setEnabled(true);
     }
 }
