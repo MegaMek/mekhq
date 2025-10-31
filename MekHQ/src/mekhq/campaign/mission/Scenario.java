@@ -646,15 +646,23 @@ public class Scenario implements IPlayerSettings {
     }
 
     public List<Integer> getSalvageForces() {
-        return salvageForces;
+        return new ArrayList<>(salvageForces);
+    }
+
+    public void resetSalvageForces() {
+        salvageForces.clear();
     }
 
     public void addSalvageForce(int forceId) {
         salvageForces.add(forceId);
     }
 
+    public void resetSalvageTechs() {
+        salvageTechs.clear();
+    }
+
     public List<UUID> getSalvageTechs() {
-        return salvageTechs;
+        return new ArrayList<>(salvageTechs);
     }
 
     public void addSalvageTech(UUID personId) {

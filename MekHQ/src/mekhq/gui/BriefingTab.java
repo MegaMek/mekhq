@@ -913,7 +913,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return true;
         }
 
-        scenario.getSalvageForces().clear(); // reset, in case we've previously canceled out of the dialog
+        scenario.resetSalvageForces(); // reset, in case we've previously canceled out of the dialog
         List<Force> salvageForceOptions = getSalvageForces(getCampaign().getHangar(),
               scenario.getBoardType() == AtBScenario.T_SPACE);
 
@@ -952,7 +952,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return true;
         }
 
-        scenario.getSalvageTechs().clear(); // reset, in case we've previously canceled out of the dialog
+        scenario.resetSalvageTechs(); // reset, in case we've previously canceled out of the dialog
         List<Person> availableTechs = getAvailableTechs();
 
         SalvageTechPicker techPicker = new SalvageTechPicker(getCampaign(), availableTechs);
