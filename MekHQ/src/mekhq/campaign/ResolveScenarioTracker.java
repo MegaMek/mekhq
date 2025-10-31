@@ -1764,11 +1764,13 @@ public class ResolveScenarioTracker {
         }
 
         if (campaignOptions.isUseCamOpsSalvage()) {
-            new SalvagePostScenarioPicker(campaign, mission, scenario, getActualSalvage(), getSoldSalvage());
+            SalvagePostScenarioPicker picker = new SalvagePostScenarioPicker(campaign, mission, scenario,
+                  getActualSalvage(), getSoldSalvage());
 
             if (campaignOptions.isUseRiskySalvage()) {
-                int salvagedUnits = getActualSalvage().size() + getSoldSalvage().size();
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, scenario.getSalvageTechs(), salvagedUnits);
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign,
+                      scenario.getSalvageTechs(),
+                      picker.getCountOfSalvageUnits());
             }
         } else {
             CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, getActualSalvage(), getSoldSalvage(),
