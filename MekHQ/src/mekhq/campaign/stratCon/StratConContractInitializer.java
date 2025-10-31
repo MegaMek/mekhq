@@ -593,7 +593,6 @@ public class StratConContractInitializer {
         for (int y = 0; y < trackHeight; y++) {
             for (int x = 0; x < trackWidth; x++) {
                 StratConCoords coords = new StratConCoords(x, y);
-
                 if (trackState.getScenario(coords) != null) {
                     continue;
                 }
@@ -601,7 +600,7 @@ public class StratConContractInitializer {
                 StratConFacility facility = trackState.getFacility(coords);
                 if (facility == null) {
                     suitableCoords.add(coords);
-                } else if (allowPlayerFacilities && !facility.isOwnerAlliedToPlayer()) {
+                } else if (allowPlayerFacilities && facility.isOwnerAlliedToPlayer()) {
                     if (emphasizeStrategicTargets) {
                         for (int weight = 0; weight < weightingMultiplier; weight++) {
                             suitableCoords.add(coords);
@@ -613,7 +612,6 @@ public class StratConContractInitializer {
 
                 if (allowPlayerForces && trackState.getAssignedForceCoords().containsValue(coords)) {
                     if (emphasizeStrategicTargets) {
-                        weightingMultiplier /= 2;
                         for (int weight = 0; weight < weightingMultiplier; weight++) {
                             suitableCoords.add(coords);
                         }
