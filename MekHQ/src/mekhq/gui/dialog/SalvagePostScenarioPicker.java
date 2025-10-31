@@ -157,6 +157,7 @@ public class SalvagePostScenarioPicker {
      * @since 0.50.10
      */
     private static class SalvageComboBoxGroup {
+        final JButton unitButton;
         final JComboBox<String> comboBox1;
         final JComboBox<String> comboBox2;
         final JLabel validationLabel;
@@ -169,6 +170,7 @@ public class SalvagePostScenarioPicker {
         /**
          * Creates a new salvage combo box group.
          *
+         * @param unitButton             a button used to access field stripping
          * @param comboBox1              first combo box for selecting a salvage unit
          * @param comboBox2              second combo box for selecting a salvage unit
          * @param validationLabel        label displaying validation status
@@ -180,9 +182,10 @@ public class SalvagePostScenarioPicker {
          * @author Illiani
          * @since 0.50.10
          */
-        SalvageComboBoxGroup(JComboBox<String> comboBox1, JComboBox<String> comboBox2, JLabel validationLabel,
-              JLabel unitLabel, JCheckBox claimedSalvageForKeeps, JCheckBox claimedSalvageForSale,
-              TestUnit targetUnit) {
+        SalvageComboBoxGroup(JButton unitButton, JComboBox<String> comboBox1, JComboBox<String> comboBox2,
+              JLabel validationLabel, JLabel unitLabel, JCheckBox claimedSalvageForKeeps,
+              JCheckBox claimedSalvageForSale, TestUnit targetUnit) {
+            this.unitButton = unitButton;
             this.comboBox1 = comboBox1;
             this.comboBox2 = comboBox2;
             this.validationLabel = validationLabel;
@@ -536,7 +539,15 @@ public class SalvagePostScenarioPicker {
                 comboBox2.addItem(displayName);
             }
 
-            SalvageComboBoxGroup group = new SalvageComboBoxGroup(comboBox1,
+            RoundedJButton fieldStripButton = new RoundedJButton("\u2692");
+            fieldStripButton.setEnabled(false); // TODO remove this line when we're ready to implement field stripping
+            fieldStripButton.setFocusable(false);
+            fieldStripButton.setToolTipText(getTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.fieldStripButton.tooltip"));
+            fieldStripButton.putClientProperty("unitId", unit);
+
+            SalvageComboBoxGroup group = new SalvageComboBoxGroup(fieldStripButton,
+                  comboBox1,
                   comboBox2,
                   validationLabel,
                   unitLabel,
@@ -556,7 +567,9 @@ public class SalvagePostScenarioPicker {
             claimedSalvageForSale.addActionListener(e -> performComboChangeAction(isContract,
                   salvageComboBoxGroups, group, finalEmployerSalvageLabel, finalUnitSalvageLabel,
                   finalAvailableTimeLabel, confirmButton));
+            fieldStripButton.addActionListener(e -> fieldStrip(group));
 
+            rowPanel.add(fieldStripButton);
             rowPanel.add(claimedSalvageForKeeps);
             rowPanel.add(claimedSalvageForSale);
             rowPanel.add(unitLabel);
@@ -596,6 +609,16 @@ public class SalvagePostScenarioPicker {
         dialog.setVisible(true);
 
         return confirmed[0] ? resultHolder.groups : null;
+    }
+
+    /**
+     * This is not currently implemented. The purpose of this method is to allow future developers and easy access point
+     * to implement field stripping, without needing to grok where it should fit in the class (and gui).
+     */
+    private void fieldStrip(SalvageComboBoxGroup group) {
+        TestUnit targetUnit = group.targetUnit;
+        // Example: open a JDialog with a list of parts that can be stripped and a way to pick a tech (that is
+        // assigned to the scenario) to perform the task. We can probably ape the Repair tab.
     }
 
     /**
