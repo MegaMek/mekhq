@@ -1964,7 +1964,9 @@ public class PersonViewPanel extends JScrollablePanel {
             }
             JLabel lblName = new JLabel(label);
             boolean isIlliterate = person.isIlliterate();
-            List<InjuryEffect> injuryEffects = InjuryEffect.g
+            boolean isAmbidextrous = person.getOptions().booleanOption(ATOW_AMBIDEXTROUS);
+            List<InjuryEffect> injuryEffects = AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
+                  person.getInjuries());
             SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
                   isIlliterate, injuryEffects);
 

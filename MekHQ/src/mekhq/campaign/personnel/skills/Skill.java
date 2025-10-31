@@ -46,6 +46,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -604,7 +605,7 @@ public class Skill {
 
         boolean isIntelligenceBased = INTELLIGENCE.equals(type.getFirstAttribute())
                                             || INTELLIGENCE.equals(type.getSecondAttribute());
-        int literacyModifier = isIntelligenceBased && skillModifierData.isIlliterate
+        int literacyModifier = isIntelligenceBased && skillModifierData.isIlliterate()
                                      ? UNTRAINED_SKILL_MODIFIER : 0;
 
         return spaModifiers + attributeModifiers + literacyModifier + totalInjuryModifier;
@@ -612,7 +613,7 @@ public class Skill {
 
     public static int getTotalInjuryModifier(SkillModifierData skillModifierData, SkillType type) {
         int totalInjuryModifier = 0;
-        for (InjuryEffect injuryEffect : skillModifierData.injuryEffects) {
+        for (InjuryEffect injuryEffect : skillModifierData.injuryEffects()) {
             int firstAttributeModifier = getAttributeModifierFromInjuryEffect(injuryEffect, type.getFirstAttribute());
             int secondAttributeModifier = getAttributeModifierFromInjuryEffect(injuryEffect, type.getSecondAttribute());
             int perceptionModifier = type.getName().equals(S_PERCEPTION) ? injuryEffect.getPerceptionModifier() : 0;
@@ -724,7 +725,7 @@ public class Skill {
     @Override
     public String toString() {
         SkillModifierData skillModifierData = new SkillModifierData(new PersonnelOptions(), new Attributes(),
-              0, false);
+              0, false, new ArrayList<>());
         return toString(skillModifierData);
     }
 
