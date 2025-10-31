@@ -9,6 +9,8 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import megamek.codeUtilities.ObjectUtility;
@@ -26,6 +28,8 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -33,6 +37,10 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConCoords;
+import mekhq.campaign.stratCon.StratConScenario;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 
@@ -311,5 +319,85 @@ public class CamOpsSalvageUtilities {
 
             tech.setMinutesLeft(0);
         }
+    }
+
+    /**
+     * A lightweight record for associating a {@link StratConTrackState} with its corresponding {@link StratConCoords}
+     * on the campaign map.
+     *
+     * <p>This is used internally when resolving which strategic track and coordinates a scenario belongs to during
+     * salvage team deployment. It allows both values to be returned together as a single, immutable result.</p>
+     *
+     * @param track  the {@link StratConTrackState} that contains the scenario
+     * @param coords the {@link StratConCoords} location of the scenario within that track
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private record TrackLocation(StratConTrackState track, StratConCoords coords) {}
+
+    /**
+     * Searches a given {@link StratConCampaignState} for the track and coordinates corresponding to a specific
+     * {@link Scenario}.
+     *
+     * <p>This method iterates over all tracks and scenarios within the provided campaign state, comparing each
+     * scenario’s backing scenario ID to the ID of the provided {@link Scenario}. When a match is found, the associated
+     * track and coordinates are returned as a {@link TrackLocation}.</p>
+     *
+     * @param scenario the scenario to locate within the campaign state
+     * @param state    the {@link StratConCampaignState} to search
+     *
+     * @return an {@link Optional} containing the {@link TrackLocation} if found, or an empty Optional if the scenario
+     *       is not part of any track
+     *
+     * @since 0.50.10
+     */
+    private static Optional<TrackLocation> findTrackAndCoords(Scenario scenario, StratConCampaignState state) {
+        final int scenarioId = scenario.getId();
+        for (StratConTrackState track : state.getTracks()) {
+            for (Map.Entry<StratConCoords, StratConScenario> entry : track.getScenarios().entrySet()) {
+                if (entry.getValue().getBackingScenarioID() == scenarioId) {
+                    return Optional.of(new TrackLocation(track, entry.getKey()));
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Deploys all salvage forces from a scenario onto its corresponding strategic track location within the contract’s
+     * {@link StratConCampaignState}.
+     *
+     * <p>This method identifies the {@link StratConTrackState} and {@link StratConCoords} that correspond to the
+     * given {@link Scenario}, and assigns each salvage-capable {@link Force} participating in the scenario to that
+     * location. If the scenario is not part of an {@link AtBContract}, or if the contract has no active strategic
+     * campaign state, the method exits without making changes.</p>
+     *
+     * @param campaign the active {@link Campaign} containing forces and missions
+     * @param scenario the {@link Scenario} whose salvage teams are being deployed
+     *
+     * @since 0.50.10
+     */
+    public static void deploySalvageTeams(Campaign campaign, Scenario scenario) {
+        final Mission mission = campaign.getMission(scenario.getMissionId());
+
+        if (!(mission instanceof AtBContract contract)) {
+            return;
+        }
+
+        final StratConCampaignState state = contract.getStratconCampaignState();
+        if (state == null) {
+            return;
+        }
+
+        findTrackAndCoords(scenario, state).ifPresent(loc -> {
+            for (int forceId : scenario.getSalvageForces()) {
+                Force force = campaign.getForce(forceId);
+                if (force != null) {
+                    loc.track().assignForce(forceId, loc.coords(), campaign.getLocalDate(), false);
+                }
+            }
+        });
     }
 }

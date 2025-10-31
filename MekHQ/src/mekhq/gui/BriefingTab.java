@@ -107,6 +107,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
@@ -860,15 +861,37 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (!displaySalvageForcePicker(scenario)) {
-            return;
-        }
+        boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
+        if (hasSalvageOpportunity) {
+            if (!displaySalvageForcePicker(scenario)) {
+                return;
+            }
 
-        if (!displaySalvageTechPicker(scenario)) {
-            return;
+            if (!displaySalvageTechPicker(scenario)) {
+                return;
+            }
         }
 
         startScenario(scenario, null);
+    }
+
+    /**
+     * Checks whether the player is able to salvage in the mission associated with the chosen scenario.
+     *
+     * @param missionId the id of the mission being checked.
+     *
+     * @return {@code true} if the player can salvage
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private boolean isHasSalvageOpportunity(int missionId) {
+        boolean hasSalvageOpportunity = true;
+        Mission mission = getCampaign().getMission(missionId);
+        if (mission instanceof Contract contract) {
+            hasSalvageOpportunity = contract.canSalvage();
+        }
+        return hasSalvageOpportunity;
     }
 
     /**
@@ -900,6 +923,10 @@ public final class BriefingTab extends CampaignGuiTab {
             List<Force> selectedForces = forcePicker.getSelectedForces();
             for (Force force : selectedForces) {
                 scenario.addSalvageForce(force.getId());
+            }
+
+            if (getCampaign().getCampaignOptions().isUseStratCon()) {
+                CamOpsSalvageUtilities.deploySalvageTeams(getCampaign(), scenario);
             }
         }
 
@@ -1130,12 +1157,15 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void runAbstractCombatAutoResolve(Scenario scenario) {
-        if (!displaySalvageForcePicker(scenario)) {
-            return;
-        }
+        boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
+        if (hasSalvageOpportunity) {
+            if (!displaySalvageForcePicker(scenario)) {
+                return;
+            }
 
-        if (!displaySalvageTechPicker(scenario)) {
-            return;
+            if (!displaySalvageTechPicker(scenario)) {
+                return;
+            }
         }
 
         List<Unit> chosen = playerUnits(scenario, new StringBuilder());
@@ -1151,12 +1181,15 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (!displaySalvageForcePicker(scenario)) {
-            return;
-        }
+        boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
+        if (hasSalvageOpportunity) {
+            if (!displaySalvageForcePicker(scenario)) {
+                return;
+            }
 
-        if (!displaySalvageTechPicker(scenario)) {
-            return;
+            if (!displaySalvageTechPicker(scenario)) {
+                return;
+            }
         }
 
         startScenario(scenario, getCampaign().getAutoResolveBehaviorSettings());
