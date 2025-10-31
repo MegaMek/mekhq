@@ -7,6 +7,7 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -219,14 +220,14 @@ public class CamOpsSalvageUtilities {
      * </ul>
      *
      * @param campaign              the current campaign
-     * @param techs                 list of technicians assigned to salvage operations (may be modified if techs die)
+     * @param techUUIDs             list of technicians assigned to salvage operations (may be modified if techs die)
      * @param numberOfSalvagedUnits the number of units being salvaged
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static void performRiskySalvageChecks(Campaign campaign, List<UUID> techs, int numberOfSalvagedUnits) {
-        if (techs.isEmpty()) {
+    public static void performRiskySalvageChecks(Campaign campaign, List<UUID> techUUIDs, int numberOfSalvagedUnits) {
+        if (techUUIDs.isEmpty()) {
             return;
         }
 
@@ -243,21 +244,26 @@ public class CamOpsSalvageUtilities {
             }
         }
 
+        List<Person> techs = new ArrayList<>();
+        for (UUID uuid : techUUIDs) {
+            Person tech = campaign.getPerson(uuid);
+            if (tech == null) {
+                LOGGER.error("null tech was passed into risky salvage");
+                continue;
+            }
+
+            techs.add(tech);
+        }
+
+
         boolean didAccidentOccur = false;
         for (int i = 0; i <= injuryEvents; i++) {
-            if (techs.isEmpty()) {
+            if (techUUIDs.isEmpty()) {
                 break;
             }
 
             didAccidentOccur = true;
-
-            UUID victimId = ObjectUtility.getRandomItem(techs);
-            Person victim = campaign.getPerson(victimId);
-            if (victim == null) {
-                LOGGER.error("null victim was passed into risk salvage");
-                techs.remove(victimId);
-                continue;
-            }
+            Person victim = ObjectUtility.getRandomItem(techs);
 
             int newHits = d6(1);
             newHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(victim, useInjuryFatigue, fatigueRate, newHits);
@@ -271,7 +277,7 @@ public class CamOpsSalvageUtilities {
 
             if (victim.getInjuries().size() > 5 || victim.getHits() > 5) {
                 victim.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACCIDENTAL);
-                techs.remove(victimId); // We're nice enough that we only kill each tech once
+                techs.remove(victim); // We're nice enough that we only kill each tech once
             }
 
             MekHQ.triggerEvent(new PersonChangedEvent(victim));
@@ -280,6 +286,32 @@ public class CamOpsSalvageUtilities {
         if (didAccidentOccur) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.accident",
                   spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
+        }
+    }
+
+    /**
+     * Depletes the remaining work time for all specified technicians to zero.
+     *
+     * <p>This method sets the remaining minutes to zero for each technician in the provided list, effectively
+     * marking them as having used all their available work time for the current period.</p>
+     *
+     * <p>If a technician UUID cannot be found in the campaign, an error is logged and that entry is skipped.</p>
+     *
+     * @param campaign the campaign containing the technicians
+     * @param techs    list of technician UUIDs whose time should be depleted
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public static void depleteTechMinutes(Campaign campaign, List<UUID> techs) {
+        for (UUID uuid : techs) {
+            Person tech = campaign.getPerson(uuid);
+            if (tech == null) {
+                LOGGER.error("null tech was passed into depleteTechMinutes");
+                continue;
+            }
+
+            tech.setMinutesLeft(0);
         }
     }
 }

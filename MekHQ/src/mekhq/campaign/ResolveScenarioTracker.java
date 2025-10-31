@@ -1767,11 +1767,14 @@ public class ResolveScenarioTracker {
             SalvagePostScenarioPicker picker = new SalvagePostScenarioPicker(campaign, mission, scenario,
                   getActualSalvage(), getSoldSalvage());
 
+            List<UUID> techUUIDs = scenario.getSalvageTechs();
             if (campaignOptions.isUseRiskySalvage()) {
                 CamOpsSalvageUtilities.performRiskySalvageChecks(campaign,
-                      scenario.getSalvageTechs(),
+                      techUUIDs,
                       picker.getCountOfSalvageUnits());
             }
+
+            CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs);
         } else {
             CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, getActualSalvage(), getSoldSalvage(),
                   getLeftoverSalvage());
