@@ -239,7 +239,7 @@ public class CamOpsSalvageUtilities {
         int injuryEvents = 0;
         for (int i = 0; i <= numberOfSalvagedUnits; i++) {
             int roll = d6(2);
-            if (roll == 0) {
+            if (roll == 2) {
                 injuryEvents++;
             }
         }
@@ -255,14 +255,11 @@ public class CamOpsSalvageUtilities {
             techs.add(tech);
         }
 
-
         boolean didAccidentOccur = false;
-        for (int i = 0; i <= injuryEvents; i++) {
+        for (int i = 0; i < injuryEvents; i++) {
             if (techUUIDs.isEmpty()) {
                 break;
             }
-
-            didAccidentOccur = true;
             Person victim = ObjectUtility.getRandomItem(techs);
 
             int newHits = d6(1);
@@ -281,6 +278,7 @@ public class CamOpsSalvageUtilities {
             }
 
             MekHQ.triggerEvent(new PersonChangedEvent(victim));
+            didAccidentOccur = true;
         }
 
         if (didAccidentOccur) {
