@@ -225,8 +225,7 @@ public class CamOpsSalvageUtilities {
      * @author Illiani
      * @since 0.50.10
      */
-    public static void performRiskySalvageChecks(Campaign campaign, List<UUID> techs,
-          int numberOfSalvagedUnits) {
+    public static void performRiskySalvageChecks(Campaign campaign, List<UUID> techs, int numberOfSalvagedUnits) {
         if (techs.isEmpty()) {
             return;
         }
@@ -272,10 +271,10 @@ public class CamOpsSalvageUtilities {
 
             if (victim.getInjuries().size() > 5 || victim.getHits() > 5) {
                 victim.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACCIDENTAL);
+                techs.remove(victimId); // We're nice enough that we only kill each tech once
             }
 
             MekHQ.triggerEvent(new PersonChangedEvent(victim));
-            techs.remove(victim); // We're nice enough that each tech can only be injured once per operation
         }
 
         if (didAccidentOccur) {
