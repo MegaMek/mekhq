@@ -101,8 +101,7 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
                     continue;
                 }
 
-                if (tech.hasSkill(skillName) &&
-                          ((tech.getMaintenanceTimeUsing() + maintenanceTime) <= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
+                if (tech.hasSkill(skillName)) {
                     final SkillLevel skillLevel = (tech.getSkillForWorkingOn(units[0]) == null) ?
                                                         SkillLevel.NONE :
                                                         tech.getSkillForWorkingOn(units[0])
