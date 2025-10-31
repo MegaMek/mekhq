@@ -115,7 +115,7 @@ public class SalvagePostScenarioPicker {
     private final List<TestUnit> employerSalvage = new ArrayList<>();
     private final Map<String, Unit> unitNameMap = new HashMap<>();
     private Map<UUID, RecoveryTimeData> recoveryTimeData;
-    private final boolean isExchangeRights;
+    private boolean isExchangeRights = false;
 
     public int getCountOfSalvageUnits() {
         return actualSalvage.size() + soldSalvage.size() + employerSalvage.size();
@@ -210,8 +210,6 @@ public class SalvagePostScenarioPicker {
             employerSalvageMoney = ((Contract) mission).getSalvagedByEmployer();
             unitSalvageMoney = ((Contract) mission).getSalvagedByUnit();
             isExchangeRights = ((Contract) mission).isSalvageExchange();
-        } else {
-            isExchangeRights = false;
         }
 
         List<SalvageComboBoxGroup> selectedGroups = showSalvageDialog(isContract);
