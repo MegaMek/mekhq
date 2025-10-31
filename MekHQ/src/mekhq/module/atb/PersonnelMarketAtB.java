@@ -95,12 +95,12 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
             } else if (roll == 5) {
                 int secondaryRoll = Compute.d6(2);
                 if (secondaryRoll == 2) {
-                    recruit = campaign.newPerson(PersonnelRole.VTOL_PILOT);
+                    recruit = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL);
                     // Frequency based on frequency of VTOLs in Xotl 3028 Merc/General
                 } else if (secondaryRoll <= 5) {
-                    recruit = campaign.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER);
+                    recruit = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
                 } else {
-                    recruit = campaign.newPerson(PersonnelRole.VEHICLE_GUNNER);
+                    recruit = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
                 }
             } else if (roll == 6 || roll == 8) {
                 if (campaign.getFaction().isClan() && (campaign.getGameYear() > 2870) && (Compute.d6(2) > 3)) {
@@ -117,16 +117,14 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
             if (null != recruit) {
                 potentialRecruits.add(recruit);
 
-                if (recruit.getPrimaryRole().isGroundVehicleDriver()) {
+                if (recruit.getPrimaryRole().isVehicleCrewGround()) {
                     /*
                      * Replace driver with 1-6 crew with equal
                      * chances of being drivers or gunners
                      */
                     potentialRecruits.remove(recruit);
                     for (int i = 0; i < Compute.d6(); i++) {
-                        potentialRecruits.add(campaign.newPerson((Compute.d6() < 4) ?
-                                                                       PersonnelRole.GROUND_VEHICLE_DRIVER
-                                                                       : PersonnelRole.VEHICLE_GUNNER));
+                        potentialRecruits.add(campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND));
                     }
                 }
 
@@ -172,16 +170,16 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                         adjustSkill(recruit, SkillType.S_GUN_MEK, gunneryMod);
                         adjustSkill(recruit, SkillType.S_PILOT_MEK, pilotingMod);
                         break;
-                    case GROUND_VEHICLE_DRIVER:
+                    case VEHICLE_CREW_GROUND:
                         adjustSkill(recruit, SkillType.S_PILOT_GVEE, pilotingMod);
+                        adjustSkill(recruit, SkillType.S_GUN_VEE, gunneryMod);
                         break;
-                    case NAVAL_VEHICLE_DRIVER:
+                    case VEHICLE_CREW_NAVAL:
                         adjustSkill(recruit, SkillType.S_PILOT_NVEE, pilotingMod);
+                        adjustSkill(recruit, SkillType.S_GUN_VEE, gunneryMod);
                         break;
-                    case VTOL_PILOT:
+                    case VEHICLE_CREW_VTOL:
                         adjustSkill(recruit, SkillType.S_PILOT_VTOL, pilotingMod);
-                        break;
-                    case VEHICLE_GUNNER:
                         adjustSkill(recruit, SkillType.S_GUN_VEE, gunneryMod);
                         break;
                     case AEROSPACE_PILOT:

@@ -503,7 +503,7 @@ public class Utilities {
                       SkillType.getType(SkillType.S_GUN_PROTO).getTarget() - oldCrew.getGunnery(),
                       0);
             } else if (u.getEntity() instanceof VTOL) {
-                p = c.newPerson(PersonnelRole.VTOL_PILOT, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.VEHICLE_CREW_VTOL, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_VTOL,
                       SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(),
                       0);
@@ -512,7 +512,7 @@ public class Utilities {
                       0);
             } else {
                 // assume tanker if we got here
-                p = c.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER, factionCode, oldCrew.getGender());
+                p = c.newPerson(PersonnelRole.VEHICLE_CREW_GROUND, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_PILOT_GVEE,
                       SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(),
                       0);
@@ -606,7 +606,7 @@ public class Utilities {
                                                           oldCrew.getGunnery()),
                               0);
                     } else if (u.getEntity() instanceof VTOL) {
-                        p = c.newPerson(PersonnelRole.VTOL_PILOT,
+                        p = c.newPerson(PersonnelRole.VEHICLE_CREW_VTOL,
                               factionCode,
                               oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_VTOL,
@@ -627,7 +627,7 @@ public class Utilities {
                               0);
                     } else {
                         // assume tanker if we got here
-                        p = c.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER,
+                        p = c.newPerson(PersonnelRole.VEHICLE_CREW_GROUND,
                               factionCode,
                               oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_GVEE,
@@ -676,10 +676,30 @@ public class Utilities {
                                   SkillType.getType(SkillType.S_GUN_MEK).getTarget() - oldCrew.getGunnery(),
                                   0);
                         } else {
-                            // assume tanker if we got here
-                            p = c.newPerson(PersonnelRole.VEHICLE_GUNNER,
-                                  factionCode,
-                                  oldCrew.getGender(numberPeopleGenerated));
+                            if (u.getEntity().getMovementMode().isMarine()) {
+                                p = c.newPerson(PersonnelRole.VEHICLE_CREW_NAVAL,
+                                      factionCode,
+                                      oldCrew.getGender(numberPeopleGenerated));
+                                p.addSkill(SkillType.S_PILOT_MEK,
+                                      SkillType.getType(SkillType.S_PILOT_NVEE).getTarget() - oldCrew.getPiloting(),
+                                      0);
+                            } else if (u.getEntity() instanceof VTOL) {
+
+                                p = c.newPerson(PersonnelRole.VEHICLE_CREW_VTOL,
+                                      factionCode,
+                                      oldCrew.getGender(numberPeopleGenerated));
+                                p.addSkill(SkillType.S_PILOT_MEK,
+                                      SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(),
+                                      0);
+                            } else {
+                                p = c.newPerson(PersonnelRole.VEHICLE_CREW_GROUND,
+                                      factionCode,
+                                      oldCrew.getGender(numberPeopleGenerated));
+                                p.addSkill(SkillType.S_PILOT_MEK,
+                                      SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(),
+                                      0);
+                            }
+
                             p.addSkill(SkillType.S_GUN_VEE,
                                   randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() -
                                                               oldCrew.getGunnery()),
@@ -703,7 +723,7 @@ public class Utilities {
 
             for (int slot = 0; slot < u.getTotalCrewNeeds(); slot++) {
                 Person p = c.newPerson(u.getEntity().isSupportVehicle() ?
-                                             PersonnelRole.VEHICLE_CREW :
+                                             PersonnelRole.COMBAT_TECHNICIAN :
                                              PersonnelRole.VESSEL_CREW,
                       factionCode,
                       oldCrew.getGender(numberPeopleGenerated));
@@ -720,9 +740,20 @@ public class Utilities {
             }
 
             if (u.canTakeTechOfficer()) {
-                consoleCmdr = c.newPerson(PersonnelRole.VEHICLE_GUNNER,
-                      factionCode,
-                      oldCrew.getGender(numberPeopleGenerated));
+                if (u.getEntity().getMovementMode().isMarine()) {
+                    consoleCmdr = c.newPerson(PersonnelRole.VEHICLE_CREW_NAVAL,
+                          factionCode,
+                          oldCrew.getGender(numberPeopleGenerated));
+                } else if (u.getEntity() instanceof VTOL) {
+                    consoleCmdr = c.newPerson(PersonnelRole.VEHICLE_CREW_VTOL,
+                          factionCode,
+                          oldCrew.getGender(numberPeopleGenerated));
+                } else {
+                    consoleCmdr = c.newPerson(PersonnelRole.VEHICLE_CREW_GROUND,
+                          factionCode,
+                          oldCrew.getGender(numberPeopleGenerated));
+                }
+
                 migrateCrewData(consoleCmdr, oldCrew, numberPeopleGenerated, false);
             }
         }

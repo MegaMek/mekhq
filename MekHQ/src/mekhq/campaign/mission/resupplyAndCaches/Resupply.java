@@ -408,7 +408,7 @@ public class Resupply {
         // First, calculate the total tonnage across all combat units in the campaign.
         // We define a 'combat unit' as any unit not flagged as non-combat who is both in a Combat
         // Team and not in a Force flagged as non-combat
-        for (CombatTeam formation : campaign.getCombatTeamsTable().values()) {
+        for (CombatTeam formation : campaign.getCombatTeamsAsMap().values()) {
             Force force = campaign.getForce(formation.getForceId());
 
             if (force == null) {

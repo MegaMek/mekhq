@@ -32,10 +32,10 @@
  */
 package mekhq.campaign.personnel.procreation;
 
-import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.enums.BloodGroup.getInheritedBloodGroup;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.POSTPARTUM_RECOVERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 

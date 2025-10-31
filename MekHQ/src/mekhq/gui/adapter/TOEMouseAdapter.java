@@ -66,6 +66,7 @@ import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.NetworkChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.force.FormationLevel;
@@ -73,6 +74,7 @@ import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.HangarSorter;
@@ -173,6 +175,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE = "REMOVE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
 
     private static final String COMMAND_OVERRIDE_FORCE_FORMATION_LEVEL = "OVERRIDE_FORMATION_LEVEL|FORCE|FORMATION_LEVEL|";
+    private static final String COMMAND_CHANGE_ROLE_PREFERENCE = "CHANGE_ROLE_PREFERENCE|FORCE|COMBAT_ROLE|";
 
     // C3 Network-related
     private static final String C3I = "C3I";
@@ -448,6 +451,18 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             singleForce.setOverrideFormationLevel(formationLevel);
 
             Force.populateFormationLevelsFromOrigin(gui.getCampaign());
+        } else if (action.getActionCommand().startsWith(COMMAND_CHANGE_ROLE_PREFERENCE)) {
+            if (singleForce == null) {
+                return;
+            }
+
+            CombatRole combatRole = CombatRole.parseFromString(st.nextToken());
+            singleForce.setCombatRoleInMemory(combatRole);
+            CombatTeam team = gui.getCampaign().getCombatTeamsAsMap().get(singleForce.getId());
+            if (team != null) {
+                team.setRole(combatRole);
+                gui.refreshAllTabs();
+            }
         } else if (command.contains(TOEMouseAdapter.CHANGE_DESC)) {
             if (null != singleForce) {
                 MarkdownEditorDialog tad = new MarkdownEditorDialog(gui.getFrame(),
@@ -787,6 +802,29 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             menu.add(menuItem);
                         }
                     }
+                }
+
+                menu = new JMenu("Change Role");
+                menu.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_ROLE_PREFERENCE + forceIds);
+                menu.addActionListener(this);
+                menu.setEnabled(true);
+                popup.add(menu);
+
+                for (CombatRole combatRole : CombatRole.values()) {
+                    String displayText = combatRole.toString();
+                    if (combatRole == force.getCombatRoleInMemory()) {
+                        displayText = "✓ " + displayText;
+                    }
+
+                    menuItem = new JMenuItem(displayText);
+                    menuItem.setToolTipText(combatRole.getToolTipText());
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_ROLE_PREFERENCE +
+                                                    force.getId() +
+                                                    '|' +
+                                                    combatRole.name());
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(true);
+                    menu.add(menuItem);
                 }
 
                 menuItem = new JMenuItem("Change Name...");

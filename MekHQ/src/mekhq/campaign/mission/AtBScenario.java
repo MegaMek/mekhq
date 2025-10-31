@@ -736,7 +736,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private void setStandardScenarioForces(Campaign campaign) {
         /* Find the number of attached units required by the command rights clause */
         int attachedUnitWeight = EntityWeightClass.WEIGHT_MEDIUM;
-        if (combatRole.isPatrol() || combatRole.isTraining()) {
+        if (combatRole.isPatrol() || combatRole.isTraining() || combatRole.isCadre()) {
             attachedUnitWeight = EntityWeightClass.WEIGHT_LIGHT;
         }
         int numAttachedPlayer = 0;
@@ -2206,7 +2206,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             return null;
         }
 
-        return campaign.getCombatTeamsTable().get(combatTeamId);
+        return campaign.getCombatTeamsAsMap().get(combatTeamId);
     }
 
     public void setCombatTeam(CombatTeam combatTeam) {

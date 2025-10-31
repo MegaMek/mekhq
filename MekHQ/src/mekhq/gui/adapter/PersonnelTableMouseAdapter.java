@@ -112,7 +112,6 @@ import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
-import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -130,6 +129,7 @@ import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
+import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -2817,6 +2817,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 JMenu characterFlawMenu = new JMenu(resources.getString("characterFlawMenu.text"));
                 menu.add(characterFlawMenu);
 
+                JMenu characterOriginMenu = new JMenu(resources.getString("characterOriginMenu.text"));
+                menu.add(characterOriginMenu);
+
                 int cost;
 
                 List<SpecialAbility> specialAbilities = new ArrayList<>(SpecialAbility.getSpecialAbilities().values());
@@ -2871,7 +2874,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                       combatAbilityMenu,
                                       maneuveringAbilityMenu,
                                       utilityAbilityMenu,
-                                      characterFlawMenu);
+                                      characterFlawMenu,
+                                      characterOriginMenu);
                             }
                         }
                     } else if (spa.getName().equals(OptionsConstants.GUNNERY_SANDBLASTER)) {
@@ -2908,8 +2912,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                       specialistMenu,
                                       combatAbilityMenu,
                                       maneuveringAbilityMenu,
-                                      utilityAbilityMenu,
-                                      characterFlawMenu);
+                                      characterFlawMenu, utilityAbilityMenu,
+                                      characterOriginMenu);
                             }
                         }
                     } else if (spa.getName().equals(OptionsConstants.MISC_ENV_SPECIALIST)) {
@@ -3001,8 +3005,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                   specialistMenu,
                                   combatAbilityMenu,
                                   maneuveringAbilityMenu,
-                                  utilityAbilityMenu,
-                                  characterFlawMenu);
+                                  characterFlawMenu, utilityAbilityMenu,
+                                  characterOriginMenu);
                         }
                     } else if (spa.getName().equals(OptionsConstants.MISC_HUMAN_TRO)) {
                         JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.MISC_HUMAN_TRO));
@@ -3078,8 +3082,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                   specialistMenu,
                                   combatAbilityMenu,
                                   maneuveringAbilityMenu,
-                                  utilityAbilityMenu,
-                                  characterFlawMenu);
+                                  characterFlawMenu, utilityAbilityMenu,
+                                  characterOriginMenu);
                         }
                     } else if (spa.getName().equals(OptionsConstants.GUNNERY_SPECIALIST) &&
                                      !person.getOptions().booleanOption(OptionsConstants.GUNNERY_SPECIALIST)) {
@@ -3120,8 +3124,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                   specialistMenu,
                                   combatAbilityMenu,
                                   maneuveringAbilityMenu,
-                                  utilityAbilityMenu,
-                                  characterFlawMenu);
+                                  characterFlawMenu, utilityAbilityMenu,
+                                  characterOriginMenu);
                         }
                     } else if (spa.getName().equals(OptionsConstants.GUNNERY_RANGE_MASTER)) {
                         JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_RANGE_MASTER));
@@ -3190,8 +3194,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                   specialistMenu,
                                   combatAbilityMenu,
                                   maneuveringAbilityMenu,
-                                  utilityAbilityMenu,
-                                  characterFlawMenu);
+                                  characterFlawMenu, utilityAbilityMenu,
+                                  characterOriginMenu);
                         }
                     } else if (Optional.ofNullable((person.getOptions().getOption(spa.getName()))).isPresent() &&
                                      (person.getOptions().getOption(spa.getName()).getType() == IOption.CHOICE) &&
@@ -3221,8 +3225,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                   specialistMenu,
                                   combatAbilityMenu,
                                   maneuveringAbilityMenu,
-                                  utilityAbilityMenu,
-                                  characterFlawMenu);
+                                  characterFlawMenu, utilityAbilityMenu,
+                                  characterOriginMenu);
                         }
                     } else if (!person.getOptions().booleanOption(spa.getName())) {
                         menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
@@ -4677,7 +4681,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     private static void placeInAppropriateSPASubMenu(SpecialAbility spa, JMenu specialistMenu, JMenu combatAbilityMenu,
-          JMenu maneuveringAbilityMenu, JMenu utilityAbilityMenu, JMenu characterFlawMenu) {
+          JMenu maneuveringAbilityMenu, JMenu characterFlawMenu, JMenu utilityAbilityMenu, JMenu characterOriginMenu) {
         AbilityCategory category = getSpaCategory(spa);
 
         switch (category) {
@@ -4685,8 +4689,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case MANEUVERING_ABILITY -> maneuveringAbilityMenu.add(specialistMenu);
             case UTILITY_ABILITY -> utilityAbilityMenu.add(specialistMenu);
             case CHARACTER_FLAW -> characterFlawMenu.add(specialistMenu);
-            case CHARACTER_CREATION_ONLY -> {
-            }
+            case CHARACTER_CREATION_ONLY -> characterOriginMenu.add(specialistMenu);
         }
     }
 

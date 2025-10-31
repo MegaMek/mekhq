@@ -59,16 +59,12 @@ public class Availability {
             case D -> -1;
             case E -> 0;
             case F -> 2;
-            case X ->
+            case F_STAR, X ->
                 // FIXME : Per IO, any IS equipment with a base SW availability of E-F that goes extinct during the
                 //  SW has it increased by 1 with F+1 meaning that there is a 50% chance of being unobtainable. This
                 //  doesn't work so well with the rules in StratOps, so for now I'm considering it equivalent to X,
                 //  which gives a +5.
                   5;
-            default -> {
-                LOGGER.error("Attempting to get availability modifier for unknown rating of {}", availability);
-                yield 999;
-            }
         };
     }
 

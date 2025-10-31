@@ -913,17 +913,19 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 continue;
             }
             for (Unit unit : tracker.getUnits()) {
-                index++;
                 if (unit.getEntity() instanceof GunEmplacement) {
+                    index++;
                     assignModel.addElement("AutoTurret, " + unit.getName());
+                    if (unit.getId().toString().equals(tracker.getKillCredits().get(killName))) {
+                        selected = index;
+                    }
                 } else if (unit.hasCommander()) {
-                    // If there's no commander we don't need to show anything because we only credit
-                    // kills to personnel.
+                    // If there's no commander we don't need to show anything because we only credit kills to personnel.
+                    index++;
                     assignModel.addElement(unit.getCommander().getFullTitle() + ", " + unit.getName());
-                }
-
-                if (unit.getId().toString().equals(tracker.getKillCredits().get(killName))) {
-                    selected = index;
+                    if (unit.getId().toString().equals(tracker.getKillCredits().get(killName))) {
+                        selected = index;
+                    }
                 }
             }
             comboAssign = new JComboBox<>(assignModel);

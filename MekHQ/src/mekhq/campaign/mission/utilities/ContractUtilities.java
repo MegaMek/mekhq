@@ -40,19 +40,21 @@ import static mekhq.campaign.force.ForceType.STANDARD;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.enums.CombatRole;
 
 public class ContractUtilities {
     /**
      * Calculates the number of lances used for this contract, based on [campaign].
      *
-     * @param campaign The campaign to reference.
+     * @param campaign    The campaign to reference.
+     * @param isCadreDuty {@code true} if {@link CombatRole#CADRE} should be considered a combat role
      *
      * @return The number of lances required.
      */
-    public static int calculateBaseNumberOfRequiredLances(Campaign campaign) {
+    public static int calculateBaseNumberOfRequiredLances(Campaign campaign, boolean isCadreDuty) {
 
         int combatForceCount = 0;
-        for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
             if (0 >= combatTeam.getSize(campaign)) { // Don't count empty combat teams (or warship-only)
                 continue;
             }
@@ -62,7 +64,9 @@ public class ContractUtilities {
                 continue;
             }
 
-            if (force.isForceType(STANDARD)) {
+            CombatRole roleInMemory = force.getCombatRoleInMemory();
+            boolean hasCombatRole = roleInMemory.isCombatRole() || (isCadreDuty && roleInMemory.isCadre());
+            if (force.isForceType(STANDARD) && hasCombatRole) {
                 combatForceCount++;
             }
         }
@@ -100,7 +104,7 @@ public class ContractUtilities {
      */
     public static int getEffectiveNumUnits(Campaign campaign) {
         double numUnits = 0;
-        for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
             Force force = combatTeam.getForce(campaign);
 
             if (force == null) {

@@ -805,7 +805,7 @@ public class Campaign implements ITechManager {
      *
      * @return the sanitized {@link Hashtable} of {@link CombatTeam} objects stored in the current campaign.
      */
-    public Hashtable<Integer, CombatTeam> getCombatTeamsTable() {
+    public Hashtable<Integer, CombatTeam> getCombatTeamsAsMap() {
         // Here we sanitize the list, ensuring ineligible formations have been removed
         // before
         // returning the hashtable. In theory, this shouldn't be necessary, however,
@@ -843,11 +843,10 @@ public class Campaign implements ITechManager {
      *
      * @return an {@link ArrayList} of all the {@link CombatTeam} objects in the {@code combatTeams} {@link Hashtable}
      */
-    public ArrayList<CombatTeam> getAllCombatTeams() {
-        // This call allows us to utilize the self-sanitizing feature of
-        // getCombatTeamsTable(),
-        // without needing to directly include the code here, too.
-        combatTeams = getCombatTeamsTable();
+    public ArrayList<CombatTeam> getCombatTeamsAsList() {
+        // This call allows us to utilize the self-sanitizing feature of getCombatTeamsTable(), without needing to
+        // directly include the code here, too.
+        combatTeams = getCombatTeamsAsMap();
 
         return combatTeams.values()
                      .stream()
@@ -2645,19 +2644,19 @@ public class Campaign implements ITechManager {
                                                    .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     switch (person.getPrimaryRole()) {
-                        case GROUND_VEHICLE_DRIVER:
+                        case VEHICLE_CREW_GROUND:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE) ?
                                                      person.getSkill(SkillType.S_PILOT_GVEE)
                                                            .getFinalSkillValue(skillModifierData) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
-                        case NAVAL_VEHICLE_DRIVER:
+                        case VEHICLE_CREW_NAVAL:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE) ?
                                                      person.getSkill(SkillType.S_PILOT_NVEE)
                                                            .getFinalSkillValue(skillModifierData) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
-                        case VTOL_PILOT:
+                        case VEHICLE_CREW_VTOL:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL) ?
                                                      person.getSkill(SkillType.S_PILOT_VTOL)
                                                            .getFinalSkillValue(skillModifierData) :
@@ -4773,8 +4772,10 @@ public class Campaign implements ITechManager {
 
             if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
                 if ((combatTeam.getMissionId() == contract.getId())) {
-                    if (!combatRole.isTraining() || contract.getContractType().isCadreDuty()) {
-                        total += combatTeam.getSize(this);
+                    if (!combatRole.isTraining()) {
+                        if (!combatRole.isCadre() || contract.getContractType().isCadreDuty()) {
+                            total += combatTeam.getSize(this);
+                        }
                     }
                 }
 

@@ -42,8 +42,10 @@ import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
 import megamek.common.units.Jumpship;
 import megamek.common.units.ProtoMek;
+import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
@@ -117,6 +119,10 @@ public class AverageExperienceRating {
         int personnelCount = 0;
         double totalExperience = 0.0;
 
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean useCommandersOnlyVehicles = campaignOptions.isOnlyCommandersMatterVehicles();
+        boolean useCommandersOnlyInfantry = campaignOptions.isOnlyCommandersMatterInfantry();
+        boolean useCommandersOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterBattleArmor();
         for (Person person : campaign.getActivePersonnel(false, false)) {
             Unit unit = person.getUnit();
 
@@ -164,6 +170,24 @@ public class AverageExperienceRating {
                     continue;
                 }
 
+                if (useCommandersOnlyInfantry) {
+                    int gunnery = 8;
+                    int antiMek = 8;
+                    String gunnerySkill = SkillType.getGunnerySkillFor(entity);
+                    if (person.hasSkill(gunnerySkill)) {
+                        Skill skill = person.getSkill(gunnerySkill);
+                        gunnery = max(0, skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()));
+                    }
+
+                    String piloting = SkillType.getDrivingSkillFor(entity);
+                    if (person.hasSkill(piloting)) {
+                        Skill skill = person.getSkill(piloting);
+                        antiMek = max(0, skill.getFinalSkillValue(person.getOptions(), person.getATOWAttributes()));
+                    }
+
+                    totalExperience += (double) (gunnery + antiMek) / 2;
+                }
+
                 // For Infantry, average experience is calculated using a different method.
                 totalExperience += calculateInfantryExperience((Infantry) entity, crew); // add the average experience
                 // to the total
@@ -178,6 +202,12 @@ public class AverageExperienceRating {
 
                 personnelCount++;
             } else {
+                if (entity instanceof Tank && useCommandersOnlyVehicles) {
+                    if (!unit.isCommander(person)) {
+                        continue;
+                    }
+                }
+
                 // For regular entities, another method calculates the average experience
                 if (unit.isGunner(person) || unit.isDriver(person)) {
                     totalExperience += calculateRegularExperience(person, entity, unit);
@@ -247,8 +277,9 @@ public class AverageExperienceRating {
         int skillValue = 0;
         int skillCount = 0;
 
+        boolean isTank = entity instanceof Tank;
         SkillModifierData skillModifierData = person.getSkillModifierData();
-        if (unit.isDriver(person)) {
+        if (isTank || unit.isDriver(person)) {
             skillType = SkillType.getDrivingSkillFor(entity);
             Skill skill = person.getSkill(skillType);
 
@@ -262,7 +293,7 @@ public class AverageExperienceRating {
             }
         }
 
-        if (unit.isGunner(person)) {
+        if (isTank || unit.isGunner(person)) {
             skillType = SkillType.getGunnerySkillFor(entity);
 
             Skill skill = person.getSkill(skillType);

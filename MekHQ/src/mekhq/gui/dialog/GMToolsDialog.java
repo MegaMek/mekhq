@@ -1474,10 +1474,10 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
                   getPerson().getPrimaryRole().isVesselPilot();
             case UnitType.INFANTRY -> getPerson().getPrimaryRole().isSoldier();
             case UnitType.MEK -> getPerson().getPrimaryRole().isMekWarrior();
-            case UnitType.NAVAL -> getPerson().getPrimaryRole().isNavalVehicleDriver();
+            case UnitType.NAVAL -> getPerson().getPrimaryRole().isVehicleCrewNaval();
             case UnitType.PROTOMEK -> getPerson().getPrimaryRole().isProtoMekPilot();
-            case UnitType.TANK -> getPerson().getPrimaryRole().isGroundVehicleDriver();
-            case UnitType.VTOL -> getPerson().getPrimaryRole().isVTOLPilot();
+            case UnitType.TANK -> getPerson().getPrimaryRole().isVehicleCrewGround();
+            case UnitType.VTOL -> getPerson().getPrimaryRole().isVehicleCrewVTOL();
             default -> false;
         };
     }

@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.personnel.generator;
 
-import static mekhq.campaign.personnel.SpecialAbility.CHARACTER_CREATION_ONLY;
-
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -70,7 +68,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
      * @return the display name of the assigned special ability, or {@code null} if no ability was assigned
      */
     public @Nullable String rollSPA(final Campaign campaign, final Person person) {
-        return rollSPA(campaign, person, false, false);
+        return rollSPA(campaign, person, false, false, false);
     }
 
     /**
@@ -87,13 +85,18 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
      * @param useAlternativeWeighting if {@code true}, positive-cost abilities are weighted more heavily in the
      *                                selection
      * @param ignoreEligibility       if {@code true}, skips eligibility checks and considers all abilities available
+     * @param isVeterancyAward        if {@code true}, some SPAs may be excluded based on veterancy award eligibility
+     *                                status
      *
      * @return the display name (including specialization if applicable) of the assigned special ability, or
      *       {@code null} if no ability could be rolled or assigned
      */
     public @Nullable String rollSPA(final Campaign campaign, final Person person, boolean useAlternativeWeighting,
-          boolean ignoreEligibility) {
-        List<SpecialAbility> abilityList = getSpecialAbilities(person, useAlternativeWeighting, ignoreEligibility);
+          boolean ignoreEligibility, boolean isVeterancyAward) {
+        List<SpecialAbility> abilityList = getSpecialAbilities(person,
+              useAlternativeWeighting,
+              ignoreEligibility,
+              isVeterancyAward);
         if (abilityList == null) {
             return null;
         }
@@ -174,7 +177,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
      * <p>If {@code ignoreEligibility} is true, all valid special abilities (excluding those limited to character
      * creation or restricted by currently present invalid abilities) are considered, and positive-cost abilities may be
      * emphasized using alternative weighting if specified. Otherwise, the list of eligible special abilities is
-     * determined by {@link #getEligibleSPAs(Person)}.</p>
+     * determined by {@link #getEligibleSPAs(Person, boolean)}.</p>
      *
      * <p>If the resulting list is empty, {@code null} is returned.</p>
      *
@@ -183,6 +186,8 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
      *                                chance of characters receiving flaws)
      * @param ignoreEligibility       if {@code true}, all valid abilities are considered regardless of other
      *                                eligibility requirements
+     * @param isVeterancyAward        if {@code true}, some SPAs may be excluded based on veterancy award eligibility
+     *                                status
      *
      * @return a list of available special abilities based on the criteria, or {@code null} if none are found
      *
@@ -190,7 +195,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
      * @since 0.50.10
      */
     private @Nullable List<SpecialAbility> getSpecialAbilities(Person person, boolean useAlternativeWeighting,
-          boolean ignoreEligibility) {
+          boolean ignoreEligibility, boolean isVeterancyAward) {
         final PersonnelOptions options = person.getOptions();
         List<SpecialAbility> abilityList;
         final List<SpecialAbility> positiveAbilities = new ArrayList<>();
@@ -198,10 +203,10 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
         if (ignoreEligibility) {
             abilityList = new ArrayList<>();
             for (SpecialAbility ability : SpecialAbility.getSpecialAbilities().values()) {
-                int cost = ability.getCost();
-                if (cost == CHARACTER_CREATION_ONLY) {
+                if (isVeterancyAward && ability.getOriginOnly()) {
                     continue;
                 }
+
                 Vector<String> invalidAbilities = ability.getInvalidAbilities();
                 boolean isValid = true;
                 if (!invalidAbilities.isEmpty()) {
@@ -214,13 +219,13 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
                 }
                 if (isValid) {
                     abilityList.add(ability);
-                    if (cost >= 0) {
+                    if (ability.getCost() >= 0) {
                         positiveAbilities.add(ability);
                     }
                 }
             }
         } else {
-            abilityList = getEligibleSPAs(person);
+            abilityList = getEligibleSPAs(person, isVeterancyAward);
         }
 
         if (abilityList.isEmpty()) {
@@ -239,12 +244,16 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
         return abilityList;
     }
 
-    private List<SpecialAbility> getEligibleSPAs(Person person) {
+    private List<SpecialAbility> getEligibleSPAs(Person person, boolean isVeterancyAward) {
         List<SpecialAbility> eligible = new ArrayList<>();
         for (Enumeration<IOption> i = person.getOptions(PersonnelOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (!ability.booleanValue()) {
                 SpecialAbility spa = SpecialAbility.getAbility(ability.getName());
+                if (isVeterancyAward && spa.getOriginOnly()) {
+                    continue;
+                }
+
                 if ((spa == null) || (spa.getWeight() <= 0)
                           || (!spa.isEligible(person.isClanPersonnel(), person.getSkills(), person.getOptions()))) {
                     continue;

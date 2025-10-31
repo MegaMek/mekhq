@@ -158,6 +158,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUltimatum;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.ReportingUtilities;
 
@@ -788,10 +789,12 @@ public class CampaignNewDayManager {
 
         processNewDayATBScenarios();
 
+        // Daily events
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
             if (campaignOptions.isUseGenericBattleValue() &&
                       !contract.getContractType().isGarrisonType() &&
                       contract.getStartDate().equals(today)) {
+                // Batchalls
                 Faction enemyFaction = contract.getEnemy();
                 String enemyFactionCode = contract.getEnemyCode();
 
@@ -820,6 +823,27 @@ public class CampaignNewDayManager {
                             campaign.addReport(report);
                         }
                     }
+                }
+            }
+
+            // Early Contract End (StratCon Only)
+            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            if (campaignState != null && !contract.getEndingDate().equals(today)) {
+                boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
+                int victoryPoints = contract.getContractScore(isUseMaplessMode);
+                int requiredVictoryPoints = isUseMaplessMode ? contract.getRequiredCombatTeams() * 10 : 1;
+
+                if (campaignState.canEndContractEarly() && victoryPoints >= requiredVictoryPoints) {
+                    new ImmersiveDialogNotification(campaign,
+                          String.format(resources.getString("stratCon.earlyContractEnd.objectives"),
+                                contract.getHyperlinkedName()), true);
+
+                    // This ensures any outstanding payout is paid out before the contract ends
+                    LocalDate adjustedDate = today.plusDays(1);
+                    int remainingMonths = contract.getMonthsLeft(adjustedDate);
+                    Money finalPayout = contract.getMonthlyPayOut().multipliedBy(remainingMonths);
+                    contract.setRoutedPayout(finalPayout);
+                    contract.setEndDate(adjustedDate);
                 }
             }
         }
@@ -1259,7 +1283,7 @@ public class CampaignNewDayManager {
         if (isBirthday && (person.getAge(today) == 16)) {
             if (campaignOptions.isRewardComingOfAgeAbilities()) {
                 SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-                singleSpecialAbilityGenerator.rollSPA(campaign, person, true, true);
+                singleSpecialAbilityGenerator.rollSPA(campaign, person, true, true, false);
             }
 
             if (campaignOptions.isRewardComingOfAgeRPSkills()) {
@@ -1706,7 +1730,7 @@ public class CampaignNewDayManager {
             for (final AtBScenario atBScenario : contract.getCurrentAtBScenarios()) {
                 if ((atBScenario.getDate() != null) && atBScenario.getDate().equals(today)) {
                     int forceId = atBScenario.getCombatTeamId();
-                    if ((campaign.getAllCombatTeams().get(forceId) != null) &&
+                    if ((campaign.getCombatTeamsAsMap().get(forceId) != null) &&
                               !campaign.getForceIds().get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation

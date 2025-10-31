@@ -45,6 +45,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
 import mekhq.campaign.personnel.InjuryType.XMLAdapter;
 import mekhq.campaign.personnel.enums.InjuryLevel;
+import mekhq.campaign.personnel.medical.BodyLocation;
 
 /**
  * Flyweight design pattern implementation. InjuryType instances should be singletons and never hold any data related to
