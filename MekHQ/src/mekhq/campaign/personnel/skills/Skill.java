@@ -55,6 +55,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.utilities.MHQXMLUtility;
@@ -109,7 +110,7 @@ public class Skill {
 
     public Skill(String type) {
         this.type = SkillType.getType(type);
-        this.level = this.type.getLevelFromExperience(SkillType.EXP_REGULAR);
+        this.level = this.type.getLevelFromExperience(EXP_REGULAR);
     }
 
     public Skill(String type, int level, int bonus) {
@@ -627,25 +628,51 @@ public class Skill {
      * Calculates the total modifiers for a character based on their SPA (Special Pilot Abilities), attributes, possible
      * illiteracy penalty, and reputation.
      *
-     * @param characterOptions the {@link PersonnelOptions} containing the character's options and SPAs
-     * @param attributes       the {@link Attributes} object representing the character's attributes
-     * @param reputation       the character's reputation value
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return the sum of SPA modifiers, attribute-based modifiers, and any additional penalty (such as for illiteracy)
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private int getModifiers(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
-        int spaModifiers = getSPAModifiers(characterOptions, reputation);
-        int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
+    private int getModifiers(SkillModifierData skillModifierData) {
+        int spaModifiers = getSPAModifiers(skillModifierData.characterOptions(),
+              skillModifierData.adjustedReputation());
+        int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), skillModifierData.attributes(), type);
+        int totalInjuryModifier = getTotalInjuryModifier(skillModifierData);
 
         boolean isIntelligenceBased = INTELLIGENCE.equals(type.getFirstAttribute())
                                             || INTELLIGENCE.equals(type.getSecondAttribute());
-        int literacyModifier = isIntelligenceBased && attributes.isIlliterate()
+        int literacyModifier = isIntelligenceBased && skillModifierData.isIlliterate()
                                      ? UNTRAINED_SKILL_MODIFIER : 0;
 
-        return spaModifiers + attributeModifiers + literacyModifier;
+        return spaModifiers + attributeModifiers + literacyModifier + totalInjuryModifier;
+    }
+
+    private int getTotalInjuryModifier(SkillModifierData skillModifierData) {
+        int totalInjuryModifier = 0;
+        for (InjuryEffect injuryEffect : skillModifierData.injuryEffects()) {
+            int firstAttributeModifier = getAttributeModifierFromInjuryEffect(injuryEffect, type.getFirstAttribute());
+            int secondAttributeModifier = getAttributeModifierFromInjuryEffect(injuryEffect, type.getSecondAttribute());
+            int perceptionModifier = type.getName().equals(S_PERCEPTION) ? injuryEffect.getPerceptionModifier() : 0;
+            totalInjuryModifier += firstAttributeModifier + secondAttributeModifier + perceptionModifier;
+        }
+        return totalInjuryModifier;
+    }
+
+    private int getAttributeModifierFromInjuryEffect(InjuryEffect injuryEffect, SkillAttribute skillAttribute) {
+        return switch (skillAttribute) {
+            case NONE -> 0;
+            case STRENGTH -> injuryEffect.getStrengthModifier();
+            case BODY -> injuryEffect.getBodyModifier();
+            case DEXTERITY -> injuryEffect.getDexterityModifier();
+            case REFLEXES -> injuryEffect.getReflexesModifier();
+            case INTELLIGENCE -> injuryEffect.getIntelligenceModifier();
+            case WILLPOWER -> injuryEffect.getWillpowerModifier();
+            case CHARISMA -> injuryEffect.getCharismaModifier();
+        };
     }
 
     /**
@@ -669,7 +696,7 @@ public class Skill {
     }
 
     public void improve() {
-        if (level >= SkillType.NUM_LEVELS - 1) {
+        if (level >= NUM_LEVELS - 1) {
             // Can't improve past the max
             return;
         }
@@ -695,7 +722,7 @@ public class Skill {
     public int getCostToImprove() {
         int cost = 0;
         int i = 1;
-        while (cost <= 0 && (level + i) < SkillType.NUM_LEVELS) {
+        while (cost <= 0 && (level + i) < NUM_LEVELS) {
             cost = type.getCost(level + i);
             ++i;
         }
