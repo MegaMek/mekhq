@@ -163,6 +163,7 @@ public final class InjuryTypes {
             InjuryType.register(52, "alt:FRACTURED_ANKLE", AlternateInjuries.FRACTURED_ANKLE);
             InjuryType.register(53, "alt:FRACTURED_KNEE", AlternateInjuries.FRACTURED_KNEE);
             InjuryType.register(54, "alt:COMPOUND_FRACTURED_SHIN", AlternateInjuries.COMPOUND_FRACTURED_SHIN);
+            InjuryType.register(55, "alt:BLOOD_LOSS", AlternateInjuries.BLOOD_LOSS);
 
             InjuryType.register("am:severed_spine", SEVERED_SPINE);
             InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);

@@ -60,7 +60,8 @@ public enum InjuryEffect {
     FRACTURE_SKULL("FRACTURE_SKULL", getWarningColor(), 0, 0, 0, 0, 0, -2, -2, -2, false),
     INTERNAL_BLEEDING("INTERNAL_BLEEDING", getNegativeColor(), 0, 0, 0, 0, 0, 0, 0, 0, true),
     PUNCTURED("PUNCTURED", getNegativeColor(), 0, -2, -2, -2, 0, 0, 0, 0, false),
-    SEVERED("SEVERED", getNegativeColor(), 0, 0, 0, -5, -5, 0, 0, 0, false);
+    SEVERED("SEVERED", getNegativeColor(), 0, 0, 0, -5, -5, 0, 0, 0, false),
+    BLOOD_LOSS("BLOOD_LOSS", getNegativeColor(), 0, -1, -1, -1, -1, -1, -1, -1, false);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.InjuryEffect";
 

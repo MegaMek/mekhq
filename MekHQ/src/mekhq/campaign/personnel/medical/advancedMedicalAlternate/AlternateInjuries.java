@@ -59,9 +59,10 @@ public class AlternateInjuries {
     private static final int ORGAN_TRAUMA_HEALING_DAYS = 49; // Internet says 6-8 weeks
     private static final int DISEMBOWELED_HEALING_DAYS = 49; // Internet says 6-8 weeks
     private static final int BONE_BRUISE_HEALING_DAYS = 42; // Internet says 6 weeks
+    private static final int BLOOD_LOSS_HEALING_DAYS = 35; // Internet says 4-6 weeks
     private static final int SEVER_HEALING_DAYS = 180; // We need to have something here for Advanced Medical
 
-    private static final InjuryLevel SEVERE_INJURY_LEVEL = InjuryLevel.DEADLY;
+    private static final InjuryLevel SEVERE_INJURY_LEVEL = InjuryLevel.CHRONIC;
     private static final InjuryLevel FRACTURE_INJURY_LEVEL = InjuryLevel.MAJOR;
     private static final InjuryLevel BURN_INJURY_LEVEL = InjuryLevel.MINOR;
 
@@ -112,6 +113,8 @@ public class AlternateInjuries {
     public static final InjuryType FRACTURED_ANKLE = new FracturedAnkle();
     public static final InjuryType FRACTURED_KNEE = new FracturedKnee();
     public static final InjuryType COMPOUND_FRACTURED_SHIN = new CompoundFracturedShin();
+    // Any
+    public static final InjuryType BLOOD_LOSS = new BloodLoss();
 
     // Base injury type classes with common behavior
     private abstract static class BaseInjury extends InjuryType {
@@ -505,6 +508,16 @@ public class AlternateInjuries {
         public CompoundFracturedShin() {
             super(COMPOUND_FRACTURE_HEALING_DAYS, InjuryEffect.COMPOUND_FRACTURE,
                   Set.of(BodyLocation.LEFT_SHIN, BodyLocation.RIGHT_SHIN));
+        }
+    }
+
+    public static final class BloodLoss extends BaseInjury {
+        public BloodLoss() {
+            super(BLOOD_LOSS_HEALING_DAYS, false, InjuryLevel.MAJOR,
+                  InjuryEffect.NONE, Set.of(BodyLocation.INTERNAL));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BLOOD_LOSS.simpleName");
+            ;
+            this.fluffText = simpleName;
         }
     }
 }
