@@ -473,7 +473,7 @@ public class Contract extends Mission {
         if ((getCachedJumpPath() == null) || getCachedJumpPath().isEmpty()
                   || !getCachedJumpPath().getFirstSystem().equals(c.getCurrentSystem())
                   || !getCachedJumpPath().getLastSystem().equals(getSystem())) {
-            setCachedJumpPath(c.calculateJumpPath(c.getCurrentSystem(), getSystem(), true, true));
+            setCachedJumpPath(c.calculateJumpPath(c.getCurrentSystem(), getSystem()));
         }
 
         return getCachedJumpPath();
