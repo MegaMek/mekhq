@@ -720,7 +720,7 @@ public class SalvagePostScenarioPicker {
 
             // If units are assigned, check validation state
             if ((unitName1 != null || unitName2 != null) && !isValidationValid(group)) {
-                confirmButton.setEnabled(false);
+                disableConfirmAndColorName(confirmButton, unitSalvageLabel);
                 return;
             }
         }
@@ -735,13 +735,17 @@ public class SalvagePostScenarioPicker {
                                               totalSalvage.getAmount().doubleValue() * 100.0;
 
                 if (currentPercent > salvagePercent) {
-                    confirmButton.setEnabled(false);
-                    if (unitSalvageLabel != null) {
-                        unitSalvageLabel.setForeground(MekHQ.getMHQOptions().getFontColorNegative());
-                    }
+                    disableConfirmAndColorName(confirmButton, unitSalvageLabel);
                     return;
                 }
             }
+        }
+
+        // Time budget check (disable and, ideally, color the time label in updateSalvageAllocation)
+        if (usedSalvageTime > maximumSalvageTime) {
+            confirmButton.setEnabled(false);
+            disableConfirmAndColorName(confirmButton, unitSalvageLabel);
+            return;
         }
 
         // Reset color if salvage percent is valid
@@ -751,6 +755,13 @@ public class SalvagePostScenarioPicker {
 
         // All checks passed
         confirmButton.setEnabled(true);
+    }
+
+    private static void disableConfirmAndColorName(JButton confirmButton, JLabel unitSalvageLabel) {
+        if (unitSalvageLabel != null) {
+            unitSalvageLabel.setForeground(MekHQ.getMHQOptions().getFontColorNegative());
+        }
+        confirmButton.setEnabled(false);
     }
 
     /**
