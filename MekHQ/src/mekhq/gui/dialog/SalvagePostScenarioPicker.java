@@ -126,17 +126,42 @@ public class SalvagePostScenarioPicker {
     /**
      * Groups a salvage unit's combo boxes with their associated labels.
      *
-     * @param comboBox1       first combo box for selecting a salvage unit
-     * @param comboBox2       second combo box for selecting a salvage unit
-     * @param validationLabel label displaying validation status
-     * @param unitLabel       label displaying the salvage unit name and value
-     * @param targetUnit      the salvage unit being assigned recovery forces
+     * <p>This class encapsulates all UI components related to assigning salvage forces to a single
+     * salvage unit. It includes two combo boxes for selecting recovery units, labels for displaying the unit
+     * information and validation status, and a flag to prevent recursive updates during combo box changes.</p>
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private record SalvageComboBoxGroup(JComboBox<String> comboBox1, JComboBox<String> comboBox2,
-          JLabel validationLabel, JLabel unitLabel, TestUnit targetUnit) {}
+    private static class SalvageComboBoxGroup {
+        final JComboBox<String> comboBox1;
+        final JComboBox<String> comboBox2;
+        final JLabel validationLabel;
+        final JLabel unitLabel;
+        final TestUnit targetUnit;
+        boolean isUpdating = false;  // Flag to prevent recursive updates
+
+        /**
+         * Creates a new salvage combo box group.
+         *
+         * @param comboBox1       first combo box for selecting a salvage unit
+         * @param comboBox2       second combo box for selecting a salvage unit
+         * @param validationLabel label displaying validation status
+         * @param unitLabel       label displaying the salvage unit name and value
+         * @param targetUnit      the salvage unit being assigned recovery forces
+         *
+         * @author Illiani
+         * @since 0.50.10
+         */
+        SalvageComboBoxGroup(JComboBox<String> comboBox1, JComboBox<String> comboBox2,
+              JLabel validationLabel, JLabel unitLabel, TestUnit targetUnit) {
+            this.comboBox1 = comboBox1;
+            this.comboBox2 = comboBox2;
+            this.validationLabel = validationLabel;
+            this.unitLabel = unitLabel;
+            this.targetUnit = targetUnit;
+        }
+    }
 
     /**
      * Creates a new post-salvage picker dialog and processes the selected salvage.
@@ -405,6 +430,13 @@ public class SalvagePostScenarioPicker {
         final boolean[] confirmed = { false };
         final ResultHolder resultHolder = new ResultHolder();
 
+        // Build the mapping and populate salvage unit options ONCE, outside the loop
+        unitNameMap.clear();
+        for (Unit salvageUnit : salvageUnits) {
+            String displayName = salvageUnit.getName(); // Use just the name
+            unitNameMap.put(displayName, salvageUnit);
+        }
+
         // Add all units to single column
         for (TestUnit unit : allUnits) {
             String unitName = unit.getName();
@@ -423,7 +455,7 @@ public class SalvagePostScenarioPicker {
                 iconography = getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.unitLabel.salvage");
             }
             unitLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.unitLabel.unit",
-                  unitName, sellValue, iconography));
+                  unitName, sellValue.toAmountString(), iconography));
 
             RecoveryTimeData data = recoveryTimeData.get(unit.getId());
             if (data != null) {
@@ -440,10 +472,7 @@ public class SalvagePostScenarioPicker {
             comboBox2.addItem(null); // Allow empty selection
 
             // Build the mapping and populate combo boxes
-            unitNameMap.clear();
-            for (Unit salvageUnit : salvageUnits) {
-                String displayName = CamOpsSalvageUtilities.getSalvageTooltip(List.of(salvageUnit), isInSpace);
-                unitNameMap.put(displayName, salvageUnit);
+            for (String displayName : unitNameMap.keySet()) {
                 comboBox1.addItem(displayName);
                 comboBox2.addItem(displayName);
             }
@@ -536,14 +565,24 @@ public class SalvagePostScenarioPicker {
     private void performComboChangeAction(boolean isContract, List<SalvageComboBoxGroup> salvageComboBoxGroups,
           SalvageComboBoxGroup group, JLabel finalEmployerSalvageLabel, JLabel finalUnitSalvageLabel,
           JLabel finalAvailableTimeLabel, JButton confirmButton) {
-        updateComboBoxOptions(salvageComboBoxGroups, unitNameMap);
-        updateValidation(group, unitNameMap);
-        updateSalvageAllocation(salvageComboBoxGroups,
-              unitNameMap,
-              finalEmployerSalvageLabel,
-              finalUnitSalvageLabel,
-              finalAvailableTimeLabel);
-        updateConfirmButtonState(salvageComboBoxGroups, confirmButton, finalUnitSalvageLabel, isContract);
+        // Prevent recursive calls
+        if (group.isUpdating) {
+            return;
+        }
+
+        try {
+            group.isUpdating = true;
+            updateComboBoxOptions(salvageComboBoxGroups, unitNameMap);
+            updateValidation(group, unitNameMap);
+            updateSalvageAllocation(salvageComboBoxGroups,
+                  unitNameMap,
+                  finalEmployerSalvageLabel,
+                  finalUnitSalvageLabel,
+                  finalAvailableTimeLabel);
+            updateConfirmButtonState(salvageComboBoxGroups, confirmButton, finalUnitSalvageLabel, isContract);
+        } finally {
+            group.isUpdating = false;
+        }
     }
 
     /**
@@ -746,18 +785,32 @@ public class SalvagePostScenarioPicker {
     private void updateSingleComboBox(JComboBox<String> comboBox, List<String> selectedUnitNames,
           Map<String, Unit> unitNameMap) {
         String currentSelection = (String) comboBox.getSelectedItem();
-        comboBox.removeAllItems();
-        comboBox.addItem(null); // Allow empty selection
 
-        for (String unitName : unitNameMap.keySet()) {
-            // Add unit if it's not selected elsewhere, or if it's the current selection
-            if (!selectedUnitNames.contains(unitName) || unitName.equals(currentSelection)) {
-                comboBox.addItem(unitName);
-            }
+        // Temporarily remove all action listeners to prevent recursive calls
+        var listeners = comboBox.getActionListeners();
+        for (var listener : listeners) {
+            comboBox.removeActionListener(listener);
         }
 
-        // Restore the selection
-        comboBox.setSelectedItem(currentSelection);
+        try {
+            comboBox.removeAllItems();
+            comboBox.addItem(null); // Allow empty selection
+
+            for (String unitName : unitNameMap.keySet()) {
+                // Add unit if it's not selected elsewhere, or if it's the current selection
+                if (!selectedUnitNames.contains(unitName) || unitName.equals(currentSelection)) {
+                    comboBox.addItem(unitName);
+                }
+            }
+
+            // Restore the selection
+            comboBox.setSelectedItem(currentSelection);
+        } finally {
+            // Re-add all action listeners
+            for (var listener : listeners) {
+                comboBox.addActionListener(listener);
+            }
+        }
     }
 
     /**
