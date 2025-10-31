@@ -936,6 +936,7 @@ public class CampaignNewDayManager {
                     unit.getEngineer().resetMinutesLeft(campaignOptions.isTechsUseAdministration());
                 }
 
+                Maintenance.checkAndCorrectMaintenanceSchedule(campaign);
                 Maintenance.doMaintenance(campaign, unit);
             } catch (Exception ex) {
                 LOGGER.error(ex,

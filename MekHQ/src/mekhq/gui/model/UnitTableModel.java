@@ -42,7 +42,6 @@ import javax.swing.table.TableCellRenderer;
 
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
-import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
 import megamek.common.units.Jumpship;
@@ -296,15 +295,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
 
                 double daysSinceLastMaintenance = unit.getDaysSinceMaintenance();
                 int cycleLength = campaign.getCampaignOptions().getMaintenanceCycleDays();
-                int ruggedMultiplier = 1;
-                if (entity.hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_1)) {
-                    ruggedMultiplier = 2;
-                }
-                if (entity.hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_2)) {
-                    ruggedMultiplier = 3;
-                }
-
-                yield ((cycleLength * ruggedMultiplier) - daysSinceLastMaintenance) + " days";
+                yield (unit.getMaintenanceCycleDuration(cycleLength) - daysSinceLastMaintenance) + " days";
             }
             case COL_BV -> entity.calculateBattleValue(true, unit.getEntity().getCrew() == null);
             case COL_REPAIR -> unit.getPartsNeedingFixing().size();
