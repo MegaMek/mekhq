@@ -7123,6 +7123,6 @@ public class Unit implements ITechnology {
             canSalvage = hasCargoCapacity || hasNavalTugAdaptor;
         }
 
-        return canSalvage && entity.getDamageLevel(true) < Entity.DMG_CRIPPLED;
+        return canSalvage && isFullyCrewed();
     }
 }
