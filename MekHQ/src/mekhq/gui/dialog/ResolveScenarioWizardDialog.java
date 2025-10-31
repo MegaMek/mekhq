@@ -669,10 +669,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
 
         gridBagConstraints.gridx = gridx++;
-        pnlSalvage.add(new JLabel(resourceMap.getString("lblSalvage.text")), gridBagConstraints);
+
+        pnlSalvage.add(new JLabel(resourceMap.getString(isUseCamOpsSalvage ? "lblWreck.text" : "lblSalvage.text")),
+              gridBagConstraints);
 
         gridBagConstraints.gridx = gridx++;
-        pnlSalvage.add(new JLabel(resourceMap.getString("lblSell.text")), gridBagConstraints);
+        pnlSalvage.add(new JLabel(isUseCamOpsSalvage ? "" : resourceMap.getString("lblSell.text")), gridBagConstraints);
 
         gridBagConstraints.gridx = gridx;
         pnlSalvage.add(new JLabel(resourceMap.getString("lblEscaped.text")), gridBagConstraints);
@@ -702,9 +704,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
 
             // Now, we start creating the boxes
-            boolean automaticallySelectSalvage = (isUseCamOpsSalvage && !tracker.usesSalvageExchange()) ||
+            boolean automaticallySelectSalvage = (isUseCamOpsSalvage) ||
                                                        (!tracker.usesSalvageExchange() && maxSalvagePct >= 100);
-            boolean automaticallySelectSell = isUseCamOpsSalvage && tracker.usesSalvageExchange();
 
             JLabel salvageUnit = new JLabel(status.getDesc(true));
             salvageUnitLabel.add(salvageUnit);
@@ -727,7 +728,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             sold.getAccessibleContext().setAccessibleName(resourceMap.getString("lblSell.text"));
             sold.setEnabled(!tracker.usesSalvageExchange() && tracker.getCampaign().getCampaignOptions().isSellUnits());
             sold.addItemListener(evt -> checkSalvageRights());
-            sold.setSelected(automaticallySelectSell);
+            sold.setVisible(!isUseCamOpsSalvage);
             soldUnitBoxes.add(sold);
             gridBagConstraints.gridx = gridx++;
             pnlSalvage.add(sold, gridBagConstraints);
