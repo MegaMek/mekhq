@@ -82,7 +82,7 @@ public class RecoveryTimeCalculations {
      * Calculates the total recovery time for an entity based on environmental conditions.
      *
      * <p>This method evaluates all environmental factors present in the scenario and applies appropriate multipliers
-     * to the base recovery time. The calculation follows Campaign Operations rules, considering:</p>
+     * to the base recovery time. The calculation follows Campaign Operations rules (pg 214, pg 209), considering:</p>
      * <ul>
      *   <li>Weather conditions (storms, precipitation)</li>
      *   <li>Wind conditions (tornadoes, hurricanes)</li>
