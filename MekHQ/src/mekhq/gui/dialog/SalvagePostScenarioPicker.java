@@ -124,7 +124,6 @@ public class SalvagePostScenarioPicker {
     private final List<TestUnit> soldSalvage = new ArrayList<>();
     private final List<TestUnit> employerSalvage = new ArrayList<>();
     private final Map<String, Unit> unitNameMap = new LinkedHashMap<>();
-    private final Map<String, Boolean> unitTowAssignments = new HashMap<>();
     private final Map<String, Double> unitCargoAssignments = new HashMap<>();
     private Map<UUID, RecoveryTimeData> recoveryTimeData;
     private boolean isExchangeRights = false;
@@ -626,7 +625,8 @@ public class SalvagePostScenarioPicker {
         dialog.add(buttonPanel, BorderLayout.SOUTH);
 
         // Initial button state check
-        updateConfirmButtonState(salvageComboBoxGroups, confirmButton, finalUnitSalvageLabel, isContract);
+        updateConfirmButtonState(salvageComboBoxGroups, confirmButton, finalUnitSalvageLabel, finalAvailableTimeLabel,
+              isContract);
 
         dialog.setPreferredSize(DEFAULT_SIZE);
         dialog.setSize(DEFAULT_SIZE);
@@ -692,7 +692,8 @@ public class SalvagePostScenarioPicker {
                   finalEmployerSalvageLabel,
                   finalUnitSalvageLabel,
                   finalAvailableTimeLabel);
-            updateConfirmButtonState(salvageComboBoxGroups, confirmButton, finalUnitSalvageLabel, isContract);
+            updateConfirmButtonState(salvageComboBoxGroups, confirmButton, finalUnitSalvageLabel,
+                  finalAvailableTimeLabel, isContract);
         } finally {
             group.isUpdating = false;
         }
@@ -712,27 +713,30 @@ public class SalvagePostScenarioPicker {
      * @param salvageComboBoxGroups list of all combo box groups
      * @param confirmButton         the confirm button to enable/disable
      * @param unitSalvageLabel      label showing unit salvage value (colored red if limit exceeded)
+     * @param salvageTimeLabel      label showing salvage time spent (colored red if limit exceeded)
      * @param isContract            whether this is a contract mission
      *
      * @author Illiani
      * @since 0.50.10
      */
     private void updateConfirmButtonState(List<SalvageComboBoxGroup> salvageComboBoxGroups, JButton confirmButton,
-          JLabel unitSalvageLabel, boolean isContract) {
+          JLabel unitSalvageLabel, JLabel salvageTimeLabel, boolean isContract) {
         // Check for any invalid units
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
+            group.unitLabel.setForeground(null); // reset
+
             String unitName1 = (String) group.comboBoxLeft.getSelectedItem();
             String unitName2 = (String) group.comboBoxRight.getSelectedItem();
 
             // If units are assigned, check validation state
             if ((unitName1 != null || unitName2 != null) && !isValidationValid(group)) {
-                disableConfirmAndColorName(confirmButton, unitSalvageLabel);
-                return;
+                disableConfirmAndColorName(confirmButton, group.unitLabel);
             }
         }
 
         // Check salvage percentage if this is a contract
         if (isContract) {
+            unitSalvageLabel.setForeground(null);
             Money totalSalvage = employerSalvageMoneyCurrent.plus(unitSalvageMoneyCurrent);
 
             if (totalSalvage.isPositive()) {
@@ -744,21 +748,15 @@ public class SalvagePostScenarioPicker {
 
                 if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0) {
                     disableConfirmAndColorName(confirmButton, unitSalvageLabel);
-                    return;
                 }
             }
         }
 
         // Time budget check (disable and, ideally, color the time label in updateSalvageAllocation)
         if (usedSalvageTime > maximumSalvageTime) {
+            salvageTimeLabel.setForeground(null);
             confirmButton.setEnabled(false);
-            disableConfirmAndColorName(confirmButton, unitSalvageLabel);
-            return;
-        }
-
-        // Reset color if salvage percent is valid
-        if (unitSalvageLabel != null) {
-            unitSalvageLabel.setForeground(null);
+            disableConfirmAndColorName(confirmButton, salvageTimeLabel);
         }
 
         // All checks passed
@@ -870,13 +868,11 @@ public class SalvagePostScenarioPicker {
      */
     private void updateComboBoxOptions(List<SalvageComboBoxGroup> salvageComboBoxGroups,
           Map<String, Unit> unitNameMap) {
-        unitTowAssignments.clear(); // Clear prior assignments, we're going to rebuild these later
-        unitCargoAssignments.clear();
+        unitCargoAssignments.clear(); // Clear prior assignments, we're going to rebuild these later
 
         // Collect all currently selected unit names
         List<String> selectedUnitNames = new ArrayList<>();
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-
             String selectedLeft = (String) group.comboBoxLeft.getSelectedItem();
             String selectedRight = (String) group.comboBoxRight.getSelectedItem();
             if (selectedLeft != null) {
@@ -1006,8 +1002,6 @@ public class SalvagePostScenarioPicker {
                 return;
             }
 
-            unitTowAssignments.put(unitNameLeft, true);
-            unitTowAssignments.put(unitNameRight, true);
             validate(group);
             return;
         }
@@ -1035,7 +1029,6 @@ public class SalvagePostScenarioPicker {
                 return;
             }
 
-            unitTowAssignments.put(unitName, true);
             validate(group);
         } else {
             double usedCargoCapacity = unitCargoAssignments.get(unitName) != null ?
