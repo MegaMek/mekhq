@@ -1038,8 +1038,6 @@ public class Scenario implements IPlayerSettings {
         }
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", date);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageForces", salvageForces);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageTechs", salvageTechs);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cloaked", isCloaked());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "boardType", boardType);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasTrack", hasTrack);
