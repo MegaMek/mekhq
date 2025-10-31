@@ -126,19 +126,19 @@ public class CamOpsSalvageUtilities {
      * @param campaign        The current {@link Campaign} to add salvage to.
      * @param mission         The {@link Mission} associated with the salvage.
      * @param scenario        The {@link Scenario} that generated the salvage.
-     * @param actualSalvage   The list of units claimed by the player.
+     * @param keptSalvage     The list of units claimed by the player.
      * @param soldSalvage     The list of units that were sold instead of claimed.
-     * @param leftoverSalvage The list of units going to the employer or unclaimed.
+     * @param employerSalvage The list of units going to the employer or unclaimed.
      *
      * @author Illiani
      * @since 0.50.10
      */
     public static void resolveSalvage(Campaign campaign, Mission mission, Scenario scenario,
-          List<TestUnit> actualSalvage, List<TestUnit> soldSalvage, List<TestUnit> leftoverSalvage) {
+          List<TestUnit> keptSalvage, List<TestUnit> soldSalvage, List<TestUnit> employerSalvage) {
         boolean isContract = mission instanceof Contract;
 
         // now let's take care of salvage
-        for (TestUnit salvageUnit : actualSalvage) {
+        for (TestUnit salvageUnit : keptSalvage) {
             ResolveScenarioTracker.UnitStatus salvageStatus = new ResolveScenarioTracker.UnitStatus(salvageUnit);
             if (salvageUnit.getEntity() instanceof Aero) {
                 ((Aero) salvageUnit.getEntity()).setFuelTonnage(((Aero) salvageStatus.getBaseEntity()).getFuelTonnage());
@@ -174,7 +174,7 @@ public class CamOpsSalvageUtilities {
 
         if (isContract) {
             Money value = Money.zero();
-            for (TestUnit salvageUnit : leftoverSalvage) {
+            for (TestUnit salvageUnit : employerSalvage) {
                 value = value.plus(salvageUnit.getSellValue());
             }
             if (((Contract) mission).isSalvageExchange()) {
@@ -191,7 +191,7 @@ public class CamOpsSalvageUtilities {
             }
         }
 
-        for (TestUnit unit : actualSalvage) {
+        for (TestUnit unit : keptSalvage) {
             unit.setSite(mission.getRepairLocation());
         }
     }
