@@ -1,27 +1,42 @@
 package mekhq.campaign.mission.camOpsSalvage;
 
+import static megamek.common.compute.Compute.d6;
 import static megamek.common.equipment.MiscType.F_NAVAL_TUG_ADAPTOR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.List;
+import java.util.UUID;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.equipment.Mounted;
 import megamek.common.units.Aero;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import megamek.common.units.Warship;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.medical.InjurySPAUtility;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 
 public class CamOpsSalvageUtilities {
+    private static final MMLogger LOGGER = MMLogger.create(CamOpsSalvageUtilities.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CamOpsSalvage";
 
     /**
@@ -59,18 +74,18 @@ public class CamOpsSalvageUtilities {
                     double tonnage = entity.getTonnage();
                     if (!isLargeVessel) {
                         tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
-                              "PostSalvagePicker.tooltip.drag", tonnage)).append(")");
+                              "CamOpsSalvageUtilities.tooltip.drag", tonnage)).append(")");
                     }
 
                     double cargoCapacity = unit.getCargoCapacity();
                     if (!(entity instanceof Mek)) {
                         tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
-                              "PostSalvagePicker.tooltip.cargo", cargoCapacity)).append(")");
+                              "CamOpsSalvageUtilities.tooltip.cargo", cargoCapacity)).append(")");
 
                         if (isLargeVessel) {
                             if (CamOpsSalvageUtilities.hasNavalTug(entity)) {
                                 tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
-                                      "PostSalvagePicker.tooltip.tug")).append(")");
+                                      "CamOpsSalvageUtilities.tooltip.tug")).append(")");
                             }
                         }
                     }
@@ -176,6 +191,95 @@ public class CamOpsSalvageUtilities {
 
         for (TestUnit unit : actualSalvage) {
             unit.setSite(mission.getRepairLocation());
+        }
+    }
+
+    /**
+     * Performs risky salvage safety checks for assigned technicians.
+     *
+     * <p>This method simulates the dangers of salvage operations by rolling for potential accidents and injuries
+     * among the assigned technicians. For each salvaged unit, there is a small chance (snake eyes on 2d6) that an
+     * injury event occurs. When an injury event occurs, a random technician from the assigned pool is injured.</p>
+     *
+     * <p>The severity of injuries is determined by rolling 1d6 for hits, which may be modified by the victim's SPAs
+     * (Special Pilot Abilities). The method respects the campaign's medical system settings, using either advanced
+     * medical injury resolution or simple hit tracking.</p>
+     *
+     * <p>If a technician accumulates more than 5 injuries or hits as a result of the accident, their status is
+     * changed to {@link PersonnelStatus#ACCIDENTAL} (deceased due to accident).</p>
+     *
+     * <p>Key features:</p>
+     * <ul>
+     *   <li>Rolls 2d6 for each salvaged unit; snake eyes (2) triggers an injury event</li>
+     *   <li>Random technician selection for each injury event</li>
+     *   <li>Injury severity adjusted by victim's SPAs and campaign fatigue settings</li>
+     *   <li>Compatible with both simple and advanced medical systems</li>
+     *   <li>Generates campaign report if any accidents occur</li>
+     * </ul>
+     *
+     * @param campaign              the current campaign
+     * @param techs                 list of technicians assigned to salvage operations (may be modified if techs die)
+     * @param numberOfSalvagedUnits the number of units being salvaged
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public static void performRiskySalvageChecks(Campaign campaign, List<UUID> techs,
+          int numberOfSalvagedUnits) {
+        if (techs.isEmpty()) {
+            return;
+        }
+
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
+        final int fatigueRate = campaignOptions.getFatigueRate();
+        final boolean useInjuryFatigue = campaignOptions.isUseInjuryFatigue();
+
+        int injuryEvents = 0;
+        for (int i = 0; i <= numberOfSalvagedUnits; i++) {
+            int roll = d6(2);
+            if (roll == 0) {
+                injuryEvents++;
+            }
+        }
+
+        boolean didAccidentOccur = false;
+        for (int i = 0; i <= injuryEvents; i++) {
+            if (techs.isEmpty()) {
+                break;
+            }
+
+            didAccidentOccur = true;
+
+            UUID victimId = ObjectUtility.getRandomItem(techs);
+            Person victim = campaign.getPerson(victimId);
+            if (victim == null) {
+                LOGGER.error("null victim was passed into risk salvage");
+                techs.remove(victimId);
+                continue;
+            }
+
+            int newHits = d6(1);
+            newHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(victim, useInjuryFatigue, fatigueRate, newHits);
+
+            if (isUseAdvancedMedical) {
+                InjuryUtil.resolveCombatDamage(campaign, victim, newHits);
+            } else {
+                int priorHits = victim.getHits();
+                victim.setHits(priorHits + newHits);
+            }
+
+            if (victim.getInjuries().size() > 5 || victim.getHits() > 5) {
+                victim.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACCIDENTAL);
+            }
+
+            MekHQ.triggerEvent(new PersonChangedEvent(victim));
+            techs.remove(victim); // We're nice enough that each tech can only be injured once per operation
+        }
+
+        if (didAccidentOccur) {
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.accident",
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
         }
     }
 }

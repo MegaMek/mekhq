@@ -50,15 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
@@ -123,6 +115,10 @@ public class SalvagePostScenarioPicker {
     private final Map<String, Unit> unitNameMap = new HashMap<>();
     private Map<UUID, RecoveryTimeData> recoveryTimeData;
 
+    public int getCountOfSalvageUnits() {
+        return salvageUnits.size();
+    }
+
     /**
      * Groups a salvage unit's combo boxes with their associated labels.
      *
@@ -138,27 +134,34 @@ public class SalvagePostScenarioPicker {
         final JComboBox<String> comboBox2;
         final JLabel validationLabel;
         final JLabel unitLabel;
+        final JCheckBox claimedSalvageForKeeps;
+        final JCheckBox claimedSalvageForSale;
         final TestUnit targetUnit;
         boolean isUpdating = false;  // Flag to prevent recursive updates
 
         /**
          * Creates a new salvage combo box group.
          *
-         * @param comboBox1       first combo box for selecting a salvage unit
-         * @param comboBox2       second combo box for selecting a salvage unit
-         * @param validationLabel label displaying validation status
-         * @param unitLabel       label displaying the salvage unit name and value
-         * @param targetUnit      the salvage unit being assigned recovery forces
+         * @param comboBox1              first combo box for selecting a salvage unit
+         * @param comboBox2              second combo box for selecting a salvage unit
+         * @param validationLabel        label displaying validation status
+         * @param unitLabel              label displaying the salvage unit name and value
+         * @param claimedSalvageForKeeps {@code true} if the player claimed the salvage for keeps
+         * @param claimedSalvageForSale  {@code true} if the player claimed the salvage for immediate sale
+         * @param targetUnit             the salvage unit being assigned recovery forces
          *
          * @author Illiani
          * @since 0.50.10
          */
-        SalvageComboBoxGroup(JComboBox<String> comboBox1, JComboBox<String> comboBox2,
-              JLabel validationLabel, JLabel unitLabel, TestUnit targetUnit) {
+        SalvageComboBoxGroup(JComboBox<String> comboBox1, JComboBox<String> comboBox2, JLabel validationLabel,
+              JLabel unitLabel, JCheckBox claimedSalvageForKeeps, JCheckBox claimedSalvageForSale,
+              TestUnit targetUnit) {
             this.comboBox1 = comboBox1;
             this.comboBox2 = comboBox2;
             this.validationLabel = validationLabel;
             this.unitLabel = unitLabel;
+            this.claimedSalvageForKeeps = claimedSalvageForKeeps;
+            this.claimedSalvageForSale = claimedSalvageForSale;
             this.targetUnit = targetUnit;
         }
     }
@@ -449,13 +452,8 @@ public class SalvagePostScenarioPicker {
 
             JLabel unitLabel = new JLabel();
             String iconography;
-            if (soldSalvage.contains(unit)) {
-                iconography = getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.unitLabel.sale");
-            } else {
-                iconography = getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.unitLabel.salvage");
-            }
             unitLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.unitLabel.unit",
-                  unitName, sellValue.toAmountString(), iconography));
+                  unitName, sellValue.toAmountString()));
 
             RecoveryTimeData data = recoveryTimeData.get(unit.getId());
             if (data != null) {
@@ -465,6 +463,13 @@ public class SalvagePostScenarioPicker {
             }
 
             JLabel validationLabel = new JLabel();
+
+            JCheckBox claimedSalvageForKeeps = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.unitLabel.salvage"));
+            claimedSalvageForKeeps.setEnabled(false);
+            JCheckBox claimedSalvageForSale = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.unitLabel.sale"));
+            claimedSalvageForSale.setEnabled(false);
 
             JComboBox<String> comboBox1 = new JComboBox<>();
             JComboBox<String> comboBox2 = new JComboBox<>();
@@ -481,6 +486,8 @@ public class SalvagePostScenarioPicker {
                   comboBox2,
                   validationLabel,
                   unitLabel,
+                  claimedSalvageForKeeps,
+                  claimedSalvageForSale,
                   unit);
             salvageComboBoxGroups.add(group);
 
@@ -490,6 +497,8 @@ public class SalvagePostScenarioPicker {
             comboBox2.addActionListener(e -> performComboChangeAction(isContract, salvageComboBoxGroups, group,
                   finalEmployerSalvageLabel, finalUnitSalvageLabel, finalAvailableTimeLabel, confirmButton));
 
+            rowPanel.add(claimedSalvageForKeeps);
+            rowPanel.add(claimedSalvageForSale);
             rowPanel.add(unitLabel);
             rowPanel.add(comboBox1);
             rowPanel.add(comboBox2);
@@ -842,7 +851,11 @@ public class SalvagePostScenarioPicker {
         // If no units selected, clear validation and reset color
         if (unit1 == null && unit2 == null) {
             group.validationLabel.setText("");
-            group.unitLabel.setForeground(null); // Reset to default color
+            group.unitLabel.setForeground(null);
+            group.claimedSalvageForKeeps.setSelected(false);
+            group.claimedSalvageForKeeps.setEnabled(false);
+            group.claimedSalvageForSale.setSelected(false);
+            group.claimedSalvageForSale.setEnabled(false);
             return;
         }
 
@@ -863,6 +876,10 @@ public class SalvagePostScenarioPicker {
             if (!hasNavalTug) {
                 group.validationLabel.setText(getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.noTug"));
                 group.unitLabel.setForeground(MekHQ.getMHQOptions().getFontColorNegative());
+                group.claimedSalvageForKeeps.setSelected(false);
+                group.claimedSalvageForKeeps.setEnabled(false);
+                group.claimedSalvageForSale.setSelected(false);
+                group.claimedSalvageForSale.setEnabled(false);
                 return;
             }
         }
@@ -880,6 +897,10 @@ public class SalvagePostScenarioPicker {
             group.validationLabel.setText(getTextAt(RESOURCE_BUNDLE,
                   "SalvagePostScenarioPicker.validation.noCapacity"));
             group.unitLabel.setForeground(MekHQ.getMHQOptions().getFontColorNegative());
+            group.claimedSalvageForKeeps.setSelected(false);
+            group.claimedSalvageForKeeps.setEnabled(false);
+            group.claimedSalvageForSale.setSelected(false);
+            group.claimedSalvageForSale.setEnabled(false);
             return;
         }
 
