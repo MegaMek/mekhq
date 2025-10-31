@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.mission;
 
+import static mekhq.campaign.force.Force.FORCE_NONE;
+
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -45,6 +47,7 @@ import java.util.Vector;
 
 import megamek.Version;
 import megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.board.Board;
 import megamek.common.loaders.MapSettings;
@@ -99,8 +102,8 @@ public class Scenario implements IPlayerSettings {
     private LocalDate date;
     private List<Integer> subForceIds;
     private List<UUID> unitIds;
-    private final List<Integer> salvageForces; // Not serialized
-    private final List<UUID> salvageTechs; // Not serialized
+    private final List<Integer> salvageForces;
+    private final List<UUID> salvageTechs;
     private int id = S_DEFAULT_ID;
     private int missionId;
     private ForceStub stub;
@@ -1018,7 +1021,25 @@ public class Scenario implements IPlayerSettings {
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "loots");
         }
 
+        if (!salvageForces.isEmpty() && getStatus().isCurrent()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "salvageForces");
+            for (Integer forceId : salvageForces) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageForce", forceId);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salvageForces");
+        }
+
+        if (!salvageTechs.isEmpty() && getStatus().isCurrent()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "salvageTechs");
+            for (UUID techId : salvageTechs) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageTech", techId);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salvageTechs");
+        }
+
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", date);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageForces", salvageForces);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageTechs", salvageTechs);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cloaked", isCloaked());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "boardType", boardType);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasTrack", hasTrack);
@@ -1138,6 +1159,38 @@ public class Scenario implements IPlayerSettings {
                         }
                         Loot loot = Loot.generateInstanceFromXML(wn3, c, version);
                         retVal.loots.add(loot);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("salvageForces")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("salvageForce")) {
+                            // Error condition of sorts!
+                            LOGGER.error("Unknown node type loaded in salvageForces nodes: {}", wn3.getNodeName());
+                            continue;
+                        }
+                        retVal.salvageForces.add(MathUtility.parseInt(wn3.getTextContent().trim(), FORCE_NONE));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("salvageTechs")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("salvageTech")) {
+                            // Error condition of sorts!
+                            LOGGER.error("Unknown node type loaded in salvageTechs nodes: {}", wn3.getNodeName());
+                            continue;
+                        }
+                        retVal.salvageTechs.add(UUID.fromString(wn3.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase(ScenarioObjective.ROOT_XML_ELEMENT_NAME)) {
                     retVal.getScenarioObjectives().add(ScenarioObjective.Deserialize(wn2));
