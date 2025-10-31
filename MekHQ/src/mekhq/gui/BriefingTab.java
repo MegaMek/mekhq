@@ -116,6 +116,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -1023,8 +1024,10 @@ public final class BriefingTab extends CampaignGuiTab {
         List<Force> salvageForceOptions = new ArrayList<>();
 
         // Collect Combat Teams
+        List<AtBContract> activeContracts = getCampaign().getActiveAtBContracts();
         for (CombatTeam combatTeam : getCampaign().getCombatTeamsAsList()) {
-            Force force = getCampaign().getForce(combatTeam.getForceId());
+            int forceId = combatTeam.getForceId();
+            Force force = getCampaign().getForce(forceId);
             if (force == null) {
                 continue;
             }
@@ -1032,7 +1035,10 @@ public final class BriefingTab extends CampaignGuiTab {
             visitedForceIds.add(force.getId());
             force.getSubForces().forEach(subForce -> visitedForceIds.add(subForce.getId()));
 
-            if (!force.isDeployed() && force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
+            boolean isDeployedToStratCon = StratConRulesManager.isForceDeployedToStratCon(activeContracts, forceId);
+            if (!force.isDeployed() &&
+                      !isDeployedToStratCon &&
+                      force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
                 salvageForceOptions.add(force);
             }
         }
