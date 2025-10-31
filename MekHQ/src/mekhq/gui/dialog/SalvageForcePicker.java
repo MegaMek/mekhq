@@ -142,7 +142,7 @@ public class SalvageForcePicker extends ImmersiveDialogCore {
               getInCharacterMessage(campaign.getCommanderAddress(), !forces.isEmpty()),
               getButtons(!forces.isEmpty()),
               getOutOfCharacterMessage(),
-              ImmersiveDialogWidth.SMALL.getWidth(),
+              ImmersiveDialogWidth.LARGE.getWidth(),
               false,
               getSupplementalPanel(scenario.getBoardType() == AtBScenario.T_SPACE, campaign.getHangar(), forces),
               null,

@@ -121,7 +121,7 @@ public class SalvageTechPicker extends ImmersiveDialogCore {
               getInCharacterMessage(campaign.getCommanderAddress(), !techs.isEmpty()),
               getButtons(!techs.isEmpty()),
               getOutOfCharacterMessage(),
-              ImmersiveDialogWidth.SMALL.getWidth(),
+              ImmersiveDialogWidth.LARGE.getWidth(),
               false,
               getSupplementalPanel(campaign, techs),
               null,

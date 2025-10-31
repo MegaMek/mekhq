@@ -52,6 +52,8 @@ import java.util.Map;
 import java.util.UUID;
 import javax.swing.*;
 
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
@@ -101,6 +103,7 @@ public class SalvagePostScenarioPicker {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CamOpsSalvage";
 
     private final static int PADDING = scaleForGUI(10);
+    private final static Dimension DEFAULT_SIZE = scaleForGUI(1000, 600);
 
     private final boolean isInSpace;
     private int maximumSalvageTime = 0;
@@ -542,8 +545,10 @@ public class SalvagePostScenarioPicker {
         // Initial button state check
         updateConfirmButtonState(salvageComboBoxGroups, confirmButton, finalUnitSalvageLabel, isContract);
 
-        dialog.pack();
+        dialog.setPreferredSize(DEFAULT_SIZE);
+        dialog.setSize(DEFAULT_SIZE);
         dialog.setLocationRelativeTo(null);
+        setPreferences(dialog); // Must be before setVisible
         dialog.setVisible(true);
 
         return confirmed[0] ? resultHolder.groups : null;
@@ -928,5 +933,18 @@ public class SalvagePostScenarioPicker {
         }
 
         group.claimedSalvageForSale.setEnabled(true);
+    }
+
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     */
+    private void setPreferences(JDialog dialog) {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(SalvagePostScenarioPicker.class);
+            dialog.setName("SalvagePostScenarioPicker");
+            preferences.manage(new JWindowPreference(dialog));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to set user preferences", ex);
+        }
     }
 }
