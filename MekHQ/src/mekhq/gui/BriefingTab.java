@@ -886,6 +886,10 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private boolean displaySalvageForcePicker(Scenario scenario) {
+        if (!getCampaign().getCampaignOptions().isUseCamOpsSalvage()) {
+            return true;
+        }
+
         scenario.getSalvageForces().clear(); // reset, in case we've previously canceled out of the dialog
         List<Force> salvageForceOptions = getSalvageForces(getCampaign().getHangar(),
               scenario.getBoardType() == AtBScenario.T_SPACE);
@@ -902,7 +906,25 @@ public final class BriefingTab extends CampaignGuiTab {
         return forcePicker.wasConfirmed();
     }
 
+
+    /**
+     * Displays a dialog allowing the player to select techs for salvage operations.
+     *
+     * <p>This method gathers all available techs from the campaign and presents them to the player via a
+     * {@link SalvageTechPicker} dialog.</p>
+     *
+     * @param scenario the scenario for which salvage forces are being selected
+     *
+     * @return {@code true} if the player confirmed their tech selection, {@code false} if they canceled
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private boolean displaySalvageTechPicker(Scenario scenario) {
+        if (!getCampaign().getCampaignOptions().isUseCamOpsSalvage()) {
+            return true;
+        }
+
         scenario.getSalvageTechs().clear(); // reset, in case we've previously canceled out of the dialog
         List<Person> availableTechs = getAvailableTechs();
 

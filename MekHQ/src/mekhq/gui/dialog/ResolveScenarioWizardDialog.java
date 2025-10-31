@@ -193,6 +193,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     // endregion Preview Panel components
     private boolean aborted = true;
 
+    private final boolean isUseCamOpsSalvage;
+
     private static final MMLogger logger = MMLogger.create(ResolveScenarioWizardDialog.class);
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
@@ -208,6 +210,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         objectiveProcessor = new ScenarioObjectiveProcessor();
         loots = tracker.getPotentialLoot();
         salvageableUnites = new ArrayList<>();
+        isUseCamOpsSalvage = campaign.getCampaignOptions().isUseCamOpsSalvage();
         if (tracker.getMission() instanceof Contract contract) {
             salvageEmployer = contract.getSalvagedByEmployer();
             salvageUnit = contract.getSalvagedByUnit();
@@ -599,24 +602,29 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
 
             JLabel lblSalvageValueUnit1 = new JLabel(resourceMap.getString("lblSalvageValueUnit1.text"));
+            lblSalvageValueUnit1.setVisible(!isUseCamOpsSalvage); // We're using setVisible to avoid null objects
             gridBagConstraints.gridx = gridx++;
             gridBagConstraints.gridy = gridY++;
             pnlSalvageValue.add(lblSalvageValueUnit1, gridBagConstraints);
 
             lblSalvageValueUnit2 = new JLabel(salvageUnit.toAmountAndSymbolString());
+            lblSalvageValueUnit2.setVisible(!isUseCamOpsSalvage);
             gridBagConstraints.gridx = gridx--;
             pnlSalvageValue.add(lblSalvageValueUnit2, gridBagConstraints);
 
             JLabel lblSalvageValueEmployer1 = new JLabel(resourceMap.getString("lblSalvageValueEmployer1.text"));
+            lblSalvageValueEmployer1.setVisible(!isUseCamOpsSalvage);
             gridBagConstraints.gridx = gridx++;
             gridBagConstraints.gridy = gridY++;
             pnlSalvageValue.add(lblSalvageValueEmployer1, gridBagConstraints);
 
             lblSalvageValueEmployer2 = new JLabel(salvageEmployer.toAmountAndSymbolString());
+            lblSalvageValueEmployer2.setVisible(!isUseCamOpsSalvage);
             gridBagConstraints.gridx = gridx--;
             pnlSalvageValue.add(lblSalvageValueEmployer2, gridBagConstraints);
 
             JLabel lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvagePct1.text"));
+            lblSalvagePct1.setVisible(!isUseCamOpsSalvage);
             gridBagConstraints.gridx = gridx++;
             gridBagConstraints.gridy = gridY++;
             pnlSalvageValue.add(lblSalvagePct1, gridBagConstraints);
@@ -635,6 +643,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                                        maxSalvagePct +
                                        "%)</span></html>";
             lblSalvagePct2 = new JLabel(salvageUsed);
+            lblSalvagePct2.setVisible(!isUseCamOpsSalvage);
             gridBagConstraints.gridx = gridx;
             pnlSalvageValue.add(lblSalvagePct2, gridBagConstraints);
 
@@ -693,6 +702,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
 
             // Now, we start creating the boxes
+            boolean automaticallySelectSalvage = (isUseCamOpsSalvage && !tracker.usesSalvageExchange()) ||
+                                                       (!tracker.usesSalvageExchange() && maxSalvagePct >= 100);
+            boolean automaticallySelectSell = isUseCamOpsSalvage && tracker.usesSalvageExchange();
+
             JLabel salvageUnit = new JLabel(status.getDesc(true));
             salvageUnitLabel.add(salvageUnit);
             gridBagConstraints.gridx = gridx++;
@@ -702,7 +715,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             salvaged.setName("salvaged");
             salvaged.getAccessibleContext().setAccessibleName(resourceMap.getString("lblSalvage.text"));
             salvaged.setEnabled(!tracker.usesSalvageExchange());
-            salvaged.setSelected(!tracker.usesSalvageExchange() && (maxSalvagePct >= 100));
+            salvaged.setSelected(automaticallySelectSalvage);
             salvaged.addItemListener(evt -> checkSalvageRights());
             salvageBoxes.add(salvaged);
             gridBagConstraints.anchor = GridBagConstraints.NORTH;
@@ -714,6 +727,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             sold.getAccessibleContext().setAccessibleName(resourceMap.getString("lblSell.text"));
             sold.setEnabled(!tracker.usesSalvageExchange() && tracker.getCampaign().getCampaignOptions().isSellUnits());
             sold.addItemListener(evt -> checkSalvageRights());
+            sold.setSelected(automaticallySelectSell);
             soldUnitBoxes.add(sold);
             gridBagConstraints.gridx = gridx++;
             pnlSalvage.add(sold, gridBagConstraints);
@@ -1808,16 +1822,18 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 continue;
             }
 
-            // always eligible with 100% salvage rights even when current == max
-            //            if ((currentSalvagePct > maxSalvagePct) && (maxSalvagePct < 100)) {
-            //                if (!salvageBoxes.get(i).isSelected()) {
-            //                    salvageBoxes.get(i).setEnabled(false);
-            //                }
-            //
-            //                if (!soldUnitBoxes.get(i).isSelected()) {
-            //                    soldUnitBoxes.get(i).setEnabled(false);
-            //                }
-            //            }
+            if (!isUseCamOpsSalvage) {
+                // always eligible with 100% salvage rights even when current == max
+                if ((currentSalvagePct > maxSalvagePct) && (maxSalvagePct < 100)) {
+                    if (!salvageBoxes.get(i).isSelected()) {
+                        salvageBoxes.get(i).setEnabled(false);
+                    }
+
+                    if (!soldUnitBoxes.get(i).isSelected()) {
+                        soldUnitBoxes.get(i).setEnabled(false);
+                    }
+                }
+            }
         }
         lblSalvageValueUnit2.setText(salvageUnit.toAmountAndSymbolString());
         lblSalvageValueEmployer2.setText(salvageEmployer.toAmountAndSymbolString());

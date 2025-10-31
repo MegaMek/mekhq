@@ -75,6 +75,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -1762,7 +1763,12 @@ public class ResolveScenarioTracker {
             }
         }
 
-        new SalvagePostScenarioPicker(campaign, mission, scenario, getActualSalvage(), getSoldSalvage());
+        if (campaignOptions.isUseCamOpsSalvage()) {
+            new SalvagePostScenarioPicker(campaign, mission, scenario, getActualSalvage(), getSoldSalvage());
+        } else {
+            CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, getActualSalvage(), getSoldSalvage(),
+                  getLeftoverSalvage());
+        }
 
         for (Loot loot : actualLoot) {
             loot.getLoot(campaign, scenario, unitsStatus);
