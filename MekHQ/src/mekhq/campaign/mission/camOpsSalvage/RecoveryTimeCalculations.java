@@ -40,6 +40,7 @@ import megamek.common.planetaryConditions.Light;
 import megamek.common.planetaryConditions.Weather;
 import megamek.common.planetaryConditions.Wind;
 import megamek.logging.MMLogger;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.universe.Planet;
 
@@ -108,28 +109,33 @@ public class RecoveryTimeCalculations {
      */
     public static RecoveryTimeData calculateRecoveryTimeForEntity(String entityName, int baseRecoveryTime,
           Scenario scenario, @Nullable Planet currentPlanet) {
-        // Multipliers
-        double weatherMultiplier = getWeatherMultiplier(scenario.getWeather());
-        double windMultiplier = getWindMultiplier(scenario.getWind());
-        double temperatureMultiplier = getTemperatureMultiplier(scenario.getTemperature());
-        double gravityMultiplier = getGravityMultiplier(scenario.getGravity());
-        double atmosphereMultiplier = getAtmosphereMultiplier(scenario.getAtmosphere(),
-              currentPlanet == null ? null : currentPlanet.getAtmosphere(scenario.getDate()));
-        double lightMultiplier = getLightMultiplier(scenario.getLight());
+        boolean isInSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
 
-        // Total
-        double totalMultiplier = BASE_MULTIPLIER +
-                                       weatherMultiplier +
-                                       windMultiplier +
-                                       temperatureMultiplier +
-                                       gravityMultiplier +
-                                       atmosphereMultiplier +
-                                       lightMultiplier;
-        int totalRecoveryTime = getTotalRecoveryTime(entityName, baseRecoveryTime, totalMultiplier);
+        if (isInSpace) {
+            int totalRecoveryTime = getTotalRecoveryTime(entityName, baseRecoveryTime, BASE_MULTIPLIER);
+            return new RecoveryTimeData(DEFAULT_MULTIPLIER, DEFAULT_MULTIPLIER, DEFAULT_MULTIPLIER, DEFAULT_MULTIPLIER,
+                  DEFAULT_MULTIPLIER, DEFAULT_MULTIPLIER, baseRecoveryTime, totalRecoveryTime);
+        } else {
+            double weatherMultiplier = getWeatherMultiplier(scenario.getWeather());
+            double windMultiplier = getWindMultiplier(scenario.getWind());
+            double temperatureMultiplier = getTemperatureMultiplier(scenario.getTemperature());
+            double gravityMultiplier = getGravityMultiplier(scenario.getGravity());
+            double atmosphereMultiplier = getAtmosphereMultiplier(scenario.getAtmosphere(),
+                  currentPlanet == null ? null : currentPlanet.getAtmosphere(scenario.getDate()));
+            double lightMultiplier = getLightMultiplier(scenario.getLight());
 
-        // Return
-        return new RecoveryTimeData(weatherMultiplier, windMultiplier, temperatureMultiplier, gravityMultiplier,
-              atmosphereMultiplier, lightMultiplier, baseRecoveryTime, totalRecoveryTime);
+            double totalMultiplier = BASE_MULTIPLIER +
+                                           weatherMultiplier +
+                                           windMultiplier +
+                                           temperatureMultiplier +
+                                           gravityMultiplier +
+                                           atmosphereMultiplier +
+                                           lightMultiplier;
+
+            int totalRecoveryTime = getTotalRecoveryTime(entityName, baseRecoveryTime, totalMultiplier);
+            return new RecoveryTimeData(weatherMultiplier, windMultiplier, temperatureMultiplier, gravityMultiplier,
+                  atmosphereMultiplier, lightMultiplier, baseRecoveryTime, totalRecoveryTime);
+        }
     }
 
     /**
