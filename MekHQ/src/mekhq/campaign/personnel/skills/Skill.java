@@ -641,7 +641,7 @@ public class Skill {
         int spaModifiers = getSPAModifiers(skillModifierData.characterOptions(),
               skillModifierData.adjustedReputation());
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), skillModifierData.attributes(), type);
-        int totalInjuryModifier = getTotalInjuryModifier(skillModifierData);
+        int totalInjuryModifier = getTotalInjuryModifier(skillModifierData, type);
 
         boolean isIntelligenceBased = INTELLIGENCE.equals(type.getFirstAttribute())
                                             || INTELLIGENCE.equals(type.getSecondAttribute());
@@ -651,7 +651,7 @@ public class Skill {
         return spaModifiers + attributeModifiers + literacyModifier + totalInjuryModifier;
     }
 
-    private int getTotalInjuryModifier(SkillModifierData skillModifierData) {
+    public static int getTotalInjuryModifier(SkillModifierData skillModifierData, SkillType type) {
         int totalInjuryModifier = 0;
         for (InjuryEffect injuryEffect : skillModifierData.injuryEffects()) {
             int firstAttributeModifier = getAttributeModifierFromInjuryEffect(injuryEffect, type.getFirstAttribute());
@@ -662,7 +662,7 @@ public class Skill {
         return totalInjuryModifier;
     }
 
-    private int getAttributeModifierFromInjuryEffect(InjuryEffect injuryEffect, SkillAttribute skillAttribute) {
+    private static int getAttributeModifierFromInjuryEffect(InjuryEffect injuryEffect, SkillAttribute skillAttribute) {
         return switch (skillAttribute) {
             case NONE -> 0;
             case STRENGTH -> injuryEffect.getStrengthModifier();
@@ -920,6 +920,13 @@ public class Skill {
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "tooltip.format.spa",
                   (spaModifier > 0 ? "+" : "") + spaModifier));
+        }
+
+        int injuryModifier = getTotalInjuryModifier(skillModifierData, type);
+        if (injuryModifier != 0) {
+            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "tooltip.format.injury",
+                  (injuryModifier > 0 ? "+" : "") + injuryModifier));
         }
 
         SkillAttribute firstLinkedAttribute = type.getFirstAttribute();

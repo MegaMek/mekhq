@@ -1962,13 +1962,14 @@ public class PersonViewPanel extends JScrollablePanel {
 
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
-            String adjustment = getAdjustment(skill, attributeModifier, spaModifier);
+            int injuryModifier = skill.getTotalInjuryModifier(SkillModifierData skillData, skill.getType());
+            String adjustment = getAdjustment(skill, attributeModifier, spaModifier, injuryModifier);
 
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
                   skill.toString(options, attributes, adjustedReputation),
                   adjustment));
             lblName.setLabelFor(lblValue);
-            String tooltip = wordWrap(skill.getTooltip(options, attributes, adjustedReputation));
+            String tooltip = wordWrap(skill.getTooltip(options, attributes, adjustedReputation), injuryModifier);
             lblName.setToolTipText(tooltip);
             lblValue.setToolTipText(tooltip);
 
@@ -1993,9 +1994,9 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlSkills;
     }
 
-    private static String getAdjustment(Skill skill, int attributeModifier, int spaModifier) {
+    private static String getAdjustment(Skill skill, int attributeModifier, int spaModifier, int injuryModifier) {
         int ageModifier = skill.getAgingModifier();
-        int totalModifier = attributeModifier + spaModifier + ageModifier;
+        int totalModifier = attributeModifier + spaModifier + ageModifier + injuryModifier;
 
         String color = "";
         String icon = "";
