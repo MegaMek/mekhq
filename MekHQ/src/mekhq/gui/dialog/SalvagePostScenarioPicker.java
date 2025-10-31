@@ -71,6 +71,7 @@ import mekhq.campaign.mission.camOpsSalvage.RecoveryTimeData;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
@@ -114,9 +115,10 @@ public class SalvagePostScenarioPicker {
     private final List<TestUnit> employerSalvage = new ArrayList<>();
     private final Map<String, Unit> unitNameMap = new HashMap<>();
     private Map<UUID, RecoveryTimeData> recoveryTimeData;
+    private final boolean isExchangeRights;
 
     public int getCountOfSalvageUnits() {
-        return salvageUnits.size();
+        return actualSalvage.size() + soldSalvage.size() + employerSalvage.size();
     }
 
     /**
@@ -207,6 +209,9 @@ public class SalvagePostScenarioPicker {
             salvagePercent = ((Contract) mission).getSalvagePct();
             employerSalvageMoney = ((Contract) mission).getSalvagedByEmployer();
             unitSalvageMoney = ((Contract) mission).getSalvagedByUnit();
+            isExchangeRights = ((Contract) mission).isSalvageExchange();
+        } else {
+            isExchangeRights = false;
         }
 
         List<SalvageComboBoxGroup> selectedGroups = showSalvageDialog(isContract);
@@ -433,7 +438,7 @@ public class SalvagePostScenarioPicker {
 
         // Button panel (created early so we can reference it in listeners)
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton confirmButton = new JButton(getText("Confirm.text"));
+        RoundedJButton confirmButton = new RoundedJButton(getText("Confirm.text"));
 
         final boolean[] confirmed = { false };
         final ResultHolder resultHolder = new ResultHolder();
@@ -920,7 +925,10 @@ public class SalvagePostScenarioPicker {
 
         group.validationLabel.setText(getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.valid"));
         group.unitLabel.setForeground(null); // Reset to default color
-        group.claimedSalvageForKeeps.setEnabled(true);
+        if (!isExchangeRights) { // For exchange rights we keep 'for keeps' disabled
+            group.claimedSalvageForKeeps.setEnabled(true);
+        }
+
         group.claimedSalvageForSale.setEnabled(true);
     }
 }
