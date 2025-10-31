@@ -68,7 +68,7 @@ public class AlternateInjuries {
 
     // Head
     public static final InjuryType SEVERED_HEAD = new SeveredHead();
-    public static final InjuryType BURNED_FACE = new BurnedFace();
+    public static final InjuryType BURN_FACE = new BurnedFace();
     public static final InjuryType HEARING_LOSS = new HearingLoss();
     public static final InjuryType BLINDNESS = new Blindness();
     public static final InjuryType FRACTURED_JAW = new FracturedJaw();
@@ -80,35 +80,35 @@ public class AlternateInjuries {
     public static final InjuryType PUNCTURED_LUNG = new PuncturedLung();
     public static final InjuryType HEART_TRAUMA = new HeartTrauma();
     // Lower Torso
-    public static final InjuryType ABDOMINAL_BURN = new AbdominalBurn();
+    public static final InjuryType BURN_ABDOMINAL = new AbdominalBurn();
     public static final InjuryType BRUISED_ORGAN = new BruisedOrgan();
     public static final InjuryType ORGAN_TRAUMA = new OrganTrauma();
     public static final InjuryType FRACTURED_GROIN = new FracturedGroin();
     public static final InjuryType DISEMBOWELED = new Disemboweled();
     // Upper Arm
     public static final InjuryType SEVERED_ARM = new SeveredArm();
-    public static final InjuryType BURNED_UPPER_ARM = new BurnedUpperArm();
+    public static final InjuryType BURN_UPPER_ARM = new BurnedUpperArm();
     public static final InjuryType FRACTURED_UPPER_ARM = new FracturedUpperArm();
     public static final InjuryType FRACTURED_ELBOW = new FracturedElbow();
     public static final InjuryType FRACTURED_SHOULDER = new FracturedShoulder();
     public static final InjuryType COMPOUND_FRACTURED_SHOULDER = new CompoundFracturedShoulder();
     // Lower Arm
     public static final InjuryType SEVERED_HAND = new SeveredHand();
-    public static final InjuryType HAND_BURN = new HandBurn();
+    public static final InjuryType BURN_HAND = new HandBurn();
     public static final InjuryType FRACTURED_HAND = new FracturedHand();
     public static final InjuryType FRACTURED_WRIST = new FracturedWrist();
     public static final InjuryType FRACTURED_FOREARM = new FracturedForearm();
     public static final InjuryType COMPOUND_FRACTURED_FOREARM = new CompoundFracturedForearm();
     // Upper Leg
     public static final InjuryType SEVERED_LEG = new SeveredLeg();
-    public static final InjuryType THIGH_BURN = new ThighBurn();
+    public static final InjuryType BURN_THIGH = new ThighBurn();
     public static final InjuryType BRUISED_FEMUR = new BruisedFemur();
     public static final InjuryType FRACTURED_FEMUR = new FracturedFemur();
     public static final InjuryType COMPOUND_FRACTURED_FEMUR = new CompoundFracturedFemur();
     public static final InjuryType FRACTURED_HIP = new FracturedHip();
     // Lower Leg
     public static final InjuryType SEVERED_FOOT = new SeveredFoot();
-    public static final InjuryType CALF_BURN = new CalfBurn();
+    public static final InjuryType BURN_CALF = new CalfBurn();
     public static final InjuryType FRACTURED_FOOT = new FracturedFoot();
     public static final InjuryType FRACTURED_ANKLE = new FracturedAnkle();
     public static final InjuryType FRACTURED_KNEE = new FracturedKnee();
@@ -299,7 +299,7 @@ public class AlternateInjuries {
 
     public static final class AbdominalBurn extends SimpleBurn {
         public AbdominalBurn() {
-            super("AlternateInjuries.ABDOMINAL_BURN.simpleName", Set.of(BodyLocation.ABDOMEN));
+            super("AlternateInjuries.BURN_ABDOMINAL.simpleName", Set.of(BodyLocation.ABDOMEN));
         }
     }
 

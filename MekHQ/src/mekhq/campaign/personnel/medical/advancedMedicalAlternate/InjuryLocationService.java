@@ -64,7 +64,7 @@ public class InjuryLocationService {
 
     private static final Map<BodyLocation, Map<Integer, SecondaryLocation>> SECONDARY_LOCATION_TABLE = Map.ofEntries(
           Map.entry(BodyLocation.HEAD, Map.of(
-                1, new SecondaryLocation(AlternateInjuries.BURNED_FACE, BodyLocation.HEAD),
+                1, new SecondaryLocation(AlternateInjuries.BURN_FACE, BodyLocation.HEAD),
                 2, new SecondaryLocation(AlternateInjuries.HEARING_LOSS, BodyLocation.EARS),
                 3, new SecondaryLocation(AlternateInjuries.BLINDNESS, BodyLocation.EYES),
                 4, new SecondaryLocation(AlternateInjuries.FRACTURED_JAW, BodyLocation.JAW),
@@ -78,63 +78,63 @@ public class InjuryLocationService {
                 5, new SecondaryLocation(AlternateInjuries.HEART_TRAUMA, BodyLocation.HEART)
           )),
           Map.entry(BodyLocation.ABDOMEN, Map.of(
-                1, new SecondaryLocation(AlternateInjuries.ABDOMINAL_BURN, BodyLocation.ABDOMEN),
+                1, new SecondaryLocation(AlternateInjuries.BURN_ABDOMINAL, BodyLocation.ABDOMEN),
                 2, new SecondaryLocation(AlternateInjuries.BRUISED_ORGAN, BodyLocation.CHEST),
                 3, new SecondaryLocation(AlternateInjuries.ORGAN_TRAUMA, BodyLocation.CHEST),
                 4, new SecondaryLocation(AlternateInjuries.FRACTURED_GROIN, BodyLocation.GROIN),
                 5, new SecondaryLocation(AlternateInjuries.DISEMBOWELED, BodyLocation.ABDOMEN)
           )),
           Map.entry(BodyLocation.LEFT_ARM, Map.of(
-                1, new SecondaryLocation(AlternateInjuries.BURNED_UPPER_ARM, BodyLocation.UPPER_LEFT_ARM),
+                1, new SecondaryLocation(AlternateInjuries.BURN_UPPER_ARM, BodyLocation.UPPER_LEFT_ARM),
                 2, new SecondaryLocation(AlternateInjuries.FRACTURED_UPPER_ARM, BodyLocation.UPPER_LEFT_ARM),
                 3, new SecondaryLocation(AlternateInjuries.FRACTURED_ELBOW, BodyLocation.LEFT_ELBOW),
                 4, new SecondaryLocation(AlternateInjuries.FRACTURED_SHOULDER, BodyLocation.LEFT_SHOULDER),
                 5, new SecondaryLocation(AlternateInjuries.COMPOUND_FRACTURED_SHOULDER, BodyLocation.LEFT_SHOULDER)
           )),
           Map.entry(BodyLocation.RIGHT_ARM, Map.of(
-                1, new SecondaryLocation(AlternateInjuries.BURNED_UPPER_ARM, BodyLocation.UPPER_RIGHT_ARM),
+                1, new SecondaryLocation(AlternateInjuries.BURN_UPPER_ARM, BodyLocation.UPPER_RIGHT_ARM),
                 2, new SecondaryLocation(AlternateInjuries.FRACTURED_UPPER_ARM, BodyLocation.UPPER_RIGHT_ARM),
                 3, new SecondaryLocation(AlternateInjuries.FRACTURED_ELBOW, BodyLocation.RIGHT_ELBOW),
                 4, new SecondaryLocation(AlternateInjuries.FRACTURED_SHOULDER, BodyLocation.RIGHT_SHOULDER),
                 5, new SecondaryLocation(AlternateInjuries.COMPOUND_FRACTURED_SHOULDER, BodyLocation.RIGHT_SHOULDER)
           )),
           Map.entry(BodyLocation.LEFT_HAND, Map.of(
-                1, new SecondaryLocation(AlternateInjuries.HAND_BURN, BodyLocation.LEFT_HAND),
+                1, new SecondaryLocation(AlternateInjuries.BURN_HAND, BodyLocation.LEFT_HAND),
                 2, new SecondaryLocation(AlternateInjuries.FRACTURED_HAND, BodyLocation.LEFT_HAND),
                 3, new SecondaryLocation(AlternateInjuries.FRACTURED_WRIST, BodyLocation.LEFT_WRIST),
                 4, new SecondaryLocation(AlternateInjuries.FRACTURED_FOREARM, BodyLocation.LEFT_FOREARM),
                 5, new SecondaryLocation(AlternateInjuries.COMPOUND_FRACTURED_FOREARM, BodyLocation.LEFT_FOREARM)
           )),
           Map.entry(BodyLocation.RIGHT_HAND, Map.of(
-                1, new SecondaryLocation(AlternateInjuries.HAND_BURN, BodyLocation.RIGHT_HAND),
+                1, new SecondaryLocation(AlternateInjuries.BURN_HAND, BodyLocation.RIGHT_HAND),
                 2, new SecondaryLocation(AlternateInjuries.FRACTURED_HAND, BodyLocation.RIGHT_HAND),
                 3, new SecondaryLocation(AlternateInjuries.FRACTURED_WRIST, BodyLocation.RIGHT_WRIST),
                 4, new SecondaryLocation(AlternateInjuries.FRACTURED_FOREARM, BodyLocation.RIGHT_FOREARM),
                 5, new SecondaryLocation(AlternateInjuries.COMPOUND_FRACTURED_FOREARM, BodyLocation.RIGHT_FOREARM)
           )),
           Map.entry(BodyLocation.LEFT_LEG, Map.of(
-                1, new SecondaryLocation(AlternateInjuries.THIGH_BURN, BodyLocation.LEFT_THIGH),
+                1, new SecondaryLocation(AlternateInjuries.BURN_THIGH, BodyLocation.LEFT_THIGH),
                 2, new SecondaryLocation(AlternateInjuries.BRUISED_FEMUR, BodyLocation.LEFT_FEMUR),
                 3, new SecondaryLocation(AlternateInjuries.FRACTURED_FEMUR, BodyLocation.LEFT_FEMUR),
                 4, new SecondaryLocation(AlternateInjuries.COMPOUND_FRACTURED_FEMUR, BodyLocation.LEFT_FEMUR),
                 5, new SecondaryLocation(AlternateInjuries.FRACTURED_HIP, BodyLocation.LEFT_HIP)
           )),
           Map.entry(BodyLocation.RIGHT_LEG, Map.of(
-                1, new SecondaryLocation(AlternateInjuries.THIGH_BURN, BodyLocation.RIGHT_THIGH),
+                1, new SecondaryLocation(AlternateInjuries.BURN_THIGH, BodyLocation.RIGHT_THIGH),
                 2, new SecondaryLocation(AlternateInjuries.BRUISED_FEMUR, BodyLocation.RIGHT_FEMUR),
                 3, new SecondaryLocation(AlternateInjuries.FRACTURED_FEMUR, BodyLocation.RIGHT_FEMUR),
                 4, new SecondaryLocation(AlternateInjuries.COMPOUND_FRACTURED_FEMUR, BodyLocation.RIGHT_FEMUR),
                 5, new SecondaryLocation(AlternateInjuries.FRACTURED_HIP, BodyLocation.RIGHT_HIP)
           )),
           Map.entry(BodyLocation.LEFT_FOOT, Map.of(
-                1, new SecondaryLocation(AlternateInjuries.CALF_BURN, BodyLocation.LEFT_CALF),
+                1, new SecondaryLocation(AlternateInjuries.BURN_CALF, BodyLocation.LEFT_CALF),
                 2, new SecondaryLocation(AlternateInjuries.FRACTURED_FOOT, BodyLocation.LEFT_FOOT),
                 3, new SecondaryLocation(AlternateInjuries.FRACTURED_ANKLE, BodyLocation.LEFT_ANKLE),
                 4, new SecondaryLocation(AlternateInjuries.FRACTURED_KNEE, BodyLocation.LEFT_KNEE),
                 5, new SecondaryLocation(AlternateInjuries.COMPOUND_FRACTURED_SHIN, BodyLocation.LEFT_SHIN)
           )),
           Map.entry(BodyLocation.RIGHT_FOOT, Map.of(
-                1, new SecondaryLocation(AlternateInjuries.CALF_BURN, BodyLocation.RIGHT_CALF),
+                1, new SecondaryLocation(AlternateInjuries.BURN_CALF, BodyLocation.RIGHT_CALF),
                 2, new SecondaryLocation(AlternateInjuries.FRACTURED_FOOT, BodyLocation.RIGHT_FOOT),
                 3, new SecondaryLocation(AlternateInjuries.FRACTURED_ANKLE, BodyLocation.RIGHT_ANKLE),
                 4, new SecondaryLocation(AlternateInjuries.FRACTURED_KNEE, BodyLocation.RIGHT_KNEE),
