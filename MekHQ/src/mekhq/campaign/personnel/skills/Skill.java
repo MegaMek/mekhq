@@ -56,6 +56,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.utilities.MHQXMLUtility;
@@ -110,7 +111,7 @@ public class Skill {
 
     public Skill(String type) {
         this.type = SkillType.getType(type);
-        this.level = this.type.getLevelFromExperience(SkillType.EXP_REGULAR);
+        this.level = this.type.getLevelFromExperience(EXP_REGULAR);
     }
 
     public Skill(String type, int level, int bonus) {
@@ -599,17 +600,42 @@ public class Skill {
         int spaModifiers = getSPAModifiers(skillModifierData.characterOptions(),
               skillModifierData.adjustedReputation());
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), skillModifierData.attributes(), type);
+        int totalInjuryModifier = getTotalInjuryModifier(skillModifierData, type);
 
         boolean isIntelligenceBased = INTELLIGENCE.equals(type.getFirstAttribute())
                                             || INTELLIGENCE.equals(type.getSecondAttribute());
-        int literacyModifier = isIntelligenceBased && skillModifierData.isIlliterate()
+        int literacyModifier = isIntelligenceBased && skillModifierData.isIlliterate
                                      ? UNTRAINED_SKILL_MODIFIER : 0;
 
-        return spaModifiers + attributeModifiers + literacyModifier;
+        return spaModifiers + attributeModifiers + literacyModifier + totalInjuryModifier;
+    }
+
+    public static int getTotalInjuryModifier(SkillModifierData skillModifierData, SkillType type) {
+        int totalInjuryModifier = 0;
+        for (InjuryEffect injuryEffect : skillModifierData.injuryEffects) {
+            int firstAttributeModifier = getAttributeModifierFromInjuryEffect(injuryEffect, type.getFirstAttribute());
+            int secondAttributeModifier = getAttributeModifierFromInjuryEffect(injuryEffect, type.getSecondAttribute());
+            int perceptionModifier = type.getName().equals(S_PERCEPTION) ? injuryEffect.getPerceptionModifier() : 0;
+            totalInjuryModifier += firstAttributeModifier + secondAttributeModifier + perceptionModifier;
+        }
+        return totalInjuryModifier;
+    }
+
+    private static int getAttributeModifierFromInjuryEffect(InjuryEffect injuryEffect, SkillAttribute skillAttribute) {
+        return switch (skillAttribute) {
+            case NONE -> 0;
+            case STRENGTH -> injuryEffect.getStrengthModifier();
+            case BODY -> injuryEffect.getBodyModifier();
+            case DEXTERITY -> injuryEffect.getDexterityModifier();
+            case REFLEXES -> injuryEffect.getReflexesModifier();
+            case INTELLIGENCE -> injuryEffect.getIntelligenceModifier();
+            case WILLPOWER -> injuryEffect.getWillpowerModifier();
+            case CHARISMA -> injuryEffect.getCharismaModifier();
+        };
     }
 
     public void improve() {
-        if (level >= SkillType.NUM_LEVELS - 1) {
+        if (level >= NUM_LEVELS - 1) {
             // Can't improve past the max
             return;
         }
@@ -635,7 +661,7 @@ public class Skill {
     public int getCostToImprove() {
         int cost = 0;
         int i = 1;
-        while (cost <= 0 && (level + i) < SkillType.NUM_LEVELS) {
+        while (cost <= 0 && (level + i) < NUM_LEVELS) {
             cost = type.getCost(level + i);
             ++i;
         }
@@ -770,6 +796,13 @@ public class Skill {
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "tooltip.format.spa",
                   (spaModifier > 0 ? "+" : "") + spaModifier));
+        }
+
+        int injuryModifier = getTotalInjuryModifier(skillModifierData, type);
+        if (injuryModifier != 0) {
+            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "tooltip.format.injury",
+                  (injuryModifier > 0 ? "+" : "") + injuryModifier));
         }
 
         SkillAttribute firstLinkedAttribute = type.getFirstAttribute();

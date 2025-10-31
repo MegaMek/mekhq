@@ -1963,14 +1963,17 @@ public class PersonViewPanel extends JScrollablePanel {
                 label = formattedSkillName;
             }
             JLabel lblName = new JLabel(label);
+            boolean isIlliterate = person.isIlliterate();
+            List<InjuryEffect> injuryEffects = InjuryEffect.g
+            SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
+                  isIlliterate, injuryEffects);
 
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
-            String adjustment = getAdjustment(skill, attributeModifier, spaModifier);
-            boolean isIlliterate = person.isIlliterate();
+            int injuryModifier = Skill.getTotalInjuryModifier(skillModifierData, skill.getType());
 
-            SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
-                  isIlliterate);
+            String adjustment = getAdjustment(skill, attributeModifier, spaModifier, injuryModifier);
+
 
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
                   skill.toString(skillModifierData),
@@ -2001,9 +2004,9 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlSkills;
     }
 
-    private static String getAdjustment(Skill skill, int attributeModifier, int spaModifier) {
+    private static String getAdjustment(Skill skill, int attributeModifier, int spaModifier, int injuryModifier) {
         int ageModifier = skill.getAgingModifier();
-        int totalModifier = attributeModifier + spaModifier + ageModifier;
+        int totalModifier = attributeModifier + spaModifier + ageModifier + injuryModifier;
 
         String color = "";
         String icon = "";
