@@ -123,6 +123,25 @@ public class SalvagePostScenarioPicker {
     private Map<UUID, RecoveryTimeData> recoveryTimeData;
     private boolean isExchangeRights = false;
 
+    /**
+     * Returns the total number of salvage units being tracked in this operation.
+     *
+     * <p>This includes all salvage currently categorized as:</p>
+     *
+     * <ul>
+     *   <li><b>Kept salvage</b> — units the player has chosen to retain</li>
+     *   <li><b>Sold salvage</b> — units marked for immediate sale</li>
+     *   <li><b>Employer salvage</b> — units allocated to the employer</li>
+     * </ul>
+     *
+     * <p>The total reflects the sum of these three lists and represents every salvage unit processed after a
+     * scenario.</p>
+     *
+     * @return the total count of salvage units across kept, sold, and employer categories
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public int getCountOfSalvageUnits() {
         return keptSalvage.size() + soldSalvage.size() + employerSalvage.size();
     }
