@@ -438,7 +438,7 @@ public class SalvagePostScenarioPicker {
         List<SalvageComboBoxGroup> salvageComboBoxGroups = new ArrayList<>();
 
         // Button panel (created early so we can reference it in listeners)
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         RoundedJButton confirmButton = new RoundedJButton(getText("Confirm.text"));
 
         final boolean[] confirmed = { false };
