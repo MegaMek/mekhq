@@ -62,12 +62,13 @@ public class CamOpsSalvageUtilities {
         StringBuilder tooltip = new StringBuilder();
 
         for (Unit unit : unitsInForce) {
-            if (!tooltip.isEmpty()) {
-                tooltip.append("<br>");
-            }
             if (unit.canSalvage(isInSpace)) {
                 Entity entity = unit.getEntity();
                 if (entity != null) {
+                    if (!tooltip.isEmpty()) {
+                        tooltip.append("<br>");
+                    }
+
                     boolean isLargeVessel = entity instanceof Dropship || entity instanceof Warship;
                     tooltip.append(unit.getName());
 
