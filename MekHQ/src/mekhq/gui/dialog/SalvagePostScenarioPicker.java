@@ -46,6 +46,8 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -162,8 +164,8 @@ public class SalvagePostScenarioPicker {
      */
     private static class SalvageComboBoxGroup {
         final JButton unitButton;
-        final JComboBox<String> comboBox1;
-        final JComboBox<String> comboBox2;
+        final JComboBox<String> comboBoxLeft;
+        final JComboBox<String> comboBoxRight;
         final JLabel validationLabel;
         final JLabel unitLabel;
         final JCheckBox claimedSalvageForKeeps;
@@ -175,8 +177,8 @@ public class SalvagePostScenarioPicker {
          * Creates a new salvage combo box group.
          *
          * @param unitButton             a button used to access field stripping
-         * @param comboBox1              first combo box for selecting a salvage unit
-         * @param comboBox2              second combo box for selecting a salvage unit
+         * @param comboBoxLeft           first combo box for selecting a salvage unit
+         * @param comboBoxRight          second combo box for selecting a salvage unit
          * @param validationLabel        label displaying validation status
          * @param unitLabel              label displaying the salvage unit name and value
          * @param claimedSalvageForKeeps {@code true} if the player claimed the salvage for keeps
@@ -186,12 +188,12 @@ public class SalvagePostScenarioPicker {
          * @author Illiani
          * @since 0.50.10
          */
-        SalvageComboBoxGroup(JButton unitButton, JComboBox<String> comboBox1, JComboBox<String> comboBox2,
+        SalvageComboBoxGroup(JButton unitButton, JComboBox<String> comboBoxLeft, JComboBox<String> comboBoxRight,
               JLabel validationLabel, JLabel unitLabel, JCheckBox claimedSalvageForKeeps,
               JCheckBox claimedSalvageForSale, TestUnit targetUnit) {
             this.unitButton = unitButton;
-            this.comboBox1 = comboBox1;
-            this.comboBox2 = comboBox2;
+            this.comboBoxLeft = comboBoxLeft;
+            this.comboBoxRight = comboBoxRight;
             this.validationLabel = validationLabel;
             this.unitLabel = unitLabel;
             this.claimedSalvageForKeeps = claimedSalvageForKeeps;
@@ -381,8 +383,8 @@ public class SalvagePostScenarioPicker {
         List<TestUnit> unitsToMoveToEmployer = new ArrayList<>();
 
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            String unitName1 = (String) group.comboBox1.getSelectedItem();
-            String unitName2 = (String) group.comboBox2.getSelectedItem();
+            String unitName1 = (String) group.comboBoxLeft.getSelectedItem();
+            String unitName2 = (String) group.comboBoxRight.getSelectedItem();
 
             // Check if player has claimed this salvage
             boolean hasClaimed = group.claimedSalvageForKeeps.isSelected() ||
@@ -680,8 +682,8 @@ public class SalvagePostScenarioPicker {
             updateComboBoxOptions(salvageComboBoxGroups, unitNameMap);
             updateValidation(group, unitNameMap);
 
-            String unitName1 = (String) group.comboBox1.getSelectedItem();
-            String unitName2 = (String) group.comboBox2.getSelectedItem();
+            String unitName1 = (String) group.comboBoxLeft.getSelectedItem();
+            String unitName2 = (String) group.comboBoxRight.getSelectedItem();
             boolean hasAssignedUnits = (unitName1 != null) || (unitName2 != null);
             boolean isValid = hasAssignedUnits && isValidationValid(group);
             syncMembershipForGroup(group, isValid);
@@ -719,8 +721,8 @@ public class SalvagePostScenarioPicker {
           JLabel unitSalvageLabel, boolean isContract) {
         // Check for any invalid units
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            String unitName1 = (String) group.comboBox1.getSelectedItem();
-            String unitName2 = (String) group.comboBox2.getSelectedItem();
+            String unitName1 = (String) group.comboBoxLeft.getSelectedItem();
+            String unitName2 = (String) group.comboBoxRight.getSelectedItem();
 
             // If units are assigned, check validation state
             if ((unitName1 != null || unitName2 != null) && !isValidationValid(group)) {
@@ -735,10 +737,12 @@ public class SalvagePostScenarioPicker {
 
             if (totalSalvage.isPositive()) {
                 // Calculate percentage: (unitSalvage / totalSalvage) * 100
-                double currentPercent = unitSalvageMoneyCurrent.getAmount().doubleValue() /
-                                              totalSalvage.getAmount().doubleValue() * 100.0;
+                BigDecimal hundred = BigDecimal.valueOf(100);
+                BigDecimal currentPercent = unitSalvageMoneyCurrent.getAmount()
+                                                  .multiply(hundred)
+                                                  .divide(totalSalvage.getAmount(), 4, RoundingMode.HALF_UP);
 
-                if (currentPercent > salvagePercent) {
+                if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0) {
                     disableConfirmAndColorName(confirmButton, unitSalvageLabel);
                     return;
                 }
@@ -808,8 +812,8 @@ public class SalvagePostScenarioPicker {
           JLabel employerSalvageLabel, JLabel unitSalvageLabel, JLabel availableTimeLabel) {
         usedSalvageTime = 0;
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            String unitName1 = (String) group.comboBox1.getSelectedItem();
-            String unitName2 = (String) group.comboBox2.getSelectedItem();
+            String unitName1 = (String) group.comboBoxLeft.getSelectedItem();
+            String unitName2 = (String) group.comboBoxRight.getSelectedItem();
             boolean hasAssignedUnits = (unitName1 != null) || (unitName2 != null);
 
             if (hasAssignedUnits) {
@@ -873,20 +877,20 @@ public class SalvagePostScenarioPicker {
         List<String> selectedUnitNames = new ArrayList<>();
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
 
-            String selected1 = (String) group.comboBox1.getSelectedItem();
-            String selected2 = (String) group.comboBox2.getSelectedItem();
-            if (selected1 != null) {
-                selectedUnitNames.add(selected1);
+            String selectedLeft = (String) group.comboBoxLeft.getSelectedItem();
+            String selectedRight = (String) group.comboBoxRight.getSelectedItem();
+            if (selectedLeft != null) {
+                selectedUnitNames.add(selectedLeft);
             }
-            if (selected2 != null) {
-                selectedUnitNames.add(selected2);
+            if (selectedRight != null) {
+                selectedUnitNames.add(selectedRight);
             }
         }
 
         // Update each combo box
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            updateSingleComboBox(group.comboBox1, selectedUnitNames, unitNameMap);
-            updateSingleComboBox(group.comboBox2, selectedUnitNames, unitNameMap);
+            updateSingleComboBox(group.comboBoxLeft, selectedUnitNames, unitNameMap);
+            updateSingleComboBox(group.comboBoxRight, selectedUnitNames, unitNameMap);
         }
     }
 
@@ -920,9 +924,9 @@ public class SalvagePostScenarioPicker {
             for (String unitName : unitNameMap.keySet()) {
                 Unit unit = unitNameMap.get(unitName);
                 double cargoCapacity = unit.getCargoCapacity();
-                boolean isAvailable = unitTowAssignments.get(unitName) == null &&
-                                            unitCargoAssignments.get(unitName) < cargoCapacity;
-                if (unitName.equals(currentSelection) || isAvailable) {
+                double currentAssignments = unitCargoAssignments.getOrDefault(unitName, 0.0);
+                boolean hasCapacity = currentAssignments < cargoCapacity;
+                if (unitName.equals(currentSelection) || (hasCapacity || !selectedUnitNames.contains(unitName))) {
                     comboBox.addItem(unitName);
                 }
             }
@@ -956,8 +960,8 @@ public class SalvagePostScenarioPicker {
      * @since 0.50.10
      */
     private void updateValidation(SalvageComboBoxGroup group, Map<String, Unit> unitNameMap) {
-        String unitNameLeft = (String) group.comboBox1.getSelectedItem();
-        String unitNameRight = (String) group.comboBox2.getSelectedItem();
+        String unitNameLeft = (String) group.comboBoxLeft.getSelectedItem();
+        String unitNameRight = (String) group.comboBoxRight.getSelectedItem();
 
         Unit salvageUnitLeft = unitNameLeft != null ? unitNameMap.get(unitNameLeft) : null;
         Unit salvageUnitRight = unitNameRight != null ? unitNameMap.get(unitNameRight) : null;
