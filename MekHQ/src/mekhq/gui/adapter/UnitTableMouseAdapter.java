@@ -106,6 +106,7 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
+import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.CancelMothballUnitAction;
@@ -670,7 +671,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     // This will increase the number of days until maintenance and then perform the maintenance. We
                     // do it this way to ensure that everything is processed cleanly.
                     while (unit.getDaysSinceMaintenance() != 0) {
-                        campaign.doMaintenance(unit);
+                        Maintenance.doMaintenance(campaign, unit);
                     }
                 } else {
                     campaign.addReport(String.format(resources.getString("maintenanceAdHoc.unable"),
