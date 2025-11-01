@@ -42,7 +42,6 @@ import java.util.stream.Collectors;
 import megamek.common.enums.TechBase;
 import megamek.common.equipment.AmmoType;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingBattleArmorSuit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -249,14 +248,7 @@ public class PartInUse {
         // Next, check they're the same item
         Part targetPart = getPartToBuy().getAcquisitionPart();
         Part otherTargetPart = otherPartInUse.getPartToBuy().getAcquisitionPart();
-
-        boolean isSamePart;
-        if (targetPart instanceof MekLocation targetMekLocation &&
-                  otherTargetPart instanceof MekLocation otherMekLocation) {
-            isSamePart = targetMekLocation.isSamePartForWarehouseOrPartsInUse(otherMekLocation);
-        } else {
-            isSamePart = targetPart.isSamePartType(otherTargetPart);
-        }
+        boolean isSamePart = targetPart.isSamePartType(otherTargetPart);
 
         // Finally, make sure both parts use the same tech base. Otherwise, Parts in Use will think a Clan ER Large
         // Laser and IS ER Large Laser are the same thing.

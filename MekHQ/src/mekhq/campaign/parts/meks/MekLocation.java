@@ -272,26 +272,6 @@ public class MekLocation extends Part {
             return false;
         }
 
-        boolean areSamePart = isSamePartChecksExcludingSensors(otherMekLocation);
-        boolean sameSensorsAndLifeSupport = bothPartsHaveSensors(otherMekLocation, true);
-        return areSamePart && sameSensorsAndLifeSupport;
-    }
-
-    public boolean isSamePartForWarehouseOrPartsInUse(Part part) {
-        if (!(part instanceof MekLocation otherMekLocation)) {
-            return false;
-        }
-
-        boolean areSamePart = isSamePartChecksExcludingSensors(otherMekLocation);
-        boolean sameSensorsAndLifeSupport = bothPartsHaveSensors(otherMekLocation, false);
-        return areSamePart && sameSensorsAndLifeSupport;
-    }
-
-    public boolean isSamePartChecksExcludingSensors(Part part) {
-        if (!(part instanceof MekLocation otherMekLocation)) {
-            return false;
-        }
-
         boolean sameLocation = getLoc() == otherMekLocation.getLoc();
         boolean sameTonnage = getUnitTonnage() == otherMekLocation.getUnitTonnage();
         boolean sameTsm = isTsm() == otherMekLocation.isTsm();
@@ -304,13 +284,21 @@ public class MekLocation extends Part {
 
         boolean sameQuadIfLeg = !isLeg() || (forQuad() == otherMekLocation.forQuad());
 
-        return sameLocation
-                     && sameTonnage
-                     && sameTsm
-                     && sameStructureType
-                     && sameClanIfEndoSteel
-                     && sameQuadIfArm
-                     && sameQuadIfLeg;
+        boolean thisHasUnit = getUnit() != null;
+        boolean otherHasUnit = otherMekLocation.getUnit() != null;
+        boolean sameSensorStatus = hasSensors() == otherMekLocation.hasSensors();
+        boolean sameLifeSupportStatus = hasLifeSupport() == otherMekLocation.hasLifeSupport();
+        boolean doBothHaveSensors = sameSensorStatus || sameLifeSupportStatus;
+        boolean passesSensorCheck = thisHasUnit || otherHasUnit || doBothHaveSensors;
+
+        return sameLocation &&
+                     sameTonnage &&
+                     sameTsm &&
+                     sameStructureType &&
+                     sameClanIfEndoSteel &&
+                     sameQuadIfArm &&
+                     sameQuadIfLeg &&
+                     passesSensorCheck;
     }
 
     private boolean bothPartsHaveSensors(MekLocation other, boolean notForWarehouseOrPartsInUse) {
