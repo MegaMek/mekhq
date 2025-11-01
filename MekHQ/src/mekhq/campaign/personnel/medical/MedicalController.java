@@ -136,8 +136,7 @@ public class MedicalController {
             if (doctor != null && patient.getDaysToWaitForHealing() <= 0) {
                 healPerson(patient, doctor, isUseAgingEffects, isClanCampaign, today);
             } else if (checkNaturalHealing(patient)) {
-                // TODO change logging level from info to debug in 50.08
-                LOGGER.info(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.natural",
+                LOGGER.debug(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.natural",
                       patient.getHyperlinkedFullTitle()));
                 Unit unit = patient.getUnit();
                 if (unit != null) {
