@@ -87,9 +87,6 @@ public class Attributes {
     private int willpower;
     private int charisma;
 
-    // We store illiteracy here as it ensures that state is always accessible to skill checks
-    private boolean isIlliterate;
-
     /**
      * The default score assigned to all attributes during initialization.
      */
@@ -161,7 +158,6 @@ public class Attributes {
         this.intelligence = intelligence;
         this.willpower = willpower;
         this.charisma = charisma;
-        isIlliterate = false;
     }
 
     /**
@@ -184,7 +180,6 @@ public class Attributes {
         this.intelligence = singleValue;
         this.willpower = singleValue;
         this.charisma = singleValue;
-        isIlliterate = false;
     }
 
     // Getters and Setters
@@ -371,14 +366,6 @@ public class Attributes {
             }
         };
         return cap;
-    }
-
-    public boolean isIlliterate() {
-        return isIlliterate;
-    }
-
-    public void setIlliterate(boolean isIlliterate) {
-        this.isIlliterate = isIlliterate;
     }
 
     /**

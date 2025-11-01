@@ -66,6 +66,7 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.TestSkillModifierData;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.work.IPartWork;
@@ -183,6 +184,7 @@ public class MRMSServiceTest {
 
         configuredOptions = new MRMSConfiguredOptions(mockCampaign);
         unit.setTech(mockTech);
+        when(mockTech.getSkillModifierData()).thenReturn(TestSkillModifierData.createDefault());
 
         unit.getEntity().setArmor(1, Mek.LOC_HEAD);
         unit.initializeParts(true);
@@ -668,7 +670,7 @@ public class MRMSServiceTest {
               skillLevel.getExperienceLevel(),
               0));
         when(mockTech.getMinutesLeft()).thenReturn(480);
-        when(mockTech.getATOWAttributes()).thenReturn(new Attributes());
+        when(mockTech.getSkillModifierData()).thenReturn(TestSkillModifierData.createDefault());
 
     }
 

@@ -62,6 +62,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
@@ -359,14 +360,14 @@ public class TrainingCombatTeams {
                 String skillName = targetSkill.getType().getName();
 
                 PerformanceLogger.improvedSkill(isLogSkillChange, trainee, today, skillName, newSkillLevel);
-
+                SkillModifierData skillModifierData = trainee.getSkillModifierData();
                 return String.format(resources.getString("learnedNewSkill.text"),
                       educator.getFullTitle(),
                       trainee.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG,
                       skillName,
-                      targetSkill.getFinalSkillValue(trainee.getOptions(), trainee.getATOWAttributes()));
+                      targetSkill.getFinalSkillValue(skillModifierData));
             }
         }
 

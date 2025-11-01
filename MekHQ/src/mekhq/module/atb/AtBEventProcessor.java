@@ -62,6 +62,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
@@ -138,7 +139,8 @@ public record AtBEventProcessor(Campaign campaign) {
         Skill adminSkill = adminHR.getSkill(S_ADMIN);
         int adminExperienceLevel = EXP_NONE;
         if (adminSkill != null) {
-            adminExperienceLevel = adminSkill.getExperienceLevel(adminHR.getOptions(), adminHR.getATOWAttributes());
+            SkillModifierData skillModifierData = adminHR.getSkillModifierData();
+            adminExperienceLevel = adminSkill.getExperienceLevel(skillModifierData);
         }
 
         modifier += adminExperienceLevel - 2;

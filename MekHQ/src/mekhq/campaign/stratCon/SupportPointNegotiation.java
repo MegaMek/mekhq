@@ -50,6 +50,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.utilities.ReportingUtilities;
@@ -196,11 +197,14 @@ public class SupportPointNegotiation {
 
         Iterator<Person> iterator = adminTransport.iterator();
 
+
         while (iterator.hasNext() && ((negotiatedSupportPoints + currentSupportPoints) < maxSupportPoints)) {
             Person admin = iterator.next();
+            SkillModifierData skillModifierData = admin.getSkillModifierData();
+
             int rollResult = Compute.d6(2) + modifier;
 
-            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue(admin.getOptions(), admin.getATOWAttributes());
+            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue(skillModifierData);
             if (rollResult >= adminSkill) {
                 negotiatedSupportPoints++;
             }
@@ -267,8 +271,7 @@ public class SupportPointNegotiation {
         adminTransport.sort((p1, p2) -> Integer.compare(getSkillValue(p2,
               isUseAgingEffects,
               isClanCampaign,
-              today,
-              p2.getRankNumeric()), getSkillValue(p1, isUseAgingEffects, isClanCampaign, today, p1.getRankNumeric())));
+              today), getSkillValue(p1, isUseAgingEffects, isClanCampaign, today)));
         return adminTransport;
     }
 
@@ -319,15 +322,13 @@ public class SupportPointNegotiation {
      * @param isUseAgingEffects Whether to apply aging effects to the reputation calculation.
      * @param isClanCampaign    Indicates whether the current campaign is a Clan campaign.
      * @param today             The current in-game date for age/reputation calculations.
-     * @param rankIndex         The index representing the current rank for modifiers.
      *
      * @return An {@link Integer} representing the total skill value after modifiers.
      */
-    private static int getSkillValue(Person person, boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
-          int rankIndex) {
+    private static int getSkillValue(Person person, boolean isUseAgingEffects, boolean isClanCampaign,
+          LocalDate today) {
         Skill skill = person.getSkill(S_ADMIN);
-        return skill.getTotalSkillLevel(person.getOptions(),
-              person.getATOWAttributes(),
-              person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rankIndex));
+        SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign, today);
+        return skill.getTotalSkillLevel(skillModifierData);
     }
 }
