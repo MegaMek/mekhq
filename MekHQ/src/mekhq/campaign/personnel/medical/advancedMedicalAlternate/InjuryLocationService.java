@@ -265,7 +265,7 @@ public class InjuryLocationService {
         }
 
         // If we hit max multiplier with a roll of 6, force a result between 1 and 5
-        if (roll == 6) {
+        if (roll == 6 && injuryDurationMultiplier == MAXIMUM_INJURY_DURATION_MULTIPLIER) {
             roll = randomInt(5) + 1;
         }
 
