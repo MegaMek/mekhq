@@ -133,6 +133,7 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -4774,13 +4775,12 @@ public class Person {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean doAdminCountNegotiation = campaignOptions.isAdminExperienceLevelIncludeNegotiation();
         final boolean isUseArtillery = campaignOptions.isUseArtillery();
-
         final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
+        final boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
+        final boolean isClanCampaign = campaign.isClanCampaign();
+        final LocalDate today = campaign.getLocalDate();
 
-        final int adjustedReputation = getAdjustedReputation(campaignOptions.isUseAgeEffects(),
-              campaign.isClanCampaign(),
-              campaign.getLocalDate(),
-              rank);
+        final SkillModifierData skillModifierData = getSkillModifierData(isUseAgingEffects, isClanCampaign, today);
 
         // Optional skills such as Admin for Techs are not counted towards the character's experience level, except
         // in the special case of Vehicle Gunners. So we only want to fetch the base professions.
@@ -4791,16 +4791,16 @@ public class Person {
                 if (!isUseArtillery) {
                     yield calculateExperienceLevelForProfession(associatedSkillNames,
                           isAlternativeQualityAveraging,
-                          adjustedReputation);
+                          skillModifierData);
                 } else {
                     Skill gunnery = getSkill(S_GUN_VEE);
                     int gunneryExperienceLevel = gunnery == null ?
                                                        EXP_NONE :
-                                                       gunnery.getExperienceLevel(options, atowAttributes);
+                                                       gunnery.getExperienceLevel(skillModifierData);
                     Skill artillery = getSkill(S_ARTILLERY);
                     int artilleryExperienceLevel = gunnery == null ?
                                                          EXP_NONE :
-                                                         artillery.getExperienceLevel(options, atowAttributes);
+                                                         artillery.getExperienceLevel(skillModifierData);
 
                     if (artilleryExperienceLevel > gunneryExperienceLevel) {
                         associatedSkillNames.remove(S_GUN_VEE);
@@ -4809,7 +4809,7 @@ public class Person {
 
                     yield calculateExperienceLevelForProfession(associatedSkillNames,
                           isAlternativeQualityAveraging,
-                          adjustedReputation);
+                          skillModifierData);
                 }
             }
             case SOLDIER -> {
@@ -4821,7 +4821,7 @@ public class Person {
                         continue;
                     }
 
-                    int currentExperienceLevel = skill.getExperienceLevel(options, atowAttributes);
+                    int currentExperienceLevel = skill.getExperienceLevel(skillModifierData);
                     if (currentExperienceLevel > highestExperienceLevel) {
                         highestExperienceLevel = currentExperienceLevel;
                     }
@@ -4830,10 +4830,10 @@ public class Person {
                 yield highestExperienceLevel;
             }
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> {
-                int adminLevel = getSkillLevelOrNegative(S_ADMIN);
+                int adminLevel = getSkillLevelOrNegative(S_ADMIN, skillModifierData);
                 adminLevel = adminLevel == -1 ? 0 : adminLevel;
 
-                int negotiationLevel = getSkillLevelOrNegative(S_NEGOTIATION);
+                int negotiationLevel = getSkillLevelOrNegative(S_NEGOTIATION, skillModifierData);
                 negotiationLevel = negotiationLevel == -1 ? 0 : negotiationLevel;
 
                 int levelSum;
@@ -4855,7 +4855,7 @@ public class Person {
             }
             default -> calculateExperienceLevelForProfession(associatedSkillNames,
                   isAlternativeQualityAveraging,
-                  adjustedReputation);
+                  skillModifierData);
         };
     }
 
@@ -4890,12 +4890,11 @@ public class Person {
      * @since 0.50.06
      */
     private int calculateExperienceLevelForProfession(List<String> skillNames, boolean isAlternativeQualityAveraging,
-          int adjustedReputation) {
+          SkillModifierData skillModifierData) {
         if (skillNames.isEmpty()) {
             // If we're not tracking skills for this profession, it always counts as REGULAR
             return EXP_REGULAR;
         }
-
         int totalSkillLevel = 0;
         boolean areAllEqual = true;
         Integer expectedExperienceLevel = null;
@@ -4915,11 +4914,11 @@ public class Person {
                 return EXP_NONE;
             }
 
-            int individualSkillLevel = skill.getTotalSkillLevel(options, atowAttributes, adjustedReputation);
+            int individualSkillLevel = skill.getTotalSkillLevel(skillModifierData);
             totalSkillLevel += individualSkillLevel;
 
             if (isAlternativeQualityAveraging) {
-                int expLevel = skill.getExperienceLevel(options, atowAttributes, adjustedReputation);
+                int expLevel = skill.getExperienceLevel(skillModifierData);
                 if (expectedExperienceLevel == null) {
                     expectedExperienceLevel = expLevel;
                 } else if (!expectedExperienceLevel.equals(expLevel)) {
@@ -5111,15 +5110,6 @@ public class Person {
     }
 
     /**
-     * @deprecated use {@link #getSkillLevel(String, boolean, boolean, LocalDate)} instead
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public int getSkillLevel(final String skillName) {
-        final Skill skill = getSkill(skillName);
-        return (skill == null) ? 0 : skill.getExperienceLevel(options, atowAttributes);
-    }
-
-    /**
      * Retrieves the experience level for a specified skill by name, with options to account for aging effects and
      * campaign type.
      *
@@ -5136,10 +5126,9 @@ public class Person {
     public int getSkillLevel(final String skillName, boolean isUseAgingEffects, boolean isClanCampaign,
           LocalDate today) {
         final Skill skill = getSkill(skillName);
+        SkillModifierData skillModifierData = getSkillModifierData(isUseAgingEffects, isClanCampaign, today);
 
-        int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rank);
-
-        return (skill == null) ? 0 : skill.getExperienceLevel(options, atowAttributes, adjustedReputation);
+        return (skill == null) ? 0 : skill.getExperienceLevel(skillModifierData);
     }
 
     /**
@@ -5153,9 +5142,15 @@ public class Person {
      *
      * @return the experience level of the skill, or {@code -1} if the skill is not found
      */
-    public int getSkillLevelOrNegative(final String skillName) {
+    public int getSkillLevelOrNegative(final String skillName, boolean isUseAgingEffects, boolean isClanCampaign,
+          LocalDate today) {
+        SkillModifierData skillModifierData = getSkillModifierData(isUseAgingEffects, isClanCampaign, today);
+        return getSkillLevelOrNegative(skillName, skillModifierData);
+    }
+
+    public int getSkillLevelOrNegative(final String skillName, SkillModifierData skillModifierData) {
         if (hasSkill(skillName)) {
-            return getSkill(skillName).getExperienceLevel(options, atowAttributes);
+            return getSkill(skillName).getExperienceLevel(skillModifierData);
         } else {
             return -1;
         }
@@ -5968,23 +5963,25 @@ public class Person {
      *       present
      */
     public @Nullable Skill getBestTechSkill() {
+        SkillModifierData skillModifierData = getSkillModifierData();
+
         Skill skill = null;
         int level = EXP_NONE;
 
-        if (hasSkill(S_TECH_MEK) && getSkill(S_TECH_MEK).getExperienceLevel(options, atowAttributes) > level) {
+        if (hasSkill(S_TECH_MEK) && getSkill(S_TECH_MEK).getExperienceLevel(skillModifierData) > level) {
             skill = getSkill(S_TECH_MEK);
-            level = getSkill(S_TECH_MEK).getExperienceLevel(options, atowAttributes);
+            level = getSkill(S_TECH_MEK).getExperienceLevel(skillModifierData);
         }
-        if (hasSkill(S_TECH_AERO) && getSkill(S_TECH_AERO).getExperienceLevel(options, atowAttributes) > level) {
+        if (hasSkill(S_TECH_AERO) && getSkill(S_TECH_AERO).getExperienceLevel(skillModifierData) > level) {
             skill = getSkill(S_TECH_AERO);
-            level = getSkill(S_TECH_AERO).getExperienceLevel(options, atowAttributes);
+            level = getSkill(S_TECH_AERO).getExperienceLevel(skillModifierData);
         }
         if (hasSkill(S_TECH_MECHANIC) &&
-                  getSkill(S_TECH_MECHANIC).getExperienceLevel(options, atowAttributes) > level) {
+                  getSkill(S_TECH_MECHANIC).getExperienceLevel(skillModifierData) > level) {
             skill = getSkill(S_TECH_MECHANIC);
-            level = getSkill(S_TECH_MECHANIC).getExperienceLevel(options, atowAttributes);
+            level = getSkill(S_TECH_MECHANIC).getExperienceLevel(skillModifierData);
         }
-        if (hasSkill(S_TECH_BA) && getSkill(S_TECH_BA).getExperienceLevel(options, atowAttributes) > level) {
+        if (hasSkill(S_TECH_BA) && getSkill(S_TECH_BA).getExperienceLevel(skillModifierData) > level) {
             skill = getSkill(S_TECH_BA);
         }
         return skill;
@@ -6111,7 +6108,8 @@ public class Person {
         int experienceLevel = SkillLevel.NONE.getExperienceLevel();
 
         if (administration != null) {
-            experienceLevel = administration.getExperienceLevel(options, atowAttributes);
+            SkillModifierData skillModifierData = getSkillModifierData();
+            experienceLevel = administration.getExperienceLevel(skillModifierData);
         }
 
         administrationMultiplier += experienceLevel * TECH_ADMINISTRATION_MULTIPLIER;
@@ -6159,7 +6157,8 @@ public class Person {
         int experienceLevel = SkillLevel.NONE.getExperienceLevel();
 
         if (administration != null) {
-            experienceLevel = administration.getExperienceLevel(options, atowAttributes);
+            SkillModifierData skillModifierData = getSkillModifierData();
+            experienceLevel = administration.getExperienceLevel(skillModifierData);
         }
 
         administrationMultiplier += experienceLevel * DOCTOR_ADMINISTRATION_MULTIPLIER;
@@ -6193,6 +6192,9 @@ public class Person {
         if (skill != null) {
             return skill;
         }
+
+        SkillModifierData skillModifierData = getSkillModifierData();
+
         // check spare parts
         // return the best one
         if (part.isRightTechType(S_TECH_MEK) && hasSkill(S_TECH_MEK)) {
@@ -6201,32 +6203,32 @@ public class Person {
 
         if (part.isRightTechType(S_TECH_BA) && hasSkill(S_TECH_BA)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_BA).getFinalSkillValue(options, atowAttributes, reputation))) {
+                      (skill.getFinalSkillValue(skillModifierData) >
+                             getSkill(S_TECH_BA).getFinalSkillValue(skillModifierData))) {
                 skill = getSkill(S_TECH_BA);
             }
         }
 
         if (part.isRightTechType(S_TECH_AERO) && hasSkill(S_TECH_AERO)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_AERO).getFinalSkillValue(options, atowAttributes, reputation))) {
+                      (skill.getFinalSkillValue(skillModifierData) >
+                             getSkill(S_TECH_AERO).getFinalSkillValue(skillModifierData))) {
                 skill = getSkill(S_TECH_AERO);
             }
         }
 
         if (part.isRightTechType(S_TECH_MECHANIC) && hasSkill(S_TECH_MECHANIC)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(options, atowAttributes, reputation))) {
+                      (skill.getFinalSkillValue(skillModifierData) >
+                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(skillModifierData))) {
                 skill = getSkill(S_TECH_MECHANIC);
             }
         }
 
         if (part.isRightTechType(S_TECH_VESSEL) && hasSkill(S_TECH_VESSEL)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_VESSEL).getFinalSkillValue(options, atowAttributes, reputation))) {
+                      (skill.getFinalSkillValue(skillModifierData) >
+                             getSkill(S_TECH_VESSEL).getFinalSkillValue(skillModifierData))) {
                 skill = getSkill(S_TECH_VESSEL);
             }
         }
@@ -6243,24 +6245,24 @@ public class Person {
 
         if (hasSkill(S_TECH_BA)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_BA).getFinalSkillValue(options, atowAttributes, reputation))) {
+                      (skill.getFinalSkillValue(skillModifierData) >
+                             getSkill(S_TECH_BA).getFinalSkillValue(skillModifierData))) {
                 skill = getSkill(S_TECH_BA);
             }
         }
 
         if (hasSkill(S_TECH_MECHANIC)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(options, atowAttributes, reputation))) {
+                      (skill.getFinalSkillValue(skillModifierData) >
+                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(skillModifierData))) {
                 skill = getSkill(S_TECH_MECHANIC);
             }
         }
 
         if (hasSkill(S_TECH_AERO)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue(options, atowAttributes, reputation) >
-                             getSkill(S_TECH_AERO).getFinalSkillValue(options, atowAttributes, reputation))) {
+                      (skill.getFinalSkillValue(skillModifierData) >
+                             getSkill(S_TECH_AERO).getFinalSkillValue(skillModifierData))) {
                 skill = getSkill(S_TECH_AERO);
             }
         }
@@ -8303,5 +8305,53 @@ public class Person {
 
         int level = languages.getLevel();
         return level < ILLITERACY_LANGUAGES_THRESHOLD;
+    }
+
+    /**
+     * Gets skill modifier data for this person without reputation adjustments.
+     *
+     * <p>This is a convenience method that returns skill modifier data with:</p>
+     * <ul>
+     *   <li>Personnel options (character traits and abilities)</li>
+     *   <li>Attributes (physical and mental stats)</li>
+     *   <li>Active injury effects (considering ambidextrous trait)</li>
+     *   <li>Adjusted reputation set to 0 (no reputation modifier)</li>
+     *   <li>Illiteracy status</li>
+     * </ul>
+     *
+     * <p>Use {@link #getSkillModifierData(boolean, boolean, LocalDate)} if reputation adjustments based on age,
+     * campaign type, and rank are needed.</p>
+     *
+     * @return a {@link SkillModifierData} object with reputation set to 0
+     */
+    public SkillModifierData getSkillModifierData() {
+        return new SkillModifierData(options, atowAttributes, 0, isIlliterate());
+    }
+
+    /**
+     * Gets skill modifier data for this person, including all factors that affect skill checks.
+     *
+     * <p>This aggregates various character properties into a single data object:</p>
+     * <ul>
+     *   <li>Personnel options (character traits and abilities)</li>
+     *   <li>Attributes (physical and mental stats)</li>
+     *   <li>Active injury effects (considering ambidextrous trait)</li>
+     *   <li>Adjusted reputation (affected by age, campaign type, and rank)</li>
+     *   <li>Illiteracy status</li>
+     * </ul>
+     *
+     * @param isUseAgingEffects whether aging effects should be applied to reputation
+     * @param isClanCampaign    whether this is a Clan campaign (affects reputation calculation)
+     * @param today             the current campaign date (used for age-based calculations)
+     *
+     * @return a {@link SkillModifierData} object containing all relevant modifiers
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public SkillModifierData getSkillModifierData(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
+        int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rank);
+
+        return new SkillModifierData(options, atowAttributes, adjustedReputation, isIlliterate());
     }
 }

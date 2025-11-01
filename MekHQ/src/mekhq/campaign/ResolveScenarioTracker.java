@@ -75,6 +75,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -87,6 +88,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.FileDialogs;
+import mekhq.gui.dialog.SalvagePostScenarioPicker;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -1761,64 +1763,21 @@ public class ResolveScenarioTracker {
             }
         }
 
-        // now lets take care of salvage
-        for (TestUnit salvageUnit : getActualSalvage()) {
-            UnitStatus salvageStatus = new UnitStatus(salvageUnit);
-            // FIXME: Need to implement a "fuel" part just like the "armor" part
-            if (salvageUnit.getEntity() instanceof Aero) {
-                ((Aero) salvageUnit.getEntity()).setFuelTonnage(((Aero) salvageStatus.getBaseEntity()).getFuelTonnage());
-            }
-            campaign.clearGameData(salvageUnit.getEntity());
-            campaign.addTestUnit(salvageUnit);
-            // if this is a contract, add to the salvaged value
-            if (isContract) {
-                ((Contract) mission).addSalvageByUnit(salvageUnit.getSellValue());
-            }
-        }
+        if (campaignOptions.isUseCamOpsSalvage()) {
+            SalvagePostScenarioPicker picker = new SalvagePostScenarioPicker(campaign, mission, scenario,
+                  getActualSalvage(), getSoldSalvage());
 
-        // And any ransomed salvaged units
-        if (!getSoldSalvage().isEmpty()) {
-            for (Unit ransomedUnit : getSoldSalvage()) {
-                unitRansoms = unitRansoms.plus(ransomedUnit.getSellValue());
+            List<UUID> techUUIDs = scenario.getSalvageTechs();
+            if (campaignOptions.isUseRiskySalvage()) {
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign,
+                      techUUIDs,
+                      picker.getCountOfSalvageUnits());
             }
 
-            if (unitRansoms.isGreaterThan(Money.zero())) {
-                getCampaign().getFinances()
-                      .credit(TransactionType.SALVAGE,
-                            getCampaign().getLocalDate(),
-                            unitRansoms,
-                            "Unit sales for " + getScenario().getName());
-                getCampaign().addReport(unitRansoms.toAmountAndSymbolString() +
-                                              " has been credited to your account from unit salvage sold following " +
-                                              getScenario().getHyperlinkedName() +
-                                              '.');
-                if (isContract) {
-                    ((Contract) mission).addSalvageByUnit(unitRansoms);
-                }
-            }
-        }
-
-        if (isContract) {
-            Money value = Money.zero();
-            for (Unit salvageUnit : getLeftoverSalvage()) {
-                value = value.plus(salvageUnit.getSellValue());
-            }
-            if (usesSalvageExchange()) {
-                value = value.multipliedBy(((Contract) mission).getSalvagePct()).dividedBy(100);
-                campaign.getFinances()
-                      .credit(TransactionType.SALVAGE_EXCHANGE,
-                            getCampaign().getLocalDate(),
-                            value,
-                            "Salvage exchange for " + scenario.getName());
-                campaign.addReport(value.toAmountAndSymbolString() +
-                                         " have been credited to your account for salvage exchange.");
-            } else {
-                ((Contract) mission).addSalvageByEmployer(value);
-            }
-        }
-
-        for (Unit unit : getActualSalvage()) {
-            unit.setSite(mission.getRepairLocation());
+            CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs);
+        } else {
+            CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, getActualSalvage(), getSoldSalvage(),
+                  getLeftoverSalvage());
         }
 
         for (Loot loot : actualLoot) {

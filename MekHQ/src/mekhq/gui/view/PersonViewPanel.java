@@ -1973,9 +1973,7 @@ public class PersonViewPanel extends JScrollablePanel {
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
             int injuryModifier = Skill.getTotalInjuryModifier(skillModifierData, skill.getType());
-
             String adjustment = getAdjustment(skill, attributeModifier, spaModifier, injuryModifier);
-
 
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
                   skill.toString(skillModifierData),

@@ -136,6 +136,7 @@ import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.RandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
@@ -2148,11 +2149,11 @@ public class CampaignGUI extends JPanel {
                 if (!ignoreMaintenance) {
                     time -= Math.max(0, tech.getMaintenanceTimeUsing());
                 }
+                SkillModifierData skillModifierData = tech.getSkillModifierData();
                 name = tech.getFullTitle() +
                              ", " +
                              getExperienceLevelName(tech.getSkillForWorkingOn(unit)
-                                                          .getExperienceLevel(tech.getOptions(),
-                                                                tech.getATOWAttributes())) +
+                                                          .getExperienceLevel(skillModifierData)) +
                              " (" +
                              time +
                              "min)";

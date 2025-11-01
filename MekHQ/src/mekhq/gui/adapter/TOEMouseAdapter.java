@@ -40,6 +40,7 @@ import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_FALSE;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
 import static mekhq.campaign.force.ForceType.CONVOY;
+import static mekhq.campaign.force.ForceType.SALVAGE;
 import static mekhq.campaign.force.ForceType.SECURITY;
 import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.force.ForceType.SUPPORT;
@@ -160,6 +161,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_CHANGE_FORCE_TYPE_STANDARD = "COMMAND_CHANGE_FORCE_TYPE_STANDARD|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_TYPE_SUPPORT = "COMMAND_CHANGE_FORCE_TYPE_SUPPORT|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_TYPE_CONVOY = "COMMAND_CHANGE_FORCE_TYPE_CONVOY|FORCE|empty|";
+    private static final String COMMAND_CHANGE_FORCE_TYPE_SALVAGE = "COMMAND_CHANGE_FORCE_TYPE_SALVAGE|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_TYPE_SECURITY = "COMMAND_CHANGE_FORCE_TYPE_SECURITY|FORCE|empty|";
     private static final String CHANGE_STRATEGIC_FORCE_OVERRIDE = "CHANGE_STRATEGIC_FORCE_OVERRIDE";
     private static final String REMOVE_STRATEGIC_FORCE_OVERRIDE = "REMOVE_STRATEGIC_FORCE_OVERRIDE";
@@ -487,6 +489,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
             if (command.contains(CONVOY.name())) {
                 forceType = CONVOY;
+            }
+
+            if (command.contains(SALVAGE.name())) {
+                forceType = SALVAGE;
             }
 
             if (command.contains(SECURITY.name())) {
@@ -1187,6 +1193,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
             menuItem = new JMenuItem("Make Convoy Force");
             menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_CONVOY + forceIds);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem("Make Salvage Force");
+            menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_SALVAGE + forceIds);
             menuItem.addActionListener(this);
             menu.add(menuItem);
 

@@ -232,7 +232,7 @@ tasks.register('stageFiles', Copy) {
     dependsOn copyLicenseFiles
 
     from projectDir
-    include "campaigns/"
+    include "campaigns/The Learning Ropes.cpnx.gz"
     include "data/**"
     include "docs/**"
     include "mmconf/**"

@@ -62,10 +62,8 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
         // 2) Person must be free
         // 3) Person cannot be deployed
         // 4) Person must be a tech
-        // 5) Person must have free maintenance time
         if (!person.getStatus().isActive() || !person.getPrisonerStatus().isFree()
-                  || person.isDeployed() || !person.isTech()
-                  || (person.getMaintenanceTimeUsing() >= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
+                  || person.isDeployed() || !person.isTech()) {
             return;
         }
 
@@ -89,8 +87,7 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
                                                    .filter(unit -> person.canTech(unit.getEntity()))
                                                    .filter(unit -> unit.canTakeTech()
                                                                          &&
-                                                                         (person.getMaintenanceTimeUsing() +
-                                                                                unit.getMaintenanceTime() <=
+                                                                         (unit.getMaintenanceTime() <=
                                                                                 Person.PRIMARY_ROLE_SUPPORT_TIME)))
                                        .toList();
         for (final Unit unit : units) {

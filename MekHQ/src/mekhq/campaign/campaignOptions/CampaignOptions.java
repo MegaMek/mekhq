@@ -612,6 +612,8 @@ public class CampaignOptions {
     private int contractMaxSalvagePercentage;
     private int dropShipBonusPercentage;
     private boolean isUseTwoWayPay;
+    private boolean isUseCamOpsSalvage;
+    private boolean isUseRiskySalvage;
     // endregion Markets Tab
 
     // region Against the Bot Tab
@@ -1272,6 +1274,8 @@ public class CampaignOptions {
         setContractMaxSalvagePercentage(100);
         setDropShipBonusPercentage(0);
         isUseTwoWayPay = true;
+        isUseCamOpsSalvage = false;
+        isUseRiskySalvage = false;
         // endregion Markets Tab
 
         // region Against the Bot Tab
@@ -3986,6 +3990,22 @@ public class CampaignOptions {
 
     public void setUseTwoWayPay(final boolean isUseTwoWayPay) {
         this.isUseTwoWayPay = isUseTwoWayPay;
+    }
+
+    public boolean isUseCamOpsSalvage() {
+        return isUseCamOpsSalvage;
+    }
+
+    public void setUseCamOpsSalvage(final boolean isUseCamOpsSalvage) {
+        this.isUseCamOpsSalvage = isUseCamOpsSalvage;
+    }
+
+    public boolean isUseRiskySalvage() {
+        return isUseRiskySalvage;
+    }
+
+    public void setUseRiskySalvage(final boolean isUseRiskySalvage) {
+        this.isUseRiskySalvage = isUseRiskySalvage;
     }
     // endregion Contract Market
     // endregion Markets Tab
