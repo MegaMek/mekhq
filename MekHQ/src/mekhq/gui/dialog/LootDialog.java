@@ -52,6 +52,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
+import mekhq.gui.CampaignGUI;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
@@ -77,23 +78,22 @@ public class LootDialog extends JDialog {
     private JScrollPane scrParts;
 
     /** Creates new LootDialog form */
-    public LootDialog(JFrame parent, boolean modal, Loot l, Campaign c) {
+    public LootDialog(JFrame parent, boolean modal, Loot l, CampaignGUI gui) {
         super(parent, modal);
         this.frame = parent;
         this.loot = l;
-        this.campaign = c;
+        this.campaign = gui.getCampaign();
         cancelled = true;
         units = new ArrayList<>();
         parts = new ArrayList<>();
         units.addAll(l.getUnits());
         parts.addAll(l.getParts());
-        initComponents();
+        initComponents(gui);
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
 
-    private void initComponents() {
-
+    private void initComponents(CampaignGUI gui) {
         txtName = new JTextField();
         JButton btnOK = new JButton("Done");
         JButton btnCancel = new JButton("Cancel");
@@ -205,7 +205,7 @@ public class LootDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Parts"), gridBagConstraints);
 
-        btnAddPart.addActionListener(evt -> addPart());
+        btnAddPart.addActionListener(evt -> addPart(gui));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -302,8 +302,8 @@ public class LootDialog extends JDialog {
         refreshUnitList();
     }
 
-    private void addPart() {
-        PartsStoreDialog psd = new PartsStoreDialog(frame, true, null, campaign, false);
+    private void addPart(CampaignGUI gui) {
+        PartsStoreDialog psd = new PartsStoreDialog(frame, true, gui, campaign, false);
         psd.setVisible(true);
         Part p = psd.getPart();
         if (null != p) {
