@@ -261,7 +261,7 @@ public class Maintenance {
         PartQuality oldQuality = part.getQuality();
         TargetRoll target = getTargetForMaintenance(campaign, part, unit.getTech(), asTechsUsed);
         if (!paidMaintenance) {
-            // TODO : Make campaign modifier user imputable
+            // TODO : Make campaign modifier user configurable
             target.addModifier(1, "did not pay for maintenance");
         }
 
