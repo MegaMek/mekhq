@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import java.util.ArrayList;
+
 import mekhq.campaign.personnel.PersonnelOptions;
 
 public class TestSkillModifierData {
@@ -41,6 +43,6 @@ public class TestSkillModifierData {
      * <p><b>Warning:</b> this is intended for use in Unit Tests only.</p>
      */
     public static SkillModifierData createDefault() {
-        return new SkillModifierData(new PersonnelOptions(), new Attributes(), 0, false);
+        return new SkillModifierData(new PersonnelOptions(), new Attributes(), 0, false, new ArrayList<>());
     }
 }
