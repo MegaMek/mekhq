@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Objects;
 
 import megamek.codeUtilities.MathUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.common.rolls.TargetRoll;
@@ -574,7 +575,11 @@ public class Skill {
      * @author Illiani
      * @since 0.50.06
      */
-    public int getTotalSkillLevel(SkillModifierData skillModifierData) {
+    public int getTotalSkillLevel(@Nullable SkillModifierData skillModifierData) {
+        if (skillModifierData == null) {
+            skillModifierData = new SkillModifierData(new PersonnelOptions(), new Attributes(), 0, false);
+        }
+
         int baseValue = level + bonus + agingModifier;
 
         int modifiers = getModifiers(skillModifierData);
