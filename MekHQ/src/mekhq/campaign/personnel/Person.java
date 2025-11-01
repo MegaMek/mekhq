@@ -4800,7 +4800,7 @@ public class Person {
                                                        EXP_NONE :
                                                        gunnery.getExperienceLevel(skillModifierData);
                     Skill artillery = getSkill(S_ARTILLERY);
-                    int artilleryExperienceLevel = gunnery == null ?
+                    int artilleryExperienceLevel = artillery == null ?
                                                          EXP_NONE :
                                                          artillery.getExperienceLevel(skillModifierData);
 
