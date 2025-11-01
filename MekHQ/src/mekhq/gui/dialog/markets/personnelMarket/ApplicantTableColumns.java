@@ -67,9 +67,13 @@ public enum ApplicantTableColumns {
     /**
      * The applicant's gender
      */
-    GENDER(4);
+    GENDER(4),
+    /**
+     * The cost to hire the applicant
+     */
+    HIRING_COST(5);
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + ApplicantTableColumns.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ApplicantTableColumns";
 
     public final int columnIndex;
 

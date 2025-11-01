@@ -56,6 +56,7 @@ import megamek.common.enums.Gender;
 import mekhq.MekHQ;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.mission.AtBContract;
@@ -430,5 +431,15 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         getLogger().debug("Rolls including capital status: {}", rolls);
 
         return rolls;
+    }
+
+    @Override
+    public Money getHiringCost(Person applicant) {
+        // Personnel are hired without a rank, meaning they have a 0.5 salary multiplier. As a Golden Hello is
+        // 12 months' salary, we double the multiplier from 12 to 24. And a normal hiring cost is one month's salary
+        // we increase 1 to 2.
+        int hiringCostMultiplier = isWasOfferingGoldenHello() ? 24 : 2;
+        Money salary = applicant.getSalary(getCampaign());
+        return salary.multipliedBy(hiringCostMultiplier);
     }
 }

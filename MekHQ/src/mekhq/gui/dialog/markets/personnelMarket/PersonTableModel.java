@@ -43,6 +43,7 @@ import javax.swing.table.AbstractTableModel;
 
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -144,6 +145,10 @@ public class PersonTableModel extends AbstractTableModel {
             }
             case AGE -> Integer.toString(person.getAge(campaign.getLocalDate()));
             case GENDER -> MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
+            case HIRING_COST -> {
+                Money hiringCost = market.getHiringCost(person);
+                yield hiringCost.toAmountString();
+            }
         };
     }
 
@@ -160,7 +165,7 @@ public class PersonTableModel extends AbstractTableModel {
     public Comparator<?> getComparator(int columnIndex) {
         ApplicantTableColumns column = ApplicantTableColumns.values()[columnIndex];
         return switch (column) {
-            case AGE -> new IntegerStringSorter();
+            case AGE, HIRING_COST -> new IntegerStringSorter();
             case EXPERIENCE -> new LevelSorter();
             default -> new NaturalOrderComparator();
         };
