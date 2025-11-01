@@ -211,9 +211,10 @@ public class AverageExperienceRating {
 
                 // For regular entities, another method calculates the average experience
                 if (unit.isGunner(person) || unit.isDriver(person)) {
-                    totalExperience += calculateRegularExperience(person, entity, unit);
+                    double experience = calculateRegularExperience(person, entity, unit);
 
-                    if (totalExperience >= 0) {
+                    if (experience >= 0) {
+                        totalExperience += experience;
                         personnelCount++;
                     }
                 }
