@@ -48,6 +48,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
@@ -279,7 +280,12 @@ public class ShoppingList {
 
     private boolean isSameEquipment(Object equipment, Object newEquipment) {
         if ((newEquipment instanceof Part) && (equipment instanceof Part)) {
-            return ((Part) equipment).isSamePartType((Part) newEquipment);
+            if (newEquipment instanceof MekLocation newMekLocation &&
+                      equipment instanceof MekLocation equipmentMekLocation) {
+                return newMekLocation.isSamePartForWarehouseOrPartsInUse(equipmentMekLocation);
+            } else {
+                return ((Part) equipment).isSamePartType((Part) newEquipment);
+            }
         } else if ((newEquipment instanceof Entity entityA) && (equipment instanceof Entity entityB)) {
             return entityA.getChassis().equals(entityB.getChassis()) && entityA.getModel().equals(entityB.getModel());
         }

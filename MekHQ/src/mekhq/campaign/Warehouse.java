@@ -52,6 +52,7 @@ import mekhq.campaign.events.parts.PartRemovedEvent;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -343,8 +344,14 @@ public class Warehouse {
     public int getSparePartsCount(Part targetPart) {
         int count = 0;
         for (Part warehousePart : getParts()) {
-            if (warehousePart.isSamePartType(targetPart)) {
-                count += getPartQuantity(warehousePart, true);
+            if (warehousePart instanceof MekLocation mekLocation) {
+                if (mekLocation.isSamePartForWarehouseOrPartsInUse(targetPart)) {
+                    count += getPartQuantity(warehousePart, true);
+                }
+            } else {
+                if (warehousePart.isSamePartType(targetPart)) {
+                    count += getPartQuantity(warehousePart, true);
+                }
             }
         }
 
