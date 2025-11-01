@@ -46,6 +46,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -578,7 +579,11 @@ public class Skill {
      */
     public int getTotalSkillLevel(@Nullable SkillModifierData skillModifierData) {
         if (skillModifierData == null) {
-            skillModifierData = new SkillModifierData(new PersonnelOptions(), new Attributes(), 0, false);
+            skillModifierData = new SkillModifierData(new PersonnelOptions(),
+                  new Attributes(),
+                  0,
+                  false,
+                  new ArrayList<>());
         }
 
         int baseValue = level + bonus + agingModifier;
@@ -729,7 +734,7 @@ public class Skill {
     @Override
     public String toString() {
         SkillModifierData skillModifierData = new SkillModifierData(new PersonnelOptions(), new Attributes(),
-              0, false);
+              0, false, new ArrayList<>());
         return toString(skillModifierData);
     }
 

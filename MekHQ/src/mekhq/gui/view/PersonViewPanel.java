@@ -120,6 +120,8 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -1961,8 +1963,11 @@ public class PersonViewPanel extends JScrollablePanel {
             }
             JLabel lblName = new JLabel(label);
             boolean isIlliterate = person.isIlliterate();
+            boolean isAmbidextrous = person.getOptions().booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
+            List<InjuryEffect> injuryEffects = AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
+                  person.getInjuries());
             SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
-                  isIlliterate, person.getInjuries());
+                  isIlliterate, injuryEffects);
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
             int injuryModifier = Skill.getTotalInjuryModifier(skillModifierData, skill.getType());

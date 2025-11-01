@@ -127,6 +127,8 @@ import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -8325,7 +8327,10 @@ public class Person {
      * @return a {@link SkillModifierData} object with reputation set to 0
      */
     public SkillModifierData getSkillModifierData() {
-        return new SkillModifierData(options, atowAttributes, 0, isIlliterate());
+        boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
+        List<InjuryEffect> injuryEffects = AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
+              injuries);
+        return new SkillModifierData(options, atowAttributes, 0, isIlliterate(), injuryEffects);
     }
 
     /**
@@ -8352,6 +8357,10 @@ public class Person {
     public SkillModifierData getSkillModifierData(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
         int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rank);
 
-        return new SkillModifierData(options, atowAttributes, adjustedReputation, isIlliterate());
+        boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
+        List<InjuryEffect> injuryEffects = AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
+              injuries);
+
+        return new SkillModifierData(options, atowAttributes, adjustedReputation, isIlliterate(), injuryEffects);
     }
 }
