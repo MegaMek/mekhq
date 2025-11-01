@@ -6221,7 +6221,9 @@ public class Campaign implements ITechManager {
                 String neighborId = neighborSystem.getId();
 
                 // Skip systems without population if avoiding empty systems
-                if (isAvoidingEmptySystems && neighborSystem.getPopulation(currentDay) == 0) {
+                if (!skipEmptySystemCheck
+                          && isAvoidingEmptySystems
+                          && neighborSystem.getPopulation(currentDay) == 0) {
                     return;
                 }
 
