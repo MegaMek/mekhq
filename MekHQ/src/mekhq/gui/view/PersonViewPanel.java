@@ -122,6 +122,7 @@ import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
@@ -1959,17 +1960,19 @@ public class PersonViewPanel extends JScrollablePanel {
                 label = formattedSkillName;
             }
             JLabel lblName = new JLabel(label);
-
+            boolean isIlliterate = person.isIlliterate();
+            SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
+                  isIlliterate, person.getInjuries());
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
-            int injuryModifier = skill.getTotalInjuryModifier(SkillModifierData skillData, skill.getType());
+            int injuryModifier = Skill.getTotalInjuryModifier(skillModifierData, skill.getType());
             String adjustment = getAdjustment(skill, attributeModifier, spaModifier, injuryModifier);
 
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
-                  skill.toString(options, attributes, adjustedReputation),
+                  skill.toString(skillModifierData),
                   adjustment));
             lblName.setLabelFor(lblValue);
-            String tooltip = wordWrap(skill.getTooltip(options, attributes, adjustedReputation), injuryModifier);
+            String tooltip = wordWrap(skill.getTooltip(skillModifierData));
             lblName.setToolTipText(tooltip);
             lblValue.setToolTipText(tooltip);
 

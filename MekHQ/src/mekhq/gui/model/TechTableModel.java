@@ -41,6 +41,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.BasicInfo;
@@ -156,7 +157,8 @@ public class TechTableModel extends DataTableModel<Person> {
                 toReturn.append("; ");
             }
 
-            int experienceLevel = skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
+            SkillModifierData skillModifierData = tech.getSkillModifierData();
+            int experienceLevel = skill.getExperienceLevel(skillModifierData);
 
             toReturn.append("<b>")
                   .append(SkillType.getColoredExperienceLevelName(experienceLevel))
