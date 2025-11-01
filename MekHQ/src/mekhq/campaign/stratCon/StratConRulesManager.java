@@ -2918,6 +2918,14 @@ public class StratConRulesManager {
                                                        .isForceDeployedHere(unit.getForceId()));
     }
 
+    public static boolean isForceDeployedToStratCon(List<AtBContract> activeAtBContracts, int forceId) {
+        return activeAtBContracts
+                     .stream()
+                     .anyMatch(contract -> (contract.getStratconCampaignState() != null) &&
+                                                 contract.getStratconCampaignState()
+                                                       .isForceDeployedHere(forceId));
+    }
+
     /**
      * Calculates the majority unit type for the forces given the IDs.
      */

@@ -1023,6 +1023,14 @@ public class CampaignOptionsMarshaller {
               indent,
               "isUseTwoWayPay",
               campaignOptions.isUseTwoWayPay());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "isUseCamOpsSalvage",
+              campaignOptions.isUseCamOpsSalvage());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "isUseRiskySalvage",
+              campaignOptions.isUseRiskySalvage());
         // endregion Contract Market
         // endregion Markets Tab
 
