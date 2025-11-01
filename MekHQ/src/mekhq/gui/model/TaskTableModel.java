@@ -113,7 +113,10 @@ public class TaskTableModel extends DataTableModel<IPartWork> {
         public Component getTableCellRendererComponent(JTable table, Object value,
               boolean isSelected, boolean hasFocus,
               int row, int column) {
-            table.setRowHeight(UIUtil.scaleForGUI(100));
+            int newRowHeight = UIUtil.scaleForGUI(100);
+            if (table.getRowHeight(row) != newRowHeight) {
+                table.setRowHeight(newRowHeight);
+            }
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
@@ -167,6 +170,9 @@ public class TaskTableModel extends DataTableModel<IPartWork> {
                 if (availableLevel == REPAIR_STATE.AVAILABLE) {
                     Person tech = panel.getSelectedTech();
 
+                    if (tech == null) {
+                        tech = panel.getTempTech();
+                    }
                     if (null == tech) {
                         //Find a valid tech that we can copy their skill from
                         List<Person> techs = gui.getCampaign().getTechs();
@@ -180,6 +186,7 @@ public class TaskTableModel extends DataTableModel<IPartWork> {
 
                             if (techTemp.canTech(part.getUnit().getEntity())) {
                                 tech = techTemp;
+                                panel.setTempTech(techTemp);
                                 break;
                             }
                         }
