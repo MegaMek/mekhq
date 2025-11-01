@@ -32,8 +32,11 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import java.util.List;
+
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 
 /**
  * Encapsulates all data needed to calculate skill modifiers for a person.
@@ -47,10 +50,11 @@ import mekhq.campaign.personnel.PersonnelOptions;
  * @param attributes         the person's physical and mental attributes
  * @param adjustedReputation the calculated reputation modifier (0 if not applicable)
  * @param isIlliterate       whether the person is illiterate
+ * @param injuryEffects      a list of injury effects currently affecting the character
  *
  * @author Illiani
  * @since 0.50.11
  */
 public record SkillModifierData(PersonnelOptions characterOptions, Attributes attributes, int adjustedReputation,
-      boolean isIlliterate) {
+      boolean isIlliterate, List<InjuryEffect> injuryEffects) {
 }
