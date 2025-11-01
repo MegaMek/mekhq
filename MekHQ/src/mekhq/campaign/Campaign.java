@@ -6744,7 +6744,7 @@ public class Campaign implements ITechManager {
             modePenalty = 0;
         }
 
-        // this is ugly, if the mode penalty drops you to green, you drop two levels instead of two
+        // this is ugly, if the mode penalty drops you to green, you drop two levels instead of one
         int value = skill.getFinalSkillValue(skillModifierData) + modePenalty;
         if ((modePenalty > 0) && (SkillType.EXP_GREEN == effectiveSkillLevel)) {
             value++;
