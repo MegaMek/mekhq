@@ -106,7 +106,7 @@ class CargoCapacityTest {
     @Test
     public void testCargoCapacityOfCargoMek() {
         Entity entity = getEntityForUnitTestingCargoCapacity(cargoMek.name, false);
-        testCargoTotal(entity, entity.getWeight() + cargoMek.getTotalCargoCapacity());
+        testCargoTotal(entity, cargoMek.getTotalCargoCapacity());
     }
 
     @Test
@@ -114,7 +114,7 @@ class CargoCapacityTest {
         Entity entity = getEntityForUnitTestingCargoCapacity(cargoMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
-        testCargoTotal(entity, entity.getWeight() + cargoMek.bayCargoCapacity);
+        testCargoTotal(entity, cargoMek.bayCargoCapacity);
     }
 
     @Test
@@ -122,7 +122,7 @@ class CargoCapacityTest {
         Entity entity = getEntityForUnitTestingCargoCapacity(cargoMek.name, false);
         assertNotNull(entity);
         killBays(entity);
-        testCargoTotal(entity, entity.getWeight() + cargoMek.otherCargoCapacity);
+        testCargoTotal(entity, cargoMek.otherCargoCapacity);
     }
 
     @Test
@@ -131,13 +131,13 @@ class CargoCapacityTest {
         assertNotNull(entity);
         killCargoLocations(entity);
         killBays(entity);
-        testCargoTotal(entity, entity.getWeight());
+        testCargoTotal(entity, 0);
     }
 
     @Test
     public void testCargoCapacityOfLiftHoistMek() {
         Entity entity = getEntityForUnitTestingCargoCapacity(liftHoistMek.name, false);
-        testCargoTotal(entity, entity.getWeight() + liftHoistMek.getTotalCargoCapacity());
+        testCargoTotal(entity, liftHoistMek.getTotalCargoCapacity());
     }
 
     @Test
@@ -145,7 +145,7 @@ class CargoCapacityTest {
         Entity entity = getEntityForUnitTestingCargoCapacity(liftHoistMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
-        testCargoTotal(entity, entity.getWeight() + liftHoistMek.bayCargoCapacity);
+        testCargoTotal(entity, liftHoistMek.bayCargoCapacity);
     }
 
     @Test
@@ -153,7 +153,7 @@ class CargoCapacityTest {
         Entity entity = getEntityForUnitTestingCargoCapacity(liftHoistMek.name, false);
         assertNotNull(entity);
         killBays(entity);
-        testCargoTotal(entity, entity.getWeight() + liftHoistMek.otherCargoCapacity);
+        testCargoTotal(entity, liftHoistMek.otherCargoCapacity);
     }
 
     @Test
@@ -162,7 +162,7 @@ class CargoCapacityTest {
         assertNotNull(entity);
         killCargoLocations(entity);
         killBays(entity);
-        testCargoTotal(entity, entity.getWeight());
+        testCargoTotal(entity, 0);
     }
 
     @Test
@@ -230,7 +230,7 @@ class CargoCapacityTest {
     @Test
     public void testCargoCapacityOfCargoTank() {
         Entity entity = getEntityForUnitTestingCargoCapacity(cargoTank.name, true);
-        testCargoTotal(entity, entity.getWeight() + cargoTank.getTotalCargoCapacity());
+        testCargoTotal(entity, cargoTank.getTotalCargoCapacity());
     }
 
     @Test
@@ -238,7 +238,7 @@ class CargoCapacityTest {
         Entity entity = getEntityForUnitTestingCargoCapacity(cargoTank.name, true);
         assertNotNull(entity);
         killCargoLocations(entity);
-        testCargoTotal(entity, entity.getWeight() + cargoTank.bayCargoCapacity);
+        testCargoTotal(entity, cargoTank.bayCargoCapacity);
     }
 
     @Test
@@ -246,7 +246,7 @@ class CargoCapacityTest {
         Entity entity = getEntityForUnitTestingCargoCapacity(cargoTank.name, true);
         assertNotNull(entity);
         killBays(entity);
-        testCargoTotal(entity, entity.getWeight() + cargoTank.otherCargoCapacity);
+        testCargoTotal(entity, cargoTank.otherCargoCapacity);
     }
 
     @Test
@@ -255,7 +255,7 @@ class CargoCapacityTest {
         assertNotNull(entity);
         killCargoLocations(entity);
         killBays(entity);
-        testCargoTotal(entity, entity.getWeight());
+        testCargoTotal(entity, 0);
     }
 
     /**
