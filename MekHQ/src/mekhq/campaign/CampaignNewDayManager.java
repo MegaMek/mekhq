@@ -146,6 +146,7 @@ import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -543,8 +544,6 @@ public class CampaignNewDayManager {
                 }
             }
 
-            person.getATOWAttributes().setIlliterate(person.isIlliterate());
-
             person.resetMinutesLeft(campaignOptions.isTechsUseAdministration());
             person.setAcquisition(0);
 
@@ -935,7 +934,7 @@ public class CampaignNewDayManager {
                     unit.getEngineer().resetMinutesLeft(campaignOptions.isTechsUseAdministration());
                 }
 
-                campaign.doMaintenance(unit);
+                Maintenance.doMaintenance(campaign, unit);
             } catch (Exception ex) {
                 LOGGER.error(ex,
                       "Unable to perform maintenance on {} ({}) due to an error",

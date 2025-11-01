@@ -39,6 +39,7 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
 
@@ -102,11 +103,12 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
                 }
 
                 if (tech.hasSkill(skillName)) {
+                    SkillModifierData skillModifierData = tech.getSkillModifierData();
+
                     final SkillLevel skillLevel = (tech.getSkillForWorkingOn(units[0]) == null) ?
                                                         SkillLevel.NONE :
                                                         tech.getSkillForWorkingOn(units[0])
-                                                              .getSkillLevel(tech.getOptions(),
-                                                                    tech.getATOWAttributes());
+                                                              .getSkillLevel(skillModifierData);
 
                     final JScrollableMenu subMenu = switch (skillLevel) {
                         case LEGENDARY -> legendaryMenu;

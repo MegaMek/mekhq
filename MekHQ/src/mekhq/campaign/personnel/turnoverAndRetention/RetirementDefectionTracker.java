@@ -64,6 +64,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionHints.FactionHints;
@@ -226,9 +227,10 @@ public class RetirementDefectionTracker {
                 if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
                     Person commander = campaign.getCommander();
                     if (commander != null && commander.hasSkill((SkillType.S_LEADER))) {
+                        SkillModifierData skillModifierData = commander.getSkillModifierData();
+
                         modifier -= commander.getSkill(SkillType.S_LEADER)
-                                          .getFinalSkillValue(commander.getOptions(),
-                                                commander.getATOWAttributes());
+                                          .getFinalSkillValue(skillModifierData);
                     }
                 } else {
                     modifier -= getManagementSkillModifier(person);
@@ -626,8 +628,9 @@ public class RetirementDefectionTracker {
      */
     private static int getIndividualCommanderLeadership(Person commander) {
         if (commander.hasSkill(SkillType.S_LEADER)) {
-            return commander.getSkill(SkillType.S_LEADER)
-                         .getFinalSkillValue(commander.getOptions(), commander.getATOWAttributes());
+            SkillModifierData skillModifierData = commander.getSkillModifierData();
+
+            return commander.getSkill(SkillType.S_LEADER).getFinalSkillValue(skillModifierData);
         } else {
             return 0;
         }
@@ -721,13 +724,8 @@ public class RetirementDefectionTracker {
                 continue;
             }
 
-            int adjustedReputation = person.getAdjustedReputation(isUseAgingEffects,
-                  isClanCampaign,
-                  today,
-                  person.getRankNumeric());
-            int skillLevel = skill.getTotalSkillLevel(person.getOptions(),
-                  person.getATOWAttributes(),
-                  adjustedReputation);
+            SkillModifierData skillModifierData = person.getSkillModifierData();
+            int skillLevel = skill.getTotalSkillLevel(skillModifierData);
 
             combinedSkillValues += skillLevel + mediatorModifier;
         }

@@ -546,22 +546,22 @@ public class StratConContractInitializer {
     /**
      * Searches for a suitable, random unoccupied coordinate on the specified {@link StratConTrackState}.
      *
-     * <p>A coordinate is considered suitable based on the absence of any existing scenario, and depending
-     * on the input parameters, may also depend on the presence or absence of facilities, player forces, or an emphasis
-     * on strategic locations.</p>
+     * <p>A coordinate is considered suitable based on the absence of any existing scenario, and depending on the
+     * input parameters, may also depend on the presence or absence of facilities, player forces, or an emphasis on
+     * strategic locations.</p>
      *
      * <p>The method performs the following steps:</p>
      * <ol>
      *   <li>Iterates over all possible coordinates on the provided track.</li>
      *   <li>Filters the coordinates based on the following criteria:
      *     <ul>
-     *       <li>A coordinate is not occupied by a scenario.</li>
+     *       <li>A scenario does not occupy the coordinate.</li>
      *       <li>{@code allowPlayerFacilities = true}: Locations with facilities owned by the player
      *           are suitable and factored into the result.</li>
      *       <li>{@code allowPlayerForces = true}: Coordinates with forces assigned to them are also
      *           included in the result.</li>
      *       <li>{@code emphasizeStrategicTargets = true}: Strategic locations, such as those containing
-     *           facilities not owned by players, are given additional weight to increase their chance
+     *           facilities owned by players, are given additional weight to increase their chance
      *           of being selected.</li>
      *     </ul>
      *   </li>
@@ -593,7 +593,6 @@ public class StratConContractInitializer {
         for (int y = 0; y < trackHeight; y++) {
             for (int x = 0; x < trackWidth; x++) {
                 StratConCoords coords = new StratConCoords(x, y);
-
                 if (trackState.getScenario(coords) != null) {
                     continue;
                 }
@@ -601,7 +600,7 @@ public class StratConContractInitializer {
                 StratConFacility facility = trackState.getFacility(coords);
                 if (facility == null) {
                     suitableCoords.add(coords);
-                } else if (allowPlayerFacilities && !facility.isOwnerAlliedToPlayer()) {
+                } else if (allowPlayerFacilities && facility.isOwnerAlliedToPlayer()) {
                     if (emphasizeStrategicTargets) {
                         for (int weight = 0; weight < weightingMultiplier; weight++) {
                             suitableCoords.add(coords);
@@ -613,7 +612,6 @@ public class StratConContractInitializer {
 
                 if (allowPlayerForces && trackState.getAssignedForceCoords().containsValue(coords)) {
                     if (emphasizeStrategicTargets) {
-                        weightingMultiplier /= 2;
                         for (int weight = 0; weight < weightingMultiplier; weight++) {
                             suitableCoords.add(coords);
                         }
