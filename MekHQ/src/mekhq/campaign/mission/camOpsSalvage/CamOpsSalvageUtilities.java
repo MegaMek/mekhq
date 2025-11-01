@@ -277,7 +277,7 @@ public class CamOpsSalvageUtilities {
         final boolean useInjuryFatigue = campaignOptions.isUseInjuryFatigue();
 
         int injuryEvents = 0;
-        for (int i = 0; i <= numberOfSalvagedUnits; i++) {
+        for (int i = 0; i < numberOfSalvagedUnits; i++) {
             int roll = d6(2);
             if (roll == 2) {
                 injuryEvents++;
