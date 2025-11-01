@@ -491,9 +491,8 @@ public class SkillCheckUtility {
                   getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.untrained.skill"));
         } else {
             Skill skill = person.getSkill(skillName);
-            int skillValue = skill.getFinalSkillValue(person.getOptions(),
-                  person.getATOWAttributes(),
-                  person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, person.getRankNumeric()));
+            int skillValue = skill.getFinalSkillValue(person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
+                  today));
             targetNumber.addModifier(skillValue, skillName);
         }
 

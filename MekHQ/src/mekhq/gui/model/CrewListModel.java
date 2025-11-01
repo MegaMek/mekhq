@@ -45,9 +45,8 @@ import megamek.common.units.Entity;
 import megamek.common.units.Tank;
 import megamek.common.units.VTOL;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
@@ -162,8 +161,7 @@ public class CrewListModel extends AbstractListModel<Person> {
             }
             String driveSkill = SkillType.getDrivingSkillFor(unit.getEntity());
 
-            PersonnelOptions options = person.getOptions();
-            Attributes attributes = person.getATOWAttributes();
+            SkillModifierData skillModifierData = person.getSkillModifierData();
             String sb = "<html><font><b>" +
                               person.getFullTitle() +
                               "</b><br/>" +
@@ -171,11 +169,11 @@ public class CrewListModel extends AbstractListModel<Person> {
                               " ("
                               +
                               (person.hasSkill(gunSkill) ?
-                                     person.getSkill(gunSkill).getFinalSkillValue(options, attributes) :
+                                     person.getSkill(gunSkill).getFinalSkillValue(skillModifierData) :
                                      "-") +
                               '/' +
                               (person.hasSkill(driveSkill) ?
-                                     person.getSkill(driveSkill).getFinalSkillValue(options, attributes) :
+                                     person.getSkill(driveSkill).getFinalSkillValue(skillModifierData) :
                                      "-") +
                               ")</font></html>";
             setHtmlText(sb);

@@ -91,6 +91,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
@@ -1648,6 +1649,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         constraints.gridx = 0;
 
         AgingMilestone milestone = getMilestone(person.getAge(campaign.getLocalDate()));
+        SkillModifierData skillModifierData = person.getSkillModifierData(campaign.getCampaignOptions()
+                                                                                .isUseAgeEffects(),
+              campaign.isClanCampaign(), campaign.getLocalDate());
 
         List<String> sortedSkillNames = getSortedSkills();
         for (int index = 0; index < sortedSkillNames.size(); index++) {
@@ -1664,10 +1668,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             lblName = new JLabel(type);
             lblValue = new JLabel();
             if (person.hasSkill(type)) {
-                lblValue.setText(person.getSkill(type)
-                                       .toString(person.getOptions(),
-                                             person.getATOWAttributes(),
-                                             person.getReputation()));
+                lblValue.setText(person.getSkill(type).toString(skillModifierData));
             } else {
                 lblValue.setText("-");
             }

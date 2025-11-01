@@ -470,7 +470,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         } else {
             for (Person patient : selectedPatients) {
                 boolean canAssignToDoctor = canAssignToDoctor(doctor);
-                
+
                 if (null != patient && patient.needsFixing() && canAssignToDoctor) {
                     patient.setDoctorId(doctor.getId(), healingWaitingPeriod);
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));

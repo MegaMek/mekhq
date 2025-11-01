@@ -82,6 +82,7 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.GMModeEvent;
@@ -106,6 +107,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
@@ -114,6 +116,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -124,14 +127,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.CompleteMissionDialog;
-import mekhq.gui.dialog.CustomizeAtBContractDialog;
-import mekhq.gui.dialog.CustomizeMissionDialog;
-import mekhq.gui.dialog.CustomizeScenarioDialog;
-import mekhq.gui.dialog.MissionTypeDialog;
-import mekhq.gui.dialog.NewAtBContractDialog;
-import mekhq.gui.dialog.NewContractDialog;
-import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog;
 import mekhq.gui.enums.MHQTabType;
@@ -761,9 +757,7 @@ public final class BriefingTab extends CampaignGuiTab {
                         "Do you really want to remove all units from this scenario?",
                         "Clear Units?",
                         JOptionPane.YES_NO_OPTION)) {
-            int row = scenarioTable.getSelectedRow();
-            Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-
+            Scenario scenario = getScenario();
             if (scenario == null) {
                 return;
             }
@@ -786,11 +780,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void printRecordSheets() {
-        final int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        final Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        final Scenario scenario = getScenario();
         if (scenario == null) {
             return;
         }
@@ -849,11 +839,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void loadScenario() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        Scenario scenario = getScenario();
         if (null != scenario) {
             getCampaignGui().getApplication().startHost(scenario, true, new ArrayList<>());
         }
@@ -864,14 +850,218 @@ public final class BriefingTab extends CampaignGuiTab {
      *
      * <p>This method first presents the scenario briefing dialog to the user via {@link #createBriefingDialog()}. If
      * the user cancels or does not accept the briefing, the method returns and does not proceed further. If accepted,
-     * it calls {@link #startScenario(BehaviorSettings)} to begin the scenario.</p>
+     * it calls {@link #startScenario(Scenario, BehaviorSettings)} to begin the scenario.</p>
      */
     private void startScenario() {
         if (!createBriefingDialog()) {
             return;
         }
 
-        startScenario(null);
+        Scenario scenario = getScenario();
+        if (scenario == null) {
+            return;
+        }
+
+        boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
+        if (hasSalvageOpportunity) {
+            if (!displaySalvageForcePicker(scenario)) {
+                return;
+            }
+
+            if (!displaySalvageTechPicker(scenario)) {
+                return;
+            }
+        }
+
+        startScenario(scenario, null);
+    }
+
+    /**
+     * Checks whether the player is able to salvage in the mission associated with the chosen scenario.
+     *
+     * @param missionId the id of the mission being checked.
+     *
+     * @return {@code true} if the player can salvage
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private boolean isHasSalvageOpportunity(int missionId) {
+        boolean hasSalvageOpportunity = true;
+        Mission mission = getCampaign().getMission(missionId);
+        if (mission instanceof Contract contract) {
+            hasSalvageOpportunity = contract.canSalvage();
+        }
+        return hasSalvageOpportunity;
+    }
+
+    /**
+     * Displays a dialog allowing the player to select forces for salvage operations.
+     *
+     * <p>This method gathers all available salvage-capable forces from the campaign and presents
+     * them to the player via a {@link SalvageForcePicker} dialog. Forces are filtered based on their salvage
+     * capabilities and whether they are deployed.</p>
+     *
+     * @param scenario the scenario for which salvage forces are being selected
+     *
+     * @return {@code true} if the player confirmed their force selection, {@code false} if they canceled
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private boolean displaySalvageForcePicker(Scenario scenario) {
+        if (!getCampaign().getCampaignOptions().isUseCamOpsSalvage()) {
+            return true;
+        }
+
+        if (scenario.getSalvageForces().isEmpty()) {
+            List<Force> salvageForceOptions = getSalvageForces(getCampaign().getHangar(),
+                  scenario.getBoardType() == AtBScenario.T_SPACE);
+
+            SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), scenario, salvageForceOptions);
+            boolean wasConfirmed = forcePicker.wasConfirmed();
+            if (wasConfirmed) {
+                List<Force> selectedForces = forcePicker.getSelectedForces();
+                for (Force force : selectedForces) {
+                    scenario.addSalvageForce(force.getId());
+                }
+
+                if (getCampaign().getCampaignOptions().isUseStratCon()) {
+                    CamOpsSalvageUtilities.deploySalvageTeams(getCampaign(), scenario);
+                }
+            }
+
+            return forcePicker.wasConfirmed();
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Displays a dialog allowing the player to select techs for salvage operations.
+     *
+     * <p>This method gathers all available techs from the campaign and presents them to the player via a
+     * {@link SalvageTechPicker} dialog.</p>
+     *
+     * @param scenario the scenario for which salvage forces are being selected
+     *
+     * @return {@code true} if the player confirmed their tech selection, {@code false} if they canceled
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private boolean displaySalvageTechPicker(Scenario scenario) {
+        if (!getCampaign().getCampaignOptions().isUseCamOpsSalvage()) {
+            return true;
+        }
+
+        if (scenario.getSalvageTechs().isEmpty()) {
+            List<Person> availableTechs = getAvailableTechs();
+
+            SalvageTechPicker techPicker = new SalvageTechPicker(getCampaign(), availableTechs);
+            boolean wasConfirmed = techPicker.wasConfirmed();
+            if (wasConfirmed) {
+                List<Person> selectedTechs = techPicker.getSelectedTechs();
+                for (Person tech : selectedTechs) {
+                    scenario.addSalvageTech(tech.getId());
+                }
+            }
+
+            return techPicker.wasConfirmed();
+        }
+
+        return true;
+    }
+
+    private List<Person> getAvailableTechs() {
+        List<Person> availableTechs = new ArrayList<>();
+        for (Person tech : getCampaign().getTechs()) {
+            if (!tech.isDeployed() && tech.getMinutesLeft() > 0) {
+                availableTechs.add(tech);
+            }
+        }
+
+        // experienceLevel lowest -> highest, minutes highest -> lowest, rank lowest -> highest, full name a -> x
+        availableTechs.sort(Comparator.comparing((Person p) -> p.getExperienceLevel(getCampaign(),
+                    p.getPrimaryRole().isTech()))
+                                  .thenComparing(Comparator.comparing(Person::getMinutesLeft).reversed())
+                                  .thenComparing(Person::getRankNumeric)
+                                  .thenComparing(Person::getFullName));
+        return availableTechs;
+    }
+
+    /**
+     * Retrieves all available forces capable of performing salvage operations.
+     *
+     * <p>This method collects forces in two passes:</p>
+     * <ol>
+     *   <li>First, it examines all combat teams and their parent forces, adding any undeployed forces
+     *       with salvage-capable units. It tracks visited force IDs to avoid duplication.</li>
+     *   <li>Second, it searches for dedicated salvage forces (non-combat team forces with salvage type)
+     *       that weren't already visited in the first pass.</li>
+     * </ol>
+     *
+     * <p>Forces are filtered to include only those that:</p>
+     * <ul>
+     *   <li>Are not currently deployed</li>
+     *   <li>Have at least one unit capable of salvage operations</li>
+     *   <li>Meet the scenario environment requirements (ground or space)</li>
+     * </ul>
+     *
+     * <p>The returned list is sorted alphabetically by force name.</p>
+     *
+     * @param hangar          the campaign hangar containing all units
+     * @param isSpaceScenario {@code true} if checking for space salvage capabilities, {@code false} for ground
+     *
+     * @return a sorted list of forces capable of salvage operations
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private List<Force> getSalvageForces(Hangar hangar, boolean isSpaceScenario) {
+        List<Integer> visitedForceIds = new ArrayList<>();
+        List<Force> salvageForceOptions = new ArrayList<>();
+
+        // Collect Combat Teams
+        List<AtBContract> activeContracts = getCampaign().getActiveAtBContracts();
+        for (CombatTeam combatTeam : getCampaign().getCombatTeamsAsList()) {
+            int forceId = combatTeam.getForceId();
+            Force force = getCampaign().getForce(forceId);
+            if (force == null) {
+                continue;
+            }
+
+            visitedForceIds.add(force.getId());
+            force.getSubForces().forEach(subForce -> visitedForceIds.add(subForce.getId()));
+
+            boolean isDeployedToStratCon = StratConRulesManager.isForceDeployedToStratCon(activeContracts, forceId);
+            if (!force.isDeployed() &&
+                      !isDeployedToStratCon &&
+                      force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
+                salvageForceOptions.add(force);
+            }
+        }
+
+        // Collect non-Combat Team salvage forces
+        for (Force force : getCampaign().getAllForces()) {
+            if (visitedForceIds.contains(force.getId())) {
+                continue;
+            }
+
+            Force parentForce = force.getParentForce();
+            if (parentForce != null && parentForce.getForceType().isSalvage()) {
+                continue;
+            }
+
+            if (force.getForceType().isSalvage() && force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
+                salvageForceOptions.add(force);
+                visitedForceIds.add(force.getId());
+            }
+        }
+
+        salvageForceOptions.sort(Comparator.comparing(Force::getFullName));
+        return salvageForceOptions;
     }
 
     /**
@@ -979,6 +1169,17 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void runAbstractCombatAutoResolve(Scenario scenario) {
+        boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
+        if (hasSalvageOpportunity) {
+            if (!displaySalvageForcePicker(scenario)) {
+                return;
+            }
+
+            if (!displaySalvageTechPicker(scenario)) {
+                return;
+            }
+        }
+
         List<Unit> chosen = playerUnits(scenario, new StringBuilder());
         if (chosen.isEmpty()) {
             return;
@@ -987,7 +1188,31 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void runPrincessAutoResolve() {
-        startScenario(getCampaign().getAutoResolveBehaviorSettings());
+        Scenario scenario = getScenario();
+        if (scenario == null) {
+            return;
+        }
+
+        boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
+        if (hasSalvageOpportunity) {
+            if (!displaySalvageForcePicker(scenario)) {
+                return;
+            }
+
+            if (!displaySalvageTechPicker(scenario)) {
+                return;
+            }
+        }
+
+        startScenario(scenario, getCampaign().getAutoResolveBehaviorSettings());
+    }
+
+    private @Nullable Scenario getScenario() {
+        int row = scenarioTable.getSelectedRow();
+        if (row < 0) {
+            return null;
+        }
+        return scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
     }
 
     private void promptAutoResolve(Scenario scenario) {
@@ -1051,15 +1276,7 @@ public final class BriefingTab extends CampaignGuiTab {
         return scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
     }
 
-    private void startScenario(BehaviorSettings autoResolveBehaviorSettings) {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-        if (scenario == null) {
-            return;
-        }
+    private void startScenario(Scenario scenario, BehaviorSettings autoResolveBehaviorSettings) {
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(false);
         if (uids.isEmpty()) {
             return;
@@ -1384,11 +1601,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void joinScenario() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        Scenario scenario = getScenario();
         if (scenario == null) {
             return;
         }
@@ -1437,11 +1650,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void deployListFile() {
-        final int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        final Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        final Scenario scenario = getScenario();
         if (scenario == null) {
             return;
         }

@@ -58,9 +58,8 @@ import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
@@ -752,8 +751,9 @@ public class MRMSService {
         int highestAvailableTechSkill = -1;
 
         for (Person tech : techs) {
+            SkillModifierData skillModifierData = tech.getSkillModifierData();
             Skill skill = tech.getSkillForWorkingOn(partWork);
-            int experienceLevel = skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
+            int experienceLevel = skill.getExperienceLevel(skillModifierData);
 
             if (experienceLevel > highestAvailableTechSkill) {
                 highestAvailableTechSkill = experienceLevel;
@@ -1085,18 +1085,17 @@ public class MRMSService {
                 continue;
             }
 
-            PersonnelOptions options = tech.getOptions();
-            Attributes attributes = tech.getATOWAttributes();
+            SkillModifierData skillModifierData = tech.getSkillModifierData();
 
-            if (mrmsOption.getSkillMin() > skill.getExperienceLevel(options, attributes)) {
+            if (mrmsOption.getSkillMin() > skill.getExperienceLevel(skillModifierData)) {
                 continue;
             }
 
-            if (mrmsOption.getSkillMax() < skill.getExperienceLevel(options, attributes)) {
+            if (mrmsOption.getSkillMax() < skill.getExperienceLevel(skillModifierData)) {
                 continue;
             }
 
-            if (partWork.getSkillMin() > skill.getExperienceLevel(options, attributes)) {
+            if (partWork.getSkillMin() > skill.getExperienceLevel(skillModifierData)) {
                 continue;
             }
 
@@ -1164,11 +1163,11 @@ public class MRMSService {
             // If we're trying to a rush a job, our effective skill goes down
             // Let's make sure we don't put it so high that we can't fix it
             // anymore
+            SkillModifierData skillModifierData = tech.getSkillModifierData();
             if (!increaseTime) {
                 int modePenalty = partWork.getMode().expReduction;
-
                 if (partWork.getSkillMin() >
-                          (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) - modePenalty)) {
+                          (skill.getExperienceLevel(skillModifierData) - modePenalty)) {
                     debugLog(
                           "...... ending calculateNewMRMSWorktime with previousWorkTime due time reduction skill mod now being less that required skill - %s ns",
                           "calculateNewMRMSWorktime",
@@ -1190,7 +1189,8 @@ public class MRMSService {
                 if (targetRoll.getValue() <= mrmsOption.getTargetNumberMax()) {
                     wtc.setWorkTime(previousNewWorkTime);
                 }
-                if (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) >=
+
+                if (skill.getExperienceLevel(skillModifierData) >=
                           highestAvailableTechSkill) {
                     wtc.setReachedMaxSkill(true);
                 }
@@ -1301,9 +1301,11 @@ public class MRMSService {
                 return -1;
             }
 
-            int experienceCompare = Integer.compare(skill1.getTotalSkillLevel(tech1.getOptions(),
-                        tech1.getATOWAttributes()),
-                  skill2.getTotalSkillLevel(tech2.getOptions(), tech2.getATOWAttributes()));
+            SkillModifierData tech1SkillModifierData = tech1.getSkillModifierData();
+            SkillModifierData tech2SkillModifierData = tech2.getSkillModifierData();
+
+            int experienceCompare = Integer.compare(skill1.getTotalSkillLevel(tech1SkillModifierData),
+                  skill2.getTotalSkillLevel(tech2SkillModifierData));
             if (experienceCompare != 0) {
                 return experienceCompare;
             }
