@@ -33,6 +33,7 @@
 package mekhq.campaign.unit;
 
 import static megamek.common.equipment.MiscType.F_CARGO;
+import static megamek.common.equipment.MiscType.F_LIFT_HOIST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -41,9 +42,13 @@ import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 
 import java.util.UUID;
 
+import megamek.common.bays.Bay;
 import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.Mounted;
+import megamek.common.game.Game;
 import megamek.common.icons.Portrait;
+import megamek.common.options.GameOptions;
+import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -68,9 +73,14 @@ class CargoCapacityTest {
 
     private Campaign mockCampaign;
     private CampaignOptions mockCampaignOptions;
+    private Game mockGame;
+    private GameOptions mockGameOptions;
 
     private final String CARGO_MEK = "Buster BC XV-M-B HaulerMech MOD";
     private final CargoUnit cargoMek = new CargoUnit(CARGO_MEK, 0, 2);
+
+    private final String LIFT_HOIST_MEK = "Quickdraw QKD-8X";
+    private final CargoUnit liftHoistMek = new CargoUnit(LIFT_HOIST_MEK, 0, 30);
 
     private final String CARGO_DROP_SHIP = "Hoshiryokou Tug Boat";
     private final CargoUnit cargoDropShip = new CargoUnit(CARGO_DROP_SHIP, 7, 100);
@@ -85,64 +95,101 @@ class CargoCapacityTest {
     public void setup() {
         mockCampaign = mock(Campaign.class);
         mockCampaignOptions = mock(CampaignOptions.class);
+        mockGame = mock(Game.class);
+        mockGameOptions = mock(GameOptions.class);
+
+        when(mockCampaign.getGame()).thenReturn(mockGame);
+        when(mockGame.getOptions()).thenReturn(mockGameOptions);
+        when(mockGameOptions.booleanOption(OptionsConstants.ADVANCED_BA_GRAB_BARS)).thenReturn(false);
     }
 
     @Test
     public void testCargoCapacityOfCargoMek() {
-        Entity entity = getEntityForUnitTesting(cargoMek.name, false);
-        testCargoTotal(entity, cargoMek.getTotalCargoCapacity());
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoMek.name, false);
+        testCargoTotal(entity, entity.getWeight() + cargoMek.getTotalCargoCapacity());
     }
 
     @Test
     public void testCargoCapacityOfCargoMekKilledLocations() {
-        Entity entity = getEntityForUnitTesting(cargoMek.name, false);
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
-        testCargoTotal(entity, cargoMek.bayCargoCapacity);
+        testCargoTotal(entity, entity.getWeight() + cargoMek.bayCargoCapacity);
     }
 
     @Test
     public void testCargoCapacityOfCargoMekKilledBays() {
-        Entity entity = getEntityForUnitTesting(cargoMek.name, false);
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoMek.name, false);
         assertNotNull(entity);
         killBays(entity);
-        testCargoTotal(entity, cargoMek.otherCargoCapacity);
+        testCargoTotal(entity, entity.getWeight() + cargoMek.otherCargoCapacity);
     }
 
     @Test
     public void testCargoCapacityOfCargoMekKillEverything() {
-        Entity entity = getEntityForUnitTesting(cargoMek.name, false);
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
         killBays(entity);
-        testCargoTotal(entity, 0);
+        testCargoTotal(entity, entity.getWeight());
+    }
+
+    @Test
+    public void testCargoCapacityOfLiftHoistMek() {
+        Entity entity = getEntityForUnitTestingCargoCapacity(liftHoistMek.name, false);
+        testCargoTotal(entity, entity.getWeight() + liftHoistMek.getTotalCargoCapacity());
+    }
+
+    @Test
+    public void testCargoCapacityOfLiftHoistMekKilledLocations() {
+        Entity entity = getEntityForUnitTestingCargoCapacity(liftHoistMek.name, false);
+        assertNotNull(entity);
+        killCargoLocations(entity);
+        testCargoTotal(entity, entity.getWeight() + liftHoistMek.bayCargoCapacity);
+    }
+
+    @Test
+    public void testCargoCapacityOfLiftHoistMekKilledBays() {
+        Entity entity = getEntityForUnitTestingCargoCapacity(liftHoistMek.name, false);
+        assertNotNull(entity);
+        killBays(entity);
+        testCargoTotal(entity, entity.getWeight() + liftHoistMek.otherCargoCapacity);
+    }
+
+    @Test
+    public void testCargoCapacityOfLiftHoistMekKillEverything() {
+        Entity entity = getEntityForUnitTestingCargoCapacity(liftHoistMek.name, false);
+        assertNotNull(entity);
+        killCargoLocations(entity);
+        killBays(entity);
+        testCargoTotal(entity, entity.getWeight());
     }
 
     @Test
     public void testCargoCapacityOfCargoDropShip() {
-        Entity entity = getEntityForUnitTesting(cargoDropShip.name, true);
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoDropShip.name, true);
         testCargoTotal(entity, cargoDropShip.getTotalCargoCapacity());
     }
 
     @Test
     public void testCargoCapacityOfCargoDropShipKilledLocations() {
-        Entity entity = getEntityForUnitTesting(cargoMek.name, false);
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoDropShip.name, true);
         assertNotNull(entity);
         killCargoLocations(entity);
-        testCargoTotal(entity, cargoMek.bayCargoCapacity);
+        testCargoTotal(entity, cargoDropShip.bayCargoCapacity);
     }
 
     @Test
     public void testCargoCapacityOfCargoDropShipKilledBays() {
-        Entity entity = getEntityForUnitTesting(cargoMek.name, false);
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoDropShip.name, true);
         assertNotNull(entity);
         killBays(entity);
-        testCargoTotal(entity, cargoMek.otherCargoCapacity);
+        testCargoTotal(entity, cargoDropShip.otherCargoCapacity);
     }
 
     @Test
     public void testCargoCapacityOfCargoDropShipKillEverything() {
-        Entity entity = getEntityForUnitTesting(cargoMek.name, false);
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoDropShip.name, true);
         assertNotNull(entity);
         killCargoLocations(entity);
         killBays(entity);
@@ -151,29 +198,29 @@ class CargoCapacityTest {
 
     @Test
     public void testCargoCapacityOfCargoFighter() {
-        Entity entity = getEntityForUnitTesting(cargoFighter.name, true);
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoFighter.name, true);
         testCargoTotal(entity, cargoFighter.getTotalCargoCapacity());
     }
 
     @Test
     public void testCargoCapacityOfCargoFighterKilledLocations() {
-        Entity entity = getEntityForUnitTesting(cargoMek.name, false);
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoFighter.name, true);
         assertNotNull(entity);
         killCargoLocations(entity);
-        testCargoTotal(entity, cargoMek.bayCargoCapacity);
+        testCargoTotal(entity, cargoFighter.bayCargoCapacity);
     }
 
     @Test
     public void testCargoCapacityOfCargoFighterKilledBays() {
-        Entity entity = getEntityForUnitTesting(cargoMek.name, false);
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoFighter.name, true);
         assertNotNull(entity);
         killBays(entity);
-        testCargoTotal(entity, cargoMek.otherCargoCapacity);
+        testCargoTotal(entity, cargoFighter.otherCargoCapacity);
     }
 
     @Test
     public void testCargoCapacityOfCargoFighterKillEverything() {
-        Entity entity = getEntityForUnitTesting(cargoMek.name, false);
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoFighter.name, true);
         assertNotNull(entity);
         killCargoLocations(entity);
         killBays(entity);
@@ -182,33 +229,33 @@ class CargoCapacityTest {
 
     @Test
     public void testCargoCapacityOfCargoTank() {
-        Entity entity = getEntityForUnitTesting(cargoTank.name, true);
-        testCargoTotal(entity, cargoTank.getTotalCargoCapacity());
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoTank.name, true);
+        testCargoTotal(entity, entity.getWeight() + cargoTank.getTotalCargoCapacity());
     }
 
     @Test
     public void testCargoCapacityOfCargoTankKilledLocations() {
-        Entity entity = getEntityForUnitTesting(cargoMek.name, false);
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoTank.name, true);
         assertNotNull(entity);
         killCargoLocations(entity);
-        testCargoTotal(entity, cargoMek.bayCargoCapacity);
+        testCargoTotal(entity, entity.getWeight() + cargoTank.bayCargoCapacity);
     }
 
     @Test
     public void testCargoCapacityOfCargoTankKilledBays() {
-        Entity entity = getEntityForUnitTesting(cargoMek.name, false);
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoTank.name, true);
         assertNotNull(entity);
         killBays(entity);
-        testCargoTotal(entity, cargoMek.otherCargoCapacity);
+        testCargoTotal(entity, entity.getWeight() + cargoTank.otherCargoCapacity);
     }
 
     @Test
     public void testCargoCapacityOfCargoTankKillEverything() {
-        Entity entity = getEntityForUnitTesting(cargoMek.name, false);
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoTank.name, true);
         assertNotNull(entity);
         killCargoLocations(entity);
         killBays(entity);
-        testCargoTotal(entity, 0);
+        testCargoTotal(entity, entity.getWeight());
     }
 
     /**
@@ -265,6 +312,9 @@ class CargoCapacityTest {
                 if (entity.getInternal(mounted.getLocation()) != IArmorState.ARMOR_NA) {
                     entity.setInternal(IArmorState.ARMOR_DESTROYED, mounted.getLocation());
                 }
+                mounted.setDestroyed(true);
+            } else if (mounted.getType().hasFlag(F_LIFT_HOIST)) {
+                mounted.setDestroyed(true);
             }
         }
     }
@@ -278,12 +328,8 @@ class CargoCapacityTest {
      * @param entity The {@link Entity} whose bays are to be simulated as destroyed.
      */
     private void killBays(Entity entity) {
-        for (Mounted<?> mounted : entity.getMisc()) {
-            if (mounted.getType().hasFlag(F_CARGO)) {
-                if (entity.getInternal(mounted.getLocation()) == IArmorState.ARMOR_NA) {
-                    mounted.setDestroyed(true);
-                }
-            }
+        for (Bay bay : entity.getTransportBays()) {
+            bay.setBayDamage(bay.getCapacity());
         }
     }
 
@@ -306,5 +352,14 @@ class CargoCapacityTest {
         public double getTotalCargoCapacity() {
             return bayCargoCapacity + otherCargoCapacity;
         }
+    }
+
+    private Entity getEntityForUnitTestingCargoCapacity(String name, boolean isBLK) {
+        Entity entity = getEntityForUnitTesting(name, isBLK);
+        if (entity != null) {
+            entity.setGame(mockGame);
+            entity.addIntrinsicTransporters();
+        }
+        return entity;
     }
 }

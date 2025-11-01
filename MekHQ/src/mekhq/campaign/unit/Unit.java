@@ -147,6 +147,7 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.unit.enums.TransporterType;
+import mekhq.campaign.utilities.CampaignTransportUtilities;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.MHQXMLUtility;
@@ -285,7 +286,6 @@ public class Unit implements ITechnology {
 
     /**
      * A convenience function to tell whether the unit can be acted upon e.g. assigned pilots, techs, repaired, etc.
-     *
      */
     public boolean isAvailable() {
         return isAvailable(false);
@@ -293,7 +293,6 @@ public class Unit implements ITechnology {
 
     /**
      * A convenience function to tell whether the unit can be acted upon e.g. assigned pilots, techs, repaired, etc.
-     *
      */
     public boolean isAvailable(boolean ignoreRefit) {
         return isPresent() && !isDeployed() && (ignoreRefit || !isRefitting()) && !isMothballing() && !isMothballed();
@@ -1284,7 +1283,6 @@ public class Unit implements ITechnology {
 
     /**
      * Number of slots doomed, missing or destroyed in all locations
-     *
      */
     public int getHitCriticalSlots(int type, int index) {
         int hits = 0;
@@ -1594,24 +1592,22 @@ public class Unit implements ITechnology {
         double capacity = 0.0;
         double cargoBayCapacity = -getTotalWeightOfUnitsAssignedToBeTransported(TACTICAL_TRANSPORT, CARGO_BAY);
 
+        final Set<TransporterType> cargoTransporterTypes =
+              CampaignTransportUtilities.mapICarryableToTransporters(TACTICAL_TRANSPORT, new Cargo());
+
         // Add capacities from transport bays
-        for (Bay bay : entity.getTransportBays()) {
-            double bayCapacity = bay.getCapacity();
-            double bayDamage = bay.getBayDamage();
+        for (Transporter transporter : entity.getTransports()
+                                             .stream()
+                                             .filter(t -> cargoTransporterTypes.contains(TransporterType.getTransporterType(
+                                                   t)))
+                                             .toList()) {
 
-            double actualCapacity = max(0, bayCapacity - bayDamage);
+            double actualCapacity = max(0, transporter.getUnused());
 
-            if (bay instanceof CargoBay) {
+            if (transporter instanceof CargoBay) {
                 cargoBayCapacity += actualCapacity;
                 continue;
-            }
-
-            if (bay instanceof RefrigeratedCargoBay) {
-                capacity += actualCapacity;
-                continue;
-            }
-
-            if (bay instanceof InsulatedCargoBay) {
+            } else {
                 capacity += actualCapacity;
             }
         }
@@ -2818,7 +2814,6 @@ public class Unit implements ITechnology {
     /**
      * The weekly maintenance cycle combined with a user defined maintenance cycle length is confusing and difficult to
      * manage so lets just make maintenance costs relative to the length of the maintenance cycle that the user defined
-     *
      */
     public Money getMaintenanceCost() {
         return getWeeklyMaintenanceCost().multipliedBy(getCampaign().getCampaignOptions().getMaintenanceCycleDays())
@@ -5005,7 +5000,6 @@ public class Unit implements ITechnology {
 
     /**
      * Sets the values of a slot in the entity crew for the indicated person.
-     *
      */
     private void assignToCrewSlot(Person person, int slot, String gunType, String driveType) {
         SkillModifierData skillModifierData = person.getSkillModifierData();
