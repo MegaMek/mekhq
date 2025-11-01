@@ -309,8 +309,7 @@ class SkillCheckUtilityTest {
                   DEFAULT_ATTRIBUTE_SCORE,
                   DEFAULT_ATTRIBUTE_SCORE);
 
-            SkillModifierData skillModifierData = new SkillModifierData(new PersonnelOptions(), characterAttributes,
-                  0, false);
+            SkillModifierData skillModifierData = TestSkillModifierData.createDefault();
 
             Person mockPerson = mock(Person.class);
             when(mockPerson.hasSkill("MISSING_NAME")).thenReturn(true);
@@ -357,8 +356,7 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE);
 
-        SkillModifierData skillModifierData = new SkillModifierData(new PersonnelOptions(), characterAttributes,
-              0, false);
+        SkillModifierData skillModifierData = TestSkillModifierData.createDefault();
 
         Person mockPerson = mock(Person.class);
         when(mockPerson.hasSkill("MISSING_NAME")).thenReturn(true);
@@ -397,8 +395,7 @@ class SkillCheckUtilityTest {
                   DEFAULT_ATTRIBUTE_SCORE,
                   DEFAULT_ATTRIBUTE_SCORE);
 
-            SkillModifierData skillModifierData = new SkillModifierData(new PersonnelOptions(), characterAttributes,
-                  0, false);
+            SkillModifierData skillModifierData = TestSkillModifierData.createDefault();
 
             Person mockPerson = mock(Person.class);
             when(mockPerson.hasSkill("MISSING_NAME")).thenReturn(true);

@@ -58,6 +58,7 @@ import mekhq.campaign.personnel.enums.InjuryHiding;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import org.w3c.dom.Node;
 
 /**
@@ -273,6 +274,10 @@ public class Injury {
 
     public Collection<Modifier> getModifiers() {
         return type.getModifiers(this);
+    }
+
+    public InjuryEffect getInjuryEffect() {
+        return type.getInjuryEffect();
     }
 
     public ExtraData getExtraData() {

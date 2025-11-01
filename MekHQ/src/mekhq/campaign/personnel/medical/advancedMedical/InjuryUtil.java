@@ -56,7 +56,9 @@ import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.BodyLocation;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -104,12 +106,87 @@ public final class InjuryUtil {
         effects.forEach(GameEffect::apply);
     }
 
-    /** Resolve effects of damage suffered during combat */
-    public static void resolveCombatDamage(Campaign c, Person person, int hits) {
-        Collection<Injury> newInjuries = genInjuries(c, person, hits);
+    /**
+     * Resolves effects of damage suffered during combat by generating and applying injuries.
+     *
+     * <p>The method used depends on the campaign's medical system setting:</p>
+     * <ul>
+     *   <li>Standard model: Uses {@link #resolveCombatDamageUsingStandardModel}</li>
+     *   <li>Alternate advanced model: Uses {@link #resolveCombatDamageUsingAlternateModel}</li>
+     * </ul>
+     *
+     * @param campaign the current campaign
+     * @param person   the person who suffered combat damage
+     * @param hits     the number of TW-scale Hits taken
+     */
+    public static void resolveCombatDamage(Campaign campaign, Person person, int hits) {
+        if (campaign.getCampaignOptions().isUseAlternativeAdvancedMedical()) {
+            resolveCombatDamageUsingAlternateModel(campaign, person, hits);
+        } else {
+            resolveCombatDamageUsingStandardModel(campaign, person, hits);
+        }
+    }
+
+    /**
+     * Resolves combat damage using the standard medical model.
+     *
+     * <p>Generates injuries based on damage taken, adds them to the person, and logs the injuries if any were
+     * created.</p>
+     *
+     * @param campaign the current campaign
+     * @param person   the person who suffered combat damage
+     * @param hits     the number of TW-scale Hits taken
+     */
+    public static void resolveCombatDamageUsingStandardModel(Campaign campaign, Person person, int hits) {
+        Collection<Injury> newInjuries = genInjuries(campaign, person, hits);
         newInjuries.forEach(person::addInjury);
         if (!newInjuries.isEmpty()) {
-            MedicalLogger.returnedWithInjuries(person, c.getLocalDate(), newInjuries);
+            MedicalLogger.returnedWithInjuries(person, campaign.getLocalDate(), newInjuries);
+        }
+    }
+
+    /**
+     * Resolves combat damage using the alternate advanced medical model.
+     *
+     * <p>This model provides more detailed injury resolution with these additional features:</p>
+     * <ul>
+     *   <li>Location-specific injuries with severance mechanics</li>
+     *   <li>Automatic removal of injuries from severed limbs</li>
+     *   <li>Verification that injuries still exist after processing before logging</li>
+     * </ul>
+     *
+     * <p>Injuries may be automatically removed during processing if the body location they affect has been severed
+     * by another injury.</p>
+     *
+     * @param campaign the current campaign
+     * @param person   the person who suffered combat damage
+     * @param hits     the number of TW-scale Hits taken
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void resolveCombatDamageUsingAlternateModel(Campaign campaign, Person person, int hits) {
+        Collection<Injury> newInjuries = AdvancedMedicalAlternate.generateInjuriesFromHits(campaign, person, hits);
+        newInjuries.forEach(person::addInjury);
+
+        // Remove injuries from limbs that have been severed
+        AdvancedMedicalAlternate.purgeIllogicalInjuries(person);
+
+        // We double-check the injury has been added, as it might have been removed by purgeIllogicalInjuries
+        boolean hasNewInjuries = false;
+        List<Injury> currentInjuries = person.getInjuries();
+        for (Injury injury : newInjuries) {
+            if (!hasNewInjuries && currentInjuries.contains(injury)) {
+                hasNewInjuries = true;
+            }
+
+            if (injury.getType().impliesDead(injury.getLocation())) {
+                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+        }
+
+        if (hasNewInjuries) {
+            MedicalLogger.returnedWithInjuries(person, campaign.getLocalDate(), newInjuries);
         }
     }
 
@@ -124,10 +201,10 @@ public final class InjuryUtil {
     // Generator methods. Those don't change the state of the person.
 
     /** Generate combat injuries spread through the whole body */
-    public static Collection<Injury> genInjuries(Campaign c, Person p, int hits) {
-        final Unit u = p.getUnit();
-        final Entity en = (null != u) ? u.getEntity() : null;
-        final boolean mekOrAero = ((en instanceof Mek) || (en instanceof Aero));
+    public static Collection<Injury> genInjuries(Campaign campaign, Person person, int hits) {
+        final Unit unit = person.getUnit();
+        final Entity entity = (null != unit) ? unit.getEntity() : null;
+        final boolean mekOrAero = ((entity instanceof Mek) || (entity instanceof Aero));
         final int critMod = mekOrAero ? 0 : 2;
         final BiFunction<IntUnaryOperator, Function<BodyLocation, Boolean>, BodyLocation> generator = mekOrAero ?
                                                                                                             HitLocationGen::mekAndAsf :
@@ -135,7 +212,7 @@ public final class InjuryUtil {
         final Map<BodyLocation, Integer> hitAccumulator = new HashMap<>();
 
         for (int i = 0; i < hits; i++) {
-            BodyLocation location = generator.apply(Compute::randomInt, (loc) -> !p.isLocationMissing(loc));
+            BodyLocation location = generator.apply(Compute::randomInt, (loc) -> !person.isLocationMissing(loc));
 
             // apply hit here
             addHitToAccumulator(hitAccumulator, location);
@@ -147,7 +224,7 @@ public final class InjuryUtil {
         }
         List<Injury> newInjuries = new ArrayList<>();
         for (Entry<BodyLocation, Integer> accEntry : hitAccumulator.entrySet()) {
-            newInjuries.addAll(genInjuries(c, p, accEntry.getKey(), accEntry.getValue()));
+            newInjuries.addAll(genInjuries(campaign, person, accEntry.getKey(), accEntry.getValue()));
         }
         return newInjuries;
     }
@@ -247,26 +324,58 @@ public final class InjuryUtil {
         return newInjuries;
     }
 
-    /** Called when creating a new injury to generate a slightly randomized healing time */
-    public static int genHealingTime(Campaign c, Person p, Injury i) {
-        return genHealingTime(c, p, i.getType(), i.getHits());
+    /**
+     * Generates healing time for an existing injury.
+     *
+     * <p>This is a convenience method that extracts the injury type and severity from the injury object and
+     * delegates to {@link #genHealingTime(Campaign, Person, InjuryType, int)}.
+     *
+     * @param campaign the current campaign
+     * @param person   the person who is injured
+     * @param injury   the injury to calculate healing time for
+     *
+     * @return calculated healing time in days (minimum 1)
+     */
+    public static int genHealingTime(Campaign campaign, Person person, Injury injury) {
+        return genHealingTime(campaign, person, injury.getType(), injury.getHits());
     }
 
-    /** Called when creating a new injury to generate a slightly randomized healing time */
-    public static int genHealingTime(Campaign c, Person p, InjuryType injuryType, int severity) {
-        int mod = 100;
-        int rand = Compute.randomInt(100);
-        if (rand < 5) {
-            mod += (Compute.d6() < 4) ? rand : -rand;
-        }
+    /**
+     * Generates healing time for an injury with random variation and personal modifiers.
+     *
+     * <p>The healing time is calculated by:</p>
+     *
+     * <ol>
+     *   <li>Getting the base recovery time from the injury type and severity</li>
+     *   <li>Adding d6 extra days for lacerations</li>
+     *   <li>Applying random variation of ±20% (80-120% of base time)</li>
+     *   <li>Applying the person's ability time modifier</li>
+     * </ol>
+     *
+     * <p>The result is always at least 1 day.</p>
+     *
+     * @param campaign   the current campaign
+     * @param person     the person who is injured
+     * @param injuryType the type of injury sustained
+     * @param severity   the severity level of the injury (used for calculating base time)
+     *
+     * @return calculated healing time in days (minimum 1)
+     */
+    public static int genHealingTime(Campaign campaign, Person person, InjuryType injuryType, int severity) {
+        int baseTime = injuryType.getRecoveryTime(severity);
 
-        int time = injuryType.getRecoveryTime(severity);
+        // Add extra time for lacerations
         if (injuryType == InjuryTypes.LACERATION) {
-            time += Compute.d6();
+            baseTime += Compute.d6();
         }
 
-        time = (int) Math.round((time * mod * p.getAbilityTimeModifier(c)) / 10000.0);
-        return time;
+        // Apply random variation: 80-120% (±20%)
+        int variationPercent = 80 + Compute.randomInt(41); // 80 to 120
+
+        // Apply both random variation and person's ability modifier
+        int time = (int) Math.round((baseTime * variationPercent * person.getAbilityTimeModifier(campaign)) / 10000.0);
+
+        return Math.max(1, time);
     }
 
     /** Generate the effects of a doctor dealing with injuries (frequency depends on campaign settings) */

@@ -41,6 +41,7 @@ import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_AMBIDEXTROUS;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
@@ -120,6 +121,8 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -1960,14 +1963,16 @@ public class PersonViewPanel extends JScrollablePanel {
                 label = formattedSkillName;
             }
             JLabel lblName = new JLabel(label);
-
+            boolean isIlliterate = person.isIlliterate();
+            boolean isAmbidextrous = person.getOptions().booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
+            List<InjuryEffect> injuryEffects = AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
+                  person.getInjuries());
+            SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
+                  isIlliterate, injuryEffects);
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
-            String adjustment = getAdjustment(skill, attributeModifier, spaModifier);
-            boolean isIlliterate = person.isIlliterate();
-
-            SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
-                  isIlliterate);
+            int injuryModifier = Skill.getTotalInjuryModifier(skillModifierData, skill.getType());
+            String adjustment = getAdjustment(skill, attributeModifier, spaModifier, injuryModifier);
 
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
                   skill.toString(skillModifierData),
@@ -1998,9 +2003,9 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlSkills;
     }
 
-    private static String getAdjustment(Skill skill, int attributeModifier, int spaModifier) {
+    private static String getAdjustment(Skill skill, int attributeModifier, int spaModifier, int injuryModifier) {
         int ageModifier = skill.getAgingModifier();
-        int totalModifier = attributeModifier + spaModifier + ageModifier;
+        int totalModifier = attributeModifier + spaModifier + ageModifier + injuryModifier;
 
         String color = "";
         String icon = "";
@@ -2609,32 +2614,32 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblAdvancedMedical1 = new JLabel();
         JLabel lblAdvancedMedical2 = new JLabel();
 
-        lblAdvancedMedical1.setName("lblAdvancedMedical1");
-        lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text"));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlInjuryDetails.add(lblAdvancedMedical1, gridBagConstraints);
 
         double vWeight = 1.0;
         if (person.hasInjuries(true)) {
             vWeight = 0.0;
         }
 
-        lblAdvancedMedical2.setName("lblAdvancedMedical2");
-        lblAdvancedMedical2.setText(getAdvancedMedalEffectString(person));
-        lblAdvancedMedical1.setLabelFor(lblAdvancedMedical2);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = vWeight;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlInjuryDetails.add(lblAdvancedMedical2, gridBagConstraints);
+        if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+            getAlternativeAdvancedMedicalDisplay(injuries,
+                  lblAdvancedMedical2,
+                  lblAdvancedMedical1,
+                  gridBagConstraints,
+                  vWeight,
+                  pnlInjuryDetails);
+        } else {
+            getAdvancedMedicalDisplay(lblAdvancedMedical1,
+                  pnlInjuryDetails,
+                  gridBagConstraints,
+                  lblAdvancedMedical2,
+                  vWeight);
+        }
 
         // This adds a dummy/invisible label to column 2, row 0 to prevent column 3 from being pushed away
         JLabel dummy = new JLabel();
@@ -2642,7 +2647,8 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -2651,7 +2657,6 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblInjury;
         int columns = 3;
         int rowsPerColumn = (int) Math.ceil((double) injuries.size() / columns);
-
         for (int i = 0; i < injuries.size(); ++i) {
             Injury injury = injuries.get(i);
 
@@ -2666,9 +2671,10 @@ public class PersonViewPanel extends JScrollablePanel {
             lblInjury = new JLabel(label);
             gridBagConstraints.gridx = col;
             gridBagConstraints.gridy = displayRow;
-            gridBagConstraints.weightx = 0.0;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInjuryDetails.add(lblInjury, gridBagConstraints);
         }
@@ -2676,6 +2682,47 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlInjuries.add(pnlInjuryDetails, BorderLayout.CENTER);
 
         return pnlInjuries;
+    }
+
+    private void getAlternativeAdvancedMedicalDisplay(List<Injury> injuries, JLabel lblAdvancedMedical2,
+          JLabel lblAdvancedMedical1,
+          GridBagConstraints gridBagConstraints, double vWeight, JPanel pnlInjuryDetails) {
+        lblAdvancedMedical2.setName("lblAdvancedMedical2");
+        boolean isAmbidextrous = person.getOptions().booleanOption(ATOW_AMBIDEXTROUS);
+        List<InjuryEffect> injuryEffects = AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous, injuries);
+        lblAdvancedMedical2.setText(InjuryEffect.getEffectsLabel(injuryEffects));
+        String injuryEffectTooltip = wordWrap(InjuryEffect.getTooltip(injuryEffects));
+        lblAdvancedMedical2.setToolTipText(injuryEffectTooltip);
+        lblAdvancedMedical1.setLabelFor(lblAdvancedMedical2);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = vWeight;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlInjuryDetails.add(lblAdvancedMedical2, gridBagConstraints);
+    }
+
+    private void getAdvancedMedicalDisplay(JLabel lblAdvancedMedical1, JPanel pnlInjuryDetails,
+          GridBagConstraints gridBagConstraints,
+          JLabel lblAdvancedMedical2, double vWeight) {
+        lblAdvancedMedical1.setName("lblAdvancedMedical1");
+        lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text"));
+        pnlInjuryDetails.add(lblAdvancedMedical1, gridBagConstraints);
+
+        lblAdvancedMedical2.setName("lblAdvancedMedical2");
+        lblAdvancedMedical2.setText(getAdvancedMedalEffectString(person));
+        lblAdvancedMedical1.setLabelFor(lblAdvancedMedical2);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = vWeight;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlInjuryDetails.add(lblAdvancedMedical2, gridBagConstraints);
     }
 
     /**

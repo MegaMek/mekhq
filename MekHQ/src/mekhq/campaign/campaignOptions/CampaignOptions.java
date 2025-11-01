@@ -267,6 +267,7 @@ public class CampaignOptions {
     private int minimumHitsForVehicles;
     private boolean useRandomHitsForVehicles;
     private boolean tougherHealing;
+    private boolean useAlternativeAdvancedMedical;
     private int maximumPatients;
     private boolean doctorsUseAdministration;
     private boolean useUsefulMedics;
@@ -859,6 +860,7 @@ public class CampaignOptions {
         setMinimumHitsForVehicles(1);
         setUseRandomHitsForVehicles(false);
         setTougherHealing(false);
+        useAlternativeAdvancedMedical = false;
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
         useUsefulMedics = false;
@@ -2049,6 +2051,14 @@ public class CampaignOptions {
 
     public void setTougherHealing(final boolean tougherHealing) {
         this.tougherHealing = tougherHealing;
+    }
+
+    public boolean isUseAlternativeAdvancedMedical() {
+        return useAlternativeAdvancedMedical;
+    }
+
+    public void setUseAlternativeAdvancedMedical(final boolean useAlternativeAdvancedMedical) {
+        this.useAlternativeAdvancedMedical = useAlternativeAdvancedMedical;
     }
 
     public int getMaximumPatients() {

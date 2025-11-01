@@ -59,6 +59,7 @@ import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.enums.ModifierValue;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.BodyLocation;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 
 /** Advanced Medical sub-system injury types */
 public final class InjuryTypes {
@@ -121,6 +122,49 @@ public final class InjuryTypes {
             InjuryType.register(12, "am:punctured_lung", PUNCTURED_LUNG);
             InjuryType.register(13, "am:cte", CTE);
             InjuryType.register(14, "am:broken_back", BROKEN_BACK);
+
+            InjuryType.register(15, "alt:SEVERED_HEAD", AlternateInjuries.SEVERED_HEAD);
+            InjuryType.register(16, "alt:BURN_FACE", AlternateInjuries.BURN_FACE);
+            InjuryType.register(17, "alt:HEARING_LOSS", AlternateInjuries.HEARING_LOSS);
+            InjuryType.register(18, "alt:BLINDNESS", AlternateInjuries.BLINDNESS);
+            InjuryType.register(19, "alt:FRACTURED_JAW", AlternateInjuries.FRACTURED_JAW);
+            InjuryType.register(20, "alt:FRACTURED_SKULL", AlternateInjuries.FRACTURED_SKULL);
+            InjuryType.register(21, "alt:BURNED_CHEST", AlternateInjuries.BURNED_CHEST);
+            InjuryType.register(22, "alt:FRACTURED_RIB", AlternateInjuries.FRACTURED_RIB);
+            InjuryType.register(23, "alt:SMOKE_INHALATION", AlternateInjuries.SMOKE_INHALATION);
+            InjuryType.register(24, "alt:PUNCTURED_LUNG", AlternateInjuries.PUNCTURED_LUNG);
+            InjuryType.register(25, "alt:HEART_TRAUMA", AlternateInjuries.HEART_TRAUMA);
+            InjuryType.register(26, "alt:BURN_ABDOMINAL", AlternateInjuries.BURN_ABDOMINAL);
+            InjuryType.register(27, "alt:BRUISED_ORGAN", AlternateInjuries.BRUISED_ORGAN);
+            InjuryType.register(28, "alt:ORGAN_TRAUMA", AlternateInjuries.ORGAN_TRAUMA);
+            InjuryType.register(29, "alt:FRACTURED_GROIN", AlternateInjuries.FRACTURED_GROIN);
+            InjuryType.register(30, "alt:DISEMBOWELED", AlternateInjuries.DISEMBOWELED);
+            InjuryType.register(31, "alt:SEVERED_ARM", AlternateInjuries.SEVERED_ARM);
+            InjuryType.register(32, "alt:BURN_UPPER_ARM", AlternateInjuries.BURN_UPPER_ARM);
+            InjuryType.register(33, "alt:FRACTURED_UPPER_ARM", AlternateInjuries.FRACTURED_UPPER_ARM);
+            InjuryType.register(34, "alt:FRACTURED_ELBOW", AlternateInjuries.FRACTURED_ELBOW);
+            InjuryType.register(35, "alt:FRACTURED_SHOULDER", AlternateInjuries.FRACTURED_SHOULDER);
+            InjuryType.register(36, "alt:COMPOUND_FRACTURED_SHOULDER", AlternateInjuries.COMPOUND_FRACTURED_SHOULDER);
+            InjuryType.register(37, "alt:SEVERED_HAND", AlternateInjuries.SEVERED_HAND);
+            InjuryType.register(38, "alt:BURN_HAND", AlternateInjuries.BURN_HAND);
+            InjuryType.register(39, "alt:FRACTURED_HAND", AlternateInjuries.FRACTURED_HAND);
+            InjuryType.register(40, "alt:FRACTURED_WRIST", AlternateInjuries.FRACTURED_WRIST);
+            InjuryType.register(41, "alt:FRACTURED_FOREARM", AlternateInjuries.FRACTURED_FOREARM);
+            InjuryType.register(42, "alt:COMPOUND_FRACTURED_FOREARM", AlternateInjuries.COMPOUND_FRACTURED_FOREARM);
+            InjuryType.register(43, "alt:SEVERED_LEG", AlternateInjuries.SEVERED_LEG);
+            InjuryType.register(44, "alt:BURN_THIGH", AlternateInjuries.BURN_THIGH);
+            InjuryType.register(45, "alt:BRUISED_FEMUR", AlternateInjuries.BRUISED_FEMUR);
+            InjuryType.register(46, "alt:FRACTURED_FEMUR", AlternateInjuries.FRACTURED_FEMUR);
+            InjuryType.register(47, "alt:COMPOUND_FRACTURED_FEMUR", AlternateInjuries.COMPOUND_FRACTURED_FEMUR);
+            InjuryType.register(48, "alt:FRACTURED_HIP", AlternateInjuries.FRACTURED_HIP);
+            InjuryType.register(49, "alt:SEVERED_FOOT", AlternateInjuries.SEVERED_FOOT);
+            InjuryType.register(50, "alt:BURN_CALF", AlternateInjuries.BURN_CALF);
+            InjuryType.register(51, "alt:FRACTURED_FOOT", AlternateInjuries.FRACTURED_FOOT);
+            InjuryType.register(52, "alt:FRACTURED_ANKLE", AlternateInjuries.FRACTURED_ANKLE);
+            InjuryType.register(53, "alt:FRACTURED_KNEE", AlternateInjuries.FRACTURED_KNEE);
+            InjuryType.register(54, "alt:COMPOUND_FRACTURED_SHIN", AlternateInjuries.COMPOUND_FRACTURED_SHIN);
+            InjuryType.register(55, "alt:BLOOD_LOSS", AlternateInjuries.BLOOD_LOSS);
+
             InjuryType.register("am:severed_spine", SEVERED_SPINE);
             InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);
             InjuryType.register("am:Postpartum_Recovery", POSTPARTUM_RECOVERY);

@@ -30,19 +30,10 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.personnel.skills;
+package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
-import java.util.ArrayList;
+import mekhq.campaign.personnel.InjuryType;
+import mekhq.campaign.personnel.medical.BodyLocation;
 
-import mekhq.campaign.personnel.PersonnelOptions;
-
-public class TestSkillModifierData {
-    /**
-     * Creates an empty {@link SkillModifierData}.
-     *
-     * <p><b>Warning:</b> this is intended for use in Unit Tests only.</p>
-     */
-    public static SkillModifierData createDefault() {
-        return new SkillModifierData(new PersonnelOptions(), new Attributes(), 0, false, new ArrayList<>());
-    }
+public record InjuryLocationData(InjuryType injuryType, BodyLocation bodyLocation, int injuryDurationMultiplier) {
 }
