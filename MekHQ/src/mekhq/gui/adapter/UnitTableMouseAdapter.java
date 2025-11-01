@@ -659,25 +659,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     continue;
                 }
 
-                Person tech = unit.getTech(); // This gets the engineer, instead, if appropriate
-                if (tech == null) {
-                    continue;
-                }
-
-                int time = tech.getMinutesLeft();
-                int maintenanceTime = unit.getMaintenanceTime();
-
-                if ((time - maintenanceTime) >= 0) {
-                    // This will increase the number of days until maintenance and then perform the maintenance. We
-                    // do it this way to ensure that everything is processed cleanly.
-                    while (unit.getDaysSinceMaintenance() != 0) {
-                        Maintenance.doMaintenance(campaign, unit);
-                    }
-                } else {
-                    campaign.addReport(String.format(resources.getString("maintenanceAdHoc.unable"),
-                          tech.getHyperlinkedFullTitle(),
-                          unit.getHyperlinkedName()));
-                }
+                Maintenance.performImmediateMaintenance(campaign, unit);
             }
         }
     }

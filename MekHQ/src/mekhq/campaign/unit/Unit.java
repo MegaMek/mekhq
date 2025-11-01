@@ -6234,6 +6234,53 @@ public class Unit implements ITechnology {
     }
 
     /**
+     * Calculates the effective maintenance cycle duration for this unit after applying any positive <b>Rugged</b>
+     * quirks. The ruggedness of a unit increases the interval between required maintenance cycles, representing
+     * improved reliability and durability.
+     *
+     * @param maintenanceCycleDays the campaign's base maintenance cycle length in days
+     *
+     * @return the adjusted maintenance cycle duration, factoring in ruggedness
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public int getMaintenanceCycleDuration(int maintenanceCycleDays) {
+        int ruggedMultiplier = 1;
+        if (entity.hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_1)) {
+            ruggedMultiplier = 2;
+        }
+
+        if (entity.hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_2)) {
+            ruggedMultiplier = 3;
+        }
+
+        return maintenanceCycleDays * ruggedMultiplier;
+    }
+
+    /**
+     * Determines how many days remain until the unit's next maintenance is due, factoring in any ruggedness-based cycle
+     * extensions.
+     *
+     * <p>The method subtracts the number of days since the last maintenance from the total maintenance cycle
+     * duration (as adjusted by rugged quirks). Any negative result is clamped to zero, indicating the unit is scheduled
+     * for maintenance.</p>
+     *
+     * @param maintenanceCycleDays the campaign's base maintenance cycle length in days
+     *
+     * @return the number of days remaining until maintenance is due, or {@code 0.0} if the unit is currently due or
+     *       overdue
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public double getDaysUntilNextMaintenance(int maintenanceCycleDays) {
+        return max(0.0, getMaintenanceCycleDuration(maintenanceCycleDays)
+                              - daysSinceMaintenance);
+    }
+
+
+    /**
      * there are no official rules about partial maintenance lets say less than half is +2 more than half is +1 penalty
      * also we will take the average rounded down of the number of AsTechs to figure out shorthanded penalty
      *

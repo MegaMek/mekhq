@@ -184,6 +184,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkNewDayMRMS;
     private JCheckBox chkNewDayOptimizeMedicalAssignments;
     private JCheckBox chkNewMonthQuickTrain;
+    private JCheckBox chkSelfCorrectMaintenance;
     private JCheckBox chkNewDayForceIconOperationalStatus;
     private MMComboBox<ForceIconOperationalStatusStyle> comboNewDayForceIconOperationalStatusStyle;
     // endregion New Day
@@ -949,6 +950,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "chkNewMonthQuickTrain.toolTipText"));
         chkNewMonthQuickTrain.setName("chkNewMonthQuickTrain.text");
 
+        chkSelfCorrectMaintenance = new JCheckBox(resources.getString(
+              "chkSelfCorrectMaintenance.text"));
+        chkSelfCorrectMaintenance.setToolTipText(resources.getString(
+              "chkSelfCorrectMaintenance.toolTipText"));
+        chkSelfCorrectMaintenance.setName("chkSelfCorrectMaintenance.text");
+
         chkNewDayForceIconOperationalStatus = new JCheckBox(resources.getString(
               "chkNewDayForceIconOperationalStatus.text"));
         chkNewDayForceIconOperationalStatus.setToolTipText(resources.getString(
@@ -1002,6 +1009,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(chkNewDayMRMS)
                                       .addComponent(chkNewDayOptimizeMedicalAssignments)
                                       .addComponent(chkNewMonthQuickTrain)
+                                      .addComponent(chkSelfCorrectMaintenance)
                                       .addComponent(chkNewDayForceIconOperationalStatus)
                                       .addGroup(layout.createParallelGroup(Alignment.LEADING)
                                                       .addComponent(lblNewDayForceIconOperationalStatusStyle)
@@ -1016,6 +1024,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(chkNewDayMRMS)
                                         .addComponent(chkNewDayOptimizeMedicalAssignments)
                                         .addComponent(chkNewMonthQuickTrain)
+                                        .addComponent(chkSelfCorrectMaintenance)
                                         .addComponent(chkNewDayForceIconOperationalStatus)
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(lblNewDayForceIconOperationalStatusStyle)
@@ -1468,6 +1477,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNewDayMRMS(chkNewDayMRMS.isSelected());
         MekHQ.getMHQOptions().setNewDayOptimizeMedicalAssignments(chkNewDayOptimizeMedicalAssignments.isSelected());
         MekHQ.getMHQOptions().setNewMonthQuickTrain(chkNewMonthQuickTrain.isSelected());
+        MekHQ.getMHQOptions().setSelfCorrectMaintenance(chkSelfCorrectMaintenance.isSelected());
         MekHQ.getMHQOptions().setNewDayForceIconOperationalStatus(chkNewDayForceIconOperationalStatus.isSelected());
         MekHQ.getMHQOptions()
               .setNewDayForceIconOperationalStatusStyle(Objects.requireNonNull(
@@ -1635,6 +1645,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
         chkNewDayOptimizeMedicalAssignments.setSelected(MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments());
         chkNewMonthQuickTrain.setSelected(MekHQ.getMHQOptions().getNewMonthQuickTrain());
+        chkSelfCorrectMaintenance.setSelected(MekHQ.getMHQOptions().getSelfCorrectMaintenance());
         if (chkNewDayForceIconOperationalStatus.isSelected() !=
                   MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {
             chkNewDayForceIconOperationalStatus.doClick();

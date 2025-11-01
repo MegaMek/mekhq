@@ -33,13 +33,24 @@
  */
 package mekhq.campaign.unit;
 
+import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.personnel.skills.SkillType.S_ZERO_G_OPERATIONS;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import megamek.common.options.OptionsConstants;
 import megamek.common.rolls.TargetRoll;
@@ -66,6 +77,9 @@ import mekhq.utilities.ReportingUtilities;
 public class Maintenance {
     private static final MMLogger LOGGER = MMLogger.create(Maintenance.class);
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Maintenance";
+    /** @deprecated Use {@link #RESOURCE_BUNDLE} instead */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
           MekHQ.getMHQOptions().getLocale());
 
@@ -98,7 +112,7 @@ public class Maintenance {
                 maintained = (availableMinutes >= minutesUsed);
 
                 if (!maintained) {
-                    // At this point, insufficient minutes is the only reason why this would be failed.
+                    // At this point, insufficient minutes is the only reason why maintenance would fail.
                     campaign.addReport(String.format(resources.getString("maintenanceNotAvailable.text"),
                           unit.getName()));
                 } else {
@@ -119,7 +133,7 @@ public class Maintenance {
                       unit.getMaintenanceCost(),
                       "Maintenance for " + unit.getName()))) {
                     campaign.addReport("<font color='" +
-                                             ReportingUtilities.getNegativeColor() +
+                                             getNegativeColor() +
                                              "'><b>You cannot afford to pay maintenance costs for " +
                                              unit.getHyperlinkedName() +
                                              "!</b></font>");
@@ -209,7 +223,7 @@ public class Maintenance {
             String paidString = "";
             if (!paidMaintenance) {
                 paidString = "<font color='" +
-                                   ReportingUtilities.getNegativeColor() +
+                                   getNegativeColor() +
                                    "'>Could not afford maintenance costs, so check is at a penalty.</font>";
             }
             campaign.addReport(techNameLinked +
@@ -238,7 +252,7 @@ public class Maintenance {
         }
         if (!damageString.isEmpty()) {
             damageString = "<b><font color='" +
-                                 ReportingUtilities.getNegativeColor() +
+                                 getNegativeColor() +
                                  "'>" +
                                  damageString +
                                  "</b></font> [<a href='REPAIR|" +
@@ -500,6 +514,308 @@ public class Maintenance {
             if (effectiveModifier < 0) {
                 target.addModifier(effectiveModifier, "Zero-G Operations");
             }
+        }
+    }
+
+    /**
+     * Verifies and corrects per-technician maintenance schedules so that each day does not exceed the technician's
+     * available minutes and urgent work is not missed.
+     *
+     * <p>The method:</p>
+     * <ul>
+     *   <li>Sorts each day's jobs by shortest maintenance time first to maximize the number of units maintained per
+     *   day.</li>
+     *   <li>If a scheduled day overflows, backfills to the latest earlier day with capacity.</li>
+     *   <li>If the only day with capacity is today, defers the actual call to immediate maintenance until after
+     *   scheduling completes.</li>
+     *   <li>If no day (including today) has capacity, records the unit as unable to maintain and reports it.</li>
+     *   <li>For engineers (who only maintain their own unit), validates that today's available minutes are
+     *   sufficient and reports if not.</li>
+     * </ul>
+     *
+     * <p>A unit is marked as 'unable to maintain' when...</p>
+     * <ul>
+     *   <li>No earlier day (today -> scheduled−1) has enough remaining minutes.</li>
+     *   <li>Today is the only candidate but lacks sufficient minutes.</li>
+     * </ul>
+     *
+     * @param campaign the active campaign providing options, dates, personnel, unit data, and the reporting sink
+     *
+     * @author Illiani
+     * @see #performImmediateMaintenance(Campaign, Unit)
+     * @since 0.50.10
+     */
+    public static void checkAndCorrectMaintenanceSchedule(Campaign campaign) {
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final int maintenanceCycleDuration = campaignOptions.getMaintenanceCycleDays();
+        final boolean techsUseAdmin = campaignOptions.isTechsUseAdministration();
+
+        final boolean hasActiveMission = !campaign.getActiveMissions(false).isEmpty();
+        final LocalDate today = campaign.getLocalDate();
+
+        List<Person> allTechs = campaign.getTechsExpanded();
+        for (Person tech : allTechs) {
+            int dailyWorkMinutes = tech.getDailyAvailableTechTime(techsUseAdmin);
+
+            // Engineers only maintain their own unit, so we're just going to verify that they will have enough time
+            // to perform that maintenance.
+            if (tech.isEngineer()) {
+                String report = performEngineerCheck(tech, dailyWorkMinutes);
+                if (!report.isBlank()) {
+                    campaign.addReport(report);
+                }
+                continue;
+            }
+
+            List<Unit> techUnits = tech.getTechUnits();
+            if (techUnits.isEmpty()) {
+                continue;
+            }
+
+            // Build a map of dates -> units initially scheduled
+            LinkedHashMap<LocalDate, List<Unit>> correctedSchedule = new LinkedHashMap<>();
+            LinkedHashMap<LocalDate, List<Unit>> maintenanceSchedule = buildSchedule(techUnits,
+                  maintenanceCycleDuration,
+                  hasActiveMission,
+                  today,
+                  correctedSchedule);
+
+            // Remaining minutes per day
+            Map<LocalDate, Integer> remainingMinutesPerDay = new LinkedHashMap<>();
+            for (LocalDate day : correctedSchedule.keySet()) {
+                remainingMinutesPerDay.put(day, dailyWorkMinutes);
+            }
+
+            List<Unit> immediateToday = new ArrayList<>();
+            List<Unit> unableToMaintain = new ArrayList<>();
+            for (Map.Entry<LocalDate, List<Unit>> schedule : maintenanceSchedule.entrySet()) {
+                evaluateMaintenanceSchedule(schedule,
+                      remainingMinutesPerDay,
+                      correctedSchedule,
+                      today,
+                      immediateToday,
+                      unableToMaintain);
+            }
+
+            // Post-evaluation reports - this is where we tell the player what's going on.
+            for (Unit maintainedUnit : immediateToday) {
+                String report = getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.immediateToday",
+                      tech.getHyperlinkedFullTitle(), maintainedUnit.getHyperlinkedName());
+                campaign.addReport(report);
+                performImmediateMaintenance(campaign, maintainedUnit);
+            }
+
+            for (Unit maintainedUnit : unableToMaintain) {
+                String report = getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.unableToMaintain",
+                      spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG,
+                      tech.getHyperlinkedFullTitle(), maintainedUnit.getHyperlinkedName());
+                campaign.addReport(report);
+            }
+        }
+    }
+
+    /**
+     * Builds the initial and corrected maintenance schedules for a technician's assigned units, based on each unit's
+     * remaining maintenance cycle time and the current campaign conditions.
+     *
+     * <p><b>Behavior</b></p>
+     * <ul>
+     *   <li>Calculates the number of days until each unit's next maintenance is due using
+     *   {@link Unit#getDaysUntilNextMaintenance(int)}.</li>
+     *   <li>Any negative or zero values are treated as due today to ensure overdue units are handled promptly.</li>
+     *   <li>If the campaign has no active mission, multiplies the computed days by four to account for slower
+     *   maintenance progress when idle. This only affects scheduling, not technician work time.</li>
+     *   <li>Populates {@code maintenanceSchedule} with each unit keyed by its scheduled maintenance date.</li>
+     *   <li>Determines the final day represented in the schedule and populates {@code correctedSchedule} with all
+     *   dates from today through that day, initializing each with an empty list to ensure coverage for all days in
+     *   the range.</li>
+     *   <li>Finally, sorts the maintenance schedule chronologically (soonest to latest) and returns it as a
+     *   {@link LinkedHashMap}.</li>
+     * </ul>
+     *
+     * @param techUnits                the list of units assigned to the technician
+     * @param maintenanceCycleDuration the duration of a full maintenance cycle in days
+     * @param hasActiveMission         {@code true} if the campaign currently has an active mission, affecting
+     *                                 scheduling
+     * @param today                    the current in-game date
+     * @param correctedSchedule        the map to populate with empty lists for all days between today and the last
+     *                                 scheduled maintenance date
+     *
+     * @return a {@link LinkedHashMap} of maintenance jobs sorted by maintenance date (soonest -> latest)
+     */
+    private static LinkedHashMap<LocalDate, List<Unit>> buildSchedule(List<Unit> techUnits,
+          int maintenanceCycleDuration, boolean hasActiveMission, LocalDate today,
+          LinkedHashMap<LocalDate, List<Unit>> correctedSchedule) {
+        LinkedHashMap<LocalDate, List<Unit>> maintenanceSchedule = new LinkedHashMap<>();
+
+        for (Unit maintainedUnit : techUnits) {
+            if (!maintainedUnit.requiresMaintenance()) {
+                continue;
+            }
+
+            // Treat negative/zero as due today (this is just for added security)
+            double daysUntilNextMaintenance =
+                  max(0.0, maintainedUnit.getDaysUntilNextMaintenance(maintenanceCycleDuration));
+
+            // Adjust when not under contract: maintenance progress is x0.25 normal
+            if (!hasActiveMission) {
+                daysUntilNextMaintenance *= 4;
+            }
+
+            LocalDate scheduleMaintenance = today.plusDays((int) Math.ceil(daysUntilNextMaintenance));
+            maintenanceSchedule.computeIfAbsent(scheduleMaintenance, k -> new ArrayList<>())
+                  .add(maintainedUnit);
+        }
+
+        LocalDate lastDay = maintenanceSchedule.keySet().stream()
+                                  .max(Comparator.naturalOrder())
+                                  .orElse(today);
+
+        for (LocalDate day = today; !day.isAfter(lastDay); day = day.plusDays(1)) {
+            correctedSchedule.put(day, new ArrayList<>());
+        }
+
+        // Sort the initial schedule by day (soonest -> latest)
+        maintenanceSchedule = maintenanceSchedule.entrySet().stream()
+                                    .sorted(Map.Entry.comparingByKey())
+                                    .collect(Collectors.toMap(
+                                          Map.Entry::getKey,
+                                          Map.Entry::getValue,
+                                          (a, b) -> a,
+                                          LinkedHashMap::new
+                                    ));
+        return maintenanceSchedule;
+    }
+
+    /**
+     * Evaluates a single day's maintenance schedule for a technician and adjusts assignments to ensure daily work
+     * limits are not exceeded. Jobs that cannot fit on their scheduled day are backfilled to the latest earlier day
+     * with remaining capacity. If only today has capacity, the job is marked for immediate maintenance. If no earlier
+     * day has available time, the unit is recorded as unable to maintain.
+     *
+     * <p><b>Algorithm</b></p>
+     * <ul>
+     *   <li>Sorts all jobs for the scheduled day by shortest maintenance time first (shortest-job-first) to maximize
+     *   the number of units maintained.</li>
+     *   <li>Checks whether each job fits in the scheduled day. If not, iterates backward from the scheduled day − 1
+     *   to today, selecting the latest day with enough remaining minutes.</li>
+     *   <li>If that day is today, the job is queued for immediate maintenance.</li>
+     *   <li>If no day (including today) has sufficient capacity, the unit is added to {@code unableToMaintain}.</li>
+     * </ul>
+     *
+     * @param schedule               the entry representing one scheduled day and its units
+     * @param remainingMinutesPerDay map tracking each day's remaining available minutes for maintenance
+     * @param correctedSchedule      the corrected per-day schedule being built
+     * @param today                  the current in-game date
+     * @param immediateToday         list collecting units requiring immediate maintenance today
+     * @param unableToMaintain       list collecting units that cannot be scheduled or maintained
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void evaluateMaintenanceSchedule(Map.Entry<LocalDate, List<Unit>> schedule,
+          Map<LocalDate, Integer> remainingMinutesPerDay, LinkedHashMap<LocalDate, List<Unit>> correctedSchedule,
+          LocalDate today, List<Unit> immediateToday, List<Unit> unableToMaintain) {
+        LocalDate day = schedule.getKey();
+        List<Unit> maintenanceJobs = new ArrayList<>(schedule.getValue());
+
+        // Shortest-job-first maximizes the count of units maintained
+        maintenanceJobs.sort(Comparator.comparingInt(Unit::getMaintenanceTime));
+
+        for (Unit maintainedUnit : maintenanceJobs) {
+            int maintenanceTime = maintainedUnit.getMaintenanceTime();
+
+            // Try the scheduled day first
+            if (maintenanceTime <= remainingMinutesPerDay.get(day)) {
+                correctedSchedule.get(day).add(maintainedUnit);
+                remainingMinutesPerDay.put(day, remainingMinutesPerDay.get(day) - maintenanceTime);
+                continue;
+            }
+
+            // Backfill: latest earlier day with capacity (today..day-1)
+            LocalDate assignedDate = null;
+            for (LocalDate potentialDay = day.minusDays(1);
+                  !potentialDay.isBefore(today);
+                  potentialDay = potentialDay.minusDays(1)) {
+                if (maintenanceTime <= remainingMinutesPerDay.get(potentialDay)) {
+                    assignedDate = potentialDay;
+                    break; // latest first because we iterate backward
+                }
+            }
+
+            if (assignedDate != null) {
+                if (assignedDate.equals(today)) {
+                    // Only today can fit -> immediate maintenance
+                    if (maintenanceTime <= remainingMinutesPerDay.get(today)) {
+                        immediateToday.add(maintainedUnit);
+                        remainingMinutesPerDay.put(today, remainingMinutesPerDay.get(today) - maintenanceTime);
+                    } else {
+                        unableToMaintain.add(maintainedUnit);
+                    }
+                } else {
+                    correctedSchedule.get(assignedDate).add(maintainedUnit);
+                    remainingMinutesPerDay.put(assignedDate,
+                          remainingMinutesPerDay.get(assignedDate) - maintenanceTime);
+                }
+            } else {
+                // No earlier day (including today) has capacity
+                unableToMaintain.add(maintainedUnit);
+            }
+        }
+    }
+
+    /**
+     * Checks whether an engineer has sufficient daily time to perform maintenance on their assigned unit and, if not,
+     * returns a formatted warning message for reporting.
+     *
+     * @param tech             the engineer to evaluate
+     * @param dailyWorkMinutes the engineer's available minutes for the day
+     *
+     * @return a formatted warning string if maintenance time exceeds available minutes; otherwise an empty string
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static String performEngineerCheck(Person tech, int dailyWorkMinutes) {
+        Unit techUnit = tech.getUnit();
+        int maintenanceTime = techUnit.getMaintenanceTime();
+        if (techUnit.requiresMaintenance() && maintenanceTime > dailyWorkMinutes) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.largeVessel",
+                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG,
+                  tech.getHyperlinkedFullTitle(), techUnit.getHyperlinkedName());
+        }
+
+        return "";
+    }
+
+    /**
+     * Attempts to perform immediate maintenance on a unit using its assigned technician's remaining minutes for today.
+     *
+     * @param campaign the campaign context used for maintenance processing and reporting
+     * @param unit     the unit to service immediately
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public static void performImmediateMaintenance(Campaign campaign, Unit unit) {
+        Person tech = unit.getTech(); // This gets the engineer, instead, if appropriate
+        if (tech == null) {
+            return;
+        }
+
+        int time = tech.getMinutesLeft();
+        int maintenanceTime = unit.getMaintenanceTime();
+
+        if ((time - maintenanceTime) >= 0) {
+            // This will increase the number of days until maintenance and then perform the maintenance. We
+            // do it this way to ensure that everything is processed cleanly.
+            while (unit.getDaysSinceMaintenance() != 0) {
+                Maintenance.doMaintenance(campaign, unit);
+            }
+        } else {
+            campaign.addReport(String.format(resources.getString("maintenanceAdHoc.unable"),
+                  tech.getHyperlinkedFullTitle(),
+                  unit.getHyperlinkedName()));
         }
     }
 }

@@ -869,6 +869,16 @@ public final class MHQOptions extends SuiteOptions {
               .putBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN, value);
     }
 
+    public boolean getSelfCorrectMaintenance() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.SELF_CORRECT_MAINTENANCE, true);
+    }
+
+    public void setSelfCorrectMaintenance(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.SELF_CORRECT_MAINTENANCE, value);
+    }
+
     public boolean getNewDayForceIconOperationalStatus() {
         return userPreferences.node(MHQConstants.NEW_DAY_NODE)
                      .getBoolean(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, true);

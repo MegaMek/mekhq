@@ -922,6 +922,10 @@ public class CampaignNewDayManager {
     }
 
     public void processNewDayUnits() {
+        if (MekHQ.getMHQOptions().getSelfCorrectMaintenance()) {
+            Maintenance.checkAndCorrectMaintenanceSchedule(campaign);
+        }
+        
         // need to loop through units twice, the first time to do all maintenance and
         // the second time to do whatever else. Otherwise, maintenance minutes might
         // get sucked up by other stuff. campaign is also a good place to ensure that a
