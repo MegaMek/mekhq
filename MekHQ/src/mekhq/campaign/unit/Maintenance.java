@@ -113,7 +113,7 @@ public class Maintenance {
                 maintained = (availableMinutes >= minutesUsed);
 
                 if (!maintained) {
-                    // At campaign point, insufficient minutes is the only reason why campaign would be failed.
+                    // At this point, insufficient minutes is the only reason why maintenance would fail.
                     campaign.addReport(String.format(resources.getString("maintenanceNotAvailable.text"),
                           unit.getName()));
                 } else {
