@@ -284,7 +284,7 @@ public class RecoveryTimeCalculations {
      * @since 0.50.10
      */
     private static double getTemperatureMultiplier(int temperature) {
-        if (temperature > 50 || temperature < 30) {
+        if (temperature > 50 || temperature < -30) {
             return ABOVE_50_C_OR_BELOW_30_C;
         }
         return DEFAULT_MULTIPLIER;
