@@ -66,7 +66,7 @@ import mekhq.campaign.unit.Unit;
 /**
  * Static helper methods implementing the "advanced medical" sub-system
  */
-public class InjuryUtil {
+public final class InjuryUtil {
     // Fumble and critical success limits for doctor skills levels 0-10, on a d100
     private static final int[] FUMBLE_LIMITS = { 50, 40, 30, 20, 12, 6, 5, 4, 3, 2, 1 };
     private static final int[] CRIT_LIMITS = { 98, 97, 94, 89, 84, 79, 74, 69, 64, 59, 49 };
