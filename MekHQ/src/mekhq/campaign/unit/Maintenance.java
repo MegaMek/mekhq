@@ -51,9 +51,8 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.work.IPartWork;
@@ -388,16 +387,13 @@ public class Maintenance {
 
         int value = 10;
         String skillLevel = "Unmaintained";
-        PersonnelOptions options = null;
-        Attributes attributes = null;
+        SkillModifierData skillModifierData = null;
         if (null != tech) {
-            options = tech.getOptions();
-            attributes = tech.getATOWAttributes();
-
             Skill skill = tech.getSkillForWorkingOn(partWork);
+            skillModifierData = tech.getSkillModifierData();
             if (null != skill) {
-                value = skill.getFinalSkillValue(options, attributes);
-                skillLevel = skill.getSkillLevel(options, attributes).toString();
+                value = skill.getFinalSkillValue(skillModifierData);
+                skillLevel = skill.getSkillLevel(skillModifierData).toString();
             }
         }
 
@@ -422,7 +418,7 @@ public class Maintenance {
                 Skill zeroGSkill = tech == null ? null : tech.getSkill(S_ZERO_G_OPERATIONS);
                 int zeroGSkillLevel = 0;
                 if (zeroGSkill != null) {
-                    zeroGSkillLevel = zeroGSkill.getTotalSkillLevel(options, attributes);
+                    zeroGSkillLevel = zeroGSkill.getTotalSkillLevel(skillModifierData);
                 }
 
                 if (planet.getGravity() < 0.8) {
