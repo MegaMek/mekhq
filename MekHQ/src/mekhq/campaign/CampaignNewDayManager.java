@@ -544,8 +544,6 @@ public class CampaignNewDayManager {
                 }
             }
 
-            person.getATOWAttributes().setIlliterate(person.isIlliterate());
-
             person.resetMinutesLeft(campaignOptions.isTechsUseAdministration());
             person.setAcquisition(0);
 
