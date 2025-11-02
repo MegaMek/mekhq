@@ -142,6 +142,7 @@ import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.GrayMonday;
+import mekhq.campaign.randomEvents.RiotScenario;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
 import mekhq.campaign.rating.IUnitRating;
@@ -782,9 +783,8 @@ public class CampaignNewDayManager {
 
         int weekOfYear = today.get(Campaign.WEEK_FIELDS.weekOfYear());
         boolean isOddWeek = (weekOfYear % 2 == 1);
-        if (campaignOptions.isUseStratCon()
-                  && (today.getDayOfWeek() == DayOfWeek.MONDAY)
-                  && isOddWeek) {
+        boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
+        if (campaignOptions.isUseStratCon() && isMonday && isOddWeek) {
             negotiateAdditionalSupportPoints(campaign);
         }
 
@@ -824,6 +824,13 @@ public class CampaignNewDayManager {
                             campaign.addReport(report);
                         }
                     }
+                }
+            }
+
+            if (true) {
+                int riotChance = 4;
+                if (true) {
+                    new RiotScenario(campaign, contract);
                 }
             }
 
@@ -925,7 +932,7 @@ public class CampaignNewDayManager {
         if (MekHQ.getMHQOptions().getSelfCorrectMaintenance()) {
             Maintenance.checkAndCorrectMaintenanceSchedule(campaign);
         }
-        
+
         // need to loop through units twice, the first time to do all maintenance and
         // the second time to do whatever else. Otherwise, maintenance minutes might
         // get sucked up by other stuff. campaign is also a good place to ensure that a
