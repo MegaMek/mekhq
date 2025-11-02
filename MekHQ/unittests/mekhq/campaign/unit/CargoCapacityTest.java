@@ -80,7 +80,7 @@ class CargoCapacityTest {
     private final CargoUnit cargoMek = new CargoUnit(CARGO_MEK, 0, 2);
 
     private final String LIFT_HOIST_MEK = "Quickdraw QKD-8X";
-    private final CargoUnit liftHoistMek = new CargoUnit(LIFT_HOIST_MEK, 0, 30);
+    private final CargoUnit liftHoistMek = new CargoUnit(LIFT_HOIST_MEK, 0, 0);
 
     private final String CARGO_DROP_SHIP = "Hoshiryokou Tug Boat";
     private final CargoUnit cargoDropShip = new CargoUnit(CARGO_DROP_SHIP, 7, 100);
