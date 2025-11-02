@@ -136,6 +136,7 @@ public class AverageExperienceRating {
             if (forceId == NO_FORCE) {
                 continue;
             }
+
             Force force = campaign.getForce(forceId);
             if (force == null) {
                 LOGGER.warn("Force returned null for forceId {}", forceId);
@@ -153,9 +154,9 @@ public class AverageExperienceRating {
                 continue;
             }
 
-            // if both primary and secondary roles are support roles, skip this person
-            // as they are also not considered combat personnel
-            if (person.getPrimaryRole().isSupport() && person.getSecondaryRole().isSupport()) {
+            // if both primary and secondary roles are support roles, skip this person as they are also not
+            // considered combat personnel.
+            if (person.isSupport()) {
                 continue;
             }
 
@@ -210,9 +211,10 @@ public class AverageExperienceRating {
 
                 // For regular entities, another method calculates the average experience
                 if (unit.isGunner(person) || unit.isDriver(person)) {
-                    totalExperience += calculateRegularExperience(person, entity, unit);
+                    double experience = calculateRegularExperience(person, entity, unit);
 
-                    if (totalExperience > 0) {
+                    if (experience >= 0) {
+                        totalExperience += experience;
                         personnelCount++;
                     }
                 }
@@ -308,7 +310,7 @@ public class AverageExperienceRating {
         }
 
         if (skillCount == 0) {
-            return 0;
+            return -1;
         }
 
         return (double) skillValue / skillCount;
