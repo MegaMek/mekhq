@@ -5288,16 +5288,21 @@ public class Unit implements ITechnology {
         if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             return false;
         }
-        
+
         boolean isMekOrProtoMek = (entity instanceof Mek) || (entity instanceof ProtoMek);
         boolean isSelectAero = (entity instanceof Aero) && !(entity instanceof ConvFighter);
 
         // We need to compute the full crew size here as some conventional fighters are single crew and others are
-        // not. Support Vehicles in general are a bit of a mess with a lot of rules exceptions
+        // not. Support Vehicles in general are a bit of a mess with a lot of rules exceptions. This special clause
+        // *is* necessary, even with the position equality check prior to the return value.
         boolean isSmallConventionalCraft = entity instanceof ConvFighter && Compute.getFullCrewSize(entity) == 1;
 
-        return (isMekOrProtoMek || isSelectAero || isSmallConventionalCraft) &&
-                     entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos();
+        if (isMekOrProtoMek || isSelectAero || isSmallConventionalCraft) {
+            // This is a final check to catch any special cases, for example Tripod 'Meks
+            return entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos();
+        }
+
+        return false;
     }
 
     public boolean usesSoldiers() {
