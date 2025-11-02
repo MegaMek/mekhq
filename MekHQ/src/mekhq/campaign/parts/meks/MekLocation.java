@@ -288,8 +288,8 @@ public class MekLocation extends Part {
         boolean otherHasUnit = otherMekLocation.getUnit() != null;
         boolean sameSensorStatus = hasSensors() == otherMekLocation.hasSensors();
         boolean sameLifeSupportStatus = hasLifeSupport() == otherMekLocation.hasLifeSupport();
-        boolean doBothHaveSensors = sameSensorStatus || sameLifeSupportStatus;
-        boolean passesSensorCheck = thisHasUnit || otherHasUnit || doBothHaveSensors;
+        boolean doBothHaveSensors = sameSensorStatus && sameLifeSupportStatus;
+        boolean passesSensorCheck = (thisHasUnit || otherHasUnit) || doBothHaveSensors;
 
         return sameLocation &&
                      sameTonnage &&
