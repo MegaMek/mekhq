@@ -155,8 +155,11 @@ public class AverageExperienceRating {
             }
 
             // if both primary and secondary roles are support roles, skip this person as they are also not
-            // considered combat personnel. The 'isTech' check is to catch Combat Technicians
-            if (person.isTechExpanded() || person.isSupport()) {
+            // considered combat personnel. Combat Technicians need special handling as they're technically a Combat
+            // Role not Support
+            boolean isDedicatedCombatTechnician = person.getPrimaryRole().isCombatTechnician() &&
+                                                        person.getSecondaryRole().isCombatTechnician();
+            if (isDedicatedCombatTechnician || person.isSupport()) {
                 continue;
             }
 
