@@ -36,16 +36,21 @@ import static mekhq.campaign.personnel.enums.GenderDescriptors.MALE_FEMALE_OTHER
 import static mekhq.campaign.personnel.skills.SkillType.getColoredExperienceLevelName;
 
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import javax.swing.table.AbstractTableModel;
 
+import megamek.common.options.IOption;
 import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
@@ -82,6 +87,8 @@ import mekhq.gui.sorter.LevelSorter;
  * @since 0.50.06
  */
 public class PersonTableModel extends AbstractTableModel {
+    MMLogger LOGGER = MMLogger.create(PersonTableModel.class);
+
     private final Campaign campaign;
     private final List<Person> people;
 
@@ -120,6 +127,26 @@ public class PersonTableModel extends AbstractTableModel {
         NewPersonnelMarket market = campaign.getNewPersonnelMarket();
         Set<UUID> rarePersonnel = market.getRarePersonnel();
 
+        int positiveSPAs = 0;
+        int negativeSPAs = 0;
+        for (Enumeration<IOption> i = person.getOptions(PersonnelOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
+            IOption ability = i.nextElement();
+            if (ability.booleanValue()) {
+                try {
+                    SpecialAbility spa = SpecialAbility.getAbility(ability.getName());
+                    if (spa.getCost() >= 0) {
+                        positiveSPAs++;
+                    } else {
+                        negativeSPAs++;
+                    }
+                } catch (Exception e) {
+                    LOGGER.debug("Unable to find reference to {} in campaign stored SPAs. This is a non-issue if the " +
+                                       "SPA isn't enabled in Campaign Options.",
+                          ability.getName());
+                }
+            }
+        }
+
         ApplicantTableColumns column = ApplicantTableColumns.values()[columnIndex];
         return switch (column) {
             case FULL_NAME -> {
@@ -145,6 +172,9 @@ public class PersonTableModel extends AbstractTableModel {
             }
             case AGE -> Integer.toString(person.getAge(campaign.getLocalDate()));
             case GENDER -> MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
+            case POSITIVE_ABILITIES -> positiveSPAs;
+            case NEGATIVE_ABILITIES -> negativeSPAs;
+            case PERFORMANCE_EXAM -> person.getPerformanceExamScore();
             case HIRING_COST -> {
                 Money hiringCost = market.getHiringCost(person);
                 yield hiringCost.toAmountString();
@@ -166,6 +196,7 @@ public class PersonTableModel extends AbstractTableModel {
         ApplicantTableColumns column = ApplicantTableColumns.values()[columnIndex];
         return switch (column) {
             case AGE, HIRING_COST -> new IntegerStringSorter();
+            case POSITIVE_ABILITIES, NEGATIVE_ABILITIES, PERFORMANCE_EXAM -> new IntegerStringSorter();
             case EXPERIENCE -> new LevelSorter();
             default -> new NaturalOrderComparator();
         };
