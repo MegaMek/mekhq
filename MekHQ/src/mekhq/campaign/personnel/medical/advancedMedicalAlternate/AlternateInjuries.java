@@ -60,7 +60,7 @@ public class AlternateInjuries {
     private static final int FRACTURE_HEALING_DAYS = 42; // Internet says 6-8 weeks
     private static final int COMPOUND_FRACTURE_HEALING_DAYS = 42; // Internet says 6-12 weeks
     private static final int SMOKE_INHALATION_HEALING_DAYS = 2; // Internet says 2-3 days
-    private static final int PUNCTURED_LUNG_HEALING_DAYS = 42; // Internet says 6-8 days
+    private static final int PUNCTURED_LUNG_HEALING_DAYS = 42; // Internet says 6-8 weeks
     private static final int HEART_TRAUMA_HEALING_DAYS = 28; // Internet says 4-12 weeks
     private static final int ORGAN_BRUISE_HEALING_DAYS = 28; // Internet says 4-6 weeks
     private static final int ORGAN_TRAUMA_HEALING_DAYS = 42; // Internet says 6-8 weeks
