@@ -53,6 +53,7 @@ import megamek.common.enums.TechBase;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -74,7 +75,6 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.PartsStoreModel;
 import mekhq.gui.model.PartsStoreModel.PartProxy;
 import mekhq.gui.sorter.PartsDetailSorter;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Taharqa
@@ -155,7 +155,7 @@ public class PartsStoreDialog extends JDialog {
         }
         partsTable.setIntercellSpacing(new Dimension(0, 0));
         partsTable.setShowGrid(false);
-        JScrollPane scrollPartsTable = new JScrollPaneWithSpeed();
+        JScrollPane scrollPartsTable = new FastJScrollPane();
         scrollPartsTable.setName("scrollPartsTable");
         scrollPartsTable.setViewportView(partsTable);
         getContentPane().add(scrollPartsTable, BorderLayout.CENTER);
