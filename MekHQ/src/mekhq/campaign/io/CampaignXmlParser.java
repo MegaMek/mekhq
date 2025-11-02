@@ -466,12 +466,16 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LOGGER.info("[Campaign Load] Rank references fixed in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
 
-        // Okay, Units, need their pilot references fixed.
+        // First we need to set the campaign reference in all units
         campaign.getHangar().forEachUnit(unit -> {
-            // Also, the unit should have its campaign set.
             unit.setCampaign(campaign);
             unit.fixReferences(campaign);
+        });
 
+        // Then we need to parse everything to fix references and make sure the unit is validated.
+        // The double-parsing of hangar contents is essential to avoid a race condition where we start validating
+        // units before the campaign and personnel references have finished being set.
+        campaign.getHangar().forEachUnit(unit -> {
             List<String> reports = unit.checkForOverCrewing();
             for (String report : reports) {
                 campaign.addReport(report);
