@@ -284,8 +284,6 @@ public class Person {
 
     // Supports edge usage by a ship's engineer composite crewman
     private int edgeUsedThisRound;
-    // To track how many edge points personnel have left until next refresh
-    private int currentEdge;
 
     // phenotype and background
     private Phenotype phenotype;
@@ -548,7 +546,6 @@ public class Person {
         isRecoveringFromFatigue = false;
         skills = new Skills();
         options = new PersonnelOptions();
-        currentEdge = 0;
         techUnits = new ArrayList<>();
         personnelLog = new ArrayList<>();
         medicalLog = new ArrayList<>();
@@ -5474,18 +5471,18 @@ public class Person {
      * @param currentEdge - integer used to track this person's edge points available for the current week
      */
     public void setCurrentEdge(final int currentEdge) {
-        this.currentEdge = currentEdge;
+        atowAttributes.setCurrentEdge(currentEdge);
     }
 
     public void changeCurrentEdge(final int amount) {
-        currentEdge = Math.max(currentEdge + amount, 0);
+        atowAttributes.changeCurrentEdge(amount);
     }
 
     /**
      * @return this person's currently available edge points. Used for weekly refresh.
      */
     public int getCurrentEdge() {
-        return currentEdge;
+        return atowAttributes.getCurrentEdge();
     }
 
     public void setEdgeUsed(final int edgeUsedThisRound) {

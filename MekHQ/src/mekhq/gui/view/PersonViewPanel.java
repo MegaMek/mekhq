@@ -710,6 +710,11 @@ public class PersonViewPanel extends JScrollablePanel {
                 continue;
             }
 
+            if (attribute == SkillAttribute.EDGE) {
+                relevantAttributes.put(attribute, 0); // modifier is irrelevant for Edge
+                continue;
+            }
+
             int attributeScore = person.getAttributeScore(attribute);
             int modifier = getIndividualAttributeModifier(attributeScore);
             if (modifier != 0) {

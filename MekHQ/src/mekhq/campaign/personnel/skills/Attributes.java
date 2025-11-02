@@ -707,19 +707,13 @@ public class Attributes {
         return edge;
     }
 
-    /**
-     * Changes the current edge by a delta.
-     *
-     * <p>The result is clamped between {@code 0} and the characters' current Edge score.
-     *
-     * @param delta the value to add to the current edge. A positive delta will increase the attribute score, while a
-     *              negative delta will decrease it.
-     *
-     * @since 0.50.5
-     */
     public void changeCurrentEdge(int delta) {
         currentEdge += delta;
         currentEdge = clamp(currentEdge, 0, edge);
+    }
+
+    public void setCurrentEdge(final int currentEdge) {
+        this.currentEdge = currentEdge;
     }
 
     // Reading and Writing
