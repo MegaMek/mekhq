@@ -88,6 +88,7 @@ public class Attributes {
     private int willpower;
     private int charisma;
     private int edge;
+    private int currentEdge;
 
     /**
      * The default score assigned to all attributes during initialization.
@@ -135,6 +136,7 @@ public class Attributes {
         willpower = DEFAULT_ATTRIBUTE_SCORE;
         charisma = DEFAULT_ATTRIBUTE_SCORE;
         edge = 0;
+        currentEdge = 0;
     }
 
 
@@ -154,7 +156,7 @@ public class Attributes {
      * @since 0.50.05
      */
     public Attributes(int strength, int body, int reflexes, int dexterity, int intelligence, int willpower,
-          int charisma, int edge) {
+          int charisma, int edge, int currentEdge) {
         this.strength = strength;
         this.body = body;
         this.reflexes = reflexes;
@@ -163,6 +165,7 @@ public class Attributes {
         this.willpower = willpower;
         this.charisma = charisma;
         this.edge = edge;
+        this.currentEdge = currentEdge;
     }
 
     /**
@@ -186,6 +189,7 @@ public class Attributes {
         this.willpower = singleValue;
         this.charisma = singleValue;
         this.edge = singleValue;
+        this.currentEdge = singleValue;
     }
 
     // Getters and Setters
@@ -212,7 +216,7 @@ public class Attributes {
             case INTELLIGENCE -> clamp(intelligence, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
             case WILLPOWER -> clamp(willpower, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
             case CHARISMA -> clamp(charisma, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-            case EDGE -> clamp(edge, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case EDGE -> clamp(edge, 0, MAXIMUM_ATTRIBUTE_SCORE);
             default -> 0;
         };
     }
@@ -315,7 +319,7 @@ public class Attributes {
             case INTELLIGENCE -> intelligence = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
             case WILLPOWER -> willpower = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
             case CHARISMA -> charisma = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
-            case EDGE -> edge = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case EDGE -> edge = clamp(score, 0, cap);
             default -> LOGGER.error("(setAttributeScore) Invalid attribute requested: {}", attribute);
         }
     }
@@ -684,7 +688,6 @@ public class Attributes {
         charisma = clamp(charisma, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
-
     /**
      * Changes the edge attribute by a delta.
      *
@@ -697,7 +700,26 @@ public class Attributes {
      */
     public void changeEdge(int delta) {
         edge += delta;
-        edge = clamp(edge, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+        edge = clamp(edge, 0, MAXIMUM_ATTRIBUTE_SCORE);
+    }
+
+    public int getCurrentEdge() {
+        return edge;
+    }
+
+    /**
+     * Changes the current edge by a delta.
+     *
+     * <p>The result is clamped between {@code 0} and the characters' current Edge score.
+     *
+     * @param delta the value to add to the current edge. A positive delta will increase the attribute score, while a
+     *              negative delta will decrease it.
+     *
+     * @since 0.50.5
+     */
+    public void changeCurrentEdge(int delta) {
+        currentEdge += delta;
+        currentEdge = clamp(currentEdge, 0, edge);
     }
 
     // Reading and Writing
@@ -731,6 +753,7 @@ public class Attributes {
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "willpower", willpower);
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "charisma", charisma);
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "edge", edge);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "currentEdge", currentEdge);
     }
 
     /**
@@ -769,6 +792,8 @@ public class Attributes {
                     this.charisma = MathUtility.parseInt(workingNode2.getTextContent(), DEFAULT_ATTRIBUTE_SCORE);
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("edge")) {
                     this.edge = MathUtility.parseInt(workingNode2.getTextContent());
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("currentEdge")) {
+                    this.currentEdge = MathUtility.parseInt(workingNode2.getTextContent());
                 }
             }
         } catch (Exception ex) {

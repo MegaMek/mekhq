@@ -159,6 +159,7 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE);
 
         TargetRoll targetNumber = new TargetRoll();
@@ -181,6 +182,7 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE,
               6,
               8,
+              DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
@@ -209,6 +211,7 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE);
 
         TargetRoll targetNumber = new TargetRoll();
@@ -230,6 +233,7 @@ class SkillCheckUtilityTest {
         Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               7,
+              DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
@@ -312,6 +316,7 @@ class SkillCheckUtilityTest {
                   DEFAULT_ATTRIBUTE_SCORE,
                   DEFAULT_ATTRIBUTE_SCORE,
                   DEFAULT_ATTRIBUTE_SCORE,
+                  DEFAULT_ATTRIBUTE_SCORE,
                   DEFAULT_ATTRIBUTE_SCORE);
 
             SkillModifierData skillModifierData = TestSkillModifierData.createDefault();
@@ -360,6 +365,7 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE);
 
         SkillModifierData skillModifierData = TestSkillModifierData.createDefault();
@@ -397,6 +403,7 @@ class SkillCheckUtilityTest {
                   DEFAULT_ATTRIBUTE_SCORE,
                   attributeScore,
                   attributeScore,
+                  DEFAULT_ATTRIBUTE_SCORE,
                   DEFAULT_ATTRIBUTE_SCORE,
                   DEFAULT_ATTRIBUTE_SCORE,
                   DEFAULT_ATTRIBUTE_SCORE,
@@ -442,7 +449,7 @@ class SkillCheckUtilityTest {
         when(campaignFaction.getShortName()).thenReturn("MERC");
         Person person = new Person(mockCampaign);
 
-        Attributes invalidAttributes = new Attributes(-5, -5, -5, -5, -5, -5, -5, -5); // Invalid attribute scores
+        Attributes invalidAttributes = new Attributes(-5, -5, -5, -5, -5, -5, -5, -5, -5); // Invalid attribute scores
         person.setATOWAttributes(invalidAttributes);
 
         SkillType testSkillType = new SkillType();
@@ -504,6 +511,7 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE,
               1,
               1,
+              DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,

@@ -54,6 +54,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 
@@ -128,7 +129,7 @@ public class CampaignUpgradeDialog {
               getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.inCharacter", campaign.getCommanderAddress()),
               BUTTONS,
               getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.outOfCharacter"),
-              null,
+              ImmersiveDialogWidth.LARGE.getWidth(),
               false,
               supplementalPanel,
               null,

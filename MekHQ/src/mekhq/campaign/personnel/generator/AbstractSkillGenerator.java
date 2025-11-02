@@ -90,7 +90,7 @@ public abstract class AbstractSkillGenerator {
      *
      * @param person The {@link Person} for whom attributes are to be generated.
      */
-    public abstract void generateAttributes(Person person);
+    public abstract void generateAttributes(Person person, boolean isUseEdge);
 
     /**
      * Generates the default skills for a {@link Person} based on their primary role.

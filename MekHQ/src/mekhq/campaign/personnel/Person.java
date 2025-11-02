@@ -3629,8 +3629,6 @@ public class Person {
                     advantages = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("edge")) {
                     edge = wn2.getTextContent();
-                } else if (nodeName.equalsIgnoreCase("edgeAvailable")) {
-                    person.currentEdge = MathUtility.parseInt(wn2.getTextContent(), 0);
                 } else if (nodeName.equalsIgnoreCase("implants")) {
                     implants = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("toughness")) {
@@ -5438,7 +5436,7 @@ public class Person {
      * @return The edge value defined in the person's options.
      */
     public int getEdge() {
-        return getOptions().intOption(OptionsConstants.EDGE);
+        return atowAttributes.getAttribute(SkillAttribute.EDGE);
     }
 
     /**
@@ -5452,20 +5450,15 @@ public class Person {
     public int getAdjustedEdge() {
         boolean hasTraumaticPast = options.booleanOption(COMPULSION_TRAUMATIC_PAST);
         int modifier = hasTraumaticPast ? -1 : 0;
-        return options.intOption(OptionsConstants.EDGE) - unlucky + modifier;
+        return getEdge() - unlucky + modifier;
     }
 
     public void setEdge(final int edge) {
-        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
-            if (OptionsConstants.EDGE.equals(ability.getName())) {
-                ability.setValue(edge);
-            }
-        }
+        atowAttributes.setAttributeScore(phenotype, options, SkillAttribute.EDGE, edge);
     }
 
     public void changeEdge(final int amount) {
-        setEdge(Math.max(getEdge() + amount, 0));
+        atowAttributes.changeEdge(amount);
     }
 
     /**

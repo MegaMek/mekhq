@@ -592,7 +592,8 @@ public enum PersonnelTableModelColumn {
                      isDexterity() ||
                      isATOWIntelligence() ||
                      isWillpower() ||
-                     isCharisma();
+                     isCharisma() ||
+                     isEdge();
     }
 
 
@@ -1399,11 +1400,11 @@ public enum PersonnelTableModelColumn {
                  REPUTATION,
                  UNLUCKY,
                  BLOODMARK,
-                 EDGE,
                  SPA_COUNT,
                  IMPLANT_COUNT,
                  LOYALTY -> new IntegerStringSorter();
-            case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA -> new AttributeScoreSorter();
+            case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA, EDGE ->
+                  new AttributeScoreSorter();
             case REASONING -> new ReasoningSorter();
             case SALARY -> new FormattedNumberSorter();
             default -> new NaturalOrderComparator();

@@ -60,6 +60,7 @@ public class SkillTest {
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE);
 
         TargetRoll targetNumber = new TargetRoll();
@@ -85,6 +86,7 @@ public class SkillTest {
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE);
 
         TargetRoll targetNumber = new TargetRoll();
@@ -104,6 +106,7 @@ public class SkillTest {
         testSkillType.setSecondAttribute(NONE);
 
         Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
