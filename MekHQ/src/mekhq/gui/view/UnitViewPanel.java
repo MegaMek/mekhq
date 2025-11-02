@@ -145,6 +145,7 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
+        y++;
 
         pnlCrew.setName("pnlCrew");
         pnlCrew.setLayout(new BorderLayout());
