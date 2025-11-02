@@ -64,6 +64,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
+import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 
@@ -122,8 +123,13 @@ public class TrainingCombatTeams {
                 continue;
             }
 
-            if (campaign.getCampaignOptions().isUseStratCon() &&
-                      !contract.getStratconCampaignState().isForceDeployedHere(combatTeam.getForceId())) {
+            CampaignOptions campaignOptions = campaign.getCampaignOptions();
+            boolean isUsingStratCon = campaignOptions.isUseStratCon();
+            boolean isUsingMaplessMode = campaignOptions.isUseStratConMaplessMode();
+            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            boolean isForceDeployed = campaignState != null &&
+                                            campaignState.isForceDeployedHere(combatTeam.getForceId());
+            if (!isUsingStratCon && (!isUsingMaplessMode && !isForceDeployed)) {
                 continue;
             }
 
