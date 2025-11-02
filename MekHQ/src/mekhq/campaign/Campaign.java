@@ -3010,6 +3010,13 @@ public class Campaign implements ITechManager {
                      .toList();
     }
 
+    public List<Person> getInjuredPersonnel() {
+        return getPatients()
+                     .stream()
+                     .filter(patient -> !patient.getInjuries().isEmpty() || patient.getHits() > 0)
+                     .toList();
+    }
+
     /**
      * List of all units that can show up in the repair bay.
      */
