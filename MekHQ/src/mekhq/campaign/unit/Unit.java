@@ -5285,21 +5285,19 @@ public class Unit implements ITechnology {
         // Taharqa: I dont think we should do it based on computed size, but whether the unit logically is the type
         // of unit that has only one pilot. This is partly because there may be some vees that only have one pilot
         // and this is also a problem for BA units with only one active suit
-        CrewType crewType = entity.getCrew().getCrewType();
-        boolean hasSamePilotAndGunner = crewType.getPilotPos() == crewType.getGunnerPos();
-
+        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
+            return false;
+        }
+        
         boolean isMekOrProtoMek = (entity instanceof Mek) || (entity instanceof ProtoMek);
-        boolean isSelectAero = (entity instanceof Aero)
-                                     && !(entity instanceof SmallCraft)
-                                     && !(entity instanceof Jumpship)
-                                     && !(entity instanceof ConvFighter);
+        boolean isSelectAero = (entity instanceof Aero) && !(entity instanceof ConvFighter);
 
         // We need to compute the full crew size here as some conventional fighters are single crew and others are
         // not. Support Vehicles in general are a bit of a mess with a lot of rules exceptions
-        boolean isSmallConventionalCraft = entity instanceof ConvFighter &&
-                                                 Compute.getFullCrewSize(entity) == 1;
+        boolean isSmallConventionalCraft = entity instanceof ConvFighter && Compute.getFullCrewSize(entity) == 1;
 
-        return (isMekOrProtoMek || isSelectAero || isSmallConventionalCraft) && hasSamePilotAndGunner;
+        return (isMekOrProtoMek || isSelectAero || isSmallConventionalCraft) &&
+                     entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos();
     }
 
     public boolean usesSoldiers() {
