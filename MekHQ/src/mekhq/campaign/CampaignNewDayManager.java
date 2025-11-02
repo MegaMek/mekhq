@@ -827,9 +827,9 @@ public class CampaignNewDayManager {
                 }
             }
 
-            if (true) {
+            if (isMonday && contract.getContractType().isRiotDuty()) {
                 int riotChance = 4;
-                if (true) {
+                if (randomInt(riotChance) == 0) {
                     new RiotScenario(campaign, contract);
                 }
             }
