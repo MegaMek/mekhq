@@ -6709,7 +6709,8 @@ public class Person {
                 }
                 yield min(attributeScore, MAXIMUM_ATTRIBUTE_SCORE);
             }
-            case BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER -> atowAttributes.getAttributeScore(attribute);
+            case BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, EDGE ->
+                  atowAttributes.getAttributeScore(attribute);
             case CHARISMA -> {
                 int attributeScore = atowAttributes.getAttributeScore(attribute);
                 if (hasExoticAppearance) {

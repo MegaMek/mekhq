@@ -163,7 +163,6 @@ public enum PersonnelTableModelColumn {
     UNLUCKY("PersonnelTableModelColumn.UNLUCKY.text"),
     BLOODMARK("PersonnelTableModelColumn.BLOODMARK.text"),
     FATIGUE("PersonnelTableModelColumn.FATIGUE.text"),
-    EDGE("PersonnelTableModelColumn.EDGE.text"),
     SPA_COUNT("PersonnelTableModelColumn.SPA_COUNT.text"),
     IMPLANT_COUNT("PersonnelTableModelColumn.IMPLANT_COUNT.text"),
     LOYALTY("PersonnelTableModelColumn.LOYALTY.text"),
@@ -180,6 +179,7 @@ public enum PersonnelTableModelColumn {
     INTELLIGENCE("PersonnelTableModelColumn.INTELLIGENCE.text"),
     WILLPOWER("PersonnelTableModelColumn.WILLPOWER.text"),
     CHARISMA("PersonnelTableModelColumn.CHARISMA.text"),
+    EDGE("PersonnelTableModelColumn.EDGE.text"),
     SHIP_TRANSPORT("PersonnelTableModelColumn.SHIP_TRANSPORT.text"),
     TACTICAL_TRANSPORT("PersonnelTableModelColumn.TACTICAL_TRANSPORT.text");
 
@@ -1048,8 +1048,6 @@ public enum PersonnelTableModelColumn {
                 return Integer.toString(getEffectiveFatigue(person.getFatigue(),
                       person.isClanPersonnel(),
                       person.getSkillLevel(campaign, false)));
-            case EDGE:
-                return Integer.toString(person.getEdge());
             case SPA_COUNT:
                 return Integer.toString(person.countOptions(PersonnelOptions.LVL3_ADVANTAGES));
             case IMPLANT_COUNT:
@@ -1108,6 +1106,10 @@ public enum PersonnelTableModelColumn {
             case CHARISMA:
                 currentAttributeValue = person.getAttributeScore(SkillAttribute.CHARISMA);
                 attributeCap = person.getAttributeCap(SkillAttribute.CHARISMA);
+                return currentAttributeValue + " / " + attributeCap;
+            case EDGE:
+                currentAttributeValue = person.getAttributeScore(SkillAttribute.EDGE);
+                attributeCap = person.getAttributeCap(SkillAttribute.EDGE);
                 return currentAttributeValue + " / " + attributeCap;
             default:
                 return "UNIMPLEMENTED";
@@ -1321,7 +1323,6 @@ public enum PersonnelTableModelColumn {
             case TRAITS -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME, CONNECTIONS, WEALTH, EXTRA_INCOME, REPUTATION, UNLUCKY, BLOODMARK ->
                       true;
-                case EDGE -> campaign.getCampaignOptions().isUseEdge();
                 default -> false;
             };
             case ATTRIBUTES -> switch (this) {
@@ -1335,6 +1336,7 @@ public enum PersonnelTableModelColumn {
                      INTELLIGENCE,
                      WILLPOWER,
                      CHARISMA -> true;
+                case EDGE -> campaign.getCampaignOptions().isUseEdge();
                 default -> false;
             };
             case OTHER -> switch (this) {

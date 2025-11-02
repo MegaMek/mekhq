@@ -605,7 +605,7 @@ public enum PersonnelRole {
         }
 
         return switch (attribute) {
-            case NONE -> 0;
+            case NONE, EDGE -> 0;
             case STRENGTH -> strength;
             case BODY -> body;
             case REFLEXES -> reflexes;

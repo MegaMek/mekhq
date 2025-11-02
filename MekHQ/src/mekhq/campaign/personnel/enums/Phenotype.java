@@ -52,24 +52,24 @@ public enum Phenotype {
     /**
      * Individual external phenotypes.
      */
-    MEKWARRIOR(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9), new ArrayList<>()),
-    ELEMENTAL(true, true, 2, 1, -1, 0, new Attributes(9, 9, 8, 7, 8, 9, 8), List.of("atow_toughness")),
-    AEROSPACE(true, true, -1, -1, +2, +2, new Attributes(7, 7, 9, 9, 9, 8, 8), List.of("flaw_glass_jaw")),
+    MEKWARRIOR(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9, 5), new ArrayList<>()),
+    ELEMENTAL(true, true, 2, 1, -1, 0, new Attributes(9, 9, 8, 7, 8, 9, 8, 5), List.of("atow_toughness")),
+    AEROSPACE(true, true, -1, -1, +2, +2, new Attributes(7, 7, 9, 9, 9, 8, 8, 5), List.of("flaw_glass_jaw")),
     // ATOW doesn't cover a vehicle phenotype, but as the linked attributes for vehicle skills are also reflexes and
     // dexterity, I copied the MekWarrior phenotype
-    VEHICLE(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9), new ArrayList<>()),
+    VEHICLE(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9, 5), new ArrayList<>()),
     // According to my research, ProtoMek pilots are normally just Aerospace washouts, so I'm assuming they'd have the
     // same phenotype modifiers.
-    PROTOMEK(true, true, -1, -1, +2, +2, new Attributes(7, 7, 9, 9, 9, 8, 8), List.of("flaw_glass_jaw")),
+    PROTOMEK(true, true, -1, -1, +2, +2, new Attributes(7, 7, 9, 9, 9, 8, 8, 5), List.of("flaw_glass_jaw")),
     // Copying the MekWarrior phenotype, same reasons as above.
-    NAVAL(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9), new ArrayList<>()),
+    NAVAL(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9, 5), new ArrayList<>()),
 
     /**
      * Individual internal phenotypes.
      */
     // Internal Phenotypes
-    NONE(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9), new ArrayList<>()),
-    GENERAL(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9), new ArrayList<>());
+    NONE(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9, 5), new ArrayList<>()),
+    GENERAL(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9, 5), new ArrayList<>());
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -88,7 +88,7 @@ public enum Phenotype {
 
     // region Constructors
     Phenotype() {
-        this(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9), new ArrayList<>());
+        this(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9, 5), new ArrayList<>());
     }
 
     Phenotype(final boolean isTrueborn, final boolean external, final int strength, final int body, final int reflexes,
@@ -168,7 +168,7 @@ public enum Phenotype {
             case BODY -> body;
             case REFLEXES -> reflexes;
             case DEXTERITY -> dexterity;
-            case NONE, INTELLIGENCE, WILLPOWER, CHARISMA -> 0;
+            case NONE, INTELLIGENCE, WILLPOWER, CHARISMA, EDGE -> 0;
         };
     }
 
