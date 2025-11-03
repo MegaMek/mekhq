@@ -33,256 +33,635 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities.getSalvageTooltip;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import javax.swing.BoxLayout;
+import java.util.Objects;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableRowSorter;
 
-import megamek.common.annotations.Nullable;
-import megamek.common.ui.FastJScrollPane;
+import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.unit.Unit;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.campaign.force.ForceType;
+import mekhq.campaign.mission.camOpsSalvage.SalvageForceData;
+import mekhq.campaign.personnel.Person;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
 /**
- * A dialog that allows the user to select forces for salvage operations before starting a scenario.
+ * Modal dialog that lists available forces capable of participating in salvage operations and lets the user select one
+ * or more for the current task.
  *
- * <p>This dialog presents the user with a list of available forces that can perform salvage operations, displaying
- * each force's name and the number of units capable of salvage. The forces are presented as checkboxes arranged in a
- * three-column layout.</p>
+ * <p>The center of the dialog is a sortable {@link JTable} backed by
+ * {@link SalvageForcePicker.SalvageForceTableModel}. Columns include force name/type, assigned tech (with
+ * experience/rank-aware sort), cargo/tow capacities, salvage-capable unit count, and a tug availability flag. Tooltips
+ * provide detailed capacity reasoning and tech status.</p>
  *
- * <p>The dialog provides context-appropriate messaging based on whether forces are available, and only allows
- * confirmation if at least one force is available for selection.</p>
+ * <p>Use {@link #wasConfirmed()} to check whether the user confirmed and {@link #getSelectedForces()} to retrieve
+ * the chosen forces after the dialog closes.</p>
  *
  * @author Illiani
  * @since 0.50.10
  */
-public class SalvageForcePicker extends ImmersiveDialogCore {
+public class SalvageForcePicker extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(SalvageForcePicker.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SalvageForcePicker";
-    private static final int NUM_COLUMNS = 3;
 
-    public final int SELECTION_CANCELLED = 0;
-    public final int SELECTION_CONFIRMED = 1;
+    private static final Dimension DIMENSION = scaleForGUI(800, 600);
+    private static final int WIDTH_60 = scaleForGUI(60);
+    private static final int WIDTH_80 = scaleForGUI(80);
+    private static final int WIDTH_100 = scaleForGUI(100);
+    private static final int WIDTH_150 = scaleForGUI(150);
 
-    private static Map<JCheckBox, Force> checkboxForceMap;
+    private boolean wasConfirmed;
+    private SalvageForceTableModel tableModel;
 
     /**
      * Checks whether the user confirmed their force selection.
      *
-     * @return {@code true} if the user confirmed their selection, {@code false} if they canceled
+     * @return {@code true} if the user pressed Confirm; {@code false} if they canceled or closed the dialog.
      *
      * @author Illiani
      * @since 0.50.10
      */
     public boolean wasConfirmed() {
-        return getDialogChoice() == SELECTION_CONFIRMED;
+        return wasConfirmed;
     }
 
     /**
-     * Retrieves the list of forces that were selected by the user.
+     * Returns all selected {@link Force}s from the table. If the table was never constructed (e.g., no forces were
+     * provided), returns an empty list.
      *
-     * <p>This method examines all checkboxes in the dialog and returns a list of forces corresponding
-     * to the checked checkboxes. If no checkboxes are selected or the dialog was canceled, an empty list is
-     * returned.</p>
-     *
-     * @return a list of selected {@link Force} objects, or an empty list if none were selected
+     * @return a list of selected forces (never {@code null})
      *
      * @author Illiani
      * @since 0.50.10
      */
     public List<Force> getSelectedForces() {
-        List<Force> selectedForces = new ArrayList<>();
+        if (tableModel == null) {
+            return new ArrayList<>();
+        }
+        return tableModel.getSelectedForces();
+    }
 
-        if (checkboxForceMap != null) {
-            for (Map.Entry<JCheckBox, Force> entry : checkboxForceMap.entrySet()) {
-                if (entry.getKey().isSelected()) {
-                    selectedForces.add(entry.getValue());
-                }
-            }
+    /**
+     * Creates and displays the salvage force picker dialog.
+     *
+     * <p>The dialog builds a sortable table when any forces are provided. The tug column is shown only for space
+     * operations. A read-only instruction panel is shown at the top, and Confirm/Cancel controls are placed at the
+     * bottom.</p>
+     *
+     * @param campaign         current campaign context; used for tech labels, experience, tooltips, and hangar lookups
+     * @param forces           the candidate salvage-capable forces with precomputed stats; may be {@code null} or
+     *                         empty
+     * @param isSpaceOperation {@code true} to show space-specific columns (e.g., tug availability); {@code false} to
+     *                         hide them
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public SalvageForcePicker(Campaign campaign, List<SalvageForceData> forces, boolean isSpaceOperation) {
+        boolean hasForces = forces != null && !forces.isEmpty();
+
+        setTitle(getText("accessingTerminal.title"));
+        setModal(true);
+        setLayout(new BorderLayout());
+
+        // Instructions at the top
+        JPanel instructionsPanel = new JPanel();
+        JTextArea instructionsLabel = new JTextArea(getInstructions());
+        instructionsLabel.setLineWrap(true);
+        instructionsLabel.setWrapStyleWord(true);
+        instructionsLabel.setEditable(false);
+        instructionsLabel.setOpaque(false);
+        instructionsLabel.setColumns(60);
+        instructionsLabel.setRows(0);
+        instructionsPanel.add(instructionsLabel);
+        add(instructionsPanel, BorderLayout.NORTH);
+
+        // Table in the center
+        if (hasForces) {
+            tableModel = new SalvageForceTableModel(campaign, forces);
+            JTable table = new JTable(tableModel);
+            table.setAutoCreateRowSorter(true);
+
+            formatSorters(table);
+            assignWidths(table, isSpaceOperation);
+            setRenderers(campaign, table);
+
+            JScrollPane scrollPane = new JScrollPane(table);
+            scrollPane.setPreferredSize(DIMENSION);
+            add(scrollPane, BorderLayout.CENTER);
         }
 
-        return selectedForces;
+        // Buttons at the bottom
+        JPanel buttonPanel = new JPanel();
+        getButtons(hasForces, buttonPanel);
+        add(buttonPanel, BorderLayout.SOUTH);
+
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
-
     /**
-     * Creates a new salvage force picker dialog.
+     * Installs cell renderers for the table, including a centered checkbox for selectable columns and a renderer that
+     * applies status coloring to wounded techs and sets helpful tooltips.
      *
-     * @param campaign the current campaign
-     * @param scenario the scenario for which salvage forces are being selected
-     * @param forces   the list of available forces that can perform salvage operations
+     * @param campaign campaign context for tooltips and status coloring
+     * @param table    the table to configure
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public SalvageForcePicker(Campaign campaign, Scenario scenario, List<Force> forces) {
-        super(campaign,
-              campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND),
-              null,
-              getInCharacterMessage(campaign.getCommanderAddress(), !forces.isEmpty()),
-              getButtons(!forces.isEmpty()),
-              getOutOfCharacterMessage(),
-              ImmersiveDialogWidth.LARGE.getWidth(),
-              false,
-              getSupplementalPanel(scenario.getBoardType() == AtBScenario.T_SPACE, campaign.getHangar(), forces),
-              null,
-              true);
+    private static void setRenderers(Campaign campaign, JTable table) {
+        table.setDefaultRenderer(Object.class, new SalvageForceTableCellRenderer(campaign));
+        table.setDefaultRenderer(Boolean.class, new SalvageForceTableCellRenderer(campaign));
+        table.setDefaultRenderer(String.class, new SalvageForceTableCellRenderer(campaign));
+        table.setDefaultRenderer(Double.class, new SalvageForceTableCellRenderer(campaign));
+        table.setDefaultRenderer(Integer.class, new SalvageForceTableCellRenderer(campaign));
+
+        table.getColumnModel().getColumn(SalvageForceTableModel.COL_SELECT).setCellRenderer(
+              new javax.swing.table.DefaultTableCellRenderer() {
+                  private final javax.swing.JCheckBox checkBox = new javax.swing.JCheckBox();
+
+                  @Override
+                  public Component getTableCellRendererComponent(JTable table, Object value,
+                        boolean isSelected, boolean hasFocus, int row, int column) {
+                      checkBox.setSelected(value != null && (Boolean) value);
+                      checkBox.setHorizontalAlignment(javax.swing.JLabel.CENTER);
+                      checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+                      checkBox.setToolTipText(getTextAt(RESOURCE_BUNDLE,
+                            "SalvageForcePicker.column.select.tooltip"));
+                      return checkBox;
+                  }
+              });
     }
 
     /**
-     * Generates the in-character message displayed in the dialog.
+     * Sets preferred column widths and hides the tug column for ground operations.
      *
-     * <p>The message varies depending on whether forces are available for deployment.</p>
-     *
-     * @param commanderAddress the formal address/title of the campaign commander
-     * @param hasForces        {@code true} if forces are available, {@code false} otherwise
-     *
-     * @return the formatted in-character message string
+     * @param table            table to adjust
+     * @param isSpaceOperation whether the current operation is in space (tug column visible) or ground (tug column
+     *                         hidden)
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static String getInCharacterMessage(String commanderAddress, boolean hasForces) {
-        String key = "SalvageForcePicker.inCharacterMessage." + (hasForces ? "normal" : "noForces");
-        return getFormattedTextAt(RESOURCE_BUNDLE, key, commanderAddress);
+    private static void assignWidths(JTable table, boolean isSpaceOperation) {
+        table.getColumnModel().getColumn(SalvageForceTableModel.COL_SELECT).setPreferredWidth(WIDTH_60);
+        table.getColumnModel().getColumn(SalvageForceTableModel.COL_FORCE_NAME).setPreferredWidth(WIDTH_150);
+        table.getColumnModel().getColumn(SalvageForceTableModel.COL_FORCE_TYPE).setPreferredWidth(WIDTH_100);
+        table.getColumnModel().getColumn(SalvageForceTableModel.COL_TECH).setPreferredWidth(WIDTH_150);
+        table.getColumnModel().getColumn(SalvageForceTableModel.COL_CARGO_CAPACITY).setPreferredWidth(WIDTH_100);
+        table.getColumnModel().getColumn(SalvageForceTableModel.COL_TOW_CAPACITY).setPreferredWidth(WIDTH_80);
+        table.getColumnModel().getColumn(SalvageForceTableModel.COL_SALVAGE_UNITS).setPreferredWidth(WIDTH_80);
+        table.getColumnModel().getColumn(SalvageForceTableModel.COL_HAS_TUG).setPreferredWidth(WIDTH_80);
+
+        // Hide Tug column for ground operations
+        if (isSpaceOperation) {
+            table.getColumnModel().getColumn(SalvageForceTableModel.COL_HAS_TUG).setPreferredWidth(WIDTH_80);
+        } else {
+            table.getColumnModel().getColumn(SalvageForceTableModel.COL_HAS_TUG).setMinWidth(0);
+            table.getColumnModel().getColumn(SalvageForceTableModel.COL_HAS_TUG).setMaxWidth(0);
+            table.getColumnModel().getColumn(SalvageForceTableModel.COL_HAS_TUG).setPreferredWidth(0);
+        }
     }
 
-
     /**
-     * Generates the out-of-character message displayed in the dialog.
+     * Configures the {@link TableRowSorter} with comparators for each column:
      *
-     * @return the out-of-character message string
+     * <ul>
+     *   <li>Select/Has Tug: boolean compare</li>
+     *   <li>Force Name: natural order (human-friendly alphanumerics)</li>
+     *   <li>Force Type: prioritizes "Salvage" types, then natural order</li>
+     *   <li>Tech: experience level (desc), rank (desc), then full name</li>
+     *   <li>Cargo/Tow: numeric ascending</li>
+     *   <li>Salvage Units: integer ascending</li>
+     * </ul>
+     *
+     * <p>Any type mismatches are logged and ignored to avoid crashing if upstream data changes.</p>
+     *
+     * @param table the table whose sorter will be configured
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static String getOutOfCharacterMessage() {
-        String key = "SalvageForcePicker.outOfCharacterMessage.salvage";
-        return getTextAt(RESOURCE_BUNDLE, key);
+    private static void formatSorters(JTable table) {
+        try {
+            @SuppressWarnings("unchecked")
+            TableRowSorter<SalvageForceTableModel> sorter = (TableRowSorter<SalvageForceTableModel>) table.getRowSorter();
+
+            // Table sorting
+            sorter.setComparator(SalvageForceTableModel.COL_SELECT, (b1, b2) ->
+                                                                          Boolean.compare(((Boolean) b1),
+                                                                                ((Boolean) b2)));
+            sorter.setComparator(SalvageForceTableModel.COL_FORCE_NAME,
+                  new NaturalOrderComparator());
+            sorter.setComparator(SalvageForceTableModel.COL_FORCE_TYPE,
+                  (s1, s2) -> forceTypeComparator((String) s1, (String) s2));
+            // Sort by experience level, then rank numeric, then full name
+            sorter.setComparator(SalvageForceTableModel.COL_TECH,
+                  (o1, o2) -> {
+                      SalvageForceTableModel model = (SalvageForceTableModel) table.getModel();
+                      int row1 = -1;
+                      int row2 = -1;
+
+                      // Find which rows have these values
+                      for (int i = 0; i < model.getRowCount(); i++) {
+                          if (Objects.equals(model.getValueAt(i, SalvageForceTableModel.COL_TECH), o1)) {
+                              row1 = i;
+                          }
+                          if (Objects.equals(model.getValueAt(i, SalvageForceTableModel.COL_TECH), o2)) {
+                              row2 = i;
+                          }
+                      }
+
+                      if (row1 == -1 || row2 == -1) {
+                          return 0;
+                      }
+
+                      return techComparator(model, row1, row2);
+                  });
+            sorter.setComparator(SalvageForceTableModel.COL_CARGO_CAPACITY,
+                  Comparator.comparingDouble(d -> ((double) d)));
+            sorter.setComparator(SalvageForceTableModel.COL_TOW_CAPACITY,
+                  Comparator.comparingDouble(d -> ((double) d)));
+            sorter.setComparator(SalvageForceTableModel.COL_SALVAGE_UNITS,
+                  Comparator.comparingInt(i -> ((int) i)));
+            sorter.setComparator(SalvageForceTableModel.COL_HAS_TUG, (b1, b2) ->
+                                                                           Boolean.compare(((Boolean) b1),
+                                                                                 ((Boolean) b2)));
+        } catch (ClassCastException e) {
+            // There's a lot of class casting so we want to catch anything that is malformed. For example, if the
+            // underlying data structure in the table changes.
+            LOGGER.error(e.getMessage());
+        }
     }
 
     /**
-     * Creates the list of buttons to display in the dialog.
+     * Compares two rows in the Tech column using:
      *
-     * <p>Always includes a Cancel button. If forces are available, also includes a Confirm button.</p>
+     * <ol>
+     *   <li>Experience level (descending; more experienced first)</li>
+     *   <li>Rank numeric (descending; higher rank first)</li>
+     *   <li>Full name (ascending)</li>
+     * </ol>
      *
-     * @param hasForces {@code true} if forces are available for selection, {@code false} otherwise
+     * <p>{@code null} techs sort last.</p>
      *
-     * @return a list of button configurations for the dialog
+     * @param model backing table model
+     * @param row1  first model row
+     * @param row2  second model row
+     *
+     * @return negative if row1 &lt; row2 under the ordering, positive if row1 &gt; row2, or 0 if equal
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static List<ImmersiveDialogCore.ButtonLabelTooltipPair> getButtons(boolean hasForces) {
-        List<ImmersiveDialogCore.ButtonLabelTooltipPair> buttons = new ArrayList<>();
-        buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(getText("Cancel.text"), null));
+    private static int techComparator(SalvageForceTableModel model, int row1, int row2) {
+        SalvageForceData data1 = model.forces.get(row1);
+        SalvageForceData data2 = model.forces.get(row2);
+
+        Person tech1 = data1.tech();
+        Person tech2 = data2.tech();
+
+        // Handle null techs - should sort last
+        if (tech1 == null && tech2 == null) {return 0;}
+        if (tech1 == null) {return 1;}
+        if (tech2 == null) {return -1;}
+
+        // Compare by experience level
+        boolean isTechSecondary1 = tech1.getSecondaryRole().isTechSecondary();
+        boolean isTechSecondary2 = tech2.getSecondaryRole().isTechSecondary();
+
+        int expLevel1 = tech1.getExperienceLevel(model.campaign, isTechSecondary1);
+        int expLevel2 = tech2.getExperienceLevel(model.campaign, isTechSecondary2);
+
+        int expCompare = Integer.compare(expLevel2, expLevel1); // Reversed (lowest -> highest)
+        if (expCompare != 0) {return expCompare;}
+
+        // If experience levels are equal, compare by rank (lowest to highest)
+        int rankCompare = Integer.compare(tech2.getRankNumeric(), tech1.getRankNumeric());
+        if (rankCompare != 0) {return rankCompare;}
+
+        // If ranks are equal, compare by full name
+        return tech1.getFullName().compareTo(tech2.getFullName());
+    }
+
+    /**
+     * Comparator used for the Force Type column. Ensures types with the display name containing
+     * {@link ForceType#SALVAGE} sort before others, then falls back to natural-order comparison of the type labels.
+     *
+     * @param s1 first type display string
+     * @param s2 second type display string
+     *
+     * @return comparison result suitable for {@link Comparator}
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static int forceTypeComparator(String s1, String s2) {
+        boolean isSalvage1 = s1.toLowerCase().contains(ForceType.SALVAGE.getDisplayName());
+        boolean isSalvage2 = s2.toLowerCase().contains(ForceType.SALVAGE.getDisplayName());
+        if (isSalvage1 && !isSalvage2) {return -1;}
+        if (!isSalvage1 && isSalvage2) {return 1;}
+        return new NaturalOrderComparator().compare(s1, s2);
+    }
+
+    /**
+     * Loads the localized instruction string shown at the top of the dialog.
+     *
+     * @return localized instructions text
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static String getInstructions() {
+        return getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.instructions");
+    }
+
+    /**
+     * Adds Cancel (always) and Confirm (only if forces exist) buttons to the provided panel and wires up their actions
+     * to close the dialog and set {@link #wasConfirmed}.
+     *
+     * @param hasForces   whether any forces were provided (controls Confirm visibility)
+     * @param buttonPanel panel to populate
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void getButtons(boolean hasForces, JPanel buttonPanel) {
+        RoundedJButton btnCancel = new RoundedJButton(getText("Cancel.text"));
+        btnCancel.addActionListener(evt -> {
+            wasConfirmed = false;
+            dispose();
+        });
+
+        RoundedJButton btnConfirm = new RoundedJButton(getText("Confirm.text"));
+        btnConfirm.addActionListener(evt -> {
+            wasConfirmed = true;
+            dispose();
+        });
+
+        buttonPanel.add(btnCancel);
 
         if (hasForces) {
-            buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(getText("Confirm.text"), null));
+            buttonPanel.add(btnConfirm);
         }
-
-        return buttons;
     }
 
     /**
-     * Creates the supplemental panel containing force selection checkboxes.
-     *
-     * <p>This panel is displayed below the main dialog message and contains checkboxes arranged in three
-     * columns. Each checkbox represents a force that can be selected for salvage operations. The checkboxes are labeled
-     * with the force's name.</p>
-     *
-     * @param isInSpace {@code true} if the scenario is a space scenario
-     * @param hangar    the current campaign hangar
-     * @param forces    the list of forces to display as checkboxes
-     *
-     * @return a {@link JPanel} containing the force selection UI with checkboxes arranged in three columns
+     * Table model that exposes {@link SalvageForceData} properties to the UI and tracks which rows are selected. Also
+     * formats tech labels (experience and injury highlighting).
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static @Nullable JPanel getSupplementalPanel(boolean isInSpace, Hangar hangar, List<Force> forces) {
-        if (forces.isEmpty()) {
-            return null;
+    private static class SalvageForceTableModel extends AbstractTableModel {
+        /** Column index for the selection checkbox. */
+        private static final int COL_SELECT = 0;
+        /** Column index for the force name. */
+        private static final int COL_FORCE_NAME = 1;
+        /** Column index for the force type display. */
+        private static final int COL_FORCE_TYPE = 2;
+        /** Column index for the assigned tech. */
+        private static final int COL_TECH = 3;
+        /** Column index for maximum cargo capacity. */
+        private static final int COL_CARGO_CAPACITY = 4;
+        /** Column index for maximum tow capacity. */
+        private static final int COL_TOW_CAPACITY = 5;
+        /** Column index for salvage-capable unit count. */
+        private static final int COL_SALVAGE_UNITS = 6;
+        /** Column index for tug availability. */
+        private static final int COL_HAS_TUG = 7;
+
+        private final Campaign campaign;
+        private final List<SalvageForceData> forces;
+        private final boolean[] selected;
+
+        private static final String[] COLUMN_NAMES = {
+              getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.select"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.force"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.type"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.tech"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.cargo"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.tow"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.picks"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.tug")
+        };
+
+        /**
+         * Creates a new table model over the provided data.
+         *
+         * @param campaign campaign context for skill/experience labels and tooltips
+         * @param forces   row data; one entry per force
+         *
+         * @author Illiani
+         * @since 0.50.10
+         */
+        public SalvageForceTableModel(Campaign campaign, List<SalvageForceData> forces) {
+            this.campaign = campaign;
+            this.forces = forces;
+            this.selected = new boolean[forces.size()];
         }
 
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
+        @Override
+        public int getRowCount() {
+            return forces.size();
+        }
 
-        JLabel lblForces = new JLabel(getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.combo.label"));
-        panel.add(lblForces, constraints);
+        @Override
+        public int getColumnCount() {
+            return COLUMN_NAMES.length;
+        }
 
-        // Create panel with three columns
-        JPanel checkboxPanel = new JPanel(new GridLayout(1, NUM_COLUMNS, 10, 0));
-        checkboxPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        JPanel leftColumn = new JPanel();
-        leftColumn.setLayout(new BoxLayout(leftColumn, BoxLayout.Y_AXIS));
-        JPanel middleColumn = new JPanel();
-        middleColumn.setLayout(new BoxLayout(middleColumn, BoxLayout.Y_AXIS));
-        JPanel rightColumn = new JPanel();
-        rightColumn.setLayout(new BoxLayout(rightColumn, BoxLayout.Y_AXIS));
+        @Override
+        public String getColumnName(int column) {
+            return COLUMN_NAMES[column];
+        }
 
-        checkboxForceMap = new LinkedHashMap<>();
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return switch (columnIndex) {
+                case COL_SELECT, COL_HAS_TUG -> Boolean.class;
+                case COL_FORCE_NAME, COL_FORCE_TYPE, COL_TECH -> String.class;
+                case COL_CARGO_CAPACITY, COL_TOW_CAPACITY -> Double.class;
+                case COL_SALVAGE_UNITS -> Integer.class;
+                default -> Object.class;
+            };
+        }
 
-        // Create checkboxes for each force
-        for (int i = 0; i < forces.size(); i++) {
-            Force force = forces.get(i);
-            List<Unit> allUnitsInForce = force.getAllUnitsAsUnits(hangar, false);
-            JCheckBox checkbox =
-                  new JCheckBox(force.getFullName() + " (" + force.getSalvageUnitCount(hangar, isInSpace) + ")");
-            checkbox.setToolTipText(wordWrap(getSalvageTooltip(allUnitsInForce, isInSpace)));
-            checkbox.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return columnIndex == COL_SELECT;
+        }
 
-            checkboxForceMap.put(checkbox, force);
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            SalvageForceData data = forces.get(rowIndex);
 
-            // Distribute checkboxes across three columns
-            if (i % NUM_COLUMNS == 0) {
-                leftColumn.add(checkbox);
-            } else if (i % NUM_COLUMNS == 1) {
-                middleColumn.add(checkbox);
+            return switch (columnIndex) {
+                case COL_SELECT -> selected[rowIndex];
+                case COL_FORCE_NAME -> data.force().getName();
+                case COL_FORCE_TYPE -> data.forceType().getDisplayName();
+                case COL_TECH -> getTechLabel(data.tech());
+                case COL_CARGO_CAPACITY -> data.maximumCargoCapacity();
+                case COL_TOW_CAPACITY -> data.maximumTowCapacity();
+                case COL_SALVAGE_UNITS -> data.salvageCapableUnits();
+                case COL_HAS_TUG -> data.hasTug();
+                default -> null;
+            };
+        }
+
+        /**
+         * Builds a display label for the tech, including short skill level labels and full title. Injured techs are
+         * wrapped in a negative-color span.
+         *
+         * @param tech the assigned tech; may be {@code null}
+         *
+         * @return a formatted label or {@code "-"} when no tech is assigned
+         *
+         * @author Illiani
+         * @since 0.50.10
+         */
+        private String getTechLabel(Person tech) {
+            if (tech == null) {
+                return "-";
+            }
+            String name = tech.getFullTitle();
+            boolean isTechSecondary = tech.getSecondaryRole().isTechSecondary();
+            String skillLevel = tech.getSkillLevel(campaign, isTechSecondary).getShortName();
+            boolean isInjured = tech.needsFixing();
+
+            String label = "[" + skillLevel + "] " + name;
+            if (isInjured) {
+                return "<html>" + messageSurroundedBySpanWithColor(getNegativeColor(), label) + "</html>";
             } else {
-                rightColumn.add(checkbox);
+                return label;
             }
         }
 
-        checkboxPanel.add(leftColumn);
-        checkboxPanel.add(middleColumn);
-        checkboxPanel.add(rightColumn);
+        @Override
+        public void setValueAt(Object value, int rowIndex, int columnIndex) {
+            if (columnIndex == COL_SELECT) {
+                selected[rowIndex] = (Boolean) value;
+                fireTableCellUpdated(rowIndex, columnIndex);
+            }
+        }
 
-        FastJScrollPane scrollPane = new FastJScrollPane(checkboxPanel);
-        scrollPane.setBorder(null);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        /**
+         * Returns the {@link Force} instances corresponding to rows whose Select checkbox is enabled.
+         *
+         * @return list of selected forces (never {@code null})
+         *
+         * @author Illiani
+         * @since 0.50.10
+         */
+        public List<Force> getSelectedForces() {
+            List<Force> selectedForces = new ArrayList<>();
+            for (int i = 0; i < forces.size(); i++) {
+                if (selected[i]) {
+                    selectedForces.add(forces.get(i).force());
+                }
+            }
+            return selectedForces;
+        }
+    }
 
-        constraints.gridy = 1;
-        constraints.weighty = 1.0;
-        constraints.fill = GridBagConstraints.BOTH;
-        panel.add(scrollPane, constraints);
+    /**
+     * Renderer for the salvage forces table. Renders booleans as centered checkboxes (not editable) and applies
+     * context-aware tooltips:
+     *
+     * <ul>
+     *   <li>Force name: full force name</li>
+     *   <li>Tech: experience/rank and injury status</li>
+     *   <li>Cargo/Tow: capacity explanation against hangar state</li>
+     *   <li>Picks: localized description of what the number represents</li>
+     *   <li>Tug: hover shows tug source/logic if available</li>
+     * </ul>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static class SalvageForceTableCellRenderer extends javax.swing.table.DefaultTableCellRenderer {
+        private final Campaign campaign;
+        private final JCheckBox checkBox = new JCheckBox();
 
-        return panel;
+        /**
+         * Creates a renderer bound to the provided campaign for tooltip/context data.
+         *
+         * @param campaign campaign context
+         *
+         * @since 0.50.10
+         */
+        public SalvageForceTableCellRenderer(Campaign campaign) {
+            this.campaign = campaign;
+            checkBox.setHorizontalAlignment(javax.swing.JLabel.CENTER);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+              boolean isSelected, boolean hasFocus,
+              int row, int column) {
+
+            SalvageForceTableModel model = (SalvageForceTableModel) table.getModel();
+            int modelRow = table.convertRowIndexToModel(row);
+            int modelColumn = table.convertColumnIndexToModel(column);
+            SalvageForceData data = model.forces.get(modelRow);
+
+            // Handle Boolean columns with checkbox
+            if (modelColumn == SalvageForceTableModel.COL_HAS_TUG) {
+                checkBox.setSelected(value != null && (Boolean) value);
+                checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+
+                String tugTooltip = data.getTugTooltip(campaign.getHangar());
+                checkBox.setToolTipText(!tugTooltip.isBlank() ? wordWrap(tugTooltip) : null);
+                return checkBox;
+            }
+
+            // Handle other columns with text
+            Component component = super.getTableCellRendererComponent(table,
+                  value,
+                  isSelected,
+                  hasFocus,
+                  row,
+                  column);
+
+            if (component instanceof JComponent jComponent) {
+                String tooltip = switch (modelColumn) {
+                    case SalvageForceTableModel.COL_FORCE_NAME -> wordWrap(data.force().getFullName());
+                    case SalvageForceTableModel.COL_TECH -> wordWrap(data.getTechTooltip(campaign));
+                    case SalvageForceTableModel.COL_CARGO_CAPACITY ->
+                          wordWrap(data.getCargoCapacityTooltip(campaign.getHangar()));
+                    case SalvageForceTableModel.COL_TOW_CAPACITY ->
+                          wordWrap(data.getTowCapacityTooltip(campaign.getHangar()));
+                    case SalvageForceTableModel.COL_SALVAGE_UNITS ->
+                          wordWrap(getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.picks.tooltip"));
+                    default -> null;
+                };
+
+                jComponent.setToolTipText(tooltip);
+            }
+
+            return component;
+        }
     }
 }
