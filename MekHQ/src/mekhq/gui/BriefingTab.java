@@ -926,6 +926,9 @@ public final class BriefingTab extends CampaignGuiTab {
                 List<Force> selectedForces = forcePicker.getSelectedForces();
                 for (Force force : selectedForces) {
                     scenario.addSalvageForce(force.getId());
+                    if (force.getTechID() != null) {
+                        scenario.addSalvageTech(force.getTechID());
+                    }
                 }
 
                 if (getCampaign().getCampaignOptions().isUseStratCon()) {
