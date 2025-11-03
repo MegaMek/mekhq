@@ -37,6 +37,7 @@ import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.personnel.skills.SkillType.S_ZERO_G_OPERATIONS;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -813,7 +814,7 @@ public class Maintenance {
                 Maintenance.doMaintenance(campaign, unit);
             }
         } else {
-            campaign.addReport(String.format(resources.getString("maintenanceAdHoc.unable"),
+            campaign.addReport(getFormattedText("maintenanceAdHoc.unable",
                   tech.getHyperlinkedFullTitle(),
                   unit.getHyperlinkedName()));
         }
