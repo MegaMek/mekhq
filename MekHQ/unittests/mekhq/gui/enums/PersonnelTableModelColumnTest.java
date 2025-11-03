@@ -872,14 +872,13 @@ public class PersonnelTableModelColumnTest {
                      REPUTATION,
                      UNLUCKY,
                      BLOODMARK,
-                     EDGE,
                      SPA_COUNT,
                      IMPLANT_COUNT,
                      LOYALTY -> assertInstanceOf(IntegerStringSorter.class,
                       personnelTableModelColumn.getComparator(mockCampaign));
                 case REASONING -> assertInstanceOf(ReasoningSorter.class,
                       personnelTableModelColumn.getComparator(mockCampaign));
-                case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA -> assertInstanceOf(
+                case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA, EDGE -> assertInstanceOf(
                       AttributeScoreSorter.class,
                       personnelTableModelColumn.getComparator(mockCampaign));
                 case SALARY -> assertInstanceOf(FormattedNumberSorter.class,
