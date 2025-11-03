@@ -227,6 +227,10 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
                 tooltip.append(entry.getKey()).append(": \u2713<br>");
             }
         }
+
+        if (!tooltip.isEmpty()) {
+            tooltip.append(getTextAt(RESOURCE_BUNDLE, "SalvageForceData.noTug"));
+        }
         return tooltip.toString();
     }
 }
