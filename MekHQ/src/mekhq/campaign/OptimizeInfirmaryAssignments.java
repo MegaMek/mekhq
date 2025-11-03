@@ -94,7 +94,15 @@ public class OptimizeInfirmaryAssignments {
         organizePatients();
 
         // Assign doctors to patients
-        assignDoctors(isDoctorsUseAdministration, maximumPatients, healingWaitingPeriod, patients, doctors);
+        boolean isOnContract = !campaign.getActiveMissions(false).isEmpty();
+        boolean isPlanetside = campaign.getLocation().isOnPlanet();
+        boolean isOnContractAndPlanetside = isPlanetside && isOnContract;
+        assignDoctors(isDoctorsUseAdministration,
+              maximumPatients,
+              healingWaitingPeriod,
+              patients,
+              doctors,
+              isOnContractAndPlanetside);
     }
 
     /**
@@ -116,9 +124,12 @@ public class OptimizeInfirmaryAssignments {
      *                                   cannot be assigned due to insufficient doctor capacity remain unassigned.
      * @param doctors                    The list of available doctors, ordered by priority (e.g., experience level or
      *                                   suitability). Doctors higher on the list are assigned first.
+     * @param isOnContractAndPlanetside  {@code true} if the campaign has an active mission and is planetside (i.e., not
+     *                                   in transit).
      */
     private void assignDoctors(final boolean isDoctorsUseAdministration, final int maximumPatients,
-          final int healingWaitingPeriod, final List<Person> patients, List<Person> doctors) {
+          final int healingWaitingPeriod, final List<Person> patients, List<Person> doctors,
+          final boolean isOnContractAndPlanetside) {
         boolean useMASHTheatres = campaign.getCampaignOptions().isUseMASHTheatres();
         int mashTheatreCapacity = useMASHTheatres ? campaign.getMashTheatreCapacity() : Integer.MAX_VALUE;
 
@@ -134,7 +145,7 @@ public class OptimizeInfirmaryAssignments {
                 continue;
             }
 
-            if (useMASHTheatres && totalPatientCounter >= mashTheatreCapacity) {
+            if (isOnContractAndPlanetside && useMASHTheatres && totalPatientCounter >= mashTheatreCapacity) {
                 // Similar to the above, we're just unassigning doctors for any remaining patients.
                 continue;
             }

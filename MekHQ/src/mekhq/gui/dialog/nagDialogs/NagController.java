@@ -113,7 +113,12 @@ public class NagController {
 
         // Untreated personnel
         boolean isUseMASHTheatres = campaignOptions.isUseMASHTheatres();
-        int mashTheatreCapacity = isUseMASHTheatres ? campaign.getMashTheatreCapacity() : Integer.MAX_VALUE;
+        boolean isOnContract = !campaign.getActiveMissions(false).isEmpty();
+        boolean isPlanetside = campaign.getLocation().isOnPlanet();
+        boolean isOnContractAndPlanetside = isPlanetside && isOnContract;
+        int mashTheatreCapacity = isUseMASHTheatres && isOnContractAndPlanetside ?
+                                        campaign.getMashTheatreCapacity() :
+                                        Integer.MAX_VALUE;
         if (UntreatedPersonnelNagDialog.checkNag(activePersonnel,
               doctorCapacity,
               isDoctorsUseAdministration,

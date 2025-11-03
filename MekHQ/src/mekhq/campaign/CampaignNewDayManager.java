@@ -564,7 +564,11 @@ public class CampaignNewDayManager {
                 person.resetCurrentEdge();
 
                 if (!person.getStatus().isMIA()) {
-                    processFatigueRecovery(campaign, person, campaign.getFieldKitchenWithinCapacity());
+                    boolean isOnContract = !campaign.getActiveMissions(false).isEmpty();
+                    boolean isPlanetside = campaign.getLocation().isOnPlanet();
+                    boolean isOnContractAndPlanetside = isPlanetside && isOnContract;
+                    boolean isWithinCapacity = !isOnContractAndPlanetside || campaign.getFieldKitchenWithinCapacity();
+                    processFatigueRecovery(campaign, person, isWithinCapacity);
                 }
 
                 processCompulsionsAndMadness(person, personnelOptions, isUseAdvancedMedical, isUseFatigue);
@@ -925,7 +929,7 @@ public class CampaignNewDayManager {
         if (MekHQ.getMHQOptions().getSelfCorrectMaintenance()) {
             Maintenance.checkAndCorrectMaintenanceSchedule(campaign);
         }
-        
+
         // need to loop through units twice, the first time to do all maintenance and
         // the second time to do whatever else. Otherwise, maintenance minutes might
         // get sucked up by other stuff. campaign is also a good place to ensure that a

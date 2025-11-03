@@ -433,7 +433,15 @@ public final class InfirmaryTab extends CampaignGuiTab {
         if (useMASHTheatres) {
             final int mashTheatreCapacity = getCampaign().getMashTheatreCapacity();
             final int patientsAssignedToDoctors = getCampaign().getPatientsAssignedToDoctors().size();
-            isWithinTheatreCapacity = mashTheatreCapacity > patientsAssignedToDoctors;
+
+            boolean isOnContract = !getCampaign().getActiveMissions(false).isEmpty();
+            boolean isPlanetside = getCampaign().getLocation().isOnPlanet();
+            boolean isOnContractAndPlanetside = isPlanetside && isOnContract;
+            if (isOnContractAndPlanetside) {
+                isWithinTheatreCapacity = mashTheatreCapacity > patientsAssignedToDoctors;
+            } else {
+                isWithinTheatreCapacity = true;
+            }
         }
 
         return isWithinDoctorCapacity && isWithinTheatreCapacity;
