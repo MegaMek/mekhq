@@ -168,7 +168,7 @@ public class SalvageTechPicker extends JDialog {
 
         // Buttons at the bottom
         JPanel buttonPanel = new JPanel();
-        getButtons(hasTechs, buttonPanel);
+        getButtons(buttonPanel);
         add(buttonPanel, BorderLayout.SOUTH);
 
         pack();
@@ -312,13 +312,12 @@ public class SalvageTechPicker extends JDialog {
      * Adds Cancel (always) and Confirm (only if techs exist) buttons to the provided panel and wires up their actions
      * to close the dialog and set {@link #wasConfirmed}.
      *
-     * @param hasTechs    whether any techs were provided (controls Confirm visibility)
      * @param buttonPanel panel to populate
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private void getButtons(boolean hasTechs, JPanel buttonPanel) {
+    private void getButtons(JPanel buttonPanel) {
         RoundedJButton btnCancel = new RoundedJButton(getText("Cancel.text"));
         btnCancel.addActionListener(evt -> {
             wasConfirmed = false;
@@ -332,10 +331,7 @@ public class SalvageTechPicker extends JDialog {
         });
 
         buttonPanel.add(btnCancel);
-
-        if (hasTechs) {
-            buttonPanel.add(btnConfirm);
-        }
+        buttonPanel.add(btnConfirm);
     }
 
     /**
