@@ -32,235 +32,455 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import javax.swing.BoxLayout;
+import java.util.Objects;
+import java.util.UUID;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableRowSorter;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.logging.MMLogger;
+import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
-public class SalvageTechPicker extends ImmersiveDialogCore {
+/**
+ * Modal dialog that lets the user pick one or more salvage technicians from a tabular list. The table supports sorting,
+ * pre-selection, and exposes results via {@link #wasConfirmed()} and {@link #getSelectedTechs()}.
+ *
+ * <p>The dialog shows an instructions panel, a scrollable table when tech data exists, and Cancel/Confirm buttons.
+ * The Confirm button is only present when at least one tech is available.</p>
+ *
+ * <p>Use {@link #wasConfirmed()} to check whether the user confirmed and {@link #getSelectedTechs()} to retrieve
+ * the chosen techs after the dialog closes.</p>
+ *
+ * @author Illiani
+ * @since 0.50.10
+ */
+public class SalvageTechPicker extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(SalvageTechPicker.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SalvageTechPicker";
-    private static final int NUM_COLUMNS = 3;
 
-    public final int SELECTION_CANCELLED = 0;
-    public final int SELECTION_CONFIRMED = 1;
+    private static final Dimension DIMENSION = scaleForGUI(800, 600);
+    private static final int WIDTH_60 = scaleForGUI(60);
+    private static final int WIDTH_80 = scaleForGUI(80);
+    private static final int WIDTH_100 = scaleForGUI(100);
 
-    private static Map<JCheckBox, Person> checkboxPersonMap;
+    private boolean wasConfirmed;
+    private SalvageTechTableModel tableModel;
 
     /**
      * Checks whether the user confirmed their tech selection.
      *
-     * @return {@code true} if the user confirmed their selection, {@code false} if they canceled
+     * @return {@code true} if the user pressed Confirm; {@code false} if they canceled or closed the dialog.
      *
      * @author Illiani
      * @since 0.50.10
      */
     public boolean wasConfirmed() {
-        return getDialogChoice() == SELECTION_CONFIRMED;
+        return wasConfirmed;
     }
 
     /**
-     * Retrieves the list of techs that were selected by the user.
+     * Returns all selected person {@link UUID}s from the table. If the table was never constructed (e.g., no techs were
+     * provided), returns an empty list.
      *
-     * <p>This method examines all checkboxes in the dialog and returns a list of techs corresponding
-     * to the checked checkboxes. If no checkboxes are selected or the dialog was canceled, an empty list is
-     * returned.</p>
-     *
-     * @return a list of selected {@link Person} objects, or an empty list if none were selected
+     * @return a list of selected person UUIDs (never {@code null})
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public List<Person> getSelectedTechs() {
-        List<Person> selectedTechs = new ArrayList<>();
+    public List<UUID> getSelectedTechs() {
+        if (tableModel == null) {
+            return new ArrayList<>();
+        }
+        return tableModel.getSelectedTechs();
+    }
 
-        if (checkboxPersonMap != null) {
-            for (Map.Entry<JCheckBox, Person> entry : checkboxPersonMap.entrySet()) {
-                if (entry.getKey().isSelected()) {
-                    selectedTechs.add(entry.getValue());
+    /**
+     * Creates and shows a modal picker dialog for salvage technicians.
+     *
+     * @param techs                list of available technicians to display. When {@code null} or empty, only
+     *                             instructions and a Cancel button are shown.
+     * @param alreadySelectedTechs list of tech UUIDs that should start as pre-selected.
+     *
+     * @implNote This constructor builds and shows the dialog immediately (modal). Callers should read results
+     *       after construction completes.
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public SalvageTechPicker(List<SalvageTechData> techs, List<UUID> alreadySelectedTechs) {
+        boolean hasTechs = techs != null && !techs.isEmpty();
+
+        setTitle(getText("accessingTerminal.title"));
+        setModal(true);
+        setLayout(new BorderLayout());
+
+        // Instructions at the top
+        JPanel instructionsPanel = new JPanel();
+        JTextArea instructionsLabel = new JTextArea(getInstructions());
+        instructionsLabel.setLineWrap(true);
+        instructionsLabel.setWrapStyleWord(true);
+        instructionsLabel.setEditable(false);
+        instructionsLabel.setOpaque(false);
+        instructionsLabel.setColumns(60);
+        instructionsLabel.setRows(0);
+        instructionsPanel.add(instructionsLabel);
+        add(instructionsPanel, BorderLayout.NORTH);
+
+        // Table in the center
+        if (hasTechs) {
+            tableModel = new SalvageTechTableModel(techs, alreadySelectedTechs);
+            JTable table = new JTable(tableModel);
+            table.setAutoCreateRowSorter(true);
+
+            formatSorters(table);
+
+            @SuppressWarnings("unchecked")
+            TableRowSorter<SalvageTechTableModel> sorter =
+                  (TableRowSorter<SalvageTechTableModel>) table.getRowSorter();
+            List<javax.swing.RowSorter.SortKey> sortKeys = new ArrayList<>();
+            sortKeys.add(new javax.swing.RowSorter.SortKey(
+                  SalvageTechTableModel.COL_SELECT,
+                  javax.swing.SortOrder.DESCENDING));
+            sorter.setSortKeys(sortKeys);
+
+            assignWidths(table);
+            setRenderers(table);
+
+            JScrollPane scrollPane = new JScrollPane(table);
+            scrollPane.setPreferredSize(DIMENSION);
+            add(scrollPane, BorderLayout.CENTER);
+        }
+
+        // Buttons at the bottom
+        JPanel buttonPanel = new JPanel();
+        getButtons(hasTechs, buttonPanel);
+        add(buttonPanel, BorderLayout.SOUTH);
+
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    /**
+     * Installs a checkbox renderer for the Select column so that boolean values are shown as centered checkboxes.
+     *
+     * @param table the table to update
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void setRenderers(JTable table) {
+        table.getColumnModel().getColumn(SalvageTechTableModel.COL_SELECT).setCellRenderer(
+              new javax.swing.table.DefaultTableCellRenderer() {
+                  private final JCheckBox checkBox = new JCheckBox();
+
+                  @Override
+                  public Component getTableCellRendererComponent(
+                        JTable table, Object value, boolean isSelected,
+                        boolean hasFocus, int row, int column) {
+                      checkBox.setSelected(value != null && (Boolean) value);
+                      checkBox.setHorizontalAlignment(
+                            javax.swing.JLabel.CENTER);
+                      checkBox.setBackground(
+                            isSelected ? table.getSelectionBackground()
+                                  : table.getBackground());
+                      return checkBox;
+                  }
+              });
+    }
+
+    /**
+     * Applies preferred widths to all columns for a readable layout.
+     *
+     * @param table the table to update
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void assignWidths(JTable table) {
+        table.getColumnModel().getColumn(SalvageTechTableModel.COL_SELECT)
+              .setPreferredWidth(WIDTH_60);
+        table.getColumnModel().getColumn(SalvageTechTableModel.COL_RANK)
+              .setPreferredWidth(WIDTH_100);
+        table.getColumnModel().getColumn(SalvageTechTableModel.COL_FIRST_NAME)
+              .setPreferredWidth(WIDTH_100);
+        table.getColumnModel().getColumn(SalvageTechTableModel.COL_LAST_NAME)
+              .setPreferredWidth(WIDTH_100);
+        table.getColumnModel().getColumn(SalvageTechTableModel.COL_SKILL_LEVEL)
+              .setPreferredWidth(WIDTH_80);
+        table.getColumnModel().getColumn(SalvageTechTableModel.COL_INJURIES)
+              .setPreferredWidth(WIDTH_60);
+        table.getColumnModel().getColumn(
+                    SalvageTechTableModel.COL_MINUTES_AVAILABLE)
+              .setPreferredWidth(WIDTH_80);
+    }
+
+    /**
+     * Configures column comparators to provide intuitive sorting for boolean, rank (by numeric value), natural string
+     * order, and integer columns.
+     *
+     * @param table the table whose sorter will be configured
+     *
+     * @implNote Rank sorting looks up the underlying row's numeric rank value to avoid lexicographic errors
+     *       (e.g., "Sergeant" vs "Private").
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void formatSorters(JTable table) {
+        try {
+            @SuppressWarnings("unchecked")
+            TableRowSorter<SalvageTechTableModel> sorter =
+                  (TableRowSorter<SalvageTechTableModel>) table.getRowSorter();
+
+            // Table sorting
+            sorter.setComparator(SalvageTechTableModel.COL_SELECT, (b1, b2) ->
+                                                                         Boolean.compare(((Boolean) b1),
+                                                                               ((Boolean) b2)));
+
+            sorter.setComparator(SalvageTechTableModel.COL_RANK, (o1, o2) -> {
+                // Get the model to access rankNumeric values
+                SalvageTechTableModel model = sorter.getModel();
+                int row1 = -1, row2 = -1;
+
+                // Find which rows contain these values
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    if (Objects.equals(model.getValueAt(
+                          i, SalvageTechTableModel.COL_RANK), o1)) {
+                        row1 = i;
+                    }
+                    if (Objects.equals(model.getValueAt(
+                          i, SalvageTechTableModel.COL_RANK), o2)) {
+                        row2 = i;
+                    }
+                }
+
+                if (row1 >= 0 && row2 >= 0) {
+                    return Integer.compare(
+                          model.getRankNumeric(row1), model.getRankNumeric(row2));
+                }
+                return 0;
+            });
+
+            sorter.setComparator(SalvageTechTableModel.COL_FIRST_NAME,
+                  new NaturalOrderComparator());
+            sorter.setComparator(SalvageTechTableModel.COL_LAST_NAME,
+                  new NaturalOrderComparator());
+            sorter.setComparator(SalvageTechTableModel.COL_SKILL_LEVEL,
+                  new NaturalOrderComparator());
+            sorter.setComparator(SalvageTechTableModel.COL_INJURIES,
+                  Comparator.comparingInt(i -> ((int) i)));
+            sorter.setComparator(
+                  SalvageTechTableModel.COL_MINUTES_AVAILABLE,
+                  Comparator.comparingInt(i -> ((int) i)));
+        } catch (ClassCastException e) {
+            // There's a lot of class casting, so we want to catch anything that
+            // is malformed. For example, if the underlying data structure in
+            // the table changes.
+            LOGGER.error(e.getMessage());
+        }
+    }
+
+    /**
+     * Localized instructional text for the dialog header.
+     *
+     * @return the localized instructions string
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static String getInstructions() {
+        return getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.instructions");
+    }
+
+    /**
+     * Adds Cancel (always) and Confirm (only if techs exist) buttons to the provided panel and wires up their actions
+     * to close the dialog and set {@link #wasConfirmed}.
+     *
+     * @param hasTechs    whether any techs were provided (controls Confirm visibility)
+     * @param buttonPanel panel to populate
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void getButtons(boolean hasTechs, JPanel buttonPanel) {
+        RoundedJButton btnCancel = new RoundedJButton(getText("Cancel.text"));
+        btnCancel.addActionListener(evt -> {
+            wasConfirmed = false;
+            dispose();
+        });
+
+        RoundedJButton btnConfirm = new RoundedJButton(getText("Confirm.text"));
+        btnConfirm.addActionListener(evt -> {
+            wasConfirmed = true;
+            dispose();
+        });
+
+        buttonPanel.add(btnCancel);
+
+        if (hasTechs) {
+            buttonPanel.add(btnConfirm);
+        }
+    }
+
+    /**
+     * Table model backing the salvage tech selection grid. Provides typed columns, pre-selection, and helpers for
+     * retrieving selected tech IDs and for comparing ranks by numeric strength.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static class SalvageTechTableModel extends AbstractTableModel {
+        /** Column index for Select (checkbox). */
+        private static final int COL_SELECT = 0;
+        /** Column index for textual Rank. */
+        private static final int COL_RANK = 1;
+        /** Column index for first name. */
+        private static final int COL_FIRST_NAME = 2;
+        /** Column index for last name. */
+        private static final int COL_LAST_NAME = 3;
+        /** Column index for skill level name. */
+        private static final int COL_SKILL_LEVEL = 4;
+        /** Column index for injury count. */
+        private static final int COL_INJURIES = 5;
+        /** Column index for available minutes. */
+        private static final int COL_MINUTES_AVAILABLE = 6;
+
+        private final List<SalvageTechData> techs;
+        private final boolean[] selected;
+
+        private static final String[] COLUMN_NAMES = {
+              getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.select"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.rank"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.firstName"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.lastName"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.skill"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.injuries"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.minutes")
+        };
+
+        /**
+         * Constructs the model.
+         *
+         * @param techs                list of rows to display (required, not {@code null})
+         * @param alreadySelectedTechs UUIDs to pre-select; may be {@code null}
+         *
+         * @author Illiani
+         * @since 0.50.10
+         */
+        public SalvageTechTableModel(List<SalvageTechData> techs, List<UUID> alreadySelectedTechs) {
+            this.techs = techs;
+            this.selected = new boolean[techs.size()];
+
+            // Pre-select checkboxes for techs that are already selected
+            for (int i = 0; i < techs.size(); i++) {
+                UUID techId = techs.get(i).tech().getId();
+                if (alreadySelectedTechs.contains(techId)) {
+                    selected[i] = true;
                 }
             }
         }
 
-        return selectedTechs;
-    }
-
-    /**
-     * Creates a new salvage tech picker dialog.
-     *
-     * @param campaign the current campaign
-     * @param techs    the list of available techs that can perform salvage operations
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    public SalvageTechPicker(Campaign campaign, List<Person> techs) {
-        super(campaign,
-              campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND),
-              null,
-              getInCharacterMessage(campaign.getCommanderAddress(), !techs.isEmpty()),
-              getButtons(!techs.isEmpty()),
-              getOutOfCharacterMessage(),
-              ImmersiveDialogWidth.LARGE.getWidth(),
-              false,
-              getSupplementalPanel(campaign, techs),
-              null,
-              true);
-    }
-
-    /**
-     * Generates the in-character message displayed in the dialog.
-     *
-     * <p>The message varies depending on whether techs are available for deployment.</p>
-     *
-     * @param commanderAddress the formal address/title of the campaign commander
-     * @param hasTechs         {@code true} if techs are available, {@code false} otherwise
-     *
-     * @return the formatted in-character message string
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private static String getInCharacterMessage(String commanderAddress, boolean hasTechs) {
-        String key = "SalvageTechPicker.inCharacterMessage." + (hasTechs ? "normal" : "noTechs");
-        return getFormattedTextAt(RESOURCE_BUNDLE, key, commanderAddress);
-    }
-
-
-    /**
-     * Generates the out-of-character message displayed in the dialog.
-     *
-     * @return the out-of-character message string
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private static String getOutOfCharacterMessage() {
-        String key = "SalvageTechPicker.outOfCharacterMessage.salvage";
-        return getTextAt(RESOURCE_BUNDLE, key);
-    }
-
-    /**
-     * Creates the list of buttons to display in the dialog.
-     *
-     * <p>Always includes a Cancel button. If techs are available, also includes a Confirm button.</p>
-     *
-     * @param hasTechs {@code true} if techs are available for selection, {@code false} otherwise
-     *
-     * @return a list of button configurations for the dialog
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private static List<ButtonLabelTooltipPair> getButtons(boolean hasTechs) {
-        List<ButtonLabelTooltipPair> buttons = new ArrayList<>();
-        buttons.add(new ButtonLabelTooltipPair(getText("Cancel.text"), null));
-
-        if (hasTechs) {
-            buttons.add(new ButtonLabelTooltipPair(getText("Confirm.text"), null));
+        @Override
+        public int getRowCount() {
+            return techs.size();
         }
 
-        return buttons;
-    }
-
-    /**
-     * Creates the supplemental panel containing tech selection checkboxes.
-     *
-     * <p>This panel is displayed below the main dialog message and contains checkboxes arranged in three
-     * columns. Each checkbox represents a tech that can be selected for salvage operations. The checkboxes are labeled
-     * with the tech's name.</p>
-     *
-     * @param campaign the current campaign context
-     * @param techs    the list of techs to display as checkboxes
-     *
-     * @return a {@link JPanel} containing the tech selection UI with checkboxes arranged in three columns
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private static @Nullable JPanel getSupplementalPanel(Campaign campaign, List<Person> techs) {
-        if (techs.isEmpty()) {
-            return null;
+        @Override
+        public int getColumnCount() {
+            return COLUMN_NAMES.length;
         }
 
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
+        @Override
+        public String getColumnName(int column) {
+            return COLUMN_NAMES[column];
+        }
 
-        JLabel lblTechs = new JLabel(getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.combo.label"));
-        panel.add(lblTechs, constraints);
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return switch (columnIndex) {
+                case COL_SELECT -> Boolean.class;
+                case COL_RANK, COL_FIRST_NAME, COL_LAST_NAME, COL_SKILL_LEVEL -> String.class;
+                case COL_INJURIES, COL_MINUTES_AVAILABLE -> Integer.class;
+                default -> Object.class;
+            };
+        }
 
-        // Create panel with three columns
-        JPanel checkboxPanel = new JPanel(new GridLayout(1, NUM_COLUMNS, 10, 0));
-        checkboxPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        JPanel leftColumn = new JPanel();
-        leftColumn.setLayout(new BoxLayout(leftColumn, BoxLayout.Y_AXIS));
-        JPanel middleColumn = new JPanel();
-        middleColumn.setLayout(new BoxLayout(middleColumn, BoxLayout.Y_AXIS));
-        JPanel rightColumn = new JPanel();
-        rightColumn.setLayout(new BoxLayout(rightColumn, BoxLayout.Y_AXIS));
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return columnIndex == COL_SELECT;
+        }
 
-        checkboxPersonMap = new LinkedHashMap<>();
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            SalvageTechData data = techs.get(rowIndex);
 
-        // Create checkboxes for each tech
-        for (int i = 0; i < techs.size(); i++) {
-            Person tech = techs.get(i);
-            String techName = tech.getFullTitle();
-            String skillLevel = tech.getSkillLevel(campaign, tech.getPrimaryRole().isTech()).toString();
-            int minutesLeft = tech.getMinutesLeft();
-            JCheckBox checkbox = new JCheckBox(techName + " (" + skillLevel + ", " + minutesLeft + "m)");
-            checkbox.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+            return switch (columnIndex) {
+                case COL_SELECT -> selected[rowIndex];
+                case COL_RANK -> data.rank();
+                case COL_FIRST_NAME -> data.firstName();
+                case COL_LAST_NAME -> data.lastName();
+                case COL_SKILL_LEVEL -> data.skillLevelName();
+                case COL_INJURIES -> data.injuries();
+                case COL_MINUTES_AVAILABLE -> data.minutesAvailable();
+                default -> null;
+            };
+        }
 
-            checkboxPersonMap.put(checkbox, tech);
-
-            // Distribute checkboxes across three columns
-            if (i % NUM_COLUMNS == 0) {
-                leftColumn.add(checkbox);
-            } else if (i % NUM_COLUMNS == 1) {
-                middleColumn.add(checkbox);
-            } else {
-                rightColumn.add(checkbox);
+        @Override
+        public void setValueAt(Object value, int rowIndex, int columnIndex) {
+            if (columnIndex == COL_SELECT) {
+                selected[rowIndex] = (Boolean) value;
+                fireTableCellUpdated(rowIndex, columnIndex);
             }
         }
 
-        checkboxPanel.add(leftColumn);
-        checkboxPanel.add(middleColumn);
-        checkboxPanel.add(rightColumn);
+        /**
+         * Returns the {@link UUID} instances corresponding to rows whose Select checkbox is enabled.
+         *
+         * @return list of selected tech UUIDs (never {@code null})
+         *
+         * @author Illiani
+         * @since 0.50.10
+         */
+        public List<UUID> getSelectedTechs() {
+            List<UUID> selectedTechs = new ArrayList<>();
+            for (int i = 0; i < techs.size(); i++) {
+                if (selected[i]) {
+                    selectedTechs.add(techs.get(i).tech().getId());
+                }
+            }
+            return selectedTechs;
+        }
 
-        JScrollPane scrollPane = new JScrollPane(checkboxPanel);
-        scrollPane.setBorder(null);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-        constraints.gridy = 1;
-        constraints.weighty = 1.0;
-        constraints.fill = GridBagConstraints.BOTH;
-        panel.add(scrollPane, constraints);
-
-        return panel;
+        /**
+         * Returns the numeric rank value for the tech at the specified row. Useful for comparator logic to ensure
+         * correct ordering.
+         *
+         * @param rowIndex the row index
+         *
+         * @return the numeric rank value
+         *
+         * @author Illiani
+         * @since 0.50.10
+         */
+        public int getRankNumeric(int rowIndex) {
+            return techs.get(rowIndex).rankNumeric();
+        }
     }
 }
