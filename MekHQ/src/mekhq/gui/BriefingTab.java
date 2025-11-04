@@ -743,7 +743,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        CustomizeScenarioDialog csd = new CustomizeScenarioDialog(getFrame(), true, null, mission, getCampaign());
+        CustomizeScenarioDialog csd = new CustomizeScenarioDialog(getFrame(), true, null, mission, getCampaignGui());
         csd.setVisible(true);
         // need to update the scenario table and refresh the scroll view
         refreshScenarioTableData();

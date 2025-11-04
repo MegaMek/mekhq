@@ -116,7 +116,7 @@ public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
         Mission mission = gui.getCampaign().getMission(scenario.getMissionId());
         if (mission != null) {
             CustomizeScenarioDialog csd = new CustomizeScenarioDialog(gui.getFrame(), true,
-                  scenario, mission, gui.getCampaign());
+                  scenario, mission, gui);
             csd.setVisible(true);
             MekHQ.triggerEvent(new ScenarioChangedEvent(scenario));
         }

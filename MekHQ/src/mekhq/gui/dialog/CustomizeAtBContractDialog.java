@@ -95,7 +95,8 @@ public class CustomizeAtBContractDialog extends JDialog {
     protected JComboBox<String> cbAllyQuality;
     protected MMComboBox<SkillLevel> comboEnemySkill;
     protected JComboBox<String> cbEnemyQuality;
-    protected JSpinner spnRequiredLances;
+    protected JSpinner spnRequiredCombatTeams;
+    protected JSpinner spnRequiredCombatElements;
     protected JMoneyTextField txtBasePay;
     protected MMComboBox<AtBMoraleLevel> comboEnemyMorale;
     protected JSpinner spnContractScoreArbitraryModifier;
@@ -203,16 +204,21 @@ public class CustomizeAtBContractDialog extends JDialog {
         JLabel lblEnemyCamo = new JLabel();
         btnEnemyCamo = new JButton();
         JLabel lblEnemyRating = new JLabel();
-        JLabel lblRequiredLances = new JLabel();
+        JLabel lblRequiredCombatTeams = new JLabel();
+        JLabel lblRequiredElements = new JLabel();
 
-        int requiredLances = contract.getRequiredCombatElements() > 0 ? contract.getRequiredCombatElements() : 1;
+        int requiredCombatTeams = contract.getRequiredCombatTeams() > 0 ? contract.getRequiredCombatTeams() : 1;
+        spnRequiredCombatTeams = new JSpinner(new SpinnerNumberModel(requiredCombatTeams, 1, null, 1));
 
-        spnRequiredLances = new JSpinner(new SpinnerNumberModel(requiredLances, 1, null, 1));
+        int requiredElements = contract.getRequiredCombatElements() > 0 ? contract.getRequiredCombatElements() : 1;
+        spnRequiredCombatElements = new JSpinner(new SpinnerNumberModel(requiredElements, 1, null, 1));
+
         JLabel lblEnemyMorale = new JLabel();
         spnContractScoreArbitraryModifier = new JSpinner(new SpinnerNumberModel(contract.getContractScoreArbitraryModifier(),
               null,
               null,
               1));
+
         JLabel lblContractScoreArbitraryModifier = new JLabel();
 
         txtBasePay = new JMoneyTextField();
@@ -381,21 +387,13 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(cbEnemyQuality, gbc);
 
-        lblRequiredLances.setText(resourceMap.getString("lblRequiredLances.text"));
-        lblRequiredLances.setName("lblRequiredLances");
+        lblRequiredCombatTeams.setText(resourceMap.getString("lblRequiredCombatTeams.text"));
+        lblRequiredCombatTeams.setName("lblRequiredCombatTeams");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
         gbc.insets = new Insets(5, 5, 5, 5);
-        leftPanel.add(lblRequiredLances, gbc);
-
-        lblRequiredLances.setText(resourceMap.getString("lblRequiredCombatElements.text"));
-        lblRequiredLances.setName("lblRequiredCombatElements");
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        leftPanel.add(lblRequiredLances, gbc);
+        leftPanel.add(lblRequiredCombatTeams, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = y++;
@@ -403,7 +401,23 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
-        leftPanel.add(spnRequiredLances, gbc);
+        leftPanel.add(spnRequiredCombatTeams, gbc);
+
+        lblRequiredElements.setText(resourceMap.getString("lblRequiredCombatElements.text"));
+        lblRequiredElements.setName("lblRequiredCombatElements");
+        gbc.gridx = 0;
+        gbc.gridy = y;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        leftPanel.add(lblRequiredElements, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = y++;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        leftPanel.add(spnRequiredCombatElements, gbc);
 
         lblEnemyMorale.setText(resourceMap.getString("lblEnemyMorale.text"));
         lblEnemyMorale.setName("lblEnemyMorale");
@@ -599,7 +613,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         contract.setAllyQuality(cbAllyQuality.getSelectedIndex());
         contract.setEnemySkill(comboEnemySkill.getSelectedItem());
         contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
-        contract.setRequiredCombatTeams((Integer) spnRequiredLances.getValue());
+        contract.setRequiredCombatTeams((Integer) spnRequiredCombatTeams.getValue());
+        contract.setRequiredCombatElements((Integer) spnRequiredCombatElements.getValue());
         contract.setMoraleLevel(comboEnemyMorale.getSelectedItem());
         contract.setContractScoreArbitraryModifier((Integer) spnContractScoreArbitraryModifier.getValue());
         contract.setBaseAmount(txtBasePay.getMoney());

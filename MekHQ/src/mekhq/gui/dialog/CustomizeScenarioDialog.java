@@ -66,6 +66,7 @@ import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.model.BotForceTableModel;
 import mekhq.gui.model.LootTableModel;
@@ -161,7 +162,7 @@ public class CustomizeScenarioDialog extends JDialog {
     private MarkdownEditorPanel txtReport;
     // endregion Variable declarations
 
-    public CustomizeScenarioDialog(JFrame parent, boolean modal, Scenario s, Mission m, Campaign c) {
+    public CustomizeScenarioDialog(JFrame parent, boolean modal, Scenario s, Mission m, CampaignGUI gui) {
         super(parent, modal);
         this.frame = parent;
         this.mission = m;
@@ -172,7 +173,7 @@ public class CustomizeScenarioDialog extends JDialog {
             scenario = s;
             newScenario = false;
         }
-        campaign = c;
+        campaign = gui.getCampaign();
         if (scenario.getDate() == null) {
             scenario.setDate(campaign.getLocalDate());
         }
@@ -210,13 +211,13 @@ public class CustomizeScenarioDialog extends JDialog {
         usingFixedMap = scenario.isUsingFixedMap();
         boardType = scenario.getBoardType();
 
-        initComponents();
+        initComponents(gui);
         setLocationRelativeTo(parent);
         setUserPreferences();
         pack();
     }
 
-    private void initComponents() {
+    private void initComponents(CampaignGUI gui) {
         getContentPane().setLayout(new BorderLayout());
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioDialog",
               MekHQ.getMHQOptions().getLocale());
@@ -350,7 +351,7 @@ public class CustomizeScenarioDialog extends JDialog {
         panObjectives.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
               "panObjectives.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
-        initLootPanel(resourceMap);
+        initLootPanel(resourceMap, gui);
         panLoot.setPreferredSize(new Dimension(400, 150));
         panLoot.setMinimumSize(new Dimension(400, 150));
         panLoot.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
@@ -997,18 +998,18 @@ public class CustomizeScenarioDialog extends JDialog {
         }
     }
 
-    private void initLootPanel(ResourceBundle resourceMap) {
+    private void initLootPanel(ResourceBundle resourceMap, CampaignGUI gui) {
         panLoot = new JPanel(new BorderLayout());
 
         JPanel panButtons = new JPanel(new GridLayout(1, 0));
         JButton btnAddLoot = new JButton(resourceMap.getString("btnAddLoot.text"));
-        btnAddLoot.addActionListener(evt -> addLoot());
+        btnAddLoot.addActionListener(evt -> addLoot(gui));
         btnAddLoot.setEnabled(scenario.getStatus().isCurrent());
         panButtons.add(btnAddLoot);
 
         btnEditLoot = new JButton(resourceMap.getString("btnEditLoot.text"));
         btnEditLoot.setEnabled(false);
-        btnEditLoot.addActionListener(evt -> editLoot());
+        btnEditLoot.addActionListener(evt -> editLoot(gui));
         panButtons.add(btnEditLoot);
 
         btnDeleteLoot = new JButton(resourceMap.getString("btnDeleteLoot.text"));
@@ -1038,8 +1039,8 @@ public class CustomizeScenarioDialog extends JDialog {
         btnEditLoot.setEnabled(row != -1);
     }
 
-    private void addLoot() {
-        LootDialog lootDialog = new LootDialog(frame, true, new Loot(), campaign);
+    private void addLoot(CampaignGUI gui) {
+        LootDialog lootDialog = new LootDialog(frame, true, new Loot(), gui);
         lootDialog.setVisible(true);
         if (null != lootDialog.getLoot()) {
             lootModel.addLoot(lootDialog.getLoot());
@@ -1047,10 +1048,10 @@ public class CustomizeScenarioDialog extends JDialog {
         refreshLootTable();
     }
 
-    private void editLoot() {
+    private void editLoot(CampaignGUI gui) {
         Loot loot = lootModel.getLootAt(lootTable.getSelectedRow());
         if (null != loot) {
-            LootDialog lootDialog = new LootDialog(frame, true, loot, campaign);
+            LootDialog lootDialog = new LootDialog(frame, true, loot, gui);
             lootDialog.setVisible(true);
             refreshLootTable();
         }

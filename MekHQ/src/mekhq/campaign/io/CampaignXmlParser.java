@@ -472,11 +472,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             unit.setCampaign(campaign);
             unit.fixReferences(campaign);
 
-            List<String> reports = unit.checkForOverCrewing();
-            for (String report : reports) {
-                campaign.addReport(report);
-            }
-
             // reset the pilot and entity, to reflect newly assigned personnel
             unit.resetPilotAndEntity();
 
@@ -565,6 +560,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else {
                     unit.setSalvage(true);
                 }
+            }
+
+            List<String> reports = unit.checkForOverCrewing();
+            for (String report : reports) {
+                campaign.addReport(report);
             }
         });
 
