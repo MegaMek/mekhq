@@ -285,7 +285,7 @@ public class SalvageTechPicker extends JDialog {
             // There's a lot of class casting, so we want to catch anything that
             // is malformed. For example, if the underlying data structure in
             // the table changes.
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
