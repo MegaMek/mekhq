@@ -45,6 +45,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -57,6 +58,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.swing.*;
 
+import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.units.Dropship;
@@ -337,6 +339,7 @@ public class SalvagePostScenarioPicker {
         allUnits = new ArrayList<>(actualSalvage);
         allUnits.addAll(soldSalvage);
         allUnits.sort(Comparator.comparing(TestUnit::getSellValue).reversed()); // Highest -> Lowest
+
     }
 
 
@@ -536,7 +539,7 @@ public class SalvagePostScenarioPicker {
             // Create row panel with label, two combo boxes, and validation label
             JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2));
             rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+            rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, scaleForGUI(60)));
 
             JLabel unitLabel = new JLabel();
             unitLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.unitLabel.unit",
@@ -569,6 +572,9 @@ public class SalvagePostScenarioPicker {
                 comboBox2.addItem(displayName);
             }
 
+            RoundedJButton viewButton = new RoundedJButton("\u24D8");
+            viewButton.setFocusable(false);
+
             RoundedJButton fieldStripButton = new RoundedJButton("\u2692");
             fieldStripButton.setEnabled(false); // TODO remove this line when we're ready to implement field stripping
             fieldStripButton.setFocusable(false);
@@ -597,8 +603,11 @@ public class SalvagePostScenarioPicker {
             claimedSalvageForSale.addActionListener(e -> performComboChangeAction(isContract,
                   salvageComboBoxGroups, group, finalEmployerSalvageLabel, finalUnitSalvageLabel,
                   finalAvailableTimeLabel, confirmButton));
+            viewButton.addActionListener(new ViewUnitListener(group.targetUnit));
+
             fieldStripButton.addActionListener(e -> fieldStrip(group));
 
+            rowPanel.add(viewButton);
             rowPanel.add(fieldStripButton);
             rowPanel.add(claimedSalvageForKeeps);
             rowPanel.add(claimedSalvageForSale);
@@ -1132,6 +1141,23 @@ public class SalvagePostScenarioPicker {
         } else {
             // Neither selected: valid -> goes to employer
             moveToList(targetUnit, employerSalvage);
+        }
+    }
+
+    private static class ViewUnitListener implements ActionListener {
+        TestUnit unit;
+
+        public ViewUnitListener(TestUnit unit) {
+            this.unit = unit;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent evt) {
+            showUnit(unit);
+        }
+
+        private void showUnit(TestUnit unit) {
+            new EntityReadoutDialog(null, true, unit.getEntity()).setVisible(true);
         }
     }
 }
