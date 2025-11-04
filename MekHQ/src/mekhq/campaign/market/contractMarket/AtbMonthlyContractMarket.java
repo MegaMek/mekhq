@@ -656,9 +656,9 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         setContractClauses(followup, campaign.getAtBUnitRatingMod(), campaign);
 
         double varianceFactor = ContractUtilities.calculateVarianceFactor();
-        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
-              contract.getContractType().isCadreDuty(), false, varianceFactor));
-        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false, varianceFactor));
+        followup.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
+              followup.getContractType().isCadreDuty(), false, varianceFactor));
+        followup.setRequiredCombatElements(calculateRequiredCombatElements(campaign, followup, false, varianceFactor));
 
         followup.setMultiplier(calculatePaymentMultiplier(campaign, followup));
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
