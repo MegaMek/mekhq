@@ -183,8 +183,11 @@ public class CamOpsSalvageUtilities {
             if (salvageUnit.getEntity() instanceof Aero) {
                 ((Aero) salvageUnit.getEntity()).setFuelTonnage(((Aero) salvageStatus.getBaseEntity()).getFuelTonnage());
             }
+
             campaign.clearGameData(salvageUnit.getEntity());
             campaign.addTestUnit(salvageUnit);
+            salvageUnit.setSite(mission.getRepairLocation());
+
             // if this is a contract, add to the salvaged value
             if (isContract) {
                 ((Contract) mission).addSalvageByUnit(salvageUnit.getSellValue());
@@ -192,13 +195,13 @@ public class CamOpsSalvageUtilities {
         }
 
         // And any ransomed salvaged units
-        Money unitRansoms = Money.zero();
         if (!soldSalvage.isEmpty()) {
+            Money unitRansoms = Money.zero();
             for (TestUnit ransomedUnit : soldSalvage) {
                 unitRansoms = unitRansoms.plus(ransomedUnit.getSellValue());
             }
 
-            if (unitRansoms.isGreaterThan(Money.zero())) {
+            if (unitRansoms.isPositive()) {
                 campaign.getFinances()
                       .credit(TransactionType.SALVAGE,
                             campaign.getLocalDate(),
@@ -206,33 +209,43 @@ public class CamOpsSalvageUtilities {
                             getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.unitSale", scenario.getName()));
                 campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.unitSale.report",
                       unitRansoms.toAmountString(), scenario.getHyperlinkedName()));
+
+                // if this is a contract, add to the salvaged value
                 if (isContract) {
                     ((Contract) mission).addSalvageByUnit(unitRansoms);
                 }
             }
         }
 
-        if (isContract) {
-            Money value = Money.zero();
-            for (TestUnit salvageUnit : employerSalvage) {
-                value = value.plus(salvageUnit.getSellValue());
-            }
-            if (((Contract) mission).isSalvageExchange()) {
-                value = value.multipliedBy(((Contract) mission).getSalvagePct()).dividedBy(100);
-                campaign.getFinances()
-                      .credit(TransactionType.SALVAGE_EXCHANGE,
-                            campaign.getLocalDate(),
-                            value,
-                            getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.exchange", scenario.getName()));
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.exchange.report",
-                      unitRansoms.toAmountString(), scenario.getHyperlinkedName()));
-            } else {
-                ((Contract) mission).addSalvageByEmployer(value);
-            }
+        Money employerTakeHome = Money.zero();
+        for (TestUnit salvageUnit : employerSalvage) {
+            employerTakeHome = employerTakeHome.plus(salvageUnit.getSellValue());
         }
 
-        for (TestUnit unit : keptSalvage) {
-            unit.setSite(mission.getRepairLocation());
+        if (isContract) {
+            if (((Contract) mission).isSalvageExchange()) {
+                int playerPercent = ((Contract) mission).getSalvagePct();
+                int employerPercent = 100 - playerPercent;
+
+                Money singlePercent = employerTakeHome.dividedBy(100);
+                employerTakeHome = singlePercent.multipliedBy(employerPercent);
+                Money playerTakeHome = singlePercent.multipliedBy(playerPercent);
+                ((Contract) mission).addSalvageByUnit(playerTakeHome);
+
+                if (playerTakeHome.isPositive()) {
+                    campaign.getFinances()
+                          .credit(TransactionType.SALVAGE_EXCHANGE,
+                                campaign.getLocalDate(),
+                                playerTakeHome,
+                                getFormattedTextAt(RESOURCE_BUNDLE,
+                                      "CamOpsSalvageUtilities.exchange",
+                                      scenario.getName()));
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.exchange.report",
+                          playerTakeHome.toAmountString(), scenario.getHyperlinkedName()));
+                }
+            }
+
+            ((Contract) mission).addSalvageByEmployer(employerTakeHome);
         }
     }
 
