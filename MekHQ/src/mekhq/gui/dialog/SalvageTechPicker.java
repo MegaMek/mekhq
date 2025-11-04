@@ -251,26 +251,21 @@ public class SalvageTechPicker extends JDialog {
                                                                          Boolean.compare(((Boolean) b1),
                                                                                ((Boolean) b2)));
 
-            sorter.setComparator(SalvageTechTableModel.COL_RANK, (o1, o2) -> {
-                // Get the model to access rankNumeric values
-                SalvageTechTableModel model = sorter.getModel();
-                int row1 = -1, row2 = -1;
-
-                // Find which rows contain these values
-                for (int i = 0; i < model.getRowCount(); i++) {
-                    if (Objects.equals(model.getValueAt(
-                          i, SalvageTechTableModel.COL_RANK), o1)) {
-                        row1 = i;
-                    }
-                    if (Objects.equals(model.getValueAt(
-                          i, SalvageTechTableModel.COL_RANK), o2)) {
-                        row2 = i;
-                    }
+            // Precompute a map from rank string to numeric value for fast lookup
+            SalvageTechTableModel model = sorter.getModel();
+            java.util.Map<String, Integer> rankToNumeric = new java.util.HashMap<>();
+            for (int i = 0; i < model.getRowCount(); i++) {
+                Object rankObj = model.getValueAt(i, SalvageTechTableModel.COL_RANK);
+                if (rankObj != null) {
+                    rankToNumeric.put(rankObj.toString(), model.getRankNumeric(i));
                 }
+            }
 
-                if (row1 >= 0 && row2 >= 0) {
-                    return Integer.compare(
-                          model.getRankNumeric(row1), model.getRankNumeric(row2));
+            sorter.setComparator(SalvageTechTableModel.COL_RANK, (o1, o2) -> {
+                Integer n1 = rankToNumeric.get(o1 != null ? o1.toString() : null);
+                Integer n2 = rankToNumeric.get(o2 != null ? o2.toString() : null);
+                if (n1 != null && n2 != null) {
+                    return Integer.compare(n1, n2);
                 }
                 return 0;
             });
