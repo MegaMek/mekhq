@@ -86,10 +86,10 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
                         salvageCapableUnits++;
                     }
 
-                    if (hasNavalTug) {
-                        double towCapacity = entity.getWeight();
-                        maximumTowCapacity = max(towCapacity, maximumTowCapacity);
-                    }
+                    double towCapacity = entity.getWeight();
+                    maximumTowCapacity = max(towCapacity, maximumTowCapacity);
+
+                    hasTug = hasNavalTug;
                 } else {
                     boolean isTowCapable = entity instanceof Mek || entity instanceof Tank;
                     if (cargoCapacity > 0.0) {

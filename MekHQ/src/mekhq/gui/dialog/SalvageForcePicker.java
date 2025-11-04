@@ -208,8 +208,6 @@ public class SalvageForcePicker extends JDialog {
                       checkBox.setSelected(value != null && (Boolean) value);
                       checkBox.setHorizontalAlignment(javax.swing.JLabel.CENTER);
                       checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-                      checkBox.setToolTipText(getTextAt(RESOURCE_BUNDLE,
-                            "SalvageForcePicker.column.select.tooltip"));
                       return checkBox;
                   }
               });
