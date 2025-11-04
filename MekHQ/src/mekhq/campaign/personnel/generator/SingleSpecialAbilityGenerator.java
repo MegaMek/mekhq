@@ -43,6 +43,7 @@ import megamek.common.compute.Compute;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Crew;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -197,11 +198,11 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
     private @Nullable List<SpecialAbility> getSpecialAbilities(Person person, boolean useAlternativeWeighting,
           boolean ignoreEligibility, boolean isVeterancyAward) {
         final PersonnelOptions options = person.getOptions();
-        List<SpecialAbility> abilityList;
+        List<SpecialAbility> abilityList = new ArrayList<>();
         final List<SpecialAbility> positiveAbilities = new ArrayList<>();
+        final List<SpecialAbility> negativeAbilities = new ArrayList<>();
 
         if (ignoreEligibility) {
-            abilityList = new ArrayList<>();
             for (SpecialAbility ability : SpecialAbility.getSpecialAbilities().values()) {
                 if (isVeterancyAward && ability.getOriginOnly()) {
                     continue;
@@ -221,6 +222,8 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
                     abilityList.add(ability);
                     if (ability.getCost() >= 0) {
                         positiveAbilities.add(ability);
+                    } else {
+                        negativeAbilities.add(ability);
                     }
                 }
             }
@@ -232,10 +235,14 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
             return null;
         }
 
+        MMLogger LOGGER = MMLogger.create(SingleSpecialAbilityGenerator.class);
+
+        // Alternative weighting will pre-determine whether the SPA is positive or negative.
         if (useAlternativeWeighting) {
-            // Duplicate positiveAbilities three times for alternative weighting. This allows us to reduce the chance
-            // of a character getting a Flaw
-            for (int i = 0; i < 3; i++) {
+            int roll = Compute.randomInt(40);
+            if (roll == 0) {
+                abilityList.addAll(negativeAbilities);
+            } else {
                 abilityList.addAll(positiveAbilities);
             }
         } else {
