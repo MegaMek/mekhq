@@ -124,7 +124,6 @@ public class SalvagePostScenarioPicker {
     private final List<TestUnit> soldSalvage = new ArrayList<>();
     private final List<TestUnit> employerSalvage = new ArrayList<>();
     private final Map<String, Unit> unitNameMap = new LinkedHashMap<>();
-    private final Map<String, Double> unitCargoAssignments = new HashMap<>();
     private Map<UUID, RecoveryTimeData> recoveryTimeData;
     private boolean isExchangeRights = false;
 
@@ -868,8 +867,6 @@ public class SalvagePostScenarioPicker {
      */
     private void updateComboBoxOptions(List<SalvageComboBoxGroup> salvageComboBoxGroups,
           Map<String, Unit> unitNameMap) {
-        unitCargoAssignments.clear(); // Clear prior assignments, we're going to rebuild these later
-
         // Collect all currently selected unit names
         List<String> selectedUnitNames = new ArrayList<>();
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
@@ -918,11 +915,8 @@ public class SalvagePostScenarioPicker {
             comboBox.addItem(null); // Allow empty selection
 
             for (String unitName : unitNameMap.keySet()) {
-                Unit unit = unitNameMap.get(unitName);
-                double cargoCapacity = unit.getCargoCapacity();
-                double currentAssignments = unitCargoAssignments.getOrDefault(unitName, 0.0);
-                boolean hasCapacity = currentAssignments < cargoCapacity;
-                if (unitName.equals(currentSelection) || (hasCapacity || !selectedUnitNames.contains(unitName))) {
+                // Only add if it's the current selection OR it's not selected anywhere else
+                if (unitName.equals(currentSelection) || !selectedUnitNames.contains(unitName)) {
                     comboBox.addItem(unitName);
                 }
             }
@@ -1001,51 +995,41 @@ public class SalvagePostScenarioPicker {
                       MekHQ.getMHQOptions().getFontColorNegative());
                 return;
             }
-
-            validate(group);
-            return;
-        }
-
-        // if one unit selected can use towing, or cargo (left selection)
-        if (salvageUnitLeft != null) {
-            useTowageOrCargo(group, unitLeftEntity, salvageUnitLeft, unitNameLeft, targetWeight);
+        } else if (salvageUnitLeft != null) {
+            if (!useTowageOrCargo(group, unitLeftEntity, salvageUnitLeft, targetWeight)) {
+                return;
+            }
         } else {
-            useTowageOrCargo(group, unitRightEntity, salvageUnitRight, unitNameRight, targetWeight);
+            if (!useTowageOrCargo(group, unitRightEntity, salvageUnitRight, targetWeight)) {
+                return;
+            }
         }
+
+        validate(group);
     }
 
-    private void useTowageOrCargo(SalvageComboBoxGroup group, Entity entity, Unit unit, String unitName,
-          double targetWeight) {
+    private boolean useTowageOrCargo(SalvageComboBoxGroup group, Entity entity, Unit unit, double targetWeight) {
         double unitWeight = entity.getWeight();
         double cargoCapacity = unit.getCargoCapacity();
-        boolean useTowage = unitCargoAssignments.get(unitName) == null ||
-                                  entity.getWeight() >= cargoCapacity;
+        boolean useTowage = entity.getWeight() >= cargoCapacity;
         if (useTowage) {
             boolean hasTowageCapacity = unitWeight >= targetWeight;
             if (!hasTowageCapacity) {
                 invalidate(group,
                       getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.noCapacity.tow"),
                       MekHQ.getMHQOptions().getFontColorNegative());
-                return;
+                return false;
             }
-
-            validate(group);
         } else {
-            double usedCargoCapacity = unitCargoAssignments.get(unitName) != null ?
-                                             unitCargoAssignments.get(unitName) :
-                                             0.0;
-            double availableCargoCapacity = cargoCapacity - usedCargoCapacity;
-            boolean hasCargoCapacity = availableCargoCapacity >= targetWeight;
+            boolean hasCargoCapacity = cargoCapacity >= targetWeight;
             if (!hasCargoCapacity) {
                 invalidate(group,
                       getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.noCapacity.cargo"),
                       MekHQ.getMHQOptions().getFontColorNegative());
-                return;
+                return false;
             }
-
-            unitCargoAssignments.put(unitName, usedCargoCapacity + unitWeight);
-            validate(group);
         }
+        return true;
     }
 
     private static boolean checkForNavalTug(SalvageComboBoxGroup group, Entity unitLeftEntity, Entity unitRightEntity) {
@@ -1122,7 +1106,7 @@ public class SalvagePostScenarioPicker {
         final boolean keeps = group.claimedSalvageForKeeps.isSelected();
 
         if (!isValid) {
-            // Invalid assignment → remove from all 3 lists
+            // Invalid assignment -> remove from all 3 lists
             removeFromAll(targetUnit);
             return;
         }
@@ -1133,7 +1117,7 @@ public class SalvagePostScenarioPicker {
         } else if (keeps) {
             moveToList(targetUnit, keptSalvage);
         } else {
-            // Neither selected: valid → goes to employer
+            // Neither selected: valid -> goes to employer
             moveToList(targetUnit, employerSalvage);
         }
     }
