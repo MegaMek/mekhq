@@ -148,11 +148,11 @@ public class ContractUtilities {
      *   <li><b>Roll 5:</b> Multiplier is 0.65.</li>
      *   <li><b>Roll 6:</b> Multiplier is 0.675.</li>
      *   <li><b>Roll 7:</b> Multiplier is 0.7.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.725.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.75.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.775.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.8.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.825.</li>
+     *   <li><b>Roll 8:</b> Multiplier is 0.725.</li>
+     *   <li><b>Roll 9:</b> Multiplier is 0.75.</li>
+     *   <li><b>Roll 10:</b> Multiplier is 0.775.</li>
+     *   <li><b>Roll 11:</b> Multiplier is 0.8.</li>
+     *   <li><b>Roll 12:</b> Multiplier is 0.825.</li>
      * </ul>
      *
      * @return the calculated variance factor as a double
