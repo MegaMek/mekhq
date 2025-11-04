@@ -43,7 +43,6 @@ import megamek.common.compute.Compute;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Crew;
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -234,8 +233,6 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
         if (abilityList.isEmpty()) {
             return null;
         }
-
-        MMLogger LOGGER = MMLogger.create(SingleSpecialAbilityGenerator.class);
 
         // Alternative weighting will pre-determine whether the SPA is positive or negative.
         if (useAlternativeWeighting) {
