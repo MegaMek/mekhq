@@ -228,7 +228,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
             }
         }
 
-        if (!tooltip.isEmpty()) {
+        if (tooltip.isEmpty()) {
             tooltip.append(getTextAt(RESOURCE_BUNDLE, "SalvageForceData.noTug"));
         }
         return tooltip.toString();
