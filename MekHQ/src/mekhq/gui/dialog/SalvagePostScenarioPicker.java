@@ -919,7 +919,7 @@ public class SalvagePostScenarioPicker {
 
             for (String unitName : unitNameMap.keySet()) {
                 Unit unit = unitNameMap.get(unitName);
-                double cargoCapacity = unit.getCargoCapacity();
+                double cargoCapacity = unit.getCargoCapacityForSalvage();
                 double currentAssignments = unitCargoAssignments.getOrDefault(unitName, 0.0);
                 boolean hasCapacity = currentAssignments < cargoCapacity;
                 if (unitName.equals(currentSelection) || (hasCapacity || !selectedUnitNames.contains(unitName))) {
@@ -1017,7 +1017,7 @@ public class SalvagePostScenarioPicker {
     private void useTowageOrCargo(SalvageComboBoxGroup group, Entity entity, Unit unit, String unitName,
           double targetWeight) {
         double unitWeight = entity.getWeight();
-        double cargoCapacity = unit.getCargoCapacity();
+        double cargoCapacity = unit.getCargoCapacityForSalvage();
         boolean useTowage = unitCargoAssignments.get(unitName) == null ||
                                   entity.getWeight() >= cargoCapacity;
         if (useTowage) {

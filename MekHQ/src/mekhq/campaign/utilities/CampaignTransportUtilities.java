@@ -324,6 +324,8 @@ public class CampaignTransportUtilities {
                   //Ship transports can't use some transport types
                   if (!(campaignTransportType.isShipTransport())) {
                       // Add ROOF_RACK back once we can better handle how they impact MP
+                      transporters.add(LIFT_HOIST);
+                      transporters.add(ROOF_RACK);
                   }
 
                   return transporters;

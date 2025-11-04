@@ -211,7 +211,7 @@ public class ResupplyUtilities {
                         continue;
                     }
 
-                    double individualCargo = unit.getCargoCapacity();
+                    double individualCargo = unit.getCargoCapacityForConvoy();
 
                     if (individualCargo > 0) {
                         hasCargo = true;
