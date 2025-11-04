@@ -355,7 +355,7 @@ public class SalvageForcePicker extends JDialog {
         int expLevel1 = tech1.getExperienceLevel(model.campaign, isTechSecondary1);
         int expLevel2 = tech2.getExperienceLevel(model.campaign, isTechSecondary2);
 
-        int expCompare = Integer.compare(expLevel2, expLevel1); // Reversed (lowest -> highest)
+        int expCompare = Integer.compare(expLevel2, expLevel1); // Reversed (highest -> lowest, more experienced first)
         if (expCompare != 0) {return expCompare;}
 
         // If experience levels are equal, compare by rank (lowest to highest)
