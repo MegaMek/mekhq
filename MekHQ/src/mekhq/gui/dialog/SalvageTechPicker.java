@@ -41,8 +41,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.UUID;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -235,8 +236,6 @@ public class SalvageTechPicker extends JDialog {
      *
      * @param table the table whose sorter will be configured
      *
-     * @implNote Rank sorting looks up the underlying row's numeric rank value to avoid lexicographic errors
-     *       (e.g., "Sergeant" vs "Private").
      * @author Illiani
      * @since 0.50.10
      */
@@ -253,7 +252,9 @@ public class SalvageTechPicker extends JDialog {
 
             // Precompute a map from rank string to numeric value for fast lookup
             SalvageTechTableModel model = sorter.getModel();
-            java.util.Map<String, Integer> rankToNumeric = new java.util.HashMap<>();
+            Map<String, Integer> rankToNumeric = new HashMap<>();
+
+            // Build lookup map once
             for (int i = 0; i < model.getRowCount(); i++) {
                 Object rankObj = model.getValueAt(i, SalvageTechTableModel.COL_RANK);
                 if (rankObj != null) {
@@ -261,13 +262,19 @@ public class SalvageTechPicker extends JDialog {
                 }
             }
 
+            // Set the comparator with fast lookups
             sorter.setComparator(SalvageTechTableModel.COL_RANK, (o1, o2) -> {
                 Integer n1 = rankToNumeric.get(o1 != null ? o1.toString() : null);
                 Integer n2 = rankToNumeric.get(o2 != null ? o2.toString() : null);
+
                 if (n1 != null && n2 != null) {
                     return Integer.compare(n1, n2);
+                } else if (n1 != null) {
+                    return -1; // n1 comes first
+                } else if (n2 != null) {
+                    return 1; // n2 comes first
                 }
-                return 0;
+                return 0; // both null, equal
             });
 
             sorter.setComparator(SalvageTechTableModel.COL_FIRST_NAME,
