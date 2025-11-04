@@ -262,8 +262,8 @@ public class SalvagePostScenarioPicker {
         }
 
         // Process selected units
-        CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, keptSalvage, this.soldSalvage,
-              employerSalvage);
+        CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, this.keptSalvage, this.soldSalvage,
+              this.employerSalvage);
     }
 
     /**
@@ -453,8 +453,14 @@ public class SalvagePostScenarioPicker {
                   "SalvagePostScenarioPicker.salvagePercent", salvagePercent));
             employerSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
                   "SalvagePostScenarioPicker.employerSalvage", employerSalvageMoneyCurrent.toAmountString()));
-            unitSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "SalvagePostScenarioPicker.unitSalvage", unitSalvageMoneyCurrent.toAmountString()));
+            if (isExchangeRights) {
+                Money actualFunds = employerSalvageMoneyCurrent.dividedBy(100).multipliedBy(salvagePercent);
+                unitSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "SalvagePostScenarioPicker.unitSalvage", actualFunds.toAmountString()));
+            } else {
+                unitSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "SalvagePostScenarioPicker.unitSalvage", unitSalvageMoneyCurrent.toAmountString()));
+            }
             availableTimeLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
                   "SalvagePostScenarioPicker.time", usedSalvageTime, maximumSalvageTime));
 
@@ -745,7 +751,7 @@ public class SalvagePostScenarioPicker {
                                                   .multiply(hundred)
                                                   .divide(totalSalvage.getAmount(), 4, RoundingMode.HALF_UP);
 
-                if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0) {
+                if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0 && !isExchangeRights) {
                     disableConfirmAndColorName(confirmButton, unitSalvageLabel);
                 }
             }
@@ -844,8 +850,16 @@ public class SalvagePostScenarioPicker {
                   "SalvagePostScenarioPicker.employerSalvage", employerSalvageMoneyCurrent.toAmountString()));
         }
         if (unitSalvageLabel != null) {
-            unitSalvageLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "SalvagePostScenarioPicker.unitSalvage", unitSalvageMoneyCurrent.toAmountString()));
+            String label;
+            if (isExchangeRights) {
+                Money actualFunds = employerSalvageMoneyCurrent.dividedBy(100).multipliedBy(salvagePercent);
+                label = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "SalvagePostScenarioPicker.unitSalvage", actualFunds.toAmountString());
+            } else {
+                label = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "SalvagePostScenarioPicker.unitSalvage", unitSalvageMoneyCurrent.toAmountString());
+            }
+            unitSalvageLabel.setText(label);
         }
         if (availableTimeLabel != null) {
             availableTimeLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -1049,11 +1063,10 @@ public class SalvagePostScenarioPicker {
     private void validate(SalvageComboBoxGroup group) {
         group.validationLabel.setText(getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.valid"));
         group.unitLabel.setForeground(null); // Reset to default color
-        if (!isExchangeRights) { // For exchange rights we keep 'for keeps' disabled
+        if (!isExchangeRights) { // For exchange rights we keep everything disabled
             group.claimedSalvageForKeeps.setEnabled(true);
+            group.claimedSalvageForSale.setEnabled(true);
         }
-
-        group.claimedSalvageForSale.setEnabled(true);
     }
 
     private static void invalidate(SalvageComboBoxGroup group, String label, Color FontColorNegative) {
