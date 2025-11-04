@@ -118,8 +118,6 @@ public class SalvageTechPicker extends JDialog {
      *                             instructions and a Cancel button are shown.
      * @param alreadySelectedTechs list of tech UUIDs that should start as pre-selected.
      *
-     * @implNote This constructor builds and shows the dialog immediately (modal). Callers should read results
-     *       after construction completes.
      * @author Illiani
      * @since 0.50.10
      */
