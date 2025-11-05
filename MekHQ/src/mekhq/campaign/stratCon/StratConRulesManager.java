@@ -1117,7 +1117,9 @@ public class StratConRulesManager {
             return;
         }
 
-        boolean isPatrol = combatTeam.getRole().isPatrol();
+        CombatRole combatRole = combatTeam.getRole();
+        boolean isPatrol = combatRole.isPatrol();
+        boolean isTraining = combatRole.isTraining();
 
         // the following things should happen:
         // 1. call to "process force deployment", which reveals fog of war in or around the coords,
@@ -1194,6 +1196,12 @@ public class StratConRulesManager {
             }
 
             finalizeBackingScenario(campaign, contract, track, autoAssignLances, scenario);
+            return;
+        }
+
+        // If we didn't trip a scenario or facility, Training forces should deploy 'sticky'
+        if (isTraining) {
+            track.addStickyForce(forceID);
         }
     }
 
