@@ -3552,7 +3552,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 boolean isEdge = attribute == SkillAttribute.EDGE;
-                if (!getCampaignOptions().isUseEdge()) {
+                if (isEdge && !getCampaignOptions().isUseEdge()) {
                     continue;
                 }
 
