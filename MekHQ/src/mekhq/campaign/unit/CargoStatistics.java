@@ -73,7 +73,7 @@ public record CargoStatistics(Campaign campaign) {
 
     public double getTotalCargoCapacity() {
         return getHangar().getUnitsStream()
-                     .mapToDouble(Unit::getCargoCapacity)
+                     .mapToDouble(Unit::getCargoCapacityForSalvage)
                      .sum();
     }
 

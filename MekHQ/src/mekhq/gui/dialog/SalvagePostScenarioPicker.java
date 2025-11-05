@@ -1038,7 +1038,7 @@ public class SalvagePostScenarioPicker {
 
     private boolean useTowageOrCargo(SalvageComboBoxGroup group, Entity entity, Unit unit, double targetWeight) {
         double unitWeight = entity.getWeight();
-        double cargoCapacity = unit.getCargoCapacity();
+        double cargoCapacity = unit.getCargoCapacityForSalvage();
         boolean useTowage = entity.getWeight() >= cargoCapacity;
         if (useTowage) {
             boolean hasTowageCapacity = unitWeight >= targetWeight;

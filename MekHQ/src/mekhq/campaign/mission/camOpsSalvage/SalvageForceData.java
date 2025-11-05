@@ -77,7 +77,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
                     continue;
                 }
 
-                double cargoCapacity = unit.getCargoCapacity();
+                double cargoCapacity = unit.getCargoCapacityForSalvage();
                 maximumCargoCapacity = max(cargoCapacity, maximumCargoCapacity);
 
                 if (isSpaceScenario) {

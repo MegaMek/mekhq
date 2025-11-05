@@ -119,7 +119,7 @@ public class CamOpsSalvageUtilities {
                               "CamOpsSalvageUtilities.tooltip.drag", tonnage)).append(")");
                     }
 
-                    double cargoCapacity = unit.getCargoCapacity();
+                    double cargoCapacity = unit.getCargoCapacityForSalvage();
                     if (!(entity instanceof Mek)) {
                         tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
                               "CamOpsSalvageUtilities.tooltip.cargo", cargoCapacity)).append(")");
