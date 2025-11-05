@@ -175,9 +175,13 @@ public class CamOpsSalvageUtilities {
      */
     public static void resolveSalvage(Campaign campaign, Mission mission, Scenario scenario,
           List<TestUnit> keptSalvage, List<TestUnit> soldSalvage, List<TestUnit> employerSalvage) {
-        boolean isContract = mission instanceof Contract;
+        int deliveryTime = 0;
+        if (mission instanceof AtBContract atbContract) {
+            deliveryTime = getDeploymentTime(scenario.getId(), atbContract);
+        }
 
         // now let's take care of salvage
+        boolean isContract = mission instanceof Contract;
         for (TestUnit salvageUnit : keptSalvage) {
             ResolveScenarioTracker.UnitStatus salvageStatus = new ResolveScenarioTracker.UnitStatus(salvageUnit);
             if (salvageUnit.getEntity() instanceof Aero) {
@@ -185,7 +189,7 @@ public class CamOpsSalvageUtilities {
             }
 
             campaign.clearGameData(salvageUnit.getEntity());
-            campaign.addTestUnit(salvageUnit);
+            campaign.addTestUnit(salvageUnit, deliveryTime);
             salvageUnit.setSite(mission.getRepairLocation());
 
             // if this is a contract, add to the salvaged value
@@ -245,6 +249,21 @@ public class CamOpsSalvageUtilities {
 
             ((Contract) mission).addSalvageByEmployer(employerTakeHome);
         }
+    }
+
+    private static int getDeploymentTime(int scenarioId, AtBContract atbContract) {
+        StratConCampaignState campaignState = atbContract.getStratconCampaignState();
+        if (campaignState != null) {
+            for (StratConTrackState track : campaignState.getTracks()) {
+                for (StratConScenario stratConScenario : track.getScenarios().values()) {
+                    if (stratConScenario.getBackingScenarioID() == scenarioId) {
+                        return track.getDeploymentTime();
+                    }
+                }
+            }
+        }
+
+        return 0;
     }
 
     /**

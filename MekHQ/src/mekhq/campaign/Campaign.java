@@ -1849,9 +1849,10 @@ public class Campaign implements ITechManager {
      * This is for adding a TestUnit that was previously created and had parts added to it. We need to do the normal
      * stuff, but we also need to take the existing parts and add them to the campaign.
      *
-     * @param testUnit TestUnit to add.
+     * @param testUnit     TestUnit to add.
+     * @param deliveryTime How many days until the unit arrives
      */
-    public void addTestUnit(TestUnit testUnit) {
+    public void addTestUnit(TestUnit testUnit, int deliveryTime) {
         // we really just want the entity and the parts so let's just wrap that around a new unit.
         Unit unit = new Unit(testUnit.getEntity(), this);
         getHangar().addUnit(unit);
@@ -1867,7 +1868,7 @@ public class Campaign implements ITechManager {
         // now lets grab the parts from the test unit and set them up with this unit
         for (Part p : testUnit.getParts()) {
             unit.addPart(p);
-            getQuartermaster().addPart(p, 0, false);
+            getQuartermaster().addPart(p, deliveryTime, false);
         }
 
         unit.resetPilotAndEntity();
