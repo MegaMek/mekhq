@@ -225,7 +225,6 @@ public class CamOpsSalvageUtilities {
         if (isContract) {
             if (((Contract) mission).isSalvageExchange()) {
                 int playerPercent = ((Contract) mission).getSalvagePct();
-                int employerPercent = 100 - playerPercent;
 
                 Money playerTakeHome = employerTakeHome.multipliedBy(playerPercent).dividedBy(100);
                 employerTakeHome = employerTakeHome.minus(playerTakeHome);
