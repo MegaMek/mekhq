@@ -715,7 +715,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             JCheckBox salvaged = new JCheckBox("");
             salvaged.setName("salvaged");
             salvaged.getAccessibleContext().setAccessibleName(resourceMap.getString("lblSalvage.text"));
-            salvaged.setEnabled(!tracker.usesSalvageExchange());
+            salvaged.setEnabled(!tracker.usesSalvageExchange() || isUseCamOpsSalvage);
             salvaged.setSelected(automaticallySelectSalvage);
             salvaged.addItemListener(evt -> checkSalvageRights());
             salvageBoxes.add(salvaged);
@@ -1782,7 +1782,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 escaped.setSelected(false);
                 escaped.setEnabled(false);
             } else {
-                salvaged.setEnabled(!tracker.usesSalvageExchange());
+                salvaged.setEnabled(!tracker.usesSalvageExchange() || isUseCamOpsSalvage);
                 sold.setEnabled(!tracker.usesSalvageExchange() &&
                                       tracker.getCampaign().getCampaignOptions().isSellUnits());
                 escaped.setEnabled(true);

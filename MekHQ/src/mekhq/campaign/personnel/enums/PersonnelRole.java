@@ -672,7 +672,7 @@ public enum PersonnelRole {
      */
     public List<String> getSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
           boolean isTechsUseAdministration, boolean isUseArtillery, boolean includeExpandedSkills) {
-        return switch (this) {
+        List<String> skills = switch (this) {
             case MEKWARRIOR -> {
                 if (isUseArtillery) {
                     yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_ARTILLERY);
@@ -1031,6 +1031,8 @@ public enum PersonnelRole {
             case COMMON_CRIMINAL -> List.of(SkillType.S_STREETWISE, SkillType.S_INTEREST_GAMBLING);
             default -> List.of();
         };
+
+        return new ArrayList<>(skills);
     }
     // endregion Getters
 

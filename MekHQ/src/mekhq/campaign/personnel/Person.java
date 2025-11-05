@@ -363,6 +363,7 @@ public class Person {
     private String personalityDescription;
     private String personalityInterviewNotes;
     private Reasoning reasoning;
+    private int performanceExamScore;
     // endregion Personality
 
     // region SPAs
@@ -583,6 +584,7 @@ public class Person {
         personalityQuirk = PersonalityQuirk.NONE;
         personalityQuirkDescriptionIndex = randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS);
         reasoning = Reasoning.AVERAGE;
+        performanceExamScore = 50;
         personalityDescription = "";
         personalityInterviewNotes = "";
         storedLoyalty = 0;
@@ -2757,6 +2759,14 @@ public class Person {
         this.reasoning = reasoning;
     }
 
+    public int getPerformanceExamScore() {
+        return performanceExamScore;
+    }
+
+    public void setPerformanceExamScore(final int performanceExamScore) {
+        this.performanceExamScore = performanceExamScore;
+    }
+
     @Deprecated(since = "0.50.07", forRemoval = true)
     public int getReasoningDescriptionIndex() {
         return 0;
@@ -3348,6 +3358,8 @@ public class Person {
             if (reasoning != Reasoning.AVERAGE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reasoning", reasoning.ordinal());
             }
+
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "performanceExamScore", performanceExamScore);
 
             if (!isNullOrBlank(personalityDescription)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
@@ -3977,7 +3989,14 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
                     person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
-                    person.reasoning = Reasoning.fromString(wn2.getTextContent().trim());
+                    Reasoning parsedReasoning = Reasoning.fromString(wn2.getTextContent().trim());
+                    person.reasoning = parsedReasoning;
+
+                    if (version.isLowerThan(new Version("0.50.10"))) { // <50.10 compatibility handler
+                        person.performanceExamScore = parsedReasoning.getExamScore();
+                    }
+                } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
+                    person.performanceExamScore = MathUtility.parseInt(wn2.getTextContent().trim(), 50);
                 } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("personalityInterviewNotes")) {

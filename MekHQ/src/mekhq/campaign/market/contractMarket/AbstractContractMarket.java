@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.market.contractMarket;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
@@ -54,11 +55,14 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.rating.IUnitRating;
@@ -85,12 +89,6 @@ public abstract class AbstractContractMarket {
     private static final int MERCENARY_THRESHOLD_HOUSE = 8;
     private static final int MERCENARY_THRESHOLD_LIAISON = 12;
     private static final int NON_MERCENARY_THRESHOLD = 12;
-
-    /**
-     * The portion of combat teams we expect to be performing combat actions. This is one in 'x' where 'x' is the value
-     * set here.
-     */
-    static final double BASE_VARIANCE_FACTOR = 0.7;
 
 
     protected List<Contract> contracts = new ArrayList<>();
@@ -260,10 +258,12 @@ public abstract class AbstractContractMarket {
      * @param campaign       the campaign containing relevant options and faction information
      * @param contract       the contract that specifies details such as subcontract status
      * @param bypassVariance a flag indicating whether variance adjustments should be bypassed
+     * @param varianceFactor the degree of variance to apply to required combat elements
      *
      * @return the calculated number of required units in combat teams, ensuring it meets game rules and constraints
      */
-    public int calculateRequiredCombatElements(Campaign campaign, AtBContract contract, boolean bypassVariance) {
+    public int calculateRequiredCombatElements(Campaign campaign, AtBContract contract, boolean bypassVariance,
+          double varianceFactor) {
         // Return 1 combat team if the contract is a subcontract
         if (contract.isSubcontract()) {
             return 1;
@@ -274,12 +274,8 @@ public abstract class AbstractContractMarket {
 
         // If bypassing variance, apply flat reduction (reduce force by 1/3)
         if (bypassVariance) {
-            return Math.max(effectiveForces - calculateBypassVarianceReduction(effectiveForces), 1);
+            return max(effectiveForces - calculateBypassVarianceReduction(effectiveForces), 1);
         }
-
-        // Apply variance based on a die roll
-        int varianceRoll = d6(2);
-        double varianceFactor = calculateVarianceFactor(varianceRoll);
 
         // Adjust available forces based on variance, ensuring minimum clamping
         int adjustedForces = (int) Math.floor((double) effectiveForces * varianceFactor);
@@ -293,43 +289,60 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Calculates the variance factor based on the given roll value and a fixed formation size divisor.
+     * Calculates the required number of combat teams (intensity) for a contract based on campaign options, contract
+     * details, and variance factors.
      *
-     * <p>
-     * The variance factor is determined by applying a multiplier to the fixed formation size divisor. The multiplier
-     * varies based on the roll value:
+     * <p>This method determines the number of combat elements needed to deploy, taking into account factors such
+     * as:</p>
      * <ul>
-     *   <li><b>Roll 2:</b> Multiplier is 0.575.</li>
-     *   <li><b>Roll 3:</b> Multiplier is 0.6.</li>
-     *   <li><b>Roll 4:</b> Multiplier is 0.625</li>
-     *   <li><b>Roll 5:</b> Multiplier is 0.65.</li>
-     *   <li><b>Roll 6:</b> Multiplier is 0.675.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.7.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.725.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.75.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.775.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.8.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.825.</li>
+     *   <li>Whether the contract is a subcontract (returns 1 as a base case).</li>
+     *   <li>The effective unit forces.</li>
+     *   <li>Whether variance bypass is enabled, applying a flat reduction to available forces.</li>
+     *   <li>Variance adjustments applied through a die roll, affecting the availability of forces.</li>
      * </ul>
      *
-     * @param roll the roll value used to determine the multiplier
+     * <p>The method ensures values are clamped to maintain a minimum deployment of at least 1 combat element while
+     * not exceeding the maximum deployable combat elements.</p>
      *
-     * @return the calculated variance factor as a double
+     * @param campaign       the campaign containing relevant options and faction information
+     * @param contract       the contract that specifies details such as subcontract status
+     * @param bypassVariance a flag indicating whether variance adjustments should be bypassed
+     * @param varianceFactor the degree of variance to apply to required combat elements
+     *
+     * @return the calculated number of required units in combat teams, ensuring it meets game rules and constraints
+     *
+     * @since 0.50.10
      */
-    private double calculateVarianceFactor(int roll) {
-        return switch (roll) {
-            case 2 -> BASE_VARIANCE_FACTOR - 0.125;
-            case 3 -> BASE_VARIANCE_FACTOR - 0.1;
-            case 4 -> BASE_VARIANCE_FACTOR - 0.075;
-            case 5 -> BASE_VARIANCE_FACTOR - 0.05;
-            case 6 -> BASE_VARIANCE_FACTOR - 0.025;
-            case 8 -> BASE_VARIANCE_FACTOR + 0.025;
-            case 9 -> BASE_VARIANCE_FACTOR + 0.05;
-            case 10 -> BASE_VARIANCE_FACTOR + 0.075;
-            case 11 -> BASE_VARIANCE_FACTOR + 0.1;
-            case 12 -> BASE_VARIANCE_FACTOR + 0.125;
-            default -> BASE_VARIANCE_FACTOR; // 7
-        };
+    public int calculateRequiredCombatTeams(Campaign campaign, AtBContract contract, boolean bypassVariance,
+          double varianceFactor) {
+        // Return 1 combat team if the contract is a subcontract
+        if (contract.isSubcontract()) {
+            return 1;
+        }
+
+        // Calculate base formation size and effective unit force
+        int effectCombatTeams = 0;
+        for (Map.Entry<Integer, CombatTeam> combatTeam : campaign.getCombatTeamsAsMap().entrySet()) {
+            Force force = campaign.getForce(combatTeam.getKey());
+            if (force != null) {
+                CombatRole combatRoleInMemory = force.getCombatRoleInMemory();
+                if (combatRoleInMemory != CombatRole.TRAINING) {
+                    effectCombatTeams++;
+                }
+            }
+        }
+
+        // If bypassing variance, apply flat reduction (reduce force by 1/3)
+        if (bypassVariance) {
+            return max(effectCombatTeams - calculateBypassVarianceReduction(effectCombatTeams), 1);
+        }
+
+        // Adjust available forces based on variance, ensuring minimum clamping
+        int adjustedCombatTeams = (int) Math.floor((double) effectCombatTeams * varianceFactor);
+        adjustedCombatTeams = max(adjustedCombatTeams, 1);
+
+        // Return the clamped value, ensuring it does not exceed max-deployable forces
+        return Math.min(adjustedCombatTeams, effectCombatTeams);
     }
 
     /**

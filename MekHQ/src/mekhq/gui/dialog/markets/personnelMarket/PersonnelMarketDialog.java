@@ -538,10 +538,10 @@ public class PersonnelMarketDialog extends JDialog {
 
         // Process recruitment and golden hello logic for all selected applicants
         for (Person applicant : recruitedPersons) {
-            if (!isGMHire && market.isWasOfferingGoldenHello()) {
+            if (!isGMHire) {
                 // Personnel are hired without rank, meaning they have a 0.5 salary multiplier. As a Golden Hello is
                 // 12 months' salary, we double the multiplier from 12 to 24.
-                Money cost = applicant.getSalary(campaign).multipliedBy(24);
+                Money cost = market.getHiringCost(applicant);
 
                 campaign.getFinances()
                       .debit(RECRUITMENT,

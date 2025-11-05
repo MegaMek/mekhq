@@ -232,15 +232,29 @@ public class PartInUse {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         }
-        if ((null == obj) || (getClass() != obj.getClass())) {
+
+        if ((null == object) || (getClass() != object.getClass())) {
             return false;
         }
-        final PartInUse other = (PartInUse) obj;
-        return Objects.equals(description, other.description) &&
-                     Objects.equals(getTechBase(), other.getTechBase());
+
+        // First, try to match using String comparison. This is weak, so we need extra checks
+        final PartInUse otherPartInUse = (PartInUse) object;
+        boolean haveMatchingDescriptions = this.description.equals(otherPartInUse.description);
+
+        // Next, check they're the same item
+        Part targetPart = getPartToBuy().getAcquisitionPart();
+        Part otherTargetPart = otherPartInUse.getPartToBuy().getAcquisitionPart();
+        boolean isSamePart = targetPart.isSamePartType(otherTargetPart);
+
+        // Finally, make sure both parts use the same tech base. Otherwise, Parts in Use will think a Clan ER Large
+        // Laser and IS ER Large Laser are the same thing.
+        boolean haveMatchingTechBases = Objects.equals(getTechBase(), otherPartInUse.getTechBase());
+
+        // Check everything matches up
+        return isSamePart && haveMatchingDescriptions && haveMatchingTechBases;
     }
 }
