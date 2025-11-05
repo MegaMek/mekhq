@@ -112,7 +112,7 @@ public class CampaignTransportUtilities {
         } else if (transporterType == TANK_TRAILER_HITCH) {
             return transportedUnit.getTonnage();
         } else if (transportedUnit instanceof Cargo) {
-            transportedUnit.getTonnage();
+            return transportedUnit.getTonnage();
         }
         return 1.0;
     }
