@@ -1710,13 +1710,14 @@ public class Unit implements ITechnology {
                 } else if (maximumMpPenalty == 1) {
                     capacity += Math.max(liftHoistCapacity, Math.min(getEntity().getTonnage(),
                           maxLiftHoistCapacity));
-                } else if (maximumMpPenalty > 3) {
+                } else if (maximumMpPenalty > 1) {
                     capacity += liftHoistCapacity;
                 }
             }
 
             if (roofRackCapacity > 0) {
-                if (maximumMpPenalty - currentMpReduction > 2) {
+                if (maximumMpPenalty - currentMpReduction > 2 ||
+                          maximumMpPenalty - currentMpReduction >= getEntity().getOriginalWalkMP() / 2) {
                     // If we're okay with the max roof rack penalty, let's take it
                     if (maximumMpPenalty - currentMpReduction >= getEntity().getOriginalWalkMP() / 2) {
                         capacity += roofRackCapacity;
