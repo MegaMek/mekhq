@@ -3546,7 +3546,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             JMenu attributesMenuIncrease = new JMenu(resources.getString("spendOnAttributes.increase"));
             int attributeImprovementCost = (int) round(getCampaignOptions().getAttributeCost() * costMultiplier);
-
+            int edgeCost = (int) round(getCampaignOptions().getEdgeCost() * costMultiplier);
             for (SkillAttribute attribute : SkillAttribute.values()) {
                 if (attribute.isNone()) {
                     continue;
@@ -3557,8 +3557,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     continue;
                 }
 
-                int attributeCost = (int) round((isEdge ? getCampaignOptions().getEdgeCost() : attributeImprovementCost)
-                                                      * costMultiplier);
+                int attributeCost = isEdge ? edgeCost : attributeImprovementCost;
 
                 int current = person.getAttributeScore(attribute);
                 // Improve
