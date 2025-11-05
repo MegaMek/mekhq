@@ -95,6 +95,7 @@ public class TransportCostCalculations {
 
     static final double COLLARS_PER_JUMPSHIP = 4.0;
     static final Money COST_PER_JUMP_PER_JUMPSHIP = Money.of(100000);
+    public static final int COST_PER_JUMP_PER_JUMPSHIP_AS_INT = 100000;
 
     // This value is derived from the Union (2708). We do make some assumptions, however. Namely, we assume that the
     // player is always able to find a DropShip that has the exact bay types they need. Use of this magical DropShip
