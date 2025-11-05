@@ -1860,7 +1860,9 @@ public class Campaign implements ITechManager {
         unit.getEntity().setOwner(player);
         unit.getEntity().setGame(game);
         unit.getEntity().setExternalIdAsString(unit.getId().toString());
-        unit.setMaintenanceMultiplier(getCampaignOptions().getDefaultMaintenanceTime());
+        if (!unit.isSelfCrewed()) {
+            unit.setMaintenanceMultiplier(getCampaignOptions().getDefaultMaintenanceTime());
+        }
 
         // now lets grab the parts from the test unit and set them up with this unit
         for (Part p : testUnit.getParts()) {
@@ -1911,7 +1913,9 @@ public class Campaign implements ITechManager {
      */
     public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, PartQuality quality) {
         Unit unit = new Unit(en, this);
-        unit.setMaintenanceMultiplier(getCampaignOptions().getDefaultMaintenanceTime());
+        if (!unit.isSelfCrewed()) {
+            unit.setMaintenanceMultiplier(getCampaignOptions().getDefaultMaintenanceTime());
+        }
         getHangar().addUnit(unit);
 
         // reset the game object
