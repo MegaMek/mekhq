@@ -3557,7 +3557,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     continue;
                 }
 
-                int attributeCost = isEdge ? edgeCost : attributeImprovementCost;
+                int attributeCost = (int) round((isEdge ? edgeCost : attributeImprovementCost)
+                                                      * reasoningXpCostMultiplier);
 
                 int current = person.getAttributeScore(attribute);
                 // Improve
