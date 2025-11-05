@@ -56,8 +56,11 @@ import javax.swing.JTextArea;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
@@ -174,6 +177,7 @@ public class SalvageForcePicker extends JDialog {
 
         pack();
         setLocationRelativeTo(null);
+        setPreferences(); // Must be before setVisible
         setVisible(true);
     }
 
@@ -652,6 +656,19 @@ public class SalvageForcePicker extends JDialog {
             }
 
             return component;
+        }
+    }
+
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     */
+    private void setPreferences() {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(SalvageForcePicker.class);
+            setName("SalvageForcePicker");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 }

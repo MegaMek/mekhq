@@ -54,8 +54,11 @@ import javax.swing.JTextArea;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
@@ -169,6 +172,7 @@ public class SalvageTechPicker extends JDialog {
 
         pack();
         setLocationRelativeTo(null);
+        setPreferences(); // Must be before setVisible
         setVisible(true);
     }
 
@@ -473,6 +477,19 @@ public class SalvageTechPicker extends JDialog {
          */
         public int getRankNumeric(int rowIndex) {
             return techs.get(rowIndex).rankNumeric();
+        }
+    }
+
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     */
+    private void setPreferences() {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(SalvageTechPicker.class);
+            setName("SalvageTechPicker");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to set user preferences", ex);
         }
     }
 }
