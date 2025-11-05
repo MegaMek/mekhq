@@ -691,7 +691,7 @@ public class Attributes {
     /**
      * Changes the edge attribute by a delta.
      *
-     * <p>The result is clamped between {@link #MINIMUM_ATTRIBUTE_SCORE} and {@link #MAXIMUM_ATTRIBUTE_SCORE}.</p>
+     * <p>The result is clamped between {@code 0} and {@link #MAXIMUM_ATTRIBUTE_SCORE}.</p>
      *
      * @param delta the value to add to the current edge. A positive delta will increase the attribute score, while a
      *              negative delta will decrease it.
