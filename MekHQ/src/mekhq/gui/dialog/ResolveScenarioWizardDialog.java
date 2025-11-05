@@ -1782,7 +1782,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 escaped.setSelected(false);
                 escaped.setEnabled(false);
             } else {
-                salvaged.setEnabled(!tracker.usesSalvageExchange());
+                salvaged.setEnabled(!tracker.usesSalvageExchange() || isUseCamOpsSalvage);
                 sold.setEnabled(!tracker.usesSalvageExchange() &&
                                       tracker.getCampaign().getCampaignOptions().isSellUnits());
                 escaped.setEnabled(true);
