@@ -111,11 +111,6 @@ public class Attributes {
      */
     public static int MAXIMUM_ATTRIBUTE_SCORE = 10;
 
-    /**
-     * Represents the cost required to improve an attribute. This is taken from ATOW pg 333.
-     */
-    public static int ATTRIBUTE_IMPROVEMENT_COST = 100;
-
     // Constructor
 
     /**
