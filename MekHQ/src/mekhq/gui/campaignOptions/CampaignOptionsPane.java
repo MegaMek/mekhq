@@ -73,6 +73,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
+import mekhq.gui.campaignOptions.optionChangeDialogs.MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.FactionStandingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.VeterancyAwardsCampaignOptionsChangedConfirmationDialog;
 
@@ -505,6 +506,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             presetSkills = preset.getSkills();
         }
 
+        // Store old values for use if we want to trigger certain dialogs
+        boolean oldAwardVeterancySPAs = options.isAwardVeterancySPAs();
+        boolean oldIsTrackFactionStanding = options.isTrackFactionStanding();
+        boolean oldIsUseMASHTheatres = options.isUseMASHTheatres();
+
         // Everything assumes general tab will be the first applied.
         // While this shouldn't break anything, it's not worth moving around.
         // For all other tabs, it makes sense to apply them in the order they
@@ -513,7 +519,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Human Resources
         personnelTab.applyCampaignOptionsToCampaign(campaign, options);
-        boolean oldAwardVeterancySPAs = options.isAwardVeterancySPAs();
         biographyTab.applyCampaignOptionsToCampaign(options);
         relationshipsTab.applyCampaignOptionsToCampaign(options);
         salariesTab.applyCampaignOptionsToCampaign(options);
@@ -532,8 +537,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         financesTab.applyCampaignOptionsToCampaign(options);
         marketsTab.applyCampaignOptionsToCampaign(options);
         rulesetsTab.applyCampaignOptionsToCampaign(options);
-
-        boolean oldIsTrackFactionStanding = options.isTrackFactionStanding();
         systemsTab.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
 
         // Tidy up
@@ -568,6 +571,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         boolean newIsAwardVeterancySPAs = options.isAwardVeterancySPAs();
         if (!isStartUp && newIsAwardVeterancySPAs && !oldAwardVeterancySPAs) { // Has tracking changed?
             new VeterancyAwardsCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseMASHTheatres = options.isUseMASHTheatres();
+        if (!isStartUp && newIsUseMASHTheatres && !oldIsUseMASHTheatres) { // Has tracking changed?
+            new MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
         campaign.resetRandomDeath();
