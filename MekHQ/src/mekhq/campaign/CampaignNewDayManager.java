@@ -191,7 +191,6 @@ public class CampaignNewDayManager {
     private final Finances finances;
     private LocalDate today;
     private CurrentLocation updatedLocation;
-    private final Set<Integer> scenariosWithDeployedForces = new HashSet<>();
 
     public CampaignNewDayManager(Campaign campaign) {
         this.campaign = campaign;
