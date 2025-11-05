@@ -100,6 +100,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceType;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -1703,6 +1704,7 @@ public class CampaignNewDayManager {
 
             for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
                 if ((scenario.getDate() != null) && scenario.getDate().isBefore(today)) {
+                    boolean hasForceDeployed = isHasForceDeployedToScenario(scenario.getId());
                     if (campaignOptions.isUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
                         StratConCampaignState campaignState = contract.getStratconCampaignState();
 
@@ -1717,16 +1719,17 @@ public class CampaignNewDayManager {
                             processAbandonedConvoy(campaign, contract, (AtBDynamicScenario) scenario);
                         }
 
-                        scenario.convertToStub(campaign, ScenarioStatus.REFUSED_ENGAGEMENT);
                         scenario.clearAllForcesAndPersonnel(campaign);
                     } else {
-                        scenario.convertToStub(campaign, ScenarioStatus.REFUSED_ENGAGEMENT);
                         contract.addPlayerMinorBreach();
 
                         campaign.addReport("Failure to deploy for " +
                                                  scenario.getHyperlinkedName() +
                                                  " resulted in a minor contract breach.");
                     }
+
+                    scenario.convertToStub(campaign,
+                          hasForceDeployed ? ScenarioStatus.FLEET_IN_BEING : ScenarioStatus.REFUSED_ENGAGEMENT);
                 }
             }
         }
@@ -1788,6 +1791,27 @@ public class CampaignNewDayManager {
                 }
             }
         }
+    }
+
+    /**
+     * Checks whether any standard force has been deployed to the given scenario.
+     *
+     * @param scenarioId The ID of the scenario to check forces for.
+     *
+     * @return {@code true} if at least one standard force is assigned to this scenario; {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private boolean isHasForceDeployedToScenario(int scenarioId) {
+        for (Force force : campaign.getAllForces()) {
+            if (force.getScenarioId() == scenarioId) {
+                if (force.isForceType(ForceType.STANDARD)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
