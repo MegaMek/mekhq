@@ -255,7 +255,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
             // Attribute randomization
             if (randomizeAttributes) {
-                boolean isEdge = attribute != SkillAttribute.EDGE;
+                boolean isEdge = attribute == SkillAttribute.EDGE;
                 int delta;
                 if (isEdge && isUseEdge) {
                     delta = d6(2) == 12 ? 1 : 0;
