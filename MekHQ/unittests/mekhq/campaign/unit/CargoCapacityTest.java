@@ -340,7 +340,7 @@ class CargoCapacityTest {
      * @param name               The name of the entity associated with the cargo.
      * @param bayCargoCapacity   The cargo capacity contributed by transport bays.
      * @param otherCargoCapacity The cargo capacity contributed by other mounted equipment.
-     * @param roofCargoCapacity  The cargo capacity Meks and Vees recieve from their roof
+     * @param roofCargoCapacity  The cargo capacity Meks and Vees receive from their roof
      * @param liftHoistCapacity  The cargo capacity granted by lift hoists - not used for convoys
      */
     public record CargoUnit(String name, double bayCargoCapacity, double otherCargoCapacity,
