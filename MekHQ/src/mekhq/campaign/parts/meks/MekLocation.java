@@ -258,28 +258,57 @@ public class MekLocation extends Part {
         return (loc == Mek.LOC_RIGHT_ARM) || (loc == Mek.LOC_LEFT_ARM);
     }
 
+    private boolean isLeg() {
+        return (loc == Mek.LOC_RIGHT_LEG) || (loc == Mek.LOC_LEFT_LEG);
+    }
+
     public boolean forQuad() {
         return forQuad;
     }
 
     @Override
     public boolean isSamePartType(Part part) {
-        if (!(part instanceof MekLocation other)) {
+        if (!(part instanceof MekLocation otherMekLocation)) {
             return false;
         }
 
-        return (getLoc() == other.getLoc()) &&
-                     (getUnitTonnage() == other.getUnitTonnage()) &&
-                     (isTsm() == other.isTsm()) &&
-                     (getStructureType() == other.getStructureType()) &&
-                     ((getStructureType() != EquipmentType.T_STRUCTURE_ENDO_STEEL) || (isClan() == other.isClan())) &&
-                     (!isArm() || forQuad() == other.forQuad())
-                     // Sensors and life support only matter if we're comparing two parts in the
-                     // warehouse.
-                     &&
-                     ((getUnit() != null) ||
-                            (other.getUnit() != null) ||
-                            (hasSensors() == other.hasSensors() && hasLifeSupport() == other.hasLifeSupport()));
+        boolean sameLocation = getLoc() == otherMekLocation.getLoc();
+        boolean sameTonnage = getUnitTonnage() == otherMekLocation.getUnitTonnage();
+        boolean sameTsm = isTsm() == otherMekLocation.isTsm();
+        boolean sameStructureType = getStructureType() == otherMekLocation.getStructureType();
+
+        boolean sameClanIfEndoSteel = (getStructureType() != EquipmentType.T_STRUCTURE_ENDO_STEEL) ||
+                                            (isClan() == otherMekLocation.isClan());
+
+        boolean sameQuadIfArm = !isArm() || (forQuad() == otherMekLocation.forQuad());
+
+        boolean sameQuadIfLeg = !isLeg() || (forQuad() == otherMekLocation.forQuad());
+
+        boolean thisHasUnit = getUnit() != null;
+        boolean otherHasUnit = otherMekLocation.getUnit() != null;
+        boolean sameSensorStatus = hasSensors() == otherMekLocation.hasSensors();
+        boolean sameLifeSupportStatus = hasLifeSupport() == otherMekLocation.hasLifeSupport();
+        boolean doBothHaveSensors = sameSensorStatus && sameLifeSupportStatus;
+        boolean passesSensorCheck = (thisHasUnit || otherHasUnit) || doBothHaveSensors;
+
+        return sameLocation &&
+                     sameTonnage &&
+                     sameTsm &&
+                     sameStructureType &&
+                     sameClanIfEndoSteel &&
+                     sameQuadIfArm &&
+                     sameQuadIfLeg &&
+                     passesSensorCheck;
+    }
+
+    private boolean bothPartsHaveSensors(MekLocation other, boolean notForWarehouseOrPartsInUse) {
+        boolean thisHasUnit = getUnit() != null;
+        boolean otherHasUnit = other.getUnit() != null;
+        boolean sameSensorStatus = notForWarehouseOrPartsInUse || (hasSensors() == other.hasSensors());
+        boolean sameLifeSupportStatus = notForWarehouseOrPartsInUse || (hasLifeSupport() == other.hasLifeSupport());
+
+        boolean doBothHaveUnitAssignments = !notForWarehouseOrPartsInUse || (thisHasUnit || otherHasUnit);
+        return doBothHaveUnitAssignments && sameSensorStatus && sameLifeSupportStatus;
     }
 
     @Override

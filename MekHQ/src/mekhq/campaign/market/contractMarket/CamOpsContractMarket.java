@@ -281,9 +281,10 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         // Step 6: Determine the initial contract clauses
         setContractClauses(contract, contractTerms);
         // Step 7: Determine the number of required lances (Not CamOps RAW)
+        double varianceFactor = ContractUtilities.calculateVarianceFactor();
         contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
-              contract.getContractType().isCadreDuty()));
-        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false));
+              contract.getContractType().isCadreDuty(), false, varianceFactor));
+        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false, varianceFactor));
         // Step 8: Calculate the payment
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
         // Step 9: Determine parts availability

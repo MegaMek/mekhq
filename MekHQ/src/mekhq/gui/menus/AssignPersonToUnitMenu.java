@@ -154,6 +154,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                                                                   .isAerospaceGrouping() ||
                                                                                   person.getSecondaryRole()
                                                                                         .isAerospaceGrouping());
+            final boolean areAllGroundCrew = Stream.of(people)
+                                                   .allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_CREW_GROUND));
             final boolean areAllVTOLCrew = Stream.of(people)
                                                  .allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_CREW_VTOL));
             final boolean areAllVesselPilots = Stream.of(people)
@@ -371,7 +373,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                         } else if (entity.getMovementMode().isMarine()) {
                             valid = areAllNavalVehicleCrew;
                         } else {
-                            valid = areAllVehicleCrew;
+                            valid = areAllGroundCrew;
                         }
                     } else if (entity instanceof ConvFighter) {
                         valid = areAllConventionalAircraftPilots;

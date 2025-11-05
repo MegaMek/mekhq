@@ -56,7 +56,8 @@ public enum ScenarioType {
     SPECIAL_LOS_TECH,
     SPECIAL_RESUPPLY,
     SPECIAL_JAIL_BREAK,
-    CONVOY;
+    CONVOY,
+    RIOT;
 
     /**
      * @return {@code true} if the scenario is considered a LosTech scenario, {@code false} otherwise.
@@ -88,10 +89,17 @@ public enum ScenarioType {
     }
 
     /**
+     * @return {@code true} if the scenario is considered a Riot scenario, {@code false} otherwise.
+     */
+    public boolean isRiot() {
+        return this == RIOT;
+    }
+
+    /**
      * @return {@code true} if the instance is one of the special types; {@code false} otherwise.
      */
     public boolean isSpecial() {
-        return this == SPECIAL_LOS_TECH || this == SPECIAL_RESUPPLY || this == SPECIAL_JAIL_BREAK;
+        return this == SPECIAL_LOS_TECH || this == SPECIAL_RESUPPLY || this == SPECIAL_JAIL_BREAK || this == RIOT;
     }
 
     /**

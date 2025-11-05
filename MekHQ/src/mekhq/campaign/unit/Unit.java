@@ -5282,19 +5282,27 @@ public class Unit implements ITechnology {
 
     public boolean usesSoloPilot() {
         // return Compute.getFullCrewSize(entity) == 1;
-        // Taharqa: I dont think we should do it based on computed size, but whether the
-        // unit logically
-        // is the type of unit that has only one pilot. This is partly because there may
-        // be some vees
-        // that only have one pilot and this is also a problem for BA units with only
-        // one active suit
-        return ((entity instanceof Mek) ||
-                      (entity instanceof ProtoMek) ||
-                      (entity instanceof Aero &&
-                             !(entity instanceof SmallCraft) &&
-                             !(entity instanceof Jumpship) &&
-                             !(entity instanceof ConvFighter))) &&
-                     (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos());
+        // Taharqa: I dont think we should do it based on computed size, but whether the unit logically is the type
+        // of unit that has only one pilot. This is partly because there may be some vees that only have one pilot
+        // and this is also a problem for BA units with only one active suit
+        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
+            return false;
+        }
+
+        boolean isMekOrProtoMek = (entity instanceof Mek) || (entity instanceof ProtoMek);
+        boolean isSelectAero = (entity instanceof Aero) && !(entity instanceof ConvFighter);
+
+        // We need to compute the full crew size here as some conventional fighters are single crew and others are
+        // not. Support Vehicles in general are a bit of a mess with a lot of rules exceptions. This special clause
+        // *is* necessary, even with the position equality check prior to the return value.
+        boolean isSmallConventionalCraft = entity instanceof ConvFighter && Compute.getFullCrewSize(entity) == 1;
+
+        if (isMekOrProtoMek || isSelectAero || isSmallConventionalCraft) {
+            // This is a final check to catch any special cases, for example Tripod 'Meks
+            return entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos();
+        }
+
+        return false;
     }
 
     public boolean usesSoldiers() {
