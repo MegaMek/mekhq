@@ -704,7 +704,7 @@ public class Attributes {
     }
 
     public int getCurrentEdge() {
-        return edge;
+        return currentEdge;
     }
 
     public void changeCurrentEdge(int delta) {
