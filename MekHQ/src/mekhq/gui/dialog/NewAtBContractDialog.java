@@ -568,14 +568,14 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setDesc(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
 
-        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
-              contract.getContractType().isCadreDuty()));
 
         AbstractContractMarket contractMarket = campaign.getContractMarket();
         if (contractMarket != null) {
-            contract.setRequiredCombatElements(contractMarket.calculateRequiredCombatElements(campaign,
-                  contract,
-                  false));
+            double varianceFactor = ContractUtilities.calculateVarianceFactor();
+            contract.setRequiredCombatTeams(contractMarket.calculateRequiredCombatTeams(campaign, contract, false,
+                  varianceFactor));
+            contract.setRequiredCombatElements(contractMarket.calculateRequiredCombatElements(campaign, contract,
+                  false, varianceFactor));
         } else {
             contract.setRequiredCombatElements(0); // This shouldn't happen, but let's not crash if it does
         }

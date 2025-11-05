@@ -477,9 +477,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(contract, unitRatingMod, campaign);
 
+        double varianceFactor = ContractUtilities.calculateVarianceFactor();
         contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
-              contract.getContractType().isCadreDuty()));
-        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false));
+              contract.getContractType().isCadreDuty(), false, varianceFactor));
+        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false, varianceFactor));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
@@ -577,9 +578,11 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         contract.setTransportComp(100);
 
+        double varianceFactor = ContractUtilities.calculateVarianceFactor();
         contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
-              contract.getContractType().isCadreDuty()));
-        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false));
+              contract.getContractType().isCadreDuty(), false, varianceFactor));
+        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false, varianceFactor));
+
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
         contract.calculateContract(campaign);
@@ -651,9 +654,12 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.setAllyQuality(contract.getAllyQuality());
         followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(followup, campaign.getAtBUnitRatingMod(), campaign);
+
+        double varianceFactor = ContractUtilities.calculateVarianceFactor();
         followup.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
-              contract.getContractType().isCadreDuty()));
-        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false));
+              followup.getContractType().isCadreDuty(), false, varianceFactor));
+        followup.setRequiredCombatElements(calculateRequiredCombatElements(campaign, followup, false, varianceFactor));
+
         followup.setMultiplier(calculatePaymentMultiplier(campaign, followup));
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
         followup.initContractDetails(campaign);

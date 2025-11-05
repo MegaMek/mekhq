@@ -191,7 +191,7 @@ public enum Reasoning {
     /**
      * Retrieves the formatted exam results text.
      *
-     * <p>Calculates the results percentage based on the current {@code level} relative to {@code GENIUS.level},
+     * <p>Calculates the result percentage based on the current {@code level} relative to {@code GENIUS.level},
      * and uses this value to format the exam results text from the resource bundle.</p>
      *
      * @return the formatted exam results string with the calculated percentage inserted.
@@ -200,13 +200,25 @@ public enum Reasoning {
      * @since 0.50.06
      */
     public String getExamResults() {
-        final String RESOURCE_KEY = "examResults.text";
+        return getFormattedTextAt(RESOURCE_BUNDLE, "examResults.text", getExamScore());
+    }
 
+    /**
+     * Retrieves the formatted exam results text.
+     *
+     * <p>Calculates the result percentage based on the current {@code level} relative to {@code GENIUS.level}.</p>
+     *
+     * @return the exam results as a calculated percentage.
+     *
+     * @author Illiani
+     * @since 0.50.010
+     */
+    public int getExamScore() {
         int results = (int) round(((double) this.level / GENIUS.level) * 100) - 5;
         results += randomInt(11);
         results = clamp(results, 0, 100);
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, results);
+        return results;
     }
 
     // region Boolean Comparison Methods

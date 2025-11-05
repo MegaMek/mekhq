@@ -109,6 +109,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
+import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
 import mekhq.campaign.mission.camOpsSalvage.SalvageForceData;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -961,15 +962,39 @@ public final class BriefingTab extends CampaignGuiTab {
             return true;
         }
 
+        List<UUID> priorSelectedTechs = new ArrayList<>();
         if (scenario.getSalvageTechs().isEmpty()) {
-            List<Person> availableTechs = getAvailableTechs();
+            List<Integer> forceIds = scenario.getSalvageForces();
+            for (Integer forceId : forceIds) {
+                Force force = getCampaign().getForce(forceId);
+                if (force != null && force.getForceType().isSalvage()) {
+                    if (force.getTechID() != null) {
+                        priorSelectedTechs.add(force.getTechID());
+                    }
+                }
+            }
 
-            SalvageTechPicker techPicker = new SalvageTechPicker(getCampaign(), availableTechs);
+            List<Person> availableTechs = getAvailableTechs();
+            List<UUID> assignedTechs = scenario.getSalvageTechs();
+            for (UUID techID : assignedTechs) {
+                Person tech = getCampaign().getPerson(techID);
+                if (tech != null && !availableTechs.contains(tech)) {
+                    availableTechs.add(0, tech);
+                }
+            }
+
+            List<SalvageTechData> techData = new ArrayList<>();
+            for (Person tech : availableTechs) {
+                SalvageTechData data = SalvageTechData.buildData(getCampaign(), tech);
+                techData.add(data);
+            }
+
+            SalvageTechPicker techPicker = new SalvageTechPicker(techData, priorSelectedTechs);
             boolean wasConfirmed = techPicker.wasConfirmed();
             if (wasConfirmed) {
-                List<Person> selectedTechs = techPicker.getSelectedTechs();
-                for (Person tech : selectedTechs) {
-                    scenario.addSalvageTech(tech.getId());
+                List<UUID> selectedTechs = techPicker.getSelectedTechs();
+                for (UUID techId : selectedTechs) {
+                    scenario.addSalvageTech(techId);
                 }
             }
 
@@ -987,12 +1012,6 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        // experienceLevel lowest -> highest, minutes highest -> lowest, rank lowest -> highest, full name a -> x
-        availableTechs.sort(Comparator.comparing((Person p) -> p.getExperienceLevel(getCampaign(),
-                    p.getPrimaryRole().isTech()))
-                                  .thenComparing(Comparator.comparing(Person::getMinutesLeft).reversed())
-                                  .thenComparing(Person::getRankNumeric)
-                                  .thenComparing(Person::getFullName));
         return availableTechs;
     }
 

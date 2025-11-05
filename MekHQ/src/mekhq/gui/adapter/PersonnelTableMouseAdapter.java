@@ -53,7 +53,6 @@ import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLA
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_LEG_TYPE_5;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_RECOVERY;
-import static mekhq.campaign.personnel.skills.Attributes.ATTRIBUTE_IMPROVEMENT_COST;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ARTILLERY;
@@ -1867,7 +1866,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 Skill skill = person.getSkill(S_SURGERY);
 
                 if (skill != null &&
-                          skill.getFinalSkillValue(skillModifierData) >=
+                          skill.getTotalSkillLevel(skillModifierData) >=
                                 REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
                     suitableDoctors.add(person);
                 }
@@ -3592,7 +3591,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(traitsMenu);
 
             JMenu attributesMenuIncrease = new JMenu(resources.getString("spendOnAttributes.increase"));
-            int attributeCost = (int) round(ATTRIBUTE_IMPROVEMENT_COST * costMultiplier);
+            int attributeCost = (int) round(getCampaignOptions().getAttributeCost() * costMultiplier);
 
             for (SkillAttribute attribute : SkillAttribute.values()) {
                 if (attribute.isNone()) {

@@ -367,8 +367,7 @@ public class WarehouseTest {
         mockSparePart.setQuantity(2);
 
         try (EventSpy eventSpy = new EventSpy()) {
-            // Add the spare part to our warehouse, and
-            // ask that it be merged with an existing part
+            // Add the spare part to our warehouse and ask that it be merged with an existing part
             addedPart = warehouse.addPart(mockSparePart, true);
 
             // We should see that the original part was changed
@@ -955,7 +954,8 @@ public class WarehouseTest {
 
         // Spare
         Part mockSparePart = spy(new MekLocation());
-        Part addedPart = warehouse.addPart(mockSparePart, true);;
+        Part addedPart = warehouse.addPart(mockSparePart, true);
+        ;
         assertEquals(mockSparePart, warehouse.findSparePart(spare -> spare.getId() == mockSparePart.getId()));
 
         Part mockUnitPart = spy(new MekLocation());
