@@ -1866,7 +1866,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 Skill skill = person.getSkill(S_SURGERY);
 
                 if (skill != null &&
-                          skill.getFinalSkillValue(skillModifierData) >=
+                          skill.getTotalSkillLevel(skillModifierData) >=
                                 REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
                     suitableDoctors.add(person);
                 }
