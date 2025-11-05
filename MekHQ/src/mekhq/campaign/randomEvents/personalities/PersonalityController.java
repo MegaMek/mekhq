@@ -136,6 +136,7 @@ public class PersonalityController {
         // Always generate Reasoning
         int reasoningRoll = randomInt(8346);
         person.setReasoning(generateReasoning(reasoningRoll));
+        person.setPerformanceExamScore(person.getReasoning().getExamScore());
 
         // finally, write the description
         writePersonalityDescription(person);
@@ -160,6 +161,7 @@ public class PersonalityController {
         person.setSocial(Social.NONE);
         person.setReasoning(Reasoning.AVERAGE);
         person.setPersonalityQuirk(PersonalityQuirk.NONE);
+        person.setPerformanceExamScore(person.getReasoning().getExamScore());
     }
 
     /**

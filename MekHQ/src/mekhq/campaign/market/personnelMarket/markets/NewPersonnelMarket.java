@@ -71,6 +71,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.MarketNewPersonnelEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
@@ -1289,5 +1290,9 @@ public class NewPersonnelMarket {
         }
 
         logger.info("Load Rare Personnel Nodes Complete!");
+    }
+
+    public Money getHiringCost(Person applicant) {
+        return Money.zero();
     }
 }
