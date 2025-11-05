@@ -38,6 +38,7 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
+import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
@@ -77,6 +78,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -100,7 +102,6 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.ForceType;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -190,6 +191,7 @@ public class CampaignNewDayManager {
     private final Finances finances;
     private LocalDate today;
     private CurrentLocation updatedLocation;
+    private final Set<Integer> scenariosWithDeployedForces = new HashSet<>();
 
     public CampaignNewDayManager(Campaign campaign) {
         this.campaign = campaign;
@@ -381,6 +383,33 @@ public class CampaignNewDayManager {
         // campaign must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(campaign));
         return true;
+    }
+
+    /**
+     * Gets all scenario IDs that have at least one standard force assigned to them.
+     *
+     * <p>This method iterates through all forces in the campaign and collects the scenario IDs of those forces that
+     * are classified as standard force types and are currently assigned to a scenario.</p>
+     *
+     * @return a set of scenario IDs that have standard forces assigned, or an empty set if no standard forces are
+     *       deployed
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private Set<Integer> getAllScenariosWithAssignedStandardForces() {
+        Set<Integer> scenarios = new HashSet<>();
+
+        for (Force force : campaign.getAllForces()) {
+            if (force.getForceType().isStandard()) {
+                int scenarioId = force.getScenarioId();
+                if (scenarioId != NO_ASSIGNED_SCENARIO) {
+                    scenarios.add(scenarioId);
+                }
+            }
+        }
+
+        return scenarios;
     }
 
     /**
@@ -1644,6 +1673,7 @@ public class CampaignNewDayManager {
     private void processNewDayATBScenarios() {
         // First, we get the list of all active AtBContracts
         List<AtBContract> contracts = campaign.getActiveAtBContracts(true);
+        Set<Integer> allScenariosWithAssignedStandardForces = getAllScenariosWithAssignedStandardForces();
 
         // Second, we process them and any already generated scenarios
         for (AtBContract contract : contracts) {
@@ -1704,7 +1734,7 @@ public class CampaignNewDayManager {
 
             for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
                 if ((scenario.getDate() != null) && scenario.getDate().isBefore(today)) {
-                    boolean hasForceDeployed = isHasForceDeployedToScenario(scenario.getId());
+                    boolean hasForceDeployed = allScenariosWithAssignedStandardForces.contains(scenario.getId());
                     if (campaignOptions.isUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
                         StratConCampaignState campaignState = contract.getStratconCampaignState();
 
@@ -1791,27 +1821,6 @@ public class CampaignNewDayManager {
                 }
             }
         }
-    }
-
-    /**
-     * Checks whether any standard force has been deployed to the given scenario.
-     *
-     * @param scenarioId The ID of the scenario to check forces for.
-     *
-     * @return {@code true} if at least one standard force is assigned to this scenario; {@code false} otherwise.
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private boolean isHasForceDeployedToScenario(int scenarioId) {
-        for (Force force : campaign.getAllForces()) {
-            if (force.getScenarioId() == scenarioId) {
-                if (force.isForceType(ForceType.STANDARD)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /**
