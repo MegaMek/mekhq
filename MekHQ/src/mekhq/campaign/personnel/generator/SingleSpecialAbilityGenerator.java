@@ -236,11 +236,17 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
 
         // Alternative weighting will pre-determine whether the SPA is positive or negative.
         if (useAlternativeWeighting) {
-            int roll = Compute.randomInt(40);
-            if (roll == 0) {
-                abilityList.addAll(negativeAbilities);
+            if (negativeAbilities.isEmpty()) {
+                return positiveAbilities;
+            } else if (positiveAbilities.isEmpty()) {
+                return negativeAbilities;
             } else {
-                abilityList.addAll(positiveAbilities);
+                int roll = Compute.randomInt(40);
+                if (roll == 0) {
+                    abilityList.addAll(negativeAbilities);
+                } else {
+                    abilityList.addAll(positiveAbilities);
+                }
             }
         } else {
             abilityList = SpecialAbility.getWeightedSpecialAbilities(abilityList);
