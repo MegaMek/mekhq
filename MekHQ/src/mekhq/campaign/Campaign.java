@@ -1726,6 +1726,12 @@ public class Campaign implements ITechManager {
         return location;
     }
 
+    public boolean isOnContractAndPlanetside() {
+        boolean isOnContract = !getActiveMissions(false).isEmpty();
+        boolean isPlanetside = location.isOnPlanet();
+        return isPlanetside && isOnContract;
+    }
+
     public List<String> getTurnoverRetirementInformation() {
         return turnoverRetirementInformation;
     }

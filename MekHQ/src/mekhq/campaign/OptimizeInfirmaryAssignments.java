@@ -94,15 +94,12 @@ public class OptimizeInfirmaryAssignments {
         organizePatients();
 
         // Assign doctors to patients
-        boolean isOnContract = !campaign.getActiveMissions(false).isEmpty();
-        boolean isPlanetside = campaign.getLocation().isOnPlanet();
-        boolean isOnContractAndPlanetside = isPlanetside && isOnContract;
         assignDoctors(isDoctorsUseAdministration,
               maximumPatients,
               healingWaitingPeriod,
               patients,
               doctors,
-              isOnContractAndPlanetside);
+              campaign.isOnContractAndPlanetside());
     }
 
     /**

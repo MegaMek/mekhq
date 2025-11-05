@@ -564,10 +564,8 @@ public class CampaignNewDayManager {
                 person.resetCurrentEdge();
 
                 if (!person.getStatus().isMIA()) {
-                    boolean isOnContract = !campaign.getActiveMissions(false).isEmpty();
-                    boolean isPlanetside = campaign.getLocation().isOnPlanet();
-                    boolean isOnContractAndPlanetside = isPlanetside && isOnContract;
-                    boolean isWithinCapacity = !isOnContractAndPlanetside || campaign.getFieldKitchenWithinCapacity();
+                    boolean isWithinCapacity = !campaign.isOnContractAndPlanetside() ||
+                                                     campaign.getFieldKitchenWithinCapacity();
                     processFatigueRecovery(campaign, person, isWithinCapacity);
                 }
 
