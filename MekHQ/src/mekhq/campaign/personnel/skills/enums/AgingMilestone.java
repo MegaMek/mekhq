@@ -140,7 +140,7 @@ public enum AgingMilestone {
      */
     public int getAttribute(SkillAttribute attribute) {
         return switch (attribute) {
-            case NONE -> NO_SKILL_ATTRIBUTE;
+            case NONE, EDGE -> NO_SKILL_ATTRIBUTE;
             case STRENGTH -> strength;
             case BODY -> body;
             case DEXTERITY -> dexterity;
@@ -171,7 +171,7 @@ public enum AgingMilestone {
 
     public int getAttributeModifier(SkillAttribute attribute) {
         return switch (attribute) {
-            case NONE -> NO_SKILL_ATTRIBUTE;
+            case NONE, EDGE -> NO_SKILL_ATTRIBUTE;
             case STRENGTH -> cumulativeStrength;
             case BODY -> cumulativeBody;
             case DEXTERITY -> cumulativeDexterity;

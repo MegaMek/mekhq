@@ -633,7 +633,7 @@ public class Skill {
 
     private static int getAttributeModifierFromInjuryEffect(InjuryEffect injuryEffect, SkillAttribute skillAttribute) {
         return switch (skillAttribute) {
-            case NONE -> 0;
+            case NONE, EDGE -> 0;
             case STRENGTH -> injuryEffect.getStrengthModifier();
             case BODY -> injuryEffect.getBodyModifier();
             case DEXTERITY -> injuryEffect.getDexterityModifier();

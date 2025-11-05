@@ -284,8 +284,6 @@ public class Person {
 
     // Supports edge usage by a ship's engineer composite crewman
     private int edgeUsedThisRound;
-    // To track how many edge points personnel have left until next refresh
-    private int currentEdge;
 
     // phenotype and background
     private Phenotype phenotype;
@@ -365,6 +363,7 @@ public class Person {
     private String personalityDescription;
     private String personalityInterviewNotes;
     private Reasoning reasoning;
+    private int performanceExamScore;
     // endregion Personality
 
     // region SPAs
@@ -548,7 +547,6 @@ public class Person {
         isRecoveringFromFatigue = false;
         skills = new Skills();
         options = new PersonnelOptions();
-        currentEdge = 0;
         techUnits = new ArrayList<>();
         personnelLog = new ArrayList<>();
         medicalLog = new ArrayList<>();
@@ -586,6 +584,7 @@ public class Person {
         personalityQuirk = PersonalityQuirk.NONE;
         personalityQuirkDescriptionIndex = randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS);
         reasoning = Reasoning.AVERAGE;
+        performanceExamScore = 50;
         personalityDescription = "";
         personalityInterviewNotes = "";
         storedLoyalty = 0;
@@ -2760,6 +2759,14 @@ public class Person {
         this.reasoning = reasoning;
     }
 
+    public int getPerformanceExamScore() {
+        return performanceExamScore;
+    }
+
+    public void setPerformanceExamScore(final int performanceExamScore) {
+        this.performanceExamScore = performanceExamScore;
+    }
+
     @Deprecated(since = "0.50.07", forRemoval = true)
     public int getReasoningDescriptionIndex() {
         return 0;
@@ -3352,6 +3359,8 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reasoning", reasoning.ordinal());
             }
 
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "performanceExamScore", performanceExamScore);
+
             if (!isNullOrBlank(personalityDescription)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
             }
@@ -3629,8 +3638,6 @@ public class Person {
                     advantages = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("edge")) {
                     edge = wn2.getTextContent();
-                } else if (nodeName.equalsIgnoreCase("edgeAvailable")) {
-                    person.currentEdge = MathUtility.parseInt(wn2.getTextContent(), 0);
                 } else if (nodeName.equalsIgnoreCase("implants")) {
                     implants = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("toughness")) {
@@ -3982,7 +3989,14 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
                     person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
-                    person.reasoning = Reasoning.fromString(wn2.getTextContent().trim());
+                    Reasoning parsedReasoning = Reasoning.fromString(wn2.getTextContent().trim());
+                    person.reasoning = parsedReasoning;
+
+                    if (version.isLowerThan(new Version("0.50.10"))) { // <50.10 compatibility handler
+                        person.performanceExamScore = parsedReasoning.getExamScore();
+                    }
+                } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
+                    person.performanceExamScore = MathUtility.parseInt(wn2.getTextContent().trim(), 50);
                 } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("personalityInterviewNotes")) {
@@ -5438,7 +5452,7 @@ public class Person {
      * @return The edge value defined in the person's options.
      */
     public int getEdge() {
-        return getOptions().intOption(OptionsConstants.EDGE);
+        return atowAttributes.getAttribute(SkillAttribute.EDGE);
     }
 
     /**
@@ -5452,20 +5466,15 @@ public class Person {
     public int getAdjustedEdge() {
         boolean hasTraumaticPast = options.booleanOption(COMPULSION_TRAUMATIC_PAST);
         int modifier = hasTraumaticPast ? -1 : 0;
-        return options.intOption(OptionsConstants.EDGE) - unlucky + modifier;
+        return getEdge() - unlucky + modifier;
     }
 
     public void setEdge(final int edge) {
-        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
-            if (OptionsConstants.EDGE.equals(ability.getName())) {
-                ability.setValue(edge);
-            }
-        }
+        atowAttributes.setAttributeScore(phenotype, options, SkillAttribute.EDGE, edge);
     }
 
     public void changeEdge(final int amount) {
-        setEdge(Math.max(getEdge() + amount, 0));
+        atowAttributes.changeEdge(amount);
     }
 
     /**
@@ -5481,18 +5490,18 @@ public class Person {
      * @param currentEdge - integer used to track this person's edge points available for the current week
      */
     public void setCurrentEdge(final int currentEdge) {
-        this.currentEdge = currentEdge;
+        atowAttributes.setCurrentEdge(currentEdge);
     }
 
     public void changeCurrentEdge(final int amount) {
-        currentEdge = Math.max(currentEdge + amount, 0);
+        atowAttributes.changeCurrentEdge(amount);
     }
 
     /**
      * @return this person's currently available edge points. Used for weekly refresh.
      */
     public int getCurrentEdge() {
-        return currentEdge;
+        return atowAttributes.getCurrentEdge();
     }
 
     public void setEdgeUsed(final int edgeUsedThisRound) {
@@ -6709,7 +6718,8 @@ public class Person {
                 }
                 yield min(attributeScore, MAXIMUM_ATTRIBUTE_SCORE);
             }
-            case BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER -> atowAttributes.getAttributeScore(attribute);
+            case BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, EDGE ->
+                  atowAttributes.getAttributeScore(attribute);
             case CHARISMA -> {
                 int attributeScore = atowAttributes.getAttributeScore(attribute);
                 if (hasExoticAppearance) {

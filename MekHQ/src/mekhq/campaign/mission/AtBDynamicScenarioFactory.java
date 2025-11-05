@@ -4567,7 +4567,7 @@ public class AtBDynamicScenarioFactory {
 
         if (entity.getAnyTypeMaxJumpMP() > 0) {
             // If the entity has jump capability, adjust the speed
-            if (entity instanceof Infantry) {
+            if (entity.isInfantry()) {
                 // For infantry, use jump MP instead of walk MP
                 speed = entity.getJumpMP();
             } else {
@@ -4577,7 +4577,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         // For aerospace units, multiply the walk MP
-        if (entity.isAerospace() && !entity.isSpheroid()) {
+        if (entity instanceof LandAirMek || entity.isAerospace() && !entity.isSpheroid()) {
             speed *= 2;
         }
 

@@ -82,6 +82,7 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -108,6 +109,8 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
+import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
+import mekhq.campaign.mission.camOpsSalvage.SalvageForceData;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
@@ -915,15 +918,18 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         if (scenario.getSalvageForces().isEmpty()) {
-            List<Force> salvageForceOptions = getSalvageForces(getCampaign().getHangar(),
-                  scenario.getBoardType() == AtBScenario.T_SPACE);
+            boolean isSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
+            List<SalvageForceData> salvageForceOptions = getSalvageForces(getCampaign(), isSpace);
 
-            SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), scenario, salvageForceOptions);
+            SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), salvageForceOptions, isSpace);
             boolean wasConfirmed = forcePicker.wasConfirmed();
             if (wasConfirmed) {
                 List<Force> selectedForces = forcePicker.getSelectedForces();
                 for (Force force : selectedForces) {
                     scenario.addSalvageForce(force.getId());
+                    if (force.getTechID() != null) {
+                        scenario.addSalvageTech(force.getTechID());
+                    }
                 }
 
                 if (getCampaign().getCampaignOptions().isUseStratCon()) {
@@ -956,15 +962,39 @@ public final class BriefingTab extends CampaignGuiTab {
             return true;
         }
 
+        List<UUID> priorSelectedTechs = new ArrayList<>();
         if (scenario.getSalvageTechs().isEmpty()) {
-            List<Person> availableTechs = getAvailableTechs();
+            List<Integer> forceIds = scenario.getSalvageForces();
+            for (Integer forceId : forceIds) {
+                Force force = getCampaign().getForce(forceId);
+                if (force != null && force.getForceType().isSalvage()) {
+                    if (force.getTechID() != null) {
+                        priorSelectedTechs.add(force.getTechID());
+                    }
+                }
+            }
 
-            SalvageTechPicker techPicker = new SalvageTechPicker(getCampaign(), availableTechs);
+            List<Person> availableTechs = getAvailableTechs();
+            List<UUID> assignedTechs = scenario.getSalvageTechs();
+            for (UUID techID : assignedTechs) {
+                Person tech = getCampaign().getPerson(techID);
+                if (tech != null && !availableTechs.contains(tech)) {
+                    availableTechs.add(0, tech);
+                }
+            }
+
+            List<SalvageTechData> techData = new ArrayList<>();
+            for (Person tech : availableTechs) {
+                SalvageTechData data = SalvageTechData.buildData(getCampaign(), tech);
+                techData.add(data);
+            }
+
+            SalvageTechPicker techPicker = new SalvageTechPicker(techData, priorSelectedTechs);
             boolean wasConfirmed = techPicker.wasConfirmed();
             if (wasConfirmed) {
-                List<Person> selectedTechs = techPicker.getSelectedTechs();
-                for (Person tech : selectedTechs) {
-                    scenario.addSalvageTech(tech.getId());
+                List<UUID> selectedTechs = techPicker.getSelectedTechs();
+                for (UUID techId : selectedTechs) {
+                    scenario.addSalvageTech(techId);
                 }
             }
 
@@ -982,12 +1012,6 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        // experienceLevel lowest -> highest, minutes highest -> lowest, rank lowest -> highest, full name a -> x
-        availableTechs.sort(Comparator.comparing((Person p) -> p.getExperienceLevel(getCampaign(),
-                    p.getPrimaryRole().isTech()))
-                                  .thenComparing(Comparator.comparing(Person::getMinutesLeft).reversed())
-                                  .thenComparing(Person::getRankNumeric)
-                                  .thenComparing(Person::getFullName));
         return availableTechs;
     }
 
@@ -1011,7 +1035,7 @@ public final class BriefingTab extends CampaignGuiTab {
      *
      * <p>The returned list is sorted alphabetically by force name.</p>
      *
-     * @param hangar          the campaign hangar containing all units
+     * @param campaign        the current campaign state
      * @param isSpaceScenario {@code true} if checking for space salvage capabilities, {@code false} for ground
      *
      * @return a sorted list of forces capable of salvage operations
@@ -1019,11 +1043,31 @@ public final class BriefingTab extends CampaignGuiTab {
      * @author Illiani
      * @since 0.50.10
      */
-    private List<Force> getSalvageForces(Hangar hangar, boolean isSpaceScenario) {
-        List<Integer> visitedForceIds = new ArrayList<>();
-        List<Force> salvageForceOptions = new ArrayList<>();
+    private List<SalvageForceData> getSalvageForces(Campaign campaign, boolean isSpaceScenario) {
+        List<SalvageForceData> salvageForceOptions = new ArrayList<>();
 
-        // Collect Combat Teams
+        // Collect eligible salvage forces (We want salvage forces first)
+        Hangar hangar = campaign.getHangar();
+        List<Force> eligibleSalvageForces = new ArrayList<>();
+        for (Force force : getCampaign().getAllForces()) {
+            Force parentForce = force.getParentForce();
+            if (parentForce != null && parentForce.getForceType().isSalvage()) {
+                continue;
+            }
+
+            if (force.getForceType().isSalvage() && force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
+                eligibleSalvageForces.add(force);
+            }
+        }
+
+        eligibleSalvageForces.sort(Comparator.comparing(Force::getFullName));
+        for (Force force : eligibleSalvageForces) {
+            SalvageForceData data = SalvageForceData.buildData(campaign, force, isSpaceScenario);
+            salvageForceOptions.add(data);
+        }
+
+        // Collect eligible Combat Teams
+        List<Force> eligibleCombatTeams = new ArrayList<>();
         List<AtBContract> activeContracts = getCampaign().getActiveAtBContracts();
         for (CombatTeam combatTeam : getCampaign().getCombatTeamsAsList()) {
             int forceId = combatTeam.getForceId();
@@ -1032,35 +1076,20 @@ public final class BriefingTab extends CampaignGuiTab {
                 continue;
             }
 
-            visitedForceIds.add(force.getId());
-            force.getSubForces().forEach(subForce -> visitedForceIds.add(subForce.getId()));
-
             boolean isDeployedToStratCon = StratConRulesManager.isForceDeployedToStratCon(activeContracts, forceId);
             if (!force.isDeployed() &&
                       !isDeployedToStratCon &&
                       force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
-                salvageForceOptions.add(force);
+                eligibleCombatTeams.add(force);
             }
         }
 
-        // Collect non-Combat Team salvage forces
-        for (Force force : getCampaign().getAllForces()) {
-            if (visitedForceIds.contains(force.getId())) {
-                continue;
-            }
-
-            Force parentForce = force.getParentForce();
-            if (parentForce != null && parentForce.getForceType().isSalvage()) {
-                continue;
-            }
-
-            if (force.getForceType().isSalvage() && force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
-                salvageForceOptions.add(force);
-                visitedForceIds.add(force.getId());
-            }
+        eligibleCombatTeams.sort(Comparator.comparing(Force::getFullName));
+        for (Force force : eligibleCombatTeams) {
+            SalvageForceData data = SalvageForceData.buildData(campaign, force, isSpaceScenario);
+            salvageForceOptions.add(data);
         }
 
-        salvageForceOptions.sort(Comparator.comparing(Force::getFullName));
         return salvageForceOptions;
     }
 

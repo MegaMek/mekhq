@@ -36,6 +36,7 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_BODY;
 import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_CHARISMA;
 import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_DEXTERITY;
+import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_EDGE;
 import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE;
 import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_REFLEXES;
 import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_STRENGTH;
@@ -86,6 +87,8 @@ public class Attributes {
     private int intelligence;
     private int willpower;
     private int charisma;
+    private int edge;
+    private int currentEdge;
 
     /**
      * The default score assigned to all attributes during initialization.
@@ -111,11 +114,6 @@ public class Attributes {
      */
     public static int MAXIMUM_ATTRIBUTE_SCORE = 10;
 
-    /**
-     * Represents the cost required to improve an attribute. This is taken from ATOW pg 333.
-     */
-    public static int ATTRIBUTE_IMPROVEMENT_COST = 100;
-
     // Constructor
 
     /**
@@ -132,6 +130,8 @@ public class Attributes {
         intelligence = DEFAULT_ATTRIBUTE_SCORE;
         willpower = DEFAULT_ATTRIBUTE_SCORE;
         charisma = DEFAULT_ATTRIBUTE_SCORE;
+        edge = 0;
+        currentEdge = 0;
     }
 
 
@@ -145,12 +145,13 @@ public class Attributes {
      * @param intelligence The initial value for the intelligence {@link SkillAttribute}.
      * @param willpower    The initial value for the willpower {@link SkillAttribute}.
      * @param charisma     The initial value for the charisma {@link SkillAttribute}.
+     * @param edge         The initial value for the edge {@link SkillAttribute}.
      *
      * @author Illiani
      * @since 0.50.05
      */
     public Attributes(int strength, int body, int reflexes, int dexterity, int intelligence, int willpower,
-          int charisma) {
+          int charisma, int edge, int currentEdge) {
         this.strength = strength;
         this.body = body;
         this.reflexes = reflexes;
@@ -158,6 +159,8 @@ public class Attributes {
         this.intelligence = intelligence;
         this.willpower = willpower;
         this.charisma = charisma;
+        this.edge = edge;
+        this.currentEdge = currentEdge;
     }
 
     /**
@@ -167,7 +170,7 @@ public class Attributes {
      * to the same value with a single argument.</p>
      *
      * @param singleValue The value to be assigned to all attribute fields, such as strength, body, reflexes, dexterity,
-     *                    intelligence, willpower, and charisma.
+     *                    intelligence, willpower, charisma, and edge.
      *
      * @author Illiani
      * @since 0.50.05
@@ -180,6 +183,8 @@ public class Attributes {
         this.intelligence = singleValue;
         this.willpower = singleValue;
         this.charisma = singleValue;
+        this.edge = singleValue;
+        this.currentEdge = singleValue;
     }
 
     // Getters and Setters
@@ -206,6 +211,7 @@ public class Attributes {
             case INTELLIGENCE -> clamp(intelligence, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
             case WILLPOWER -> clamp(willpower, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
             case CHARISMA -> clamp(charisma, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case EDGE -> clamp(edge, 0, MAXIMUM_ATTRIBUTE_SCORE);
             default -> 0;
         };
     }
@@ -257,6 +263,7 @@ public class Attributes {
             case INTELLIGENCE -> intelligence;
             case WILLPOWER -> willpower;
             case CHARISMA -> charisma;
+            case EDGE -> edge;
             default -> {
                 LOGGER.error("(getAttributeScore) Invalid attribute requested: {}", attribute);
                 yield DEFAULT_ATTRIBUTE_SCORE;
@@ -307,6 +314,7 @@ public class Attributes {
             case INTELLIGENCE -> intelligence = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
             case WILLPOWER -> willpower = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
             case CHARISMA -> charisma = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case EDGE -> edge = clamp(score, 0, cap);
             default -> LOGGER.error("(setAttributeScore) Invalid attribute requested: {}", attribute);
         }
     }
@@ -347,6 +355,7 @@ public class Attributes {
         boolean hasExceptionalIntelligence = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE);
         boolean hasExceptionalWillpower = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_WILLPOWER);
         boolean hasExceptionalCharisma = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_CHARISMA);
+        boolean hasExceptionalEdge = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_EDGE);
 
         cap += switch (attribute) {
             case STRENGTH -> {
@@ -360,6 +369,7 @@ public class Attributes {
             case INTELLIGENCE -> hasExceptionalIntelligence ? 1 : 0;
             case WILLPOWER -> hasExceptionalWillpower ? 1 : 0;
             case CHARISMA -> hasExceptionalCharisma ? 1 : 0;
+            case EDGE -> hasExceptionalEdge ? 1 : 0;
             default -> {
                 LOGGER.error("(setAttributeScore) Invalid attribute requested for cap modifier: {}", attribute);
                 yield 0;
@@ -673,6 +683,34 @@ public class Attributes {
         charisma = clamp(charisma, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
+    /**
+     * Changes the edge attribute by a delta.
+     *
+     * <p>The result is clamped between {@code 0} and {@link #MAXIMUM_ATTRIBUTE_SCORE}.</p>
+     *
+     * @param delta the value to add to the current edge. A positive delta will increase the attribute score, while a
+     *              negative delta will decrease it.
+     *
+     * @since 0.50.5
+     */
+    public void changeEdge(int delta) {
+        edge += delta;
+        edge = clamp(edge, 0, MAXIMUM_ATTRIBUTE_SCORE);
+    }
+
+    public int getCurrentEdge() {
+        return currentEdge;
+    }
+
+    public void changeCurrentEdge(int delta) {
+        currentEdge += delta;
+        currentEdge = clamp(currentEdge, 0, edge);
+    }
+
+    public void setCurrentEdge(final int currentEdge) {
+        this.currentEdge = currentEdge;
+    }
+
     // Reading and Writing
 
     /**
@@ -703,6 +741,8 @@ public class Attributes {
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "intelligence", intelligence);
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "willpower", willpower);
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "charisma", charisma);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "edge", edge);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "currentEdge", currentEdge);
     }
 
     /**
@@ -739,6 +779,10 @@ public class Attributes {
                     this.willpower = MathUtility.parseInt(workingNode2.getTextContent(), DEFAULT_ATTRIBUTE_SCORE);
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("charisma")) {
                     this.charisma = MathUtility.parseInt(workingNode2.getTextContent(), DEFAULT_ATTRIBUTE_SCORE);
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("edge")) {
+                    this.edge = MathUtility.parseInt(workingNode2.getTextContent());
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("currentEdge")) {
+                    this.currentEdge = MathUtility.parseInt(workingNode2.getTextContent());
                 }
             }
         } catch (Exception ex) {

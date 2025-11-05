@@ -54,19 +54,19 @@ import mekhq.campaign.personnel.medical.BodyLocation;
 public class AlternateInjuries {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AlternateInjuries";
 
-    private static final int BURN_HEALING_DAYS = 14; // Internet says 1-3 weeks
+    private static final int BURN_HEALING_DAYS = 7; // Internet says 1-3 weeks
     private static final int DEAFNESS_HEALING_DAYS = 7; // Internet says around a week
-    private static final int BLINDNESS_HEALING_DAYS = 14; // Internet says this varies a lot, we went with 2 weeks
-    private static final int FRACTURE_HEALING_DAYS = 49; // Internet says 6-8 weeks
-    private static final int COMPOUND_FRACTURE_HEALING_DAYS = 56; // Internet says 6-12 weeks
-    private static final int SMOKE_INHALATION_HEALING_DAYS = 3; // Internet says 2-3 days
-    private static final int PUNCTURED_LUNG_HEALING_DAYS = 49; // Internet says 6-8 days
-    private static final int HEART_TRAUMA_HEALING_DAYS = 56; // Internet says 4-12 weeks
-    private static final int ORGAN_BRUISE_HEALING_DAYS = 35; // Internet says 4-6 weeks
-    private static final int ORGAN_TRAUMA_HEALING_DAYS = 49; // Internet says 6-8 weeks
-    private static final int DISEMBOWELED_HEALING_DAYS = 49; // Internet says 6-8 weeks
+    private static final int BLINDNESS_HEALING_DAYS = 7; // Internet says this varies a lot, we went with a week
+    private static final int FRACTURE_HEALING_DAYS = 42; // Internet says 6-8 weeks
+    private static final int COMPOUND_FRACTURE_HEALING_DAYS = 42; // Internet says 6-12 weeks
+    private static final int SMOKE_INHALATION_HEALING_DAYS = 2; // Internet says 2-3 days
+    private static final int PUNCTURED_LUNG_HEALING_DAYS = 42; // Internet says 6-8 weeks
+    private static final int HEART_TRAUMA_HEALING_DAYS = 28; // Internet says 4-12 weeks
+    private static final int ORGAN_BRUISE_HEALING_DAYS = 28; // Internet says 4-6 weeks
+    private static final int ORGAN_TRAUMA_HEALING_DAYS = 42; // Internet says 6-8 weeks
+    private static final int DISEMBOWELED_HEALING_DAYS = 42; // Internet says 6-8 weeks
     private static final int BONE_BRUISE_HEALING_DAYS = 42; // Internet says 6 weeks
-    private static final int BLOOD_LOSS_HEALING_DAYS = 35; // Internet says 4-6 weeks
+    private static final int BLOOD_LOSS_HEALING_DAYS = 28; // Internet says 4-6 weeks
     private static final int SEVER_HEALING_DAYS = 180; // We need to have something here for Advanced Medical
 
     private static final InjuryLevel SEVERE_INJURY_LEVEL = InjuryLevel.CHRONIC;

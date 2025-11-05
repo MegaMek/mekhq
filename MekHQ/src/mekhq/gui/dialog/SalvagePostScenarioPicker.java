@@ -45,6 +45,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -57,6 +58,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.swing.*;
 
+import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.units.Dropship;
@@ -124,7 +126,6 @@ public class SalvagePostScenarioPicker {
     private final List<TestUnit> soldSalvage = new ArrayList<>();
     private final List<TestUnit> employerSalvage = new ArrayList<>();
     private final Map<String, Unit> unitNameMap = new LinkedHashMap<>();
-    private final Map<String, Double> unitCargoAssignments = new HashMap<>();
     private Map<UUID, RecoveryTimeData> recoveryTimeData;
     private boolean isExchangeRights = false;
 
@@ -263,8 +264,8 @@ public class SalvagePostScenarioPicker {
         }
 
         // Process selected units
-        CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, keptSalvage, this.soldSalvage,
-              employerSalvage);
+        CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, this.keptSalvage, this.soldSalvage,
+              this.employerSalvage);
     }
 
     /**
@@ -338,6 +339,7 @@ public class SalvagePostScenarioPicker {
         allUnits = new ArrayList<>(actualSalvage);
         allUnits.addAll(soldSalvage);
         allUnits.sort(Comparator.comparing(TestUnit::getSellValue).reversed()); // Highest -> Lowest
+
     }
 
 
@@ -454,8 +456,14 @@ public class SalvagePostScenarioPicker {
                   "SalvagePostScenarioPicker.salvagePercent", salvagePercent));
             employerSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
                   "SalvagePostScenarioPicker.employerSalvage", employerSalvageMoneyCurrent.toAmountString()));
-            unitSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "SalvagePostScenarioPicker.unitSalvage", unitSalvageMoneyCurrent.toAmountString()));
+            if (isExchangeRights) {
+                Money actualFunds = employerSalvageMoneyCurrent.dividedBy(100).multipliedBy(salvagePercent);
+                unitSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "SalvagePostScenarioPicker.unitSalvage", actualFunds.toAmountString()));
+            } else {
+                unitSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "SalvagePostScenarioPicker.unitSalvage", unitSalvageMoneyCurrent.toAmountString()));
+            }
             availableTimeLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
                   "SalvagePostScenarioPicker.time", usedSalvageTime, maximumSalvageTime));
 
@@ -531,7 +539,7 @@ public class SalvagePostScenarioPicker {
             // Create row panel with label, two combo boxes, and validation label
             JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2));
             rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+            rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, scaleForGUI(60)));
 
             JLabel unitLabel = new JLabel();
             unitLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.unitLabel.unit",
@@ -564,6 +572,9 @@ public class SalvagePostScenarioPicker {
                 comboBox2.addItem(displayName);
             }
 
+            RoundedJButton viewButton = new RoundedJButton("\u24D8");
+            viewButton.setFocusable(false);
+
             RoundedJButton fieldStripButton = new RoundedJButton("\u2692");
             fieldStripButton.setEnabled(false); // TODO remove this line when we're ready to implement field stripping
             fieldStripButton.setFocusable(false);
@@ -592,8 +603,11 @@ public class SalvagePostScenarioPicker {
             claimedSalvageForSale.addActionListener(e -> performComboChangeAction(isContract,
                   salvageComboBoxGroups, group, finalEmployerSalvageLabel, finalUnitSalvageLabel,
                   finalAvailableTimeLabel, confirmButton));
+            viewButton.addActionListener(new ViewUnitListener(group.targetUnit));
+
             fieldStripButton.addActionListener(e -> fieldStrip(group));
 
+            rowPanel.add(viewButton);
             rowPanel.add(fieldStripButton);
             rowPanel.add(claimedSalvageForKeeps);
             rowPanel.add(claimedSalvageForSale);
@@ -746,7 +760,7 @@ public class SalvagePostScenarioPicker {
                                                   .multiply(hundred)
                                                   .divide(totalSalvage.getAmount(), 4, RoundingMode.HALF_UP);
 
-                if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0) {
+                if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0 && !isExchangeRights) {
                     disableConfirmAndColorName(confirmButton, unitSalvageLabel);
                 }
             }
@@ -845,8 +859,16 @@ public class SalvagePostScenarioPicker {
                   "SalvagePostScenarioPicker.employerSalvage", employerSalvageMoneyCurrent.toAmountString()));
         }
         if (unitSalvageLabel != null) {
-            unitSalvageLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "SalvagePostScenarioPicker.unitSalvage", unitSalvageMoneyCurrent.toAmountString()));
+            String label;
+            if (isExchangeRights) {
+                Money actualFunds = employerSalvageMoneyCurrent.dividedBy(100).multipliedBy(salvagePercent);
+                label = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "SalvagePostScenarioPicker.unitSalvage", actualFunds.toAmountString());
+            } else {
+                label = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "SalvagePostScenarioPicker.unitSalvage", unitSalvageMoneyCurrent.toAmountString());
+            }
+            unitSalvageLabel.setText(label);
         }
         if (availableTimeLabel != null) {
             availableTimeLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -868,9 +890,17 @@ public class SalvagePostScenarioPicker {
      */
     private void updateComboBoxOptions(List<SalvageComboBoxGroup> salvageComboBoxGroups,
           Map<String, Unit> unitNameMap) {
-        unitCargoAssignments.clear(); // Clear prior assignments, we're going to rebuild these later
-
         // Collect all currently selected unit names
+        List<String> selectedUnitNames = getSelectedUnitNames(salvageComboBoxGroups);
+
+        // Update each combo box
+        for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
+            updateSingleComboBox(group.comboBoxLeft, selectedUnitNames, unitNameMap);
+            updateSingleComboBox(group.comboBoxRight, selectedUnitNames, unitNameMap);
+        }
+    }
+
+    private static List<String> getSelectedUnitNames(List<SalvageComboBoxGroup> salvageComboBoxGroups) {
         List<String> selectedUnitNames = new ArrayList<>();
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
             String selectedLeft = (String) group.comboBoxLeft.getSelectedItem();
@@ -882,12 +912,7 @@ public class SalvagePostScenarioPicker {
                 selectedUnitNames.add(selectedRight);
             }
         }
-
-        // Update each combo box
-        for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            updateSingleComboBox(group.comboBoxLeft, selectedUnitNames, unitNameMap);
-            updateSingleComboBox(group.comboBoxRight, selectedUnitNames, unitNameMap);
-        }
+        return selectedUnitNames;
     }
 
     /**
@@ -918,11 +943,8 @@ public class SalvagePostScenarioPicker {
             comboBox.addItem(null); // Allow empty selection
 
             for (String unitName : unitNameMap.keySet()) {
-                Unit unit = unitNameMap.get(unitName);
-                double cargoCapacity = unit.getCargoCapacityForSalvage();
-                double currentAssignments = unitCargoAssignments.getOrDefault(unitName, 0.0);
-                boolean hasCapacity = currentAssignments < cargoCapacity;
-                if (unitName.equals(currentSelection) || (hasCapacity || !selectedUnitNames.contains(unitName))) {
+                // Only add if it's the current selection OR it's not selected anywhere else
+                if (unitName.equals(currentSelection) || !selectedUnitNames.contains(unitName)) {
                     comboBox.addItem(unitName);
                 }
             }
@@ -1001,51 +1023,41 @@ public class SalvagePostScenarioPicker {
                       MekHQ.getMHQOptions().getFontColorNegative());
                 return;
             }
-
-            validate(group);
-            return;
-        }
-
-        // if one unit selected can use towing, or cargo (left selection)
-        if (salvageUnitLeft != null) {
-            useTowageOrCargo(group, unitLeftEntity, salvageUnitLeft, unitNameLeft, targetWeight);
+        } else if (salvageUnitLeft != null) {
+            if (!useTowageOrCargo(group, unitLeftEntity, salvageUnitLeft, targetWeight)) {
+                return;
+            }
         } else {
-            useTowageOrCargo(group, unitRightEntity, salvageUnitRight, unitNameRight, targetWeight);
+            if (!useTowageOrCargo(group, unitRightEntity, salvageUnitRight, targetWeight)) {
+                return;
+            }
         }
+
+        validate(group);
     }
 
-    private void useTowageOrCargo(SalvageComboBoxGroup group, Entity entity, Unit unit, String unitName,
-          double targetWeight) {
+    private boolean useTowageOrCargo(SalvageComboBoxGroup group, Entity entity, Unit unit, double targetWeight) {
         double unitWeight = entity.getWeight();
         double cargoCapacity = unit.getCargoCapacityForSalvage();
-        boolean useTowage = unitCargoAssignments.get(unitName) == null ||
-                                  entity.getWeight() >= cargoCapacity;
+        boolean useTowage = entity.getWeight() >= cargoCapacity;
         if (useTowage) {
             boolean hasTowageCapacity = unitWeight >= targetWeight;
             if (!hasTowageCapacity) {
                 invalidate(group,
                       getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.noCapacity.tow"),
                       MekHQ.getMHQOptions().getFontColorNegative());
-                return;
+                return false;
             }
-
-            validate(group);
         } else {
-            double usedCargoCapacity = unitCargoAssignments.get(unitName) != null ?
-                                             unitCargoAssignments.get(unitName) :
-                                             0.0;
-            double availableCargoCapacity = cargoCapacity - usedCargoCapacity;
-            boolean hasCargoCapacity = availableCargoCapacity >= targetWeight;
+            boolean hasCargoCapacity = cargoCapacity >= targetWeight;
             if (!hasCargoCapacity) {
                 invalidate(group,
                       getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.noCapacity.cargo"),
                       MekHQ.getMHQOptions().getFontColorNegative());
-                return;
+                return false;
             }
-
-            unitCargoAssignments.put(unitName, usedCargoCapacity + unitWeight);
-            validate(group);
         }
+        return true;
     }
 
     private static boolean checkForNavalTug(SalvageComboBoxGroup group, Entity unitLeftEntity, Entity unitRightEntity) {
@@ -1065,11 +1077,10 @@ public class SalvagePostScenarioPicker {
     private void validate(SalvageComboBoxGroup group) {
         group.validationLabel.setText(getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.valid"));
         group.unitLabel.setForeground(null); // Reset to default color
-        if (!isExchangeRights) { // For exchange rights we keep 'for keeps' disabled
+        if (!isExchangeRights) { // For exchange rights we keep everything disabled
             group.claimedSalvageForKeeps.setEnabled(true);
+            group.claimedSalvageForSale.setEnabled(true);
         }
-
-        group.claimedSalvageForSale.setEnabled(true);
     }
 
     private static void invalidate(SalvageComboBoxGroup group, String label, Color FontColorNegative) {
@@ -1122,7 +1133,7 @@ public class SalvagePostScenarioPicker {
         final boolean keeps = group.claimedSalvageForKeeps.isSelected();
 
         if (!isValid) {
-            // Invalid assignment → remove from all 3 lists
+            // Invalid assignment -> remove from all 3 lists
             removeFromAll(targetUnit);
             return;
         }
@@ -1133,8 +1144,19 @@ public class SalvagePostScenarioPicker {
         } else if (keeps) {
             moveToList(targetUnit, keptSalvage);
         } else {
-            // Neither selected: valid → goes to employer
+            // Neither selected: valid -> goes to employer
             moveToList(targetUnit, employerSalvage);
+        }
+    }
+
+    private record ViewUnitListener(TestUnit unit) implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent evt) {
+            showUnit(unit);
+        }
+
+        private void showUnit(TestUnit unit) {
+            new EntityReadoutDialog(null, true, unit.getEntity()).setVisible(true);
         }
     }
 }

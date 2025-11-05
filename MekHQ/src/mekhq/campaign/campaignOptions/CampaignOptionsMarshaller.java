@@ -134,6 +134,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "missionXpOutstandingSuccess",
               campaignOptions.getMissionXpOutstandingSuccess());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeCost", campaignOptions.getEdgeCost());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attributeCost", campaignOptions.getAttributeCost());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitByYear", campaignOptions.isLimitByYear());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "disallowExtinctStuff", campaignOptions.isDisallowExtinctStuff());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowClanPurchases", campaignOptions.isAllowClanPurchases());

@@ -556,6 +556,7 @@ public class CampaignOptions {
     private int missionXpSuccess;
     private int missionXpOutstandingSuccess;
 
+    private int attributeCost;
     private int edgeCost;
     // endregion Experience Tab
 
@@ -1210,6 +1211,7 @@ public class CampaignOptions {
         missionXpSuccess = 3;
         missionXpOutstandingSuccess = 5;
         edgeCost = 10;
+        attributeCost = 100;
         // endregion Experience Tab
 
         // region Skills Tab
@@ -4399,6 +4401,14 @@ public class CampaignOptions {
 
     public void setEdgeCost(final int edgeCost) {
         this.edgeCost = edgeCost;
+    }
+
+    public int getAttributeCost() {
+        return attributeCost;
+    }
+
+    public void setAttributeCost(final int attributeCost) {
+        this.attributeCost = attributeCost;
     }
 
     public int getWaitingPeriod() {

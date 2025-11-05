@@ -78,6 +78,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Crew;
 import megamek.common.units.Entity;
 import megamek.common.universe.FactionTag;
@@ -111,7 +112,6 @@ import mekhq.gui.control.EditKillLogControl;
 import mekhq.gui.control.EditLogControl;
 import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.control.EditScenarioLogControl;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 
 /**
@@ -269,8 +269,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         JLabel lblToughness = new JLabel();
         textEducationLevel = new JComboBox<>();
         JLabel lblEducationLevel = new JLabel();
-        JScrollPane scrOptions = new JScrollPaneWithSpeed();
-        JScrollPane scrSkills = new JScrollPaneWithSpeed();
+        FastJScrollPane scrOptions = new FastJScrollPane();
+        FastJScrollPane scrSkills = new FastJScrollPane();
         JPanel panButtons = new JPanel();
         JButton btnOk = new JButton();
 
@@ -1248,7 +1248,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panDemographics.add(txtBio, gridBagConstraints);
 
-        JScrollPane scrollPane = new JScrollPane(panDemographics);
+        FastJScrollPane scrollPane = new FastJScrollPane(panDemographics);
         scrollPane.setMinimumSize(UIUtil.scaleForGUI(600, 500));
         scrollPane.setPreferredSize(UIUtil.scaleForGUI(600, 500));
 
