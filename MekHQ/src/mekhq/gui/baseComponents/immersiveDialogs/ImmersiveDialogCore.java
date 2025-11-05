@@ -548,7 +548,7 @@ public class ImmersiveDialogCore extends JDialog {
     protected JPanel populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout) {
         final int padding = getPadding();
 
-        // Main container panel to hold the spinner and button panel
+        // Main container panel to hold the button panel
         JPanel containerPanel = new JPanel();
         containerPanel.setLayout(new BorderLayout(padding, padding));
 
