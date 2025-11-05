@@ -207,8 +207,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_ADD_SCENARIO_ENTRY = "ADD_SCENARIO_ENTRY";
     private static final String CMD_EDIT_KILL_LOG = "KILL_LOG";
     private static final String CMD_ADD_KILL = "ADD_KILL";
-    private static final String CMD_BUY_EDGE = "EDGE_BUY";
-    private static final String CMD_SET_EDGE = "EDGE_SET";
     private static final String CMD_SET_XP = "XP_SET";
     private static final String CMD_ADD_XP = "XP_ADD";
     private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY";
@@ -1374,50 +1372,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            case CMD_BUY_EDGE: {
-                int baseCost = getCampaignOptions().getEdgeCost();
-                final double xpCostMultiplier = getCampaignOptions().getXpCostMultiplier();
-                final boolean isUseReasoningMultiplier = getCampaignOptions().isUseReasoningXpMultiplier();
-                for (Person person : people) {
-                    double reasoningXpCostMultiplier = person.getReasoningXpCostMultiplier(isUseReasoningMultiplier);
-
-                    // Reasoning cost changes should always take place before global changes
-                    int cost = (int) round(baseCost * reasoningXpCostMultiplier);
-                    cost = (int) round(cost * xpCostMultiplier);
-
-                    selectedPerson.spendXP(cost);
-                    person.changeEdge(1);
-                    // Make the new edge point available to support personnel, but don't reset until
-                    // the week ends
-                    person.changeCurrentEdge(1);
-                    PerformanceLogger.gainedEdge(getCampaign(), person, getCampaign().getLocalDate());
-                    getCampaign().addReport(String.format(resources.getString("gainedEdge.format"),
-                          selectedPerson.getHyperlinkedName()));
-                    getCampaign().personUpdated(person);
-                }
-                break;
-            }
-            case CMD_SET_EDGE: {
-                PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                      true,
-                      resources.getString("edge.text"),
-                      selectedPerson.getEdge(),
-                      0,
-                      10);
-                popupValueChoiceDialog.setVisible(true);
-                if (popupValueChoiceDialog.getValue() < 0) {
-                    return;
-                }
-                int i = popupValueChoiceDialog.getValue();
-                for (Person person : people) {
-                    person.setEdge(i);
-                    // Reset currentEdge for support people
-                    person.resetCurrentEdge();
-                    PerformanceLogger.changedEdge(getCampaign(), person, getCampaign().getLocalDate());
-                    getCampaign().personUpdated(person);
-                }
-                break;
-            }
             case CMD_ADD_KILL: {
                 AddOrEditKillEntryDialog nkd;
                 Unit unit = selectedPerson.getUnit();
@@ -1739,7 +1693,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 RandomSkillPreferences skillPreferences = getCampaign().getRandomSkillPreferences();
                 AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
                 for (Person person : people) {
-                    skillGenerator.generateAttributes(person);
+                    skillGenerator.generateAttributes(person, getCampaign().getCampaignOptions().isUseEdge());
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -3591,12 +3545,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(traitsMenu);
 
             JMenu attributesMenuIncrease = new JMenu(resources.getString("spendOnAttributes.increase"));
-            int attributeCost = (int) round(getCampaignOptions().getAttributeCost() * costMultiplier);
-
+            int attributeImprovementCost = (int) round(getCampaignOptions().getAttributeCost() * costMultiplier);
+            int edgeCost = (int) round(getCampaignOptions().getEdgeCost() * costMultiplier);
             for (SkillAttribute attribute : SkillAttribute.values()) {
                 if (attribute.isNone()) {
                     continue;
                 }
+
+                boolean isEdge = attribute == SkillAttribute.EDGE;
+                if (isEdge && !getCampaignOptions().isUseEdge()) {
+                    continue;
+                }
+
+                int attributeCost = (int) round((isEdge ? edgeCost : attributeImprovementCost)
+                                                      * reasoningXpCostMultiplier);
 
                 int current = person.getAttributeScore(attribute);
                 // Improve
@@ -3616,24 +3578,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 attributesMenuIncrease.add(menuItem);
             }
             menu.add(attributesMenuIncrease);
-
-            // Edge Purchasing
-            if (getCampaignOptions().isUseEdge()) {
-                JMenu edgeMenu = new JMenu(resources.getString("edge.text"));
-
-                // Reasoning cost changes should always take place before global changes
-                int cost = (int) round(getCampaignOptions().getEdgeCost() * reasoningXpCostMultiplier);
-                cost = (int) round(cost * xpCostMultiplier);
-
-                if (cost >= 0) {
-                    menuItem = new JMenuItem(String.format(resources.getString("spendOnEdge.text"), cost));
-                    menuItem.setActionCommand(makeCommand(CMD_BUY_EDGE, String.valueOf(cost)));
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(person.getXP() >= cost);
-                    edgeMenu.add(menuItem);
-                }
-                JMenuHelpers.addMenuIfNonEmpty(menu, edgeMenu);
-            }
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             // endregion Spend XP Menu
 
@@ -4433,12 +4377,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             menu.add(menuItem);
 
-            if (getCampaignOptions().isUseEdge()) {
-                menuItem = new JMenuItem(resources.getString("setEdge.text"));
-                menuItem.setActionCommand(CMD_SET_EDGE);
-                menuItem.addActionListener(this);
-                menu.add(menuItem);
-            }
             menuItem = new JMenuItem(resources.getString("editPerson.text"));
             menuItem.setActionCommand(CMD_EDIT);
             menuItem.addActionListener(this);

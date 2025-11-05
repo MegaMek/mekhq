@@ -284,8 +284,6 @@ public class Person {
 
     // Supports edge usage by a ship's engineer composite crewman
     private int edgeUsedThisRound;
-    // To track how many edge points personnel have left until next refresh
-    private int currentEdge;
 
     // phenotype and background
     private Phenotype phenotype;
@@ -549,7 +547,6 @@ public class Person {
         isRecoveringFromFatigue = false;
         skills = new Skills();
         options = new PersonnelOptions();
-        currentEdge = 0;
         techUnits = new ArrayList<>();
         personnelLog = new ArrayList<>();
         medicalLog = new ArrayList<>();
@@ -3641,8 +3638,6 @@ public class Person {
                     advantages = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("edge")) {
                     edge = wn2.getTextContent();
-                } else if (nodeName.equalsIgnoreCase("edgeAvailable")) {
-                    person.currentEdge = MathUtility.parseInt(wn2.getTextContent(), 0);
                 } else if (nodeName.equalsIgnoreCase("implants")) {
                     implants = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("toughness")) {
@@ -5457,7 +5452,7 @@ public class Person {
      * @return The edge value defined in the person's options.
      */
     public int getEdge() {
-        return getOptions().intOption(OptionsConstants.EDGE);
+        return atowAttributes.getAttribute(SkillAttribute.EDGE);
     }
 
     /**
@@ -5471,20 +5466,15 @@ public class Person {
     public int getAdjustedEdge() {
         boolean hasTraumaticPast = options.booleanOption(COMPULSION_TRAUMATIC_PAST);
         int modifier = hasTraumaticPast ? -1 : 0;
-        return options.intOption(OptionsConstants.EDGE) - unlucky + modifier;
+        return getEdge() - unlucky + modifier;
     }
 
     public void setEdge(final int edge) {
-        for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
-            if (OptionsConstants.EDGE.equals(ability.getName())) {
-                ability.setValue(edge);
-            }
-        }
+        atowAttributes.setAttributeScore(phenotype, options, SkillAttribute.EDGE, edge);
     }
 
     public void changeEdge(final int amount) {
-        setEdge(Math.max(getEdge() + amount, 0));
+        atowAttributes.changeEdge(amount);
     }
 
     /**
@@ -5500,18 +5490,18 @@ public class Person {
      * @param currentEdge - integer used to track this person's edge points available for the current week
      */
     public void setCurrentEdge(final int currentEdge) {
-        this.currentEdge = currentEdge;
+        atowAttributes.setCurrentEdge(currentEdge);
     }
 
     public void changeCurrentEdge(final int amount) {
-        currentEdge = Math.max(currentEdge + amount, 0);
+        atowAttributes.changeCurrentEdge(amount);
     }
 
     /**
      * @return this person's currently available edge points. Used for weekly refresh.
      */
     public int getCurrentEdge() {
-        return currentEdge;
+        return atowAttributes.getCurrentEdge();
     }
 
     public void setEdgeUsed(final int edgeUsedThisRound) {
@@ -6728,7 +6718,8 @@ public class Person {
                 }
                 yield min(attributeScore, MAXIMUM_ATTRIBUTE_SCORE);
             }
-            case BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER -> atowAttributes.getAttributeScore(attribute);
+            case BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, EDGE ->
+                  atowAttributes.getAttributeScore(attribute);
             case CHARISMA -> {
                 int attributeScore = atowAttributes.getAttributeScore(attribute);
                 if (hasExoticAppearance) {

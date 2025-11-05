@@ -710,12 +710,22 @@ public class PersonViewPanel extends JScrollablePanel {
                 continue;
             }
 
+            if (attribute == SkillAttribute.EDGE) {
+                relevantAttributes.put(attribute, 0); // modifier is irrelevant for Edge
+                continue;
+            }
+
             int attributeScore = person.getAttributeScore(attribute);
             int modifier = getIndividualAttributeModifier(attributeScore);
             if (modifier != 0) {
                 relevantAttributes.put(attribute, modifier);
             }
         }
+
+        if (!campaignOptions.isUseEdge()) {
+            relevantAttributes.remove(SkillAttribute.EDGE);
+        }
+
         return relevantAttributes;
     }
 
@@ -2043,21 +2053,44 @@ public class PersonViewPanel extends JScrollablePanel {
         int skillsPerColumn = (int) ceil(relevantAttributes.size() / numColumns);
 
         int i = 0;
-        for (SkillAttribute attribute : relevantAttributes.keySet()) {
+        for (SkillAttribute attribute : SkillAttribute.values()) {
+            if (!relevantAttributes.containsKey(attribute)) {
+                continue;
+            }
+
             int column = i / skillsPerColumn; // 0, 1, 2
             int row = i % skillsPerColumn;
             int gridX = column * 2; // Each column takes 2 grid positions: name + value
 
-            String attributeName = attribute.getLabel();
-            int attributeModifier = relevantAttributes.get(attribute);
+            int baseEdge = person.getEdge();
+            int adjustedEdge = person.getAdjustedEdge();
+            int currentEdge = person.getCurrentEdge();
 
-            JLabel lblName = new JLabel(attributeName);
-            JLabel lblValue = new JLabel((attributeModifier > 0 ? "+" : "") + attributeModifier);
-            lblName.setLabelFor(lblValue);
+            JLabel lblName = new JLabel();
+            JLabel lblValue = new JLabel();
+            if (attribute != SkillAttribute.EDGE) {
+                String attributeName = attribute.getLabel();
+                int attributeModifier = relevantAttributes.get(attribute);
 
-            String tooltip = wordWrap(attribute.getDescription());
-            lblName.setToolTipText(tooltip);
-            lblValue.setToolTipText(tooltip);
+                lblName.setText(attributeName);
+                lblValue.setText((attributeModifier > 0 ? "+" : "") + attributeModifier);
+                lblName.setLabelFor(lblValue);
+
+                String tooltip = wordWrap(attribute.getDescription());
+                lblName.setToolTipText(tooltip);
+                lblValue.setToolTipText(tooltip);
+            } else {
+                String attributeName = attribute.getLabel();
+                String adjustment = getTraitAdjustmentIcon(baseEdge, adjustedEdge);
+                String value = "<html>" + currentEdge + "/" + adjustedEdge + adjustment + "</html>";
+
+                lblName.setText(attributeName);
+                lblValue.setText(value);
+
+                String tooltip = wordWrap(attribute.getDescription());
+                lblName.setToolTipText(tooltip);
+                lblValue.setToolTipText(tooltip);
+            }
 
             // Name label constraints
             GridBagConstraints nameConstraints = new GridBagConstraints();
@@ -2119,22 +2152,41 @@ public class PersonViewPanel extends JScrollablePanel {
             int row = i % skillsPerColumn;
             int gridX = column * 2; // Each column takes 2 grid positions: name + value
 
-            String attributeName = attribute.getLabel();
-            int attributeScore = attributes.getAttributeScore(attribute);
-            int attributeModifier = attributes.getAttributeModifier(attribute);
+            int baseEdge = person.getEdge();
+            int adjustedEdge = person.getAdjustedEdge();
+            int currentEdge = person.getCurrentEdge();
 
-            JLabel lblName = new JLabel(attributeName);
-            String value = String.valueOf(attributeScore);
-            if (attributeModifier != 0) {
-                value += " (" + (attributeModifier > 0 ? "+" : "") + attributeModifier + ")";
+            JLabel lblName = new JLabel();
+            JLabel lblValue = new JLabel();
+            if (attribute != SkillAttribute.EDGE) {
+                String attributeName = attribute.getLabel();
+                int attributeScore = attributes.getAttributeScore(attribute);
+                int attributeModifier = attributes.getAttributeModifier(attribute);
+
+                lblName.setText(attributeName);
+                String value = String.valueOf(attributeScore);
+                if (attributeModifier != 0) {
+                    value += " (" + (attributeModifier > 0 ? "+" : "") + attributeModifier + ")";
+                }
+
+                lblValue.setText(value);
+                lblName.setLabelFor(lblValue);
+
+                String tooltip = wordWrap(attribute.getDescription());
+                lblName.setToolTipText(tooltip);
+                lblValue.setToolTipText(tooltip);
+            } else if (campaignOptions.isUseEdge() && (baseEdge != 0 || adjustedEdge != 0)) {
+                String attributeName = attribute.getLabel();
+                String adjustment = getTraitAdjustmentIcon(baseEdge, adjustedEdge);
+                String value = "<html>" + currentEdge + "/" + adjustedEdge + adjustment + "</html>";
+
+                lblName.setText(attributeName);
+                lblValue.setText(value);
+
+                String tooltip = wordWrap(attribute.getDescription());
+                lblName.setToolTipText(tooltip);
+                lblValue.setToolTipText(tooltip);
             }
-
-            JLabel lblValue = new JLabel(value);
-            lblName.setLabelFor(lblValue);
-
-            String tooltip = wordWrap(attribute.getDescription());
-            lblName.setToolTipText(tooltip);
-            lblValue.setToolTipText(tooltip);
 
             // Name label constraints
             GridBagConstraints nameConstraints = new GridBagConstraints();
@@ -2284,20 +2336,6 @@ public class PersonViewPanel extends JScrollablePanel {
             lblToughness.setToolTipText(wordWrap(resourceMap.getString("lblToughness.tooltip")));
         }
 
-        JLabel lblEdge = null;
-        int baseEdge = person.getEdge();
-        int adjustedEdge = person.getAdjustedEdge();
-        int currentEdge = person.getCurrentEdge();
-        if (campaignOptions.isUseEdge() && (baseEdge != 0 || adjustedEdge != 0)) {
-            String adjustment = getTraitAdjustmentIcon(baseEdge, adjustedEdge);
-            String edgeLabel = String.format(resourceMap.getString("format.traitValue"),
-                  resourceMap.getString("lblEdge.text"),
-                  currentEdge + "/" + adjustedEdge,
-                  adjustment);
-            lblEdge = new JLabel(edgeLabel);
-            lblEdge.setToolTipText(wordWrap(resourceMap.getString("lblEdge.tooltip")));
-        }
-
         JLabel lblLoyalty = null;
         int loyaltyModifier = person.getLoyaltyModifier(person.getAdjustedLoyalty(campaign.getFaction()));
         if ((campaignOptions.isUseLoyaltyModifiers()) &&
@@ -2416,9 +2454,6 @@ public class PersonViewPanel extends JScrollablePanel {
         }
         if (lblToughness != null) {
             components.add(lblToughness);
-        }
-        if (lblEdge != null) {
-            components.add(lblEdge);
         }
         if (lblLoyalty != null) {
             components.add(lblLoyalty);

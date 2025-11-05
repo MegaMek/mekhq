@@ -949,6 +949,16 @@ This SPA increases that maximum by 1, but does not increase the Attribute itself
         <skillPrereq />
     </ability>
     <ability>
+        <lookupName>exceptional_attribute_edge</lookupName>
+        <displayName>Exceptional Attribute - Edge (ATOW)</displayName>
+        <desc><![CDATA[Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+This SPA increases that maximum by 1, but does not increase the Attribute itself.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq />
+    </ability>
+    <ability>
         <lookupName>eagle_eyes</lookupName>
         <xpCost>100</xpCost>
         <weight>2</weight>

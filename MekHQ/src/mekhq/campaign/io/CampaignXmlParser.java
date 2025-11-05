@@ -37,6 +37,10 @@ import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 import java.io.File;
@@ -48,6 +52,7 @@ import java.io.PrintStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
@@ -70,6 +75,8 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.MekSummaryCache;
+import megamek.common.options.IOption;
+import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Jumpship;
@@ -128,6 +135,7 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyArc.StoryArc;
@@ -150,6 +158,7 @@ import org.w3c.dom.NodeList;
 
 
 public record CampaignXmlParser(InputStream is, MekHQ app) {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignXmlParser";
     private static final MMLogger LOGGER = MMLogger.create(CampaignXmlParser.class);
 
     public void close() throws IOException {
@@ -1058,6 +1067,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
             if (p != null) {
                 campaign.importPerson(p);
+
+                // <50.10 compatibility handler (moves old SPA-based Edge to current Attribute-based
+                performEdgeConversion(campaign, p);
             }
         }
 
@@ -1081,6 +1093,41 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
         LOGGER.info("Load Personnel Nodes Complete!");
+    }
+
+    private static void performEdgeConversion(Campaign campaign, Person person) {
+        for (Enumeration<IOption> i = person.getOptions().getOptions(); i.hasMoreElements(); ) {
+            IOption ability = i.nextElement();
+            if (OptionsConstants.EDGE.equals(ability.getName())) {
+                Object object = ability.getValue();
+                if (object instanceof Integer oldEdge) {
+                    // Either we've already converted, or there is nothing to convert. Regardless, we're done here.
+                    if (oldEdge == 0) {
+                        return;
+                    }
+
+                    person.setAttributeScore(SkillAttribute.EDGE, oldEdge);
+                    int newEdge = person.getAttributeScore(SkillAttribute.EDGE);
+                    int difference = oldEdge - newEdge;
+                    if (difference > 0) { // We were unable to convert some over
+                        int edgeCost = campaign.getCampaignOptions().getEdgeCost();
+                        int rebate = edgeCost * difference;
+                        person.awardXP(campaign, rebate);
+                        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                              "CampaignXmlParser.compatibility.edge",
+                              spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG,
+                              person.getHyperlinkedFullTitle(), difference, rebate));
+                    }
+
+                    person.setCurrentEdge(person.getEdge()); // We're resetting everyone's Edge as a kindness
+                    ability.setValue(0); // This is our marker that conversion has been done.
+                } else {
+                    LOGGER.error("Unknown Object type {} loaded into Edge compatibility handler from {}",
+                          object.getClass().getSimpleName(), ability.getName());
+                }
+                return;
+            }
+        }
     }
 
     /**

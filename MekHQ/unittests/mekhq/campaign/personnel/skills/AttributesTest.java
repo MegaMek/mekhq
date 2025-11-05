@@ -220,7 +220,11 @@ public class AttributesTest {
                 continue;
             }
 
-            assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(attribute));
+            if (attribute != SkillAttribute.EDGE) {
+                assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(attribute));
+            } else {
+                assertEquals(0, attributes.getAttributeScore(attribute));
+            }
         }
     }
 

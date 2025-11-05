@@ -218,7 +218,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
      * @param person the {@link Person} whose attributes will be generated and assigned
      */
     @Override
-    public void generateAttributes(Person person) {
+    public void generateAttributes(Person person, boolean isUseEdge) {
         RandomSkillPreferences skillPreferences = getSkillPreferences();
 
         // Reset Attribute Scores to default
@@ -227,7 +227,11 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
                 continue;
             }
 
-            person.setAttributeScore(attribute, DEFAULT_ATTRIBUTE_SCORE);
+            if (attribute != SkillAttribute.EDGE) {
+                person.setAttributeScore(attribute, DEFAULT_ATTRIBUTE_SCORE);
+            } else {
+                person.setAttributeScore(attribute, 0);
+            }
         }
 
         // If we're not using attributes, early exit
@@ -251,7 +255,14 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
             // Attribute randomization
             if (randomizeAttributes) {
-                int delta = clamp(performTraitRoll(), MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+                boolean isEdge = attribute == SkillAttribute.EDGE;
+                int delta;
+                if (isEdge && isUseEdge) {
+                    delta = d6(2) == 12 ? 1 : 0;
+                } else {
+                    delta = clamp(performTraitRoll(), MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+                }
+
                 if (delta != 0) {
                     person.changeAttributeScore(attribute, delta);
                 }
