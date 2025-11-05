@@ -891,6 +891,16 @@ public class SalvagePostScenarioPicker {
     private void updateComboBoxOptions(List<SalvageComboBoxGroup> salvageComboBoxGroups,
           Map<String, Unit> unitNameMap) {
         // Collect all currently selected unit names
+        List<String> selectedUnitNames = getSelectedUnitNames(salvageComboBoxGroups);
+
+        // Update each combo box
+        for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
+            updateSingleComboBox(group.comboBoxLeft, selectedUnitNames, unitNameMap);
+            updateSingleComboBox(group.comboBoxRight, selectedUnitNames, unitNameMap);
+        }
+    }
+
+    private static List<String> getSelectedUnitNames(List<SalvageComboBoxGroup> salvageComboBoxGroups) {
         List<String> selectedUnitNames = new ArrayList<>();
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
             String selectedLeft = (String) group.comboBoxLeft.getSelectedItem();
@@ -902,12 +912,7 @@ public class SalvagePostScenarioPicker {
                 selectedUnitNames.add(selectedRight);
             }
         }
-
-        // Update each combo box
-        for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            updateSingleComboBox(group.comboBoxLeft, selectedUnitNames, unitNameMap);
-            updateSingleComboBox(group.comboBoxRight, selectedUnitNames, unitNameMap);
-        }
+        return selectedUnitNames;
     }
 
     /**
@@ -1144,13 +1149,7 @@ public class SalvagePostScenarioPicker {
         }
     }
 
-    private static class ViewUnitListener implements ActionListener {
-        TestUnit unit;
-
-        public ViewUnitListener(TestUnit unit) {
-            this.unit = unit;
-        }
-
+    private record ViewUnitListener(TestUnit unit) implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent evt) {
             showUnit(unit);
