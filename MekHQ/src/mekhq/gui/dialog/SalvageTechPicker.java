@@ -123,8 +123,6 @@ public class SalvageTechPicker extends JDialog {
      * @since 0.50.10
      */
     public SalvageTechPicker(List<SalvageTechData> techs, List<UUID> alreadySelectedTechs) {
-        boolean hasTechs = techs != null && !techs.isEmpty();
-
         setTitle(getText("accessingTerminal.title"));
         setModal(true);
         setLayout(new BorderLayout());
@@ -142,29 +140,27 @@ public class SalvageTechPicker extends JDialog {
         add(instructionsPanel, BorderLayout.NORTH);
 
         // Table in the center
-        if (hasTechs) {
-            tableModel = new SalvageTechTableModel(techs, alreadySelectedTechs);
-            JTable table = new JTable(tableModel);
-            table.setAutoCreateRowSorter(true);
+        tableModel = new SalvageTechTableModel(techs, alreadySelectedTechs);
+        JTable table = new JTable(tableModel);
+        table.setAutoCreateRowSorter(true);
 
-            formatSorters(table);
+        formatSorters(table);
 
-            @SuppressWarnings("unchecked")
-            TableRowSorter<SalvageTechTableModel> sorter =
-                  (TableRowSorter<SalvageTechTableModel>) table.getRowSorter();
-            List<javax.swing.RowSorter.SortKey> sortKeys = new ArrayList<>();
-            sortKeys.add(new javax.swing.RowSorter.SortKey(
-                  SalvageTechTableModel.COL_SELECT,
-                  javax.swing.SortOrder.DESCENDING));
-            sorter.setSortKeys(sortKeys);
+        @SuppressWarnings("unchecked")
+        TableRowSorter<SalvageTechTableModel> sorter =
+              (TableRowSorter<SalvageTechTableModel>) table.getRowSorter();
+        List<javax.swing.RowSorter.SortKey> sortKeys = new ArrayList<>();
+        sortKeys.add(new javax.swing.RowSorter.SortKey(
+              SalvageTechTableModel.COL_SELECT,
+              javax.swing.SortOrder.DESCENDING));
+        sorter.setSortKeys(sortKeys);
 
-            assignWidths(table);
-            setRenderers(table);
+        assignWidths(table);
+        setRenderers(table);
 
-            JScrollPane scrollPane = new JScrollPane(table);
-            scrollPane.setPreferredSize(DIMENSION);
-            add(scrollPane, BorderLayout.CENTER);
-        }
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setPreferredSize(DIMENSION);
+        add(scrollPane, BorderLayout.CENTER);
 
         // Buttons at the bottom
         JPanel buttonPanel = new JPanel();

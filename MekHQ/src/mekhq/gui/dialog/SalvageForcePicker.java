@@ -138,8 +138,6 @@ public class SalvageForcePicker extends JDialog {
      * @since 0.50.10
      */
     public SalvageForcePicker(Campaign campaign, List<SalvageForceData> forces, boolean isSpaceOperation) {
-        boolean hasForces = forces != null && !forces.isEmpty();
-
         setTitle(getText("accessingTerminal.title"));
         setModal(true);
         setLayout(new BorderLayout());
@@ -157,19 +155,17 @@ public class SalvageForcePicker extends JDialog {
         add(instructionsPanel, BorderLayout.NORTH);
 
         // Table in the center
-        if (hasForces) {
-            tableModel = new SalvageForceTableModel(campaign, forces);
-            JTable table = new JTable(tableModel);
-            table.setAutoCreateRowSorter(true);
+        tableModel = new SalvageForceTableModel(campaign, forces);
+        JTable table = new JTable(tableModel);
+        table.setAutoCreateRowSorter(true);
 
-            formatSorters(table);
-            assignWidths(table, isSpaceOperation);
-            setRenderers(campaign, table);
+        formatSorters(table);
+        assignWidths(table, isSpaceOperation);
+        setRenderers(campaign, table);
 
-            JScrollPane scrollPane = new JScrollPane(table);
-            scrollPane.setPreferredSize(DIMENSION);
-            add(scrollPane, BorderLayout.CENTER);
-        }
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setPreferredSize(DIMENSION);
+        add(scrollPane, BorderLayout.CENTER);
 
         // Buttons at the bottom
         JPanel buttonPanel = new JPanel();
