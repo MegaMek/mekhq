@@ -267,7 +267,7 @@ public class HangarStatistics {
     public int getTotalLargeCraftPassengerCapacity() {
         return getHangar().getUnitsStream()
                      .filter(u -> u.getEntity().isLargeCraft())
-                     .mapToInt(u -> u.getEntity().getNPassenger())
+                     .mapToInt(u -> u.getEntity().getPassengerCapacityWithoutBayCrew())
                      .sum();
     }
 }
