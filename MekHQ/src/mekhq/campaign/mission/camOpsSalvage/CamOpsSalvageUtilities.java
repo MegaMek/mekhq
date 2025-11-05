@@ -251,14 +251,27 @@ public class CamOpsSalvageUtilities {
         }
     }
 
+    /**
+     * Gets the deployment time for a scenario within a StratCon contract.
+     *
+     * <p>This method searches through all tracks in the contract's StratCon campaign state to find the track
+     * containing the specified scenario, then returns that track's deployment time.</p>
+     *
+     * @param scenarioId  the ID of the scenario to look up
+     * @param atbContract the Against the Bot contract to search within
+     *
+     * @return the deployment time in days for the track containing the scenario, or 0 if the scenario is not found or
+     *       the contract has no StratCon state
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private static int getDeploymentTime(int scenarioId, AtBContract atbContract) {
         StratConCampaignState campaignState = atbContract.getStratconCampaignState();
         if (campaignState != null) {
             for (StratConTrackState track : campaignState.getTracks()) {
-                for (StratConScenario stratConScenario : track.getScenarios().values()) {
-                    if (stratConScenario.getBackingScenarioID() == scenarioId) {
-                        return track.getDeploymentTime();
-                    }
+                if (track.getBackingScenariosMap().get(scenarioId) != null) {
+                    return track.getDeploymentTime();
                 }
             }
         }
