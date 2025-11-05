@@ -83,6 +83,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
@@ -1499,7 +1500,10 @@ public class StratConRulesManager {
         Hangar hangar = campaign.getHangar();
         List<ScoutRecord> scouts = force == null ? new ArrayList<>() : buildScoutMap(force, hangar);
 
-        boolean useAdvancedScouting = campaign.getCampaignOptions().isUseAdvancedScouting();
+        boolean isClanCampaign = campaign.isClanCampaign();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean useAdvancedScouting = campaignOptions.isUseAdvancedScouting();
+        boolean isUsingAgeEffects = campaignOptions.isUseAgeEffects();
         // Each scout may scan up to scanMultiplier hexes
         for (ScoutRecord scoutData : scouts) {
             Person scout = scoutData.scout();
@@ -1533,14 +1537,14 @@ public class StratConRulesManager {
                         TargetRollModifier speedModifier = getUnitSpeedModifier(scoutData.unitAtBSpeed());
                         TargetRollModifier sensorsModifier = new TargetRollModifier(
                               scoutData.hasSensorEquipment() ? -1 : 0, "Unit Sensors");
-                        boolean wasScoutingSuccessful =
-                              !useAdvancedScouting || SkillCheckUtility.performQuickSkillCheck(scout,
-                                    scoutData.skillName(), List.of(weightModifier, speedModifier, sensorsModifier), 0,
-                                    false, false,
-                                    campaign.getLocalDate()
-                              );
+
+                        SkillCheckUtility skillCheck = new SkillCheckUtility(scout, scoutData.skillName(),
+                              List.of(weightModifier, speedModifier, sensorsModifier), 0, false, false,
+                              isUsingAgeEffects, isClanCampaign, campaign.getLocalDate());
+                        campaign.addReport(skillCheck.getResultsText());
 
                         // Mark the current coordinate as revealed (count only on success)
+                        boolean wasScoutingSuccessful = !useAdvancedScouting || skillCheck.isSuccess();
                         if (wasScoutingSuccessful) {
                             // Process facilities
                             targetFacility = track.getFacility(checkCoords);
