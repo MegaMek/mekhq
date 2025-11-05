@@ -97,7 +97,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
               useAlternativeWeighting,
               ignoreEligibility,
               isVeterancyAward);
-        if (abilityList == null) {
+        if (abilityList.isEmpty()) {
             return null;
         }
 
@@ -189,12 +189,12 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
      * @param isVeterancyAward        if {@code true}, some SPAs may be excluded based on veterancy award eligibility
      *                                status
      *
-     * @return a list of available special abilities based on the criteria, or {@code null} if none are found
+     * @return a list of available special abilities based on the criteria, or an empty list is none are found
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private @Nullable List<SpecialAbility> getSpecialAbilities(Person person, boolean useAlternativeWeighting,
+    private List<SpecialAbility> getSpecialAbilities(Person person, boolean useAlternativeWeighting,
           boolean ignoreEligibility, boolean isVeterancyAward) {
         final PersonnelOptions options = person.getOptions();
         List<SpecialAbility> abilityList = new ArrayList<>();
@@ -228,10 +228,6 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
             }
         } else {
             abilityList = getEligibleSPAs(person, isVeterancyAward);
-        }
-
-        if (abilityList.isEmpty()) {
-            return null;
         }
 
         // Alternative weighting will pre-determine whether the SPA is positive or negative.
