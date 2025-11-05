@@ -543,6 +543,7 @@ public class ImmersiveDialogCore extends JDialog {
      *
      * @param buttons A {@link List} of {@link ButtonLabelTooltipPair} instances, where each pair defines the label and
      *                tooltip for a button.
+     * @param isVerticalLayout A {@code boolean} value indicating the layout style: {@code true} for vertical stacking, {@code false} for horizontal arrangement.
      */
     protected JPanel populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout) {
         final int padding = getPadding();
