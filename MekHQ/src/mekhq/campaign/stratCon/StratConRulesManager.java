@@ -2472,13 +2472,13 @@ public class StratConRulesManager {
      * Worker function that sets scenario deploy/battle/return dates based on the track's properties and current
      * campaign date. Takes a fixed deployment day of X days from campaign's today date.
      */
-    private static void setScenarioDates(int deploymentDay, StratConTrackState track, Campaign campaign,
+    private static void setScenarioDates(int deploymentDelay, StratConTrackState track, Campaign campaign,
           StratConScenario scenario) {
         // set up deployment day, battle day, return day here
         // safety code to prevent attempts to generate random int with upper bound of 0
         // which is apparently illegal
-        int battleDay = deploymentDay + (track.getDeploymentTime() > 0 ? randomInt(track.getDeploymentTime()) : 0);
-        int returnDay = deploymentDay + track.getDeploymentTime();
+        int battleDay = deploymentDelay + (track.getDeploymentTime() > 0 ? randomInt(track.getDeploymentTime()) : 0);
+        int returnDay = deploymentDelay + track.getDeploymentTime();
 
         LocalDate battleDate = campaign.getLocalDate().plusDays(battleDay);
         LocalDate returnDate = campaign.getLocalDate().plusDays(returnDay);
