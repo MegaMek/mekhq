@@ -1566,7 +1566,7 @@ public class Unit implements ITechnology {
     /**
      * @return the total cargo capacity of the entity. Returns 0.0 if the entity is not fully crewed.
      *
-     * @Deprecated create a more specific one like {@link #getCargoCapacityForConvoy} or
+     * @deprecated create a more specific one like {@link #getCargoCapacityForConvoy} or
      *       {@link #getCargoCapacityForSalvage}
      *       <br>
      *       Calculates and returns the cargo capacity of the entity based on its transport bays, mounted equipment, and
