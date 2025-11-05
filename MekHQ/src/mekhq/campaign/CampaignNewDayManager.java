@@ -565,7 +565,9 @@ public class CampaignNewDayManager {
                 person.resetCurrentEdge();
 
                 if (!person.getStatus().isMIA()) {
-                    processFatigueRecovery(campaign, person, campaign.getFieldKitchenWithinCapacity());
+                    boolean isWithinCapacity = !campaign.isOnContractAndPlanetside() ||
+                                                     campaign.getFieldKitchenWithinCapacity();
+                    processFatigueRecovery(campaign, person, isWithinCapacity);
                 }
 
                 processCompulsionsAndMadness(person, personnelOptions, isUseAdvancedMedical, isUseFatigue);
