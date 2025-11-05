@@ -712,7 +712,7 @@ public class TransportCostCalculations {
      * Calculates passenger bay requirements and costs based on the personnel list, counting only those present and
      * assigned to the force. Updates totals for passenger bay counts and costs.
      *
-     * @param passengerCapacity the total passenger capacity of all Large Vessels in the campaign combined
+     * @param passengerCapacity the total passenger capacity of all Large Craft in the campaign combined
      *
      * @author Illiani
      * @since 50.10
