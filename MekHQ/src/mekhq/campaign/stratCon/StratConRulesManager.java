@@ -2480,11 +2480,10 @@ public class StratConRulesManager {
         int battleDay = deploymentDay + (track.getDeploymentTime() > 0 ? randomInt(track.getDeploymentTime()) : 0);
         int returnDay = deploymentDay + track.getDeploymentTime();
 
-        LocalDate deploymentDate = campaign.getLocalDate().plusDays(deploymentDay);
         LocalDate battleDate = campaign.getLocalDate().plusDays(battleDay);
         LocalDate returnDate = campaign.getLocalDate().plusDays(returnDay);
 
-        scenario.setDeploymentDate(deploymentDate);
+        scenario.setDeploymentDate(battleDate);
         scenario.setActionDate(battleDate);
         scenario.setReturnDate(returnDate);
     }
