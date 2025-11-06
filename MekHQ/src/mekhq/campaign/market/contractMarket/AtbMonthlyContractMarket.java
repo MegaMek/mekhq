@@ -667,7 +667,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         contract.clanTechSalvageOverride();
 
-        contract.setName(String.format("%s - %s - %s %s (Followup)",
+        contract.setName(String.format("(Followup) %s - %s - %s %s",
               contract.getStartDate()
                     .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
               contract.getEmployer(),
