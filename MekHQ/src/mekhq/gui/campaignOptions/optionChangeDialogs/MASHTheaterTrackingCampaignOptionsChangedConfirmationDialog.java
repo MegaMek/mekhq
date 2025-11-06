@@ -68,7 +68,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends JDialog {
-    final MMLogger LOGGER = MMLogger.create(MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MASHTheatreTrackingCampaignOptionsChangedConfirmationDialog";
 
     private final int PADDING = scaleForGUI(10);
