@@ -49,6 +49,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -94,6 +95,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * @author Neoancient
  */
 public class AtbMonthlyContractMarket extends AbstractContractMarket {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AtbMonthlyContractMarket";
     private static final MMLogger logger = MMLogger.create(AtbMonthlyContractMarket.class);
 
     private static final int COMSTAR_CO_OPT_CHANCE = 200;
@@ -121,6 +123,17 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (((campaign.getLocalDate().getDayOfMonth() == 1)) || newCampaign) {
             // need to copy to prevent concurrent modification errors
             new ArrayList<>(contracts).forEach(this::removeContract);
+
+            Person campaignCommander = campaign.getCommander();
+            if (campaignCommander != null && !newCampaign) {
+                if (campaignCommander.getConnections() > 0) {
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "AtbMonthlyContractMarket.connectionsReport.normal"));
+                } else {
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "AtbMonthlyContractMarket.connectionsReport.none"));
+                }
+            }
 
             int unitRatingMod = campaign.getAtBUnitRatingMod();
 
@@ -586,13 +599,30 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         return contract;
     }
 
+    /**
+     * Determines and sets the contract type for a new AtB contract through negotiation.
+     *
+     * <p>This method performs a negotiation skill check using the campaign commander's negotiation skill and
+     * connections. The margin of success from this check, combined with the commander's connections rating, influences
+     * which contract types are available from the employer. The negotiation results are added to the campaign
+     * report.</p>
+     *
+     * @param campaign the current campaign
+     * @param contract the AtB contract to assign a type to
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void getContractType(Campaign campaign, AtBContract contract) {
         Person campaignCommander = campaign.getFlaggedCommander();
-        int connections = campaignCommander.getConnections();
+
+        int connections = campaignCommander != null ? campaignCommander.getConnections() : 0;
+
         boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
         boolean isClanCampaign = campaign.isClanCampaign();
         SkillCheckUtility checkUtility = new SkillCheckUtility(campaignCommander, S_NEGOTIATION, null,
               0, false, true, isUseAgingEffects, isClanCampaign, campaign.getLocalDate());
+
         campaign.addReport(checkUtility.getResultsText());
         contract.setContractType(ContractTypePicker.findMissionType(contract.getEmployerFaction(), connections,
               max(0, checkUtility.getMarginOfSuccess())));
