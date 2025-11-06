@@ -191,7 +191,8 @@ public enum AtBContractType {
         if (variance > 0) {
             return baseLength + randomInt(variance);
         } else {
-            return baseLength;
+            // If we can't determine variance return the constantLength
+            return constantLength;
         }
     }
 
