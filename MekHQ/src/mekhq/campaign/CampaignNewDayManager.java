@@ -38,6 +38,7 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
+import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
@@ -77,6 +78,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -380,6 +382,33 @@ public class CampaignNewDayManager {
         // campaign must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(campaign));
         return true;
+    }
+
+    /**
+     * Gets all scenario IDs that have at least one standard force assigned to them.
+     *
+     * <p>This method iterates through all forces in the campaign and collects the scenario IDs of those forces that
+     * are classified as standard force types and are currently assigned to a scenario.</p>
+     *
+     * @return a set of scenario IDs that have standard forces assigned, or an empty set if no standard forces are
+     *       deployed
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private Set<Integer> getAllScenariosWithAssignedStandardForces() {
+        Set<Integer> scenarios = new HashSet<>();
+
+        for (Force force : campaign.getAllForces()) {
+            if (force.getForceType().isStandard()) {
+                int scenarioId = force.getScenarioId();
+                if (scenarioId != NO_ASSIGNED_SCENARIO) {
+                    scenarios.add(scenarioId);
+                }
+            }
+        }
+
+        return scenarios;
     }
 
     /**
@@ -1643,6 +1672,7 @@ public class CampaignNewDayManager {
     private void processNewDayATBScenarios() {
         // First, we get the list of all active AtBContracts
         List<AtBContract> contracts = campaign.getActiveAtBContracts(true);
+        Set<Integer> allScenariosWithAssignedStandardForces = getAllScenariosWithAssignedStandardForces();
 
         // Second, we process them and any already generated scenarios
         for (AtBContract contract : contracts) {
@@ -1703,6 +1733,7 @@ public class CampaignNewDayManager {
 
             for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
                 if ((scenario.getDate() != null) && scenario.getDate().isBefore(today)) {
+                    boolean hasForceDeployed = allScenariosWithAssignedStandardForces.contains(scenario.getId());
                     if (campaignOptions.isUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
                         StratConCampaignState campaignState = contract.getStratconCampaignState();
 
@@ -1717,16 +1748,17 @@ public class CampaignNewDayManager {
                             processAbandonedConvoy(campaign, contract, (AtBDynamicScenario) scenario);
                         }
 
-                        scenario.convertToStub(campaign, ScenarioStatus.REFUSED_ENGAGEMENT);
                         scenario.clearAllForcesAndPersonnel(campaign);
                     } else {
-                        scenario.convertToStub(campaign, ScenarioStatus.REFUSED_ENGAGEMENT);
                         contract.addPlayerMinorBreach();
 
                         campaign.addReport("Failure to deploy for " +
                                                  scenario.getHyperlinkedName() +
                                                  " resulted in a minor contract breach.");
                     }
+
+                    scenario.convertToStub(campaign,
+                          hasForceDeployed ? ScenarioStatus.FLEET_IN_BEING : ScenarioStatus.REFUSED_ENGAGEMENT);
                 }
             }
         }
