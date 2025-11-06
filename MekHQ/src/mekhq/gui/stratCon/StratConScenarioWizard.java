@@ -64,6 +64,7 @@ import javax.swing.event.ListSelectionListener;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Minefield;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -86,7 +87,6 @@ import mekhq.gui.StratConPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.StratConReinforcementsConfirmationDialog;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.ArrayUtils;
@@ -115,8 +115,6 @@ public class StratConScenarioWizard extends JDialog {
     private CampaignTransportType selectedCampaignTransportType = null;
 
     private JComboBox<String> cboTransportType = new JComboBox<>();
-
-    private boolean wasCanceled;
 
     private JPanel contentPanel;
     private JButton btnCommit;
@@ -163,14 +161,6 @@ public class StratConScenarioWizard extends JDialog {
         setUI(isPrimaryForce);
     }
 
-    public boolean isWasCanceled() {
-        return wasCanceled;
-    }
-
-    public void setWasCanceled(boolean wasCancelled) {
-        this.wasCanceled = wasCancelled;
-    }
-
     /**
      * Configures and initializes the user interface for the scenario setup wizard. This method dynamically assembles
      * various UI components based on the scenario's state and whether the primary force is being assigned.
@@ -207,6 +197,7 @@ public class StratConScenarioWizard extends JDialog {
     private void setUI(boolean isPrimaryForce) {
         setTitle(resources.getString("scenarioSetupWizard.title"));
         getContentPane().removeAll();
+        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
         // Create a new panel to hold all components
         contentPanel = new JPanel(new CardLayout());
@@ -497,7 +488,7 @@ public class StratConScenarioWizard extends JDialog {
      */
     private JList<Force> addAvailableForceList(JPanel parent, GridBagConstraints gbc,
           ScenarioForceTemplate forceTemplate) {
-        JScrollPane forceListContainer = new JScrollPaneWithSpeed();
+        JScrollPane forceListContainer = new FastJScrollPane();
 
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
               StratConRulesManager.getAvailableForceIDsForManualDeployment(forceTemplate.getAllowedUnitType(),
@@ -711,14 +702,6 @@ public class StratConScenarioWizard extends JDialog {
             btnCommit.addActionListener(evt -> reinforcementConfirmDialog());
         }
 
-        JButton btnCancel = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCancel.text"));
-        btnCancel.setActionCommand("CANCEL_CLICK");
-        btnCancel.addActionListener(evt -> {
-            wasCanceled = true;
-            closeWizard();
-        });
-        btnCancel.setEnabled(true);
-
         // Configure layout constraints for the buttons
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.anchor = GridBagConstraints.CENTER;
@@ -747,8 +730,6 @@ public class StratConScenarioWizard extends JDialog {
         // Align and add cancel button to the content panel
         constraints.gridy++;
         constraints.gridheight = GridBagConstraints.REMAINDER;
-        constraints.anchor = GridBagConstraints.WEST;
-        contentPanel.add(btnCancel, constraints);
         constraints.anchor = GridBagConstraints.CENTER;
 
         // Add the commit button to the content panel

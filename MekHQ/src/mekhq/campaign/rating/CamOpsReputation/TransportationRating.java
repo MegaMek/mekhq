@@ -37,16 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import megamek.common.bays.SuperHeavyVehicleBay;
-import megamek.common.bays.ASFBay;
-import megamek.common.bays.BattleArmorBay;
-import megamek.common.bays.Bay;
-import megamek.common.bays.HeavyVehicleBay;
-import megamek.common.bays.InfantryBay;
-import megamek.common.bays.LightVehicleBay;
-import megamek.common.bays.MekBay;
-import megamek.common.bays.ProtoMekBay;
-import megamek.common.bays.SmallCraftBay;
+import megamek.common.bays.*;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -328,7 +319,7 @@ public class TransportationRating {
                 passengerCapacity += bay.getPersonnel(entity.isClan());
             }
 
-            passengerCapacity += entity.getNPassenger();
+            passengerCapacity += entity.getPassengerCapacityWithoutBayCrew();
         }
 
         // Map the capacity of each bay type

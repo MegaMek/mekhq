@@ -82,7 +82,7 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
         Set<TransporterType> transporterTypes = new HashSet<>(campaign.getTransports(TOW_TRANSPORT).keySet());
 
         for (Unit unit : units) {
-            Set<TransporterType> unitTransporterTypes = CampaignTransportUtilities.mapEntityToTransporters(TOW_TRANSPORT,
+            Set<TransporterType> unitTransporterTypes = CampaignTransportUtilities.mapICarryableToTransporters(TOW_TRANSPORT,
                   unit.getEntity());
             if (!unitTransporterTypes.isEmpty()) {
                 transporterTypes.retainAll(unitTransporterTypes);

@@ -111,6 +111,7 @@ import mekhq.campaign.events.persons.PersonTechAssignmentEvent;
 import mekhq.campaign.events.units.UnitArrivedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceType;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -147,6 +148,7 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.unit.enums.TransporterType;
+import mekhq.campaign.utilities.CampaignTransportUtilities;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.MHQXMLUtility;
@@ -285,7 +287,6 @@ public class Unit implements ITechnology {
 
     /**
      * A convenience function to tell whether the unit can be acted upon e.g. assigned pilots, techs, repaired, etc.
-     *
      */
     public boolean isAvailable() {
         return isAvailable(false);
@@ -293,7 +294,6 @@ public class Unit implements ITechnology {
 
     /**
      * A convenience function to tell whether the unit can be acted upon e.g. assigned pilots, techs, repaired, etc.
-     *
      */
     public boolean isAvailable(boolean ignoreRefit) {
         return isPresent() && !isDeployed() && (ignoreRefit || !isRefitting()) && !isMothballing() && !isMothballed();
@@ -1284,7 +1284,6 @@ public class Unit implements ITechnology {
 
     /**
      * Number of slots doomed, missing or destroyed in all locations
-     *
      */
     public int getHitCriticalSlots(int type, int index) {
         int hits = 0;
@@ -1556,9 +1555,55 @@ public class Unit implements ITechnology {
         return partsValue;
     }
 
+    public double getCargoCapacityForSalvage() {
+        return getCargoCapacity(Math.max(0, getEntity().getOriginalWalkMP() - 1), ForceType.SALVAGE);
+    }
+
+    public double getCargoCapacityForConvoy() {
+        return getCargoCapacity(0, ForceType.CONVOY);
+    }
+
     /**
-     * Calculates the total cargo capacity of the entity, considering the usable capacities of transport bays and
-     * mounted equipment designated for cargo. The calculation is performed only if the entity is fully crewed.
+     * @return the total cargo capacity of the entity. Returns 0.0 if the entity is not fully crewed.
+     *
+     * @deprecated create a more specific one like {@link #getCargoCapacityForConvoy} or
+     *       {@link #getCargoCapacityForSalvage}
+     *       <br>
+     *       Calculates and returns the cargo capacity of the entity based on its transport bays, mounted equipment, and
+     *       other relevant factors.
+     *
+     *       <p>
+     *       The total cargo capacity is derived from the following:
+     *       </p>
+     *       <ul>
+     *       <li>The usable capacities of transport bays ({@link CargoBay},
+     *       {@link RefrigeratedCargoBay},
+     *       or {@link InsulatedCargoBay}), adjusted for existing damage.</li>
+     *       <li>The tonnage of mounted equipment tagged with the {@code F_CARGO} flag,
+     *       provided
+     *       the equipment is operable and located in non-destroyed sections of the
+     *       entity.</li>
+     *       </ul>
+     *
+     *       <p>
+     *       <strong>Special Conditions:</strong>
+     *       </p>
+     *       <ul>
+     *       <li>The method returns {@code 0.0} if the entity is not fully crewed.</li>
+     *       <li>Bays or mounted equipment damaged beyond usability are excluded from the
+     *       total.</li>
+     *       <li>Only equipment in valid (non-destroyed) sections of the entity are
+     *       considered.</li>
+     *       </ul>
+     */
+    @Deprecated(since = "0.50.10")
+    public double getCargoCapacity() {
+        return getCargoCapacity(0, ForceType.CONVOY);
+    }
+
+    /**
+     * Calculates and returns the cargo capacity of the entity based on its transport bays, mounted equipment, and other
+     * relevant factors.
      *
      * <p>
      * The total cargo capacity is derived from the following:
@@ -1584,9 +1629,13 @@ public class Unit implements ITechnology {
      * considered.</li>
      * </ul>
      *
-     * @return The total cargo capacity of the entity if fully crewed; otherwise, {@code 0.0}.
+     * @param maximumMpPenalty the maximum movement penalty that can be applied to the entity.
+     * @param forceType        the type of force (e.g., convoy) which determines certain restrictions on transportation
+     *                         capacity.
+     *
+     * @return the total cargo capacity of the entity. Returns 0.0 if the entity is not fully crewed.
      */
-    public double getCargoCapacity() {
+    public double getCargoCapacity(int maximumMpPenalty, ForceType forceType) {
         if (!isFullyCrewed()) {
             return 0.0;
         }
@@ -1594,24 +1643,44 @@ public class Unit implements ITechnology {
         double capacity = 0.0;
         double cargoBayCapacity = -getTotalWeightOfUnitsAssignedToBeTransported(TACTICAL_TRANSPORT, CARGO_BAY);
 
+        final Set<TransporterType> cargoTransporterTypes =
+              CampaignTransportUtilities.mapICarryableToTransporters(TACTICAL_TRANSPORT, new Cargo());
+
+        int currentMpReduction = 0;
+        int liftHoistCount = 0;
+        double liftHoistCapacity = 0.0;
+        double roofRackCapacity = 0.0;
+
         // Add capacities from transport bays
-        for (Bay bay : entity.getTransportBays()) {
-            double bayCapacity = bay.getCapacity();
-            double bayDamage = bay.getBayDamage();
+        for (Transporter transporter : entity.getTransports()
+                                             .stream()
+                                             .filter(t -> cargoTransporterTypes.contains(TransporterType.getTransporterType(
+                                                   t)))
+                                             .toList()) {
 
-            double actualCapacity = max(0, bayCapacity - bayDamage);
+            double actualCapacity = max(0, transporter.getUnused());
 
-            if (bay instanceof CargoBay) {
+            if (transporter instanceof CargoBay) {
                 cargoBayCapacity += actualCapacity;
                 continue;
-            }
-
-            if (bay instanceof RefrigeratedCargoBay) {
-                capacity += actualCapacity;
-                continue;
-            }
-
-            if (bay instanceof InsulatedCargoBay) {
+            } else {
+                // No using your arms, roof rack, or lift hoists for convoys!
+                if (transporter instanceof ExternalCargo) {
+                    if (forceType != ForceType.CONVOY) {
+                        if (transporter instanceof RoofRack) {
+                            roofRackCapacity += actualCapacity;
+                            continue;
+                        }
+                        if (transporter instanceof LiftHoist) {
+                            // Lift Hoist
+                            liftHoistCount++;
+                            liftHoistCapacity += actualCapacity;
+                            continue;
+                        }
+                    }
+                    // Do not add to capacity now
+                    continue;
+                }
                 capacity += actualCapacity;
             }
         }
@@ -1626,6 +1695,35 @@ public class Unit implements ITechnology {
                 // that first.
                 if (!mounted.getEntity().isLocationBad(mounted.getLocation()) && (mounted.isOperable())) {
                     capacity += mounted.getTonnage();
+                }
+            }
+        }
+
+        // No using your arms, roof rack, or lift hoists for convoys!
+        if (forceType != ForceType.CONVOY) {
+            if (liftHoistCount > 0) {
+                double maxLiftHoistCapacity = liftHoistCount * getEntity().getTonnage() / 2;
+                // Lift Hoist
+                if (maximumMpPenalty == 0) {
+                    capacity += Math.max(liftHoistCapacity, Math.min(getEntity().getTonnage() / 2,
+                          maxLiftHoistCapacity));
+                } else if (maximumMpPenalty == 1) {
+                    capacity += Math.max(liftHoistCapacity, Math.min(getEntity().getTonnage(),
+                          maxLiftHoistCapacity));
+                } else if (maximumMpPenalty > 1) {
+                    capacity += liftHoistCapacity;
+                }
+            }
+
+            if (roofRackCapacity > 0) {
+                if (maximumMpPenalty - currentMpReduction > 2 ||
+                          maximumMpPenalty - currentMpReduction >= getEntity().getOriginalWalkMP() / 2) {
+                    // If we're okay with the max roof rack penalty, let's take it
+                    if (maximumMpPenalty - currentMpReduction >= getEntity().getOriginalWalkMP() / 2) {
+                        capacity += roofRackCapacity;
+                    } else {
+                        capacity += Math.max(roofRackCapacity, getEntity().getTonnage() / 4.0);
+                    }
                 }
             }
         }
@@ -2818,7 +2916,6 @@ public class Unit implements ITechnology {
     /**
      * The weekly maintenance cycle combined with a user defined maintenance cycle length is confusing and difficult to
      * manage so lets just make maintenance costs relative to the length of the maintenance cycle that the user defined
-     *
      */
     public Money getMaintenanceCost() {
         return getWeeklyMaintenanceCost().multipliedBy(getCampaign().getCampaignOptions().getMaintenanceCycleDays())
@@ -5005,7 +5102,6 @@ public class Unit implements ITechnology {
 
     /**
      * Sets the values of a slot in the entity crew for the indicated person.
-     *
      */
     private void assignToCrewSlot(Person person, int slot, String gunType, String driveType) {
         SkillModifierData skillModifierData = person.getSkillModifierData();
@@ -7173,7 +7269,7 @@ public class Unit implements ITechnology {
 
         boolean isMek = entity instanceof Mek;
         if (!isMek) {
-            boolean hasCargoCapacity = getCargoCapacity() > 0;
+            boolean hasCargoCapacity = getCargoCapacityForSalvage() > 0;
             boolean hasNavalTugAdaptor = isInSpace && CamOpsSalvageUtilities.hasNavalTug(entity);
             canSalvage = hasCargoCapacity || hasNavalTugAdaptor;
         }

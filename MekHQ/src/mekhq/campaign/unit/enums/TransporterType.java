@@ -40,6 +40,9 @@ import megamek.common.bays.*;
 import megamek.common.equipment.ClampMountMek;
 import megamek.common.equipment.ClampMountTank;
 import megamek.common.equipment.DockingCollar;
+import megamek.common.equipment.LiftHoist;
+import megamek.common.equipment.MekArms;
+import megamek.common.equipment.RoofRack;
 import megamek.common.equipment.TankTrailerHitch;
 import megamek.common.equipment.Transporter;
 import megamek.common.units.DropShuttleBay;
@@ -79,7 +82,12 @@ public enum TransporterType {
     CLAMP_MOUNT_MEK(ClampMountMek.class),
     CLAMP_MOUNT_TANK(ClampMountTank.class),
     PROTO_MEK_CLAMP_MOUNT(ProtoMekClampMount.class),
-    CARGO_BAY(CargoBay.class);
+    CARGO_BAY(CargoBay.class),
+    INSULATED_BAY(InsulatedCargoBay.class),
+    REFRIGERATED_BAY(RefrigeratedCargoBay.class),
+    LIFT_HOIST(LiftHoist.class),
+    MEK_ARMS(MekArms.class),
+    ROOF_RACK(RoofRack.class);
     // TODO from MekHQ#5928: CARGO_CONTAINER(CargoContainer.class) - Add this once CargoContainer implements Transporter
 
     // endregion Enum declarations
