@@ -128,10 +128,12 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             if (campaignCommander != null && !newCampaign) {
                 if (campaignCommander.getConnections() > 0) {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                          "AtbMonthlyContractMarket.connectionsReport.normal"));
+                          "AtbMonthlyContractMarket.connectionsReport.normal",
+                          campaignCommander.getHyperlinkedFullTitle()));
                 } else {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                          "AtbMonthlyContractMarket.connectionsReport.none"));
+                          "AtbMonthlyContractMarket.connectionsReport.none",
+                          campaignCommander.getHyperlinkedFullTitle()));
                 }
             }
 
