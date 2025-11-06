@@ -5639,6 +5639,10 @@ public class Unit implements ITechnology {
         return false;
     }
 
+    public boolean isHandheldWeapon() {
+        return entity instanceof HandheldWeapon;
+    }
+
     public int getForceId() {
         return forceId;
     }
@@ -6676,7 +6680,8 @@ public class Unit implements ITechnology {
                 partsCost = partsCost.multipliedBy(2.0);
             }
 
-            if (!(entity instanceof Infantry)) {
+            // No engines for tanks or HHW
+            if (!(entity instanceof Infantry) && !(entity instanceof HandheldWeapon)) {
                 if ((engine.getEngineType() == Engine.XL_ENGINE) || (engine.getEngineType() == Engine.XXL_ENGINE)) {
                     partsCost = partsCost.multipliedBy(2.5);
                 } else if (engine.getEngineType() == Engine.LIGHT_ENGINE) {
