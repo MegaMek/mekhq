@@ -164,12 +164,11 @@ public enum AtBContractType {
      * contract type's standard duration. Otherwise, the constant length defined by the contract type is used.</p>
      *
      * @param useVariableContractLengths whether to use variable length calculation
-     * @param contractType               the type of contract, which defines the base length
      *
      * @return the calculated contract length in months
      */
-    public int calculateLength(final boolean useVariableContractLengths, final AtBContractType contractType) {
-        return useVariableContractLengths ? calculateVariableLength(contractType) : getConstantLength();
+    public int calculateLength(final boolean useVariableContractLengths) {
+        return useVariableContractLengths ? calculateVariableLength() : getConstantLength();
     }
 
     /**
@@ -179,12 +178,9 @@ public enum AtBContractType {
      * length. For example, a contract type with a constant length of 12 months would have a base of 9 months plus 0-6
      * months variance, resulting in a range of 9-15 months.</p>
      *
-     * @param contractType the type of contract, which defines the base length
-     *
      * @return the calculated variable contract length in months
      */
-    private int calculateVariableLength(AtBContractType contractType) {
-        int constantLength = contractType.constantLength;
+    private int calculateVariableLength() {
         int baseLength = (int) round(constantLength * 0.75);
         int variance = (int) round(constantLength * 0.5);
 
