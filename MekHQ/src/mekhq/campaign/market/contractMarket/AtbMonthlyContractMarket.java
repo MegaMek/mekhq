@@ -625,7 +625,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         // The order in this method needs to match generateAtBContract
 
-        AtBContract followup = new AtBContract("Followup Contract");
+        AtBContract followup = new AtBContract(contract.getContractType().toString() + " (followup)");
         lastId++;
         followup.setId(lastId);
         contractIds.put(lastId, followup);
