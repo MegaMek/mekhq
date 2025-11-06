@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.factionStanding;
+package mekhq.gui.campaignOptions.optionChangeDialogs;
 
 import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
@@ -117,9 +117,10 @@ public class FactionStandingCampaignOptionsChangedConfirmationDialog extends JDi
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionStandingCampaignOptionsChangedConfirmationDialog(JDialog parent, ImageIcon campaignIcon, Faction campaignFaction,
-                                                                   LocalDate today, FactionStandings factionStandings, Collection<Mission> missions,
-                                                                   boolean isFactionStandingEnabled, double regardMultiplier) {
+    public FactionStandingCampaignOptionsChangedConfirmationDialog(JDialog parent, ImageIcon campaignIcon,
+          Faction campaignFaction,
+          LocalDate today, FactionStandings factionStandings, Collection<Mission> missions,
+          boolean isFactionStandingEnabled, double regardMultiplier) {
         this.campaignIcon = campaignIcon;
         this.campaignFaction = campaignFaction;
         this.today = today;

@@ -209,13 +209,6 @@ public class MaplessStratCon {
             scenarioWizard.setVisible(true);
         }
 
-        if (scenarioWizard.isWasCanceled()) {
-            stratConScenario.resetScenario(campaign);
-
-            // We currently retain the wizard in memory, so need to make sure we reset the canceled state
-            scenarioWizard.setWasCanceled(false);
-        }
-
         stratConPanel.setCommitForces(false);
         stratConPanel.repaint();
     }

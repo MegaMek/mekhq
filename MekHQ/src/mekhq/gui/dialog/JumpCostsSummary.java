@@ -373,9 +373,10 @@ public class JumpCostsSummary extends JDialog {
         summary.add(lblJumpShips);
 
         int jumpShipCost = (int) round(calculations.getDockingCollarCost());
-        int perJumpCost = (int) round(calculations.getJumpShipsRequired());
+        int perJumpCost = (int) round(calculations.getJumpShipsRequired() *
+                                            TransportCostCalculations.COST_PER_JUMP_PER_JUMPSHIP_AS_INT);
         String jumpShipCostLabel = getFormattedTextAt(RESOURCE_BUNDLE,
-              "TransportCostCalculations.report.entry.cost", jumpShipCost, perJumpCost);
+              "TransportCostCalculations.report.entry.cost.plusJump", jumpShipCost, perJumpCost);
         JLabel lblJumpShipsCost = new JLabel(jumpShipCostLabel);
         summary.add(lblJumpShipsCost);
 

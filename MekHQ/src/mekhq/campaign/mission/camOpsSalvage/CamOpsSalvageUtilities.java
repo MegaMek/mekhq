@@ -119,7 +119,7 @@ public class CamOpsSalvageUtilities {
                               "CamOpsSalvageUtilities.tooltip.drag", tonnage)).append(")");
                     }
 
-                    double cargoCapacity = unit.getCargoCapacity();
+                    double cargoCapacity = unit.getCargoCapacityForSalvage();
                     if (!(entity instanceof Mek)) {
                         tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
                               "CamOpsSalvageUtilities.tooltip.cargo", cargoCapacity)).append(")");
@@ -175,9 +175,13 @@ public class CamOpsSalvageUtilities {
      */
     public static void resolveSalvage(Campaign campaign, Mission mission, Scenario scenario,
           List<TestUnit> keptSalvage, List<TestUnit> soldSalvage, List<TestUnit> employerSalvage) {
-        boolean isContract = mission instanceof Contract;
+        int deliveryTime = 0;
+        if (mission instanceof AtBContract atbContract) {
+            deliveryTime = getDeploymentTime(scenario.getId(), atbContract);
+        }
 
         // now let's take care of salvage
+        boolean isContract = mission instanceof Contract;
         for (TestUnit salvageUnit : keptSalvage) {
             ResolveScenarioTracker.UnitStatus salvageStatus = new ResolveScenarioTracker.UnitStatus(salvageUnit);
             if (salvageUnit.getEntity() instanceof Aero) {
@@ -185,7 +189,7 @@ public class CamOpsSalvageUtilities {
             }
 
             campaign.clearGameData(salvageUnit.getEntity());
-            campaign.addTestUnit(salvageUnit);
+            campaign.addTestUnit(salvageUnit, deliveryTime);
             salvageUnit.setSite(mission.getRepairLocation());
 
             // if this is a contract, add to the salvaged value
@@ -245,6 +249,34 @@ public class CamOpsSalvageUtilities {
 
             ((Contract) mission).addSalvageByEmployer(employerTakeHome);
         }
+    }
+
+    /**
+     * Gets the deployment time for a scenario within a StratCon contract.
+     *
+     * <p>This method searches through all tracks in the contract's StratCon campaign state to find the track
+     * containing the specified scenario, then returns that track's deployment time.</p>
+     *
+     * @param scenarioId  the ID of the scenario to look up
+     * @param atbContract the Against the Bot contract to search within
+     *
+     * @return the deployment time in days for the track containing the scenario, or 0 if the scenario is not found or
+     *       the contract has no StratCon state
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static int getDeploymentTime(int scenarioId, AtBContract atbContract) {
+        StratConCampaignState campaignState = atbContract.getStratconCampaignState();
+        if (campaignState != null) {
+            for (StratConTrackState track : campaignState.getTracks()) {
+                if (track.getBackingScenariosMap().get(scenarioId) != null) {
+                    return track.getDeploymentTime();
+                }
+            }
+        }
+
+        return 0;
     }
 
     /**

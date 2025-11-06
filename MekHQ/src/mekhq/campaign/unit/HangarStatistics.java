@@ -263,4 +263,11 @@ public class HangarStatistics {
                      .mapToInt(Unit::getDocks)
                      .sum();
     }
+
+    public int getTotalLargeCraftPassengerCapacity() {
+        return getHangar().getUnitsStream()
+                     .filter(u -> u.getEntity().isLargeCraft())
+                     .mapToInt(u -> u.getEntity().getPassengerCapacityWithoutBayCrew())
+                     .sum();
+    }
 }

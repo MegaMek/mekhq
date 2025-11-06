@@ -41,6 +41,8 @@ import java.util.Optional;
 import java.util.Vector;
 
 import megamek.common.battleArmor.BattleArmor;
+import megamek.common.equipment.Cargo;
+import megamek.common.equipment.ICarryable;
 import megamek.common.units.*;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -55,59 +57,62 @@ public class CampaignTransportUtilities {
 
     // region Static Helpers
 
-    interface Visitor<T extends Entity> {
-        boolean isInterestedIn(Entity entity);
+    interface Visitor<T extends ICarryable> {
+        boolean isInterestedIn(ICarryable entity);
 
         EnumSet<TransporterType> getTransporterTypes(T entity, CampaignTransportType campaignTransportType);
     }
 
     /**
      * Helps the menus need to check less when generating Transports. Let's get a list of TransporterTypes that this
-     * Entity could potentially be transported in. This will make it much easier to determine what Transporters we
+     * ICarryable could potentially be transported in. This will make it much easier to determine what Transporters we
      * should even look at. In addition, CampaignTransportTypes that can't use certain TransporterTypes is handled, like
      * Ship Transports not being able to use InfantryCompartments or BattleArmorHandles. Use a Bay! Or DockingCollar.
      *
      * @param campaignTransportType type (enum) of campaign transport - some transport types can't use certain
      *                              transporters
-     * @param unit                  unit we want to get the Transporter types that could potentially hold it
+     * @param carryable             carryable object we want to get the Transporter types that could potentially hold
+     *                              it
      *
      * @return Transporter types that could potentially transport this entity
      *
      * @see TransporterType
      */
-    public static EnumSet<TransporterType> mapEntityToTransporters(CampaignTransportType campaignTransportType,
-          Entity unit) {
-        if (campaignTransportType.isTowTransport()) {
-            if (unit.isTrailer()) {
+    public static EnumSet<TransporterType> mapICarryableToTransporters(CampaignTransportType campaignTransportType,
+          ICarryable carryable) {
+        if (campaignTransportType.isTowTransport() && carryable instanceof Entity entity) {
+            if (entity.isTrailer()) {
                 return EnumSet.of(TANK_TRAILER_HITCH);
             } else {
                 return EnumSet.noneOf(TransporterType.class);
             }
         }
-        return getTransportTypeClassifier(unit).map(v -> v.getTransporterTypes(unit, campaignTransportType))
+        return getTransportTypeClassifier(carryable).map(v -> v.getTransporterTypes(carryable, campaignTransportType))
                      .orElse(EnumSet.noneOf(TransporterType.class));
     }
 
 
     /**
      * Most slots are 1:1, infantry use their tonnage in some cases TANK_TRAILER_HITCH use the maximum pulling capacity
-     * of its tractor so return the transported unit's weight
+     * of its tractor so return the transported unit's weight. If it's cargo, let's use its tonnage.
      *
      * @param transporterType type (Enum) of Transporter
-     * @param transportedUnit Entity we want the capacity usage of
+     * @param transportedUnit ICarryable we want the capacity usage of
      *
      * @return how much capacity this unit uses when being transported in this kind of transporter
      */
-    public static double transportCapacityUsage(TransporterType transporterType, Entity transportedUnit) {
-        if (transportedUnit instanceof Infantry) {
+    public static double transportCapacityUsage(TransporterType transporterType, ICarryable transportedUnit) {
+        if (transportedUnit instanceof Infantry transportedInfantry) {
             if (transporterType == INFANTRY_BAY ||
                       transporterType == CARGO_BAY) { // TODO from MekHQ#5928: Add Cargo Container
-                return calcInfantryBayWeight(transportedUnit);
+                return calcInfantryBayWeight(transportedInfantry);
             } else if (transporterType == INFANTRY_COMPARTMENT) {
-                return calcInfantryCompartmentWeight(transportedUnit);
+                return calcInfantryCompartmentWeight(transportedInfantry);
             }
         } else if (transporterType == TANK_TRAILER_HITCH) {
-            return transportedUnit.getWeight();
+            return transportedUnit.getTonnage();
+        } else if (transportedUnit instanceof Cargo) {
+            return transportedUnit.getTonnage();
         }
         return 1.0;
     }
@@ -145,7 +150,7 @@ public class CampaignTransportUtilities {
     private static final List<Visitor> visitors = List.of(
           new Visitor<ProtoMek>() {
               @Override
-              public boolean isInterestedIn(Entity entity) {
+              public boolean isInterestedIn(ICarryable entity) {
                   return entity instanceof ProtoMek;
               }
 
@@ -166,7 +171,7 @@ public class CampaignTransportUtilities {
           new Visitor<Aero>() {
 
               @Override
-              public boolean isInterestedIn(Entity entity) {
+              public boolean isInterestedIn(ICarryable entity) {
                   return entity instanceof Aero;
               }
 
@@ -197,7 +202,7 @@ public class CampaignTransportUtilities {
           new Visitor<Tank>() {
 
               @Override
-              public boolean isInterestedIn(Entity entity) {
+              public boolean isInterestedIn(ICarryable entity) {
                   return entity instanceof Tank;
               }
 
@@ -224,7 +229,7 @@ public class CampaignTransportUtilities {
           new Visitor<Mek>() {
 
               @Override
-              public boolean isInterestedIn(Entity entity) {
+              public boolean isInterestedIn(ICarryable entity) {
                   return entity instanceof Mek;
               }
 
@@ -263,7 +268,7 @@ public class CampaignTransportUtilities {
           new Visitor<Infantry>() {
 
               @Override
-              public boolean isInterestedIn(Entity entity) {
+              public boolean isInterestedIn(ICarryable entity) {
                   return entity instanceof Infantry;
               }
 
@@ -300,9 +305,34 @@ public class CampaignTransportUtilities {
 
                   return transporters;
               }
+          },
+          new Visitor<Cargo>() {
+              @Override
+              public boolean isInterestedIn(ICarryable entity) {
+                  return entity instanceof Cargo;
+              }
+
+              @Override
+              public EnumSet<TransporterType> getTransporterTypes(Cargo cargo,
+                    CampaignTransportType
+                          campaignTransportType) {
+                  EnumSet<TransporterType> transporters = EnumSet.noneOf(TransporterType.class);
+                  transporters.add(CARGO_BAY);
+                  transporters.add(REFRIGERATED_BAY);
+                  transporters.add(INSULATED_BAY);
+
+                  //Ship transports can't use some transport types
+                  if (!(campaignTransportType.isShipTransport())) {
+                      // Add ROOF_RACK back once we can better handle how they impact MP
+                      transporters.add(LIFT_HOIST);
+                      transporters.add(ROOF_RACK);
+                  }
+
+                  return transporters;
+              }
           });
 
-    private static Optional<Visitor> getTransportTypeClassifier(Entity entity) {
+    private static Optional<Visitor> getTransportTypeClassifier(ICarryable entity) {
         return visitors.stream().filter(v -> v.isInterestedIn(entity)).findFirst();
     }
 
