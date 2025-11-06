@@ -405,22 +405,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
         contract.setEmployerCode(employer, campaign.getGameYear());
-        if (campaign.isPirateCampaign()) {
-            int connections = 0;
-            Person commander = campaign.getCommander();
-            if (commander != null) {
-                connections = commander.getAdjustedConnections();
-            }
-            int roll = d6(2) + connections;
-            if (roll < 6) {
-                contract.setContractType(AtBContractType.RECON_RAID);
-            } else {
-                contract.setContractType(AtBContractType.OBJECTIVE_RAID);
-            }
-        } else {
-            contract.setContractType(findMissionType(unitRatingMod,
-                  Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()));
-        }
+        contract.setContractType(ContractTypePicker.findMissionType(contract.getEmployerFaction()));
 
         setEnemyCode(contract);
         setIsRiotDuty(contract);
@@ -503,8 +488,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     protected AtBContract generateAtBSubcontract(Campaign campaign, AtBContract parent, int unitRatingMod) {
         AtBContract contract = new AtBContract("New Subcontract");
         contract.setEmployerCode(parent.getEmployerCode(), campaign.getGameYear());
-        contract.setContractType(findMissionType(unitRatingMod,
-              Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()));
+        contract.setContractType(ContractTypePicker.findMissionType(contract.getEmployerFaction()));
 
         if (contract.getContractType().isPirateHunting()) {
             Faction employer = contract.getEmployerFaction();
@@ -897,7 +881,9 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         int[][] missionMods = { { 1, 0, 1, 0 }, { 0, 1, -1, -3 }, { -3, 0, 2, 1 }, { -2, 1, -1, -1 }, { -2, 0, 2, 3 },
                                 { -1, 1, 1, 1 }, { -2, 3, -2, -1 }, { 2, 2, -1, -1 }, { 0, 2, 2, 1 }, { -1, 0, 1, 2 },
-                                { -1, -2, 1, -1 }, { -1, -1, 2, 1 } };
+                                { -1, -2, 1, -1 }, { -1, -1, 2, 1 }, { 2, 1, -1, -3 }, { -1, 4, -3, -2 },
+                                { -3, 0, 2, 1 }, { -1, -2, 1, -1 }, { -2, 0, 2, 1 }, { -1, 4, -3, -2 },
+                                { 2, 1, -1, -1 } };
         for (int i = 0; i < mods.mods.length; i++) {
             mods.mods[i] += missionMods[contract.getContractType().ordinal()][i];
         }

@@ -49,7 +49,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import megamek.Version;
-import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -522,22 +521,6 @@ public abstract class AbstractContractMarket {
         } else {
             contract.setTransportComp(100);
         }
-    }
-
-    protected AtBContractType findMissionType(int unitRatingMod, boolean majorPower) {
-        final AtBContractType[][] table = {
-              // col 0: IS Houses
-              { AtBContractType.GUERRILLA_WARFARE, AtBContractType.RECON_RAID, AtBContractType.PIRATE_HUNTING,
-                AtBContractType.PLANETARY_ASSAULT, AtBContractType.OBJECTIVE_RAID, AtBContractType.OBJECTIVE_RAID,
-                AtBContractType.EXTRACTION_RAID, AtBContractType.RECON_RAID, AtBContractType.GARRISON_DUTY,
-                AtBContractType.CADRE_DUTY, AtBContractType.RELIEF_DUTY },
-              // col 1: Others
-              { AtBContractType.GUERRILLA_WARFARE, AtBContractType.RECON_RAID, AtBContractType.PLANETARY_ASSAULT,
-                AtBContractType.OBJECTIVE_RAID, AtBContractType.EXTRACTION_RAID, AtBContractType.PIRATE_HUNTING,
-                AtBContractType.SECURITY_DUTY, AtBContractType.OBJECTIVE_RAID, AtBContractType.GARRISON_DUTY,
-                AtBContractType.CADRE_DUTY, AtBContractType.DIVERSIONARY_RAID } };
-        int roll = MathUtility.clamp(d6(2) + unitRatingMod - IUnitRating.DRAGOON_C, 2, 12);
-        return table[majorPower ? 0 : 1][roll - 2];
     }
 
     protected void setEnemyCode(AtBContract contract) {
