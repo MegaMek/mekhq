@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.market.contractMarket;
 
+import static java.lang.Math.max;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.ELITE;
@@ -72,6 +73,7 @@ import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
@@ -253,7 +255,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
 
             if (newCampaign) {
-                numContracts = Math.max(numContracts, 2);
+                numContracts = max(numContracts, 2);
             }
 
             for (int i = 0; i < numContracts; i++) {
@@ -405,7 +407,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
         contract.setEmployerCode(employer, campaign.getGameYear());
-        contract.setContractType(ContractTypePicker.findMissionType(contract.getEmployerFaction()));
+
+        getContractType(campaign, contract);
 
         setEnemyCode(contract);
         setIsRiotDuty(contract);
@@ -488,7 +491,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     protected AtBContract generateAtBSubcontract(Campaign campaign, AtBContract parent, int unitRatingMod) {
         AtBContract contract = new AtBContract("New Subcontract");
         contract.setEmployerCode(parent.getEmployerCode(), campaign.getGameYear());
-        contract.setContractType(ContractTypePicker.findMissionType(contract.getEmployerFaction()));
+        getContractType(campaign, contract);
 
         if (contract.getContractType().isPirateHunting()) {
             Faction employer = contract.getEmployerFaction();
@@ -549,10 +552,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
 
-        contract.setCommandRights(ContractCommandRights.values()[Math.max(parent.getCommandRights().ordinal() - 1, 0)]);
+        contract.setCommandRights(ContractCommandRights.values()[max(parent.getCommandRights().ordinal() - 1, 0)]);
         contract.setSalvageExchange(parent.isSalvageExchange());
-        contract.setSalvagePct(Math.max(parent.getSalvagePct() - 10, 0));
-        contract.setStraightSupport(Math.max(parent.getStraightSupport() - 20, 0));
+        contract.setSalvagePct(max(parent.getSalvagePct() - 10, 0));
+        contract.setStraightSupport(max(parent.getStraightSupport() - 20, 0));
         if (parent.getBattleLossComp() <= 10) {
             contract.setBattleLossComp(0);
         } else if (parent.getBattleLossComp() <= 20) {
@@ -581,6 +584,18 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.clanTechSalvageOverride();
 
         return contract;
+    }
+
+    private void getContractType(Campaign campaign, AtBContract contract) {
+        Person campaignCommander = campaign.getFlaggedCommander();
+        int connections = campaignCommander.getConnections();
+        boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        boolean isClanCampaign = campaign.isClanCampaign();
+        SkillCheckUtility checkUtility = new SkillCheckUtility(campaignCommander, S_NEGOTIATION, null,
+              0, false, true, isUseAgingEffects, isClanCampaign, campaign.getLocalDate());
+        campaign.addReport(checkUtility.getResultsText());
+        contract.setContractType(ContractTypePicker.findMissionType(contract.getEmployerFaction(), connections,
+              max(0, checkUtility.getMarginOfSuccess())));
     }
 
     /**
