@@ -625,7 +625,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         // The order in this method needs to match generateAtBContract
 
-        AtBContract followup = new AtBContract(contract.getContractType().toString() + " (followup)");
+        AtBContract followup = new AtBContract("Unnamed Contract");
         lastId++;
         followup.setId(lastId);
         contractIds.put(lastId, followup);
@@ -666,6 +666,13 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.calculateContract(campaign);
 
         contract.clanTechSalvageOverride();
+
+        contract.setName(String.format("%s - %s - %s %s (Followup)",
+              contract.getStartDate()
+                    .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
+              contract.getEmployer(),
+              contract.getSystem().getName(contract.getStartDate()),
+              contract.getContractType()));
 
         contracts.add(followup);
         followupContracts.put(followup.getId(), contract.getId());
