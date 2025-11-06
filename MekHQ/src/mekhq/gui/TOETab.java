@@ -183,6 +183,8 @@ public final class TOETab extends CampaignGuiTab {
         }
 
         List<Scenario> sortedScenarios = new ArrayList<>(scenarioMissionMap.keySet());
+        // A scenario will have a null date if it hasn't been found in StratCon yet
+        sortedScenarios.removeIf(scenario -> scenario.getDate() == null);
         sortedScenarios.sort(Comparator.comparing(Scenario::getDate).reversed());
 
         // Show scenario picker
