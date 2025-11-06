@@ -33,6 +33,7 @@
 package mekhq.campaign.mission;
 
 import static java.lang.Math.ceil;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
@@ -469,7 +470,7 @@ public class TransportCostCalculations {
 
         countUnitsByType();
         calculateAdditionalBayRequirementsFromUnits();
-        calculateAdditionalBayRequirementsFromPassengers();
+        calculateAdditionalBayRequirementsFromPassengers(hangarStatistics.getTotalLargeCraftPassengerCapacity());
         additionalDropShipsRequired += (int) ceil(totalAdditionalBaysRequired / BAYS_PER_DROPSHIP);
 
         calculateAdditionalJumpCollarsRequirements();
@@ -572,7 +573,7 @@ public class TransportCostCalculations {
         additionalSmallCraftBaysRequired = -min(0, smallCraftBayUsage);
         additionalSmallCraftBaysCost = round(additionalSmallCraftBaysRequired * SMALL_CRAFT_COST);
         totalCost = totalCost.plus(additionalSmallCraftBaysCost);
-        int smallCraftSpareCapacity = Math.max(0, smallCraftBayUsage);
+        int smallCraftSpareCapacity = max(0, smallCraftBayUsage);
 
         // ASF (including Conv Fighters)
         int asfBays = hangarStatistics.getTotalASFBays() + smallCraftSpareCapacity;
@@ -592,7 +593,7 @@ public class TransportCostCalculations {
         int superHeavyVehicleBays = hangarStatistics.getTotalSuperHeavyVehicleBays();
         int superHeavyVehicleBayUsage = superHeavyVehicleBays - superHeavyVehicleCount;
         additionalSuperHeavyVehicleBaysRequired = -min(0, superHeavyVehicleBayUsage);
-        int superHeavyVehicleSpareCapacity = Math.max(0, superHeavyVehicleBayUsage);
+        int superHeavyVehicleSpareCapacity = max(0, superHeavyVehicleBayUsage);
         additionalSuperHeavyVehicleBaysCost = round(additionalSuperHeavyVehicleBaysRequired * SUPER_HEAVY_VEHICLE_COST);
         totalCost = totalCost.plus(additionalSuperHeavyVehicleBaysCost);
 
@@ -600,7 +601,7 @@ public class TransportCostCalculations {
         int heavyVehicleBays = hangarStatistics.getTotalHeavyVehicleBays() + superHeavyVehicleSpareCapacity;
         int heavyVehicleBayUsage = heavyVehicleBays - heavyVehicleCount;
         additionalHeavyVehicleBaysRequired = -min(0, heavyVehicleBayUsage);
-        int heavyVehicleSpareCapacity = Math.max(0, heavyVehicleBayUsage);
+        int heavyVehicleSpareCapacity = max(0, heavyVehicleBayUsage);
         additionalHeavyVehicleBaysCost = round(additionalHeavyVehicleBaysRequired * HEAVY_VEHICLE_COST);
         totalCost = totalCost.plus(additionalHeavyVehicleBaysCost);
 
@@ -712,10 +713,12 @@ public class TransportCostCalculations {
      * Calculates passenger bay requirements and costs based on the personnel list, counting only those present and
      * assigned to the force. Updates totals for passenger bay counts and costs.
      *
+     * @param passengerCapacity the total passenger capacity of all Large Craft in the campaign combined
+     *
      * @author Illiani
      * @since 50.10
      */
-    void calculateAdditionalBayRequirementsFromPassengers() {
+    void calculateAdditionalBayRequirementsFromPassengers(int passengerCapacity) {
         int passengerCount = 0;
         for (Person person : personnel) {
             if (person.getStatus().isAbsent() || person.getStatus().isDepartedUnit()) {
@@ -723,7 +726,9 @@ public class TransportCostCalculations {
             }
             passengerCount++;
         }
-        additionalPassengerBaysRequired = (int) ceil(passengerCount / PASSENGERS_PER_BAY);
+
+        int additionalPassengerNeeds = max(0, passengerCount - passengerCapacity);
+        additionalPassengerBaysRequired = (int) ceil(additionalPassengerNeeds / PASSENGERS_PER_BAY);
         additionalPassengerBaysCost = round(additionalPassengerBaysRequired * PASSENGERS_COST);
         totalCost = totalCost.plus(additionalPassengerBaysCost);
         totalAdditionalBaysRequired += additionalPassengerBaysRequired;
