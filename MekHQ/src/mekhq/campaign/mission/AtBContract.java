@@ -357,7 +357,7 @@ public class AtBContract extends Contract {
     }
 
     public void calculateLength(final boolean variable) {
-        setLength(getContractType().calculateLength(variable, this));
+        setLength(getContractType().calculateLength(variable));
     }
 
     /**

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.enums;
 
+import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.mission.enums.AtBEventType.*;
 
@@ -42,7 +43,6 @@ import megamek.common.eras.EraFlag;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 
 public enum AtBContractType {
@@ -199,23 +199,39 @@ public enum AtBContractType {
     }
     // endregion Boolean Comparison Methods
 
-    public int calculateLength(final boolean variable, final AtBContract contract) {
-        return variable ? calculateVariableLength(contract) : getConstantLength();
+    /**
+     * Calculates the length of the contract in months.
+     *
+     * <p>If variable contract lengths are enabled, the length is calculated with randomization around the base
+     * contract type's standard duration. Otherwise, the constant length defined by the contract type is used.</p>
+     *
+     * @param useVariableContractLengths whether to use variable length calculation
+     *
+     * @return the calculated contract length in months
+     */
+    public int calculateLength(final boolean useVariableContractLengths) {
+        return useVariableContractLengths ? calculateVariableLength() : getConstantLength();
     }
 
-    private int calculateVariableLength(final AtBContract contract) {
-        return switch (this) {
-            case CADRE_DUTY, SECURITY_DUTY -> 4;
-            case GARRISON_DUTY -> 9 + Compute.d6(3);
-            case DIVERSIONARY_RAID, RECON_RAID -> 1;
-            case EXTRACTION_RAID -> 1 + contract.getEnemySkill().ordinal();
-            case OBJECTIVE_RAID, PIRATE_HUNTING -> 3 + randomInt(3);
-            case PLANETARY_ASSAULT, RELIEF_DUTY -> 4 + randomInt(3);
-            case GUERRILLA_WARFARE, RIOT_DUTY -> 6;
-            // Another PR handles these
-            case ASSASSINATION, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID, RETAINER, SABOTAGE, TERRORISM ->
-                  constantLength;
-        };
+    /**
+     * Calculates a variable contract length with randomization.
+     *
+     * <p>The length is calculated as 75% of the constant length plus a random variance of up to 50% of the constant
+     * length. For example, a contract type with a constant length of 12 months would have a base of 9 months plus 0-6
+     * months variance, resulting in a range of 9-15 months.</p>
+     *
+     * @return the calculated variable contract length in months
+     */
+    private int calculateVariableLength() {
+        int baseLength = (int) round(constantLength * 0.75);
+        int variance = (int) round(constantLength * 0.5);
+
+        if (variance > 0) {
+            return baseLength + randomInt(variance);
+        } else {
+            // If we can't determine variance return the constantLength
+            return constantLength;
+        }
     }
 
     /**
