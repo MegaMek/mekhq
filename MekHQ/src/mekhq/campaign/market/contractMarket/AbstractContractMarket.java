@@ -778,7 +778,7 @@ public abstract class AbstractContractMarket {
     private int calculateContractTypeModifiers(AtBContractType contractType, boolean isAttacker) {
         int mod = 0;
 
-        if (contractType.isGuerrillaWarfare() || contractType.isCadreDuty()) {
+        if (contractType.isGuerrillaType() || contractType.isCadreDuty()) {
             mod -= 3;
         } else if (contractType.isGarrisonDuty() || contractType.isSecurityDuty()) {
             mod -= 2;

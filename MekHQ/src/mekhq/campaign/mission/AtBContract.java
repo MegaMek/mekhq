@@ -458,7 +458,7 @@ public class AtBContract extends Contract {
                 moraleLevel = newMoraleLevel;
                 routEnd = null;
 
-                if (contractType.isGarrisonDuty()) {
+                if (contractType.isGarrisonDuty() || contractType.isRetainer()) {
                     updateEnemy(campaign, today); // mix it up a little
                 }
             }
@@ -589,7 +589,7 @@ public class AtBContract extends Contract {
 
         AtBContractType contractType = getContractType();
 
-        if (contractType.isGuerrillaWarfare()) {
+        if (contractType.isGuerrillaType()) {
             repairLocation = Unit.SITE_IMPROVISED;
         } else if (contractType.isRaidType()) {
             repairLocation = Unit.SITE_FIELD_WORKSHOP;
