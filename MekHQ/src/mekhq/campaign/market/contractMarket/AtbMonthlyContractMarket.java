@@ -616,16 +616,22 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     private void getContractType(Campaign campaign, AtBContract contract) {
         Person campaignCommander = campaign.getFlaggedCommander();
 
-        int connections = campaignCommander != null ? campaignCommander.getConnections() : 0;
+        int connections = 0;
+        int negotiationsMarginOfSuccess = 0;
+        if (campaignCommander != null) {
+            connections = campaignCommander.getConnections();
 
-        boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
-        boolean isClanCampaign = campaign.isClanCampaign();
-        SkillCheckUtility checkUtility = new SkillCheckUtility(campaignCommander, S_NEGOTIATION, null,
-              0, false, true, isUseAgingEffects, isClanCampaign, campaign.getLocalDate());
+            boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
+            boolean isClanCampaign = campaign.isClanCampaign();
+            SkillCheckUtility checkUtility = new SkillCheckUtility(campaignCommander, S_NEGOTIATION, null,
+                  0, false, true, isUseAgingEffects, isClanCampaign, campaign.getLocalDate());
+            negotiationsMarginOfSuccess = max(0, checkUtility.getMarginOfSuccess());
 
-        campaign.addReport(checkUtility.getResultsText());
+            campaign.addReport(checkUtility.getResultsText());
+        }
+
         contract.setContractType(ContractTypePicker.findMissionType(contract.getEmployerFaction(), connections,
-              max(0, checkUtility.getMarginOfSuccess())));
+              negotiationsMarginOfSuccess));
     }
 
     /**
