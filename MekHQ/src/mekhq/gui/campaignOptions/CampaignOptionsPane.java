@@ -73,8 +73,8 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
-import mekhq.gui.dialog.factionStanding.FactionStandingCampaignOptionsChangedConfirmationDialog;
-import mekhq.gui.dialog.factionStanding.VeterancyAwardsCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.FactionStandingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.VeterancyAwardsCampaignOptionsChangedConfirmationDialog;
 
 /**
  * The {@code CampaignOptionsPane} class represents a tabbed pane used for displaying and managing various campaign

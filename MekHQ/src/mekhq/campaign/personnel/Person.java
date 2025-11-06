@@ -7880,12 +7880,14 @@ public class Person {
         final int DEATH_THRESHOLD = 5;
 
         if (hasBerserker && failedWillpowerCheck) {
+            LocalDate today = campaign.getLocalDate();
             Set<Person> victims = new HashSet<>();
             List<Person> allActivePersonnel = campaign.getActivePersonnel(true, true);
+
             if (isDeployed() && unit != null) {
-                getLocalVictims(allActivePersonnel, victims);
+                getLocalVictims(today, allActivePersonnel, victims);
             } else {
-                getNonDeployedVictims(allActivePersonnel, victims);
+                getNonDeployedVictims(today, allActivePersonnel, victims);
             }
 
             // The berserker hurts themselves
@@ -7993,19 +7995,23 @@ public class Person {
      * non-deployed person is chosen from the available pool and added to the victims set. Once chosen, a victim will
      * not be selected again.</p>
      *
+     * @param today              The current in-game date, used to determine if a potential victim is a child (so they
+     *                           can be excluded)
      * @param allActivePersonnel the list of all active personnel, including both deployed and non-deployed
      * @param victims            the set to which randomly selected non-deployed victims will be added
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private void getNonDeployedVictims(List<Person> allActivePersonnel, Set<Person> victims) {
+    private void getNonDeployedVictims(LocalDate today, List<Person> allActivePersonnel, Set<Person> victims) {
         Set<Person> potentialVictims = new HashSet<>();
 
         for (Person bystander : allActivePersonnel) {
-            if (!bystander.isDeployed()) {
-                potentialVictims.add(bystander);
+            if (bystander.isChild(today) || bystander.isDeployed()) {
+                continue;
             }
+
+            potentialVictims.add(bystander);
         }
 
         potentialVictims.remove(this);
@@ -8030,17 +8036,23 @@ public class Person {
      * eligible to be selected. The number of victims chosen is based on a single six-sided die roll. For each count, a
      * random eligible person is added to the victims set; once chosen, a victim will not be selected again.</p>
      *
+     * @param today              The current in-game date, used to determine if a potential victim is a child (so they
+     *                           can be excluded)
      * @param allActivePersonnel the list of all active personnel, including both deployed and non-deployed
      * @param victims            the set to which randomly selected victims from the same scenario will be added
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private void getLocalVictims(List<Person> allActivePersonnel, Set<Person> victims) {
+    private void getLocalVictims(LocalDate today, List<Person> allActivePersonnel, Set<Person> victims) {
         Set<Person> potentialVictims = new HashSet<>();
 
         int scenarioId = unit.getScenarioId();
         for (Person bystander : allActivePersonnel) {
+            if (bystander.isChild(today)) {
+                continue;
+            }
+
             Unit bystanderUnit = bystander.getUnit();
             if (bystanderUnit != null) {
                 if (scenarioId == bystanderUnit.getScenarioId()) {

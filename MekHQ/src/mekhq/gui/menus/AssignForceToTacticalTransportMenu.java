@@ -80,7 +80,7 @@ public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMe
         Set<TransporterType> transporterTypes = new HashSet<>(campaign.getTransports(TACTICAL_TRANSPORT).keySet());
 
         for (Unit unit : units) {
-            Set<TransporterType> unitTransporterTypes = CampaignTransportUtilities.mapEntityToTransporters(
+            Set<TransporterType> unitTransporterTypes = CampaignTransportUtilities.mapICarryableToTransporters(
                   TACTICAL_TRANSPORT,
                   unit.getEntity());
             if (!unitTransporterTypes.isEmpty()) {

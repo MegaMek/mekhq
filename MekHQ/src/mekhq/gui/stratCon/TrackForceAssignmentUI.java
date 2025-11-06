@@ -51,6 +51,7 @@ import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConCoords;
 import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.gui.StratConPanel;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
@@ -105,6 +106,11 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         availableForceList.setModel(lanceModel);
         availableForceList.setCellRenderer(new ScenarioWizardLanceRenderer(campaign));
+        availableForceList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                btnConfirm.setEnabled(!availableForceList.isSelectionEmpty());
+            }
+        });
 
         forceListContainer.setViewportView(availableForceList);
 
@@ -113,7 +119,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         gbc.gridy++;
 
         getContentPane().add(btnConfirm, gbc);
-        btnConfirm.setEnabled(true);
+        btnConfirm.setEnabled(false);
 
         pack();
         repaint();
@@ -139,6 +145,15 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
             // sometimes the scenario templates take a little while to load, we don't want the user
             // clicking the button fifty times and getting a bunch of scenarios.
             btnConfirm.setEnabled(false);
+
+            // This dialog marks a point of no return, so we ask the player to confirm their decision before moving
+            // forward
+            ImmersiveDialogConfirmation dialog = new ImmersiveDialogConfirmation(campaign);
+            if (!dialog.wasConfirmed()) {
+                btnConfirm.setEnabled(true);
+                return;
+            }
+
             for (Force force : availableForceList.getSelectedValuesList()) {
                 StratConRulesManager.deployForceToCoords(ownerPanel.getSelectedCoords(),
                       force.getId(), campaign, currentCampaignState.getContract(), ownerPanel.getCurrentTrack(), false);
