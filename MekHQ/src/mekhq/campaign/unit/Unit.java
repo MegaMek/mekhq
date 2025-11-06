@@ -6680,7 +6680,7 @@ public class Unit implements ITechnology {
                 partsCost = partsCost.multipliedBy(2.0);
             }
 
-            // No engines for tanks or HHW
+            // No engines for infantry or HHW
             if (!(entity instanceof Infantry) && !(entity instanceof HandheldWeapon)) {
                 if ((engine.getEngineType() == Engine.XL_ENGINE) || (engine.getEngineType() == Engine.XXL_ENGINE)) {
                     partsCost = partsCost.multipliedBy(2.5);
