@@ -2243,6 +2243,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             addRoleToMenu(role, menuCombatPrimary, cbMenuItem, menuSupportPrimary, menuCivilianPrimary);
         }
 
+        menuCombatPrimary.addSeparator();
+        menuSupportPrimary.addSeparator();
+        menuCivilianPrimary.addSeparator();
+
         for (final PersonnelRole role : cannotPerformRoles) {
             cbMenuItem = new JCheckBoxMenuItem(role.getLabel(getCampaign().isClanCampaign()));
             cbMenuItem.setToolTipText(wordWrap(role.getTooltip(getCampaign().isClanCampaign())));
