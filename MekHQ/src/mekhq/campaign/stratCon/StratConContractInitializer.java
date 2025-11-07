@@ -503,7 +503,7 @@ public class StratConContractInitializer {
                 scenario.setActionDate(null);
                 scenario.setReturnDate(null);
                 scenario.setStrategicObjective(true);
-                scenario.setTurningPoint(true);
+                scenario.setTurningPoint(false);
                 scenario.getBackingScenario().setCloaked(true);
                 // apply objective mods
                 if (objectiveModifiers != null) {
