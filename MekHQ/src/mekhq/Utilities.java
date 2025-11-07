@@ -722,9 +722,9 @@ public class Utilities {
             }
 
             for (int slot = 0; slot < u.getTotalCrewNeeds(); slot++) {
-                Person p = c.newPerson(u.getEntity().isSupportVehicle() ?
-                                             PersonnelRole.COMBAT_TECHNICIAN :
-                                             PersonnelRole.VESSEL_CREW,
+                Person p = c.newPerson(u.getEntity().isLargeCraft() ?
+                                             PersonnelRole.VESSEL_CREW :
+                                             PersonnelRole.COMBAT_TECHNICIAN,
                       factionCode,
                       oldCrew.getGender(numberPeopleGenerated));
 
