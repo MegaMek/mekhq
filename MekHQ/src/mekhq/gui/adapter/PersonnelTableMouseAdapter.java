@@ -2804,11 +2804,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                           true);
                 }
 
-                combatAbilityMenu.addSeparator();
-                maneuveringAbilityMenu.addSeparator();
-                utilityAbilityMenu.addSeparator();
-                characterFlawMenu.addSeparator();
-                characterOriginMenu.addSeparator();
+                if (!eligibleAbilities.isEmpty()) {
+                    combatAbilityMenu.addSeparator();
+                    maneuveringAbilityMenu.addSeparator();
+                    utilityAbilityMenu.addSeparator();
+                    characterFlawMenu.addSeparator();
+                    characterOriginMenu.addSeparator();
+                }
 
                 for (SpecialAbility spa : notEligibleAbilities) {
                     addSPAToMenu(spa,
