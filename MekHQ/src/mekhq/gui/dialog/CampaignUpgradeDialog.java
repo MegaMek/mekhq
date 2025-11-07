@@ -204,14 +204,12 @@ public class CampaignUpgradeDialog {
             protected void done() {
                 loadingDialog.setVisible(false);
                 loadingDialog.dispose();
-                onUpgradeComplete.run(); // trigger the external options update
+                onUpgradeComplete.run();
             }
         };
 
-        SwingUtilities.invokeLater(() -> {
-            worker.execute();
-            loadingDialog.setVisible(true);
-        });
+        worker.execute();
+        loadingDialog.setVisible(true);
     }
 
     /**
