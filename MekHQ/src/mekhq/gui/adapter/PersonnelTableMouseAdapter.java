@@ -2212,7 +2212,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenu menuSupportPrimary = new JMenu(resources.getString("changeRole.support"));
         JMenu menuCivilianPrimary = new JMenu(resources.getString("changeRole.civilian"));
 
-
+        List<PersonnelRole> canPerformRoles = new ArrayList<>();
+        List<PersonnelRole> cannotPerformRoles = new ArrayList<>();
         for (final PersonnelRole role : roles) {
             boolean allCanPerform = true;
 
@@ -2224,23 +2225,32 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (allCanPerform) {
-                cbMenuItem = new JCheckBoxMenuItem(role.getLabel(getCampaign().isClanCampaign()));
-                cbMenuItem.setToolTipText(wordWrap(role.getTooltip(getCampaign().isClanCampaign()), 50));
-                cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_ROLE, role.name()));
-                cbMenuItem.addActionListener(this);
-                if (oneSelected && role == person.getPrimaryRole()) {
-                    cbMenuItem.setSelected(true);
-                }
-
-                if (role.isCombat()) {
-                    menuCombatPrimary.add(cbMenuItem);
-                } else if (role.isSupport(true)) {
-                    menuSupportPrimary.add(cbMenuItem);
-                } else {
-                    menuCivilianPrimary.add(cbMenuItem);
-                }
+                canPerformRoles.add(role);
+            } else {
+                cannotPerformRoles.add(role);
             }
         }
+
+        for (final PersonnelRole role : canPerformRoles) {
+            cbMenuItem = new JCheckBoxMenuItem(role.getLabel(getCampaign().isClanCampaign()));
+            cbMenuItem.setToolTipText(wordWrap(role.getTooltip(getCampaign().isClanCampaign())));
+            cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_ROLE, role.name()));
+            cbMenuItem.addActionListener(this);
+            if (oneSelected && role == person.getPrimaryRole()) {
+                cbMenuItem.setSelected(true);
+            }
+
+            addRoleToMenu(role, menuCombatPrimary, cbMenuItem, menuSupportPrimary, menuCivilianPrimary);
+        }
+
+        for (final PersonnelRole role : cannotPerformRoles) {
+            cbMenuItem = new JCheckBoxMenuItem(role.getLabel(getCampaign().isClanCampaign()));
+            cbMenuItem.setToolTipText(wordWrap(role.getTooltip(getCampaign().isClanCampaign())));
+            cbMenuItem.setEnabled(false);
+
+            addRoleToMenu(role, menuCombatPrimary, cbMenuItem, menuSupportPrimary, menuCivilianPrimary);
+        }
+
         if (menuCombatPrimary.getItemCount() > 0) {
             menu.add(menuCombatPrimary);
         }
@@ -2276,13 +2286,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     cbMenuItem.setSelected(true);
                 }
 
-                if (role.isCombat()) {
-                    menuCombatSecondary.add(cbMenuItem);
-                } else if (role.isSupport(true)) {
-                    menuSupportSecondary.add(cbMenuItem);
-                } else {
-                    menuCivilianSecondary.add(cbMenuItem);
-                }
+                addRoleToMenu(role, menuCombatSecondary, cbMenuItem, menuSupportSecondary, menuCivilianSecondary);
             }
         }
 
@@ -4596,6 +4600,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // endregion GM Menu
 
         return Optional.of(popup);
+    }
+
+    private static void addRoleToMenu(PersonnelRole role, JMenu menuCombatPrimary, JCheckBoxMenuItem cbMenuItem,
+          JMenu menuSupportPrimary, JMenu menuCivilianPrimary) {
+        if (role.isCombat()) {
+            menuCombatPrimary.add(cbMenuItem);
+        } else if (role.isSupport(true)) {
+            menuSupportPrimary.add(cbMenuItem);
+        } else {
+            menuCivilianPrimary.add(cbMenuItem);
+        }
     }
 
     /**
