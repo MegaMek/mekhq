@@ -72,6 +72,7 @@ public class CampaignOptionsUnmarshaller {
         CampaignOptions campaignOptions = new CampaignOptions();
         NodeList childNodes = parentNod.getChildNodes();
 
+        boolean wasUsingAtB = false;
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node childNode = childNodes.item(i);
 
@@ -88,19 +89,26 @@ public class CampaignOptionsUnmarshaller {
             }
 
             try {
-                parseNodeName(version, nodeName, campaignOptions, nodeContents, childNode);
+                if (parseNodeName(version, nodeName, campaignOptions, nodeContents, childNode)) {
+                    wasUsingAtB = true;
+                }
             } catch (Exception ex) {
                 LOGGER.error(ex, "Exception parsing campaign option node: {}", nodeName);
             }
+        }
+
+        //  < 50.10 compatibility handler
+        if (wasUsingAtB && !campaignOptions.isUseStratCon()) {
+            // Mapless StratCon replaced AtB in 50.10
+            campaignOptions.setUseStratConMaplessMode(true);
         }
 
         LOGGER.debug("Load Campaign Options Complete!");
         return campaignOptions;
     }
 
-    private static void parseNodeName(Version version, String nodeName, CampaignOptions campaignOptions,
+    private static boolean parseNodeName(Version version, String nodeName, CampaignOptions campaignOptions,
           String nodeContents, Node childNode) {
-        boolean wasUsingAtB = false;
         switch (nodeName) {
             case "checkMaintenance" -> campaignOptions.setCheckMaintenance(parseBoolean(nodeContents));
             case "maintenanceCycleDays" -> campaignOptions.setMaintenanceCycleDays(parseInt(nodeContents));
@@ -391,7 +399,7 @@ public class CampaignOptionsUnmarshaller {
                         nodeContents));
             case "salaryXPMultipliers" -> {
                 if (!childNode.hasChildNodes()) {
-                    return;
+                    return false;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int j = 0; j < nl2.getLength(); j++) {
@@ -450,12 +458,12 @@ public class CampaignOptionsUnmarshaller {
             case "nonBinaryDiceSize" -> campaignOptions.setNonBinaryDiceSize(parseInt(nodeContents));
             case "randomOriginOptions" -> {
                 if (!childNode.hasChildNodes()) {
-                    return;
+                    return false;
                 }
                 final RandomOriginOptions randomOriginOptions = RandomOriginOptions.parseFromXML(childNode.getChildNodes(),
                       true);
                 if (randomOriginOptions == null) {
-                    return;
+                    return false;
                 }
                 campaignOptions.setRandomOriginOptions(randomOriginOptions);
             }
@@ -495,7 +503,7 @@ public class CampaignOptionsUnmarshaller {
             case "logMarriageNameChanges" -> campaignOptions.setLogMarriageNameChanges(parseBoolean(nodeContents));
             case "marriageSurnameWeights" -> {
                 if (!childNode.hasChildNodes()) {
-                    return;
+                    return false;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int j = 0; j < nl2.getLength(); j++) {
@@ -524,7 +532,7 @@ public class CampaignOptionsUnmarshaller {
             case "usePrisonerDivorce" -> campaignOptions.setUsePrisonerDivorce(parseBoolean(nodeContents));
             case "divorceSurnameWeights" -> {
                 if (!childNode.hasChildNodes()) {
-                    return;
+                    return false;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int j = 0; j < nl2.getLength(); j++) {
@@ -607,7 +615,7 @@ public class CampaignOptionsUnmarshaller {
             case "militaryAcademyAccidents" -> campaignOptions.setMilitaryAcademyAccidents(parseInt(nodeContents));
             case "enabledRandomDeathAgeGroups" -> {
                 if (!childNode.hasChildNodes()) {
-                    return;
+                    return false;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int i = 0; i < nl2.getLength(); i++) {
@@ -764,7 +772,7 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "personnelMarketRandomRemovalTargets" -> {
                 if (!childNode.hasChildNodes()) {
-                    return;
+                    return false;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int j = 0; j < nl2.getLength(); j++) {
@@ -822,7 +830,9 @@ public class CampaignOptionsUnmarshaller {
                     campaignOptions.setPhenotypeProbability(i, parseInt(values[i]));
                 }
             }
-            case "useAtB" -> wasUsingAtB = true; // < 50.10 compatibility handler
+            case "useAtB" -> {
+                return true; // < 50.10 compatibility handler
+            }
             case "useStratCon" -> campaignOptions.setUseStratCon(parseBoolean(nodeContents));
             case "useMaplessStratCon" -> campaignOptions.setUseStratConMaplessMode(parseBoolean(nodeContents));
             case "useAdvancedScouting" -> campaignOptions.setUseAdvancedScouting(parseBoolean(nodeContents));
@@ -900,10 +910,6 @@ public class CampaignOptionsUnmarshaller {
             default -> LOGGER.warn("Potentially unexpected entry in campaign options: {}", nodeName);
         }
 
-        //  < 50.10 compatibility handler
-        if (wasUsingAtB && !campaignOptions.isUseStratCon()) {
-            // Mapless StratCon replaced AtB in 50.10
-            campaignOptions.setUseStratConMaplessMode(true);
-        }
+        return false;
     }
 }
