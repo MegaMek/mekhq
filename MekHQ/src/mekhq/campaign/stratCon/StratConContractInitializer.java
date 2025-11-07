@@ -32,7 +32,9 @@
  */
 package mekhq.campaign.stratCon;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.lang.Math.round;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static mekhq.campaign.stratCon.SupportPointNegotiation.negotiateInitialSupportPoints;
 
@@ -92,11 +94,13 @@ public class StratConContractInitializer {
         // scenarios
         // when objective is allied/hostile facility, place those facilities
 
-        int maximumTrackIndex = Math.max(0, contract.getRequiredCombatTeams() / NUM_LANCES_PER_TRACK);
+        int maximumTrackIndex = max(0, contract.getRequiredCombatTeams() / NUM_LANCES_PER_TRACK);
         int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
 
         for (int x = 0; x < maximumTrackIndex; x++) {
-            int scenarioOdds = getScenarioOdds(contractDefinition);
+            int scenarioOdds = getScenarioOdds(campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(),
+                  contractDefinition);
+
             int deploymentTime = getDeploymentTime(contractDefinition);
 
             StratConTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK,
@@ -112,7 +116,9 @@ public class StratConContractInitializer {
         // required lances.
         int oddLanceCount = contract.getRequiredCombatTeams() % NUM_LANCES_PER_TRACK;
         if (oddLanceCount > 0) {
-            int scenarioOdds = getScenarioOdds(contractDefinition);
+            int scenarioOdds = getScenarioOdds(campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(),
+                  contractDefinition);
+
             int deploymentTime = getDeploymentTime(contractDefinition);
 
             StratConTrackState track = initializeTrackState(oddLanceCount,
@@ -125,7 +131,9 @@ public class StratConContractInitializer {
 
         // Last chance generation, to ensure we never generate a StratCon map with 0 tracks
         if (campaignState.getTrackCount() == 0) {
-            int scenarioOdds = getScenarioOdds(contractDefinition);
+            int scenarioOdds = getScenarioOdds(campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(),
+                  contractDefinition);
+
             int deploymentTime = getDeploymentTime(contractDefinition);
 
             StratConTrackState track = initializeTrackState(1, scenarioOdds, deploymentTime, planetaryTemperature);
@@ -139,7 +147,7 @@ public class StratConContractInitializer {
             for (ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
                 int objectiveCount = objectiveParams.objectiveCount > 0 ?
                                            (int) objectiveParams.objectiveCount :
-                                           (int) Math.max(1,
+                                           (int) max(1,
                                                  -objectiveParams.objectiveCount * contract.getRequiredCombatTeams());
 
                 List<Integer> trackObjects = trackObjectDistribution(objectiveCount, campaignState.getTrackCount());
@@ -247,7 +255,7 @@ public class StratConContractInitializer {
         if (contract.getContractType().isGarrisonDuty()) {
             contract.setMoraleLevel(AtBMoraleLevel.ROUTED);
 
-            LocalDate routEnd = contract.getStartDate().plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
+            LocalDate routEnd = contract.getStartDate().plusMonths(max(1, Compute.d6() - 3)).minusDays(1);
             contract.setRoutEndDate(routEnd);
         } else {
             contract.checkMorale(campaign, campaign.getLocalDate());
@@ -265,6 +273,15 @@ public class StratConContractInitializer {
 
         // Determine starting Support Points
         negotiateInitialSupportPoints(campaign, contract);
+    }
+
+    public static int getScenarioOdds(boolean isUseAltAdvancedMedical, StratConContractDefinition contractDefinition) {
+        int scenarioOdds = getScenarioOdds(contractDefinition);
+        if (isUseAltAdvancedMedical) {
+            // With Alt Advanced medical scenarios are much more dangerous, we reduce the tempo to account for this
+            scenarioOdds = max(5, (int) round(scenarioOdds * 0.66));
+        }
+        return scenarioOdds;
     }
 
     /**
@@ -302,7 +319,7 @@ public class StratConContractInitializer {
      * @author Illiani
      * @since 0.50.05
      */
-    private static int getScenarioOdds(StratConContractDefinition contractDefinition) {
+    public static int getScenarioOdds(StratConContractDefinition contractDefinition) {
         return contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
     }
 
@@ -350,7 +367,7 @@ public class StratConContractInitializer {
      */
     private static List<Integer> trackObjectDistribution(int numObjects, int numTracks) {
         // This ensures we're not at risk of dividing by 0
-        numTracks = Math.max(1, numTracks);
+        numTracks = max(1, numTracks);
 
         List<Integer> retVal = new ArrayList<>();
         int leftOver = numObjects % numTracks;
