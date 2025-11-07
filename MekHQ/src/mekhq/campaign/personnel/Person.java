@@ -149,6 +149,7 @@ import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -5936,7 +5937,7 @@ public class Person {
      *                                 calculations for technicians.
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
-        if (unit != null && unit.isDeployed()) {
+        if (unit != null && (unit.isDeployed() || StratConRulesManager.isUnitDeployedToStratCon(unit))) {
             this.minutesLeft = 0;
             this.overtimeLeft = 0;
             return;
