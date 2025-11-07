@@ -706,7 +706,6 @@ public class StratConScenarioWizard extends JDialog {
         btnCancel.setActionCommand("CANCEL_CLICK");
         btnCancel.setVisible(!isPrimaryForce);
         btnCancel.addActionListener(evt -> closeWizard());
-        btnCancel.setEnabled(true);
 
         // Configure layout constraints for the buttons
         constraints.gridwidth = GridBagConstraints.REMAINDER;
