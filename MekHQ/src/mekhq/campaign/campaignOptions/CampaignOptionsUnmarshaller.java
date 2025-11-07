@@ -100,6 +100,7 @@ public class CampaignOptionsUnmarshaller {
 
     private static void parseNodeName(Version version, String nodeName, CampaignOptions campaignOptions,
           String nodeContents, Node childNode) {
+        boolean wasUsingAtB = false;
         switch (nodeName) {
             case "checkMaintenance" -> campaignOptions.setCheckMaintenance(parseBoolean(nodeContents));
             case "maintenanceCycleDays" -> campaignOptions.setMaintenanceCycleDays(parseInt(nodeContents));
@@ -821,7 +822,7 @@ public class CampaignOptionsUnmarshaller {
                     campaignOptions.setPhenotypeProbability(i, parseInt(values[i]));
                 }
             }
-            case "useAtB" -> campaignOptions.setUseAtB(parseBoolean(nodeContents));
+            case "useAtB" -> wasUsingAtB = true; // < 50.10 compatibility handler
             case "useStratCon" -> campaignOptions.setUseStratCon(parseBoolean(nodeContents));
             case "useMaplessStratCon" -> campaignOptions.setUseStratConMaplessMode(parseBoolean(nodeContents));
             case "useAdvancedScouting" -> campaignOptions.setUseAdvancedScouting(parseBoolean(nodeContents));
@@ -897,6 +898,12 @@ public class CampaignOptionsUnmarshaller {
             case "factionStandingGainMultiplier" -> campaignOptions.setRegardMultiplier(parseDouble(
                   nodeContents, 1.0));
             default -> LOGGER.warn("Potentially unexpected entry in campaign options: {}", nodeName);
+        }
+
+        //  < 50.10 compatibility handler
+        if (wasUsingAtB && !campaignOptions.isUseStratCon()) {
+            // Mapless StratCon replaced AtB in 50.10
+            campaignOptions.setUseStratConMaplessMode(true);
         }
     }
 }
