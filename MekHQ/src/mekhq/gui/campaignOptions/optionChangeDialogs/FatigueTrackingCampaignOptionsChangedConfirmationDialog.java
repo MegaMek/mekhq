@@ -67,9 +67,9 @@ import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
-public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.MASHTheatreTrackingCampaignOptionsChangedConfirmationDialog";
+public class FatigueTrackingCampaignOptionsChangedConfirmationDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(FatigueTrackingCampaignOptionsChangedConfirmationDialog.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FatigueTrackingCampaignOptionsChangedConfirmationDialog";
 
     private final int PADDING = scaleForGUI(10);
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
@@ -78,7 +78,7 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
     private ImageIcon campaignIcon;
     private final Campaign campaign;
 
-    public MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
+    public FatigueTrackingCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
         this.campaignIcon = campaign.getCampaignFactionIcon();
         this.campaign = campaign;
 
@@ -153,7 +153,7 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         editorPane.setFocusable(false);
 
         String description = getFormattedTextAt(RESOURCE_BUNDLE,
-              "MASHTheatreTrackingCampaignOptionsChangedConfirmationDialog.description",
+              "FatigueTrackingCampaignOptionsChangedConfirmationDialog.description",
               spanOpeningWithCustomColor(getWarningColor()),
               CLOSING_SPAN_TAG);
         String fontStyle = "font-family: Noto Sans;";
@@ -173,11 +173,11 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         pnlButtons.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         RoundedJButton btnCancel = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.cancel"));
+              "FatigueTrackingCampaignOptionsChangedConfirmationDialog.cancel"));
         btnCancel.addActionListener(evt -> dispose());
 
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.confirm"));
+              "FatigueTrackingCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
             processFreeUnit(campaign);
             dispose();
@@ -191,9 +191,9 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
     }
 
     public static void processFreeUnit(Campaign campaign) {
-        MekSummary mekSummary = MekSummaryCache.getInstance().getMek("MASH Truck (Small)");
+        MekSummary mekSummary = MekSummaryCache.getInstance().getMek("Flatbed Truck (Kitchen)");
         if (mekSummary == null) {
-            LOGGER.error("Cannot find entry for {}", "MASH Truck (Small)");
+            LOGGER.error("Cannot find entry for {}", "Flatbed Truck (Kitchen)");
             return;
         }
 

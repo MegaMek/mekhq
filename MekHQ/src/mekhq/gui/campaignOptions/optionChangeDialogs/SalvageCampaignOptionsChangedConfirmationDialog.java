@@ -67,9 +67,9 @@ import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
-public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.MASHTheatreTrackingCampaignOptionsChangedConfirmationDialog";
+public class SalvageCampaignOptionsChangedConfirmationDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(SalvageCampaignOptionsChangedConfirmationDialog.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SalvageCampaignOptionsChangedConfirmationDialog";
 
     private final int PADDING = scaleForGUI(10);
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
@@ -78,7 +78,7 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
     private ImageIcon campaignIcon;
     private final Campaign campaign;
 
-    public MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
+    public SalvageCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
         this.campaignIcon = campaign.getCampaignFactionIcon();
         this.campaign = campaign;
 
@@ -153,7 +153,7 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         editorPane.setFocusable(false);
 
         String description = getFormattedTextAt(RESOURCE_BUNDLE,
-              "MASHTheatreTrackingCampaignOptionsChangedConfirmationDialog.description",
+              "SalvageCampaignOptionsChangedConfirmationDialog.description",
               spanOpeningWithCustomColor(getWarningColor()),
               CLOSING_SPAN_TAG);
         String fontStyle = "font-family: Noto Sans;";
@@ -173,13 +173,13 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         pnlButtons.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         RoundedJButton btnCancel = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.cancel"));
+              "SalvageCampaignOptionsChangedConfirmationDialog.cancel"));
         btnCancel.addActionListener(evt -> dispose());
 
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.confirm"));
+              "SalvageCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeUnit(campaign);
+            processFreeUnits(campaign);
             dispose();
         });
 
@@ -190,23 +190,30 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         return pnlButtons;
     }
 
-    public static void processFreeUnit(Campaign campaign) {
-        MekSummary mekSummary = MekSummaryCache.getInstance().getMek("MASH Truck (Small)");
-        if (mekSummary == null) {
-            LOGGER.error("Cannot find entry for {}", "MASH Truck (Small)");
-            return;
+    public static void processFreeUnits(Campaign campaign) {
+        int truckCount = campaign.getFaction().getFormationBaseSize();
+        if (campaign.isClanCampaign()) {
+            truckCount *= 2; // 2 vehicles per point
         }
 
-        try {
-            PartQuality quality = PartQuality.QUALITY_D;
-            if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
-                quality = UnitOrder.getRandomUnitQuality(0);
+        for (int i = 0; i < truckCount; i++) {
+            MekSummary mekSummary = MekSummaryCache.getInstance().getMek("BattleMech Recovery Vehicle");
+            if (mekSummary == null) {
+                LOGGER.error("Cannot find entry for {}", "enums");
+                return;
             }
-            campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
-        } catch (Exception e) {
-            LOGGER.error(e, "Unable to load entity: {}: {}. Returning none.",
-                  mekSummary.getSourceFile(),
-                  mekSummary.getEntryName());
+
+            try {
+                PartQuality quality = PartQuality.QUALITY_D;
+                if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+                    quality = UnitOrder.getRandomUnitQuality(0);
+                }
+                campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
+            } catch (Exception e) {
+                LOGGER.error(e, "Unable to load entity: {}: {}. Returning none.",
+                      mekSummary.getSourceFile(),
+                      mekSummary.getEntryName());
+            }
         }
     }
 }
