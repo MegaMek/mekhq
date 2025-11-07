@@ -192,7 +192,7 @@ public class AtBScenarioModifierApplicator {
                     int numClusters = Compute.randomInt(battleDamageIntensity);
 
                     for (int clusterCount = 0; clusterCount < numClusters; clusterCount++) {
-                        HitData hitData = en.rollHitLocation(ToHitData.HIT_NORMAL, Compute.randomInt(4));
+                        HitData hitData = en.rollHitLocation(ToHitData.HIT_NORMAL, Compute.randomInt(4), false);
                         int resultingArmor = Math.max(1, en.getArmor(hitData) - 5);
 
                         en.setArmor(resultingArmor, hitData);
