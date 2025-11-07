@@ -39,6 +39,7 @@ import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_EDGE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
@@ -258,7 +259,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
                 boolean isEdge = attribute == SkillAttribute.EDGE;
                 int delta;
                 if (isEdge && isUseEdge) {
-                    delta = d6(2) == 12 ? 1 : 0;
+                    delta = d6(2) == 12 ? 1 : MINIMUM_EDGE_SCORE;
                 } else {
                     delta = clamp(performTraitRoll(), MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
                 }

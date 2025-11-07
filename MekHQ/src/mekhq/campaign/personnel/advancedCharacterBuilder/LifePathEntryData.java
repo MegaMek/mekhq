@@ -43,6 +43,7 @@ import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathDataClas
 import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathDataClassLookup.SPA;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_EDGE_SCORE;
 
 import java.util.UUID;
 
@@ -265,8 +266,9 @@ public record LifePathEntryData(
      * @since 0.50.07
      */
     public int getSkillAttribute(SkillAttribute attribute) {
+        int minimumScore = attribute == SkillAttribute.EDGE ? MINIMUM_EDGE_SCORE : MINIMUM_ATTRIBUTE_SCORE;
         if (!SKILL_ATTRIBUTE.getLookupName().equalsIgnoreCase(classLookupName)) {
-            return MINIMUM_ATTRIBUTE_SCORE;
+            return minimumScore;
         }
 
         if (attribute == SkillAttribute.NONE) {
@@ -274,10 +276,10 @@ public record LifePathEntryData(
         }
 
         if (!attribute.getLookupName().equalsIgnoreCase(objectLookupName)) {
-            return MINIMUM_ATTRIBUTE_SCORE;
+            return minimumScore;
         }
 
-        return clamp(value, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+        return clamp(value, minimumScore, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     /**
