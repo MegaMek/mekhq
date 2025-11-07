@@ -201,12 +201,16 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         } else if (isVTOL) {
             personnel = personnel.stream()
                               .filter(person -> person.getPrimaryRole().isVTOLCrew() ||
-                                                      person.getSecondaryRole().isVTOLCrew())
+                                                      person.getSecondaryRole().isVTOLCrew() ||
+                                                      person.getPrimaryRole().isVehicleCrewExtended() ||
+                                                      person.getSecondaryRole().isVehicleCrewExtended())
                               .collect(Collectors.toList());
         } else if (isTank) {
             personnel = personnel.stream()
                               .filter(person -> person.getPrimaryRole().isVehicleCrewMember() ||
-                                                      person.getSecondaryRole().isVehicleCrewMember())
+                                                      person.getSecondaryRole().isVehicleCrewMember() ||
+                                                      person.getPrimaryRole().isVehicleCrewExtended() ||
+                                                      person.getSecondaryRole().isVehicleCrewExtended())
                               .collect(Collectors.toList());
         } else if (isSmallCraftOrJumpShip) {
             personnel = personnel.stream()
