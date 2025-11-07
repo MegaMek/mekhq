@@ -4839,7 +4839,7 @@ public class Unit implements ITechnology {
      * double-counting personnel who serve in multiple roles.</p>
      *
      * <p>Non-combat crew members (such as vessel crew and combat technicians) are excluded from this calculation as
-     * their Edge is handled separately through MekHQ's non-combat personnel system.<p>
+     * their Edge is handled separately through MekHQ's non-combat personnel system.</p>
      *
      * @param crewSize         the total size of the crew to use for calculating the average Edge value
      * @param isCommandersOnly {@code true} if the 'Commanders Only' option is enabled for this unit type
