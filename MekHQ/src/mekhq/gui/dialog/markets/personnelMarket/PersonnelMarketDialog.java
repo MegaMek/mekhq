@@ -38,6 +38,7 @@ import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
+import static mekhq.campaign.market.personnelMarket.markets.PersonnelMarketMekHQ.ALTERNATE_ADVANCED_MEDICAL_RECRUITMENT_MULTIPLIER;
 import static mekhq.gui.enums.PersonnelFilter.ACTIVE;
 import static mekhq.gui.enums.PersonnelFilter.ALL;
 import static mekhq.gui.enums.PersonnelFilter.getStandardPersonnelFilters;
@@ -310,6 +311,10 @@ public class PersonnelMarketDialog extends JDialog {
         int recruitmentSliderMaximum = campaignOptions.getPersonnelMarketStyle() != PERSONNEL_MARKET_DISABLED ?
                                              MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS :
                                              MAXIMUM_DAYS_IN_MONTH;
+        if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+            recruitmentSliderMaximum *= ALTERNATE_ADVANCED_MEDICAL_RECRUITMENT_MULTIPLIER;
+        }
+
         int recruitmentSliderCurrent = min(market.getRecruitmentRolls(), recruitmentSliderMaximum);
         JSlider personnelAvailabilitySlider = new JSlider(0, recruitmentSliderMaximum, recruitmentSliderCurrent);
         personnelAvailabilitySlider.setEnabled(false);
