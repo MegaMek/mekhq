@@ -4869,9 +4869,9 @@ public class Unit implements ITechnology {
                                                      !entity.hasETypeFlag(Entity.ETYPE_BATTLEARMOR);
         boolean isTank = entity instanceof Tank; // Includes Wet Naval and VTOLs
 
-        // For Tanks-type entities both drivers and gunners contribute to gunnery & piloting
-        List<Person> crew = getCompositeCrew(isTank);
-        for (Person person : crew) {
+        // For certain entities both drivers and gunners contribute to gunnery & piloting
+        List<Person> relevantCrew = getCompositeCrew(isTank || entityIsConventionalInfantry, true);
+        for (Person person : relevantCrew) {
             if (person.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
@@ -4896,9 +4896,9 @@ public class Unit implements ITechnology {
             }
         }
 
-        crew = getCompositeCrew(isTank);
+        relevantCrew = getCompositeCrew(isTank || entityIsConventionalInfantry, false);
         boolean smallArmsOnly = campaign.getCampaignOptions().isUseSmallArmsOnly();
-        for (Person person : crew) {
+        for (Person person : relevantCrew) {
             if (person.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
@@ -5040,11 +5040,24 @@ public class Unit implements ITechnology {
         entity.getCrew().setMissing(false, 0);
     }
 
-    private List<Person> getCompositeCrew(boolean isTank) {
-        if (isTank) {
+    /**
+     * Returns the appropriate list of personnel based on entity type and role.
+     *
+     * <p>For tank entities, this method returns the entire crew regardless of the role specified. For non-tank,
+     * non-infantry entities, it returns either the drivers or gunners list based on the {@code isDrivers} parameter.
+     *
+     * @param isTankOrInfantry {@code true} if the entity is a tank or infantry, {@code false} otherwise
+     * @param isDrivers        {@code true} to return drivers, {@code false} to return gunners (ignored if
+     *                         {@code isTankOrInfantry} is {@code true})
+     *
+     * @return a list of personnel; for tanks returns the full crew, for other entities returns either drivers or a copy
+     *       of the gunners list
+     */
+    private List<Person> getCompositeCrew(boolean isTankOrInfantry, boolean isDrivers) {
+        if (isTankOrInfantry) {
             return getCrew();
         } else {
-            return drivers;
+            return isDrivers ? drivers : new ArrayList<>(gunners);
         }
     }
 
