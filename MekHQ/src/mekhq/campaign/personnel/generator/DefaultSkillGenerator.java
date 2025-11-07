@@ -259,7 +259,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
                 boolean isEdge = attribute == SkillAttribute.EDGE;
                 int delta;
                 if (isEdge && isUseEdge) {
-                    delta = d6(2) == 12 ? 1 : MINIMUM_EDGE_SCORE;
+                    delta = d6(2) == 12 ? 1 : 0;
                 } else {
                     delta = clamp(performTraitRoll(), MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
                 }
