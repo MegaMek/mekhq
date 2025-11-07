@@ -4823,7 +4823,7 @@ public class Unit implements ITechnology {
                 entity.getCrew().setHits(commander.getHits(), 0);
             }
 
-            // Assign edge points to spacecraft and vehicle crews and infantry units This overwrites the Edge value
+            // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
             // assigned above (which will always be 0 in 0.50.10+).
             if (campaignOptions.isUseEdge()) {
                 setEdgeForCrew(usesSoloPilot() ? 1 : getCrew().size(), commanderOnly);
