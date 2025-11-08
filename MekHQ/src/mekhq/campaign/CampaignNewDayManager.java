@@ -1063,6 +1063,7 @@ public class CampaignNewDayManager {
         }
 
         // ok now we can check for other stuff we might need to do to units
+        int defaultRepairSite = AtBContract.getBestRepairLocation(campaign.getActiveAtBContracts());
         List<UUID> unitsToRemove = new ArrayList<>();
         for (Unit unit : hangar.getUnits()) {
             if (unit.isRefitting()) {
@@ -1080,6 +1081,7 @@ public class CampaignNewDayManager {
                           unit.getHyperlinkedName(),
                           spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                           CLOSING_SPAN_TAG));
+                    unit.setSite(defaultRepairSite);
                 }
             }
 
