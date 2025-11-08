@@ -101,7 +101,7 @@ public class InjuryLevelTest {
     @Test
     public void testIsMajorOrDeadly() {
         for (final InjuryLevel level : levels) {
-            if ((level == InjuryLevel.MAJOR) || (level == InjuryLevel.DEADLY)) {
+            if ((level == InjuryLevel.MAJOR) || (level == InjuryLevel.DEADLY) || (level == InjuryLevel.DISEASE)) {
                 assertTrue(level.isMajorOrDeadly());
             } else {
                 assertFalse(level.isMajorOrDeadly());

@@ -122,7 +122,8 @@ public class PersonnelStatusTest {
     @Test
     public void testIsDepartedUnit() {
         List<PersonnelStatus> deadStatuses = List.of(KIA, HOMICIDE, WOUNDS, DISEASE, ACCIDENTAL, NATURAL_CAUSES,
-              OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED, SUICIDE, BONDSREF, SEPPUKU);
+              OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED, SUICIDE, BONDSREF, SEPPUKU,
+              CONTAGIOUS_DISEASE);
         List<PersonnelStatus> validStatuses = List.of(RETIRED, RESIGNED, SACKED, DESERTED, DEFECTED, MISSING, LEFT,
               ENEMY_BONDSMAN, BACKGROUND_CHARACTER, IMPRISONED, DISHONORABLY_DISCHARGED);
 
@@ -135,11 +136,9 @@ public class PersonnelStatusTest {
 
     @Test
     public void testIsDead() {
-        List<PersonnelStatus> validStatuses = List.of(KIA, HOMICIDE, WOUNDS, DISEASE, ACCIDENTAL,
-              NATURAL_CAUSES, OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED,
-              SUICIDE,
-              BONDSREF,
-              SEPPUKU);
+        List<PersonnelStatus> validStatuses = List.of(KIA, HOMICIDE, WOUNDS, DISEASE, ACCIDENTAL, NATURAL_CAUSES,
+              OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED, SUICIDE, BONDSREF, SEPPUKU,
+              CONTAGIOUS_DISEASE);
 
         for (PersonnelStatus status : PersonnelStatus.values()) {
             boolean isDead = validStatuses.contains(status);
@@ -152,10 +151,7 @@ public class PersonnelStatusTest {
     public void testIsDeadOrMIA() {
         List<PersonnelStatus> validStatuses = List.of(KIA, HOMICIDE, WOUNDS, DISEASE, ACCIDENTAL,
               NATURAL_CAUSES, OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED,
-              SUICIDE,
-              BONDSREF,
-              MIA,
-              SEPPUKU);
+              SUICIDE, BONDSREF, MIA, SEPPUKU, CONTAGIOUS_DISEASE);
 
         for (PersonnelStatus status : PersonnelStatus.values()) {
             boolean isDeadOrMIA = validStatuses.contains(status);
