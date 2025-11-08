@@ -164,8 +164,6 @@ public class FactionAccoladeEvent {
 
             ImmersiveDialogWidth dialogWidth;
             if (accoladeLevel.is(APPEARING_IN_SEARCHES) ||
-                      accoladeLevel.is(TAKING_NOTICE_0) ||
-                      accoladeLevel.is(TAKING_NOTICE_1) ||
                       isCashReward) {
                 dialogWidth = ImmersiveDialogWidth.MEDIUM;
             } else {
