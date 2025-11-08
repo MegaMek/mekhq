@@ -407,9 +407,14 @@ public class Inoculations {
         Set<InjuryType> activeDiseases = getActiveDiseases(allPersonnel);
         int diseaseChance = activeDiseases.isEmpty() ? MONTHLY_NEW_DISEASE_CHANCE : MONTHLY_DISEASE_SPREAD_CHANCE;
 
-        // If there are no active diseases, add one
         if (activeDiseases.isEmpty()) {
-            activeDiseases.add(DiseaseService.catchRandomDisease());
+            if (planetCode != null) {
+                // If there are no active diseases, add one
+                activeDiseases.add(DiseaseService.catchRandomDisease());
+            } else {
+                // No new diseases are introduced while in transit
+                return;
+            }
         }
 
         // Now roll for the spread of disease among vaccine dodgers
@@ -529,8 +534,7 @@ public class Inoculations {
      * Triggers campaign reports for diseases that have spread.
      *
      * <p>Displays colored alerts for each spreading disease. Alert color is red if in transit (higher danger) or
-     * yellow
-     * if on a planet.</p>
+     * yellow if on a planet.</p>
      *
      * @param campaign          the current campaign
      * @param isInTransit       true if the campaign is in transit between planets
