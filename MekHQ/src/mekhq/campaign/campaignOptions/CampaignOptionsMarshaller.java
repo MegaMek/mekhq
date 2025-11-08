@@ -156,6 +156,7 @@ public class CampaignOptionsMarshaller {
               campaignOptions.getAcquisitionPersonnelCategory().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techLevel", campaignOptions.getTechLevel());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitTransitTime", campaignOptions.getUnitTransitTime());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noDeliveriesInTransit", campaignOptions.isNoDeliveriesInTransit());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryAcquisition",
               campaignOptions.isUsePlanetaryAcquisition());
         MHQXMLUtility.writeSimpleXMLTag(pw,

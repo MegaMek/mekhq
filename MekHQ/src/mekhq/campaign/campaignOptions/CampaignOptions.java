@@ -188,6 +188,7 @@ public class CampaignOptions {
 
     // Delivery
     private int unitTransitTime;
+    private boolean noDeliveriesInTransit;
 
     // Planetary Acquisition
     private boolean usePlanetaryAcquisition;
@@ -770,6 +771,7 @@ public class CampaignOptions {
 
         // Delivery
         unitTransitTime = TRANSIT_UNIT_MONTH;
+        noDeliveriesInTransit = false;
 
         // Planetary Acquisition
         usePlanetaryAcquisition = false;
@@ -4480,6 +4482,14 @@ public class CampaignOptions {
 
     public void setUnitTransitTime(final int unitTransitTime) {
         this.unitTransitTime = unitTransitTime;
+    }
+
+    public boolean isNoDeliveriesInTransit() {
+        return noDeliveriesInTransit;
+    }
+
+    public void setNoDeliveriesInTransit(final boolean noDeliveriesInTransit) {
+        this.noDeliveriesInTransit = noDeliveriesInTransit;
     }
 
     public boolean isUsePlanetaryAcquisition() {

@@ -156,6 +156,7 @@ public class CampaignOptionsUnmarshaller {
             case "acquisitionSkill" -> campaignOptions.setAcquisitionSkill(nodeContents);
             case "useFunctionalAppraisal" -> campaignOptions.setUseFunctionalAppraisal(parseBoolean(nodeContents));
             case "unitTransitTime" -> campaignOptions.setUnitTransitTime(parseInt(nodeContents));
+            case "noDeliveriesInTransit" -> campaignOptions.setNoDeliveriesInTransit(parseBoolean(nodeContents));
             case "clanAcquisitionPenalty" -> campaignOptions.setClanAcquisitionPenalty(parseInt(nodeContents));
             case "isAcquisitionPenalty" -> campaignOptions.setIsAcquisitionPenalty(parseInt(nodeContents));
             case "usePlanetaryAcquisition" -> campaignOptions.setPlanetaryAcquisition(parseBoolean(nodeContents));
