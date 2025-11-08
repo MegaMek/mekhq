@@ -51,12 +51,11 @@ public class MedicalLogger {
     private static final ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
           MekHQ.getMHQOptions().getLocale());
 
-    public static MedicalLogEntry inoculation(Person person, LocalDate date, String planetName) {
-        String message = logEntriesResourceMap.getString("inoculation.text");
+    public static void inoculation(Person person, LocalDate date, String planetName) {
+        String message = String.format(logEntriesResourceMap.getString("inoculation.text"), planetName);
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date,
-              String.format(message, planetName));
+              MessageFormat.format(message, planetName));
         person.addMedicalLogEntry(medicalLogEntry);
-        return medicalLogEntry;
     }
 
     public static MedicalLogEntry severedSpine(Person person, LocalDate date) {

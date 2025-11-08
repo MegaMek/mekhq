@@ -39,7 +39,12 @@ public class Inoculations {
 
     private static final int MONTHLY_NEW_DISEASE_CHANCE = 250;
     private static final int MONTHLY_DISEASE_SPREAD_CHANCE = 50;
-    private static final int INOCULATION_COST_PER_PERSON = 50;
+
+    // ATOW says 50 C-Bills/Person; we've increased it as these vaccines are 100% effective, unlike those in ATOW.
+    // They also don't require MedTech checks, and they don't run the risk of an allergic reaction or failing. That
+    // suggests these are higher quality. Also, this whole mechanic is meant to be a money sink, so it needs to have
+    // some teeth.
+    private static final int INOCULATION_COST_PER_PERSON = 200;
 
     private static final int DIALOG_CHOICE_EVERYBODY = 0;
     private static final int DIALOG_CHOICE_MILITARY = 1;
@@ -53,6 +58,8 @@ public class Inoculations {
             return;
         }
         Planet currentPlanet = location.getPlanet();
+        LocalDate today = campaign.getLocalDate();
+        String planetName = currentPlanet.getName(today);
 
         // Determine who, if anyone, needs inoculations
         Collection<Person> allPersonnel = campaign.getPersonnel();
@@ -61,6 +68,8 @@ public class Inoculations {
         gatherPersonnelInNeedOfInoculations(allPersonnel, currentPlanet.getId(), civilianPersonnel, militaryPersonnel);
 
         if (militaryPersonnel.isEmpty() && civilianPersonnel.isEmpty()) { // Nobody needs treatment
+            new ImmersiveDialogNotification(campaign,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "Inoculations.fullVaccinated", planetName), true);
             return;
         }
 
@@ -68,13 +77,11 @@ public class Inoculations {
         Money civilianInoculationCost = Money.of(INOCULATION_COST_PER_PERSON).multipliedBy(civilianPersonnel.size());
         Money totalInoculationCost = militaryInoculationCost.plus(civilianInoculationCost);
 
-        LocalDate today = campaign.getLocalDate();
-
         ImmersiveDialogSimple dialog = null;
         boolean wasConfirmed = false;
         while (!wasConfirmed) {
             dialog = triggerDialog(campaign,
-                  currentPlanet.getName(today),
+                  planetName,
                   militaryInoculationCost.toAmountString(),
                   civilianInoculationCost.toAmountString(),
                   totalInoculationCost.toAmountString(),
