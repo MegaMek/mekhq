@@ -161,7 +161,7 @@ public class PerformResupply {
         }
 
         final boolean isIndependent = contract.getCommandRights().isIndependent();
-        final boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
+        final boolean isGuerrilla = contract.getContractType().isGuerrillaType();
         final boolean isPirate = PIRATE_FACTION_CODE.equals(contract.getEmployerCode());
         final ResupplyType resupplyType = resupply.getResupplyType();
 

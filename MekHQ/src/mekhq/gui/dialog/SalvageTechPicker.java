@@ -47,11 +47,15 @@ import java.util.Map;
 import java.util.UUID;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.preferences.JWindowPreference;
@@ -61,6 +65,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.sorter.LevelSorter;
 
 /**
  * Modal dialog that lets the user pick one or more salvage technicians from a tabular list. The table supports sorting,
@@ -85,7 +90,7 @@ public class SalvageTechPicker extends JDialog {
     private static final int WIDTH_100 = scaleForGUI(100);
 
     private boolean wasConfirmed;
-    private SalvageTechTableModel tableModel;
+    private final SalvageTechTableModel tableModel;
 
     /**
      * Checks whether the user confirmed their tech selection.
@@ -152,10 +157,10 @@ public class SalvageTechPicker extends JDialog {
         @SuppressWarnings("unchecked")
         TableRowSorter<SalvageTechTableModel> sorter =
               (TableRowSorter<SalvageTechTableModel>) table.getRowSorter();
-        List<javax.swing.RowSorter.SortKey> sortKeys = new ArrayList<>();
-        sortKeys.add(new javax.swing.RowSorter.SortKey(
+        List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        sortKeys.add(new RowSorter.SortKey(
               SalvageTechTableModel.COL_SELECT,
-              javax.swing.SortOrder.DESCENDING));
+              SortOrder.DESCENDING));
         sorter.setSortKeys(sortKeys);
 
         assignWidths(table);
@@ -186,7 +191,7 @@ public class SalvageTechPicker extends JDialog {
      */
     private static void setRenderers(JTable table) {
         table.getColumnModel().getColumn(SalvageTechTableModel.COL_SELECT).setCellRenderer(
-              new javax.swing.table.DefaultTableCellRenderer() {
+              new DefaultTableCellRenderer() {
                   private final JCheckBox checkBox = new JCheckBox();
 
                   @Override
@@ -195,7 +200,7 @@ public class SalvageTechPicker extends JDialog {
                         boolean hasFocus, int row, int column) {
                       checkBox.setSelected(value != null && (Boolean) value);
                       checkBox.setHorizontalAlignment(
-                            javax.swing.JLabel.CENTER);
+                            JLabel.CENTER);
                       checkBox.setBackground(
                             isSelected ? table.getSelectionBackground()
                                   : table.getBackground());
@@ -282,7 +287,7 @@ public class SalvageTechPicker extends JDialog {
             sorter.setComparator(SalvageTechTableModel.COL_LAST_NAME,
                   new NaturalOrderComparator());
             sorter.setComparator(SalvageTechTableModel.COL_SKILL_LEVEL,
-                  new NaturalOrderComparator());
+                  new LevelSorter());
             sorter.setComparator(SalvageTechTableModel.COL_INJURIES,
                   Comparator.comparingInt(i -> ((int) i)));
             sorter.setComparator(

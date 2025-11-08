@@ -317,7 +317,7 @@ public class CampaignGUI extends JPanel {
         addStandardTab(MHQTabType.INFIRMARY);
         addStandardTab(MHQTabType.MEK_LAB);
         addStandardTab(MHQTabType.FINANCES);
-        
+
         boolean isMaplessMode = getCampaign().getCampaignOptions().isUseStratConMaplessMode();
         int stratConTabIndex = tabMain.indexOfTab(MHQTabType.STRAT_CON.toString());
 
@@ -2007,7 +2007,7 @@ public class CampaignGUI extends JPanel {
                 name = "<html>" +
                              tech.getFullName() +
                              ", <b>" +
-                             SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)) +
+                             SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false, true)) +
                              "</b> " +
                              tech.getPrimaryRoleDesc() +
                              " (" +
@@ -2149,7 +2149,7 @@ public class CampaignGUI extends JPanel {
                 if (!ignoreMaintenance) {
                     time -= Math.max(0, tech.getMaintenanceTimeUsing());
                 }
-                SkillModifierData skillModifierData = tech.getSkillModifierData();
+                SkillModifierData skillModifierData = tech.getSkillModifierData(true);
                 name = tech.getFullTitle() +
                              ", " +
                              getExperienceLevelName(tech.getSkillForWorkingOn(unit)

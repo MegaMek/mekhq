@@ -1738,7 +1738,7 @@ public class Campaign implements ITechManager {
 
     public TransportCostCalculations getTransportCostCalculation(int crewExperienceLevel) {
         return new TransportCostCalculations(getHangar().getUnits(),
-              getPersonnel(),
+              getPersonnelFilteringOutDepartedAndAbsent(),
               getCargoStatistics(),
               getHangarStatistics(),
               crewExperienceLevel);
@@ -2171,7 +2171,7 @@ public class Campaign implements ITechManager {
     }
 
     public boolean getMashTheatresWithinCapacity() {
-        return mashTheatreCapacity >= getPatientsAssignedToDoctors().size();
+        return isOnContractAndPlanetside() || mashTheatreCapacity >= getPatientsAssignedToDoctors().size();
     }
 
     public int getMashTheatreCapacity() {
@@ -3307,7 +3307,7 @@ public class Campaign implements ITechManager {
 
         // Return the tech collection sorted worst to best Skill Level, or reversed if we want elites first
         techs.sort(Comparator.comparingInt(person -> person.getSkillLevel(this,
-              !person.getPrimaryRole().isTech() && person.getSecondaryRole().isTechSecondary()).ordinal()));
+              !person.getPrimaryRole().isTech() && person.getSecondaryRole().isTechSecondary(), true).ordinal()));
 
         if (eliteFirst) {
             Collections.reverse(techs);
@@ -4665,7 +4665,7 @@ public class Campaign implements ITechManager {
                       (!getCampaignOptions().isDestroyByMargin()
                              // if a legendary, primary tech and destroy by margin is NOT on
                              &&
-                             ((tech.getExperienceLevel(this, false) == SkillType.EXP_LEGENDARY) ||
+                             ((tech.getExperienceLevel(this, false, true) == SkillType.EXP_LEGENDARY) ||
                                     tech.getPrimaryRole().isVesselCrew())) // For vessel crews
                             && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);

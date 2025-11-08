@@ -81,27 +81,15 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                     recruit = campaign.newPerson(PersonnelRole.BA_TECH);
                 } else if (secondaryRoll < 4) {
                     recruit = campaign.newPerson(PersonnelRole.MECHANIC);
-                } else if (secondaryRoll == 4 && campaign.getCampaignOptions().isUseAero()) {
+                } else if (secondaryRoll == 4) {
                     recruit = campaign.newPerson(PersonnelRole.AERO_TEK);
                 } else {
                     recruit = campaign.newPerson(PersonnelRole.MEK_TECH);
                 }
             } else if (roll == 4 || roll == 10) {
                 recruit = campaign.newPerson(PersonnelRole.MEKWARRIOR);
-            } else if (roll == 5 && campaign.getCampaignOptions().isUseAero()) {
-                recruit = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT);
-            } else if (roll == 5 && campaign.getFaction().isClan()) {
-                recruit = campaign.newPerson(PersonnelRole.MEKWARRIOR);
             } else if (roll == 5) {
-                int secondaryRoll = Compute.d6(2);
-                if (secondaryRoll == 2) {
-                    recruit = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL);
-                    // Frequency based on frequency of VTOLs in Xotl 3028 Merc/General
-                } else if (secondaryRoll <= 5) {
-                    recruit = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
-                } else {
-                    recruit = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
-                }
+                recruit = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT);
             } else if (roll == 6 || roll == 8) {
                 if (campaign.getFaction().isClan() && (campaign.getGameYear() > 2870) && (Compute.d6(2) > 3)) {
                     recruit = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR);

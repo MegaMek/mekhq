@@ -176,7 +176,7 @@ public class Fatigue {
      */
     public static void processFatigueActions(Campaign campaign, Person person) {
         int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
-              person.getSkillLevel(campaign, false));
+              person.getSkillLevel(campaign, false, true));
 
         if (!campaign.getCampaignOptions().isUseFatigue()) {
             return;
@@ -261,7 +261,7 @@ public class Fatigue {
                 for (Person person : unit.getCrew()) {
                     int fatigue = person.getFatigue();
                     boolean isClan = person.isClanPersonnel();
-                    SkillLevel experienceLevel = person.getSkillLevel(campaign, false);
+                    SkillLevel experienceLevel = person.getSkillLevel(campaign, false, true);
                     int effectiveFatigue = getEffectiveFatigue(fatigue, isClan, experienceLevel);
 
                     if (effectiveFatigue >= leaveThreshold) {

@@ -702,6 +702,11 @@ public class StratConScenarioWizard extends JDialog {
             btnCommit.addActionListener(evt -> reinforcementConfirmDialog());
         }
 
+        JButton btnCancel = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCancel.text"));
+        btnCancel.setActionCommand("CANCEL_CLICK");
+        btnCancel.setVisible(!isPrimaryForce);
+        btnCancel.addActionListener(evt -> closeWizard());
+
         // Configure layout constraints for the buttons
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.anchor = GridBagConstraints.CENTER;
@@ -730,6 +735,8 @@ public class StratConScenarioWizard extends JDialog {
         // Align and add cancel button to the content panel
         constraints.gridy++;
         constraints.gridheight = GridBagConstraints.REMAINDER;
+        constraints.anchor = GridBagConstraints.WEST;
+        contentPanel.add(btnCancel, constraints);
         constraints.anchor = GridBagConstraints.CENTER;
 
         // Add the commit button to the content panel

@@ -2077,15 +2077,7 @@ public class AtBDynamicScenarioFactory {
         // return getEntityByName("Heavy Tracked APC", params.getFaction(), skill, campaign);
         // return getEntityByName("Badger (C) Tracked Transport B", params.getFaction(), skill, campaign);
 
-        if (campaign.getCampaignOptions().isOpForUsesVTOLs()) {
-            params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
-        } else {
-            if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
-                params.setFilter(mekSummary -> !mekSummary.isClan() && !mekSummary.getUnitType().equals("VTOL"));
-            } else {
-                params.setFilter(mekSummary -> !mekSummary.getUnitType().equals("VTOL"));
-            }
-        }
+        params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
 
         MekSummary unitData = campaign.getUnitGenerator().generate(params);
 
@@ -3080,9 +3072,7 @@ public class AtBDynamicScenarioFactory {
 
             // If ground vehicles are permitted in general and by environmental conditions,
             // and for Clans if this is a Clan faction, then use them. Otherwise, only use Meks.
-            if (campaign.getCampaignOptions().isUseVehicles() &&
-                      allowTanks &&
-                      (!faction.isClan() || (faction.isClan() && campaign.getCampaignOptions().isClanVehicles()))) {
+            if (allowTanks) {
 
                 // some specialized logic for clan op fors
                 // if we're in the late republic or dark ages, clans no longer have the luxury
@@ -3250,7 +3240,7 @@ public class AtBDynamicScenarioFactory {
 
         // Random determination of Mek or ground vehicle
         int roll = d6(2);
-        int unitType = campaign.getCampaignOptions().isClanVehicles() && (roll <= vehicleTarget) ? TANK : MEK;
+        int unitType = roll <= vehicleTarget ? TANK : MEK;
 
         if ((campaign.getGameYear() >= 3057) && (randomInt(100) < 6)) {
             unitType = PROTOMEK;

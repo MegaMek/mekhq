@@ -59,6 +59,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
@@ -137,13 +138,14 @@ public class TransportCostCalculations {
     static final double PASSENGERS_COST = INFANTRY_COST;
 
     private final Collection<Unit> hangarContents;
-    private final Collection<Person> personnel;
+    private final Collection<Person> allPersonnel;
     private final CargoStatistics cargoStatistics;
     private final HangarStatistics hangarStatistics;
     private final int crewExperienceLevel;
 
     private double additionalCargoSpaceRequired;
     private double cargoBayCost;
+    private double tetrisMasterMultiplier = 1.0;
     private int requiredCargoDropShips;
 
     private int additionalSmallCraftBaysRequired;
@@ -408,7 +410,7 @@ public class TransportCostCalculations {
      * Constructs a new TransportCostCalculations class for evaluating jump and transport costs.
      *
      * @param hangarContents      The contents of the campaign's {@link Hangar}
-     * @param personnel           The {@link Person} list representing personnel to be transported.
+     * @param allPersonnel        The {@link Person} list representing personnel to be transported.
      * @param cargoStatistics     The {@link CargoStatistics} describing cargo loads.
      * @param hangarStatistics    The {@link HangarStatistics} listing all available bay capacities.
      * @param crewExperienceLevel The experience level to use for crew-related cost multipliers.
@@ -416,14 +418,37 @@ public class TransportCostCalculations {
      * @author Illiani
      * @since 50.10
      */
-    public TransportCostCalculations(final Collection<Unit> hangarContents, final Collection<Person> personnel,
+    public TransportCostCalculations(final Collection<Unit> hangarContents, final Collection<Person> allPersonnel,
           final CargoStatistics cargoStatistics, final HangarStatistics hangarStatistics,
           final int crewExperienceLevel) {
         this.hangarContents = hangarContents;
-        this.personnel = personnel;
         this.cargoStatistics = cargoStatistics;
         this.hangarStatistics = hangarStatistics;
         this.crewExperienceLevel = crewExperienceLevel;
+        this.allPersonnel = allPersonnel;
+
+        setTetrisMasterMultiplier();
+    }
+
+    /**
+     * Calculates and sets the Tetris Master multiplier based on active personnel.
+     *
+     * <p>This method examines all active personnel in the provided collection and increments the
+     * tetrisMasterMultiplier by 0.05 (5%) for each person who has the ADMIN_TETRIS_MASTER personnel option enabled. The
+     * multiplier accumulates across all qualifying personnel.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void setTetrisMasterMultiplier() {
+        Collection<Person> activePersonnel = allPersonnel.stream()
+                                                   .filter(p -> p.getStatus().isActive())
+                                                   .toList();
+        for (Person person : activePersonnel) {
+            if (person.getOptions().booleanOption(PersonnelOptions.ADMIN_TETRIS_MASTER)) {
+                tetrisMasterMultiplier += 0.05;
+            }
+        }
     }
 
     /**
@@ -543,7 +568,7 @@ public class TransportCostCalculations {
      * @since 50.10
      */
     void calculateCargoRequirements() {
-        final double totalCargoCapacity = cargoStatistics.getTotalCargoCapacity();
+        double totalCargoCapacity = getTotalCargoCapacity();
 
         double totalCargoUsage = cargoStatistics.getCargoTonnage(false, false);
         totalCargoUsage += cargoStatistics.getCargoTonnage(false, true);
@@ -556,6 +581,12 @@ public class TransportCostCalculations {
         additionalDropShipsRequired += requiredCargoDropShips;
 
         totalCost = totalCost.plus(cargoBayCost);
+    }
+
+    private double getTotalCargoCapacity() {
+        double totalCargoCapacity = cargoStatistics.getTotalCargoCapacity();
+        totalCargoCapacity *= tetrisMasterMultiplier;
+        return totalCargoCapacity;
     }
 
     /**
@@ -719,14 +750,7 @@ public class TransportCostCalculations {
      * @since 50.10
      */
     void calculateAdditionalBayRequirementsFromPassengers(int passengerCapacity) {
-        int passengerCount = 0;
-        for (Person person : personnel) {
-            if (person.getStatus().isAbsent() || person.getStatus().isDepartedUnit()) {
-                continue;
-            }
-            passengerCount++;
-        }
-
+        int passengerCount = allPersonnel.size();
         int additionalPassengerNeeds = max(0, passengerCount - passengerCapacity);
         additionalPassengerBaysRequired = (int) ceil(additionalPassengerNeeds / PASSENGERS_PER_BAY);
         additionalPassengerBaysCost = round(additionalPassengerBaysRequired * PASSENGERS_COST);

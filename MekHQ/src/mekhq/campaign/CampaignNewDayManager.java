@@ -470,8 +470,9 @@ public class CampaignNewDayManager {
                         false), campaignOptions.getFieldKitchenCapacity());
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, false),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
-            campaign.setFieldKitchenWithinCapacity(areFieldKitchensWithinCapacity(fieldKitchenCapacity,
-                  fieldKitchenUsage));
+            boolean withinCapacity = campaign.isOnContractAndPlanetside() ||
+                                           areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
+            campaign.setFieldKitchenWithinCapacity(withinCapacity);
         } else {
             campaign.setFieldKitchenWithinCapacity(false);
         }
@@ -1007,6 +1008,16 @@ public class CampaignNewDayManager {
             // If the part is currently in-transit...
             if (!part.isPresent()) {
                 // ... decrement the number of days until it arrives...
+                int newDaysToArrival = part.getDaysToArrival() - 1;
+
+                // If we're in transit and we don't allow deliveries while in transit the part will remain fixed with
+                // a delivery time of 1 day until we arrive at our destination.
+                if (campaignOptions.isNoDeliveriesInTransit() &&
+                          !campaign.getLocation().isOnPlanet() &&
+                          newDaysToArrival <= 0) {
+                    return;
+                }
+
                 part.setDaysToArrival(part.getDaysToArrival() - 1);
 
                 if (part.isPresent()) {
@@ -1067,6 +1078,7 @@ public class CampaignNewDayManager {
         }
 
         // ok now we can check for other stuff we might need to do to units
+        int defaultRepairSite = AtBContract.getBestRepairLocation(campaign.getActiveAtBContracts());
         List<UUID> unitsToRemove = new ArrayList<>();
         for (Unit unit : hangar.getUnits()) {
             if (unit.isRefitting()) {
@@ -1076,7 +1088,7 @@ public class CampaignNewDayManager {
                 campaign.workOnMothballingOrActivation(unit);
             }
             if (!unit.isPresent()) {
-                unit.checkArrival();
+                unit.checkArrival(!campaign.getLocation().isOnPlanet() && campaignOptions.isNoDeliveriesInTransit());
 
                 // Has unit just been delivered?
                 if (unit.isPresent()) {
@@ -1084,6 +1096,7 @@ public class CampaignNewDayManager {
                           unit.getHyperlinkedName(),
                           spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                           CLOSING_SPAN_TAG));
+                    unit.setSite(defaultRepairSite);
                 }
             }
 
@@ -1570,7 +1583,7 @@ public class CampaignNewDayManager {
      * @param contract the {@link AtBContract} for which resupply is being processed
      */
     private void processResupply(AtBContract contract) {
-        boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare()
+        boolean isGuerrilla = contract.getContractType().isGuerrillaType()
                                     || PIRATE_FACTION_CODE.equals(contract.getEmployerCode());
 
         if (!isGuerrilla || randomInt(4) == 0) {

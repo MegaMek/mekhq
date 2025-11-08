@@ -187,6 +187,7 @@ public class PersonnelTab {
     private JCheckBox chkUseRandomHitsForVehicles;
     private JCheckBox chkUseTougherHealing;
     private JCheckBox chkUseAlternativeAdvancedMedical;
+    private JCheckBox chkUseKinderAlternativeAdvancedMedical;
     private JCheckBox chkUseRandomDiseases;
     private JLabel lblMaximumPatients;
     private JSpinner spnMaximumPatients;
@@ -278,6 +279,7 @@ public class PersonnelTab {
         chkUseRandomHitsForVehicles = new JCheckBox();
         chkUseTougherHealing = new JCheckBox();
         chkUseAlternativeAdvancedMedical = new JCheckBox();
+        chkUseKinderAlternativeAdvancedMedical = new JCheckBox();
         chkUseRandomDiseases = new JCheckBox();
 
         lblMaximumPatients = new JLabel();
@@ -850,6 +852,10 @@ public class PersonnelTab {
         chkUseAlternativeAdvancedMedical.addMouseListener(createTipPanelUpdater(medicalHeader,
               "UseAlternativeAdvancedMedical"));
 
+        chkUseKinderAlternativeAdvancedMedical = new CampaignOptionsCheckBox("UseKinderAlternativeAdvancedMedical");
+        chkUseKinderAlternativeAdvancedMedical.addMouseListener(createTipPanelUpdater(medicalHeader,
+              "UseKinderAlternativeAdvancedMedical"));
+
         chkUseRandomDiseases = new CampaignOptionsCheckBox("UseRandomDiseases");
         chkUseRandomDiseases.addMouseListener(createTipPanelUpdater(medicalHeader,
               "UseRandomDiseases"));
@@ -936,6 +942,8 @@ public class PersonnelTab {
         panelRight.add(chkUseTougherHealing, layoutRight);
         layoutRight.gridy++;
         panelRight.add(chkUseAlternativeAdvancedMedical, layoutRight);
+        layoutRight.gridy++;
+        panelRight.add(chkUseKinderAlternativeAdvancedMedical, layoutRight);
         layoutRight.gridy++;
         panelRight.add(chkUseRandomDiseases, layoutRight);
 
@@ -1396,13 +1404,14 @@ public class PersonnelTab {
         txtAwardSetFilterList.setText(options.getAwardSetFilterList());
 
         // Medical
-        chkUseAdvancedMedical.setSelected(options.isUseAdvancedMedical());
+        chkUseAdvancedMedical.setSelected(options.isUseAdvancedMedicalDirect());
         spnHealWaitingPeriod.setValue(options.getHealingWaitingPeriod());
         spnNaturalHealWaitingPeriod.setValue(options.getNaturalHealingWaitingPeriod());
         spnMinimumHitsForVehicles.setValue(options.getMinimumHitsForVehicles());
         chkUseRandomHitsForVehicles.setSelected(options.isUseRandomHitsForVehicles());
         chkUseTougherHealing.setSelected(options.isTougherHealing());
         chkUseAlternativeAdvancedMedical.setSelected(options.isUseAlternativeAdvancedMedical());
+        chkUseKinderAlternativeAdvancedMedical.setSelected(options.isUseKinderAlternativeAdvancedMedical());
         chkUseRandomDiseases.setSelected(options.isUseRandomDiseases());
         spnMaximumPatients.setValue(options.getMaximumPatients());
         chkDoctorsUseAdministration.setSelected(options.isDoctorsUseAdministration());
@@ -1504,6 +1513,7 @@ public class PersonnelTab {
         options.setUseRandomHitsForVehicles(chkUseRandomHitsForVehicles.isSelected());
         options.setTougherHealing(chkUseTougherHealing.isSelected());
         options.setUseAlternativeAdvancedMedical(chkUseAlternativeAdvancedMedical.isSelected());
+        options.setUseKinderAlternativeAdvancedMedical(chkUseKinderAlternativeAdvancedMedical.isSelected());
         options.setUseRandomDiseases(chkUseRandomDiseases.isSelected());
         options.setMaximumPatients((int) spnMaximumPatients.getValue());
         options.setDoctorsUseAdministration(chkDoctorsUseAdministration.isSelected());

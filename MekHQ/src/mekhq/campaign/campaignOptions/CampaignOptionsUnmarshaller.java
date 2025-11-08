@@ -156,6 +156,7 @@ public class CampaignOptionsUnmarshaller {
             case "acquisitionSkill" -> campaignOptions.setAcquisitionSkill(nodeContents);
             case "useFunctionalAppraisal" -> campaignOptions.setUseFunctionalAppraisal(parseBoolean(nodeContents));
             case "unitTransitTime" -> campaignOptions.setUnitTransitTime(parseInt(nodeContents));
+            case "noDeliveriesInTransit" -> campaignOptions.setNoDeliveriesInTransit(parseBoolean(nodeContents));
             case "clanAcquisitionPenalty" -> campaignOptions.setClanAcquisitionPenalty(parseInt(nodeContents));
             case "isAcquisitionPenalty" -> campaignOptions.setIsAcquisitionPenalty(parseInt(nodeContents));
             case "usePlanetaryAcquisition" -> campaignOptions.setPlanetaryAcquisition(parseBoolean(nodeContents));
@@ -359,6 +360,8 @@ public class CampaignOptionsUnmarshaller {
             case "tougherHealing" -> campaignOptions.setTougherHealing(parseBoolean(nodeContents));
             case "useAlternativeAdvancedMedical" ->
                   campaignOptions.setUseAlternativeAdvancedMedical(parseBoolean(nodeContents));
+            case "useKinderAlternativeAdvancedMedical" ->
+                  campaignOptions.setUseKinderAlternativeAdvancedMedical(parseBoolean(nodeContents));
             case "useRandomDiseases" -> campaignOptions.setUseRandomDiseases(parseBoolean(nodeContents));
             case "maximumPatients" -> campaignOptions.setMaximumPatients(parseInt(nodeContents));
             case "doctorsUseAdministration" -> campaignOptions.setDoctorsUseAdministration(parseBoolean(
@@ -826,17 +829,11 @@ public class CampaignOptionsUnmarshaller {
             case "useStratCon" -> campaignOptions.setUseStratCon(parseBoolean(nodeContents));
             case "useMaplessStratCon" -> campaignOptions.setUseStratConMaplessMode(parseBoolean(nodeContents));
             case "useAdvancedScouting" -> campaignOptions.setUseAdvancedScouting(parseBoolean(nodeContents));
-            case "useAero" -> campaignOptions.setUseAero(parseBoolean(nodeContents));
-            case "useVehicles" -> campaignOptions.setUseVehicles(parseBoolean(nodeContents));
-            case "clanVehicles" -> campaignOptions.setClanVehicles(parseBoolean(nodeContents));
             case "useGenericBattleValue" -> campaignOptions.setUseGenericBattleValue(parseBoolean(nodeContents));
             case "useVerboseBidding" -> campaignOptions.setUseVerboseBidding(parseBoolean(nodeContents));
-            case "doubleVehicles" -> campaignOptions.setDoubleVehicles(parseBoolean(nodeContents));
-            case "adjustPlayerVehicles" -> campaignOptions.setAdjustPlayerVehicles(parseBoolean(nodeContents));
             case "opForLanceTypeMeks" -> campaignOptions.setOpForLanceTypeMeks(parseInt(nodeContents));
             case "opForLanceTypeMixed" -> campaignOptions.setOpForLanceTypeMixed(parseInt(nodeContents));
             case "opForLanceTypeVehicles" -> campaignOptions.setOpForLanceTypeVehicles(parseInt(nodeContents));
-            case "opForUsesVTOLs" -> campaignOptions.setOpForUsesVTOLs(parseBoolean(nodeContents));
             case "useDropShips" -> campaignOptions.setUseDropShips(parseBoolean(nodeContents));
             case "mercSizeLimited" -> campaignOptions.setMercSizeLimited(parseBoolean(nodeContents));
             case "moraleVictoryEffect" -> campaignOptions.setMoraleVictoryEffect(parseInt(nodeContents));
@@ -866,10 +863,6 @@ public class CampaignOptionsUnmarshaller {
             case "useLightConditions" -> campaignOptions.setUseLightConditions(parseBoolean(nodeContents));
             case "usePlanetaryConditions" -> campaignOptions.setUsePlanetaryConditions(parseBoolean(nodeContents));
             case "restrictPartsByMission" -> campaignOptions.setRestrictPartsByMission(parseBoolean(nodeContents));
-            case "allowOpForLocalUnits" -> campaignOptions.setAllowOpForLocalUnits(parseBoolean(nodeContents));
-            case "allowOpForAeros" -> campaignOptions.setAllowOpForAerospace(parseBoolean(nodeContents));
-            case "opForAeroChance" -> campaignOptions.setOpForAeroChance(parseInt(nodeContents));
-            case "opForLocalUnitChance" -> campaignOptions.setOpForLocalUnitChance(parseInt(nodeContents));
             case "fixedMapChance" -> campaignOptions.setFixedMapChance(parseInt(nodeContents));
             case "spaUpgradeIntensity" -> campaignOptions.setSpaUpgradeIntensity(parseInt(nodeContents));
             case "scenarioModMax" -> campaignOptions.setScenarioModMax(parseInt(nodeContents));

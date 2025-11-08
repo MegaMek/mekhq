@@ -76,7 +76,10 @@ import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
 import mekhq.gui.campaignOptions.optionChangeDialogs.FactionStandingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.FatigueTrackingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.SalvageCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.StratConConvoyCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.VeterancyAwardsCampaignOptionsChangedConfirmationDialog;
 
 /**
@@ -512,6 +515,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         boolean oldAwardVeterancySPAs = options.isAwardVeterancySPAs();
         boolean oldIsTrackFactionStanding = options.isTrackFactionStanding();
         boolean oldIsUseMASHTheatres = options.isUseMASHTheatres();
+        boolean oldIsUseFatigue = options.isUseFatigue();
+        boolean oldIsUseAdvancedSalvage = options.isUseCamOpsSalvage();
+        boolean oldIsUseStratCon = options.isUseStratCon();
         boolean oldIsUseDiseases = options.isUseRandomDiseases();
 
         // Everything assumes general tab will be the first applied.
@@ -579,6 +585,21 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         boolean newIsUseMASHTheatres = options.isUseMASHTheatres();
         if (!isStartUp && newIsUseMASHTheatres && !oldIsUseMASHTheatres) { // Has tracking changed?
             new MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseFatigue = options.isUseFatigue();
+        if (!isStartUp && newIsUseFatigue && !oldIsUseFatigue) { // Has tracking changed?
+            new FatigueTrackingCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseAdvancedSalvage = options.isUseCamOpsSalvage();
+        if (!isStartUp && newIsUseAdvancedSalvage && !oldIsUseAdvancedSalvage) { // Has tracking changed?
+            new SalvageCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseStratCon = options.isUseStratCon();
+        if (!isStartUp && newIsUseStratCon && !oldIsUseStratCon) { // Has tracking changed?
+            new StratConConvoyCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
         boolean newIsUseDiseases = options.isUseRandomDiseases();
