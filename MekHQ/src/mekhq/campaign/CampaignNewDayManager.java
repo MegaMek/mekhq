@@ -281,7 +281,10 @@ public class CampaignNewDayManager {
 
         if (isMonday) {
             Fatigue.processDeploymentFatigueResponses(campaign);
-            Inoculations.performDiseaseChecks(campaign);
+
+            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+                Inoculations.performDiseaseChecks(campaign);
+            }
         }
 
         // Manage the Markets

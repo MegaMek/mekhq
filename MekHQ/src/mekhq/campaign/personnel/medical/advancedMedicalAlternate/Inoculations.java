@@ -108,7 +108,7 @@ public class Inoculations {
      */
     public static void triggerInoculationPrompt(Campaign campaign, boolean isAdHoc) {
         CurrentLocation location = campaign.getLocation();
-        if (!location.isOnPlanet()) {
+        if (!location.isInTransit()) {
             new ImmersiveDialogNotification(campaign, getTextAt(RESOURCE_BUNDLE, "Inoculations.inTransit"), true);
             return;
         }
