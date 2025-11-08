@@ -1738,7 +1738,7 @@ public class Campaign implements ITechManager {
 
     public TransportCostCalculations getTransportCostCalculation(int crewExperienceLevel) {
         return new TransportCostCalculations(getHangar().getUnits(),
-              getPersonnel(),
+              getPersonnelFilteringOutDepartedAndAbsent(),
               getCargoStatistics(),
               getHangarStatistics(),
               crewExperienceLevel);
@@ -2797,6 +2797,20 @@ public class Campaign implements ITechManager {
     public List<Person> getPersonnelFilteringOutDeparted() {
         return getPersonnel().stream()
                      .filter(person -> !person.getStatus().isDepartedUnit())
+                     .collect(Collectors.toList());
+    }
+
+
+    /**
+     * Retrieves a list of personnel, excluding those whose status indicates they have either left the unit, or are
+     * presently away.
+     *
+     * @return a {@code List} of {@link Person} objects who have not left the unit
+     */
+    public List<Person> getPersonnelFilteringOutDepartedAndAbsent() {
+        return getPersonnel().stream()
+                     .filter(person -> !person.getStatus().isDepartedUnit())
+                     .filter(person -> !person.getStatus().isAbsent())
                      .collect(Collectors.toList());
     }
 
