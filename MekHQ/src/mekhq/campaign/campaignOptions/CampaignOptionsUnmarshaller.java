@@ -362,6 +362,7 @@ public class CampaignOptionsUnmarshaller {
                   campaignOptions.setUseAlternativeAdvancedMedical(parseBoolean(nodeContents));
             case "useKinderAlternativeAdvancedMedical" ->
                   campaignOptions.setUseKinderAlternativeAdvancedMedical(parseBoolean(nodeContents));
+            case "useRandomDiseases" -> campaignOptions.setUseRandomDiseases(parseBoolean(nodeContents));
             case "maximumPatients" -> campaignOptions.setMaximumPatients(parseInt(nodeContents));
             case "doctorsUseAdministration" -> campaignOptions.setDoctorsUseAdministration(parseBoolean(
                   nodeContents));

@@ -323,6 +323,7 @@ public class Person {
 
     // region Advanced Medical
     private List<Injury> injuries;
+    private List<String> planetaryInoculations;
     // endregion Advanced Medical
 
     // region Against the Bot
@@ -557,6 +558,7 @@ public class Person {
         performanceLog = new ArrayList<>();
         awardController = new PersonAwardController(this);
         injuries = new ArrayList<>();
+        planetaryInoculations = new ArrayList<>();
         originalUnitWeight = EntityWeightClass.WEIGHT_ULTRA_LIGHT;
         originalUnitTech = TECH_IS1;
         originalUnitId = null;
@@ -3248,6 +3250,14 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "injuries");
             }
 
+            if (!planetaryInoculations.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "planetaryInoculations");
+                for (String planetaryInoculation : planetaryInoculations) {
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetaryInoculation", planetaryInoculation);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "planetaryInoculations");
+            }
+
             if (originalUnitWeight != EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "originalUnitWeight", originalUnitWeight);
             }
@@ -3899,6 +3909,22 @@ public class Person {
                     person.injuries.stream()
                           .filter(inj -> (null == inj.getStart()))
                           .forEach(inj -> inj.setStart(today.minusDays(inj.getOriginalTime() - inj.getTime())));
+                } else if (nodeName.equalsIgnoreCase("planetaryInoculations")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("planetaryInoculation")) {
+                            LOGGER.error("Unknown node type not loaded in Planetary Inoculations nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+                        person.planetaryInoculations.add(wn3.getTextContent());
+                    }
                 } else if (nodeName.equalsIgnoreCase("originalUnitWeight")) {
                     person.originalUnitWeight = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("originalUnitTech")) {
@@ -6948,6 +6974,20 @@ public class Person {
     public void removeInjury(final Injury injury) {
         injuries.remove(injury);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    public List<String> getPlanetaryInoculations() {
+        return planetaryInoculations;
+    }
+
+    public boolean hasPlanetaryInoculation(String planetId) {
+        return planetaryInoculations.contains(planetId);
+    }
+
+    public void addPlanetaryInoculation(String planetId) {
+        if (!hasPlanetaryInoculation(planetId)) {
+            planetaryInoculations.add(planetId);
+        }
     }
 
     public void diagnose(final Campaign campaign, final int hits) {

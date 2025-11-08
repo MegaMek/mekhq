@@ -2393,6 +2393,15 @@ public class Campaign implements ITechManager {
                   add));
         }
 
+        // Inoculations
+        if (location.isOnPlanet()) {
+            String planetId = location.getPlanet().getId();
+            person.addPlanetaryInoculation(planetId);
+        }
+
+        String originPlanetId = person.getOriginPlanet().getId();
+        person.addPlanetaryInoculation(originPlanetId);
+
         MekHQ.triggerEvent(new PersonNewEvent(person));
         return true;
     }

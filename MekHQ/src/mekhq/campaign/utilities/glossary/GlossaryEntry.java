@@ -76,6 +76,7 @@ public enum GlossaryEntry {
     DELIVERY_TIMES("DELIVERY_TIMES", new Version("0.50.06")),
     DEPRECATED("DEPRECATED", new Version("0.50.06")),
     DIGITAL_GM("DIGITAL_GM", new Version("0.50.06")),
+    DISEASES("DISEASES", new Version("0.50.10")),
     EDGE("EDGE", new Version("0.50.06")),
     EDUCATION("EDUCATION", new Version("0.50.06")),
     EMPTY_SYSTEMS("EMPTY_SYSTEMS", new Version("0.50.06")),

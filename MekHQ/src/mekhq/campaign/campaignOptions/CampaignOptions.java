@@ -270,6 +270,7 @@ public class CampaignOptions {
     private boolean tougherHealing;
     private boolean useAlternativeAdvancedMedical;
     private boolean useKinderAlternativeAdvancedMedical;
+    private boolean useRandomDiseases;
     private int maximumPatients;
     private boolean doctorsUseAdministration;
     private boolean useUsefulMedics;
@@ -854,6 +855,7 @@ public class CampaignOptions {
         setTougherHealing(false);
         useAlternativeAdvancedMedical = false;
         useKinderAlternativeAdvancedMedical = false;
+        useRandomDiseases = false;
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
         useUsefulMedics = false;
@@ -2075,6 +2077,14 @@ public class CampaignOptions {
 
     public void setUseKinderAlternativeAdvancedMedical(final boolean useKinderAlternativeAdvancedMedical) {
         this.useKinderAlternativeAdvancedMedical = useKinderAlternativeAdvancedMedical;
+    }
+
+    public boolean isUseRandomDiseases() {
+        return useRandomDiseases;
+    }
+
+    public void setUseRandomDiseases(final boolean useRandomDiseases) {
+        this.useRandomDiseases = useRandomDiseases;
     }
 
     public int getMaximumPatients() {

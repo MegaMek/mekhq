@@ -357,6 +357,8 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tougherHealing", campaignOptions.isTougherHealing());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAlternativeAdvancedMedical",
               campaignOptions.isUseAlternativeAdvancedMedical());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDiseases",
+              campaignOptions.isUseRandomDiseases());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumPatients", campaignOptions.getMaximumPatients());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,

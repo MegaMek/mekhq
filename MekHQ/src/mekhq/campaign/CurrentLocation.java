@@ -57,6 +57,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
@@ -288,8 +289,9 @@ public class CurrentLocation {
     public void newDay(Campaign campaign) {
         final boolean wasTraveling = !isOnPlanet();
 
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
-              campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
+              campaign.isGM(), campaignOptions.isUseFactionStandingCommandCircuitSafe(),
               campaign.getFactionStandings(), campaign.getFutureAtBContracts());
 
         // recharge even if there is no jump path
@@ -325,7 +327,6 @@ public class CurrentLocation {
             }
             if (isAtJumpPoint() && (rechargeTime >= neededRechargeTime)) {
                 // jump
-                final CampaignOptions campaignOptions = campaign.getCampaignOptions();
                 if (campaignOptions.isPayForTransport()) {
                     if (campaignOptions.isUseAbilities()) {
                         for (Person person : campaign.getPersonnelFilteringOutDeparted()) {
@@ -383,8 +384,11 @@ public class CurrentLocation {
         }
 
         // If we were previously traveling and now aren't, we should check to see if we have arrived at a contract
-        // system earlier than necessary.
+        // system earlier than necessary. And, if appropriate, trigger innoculation prompts
         if (wasTraveling && isOnPlanet()) {
+            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+                Inoculations.triggerInoculationPrompt(campaign, false);
+            }
             testForEarlyArrival(campaign);
         }
     }

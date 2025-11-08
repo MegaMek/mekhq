@@ -63,8 +63,10 @@ import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -516,6 +518,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         boolean oldIsUseFatigue = options.isUseFatigue();
         boolean oldIsUseAdvancedSalvage = options.isUseCamOpsSalvage();
         boolean oldIsUseStratCon = options.isUseStratCon();
+        boolean oldIsUseDiseases = options.isUseRandomDiseases();
 
         // Everything assumes general tab will be the first applied.
         // While this shouldn't break anything, it's not worth moving around.
@@ -599,9 +602,45 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             new StratConConvoyCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
+        boolean newIsUseDiseases = options.isUseRandomDiseases();
+        if (!isStartUp && newIsUseDiseases && !oldIsUseDiseases) { // Has tracking changed?
+            inoculateAllCharacters();
+        }
+
         campaign.resetRandomDeath();
         if (campaignGui != null) {
             campaignGui.refreshMarketButtonLabels();
+        }
+    }
+
+    /**
+     * Inoculates all campaign personnel for their current planet and origin planet.
+     *
+     * <p>This method adds planetary inoculation records for:</p>
+     *
+     * <ul>
+     *   <li>The current planet (if the campaign is on a planet, not in transit)</li>
+     *   <li>Each person's origin planet</li>
+     * </ul>
+     *
+     * <p>Personnel are assumed to have prior inoculation for their home planet, while current planet inoculation
+     * requires campaign location tracking.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void inoculateAllCharacters() {
+        String currentPlanetId = null;
+        CurrentLocation location = campaign.getLocation();
+        if (location.isOnPlanet()) {
+            currentPlanetId = location.getPlanet().getId();
+        }
+        for (Person person : campaign.getPersonnel()) {
+            if (currentPlanetId != null) {
+                person.addPlanetaryInoculation(currentPlanetId);
+            }
+            String originPlanetId = person.getOriginPlanet().getId();
+            person.addPlanetaryInoculation(originPlanetId);
         }
     }
 
