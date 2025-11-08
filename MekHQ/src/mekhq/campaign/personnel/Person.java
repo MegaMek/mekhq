@@ -149,6 +149,7 @@ import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -5915,6 +5916,7 @@ public class Person {
      * applied to calculate the adjusted task time for technicians.</p>
      *
      * <ul>
+     *   <li>If the character is assigned to a unit and that unit is deployed their available time is reduced to 0.</li>
      *   <li>If the primary role is a doctor, the base support time values for the primary role
      *       are assigned without any adjustments.</li>
      *   <li>If the secondary role is a doctor, the base support time values for the secondary role
@@ -5935,6 +5937,12 @@ public class Person {
      *                                 calculations for technicians.
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
+        if (unit != null && (unit.isDeployed() || StratConRulesManager.isUnitDeployedToStratCon(unit))) {
+            this.minutesLeft = 0;
+            this.overtimeLeft = 0;
+            return;
+        }
+
         // Doctors
         if (primaryRole.isDoctor()) {
             this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
