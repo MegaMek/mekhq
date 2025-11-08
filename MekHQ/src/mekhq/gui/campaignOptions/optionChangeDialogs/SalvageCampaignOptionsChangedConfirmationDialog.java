@@ -196,10 +196,11 @@ public class SalvageCampaignOptionsChangedConfirmationDialog extends JDialog {
             truckCount *= 2; // 2 vehicles per point
         }
 
+        String unitName = "BattleMech Recovery Vehicle";
         for (int i = 0; i < truckCount; i++) {
-            MekSummary mekSummary = MekSummaryCache.getInstance().getMek("BattleMech Recovery Vehicle");
+            MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unitName);
             if (mekSummary == null) {
-                LOGGER.error("Cannot find entry for {}", "enums");
+                LOGGER.error("Cannot find entry for {}", unitName);
                 return;
             }
 
