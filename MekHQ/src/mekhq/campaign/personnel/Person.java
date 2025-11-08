@@ -5360,6 +5360,10 @@ public class Person {
         return options;
     }
 
+    public void setOptions(final PersonnelOptions options) {
+        this.options = options;
+    }
+
     /**
      * @return the options of the given category that this pilot has
      */
