@@ -222,12 +222,14 @@ public class JumpCostsSummary extends JDialog {
         cargoSummary.setBorder(RoundedLineBorder.createRoundedLineBorder(title));
         cargoSummary.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        boolean hasContents = false;
         int requiredSmallCraftSpace = calculations.getAdditionalSmallCraftBaysRequired();
         if (requiredSmallCraftSpace > 0) {
             createSummaryEntry("TransportCostCalculations.report.entry.smallCraft",
                   requiredSmallCraftSpace,
                   cargoSummary,
                   calculations.getAdditionalSmallCraftBaysCost());
+            hasContents = true;
         }
 
         int requiredASFSpace = calculations.getAdditionalASFBaysRequired();
@@ -236,6 +238,7 @@ public class JumpCostsSummary extends JDialog {
                   requiredASFSpace,
                   cargoSummary,
                   calculations.getAdditionalASFBaysCost());
+            hasContents = true;
         }
 
         int requiredMekSpace = calculations.getAdditionalMekBaysRequired();
@@ -244,6 +247,7 @@ public class JumpCostsSummary extends JDialog {
                   requiredMekSpace,
                   cargoSummary,
                   calculations.getAdditionalMekBaysCost());
+            hasContents = true;
         }
 
         int requiredSuperHeavyVehicleSpace = calculations.getAdditionalSuperHeavyVehicleBaysRequired();
@@ -252,6 +256,7 @@ public class JumpCostsSummary extends JDialog {
                   requiredSuperHeavyVehicleSpace,
                   cargoSummary,
                   calculations.getAdditionalSuperHeavyVehicleBaysCost());
+            hasContents = true;
         }
 
         int requiredHeavyVehicleSpace = calculations.getAdditionalHeavyVehicleBaysRequired();
@@ -260,6 +265,7 @@ public class JumpCostsSummary extends JDialog {
                   requiredHeavyVehicleSpace,
                   cargoSummary,
                   calculations.getAdditionalHeavyVehicleBaysCost());
+            hasContents = true;
         }
 
         int requiredLightVehicleSpace = calculations.getAdditionalLightVehicleBaysRequired();
@@ -268,6 +274,7 @@ public class JumpCostsSummary extends JDialog {
                   requiredLightVehicleSpace,
                   cargoSummary,
                   calculations.getAdditionalLightVehicleBaysCost());
+            hasContents = true;
         }
 
         int requiredProtoMekSpace = calculations.getAdditionalProtoMekBaysRequired();
@@ -276,6 +283,7 @@ public class JumpCostsSummary extends JDialog {
                   requiredProtoMekSpace,
                   cargoSummary,
                   calculations.getAdditionalProtoMekBaysCost());
+            hasContents = true;
         }
 
         int requiredBattleArmorSpace = calculations.getAdditionalBattleArmorBaysRequired();
@@ -284,6 +292,7 @@ public class JumpCostsSummary extends JDialog {
                   requiredBattleArmorSpace,
                   cargoSummary,
                   calculations.getAdditionalBattleArmorBaysCost());
+            hasContents = true;
         }
 
         int requiredInfantrySpace = calculations.getAdditionalInfantryBaysRequired();
@@ -292,6 +301,7 @@ public class JumpCostsSummary extends JDialog {
                   requiredInfantrySpace,
                   cargoSummary,
                   calculations.getAdditionalInfantryBaysCost());
+            hasContents = true;
         }
 
         int requiredOtherUnitSpace = calculations.getOtherUnitCount();
@@ -300,9 +310,10 @@ public class JumpCostsSummary extends JDialog {
                   requiredOtherUnitSpace,
                   cargoSummary,
                   calculations.getAdditionalOtherUnitBaysCost());
+            hasContents = true;
         }
 
-        return cargoSummary;
+        return hasContents ? cargoSummary : new JPanel();
     }
 
     /**

@@ -319,7 +319,8 @@ public class TransportationRating {
                 passengerCapacity += bay.getPersonnel(entity.isClan());
             }
 
-            passengerCapacity += entity.getPassengerCapacityWithoutBayCrew();
+            passengerCapacity += entity.getNPassenger();
+            passengerCapacity += entity.getBayPersonnel();
         }
 
         // Map the capacity of each bay type
@@ -399,11 +400,7 @@ public class TransportationRating {
         }
 
         // Count the number of passengers by filtering the personnel list
-        int passengerCount = (int) campaign.getPersonnel().stream()
-                                         .filter(person -> !person.getStatus().isAbsent() &&
-                                                                 !person.getStatus().isDepartedUnit())
-                                         .filter(person -> person.getUnit() == null)
-                                         .count();
+        int passengerCount = (int) campaign.getPersonnelFilteringOutDepartedAndAbsent().size();
 
         // Map each unit count to its type
         Map<String, Integer> transportRequirements = new HashMap<>(Map.of(
