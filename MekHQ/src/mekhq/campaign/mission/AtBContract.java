@@ -595,6 +595,34 @@ public class AtBContract extends Contract {
     }
 
     /**
+     * Determines the best available repair location from a list of active contracts.
+     *
+     * <p>This method evaluates all active contracts and returns the highest quality repair facility available.
+     * Repair locations are ranked numerically, with higher values representing better facilities. If no active
+     * contracts exist, a basic facility is assumed to be available.</p>
+     *
+     * @param activeContracts the list of active contracts to evaluate for repair facilities
+     *
+     * @return the numeric value of the best available repair location; returns {@link Unit#SITE_FACILITY_BASIC} if no
+     *       contracts are active
+     */
+    public static int getBestRepairLocation(List<AtBContract> activeContracts) {
+        if (activeContracts.isEmpty()) {
+            return Unit.SITE_FACILITY_BASIC;
+        }
+
+        int bestSite = Unit.SITE_IMPROVISED;
+        for (AtBContract contract : activeContracts) {
+            int repairLocation = contract.getRepairLocation();
+            if (repairLocation > bestSite) {
+                bestSite = repairLocation;
+            }
+        }
+
+        return bestSite;
+    }
+
+    /**
      * Calculates the overall contract score based on scenario outcomes and modifiers.
      *
      * <p>For StratCon campaigns, this returns the current victory points from the campaign state.</p>
