@@ -268,6 +268,7 @@ public class CampaignOptions {
     private boolean useRandomHitsForVehicles;
     private boolean tougherHealing;
     private boolean useAlternativeAdvancedMedical;
+    private boolean useKinderAlternativeAdvancedMedical;
     private int maximumPatients;
     private boolean doctorsUseAdministration;
     private boolean useUsefulMedics;
@@ -862,6 +863,7 @@ public class CampaignOptions {
         setUseRandomHitsForVehicles(false);
         setTougherHealing(false);
         useAlternativeAdvancedMedical = false;
+        useKinderAlternativeAdvancedMedical = false;
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
         useUsefulMedics = false;
@@ -2007,7 +2009,32 @@ public class CampaignOptions {
     // endregion Expanded Personnel Information
 
     // region Medical
+
+    /**
+     * Checks if any form of advanced medical system is enabled.
+     *
+     * <p>This method returns {@code true} if either the standard advanced medical system or the alternative advanced
+     * medical system is enabled.</p>
+     *
+     * @return {@code true} if either advanced medical system is in use, {@code false} otherwise
+     *
+     * @see #isUseAdvancedMedicalDirect()
+     */
     public boolean isUseAdvancedMedical() {
+        return useAdvancedMedical || useAlternativeAdvancedMedical;
+    }
+
+    /**
+     * Checks if the standard advanced medical system is enabled.
+     *
+     * <p>This method specifically checks only the standard advanced medical system, ignoring the alternative
+     * advanced medical system setting.</p>
+     *
+     * @return {@code true} if the standard advanced medical system is enabled, {@code false} otherwise
+     *
+     * @see #isUseAdvancedMedical()
+     */
+    public boolean isUseAdvancedMedicalDirect() {
         return useAdvancedMedical;
     }
 
@@ -2061,6 +2088,14 @@ public class CampaignOptions {
 
     public void setUseAlternativeAdvancedMedical(final boolean useAlternativeAdvancedMedical) {
         this.useAlternativeAdvancedMedical = useAlternativeAdvancedMedical;
+    }
+
+    public boolean isUseKinderAlternativeAdvancedMedical() {
+        return useKinderAlternativeAdvancedMedical;
+    }
+
+    public void setUseKinderAlternativeAdvancedMedical(final boolean useKinderAlternativeAdvancedMedical) {
+        this.useKinderAlternativeAdvancedMedical = useKinderAlternativeAdvancedMedical;
     }
 
     public int getMaximumPatients() {
