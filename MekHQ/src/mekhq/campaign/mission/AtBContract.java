@@ -40,7 +40,6 @@ import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.ELITE;
@@ -443,14 +442,11 @@ public class AtBContract extends Contract {
                     StratConContractDefinition contractDefinition = getContractDefinition(getContractType());
 
                     if (contractDefinition != null) {
-                        List<Integer> definedScenarioOdds = contractDefinition.getScenarioOdds();
-
-                        int scenarioOddsMultiplier = randomInt(20) == 0 ? 2 : 1;
-
                         for (StratConTrackState trackState : stratconCampaignState.getTracks()) {
-                            int baseScenarioOdds = getRandomItem(definedScenarioOdds);
+                            int scenarioOdds = StratConContractInitializer.getScenarioOdds(
+                                  campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(), contractDefinition);
 
-                            trackState.setScenarioOdds(baseScenarioOdds * scenarioOddsMultiplier);
+                            trackState.setScenarioOdds(scenarioOdds);
                         }
                     }
                 }
