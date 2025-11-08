@@ -184,7 +184,7 @@ public class RetirementDefectionTracker {
             // Desirability modifier
             if ((campaign.getCampaignOptions().isUseSkillModifiers()) &&
                       (person.getAge(campaign.getLocalDate()) < RETIREMENT_AGE)) {
-                targetNumber.addModifier(min(EXP_ELITE - 2, person.getExperienceLevel(campaign, false) - 2),
+                targetNumber.addModifier(min(EXP_ELITE - 2, person.getExperienceLevel(campaign, false, true) - 2),
                       resources.getString("desirability.text"));
             }
 
@@ -227,7 +227,7 @@ public class RetirementDefectionTracker {
                 if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
                     Person commander = campaign.getCommander();
                     if (commander != null && commander.hasSkill((SkillType.S_LEADER))) {
-                        SkillModifierData skillModifierData = commander.getSkillModifierData();
+                        SkillModifierData skillModifierData = commander.getSkillModifierData(true);
 
                         modifier -= commander.getSkill(SkillType.S_LEADER)
                                           .getFinalSkillValue(skillModifierData);
@@ -704,10 +704,6 @@ public class RetirementDefectionTracker {
      */
     public static int getCombinedSkillValues(Campaign campaign, String skillType) {
         int combinedSkillValues = 0;
-
-        boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
-        boolean isClanCampaign = campaign.isClanCampaign();
-        LocalDate today = campaign.getLocalDate();
 
         for (Person person : campaign.getActivePersonnel(false, false)) {
             boolean isAdmin = person.getPrimaryRole().isAdministratorHR() ||

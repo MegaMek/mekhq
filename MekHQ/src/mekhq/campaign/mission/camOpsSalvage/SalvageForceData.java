@@ -125,7 +125,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
             tooltip.append(tech.getFullTitle()).append("<br>");
 
             boolean isTechSecondary = tech.getSecondaryRole().isTechSecondary();
-            tooltip.append(tech.getSkillLevel(campaign, isTechSecondary)).append("<br>");
+            tooltip.append(tech.getSkillLevel(campaign, isTechSecondary, true)).append("<br>");
 
             String injuryLabelKey;
             int injuries;
