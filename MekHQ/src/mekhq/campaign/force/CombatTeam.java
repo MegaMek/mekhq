@@ -767,7 +767,7 @@ public class CombatTeam {
                 CampaignOptions campaignOptions = campaign.getCampaignOptions();
                 if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
                     if (entityType == ETYPE_TANK) {
-                        if (isClan || campaignOptions.isAdjustPlayerVehicles()) {
+                        if (isClan) {
                             weight += entity.getWeight() * 0.5;
                         } else {
                             weight += entity.getWeight();

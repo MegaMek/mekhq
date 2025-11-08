@@ -607,7 +607,7 @@ public class ReputationController {
      */
     public void writeReputationToXML(final PrintWriter pw, int indent) {
         // average experience rating
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "averageSkillLevel", averageSkillLevel.toString());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "averageSkillLevel", averageSkillLevel.name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "averageExperienceRating", averageExperienceRating);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atbModifier", atbModifier);
 

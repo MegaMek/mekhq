@@ -106,9 +106,7 @@ public class RulesetsTab {
     private MMComboBox<SkillLevel> comboMinimumCallsignSkillLevel;
 
     private JCheckBox chkUseDropShips;
-    private JCheckBox chkOpForUsesVTOLs;
 
-    private JCheckBox chkClanVehicles;
     private JCheckBox chkRegionalMekVariations;
 
     private JCheckBox chkAttachedPlayerCamouflage;
@@ -159,15 +157,6 @@ public class RulesetsTab {
     //start Legacy AtB
     private CampaignOptionsHeaderPanel legacyHeader;
     private JCheckBox chkUseAtB;
-
-    private JPanel pnlLegacyOpForGenerationPanel;
-    private JCheckBox chkUseVehicles;
-    private JCheckBox chkDoubleVehicles;
-    private JCheckBox chkOpForUsesAero;
-    private JLabel lblOpForAeroChance;
-    private JSpinner spnOpForAeroChance;
-    private JCheckBox chkOpForUsesLocalForces;
-    private JCheckBox chkAdjustPlayerVehicles;
 
     private JPanel pnlLegacyScenarioGenerationPanel;
     private JLabel lblIntensity;
@@ -243,8 +232,6 @@ public class RulesetsTab {
         spnOpForLanceTypeVehicles = new JSpinner();
 
         chkUseDropShips = new JCheckBox();
-        chkOpForUsesVTOLs = new JCheckBox();
-        chkClanVehicles = new JCheckBox();
         chkRegionalMekVariations = new JCheckBox();
 
         chkAttachedPlayerCamouflage = new JCheckBox();
@@ -321,8 +308,6 @@ public class RulesetsTab {
         pnlUnitRatioPanel = createUniversalUnitRatioPanel();
 
         chkUseDropShips = new CampaignOptionsCheckBox("UseDropShips");
-        chkOpForUsesVTOLs = new CampaignOptionsCheckBox("OpForUsesVTOLs");
-        chkClanVehicles = new CampaignOptionsCheckBox("ClanVehicles");
         chkRegionalMekVariations = new CampaignOptionsCheckBox("RegionalMekVariations");
 
         chkAttachedPlayerCamouflage = new CampaignOptionsCheckBox("AttachedPlayerCamouflage");
@@ -384,12 +369,6 @@ public class RulesetsTab {
         layout.gridy++;
         layout.gridwidth = 2;
         panel.add(chkUseDropShips, layout);
-
-        layout.gridy++;
-        panel.add(chkOpForUsesVTOLs, layout);
-
-        layout.gridy++;
-        panel.add(chkClanVehicles, layout);
 
         layout.gridy++;
         panel.add(chkRegionalMekVariations, layout);
@@ -802,8 +781,6 @@ public class RulesetsTab {
         comboMinimumCallsignSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader,
               "MinimumCallsignSkillLevel"));
         chkUseDropShips.addMouseListener(createTipPanelUpdater(stratConHeader, "UseDropShips"));
-        chkOpForUsesVTOLs.addMouseListener(createTipPanelUpdater(stratConHeader, "OpForUsesVTOLs"));
-        chkClanVehicles.addMouseListener(createTipPanelUpdater(stratConHeader, "ClanVehicles"));
         chkRegionalMekVariations.addMouseListener(createTipPanelUpdater(stratConHeader, "RegionalMekVariations"));
         chkAttachedPlayerCamouflage.addMouseListener(createTipPanelUpdater(stratConHeader, "AttachedPlayerCamouflage"));
         chkPlayerControlsAttachedUnits.addMouseListener(createTipPanelUpdater(stratConHeader,
@@ -883,16 +860,6 @@ public class RulesetsTab {
         // General
         chkUseAtB = new JCheckBox();
 
-        // OpFor Generation
-        pnlLegacyOpForGenerationPanel = new JPanel();
-        chkUseVehicles = new JCheckBox();
-        chkDoubleVehicles = new JCheckBox();
-        chkOpForUsesAero = new JCheckBox();
-        lblOpForAeroChance = new JLabel();
-        spnOpForAeroChance = new JSpinner();
-        chkOpForUsesLocalForces = new JCheckBox();
-        chkAdjustPlayerVehicles = new JCheckBox();
-
         // Scenarios
         pnlLegacyScenarioGenerationPanel = new JPanel();
         chkGenerateChases = new JCheckBox();
@@ -924,7 +891,6 @@ public class RulesetsTab {
 
         chkUseAtB = new CampaignOptionsCheckBox("UseAtB");
         chkUseAtB.addMouseListener(createTipPanelUpdater(legacyHeader, "UseAtB"));
-        pnlLegacyOpForGenerationPanel = createLegacyOpForGenerationPanel();
         pnlLegacyScenarioGenerationPanel = createLegacyScenarioGenerationPanel();
 
         // Layout the Panel
@@ -941,73 +907,10 @@ public class RulesetsTab {
         panel.add(chkUseAtB, layout);
 
         layout.gridy++;
-        panel.add(pnlLegacyOpForGenerationPanel, layout);
-        layout.gridx++;
         panel.add(pnlLegacyScenarioGenerationPanel, layout);
 
         // Create panel and return
         return createParentPanel(panel, "LegacyTab");
-    }
-
-    /**
-     * Creates the UI panel for configuring the Legacy AtB opponent force (OpFor) generation settings.
-     * <p>
-     * Options include enabling vehicle support, aero unit chances, local forces, and player vehicle adjustments. The
-     * panel provides various checkboxes and spinners for user interaction.
-     * </p>
-     *
-     * @return a {@link JPanel} containing controls to configure AtB opponent force generation options
-     */
-    private JPanel createLegacyOpForGenerationPanel() {
-        // Content
-        chkUseVehicles = new CampaignOptionsCheckBox("UseVehicles");
-        chkUseVehicles.addMouseListener(createTipPanelUpdater(legacyHeader, "UseVehicles"));
-        chkDoubleVehicles = new CampaignOptionsCheckBox("DoubleVehicles");
-        chkDoubleVehicles.addMouseListener(createTipPanelUpdater(legacyHeader, "DoubleVehicles"));
-        chkOpForUsesAero = new CampaignOptionsCheckBox("OpForUsesAero");
-        chkOpForUsesAero.addMouseListener(createTipPanelUpdater(legacyHeader, "OpForUsesAero"));
-        lblOpForAeroChance = new CampaignOptionsLabel("OpForAeroChance");
-        lblOpForAeroChance.addMouseListener(createTipPanelUpdater(legacyHeader, "OpForAeroChance"));
-        spnOpForAeroChance = new CampaignOptionsSpinner("OpForAeroChance",
-              0, 0, 6, 1);
-        spnOpForAeroChance.addMouseListener(createTipPanelUpdater(legacyHeader, "OpForAeroChance"));
-        chkOpForUsesLocalForces = new CampaignOptionsCheckBox("OpForUsesLocalForces");
-        chkOpForUsesLocalForces.addMouseListener(createTipPanelUpdater(legacyHeader, "OpForUsesLocalForces"));
-        chkAdjustPlayerVehicles = new CampaignOptionsCheckBox("AdjustPlayerVehicles");
-        chkAdjustPlayerVehicles.addMouseListener(createTipPanelUpdater(legacyHeader, "AdjustPlayerVehicles"));
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("LegacyOpForGenerationPanel", true,
-              "LegacyOpForGenerationPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 2;
-        panel.add(chkUseVehicles, layout);
-
-        layout.gridy++;
-        panel.add(chkDoubleVehicles, layout);
-
-        layout.gridy++;
-        panel.add(chkOpForUsesAero, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblOpForAeroChance, layout);
-        layout.gridx++;
-        panel.add(spnOpForAeroChance, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(chkOpForUsesLocalForces, layout);
-
-        layout.gridy++;
-        panel.add(chkAdjustPlayerVehicles, layout);
-
-        return panel;
     }
 
     /**
@@ -1215,8 +1118,6 @@ public class RulesetsTab {
         options.setAutoGenerateOpForCallSigns(chkAutoGenerateOpForCallSigns.isSelected());
         options.setMinimumCallsignSkillLevel(comboMinimumCallsignSkillLevel.getSelectedItem());
         options.setUseDropShips(chkUseDropShips.isSelected());
-        options.setOpForUsesVTOLs(chkOpForUsesVTOLs.isSelected());
-        options.setClanVehicles(chkClanVehicles.isSelected());
         options.setRegionalMekVariations(chkRegionalMekVariations.isSelected());
         options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
         options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
@@ -1249,12 +1150,6 @@ public class RulesetsTab {
 
         // Legacy
         options.setUseAtB(chkUseAtB.isSelected() && !chkUseStratCon.isSelected());
-        options.setUseVehicles(chkUseVehicles.isSelected());
-        options.setDoubleVehicles(chkDoubleVehicles.isSelected());
-        options.setUseAero(chkOpForUsesAero.isSelected());
-        options.setOpForAeroChance((int) spnOpForAeroChance.getValue());
-        options.setAllowOpForLocalUnits(chkOpForUsesLocalForces.isSelected());
-        options.setAdjustPlayerVehicles(chkAdjustPlayerVehicles.isSelected());
         options.setGenerateChases(chkGenerateChases.isSelected());
 
         for (int i = 0; i < spnAtBBattleChance.length; i++) {
@@ -1293,8 +1188,6 @@ public class RulesetsTab {
         chkAutoGenerateOpForCallSigns.setSelected(options.isAutoGenerateOpForCallSigns());
         comboMinimumCallsignSkillLevel.setSelectedItem(options.getMinimumCallsignSkillLevel());
         chkUseDropShips.setSelected(options.isUseDropShips());
-        chkOpForUsesVTOLs.setSelected(options.isOpForUsesVTOLs());
-        chkClanVehicles.setSelected(options.isClanVehicles());
         chkRegionalMekVariations.setSelected(options.isRegionalMekVariations());
         chkAttachedPlayerCamouflage.setSelected(options.isAttachedPlayerCamouflage());
         chkPlayerControlsAttachedUnits.setSelected(options.isPlayerControlsAttachedUnits());
@@ -1327,12 +1220,6 @@ public class RulesetsTab {
 
         // Legacy
         chkUseAtB.setSelected(options.isUseAtB() && !options.isUseStratCon());
-        chkUseVehicles.setSelected(options.isUseVehicles());
-        chkDoubleVehicles.setSelected(options.isDoubleVehicles());
-        chkOpForUsesAero.setSelected(options.isUseAero());
-        spnOpForAeroChance.setValue(options.getOpForAeroChance());
-        chkOpForUsesLocalForces.setSelected(options.isAllowOpForLocalUnits());
-        chkAdjustPlayerVehicles.setSelected(options.isAdjustPlayerVehicles());
         chkGenerateChases.setSelected(options.isGenerateChases());
         for (CombatRole role : CombatRole.values()) {
             if (role.ordinal() <= CombatRole.CADRE.ordinal()) {

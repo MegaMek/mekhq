@@ -190,7 +190,11 @@ public class CamOpsSalvageUtilities {
 
             campaign.clearGameData(salvageUnit.getEntity());
             campaign.addTestUnit(salvageUnit, deliveryTime);
-            salvageUnit.setSite(mission.getRepairLocation());
+            if (mission instanceof AtBContract atbContract) {
+                salvageUnit.setSite(atbContract.getRepairLocation());
+            } else {
+                salvageUnit.setSite(mission.getRepairLocation());
+            }
 
             // if this is a contract, add to the salvaged value
             if (isContract) {

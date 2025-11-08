@@ -74,7 +74,7 @@ public class DialogContractStart extends JDialog {
         this.contract = contract;
 
         String outOfCharacterMessageKey = "outOfCharacter.contractStart." +
-                                                (contract.getContractType().isGuerrillaWarfare() ?
+                                                (contract.getContractType().isGuerrillaType() ?
                                                        "guerrilla" :
                                                        "normal");
 
@@ -151,7 +151,7 @@ public class DialogContractStart extends JDialog {
         String convoyMessage;
         String commanderTitle = campaign.getCommanderAddress();
 
-        if (contract.getContractType().isGuerrillaWarfare() || campaign.isPirateCampaign()) {
+        if (contract.getContractType().isGuerrillaType() || campaign.isPirateCampaign()) {
             String convoyMessageTemplate = "contractStartMessageGuerrilla.text";
             convoyMessage = getFormattedTextAt(RESOURCE_BUNDLE, convoyMessageTemplate, commanderTitle);
         } else {

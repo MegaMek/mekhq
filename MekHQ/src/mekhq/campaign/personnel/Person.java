@@ -149,6 +149,7 @@ import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -2324,7 +2325,7 @@ public class Person {
         }
 
         // Is the character a veteran in their primary profession?
-        int experienceLevel = getExperienceLevel(campaign, false);
+        int experienceLevel = getExperienceLevel(campaign, false, true);
         if (experienceLevel < EXP_VETERAN) {
             return;
         }
@@ -4402,7 +4403,7 @@ public class Person {
         // Experience multiplier
         primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions()
                                                      .getSalaryXPMultipliers()
-                                                     .get(getSkillLevel(campaign, false)));
+                                                     .get(getSkillLevel(campaign, false, true)));
 
         // Specialization multiplier
         if (getPrimaryRole().isSoldierOrBattleArmour()) {
@@ -4431,7 +4432,7 @@ public class Person {
             // Experience modifier
             secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions()
                                                              .getSalaryXPMultipliers()
-                                                             .get(getSkillLevel(campaign, true)));
+                                                             .get(getSkillLevel(campaign, true, true)));
 
             // Specialization
             if (getSecondaryRole().isSoldierOrBattleArmour()) {
@@ -4712,10 +4713,13 @@ public class Person {
             } else if (getRankLevel() < otherPerson.getRankLevel()) {
                 return false;
             } else {
-                if (getExperienceLevel(campaign, false) == otherPerson.getExperienceLevel(campaign, false)) {
-                    return getExperienceLevel(campaign, true) > otherPerson.getExperienceLevel(campaign, true);
+                if (getExperienceLevel(campaign, false, true) ==
+                          otherPerson.getExperienceLevel(campaign, false, true)) {
+                    return getExperienceLevel(campaign, true, true) >
+                                 otherPerson.getExperienceLevel(campaign, true, true);
                 } else {
-                    return getExperienceLevel(campaign, false) > otherPerson.getExperienceLevel(campaign, false);
+                    return getExperienceLevel(campaign, false, true) >
+                                 otherPerson.getExperienceLevel(campaign, false, true);
                 }
             }
         } else {
@@ -4753,7 +4757,16 @@ public class Person {
     }
 
     public SkillLevel getSkillLevel(final Campaign campaign, final boolean secondary) {
-        return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary) + 1];
+        return getSkillLevel(campaign, secondary, false);
+    }
+
+    public SkillLevel getSkillLevel(final Campaign campaign, final boolean secondary,
+          final boolean excludeInjuryEffects) {
+        return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary, excludeInjuryEffects) + 1];
+    }
+
+    public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
+        return getExperienceLevel(campaign, secondary, false);
     }
 
     /**
@@ -4779,13 +4792,14 @@ public class Person {
      *     </li>
      * </ul>
      *
-     * @param campaign  the campaign context, providing options and relevant configuration
-     * @param secondary if {@code true}, evaluates the person's secondary role; if {@code false}, evaluates the primary
-     *                  role
+     * @param campaign             the campaign context, providing options and relevant configuration
+     * @param secondary            if {@code true}, evaluates the person's secondary role; if {@code false}, evaluates
+     *                             the primary role
+     * @param excludeInjuryEffects if {@code true} injury effect modifiers will be excluded from calculations
      *
      * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
      */
-    public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
+    public int getExperienceLevel(final Campaign campaign, final boolean secondary, boolean excludeInjuryEffects) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
 
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -4796,7 +4810,10 @@ public class Person {
         final boolean isClanCampaign = campaign.isClanCampaign();
         final LocalDate today = campaign.getLocalDate();
 
-        final SkillModifierData skillModifierData = getSkillModifierData(isUseAgingEffects, isClanCampaign, today);
+        final SkillModifierData skillModifierData = getSkillModifierData(isUseAgingEffects,
+              isClanCampaign,
+              today,
+              excludeInjuryEffects);
 
         // Optional skills such as Admin for Techs are not counted towards the character's experience level, except
         // in the special case of Vehicle Gunners. So we only want to fetch the base professions.
@@ -4991,7 +5008,7 @@ public class Person {
      *       among other places
      */
     public String getFullDesc(final Campaign campaign) {
-        return "<b>" + getFullTitle() + "</b><br/>" + getSkillLevel(campaign, false) + ' ' + getRoleDesc();
+        return "<b>" + getFullTitle() + "</b><br/>" + getSkillLevel(campaign, false, true) + ' ' + getRoleDesc();
     }
 
     public String getHTMLTitle() {
@@ -5358,6 +5375,10 @@ public class Person {
     // region Personnel Options
     public PersonnelOptions getOptions() {
         return options;
+    }
+
+    public void setOptions(final PersonnelOptions options) {
+        this.options = options;
     }
 
     /**
@@ -5915,6 +5936,7 @@ public class Person {
      * applied to calculate the adjusted task time for technicians.</p>
      *
      * <ul>
+     *   <li>If the character is assigned to a unit and that unit is deployed their available time is reduced to 0.</li>
      *   <li>If the primary role is a doctor, the base support time values for the primary role
      *       are assigned without any adjustments.</li>
      *   <li>If the secondary role is a doctor, the base support time values for the secondary role
@@ -5935,6 +5957,12 @@ public class Person {
      *                                 calculations for technicians.
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
+        if (unit != null && (unit.isDeployed() || StratConRulesManager.isUnitDeployedToStratCon(unit))) {
+            this.minutesLeft = 0;
+            this.overtimeLeft = 0;
+            return;
+        }
+
         // Doctors
         if (primaryRole.isDoctor()) {
             this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
@@ -7149,7 +7177,7 @@ public class Person {
         if (isFounder()) {
             shares++;
         }
-        shares += Math.max(-1, getExperienceLevel(campaign, false) - 2);
+        shares += Math.max(-1, getExperienceLevel(campaign, false, true) - 2);
 
         if (getRank().isOfficer()) {
             final Profession profession = Profession.getProfessionFromPersonnelRole(getPrimaryRole());
@@ -7193,7 +7221,7 @@ public class Person {
         // MekWarriors and aero pilots are worth more than the other types of scrubs
         return (getPrimaryRole().isMekWarriorGrouping() || getPrimaryRole().isAerospacePilot() ?
                       MEKWARRIOR_AERO_RANSOM_VALUES :
-                      OTHER_RANSOM_VALUES).get(getExperienceLevel(campaign, false));
+                      OTHER_RANSOM_VALUES).get(getExperienceLevel(campaign, false, true));
     }
 
     public static class PersonUnitRef extends Unit {
@@ -8332,6 +8360,21 @@ public class Person {
     }
 
     /**
+     * Retrieves skill modifier data for this person with default settings.
+     *
+     * <p>This is a convenience method that calls {@link #getSkillModifierData(boolean)} with exclude injury effects
+     * disabled.</p>
+     *
+     * @return a {@link SkillModifierData} object containing the calculated skill modifiers
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public SkillModifierData getSkillModifierData() {
+        return getSkillModifierData(false);
+    }
+
+    /**
      * Gets skill modifier data for this person without reputation adjustments.
      *
      * <p>This is a convenience method that returns skill modifier data with:</p>
@@ -8346,13 +8389,39 @@ public class Person {
      * <p>Use {@link #getSkillModifierData(boolean, boolean, LocalDate)} if reputation adjustments based on age,
      * campaign type, and rank are needed.</p>
      *
+     * @param excludeInjuryEffects {@code true} to ignore all skill modifiers from injury effects.
+     *
      * @return a {@link SkillModifierData} object with reputation set to 0
+     *
+     * @author Illiani
+     * @since 0.50.10
      */
-    public SkillModifierData getSkillModifierData() {
+    public SkillModifierData getSkillModifierData(boolean excludeInjuryEffects) {
         boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
-        List<InjuryEffect> injuryEffects = AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
-              injuries);
+        List<InjuryEffect> injuryEffects = excludeInjuryEffects ? new ArrayList<>() :
+                                                 AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
+                                                       injuries);
         return new SkillModifierData(options, atowAttributes, 0, isIlliterate(), injuryEffects);
+    }
+
+    /**
+     * Retrieves skill modifier data for this person based on campaign settings and current date.
+     *
+     * <p>This is a convenience method that calls the full
+     * {@link #getSkillModifierData(boolean, boolean, LocalDate, boolean)} method with the exclude injury modifiers flag
+     * set to {@code false}.
+     *
+     * @param isUseAgingEffects {@code true} if aging effects should be applied to skill modifiers
+     * @param isClanCampaign    {@code true} if this is a Clan campaign, {@code false} otherwise
+     * @param today             the current date to use for calculating age-based modifiers
+     *
+     * @return a {@link SkillModifierData} object containing the calculated skill modifiers
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public SkillModifierData getSkillModifierData(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
+        return getSkillModifierData(isUseAgingEffects, isClanCampaign, today, false);
     }
 
     /**
@@ -8367,21 +8436,25 @@ public class Person {
      *   <li>Illiteracy status</li>
      * </ul>
      *
-     * @param isUseAgingEffects whether aging effects should be applied to reputation
-     * @param isClanCampaign    whether this is a Clan campaign (affects reputation calculation)
-     * @param today             the current campaign date (used for age-based calculations)
+     * @param isUseAgingEffects    whether aging effects should be applied to reputation
+     * @param isClanCampaign       whether this is a Clan campaign (affects reputation calculation)
+     * @param today                the current campaign date (used for age-based calculations)
+     * @param excludeInjuryEffects {@code true} to ignore all skill modifiers from injury effects.
      *
      * @return a {@link SkillModifierData} object containing all relevant modifiers
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public SkillModifierData getSkillModifierData(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
+    public SkillModifierData getSkillModifierData(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
+          boolean excludeInjuryEffects) {
         int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rank);
 
         boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
-        List<InjuryEffect> injuryEffects = AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
-              injuries);
+        List<InjuryEffect> injuryEffects = excludeInjuryEffects ?
+                                                 new ArrayList<>() :
+                                                 AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
+                                                       injuries);
 
         return new SkillModifierData(options, atowAttributes, adjustedReputation, isIlliterate(), injuryEffects);
     }

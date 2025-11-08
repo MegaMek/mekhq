@@ -105,7 +105,7 @@ public class FactionStandingGreeting {
         }
 
         final Person contractRepresentative = atBContract.getEmployerLiaison();
-        final boolean isGuerrillaWarfare = atBContract.getContractType().isGuerrillaWarfare();
+        final boolean isGuerrillaWarfare = atBContract.getContractType().isGuerrillaType();
         final boolean isIndependent = atBContract.getCommandRights().isIndependent();
         final FactionStandingLevel factionStandingLevel = getFactionStandingsLevel(campaign.getFactionStandings(),
               contractRepresentative);

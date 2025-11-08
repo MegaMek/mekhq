@@ -100,13 +100,16 @@ public class FactionJudgmentSceneDialog {
         String inCharacterText = getInCharacterText(RESOURCE_BUNDLE, dialogKey, commander, secondCharacter,
               factionName, campaignName, locationName, 0, commanderAddress);
 
+        String outOfCharacterText = sceneType != FactionJudgmentSceneType.DISBAND ? null : getTextAt(RESOURCE_BUNDLE,
+              "FactionJudgmentSceneDialog.DISBAND.ooc");
+
         new ImmersiveDialogSimple(
               campaign,
               commander,
               secondCharacter,
               inCharacterText,
               getButtonLabels(sceneType),
-              null,
+              outOfCharacterText,
               null,
               false,
               ImmersiveDialogWidth.LARGE);

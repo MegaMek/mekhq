@@ -57,6 +57,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
@@ -1300,6 +1301,7 @@ public class TransportCostCalculationsTest {
     public void testCalculateAdditionalBayRequirementsFromPassengers(int passengerCount) {
         Person person = new Person(UUID.randomUUID());
         person.setStatus(PersonnelStatus.ACTIVE);
+        person.setOptions(new PersonnelOptions());
         Collection<Person> passengers = new ArrayList<>();
         for (int i = 0; i < passengerCount; i++) {
             passengers.add(person);

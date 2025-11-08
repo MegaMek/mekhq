@@ -129,12 +129,22 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
                 return t + "/" + contract.getRequiredCombatElements();
             }
             return Integer.toString(contract.getRequiredCombatElements());
-        } else if (contract.getContractType().getRequiredCombatRole().ordinal() == column - 2) {
+        }
+
+        CombatRole requiredRole = contract.getContractType().getRequiredCombatRole();
+        CombatRole columnRole = switch (column) {
+            case COL_FIGHT -> MANEUVER;
+            case COL_DEFEND -> FRONTLINE;
+            case COL_SCOUT -> PATROL;
+            case COL_TRAINING -> CADRE;
+            default -> null;
+        };
+
+        if (columnRole != null && requiredRole == columnRole) {
             int t = 0;
             for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
                 if (data.get(row).equals(combatTeam.getContract(campaign)) &&
-                          (combatTeam.getRole() ==
-                                 combatTeam.getContract(campaign).getContractType().getRequiredCombatRole()) &&
+                          (combatTeam.getRole() == requiredRole) &&
                           combatTeam.isEligible(campaign)) {
                     t += combatTeam.getSize(campaign);
                 }

@@ -188,6 +188,7 @@ public class CampaignOptions {
 
     // Delivery
     private int unitTransitTime;
+    private boolean noDeliveriesInTransit;
 
     // Planetary Acquisition
     private boolean usePlanetaryAcquisition;
@@ -268,6 +269,7 @@ public class CampaignOptions {
     private boolean useRandomHitsForVehicles;
     private boolean tougherHealing;
     private boolean useAlternativeAdvancedMedical;
+    private boolean useKinderAlternativeAdvancedMedical;
     private int maximumPatients;
     private boolean doctorsUseAdministration;
     private boolean useUsefulMedics;
@@ -624,11 +626,6 @@ public class CampaignOptions {
     private boolean useAdvancedScouting;
     private SkillLevel skillLevel;
 
-    // Unit Administration
-    private boolean useAero;
-    private boolean useVehicles;
-    private boolean clanVehicles;
-
     // Contract Operations
     private int moraleVictoryEffect;
     private int moraleDecisiveVictoryEffect;
@@ -642,16 +639,9 @@ public class CampaignOptions {
     // Scenarios
     private boolean useGenericBattleValue;
     private boolean useVerboseBidding;
-    private boolean doubleVehicles;
     private int opForLanceTypeMeks;
     private int opForLanceTypeMixed;
     private int opForLanceTypeVehicles;
-    private boolean opForUsesVTOLs;
-    private boolean allowOpForAerospace;
-    private int opForAeroChance;
-    private boolean allowOpForLocalUnits;
-    private int opForLocalUnitChance;
-    private boolean adjustPlayerVehicles;
     private boolean regionalMekVariations;
     private boolean attachedPlayerCamouflage;
     private boolean playerControlsAttachedUnits;
@@ -770,6 +760,7 @@ public class CampaignOptions {
 
         // Delivery
         unitTransitTime = TRANSIT_UNIT_MONTH;
+        noDeliveriesInTransit = false;
 
         // Planetary Acquisition
         usePlanetaryAcquisition = false;
@@ -862,6 +853,7 @@ public class CampaignOptions {
         setUseRandomHitsForVehicles(false);
         setTougherHealing(false);
         useAlternativeAdvancedMedical = false;
+        useKinderAlternativeAdvancedMedical = false;
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
         useUsefulMedics = false;
@@ -1291,10 +1283,6 @@ public class CampaignOptions {
         autoResolveNumberOfScenarios = 100;
         autoResolveExperimentalPacarGuiEnabled = false;
         strategicViewMinimapTheme = "gbc green.theme";
-        // Unit Administration
-        useAero = false;
-        useVehicles = true;
-        clanVehicles = false;
 
         // Morale
         moraleDecisiveVictoryEffect = 2;
@@ -1316,18 +1304,11 @@ public class CampaignOptions {
         // Scenarios
         useGenericBattleValue = true;
         useVerboseBidding = false;
-        doubleVehicles = false;
         setOpForLanceTypeMeks(1);
         setOpForLanceTypeMixed(2);
         setOpForLanceTypeVehicles(3);
-        setOpForUsesVTOLs(true);
-        setAllowOpForAerospace(false);
-        setOpForAeroChance(5);
-        setAllowOpForLocalUnits(false);
-        setOpForLocalUnitChance(5);
         setFixedMapChance(25);
         setSpaUpgradeIntensity(0);
-        adjustPlayerVehicles = false;
         regionalMekVariations = false;
         attachedPlayerCamouflage = true;
         playerControlsAttachedUnits = false;
@@ -2007,7 +1988,32 @@ public class CampaignOptions {
     // endregion Expanded Personnel Information
 
     // region Medical
+
+    /**
+     * Checks if any form of advanced medical system is enabled.
+     *
+     * <p>This method returns {@code true} if either the standard advanced medical system or the alternative advanced
+     * medical system is enabled.</p>
+     *
+     * @return {@code true} if either advanced medical system is in use, {@code false} otherwise
+     *
+     * @see #isUseAdvancedMedicalDirect()
+     */
     public boolean isUseAdvancedMedical() {
+        return useAdvancedMedical || useAlternativeAdvancedMedical;
+    }
+
+    /**
+     * Checks if the standard advanced medical system is enabled.
+     *
+     * <p>This method specifically checks only the standard advanced medical system, ignoring the alternative
+     * advanced medical system setting.</p>
+     *
+     * @return {@code true} if the standard advanced medical system is enabled, {@code false} otherwise
+     *
+     * @see #isUseAdvancedMedical()
+     */
+    public boolean isUseAdvancedMedicalDirect() {
         return useAdvancedMedical;
     }
 
@@ -2061,6 +2067,14 @@ public class CampaignOptions {
 
     public void setUseAlternativeAdvancedMedical(final boolean useAlternativeAdvancedMedical) {
         this.useAlternativeAdvancedMedical = useAlternativeAdvancedMedical;
+    }
+
+    public boolean isUseKinderAlternativeAdvancedMedical() {
+        return useKinderAlternativeAdvancedMedical;
+    }
+
+    public void setUseKinderAlternativeAdvancedMedical(final boolean useKinderAlternativeAdvancedMedical) {
+        this.useKinderAlternativeAdvancedMedical = useKinderAlternativeAdvancedMedical;
     }
 
     public int getMaximumPatients() {
@@ -4482,6 +4496,14 @@ public class CampaignOptions {
         this.unitTransitTime = unitTransitTime;
     }
 
+    public boolean isNoDeliveriesInTransit() {
+        return noDeliveriesInTransit;
+    }
+
+    public void setNoDeliveriesInTransit(final boolean noDeliveriesInTransit) {
+        this.noDeliveriesInTransit = noDeliveriesInTransit;
+    }
+
     public boolean isUsePlanetaryAcquisition() {
         return usePlanetaryAcquisition;
     }
@@ -4814,30 +4836,6 @@ public class CampaignOptions {
         this.useAdvancedScouting = useAdvancedScouting;
     }
 
-    public boolean isUseAero() {
-        return useAero;
-    }
-
-    public void setUseAero(final boolean useAero) {
-        this.useAero = useAero;
-    }
-
-    public boolean isUseVehicles() {
-        return useVehicles;
-    }
-
-    public void setUseVehicles(final boolean useVehicles) {
-        this.useVehicles = useVehicles;
-    }
-
-    public boolean isClanVehicles() {
-        return clanVehicles;
-    }
-
-    public void setClanVehicles(final boolean clanVehicles) {
-        this.clanVehicles = clanVehicles;
-    }
-
     /**
      * Returns whether Generic BV is being used.
      *
@@ -4874,22 +4872,6 @@ public class CampaignOptions {
         this.useVerboseBidding = useVerboseBidding;
     }
 
-    public boolean isDoubleVehicles() {
-        return doubleVehicles;
-    }
-
-    public void setDoubleVehicles(final boolean doubleVehicles) {
-        this.doubleVehicles = doubleVehicles;
-    }
-
-    public boolean isAdjustPlayerVehicles() {
-        return adjustPlayerVehicles;
-    }
-
-    public void setAdjustPlayerVehicles(final boolean adjustPlayerVehicles) {
-        this.adjustPlayerVehicles = adjustPlayerVehicles;
-    }
-
     public int getOpForLanceTypeMeks() {
         return opForLanceTypeMeks;
     }
@@ -4912,14 +4894,6 @@ public class CampaignOptions {
 
     public void setOpForLanceTypeVehicles(final int opForLanceTypeVehicles) {
         this.opForLanceTypeVehicles = opForLanceTypeVehicles;
-    }
-
-    public boolean isOpForUsesVTOLs() {
-        return opForUsesVTOLs;
-    }
-
-    public void setOpForUsesVTOLs(final boolean opForUsesVTOLs) {
-        this.opForUsesVTOLs = opForUsesVTOLs;
     }
 
     public boolean isUseDropShips() {
@@ -5199,38 +5173,6 @@ public class CampaignOptions {
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public void setLimitLanceNumUnits(final boolean limitLanceNumUnits) {
-    }
-
-    public boolean isAllowOpForAerospace() {
-        return allowOpForAerospace;
-    }
-
-    public void setAllowOpForAerospace(final boolean allowOpForAerospace) {
-        this.allowOpForAerospace = allowOpForAerospace;
-    }
-
-    public boolean isAllowOpForLocalUnits() {
-        return allowOpForLocalUnits;
-    }
-
-    public void setAllowOpForLocalUnits(final boolean allowOpForLocalUnits) {
-        this.allowOpForLocalUnits = allowOpForLocalUnits;
-    }
-
-    public int getOpForAeroChance() {
-        return opForAeroChance;
-    }
-
-    public void setOpForAeroChance(final int opForAeroChance) {
-        this.opForAeroChance = opForAeroChance;
-    }
-
-    public int getOpForLocalUnitChance() {
-        return opForLocalUnitChance;
-    }
-
-    public void setOpForLocalUnitChance(final int opForLocalUnitChance) {
-        this.opForLocalUnitChance = opForLocalUnitChance;
     }
 
     public int getFixedMapChance() {

@@ -502,7 +502,7 @@ public class ForceViewPanel extends JScrollablePanel {
         toReturn.append("<html><nobr><font size='3'><b>")
               .append(person.getFullTitle())
               .append("</b><br/><b>")
-              .append(SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false)))
+              .append(SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false, true)))
               .append("</b> ")
               .append(person.getRoleDesc());
 
@@ -536,7 +536,7 @@ public class ForceViewPanel extends JScrollablePanel {
         }
 
         int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
-              person.getSkillLevel(campaign, false));
+              person.getSkillLevel(campaign, false, true));
         if (campaign.getCampaignOptions().isUseFatigue() && (effectiveFatigue > 0)) {
             isFatigued = true;
             if (isInjured) {

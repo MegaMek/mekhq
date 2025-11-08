@@ -350,8 +350,8 @@ public class SalvageForcePicker extends JDialog {
         boolean isTechSecondary1 = tech1.getSecondaryRole().isTechSecondary();
         boolean isTechSecondary2 = tech2.getSecondaryRole().isTechSecondary();
 
-        int expLevel1 = tech1.getExperienceLevel(model.campaign, isTechSecondary1);
-        int expLevel2 = tech2.getExperienceLevel(model.campaign, isTechSecondary2);
+        int expLevel1 = tech1.getExperienceLevel(model.campaign, isTechSecondary1, true);
+        int expLevel2 = tech2.getExperienceLevel(model.campaign, isTechSecondary2, true);
 
         int expCompare = Integer.compare(expLevel2, expLevel1); // Reversed (highest -> lowest, more experienced first)
         if (expCompare != 0) {return expCompare;}
@@ -542,7 +542,7 @@ public class SalvageForcePicker extends JDialog {
             }
             String name = tech.getFullTitle();
             boolean isTechSecondary = tech.getSecondaryRole().isTechSecondary();
-            String skillLevel = tech.getSkillLevel(campaign, isTechSecondary).getShortName();
+            String skillLevel = tech.getSkillLevel(campaign, isTechSecondary, true).getShortName();
             boolean isInjured = tech.needsFixing();
 
             String label = "[" + skillLevel + "] " + name;

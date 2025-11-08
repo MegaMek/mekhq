@@ -721,15 +721,13 @@ public class StratConRulesManager {
      */
     private static void determineIfTurningPointScenario(AtBContract contract, StratConScenario scenario) {
         ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
-        boolean isResupply = scenarioType.isResupply();
-        boolean isJailBreak = scenarioType.isJailBreak();
+        boolean isObjective = scenario.isStrategicObjective();
+        boolean isSpecial = scenarioType.isSpecial();
 
-        if (isResupply || isJailBreak) {
+        if (isSpecial || isObjective) {
             scenario.setTurningPoint(false);
             return;
         }
-
-        boolean isObjective = scenario.isStrategicObjective();
 
         ContractCommandRights commandRights = contract.getCommandRights();
         switch (commandRights) {

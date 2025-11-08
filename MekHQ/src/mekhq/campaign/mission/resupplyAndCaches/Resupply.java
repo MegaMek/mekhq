@@ -801,7 +801,7 @@ public class Resupply {
         Person negotiator;
         negotiatorSkill = NONE.ordinal();
 
-        if (contract.getContractType().isGuerrillaWarfare() || PIRATE_FACTION_CODE.equals(contract.getEmployerCode())) {
+        if (contract.getContractType().isGuerrillaType() || PIRATE_FACTION_CODE.equals(contract.getEmployerCode())) {
             negotiator = campaign.getCommander();
         } else {
             negotiator = null;

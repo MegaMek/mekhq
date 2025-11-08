@@ -4784,26 +4784,10 @@ public class Unit implements ITechnology {
             // Assign the options to our unit
             entity.getCrew().setOptions(options);
 
-            // Assign edge points to spacecraft and vehicle crews and infantry units
-            // This overwrites the Edge value assigned above.
+            // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
+            // assigned above (which will always be 0 in 0.50.10+).
             if (campaignOptions.isUseEdge()) {
-                double sumEdge = 0;
-                for (Person p : drivers) {
-                    sumEdge += p.getCurrentEdge();
-                }
-                // Again, don't count infantrymen twice
-                if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
-                    for (Person p : gunners) {
-                        sumEdge += p.getCurrentEdge();
-                    }
-                }
-                // Average the edge values of pilots and gunners. The Spacecraft Engineer
-                // (vessel crewmembers)
-                // handle edge solely through MHQ as noncombat personnel, so aren't considered
-                // here
-                int edge = (int) Math.round(sumEdge / crewSize);
-                IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
-                edgeOption.setValue((Integer) edge);
+                setEdgeForCrew(crewSize, commanderOnly);
             }
 
             // Reset the composite technician used by spacecraft and infantry
@@ -4811,12 +4795,9 @@ public class Unit implements ITechnology {
             // unit type
             resetEngineer();
 
-            // TODO : Set up crew hits. This might only apply to spacecraft, and should
-            // reflect
-            // the unit's current crew size vs its required crew size. There's also the
-            // question
-            // of what to do with extra crew quarters and crewmember assignments beyond the
-            // minimum.
+            // TODO : Set up crew hits. This might only apply to spacecraft, and should reflect the unit's current
+            //  crew size vs its required crew size. There's also the question of what to do with extra crew quarters
+            //  and crewmember assignments beyond the minimum.
         } else {
             // For other unit types, just use the unit commander's abilities.
             PilotOptions cdrOptions = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
@@ -4841,7 +4822,56 @@ public class Unit implements ITechnology {
                 }
                 entity.getCrew().setHits(commander.getHits(), 0);
             }
+
+            // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
+            // assigned above (which will always be 0 in 0.50.10+).
+            if (campaignOptions.isUseEdge()) {
+                setEdgeForCrew(usesSoloPilot() ? 1 : getCrew().size(), commanderOnly);
+            }
         }
+    }
+
+    /**
+     * Sets the Edge value for the entity's crew based on the average Edge of drivers and gunners.
+     *
+     * <p>This method calculates the average Edge value from all drivers and gunners assigned to the entity, then
+     * applies it to the entity's crew option. Solo pilots and infantry units are handled specially to avoid
+     * double-counting personnel who serve in multiple roles.</p>
+     *
+     * <p>Non-combat crew members (such as vessel crew and combat technicians) are excluded from this calculation as
+     * their Edge is handled separately through MekHQ's non-combat personnel system.</p>
+     *
+     * @param crewSize         the total size of the crew to use for calculating the average Edge value
+     * @param isCommandersOnly {@code true} if the 'Commanders Only' option is enabled for this unit type
+     */
+    private void setEdgeForCrew(double crewSize, boolean isCommandersOnly) {
+        double sumEdge = 0;
+        if (isCommandersOnly) {
+            Person commander = getCommander();
+            if (commander != null) {
+                IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
+                edgeOption.setValue(commander.getCurrentEdge());
+            }
+
+            return;
+        }
+
+        for (Person drivers : drivers) {
+            sumEdge += drivers.getCurrentEdge();
+        }
+
+        // Don't count solo pilots, or Infantry twice. In both cases the drivers are also the gunners
+        if (!usesSoloPilot() && !entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
+            for (Person gunners : gunners) {
+                sumEdge += gunners.getCurrentEdge();
+            }
+        }
+
+        // Average the edge values of pilots and gunners. Non-Gunners, non-drivers (i.e. Vessel Crewmembers and
+        // Combat Technicians mostly) handle edge solely through MHQ as noncombat personnel, so aren't considered here
+        int edge = (int) Math.round(sumEdge / crewSize);
+        IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
+        edgeOption.setValue(edge);
     }
 
     /**
@@ -4869,9 +4899,9 @@ public class Unit implements ITechnology {
                                                      !entity.hasETypeFlag(Entity.ETYPE_BATTLEARMOR);
         boolean isTank = entity instanceof Tank; // Includes Wet Naval and VTOLs
 
-        // For Tanks-type entities both drivers and gunners contribute to gunnery & piloting
-        List<Person> crew = getCompositeCrew(isTank);
-        for (Person person : crew) {
+        // For certain entities both drivers and gunners contribute to gunnery & piloting
+        List<Person> relevantCrew = getCompositeCrew(isTank || entityIsConventionalInfantry, true);
+        for (Person person : relevantCrew) {
             if (person.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
@@ -4896,9 +4926,9 @@ public class Unit implements ITechnology {
             }
         }
 
-        crew = getCompositeCrew(isTank);
+        relevantCrew = getCompositeCrew(isTank || entityIsConventionalInfantry, false);
         boolean smallArmsOnly = campaign.getCampaignOptions().isUseSmallArmsOnly();
-        for (Person person : crew) {
+        for (Person person : relevantCrew) {
             if (person.getHits() > 0 && !usesSoloPilot()) {
                 continue;
             }
@@ -5040,11 +5070,24 @@ public class Unit implements ITechnology {
         entity.getCrew().setMissing(false, 0);
     }
 
-    private List<Person> getCompositeCrew(boolean isTank) {
-        if (isTank) {
+    /**
+     * Returns the appropriate list of personnel based on entity type and role.
+     *
+     * <p>For tank entities, this method returns the entire crew regardless of the role specified. For non-tank,
+     * non-infantry entities, it returns either the drivers or gunners list based on the {@code isDrivers} parameter.
+     *
+     * @param isTankOrInfantry {@code true} if the entity is a tank or infantry, {@code false} otherwise
+     * @param isDrivers        {@code true} to return drivers, {@code false} to return gunners (ignored if
+     *                         {@code isTankOrInfantry} is {@code true})
+     *
+     * @return a list of personnel; for tanks or infantry returns the full crew, for other entities returns either drivers or a copy
+     *       of the gunners list
+     */
+    private List<Person> getCompositeCrew(boolean isTankOrInfantry, boolean isDrivers) {
+        if (isTankOrInfantry) {
             return getCrew();
         } else {
-            return drivers;
+            return isDrivers ? drivers : new ArrayList<>(gunners);
         }
     }
 
@@ -5639,6 +5682,10 @@ public class Unit implements ITechnology {
         return false;
     }
 
+    public boolean isHandheldWeapon() {
+        return entity instanceof HandheldWeapon;
+    }
+
     public int getForceId() {
         return forceId;
     }
@@ -6169,12 +6216,32 @@ public class Unit implements ITechnology {
         return daysToArrival;
     }
 
-    public boolean checkArrival() {
+    /**
+     * Checks and updates the arrival countdown for this unit.
+     *
+     * <p>This method decrements the days to arrival counter and determines whether the unit has arrived. If delivery
+     * is obstructed when the unit would arrive, the arrival is delayed by maintaining the counter at 1 day
+     * remaining.</p>
+     *
+     * <p>When a unit successfully arrives (countdown reaches 0 and delivery is not obstructed), a UnitArrivedEvent
+     * is triggered.</p>
+     *
+     * @param obstructDelivery if {@code true}, delays arrival by one day when the unit would otherwise arrive; if
+     *                         {@code false}, allows normal arrival
+     *
+     * @return {@code true} if the unit has arrived this check
+     */
+    public boolean checkArrival(boolean obstructDelivery) {
         if (daysToArrival > 0) {
             daysToArrival--;
-            if (daysToArrival == 0) {
-                MekHQ.triggerEvent(new UnitArrivedEvent(this));
-                return true;
+            if (daysToArrival <= 0) {
+                if (obstructDelivery) {
+                    daysToArrival = 1;
+                    return false;
+                } else {
+                    MekHQ.triggerEvent(new UnitArrivedEvent(this));
+                    return true;
+                }
             }
         }
         return false;
@@ -6310,8 +6377,8 @@ public class Unit implements ITechnology {
         double timeIncrease = 0.25;
 
         for (Mission mission : activeMissions) {
-            if (mission instanceof AtBContract) {
-                if (((AtBContract) mission).getContractType().isGarrisonDuty()) {
+            if (mission instanceof AtBContract atBContract) {
+                if (atBContract.getContractType().isGarrisonDuty() || atBContract.getContractType().isRetainer()) {
                     continue;
                 }
             }
@@ -6676,7 +6743,8 @@ public class Unit implements ITechnology {
                 partsCost = partsCost.multipliedBy(2.0);
             }
 
-            if (!(entity instanceof Infantry)) {
+            // No engines for infantry or HHW
+            if (!(entity instanceof Infantry) && !(entity instanceof HandheldWeapon)) {
                 if ((engine.getEngineType() == Engine.XL_ENGINE) || (engine.getEngineType() == Engine.XXL_ENGINE)) {
                     partsCost = partsCost.multipliedBy(2.5);
                 } else if (engine.getEngineType() == Engine.LIGHT_ENGINE) {

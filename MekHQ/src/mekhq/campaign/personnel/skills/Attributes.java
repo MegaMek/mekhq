@@ -96,7 +96,7 @@ public class Attributes {
     public static int DEFAULT_ATTRIBUTE_SCORE = 5;
 
     /**
-     * The minimum allowable score for any attribute.
+     * The minimum allowable score for any attribute (other than Edge).
      *
      * <p>Attribute values cannot be set below this limit, and any attempts to do so will result in clamping to this
      * value.</p>
@@ -105,6 +105,14 @@ public class Attributes {
      * and outside the scope of MekHQ tracking (for now).</p>
      */
     public static int MINIMUM_ATTRIBUTE_SCORE = 1;
+
+    /**
+     * The minimum allowable score for the Edge attribute.
+     *
+     * <p>Edge values cannot be set below this limit, and any attempts to do so will result in clamping to this
+     * value.</p>
+     */
+    public static int MINIMUM_EDGE_SCORE = 0;
 
     /**
      * The maximum allowable score for any attribute.
@@ -211,7 +219,7 @@ public class Attributes {
             case INTELLIGENCE -> clamp(intelligence, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
             case WILLPOWER -> clamp(willpower, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
             case CHARISMA -> clamp(charisma, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-            case EDGE -> clamp(edge, 0, MAXIMUM_ATTRIBUTE_SCORE);
+            case EDGE -> clamp(edge, MINIMUM_EDGE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
             default -> 0;
         };
     }
@@ -314,7 +322,7 @@ public class Attributes {
             case INTELLIGENCE -> intelligence = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
             case WILLPOWER -> willpower = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
             case CHARISMA -> charisma = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
-            case EDGE -> edge = clamp(score, 0, cap);
+            case EDGE -> edge = clamp(score, MINIMUM_EDGE_SCORE, cap);
             default -> LOGGER.error("(setAttributeScore) Invalid attribute requested: {}", attribute);
         }
     }
@@ -695,7 +703,7 @@ public class Attributes {
      */
     public void changeEdge(int delta) {
         edge += delta;
-        edge = clamp(edge, 0, MAXIMUM_ATTRIBUTE_SCORE);
+        edge = clamp(edge, MINIMUM_EDGE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     public int getCurrentEdge() {
@@ -704,7 +712,7 @@ public class Attributes {
 
     public void changeCurrentEdge(int delta) {
         currentEdge += delta;
-        currentEdge = clamp(currentEdge, 0, edge);
+        currentEdge = clamp(currentEdge, MINIMUM_EDGE_SCORE, edge);
     }
 
     public void setCurrentEdge(final int currentEdge) {
