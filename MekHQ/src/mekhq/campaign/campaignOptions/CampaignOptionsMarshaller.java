@@ -1064,20 +1064,14 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStratCon", campaignOptions.isUseStratCon());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMaplessStratCon", campaignOptions.isUseStratConMaplessMode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedScouting", campaignOptions.isUseAdvancedScouting());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAero", campaignOptions.isUseAero());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useVehicles", campaignOptions.isUseVehicles());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanVehicles", campaignOptions.isClanVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useGenericBattleValue", campaignOptions.isUseGenericBattleValue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useVerboseBidding", campaignOptions.isUseVerboseBidding());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doubleVehicles", campaignOptions.isDoubleVehicles());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPlayerVehicles", campaignOptions.isAdjustPlayerVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeMeks", campaignOptions.getOpForLanceTypeMeks());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeMixed", campaignOptions.getOpForLanceTypeMixed());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "opForLanceTypeVehicles",
               campaignOptions.getOpForLanceTypeVehicles());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForUsesVTOLs", campaignOptions.isOpForUsesVTOLs());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDropShips", campaignOptions.isUseDropShips());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mercSizeLimited", campaignOptions.isMercSizeLimited());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleVictoryEffect", campaignOptions.getMoraleVictoryEffect());
@@ -1107,10 +1101,6 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isAssignPortraitOnRoleChange());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowDuplicatePortraits",
               campaignOptions.isAllowDuplicatePortraits());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForAeros", campaignOptions.isAllowOpForAerospace());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForLocalUnits", campaignOptions.isAllowOpForLocalUnits());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForAeroChance", campaignOptions.getOpForAeroChance());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLocalUnitChance", campaignOptions.getOpForLocalUnitChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fixedMapChance", campaignOptions.getFixedMapChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaUpgradeIntensity", campaignOptions.getSpaUpgradeIntensity());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModMax", campaignOptions.getScenarioModMax());
