@@ -90,7 +90,7 @@ public enum InjuryEffect {
     DISEASE_BREATHING_SLIGHT("DISEASE_BREATHING_SLIGHT", getWarningColor(), 0, -1, -1, 0, 0, 0, 0, 0, false),
     DISEASE_BREATHING_MODERATE("DISEASE_BREATHING_MODERATE", getWarningColor(), 0, -2, -2, 0, 0, 0, 0, 0, false),
     DISEASE_BREATHING_SEVERE("DISEASE_BREATHING_SEVERE", getNegativeColor(), 0, -3, -3, 0, 0, 0, 0, 0, false),
-    DISEASE_HEMOPHILIA_SLIGHT("DISEASE_HEMOPHILIA_SLIGHT", getWarningColor(), 0, -0, -1, 0, 0, 0, 0, 0, false),
+    DISEASE_HEMOPHILIA_SLIGHT("DISEASE_HEMOPHILIA_SLIGHT", getWarningColor(), 0, 0, -1, 0, 0, 0, 0, 0, false),
     DISEASE_HEMOPHILIA_MODERATE("DISEASE_HEMOPHILIA_MODERATE", getWarningColor(), 0, 0, -2, 0, 0, 0, 0, 0, false),
     DISEASE_HEMOPHILIA_SEVERE("DISEASE_HEMOPHILIA_SEVERE", getNegativeColor(), 0, 0, -3, 0, 0, 0, 0, 0, true),
     DISEASE_VENEREAL_SLIGHT("DISEASE_VENEREAL_SLIGHT", getWarningColor(), 0, 0, 0, 0, 0, 0, 0, -1, false),

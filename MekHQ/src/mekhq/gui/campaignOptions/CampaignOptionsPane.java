@@ -577,7 +577,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
 
         boolean newIsUseMASHTheatres = options.isUseMASHTheatres();
-        if (!isStartUp && newIsUseMASHTheatres && !oldIsUseDiseases) { // Has tracking changed?
+        if (!isStartUp && newIsUseMASHTheatres && !oldIsUseMASHTheatres) { // Has tracking changed?
             new MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
@@ -605,7 +605,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * <p>Personnel are assumed to have prior inoculation for their home planet, while current planet inoculation
      * requires campaign location tracking.</p>
      *
-     * @author Illaini
+     * @author Illiani
      * @since 0.50.10
      */
     private void inoculateAllCharacters() {

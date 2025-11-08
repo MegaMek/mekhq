@@ -3252,7 +3252,7 @@ public class Person {
             if (!planetaryInoculations.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "planetaryInoculations");
                 for (String planetaryInoculation : planetaryInoculations) {
-                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "originalUnitTech", planetaryInoculation);
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetaryInoculation", planetaryInoculation);
                 }
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "planetaryInoculations");
             }

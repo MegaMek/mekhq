@@ -40,7 +40,6 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.Gender;
-import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
@@ -83,8 +82,6 @@ public class InjuryType {
     }
 
     public static void register(int id, String key, InjuryType injType) {
-        MMLogger LOGGER = MMLogger.create(InjuryType.class);
-        LOGGER.info(key);
         Objects.requireNonNull(injType);
         if (id >= 0) {
             if (ID_REGISTRY.containsKey(id)) {
