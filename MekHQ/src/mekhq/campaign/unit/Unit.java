@@ -4784,26 +4784,10 @@ public class Unit implements ITechnology {
             // Assign the options to our unit
             entity.getCrew().setOptions(options);
 
-            // Assign edge points to spacecraft and vehicle crews and infantry units
-            // This overwrites the Edge value assigned above.
+            // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
+            // assigned above (which will always be 0 in 0.50.10+).
             if (campaignOptions.isUseEdge()) {
-                double sumEdge = 0;
-                for (Person p : drivers) {
-                    sumEdge += p.getCurrentEdge();
-                }
-                // Again, don't count infantrymen twice
-                if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
-                    for (Person p : gunners) {
-                        sumEdge += p.getCurrentEdge();
-                    }
-                }
-                // Average the edge values of pilots and gunners. The Spacecraft Engineer
-                // (vessel crewmembers)
-                // handle edge solely through MHQ as noncombat personnel, so aren't considered
-                // here
-                int edge = (int) Math.round(sumEdge / crewSize);
-                IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
-                edgeOption.setValue((Integer) edge);
+                setEdgeForCrew(crewSize, commanderOnly);
             }
 
             // Reset the composite technician used by spacecraft and infantry
@@ -4811,12 +4795,9 @@ public class Unit implements ITechnology {
             // unit type
             resetEngineer();
 
-            // TODO : Set up crew hits. This might only apply to spacecraft, and should
-            // reflect
-            // the unit's current crew size vs its required crew size. There's also the
-            // question
-            // of what to do with extra crew quarters and crewmember assignments beyond the
-            // minimum.
+            // TODO : Set up crew hits. This might only apply to spacecraft, and should reflect the unit's current
+            //  crew size vs its required crew size. There's also the question of what to do with extra crew quarters
+            //  and crewmember assignments beyond the minimum.
         } else {
             // For other unit types, just use the unit commander's abilities.
             PilotOptions cdrOptions = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
@@ -4841,7 +4822,56 @@ public class Unit implements ITechnology {
                 }
                 entity.getCrew().setHits(commander.getHits(), 0);
             }
+
+            // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
+            // assigned above (which will always be 0 in 0.50.10+).
+            if (campaignOptions.isUseEdge()) {
+                setEdgeForCrew(usesSoloPilot() ? 1 : getCrew().size(), commanderOnly);
+            }
         }
+    }
+
+    /**
+     * Sets the Edge value for the entity's crew based on the average Edge of drivers and gunners.
+     *
+     * <p>This method calculates the average Edge value from all drivers and gunners assigned to the entity, then
+     * applies it to the entity's crew option. Solo pilots and infantry units are handled specially to avoid
+     * double-counting personnel who serve in multiple roles.</p>
+     *
+     * <p>Non-combat crew members (such as vessel crew and combat technicians) are excluded from this calculation as
+     * their Edge is handled separately through MekHQ's non-combat personnel system.</p>
+     *
+     * @param crewSize         the total size of the crew to use for calculating the average Edge value
+     * @param isCommandersOnly {@code true} if the 'Commanders Only' option is enabled for this unit type
+     */
+    private void setEdgeForCrew(double crewSize, boolean isCommandersOnly) {
+        double sumEdge = 0;
+        if (isCommandersOnly) {
+            Person commander = getCommander();
+            if (commander != null) {
+                IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
+                edgeOption.setValue(commander.getCurrentEdge());
+            }
+
+            return;
+        }
+
+        for (Person drivers : drivers) {
+            sumEdge += drivers.getCurrentEdge();
+        }
+
+        // Don't count solo pilots, or Infantry twice. In both cases the drivers are also the gunners
+        if (!usesSoloPilot() && !entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
+            for (Person gunners : gunners) {
+                sumEdge += gunners.getCurrentEdge();
+            }
+        }
+
+        // Average the edge values of pilots and gunners. Non-Gunners, non-drivers (i.e. Vessel Crewmembers and
+        // Combat Technicians mostly) handle edge solely through MHQ as noncombat personnel, so aren't considered here
+        int edge = (int) Math.round(sumEdge / crewSize);
+        IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
+        edgeOption.setValue(edge);
     }
 
     /**
