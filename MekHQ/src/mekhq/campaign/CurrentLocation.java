@@ -57,6 +57,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
@@ -383,8 +384,9 @@ public class CurrentLocation {
         }
 
         // If we were previously traveling and now aren't, we should check to see if we have arrived at a contract
-        // system earlier than necessary.
+        // system earlier than necessary. And, if appropriate, trigger innoculation prompts
         if (wasTraveling && isOnPlanet()) {
+            Inoculations.triggerInoculationPrompt(campaign, false);
             testForEarlyArrival(campaign);
         }
     }

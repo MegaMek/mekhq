@@ -130,6 +130,8 @@ import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.DiseaseService;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -191,6 +193,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_EDIT_INJURIES = "EDIT_INJURIES";
     private static final String CMD_ADD_RANDOM_INJURY = "ADD_RANDOM_INJURY";
     private static final String CMD_ADD_RANDOM_INJURIES = "ADD_RANDOM_INJURIES";
+    private static final String CMD_ADD_RANDOM_DISEASE = "CMD_ADD_RANDOM_DISEASE";
     private static final String CMD_REMOVE_INJURY = "REMOVE_INJURY";
     private static final String CMD_REPLACE_MISSING_LIMB = "REPLACE_MISSING_LIMB";
     private static final String CMD_CLEAR_INJURIES = "CLEAR_INJURIES";
@@ -1581,6 +1584,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ADD_RANDOM_INJURY: {
                 for (Person person : people) {
                     InjuryUtil.resolveCombatDamage(getCampaign(), person, 1);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_ADD_RANDOM_DISEASE: {
+                InjuryType disease = DiseaseService.catchRandomDisease();
+                Inoculations.triggerDiseaseSpreadMessages(getCampaign(), !getCampaign().getLocation().isOnPlanet(),
+                      Collections.singleton(disease.getSimpleName()));
+                for (Person person : people) {
+                    Inoculations.applyDisease(getCampaign(), person, disease);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -4416,6 +4429,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 menuItem = new JMenuItem(resources.getString("addRandomInjuries.format"));
                 menuItem.setActionCommand(CMD_ADD_RANDOM_INJURIES);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+
+                menuItem = new JMenuItem(resources.getString("addRandomDisease.format"));
+                menuItem.setActionCommand(CMD_ADD_RANDOM_DISEASE);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
             }

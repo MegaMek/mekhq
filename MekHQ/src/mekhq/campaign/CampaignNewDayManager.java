@@ -138,6 +138,7 @@ import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.medical.MedicalController;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.QuickTrain;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
@@ -274,13 +275,13 @@ public class CampaignNewDayManager {
         campaign.getLocation().newDay(campaign);
         updatedLocation = campaign.getLocation();
 
-
         updateFacilities();
 
         processNewDayPersonnel();
 
         if (isMonday) {
             Fatigue.processDeploymentFatigueResponses(campaign);
+            Inoculations.performDiseaseChecks(campaign);
         }
 
         // Manage the Markets
