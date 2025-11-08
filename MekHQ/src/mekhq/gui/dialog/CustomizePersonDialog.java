@@ -1649,9 +1649,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         constraints.gridx = 0;
 
         AgingMilestone milestone = getMilestone(person.getAge(campaign.getLocalDate()));
-        SkillModifierData skillModifierData = person.getSkillModifierData(campaign.getCampaignOptions()
-                                                                                .isUseAgeEffects(),
-              campaign.isClanCampaign(), campaign.getLocalDate());
+        SkillModifierData skillModifierData = person.getSkillModifierData(
+              campaign.getCampaignOptions().isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate(),
+              true);
 
         List<String> sortedSkillNames = getSortedSkills();
         for (int index = 0; index < sortedSkillNames.size(); index++) {

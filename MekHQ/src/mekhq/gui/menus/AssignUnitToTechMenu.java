@@ -103,7 +103,7 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
                 }
 
                 if (tech.hasSkill(skillName)) {
-                    SkillModifierData skillModifierData = tech.getSkillModifierData();
+                    SkillModifierData skillModifierData = tech.getSkillModifierData(true);
 
                     final SkillLevel skillLevel = (tech.getSkillForWorkingOn(units[0]) == null) ?
                                                         SkillLevel.NONE :

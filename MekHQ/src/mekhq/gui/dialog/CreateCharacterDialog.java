@@ -1254,9 +1254,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         List<String> sortedSkillNames = SkillType.getSortedSkillNames();
 
-        SkillModifierData skillModifierData = person.getSkillModifierData(campaign.getCampaignOptions()
-                                                                                .isUseAgeEffects(),
-              campaign.isClanCampaign(), campaign.getLocalDate());
+        SkillModifierData skillModifierData = person.getSkillModifierData(
+              campaign.getCampaignOptions().isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate(),
+              true);
         SkillType skillType;
         for (int index = 0; index < sortedSkillNames.size(); index++) {
             c.gridy = index;

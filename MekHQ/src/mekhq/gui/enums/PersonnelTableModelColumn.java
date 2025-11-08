@@ -621,7 +621,7 @@ public enum PersonnelTableModelColumn {
         final int baseBedCapacity = campaignOptions.getMaximumPatients();
         final boolean isUseMedicalAdmin = campaignOptions.isDoctorsUseAdministration();
 
-        SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgeEffects, isClanCampaign, today);
+        SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgeEffects, isClanCampaign, today, true);
         switch (this) {
             case PERSON:
                 return "";
@@ -682,7 +682,7 @@ public enum PersonnelTableModelColumn {
                 return GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
             case SKILL_LEVEL:
                 return "<html>" +
-                             SkillType.getColoredExperienceLevelName(person.getExperienceLevel(campaign, false)) +
+                             SkillType.getColoredExperienceLevelName(person.getExperienceLevel(campaign, false, true)) +
                              "</html>";
             case PERSONNEL_ROLE:
                 return person.getFormatedRoleDescriptions(today);
@@ -1048,7 +1048,7 @@ public enum PersonnelTableModelColumn {
             case FATIGUE:
                 return Integer.toString(getEffectiveFatigue(person.getFatigue(),
                       person.isClanPersonnel(),
-                      person.getSkillLevel(campaign, false)));
+                      person.getSkillLevel(campaign, false, true)));
             case SPA_COUNT:
                 return Integer.toString(person.countOptions(PersonnelOptions.LVL3_ADVANTAGES));
             case IMPLANT_COUNT:

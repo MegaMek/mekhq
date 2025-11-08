@@ -926,7 +926,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setActionCommand(COMMAND_ADD_LANCE_TECH + tech.getId() + '|' + forceIds);
                             menuItem.addActionListener(this);
 
-                            switch (tech.getSkillLevel(gui.getCampaign(), !tech.getPrimaryRole().isTech())) {
+                            switch (tech.getSkillLevel(gui.getCampaign(), !tech.getPrimaryRole().isTech(), true)) {
                                 case LEGENDARY:
                                     legendaryMenu.add(menuItem);
                                     break;
