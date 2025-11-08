@@ -91,6 +91,8 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * @since 0.50.06
  */
 public class PersonnelMarketMekHQ extends NewPersonnelMarket {
+    public static final int ALTERNATE_ADVANCED_MEDICAL_RECRUITMENT_MULTIPLIER = 2;
+
     /**
      * Constructs a personnel market using the MekHQ classic ruleset.
      *
@@ -334,6 +336,13 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         getLogger().debug("Base rolls: {}", lengthOfMonth);
 
         int rolls = lengthOfMonth * getSystemStatusRecruitmentMultiplier();
+        if (getCampaign().getCampaignOptions().isUseAlternativeAdvancedMedical()) {
+            // Alt Advanced Medical increases the impact of injuries. Therefore, players need to maintain a larger
+            // roster of combat personnel. This multiplier doubles the number of recruits in the pool to account for
+            // this.
+            rolls *= ALTERNATE_ADVANCED_MEDICAL_RECRUITMENT_MULTIPLIER;
+        }
+
         getLogger().debug("Rolls modified for location: {}", rolls);
 
         rolls = clamp((int) round(rolls * getSystemPopulationRecruitmentMultiplier()), 1, rolls);
