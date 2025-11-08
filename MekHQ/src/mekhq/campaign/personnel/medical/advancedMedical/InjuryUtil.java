@@ -49,7 +49,6 @@ import megamek.common.compute.Compute;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
 import mekhq.campaign.log.MedicalLogger;
@@ -175,11 +174,8 @@ public final class InjuryUtil {
         Collection<Injury> newInjuries = AdvancedMedicalAlternate.generateInjuriesFromHits(campaign, person, hits);
         for (Injury injury : newInjuries) {
             if (isUseKinderMode) {
-                MMLogger LOGGER = MMLogger.create(InjuryUtil.class);
                 int originalRecoveryTime = injury.getOriginalTime();
-                LOGGER.info("originalRecoveryTime: " + originalRecoveryTime);
                 int newRecoveryTime = (int) ceil(originalRecoveryTime / 2.0);
-                LOGGER.info("newRecoveryTime: " + newRecoveryTime);
                 injury.setOriginalTime(newRecoveryTime);
                 injury.setTime(newRecoveryTime);
             }
