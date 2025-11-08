@@ -5050,7 +5050,7 @@ public class Unit implements ITechnology {
      * @param isDrivers        {@code true} to return drivers, {@code false} to return gunners (ignored if
      *                         {@code isTankOrInfantry} is {@code true})
      *
-     * @return a list of personnel; for tanks returns the full crew, for other entities returns either drivers or a copy
+     * @return a list of personnel; for tanks or infantry returns the full crew, for other entities returns either drivers or a copy
      *       of the gunners list
      */
     private List<Person> getCompositeCrew(boolean isTankOrInfantry, boolean isDrivers) {
