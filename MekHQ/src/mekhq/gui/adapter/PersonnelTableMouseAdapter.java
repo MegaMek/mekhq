@@ -4334,9 +4334,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                       resources.getString("envspec_light.text"),
                       costDesc));
-                menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                       "<br><br>" +
-                                                       spa.getAllPrereqDesc()));
+                try {
+                    menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                           "<br><br>" +
+                                                           spa.getAllPrereqDesc()));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
                 menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
                       Crew.ENVIRONMENT_SPECIALIST_LIGHT,
                       String.valueOf(cost)));
@@ -4550,9 +4554,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
                       resources.getString("rangemaster_lng.text"),
                       costDesc));
-                menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                       "<br><br>" +
-                                                       spa.getAllPrereqDesc()));
                 menuItem.setToolTipText(wordWrap(spa.getDescription() +
                                                        "<br><br>" +
                                                        spa.getAllPrereqDesc()));
