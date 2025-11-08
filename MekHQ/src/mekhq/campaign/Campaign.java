@@ -2171,7 +2171,7 @@ public class Campaign implements ITechManager {
     }
 
     public boolean getMashTheatresWithinCapacity() {
-        return mashTheatreCapacity >= getPatientsAssignedToDoctors().size();
+        return isOnContractAndPlanetside() || mashTheatreCapacity >= getPatientsAssignedToDoctors().size();
     }
 
     public int getMashTheatreCapacity() {
