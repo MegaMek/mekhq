@@ -47,13 +47,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import megamek.common.units.Entity;
-import megamek.common.units.EntityMovementMode;
-import megamek.common.loaders.MekFileParser;
-import megamek.common.loaders.MekSummary;
-import megamek.common.units.UnitType;
 import megamek.common.enums.Gender;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.UnitType;
 import megamek.common.universe.FactionLeaderData;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -120,8 +120,9 @@ public class FactionAccoladeEvent {
         this.campaign = campaign;
         this.factionCode = accoladingFaction.getShortName();
 
-        // This is a silent accolade level, it gets logged internally, but the player isn't made aware of it
+        // This is a minor accolade level with no special effects
         if (accoladeLevel.is(TAKING_NOTICE_0) || accoladeLevel.is(TAKING_NOTICE_1)) {
+            triggerTakingNoticeNotification(campaign, accoladingFaction, accoladeLevel);
             return;
         }
 
@@ -162,7 +163,10 @@ public class FactionAccoladeEvent {
             }
 
             ImmersiveDialogWidth dialogWidth;
-            if (accoladeLevel.is(APPEARING_IN_SEARCHES) || isCashReward) {
+            if (accoladeLevel.is(APPEARING_IN_SEARCHES) ||
+                      accoladeLevel.is(TAKING_NOTICE_0) ||
+                      accoladeLevel.is(TAKING_NOTICE_1) ||
+                      isCashReward) {
                 dialogWidth = ImmersiveDialogWidth.MEDIUM;
             } else {
                 dialogWidth = ImmersiveDialogWidth.LARGE;
@@ -222,6 +226,14 @@ public class FactionAccoladeEvent {
         }
     }
 
+    private static void triggerTakingNoticeNotification(Campaign campaign, Faction accoladingFaction,
+          FactionAccoladeLevel accoladeLevel) {
+        String factionName = FactionStandingUtilities.getFactionName(accoladingFaction, campaign.getGameYear());
+        String key = "FactionJudgmentDialog.message." + accoladeLevel.name() + ".message";
+        String message = getFormattedTextAt(RESOURCE_BUNDLE, key, factionName);
+        new ImmersiveDialogNotification(campaign, message, true);
+    }
+
     /**
      * Determines and constructs the {@link Person} who will serve as the speaker for a given accolade event based on
      * the campaign state, the awarding faction, and the level of the accolade.
@@ -241,7 +253,9 @@ public class FactionAccoladeEvent {
      */
     private static Person getSpeaker(Campaign campaign, Faction accoladingFaction, FactionAccoladeLevel accoladeLevel) {
         Person speaker;
-        if (accoladeLevel.is(APPEARING_IN_SEARCHES)) {
+        if (accoladeLevel.is(TAKING_NOTICE_0) || accoladeLevel.is(TAKING_NOTICE_1)) {
+            return null;
+        } else if (accoladeLevel.is(APPEARING_IN_SEARCHES)) {
             speaker = campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND);
         } else {
             boolean isLetterFromHeadOfState = accoladeLevel.is(LETTER_FROM_HEAD_OF_STATE);
