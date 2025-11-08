@@ -663,10 +663,10 @@ public class ContractMarketDialog extends JDialog {
 
 
         AtBContractType contractType = ((AtBContract) selectedContract).getContractType();
-        if (contractType.isGarrisonDuty()) {
+        if (contractType.isGarrisonDuty() || contractType.isRetainer()) {
             inCharacterResourceKey = "messageChallengeGarrison.inCharacter";
             outOfCharacterResourceKey = "messageChallengeGarrison.outOfCharacter";
-        } else if (contractType.isGuerrillaWarfare()) {
+        } else if (contractType.isGuerrillaType()) {
             inCharacterResourceKey = "messageChallengeGuerrilla.inCharacter";
             outOfCharacterResourceKey = "messageChallengeGuerrilla.outOfCharacter";
         } else {

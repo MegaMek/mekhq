@@ -6314,8 +6314,8 @@ public class Unit implements ITechnology {
         double timeIncrease = 0.25;
 
         for (Mission mission : activeMissions) {
-            if (mission instanceof AtBContract) {
-                if (((AtBContract) mission).getContractType().isGarrisonDuty()) {
+            if (mission instanceof AtBContract atBContract) {
+                if (atBContract.getContractType().isGarrisonDuty() || atBContract.getContractType().isRetainer()) {
                     continue;
                 }
             }

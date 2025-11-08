@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.market.contractMarket;
 
+import static java.lang.Math.max;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.ELITE;
@@ -48,6 +49,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -72,6 +74,7 @@ import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
@@ -92,6 +95,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * @author Neoancient
  */
 public class AtbMonthlyContractMarket extends AbstractContractMarket {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AtbMonthlyContractMarket";
     private static final MMLogger logger = MMLogger.create(AtbMonthlyContractMarket.class);
 
     private static final int COMSTAR_CO_OPT_CHANCE = 200;
@@ -119,6 +123,19 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (((campaign.getLocalDate().getDayOfMonth() == 1)) || newCampaign) {
             // need to copy to prevent concurrent modification errors
             new ArrayList<>(contracts).forEach(this::removeContract);
+
+            Person campaignCommander = campaign.getCommander();
+            if (campaignCommander != null && !newCampaign) {
+                if (campaignCommander.getConnections() > 0) {
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "AtbMonthlyContractMarket.connectionsReport.normal",
+                          campaignCommander.getHyperlinkedFullTitle()));
+                } else {
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "AtbMonthlyContractMarket.connectionsReport.none",
+                          campaignCommander.getHyperlinkedFullTitle()));
+                }
+            }
 
             int unitRatingMod = campaign.getAtBUnitRatingMod();
 
@@ -253,7 +270,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
 
             if (newCampaign) {
-                numContracts = Math.max(numContracts, 2);
+                numContracts = max(numContracts, 2);
             }
 
             for (int i = 0; i < numContracts; i++) {
@@ -405,22 +422,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
         contract.setEmployerCode(employer, campaign.getGameYear());
-        if (campaign.isPirateCampaign()) {
-            int connections = 0;
-            Person commander = campaign.getCommander();
-            if (commander != null) {
-                connections = commander.getAdjustedConnections();
-            }
-            int roll = d6(2) + connections;
-            if (roll < 6) {
-                contract.setContractType(AtBContractType.RECON_RAID);
-            } else {
-                contract.setContractType(AtBContractType.OBJECTIVE_RAID);
-            }
-        } else {
-            contract.setContractType(findMissionType(unitRatingMod,
-                  Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()));
-        }
+
+        getContractType(campaign, contract);
 
         setEnemyCode(contract);
         setIsRiotDuty(contract);
@@ -503,8 +506,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     protected AtBContract generateAtBSubcontract(Campaign campaign, AtBContract parent, int unitRatingMod) {
         AtBContract contract = new AtBContract("New Subcontract");
         contract.setEmployerCode(parent.getEmployerCode(), campaign.getGameYear());
-        contract.setContractType(findMissionType(unitRatingMod,
-              Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()));
+        getContractType(campaign, contract);
 
         if (contract.getContractType().isPirateHunting()) {
             Faction employer = contract.getEmployerFaction();
@@ -565,10 +567,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
 
-        contract.setCommandRights(ContractCommandRights.values()[Math.max(parent.getCommandRights().ordinal() - 1, 0)]);
+        contract.setCommandRights(ContractCommandRights.values()[max(parent.getCommandRights().ordinal() - 1, 0)]);
         contract.setSalvageExchange(parent.isSalvageExchange());
-        contract.setSalvagePct(Math.max(parent.getSalvagePct() - 10, 0));
-        contract.setStraightSupport(Math.max(parent.getStraightSupport() - 20, 0));
+        contract.setSalvagePct(max(parent.getSalvagePct() - 10, 0));
+        contract.setStraightSupport(max(parent.getStraightSupport() - 20, 0));
         if (parent.getBattleLossComp() <= 10) {
             contract.setBattleLossComp(0);
         } else if (parent.getBattleLossComp() <= 20) {
@@ -597,6 +599,41 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.clanTechSalvageOverride();
 
         return contract;
+    }
+
+    /**
+     * Determines and sets the contract type for a new AtB contract through negotiation.
+     *
+     * <p>This method performs a negotiation skill check using the campaign commander's negotiation skill and
+     * connections. The margin of success from this check, combined with the commander's connections rating, influences
+     * which contract types are available from the employer. The negotiation results are added to the campaign
+     * report.</p>
+     *
+     * @param campaign the current campaign
+     * @param contract the AtB contract to assign a type to
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void getContractType(Campaign campaign, AtBContract contract) {
+        Person campaignCommander = campaign.getFlaggedCommander();
+
+        int connections = 0;
+        int negotiationsMarginOfSuccess = 0;
+        if (campaignCommander != null) {
+            connections = campaignCommander.getConnections();
+
+            boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
+            boolean isClanCampaign = campaign.isClanCampaign();
+            SkillCheckUtility checkUtility = new SkillCheckUtility(campaignCommander, S_NEGOTIATION, null,
+                  0, false, true, isUseAgingEffects, isClanCampaign, campaign.getLocalDate());
+            negotiationsMarginOfSuccess = max(0, checkUtility.getMarginOfSuccess());
+
+            campaign.addReport(checkUtility.getResultsText());
+        }
+
+        contract.setContractType(ContractTypePicker.findMissionType(contract.getEmployerFaction(), connections,
+              negotiationsMarginOfSuccess));
     }
 
     /**
@@ -897,7 +934,9 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         int[][] missionMods = { { 1, 0, 1, 0 }, { 0, 1, -1, -3 }, { -3, 0, 2, 1 }, { -2, 1, -1, -1 }, { -2, 0, 2, 3 },
                                 { -1, 1, 1, 1 }, { -2, 3, -2, -1 }, { 2, 2, -1, -1 }, { 0, 2, 2, 1 }, { -1, 0, 1, 2 },
-                                { -1, -2, 1, -1 }, { -1, -1, 2, 1 } };
+                                { -1, -2, 1, -1 }, { -1, -1, 2, 1 }, { 2, 1, -1, -3 }, { -1, 4, -3, -2 },
+                                { -3, 0, 2, 1 }, { -1, -2, 1, -1 }, { -2, 0, 2, 1 }, { -1, 4, -3, -2 },
+                                { 2, 1, -1, -1 } };
         for (int i = 0; i < mods.mods.length; i++) {
             mods.mods[i] += missionMods[contract.getContractType().ordinal()][i];
         }

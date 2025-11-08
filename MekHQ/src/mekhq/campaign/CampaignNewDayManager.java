@@ -1566,7 +1566,7 @@ public class CampaignNewDayManager {
      * @param contract the {@link AtBContract} for which resupply is being processed
      */
     private void processResupply(AtBContract contract) {
-        boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare()
+        boolean isGuerrilla = contract.getContractType().isGuerrillaType()
                                     || PIRATE_FACTION_CODE.equals(contract.getEmployerCode());
 
         if (!isGuerrilla || randomInt(4) == 0) {
