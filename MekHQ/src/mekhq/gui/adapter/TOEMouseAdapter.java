@@ -1023,6 +1023,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 // Only add units that have commanders
                 // Or Gun Emplacements!
                 // Or don't need a crew (trailers)
+                // Or HHWs
                 // TODO: Or Robotic Systems!
                 JMenu unsorted = new JMenu("Unsorted");
 
@@ -1044,7 +1045,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             }
                             unitTypeMenus.get(type).setEnabled(true);
                         }
-                    } else if ((u.getForceId() < 1) && (u.isPresent()) && (u.isUnmannedTrailer())) {
+                    } else if ((u.getForceId() < 1) &&
+                                     (u.isPresent()) &&
+                                     (u.isUnmannedTrailer() || u.isHandheldWeapon())) {
                         JMenuItem menuItem0 = new JMenuItem(u.getName());
                         menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + '|' + forceIds);
                         menuItem0.addActionListener(this);
