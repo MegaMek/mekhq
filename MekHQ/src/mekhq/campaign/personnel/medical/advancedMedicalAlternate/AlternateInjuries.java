@@ -613,7 +613,7 @@ public class AlternateInjuries {
     // Diseases
     private abstract static class Disease extends BaseInjury {
         protected Disease() {
-            super(DiseaseService.getDiseaseDuration(),
+            super(5, // This is just a placeholder value, we assign it elsewhere
                   false,
                   InjuryLevel.DISEASE,
                   InjuryEffect.NONE,
@@ -658,6 +658,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GROWTHS_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
         }
 
         @Override
@@ -702,6 +703,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.INFECTION_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
         }
 
         @Override
@@ -746,6 +748,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEARING_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
         }
 
         @Override
@@ -790,6 +793,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WEAKNESS_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
         }
 
         @Override
@@ -834,6 +838,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SORES_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
         }
 
         @Override
@@ -878,6 +883,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FLU_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
         }
 
         @Override
@@ -922,6 +928,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIGHT_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
         }
 
         @Override
@@ -966,6 +973,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TREMORS_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
         }
 
         @Override
@@ -1010,6 +1018,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BREATHING_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
         }
 
         @Override
@@ -1054,6 +1063,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEMOPHILIA_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
         }
 
         @Override
@@ -1098,6 +1108,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.VENEREAL_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
         }
 
         @Override

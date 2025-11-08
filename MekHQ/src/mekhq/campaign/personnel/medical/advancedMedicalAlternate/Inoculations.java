@@ -287,12 +287,19 @@ public class Inoculations {
             return;
         }
 
-        Injury newInjury = disease.newInjury(campaign, person, BodyLocation.INTERNAL, 1);
-        if (newInjury == null) {
+        Injury newDisease = disease.newInjury(campaign, person, BodyLocation.INTERNAL, 1);
+        if (newDisease == null) {
             LOGGER.error("Failed to generate disease of type {} at body location {} with duration multiplier {}",
                   disease, BodyLocation.INTERNAL, 1);
         } else {
-            person.addInjury(newInjury);
+            int duration = DiseaseService.getDiseaseDuration();
+            newDisease.setOriginalTime(duration);
+            newDisease.setTime(duration);
+            person.addInjury(newDisease);
+
+            if (disease.impliesDead(BodyLocation.INTERNAL)) {
+                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.DISEASE);
+            }
         }
     }
 
