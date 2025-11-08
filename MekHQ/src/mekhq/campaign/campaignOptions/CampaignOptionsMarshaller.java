@@ -337,7 +337,9 @@ public class CampaignOptionsMarshaller {
         // endregion Admin
 
         // region Medical
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedMedical", campaignOptions.isUseAdvancedMedical());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedMedical", campaignOptions.isUseAdvancedMedicalDirect());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useKinderAlternativeAdvancedMedical",
+              campaignOptions.isUseKinderAlternativeAdvancedMedical());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "healWaitingPeriod", campaignOptions.getHealingWaitingPeriod());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
