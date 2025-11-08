@@ -196,6 +196,7 @@ public class SalvageCampaignOptionsChangedConfirmationDialog extends JDialog {
             truckCount *= 2; // 2 vehicles per point
         }
 
+        // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
         String unitName = "BattleMech Recovery Vehicle";
         for (int i = 0; i < truckCount; i++) {
             MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unitName);
