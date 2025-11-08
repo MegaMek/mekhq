@@ -275,6 +275,19 @@ public class StratConContractInitializer {
         negotiateInitialSupportPoints(campaign, contract);
     }
 
+    /**
+     * Calculates the scenario odds with optional adjustment for alternate advanced medical rules.
+     *
+     * <p>This method retrieves the base scenario odds from the contract definition and applies a reduction modifier
+     * when alternate advanced medical rules are enabled. The reduction accounts for the increased danger of scenarios
+     * under these rules by lowering the scenario frequency to 66% of the base rate, with a minimum threshold of 5.</p>
+     *
+     * @param isUseAltAdvancedMedical if true, applies a 0.66 multiplier to reduce scenario frequency due to increased
+     *                                danger; if false, returns base odds
+     * @param contractDefinition      the contract definition containing base scenario odds configuration
+     *
+     * @return the calculated scenario odds, minimum of 5 if alternate medical rules are active
+     */
     public static int getScenarioOdds(boolean isUseAltAdvancedMedical, StratConContractDefinition contractDefinition) {
         int scenarioOdds = getScenarioOdds(contractDefinition);
         if (isUseAltAdvancedMedical) {
