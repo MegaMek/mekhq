@@ -6173,12 +6173,32 @@ public class Unit implements ITechnology {
         return daysToArrival;
     }
 
-    public boolean checkArrival() {
+    /**
+     * Checks and updates the arrival countdown for this unit.
+     *
+     * <p>This method decrements the days to arrival counter and determines whether the unit has arrived. If delivery
+     * is obstructed when the unit would arrive, the arrival is delayed by maintaining the counter at 1 day
+     * remaining.</p>
+     *
+     * <p>When a unit successfully arrives (countdown reaches 0 and delivery is not obstructed), a UnitArrivedEvent
+     * is triggered.</p>
+     *
+     * @param obstructDelivery if {@code true}, delays arrival by one day when the unit would otherwise arrive; if
+     *                         {@code false}, allows normal arrival
+     *
+     * @return {@code true} if the unit has arrived this check
+     */
+    public boolean checkArrival(boolean obstructDelivery) {
         if (daysToArrival > 0) {
             daysToArrival--;
-            if (daysToArrival == 0) {
-                MekHQ.triggerEvent(new UnitArrivedEvent(this));
-                return true;
+            if (daysToArrival <= 0) {
+                if (obstructDelivery) {
+                    daysToArrival = 1;
+                    return false;
+                } else {
+                    MekHQ.triggerEvent(new UnitArrivedEvent(this));
+                    return true;
+                }
             }
         }
         return false;
