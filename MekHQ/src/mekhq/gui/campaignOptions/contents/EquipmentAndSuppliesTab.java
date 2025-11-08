@@ -134,6 +134,7 @@ public class EquipmentAndSuppliesTab {
     private static final int TRANSIT_UNIT_WEEK = 1;
     private static final int TRANSIT_UNIT_MONTH = 2;
     private static final int TRANSIT_UNIT_NUM = 3;
+    private JCheckBox chkNoDeliveriesInTransit;
     //end Delivery Tab
 
     //start Planetary Acquisition Tab
@@ -252,6 +253,7 @@ public class EquipmentAndSuppliesTab {
     private void initializeDelivery() {
         lblTransitTimeUnits = new JLabel();
         choiceTransitTimeUnits = new MMComboBox<>("choiceTransitTimeUnits", getTransitUnitOptions());
+        chkNoDeliveriesInTransit = new JCheckBox();
     }
 
     /**
@@ -411,6 +413,9 @@ public class EquipmentAndSuppliesTab {
         lblTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
         choiceTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
 
+        chkNoDeliveriesInTransit = new CampaignOptionsCheckBox("NoDeliveriesInTransit");
+        chkNoDeliveriesInTransit.addMouseListener(createTipPanelUpdater(acquisitionHeader, "NoDeliveriesInTransit"));
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AcquisitionPanel", true, "AcquisitionPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -462,6 +467,10 @@ public class EquipmentAndSuppliesTab {
         panel.add(lblTransitTimeUnits, layout);
         layout.gridx++;
         panel.add(choiceTransitTimeUnits, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkNoDeliveriesInTransit, layout);
 
         return panel;
     }
@@ -1136,6 +1145,7 @@ public class EquipmentAndSuppliesTab {
 
         // Delivery
         options.setUnitTransitTime(choiceTransitTimeUnits.getSelectedIndex());
+        options.setNoDeliveriesInTransit(chkNoDeliveriesInTransit.isSelected());
 
         // Planetary Acquisitions
         options.setPlanetaryAcquisition(usePlanetaryAcquisitions.isSelected());
@@ -1218,6 +1228,7 @@ public class EquipmentAndSuppliesTab {
 
         // Delivery
         choiceTransitTimeUnits.setSelectedIndex(options.getUnitTransitTime());
+        chkNoDeliveriesInTransit.setSelected(options.isNoDeliveriesInTransit());
 
         // Planetary Acquisitions
         usePlanetaryAcquisitions.setSelected(options.isUsePlanetaryAcquisition());

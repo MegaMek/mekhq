@@ -1003,6 +1003,16 @@ public class CampaignNewDayManager {
             // If the part is currently in-transit...
             if (!part.isPresent()) {
                 // ... decrement the number of days until it arrives...
+                int newDaysToArrival = part.getDaysToArrival() - 1;
+
+                // If we're in transit and we don't allow deliveries while in transit the part will remain fixed with
+                // a delivery time of 1 day until we arrive at our destination.
+                if (campaignOptions.isNoDeliveriesInTransit() &&
+                          !campaign.getLocation().isOnPlanet() &&
+                          newDaysToArrival <= 0) {
+                    return;
+                }
+
                 part.setDaysToArrival(part.getDaysToArrival() - 1);
 
                 if (part.isPresent()) {
@@ -1072,7 +1082,7 @@ public class CampaignNewDayManager {
                 campaign.workOnMothballingOrActivation(unit);
             }
             if (!unit.isPresent()) {
-                unit.checkArrival();
+                unit.checkArrival(!campaign.getLocation().isOnPlanet() && campaignOptions.isNoDeliveriesInTransit());
 
                 // Has unit just been delivered?
                 if (unit.isPresent()) {
