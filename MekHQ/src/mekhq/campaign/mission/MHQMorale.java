@@ -117,9 +117,10 @@ public class MHQMorale {
         int reliability = getReliability(contract);
         targetNumber.addModifier(reliability, "Enemy Reliability");
 
-        int performanceModifier = getPerformanceModifier(
-              today, contract, decisiveVictoryModifier, victoryModifier,
-              decisiveDefeatModifier, defeatModifier);
+        // We invert the polarity of the modifiers as we display positive for good, negative for bad in campaign
+        // options. That decision was made to reduce potential confusion among the playerbase.
+        int performanceModifier = getPerformanceModifier(today, contract, -decisiveVictoryModifier, -victoryModifier,
+              -decisiveDefeatModifier, -defeatModifier);
         targetNumber.addModifier(performanceModifier, "Performance Modifier");
 
         // The actual check
@@ -192,7 +193,7 @@ public class MHQMorale {
         AtBMoraleLevel updatedMoraleLevel = currentMoraleLevel;
         MoraleOutcome moraleOutcome;
 
-        if (roll <= 5) {
+        if (roll <= 6) {
             moraleOutcome = MoraleOutcome.RALLYING;
             updatedMoraleLevel = switch (currentMoraleLevel) {
                 case ROUTED -> AtBMoraleLevel.CRITICAL;
@@ -202,7 +203,7 @@ public class MHQMorale {
                 case ADVANCING -> AtBMoraleLevel.DOMINATING;
                 case DOMINATING, OVERWHELMING -> AtBMoraleLevel.OVERWHELMING;
             };
-        } else if (roll >= 9) {
+        } else if (roll >= 8) {
             moraleOutcome = MoraleOutcome.WAVERING;
             updatedMoraleLevel = switch (currentMoraleLevel) {
                 case ROUTED, CRITICAL -> AtBMoraleLevel.ROUTED;
