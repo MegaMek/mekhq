@@ -79,7 +79,7 @@ public class Inoculations {
     private static final MMLogger LOGGER = MMLogger.create(Inoculations.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Inoculations";
 
-    private static final int MONTHLY_NEW_DISEASE_CHANCE = 250;
+    private static final int MONTHLY_NEW_DISEASE_CHANCE = 1000;
     private static final int MONTHLY_DISEASE_SPREAD_CHANCE = 50;
 
     // ATOW says 50 C-Bills/Person; we've increased it as these vaccines are 100% effective, unlike those in ATOW.
