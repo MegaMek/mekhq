@@ -252,7 +252,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
         }
 
-        if (campaignOptions.isUseStratCon()) {
+        if (campaignOptions.isUseCamOpsSalvage()) {
             new ImmersiveDialogNotification(campaign,
                   resources.getString("CompanyGenerationDialog.campaignOptions.salvage"),
                   true);
