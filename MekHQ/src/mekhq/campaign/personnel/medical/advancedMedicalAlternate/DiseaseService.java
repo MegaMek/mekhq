@@ -1,3 +1,35 @@
+/*
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
 package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
 import static megamek.common.compute.Compute.d6;
@@ -6,7 +38,20 @@ import java.util.Map;
 
 import mekhq.campaign.personnel.InjuryType;
 
+/**
+ * Service class for disease generation and management.
+ *
+ * <p>This class provides functionality for randomly generating diseases and their durations using roll-based tables.
+ * Diseases are categorized by type and severity, with specific injury types determined through a two-stage random
+ * process.</p>
+ *
+ * @author Illiani
+ * @since 0.50.10
+ */
 public class DiseaseService {
+    /**
+     * Maps 2d6 roll results to disease type categories.
+     */
     private static final Map<Integer, DiseaseType> DISEASE_TYPE_TABLE = Map.ofEntries(
           Map.entry(2, DiseaseType.GROWTHS),
           Map.entry(3, DiseaseType.INFECTION),
@@ -21,6 +66,9 @@ public class DiseaseService {
           Map.entry(12, DiseaseType.HEMOPHILIA)
     );
 
+    /**
+     * Maps disease types to specific injury types based on a d6 roll.
+     */
     private static final Map<DiseaseType, Map<Integer, InjuryType>> SPECIFIC_DISEASE_TABLE = Map.ofEntries(
           Map.entry(DiseaseType.GROWTHS, Map.of(
                 1, AlternateInjuries.GROWTHS_DISCOMFORT,
@@ -112,6 +160,20 @@ public class DiseaseService {
           ))
     );
 
+    /**
+     * Generates a random disease with random severity.
+     *
+     * <p>This method uses a two-stage random process:</p>
+     * <ol>
+     *   <li>Roll 2d6 to determine the disease type category</li>
+     *   <li>Roll 1d6 to determine severity within that category</li>
+     * </ol>
+     *
+     * @return a randomly determined InjuryType representing a disease
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public static InjuryType catchRandomDisease() {
         int diseaseTypeRoll = d6(2);
         int actualDiseaseRoll = d6(1);
@@ -120,6 +182,14 @@ public class DiseaseService {
         return SPECIFIC_DISEASE_TABLE.get(type).get(actualDiseaseRoll);
     }
 
+    /**
+     * Generates a random duration for a disease in days.
+     *
+     * @return the disease duration in days
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public static int getDiseaseDuration() {
         int roll = d6(1);
         return switch (roll) {
