@@ -1278,7 +1278,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                           person.getFullName());
                     getCampaign().getFinances().credit(TransactionType.RANSOM, today, bounty, bountyReport);
                     person.changeStatus(getCampaign(), today, PersonnelStatus.HOMICIDE);
-                    validBounty = true;
+                    if (person.getPrisonerStatus().isFree()) { // Deliberately excluding Bondsmen from this check
+                        validBounty = true;
+                    }
                 }
 
                 if (validBounty) {
