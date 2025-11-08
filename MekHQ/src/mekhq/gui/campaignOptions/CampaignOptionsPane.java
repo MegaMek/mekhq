@@ -589,7 +589,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             new FatigueTrackingCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
-        boolean newIsUseAdvancedSalvage = options.isUseStratCon();
+        boolean newIsUseAdvancedSalvage = options.isUseCamOpsSalvage();
         if (!isStartUp && newIsUseAdvancedSalvage && !oldIsUseAdvancedSalvage) { // Has tracking changed?
             new SalvageCampaignOptionsChangedConfirmationDialog(campaign);
         }
