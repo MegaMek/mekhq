@@ -196,7 +196,7 @@ public class PersonTableModel extends AbstractTableModel {
         ApplicantTableColumns column = ApplicantTableColumns.values()[columnIndex];
         return switch (column) {
             case AGE, HIRING_COST -> new IntegerStringSorter();
-            case POSITIVE_ABILITIES, NEGATIVE_ABILITIES, PERFORMANCE_EXAM -> new IntegerStringSorter();
+            case POSITIVE_ABILITIES, NEGATIVE_ABILITIES, PERFORMANCE_EXAM -> Comparator.naturalOrder();
             case EXPERIENCE -> new LevelSorter();
             default -> new NaturalOrderComparator();
         };
