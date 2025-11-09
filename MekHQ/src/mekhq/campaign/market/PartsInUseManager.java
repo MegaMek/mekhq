@@ -44,7 +44,6 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
@@ -89,8 +88,6 @@ import mekhq.campaign.work.IAcquisitionWork;
  * </ul>
  */
 public class PartsInUseManager {
-    private static final MMLogger LOGGER = MMLogger.create(PartsInUseManager.class);
-
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final Warehouse warehouse;
@@ -110,7 +107,6 @@ public class PartsInUseManager {
         this.shoppingList = campaign.getShoppingList();
         this.quartermaster = campaign.getQuartermaster();
         this.partsInUseRequestedStockMap = campaign.getPartsInUseRequestedStockMap();
-        LOGGER.info("partsInUseRequestedStockMap: {}", partsInUseRequestedStockMap);
     }
 
     /**
