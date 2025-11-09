@@ -109,8 +109,8 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
-import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
 import mekhq.campaign.mission.camOpsSalvage.SalvageForceData;
+import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
@@ -924,11 +924,24 @@ public final class BriefingTab extends CampaignGuiTab {
             SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), salvageForceOptions, isSpace);
             boolean wasConfirmed = forcePicker.wasConfirmed();
             if (wasConfirmed) {
+                Hangar hangar = getCampaign().getHangar();
                 List<Force> selectedForces = forcePicker.getSelectedForces();
                 for (Force force : selectedForces) {
                     scenario.addSalvageForce(force.getId());
                     if (force.getTechID() != null) {
                         scenario.addSalvageTech(force.getTechID());
+                    }
+
+                    for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+                        if (unit.isSelfCrewed()) {
+                            continue;
+                        }
+
+                        for (Person person : unit.getCrew()) {
+                            if (person.isTechExpanded() && !person.isEngineer()) {
+                                scenario.addSalvageTech(person.getId());
+                            }
+                        }
                     }
                 }
 
