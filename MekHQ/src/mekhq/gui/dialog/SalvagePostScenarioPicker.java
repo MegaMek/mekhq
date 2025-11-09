@@ -773,11 +773,12 @@ public class SalvagePostScenarioPicker {
 
         // Time budget check (disable and, ideally, color the time label in updateSalvageAllocation)
         if (usedSalvageTime > maximumSalvageTime) {
+            disableConfirmAndColorName(confirmButton, salvageTimeLabel);
+            shouldEnable = false;
+        } else {
             if (salvageTimeLabel != null) {
                 salvageTimeLabel.setForeground(null);
             }
-            disableConfirmAndColorName(confirmButton, salvageTimeLabel);
-            shouldEnable = false;
         }
 
         // All checks passed
