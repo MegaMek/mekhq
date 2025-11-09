@@ -58,7 +58,7 @@ public enum ProstheticType {
           1,
           2,
           List.of(LEFT_ARM, RIGHT_ARM),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.WOODEN_ARM,
           Money.of(75),
           TechRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
@@ -68,7 +68,7 @@ public enum ProstheticType {
           1,
           2,
           List.of(LEFT_HAND, RIGHT_HAND),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.HOOK_HAND,
           Money.of(75),
           TechRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
@@ -78,7 +78,7 @@ public enum ProstheticType {
           1,
           2,
           List.of(LEFT_LEG, RIGHT_LEG),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.PEG_LEG,
           Money.of(75),
           TechRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
@@ -88,7 +88,7 @@ public enum ProstheticType {
           1,
           2,
           List.of(LEFT_FOOT, RIGHT_FOOT),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.WOODEN_FOOT,
           Money.of(75),
           TechRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
@@ -98,7 +98,7 @@ public enum ProstheticType {
           2,
           2,
           List.of(LEFT_ARM, RIGHT_ARM),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.SIMPLE_ARM,
           Money.of(750),
           TechRating.B,
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
@@ -108,7 +108,7 @@ public enum ProstheticType {
           2,
           2,
           List.of(LEFT_HAND, RIGHT_HAND),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.SIMPLE_CLAW_HAND,
           Money.of(750),
           TechRating.B,
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
@@ -118,7 +118,7 @@ public enum ProstheticType {
           2,
           2,
           List.of(LEFT_LEG, RIGHT_LEG),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.SIMPLE_LEG,
           Money.of(250),
           TechRating.B,
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
@@ -128,7 +128,7 @@ public enum ProstheticType {
           2,
           2,
           List.of(LEFT_FOOT, RIGHT_FOOT),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.SIMPLE_FOOT,
           Money.of(250),
           TechRating.B,
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
@@ -138,7 +138,7 @@ public enum ProstheticType {
           3,
           5,
           List.of(LEFT_ARM, RIGHT_ARM),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.PROSTHETIC_ARM,
           Money.of(7500),
           TechRating.C,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
@@ -148,7 +148,7 @@ public enum ProstheticType {
           3,
           5,
           List.of(LEFT_HAND, RIGHT_HAND),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.PROSTHETIC_HAND,
           Money.of(7500),
           TechRating.C,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
@@ -158,7 +158,7 @@ public enum ProstheticType {
           3,
           5,
           List.of(LEFT_LEG, RIGHT_LEG),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.PROSTHETIC_LEG,
           Money.of(10000),
           TechRating.C,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
@@ -168,7 +168,7 @@ public enum ProstheticType {
           3,
           5,
           List.of(LEFT_FOOT, RIGHT_FOOT),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.PROSTHETIC_FOOT,
           Money.of(10000),
           TechRating.C,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
@@ -178,7 +178,7 @@ public enum ProstheticType {
           4,
           5,
           List.of(LEFT_ARM, RIGHT_ARM),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.ADVANCED_PROSTHETIC_ARM,
           Money.of(25000),
           TechRating.D,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
@@ -188,7 +188,7 @@ public enum ProstheticType {
           4,
           5,
           List.of(LEFT_HAND, RIGHT_HAND),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.ADVANCED_PROSTHETIC_HAND,
           Money.of(25000),
           TechRating.D,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
@@ -198,7 +198,7 @@ public enum ProstheticType {
           4,
           5,
           List.of(LEFT_LEG, RIGHT_LEG),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.ADVANCED_PROSTHETIC_LEG,
           Money.of(17500),
           TechRating.D,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
@@ -208,7 +208,7 @@ public enum ProstheticType {
           4,
           5,
           List.of(LEFT_FOOT, RIGHT_FOOT),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.ADVANCED_PROSTHETIC_FOOT,
           Money.of(17500),
           TechRating.D,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
@@ -218,7 +218,7 @@ public enum ProstheticType {
           5,
           5,
           List.of(LEFT_ARM, RIGHT_ARM),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.MYOMER_ARM,
           Money.of(200000),
           TechRating.E,
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
@@ -228,7 +228,7 @@ public enum ProstheticType {
           5,
           5,
           List.of(LEFT_HAND, RIGHT_HAND),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.MYOMER_HAND,
           Money.of(100000),
           TechRating.E,
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
@@ -238,7 +238,7 @@ public enum ProstheticType {
           5,
           5,
           List.of(LEFT_LEG, RIGHT_LEG),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.MYOMER_LEG,
           Money.of(125000),
           TechRating.E,
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
@@ -248,7 +248,7 @@ public enum ProstheticType {
           5,
           5,
           List.of(LEFT_FOOT, RIGHT_FOOT),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.MYOMER_FOOT,
           Money.of(50000),
           TechRating.E,
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
@@ -258,7 +258,7 @@ public enum ProstheticType {
           6,
           5,
           List.of(LEFT_ARM, RIGHT_ARM),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.CLONED_ARM,
           Money.of(500000),
           TechRating.E,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
@@ -268,7 +268,7 @@ public enum ProstheticType {
           6,
           5,
           List.of(LEFT_HAND, RIGHT_HAND),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.CLONED_HAND,
           Money.of(300000),
           TechRating.E,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
@@ -278,7 +278,7 @@ public enum ProstheticType {
           6,
           5,
           List.of(LEFT_LEG, RIGHT_LEG),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.CLONED_LEG,
           Money.of(350000),
           TechRating.E,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
@@ -288,7 +288,7 @@ public enum ProstheticType {
           6,
           5,
           List.of(LEFT_FOOT, RIGHT_FOOT),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.CLONED_FOOT,
           Money.of(50000),
           TechRating.E,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
@@ -298,7 +298,7 @@ public enum ProstheticType {
           2,
           2,
           List.of(EYES),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.EYE_IMPLANT,
           Money.of(350),
           TechRating.B,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
@@ -308,7 +308,7 @@ public enum ProstheticType {
           3,
           5,
           List.of(EARS),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.BIONIC_EAR,
           Money.of(100000),
           TechRating.C,
           AvailabilityValue.A, AvailabilityValue.C, AvailabilityValue.A,
@@ -318,7 +318,7 @@ public enum ProstheticType {
           4,
           5,
           List.of(EYES),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.BIONIC_EYE,
           Money.of(220000),
           TechRating.C,
           AvailabilityValue.A, AvailabilityValue.C, AvailabilityValue.A,
@@ -328,7 +328,7 @@ public enum ProstheticType {
           3,
           5,
           List.of(HEART),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.BIONIC_HEART,
           Money.of(500000),
           TechRating.C,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
@@ -338,7 +338,7 @@ public enum ProstheticType {
           4,
           5,
           List.of(LUNGS),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.BIONIC_LUNGS,
           Money.of(800000),
           TechRating.C,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
@@ -348,7 +348,7 @@ public enum ProstheticType {
           4,
           5,
           List.of(ORGANS),
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.BIONIC_ORGAN_OTHER,
           Money.of(750000),
           TechRating.C,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.C,
@@ -358,7 +358,7 @@ public enum ProstheticType {
           2,
           2,
           List.of(), // This is a special case used to heal burns
-          AlternateInjuries.BLINDNESS,
+          AlternateInjuries.COSMETIC_SURGERY,
           Money.of(2500),
           TechRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
@@ -510,50 +510,39 @@ public enum ProstheticType {
 
     @Override
     public String toString() {
-        return getTextAt(RESOURCE_BUNDLE, "InjuryEffect." + lookupName + ".name");
+        return getTextAt(RESOURCE_BUNDLE, "ProstheticType." + lookupName + ".name");
     }
 
-    public static String getTooltip(List<InjuryEffect> injuryEffects) {
+    public String getTooltip() {
         // Map attributes to their aggregated modifiers
         Map<SkillAttribute, Integer> attributeTotals = new EnumMap<>(SkillAttribute.class);
-        int perceptionTotal = 0;
-        int postScenarioInjuries = 0;
 
         // Aggregate modifiers
-        for (InjuryEffect effect : injuryEffects) {
-            perceptionTotal += effect.getPerceptionModifier();
-            addToMap(attributeTotals, SkillAttribute.STRENGTH, effect.getStrengthModifier());
-            addToMap(attributeTotals, SkillAttribute.BODY, effect.getBodyModifier());
-            addToMap(attributeTotals, SkillAttribute.REFLEXES, effect.getReflexesModifier());
-            addToMap(attributeTotals, SkillAttribute.DEXTERITY, effect.getDexterityModifier());
-            addToMap(attributeTotals, SkillAttribute.INTELLIGENCE, effect.getIntelligenceModifier());
-            addToMap(attributeTotals, SkillAttribute.WILLPOWER, effect.getWillpowerModifier());
-            addToMap(attributeTotals, SkillAttribute.CHARISMA, effect.getCharismaModifier());
-
-            if (effect.isInflictsPostScenarioInjury()) {
-                postScenarioInjuries++;
-            }
-        }
+        InjuryEffect effect = injuryType.getInjuryEffect();
+        int perception = effect.getPerceptionModifier();
+        addToMap(attributeTotals, SkillAttribute.STRENGTH, effect.getStrengthModifier());
+        addToMap(attributeTotals, SkillAttribute.BODY, effect.getBodyModifier());
+        addToMap(attributeTotals, SkillAttribute.REFLEXES, effect.getReflexesModifier());
+        addToMap(attributeTotals, SkillAttribute.DEXTERITY, effect.getDexterityModifier());
+        addToMap(attributeTotals, SkillAttribute.INTELLIGENCE, effect.getIntelligenceModifier());
+        addToMap(attributeTotals, SkillAttribute.WILLPOWER, effect.getWillpowerModifier());
+        addToMap(attributeTotals, SkillAttribute.CHARISMA, effect.getCharismaModifier());
 
         // Build tooltip
         List<String> tooltipPortion = new ArrayList<>();
+        tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.general"));
 
-        if (perceptionTotal != 0) {
+        if (perception != 0) {
             tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "InjuryEffect.tooltip.perception", perceptionTotal));
+                  "ProstheticType.tooltip.perception", perception));
         }
 
         for (SkillAttribute attribute : SkillAttribute.values()) {
             int modifier = attributeTotals.getOrDefault(attribute, 0);
             if (modifier != 0) {
                 tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "InjuryEffect.tooltip.attribute", modifier, attribute));
+                      "ProstheticType.tooltip.attribute", modifier, attribute));
             }
-        }
-
-        if (postScenarioInjuries > 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "InjuryEffect.tooltip.inflictsHit", postScenarioInjuries));
         }
 
         return String.join(" ", tooltipPortion);

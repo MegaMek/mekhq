@@ -72,7 +72,7 @@ public class AlternateInjuries {
     private static final int CLONED_LIMB_HEALING_DAYS = 21; // ATOW pg 316
     private static final int REPLACEMENT_LIMB_HEALING_DAYS = 42; // ATOW pg 316
 
-    private static final InjuryLevel SEVERE_INJURY_LEVEL = InjuryLevel.CHRONIC;
+    private static final InjuryLevel SEVER_INJURY_LEVEL = InjuryLevel.CHRONIC;
     private static final InjuryLevel FRACTURE_INJURY_LEVEL = InjuryLevel.MAJOR;
     private static final InjuryLevel BURN_INJURY_LEVEL = InjuryLevel.MINOR;
 
@@ -249,12 +249,14 @@ public class AlternateInjuries {
             super(BURN_HEALING_DAYS, false, BURN_INJURY_LEVEL, InjuryEffect.NONE, locations);
             this.simpleName = getTextAt(RESOURCE_BUNDLE, nameKey);
             this.fluffText = getTextAt(RESOURCE_BUNDLE, nameKey);
+            this.injurySubType = InjurySubType.BURN;
         }
     }
 
     private abstract static class FormattedBurn extends BaseInjury {
         protected FormattedBurn(Set<BodyLocation> locations) {
             super(BURN_HEALING_DAYS, false, BURN_INJURY_LEVEL, InjuryEffect.NONE, locations);
+            this.injurySubType = InjurySubType.BURN;
         }
 
         @Override
@@ -290,9 +292,9 @@ public class AlternateInjuries {
         }
     }
 
-    private abstract static class FormattedSevere extends BaseInjury {
-        protected FormattedSevere(Set<BodyLocation> locations) {
-            super(SEVER_HEALING_DAYS, true, SEVERE_INJURY_LEVEL, InjuryEffect.SEVERED, locations);
+    private abstract static class FormattedSever extends BaseInjury {
+        protected FormattedSever(Set<BodyLocation> locations) {
+            super(SEVER_HEALING_DAYS, true, SEVER_INJURY_LEVEL, InjuryEffect.SEVERED, locations);
         }
 
         @Override
@@ -349,7 +351,7 @@ public class AlternateInjuries {
         }
     }
 
-    public static final class SeveredHead extends FormattedSevere {
+    public static final class SeveredHead extends FormattedSever {
         public SeveredHead() {
             super(Set.of(BodyLocation.SKULL));
         }
@@ -463,7 +465,7 @@ public class AlternateInjuries {
     }
 
     // Arm injuries
-    public static final class SeveredArm extends FormattedSevere {
+    public static final class SeveredArm extends FormattedSever {
         public SeveredArm() {
             super(Set.of(BodyLocation.LEFT_ARM, BodyLocation.RIGHT_ARM));
         }
@@ -504,7 +506,7 @@ public class AlternateInjuries {
     }
 
     // Hand injuries
-    public static final class SeveredHand extends FormattedSevere {
+    public static final class SeveredHand extends FormattedSever {
         public SeveredHand() {
             super(Set.of(BodyLocation.LEFT_HAND, BodyLocation.RIGHT_HAND));
         }
@@ -545,7 +547,7 @@ public class AlternateInjuries {
     }
 
     // Leg injuries
-    public static final class SeveredLeg extends FormattedSevere {
+    public static final class SeveredLeg extends FormattedSever {
         public SeveredLeg() {
             super(Set.of(BodyLocation.LEFT_LEG, BodyLocation.RIGHT_LEG));
         }
@@ -598,7 +600,7 @@ public class AlternateInjuries {
     }
 
     // Foot injuries
-    public static final class SeveredFoot extends FormattedSevere {
+    public static final class SeveredFoot extends FormattedSever {
         public SeveredFoot() {
             super(Set.of(BodyLocation.LEFT_FOOT, BodyLocation.RIGHT_FOOT));
         }
@@ -652,10 +654,11 @@ public class AlternateInjuries {
         protected Disease() {
             super(5, // This is just a placeholder value, we assign it elsewhere
                   false,
-                  InjuryLevel.DISEASE,
+                  InjuryLevel.MINOR,
                   InjuryEffect.NONE,
                   Set.of(BodyLocation.INTERNAL));
             this.maxSeverity = 1;
+            this.injurySubType = InjurySubType.DISEASE;
         }
     }
 
@@ -679,6 +682,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GROWTHS_MODERATE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_GROWTHS_MODERATE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -687,6 +691,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GROWTHS_SEVERE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_GROWTHS_SEVERE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -696,6 +701,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GROWTHS_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
             this.permanent = true;
+            this.level = InjuryLevel.DEADLY;
         }
 
         @Override
@@ -724,6 +730,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.INFECTION_MODERATE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_INFECTION_MODERATE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -732,6 +739,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.INFECTION_SEVERE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_INFECTION_SEVERE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -741,6 +749,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.INFECTION_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
             this.permanent = true;
+            this.level = InjuryLevel.DEADLY;
         }
 
         @Override
@@ -769,6 +778,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEARING_MODERATE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_HEARING_MODERATE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -777,6 +787,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEARING_SEVERE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_HEARING_SEVERE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -786,6 +797,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEARING_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
             this.permanent = true;
+            this.level = InjuryLevel.DEADLY;
         }
 
         @Override
@@ -814,6 +826,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WEAKNESS_MODERATE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_WEAKNESS_MODERATE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -822,6 +835,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WEAKNESS_SEVERE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_WEAKNESS_SEVERE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -831,6 +845,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WEAKNESS_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
             this.permanent = true;
+            this.level = InjuryLevel.DEADLY;
         }
 
         @Override
@@ -859,6 +874,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SORES_MODERATE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_SORES_MODERATE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -867,6 +883,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SORES_SEVERE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_SORES_SEVERE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -876,6 +893,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SORES_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
             this.permanent = true;
+            this.level = InjuryLevel.DEADLY;
         }
 
         @Override
@@ -904,6 +922,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FLU_MODERATE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_FLU_MODERATE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -912,6 +931,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FLU_SEVERE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_FLU_SEVERE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -921,6 +941,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FLU_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
             this.permanent = true;
+            this.level = InjuryLevel.DEADLY;
         }
 
         @Override
@@ -949,6 +970,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIGHT_MODERATE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_SIGHT_MODERATE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -957,6 +979,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIGHT_SEVERE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_SIGHT_SEVERE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -966,6 +989,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIGHT_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
             this.permanent = true;
+            this.level = InjuryLevel.DEADLY;
         }
 
         @Override
@@ -994,6 +1018,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TREMORS_MODERATE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_TREMORS_MODERATE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -1002,6 +1027,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TREMORS_SEVERE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_TREMORS_SEVERE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -1011,6 +1037,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TREMORS_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
             this.permanent = true;
+            this.level = InjuryLevel.DEADLY;
         }
 
         @Override
@@ -1039,6 +1066,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BREATHING_MODERATE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_BREATHING_MODERATE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -1047,6 +1075,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BREATHING_SEVERE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_BREATHING_SEVERE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -1056,6 +1085,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BREATHING_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
             this.permanent = true;
+            this.level = InjuryLevel.DEADLY;
         }
 
         @Override
@@ -1084,6 +1114,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEMOPHILIA_MODERATE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_HEMOPHILIA_MODERATE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -1092,6 +1123,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEMOPHILIA_SEVERE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_HEMOPHILIA_SEVERE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -1101,6 +1133,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEMOPHILIA_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
             this.permanent = true;
+            this.level = InjuryLevel.DEADLY;
         }
 
         @Override
@@ -1129,6 +1162,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.VENEREAL_MODERATE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_VENEREAL_MODERATE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
@@ -1137,12 +1171,14 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.VENEREAL_SEVERE.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_VENEREAL_SEVERE;
+            this.level = InjuryLevel.MAJOR;
         }
     }
 
     public static final class VenerealDeadly extends Disease {
         VenerealDeadly() {
             super();
+            this.level = InjuryLevel.DEADLY;
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.VENEREAL_DEADLY.simpleName");
             this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
             this.permanent = true;
@@ -1163,6 +1199,7 @@ public class AlternateInjuries {
                   InjuryEffect.NONE,
                   Set.of(BodyLocation.INTERNAL)); // A placeholder effect, we replace it later
             this.maxSeverity = 1;
+            this.injurySubType = InjurySubType.PROSTHETIC;
         }
     }
 
@@ -1444,14 +1481,14 @@ public class AlternateInjuries {
 
     public static final class ClonedLimbRecovery extends BaseInjury {
         ClonedLimbRecovery() {
-            super(CLONED_LIMB_HEALING_DAYS, false, InjuryLevel.CHRONIC, InjuryEffect.SEVERED, Set.of(INTERNAL));
+            super(CLONED_LIMB_HEALING_DAYS, false, InjuryLevel.MINOR, InjuryEffect.SEVERED, Set.of(INTERNAL));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CLONED_LIMB_RECOVERY.simpleName");
         }
     }
 
     public static final class ReplacementLimbRecovery extends BaseInjury {
         ReplacementLimbRecovery() {
-            super(REPLACEMENT_LIMB_HEALING_DAYS, false, InjuryLevel.CHRONIC, InjuryEffect.SEVERED, Set.of(INTERNAL));
+            super(REPLACEMENT_LIMB_HEALING_DAYS, false, InjuryLevel.MINOR, InjuryEffect.SEVERED, Set.of(INTERNAL));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.REPLACEMENT_LIMB_RECOVERY.simpleName");
         }
     }
