@@ -1103,13 +1103,17 @@ public final class BriefingTab extends CampaignGuiTab {
             if (!force.isDeployed() &&
                       !isDeployedToStratCon &&
                       force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
+                boolean hasDeployedUnit = false;
                 for (Unit unit : force.getAllUnitsAsUnits(getCampaign().getHangar(), false)) {
                     if (StratConRulesManager.isUnitDeployedToStratCon(unit)) {
+                        hasDeployedUnit = true;
                         break;
                     }
                 }
 
-                eligibleCombatTeams.add(force);
+                if (!hasDeployedUnit) {
+                    eligibleCombatTeams.add(force);
+                }
             }
         }
 
