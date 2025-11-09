@@ -164,6 +164,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
+import mekhq.gui.dialog.AdvancedReplacementLimbDialog;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.ReportingUtilities;
 
@@ -340,6 +341,8 @@ public class CampaignNewDayManager {
         }
 
         campaign.resetAsTechMinutes();
+
+        new AdvancedReplacementLimbDialog(campaign, campaign.getActivePersonnel(false, false).get(0));
 
         processNewDayUnits();
 

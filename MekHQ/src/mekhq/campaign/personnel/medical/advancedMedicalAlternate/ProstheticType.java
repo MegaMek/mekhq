@@ -472,7 +472,7 @@ public enum ProstheticType {
         // Otherwise, we check based on the Technology Rating of the current planet
         Planet planet = currentLocation.getPlanet();
         TechRating techRating = planet.getTechRating(today);
-        return !techRating.isBetterThan(technologyRating);
+        return !technologyRating.isBetterThan(techRating);
     }
 
     public @Nullable Money getCost(int gameYear) {
@@ -513,7 +513,7 @@ public enum ProstheticType {
         return getTextAt(RESOURCE_BUNDLE, "ProstheticType." + lookupName + ".name");
     }
 
-    public String getTooltip() {
+    public String getTooltip(int gameYear) {
         // Map attributes to their aggregated modifiers
         Map<SkillAttribute, Integer> attributeTotals = new EnumMap<>(SkillAttribute.class);
 
@@ -530,7 +530,12 @@ public enum ProstheticType {
 
         // Build tooltip
         List<String> tooltipPortion = new ArrayList<>();
-        tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.general"));
+
+        Money cost = getCost(gameYear);
+        if (cost != null) {
+            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.cost",
+                  cost.toAmountString()));
+        }
 
         if (perception != 0) {
             tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,

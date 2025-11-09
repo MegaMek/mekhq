@@ -222,7 +222,7 @@ public class InjuryType {
         return injuryEffect;
     }
 
-    public InjurySubType getInjurySubType() {
+    public InjurySubType getSubType() {
         return injurySubType;
     }
 
