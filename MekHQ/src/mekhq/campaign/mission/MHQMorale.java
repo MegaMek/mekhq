@@ -111,16 +111,21 @@ public class MHQMorale {
     public static String performMoraleCheck(final LocalDate today, final AtBContract contract,
           final int decisiveVictoryModifier, final int victoryModifier, final int decisiveDefeatModifier,
           final int defeatModifier) {
+        // We invert the polarity of the modifiers as we display positive for good, negative for bad in campaign
+        // options. That decision was made to reduce potential confusion among the playerbase.
+        int adjustedDecisiveVictoryModifier = -decisiveVictoryModifier;
+        int adjustedVictoryModifier = -victoryModifier;
+        int adjustedDecisiveDefeatModifier = -decisiveDefeatModifier;
+        int adjustedDefeatModifier = -defeatModifier;
+
         final TargetRoll targetNumber = new TargetRoll();
 
         // Add modifiers to the target number
         int reliability = getReliability(contract);
         targetNumber.addModifier(reliability, "Enemy Reliability");
 
-        // We invert the polarity of the modifiers as we display positive for good, negative for bad in campaign
-        // options. That decision was made to reduce potential confusion among the playerbase.
-        int performanceModifier = getPerformanceModifier(today, contract, -decisiveVictoryModifier, -victoryModifier,
-              -decisiveDefeatModifier, -defeatModifier);
+        int performanceModifier = getPerformanceModifier(today, contract, adjustedDecisiveVictoryModifier,
+              adjustedVictoryModifier, adjustedDecisiveDefeatModifier, adjustedDefeatModifier);
         targetNumber.addModifier(performanceModifier, "Performance Modifier");
 
         // The actual check
@@ -128,8 +133,8 @@ public class MHQMorale {
         MoraleOutcome moraleOutcome = getMoraleOutcome(contract, roll);
 
         // Generate and return the report
-        PerformanceOutcome performanceOutcome = getOutcome(decisiveVictoryModifier, victoryModifier,
-              decisiveDefeatModifier, defeatModifier, performanceModifier);
+        PerformanceOutcome performanceOutcome = getOutcome(adjustedDecisiveVictoryModifier, adjustedVictoryModifier,
+              adjustedDecisiveDefeatModifier, adjustedDefeatModifier, performanceModifier);
         return getReport(performanceOutcome, moraleOutcome, roll);
     }
 
