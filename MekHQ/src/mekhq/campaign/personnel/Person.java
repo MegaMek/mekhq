@@ -5767,7 +5767,12 @@ public class Person {
      *       time, applying the administrative multiplier (if enabled), and deducting maintenance time.
      */
     public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
-        int baseTime = (getPrimaryRole().isTech() ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME);
+        int baseTime;
+        if (primaryRole.isTech() && secondaryRole.isNone()) {
+            baseTime = PRIMARY_ROLE_SUPPORT_TIME;
+        } else {
+            baseTime = SECONDARY_ROLE_SUPPORT_TIME;
+        }
 
         return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration));
     }
