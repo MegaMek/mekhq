@@ -734,7 +734,7 @@ public class TransportCostCalculations {
                     battleArmorCount++;
                 } else if (entity.isInfantry()) {
                     infantryCount++;
-                } else if (!(entity instanceof Jumpship)) { // Includes WarShips
+                } else if (!(entity instanceof Jumpship) && !entity.isHandheldWeapon()) { // Includes WarShips
                     otherUnitCount++;
                 }
             }
