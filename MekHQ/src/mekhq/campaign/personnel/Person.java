@@ -8249,7 +8249,7 @@ public class Person {
      * @since 0.50.07
      */
     public int getDarkSecretModifier(final boolean isReputation) {
-        // If the dark secret is not revealed or the character does not have a dark secret, return 0
+        // Only apply modifiers if the character has a dark secret AND it is revealed; otherwise, return 0
         if (!darkSecretRevealed || !hasDarkSecret()) {
             return 0;
         }
