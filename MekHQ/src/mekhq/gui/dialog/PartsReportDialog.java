@@ -402,7 +402,7 @@ public class PartsReportDialog extends JDialog {
 
     private void refreshOverviewSpecificPart(int row, PartInUse partInUse, IAcquisitionWork newPart) {
         storePartInUseRequestedStock(partInUse);
-        if (partInUse.equals(new PartInUse((Part) newPart))) {
+        if (partInUse.equals(new PartInUse(newPart.getAcquisitionPart()))) {
             // Simple update
             partsInUseManager.updatePartInUse(partInUse, ignoreMothballedCheck.isSelected(),
                   getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem()));
