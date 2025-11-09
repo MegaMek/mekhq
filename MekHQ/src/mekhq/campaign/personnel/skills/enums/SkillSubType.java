@@ -64,6 +64,11 @@ public enum SkillSubType {
     SUPPORT,
 
     /**
+     * Represents technician skills.
+     */
+    SUPPORT_TECHNICIAN(),
+
+    /**
      * Use {@link #UTILITY_COMMAND} instead
      */
     @Deprecated(since = "0.50.10", forRemoval = true)
