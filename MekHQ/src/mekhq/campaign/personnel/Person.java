@@ -5745,33 +5745,27 @@ public class Person {
     }
 
     /**
-     * Calculates and retrieves the current daily available tech time for the person.
+     * Calculates the total available tech time per day for this person, including adjustments for skill level and
+     * administrative support.
      *
-     * <p>This calculation does not account for any expended time but incorporates potential administrative
-     * adjustments if specified.</p>
+     * <p>Primary role techs (with no secondary role) receive full base time, while secondary role or expanded tech
+     * roles receive reduced base time. Personnel without any tech role receive no tech time. The base time is then
+     * multiplied by factors based on the tech's skill level and whether administrative support is available.</p>
      *
-     * <p>The calculation follows these rules:</p>
-     * <ul>
-     *   <li>If the person's primary role is a technician, the base support time is determined from the primary
-     *   role.</li>
-     *   <li>Otherwise, the base support time is taken from the secondary role.</li>
-     * </ul>
+     * @param isTechsUseAdministration whether techs benefit from administrative support personnel, which increases
+     *                                 their available working time
      *
-     * <p>If administrative adjustments are enabled (via the {@code isTechsUseAdministration} parameter),
-     * the support time is multiplied by an administrative adjustment multiplier.</p>
-     *
-     * @param isTechsUseAdministration A boolean flag indicating whether administrative adjustments should be applied in
-     *                                 the calculation.
-     *
-     * @return The adjusted daily available tech time for the person, after factoring in the appropriate role support
-     *       time, applying the administrative multiplier (if enabled), and deducting maintenance time.
+     * @return the total available tech time in minutes per day, rounded to the nearest minute, or 0 if the person has
+     *       no tech role
      */
     public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
         int baseTime;
         if (primaryRole.isTech() && secondaryRole.isNone()) {
             baseTime = PRIMARY_ROLE_SUPPORT_TIME;
-        } else {
+        } else if (isTechExpanded()) {
             baseTime = SECONDARY_ROLE_SUPPORT_TIME;
+        } else {
+            return 0;
         }
 
         return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration));
@@ -5958,67 +5952,53 @@ public class Person {
     }
 
     /**
-     * Resets the number of minutes and overtime minutes a person has left for tasks, based on their primary or
-     * secondary role. Administrative adjustments may be applied for technicians if specified.
+     * Resets the available working time (minutes and overtime) for this person based on their role, deployment status,
+     * and administrative support.
      *
-     * <p>This method calculates and assigns task and overtime time values depending on whether
-     * the person is identified as a technician or doctor, and whether their role is primary or secondary. If
-     * administrative adjustments are enabled (via the {@code isTechsUseAdministration} parameter), a multiplier is
-     * applied to calculate the adjusted task time for technicians.</p>
+     * <p>Personnel deployed to combat or without support roles have no available time. Doctors receive standard
+     * support time, while techs receive time adjusted by skill and administration multipliers.</p>
      *
-     * <ul>
-     *   <li>If the character is assigned to a unit and that unit is deployed their available time is reduced to 0.</li>
-     *   <li>If the primary role is a doctor, the base support time values for the primary role
-     *       are assigned without any adjustments.</li>
-     *   <li>If the secondary role is a doctor, the base support time values for the secondary role
-     *       are assigned without any adjustments.</li>
-     *   <li>If the primary role is a technician and administrative adjustments are enabled, the primary
-     *       role's support time is multiplied by the administrative adjustment multiplier and assigned.</li>
-     *   <li>If the secondary role is a technician (secondary-specific), and administrative adjustments
-     *       are enabled, the secondary role's support time is multiplied by the adjustment multiplier and assigned.</li>
-     *   <li>If administrative adjustments are not enabled for technicians, base (non-adjusted) time values
-     *       are used for both primary and secondary roles.</li>
-     * </ul>
-     *
-     * <p>If the person has both primary and secondary roles applicable (e.g., a doctor as the primary
-     * and a technician as the secondary), the logic prioritizes the roles as listed above, with primary roles
-     * taking precedence.</p>
-     *
-     * @param isTechsUseAdministration Indicates whether administrative adjustments should be applied to the time
-     *                                 calculations for technicians.
+     * @param isTechsUseAdministration whether techs benefit from administrative support personnel, which increases
+     *                                 their available working time
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
+        // Units deployed to combat have no available time
         if (unit != null && (unit.isDeployed() || StratConRulesManager.isUnitDeployedToStratCon(unit))) {
             this.minutesLeft = 0;
             this.overtimeLeft = 0;
             return;
         }
 
-        // Doctors
-        if (primaryRole.isDoctor()) {
-            this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
-            this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
+        // Determine if this is a primary or secondary support role
+        boolean isPrimaryRole = (primaryRole.isTech() || primaryRole.isDoctor()) && secondaryRole.isNone();
+        boolean isBusyTech = (primaryRole.isTech() || primaryRole.isDoctor()) && !secondaryRole.isNone();
+        boolean isSecondaryRole = (isBusyTech || secondaryRole.isTechSecondary() || secondaryRole.isDoctor()) &&
+                                        !isPrimaryRole;
+
+        // Personnel without tech or doctor roles have no available time
+        if (!isPrimaryRole && !isSecondaryRole) {
+            this.minutesLeft = 0;
+            this.overtimeLeft = 0;
             return;
         }
 
-        if (secondaryRole.isDoctor()) {
-            this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
-            this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
+        // Doctors get standard support time based on role priority
+        if (isDoctor()) {
+            this.minutesLeft = isPrimaryRole ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME;
+            this.overtimeLeft = isPrimaryRole ? PRIMARY_ROLE_OVERTIME_SUPPORT_TIME
+                                      : SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
             return;
         }
 
-        // Technicians
-        if (primaryRole.isTech()) {
+        // Techs get support time adjusted by skill and administration multipliers
+        if (isTech()) {
+            int baseMinutes = isPrimaryRole ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME;
+            int baseOvertime = isPrimaryRole ? PRIMARY_ROLE_OVERTIME_SUPPORT_TIME
+                                     : SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
+
             double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
-            this.minutesLeft = (int) Math.round(PRIMARY_ROLE_SUPPORT_TIME * multiplier);
-            this.overtimeLeft = (int) Math.round(PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * multiplier);
-            return;
-        }
-
-        if (secondaryRole.isTechSecondary()) {
-            double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
-            this.minutesLeft = (int) Math.round(SECONDARY_ROLE_SUPPORT_TIME * multiplier);
-            this.overtimeLeft = (int) Math.round(SECONDARY_ROLE_OVERTIME_SUPPORT_TIME * multiplier);
+            this.minutesLeft = (int) Math.round(baseMinutes * multiplier);
+            this.overtimeLeft = (int) Math.round(baseOvertime * multiplier);
         }
     }
 
