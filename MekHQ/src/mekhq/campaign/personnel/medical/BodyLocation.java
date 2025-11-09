@@ -56,6 +56,7 @@ public enum BodyLocation {
     RIBS(16, "BodyLocation.RIBS.text", false, CHEST),
     LUNGS(17, "BodyLocation.LUNGS.text", false, CHEST),
     HEART(18, "BodyLocation.HEART.text", false, CHEST),
+    ORGANS(44, "BodyLocation.ORGANS.text", false, CHEST),
     ABDOMEN(4, "BodyLocation.ABDOMEN.text"),
     GROIN(19, "BodyLocation.GROIN.text", false, ABDOMEN),
     RIGHT_ARM(5, "BodyLocation.RIGHT_ARM.text", true),

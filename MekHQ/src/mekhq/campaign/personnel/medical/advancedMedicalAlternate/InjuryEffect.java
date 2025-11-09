@@ -95,7 +95,16 @@ public enum InjuryEffect {
     DISEASE_HEMOPHILIA_SEVERE("DISEASE_HEMOPHILIA_SEVERE", getNegativeColor(), 0, 0, -3, 0, 0, 0, 0, 0, true),
     DISEASE_VENEREAL_SLIGHT("DISEASE_VENEREAL_SLIGHT", getWarningColor(), 0, 0, 0, 0, 0, 0, 0, -1, false),
     DISEASE_VENEREAL_MODERATE("DISEASE_VENEREAL_MODERATE", getWarningColor(), 0, 0, 0, 0, 0, 0, 0, -2, false),
-    DISEASE_VENEREAL_SEVERE("DISEASE_VENEREAL_SEVERE", getNegativeColor(), 0, 0, 0, 0, 0, 0, 0, -3, false);
+    DISEASE_VENEREAL_SEVERE("DISEASE_VENEREAL_SEVERE", getNegativeColor(), 0, 0, 0, 0, 0, 0, 0, -3, false),
+    TYPE_1_LIMB_REPLACEMENT("TYPE_1_LIMB_REPLACEMENT", "", 0, -2, 0, -4, -4, 0, 0, 0, false),
+    TYPE_2_LIMB_REPLACEMENT("TYPE_2_LIMB_REPLACEMENT", "", 0, -1, 0, -3, -3, 0, 0, 0, false),
+    TYPE_3_LIMB_REPLACEMENT("TYPE_3_LIMB_REPLACEMENT", "", 0, 0, 0, -2, -2, 0, 0, 0, false),
+    TYPE_4_LIMB_REPLACEMENT("TYPE_4_LIMB_REPLACEMENT", "", 0, 0, 0, -1, -1, 0, 0, 0, false),
+    TYPE_5_LIMB_REPLACEMENT("TYPE_5_LIMB_REPLACEMENT", "", 0, 1, 0, 0, 0, 0, 0, 0, false),
+    TYPE_6_LIMB_REPLACEMENT("TYPE_6_LIMB_REPLACEMENT", "", 0, 0, 0, 0, 0, 0, 0, 0, false),
+    TYPE_2_SENSORY_REPLACEMENT("TYPE_2_SENSORY_REPLACEMENT", "", -1, 0, 0, 0, 0, 0, 0, 0, false),
+    TYPE_3_SENSORY_REPLACEMENT("TYPE_3_SENSORY_REPLACEMENT", "", 0, 0, 0, 0, 0, 0, 0, 0, false),
+    TYPE_4_SENSORY_REPLACEMENT("TYPE_3_SENSORY_REPLACEMENT", "", 1, 0, 0, 0, 0, 0, 0, 0, false);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.InjuryEffect";
 
