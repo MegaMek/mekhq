@@ -44,6 +44,7 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
@@ -88,6 +89,8 @@ import mekhq.campaign.work.IAcquisitionWork;
  * </ul>
  */
 public class PartsInUseManager {
+    private static final MMLogger LOGGER = MMLogger.create(PartsInUseManager.class);
+
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final Warehouse warehouse;
@@ -107,6 +110,7 @@ public class PartsInUseManager {
         this.shoppingList = campaign.getShoppingList();
         this.quartermaster = campaign.getQuartermaster();
         this.partsInUseRequestedStockMap = campaign.getPartsInUseRequestedStockMap();
+        LOGGER.info("partsInUseRequestedStockMap: {}", partsInUseRequestedStockMap);
     }
 
     /**
@@ -336,8 +340,7 @@ public class PartsInUseManager {
                 return;
             }
 
-            String stockKey = partInUse.getDescription();
-            stockKey += Part.getTechBaseName(partInUse.getTechBase());
+            String stockKey = getStockKey(partInUse);
 
             if (inUse.containsKey(partInUse)) {
                 partInUse = inUse.get(partInUse);
@@ -361,8 +364,7 @@ public class PartsInUseManager {
                 continue;
             }
 
-            String stockKey = partInUse.getDescription();
-            stockKey += Part.getTechBaseName(partInUse.getTechBase());
+            String stockKey = getStockKey(partInUse);
 
             if (inUse.containsKey(partInUse)) {
                 partInUse = inUse.get(partInUse);
@@ -463,5 +465,18 @@ public class PartsInUseManager {
         }
 
         return toBuy;
+    }
+
+    /**
+     * Generates a unique stock key for a part by combining its description and tech base name.
+     *
+     * @param partInUse the part to generate a stock key for
+     *
+     * @return a string combining the part's description and tech base name
+     */
+    public static String getStockKey(PartInUse partInUse) {
+        String stockKey = partInUse.getDescription();
+        stockKey += Part.getTechBaseName(partInUse.getTechBase());
+        return stockKey;
     }
 }

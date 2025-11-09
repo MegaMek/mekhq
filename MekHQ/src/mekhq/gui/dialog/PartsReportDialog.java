@@ -469,14 +469,14 @@ public class PartsReportDialog extends JDialog {
         Map<String, Double> stockMap = new LinkedHashMap<>();
         for (int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
             PartInUse partInUse = overviewPartsModel.getPartInUse(row);
-            stockMap.put(partInUse.getDescription(), partInUse.getRequestedStock());
+            stockMap.put(PartsInUseManager.getStockKey(partInUse), partInUse.getRequestedStock());
         }
         campaign.setPartsInUseRequestedStockMap(stockMap);
     }
 
     private void storePartInUseRequestedStock(PartInUse partInUse) {
         Map<String, Double> stockMap = campaign.getPartsInUseRequestedStockMap();
-        stockMap.put(partInUse.getDescription(), partInUse.getRequestedStock());
+        stockMap.put(PartsInUseManager.getStockKey(partInUse), partInUse.getRequestedStock());
     }
 
     private void onClose() {
