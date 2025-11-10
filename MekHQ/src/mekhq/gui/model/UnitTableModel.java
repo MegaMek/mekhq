@@ -38,6 +38,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -205,8 +206,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
         int crewNeeded = unit.getTotalCrewNeeds();
         int crewAssigned = unit.getActiveCrew().size() - (gunnersAssigned + driversAssigned + navigatorsAssigned);
 
-        StringBuilder report = new StringBuilder("<html>");
-
+        List<String> reports = new ArrayList<>();
 
         Campaign campaign = unit.getCampaign();
         boolean isClanCampaign = campaign != null && campaign.isClanCampaign();
@@ -214,54 +214,52 @@ public class UnitTableModel extends DataTableModel<Unit> {
             PersonnelRole driverRole = unit.getDriverRole();
             String driverDisplay = driverRole == null ? getTextAt(RESOURCE_BUNDLE,
                   "UnitTableModel.crewNeeds.unknown") : driverRole.getLabel(isClanCampaign);
-            appendReport(report, getFormattedTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.drivers", driverDisplay),
-                  driversAssigned, driversNeeded);
+            appendReport(reports,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.drivers", driverDisplay),
+                  driversAssigned,
+                  driversNeeded);
         }
 
         if (gunnersNeeded > 0 && soldiersNeeded == 0) {
-            report.append("<br>");
-
             PersonnelRole gunnerRole = unit.getGunnerRole();
             String gunnerDisplay = gunnerRole == null ? getTextAt(RESOURCE_BUNDLE,
                   "UnitTableModel.crewNeeds.unknown") : gunnerRole.getLabel(isClanCampaign);
 
-            appendReport(report, getFormattedTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.gunners", gunnerDisplay),
-                  gunnersAssigned, gunnersNeeded);
+            appendReport(reports,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.gunners", gunnerDisplay),
+                  gunnersAssigned,
+                  gunnersNeeded);
         }
 
         if (soldiersNeeded > 0) {
-            report.append("<br>");
-            appendReport(report, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.soldiers"), soldiersAssigned,
+            appendReport(reports, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.soldiers"), soldiersAssigned,
                   soldiersNeeded);
         }
 
         if (crewNeeded > 0) {
-            report.append("<br>");
             String key = entity.isLargeCraft() ? "UnitTableModel.crewNeeds.crew" : "UnitTableModel.crewNeeds.other";
-            appendReport(report, getTextAt(RESOURCE_BUNDLE, key), crewAssigned, crewNeeded);
+            appendReport(reports, getTextAt(RESOURCE_BUNDLE, key), crewAssigned, crewNeeded);
         }
 
         if (navigatorsNeeded > 0) {
-            report.append("<br>");
-            appendReport(report, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.navigator"), navigatorsAssigned,
+            appendReport(reports, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.navigator"), navigatorsAssigned,
                   navigatorsNeeded);
         }
 
-        report.append("</html>");
-
-        return report.toString();
+        String finalReport = reports.isEmpty() ? "" : String.join("<br>", reports);
+        return "<html>" + finalReport + "</html>";
     }
 
     /**
      * Appends a crew report line to the provided StringBuilder.
      *
-     * @param report   the {@link StringBuilder} to append to
+     * @param report   the {@link List} to add to
      * @param title    the title of the crew role (e.g., "Driver", "Gunner")
      * @param assigned the number of crew members assigned to the role
      * @param needed   the number of crew members needed for the role
      */
-    private static void appendReport(StringBuilder report, String title, int assigned, int needed) {
-        report.append(String.format("<b>%s: </b>%d/%d", title, assigned, needed));
+    private static void appendReport(List<String> report, String title, int assigned, int needed) {
+        report.add(String.format("<b>%s: </b>%d/%d", title, assigned, needed));
     }
 
     @Override
