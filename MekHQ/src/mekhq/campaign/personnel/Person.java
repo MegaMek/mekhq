@@ -4276,9 +4276,8 @@ public class Person {
      * Updates skills for personnel with the Vehicle Crew profession by ensuring they have the Mechanic skill.
      *
      * <p>This method is used during XML loading to migrate legacy data. If the person lacks the
-     * {@link SkillType#S_TECH_MECHANIC} skill, it will be added at a level equal to their highest existing vehicle
-     * crew-related skill (e.g., Tech Vee, Gunnery Vee, Piloting Vee, or Driving). This ensures backwards compatibility
-     * when loading older save files.</p>
+     * {@link SkillType#S_TECH_MECHANIC} skill, it will be added at a level 3. This ensures backwards compatibility when
+     * loading older save files.</p>
      *
      * @param today       the current date
      * @param person      the person whose skills should be updated
@@ -4299,7 +4298,6 @@ public class Person {
 
         if (!person.hasSkill(S_TECH_MECHANIC)) {
             person.addSkill(S_TECH_MECHANIC, 3, 0);
-            return true;
         }
 
         if (isPrimary) {
@@ -4308,7 +4306,7 @@ public class Person {
             person.setSecondaryRole(PersonnelRole.COMBAT_TECHNICIAN);
         }
 
-        return false;
+        return true;
     }
 
     /**
