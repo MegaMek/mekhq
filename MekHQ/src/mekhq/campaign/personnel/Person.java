@@ -65,7 +65,6 @@ import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUN
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
@@ -4148,16 +4147,6 @@ public class Person {
                 person.setJoinedCampaign(today);
             }
 
-            // <50.10 compatibility handler
-            if (updateSkillsForVehicleProfessions(today, person, person.getPrimaryRole(), true) ||
-                      updateSkillsForVehicleProfessions(today, person, person.getSecondaryRole(), false)) {
-                String report = getFormattedTextAt(RESOURCE_BUNDLE, "vehicleProfessionSkillChange",
-                      spanOpeningWithCustomColor(getWarningColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle());
-                campaign.addReport(report);
-            }
-
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
             if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
@@ -4213,7 +4202,7 @@ public class Person {
      * @author Illiani
      * @since 0.50.10
      */
-    private static boolean updateSkillsForVehicleProfessions(LocalDate today, Person person, PersonnelRole role,
+    public static boolean updateSkillsForVehicleProfessions(LocalDate today, Person person, PersonnelRole role,
           boolean isPrimary) {
         if (role == PersonnelRole.VEHICLE_CREW) { // The old vehicle crew profession is handled differently
             return updateSkillsForVehicleCrewProfession(today, person, role, isPrimary);
