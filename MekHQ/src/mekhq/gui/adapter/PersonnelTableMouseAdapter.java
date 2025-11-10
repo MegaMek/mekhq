@@ -2972,7 +2972,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             case NONE -> newSkillsMenu.add(menuItem);
                             case COMBAT_GUNNERY -> combatGunnerySkillsNew.add(menuItem);
                             case COMBAT_PILOTING -> combatPilotingSkillsNew.add(menuItem);
-                            case SUPPORT -> supportSkillsNew.add(menuItem);
+                            case SUPPORT, SUPPORT_TECHNICIAN -> supportSkillsNew.add(menuItem);
                             case UTILITY, UTILITY_COMMAND -> utilitySkillsNew.add(menuItem);
                             case ROLEPLAY_GENERAL -> roleplaySkillsNew.add(menuItem);
                             case ROLEPLAY_ART -> roleplaySkillsArtNew.add(menuItem);

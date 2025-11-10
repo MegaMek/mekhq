@@ -929,7 +929,10 @@ public final class BriefingTab extends CampaignGuiTab {
                 for (Force force : selectedForces) {
                     scenario.addSalvageForce(force.getId());
                     if (force.getTechID() != null) {
-                        scenario.addSalvageTech(force.getTechID());
+                        Person tech = getCampaign().getPerson(force.getTechID());
+                        if (tech != null && !tech.isEngineer()) {
+                            scenario.addSalvageTech(force.getTechID());
+                        }
                     }
 
                     for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
@@ -984,7 +987,10 @@ public final class BriefingTab extends CampaignGuiTab {
                 Force force = getCampaign().getForce(forceId);
                 if (force != null && force.getForceType().isSalvage()) {
                     if (force.getTechID() != null) {
-                        priorSelectedTechs.add(force.getTechID());
+                        Person tech = getCampaign().getPerson(force.getTechID());
+                        if (tech != null && !tech.isEngineer()) {
+                            priorSelectedTechs.add(force.getTechID());
+                        }
                     }
                 }
             }
@@ -993,7 +999,7 @@ public final class BriefingTab extends CampaignGuiTab {
             List<UUID> assignedTechs = scenario.getSalvageTechs();
             for (UUID techID : assignedTechs) {
                 Person tech = getCampaign().getPerson(techID);
-                if (tech != null && !availableTechs.contains(tech)) {
+                if (tech != null && !availableTechs.contains(tech) && !tech.isEngineer()) {
                     availableTechs.add(0, tech);
                 }
             }
@@ -1019,10 +1025,27 @@ public final class BriefingTab extends CampaignGuiTab {
         return true;
     }
 
+    /**
+     * Retrieves a list of technicians available for work assignment.
+     *
+     * <p>This method filters the campaign's expanded tech roster to find personnel who meet all availability
+     * criteria. A technician is considered available if they:</p>
+     *
+     * <ul>
+     *   <li>Are not currently deployed</li>
+     *   <li>Have remaining work time available (minutesLeft > 0)</li>
+     *   <li>Are not classified as engineers</li>
+     * </ul>
+     *
+     * @return a list of available technicians meeting all criteria; may be empty if no technicians are available
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private List<Person> getAvailableTechs() {
         List<Person> availableTechs = new ArrayList<>();
-        for (Person tech : getCampaign().getTechs()) {
-            if (!tech.isDeployed() && tech.getMinutesLeft() > 0) {
+        for (Person tech : getCampaign().getTechsExpanded(true, false, true)) {
+            if (!tech.isDeployed() && tech.getMinutesLeft() > 0 && !tech.isEngineer()) {
                 availableTechs.add(tech);
             }
         }
@@ -1095,7 +1118,17 @@ public final class BriefingTab extends CampaignGuiTab {
             if (!force.isDeployed() &&
                       !isDeployedToStratCon &&
                       force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
-                eligibleCombatTeams.add(force);
+                boolean hasDeployedUnit = false;
+                for (Unit unit : force.getAllUnitsAsUnits(getCampaign().getHangar(), false)) {
+                    if (StratConRulesManager.isUnitDeployedToStratCon(unit)) {
+                        hasDeployedUnit = true;
+                        break;
+                    }
+                }
+
+                if (!hasDeployedUnit) {
+                    eligibleCombatTeams.add(force);
+                }
             }
         }
 

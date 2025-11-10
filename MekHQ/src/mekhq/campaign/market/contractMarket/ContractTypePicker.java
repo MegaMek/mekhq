@@ -1,5 +1,6 @@
 package mekhq.campaign.market.contractMarket;
 
+import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 
 import mekhq.campaign.mission.enums.AtBContractType;
@@ -61,7 +62,7 @@ public class ContractTypePicker {
      *
      * @param modifier the total modifier to apply
      *
-     * @return the modified dice roll result
+     * @return the modified dice roll result, clamped to 2 -> 12 (inclusive)
      *
      * @author Illiani
      * @since 0.50.10
@@ -72,13 +73,17 @@ public class ContractTypePicker {
         // Ostensibly, the player is meant to pick whether they want to raise or lower the result. However, bugging the
         // player every time we roll a contract would get annoying real quick, so we're going to gravitate towards
         // the extremes - where the interesting contract types are.
+        int result;
+
         if (initialRoll < 7) {
-            return initialRoll - modifier;
+            result = initialRoll - modifier;
         } else if (initialRoll > 7) {
-            return initialRoll + modifier;
+            result = initialRoll + modifier;
         } else {
-            return initialRoll;
+            result = initialRoll;
         }
+
+        return clamp(result, 2, 12);
     }
 
     /**
