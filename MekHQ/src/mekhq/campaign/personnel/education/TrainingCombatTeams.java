@@ -421,7 +421,7 @@ public class TrainingCombatTeams {
 
         Set<String> professionSkills = new HashSet<>();
         for (Person educator : educators) {
-            // First, collect all the skills. We use a Set, as we don't want duplicates
+            // Collect all unique skills from all educators. We use a Set to avoid duplicates.
 
             PersonnelRole primaryRole = educator.getPrimaryRole();
             PersonnelRole secondaryRole = educator.getSecondaryRole();
