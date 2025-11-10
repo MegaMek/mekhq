@@ -52,6 +52,7 @@ import java.util.List;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
@@ -719,7 +720,7 @@ public class TransportCostCalculations {
 
             // Non-vehicle entities are categorized based on the entity types
             else {
-                if (entity.isDropShip()) {
+                if (entity.isDropShip() || entity.isSpaceStation()) { // Both require jump collars
                     dropShipCount++;
                 } else if (entity.isSmallCraft()) {
                     smallCraftCount++;
@@ -733,7 +734,7 @@ public class TransportCostCalculations {
                     battleArmorCount++;
                 } else if (entity.isInfantry()) {
                     infantryCount++;
-                } else {
+                } else if (!(entity instanceof Jumpship) && !entity.isHandheldWeapon()) { // Includes WarShips
                     otherUnitCount++;
                 }
             }

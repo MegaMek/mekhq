@@ -153,6 +153,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         add(buttonPanel, BorderLayout.SOUTH);
 
         currentFactions = RandomFactionGenerator.getInstance().getCurrentFactions();
+        currentFactions.add(contract.getEmployerCode());
+        currentFactions.add(contract.getEnemyCode());
 
         GridBagConstraints gbc;
 
