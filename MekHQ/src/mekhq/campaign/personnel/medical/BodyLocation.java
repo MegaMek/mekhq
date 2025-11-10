@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.medical;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -100,6 +101,20 @@ public enum BodyLocation {
     private final boolean limb; // Includes everything attached to a limb
     private final String locationName;
     private final BodyLocation parent;
+
+    public static final List<BodyLocation> PRIMARY_LOCATIONS = List.of(
+          HEAD,
+          CHEST,
+          ABDOMEN,
+          LEFT_ARM,
+          RIGHT_ARM,
+          LEFT_HAND,
+          RIGHT_HAND,
+          LEFT_LEG,
+          RIGHT_LEG,
+          LEFT_FOOT,
+          RIGHT_FEMUR
+    );
 
     /**
      * We can't use an EnumSet here because it requires the whole enum to be initialised. We fix it later, in the static
@@ -168,6 +183,18 @@ public enum BodyLocation {
     public BodyLocation Parent() {
         return parent;
     }
+
+    public BodyLocation getFirstPrimaryLocation() {
+        if (PRIMARY_LOCATIONS.contains(this)) {
+            return this;
+        }
+
+        BodyLocation location = this;
+        while (!PRIMARY_LOCATIONS.contains(location)) {
+            location = location.parent;
+        }
+        return location;
+    }
     //endregion Getters
 
     /**
@@ -206,6 +233,10 @@ public enum BodyLocation {
 
     public boolean isChildOf(BodyLocation parent) {
         return ((null != this.parent) && ((this.parent == parent) || this.parent.isChildOf(parent)));
+    }
+
+    public boolean isImmediateChildOf(BodyLocation parent) {
+        return null != this.parent && this.parent == parent;
     }
 
     public static final class XMLAdapter extends XmlAdapter<String, BodyLocation> {

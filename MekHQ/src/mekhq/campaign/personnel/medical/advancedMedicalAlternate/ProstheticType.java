@@ -496,6 +496,9 @@ public enum ProstheticType {
         // Build tooltip
         List<String> tooltipPortion = new ArrayList<>();
 
+        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.skill",
+              surgeryLevel));
+
         Money cost = getCost(gameYear);
         if (cost != null) {
             tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.cost",
