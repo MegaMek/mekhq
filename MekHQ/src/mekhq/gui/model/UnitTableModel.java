@@ -32,6 +32,8 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
@@ -61,6 +63,8 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
  * @author Jay lawson
  */
 public class UnitTableModel extends DataTableModel<Unit> {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.UnitTableModel";
+
     //region Variable Declarations
     public static final int COL_NAME = 0;
     public static final int COL_TYPE = 1;
@@ -203,27 +207,32 @@ public class UnitTableModel extends DataTableModel<Unit> {
 
 
         if (driversNeeded > 0 && soldiersNeeded == 0) {
-            appendReport(report, "Drivers", driversAssigned, driversNeeded);
+            appendReport(report, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.drivers"), driversAssigned,
+                  driversNeeded);
         }
 
         if (gunnersNeeded > 0 && soldiersNeeded == 0) {
             report.append("<br>");
-            appendReport(report, "Gunners", gunnersAssigned, gunnersNeeded);
+            appendReport(report, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.gunners"), gunnersAssigned,
+                  gunnersNeeded);
         }
 
         if (soldiersNeeded > 0) {
             report.append("<br>");
-            appendReport(report, "Soldiers", soldiersAssigned, soldiersNeeded);
+            appendReport(report, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.soldiers"), soldiersAssigned,
+                  soldiersNeeded);
         }
 
         if (crewNeeded > 0) {
             report.append("<br>");
-            appendReport(report, "Crew", crewAssigned, crewNeeded);
+            String key = entity.isLargeCraft() ? "UnitTableModel.crewNeeds.crew" : "UnitTableModel.crewNeeds.other";
+            appendReport(report, getTextAt(RESOURCE_BUNDLE, key), crewAssigned, crewNeeded);
         }
 
         if (navigatorsNeeded > 0) {
             report.append("<br>");
-            appendReport(report, "Navigator", navigatorsAssigned, navigatorsNeeded);
+            appendReport(report, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.navigator"), navigatorsAssigned,
+                  navigatorsNeeded);
         }
 
         report.append("</html>");
