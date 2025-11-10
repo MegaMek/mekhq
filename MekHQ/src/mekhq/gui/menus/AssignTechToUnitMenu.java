@@ -120,8 +120,6 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
 
             final JMenuItem miUnit = new JMenuItem(unit.getName());
             miUnit.setName("miUnit");
-            miUnit.setForeground(unit.determineForegroundColor("Menu"));
-            miUnit.setBackground(unit.determineBackgroundColor("Menu"));
             miUnit.addActionListener(evt -> unit.setTech(person));
             entityWeightClassMenu.add(miUnit);
         }
