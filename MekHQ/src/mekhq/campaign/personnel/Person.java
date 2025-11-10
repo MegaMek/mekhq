@@ -5748,13 +5748,20 @@ public class Person {
      *       no tech role
      */
     public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
-        int baseTime;
-        if (primaryRole.isTech() && secondaryRole.isNone()) {
-            baseTime = PRIMARY_ROLE_SUPPORT_TIME;
-        } else if (isTechExpanded()) {
-            baseTime = SECONDARY_ROLE_SUPPORT_TIME;
-        } else {
-            return 0;
+        int baseTime = 0;
+
+        if (primaryRole.isTech()) {
+            if (secondaryRole.isNone() || secondaryRole.isCivilian()) {
+                baseTime = PRIMARY_ROLE_SUPPORT_TIME;
+            } else {
+                baseTime = SECONDARY_ROLE_SUPPORT_TIME;
+            }
+        } else if (secondaryRole.isTechSecondary()) {
+            if (primaryRole.isNone() || primaryRole.isCivilian()) {
+                baseTime = PRIMARY_ROLE_SUPPORT_TIME;
+            } else {
+                baseTime = SECONDARY_ROLE_SUPPORT_TIME;
+            }
         }
 
         return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration));
@@ -5958,36 +5965,34 @@ public class Person {
             return;
         }
 
-        // Determine if this is a primary or secondary support role
-        boolean isPrimaryRole = (primaryRole.isTech() || primaryRole.isDoctor()) && secondaryRole.isNone();
-        boolean isBusyTech = (primaryRole.isTech() || primaryRole.isDoctor()) && !secondaryRole.isNone();
-        boolean isSecondaryRole = (isBusyTech || secondaryRole.isTechSecondary() || secondaryRole.isDoctor()) &&
-                                        !isPrimaryRole;
-
         // Personnel without tech or doctor roles have no available time
-        if (!isPrimaryRole && !isSecondaryRole) {
+        if (!isTech() && !isDoctor()) {
             this.minutesLeft = 0;
             this.overtimeLeft = 0;
             return;
         }
 
-        // Doctors get standard support time based on role priority
-        if (isDoctor()) {
-            this.minutesLeft = isPrimaryRole ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME;
-            this.overtimeLeft = isPrimaryRole ? PRIMARY_ROLE_OVERTIME_SUPPORT_TIME
-                                      : SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
-            return;
+        if (primaryRole.isTech() || primaryRole.isDoctor()) {
+            getRoleMinutes(secondaryRole);
+        } else if (secondaryRole.isTechSecondary() || secondaryRole.isDoctor()) {
+            getRoleMinutes(primaryRole);
         }
 
         // Techs get support time adjusted by skill and administration multipliers
-        if (isTech()) {
-            int baseMinutes = isPrimaryRole ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME;
-            int baseOvertime = isPrimaryRole ? PRIMARY_ROLE_OVERTIME_SUPPORT_TIME
-                                     : SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
-
+        if (isTech() && isTechsUseAdministration) {
             double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
-            this.minutesLeft = (int) Math.round(baseMinutes * multiplier);
-            this.overtimeLeft = (int) Math.round(baseOvertime * multiplier);
+            this.minutesLeft = (int) Math.round(minutesLeft * multiplier);
+            this.overtimeLeft = (int) Math.round(overtimeLeft * multiplier);
+        }
+    }
+
+    private void getRoleMinutes(PersonnelRole comparisonRole) {
+        if (comparisonRole.isNone() || comparisonRole.isCivilian()) {
+            this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
+            this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
+        } else {
+            this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
+            this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
     }
 
