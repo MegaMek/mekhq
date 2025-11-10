@@ -246,7 +246,9 @@ public class UnitTableModel extends DataTableModel<Unit> {
                   navigatorsNeeded);
         }
 
-        String finalReport = reports.isEmpty() ? "" : String.join("<br>", reports);
+        String finalReport = reports.isEmpty() ?
+                                   getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.none") :
+                                   String.join("<br>", reports);
         return "<html>" + finalReport + "</html>";
     }
 

@@ -7365,27 +7365,27 @@ public class Unit implements ITechnology {
 
         if (entity instanceof LandAirMek) {
             return PersonnelRole.LAM_PILOT;
-        } else if (entity instanceof Mek) {
+        } else if (entity.isMek()) {
             return PersonnelRole.MEKWARRIOR;
         } else if (entity instanceof VTOL) {
             return PersonnelRole.VEHICLE_CREW_VTOL;
-        } else if (entity instanceof Tank) {
+        } else if (entity instanceof Tank) { // instanceof to include Gun Emplacements
             if (entity.getMovementMode().isMarine()) {
                 return PersonnelRole.VEHICLE_CREW_NAVAL;
             } else {
                 return PersonnelRole.VEHICLE_CREW_GROUND;
             }
-        } else if (entity instanceof ConvFighter) {
+        } else if (entity.isConventionalFighter()) {
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
-        } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
+        } else if (entity.isLargeCraft()) {
             return PersonnelRole.VESSEL_PILOT;
-        } else if (entity instanceof Aero) {
+        } else if (entity.isAerospace()) {
             return PersonnelRole.AEROSPACE_PILOT;
-        } else if (entity instanceof BattleArmor) {
+        } else if (entity.isBattleArmor()) {
             return PersonnelRole.BATTLE_ARMOUR;
-        } else if (entity instanceof Infantry) {
+        } else if (entity.isConventionalInfantry()) {
             return PersonnelRole.SOLDIER;
-        } else if (entity instanceof ProtoMek) {
+        } else if (entity.isProtoMek()) {
             return PersonnelRole.PROTOMEK_PILOT;
         } else {
             LOGGER.info("Unknown unit type parsed into getDriverRole(): {}", entity.getUnitType());
@@ -7413,9 +7413,9 @@ public class Unit implements ITechnology {
 
         if (entity instanceof LandAirMek) {
             return PersonnelRole.LAM_PILOT;
-        } else if (entity instanceof Mek) {
+        } else if (entity.isMek()) {
             return PersonnelRole.MEKWARRIOR;
-        } else if (entity instanceof Tank) {
+        } else if (entity instanceof Tank) { // instanceof to include Gun Emplacements
             if (entity.getMovementMode().isMarine()) {
                 return PersonnelRole.VEHICLE_CREW_NAVAL;
             } else if (entity.getMovementMode().isVTOL()) {
@@ -7423,17 +7423,17 @@ public class Unit implements ITechnology {
             } else {
                 return PersonnelRole.VEHICLE_CREW_GROUND;
             }
-        } else if (entity instanceof ConvFighter) {
+        } else if (entity.isConventionalInfantry()) {
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
-        } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
+        } else if (entity.isSmallCraft() || entity.isLargeCraft()) {
             return PersonnelRole.VESSEL_GUNNER;
-        } else if (entity instanceof Aero) {
+        } else if (entity.isAerospace()) {
             return PersonnelRole.AEROSPACE_PILOT;
-        } else if (entity instanceof BattleArmor) {
+        } else if (entity.isBattleArmor()) {
             return PersonnelRole.BATTLE_ARMOUR;
-        } else if (entity instanceof Infantry) {
+        } else if (entity.isConventionalInfantry()) {
             return PersonnelRole.SOLDIER;
-        } else if (entity instanceof ProtoMek) {
+        } else if (entity.isProtoMek()) {
             return PersonnelRole.PROTOMEK_PILOT;
         } else {
             LOGGER.info("Unknown unit type parsed into getGunnerRole(): {}", entity.getUnitType());
