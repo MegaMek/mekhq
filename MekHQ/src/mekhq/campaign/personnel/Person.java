@@ -4204,10 +4204,6 @@ public class Person {
      */
     public static boolean updateSkillsForVehicleProfessions(LocalDate today, Person person, PersonnelRole role,
           boolean isPrimary) {
-        if (role == PersonnelRole.VEHICLE_CREW) { // The old vehicle crew profession is handled differently
-            return updateSkillsForVehicleCrewProfession(today, person, role, isPrimary);
-        }
-
         PersonnelRole newProfession = null;
         String drivingSkillType = null;
         String gunnerySkillType = S_GUN_VEE;
@@ -4294,7 +4290,7 @@ public class Person {
      * @author Illiani
      * @since 0.50.10
      */
-    private static boolean updateSkillsForVehicleCrewProfession(LocalDate today, Person person,
+    public static boolean updateSkillsForVehicleCrewProfession(LocalDate today, Person person,
           PersonnelRole currentRole,
           boolean isPrimary) {
         if (currentRole != PersonnelRole.VEHICLE_CREW) {
