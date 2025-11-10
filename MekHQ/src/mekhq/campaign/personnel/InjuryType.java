@@ -157,6 +157,10 @@ public class InjuryType {
         return InjuryType.REV_REGISTRY.get(this);
     }
 
+    public Set<BodyLocation> getAllowedLocations() {
+        return allowedLocations;
+    }
+
     public boolean isValidInLocation(BodyLocation loc) {
         if (null == allowedLocations) {
             allowedLocations = EnumSet.allOf(BodyLocation.class);

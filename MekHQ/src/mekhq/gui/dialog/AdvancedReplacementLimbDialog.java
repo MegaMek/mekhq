@@ -2,7 +2,6 @@ package mekhq.gui.dialog;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.medical.BodyLocation.*;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.COSMETIC_SURGERY;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -12,6 +11,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,36 +26,49 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType;
 
 public class AdvancedReplacementLimbDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(AdvancedReplacementLimbDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvancedReplacementLimbDialog";
 
-    private static final List<BodyLocation> VALID_BODY_LOCATIONS = List.of(LEFT_ARM, RIGHT_ARM, LEFT_HAND, RIGHT_HAND,
-          LEFT_LEG, RIGHT_LEG, LEFT_FOOT, RIGHT_FOOT, EYES, EARS, HEART, LUNGS, ORGANS);
+    // The order here is important and any changes will be reflected in the gui
+    private static final List<BodyLocation> VALID_BODY_LOCATIONS = List.of(
+          HEAD,
+          EYES,
+          EARS,
+          LEFT_ARM,
+          RIGHT_ARM,
+          LEFT_HAND,
+          RIGHT_HAND,
+          CHEST,
+          HEART,
+          LUNGS,
+          ORGANS,
+          ABDOMEN,
+          LEFT_LEG,
+          RIGHT_LEG,
+          LEFT_FOOT,
+          RIGHT_FOOT
+    );
 
     private final Campaign campaign;
-    private final Person surgeon;
-    private final List<Injury> relevantInjuries = new ArrayList<>();
-    private final Map<Injury, List<ProstheticType>> treatmentOptions = new HashMap<>();
-    private final Map<Injury, JComboBox<ProstheticType>> treatmentSelections = new HashMap<>();
+    private final Person surgeon; // can be null
+    private final Map<BodyLocation, List<Injury>> relevantInjuries = new HashMap<>();
+    private final Map<BodyLocation, List<ProstheticType>> treatmentOptions = new HashMap<>();
+    private final Map<BodyLocation, JComboBox<ProstheticType>> treatmentSelections = new HashMap<>();
     private boolean wasConfirmed = false;
 
     public AdvancedReplacementLimbDialog(Campaign campaign, Person patient) {
         this.campaign = campaign;
-        surgeon = getSurgeon(campaign.getDoctors());
+        surgeon = getSurgeon(campaign.getDoctors()); // can return null
 
         gatherRelevantInjuries(patient.getInjuries());
-        if (relevantInjuries.isEmpty()) {
-            // There is nothing to heal
-            return;
-        }
-
         gatherTreatmentOptions();
 
         initializeUI();
@@ -78,24 +91,25 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 
         // Add injury labels and treatment comboboxes
-        for (int i = 0; i < relevantInjuries.size(); i++) {
-            Injury injury = relevantInjuries.get(i);
-
-            // Injury label
+        int i = 0;
+        for (BodyLocation bodyLocation : VALID_BODY_LOCATIONS) {
+            // Label
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
             gridBagConstraints.weightx = 0.5;
-            JLabel injuryLabel = new JLabel(injury.getName());
-            mainPanel.add(injuryLabel, gridBagConstraints);
+            JLabel location = new JLabel(bodyLocation.locationName());
+            mainPanel.add(location, gridBagConstraints);
 
             // ProstheticType combobox
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = i;
             gridBagConstraints.weightx = 0.5;
-            List<ProstheticType> options = treatmentOptions.get(injury);
+            List<ProstheticType> options = treatmentOptions.get(bodyLocation);
+            LOGGER.info(bodyLocation.locationName());
             JComboBox<ProstheticType> treatmentComboBox = createTreatmentComboBox(options);
-            treatmentSelections.put(injury, treatmentComboBox);
+            treatmentSelections.put(bodyLocation, treatmentComboBox);
             mainPanel.add(treatmentComboBox, gridBagConstraints);
+            i++;
         }
 
         // Wrap main panel in scroll pane in case of many injuries
@@ -221,9 +235,9 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         return wasConfirmed;
     }
 
-    public Map<Injury, ProstheticType> getSelectedTreatments() {
-        Map<Injury, ProstheticType> selections = new HashMap<>();
-        for (Map.Entry<Injury, JComboBox<ProstheticType>> entry : treatmentSelections.entrySet()) {
+    public Map<BodyLocation, ProstheticType> getSelectedTreatments() {
+        Map<BodyLocation, ProstheticType> selections = new HashMap<>();
+        for (Map.Entry<BodyLocation, JComboBox<ProstheticType>> entry : treatmentSelections.entrySet()) {
             ProstheticType selectedTreatment = (ProstheticType) entry.getValue().getSelectedItem();
             selections.put(entry.getKey(), selectedTreatment);
         }
@@ -249,49 +263,30 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     }
 
     private void gatherRelevantInjuries(List<Injury> injuries) {
+        injuries.sort(Comparator.comparing(Injury::getName)); // we want a consistent order
         for (Injury injury : injuries) {
-            InjuryType injuryType = injury.getType();
+            BodyLocation location = injury.getLocation();
+            for (BodyLocation mappedLocation : VALID_BODY_LOCATIONS) {
+                boolean isSameLocation = location.equals(mappedLocation);
+                boolean isChildOfLocation = location.isChildOf(mappedLocation);
 
-            // Skip non-Alt Advanced Medical injuries
-            if (!injuryType.getKey().contains("alt:")) {
-                continue;
-            }
-
-            // Skip prosthetic injuries
-            if (injuryType.getSubType().isProsthetic()) {
-                continue;
-            }
-
-            // Skip non-permanent injuries
-            if (!injury.isPermanent()) {
-                continue;
-            }
-
-            // Add burn injuries
-            if (injury.getSubType().isBurn()) {
-                relevantInjuries.add(injury);
-                continue;
-            }
-
-            // Add injuries with valid body locations
-            BodyLocation location = getBodyLocation(injury);
-            if (VALID_BODY_LOCATIONS.contains(location)) {
-                relevantInjuries.add(injury);
+                // Head and chest are special cases, as 'prosthetics' used there won't remove all injuries in that
+                // location, just the localized ones
+                boolean locationIsHead = mappedLocation.equals(HEAD);
+                boolean locationIsChest = mappedLocation.equals(CHEST);
+                if (isSameLocation || (isChildOfLocation && !(locationIsHead || locationIsChest))) {
+                    // If a BodyLocation is the child of multiple valid locations, we want it added to each, so we
+                    // don't break after finding one match
+                    relevantInjuries.computeIfAbsent(mappedLocation, k -> new ArrayList<>()).add(injury);
+                }
             }
         }
     }
 
     private void gatherTreatmentOptions() {
-        for (Injury injury : relevantInjuries) {
-            InjuryType injuryType = injury.getType();
-            if (injuryType.getSubType().isBurn()) {
-                treatmentOptions.put(injury, List.of(COSMETIC_SURGERY));
-                continue;
-            }
-
-            BodyLocation injuryLocation = getBodyLocation(injury);
-            List<ProstheticType> eligibleTreatments = getEligibleTreatments(injuryLocation);
-            treatmentOptions.put(injury, eligibleTreatments);
+        for (BodyLocation location : VALID_BODY_LOCATIONS) {
+            List<ProstheticType> eligibleTreatments = getEligibleTreatments(location);
+            treatmentOptions.put(location, eligibleTreatments);
         }
     }
 
@@ -299,26 +294,11 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         List<ProstheticType> eligibleTreatments = new ArrayList<>();
         for (ProstheticType type : ProstheticType.values()) {
             if (type.getEligibleLocations().contains(injuryLocation)) {
+                LOGGER.info("VALID:{}", injuryLocation);
                 eligibleTreatments.add(type);
             }
         }
         return eligibleTreatments;
-    }
-
-    private static BodyLocation getBodyLocation(Injury injury) {
-        BodyLocation injuryLocation = injury.getLocation();
-        if (injuryLocation.isChildOf(LEFT_HAND)) {
-            injuryLocation = LEFT_HAND;
-        } else if (injuryLocation.isChildOf(RIGHT_HAND)) {
-            injuryLocation = RIGHT_HAND;
-        } else if (injuryLocation.isChildOf(LEFT_FOOT)) {
-            injuryLocation = LEFT_FOOT;
-        } else if (injuryLocation.isChildOf(RIGHT_FOOT)) {
-            injuryLocation = RIGHT_FOOT;
-        } else if (injuryLocation.Parent() != null) {
-            injuryLocation = injuryLocation.Parent();
-        }
-        return injuryLocation;
     }
 }
 

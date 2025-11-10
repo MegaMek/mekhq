@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
-import static mekhq.campaign.personnel.medical.BodyLocation.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -41,6 +40,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
@@ -57,7 +57,6 @@ public enum ProstheticType {
     WOODEN_ARM("WOODEN_ARM",
           1,
           2,
-          List.of(LEFT_ARM, RIGHT_ARM),
           AlternateInjuries.WOODEN_ARM,
           Money.of(75),
           TechRating.A,
@@ -67,7 +66,6 @@ public enum ProstheticType {
     HOOK_HAND("HOOK_HAND",
           1,
           2,
-          List.of(LEFT_HAND, RIGHT_HAND),
           AlternateInjuries.HOOK_HAND,
           Money.of(75),
           TechRating.A,
@@ -77,7 +75,6 @@ public enum ProstheticType {
     PEG_LEG("PEG_LEG",
           1,
           2,
-          List.of(LEFT_LEG, RIGHT_LEG),
           AlternateInjuries.PEG_LEG,
           Money.of(75),
           TechRating.A,
@@ -87,7 +84,6 @@ public enum ProstheticType {
     WOODEN_FOOT("WOODEN_FOOT",
           1,
           2,
-          List.of(LEFT_FOOT, RIGHT_FOOT),
           AlternateInjuries.WOODEN_FOOT,
           Money.of(75),
           TechRating.A,
@@ -97,7 +93,6 @@ public enum ProstheticType {
     SIMPLE_ARM("SIMPLE_ARM",
           2,
           2,
-          List.of(LEFT_ARM, RIGHT_ARM),
           AlternateInjuries.SIMPLE_ARM,
           Money.of(750),
           TechRating.B,
@@ -107,7 +102,6 @@ public enum ProstheticType {
     SIMPLE_CLAW_HAND("SIMPLE_CLAW_HAND",
           2,
           2,
-          List.of(LEFT_HAND, RIGHT_HAND),
           AlternateInjuries.SIMPLE_CLAW_HAND,
           Money.of(750),
           TechRating.B,
@@ -117,7 +111,6 @@ public enum ProstheticType {
     SIMPLE_LEG("SIMPLE_LEG",
           2,
           2,
-          List.of(LEFT_LEG, RIGHT_LEG),
           AlternateInjuries.SIMPLE_LEG,
           Money.of(250),
           TechRating.B,
@@ -127,7 +120,6 @@ public enum ProstheticType {
     SIMPLE_FOOT("SIMPLE_FOOT",
           2,
           2,
-          List.of(LEFT_FOOT, RIGHT_FOOT),
           AlternateInjuries.SIMPLE_FOOT,
           Money.of(250),
           TechRating.B,
@@ -137,7 +129,6 @@ public enum ProstheticType {
     PROSTHETIC_ARM("PROSTHETIC_ARM",
           3,
           5,
-          List.of(LEFT_ARM, RIGHT_ARM),
           AlternateInjuries.PROSTHETIC_ARM,
           Money.of(7500),
           TechRating.C,
@@ -147,7 +138,6 @@ public enum ProstheticType {
     PROSTHETIC_HAND("PROSTHETIC_HAND",
           3,
           5,
-          List.of(LEFT_HAND, RIGHT_HAND),
           AlternateInjuries.PROSTHETIC_HAND,
           Money.of(7500),
           TechRating.C,
@@ -157,7 +147,6 @@ public enum ProstheticType {
     PROSTHETIC_LEG("PROSTHETIC_LEG",
           3,
           5,
-          List.of(LEFT_LEG, RIGHT_LEG),
           AlternateInjuries.PROSTHETIC_LEG,
           Money.of(10000),
           TechRating.C,
@@ -167,7 +156,6 @@ public enum ProstheticType {
     PROSTHETIC_FOOT("PROSTHETIC_FOOT",
           3,
           5,
-          List.of(LEFT_FOOT, RIGHT_FOOT),
           AlternateInjuries.PROSTHETIC_FOOT,
           Money.of(10000),
           TechRating.C,
@@ -177,7 +165,6 @@ public enum ProstheticType {
     ADVANCED_PROSTHETIC_ARM("ADVANCED_PROSTHETIC_ARM",
           4,
           5,
-          List.of(LEFT_ARM, RIGHT_ARM),
           AlternateInjuries.ADVANCED_PROSTHETIC_ARM,
           Money.of(25000),
           TechRating.D,
@@ -187,7 +174,6 @@ public enum ProstheticType {
     ADVANCED_PROSTHETIC_HAND("ADVANCED_PROSTHETIC_HAND",
           4,
           5,
-          List.of(LEFT_HAND, RIGHT_HAND),
           AlternateInjuries.ADVANCED_PROSTHETIC_HAND,
           Money.of(25000),
           TechRating.D,
@@ -197,7 +183,6 @@ public enum ProstheticType {
     ADVANCED_PROSTHETIC_LEG("ADVANCED_PROSTHETIC_LEG",
           4,
           5,
-          List.of(LEFT_LEG, RIGHT_LEG),
           AlternateInjuries.ADVANCED_PROSTHETIC_LEG,
           Money.of(17500),
           TechRating.D,
@@ -207,7 +192,6 @@ public enum ProstheticType {
     ADVANCED_PROSTHETIC_FOOT("ADVANCED_PROSTHETIC_FOOT",
           4,
           5,
-          List.of(LEFT_FOOT, RIGHT_FOOT),
           AlternateInjuries.ADVANCED_PROSTHETIC_FOOT,
           Money.of(17500),
           TechRating.D,
@@ -217,7 +201,6 @@ public enum ProstheticType {
     MYOMER_ARM("MYOMER_ARM",
           5,
           5,
-          List.of(LEFT_ARM, RIGHT_ARM),
           AlternateInjuries.MYOMER_ARM,
           Money.of(200000),
           TechRating.E,
@@ -227,7 +210,6 @@ public enum ProstheticType {
     MYOMER_HAND("MYOMER_HAND",
           5,
           5,
-          List.of(LEFT_HAND, RIGHT_HAND),
           AlternateInjuries.MYOMER_HAND,
           Money.of(100000),
           TechRating.E,
@@ -237,7 +219,6 @@ public enum ProstheticType {
     MYOMER_LEG("MYOMER_LEG",
           5,
           5,
-          List.of(LEFT_LEG, RIGHT_LEG),
           AlternateInjuries.MYOMER_LEG,
           Money.of(125000),
           TechRating.E,
@@ -247,7 +228,6 @@ public enum ProstheticType {
     MYOMER_FOOT("MYOMER_FOOT",
           5,
           5,
-          List.of(LEFT_FOOT, RIGHT_FOOT),
           AlternateInjuries.MYOMER_FOOT,
           Money.of(50000),
           TechRating.E,
@@ -257,7 +237,6 @@ public enum ProstheticType {
     CLONED_ARM("CLONED_ARM",
           6,
           5,
-          List.of(LEFT_ARM, RIGHT_ARM),
           AlternateInjuries.CLONED_ARM,
           Money.of(500000),
           TechRating.E,
@@ -267,7 +246,6 @@ public enum ProstheticType {
     CLONED_HAND("CLONED_HAND",
           6,
           5,
-          List.of(LEFT_HAND, RIGHT_HAND),
           AlternateInjuries.CLONED_HAND,
           Money.of(300000),
           TechRating.E,
@@ -277,7 +255,6 @@ public enum ProstheticType {
     CLONED_LEG("CLONED_LEG",
           6,
           5,
-          List.of(LEFT_LEG, RIGHT_LEG),
           AlternateInjuries.CLONED_LEG,
           Money.of(350000),
           TechRating.E,
@@ -287,7 +264,6 @@ public enum ProstheticType {
     CLONED_FOOT("CLONED_FOOT",
           6,
           5,
-          List.of(LEFT_FOOT, RIGHT_FOOT),
           AlternateInjuries.CLONED_FOOT,
           Money.of(50000),
           TechRating.E,
@@ -297,7 +273,6 @@ public enum ProstheticType {
     EYE_IMPLANT("EYE_IMPLANT",
           2,
           2,
-          List.of(EYES),
           AlternateInjuries.EYE_IMPLANT,
           Money.of(350),
           TechRating.B,
@@ -307,7 +282,6 @@ public enum ProstheticType {
     BIONIC_EAR("BIONIC_EAR",
           3,
           5,
-          List.of(EARS),
           AlternateInjuries.BIONIC_EAR,
           Money.of(100000),
           TechRating.C,
@@ -317,7 +291,6 @@ public enum ProstheticType {
     BIONIC_EYE("BIONIC_EYE",
           4,
           5,
-          List.of(EYES),
           AlternateInjuries.BIONIC_EYE,
           Money.of(220000),
           TechRating.C,
@@ -327,7 +300,6 @@ public enum ProstheticType {
     BIONIC_HEART("BIONIC_HEART",
           3,
           5,
-          List.of(HEART),
           AlternateInjuries.BIONIC_HEART,
           Money.of(500000),
           TechRating.C,
@@ -337,7 +309,6 @@ public enum ProstheticType {
     BIONIC_LUNGS("BIONIC_LUNGS",
           4,
           5,
-          List.of(LUNGS),
           AlternateInjuries.BIONIC_LUNGS,
           Money.of(800000),
           TechRating.C,
@@ -347,7 +318,6 @@ public enum ProstheticType {
     BIONIC_ORGAN_OTHER("BIONIC_ORGAN_OTHER",
           4,
           5,
-          List.of(ORGANS),
           AlternateInjuries.BIONIC_ORGAN_OTHER,
           Money.of(750000),
           TechRating.C,
@@ -357,7 +327,6 @@ public enum ProstheticType {
     COSMETIC_SURGERY("COSMETIC_SURGERY",
           2,
           2,
-          List.of(), // This is a special case used to heal burns
           AlternateInjuries.COSMETIC_SURGERY,
           Money.of(2500),
           TechRating.A,
@@ -368,7 +337,6 @@ public enum ProstheticType {
     private final String lookupName;
     private final int prostheticType;
     private final int surgeryLevel;
-    private final List<BodyLocation> eligibleLocations;
     private final InjuryType injuryType;
     private final Money baseCost;
     private final TechRating technologyRating;
@@ -393,15 +361,12 @@ public enum ProstheticType {
     private static final double AVAILABILITY_MULTIPLIER_F_STAR = 0.0; // Unavailable
     private static final double AVAILABILITY_MULTIPLIER_X = 0.0; // Unavailable
 
-    ProstheticType(String lookupName, int prostheticType, int surgeryLevel, List<BodyLocation> eligibleLocations,
-          InjuryType injuryType,
-          Money baseCost, TechRating technologyRating, AvailabilityValue availabilityEarly,
-          AvailabilityValue availabilityMid, AvailabilityValue availabilityLate, boolean isClanOnly,
-          boolean isComStarOnly) {
+    ProstheticType(String lookupName, int prostheticType, int surgeryLevel, InjuryType injuryType, Money baseCost,
+          TechRating technologyRating, AvailabilityValue availabilityEarly, AvailabilityValue availabilityMid,
+          AvailabilityValue availabilityLate, boolean isClanOnly, boolean isComStarOnly) {
         this.lookupName = lookupName;
         this.prostheticType = prostheticType;
         this.surgeryLevel = surgeryLevel;
-        this.eligibleLocations = eligibleLocations;
         this.injuryType = injuryType;
         this.baseCost = baseCost;
         this.technologyRating = technologyRating;
@@ -420,8 +385,8 @@ public enum ProstheticType {
         return surgeryLevel;
     }
 
-    public List<BodyLocation> getEligibleLocations() {
-        return eligibleLocations;
+    public Set<BodyLocation> getEligibleLocations() {
+        return injuryType.getAllowedLocations();
     }
 
     public InjuryType getInjuryType() {

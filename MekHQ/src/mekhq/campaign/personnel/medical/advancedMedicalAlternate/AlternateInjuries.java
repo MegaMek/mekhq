@@ -1474,8 +1474,8 @@ public class AlternateInjuries {
         CosmeticSurgery() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COSMETIC_SURGERY.simpleName");
-            this.allowedLocations = Set.of(HEAD, ABDOMEN, CHEST, UPPER_LEFT_ARM, UPPER_RIGHT_ARM, LEFT_HAND,
-                  RIGHT_HAND, LEFT_THIGH, RIGHT_THIGH, LEFT_CALF, RIGHT_CALF);
+            this.allowedLocations = Set.of(HEAD, ABDOMEN, CHEST, LEFT_ARM, RIGHT_ARM, LEFT_HAND,
+                  RIGHT_HAND, LEFT_LEG, RIGHT_LEG);
         }
     }
 
