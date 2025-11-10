@@ -32,6 +32,8 @@
  */
 package mekhq.gui.menus;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
+
 import java.util.stream.Stream;
 import javax.swing.JMenuItem;
 
@@ -68,6 +70,8 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
         if ((units.length == 0) || Stream.of(units).anyMatch(Unit::isSelfCrewed)) {
             return;
         }
+
+        boolean techsUseAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
 
         // Initialize Menu
         setText(resources.getString("AssignUnitToTechMenu.title"));
@@ -122,13 +126,9 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
                     };
 
                     if (subMenu != null) {
-                        int dailyTime = tech.getDailyAvailableTechTime(campaign.getCampaignOptions()
-                                                                             .isTechsUseAdministration());
-                        int dailyTimeUsing = tech.getMaintenanceTimeUsing();
-                        int available = dailyTime - dailyTimeUsing;
-
-                        final JMenuItem miAssignTech = new JMenuItem(String.format(resources.getString(
-                              "miAssignTech.text"), tech.getFullTitle(), available));
+                        String display = getFormattedText("AssignTechToUnitMenu.display", tech.getFullTitle(),
+                              maintenanceTime, tech.getDailyAvailableTechTime(techsUseAdmin));
+                        final JMenuItem miAssignTech = new JMenuItem(display);
                         miAssignTech.setName("miAssignTech");
                         miAssignTech.addActionListener(evt -> {
                             for (final Unit unit : units) {
