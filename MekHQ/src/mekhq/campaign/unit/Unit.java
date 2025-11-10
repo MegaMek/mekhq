@@ -7367,11 +7367,11 @@ public class Unit implements ITechnology {
             return PersonnelRole.LAM_PILOT;
         } else if (entity.isMek()) {
             return PersonnelRole.MEKWARRIOR;
-        } else if (entity instanceof VTOL) {
-            return PersonnelRole.VEHICLE_CREW_VTOL;
         } else if (entity instanceof Tank) { // instanceof to include Gun Emplacements
             if (entity.getMovementMode().isMarine()) {
                 return PersonnelRole.VEHICLE_CREW_NAVAL;
+            } else if (entity.getMovementMode().isVTOL()) {
+                return PersonnelRole.VEHICLE_CREW_VTOL;
             } else {
                 return PersonnelRole.VEHICLE_CREW_GROUND;
             }
