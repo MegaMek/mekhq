@@ -736,7 +736,7 @@ public class SalvagePostScenarioPicker {
      */
     private void updateConfirmButtonState(List<SalvageComboBoxGroup> salvageComboBoxGroups, JButton confirmButton,
           JLabel unitSalvageLabel, JLabel salvageTimeLabel, boolean isContract) {
-        boolean shouldEnable = maximumSalvageTime > 0;
+        boolean shouldEnable = true;
 
         // Check for any invalid units
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
