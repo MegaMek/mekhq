@@ -948,6 +948,7 @@ public final class BriefingTab extends CampaignGuiTab {
                                 scenario.addSalvageTech(person.getId());
                             }
                         }
+                    }
                 }
 
                 if (getCampaign().getCampaignOptions().isUseStratCon()) {
