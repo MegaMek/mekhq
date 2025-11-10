@@ -61,6 +61,9 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
         ForceType forceType = force.getForceType();
         UUID techId = force.getTechID();
         Person tech = techId == null || !forceType.isSalvage() ? null : campaign.getPerson(techId);
+        if (tech != null && tech.isEngineer()) { // Engineers cannot salvage
+            tech = null;
+        }
 
         double maximumCargoCapacity = 0.0;
         double maximumTowCapacity = 0.0;
