@@ -425,7 +425,7 @@ public class TrainingCombatTeams {
 
             PersonnelRole primaryRole = educator.getPrimaryRole();
             PersonnelRole secondaryRole = educator.getSecondaryRole();
-            getSkillsForProfession(educator,
+            getSkillsForProfession(
                   primaryRole,
                   professionSkills,
                   isUseArtillery,
@@ -476,7 +476,6 @@ public class TrainingCombatTeams {
      * enabled, it also adds any scouting skills the educator possesses. Non-combat roles are not processed and will
      * cause an early return.</p>
      *
-     * @param educator              the person whose skills are being evaluated
      * @param primaryRole           the educator's primary role
      * @param professionSkills      the set to add relevant skill names to (additive)
      * @param isUseArtillery        whether artillery skills should be included
@@ -486,10 +485,8 @@ public class TrainingCombatTeams {
      * @author Illiani
      * @since 0.50.10
      */
-    private static void getSkillsForProfession(Person educator, PersonnelRole primaryRole,
-          Set<String> professionSkills, boolean isUseArtillery,
-          PersonnelRole secondaryRole, boolean isUseAdvancedScouting) {
-
+    private static void getSkillsForProfession(PersonnelRole primaryRole, Set<String> professionSkills,
+          boolean isUseArtillery, PersonnelRole secondaryRole, boolean isUseAdvancedScouting) {
         if (primaryRole.isCombat()) {
             professionSkills.addAll(primaryRole.getSkillsForProfession(false, false, false,
                   isUseArtillery, true));
