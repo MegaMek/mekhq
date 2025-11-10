@@ -5080,8 +5080,8 @@ public class Unit implements ITechnology {
      * @param isDrivers        {@code true} to return drivers, {@code false} to return gunners (ignored if
      *                         {@code isTankOrInfantry} is {@code true})
      *
-     * @return a list of personnel; for tanks or infantry returns the full crew, for other entities returns either drivers or a copy
-     *       of the gunners list
+     * @return a list of personnel; for tanks or infantry returns the full crew, for other entities returns either
+     *       drivers or a copy of the gunners list
      */
     private List<Person> getCompositeCrew(boolean isTankOrInfantry, boolean isDrivers) {
         if (isTankOrInfantry) {
@@ -7343,5 +7343,101 @@ public class Unit implements ITechnology {
         }
 
         return canSalvage && isFullyCrewed();
+    }
+
+    /**
+     * Determines the appropriate personnel role for the driver/pilot position of this unit's entity.
+     *
+     * <p>The role is determined based on the entity's type and movement characteristics. For example, 'Meks require
+     * MekWarriors, while tanks may require different crew types based on whether hey are ground, naval, or VTOL
+     * units.</p>
+     *
+     * @return the personnel role required to operate this entity as a driver/pilot, or {@code null} if the entity is
+     *       null or of an unknown type
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public @Nullable PersonnelRole getDriverRole() {
+        if (entity == null) {
+            return null;
+        }
+
+        if (entity instanceof LandAirMek) {
+            return PersonnelRole.LAM_PILOT;
+        } else if (entity instanceof Mek) {
+            return PersonnelRole.MEKWARRIOR;
+        } else if (entity instanceof VTOL) {
+            return PersonnelRole.VEHICLE_CREW_VTOL;
+        } else if (entity instanceof Tank) {
+            if (entity.getMovementMode().isMarine()) {
+                return PersonnelRole.VEHICLE_CREW_NAVAL;
+            } else {
+                return PersonnelRole.VEHICLE_CREW_GROUND;
+            }
+        } else if (entity instanceof ConvFighter) {
+            return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
+        } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
+            return PersonnelRole.VESSEL_PILOT;
+        } else if (entity instanceof Aero) {
+            return PersonnelRole.AEROSPACE_PILOT;
+        } else if (entity instanceof BattleArmor) {
+            return PersonnelRole.BATTLE_ARMOUR;
+        } else if (entity instanceof Infantry) {
+            return PersonnelRole.SOLDIER;
+        } else if (entity instanceof ProtoMek) {
+            return PersonnelRole.PROTOMEK_PILOT;
+        } else {
+            LOGGER.info("Unknown unit type parsed into getDriverRole(): {}", entity.getUnitType());
+            return null;
+        }
+    }
+
+    /**
+     * Determines the appropriate personnel role for the gunner position of this unit's entity.
+     *
+     * <p>The role is determined based on the entity's type and movement characteristics. For most single-crew units
+     * ('Meks, aerospace fighters, etc.), the gunner role is the same as the driver role. For multi-crew units like
+     * vessels, a separate gunner role exists.</p>
+     *
+     * @return the personnel role required to operate this entity as a gunner, or {@code null} if the entity is null or
+     *       of an unknown type
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public @Nullable PersonnelRole getGunnerRole() {
+        if (entity == null) {
+            return null;
+        }
+
+        if (entity instanceof LandAirMek) {
+            return PersonnelRole.LAM_PILOT;
+        } else if (entity instanceof Mek) {
+            return PersonnelRole.MEKWARRIOR;
+        } else if (entity instanceof Tank) {
+            if (entity.getMovementMode().isMarine()) {
+                return PersonnelRole.VEHICLE_CREW_NAVAL;
+            } else if (entity.getMovementMode().isVTOL()) {
+                return PersonnelRole.VEHICLE_CREW_VTOL;
+            } else {
+                return PersonnelRole.VEHICLE_CREW_GROUND;
+            }
+        } else if (entity instanceof ConvFighter) {
+            return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
+        } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
+            return PersonnelRole.VESSEL_GUNNER;
+        } else if (entity instanceof Aero) {
+            return PersonnelRole.AEROSPACE_PILOT;
+        } else if (entity instanceof BattleArmor) {
+            return PersonnelRole.BATTLE_ARMOUR;
+        } else if (entity instanceof Infantry) {
+            return PersonnelRole.SOLDIER;
+        } else if (entity instanceof ProtoMek) {
+            return PersonnelRole.PROTOMEK_PILOT;
+        } else {
+            LOGGER.info("Unknown unit type parsed into getGunnerRole(): {}", entity.getUnitType());
+            return null;
+        }
     }
 }

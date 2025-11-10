@@ -32,6 +32,7 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
@@ -53,6 +54,7 @@ import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
@@ -206,15 +208,25 @@ public class UnitTableModel extends DataTableModel<Unit> {
         StringBuilder report = new StringBuilder("<html>");
 
 
+        Campaign campaign = unit.getCampaign();
+        boolean isClanCampaign = campaign != null && campaign.isClanCampaign();
         if (driversNeeded > 0 && soldiersNeeded == 0) {
-            appendReport(report, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.drivers"), driversAssigned,
-                  driversNeeded);
+            PersonnelRole driverRole = unit.getDriverRole();
+            String driverDisplay = driverRole == null ? getTextAt(RESOURCE_BUNDLE,
+                  "UnitTableModel.crewNeeds.unknown") : driverRole.getLabel(isClanCampaign);
+            appendReport(report, getFormattedTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.drivers", driverDisplay),
+                  driversAssigned, driversNeeded);
         }
 
         if (gunnersNeeded > 0 && soldiersNeeded == 0) {
             report.append("<br>");
-            appendReport(report, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.gunners"), gunnersAssigned,
-                  gunnersNeeded);
+
+            PersonnelRole gunnerRole = unit.getGunnerRole();
+            String gunnerDisplay = gunnerRole == null ? getTextAt(RESOURCE_BUNDLE,
+                  "UnitTableModel.crewNeeds.unknown") : gunnerRole.getLabel(isClanCampaign);
+
+            appendReport(report, getFormattedTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.gunners", gunnerDisplay),
+                  gunnersAssigned, gunnersNeeded);
         }
 
         if (soldiersNeeded > 0) {
