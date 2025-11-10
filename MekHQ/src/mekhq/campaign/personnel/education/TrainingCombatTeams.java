@@ -417,7 +417,7 @@ public class TrainingCombatTeams {
     private static Map<String, Integer> createSkillsList(Campaign campaign, Set<Person> educators) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean isUseArtillery = campaignOptions.isUseArtillery();
-        boolean isUseAdvancedScouting = campaign.getCampaignOptions().isUseAdvancedScouting();
+        final boolean isUseAdvancedScouting = campaign.getCampaignOptions().isUseAdvancedScouting();
 
         Set<String> professionSkills = new HashSet<>();
         for (Person educator : educators) {
