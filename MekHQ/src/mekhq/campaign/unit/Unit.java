@@ -7349,7 +7349,7 @@ public class Unit implements ITechnology {
      * Determines the appropriate personnel role for the driver/pilot position of this unit's entity.
      *
      * <p>The role is determined based on the entity's type and movement characteristics. For example, 'Meks require
-     * MekWarriors, while tanks may require different crew types based on whether hey are ground, naval, or VTOL
+     * MekWarriors, while tanks may require different crew types based on whether they are ground, naval, or VTOL
      * units.</p>
      *
      * @return the personnel role required to operate this entity as a driver/pilot, or {@code null} if the entity is
