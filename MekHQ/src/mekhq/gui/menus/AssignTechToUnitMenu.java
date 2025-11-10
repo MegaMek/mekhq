@@ -125,8 +125,6 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
                   unit.getMaintenanceTime(), person.getDailyAvailableTechTime(techsUseAdmin));
             final JMenuItem miUnit = new JMenuItem(display);
             miUnit.setName("miUnit");
-            miUnit.setForeground(unit.determineForegroundColor("Menu"));
-            miUnit.setBackground(unit.determineBackgroundColor("Menu"));
             miUnit.addActionListener(evt -> unit.setTech(person));
             entityWeightClassMenu.add(miUnit);
         }
