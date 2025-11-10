@@ -116,7 +116,7 @@
                0, 0,
                0, 0,
                true, mock(SpaceStation.class),
-               "<html></html>");
+               "<html>None</html>");
      }
 
      @Test
