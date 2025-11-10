@@ -501,13 +501,9 @@ public class TrainingCombatTeams {
             return;
         }
 
-        // Add scouting skills if enabled and the educator has them
+        // Add all scouting skills if advanced scouting is enabled
         if (isUseAdvancedScouting) {
-            for (String skillName : ScoutingSkills.SCOUTING_SKILLS) {
-                if (educator.hasSkill(skillName)) {
-                    professionSkills.add(skillName);
-                }
-            }
+            professionSkills.addAll(ScoutingSkills.SCOUTING_SKILLS);
         }
     }
 }
