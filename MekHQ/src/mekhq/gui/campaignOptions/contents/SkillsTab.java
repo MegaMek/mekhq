@@ -204,7 +204,7 @@ public class SkillsTab {
             boolean isCorrectType = switch (category) {
                 case NONE, COMBAT_GUNNERY -> subType == COMBAT_GUNNERY;
                 case COMBAT_PILOTING -> subType == COMBAT_PILOTING;
-                case SUPPORT -> subType == SUPPORT;
+                case SUPPORT, SUPPORT_TECHNICIAN -> subType == SUPPORT;
                 case UTILITY -> subType == UTILITY ||
                                       subType == UTILITY_COMMAND;
                 case ROLEPLAY_GENERAL -> subType == ROLEPLAY_GENERAL ||
