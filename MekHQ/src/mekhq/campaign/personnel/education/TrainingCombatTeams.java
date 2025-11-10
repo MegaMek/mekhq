@@ -478,7 +478,7 @@ public class TrainingCombatTeams {
      *
      * @param educator              the person whose skills are being evaluated
      * @param primaryRole           the educator's primary role
-     * @param professionSkills      the set to populate with relevant skill names
+     * @param professionSkills      the set to add relevant skill names to (additive)
      * @param isUseArtillery        whether artillery skills should be included
      * @param secondaryRole         the educator's secondary role
      * @param isUseAdvancedScouting whether to include advanced scouting skills
