@@ -32,6 +32,8 @@
  */
 package mekhq.gui.menus;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JMenuItem;
@@ -66,6 +68,7 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
                   || person.isDeployed() || !person.isTech()) {
             return;
         }
+        boolean techsUseAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
 
         // Initialize Menu
         setText(resources.getString("AssignTechToUnitMenu.title"));
@@ -118,7 +121,9 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
                       EntityWeightClass.getClassName(weightClass, unit.getEntity()));
             }
 
-            final JMenuItem miUnit = new JMenuItem(unit.getName());
+            String display = getFormattedText("AssignTechToUnitMenu.display", unit.getName(),
+                  unit.getMaintenanceTime(), person.getDailyAvailableTechTime(techsUseAdmin));
+            final JMenuItem miUnit = new JMenuItem(display);
             miUnit.setName("miUnit");
             miUnit.setForeground(unit.determineForegroundColor("Menu"));
             miUnit.setBackground(unit.determineBackgroundColor("Menu"));
