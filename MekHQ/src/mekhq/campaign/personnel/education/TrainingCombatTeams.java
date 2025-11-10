@@ -60,6 +60,8 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -413,37 +415,99 @@ public class TrainingCombatTeams {
      * @return a {@link Map} of skill names to experience levels representing the available skills for teaching
      */
     private static Map<String, Integer> createSkillsList(Campaign campaign, Set<Person> educators) {
-        Map<String, Integer> educatorSkills = new HashMap<>();
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean isUseArtillery = campaignOptions.isUseArtillery();
+        boolean isUseAdvancedScouting = campaign.getCampaignOptions().isUseAdvancedScouting();
+
+        Set<String> professionSkills = new HashSet<>();
         for (Person educator : educators) {
             // First, collect all the skills. We use a Set, as we don't want duplicates
-            Set<String> professionSkills = new HashSet<>();
 
-            if (educator.getPrimaryRole().isCombat()) {
-                professionSkills.addAll(educator.getProfessionSkills(campaign, false));
-            }
+            PersonnelRole primaryRole = educator.getPrimaryRole();
+            PersonnelRole secondaryRole = educator.getSecondaryRole();
+            getSkillsForProfession(educator,
+                  primaryRole,
+                  professionSkills,
+                  isUseArtillery,
+                  secondaryRole,
+                  isUseAdvancedScouting);
+        }
 
-            if (educator.getSecondaryRole().isCombat()) {
-                professionSkills.addAll(educator.getProfessionSkills(campaign, true));
-            }
+        // Then, find the best experience level available among educators in the commander's unit
 
-            // Then, find the best experience level available among educators in the commander's unit
+        return getEducatorSkills(educators, professionSkills);
+    }
+
+    /**
+     * Determines the highest skill level available among all educators for each profession skill.
+     *
+     * <p>Iterates through all educators and profession skills to find the maximum skill level that can be taught for
+     * each skill. Only skills that at least one educator possesses are included in the result.</p>
+     *
+     * @param educators        the set of educators to evaluate
+     * @param professionSkills the set of skill names relevant to the profession
+     *
+     * @return a map of skill names to their highest available level among all educators, containing only skills that at
+     *       least one educator possesses
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static Map<String, Integer> getEducatorSkills(Set<Person> educators, Set<String> professionSkills) {
+        Map<String, Integer> educatorSkills = new HashMap<>();
+
+        for (Person educator : educators) {
             for (String professionSkill : professionSkills) {
                 Skill skill = educator.getSkill(professionSkill);
 
                 if (skill != null) {
-                    if (!educatorSkills.containsKey(professionSkill)) {
-                        educatorSkills.put(professionSkill, skill.getLevel());
-                    } else {
-                        int educatorSkillLevel = educatorSkills.get(professionSkill);
-
-                        if (educatorSkillLevel < skill.getLevel()) {
-                            educatorSkills.put(professionSkill, skill.getLevel());
-                        }
-                    }
+                    educatorSkills.merge(professionSkill, skill.getLevel(), Math::max);
                 }
             }
         }
 
         return educatorSkills;
+    }
+
+    /**
+     * Collects the relevant skills for a given profession based on an educator's roles.
+     *
+     * <p>For combat roles (primary or secondary), adds all combat-related profession skills. If advanced scouting is
+     * enabled, it also adds any scouting skills the educator possesses. Non-combat roles are not processed and will
+     * cause an early return.</p>
+     *
+     * @param educator              the person whose skills are being evaluated
+     * @param primaryRole           the educator's primary role
+     * @param professionSkills      the set to populate with relevant skill names
+     * @param isUseArtillery        whether artillery skills should be included
+     * @param secondaryRole         the educator's secondary role
+     * @param isUseAdvancedScouting whether to include advanced scouting skills
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void getSkillsForProfession(Person educator, PersonnelRole primaryRole,
+          Set<String> professionSkills, boolean isUseArtillery,
+          PersonnelRole secondaryRole, boolean isUseAdvancedScouting) {
+
+        if (primaryRole.isCombat()) {
+            professionSkills.addAll(primaryRole.getSkillsForProfession(false, false, false,
+                  isUseArtillery, true));
+        } else if (secondaryRole.isCombat()) { // Primary overrides secondary, so no double-dipping
+            professionSkills.addAll(secondaryRole.getSkillsForProfession(false, false, false,
+                  isUseArtillery, true));
+        } else {
+            // support professions cannot teach skills through training forces
+            return;
+        }
+
+        // Add scouting skills if enabled and the educator has them
+        if (isUseAdvancedScouting) {
+            for (String skillName : ScoutingSkills.SCOUTING_SKILLS) {
+                if (educator.hasSkill(skillName)) {
+                    professionSkills.add(skillName);
+                }
+            }
+        }
     }
 }
