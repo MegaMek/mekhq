@@ -924,6 +924,7 @@ public final class BriefingTab extends CampaignGuiTab {
             SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), salvageForceOptions, isSpace);
             boolean wasConfirmed = forcePicker.wasConfirmed();
             if (wasConfirmed) {
+                Hangar hangar = getCampaign().getHangar();
                 List<Force> selectedForces = forcePicker.getSelectedForces();
                 for (Force force : selectedForces) {
                     scenario.addSalvageForce(force.getId());
@@ -931,6 +932,21 @@ public final class BriefingTab extends CampaignGuiTab {
                         Person tech = getCampaign().getPerson(force.getTechID());
                         if (tech != null && !tech.isEngineer()) {
                             scenario.addSalvageTech(force.getTechID());
+                        }
+                    }
+
+                    for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+                        if (unit.isSelfCrewed()) {
+                            continue;
+                        }
+
+                        // Add tech crew members (excluding engineers) from non-self-crewed units to the salvage tech list.
+                        // This ensures that all available technical personnel who are not engineers and are not assigned to self-crewed units
+                        // are included for salvage operations, as they may be needed for post-battle recovery and repair tasks.
+                        for (Person person : unit.getCrew()) {
+                            if (person.isTechExpanded() && !person.isEngineer()) {
+                                scenario.addSalvageTech(person.getId());
+                            }
                         }
                     }
                 }
