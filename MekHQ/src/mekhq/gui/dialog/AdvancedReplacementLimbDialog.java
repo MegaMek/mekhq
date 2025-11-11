@@ -34,8 +34,10 @@ import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
 import mekhq.gui.view.PaperDoll;
 
@@ -71,6 +73,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private final Campaign campaign;
     private final Person patient;
     private final Person surgeon; // can be null
+    private int surgeonTotalSkill = 0;
+    private int surgeonSkillTargetNumber = 0;
     private int surgeryLevelNeeded = 0;
     private boolean isUseLocalSurgeon;
     private Money totalCost = Money.zero();
@@ -115,7 +119,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         // Create tutorial panel at the top of left container
         JPanel tutorialPanel = new JPanel(new BorderLayout());
-        tutorialPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        tutorialPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
         JTextArea tutorialText = new JTextArea(getTextAt(RESOURCE_BUNDLE,
               "AdvancedReplacementLimbDialog.instructions"));
         tutorialText.setWrapStyleWord(true);
@@ -128,7 +132,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         // Create main panel for injuries and treatments
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new GridBagLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        mainPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.insets = new Insets(0, PADDING, PADDING / 2, PADDING);
@@ -163,7 +167,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         // Create right panel
         JPanel rightPanel = new JPanel(new BorderLayout());
-        rightPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        rightPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
         rightPanel.setPreferredSize(scaleForGUI(250, 0)); // Set preferred width, height will stretch
 
         // Add content to right panel
@@ -178,7 +182,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         // Create summary panel above buttons
         JPanel summaryPanel = new JPanel(new BorderLayout());
-        summaryPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING / 2, PADDING));
+        summaryPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
         summaryLabel = new JLabel(" "); // Initialize with empty space to maintain height
         summaryLabel.setVerticalAlignment(SwingConstants.TOP);
         summaryPanel.add(summaryLabel, BorderLayout.CENTER);
@@ -295,8 +299,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         int selectedCount = getSelectedTreatments().size();
 
         getSurgeryCostAndSkillRequirements();
-        isUseLocalSurgeon();
 
+        isUseLocalSurgeon();
         if (isUseLocalSurgeon) {
             totalCost = totalCost.multipliedBy(10);
         }
@@ -320,7 +324,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                 }
             } else {
                 summary.add(getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.status.surgeon",
-                      surgeon.getFullTitle()));
+                      surgeon.getFullTitle(), surgeryLevelNeeded));
             }
 
             if (totalCost.isPositive()) {
@@ -329,6 +333,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             }
         } else {
             summary.add(" "); // These just ensure the gui stays at the same height
+            summary.add(" ");
             summary.add(" ");
             summary.add(" ");
             summary.add(" ");
@@ -356,8 +361,11 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         if (!isUseLocalSurgeon) {
             Skill surgerySkill = surgeon.getSkill(S_SURGERY);
             if (surgerySkill != null) {
-                int totalLevel = surgerySkill.getTotalSkillLevel(surgeon.getSkillModifierData());
-                isUseLocalSurgeon = totalLevel >= surgeryLevelNeeded;
+                SkillModifierData modifierData = surgeon.getSkillModifierData();
+                surgeonTotalSkill = surgerySkill.getTotalSkillLevel(modifierData);
+                surgeonSkillTargetNumber = surgerySkill.getFinalSkillValue(modifierData);
+
+                isUseLocalSurgeon = surgeonTotalSkill < surgeryLevelNeeded;
             } else {
                 isUseLocalSurgeon = true;
             }
@@ -543,10 +551,12 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             } else if (!patient.isLocationMissing(bodyLocation)) {
                 InjuryLevel level = getMaxInjuryLevel(bodyLocation);
                 Color color = switch (level) {
-                    case CHRONIC -> new Color(255, 204, 255);
-                    case DEADLY -> Color.RED;
-                    case MAJOR -> Color.ORANGE;
-                    case MINOR -> Color.YELLOW;
+                    case CHRONIC -> new Color(255, 204, 255, 128); // 50% alpha
+                    case DEADLY -> new Color(Color.RED.getRed(), Color.RED.getGreen(), Color.RED.getBlue(), 128);
+                    case MAJOR ->
+                          new Color(Color.ORANGE.getRed(), Color.ORANGE.getGreen(), Color.ORANGE.getBlue(), 128);
+                    case MINOR ->
+                          new Color(Color.YELLOW.getRed(), Color.YELLOW.getGreen(), Color.YELLOW.getBlue(), 128);
                     default -> null;
                 };
                 doll.setLocColor(bodyLocation, color);
@@ -555,7 +565,6 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         doll.addActionListener(dollActionListener);
         panel.add(doll);
-        panel.add(Box.createVerticalGlue());
     }
 
     private InjuryLevel getMaxInjuryLevel(BodyLocation bodyLocation) {
