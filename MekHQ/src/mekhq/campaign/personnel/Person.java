@@ -2047,7 +2047,7 @@ public class Person {
     /**
      * This method returns the character's base loyalty score.
      *
-     * <p><b>Usage:</b> In most cases you will want to use {@link #getAdjustedLoyalty(Faction)} instead.</p>
+     * <p><b>Usage:</b> In most cases you will want to use {@link #getAdjustedLoyalty(Faction, boolean)} instead.</p>
      *
      * @return the loyalty value as an {@link Integer}
      */
