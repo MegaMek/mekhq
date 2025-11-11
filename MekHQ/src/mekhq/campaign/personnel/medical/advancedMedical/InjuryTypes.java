@@ -252,6 +252,8 @@ public final class InjuryTypes {
             InjuryType.register(141, "alt:COSMETIC_SURGERY", AlternateInjuries.COSMETIC_SURGERY);
             InjuryType.register(142, "alt:CLONED_LIMB_RECOVERY", AlternateInjuries.CLONED_LIMB_RECOVERY);
             InjuryType.register(143, "alt:REPLACEMENT_LIMB_RECOVERY", AlternateInjuries.REPLACEMENT_LIMB_RECOVERY);
+            InjuryType.register(144, "alt:COSMETIC_SURGERY_RECOVERY", AlternateInjuries.COSMETIC_SURGERY_RECOVERY);
+            InjuryType.register(145, "alt:REPLACEMENT_ORGAN_RECOVERY", AlternateInjuries.REPLACEMENT_ORGAN_RECOVERY);
 
             InjuryType.register("am:severed_spine", SEVERED_SPINE);
             InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);

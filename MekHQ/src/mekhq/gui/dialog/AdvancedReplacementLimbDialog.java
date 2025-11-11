@@ -1,8 +1,14 @@
 package mekhq.gui.dialog;
 
+import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.personnel.medical.BodyLocation.*;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.CLONED_LIMB_RECOVERY;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.COSMETIC_SURGERY_RECOVERY;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.REPLACEMENT_LIMB_RECOVERY;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.REPLACEMENT_ORGAN_RECOVERY;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.COSMETIC_SURGERY;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -18,6 +24,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.*;
 
 import megamek.client.ui.preferences.JWindowPreference;
@@ -29,11 +36,13 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -72,9 +81,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
     private final Campaign campaign;
     private final Person patient;
-    private final Person surgeon; // can be null
-    private int surgeonTotalSkill = 0;
-    private int surgeonSkillTargetNumber = 0;
+    private Person surgeon; // can be null
     private int surgeryLevelNeeded = 0;
     private boolean isUseLocalSurgeon;
     private Money totalCost = Money.zero();
@@ -87,8 +94,9 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private final Map<BodyLocation, List<ProstheticType>> treatmentOptions = new HashMap<>();
     private final Map<BodyLocation, JComboBox<ProstheticType>> treatmentSelections = new HashMap<>();
     private RoundedJButton confirmButton;
-    private boolean wasConfirmed = false;
     private JLabel summaryLabel;
+
+    private record PlannedSurgery(ProstheticType type, BodyLocation location) {}
 
     public AdvancedReplacementLimbDialog(Campaign campaign, Person patient) {
         this.patient = patient;
@@ -104,6 +112,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         pack();
         setMaximumSize(MAXIMUM_DIALOG_SIZE);
         setLocationRelativeTo(null);
+        setModal(true);
         setPreferences(this); // Must be before setVisible
         setVisible(true);
     }
@@ -139,7 +148,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 
-        // Add injury labels and treatment comboboxes
+        // Add location labels and treatment combos
         int i = 0;
         for (BodyLocation bodyLocation : VALID_BODY_LOCATIONS) {
             // Label
@@ -161,18 +170,14 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
 
         leftContainer.add(mainPanel, BorderLayout.CENTER);
-
-        // Add left container to center container
         centerContainer.add(leftContainer, BorderLayout.CENTER);
 
         // Create right panel
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        rightPanel.setPreferredSize(scaleForGUI(250, 0)); // Set preferred width, height will stretch
+        rightPanel.setPreferredSize(scaleForGUI(250, 0));
 
-        // Add content to right panel
         fillDoll(rightPanel);
-
         centerContainer.add(rightPanel, BorderLayout.EAST);
 
         // Wrap entire center container in scroll pane
@@ -183,7 +188,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         // Create summary panel above buttons
         JPanel summaryPanel = new JPanel(new BorderLayout());
         summaryPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        summaryLabel = new JLabel(" "); // Initialize with empty space to maintain height
+        summaryLabel = new JLabel();
         summaryLabel.setVerticalAlignment(SwingConstants.TOP);
         summaryPanel.add(summaryLabel, BorderLayout.CENTER);
         add(summaryPanel, BorderLayout.SOUTH);
@@ -208,14 +213,13 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         buttonPanel.add(documentationButton);
         buttonPanel.add(confirmButton);
 
-        // Create bottom container to hold summary and buttons
         JPanel bottomContainer = new JPanel(new BorderLayout());
         bottomContainer.add(summaryPanel, BorderLayout.NORTH);
         bottomContainer.add(buttonPanel, BorderLayout.SOUTH);
 
         add(bottomContainer, BorderLayout.SOUTH);
 
-        // Initialize summary
+        // Initialize summary (and other important values)
         updateSummary();
     }
 
@@ -362,9 +366,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             Skill surgerySkill = surgeon.getSkill(S_SURGERY);
             if (surgerySkill != null) {
                 SkillModifierData modifierData = surgeon.getSkillModifierData();
-                surgeonTotalSkill = surgerySkill.getTotalSkillLevel(modifierData);
-                surgeonSkillTargetNumber = surgerySkill.getFinalSkillValue(modifierData);
-
+                int surgeonTotalSkill = surgerySkill.getTotalSkillLevel(modifierData);
                 isUseLocalSurgeon = surgeonTotalSkill < surgeryLevelNeeded;
             } else {
                 isUseLocalSurgeon = true;
@@ -403,13 +405,118 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
     }
 
-    private void onConfirm(ActionEvent e) {
-        wasConfirmed = true;
+    private void onConfirm(ActionEvent event) {
         dispose();
+
+        // Get a local surgeon (if applicable)
+        getLocalSurgeon();
+
+        // Perform the surgery skill checks
+        List<PlannedSurgery> successfulSurgeries = new ArrayList<>();
+        List<PlannedSurgery> unsuccessfulSurgeries = new ArrayList<>();
+        performSurgerySkillChecks(successfulSurgeries, unsuccessfulSurgeries);
+
+        boolean useKinderMode = campaign.getCampaignOptions().isUseKinderAlternativeAdvancedMedical();
+        for (PlannedSurgery surgery : successfulSurgeries) {
+            performSurgery(surgery, useKinderMode);
+        }
     }
 
-    public boolean isWasConfirmed() {
-        return wasConfirmed;
+    private void performSurgery(PlannedSurgery surgery, boolean useKinderMode) {
+        BodyLocation location = surgery.location;
+        ProstheticType type = surgery.type;
+
+        // Remove injuries based on the surgery type
+        boolean isBurnRemovalOnly = type == COSMETIC_SURGERY;
+        for (Injury injury : relevantInjuries.getOrDefault(location, new ArrayList<>())) {
+            if (injury != null && (injury.getSubType().isBurn() || !isBurnRemovalOnly)) {
+                patient.removeInjury(injury);
+            }
+        }
+
+        // Add the new surgery 'injury'. This is a semi-permanent record of the surgery on the character
+        InjuryType injuryType = type.getInjuryType();
+        Injury injury = injuryType.newInjury(campaign, patient, location, 1);
+        adjustForKinderMode(useKinderMode, injury);
+        patient.addInjury(injury);
+
+        // Add recovery period injuries
+        InjuryType recoveryInjuryType = getRecoveryInjuryType(surgery);
+        Injury recoveryInjury = recoveryInjuryType.newInjury(campaign, patient, INTERNAL, 1);
+        adjustForKinderMode(useKinderMode, recoveryInjury);
+        patient.addInjury(recoveryInjury);
+    }
+
+    private static InjuryType getRecoveryInjuryType(PlannedSurgery surgery) {
+        ProstheticType type = surgery.type;
+        if (type == COSMETIC_SURGERY) {
+            return COSMETIC_SURGERY_RECOVERY;
+        } else if (surgery.location.isLimb()) {
+            if (type.getProstheticType() >= 6) {
+                return CLONED_LIMB_RECOVERY;
+            } else {
+                return REPLACEMENT_LIMB_RECOVERY;
+            }
+        } else {
+            return REPLACEMENT_ORGAN_RECOVERY;
+        }
+    }
+
+    private static void adjustForKinderMode(boolean useKinderMode, Injury injury) {
+        if (useKinderMode) {
+            int originalRecoveryTime = injury.getOriginalTime();
+            int newRecoveryTime = (int) ceil(originalRecoveryTime / 2.0);
+            injury.setOriginalTime(newRecoveryTime);
+            injury.setTime(newRecoveryTime);
+        }
+    }
+
+    private void getLocalSurgeon() {
+        if (isUseLocalSurgeon) {
+            surgeon = new Person(campaign);
+            surgeon.addSkill(S_SURGERY, surgeryLevelNeeded + 1, 0);
+            surgeon.setEdge(1); // We don't want Local Surgeons to be completely worthless
+            surgeon.setCurrentEdge(1);
+        }
+    }
+
+    private void performSurgerySkillChecks(List<PlannedSurgery> successfulSurgeries,
+          List<PlannedSurgery> unsuccessfulSurgeries) {
+        // First, prioritize surgeries based on difficulty and expense. This is so that any available Edge is used on
+        // the more important surgeries first.
+        List<PlannedSurgery> prioritizedSurgeries = getPrioritizedSurgeries();
+
+        for (PlannedSurgery surgery : new ArrayList<>(prioritizedSurgeries)) {
+            SkillCheckUtility skillCheckUtility = new SkillCheckUtility(surgeon, S_SURGERY, List.of(), 0, true, false);
+            campaign.addReport(skillCheckUtility.getResultsText());
+            if (skillCheckUtility.isSuccess()) {
+                successfulSurgeries.add(surgery);
+            } else {
+                unsuccessfulSurgeries.add(surgery);
+            }
+        }
+    }
+
+    private List<PlannedSurgery> getPrioritizedSurgeries() {
+        int gameYear = campaign.getGameYear();
+        Map<BodyLocation, ProstheticType> scheduledSurgeries = getSelectedTreatments();
+
+        List<PlannedSurgery> prioritizedSurgeries = new ArrayList<>();
+        for (Map.Entry<BodyLocation, ProstheticType> entry : scheduledSurgeries.entrySet()) {
+            prioritizedSurgeries.add(new PlannedSurgery(entry.getValue(), entry.getKey()));
+        }
+
+        prioritizedSurgeries.sort(
+              Comparator.<PlannedSurgery>comparingInt(s -> s.type().getSurgeryLevel())
+                    .reversed() // highest surgery level first
+                    .thenComparing(
+                          // We shouldn't hit `null` at this point, as any null selections should have been filtered out
+                          s -> Objects.requireNonNull(s.type().getCost(gameYear)),
+                          Comparator.reverseOrder() // highest cost first
+                    )
+        );
+
+        return prioritizedSurgeries;
     }
 
     private @Nullable Person getSurgeon(List<Person> activePersonnel) {

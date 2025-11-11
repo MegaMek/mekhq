@@ -267,7 +267,10 @@ public enum InjuryEffect {
     }
 
     private static String formatEffect(InjuryEffect effect, long count) {
-        String effectName = spanOpeningWithCustomColor(effect.getTextColor()) + effect + CLOSING_SPAN_TAG;
+        String color = effect.getTextColor();
+        String openSpan = color.isBlank() ? "" : spanOpeningWithCustomColor(color);
+        String closeSpace = color.isBlank() ? "" : CLOSING_SPAN_TAG;
+        String effectName = openSpan + effect + closeSpace;
         return count > 1 ? effectName + " (x" + count + ")" : effectName;
     }
 }

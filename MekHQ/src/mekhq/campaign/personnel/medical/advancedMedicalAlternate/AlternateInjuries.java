@@ -32,8 +32,13 @@
  */
 package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
+import static mekhq.campaign.personnel.enums.InjuryLevel.CHRONIC;
+import static mekhq.campaign.personnel.enums.InjuryLevel.DEADLY;
+import static mekhq.campaign.personnel.enums.InjuryLevel.MAJOR;
+import static mekhq.campaign.personnel.enums.InjuryLevel.MINOR;
 import static mekhq.campaign.personnel.medical.BodyLocation.*;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.MAXIMUM_INJURY_DURATION_MULTIPLIER;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -71,10 +76,11 @@ public class AlternateInjuries {
     private static final int SEVER_HEALING_DAYS = 180; // We need to have something here for Advanced Medical
     private static final int CLONED_LIMB_HEALING_DAYS = 21; // ATOW pg 316
     private static final int REPLACEMENT_LIMB_HEALING_DAYS = 42; // ATOW pg 316
+    private static final int COSMETIC_SURGERY_RECOVERY_HEALING_DAYS = 7; // Internet says 2-3 weeks
 
-    private static final InjuryLevel SEVER_INJURY_LEVEL = InjuryLevel.CHRONIC;
-    private static final InjuryLevel FRACTURE_INJURY_LEVEL = InjuryLevel.MAJOR;
-    private static final InjuryLevel BURN_INJURY_LEVEL = InjuryLevel.MINOR;
+    private static final InjuryLevel SEVER_INJURY_LEVEL = CHRONIC;
+    private static final InjuryLevel FRACTURE_INJURY_LEVEL = MAJOR;
+    private static final InjuryLevel BURN_INJURY_LEVEL = MINOR;
 
     // Head
     public static final InjuryType SEVERED_HEAD = new SeveredHead();
@@ -215,6 +221,8 @@ public class AlternateInjuries {
     public static final InjuryType COSMETIC_SURGERY = new CosmeticSurgery();
     public static final InjuryType CLONED_LIMB_RECOVERY = new ClonedLimbRecovery();
     public static final InjuryType REPLACEMENT_LIMB_RECOVERY = new ReplacementLimbRecovery();
+    public static final InjuryType REPLACEMENT_ORGAN_RECOVERY = new ReplacementOrganRecovery();
+    public static final InjuryType COSMETIC_SURGERY_RECOVERY = new CosmeticSurgeryRecovery();
 
     // Base injury type classes with common behavior
     private abstract static class BaseInjury extends InjuryType {
@@ -246,7 +254,7 @@ public class AlternateInjuries {
 
     private abstract static class SimpleBurn extends BaseInjury {
         protected SimpleBurn(String nameKey, Set<BodyLocation> locations) {
-            super(BURN_HEALING_DAYS, false, BURN_INJURY_LEVEL, InjuryEffect.NONE, locations);
+            super(BURN_HEALING_DAYS, false, BURN_INJURY_LEVEL, NONE, locations);
             this.simpleName = getTextAt(RESOURCE_BUNDLE, nameKey);
             this.fluffText = getTextAt(RESOURCE_BUNDLE, nameKey);
             this.injurySubType = InjurySubType.BURN;
@@ -255,7 +263,7 @@ public class AlternateInjuries {
 
     private abstract static class FormattedBurn extends BaseInjury {
         protected FormattedBurn(Set<BodyLocation> locations) {
-            super(BURN_HEALING_DAYS, false, BURN_INJURY_LEVEL, InjuryEffect.NONE, locations);
+            super(BURN_HEALING_DAYS, false, BURN_INJURY_LEVEL, NONE, locations);
             this.injurySubType = InjurySubType.BURN;
         }
 
@@ -280,7 +288,7 @@ public class AlternateInjuries {
 
         @Override
         public String getName(BodyLocation loc, int severity) {
-            String key = injuryEffect == InjuryEffect.COMPOUND_FRACTURE
+            String key = injuryEffect == COMPOUND_FRACTURE
                                ? "AlternateInjuries.COMPOUND_FRACTURE.simpleName"
                                : "AlternateInjuries.FRACTURE.simpleName";
             return getFormattedTextAt(RESOURCE_BUNDLE, key, loc.locationName());
@@ -294,7 +302,7 @@ public class AlternateInjuries {
 
     private abstract static class FormattedSever extends BaseInjury {
         protected FormattedSever(Set<BodyLocation> locations) {
-            super(SEVER_HEALING_DAYS, true, SEVER_INJURY_LEVEL, InjuryEffect.SEVERED, locations);
+            super(SEVER_HEALING_DAYS, true, SEVER_INJURY_LEVEL, SEVERED, locations);
         }
 
         @Override
@@ -319,41 +327,41 @@ public class AlternateInjuries {
     public static final class BurnedFace extends SimpleBurn {
         public BurnedFace() {
             super("AlternateInjuries.FACIAL_BURN.simpleName",
-                  Set.of(BodyLocation.HEAD));
+                  Set.of(HEAD));
         }
     }
 
     public static final class HearingLoss extends BaseInjury {
         public HearingLoss() {
-            super(DEAFNESS_HEALING_DAYS, false, InjuryLevel.MINOR,
-                  InjuryEffect.DEAFENED, Set.of(BodyLocation.EARS));
+            super(DEAFNESS_HEALING_DAYS, false, MINOR,
+                  DEAFENED, Set.of(EARS));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEARING_LOSS.simpleName");
         }
     }
 
     public static final class Blindness extends BaseInjury {
         public Blindness() {
-            super(BLINDNESS_HEALING_DAYS, false, InjuryLevel.MINOR,
-                  InjuryEffect.BLINDED, Set.of(EYES));
+            super(BLINDNESS_HEALING_DAYS, false, MINOR,
+                  BLINDED, Set.of(EYES));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BLINDNESS.simpleName");
         }
     }
 
     public static final class FracturedJaw extends FormattedFracture {
         public FracturedJaw() {
-            super(FRACTURE_HEALING_DAYS, InjuryEffect.FRACTURE_JAW, Set.of(BodyLocation.JAW));
+            super(FRACTURE_HEALING_DAYS, FRACTURE_JAW, Set.of(JAW));
         }
     }
 
     public static final class FracturedSkull extends FormattedFracture {
         public FracturedSkull() {
-            super(FRACTURE_HEALING_DAYS, InjuryEffect.FRACTURE_SKULL, Set.of(BodyLocation.SKULL));
+            super(FRACTURE_HEALING_DAYS, FRACTURE_SKULL, Set.of(SKULL));
         }
     }
 
     public static final class SeveredHead extends FormattedSever {
         public SeveredHead() {
-            super(Set.of(BodyLocation.SKULL));
+            super(Set.of(SKULL));
         }
 
         @Override
@@ -365,43 +373,43 @@ public class AlternateInjuries {
     // Torso injuries
     public static final class BurnedChest extends FormattedBurn {
         public BurnedChest() {
-            super(Set.of(BodyLocation.CHEST));
+            super(Set.of(CHEST));
         }
     }
 
     public static final class FracturedRib extends FormattedFracture {
         public FracturedRib() {
-            super(FRACTURE_HEALING_DAYS, InjuryEffect.FRACTURE_RIB, Set.of(BodyLocation.RIBS));
+            super(FRACTURE_HEALING_DAYS, FRACTURE_RIB, Set.of(RIBS));
         }
     }
 
     public static final class SmokeInhalation extends BaseInjury {
         public SmokeInhalation() {
-            super(SMOKE_INHALATION_HEALING_DAYS, false, InjuryLevel.MINOR,
-                  InjuryEffect.NONE, Set.of(BodyLocation.LUNGS));
+            super(SMOKE_INHALATION_HEALING_DAYS, false, MINOR,
+                  NONE, Set.of(LUNGS));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SMOKE_INHALATION.simpleName");
         }
     }
 
     public static final class PuncturedLung extends BaseInjury {
         public PuncturedLung() {
-            super(PUNCTURED_LUNG_HEALING_DAYS, false, InjuryLevel.DEADLY,
-                  InjuryEffect.PUNCTURED, Set.of(BodyLocation.LUNGS));
+            super(PUNCTURED_LUNG_HEALING_DAYS, false, DEADLY,
+                  PUNCTURED, Set.of(LUNGS));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PUNCTURED_LUNG.simpleName");
         }
     }
 
     public static final class HeartTrauma extends BaseInjury {
         public HeartTrauma() {
-            super(HEART_TRAUMA_HEALING_DAYS, false, InjuryLevel.DEADLY,
-                  InjuryEffect.INTERNAL_BLEEDING, Set.of(BodyLocation.HEART));
+            super(HEART_TRAUMA_HEALING_DAYS, false, DEADLY,
+                  INTERNAL_BLEEDING, Set.of(HEART));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEART_TRAUMA.simpleName");
         }
 
         @Override
         public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
             return Collections.singletonList(new GameEffect("Blood Loss", operator -> {
-                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, BodyLocation.INTERNAL, 1);
+                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, INTERNAL, 1);
                 person.addInjury(bleeding);
                 MedicalLogger.internalBleedingWorsened(person, campaign.getLocalDate());
             }));
@@ -410,29 +418,29 @@ public class AlternateInjuries {
 
     public static final class AbdominalBurn extends SimpleBurn {
         public AbdominalBurn() {
-            super("AlternateInjuries.BURN_ABDOMINAL.simpleName", Set.of(BodyLocation.ABDOMEN));
+            super("AlternateInjuries.BURN_ABDOMINAL.simpleName", Set.of(ABDOMEN));
         }
     }
 
     public static final class BruisedOrgan extends BaseInjury {
         public BruisedOrgan() {
-            super(ORGAN_BRUISE_HEALING_DAYS, false, InjuryLevel.MINOR,
-                  InjuryEffect.NONE, Set.of(BodyLocation.ORGANS));
+            super(ORGAN_BRUISE_HEALING_DAYS, false, MINOR,
+                  NONE, Set.of(ORGANS));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BRUISED_ORGAN.simpleName");
         }
     }
 
     public static final class OrganTrauma extends BaseInjury {
         public OrganTrauma() {
-            super(ORGAN_TRAUMA_HEALING_DAYS, false, InjuryLevel.DEADLY,
-                  InjuryEffect.INTERNAL_BLEEDING, Set.of(BodyLocation.ORGANS));
+            super(ORGAN_TRAUMA_HEALING_DAYS, false, DEADLY,
+                  INTERNAL_BLEEDING, Set.of(ORGANS));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ORGAN_TRAUMA.simpleName");
         }
 
         @Override
         public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
             return Collections.singletonList(new GameEffect("Blood Loss", operator -> {
-                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, BodyLocation.INTERNAL, 1);
+                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, INTERNAL, 1);
                 person.addInjury(bleeding);
                 MedicalLogger.internalBleedingWorsened(person, campaign.getLocalDate());
             }));
@@ -442,22 +450,22 @@ public class AlternateInjuries {
     public static final class FracturedGroin extends BaseInjury {
         public FracturedGroin() {
             super(FRACTURE_HEALING_DAYS, false, FRACTURE_INJURY_LEVEL,
-                  InjuryEffect.FRACTURE_LIMB, Set.of(BodyLocation.GROIN));
+                  FRACTURE_LIMB, Set.of(GROIN));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FRACTURED_GROIN.simpleName");
         }
     }
 
     public static final class Disemboweled extends BaseInjury {
         public Disemboweled() {
-            super(DISEMBOWELED_HEALING_DAYS, false, InjuryLevel.DEADLY,
-                  InjuryEffect.INTERNAL_BLEEDING, Set.of(BodyLocation.ABDOMEN));
+            super(DISEMBOWELED_HEALING_DAYS, false, DEADLY,
+                  INTERNAL_BLEEDING, Set.of(ABDOMEN));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DISEMBOWELED.simpleName");
         }
 
         @Override
         public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
             return Collections.singletonList(new GameEffect("Blood Loss", operator -> {
-                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, BodyLocation.INTERNAL, 1);
+                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, INTERNAL, 1);
                 person.addInjury(bleeding);
                 MedicalLogger.internalBleedingWorsened(person, campaign.getLocalDate());
             }));
@@ -467,102 +475,102 @@ public class AlternateInjuries {
     // Arm injuries
     public static final class SeveredArm extends FormattedSever {
         public SeveredArm() {
-            super(Set.of(BodyLocation.LEFT_ARM, BodyLocation.RIGHT_ARM));
+            super(Set.of(LEFT_ARM, RIGHT_ARM));
         }
     }
 
     public static final class BurnedUpperArm extends FormattedBurn {
         public BurnedUpperArm() {
-            super(Set.of(BodyLocation.UPPER_LEFT_ARM, BodyLocation.UPPER_RIGHT_ARM));
+            super(Set.of(UPPER_LEFT_ARM, UPPER_RIGHT_ARM));
         }
     }
 
     public static final class FracturedUpperArm extends FormattedFracture {
         public FracturedUpperArm() {
-            super(FRACTURE_HEALING_DAYS, InjuryEffect.COMPOUND_FRACTURE,
-                  Set.of(BodyLocation.UPPER_LEFT_ARM, BodyLocation.UPPER_RIGHT_ARM));
+            super(FRACTURE_HEALING_DAYS, COMPOUND_FRACTURE,
+                  Set.of(UPPER_LEFT_ARM, UPPER_RIGHT_ARM));
         }
     }
 
     public static final class FracturedElbow extends FormattedFracture {
         public FracturedElbow() {
-            super(FRACTURE_HEALING_DAYS, InjuryEffect.COMPOUND_FRACTURE,
-                  Set.of(BodyLocation.LEFT_ELBOW, BodyLocation.RIGHT_ELBOW));
+            super(FRACTURE_HEALING_DAYS, COMPOUND_FRACTURE,
+                  Set.of(LEFT_ELBOW, RIGHT_ELBOW));
         }
     }
 
     public static final class FracturedShoulder extends FormattedFracture {
         public FracturedShoulder() {
-            super(FRACTURE_HEALING_DAYS, InjuryEffect.FRACTURE_LIMB,
-                  Set.of(BodyLocation.LEFT_SHOULDER, BodyLocation.RIGHT_SHOULDER));
+            super(FRACTURE_HEALING_DAYS, FRACTURE_LIMB,
+                  Set.of(LEFT_SHOULDER, RIGHT_SHOULDER));
         }
     }
 
     public static final class CompoundFracturedShoulder extends FormattedFracture {
         public CompoundFracturedShoulder() {
-            super(COMPOUND_FRACTURE_HEALING_DAYS, InjuryEffect.COMPOUND_FRACTURE,
-                  Set.of(BodyLocation.LEFT_SHOULDER, BodyLocation.RIGHT_SHOULDER));
+            super(COMPOUND_FRACTURE_HEALING_DAYS, COMPOUND_FRACTURE,
+                  Set.of(LEFT_SHOULDER, RIGHT_SHOULDER));
         }
     }
 
     // Hand injuries
     public static final class SeveredHand extends FormattedSever {
         public SeveredHand() {
-            super(Set.of(BodyLocation.LEFT_HAND, BodyLocation.RIGHT_HAND));
+            super(Set.of(LEFT_HAND, RIGHT_HAND));
         }
     }
 
     public static final class HandBurn extends FormattedBurn {
         public HandBurn() {
-            super(Set.of(BodyLocation.LEFT_HAND, BodyLocation.RIGHT_HAND));
+            super(Set.of(LEFT_HAND, RIGHT_HAND));
         }
     }
 
     public static final class FracturedHand extends FormattedFracture {
         public FracturedHand() {
-            super(FRACTURE_HEALING_DAYS, InjuryEffect.COMPOUND_FRACTURE,
-                  Set.of(BodyLocation.LEFT_HAND, BodyLocation.RIGHT_HAND));
+            super(FRACTURE_HEALING_DAYS, COMPOUND_FRACTURE,
+                  Set.of(LEFT_HAND, RIGHT_HAND));
         }
     }
 
     public static final class FracturedWrist extends FormattedFracture {
         public FracturedWrist() {
-            super(FRACTURE_HEALING_DAYS, InjuryEffect.COMPOUND_FRACTURE,
-                  Set.of(BodyLocation.LEFT_WRIST, BodyLocation.RIGHT_WRIST));
+            super(FRACTURE_HEALING_DAYS, COMPOUND_FRACTURE,
+                  Set.of(LEFT_WRIST, RIGHT_WRIST));
         }
     }
 
     public static final class FracturedForearm extends FormattedFracture {
         public FracturedForearm() {
-            super(FRACTURE_HEALING_DAYS, InjuryEffect.COMPOUND_FRACTURE,
-                  Set.of(BodyLocation.LEFT_FOREARM, BodyLocation.RIGHT_FOREARM));
+            super(FRACTURE_HEALING_DAYS, COMPOUND_FRACTURE,
+                  Set.of(LEFT_FOREARM, RIGHT_FOREARM));
         }
     }
 
     public static final class CompoundFracturedForearm extends FormattedFracture {
         public CompoundFracturedForearm() {
-            super(COMPOUND_FRACTURE_HEALING_DAYS, InjuryEffect.COMPOUND_FRACTURE,
-                  Set.of(BodyLocation.LEFT_FOREARM, BodyLocation.RIGHT_FOREARM));
+            super(COMPOUND_FRACTURE_HEALING_DAYS, COMPOUND_FRACTURE,
+                  Set.of(LEFT_FOREARM, RIGHT_FOREARM));
         }
     }
 
     // Leg injuries
     public static final class SeveredLeg extends FormattedSever {
         public SeveredLeg() {
-            super(Set.of(BodyLocation.LEFT_LEG, BodyLocation.RIGHT_LEG));
+            super(Set.of(LEFT_LEG, RIGHT_LEG));
         }
     }
 
     public static final class ThighBurn extends FormattedBurn {
         public ThighBurn() {
-            super(Set.of(BodyLocation.LEFT_THIGH, BodyLocation.RIGHT_THIGH));
+            super(Set.of(LEFT_THIGH, RIGHT_THIGH));
         }
     }
 
     public static final class BruisedFemur extends BaseInjury {
         public BruisedFemur() {
-            super(BONE_BRUISE_HEALING_DAYS, false, InjuryLevel.MINOR,
-                  InjuryEffect.NONE, Set.of(BodyLocation.LEFT_FEMUR, BodyLocation.RIGHT_FEMUR));
+            super(BONE_BRUISE_HEALING_DAYS, false, MINOR,
+                  NONE, Set.of(LEFT_FEMUR, RIGHT_FEMUR));
         }
 
         @Override
@@ -580,70 +588,70 @@ public class AlternateInjuries {
 
     public static final class FracturedFemur extends FormattedFracture {
         public FracturedFemur() {
-            super(FRACTURE_HEALING_DAYS, InjuryEffect.FRACTURE_LIMB,
-                  Set.of(BodyLocation.LEFT_FEMUR, BodyLocation.RIGHT_FEMUR));
+            super(FRACTURE_HEALING_DAYS, FRACTURE_LIMB,
+                  Set.of(LEFT_FEMUR, RIGHT_FEMUR));
         }
     }
 
     public static final class CompoundFracturedFemur extends FormattedFracture {
         public CompoundFracturedFemur() {
-            super(COMPOUND_FRACTURE_HEALING_DAYS, InjuryEffect.COMPOUND_FRACTURE,
-                  Set.of(BodyLocation.LEFT_FEMUR, BodyLocation.RIGHT_FEMUR));
+            super(COMPOUND_FRACTURE_HEALING_DAYS, COMPOUND_FRACTURE,
+                  Set.of(LEFT_FEMUR, RIGHT_FEMUR));
         }
     }
 
     public static final class FracturedHip extends FormattedFracture {
         public FracturedHip() {
-            super(FRACTURE_HEALING_DAYS, InjuryEffect.FRACTURE_LIMB,
-                  Set.of(BodyLocation.LEFT_HIP, BodyLocation.RIGHT_HIP));
+            super(FRACTURE_HEALING_DAYS, FRACTURE_LIMB,
+                  Set.of(LEFT_HIP, RIGHT_HIP));
         }
     }
 
     // Foot injuries
     public static final class SeveredFoot extends FormattedSever {
         public SeveredFoot() {
-            super(Set.of(BodyLocation.LEFT_FOOT, BodyLocation.RIGHT_FOOT));
+            super(Set.of(LEFT_FOOT, RIGHT_FOOT));
         }
     }
 
     public static final class CalfBurn extends FormattedBurn {
         public CalfBurn() {
-            super(Set.of(BodyLocation.LEFT_CALF, BodyLocation.RIGHT_CALF));
+            super(Set.of(LEFT_CALF, RIGHT_CALF));
         }
     }
 
     public static final class FracturedFoot extends FormattedFracture {
         public FracturedFoot() {
-            super(FRACTURE_HEALING_DAYS, InjuryEffect.FRACTURE_LIMB,
-                  Set.of(BodyLocation.LEFT_FOOT, BodyLocation.RIGHT_FOOT));
+            super(FRACTURE_HEALING_DAYS, FRACTURE_LIMB,
+                  Set.of(LEFT_FOOT, RIGHT_FOOT));
         }
     }
 
     public static final class FracturedAnkle extends FormattedFracture {
         public FracturedAnkle() {
-            super(FRACTURE_HEALING_DAYS, InjuryEffect.FRACTURE_LIMB,
-                  Set.of(BodyLocation.LEFT_ANKLE, BodyLocation.RIGHT_ANKLE));
+            super(FRACTURE_HEALING_DAYS, FRACTURE_LIMB,
+                  Set.of(LEFT_ANKLE, RIGHT_ANKLE));
         }
     }
 
     public static final class FracturedKnee extends FormattedFracture {
         public FracturedKnee() {
-            super(FRACTURE_HEALING_DAYS, InjuryEffect.FRACTURE_LIMB,
-                  Set.of(BodyLocation.LEFT_KNEE, BodyLocation.RIGHT_KNEE));
+            super(FRACTURE_HEALING_DAYS, FRACTURE_LIMB,
+                  Set.of(LEFT_KNEE, RIGHT_KNEE));
         }
     }
 
     public static final class CompoundFracturedShin extends FormattedFracture {
         public CompoundFracturedShin() {
-            super(COMPOUND_FRACTURE_HEALING_DAYS, InjuryEffect.COMPOUND_FRACTURE,
-                  Set.of(BodyLocation.LEFT_SHIN, BodyLocation.RIGHT_SHIN));
+            super(COMPOUND_FRACTURE_HEALING_DAYS, COMPOUND_FRACTURE,
+                  Set.of(LEFT_SHIN, RIGHT_SHIN));
         }
     }
 
     public static final class BloodLoss extends BaseInjury {
         public BloodLoss() {
-            super(BLOOD_LOSS_HEALING_DAYS, false, InjuryLevel.MAJOR,
-                  InjuryEffect.NONE, Set.of(BodyLocation.INTERNAL));
+            super(BLOOD_LOSS_HEALING_DAYS, false, MAJOR,
+                  NONE, Set.of(INTERNAL));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BLOOD_LOSS.simpleName");
             this.fluffText = simpleName;
         }
@@ -654,9 +662,9 @@ public class AlternateInjuries {
         protected Disease() {
             super(5, // This is just a placeholder value, we assign it elsewhere
                   false,
-                  InjuryLevel.MINOR,
-                  InjuryEffect.NONE,
-                  Set.of(BodyLocation.INTERNAL));
+                  MINOR,
+                  NONE,
+                  Set.of(INTERNAL));
             this.maxSeverity = 1;
             this.injurySubType = InjurySubType.DISEASE;
         }
@@ -673,7 +681,7 @@ public class AlternateInjuries {
         GrowthsSlight() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GROWTHS_SLIGHT.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_GROWTHS_SLIGHT;
+            this.injuryEffect = DISEASE_GROWTHS_SLIGHT;
         }
     }
 
@@ -681,8 +689,8 @@ public class AlternateInjuries {
         GrowthsModerate() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GROWTHS_MODERATE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_GROWTHS_MODERATE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_GROWTHS_MODERATE;
+            this.level = MAJOR;
         }
     }
 
@@ -690,8 +698,8 @@ public class AlternateInjuries {
         GrowthsSevere() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GROWTHS_SEVERE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_GROWTHS_SEVERE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_GROWTHS_SEVERE;
+            this.level = MAJOR;
         }
     }
 
@@ -699,9 +707,9 @@ public class AlternateInjuries {
         GrowthsDeadly() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GROWTHS_DEADLY.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
             this.permanent = true;
-            this.level = InjuryLevel.DEADLY;
+            this.level = DEADLY;
         }
 
         @Override
@@ -721,7 +729,7 @@ public class AlternateInjuries {
         InfectionSlight() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.INFECTION_SLIGHT.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_INFECTION_SLIGHT;
+            this.injuryEffect = DISEASE_INFECTION_SLIGHT;
         }
     }
 
@@ -729,8 +737,8 @@ public class AlternateInjuries {
         InfectionModerate() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.INFECTION_MODERATE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_INFECTION_MODERATE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_INFECTION_MODERATE;
+            this.level = MAJOR;
         }
     }
 
@@ -738,8 +746,8 @@ public class AlternateInjuries {
         InfectionSevere() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.INFECTION_SEVERE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_INFECTION_SEVERE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_INFECTION_SEVERE;
+            this.level = MAJOR;
         }
     }
 
@@ -747,9 +755,9 @@ public class AlternateInjuries {
         InfectionDeadly() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.INFECTION_DEADLY.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
             this.permanent = true;
-            this.level = InjuryLevel.DEADLY;
+            this.level = DEADLY;
         }
 
         @Override
@@ -769,7 +777,7 @@ public class AlternateInjuries {
         HearingSlight() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEARING_SLIGHT.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_HEARING_SLIGHT;
+            this.injuryEffect = DISEASE_HEARING_SLIGHT;
         }
     }
 
@@ -777,8 +785,8 @@ public class AlternateInjuries {
         HearingModerate() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEARING_MODERATE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_HEARING_MODERATE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_HEARING_MODERATE;
+            this.level = MAJOR;
         }
     }
 
@@ -786,8 +794,8 @@ public class AlternateInjuries {
         HearingSevere() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEARING_SEVERE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_HEARING_SEVERE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_HEARING_SEVERE;
+            this.level = MAJOR;
         }
     }
 
@@ -795,9 +803,9 @@ public class AlternateInjuries {
         HearingDeadly() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEARING_DEADLY.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
             this.permanent = true;
-            this.level = InjuryLevel.DEADLY;
+            this.level = DEADLY;
         }
 
         @Override
@@ -817,7 +825,7 @@ public class AlternateInjuries {
         WeaknessSlight() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WEAKNESS_SLIGHT.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_WEAKNESS_SLIGHT;
+            this.injuryEffect = DISEASE_WEAKNESS_SLIGHT;
         }
     }
 
@@ -825,8 +833,8 @@ public class AlternateInjuries {
         WeaknessModerate() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WEAKNESS_MODERATE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_WEAKNESS_MODERATE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_WEAKNESS_MODERATE;
+            this.level = MAJOR;
         }
     }
 
@@ -834,8 +842,8 @@ public class AlternateInjuries {
         WeaknessSevere() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WEAKNESS_SEVERE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_WEAKNESS_SEVERE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_WEAKNESS_SEVERE;
+            this.level = MAJOR;
         }
     }
 
@@ -843,9 +851,9 @@ public class AlternateInjuries {
         WeaknessDeadly() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WEAKNESS_DEADLY.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
             this.permanent = true;
-            this.level = InjuryLevel.DEADLY;
+            this.level = DEADLY;
         }
 
         @Override
@@ -865,7 +873,7 @@ public class AlternateInjuries {
         SoresSlight() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SORES_SLIGHT.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_SORES_SLIGHT;
+            this.injuryEffect = DISEASE_SORES_SLIGHT;
         }
     }
 
@@ -873,8 +881,8 @@ public class AlternateInjuries {
         SoresModerate() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SORES_MODERATE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_SORES_MODERATE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_SORES_MODERATE;
+            this.level = MAJOR;
         }
     }
 
@@ -882,8 +890,8 @@ public class AlternateInjuries {
         SoresSevere() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SORES_SEVERE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_SORES_SEVERE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_SORES_SEVERE;
+            this.level = MAJOR;
         }
     }
 
@@ -891,9 +899,9 @@ public class AlternateInjuries {
         SoresDeadly() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SORES_DEADLY.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
             this.permanent = true;
-            this.level = InjuryLevel.DEADLY;
+            this.level = DEADLY;
         }
 
         @Override
@@ -913,7 +921,7 @@ public class AlternateInjuries {
         FluSlight() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FLU_SLIGHT.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_FLU_SLIGHT;
+            this.injuryEffect = DISEASE_FLU_SLIGHT;
         }
     }
 
@@ -921,8 +929,8 @@ public class AlternateInjuries {
         FluModerate() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FLU_MODERATE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_FLU_MODERATE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_FLU_MODERATE;
+            this.level = MAJOR;
         }
     }
 
@@ -930,8 +938,8 @@ public class AlternateInjuries {
         FluSevere() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FLU_SEVERE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_FLU_SEVERE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_FLU_SEVERE;
+            this.level = MAJOR;
         }
     }
 
@@ -939,9 +947,9 @@ public class AlternateInjuries {
         FluDeadly() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FLU_DEADLY.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
             this.permanent = true;
-            this.level = InjuryLevel.DEADLY;
+            this.level = DEADLY;
         }
 
         @Override
@@ -961,7 +969,7 @@ public class AlternateInjuries {
         SightSlight() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIGHT_SLIGHT.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_SIGHT_SLIGHT;
+            this.injuryEffect = DISEASE_SIGHT_SLIGHT;
         }
     }
 
@@ -969,8 +977,8 @@ public class AlternateInjuries {
         SightModerate() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIGHT_MODERATE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_SIGHT_MODERATE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_SIGHT_MODERATE;
+            this.level = MAJOR;
         }
     }
 
@@ -978,8 +986,8 @@ public class AlternateInjuries {
         SightSevere() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIGHT_SEVERE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_SIGHT_SEVERE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_SIGHT_SEVERE;
+            this.level = MAJOR;
         }
     }
 
@@ -987,9 +995,9 @@ public class AlternateInjuries {
         SightDeadly() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIGHT_DEADLY.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
             this.permanent = true;
-            this.level = InjuryLevel.DEADLY;
+            this.level = DEADLY;
         }
 
         @Override
@@ -1009,7 +1017,7 @@ public class AlternateInjuries {
         TremorsSlight() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TREMORS_SLIGHT.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_TREMORS_SLIGHT;
+            this.injuryEffect = DISEASE_TREMORS_SLIGHT;
         }
     }
 
@@ -1017,8 +1025,8 @@ public class AlternateInjuries {
         TremorsModerate() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TREMORS_MODERATE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_TREMORS_MODERATE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_TREMORS_MODERATE;
+            this.level = MAJOR;
         }
     }
 
@@ -1026,8 +1034,8 @@ public class AlternateInjuries {
         TremorsSevere() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TREMORS_SEVERE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_TREMORS_SEVERE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_TREMORS_SEVERE;
+            this.level = MAJOR;
         }
     }
 
@@ -1035,9 +1043,9 @@ public class AlternateInjuries {
         TremorsDeadly() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TREMORS_DEADLY.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
             this.permanent = true;
-            this.level = InjuryLevel.DEADLY;
+            this.level = DEADLY;
         }
 
         @Override
@@ -1057,7 +1065,7 @@ public class AlternateInjuries {
         BreathingSlight() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BREATHING_SLIGHT.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_BREATHING_SLIGHT;
+            this.injuryEffect = DISEASE_BREATHING_SLIGHT;
         }
     }
 
@@ -1065,8 +1073,8 @@ public class AlternateInjuries {
         BreathingModerate() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BREATHING_MODERATE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_BREATHING_MODERATE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_BREATHING_MODERATE;
+            this.level = MAJOR;
         }
     }
 
@@ -1074,8 +1082,8 @@ public class AlternateInjuries {
         BreathingSevere() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BREATHING_SEVERE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_BREATHING_SEVERE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_BREATHING_SEVERE;
+            this.level = MAJOR;
         }
     }
 
@@ -1083,9 +1091,9 @@ public class AlternateInjuries {
         BreathingDeadly() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BREATHING_DEADLY.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
             this.permanent = true;
-            this.level = InjuryLevel.DEADLY;
+            this.level = DEADLY;
         }
 
         @Override
@@ -1105,7 +1113,7 @@ public class AlternateInjuries {
         HemophiliaSlight() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEMOPHILIA_SLIGHT.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_HEMOPHILIA_SLIGHT;
+            this.injuryEffect = DISEASE_HEMOPHILIA_SLIGHT;
         }
     }
 
@@ -1113,8 +1121,8 @@ public class AlternateInjuries {
         HemophiliaModerate() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEMOPHILIA_MODERATE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_HEMOPHILIA_MODERATE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_HEMOPHILIA_MODERATE;
+            this.level = MAJOR;
         }
     }
 
@@ -1122,8 +1130,8 @@ public class AlternateInjuries {
         HemophiliaSevere() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEMOPHILIA_SEVERE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_HEMOPHILIA_SEVERE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_HEMOPHILIA_SEVERE;
+            this.level = MAJOR;
         }
     }
 
@@ -1131,9 +1139,9 @@ public class AlternateInjuries {
         HemophiliaDeadly() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEMOPHILIA_DEADLY.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
             this.permanent = true;
-            this.level = InjuryLevel.DEADLY;
+            this.level = DEADLY;
         }
 
         @Override
@@ -1153,7 +1161,7 @@ public class AlternateInjuries {
         VenerealSlight() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.VENEREAL_SLIGHT.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_VENEREAL_SLIGHT;
+            this.injuryEffect = DISEASE_VENEREAL_SLIGHT;
         }
     }
 
@@ -1161,8 +1169,8 @@ public class AlternateInjuries {
         VenerealModerate() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.VENEREAL_MODERATE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_VENEREAL_MODERATE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_VENEREAL_MODERATE;
+            this.level = MAJOR;
         }
     }
 
@@ -1170,17 +1178,17 @@ public class AlternateInjuries {
         VenerealSevere() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.VENEREAL_SEVERE.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_VENEREAL_SEVERE;
-            this.level = InjuryLevel.MAJOR;
+            this.injuryEffect = DISEASE_VENEREAL_SEVERE;
+            this.level = MAJOR;
         }
     }
 
     public static final class VenerealDeadly extends Disease {
         VenerealDeadly() {
             super();
-            this.level = InjuryLevel.DEADLY;
+            this.level = DEADLY;
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.VENEREAL_DEADLY.simpleName");
-            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
             this.permanent = true;
         }
 
@@ -1195,9 +1203,9 @@ public class AlternateInjuries {
         protected Prosthetic() {
             super(SEVER_HEALING_DAYS, // As a permanent 'injury' healing time is largely irrelevant
                   true,
-                  InjuryLevel.CHRONIC,
-                  InjuryEffect.NONE,
-                  Set.of(BodyLocation.INTERNAL)); // A placeholder effect, we replace it later
+                  CHRONIC,
+                  NONE,
+                  Set.of(INTERNAL)); // A placeholder effect, we replace it later
             this.maxSeverity = 1;
             this.injurySubType = InjurySubType.PROSTHETIC;
         }
@@ -1206,9 +1214,15 @@ public class AlternateInjuries {
     public static final class WoodenArm extends Prosthetic {
         WoodenArm() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WOODEN_ARM.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WOODEN_LIMB.simpleName");
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
-            this.injuryEffect = InjuryEffect.TYPE_1_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_1_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WOODEN_LIMB.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
@@ -1217,7 +1231,13 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HOOK_HAND.simpleName");
             this.allowedLocations = Set.of(LEFT_HAND, RIGHT_HAND);
-            this.injuryEffect = InjuryEffect.TYPE_1_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_1_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HOOK_HAND.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
@@ -1226,196 +1246,328 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PEG_LEG.simpleName");
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
-            this.injuryEffect = InjuryEffect.TYPE_1_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_1_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PEG_LEG.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class WoodenFoot extends Prosthetic {
         WoodenFoot() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WOODEN_FOOT.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WOODEN_LIMB.simpleName");
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
-            this.injuryEffect = InjuryEffect.TYPE_1_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_1_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WOODEN_LIMB.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class SimpleArm extends Prosthetic {
         SimpleArm() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIMPLE_ARM.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PLASTIC_PROSTHETIC.simpleName");
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
-            this.injuryEffect = InjuryEffect.TYPE_2_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_2_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PLASTIC_PROSTHETIC.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class SimpleClawHand extends Prosthetic {
         SimpleClawHand() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIMPLE_CLAW_HAND.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PLASTIC_PROSTHETIC.simpleName");
             this.allowedLocations = Set.of(LEFT_HAND, RIGHT_HAND);
-            this.injuryEffect = InjuryEffect.TYPE_2_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_2_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PLASTIC_PROSTHETIC.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class SimpleLeg extends Prosthetic {
         SimpleLeg() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIMPLE_LEG.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PLASTIC_PROSTHETIC.simpleName");
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
-            this.injuryEffect = InjuryEffect.TYPE_2_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_2_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PLASTIC_PROSTHETIC.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class SimpleFoot extends Prosthetic {
         SimpleFoot() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIMPLE_FOOT.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PLASTIC_PROSTHETIC.simpleName");
             this.allowedLocations = Set.of(LEFT_FOOT, RIGHT_FOOT);
-            this.injuryEffect = InjuryEffect.TYPE_2_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_2_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PLASTIC_PROSTHETIC.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class ProstheticArm extends Prosthetic {
         ProstheticArm() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PROSTHETIC_ARM.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COMPLEX_PROSTHETIC.simpleName");
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
-            this.injuryEffect = InjuryEffect.TYPE_3_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_3_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COMPLEX_PROSTHETIC.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class ProstheticHand extends Prosthetic {
         ProstheticHand() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PROSTHETIC_HAND.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COMPLEX_PROSTHETIC.simpleName");
             this.allowedLocations = Set.of(LEFT_HAND, RIGHT_HAND);
-            this.injuryEffect = InjuryEffect.TYPE_3_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_3_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COMPLEX_PROSTHETIC.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class ProstheticLeg extends Prosthetic {
         ProstheticLeg() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PROSTHETIC_LEG.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COMPLEX_PROSTHETIC.simpleName");
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
-            this.injuryEffect = InjuryEffect.TYPE_3_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_3_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COMPLEX_PROSTHETIC.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class ProstheticFoot extends Prosthetic {
         ProstheticFoot() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PROSTHETIC_FOOT.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COMPLEX_PROSTHETIC.simpleName");
             this.allowedLocations = Set.of(LEFT_FOOT, RIGHT_FOOT);
-            this.injuryEffect = InjuryEffect.TYPE_3_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_3_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COMPLEX_PROSTHETIC.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class AdvancedProstheticArm extends Prosthetic {
         AdvancedProstheticArm() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ADVANCED_PROSTHETIC_ARM.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ADVANCED_PROSTHETIC.simpleName");
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
-            this.injuryEffect = InjuryEffect.TYPE_4_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_4_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ADVANCED_PROSTHETIC.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class AdvancedProstheticHand extends Prosthetic {
         AdvancedProstheticHand() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ADVANCED_PROSTHETIC_HAND.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ADVANCED_PROSTHETIC.simpleName");
             this.allowedLocations = Set.of(LEFT_HAND, RIGHT_HAND);
-            this.injuryEffect = InjuryEffect.TYPE_4_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_4_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ADVANCED_PROSTHETIC.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class AdvancedProstheticLeg extends Prosthetic {
         AdvancedProstheticLeg() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ADVANCED_PROSTHETIC_LEG.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ADVANCED_PROSTHETIC.simpleName");
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
-            this.injuryEffect = InjuryEffect.TYPE_4_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_4_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ADVANCED_PROSTHETIC.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class AdvancedProstheticFoot extends Prosthetic {
         AdvancedProstheticFoot() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ADVANCED_PROSTHETIC_FOOT.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ADVANCED_PROSTHETIC.simpleName");
             this.allowedLocations = Set.of(LEFT_FOOT, RIGHT_FOOT);
-            this.injuryEffect = InjuryEffect.TYPE_4_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_4_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ADVANCED_PROSTHETIC.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class MyomerArm extends Prosthetic {
         MyomerArm() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER_ARM.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName");
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
-            this.injuryEffect = InjuryEffect.TYPE_5_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_5_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class MyomerHand extends Prosthetic {
         MyomerHand() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER_HAND.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName");
             this.allowedLocations = Set.of(LEFT_HAND, RIGHT_HAND);
-            this.injuryEffect = InjuryEffect.TYPE_5_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_5_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class MyomerLeg extends Prosthetic {
         MyomerLeg() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER_LEG.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName");
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
-            this.injuryEffect = InjuryEffect.TYPE_5_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_5_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class MyomerFoot extends Prosthetic {
         MyomerFoot() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER_FOOT.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName");
             this.allowedLocations = Set.of(LEFT_FOOT, RIGHT_FOOT);
-            this.injuryEffect = InjuryEffect.TYPE_5_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_5_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class ClonedArm extends Prosthetic {
         ClonedArm() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CLONED_ARM.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CLONED.simpleName");
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
-            this.injuryEffect = InjuryEffect.TYPE_6_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_6_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CLONED.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class ClonedHand extends Prosthetic {
         ClonedHand() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CLONED_HAND.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CLONED.simpleName");
             this.allowedLocations = Set.of(LEFT_HAND, RIGHT_HAND);
-            this.injuryEffect = InjuryEffect.TYPE_6_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_6_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CLONED.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class ClonedLeg extends Prosthetic {
         ClonedLeg() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CLONED_LEG.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CLONED.simpleName");
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
-            this.injuryEffect = InjuryEffect.TYPE_6_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_6_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CLONED.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class ClonedFoot extends Prosthetic {
         ClonedFoot() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CLONED_FOOT.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CLONED.simpleName");
             this.allowedLocations = Set.of(LEFT_FOOT, RIGHT_FOOT);
-            this.injuryEffect = InjuryEffect.TYPE_6_LIMB_REPLACEMENT;
+            this.injuryEffect = TYPE_6_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CLONED.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
@@ -1424,7 +1576,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.EYE_IMPLANT.simpleName");
             this.allowedLocations = Set.of(EYES);
-            this.injuryEffect = InjuryEffect.TYPE_2_SENSORY_REPLACEMENT;
+            this.injuryEffect = TYPE_2_SENSORY_REPLACEMENT;
         }
     }
 
@@ -1433,7 +1585,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BIONIC_EAR.simpleName");
             this.allowedLocations = Set.of(EARS);
-            this.injuryEffect = InjuryEffect.TYPE_3_SENSORY_REPLACEMENT;
+            this.injuryEffect = TYPE_3_SENSORY_REPLACEMENT;
         }
     }
 
@@ -1442,7 +1594,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BIONIC_EYE.simpleName");
             this.allowedLocations = Set.of(EYES);
-            this.injuryEffect = InjuryEffect.TYPE_4_SENSORY_REPLACEMENT;
+            this.injuryEffect = TYPE_4_SENSORY_REPLACEMENT;
         }
     }
 
@@ -1476,20 +1628,49 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COSMETIC_SURGERY.simpleName");
             this.allowedLocations = Set.of(HEAD, ABDOMEN, CHEST, LEFT_ARM, RIGHT_ARM, LEFT_HAND,
                   RIGHT_HAND, LEFT_LEG, RIGHT_LEG);
+            this.injuryEffect = NONE;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COSMETIC_SURGERY.simpleName",
+                  Utilities.capitalize(loc.locationName()));
         }
     }
 
     public static final class ClonedLimbRecovery extends BaseInjury {
         ClonedLimbRecovery() {
-            super(CLONED_LIMB_HEALING_DAYS, false, InjuryLevel.MINOR, InjuryEffect.SEVERED, Set.of(INTERNAL));
+            super(CLONED_LIMB_HEALING_DAYS, false, MINOR, SEVERED, Set.of(INTERNAL));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CLONED_LIMB_RECOVERY.simpleName");
         }
     }
 
     public static final class ReplacementLimbRecovery extends BaseInjury {
         ReplacementLimbRecovery() {
-            super(REPLACEMENT_LIMB_HEALING_DAYS, false, InjuryLevel.MINOR, InjuryEffect.SEVERED, Set.of(INTERNAL));
+            super(REPLACEMENT_LIMB_HEALING_DAYS, false, MINOR, SEVERED, Set.of(INTERNAL));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.REPLACEMENT_LIMB_RECOVERY.simpleName");
+        }
+    }
+
+    public static final class ReplacementOrganRecovery extends BaseInjury {
+        ReplacementOrganRecovery() {
+            super(REPLACEMENT_LIMB_HEALING_DAYS,
+                  false,
+                  MINOR,
+                  INTERNAL_BLEEDING,
+                  Set.of(INTERNAL));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.REPLACEMENT_ORGAN_RECOVERY.simpleName");
+        }
+    }
+
+    public static final class CosmeticSurgeryRecovery extends BaseInjury {
+        CosmeticSurgeryRecovery() {
+            super(COSMETIC_SURGERY_RECOVERY_HEALING_DAYS,
+                  false,
+                  MINOR,
+                  NONE,
+                  Set.of(INTERNAL));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COSMETIC_SURGERY_RECOVERY.simpleName");
         }
     }
 }
