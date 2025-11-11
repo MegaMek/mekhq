@@ -183,18 +183,6 @@ public enum BodyLocation {
     public BodyLocation Parent() {
         return parent;
     }
-
-    public BodyLocation getFirstPrimaryLocation() {
-        if (PRIMARY_LOCATIONS.contains(this)) {
-            return this;
-        }
-
-        BodyLocation location = this;
-        while (!PRIMARY_LOCATIONS.contains(location)) {
-            location = location.parent;
-        }
-        return location;
-    }
     //endregion Getters
 
     /**
@@ -232,7 +220,7 @@ public enum BodyLocation {
     }
 
     public boolean isChildOf(BodyLocation parent) {
-        return ((null != this.parent) && ((this.parent == parent) || this.parent.isChildOf(parent)));
+        return ((null != this.parent) && (isImmediateChildOf(parent) || this.parent.isChildOf(parent)));
     }
 
     public boolean isImmediateChildOf(BodyLocation parent) {

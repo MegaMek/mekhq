@@ -90,6 +90,19 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
 import mekhq.gui.view.PaperDoll;
 
+/**
+ * Dialog for planning and executing advanced replacement limb and prosthetic surgeries for a single patient.
+ *
+ * <p>The dialog displays the patient's injuries, available prosthetic options per body location, projected surgery
+ * difficulty, and total cost. It also performs surgery skill checks, applies resulting injuries or recovery effects,
+ * and debits campaign funds when the user confirms the plan.</p>
+ *
+ * <p>This dialog is modal and is shown immediately from its constructor when a non-{@code null} patient is
+ * supplied.</p>
+ *
+ * @author Illiani
+ * @since 0.50.10
+ */
 public class AdvancedReplacementLimbDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(AdvancedReplacementLimbDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvancedReplacementLimbDialog";
@@ -99,7 +112,10 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private static final String MALE_PAPER_DOLL = "default_male_paperdoll";
     private static final String FEMALE_PAPER_DOLL = "default_female_paperdoll";
 
-    // The order here is important and any changes will be reflected in the gui
+    /**
+     * Valid body locations that can be targeted by replacement or prosthetic treatments. The order of this list
+     * controls the ordering in the GUI.
+     */
     private static final List<BodyLocation> VALID_BODY_LOCATIONS = List.of(
           HEAD,
           EYES,
@@ -131,21 +147,54 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private PaperDoll defaultFemaleDoll;
     private ActionListener dollActionListener;
 
-    private final Map<BodyLocation, List<Injury>> relevantInjuries = new HashMap<>();
-    private final Map<BodyLocation, List<Injury>> injuriesMappedToPrimaryLocations = new HashMap<>();
-    private final Map<BodyLocation, List<ProstheticType>> treatmentOptions = new HashMap<>();
-    private final Map<BodyLocation, JComboBox<ProstheticType>> treatmentSelections = new HashMap<>();
+    private final Map<BodyLocation, List<Injury>> relevantInjuries =
+          new HashMap<>();
+    private final Map<BodyLocation, List<Injury>> injuriesMappedToPrimaryLocations =
+          new HashMap<>();
+    private final Map<BodyLocation, List<ProstheticType>> treatmentOptions =
+          new HashMap<>();
+    private final Map<BodyLocation, JComboBox<ProstheticType>> treatmentSelections =
+          new HashMap<>();
 
     private RoundedJButton confirmButton;
     private JLabel summaryLabel;
 
+    /**
+     * Represents a planned surgery consisting of a prosthetic type and a specific body location.
+     *
+     * @param type     the prosthetic type to be installed
+     * @param location the body location being treated
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private record PlannedSurgery(ProstheticType type, BodyLocation location) {
+        /**
+         * Builds a simple label combining the prosthetic display name and the location name, for use in reports.
+         *
+         * @return a human-readable label for the planned surgery
+         *
+         * @author Illiani
+         * @since 0.50.10
+         */
         public String getLabel() {
             return type.toString() + "-" + location.locationName();
         }
     }
 
-    public AdvancedReplacementLimbDialog(Campaign campaign, @Nullable Person patient) {
+    /**
+     * Creates and displays a new {@link AdvancedReplacementLimbDialog} for the given patient.
+     *
+     * <p>If the patient is {@code null}, the dialog performs no initialization and returns without being shown.</p>
+     *
+     * @param campaign the active campaign context
+     * @param patient  the patient undergoing treatment, or {@code null}
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public AdvancedReplacementLimbDialog(Campaign campaign,
+          @Nullable Person patient) {
         this.patient = patient;
         this.campaign = campaign;
         surgeon = getSurgeon(campaign.getDoctors()); // can return null
@@ -168,6 +217,13 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         setVisible(true);
     }
 
+    /**
+     * Initializes the dialog UI, assembling the instructions, prosthetic selection grid, paper doll, summary, and
+     * button panel.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void initializeUI() {
         setLayout(new BorderLayout());
 
@@ -195,13 +251,14 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         mainPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.insets = new Insets(0, PADDING, PADDING / 2, PADDING);
+        gridBagConstraints.insets =
+              new Insets(0, PADDING, PADDING / 2, PADDING);
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel patientName = new JLabel("<html><h2>" + patient.getFullTitle() + "</h2></html>");
+        JLabel patientName = new JLabel("<html><h2>"
+                                              + patient.getFullTitle() + "</h2></html>");
         mainPanel.add(patientName, gridBagConstraints);
-
 
         // Add location labels and treatment combos
         int i = 1;
@@ -218,7 +275,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             gridBagConstraints.gridy = i;
             gridBagConstraints.weightx = 0.5;
             List<ProstheticType> options = treatmentOptions.get(bodyLocation);
-            JComboBox<ProstheticType> treatmentComboBox = createTreatmentComboBox(options);
+            JComboBox<ProstheticType> treatmentComboBox =
+                  createTreatmentComboBox(options);
             treatmentSelections.put(bodyLocation, treatmentComboBox);
             mainPanel.add(treatmentComboBox, gridBagConstraints);
             i++;
@@ -245,21 +303,24 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         summaryLabel = new JLabel();
         summaryLabel.setVerticalAlignment(SwingConstants.TOP);
         summaryPanel.add(summaryLabel, BorderLayout.CENTER);
-        add(summaryPanel, BorderLayout.SOUTH);
 
         // Create button panel at the bottom
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(PADDING / 2, PADDING, PADDING, PADDING));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(
+              PADDING / 2, PADDING, PADDING, PADDING));
 
-        RoundedJButton cancelButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+        RoundedJButton cancelButton = new RoundedJButton(getTextAt(
+              RESOURCE_BUNDLE,
               "AdvancedReplacementLimbDialog.button.cancel"));
         cancelButton.addActionListener(evt -> dispose());
 
-        RoundedJButton documentationButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+        RoundedJButton documentationButton = new RoundedJButton(getTextAt(
+              RESOURCE_BUNDLE,
               "AdvancedReplacementLimbDialog.button.documentation"));
         documentationButton.addActionListener(this::onDocumentation);
 
-        confirmButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+        confirmButton = new RoundedJButton(getTextAt(
+              RESOURCE_BUNDLE,
               "AdvancedReplacementLimbDialog.button.confirm"));
         confirmButton.addActionListener(this::onConfirm);
 
@@ -277,7 +338,19 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         updateSummary();
     }
 
-    private JComboBox<ProstheticType> createTreatmentComboBox(List<ProstheticType> options) {
+    /**
+     * Creates a combo box for selecting a prosthetic treatment at a given body location, including tooltips and
+     * availability-based disabling.
+     *
+     * @param options the list of candidate prosthetic types for this location
+     *
+     * @return a configured {@link JComboBox} instance
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private JComboBox<ProstheticType> createTreatmentComboBox(
+          List<ProstheticType> options) {
         int gameYear = campaign.getGameYear();
         boolean isOnPlanet = campaign.getLocation().isOnPlanet();
 
@@ -291,19 +364,24 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             comboBox.addItem(treatment);
         }
 
-        // Custom renderer to display "None" for null option and disable items based on location
-        String defaultTooltip = getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.combo.none.tooltip");
+        // Custom renderer to display "None" for null option and disable items
+        // based on location
+        String defaultTooltip = getTextAt(RESOURCE_BUNDLE,
+              "AdvancedReplacementLimbDialog.combo.none.tooltip");
         comboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value,
-                  int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            public Component getListCellRendererComponent(JList<?> list,
+                  Object value, int index, boolean isSelected,
+                  boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index,
+                      isSelected, cellHasFocus);
 
                 boolean enabled = true;
                 String tooltip;
 
                 if (value == null) {
-                    setText(getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.combo.none.label"));
+                    setText(getTextAt(RESOURCE_BUNDLE,
+                          "AdvancedReplacementLimbDialog.combo.none.label"));
                     tooltip = defaultTooltip;
                 } else {
                     ProstheticType type = (ProstheticType) value;
@@ -311,7 +389,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
                     // Build tooltip with base info and exclusions
                     String baseTooltip = type.getTooltip(gameYear);
-                    String exclusions = getExclusions(isOnPlanet, type, gameYear);
+                    String exclusions =
+                          getExclusions(isOnPlanet, type, gameYear);
 
                     if (!exclusions.isBlank()) {
                         enabled = false;
@@ -330,7 +409,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         // Add listener to update tooltip and summary based on selection
         comboBox.addActionListener(e -> {
-            ProstheticType selected = (ProstheticType) comboBox.getSelectedItem();
+            ProstheticType selected =
+                  (ProstheticType) comboBox.getSelectedItem();
             if (selected == null) {
                 comboBox.setToolTipText(defaultTooltip);
             } else {
@@ -347,8 +427,16 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         return comboBox;
     }
 
+    /**
+     * Updates the summary panel to reflect the current prosthetic selections, including the number of surgeries,
+     * required surgery level, surgeon choice, and total cost. Also enables or disables the confirm button based on
+     * available campaign funds.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void updateSummary() {
-        if (summaryLabel == null) {
+        if (summaryLabel == null || confirmButton == null) {
             return;
         }
 
@@ -358,48 +446,62 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         getSurgeryCostAndSkillRequirements();
 
-        isUseLocalSurgeon();
+        updateUseLocalSurgeonFlag();
         if (isUseLocalSurgeon) {
             totalCost = totalCost.multipliedBy(10);
         }
 
-        confirmButton.setEnabled(campaign.getFunds().isGreaterOrEqualThan(totalCost));
+        confirmButton.setEnabled(campaign.getFunds().isGreaterOrEqualThan(totalCost) && selectedCount > 0);
 
         List<String> summary = new ArrayList<>();
         if (selectedCount > 0) {
-            summary.add(getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.status.selected",
+            summary.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "AdvancedReplacementLimbDialog.status.selected",
                   selectedCount));
 
-            summary.add(getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.status.difficulty",
+            summary.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "AdvancedReplacementLimbDialog.status.difficulty",
                   surgeryLevelNeeded));
 
             if (isUseLocalSurgeon) {
                 if (campaign.getLocation().isOnPlanet()) {
-                    summary.add(getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.status.localSurgeon"));
+                    summary.add(getTextAt(RESOURCE_BUNDLE,
+                          "AdvancedReplacementLimbDialog.status.localSurgeon"));
                 } else {
                     summary.add(getTextAt(RESOURCE_BUNDLE,
                           "AdvancedReplacementLimbDialog.status.localSurgeon.transit"));
                 }
             } else {
-                summary.add(getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.status.surgeon",
+                summary.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "AdvancedReplacementLimbDialog.status.surgeon",
                       surgeon.getFullTitle(), surgeryLevelNeeded));
             }
 
             if (totalCost.isPositive()) {
-                summary.add(getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.status.total",
+                summary.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "AdvancedReplacementLimbDialog.status.total",
                       totalCost.toAmountString()));
             }
         } else {
-            summary.add(" "); // These just ensure the gui stays at the same height
+            // These just ensure the gui stays at the same height
+            summary.add(" ");
             summary.add(" ");
             summary.add(" ");
             summary.add(" ");
             summary.add(" ");
         }
 
-        summaryLabel.setText("<html>" + String.join("<br>", summary) + "</html>");
+        summaryLabel.setText("<html>" + String.join("<br>", summary)
+                                   + "</html>");
     }
 
+    /**
+     * Aggregates the total surgery cost and determines the highest surgery level required among all selected prosthetic
+     * treatments.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void getSurgeryCostAndSkillRequirements() {
         for (ProstheticType surgeryType : getSelectedTreatments().values()) {
             int neededSurgeryLevel = surgeryType.getSurgeryLevel();
@@ -414,13 +516,22 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
     }
 
-    private void isUseLocalSurgeon() {
+    /**
+     * Determines whether a local (NPC) surgeon must be used instead of a campaign doctor, based on availability and
+     * surgery skill.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void updateUseLocalSurgeonFlag() {
         isUseLocalSurgeon = surgeon == null;
         if (!isUseLocalSurgeon) {
             Skill surgerySkill = surgeon.getSkill(S_SURGERY);
             if (surgerySkill != null) {
-                SkillModifierData modifierData = surgeon.getSkillModifierData();
-                int surgeonTotalSkill = surgerySkill.getTotalSkillLevel(modifierData);
+                SkillModifierData modifierData =
+                      surgeon.getSkillModifierData();
+                int surgeonTotalSkill =
+                      surgerySkill.getTotalSkillLevel(modifierData);
                 isUseLocalSurgeon = surgeonTotalSkill < surgeryLevelNeeded;
             } else {
                 isUseLocalSurgeon = true;
@@ -428,28 +539,55 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
     }
 
-    private String getExclusions(boolean isOnPlanet, ProstheticType selected, int gameYear) {
+    /**
+     * Builds a text snippet describing why a selected prosthetic is excluded at the current time, based on location,
+     * faction, tech rating, and year.
+     *
+     * @param isOnPlanet whether the campaign is currently on a planet
+     * @param selected   the prosthetic type being evaluated
+     * @param gameYear   the current in-game year
+     *
+     * @return a concatenated exclusion message, or an empty string if allowed
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private String getExclusions(boolean isOnPlanet, ProstheticType selected,
+          int gameYear) {
         String tooltip = "";
         // Check if selection should be disabled
         if (!isOnPlanet && selected.getProstheticType() > 2) {
-            tooltip += getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.exclusions.planet");
+            tooltip += getTextAt(RESOURCE_BUNDLE,
+                  "AdvancedReplacementLimbDialog.exclusions.planet");
         }
 
         if (!selected.isAvailableToFaction(campaign.getFaction())) {
-            tooltip += getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.exclusions.faction");
+            tooltip += getTextAt(RESOURCE_BUNDLE,
+                  "AdvancedReplacementLimbDialog.exclusions.faction");
         }
 
-        if (!selected.isAvailableInCurrentLocation(campaign.getLocation(), campaign.getLocalDate())) {
-            tooltip += getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.exclusions.tech");
+        if (!selected.isAvailableInCurrentLocation(campaign.getLocation(),
+              campaign.getLocalDate())) {
+            tooltip += getTextAt(RESOURCE_BUNDLE,
+                  "AdvancedReplacementLimbDialog.exclusions.tech");
         }
 
         if (selected.getCost(gameYear) == null) {
-            tooltip += getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.exclusions.year");
+            tooltip += getTextAt(RESOURCE_BUNDLE,
+                  "AdvancedReplacementLimbDialog.exclusions.year");
         }
         return tooltip;
     }
 
-    private void onDocumentation(ActionEvent e) {
+    /**
+     * Opens the glossary entry describing prosthetics when the documentation button is pressed.
+     *
+     * @param event the originating action event
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void onDocumentation(ActionEvent event) {
         GlossaryEntry glossaryEntry = GlossaryEntry.PROSTHETICS;
 
         try {
@@ -459,6 +597,16 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
     }
 
+    /**
+     * Handles the confirm action. This method disposes the dialog, charges the campaign, determines the surgeon,
+     * performs surgery skill checks, applies surgery and recovery injuries, and reports results back to the campaign
+     * log.
+     *
+     * @param event the originating action event
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void onConfirm(ActionEvent event) {
         dispose();
 
@@ -468,17 +616,21 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         // Get a local surgeon (if applicable)
         getLocalSurgeon();
 
-        // First, prioritize surgeries based on difficulty and expense. This is so that any available Edge is used on
-        // the more important surgeries first.
+        // First, prioritize surgeries based on difficulty and expense. This is
+        // so that any available Edge is used on the more important surgeries
+        // first.
         List<PlannedSurgery> prioritizedSurgeries = getPrioritizedSurgeries();
 
         // Then perform the surgery skill checks
         List<PlannedSurgery> successfulSurgeries = new ArrayList<>();
         List<PlannedSurgery> unsuccessfulSurgeries = new ArrayList<>();
-        performSurgerySkillChecks(prioritizedSurgeries, successfulSurgeries, unsuccessfulSurgeries);
+        performSurgerySkillChecks(prioritizedSurgeries, successfulSurgeries,
+              unsuccessfulSurgeries);
 
         // Then perform the actual surgeries
-        boolean useKinderMode = campaign.getCampaignOptions().isUseKinderAlternativeAdvancedMedical();
+        boolean useKinderMode =
+              campaign.getCampaignOptions()
+                    .isUseKinderAlternativeAdvancedMedical();
         for (PlannedSurgery surgery : prioritizedSurgeries) {
             performSurgery(surgery, useKinderMode, successfulSurgeries);
         }
@@ -486,21 +638,25 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         // Notify the player of the results
         if (!successfulSurgeries.isEmpty()) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG,
+                  spanOpeningWithCustomColor(getPositiveColor()),
+                  CLOSING_SPAN_TAG,
                   "AdvancedReplacementLimbDialog.report.successful",
-                  String.join(", ", successfulSurgeries.stream()
-                                          .map(PlannedSurgery::getLabel)
-                                          .toList())
+                  String.join(", ",
+                        successfulSurgeries.stream()
+                              .map(PlannedSurgery::getLabel)
+                              .toList())
             ));
         }
 
         if (!unsuccessfulSurgeries.isEmpty()) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG,
+                  spanOpeningWithCustomColor(getPositiveColor()),
+                  CLOSING_SPAN_TAG,
                   "AdvancedReplacementLimbDialog.report.unsuccessful",
-                  String.join(", ", unsuccessfulSurgeries.stream()
-                                          .map(PlannedSurgery::getLabel)
-                                          .toList())
+                  String.join(", ",
+                        unsuccessfulSurgeries.stream()
+                              .map(PlannedSurgery::getLabel)
+                              .toList())
             ));
         }
 
@@ -508,13 +664,32 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         checkForDeath();
     }
 
+    /**
+     * Debits the campaign finances for the total cost of all planned surgeries.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void payForSurgeries() {
         Finances finances = campaign.getFinances();
         LocalDate today = campaign.getLocalDate();
-        finances.debit(TransactionType.REPAIRS, today, totalCost, getFormattedTextAt(RESOURCE_BUNDLE,
-              "AdvancedReplacementLimbDialog.transaction", patient.getFullTitle()));
+        finances.debit(TransactionType.REPAIRS, today, totalCost,
+              getFormattedTextAt(RESOURCE_BUNDLE,
+                    "AdvancedReplacementLimbDialog.transaction",
+                    patient.getFullTitle()));
     }
 
+    /**
+     * Applies the outcome of a single planned surgery. On success, removes applicable injuries, adds a record injury,
+     * and adds recovery injuries. On failure, adds a failed-surgery recovery injury.
+     *
+     * @param surgery             the surgery being performed
+     * @param useKinderMode       whether to halve recovery times
+     * @param successfulSurgeries the list of surgeries that passed their skill checks
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void performSurgery(PlannedSurgery surgery, boolean useKinderMode,
           List<PlannedSurgery> successfulSurgeries) {
         BodyLocation location = surgery.location;
@@ -523,31 +698,46 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         if (successfulSurgeries.contains(surgery)) {
             // Remove injuries based on the surgery type
             boolean isBurnRemovalOnly = type == COSMETIC_SURGERY;
-            for (Injury injury : relevantInjuries.getOrDefault(location, new ArrayList<>())) {
-                if (injury != null && (injury.getSubType().isBurn() || !isBurnRemovalOnly)) {
+            for (Injury injury : relevantInjuries.getOrDefault(location,
+                  new ArrayList<>())) {
+                if (injury != null
+                          && (injury.getSubType().isBurn() || !isBurnRemovalOnly)) {
                     patient.removeInjury(injury);
                 }
             }
 
-            // Add the new surgery 'injury'. This is a semi-permanent record of the surgery on the character
+            // Add the new surgery 'injury'. This is a semi-permanent record of
+            // the surgery on the character
             InjuryType injuryType = type.getInjuryType();
-            Injury injury = injuryType.newInjury(campaign, patient, location, 0);
+            Injury injury = injuryType.newInjury(campaign, patient, location,
+                  0);
             adjustForKinderMode(useKinderMode, injury);
             patient.addInjury(injury);
 
             // Add recovery period injuries
             InjuryType recoveryInjuryType = getRecoveryInjuryType(surgery);
-            Injury recoveryInjury = recoveryInjuryType.newInjury(campaign, patient, INTERNAL, 1);
+            Injury recoveryInjury =
+                  recoveryInjuryType.newInjury(campaign, patient,
+                        INTERNAL, 1);
             adjustForKinderMode(useKinderMode, recoveryInjury);
             patient.addInjury(recoveryInjury);
         } else {
             // Add failed surgery injury
-            Injury recoveryInjury = FAILED_SURGERY_RECOVERY.newInjury(campaign, patient, INTERNAL, 1);
+            Injury recoveryInjury =
+                  FAILED_SURGERY_RECOVERY.newInjury(campaign, patient,
+                        INTERNAL, 1);
             adjustForKinderMode(useKinderMode, recoveryInjury);
             patient.addInjury(recoveryInjury);
         }
     }
 
+    /**
+     * Determines whether accumulated injury hits after surgery result in the patient's death (medical complications)
+     * and updates their status accordingly.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void checkForDeath() {
         int deathThreshold = 5;
         for (Injury injury : patient.getInjuries()) {
@@ -555,10 +745,22 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
 
         if (deathThreshold < 0) {
-            patient.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            patient.changeStatus(campaign, campaign.getLocalDate(),
+                  PersonnelStatus.MEDICAL_COMPLICATIONS);
         }
     }
 
+    /**
+     * Selects the appropriate recovery injury type to apply after a successful surgery, based on prosthetic generation
+     * and whether a limb or organ was treated.
+     *
+     * @param surgery the planned surgery
+     *
+     * @return the corresponding recovery {@link InjuryType}
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private static InjuryType getRecoveryInjuryType(PlannedSurgery surgery) {
         ProstheticType type = surgery.type;
         if (type == COSMETIC_SURGERY) {
@@ -574,7 +776,18 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
     }
 
-    private static void adjustForKinderMode(boolean useKinderMode, Injury injury) {
+    /**
+     * Adjusts an injury's recovery time when "kinder" advanced medical rules are enabled by halving both the original
+     * and current recovery time.
+     *
+     * @param useKinderMode whether kinder mode is active
+     * @param injury        the injury whose recovery time should be adjusted
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void adjustForKinderMode(boolean useKinderMode,
+          Injury injury) {
         if (useKinderMode) {
             int originalRecoveryTime = injury.getOriginalTime();
             int newRecoveryTime = (int) ceil(originalRecoveryTime / 2.0);
@@ -583,19 +796,40 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
     }
 
+    /**
+     * Creates a temporary local surgeon if needed, with sufficient surgery skill and a small amount of Edge so that
+     * local surgeons are not completely ineffective.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void getLocalSurgeon() {
         if (isUseLocalSurgeon) {
             surgeon = new Person(campaign);
             surgeon.addSkill(S_SURGERY, surgeryLevelNeeded + 1, 0);
-            surgeon.setEdge(1); // We don't want Local Surgeons to be completely worthless
+            surgeon.setEdge(1); // We don't want Local Surgeons to be
             surgeon.setCurrentEdge(1);
         }
     }
 
+    /**
+     * Performs surgery skill checks for each planned surgery and populates the lists of successful and unsuccessful
+     * surgeries. Each check generates a report entry in the campaign log.
+     *
+     * @param prioritizedSurgeries  the surgeries ordered by importance
+     * @param successfulSurgeries   out parameter for successful surgeries
+     * @param unsuccessfulSurgeries out parameter for unsuccessful surgeries
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void performSurgerySkillChecks(List<PlannedSurgery> prioritizedSurgeries,
-          List<PlannedSurgery> successfulSurgeries, List<PlannedSurgery> unsuccessfulSurgeries) {
+          List<PlannedSurgery> successfulSurgeries,
+          List<PlannedSurgery> unsuccessfulSurgeries) {
         for (PlannedSurgery surgery : new ArrayList<>(prioritizedSurgeries)) {
-            SkillCheckUtility skillCheckUtility = new SkillCheckUtility(surgeon, S_SURGERY, List.of(), 0, true, false);
+            SkillCheckUtility skillCheckUtility =
+                  new SkillCheckUtility(surgeon, S_SURGERY, List.of(),
+                        0, true, false);
             campaign.addReport(skillCheckUtility.getResultsText());
             if (skillCheckUtility.isSuccess()) {
                 successfulSurgeries.add(surgery);
@@ -605,21 +839,36 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
     }
 
+    /**
+     * Builds and returns a list of planned surgeries sorted by surgery difficulty and then by cost, from highest to
+     * lowest. This is used to prioritize which surgeries consume Edge first.
+     *
+     * @return a sorted list of {@link PlannedSurgery} instances
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private List<PlannedSurgery> getPrioritizedSurgeries() {
         int gameYear = campaign.getGameYear();
-        Map<BodyLocation, ProstheticType> scheduledSurgeries = getSelectedTreatments();
+        Map<BodyLocation, ProstheticType> scheduledSurgeries =
+              getSelectedTreatments();
 
         List<PlannedSurgery> prioritizedSurgeries = new ArrayList<>();
-        for (Map.Entry<BodyLocation, ProstheticType> entry : scheduledSurgeries.entrySet()) {
-            prioritizedSurgeries.add(new PlannedSurgery(entry.getValue(), entry.getKey()));
+        for (Map.Entry<BodyLocation, ProstheticType> entry :
+              scheduledSurgeries.entrySet()) {
+            prioritizedSurgeries.add(
+                  new PlannedSurgery(entry.getValue(), entry.getKey()));
         }
 
         prioritizedSurgeries.sort(
-              Comparator.<PlannedSurgery>comparingInt(s -> s.type().getSurgeryLevel())
+              Comparator.<PlannedSurgery>comparingInt(
+                          s -> s.type().getSurgeryLevel())
                     .reversed() // highest surgery level first
                     .thenComparing(
-                          // We shouldn't hit `null` at this point, as any null selections should have been filtered out
-                          s -> Objects.requireNonNull(s.type().getCost(gameYear)),
+                          // We shouldn't hit `null` at this point, as any
+                          // null selections should have been filtered out
+                          s -> Objects.requireNonNull(
+                                s.type().getCost(gameYear)),
                           Comparator.reverseOrder() // highest cost first
                     )
         );
@@ -627,6 +876,17 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         return prioritizedSurgeries;
     }
 
+    /**
+     * Determines the senior surgeon from the supplied personnel list, based on doctor status and rank/skill
+     * tiebreakers.
+     *
+     * @param activePersonnel the list of active personnel to search
+     *
+     * @return the most senior surgeon, or {@code null} if none are available
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private @Nullable Person getSurgeon(List<Person> activePersonnel) {
         Person seniorSurgeon = null;
         for (Person person : activePersonnel) {
@@ -636,7 +896,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                     continue;
                 }
 
-                if (person.outRanksUsingSkillTiebreaker(campaign, seniorSurgeon)) {
+                if (person.outRanksUsingSkillTiebreaker(campaign,
+                      seniorSurgeon)) {
                     seniorSurgeon = person;
                 }
             }
@@ -645,8 +906,17 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         return seniorSurgeon;
     }
 
+    /**
+     * Populates maps of injuries relevant to replacement surgery, both by individual location and by primary location,
+     * to drive the UI and paper doll overlay.
+     *
+     * @param injuries the list of injuries on the patient
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void gatherRelevantInjuries(List<Injury> injuries) {
-        injuries.sort(Comparator.comparing(Injury::getName)); // we want a consistent order
+        injuries.sort(Comparator.comparing(Injury::getName)); // consistent order
         for (Injury injury : injuries) {
             BodyLocation location = injury.getLocation();
             for (BodyLocation mappedLocation : BodyLocation.values()) {
@@ -654,20 +924,28 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                     boolean isSameLocation = location.equals(mappedLocation);
                     boolean childOf = location.isChildOf(mappedLocation);
 
-                    // Head and chest are special cases, as 'prosthetics' used there won't remove all injuries in that
-                    // location, just the localized ones
+                    // Head and chest are special cases, as 'prosthetics' used
+                    // there won't remove all injuries in that location,
+                    // just the localized ones
                     boolean locationIsHead = mappedLocation.equals(HEAD);
                     boolean locationIsChest = mappedLocation.equals(CHEST);
-                    if (isSameLocation || (childOf && !(locationIsHead || locationIsChest))) {
-                        // If a BodyLocation is the child of multiple valid locations, we want it added to each, so we
-                        // don't break after finding one match
-                        relevantInjuries.computeIfAbsent(mappedLocation, k -> new ArrayList<>()).add(injury);
+                    if (isSameLocation
+                              || (childOf && !(locationIsHead || locationIsChest))) {
+                        // If a BodyLocation is the child of multiple valid
+                        // locations, we want it added to each, so we don't
+                        // break after finding one match
+                        relevantInjuries
+                              .computeIfAbsent(mappedLocation,
+                                    k -> new ArrayList<>())
+                              .add(injury);
                     }
                 }
 
                 if (PRIMARY_LOCATIONS.contains(mappedLocation)) {
                     if (location.isImmediateChildOf(mappedLocation)) {
-                        injuriesMappedToPrimaryLocations.computeIfAbsent(mappedLocation, k -> new ArrayList<>())
+                        injuriesMappedToPrimaryLocations
+                              .computeIfAbsent(mappedLocation,
+                                    k -> new ArrayList<>())
                               .add(injury);
                     }
                 }
@@ -675,14 +953,34 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
     }
 
+    /**
+     * Builds the list of available prosthetic treatment options for each valid body location and populates
+     * {@link #treatmentOptions}.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void gatherTreatmentOptions() {
         for (BodyLocation location : VALID_BODY_LOCATIONS) {
-            List<ProstheticType> eligibleTreatments = getEligibleTreatments(location);
+            List<ProstheticType> eligibleTreatments =
+                  getEligibleTreatments(location);
             treatmentOptions.put(location, eligibleTreatments);
         }
     }
 
-    private static List<ProstheticType> getEligibleTreatments(BodyLocation injuryLocation) {
+    /**
+     * Determines which prosthetic types are eligible for a given body location based on their configured allowed
+     * locations.
+     *
+     * @param injuryLocation the location being evaluated
+     *
+     * @return a list of prosthetic types that can treat the location
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static List<ProstheticType> getEligibleTreatments(
+          BodyLocation injuryLocation) {
         List<ProstheticType> eligibleTreatments = new ArrayList<>();
         for (ProstheticType type : ProstheticType.values()) {
             if (type.getEligibleLocations().contains(injuryLocation)) {
@@ -692,18 +990,38 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         return eligibleTreatments;
     }
 
+    /**
+     * Returns the currently selected prosthetic treatment for each body location that has a non-null selection in the
+     * UI.
+     *
+     * @return a map of body location to chosen {@link ProstheticType}
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public Map<BodyLocation, ProstheticType> getSelectedTreatments() {
         Map<BodyLocation, ProstheticType> selections = new HashMap<>();
-        for (Map.Entry<BodyLocation, JComboBox<ProstheticType>> entry : treatmentSelections.entrySet()) {
-            ProstheticType selectedTreatment = (ProstheticType) entry.getValue().getSelectedItem();
+        boolean isPlanetside = campaign.getLocation().isOnPlanet();
+        int gameYear = campaign.getGameYear();
+        for (Map.Entry<BodyLocation, JComboBox<ProstheticType>> entry :
+              treatmentSelections.entrySet()) {
+            ProstheticType selectedTreatment =
+                  (ProstheticType) entry.getValue().getSelectedItem();
 
-            if (selectedTreatment != null) {
+            if (selectedTreatment != null && getExclusions(isPlanetside, selectedTreatment, gameYear).isBlank()) {
                 selections.put(entry.getKey(), selectedTreatment);
             }
         }
         return selections;
     }
 
+    /**
+     * Loads default male and female paper dolls and sets up the action listener used to display injury details when the
+     * user clicks on a body location.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public void paperDoll() {
         // Preload default paper dolls
         try (InputStream fis = new FileInputStream(campaign.getApp()
@@ -723,37 +1041,65 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
 
         dollActionListener = ae -> {
-            final BodyLocation bodyLocation = BodyLocation.of(ae.getActionCommand());
-            final boolean locationPicked = !bodyLocation.locationName().isEmpty();
+            final BodyLocation bodyLocation =
+                  BodyLocation.of(ae.getActionCommand());
+            final boolean locationPicked =
+                  !bodyLocation.locationName().isEmpty();
             Point mousePos = doll.getMousePosition();
+
+            // getMousePosition() can return null if the mouse isn’t over the component (or in some edge timing cases).
+            if (mousePos == null) {
+                return;
+            }
+
             JPopupMenu popup = new JPopupMenu();
             if (locationPicked) {
-                JLabel header = new JLabel(Utilities.capitalize(bodyLocation.locationName()));
-                header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD));
+                JLabel header = new JLabel(
+                      Utilities.capitalize(bodyLocation.locationName()));
+                header.setFont(UIManager.getDefaults()
+                                     .getFont("Menu.font")
+                                     .deriveFont(Font.BOLD));
                 popup.add(header);
                 popup.addSeparator();
 
-                if (injuriesMappedToPrimaryLocations.containsKey(bodyLocation)) {
-                    for (Injury injury : injuriesMappedToPrimaryLocations.get(bodyLocation)) {
+                if (injuriesMappedToPrimaryLocations.containsKey(
+                      bodyLocation)) {
+                    for (Injury injury :
+                          injuriesMappedToPrimaryLocations.get(
+                                bodyLocation)) {
                         popup.add(injury.getName());
                     }
                 }
             }
             Dimension popupSize = popup.getPreferredSize();
-            popup.show(doll, (int) (mousePos.getX() - popupSize.getWidth()) + PADDING, (int) mousePos.getY() - PADDING);
+            popup.show(doll,
+                  (int) (mousePos.getX() - popupSize.getWidth())
+                        + PADDING,
+                  (int) mousePos.getY() - PADDING);
         };
     }
 
+    /**
+     * Populates the right-hand panel with a paper doll representation of the patient, including highlighted injuries
+     * and interactive click handlers.
+     *
+     * @param panel the panel to populate with the paper doll
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void fillDoll(JPanel panel) {
         panel.removeAll();
 
         if (null != doll) {
             doll.removeActionListener(dollActionListener);
         }
-        doll = patient.getGender().isMale() ? defaultMaleDoll : defaultFemaleDoll;
+        doll = patient.getGender().isMale()
+                     ? defaultMaleDoll
+                     : defaultFemaleDoll;
 
-        int dollWidth = scaleForGUI(200);  // Adjust this value
-        int dollHeight = scaleForGUI(600); // Adjust this value
+        int dollWidth = scaleForGUI(200);
+        int dollHeight = scaleForGUI(600);
         doll.setSize(dollWidth, dollHeight);
         doll.setPreferredSize(new Dimension(dollWidth, dollHeight));
 
@@ -761,17 +1107,21 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         doll.clearLocTags();
         doll.setHighlightColor(new Color(170, 170, 255));
         PRIMARY_LOCATIONS.forEach(bodyLocation -> {
-            if (patient.isLocationMissing(bodyLocation) && !patient.isLocationMissing(bodyLocation.Parent())) {
+            if (patient.isLocationMissing(bodyLocation)
+                      && !patient.isLocationMissing(bodyLocation.Parent())) {
                 doll.setLocTag(bodyLocation, "lost");
             } else if (!patient.isLocationMissing(bodyLocation)) {
                 InjuryLevel level = getMaxInjuryLevel(bodyLocation);
                 Color color = switch (level) {
                     case CHRONIC -> new Color(255, 204, 255, 128); // 50% alpha
-                    case DEADLY -> new Color(Color.RED.getRed(), Color.RED.getGreen(), Color.RED.getBlue(), 128);
-                    case MAJOR ->
-                          new Color(Color.ORANGE.getRed(), Color.ORANGE.getGreen(), Color.ORANGE.getBlue(), 128);
-                    case MINOR ->
-                          new Color(Color.YELLOW.getRed(), Color.YELLOW.getGreen(), Color.YELLOW.getBlue(), 128);
+                    case DEADLY -> new Color(Color.RED.getRed(),
+                          Color.RED.getGreen(), Color.RED.getBlue(), 128);
+                    case MAJOR -> new Color(Color.ORANGE.getRed(),
+                          Color.ORANGE.getGreen(),
+                          Color.ORANGE.getBlue(), 128);
+                    case MINOR -> new Color(Color.YELLOW.getRed(),
+                          Color.YELLOW.getGreen(),
+                          Color.YELLOW.getBlue(), 128);
                     default -> null;
                 };
                 doll.setLocColor(bodyLocation, color);
@@ -782,10 +1132,22 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         panel.add(doll);
     }
 
+    /**
+     * Determines the highest visible injury level found amongst injuries mapped to the given primary body location.
+     *
+     * @param bodyLocation the location to check
+     *
+     * @return the maximum {@link InjuryLevel}, or {@link InjuryLevel#NONE} if no visible injuries are present
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private InjuryLevel getMaxInjuryLevel(BodyLocation bodyLocation) {
         InjuryLevel maxLevel = InjuryLevel.NONE;
 
-        for (Injury injury : injuriesMappedToPrimaryLocations.getOrDefault(bodyLocation, new ArrayList<>())) {
+        for (Injury injury :
+              injuriesMappedToPrimaryLocations.getOrDefault(
+                    bodyLocation, new ArrayList<>())) {
             if (!injury.isHidden()) {
                 if (injury.getLevel().ordinal() > maxLevel.ordinal()) {
                     maxLevel = injury.getLevel();
@@ -797,11 +1159,19 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     }
 
     /**
-     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     * Forces the preferences for this dialog to be tracked in MekHQ instead of MegaMek, allowing its position and size
+     * to be remembered between runs.
+     *
+     * @param dialog the dialog whose preferences are being managed
+     *
+     * @author Illiani
+     * @since 0.50.10
      */
     private void setPreferences(JDialog dialog) {
         try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AdvancedReplacementLimbDialog.class);
+            PreferencesNode preferences =
+                  MekHQ.getMHQPreferences()
+                        .forClass(AdvancedReplacementLimbDialog.class);
             dialog.setName("AdvancedReplacementLimbDialog");
             preferences.manage(new JWindowPreference(dialog));
         } catch (Exception ex) {
@@ -809,5 +1179,3 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
     }
 }
-
-

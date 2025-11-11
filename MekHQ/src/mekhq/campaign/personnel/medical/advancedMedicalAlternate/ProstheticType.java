@@ -53,6 +53,20 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 
+/**
+ * Enumeration representing the various types of prosthetics and artificial body replacements available in the Alternate
+ * Advanced Medical system.
+ *
+ * <p>Each {@code ProstheticType} entry defines attributes such as its base cost, required surgery level, associated
+ * {@link InjuryType}, and availability across different eras and factions. These values are used by the MekHQ medical
+ * framework to determine purchase cost, eligibility, and in-game behavior.</p>
+ *
+ * <p>Prosthetic types range from crude wooden limbs to advanced cloned or myomer replacements. Each type also
+ * encodes its associated technology rating, factional exclusivity, and temporal availability.</p>
+ *
+ * @author Illiani
+ * @since 0.50.10
+ */
 public enum ProstheticType {
     WOODEN_ARM("WOODEN_ARM",
           1,
@@ -348,19 +362,38 @@ public enum ProstheticType {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ProstheticType";
 
-    // Availability multipliers
+    // Era boundaries
     private static final int EARLY_ERA_CUTOFF = 2800;
     private static final int LATE_ERA_START = 3051;
 
-    private static final double AVAILABILITY_MULTIPLIER_A = 1.0; // Very Common
-    private static final double AVAILABILITY_MULTIPLIER_B = 1.0; // Common
-    private static final double AVAILABILITY_MULTIPLIER_C = 1.0; // Uncommon
-    private static final double AVAILABILITY_MULTIPLIER_D = 1.25; // Rare
-    private static final double AVAILABILITY_MULTIPLIER_E = 1.5; // Very Rare
-    private static final double AVAILABILITY_MULTIPLIER_F = 10.0; // Unique
-    private static final double AVAILABILITY_MULTIPLIER_F_STAR = 0.0; // Unavailable
-    private static final double AVAILABILITY_MULTIPLIER_X = 0.0; // Unavailable
+    // Availability cost multipliers
+    private static final double AVAILABILITY_MULTIPLIER_A = 1.0;
+    private static final double AVAILABILITY_MULTIPLIER_B = 1.0;
+    private static final double AVAILABILITY_MULTIPLIER_C = 1.0;
+    private static final double AVAILABILITY_MULTIPLIER_D = 1.25;
+    private static final double AVAILABILITY_MULTIPLIER_E = 1.5;
+    private static final double AVAILABILITY_MULTIPLIER_F = 10.0;
+    private static final double AVAILABILITY_MULTIPLIER_F_STAR = 0.0;
+    private static final double AVAILABILITY_MULTIPLIER_X = 0.0;
 
+    /**
+     * Constructs a new {@code ProstheticType} entry.
+     *
+     * @param lookupName        the resource key for localization and lookup
+     * @param prostheticType    the prosthetic tier (as per ATOW)
+     * @param surgeryLevel      the minimum medical skill or facility level required
+     * @param injuryType        the injury this prosthetic 'inflicts'
+     * @param baseCost          the base market price before modifiers (as per ATOW)
+     * @param technologyRating  the required technology rating for construction (as per ATOW)
+     * @param availabilityEarly availability rating for early eras (pre-2800) (as per ATOW)
+     * @param availabilityMid   availability rating for middle eras (2800–3050) (as per ATOW)
+     * @param availabilityLate  availability rating for late eras (3051+) (as per ATOW)
+     * @param isClanOnly        whether this item is exclusive to Clan factions (as per ATOW)
+     * @param isComStarOnly     whether this item is exclusive to ComStar/Word of Blake factions (as per ATOW)
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     ProstheticType(String lookupName, int prostheticType, int surgeryLevel, InjuryType injuryType, Money baseCost,
           TechRating technologyRating, AvailabilityValue availabilityEarly, AvailabilityValue availabilityMid,
           AvailabilityValue availabilityLate, boolean isClanOnly, boolean isComStarOnly) {
@@ -377,81 +410,107 @@ public enum ProstheticType {
         this.isComStarOnly = isComStarOnly;
     }
 
+    /** @return the prosthetic classification. */
     public int getProstheticType() {
         return prostheticType;
     }
 
+    /** @return the minimum surgical skill required. */
     public int getSurgeryLevel() {
         return surgeryLevel;
     }
 
+    /**
+     * Retrieves all valid body locations this prosthetic can replace, as defined by its associated {@link InjuryType}.
+     *
+     * @return a set of {@link BodyLocation} values eligible for replacement.
+     */
     public Set<BodyLocation> getEligibleLocations() {
         return injuryType.getAllowedLocations();
     }
 
+    /** @return the {@link InjuryType} this prosthetic 'inflicts'. */
     public InjuryType getInjuryType() {
         return injuryType;
     }
 
+    /** @return the base unmodified cost of this prosthetic. */
     public Money getBaseCost() {
         return baseCost;
     }
 
-    public TechRating getTechnologyRating() {
-        return technologyRating;
-    }
-
-    public AvailabilityValue getAvailabilityEarly() {
-        return availabilityEarly;
-    }
-
-    public AvailabilityValue getAvailabilityMid() {
-        return availabilityMid;
-    }
-
-    public AvailabilityValue getAvailabilityLate() {
-        return availabilityLate;
-    }
-
-    public boolean isClanOnly() {
-        return isClanOnly;
-    }
-
-    public boolean isComStarOnly() {
-        return isComStarOnly;
-    }
-
+    /**
+     * Determines if the given faction can access this prosthetic type.
+     *
+     * @param campaignFaction the faction to check
+     *
+     * @return {@code true} if the faction can access this prosthetic type; otherwise {@code false}.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public boolean isAvailableToFaction(Faction campaignFaction) {
         if (!campaignFaction.isClan() && isClanOnly) {
             return false;
         }
-
         return campaignFaction.isComStarOrWoB() || !isComStarOnly;
     }
 
+    /**
+     * Checks if this prosthetic is available for purchase or use based on the current location and planetary tech
+     * rating.
+     *
+     * @param currentLocation the campaign's current location
+     * @param today           the in-game date
+     *
+     * @return {@code true} if available in the current location and era
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public boolean isAvailableInCurrentLocation(CurrentLocation currentLocation, LocalDate today) {
-        // If the campaign is in transit, we treat them as Technology Rating B
         if (!currentLocation.isOnPlanet()) {
+            // In transit: availability limited to rating B or lower
             return !technologyRating.isBetterThan(TechRating.B);
         }
-        // Otherwise, we check based on the Technology Rating of the current planet
+
         Planet planet = currentLocation.getPlanet();
         TechRating planetTechRating = planet.getTechRating(today);
-        // There is a minimum tech rating of B
-        planetTechRating = planetTechRating.isBetterThan(TechRating.B) ? planetTechRating : TechRating.B;
-
+        if (!planetTechRating.isBetterThan(TechRating.B)) {
+            planetTechRating = TechRating.B;
+        }
         return !technologyRating.isBetterThan(planetTechRating);
     }
 
+    /**
+     * Calculates the adjusted cost for this prosthetic based on the game year. The price may vary depending on its
+     * availability in that era.
+     *
+     * @param gameYear the current in-game year
+     *
+     * @return the adjusted cost, or {@code null} if the item is not available
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public @Nullable Money getCost(int gameYear) {
         double availabilityMultiplier = getAvailabilityMultiplier(gameYear);
-        if (availabilityMultiplier == 0.0) { // Not available for purchase
+        if (availabilityMultiplier == 0.0) {
             return null;
         }
-
         return baseCost.multipliedBy(availabilityMultiplier);
     }
 
+    /**
+     * Returns the price multiplier for this prosthetic based on its availability rating in the specified year.
+     *
+     * @param gameYear the current in-game year
+     *
+     * @return a multiplier representing rarity and availability
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public double getAvailabilityMultiplier(int gameYear) {
         AvailabilityValue availability = getAvailability(gameYear);
         return switch (availability) {
@@ -466,6 +525,16 @@ public enum ProstheticType {
         };
     }
 
+    /**
+     * Determines which {@link AvailabilityValue} applies for a given year.
+     *
+     * @param gameYear the current in-game year
+     *
+     * @return the effective {@link AvailabilityValue} for that era
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private AvailabilityValue getAvailability(int gameYear) {
         if (gameYear < EARLY_ERA_CUTOFF) {
             return availabilityEarly;
@@ -476,18 +545,32 @@ public enum ProstheticType {
         }
     }
 
+    /**
+     * Returns the localized display name for this prosthetic type.
+     *
+     * @return the translated name string
+     */
     @Override
     public String toString() {
         return getTextAt(RESOURCE_BUNDLE, "ProstheticType." + lookupName + ".name");
     }
 
+    /**
+     * Builds a localized tooltip summarizing key information about this prosthetic, including cost, surgical
+     * requirements, and attribute modifiers.
+     *
+     * @param gameYear the current in-game year for cost and availability calculation
+     *
+     * @return a formatted tooltip string suitable for UI display
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public String getTooltip(int gameYear) {
-        // Map attributes to their aggregated modifiers
         Map<SkillAttribute, Integer> attributeTotals = new EnumMap<>(SkillAttribute.class);
-
-        // Aggregate modifiers
         InjuryEffect effect = injuryType.getInjuryEffect();
         int perception = effect.getPerceptionModifier();
+
         addToMap(attributeTotals, SkillAttribute.STRENGTH, effect.getStrengthModifier());
         addToMap(attributeTotals, SkillAttribute.BODY, effect.getBodyModifier());
         addToMap(attributeTotals, SkillAttribute.REFLEXES, effect.getReflexesModifier());
@@ -496,11 +579,8 @@ public enum ProstheticType {
         addToMap(attributeTotals, SkillAttribute.WILLPOWER, effect.getWillpowerModifier());
         addToMap(attributeTotals, SkillAttribute.CHARISMA, effect.getCharismaModifier());
 
-        // Build tooltip
         List<String> tooltipPortion = new ArrayList<>();
-
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.skill",
-              surgeryLevel));
+        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.skill", surgeryLevel));
 
         Money cost = getCost(gameYear);
         if (cost != null) {
@@ -509,8 +589,7 @@ public enum ProstheticType {
         }
 
         if (perception != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "ProstheticType.tooltip.perception", perception));
+            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.perception", perception));
         }
 
         for (SkillAttribute attribute : SkillAttribute.values()) {
@@ -524,6 +603,16 @@ public enum ProstheticType {
         return String.join(" ", tooltipPortion);
     }
 
+    /**
+     * Utility method for aggregating skill attribute modifiers.
+     *
+     * @param map   the aggregation map
+     * @param key   the skill attribute being modified
+     * @param value the modifier to add (ignored if zero)
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private static void addToMap(Map<SkillAttribute, Integer> map, SkillAttribute key, int value) {
         map.merge(key, value, Integer::sum);
     }
