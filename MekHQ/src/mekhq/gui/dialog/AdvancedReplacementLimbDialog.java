@@ -35,6 +35,7 @@ import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
 import mekhq.gui.view.PaperDoll;
 
@@ -81,6 +82,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private final Map<BodyLocation, List<Injury>> injuriesMappedToPrimaryLocations = new HashMap<>();
     private final Map<BodyLocation, List<ProstheticType>> treatmentOptions = new HashMap<>();
     private final Map<BodyLocation, JComboBox<ProstheticType>> treatmentSelections = new HashMap<>();
+    private RoundedJButton confirmButton;
     private boolean wasConfirmed = false;
     private JLabel summaryLabel;
 
@@ -186,15 +188,15 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(PADDING / 2, PADDING, PADDING, PADDING));
 
-        JButton cancelButton = new JButton(getTextAt(RESOURCE_BUNDLE,
+        RoundedJButton cancelButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "AdvancedReplacementLimbDialog.button.cancel"));
         cancelButton.addActionListener(evt -> dispose());
 
-        JButton documentationButton = new JButton(getTextAt(RESOURCE_BUNDLE,
+        RoundedJButton documentationButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "AdvancedReplacementLimbDialog.button.documentation"));
         documentationButton.addActionListener(this::onDocumentation);
 
-        JButton confirmButton = new JButton(getTextAt(RESOURCE_BUNDLE,
+        confirmButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "AdvancedReplacementLimbDialog.button.confirm"));
         confirmButton.addActionListener(this::onConfirm);
 
@@ -298,6 +300,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         if (isUseLocalSurgeon) {
             totalCost = totalCost.multipliedBy(10);
         }
+
+        confirmButton.setEnabled(campaign.getFunds().isGreaterOrEqualThan(totalCost));
 
         List<String> summary = new ArrayList<>();
         if (selectedCount > 0) {
