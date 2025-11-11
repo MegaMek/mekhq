@@ -1054,7 +1054,8 @@ public enum PersonnelTableModelColumn {
             case IMPLANT_COUNT:
                 return Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
             case LOYALTY:
-                return String.valueOf(person.getAdjustedLoyalty(campaign.getFaction()));
+                return String.valueOf(person.getAdjustedLoyalty(campaign.getFaction(),
+                      campaignOptions.isUseAlternativeAdvancedMedical()));
             case EDUCATION:
                 return person.getEduHighestEducation().toString();
             case AGGRESSION:
