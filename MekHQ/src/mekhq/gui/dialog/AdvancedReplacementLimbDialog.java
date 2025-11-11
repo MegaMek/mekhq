@@ -820,7 +820,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         if (isUseLocalSurgeon) {
             surgeon = new Person(campaign);
             surgeon.addSkill(S_SURGERY, surgeryLevelNeeded + 1, 0);
-            surgeon.setEdge(1); // We don't want Local Surgeons to be
+            surgeon.setEdge(1); // We don't want Local Surgeons to be completely ineffective
             surgeon.setCurrentEdge(1);
         }
     }
