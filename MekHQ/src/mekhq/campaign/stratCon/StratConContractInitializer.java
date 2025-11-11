@@ -292,7 +292,7 @@ public class StratConContractInitializer {
         int scenarioOdds = getScenarioOdds(contractDefinition);
         if (isUseAltAdvancedMedical) {
             // With Alt Advanced medical scenarios are much more dangerous, we reduce the tempo to account for this
-            scenarioOdds = max(5, (int) round(scenarioOdds * 0.66));
+            scenarioOdds = max(5, (int) round(scenarioOdds * 0.8));
         }
         return scenarioOdds;
     }
