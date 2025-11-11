@@ -2058,14 +2058,16 @@ public class Person {
     /**
      * Calculates and returns the adjusted loyalty value for the given campaign faction.
      *
-     * @param campaignFaction the campaign {@link Faction} being compared with the origin {@link Faction}
+     * @param campaignFaction                     the campaign {@link Faction} being compared with the origin
+     *                                            {@link Faction}
+     * @param isAlternativeAdvancedMedicalEnabled {@code true} if advanced medical's alternate mode is enabled
      *
      * @return the loyalty value adjusted based on the provided campaign {@link Faction}
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public int getAdjustedLoyalty(Faction campaignFaction) {
+    public int getAdjustedLoyalty(Faction campaignFaction, boolean isAlternativeAdvancedMedicalEnabled) {
         final int LOYALTY_PENALTY_FOR_ANARCHIST = -2;
 
         boolean campaignFactionMatchesOriginFaction = originFaction.equals(campaignFaction);
@@ -2084,6 +2086,19 @@ public class Person {
         boolean hasFactionLoyalty = options.booleanOption(COMPULSION_FACTION_LOYALTY);
         if (hasFactionLoyalty) {
             modifier += campaignFactionMatchesOriginFaction ? 1 : -4;
+        }
+
+        boolean hasBodyModAddiction = options.booleanOption(COMPULSION_BODY_MOD_ADDICTION);
+        if (isAlternativeAdvancedMedicalEnabled && hasBodyModAddiction) {
+            boolean hasProsthetic = false;
+            for (Injury injury : getPermanentInjuries()) {
+                if (injury.getSubType().isProsthetic()) {
+                    hasProsthetic = true;
+                    break;
+                }
+            }
+
+            modifier += hasProsthetic ? 0 : -2;
         }
 
         return loyalty + modifier;

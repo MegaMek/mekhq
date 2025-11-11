@@ -35,6 +35,8 @@ package mekhq.gui.dialog;
 import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_BIONIC_HATE;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_BIOLOGICAL_MACHINIST;
 import static mekhq.campaign.personnel.medical.BodyLocation.*;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.CLONED_LIMB_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.COSMETIC_SURGERY_RECOVERY;
@@ -261,26 +263,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         mainPanel.add(patientName, gridBagConstraints);
 
         // Add location labels and treatment combos
-        int i = 1;
-        for (BodyLocation bodyLocation : VALID_BODY_LOCATIONS) {
-            // Label
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = i;
-            gridBagConstraints.weightx = 0.5;
-            JLabel location = new JLabel(bodyLocation.locationName());
-            mainPanel.add(location, gridBagConstraints);
-
-            // ProstheticType combobox
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = i;
-            gridBagConstraints.weightx = 0.5;
-            List<ProstheticType> options = treatmentOptions.get(bodyLocation);
-            JComboBox<ProstheticType> treatmentComboBox =
-                  createTreatmentComboBox(options);
-            treatmentSelections.put(bodyLocation, treatmentComboBox);
-            mainPanel.add(treatmentComboBox, gridBagConstraints);
-            i++;
-        }
+        addSurgeryComboBoxes(gridBagConstraints, mainPanel);
         leftContainer.add(mainPanel, BorderLayout.CENTER);
         centerContainer.add(leftContainer, BorderLayout.CENTER);
 
@@ -338,6 +321,28 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         updateSummary();
     }
 
+    private void addSurgeryComboBoxes(GridBagConstraints gridBagConstraints, JPanel mainPanel) {
+        int i = 1;
+        for (BodyLocation bodyLocation : VALID_BODY_LOCATIONS) {
+            // Label
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = i;
+            gridBagConstraints.weightx = 0.5;
+            JLabel location = new JLabel(bodyLocation.locationName());
+            mainPanel.add(location, gridBagConstraints);
+
+            // ProstheticType combobox
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = i;
+            gridBagConstraints.weightx = 0.5;
+            List<ProstheticType> options = treatmentOptions.get(bodyLocation);
+            JComboBox<ProstheticType> treatmentComboBox = createTreatmentComboBox(options);
+            treatmentSelections.put(bodyLocation, treatmentComboBox);
+            mainPanel.add(treatmentComboBox, gridBagConstraints);
+            i++;
+        }
+    }
+
     /**
      * Creates a combo box for selecting a prosthetic treatment at a given body location, including tooltips and
      * availability-based disabling.
@@ -366,8 +371,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         // Custom renderer to display "None" for null option and disable items
         // based on location
-        String defaultTooltip = getTextAt(RESOURCE_BUNDLE,
-              "AdvancedReplacementLimbDialog.combo.none.tooltip");
+        String defaultTooltip = getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.combo.none.tooltip");
         comboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list,
@@ -389,8 +393,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
                     // Build tooltip with base info and exclusions
                     String baseTooltip = type.getTooltip(gameYear);
-                    String exclusions =
-                          getExclusions(isOnPlanet, type, gameYear);
+                    String exclusions = getExclusions(isOnPlanet, type, gameYear);
 
                     if (!exclusions.isBlank()) {
                         enabled = false;
@@ -552,11 +555,17 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * @author Illiani
      * @since 0.50.10
      */
-    private String getExclusions(boolean isOnPlanet, ProstheticType selected,
-          int gameYear) {
+    private String getExclusions(boolean isOnPlanet, ProstheticType selected, int gameYear) {
         String tooltip = "";
         // Check if selection should be disabled
-        if (!isOnPlanet && selected.getProstheticType() > 2) {
+        int atowProstheticType = selected.getProstheticType();
+        boolean hasHatredOfBionics = patient.getOptions().booleanOption(COMPULSION_BIONIC_HATE);
+        if (hasHatredOfBionics && atowProstheticType > 2) {
+            tooltip += getTextAt(RESOURCE_BUNDLE,
+                  "AdvancedReplacementLimbDialog.exclusions.refused");
+        }
+
+        if (!isOnPlanet && atowProstheticType > 2) {
             tooltip += getTextAt(RESOURCE_BUNDLE,
                   "AdvancedReplacementLimbDialog.exclusions.planet");
         }
@@ -624,8 +633,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         // Then perform the surgery skill checks
         List<PlannedSurgery> successfulSurgeries = new ArrayList<>();
         List<PlannedSurgery> unsuccessfulSurgeries = new ArrayList<>();
-        performSurgerySkillChecks(prioritizedSurgeries, successfulSurgeries,
-              unsuccessfulSurgeries);
+        performSurgerySkillChecks(prioritizedSurgeries, successfulSurgeries, unsuccessfulSurgeries);
 
         // Then perform the actual surgeries
         boolean useKinderMode =
@@ -824,12 +832,13 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * @since 0.50.10
      */
     private void performSurgerySkillChecks(List<PlannedSurgery> prioritizedSurgeries,
-          List<PlannedSurgery> successfulSurgeries,
-          List<PlannedSurgery> unsuccessfulSurgeries) {
+          List<PlannedSurgery> successfulSurgeries, List<PlannedSurgery> unsuccessfulSurgeries) {
+        boolean hasMachinistSPA = surgeon.getOptions().booleanOption(UNOFFICIAL_BIOLOGICAL_MACHINIST);
+
         for (PlannedSurgery surgery : new ArrayList<>(prioritizedSurgeries)) {
-            SkillCheckUtility skillCheckUtility =
-                  new SkillCheckUtility(surgeon, S_SURGERY, List.of(),
-                        0, true, false);
+            int spaModifier = surgery.type != COSMETIC_SURGERY && hasMachinistSPA ? -2 : 0;
+            SkillCheckUtility skillCheckUtility = new SkillCheckUtility(surgeon, S_SURGERY, List.of(),
+                  spaModifier, true, false);
             campaign.addReport(skillCheckUtility.getResultsText());
             if (skillCheckUtility.isSuccess()) {
                 successfulSurgeries.add(surgery);
@@ -962,8 +971,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      */
     private void gatherTreatmentOptions() {
         for (BodyLocation location : VALID_BODY_LOCATIONS) {
-            List<ProstheticType> eligibleTreatments =
-                  getEligibleTreatments(location);
+            List<ProstheticType> eligibleTreatments = getEligibleTreatments(location);
             treatmentOptions.put(location, eligibleTreatments);
         }
     }
