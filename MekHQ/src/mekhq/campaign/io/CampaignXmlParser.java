@@ -541,6 +541,15 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                       person.getHyperlinkedFullTitle());
                 campaign.addReport(report);
             }
+
+            if (Person.updateSkillsForVehicleCrewProfession(today, person, person.getPrimaryRole(), true) ||
+                      Person.updateSkillsForVehicleCrewProfession(today, person, person.getSecondaryRole(), false)) {
+                String report = getFormattedTextAt(RESOURCE_BUNDLE, "vehicleCrewProfessionSkillChange",
+                      spanOpeningWithCustomColor(getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle());
+                campaign.addReport(report);
+            }
         }
 
         campaign.getHangar().forEachUnit(unit -> {
