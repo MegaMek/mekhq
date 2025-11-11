@@ -125,14 +125,17 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private int surgeryLevelNeeded = 0;
     private boolean isUseLocalSurgeon;
     private Money totalCost = Money.zero();
+
     private PaperDoll doll;
     private PaperDoll defaultMaleDoll;
     private PaperDoll defaultFemaleDoll;
     private ActionListener dollActionListener;
+
     private final Map<BodyLocation, List<Injury>> relevantInjuries = new HashMap<>();
     private final Map<BodyLocation, List<Injury>> injuriesMappedToPrimaryLocations = new HashMap<>();
     private final Map<BodyLocation, List<ProstheticType>> treatmentOptions = new HashMap<>();
     private final Map<BodyLocation, JComboBox<ProstheticType>> treatmentSelections = new HashMap<>();
+
     private RoundedJButton confirmButton;
     private JLabel summaryLabel;
 
@@ -142,10 +145,14 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
     }
 
-    public AdvancedReplacementLimbDialog(Campaign campaign, Person patient) {
+    public AdvancedReplacementLimbDialog(Campaign campaign, @Nullable Person patient) {
         this.patient = patient;
         this.campaign = campaign;
         surgeon = getSurgeon(campaign.getDoctors()); // can return null
+
+        if (patient == null) {
+            return;
+        }
 
         gatherRelevantInjuries(patient.getInjuries());
         gatherTreatmentOptions();
