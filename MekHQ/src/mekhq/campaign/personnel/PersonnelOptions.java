@@ -146,7 +146,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String COMPULSION_XENOPHOBIA = "compulsion_xenophobia";
     public static final String COMPULSION_ADDICTION = "compulsion_addiction";
     public static final String COMPULSION_BIONIC_HATE = "compulsion_bionic_hate";
-    public static final String COMPULSION_BODY_MOD_ADDICTION = "compulsion_body_mod_addition";
+    public static final String COMPULSION_BODY_MOD_ADDICTION = "compulsion_body_mod_addiction";
 
     public static final String MADNESS_FLASHBACKS = "madness_flashbacks";
     public static final String MADNESS_CONFUSION = "madness_confusion";

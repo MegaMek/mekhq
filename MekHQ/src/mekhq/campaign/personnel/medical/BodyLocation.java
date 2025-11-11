@@ -113,7 +113,7 @@ public enum BodyLocation {
           LEFT_LEG,
           RIGHT_LEG,
           LEFT_FOOT,
-          RIGHT_FEMUR
+          RIGHT_FOOT
     );
 
     /**

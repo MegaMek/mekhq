@@ -104,7 +104,7 @@ public enum InjuryEffect {
     TYPE_6_LIMB_REPLACEMENT("TYPE_6_LIMB_REPLACEMENT", "", 0, 0, 0, 0, 0, 0, 0, 0, false),
     TYPE_2_SENSORY_REPLACEMENT("TYPE_2_SENSORY_REPLACEMENT", "", -1, 0, 0, 0, 0, 0, 0, 0, false),
     TYPE_3_SENSORY_REPLACEMENT("TYPE_3_SENSORY_REPLACEMENT", "", 0, 0, 0, 0, 0, 0, 0, 0, false),
-    TYPE_4_SENSORY_REPLACEMENT("TYPE_3_SENSORY_REPLACEMENT", "", 1, 0, 0, 0, 0, 0, 0, 0, false);
+    TYPE_4_SENSORY_REPLACEMENT("TYPE_4_SENSORY_REPLACEMENT", "", 1, 0, 0, 0, 0, 0, 0, 0, false);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.InjuryEffect";
 
