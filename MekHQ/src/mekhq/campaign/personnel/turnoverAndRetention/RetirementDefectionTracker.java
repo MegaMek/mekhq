@@ -301,7 +301,8 @@ public class RetirementDefectionTracker {
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
                       (!campaign.getCampaignOptions().isUseHideLoyalty())) {
 
-                int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction());
+                int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction(),
+                      campaign.getCampaignOptions().isUseAlternativeAdvancedMedical());
 
                 if (person.isCommander()) {
                     loyaltyScore += 2;
@@ -739,7 +740,8 @@ public class RetirementDefectionTracker {
     private int getBaseTargetNumber(Campaign campaign, Person person) {
         if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
                   (campaign.getCampaignOptions().isUseHideLoyalty())) {
-            int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction());
+            int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction(),
+                  campaign.getCampaignOptions().isUseAlternativeAdvancedMedical());
 
             if (person.isCommander()) {
                 loyaltyScore += 2;
