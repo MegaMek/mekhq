@@ -4204,10 +4204,6 @@ public class Person {
      */
     public static boolean updateSkillsForVehicleProfessions(LocalDate today, Person person, PersonnelRole role,
           boolean isPrimary) {
-        if (role == PersonnelRole.VEHICLE_CREW) { // The old vehicle crew profession is handled differently
-            return updateSkillsForVehicleCrewProfession(today, person, role, isPrimary);
-        }
-
         PersonnelRole newProfession = null;
         String drivingSkillType = null;
         String gunnerySkillType = S_GUN_VEE;
@@ -4280,9 +4276,8 @@ public class Person {
      * Updates skills for personnel with the Vehicle Crew profession by ensuring they have the Mechanic skill.
      *
      * <p>This method is used during XML loading to migrate legacy data. If the person lacks the
-     * {@link SkillType#S_TECH_MECHANIC} skill, it will be added at a level equal to their highest existing vehicle
-     * crew-related skill (e.g., Tech Vee, Gunnery Vee, Piloting Vee, or Driving). This ensures backwards compatibility
-     * when loading older save files.</p>
+     * {@link SkillType#S_TECH_MECHANIC} skill, it will be added at a level 3. This ensures backwards compatibility when
+     * loading older save files.</p>
      *
      * @param today       the current date
      * @param person      the person whose skills should be updated
@@ -4294,7 +4289,7 @@ public class Person {
      * @author Illiani
      * @since 0.50.10
      */
-    private static boolean updateSkillsForVehicleCrewProfession(LocalDate today, Person person,
+    public static boolean updateSkillsForVehicleCrewProfession(LocalDate today, Person person,
           PersonnelRole currentRole,
           boolean isPrimary) {
         if (currentRole != PersonnelRole.VEHICLE_CREW) {
@@ -4303,7 +4298,6 @@ public class Person {
 
         if (!person.hasSkill(S_TECH_MECHANIC)) {
             person.addSkill(S_TECH_MECHANIC, 3, 0);
-            return true;
         }
 
         if (isPrimary) {
@@ -4312,7 +4306,7 @@ public class Person {
             person.setSecondaryRole(PersonnelRole.COMBAT_TECHNICIAN);
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -5748,13 +5742,20 @@ public class Person {
      *       no tech role
      */
     public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
-        int baseTime;
-        if (primaryRole.isTech() && secondaryRole.isNone()) {
-            baseTime = PRIMARY_ROLE_SUPPORT_TIME;
-        } else if (isTechExpanded()) {
-            baseTime = SECONDARY_ROLE_SUPPORT_TIME;
-        } else {
-            return 0;
+        int baseTime = 0;
+
+        if (primaryRole.isTech()) {
+            if (secondaryRole.isNone() || secondaryRole.isCivilian()) {
+                baseTime = PRIMARY_ROLE_SUPPORT_TIME;
+            } else {
+                baseTime = SECONDARY_ROLE_SUPPORT_TIME;
+            }
+        } else if (secondaryRole.isTechSecondary()) {
+            if (primaryRole.isNone() || primaryRole.isCivilian()) {
+                baseTime = PRIMARY_ROLE_SUPPORT_TIME;
+            } else {
+                baseTime = SECONDARY_ROLE_SUPPORT_TIME;
+            }
         }
 
         return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration));
@@ -5958,36 +5959,34 @@ public class Person {
             return;
         }
 
-        // Determine if this is a primary or secondary support role
-        boolean isPrimaryRole = (primaryRole.isTech() || primaryRole.isDoctor()) && secondaryRole.isNone();
-        boolean isBusyTech = (primaryRole.isTech() || primaryRole.isDoctor()) && !secondaryRole.isNone();
-        boolean isSecondaryRole = (isBusyTech || secondaryRole.isTechSecondary() || secondaryRole.isDoctor()) &&
-                                        !isPrimaryRole;
-
         // Personnel without tech or doctor roles have no available time
-        if (!isPrimaryRole && !isSecondaryRole) {
+        if (!isTech() && !isDoctor()) {
             this.minutesLeft = 0;
             this.overtimeLeft = 0;
             return;
         }
 
-        // Doctors get standard support time based on role priority
-        if (isDoctor()) {
-            this.minutesLeft = isPrimaryRole ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME;
-            this.overtimeLeft = isPrimaryRole ? PRIMARY_ROLE_OVERTIME_SUPPORT_TIME
-                                      : SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
-            return;
+        if (primaryRole.isTech() || primaryRole.isDoctor()) {
+            getRoleMinutes(secondaryRole);
+        } else if (secondaryRole.isTechSecondary() || secondaryRole.isDoctor()) {
+            getRoleMinutes(primaryRole);
         }
 
         // Techs get support time adjusted by skill and administration multipliers
-        if (isTech()) {
-            int baseMinutes = isPrimaryRole ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME;
-            int baseOvertime = isPrimaryRole ? PRIMARY_ROLE_OVERTIME_SUPPORT_TIME
-                                     : SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
-
+        if (isTech() && isTechsUseAdministration) {
             double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
-            this.minutesLeft = (int) Math.round(baseMinutes * multiplier);
-            this.overtimeLeft = (int) Math.round(baseOvertime * multiplier);
+            this.minutesLeft = (int) Math.round(minutesLeft * multiplier);
+            this.overtimeLeft = (int) Math.round(overtimeLeft * multiplier);
+        }
+    }
+
+    private void getRoleMinutes(PersonnelRole comparisonRole) {
+        if (comparisonRole.isNone() || comparisonRole.isCivilian()) {
+            this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
+            this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
+        } else {
+            this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
+            this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
     }
 
