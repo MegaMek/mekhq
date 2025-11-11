@@ -223,6 +223,7 @@ public class AlternateInjuries {
     public static final InjuryType REPLACEMENT_LIMB_RECOVERY = new ReplacementLimbRecovery();
     public static final InjuryType REPLACEMENT_ORGAN_RECOVERY = new ReplacementOrganRecovery();
     public static final InjuryType COSMETIC_SURGERY_RECOVERY = new CosmeticSurgeryRecovery();
+    public static final InjuryType FAILED_SURGERY_RECOVERY = new FailedSurgeryRecovery();
 
     // Base injury type classes with common behavior
     private abstract static class BaseInjury extends InjuryType {
@@ -1206,7 +1207,7 @@ public class AlternateInjuries {
                   CHRONIC,
                   NONE,
                   Set.of(INTERNAL)); // A placeholder effect, we replace it later
-            this.maxSeverity = 1;
+            this.maxSeverity = 0; // Prosthetics don't count towards the character's "hits"
             this.injurySubType = InjurySubType.PROSTHETIC;
         }
     }
@@ -1671,6 +1672,17 @@ public class AlternateInjuries {
                   NONE,
                   Set.of(INTERNAL));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COSMETIC_SURGERY_RECOVERY.simpleName");
+        }
+    }
+
+    public static final class FailedSurgeryRecovery extends BaseInjury {
+        FailedSurgeryRecovery() {
+            super(COSMETIC_SURGERY_RECOVERY_HEALING_DAYS, // Not a mistake
+                  false,
+                  MINOR,
+                  NONE,
+                  Set.of(INTERNAL));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FAILED_SURGERY_RECOVERY.simpleName");
         }
     }
 }

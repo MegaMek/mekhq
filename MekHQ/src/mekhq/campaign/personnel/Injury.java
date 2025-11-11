@@ -223,7 +223,7 @@ public class Injury {
     }
 
     public int getHits() {
-        return hits;
+        return getSubType().isProsthetic() ? 0 : hits;
     }
 
     public void setHits(int num) {

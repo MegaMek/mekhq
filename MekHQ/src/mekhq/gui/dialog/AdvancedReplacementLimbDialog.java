@@ -1,3 +1,35 @@
+/*
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
 package mekhq.gui.dialog;
 
 import static java.lang.Math.ceil;
@@ -6,12 +38,16 @@ import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.personnel.medical.BodyLocation.*;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.CLONED_LIMB_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.COSMETIC_SURGERY_RECOVERY;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.FAILED_SURGERY_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.REPLACEMENT_LIMB_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.REPLACEMENT_ORGAN_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.COSMETIC_SURGERY;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -19,6 +55,7 @@ import java.awt.event.ActionListener;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -34,11 +71,14 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.InjuryLevel;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType;
 import mekhq.campaign.personnel.skills.Skill;
@@ -96,7 +136,11 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private RoundedJButton confirmButton;
     private JLabel summaryLabel;
 
-    private record PlannedSurgery(ProstheticType type, BodyLocation location) {}
+    private record PlannedSurgery(ProstheticType type, BodyLocation location) {
+        public String getLabel() {
+            return type.toString() + "-" + location.locationName();
+        }
+    }
 
     public AdvancedReplacementLimbDialog(Campaign campaign, Person patient) {
         this.patient = patient;
@@ -408,43 +452,101 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private void onConfirm(ActionEvent event) {
         dispose();
 
+        // Pay for everything
+        payForSurgeries();
+
         // Get a local surgeon (if applicable)
         getLocalSurgeon();
 
-        // Perform the surgery skill checks
+        // First, prioritize surgeries based on difficulty and expense. This is so that any available Edge is used on
+        // the more important surgeries first.
+        List<PlannedSurgery> prioritizedSurgeries = getPrioritizedSurgeries();
+
+        // Then perform the surgery skill checks
         List<PlannedSurgery> successfulSurgeries = new ArrayList<>();
         List<PlannedSurgery> unsuccessfulSurgeries = new ArrayList<>();
-        performSurgerySkillChecks(successfulSurgeries, unsuccessfulSurgeries);
+        performSurgerySkillChecks(prioritizedSurgeries, successfulSurgeries, unsuccessfulSurgeries);
 
+        // Then perform the actual surgeries
         boolean useKinderMode = campaign.getCampaignOptions().isUseKinderAlternativeAdvancedMedical();
-        for (PlannedSurgery surgery : successfulSurgeries) {
-            performSurgery(surgery, useKinderMode);
+        for (PlannedSurgery surgery : prioritizedSurgeries) {
+            performSurgery(surgery, useKinderMode, successfulSurgeries);
         }
+
+        // Notify the player of the results
+        if (!successfulSurgeries.isEmpty()) {
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG,
+                  "AdvancedReplacementLimbDialog.report.successful",
+                  String.join(", ", successfulSurgeries.stream()
+                                          .map(PlannedSurgery::getLabel)
+                                          .toList())
+            ));
+        }
+
+        if (!unsuccessfulSurgeries.isEmpty()) {
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG,
+                  "AdvancedReplacementLimbDialog.report.unsuccessful",
+                  String.join(", ", unsuccessfulSurgeries.stream()
+                                          .map(PlannedSurgery::getLabel)
+                                          .toList())
+            ));
+        }
+
+        // Check to see if the patient died on the operating table
+        checkForDeath();
     }
 
-    private void performSurgery(PlannedSurgery surgery, boolean useKinderMode) {
+    private void payForSurgeries() {
+        Finances finances = campaign.getFinances();
+        LocalDate today = campaign.getLocalDate();
+        finances.debit(TransactionType.REPAIRS, today, totalCost, getFormattedTextAt(RESOURCE_BUNDLE,
+              "AdvancedReplacementLimbDialog.transaction", patient.getFullTitle()));
+    }
+
+    private void performSurgery(PlannedSurgery surgery, boolean useKinderMode,
+          List<PlannedSurgery> successfulSurgeries) {
         BodyLocation location = surgery.location;
         ProstheticType type = surgery.type;
 
-        // Remove injuries based on the surgery type
-        boolean isBurnRemovalOnly = type == COSMETIC_SURGERY;
-        for (Injury injury : relevantInjuries.getOrDefault(location, new ArrayList<>())) {
-            if (injury != null && (injury.getSubType().isBurn() || !isBurnRemovalOnly)) {
-                patient.removeInjury(injury);
+        if (successfulSurgeries.contains(surgery)) {
+            // Remove injuries based on the surgery type
+            boolean isBurnRemovalOnly = type == COSMETIC_SURGERY;
+            for (Injury injury : relevantInjuries.getOrDefault(location, new ArrayList<>())) {
+                if (injury != null && (injury.getSubType().isBurn() || !isBurnRemovalOnly)) {
+                    patient.removeInjury(injury);
+                }
             }
+
+            // Add the new surgery 'injury'. This is a semi-permanent record of the surgery on the character
+            InjuryType injuryType = type.getInjuryType();
+            Injury injury = injuryType.newInjury(campaign, patient, location, 0);
+            adjustForKinderMode(useKinderMode, injury);
+            patient.addInjury(injury);
+
+            // Add recovery period injuries
+            InjuryType recoveryInjuryType = getRecoveryInjuryType(surgery);
+            Injury recoveryInjury = recoveryInjuryType.newInjury(campaign, patient, INTERNAL, 1);
+            adjustForKinderMode(useKinderMode, recoveryInjury);
+            patient.addInjury(recoveryInjury);
+        } else {
+            // Add failed surgery injury
+            Injury recoveryInjury = FAILED_SURGERY_RECOVERY.newInjury(campaign, patient, INTERNAL, 1);
+            adjustForKinderMode(useKinderMode, recoveryInjury);
+            patient.addInjury(recoveryInjury);
+        }
+    }
+
+    private void checkForDeath() {
+        int deathThreshold = 5;
+        for (Injury injury : patient.getInjuries()) {
+            deathThreshold -= injury.getHits();
         }
 
-        // Add the new surgery 'injury'. This is a semi-permanent record of the surgery on the character
-        InjuryType injuryType = type.getInjuryType();
-        Injury injury = injuryType.newInjury(campaign, patient, location, 1);
-        adjustForKinderMode(useKinderMode, injury);
-        patient.addInjury(injury);
-
-        // Add recovery period injuries
-        InjuryType recoveryInjuryType = getRecoveryInjuryType(surgery);
-        Injury recoveryInjury = recoveryInjuryType.newInjury(campaign, patient, INTERNAL, 1);
-        adjustForKinderMode(useKinderMode, recoveryInjury);
-        patient.addInjury(recoveryInjury);
+        if (deathThreshold < 0) {
+            patient.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+        }
     }
 
     private static InjuryType getRecoveryInjuryType(PlannedSurgery surgery) {
@@ -480,12 +582,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
     }
 
-    private void performSurgerySkillChecks(List<PlannedSurgery> successfulSurgeries,
-          List<PlannedSurgery> unsuccessfulSurgeries) {
-        // First, prioritize surgeries based on difficulty and expense. This is so that any available Edge is used on
-        // the more important surgeries first.
-        List<PlannedSurgery> prioritizedSurgeries = getPrioritizedSurgeries();
-
+    private void performSurgerySkillChecks(List<PlannedSurgery> prioritizedSurgeries,
+          List<PlannedSurgery> successfulSurgeries, List<PlannedSurgery> unsuccessfulSurgeries) {
         for (PlannedSurgery surgery : new ArrayList<>(prioritizedSurgeries)) {
             SkillCheckUtility skillCheckUtility = new SkillCheckUtility(surgeon, S_SURGERY, List.of(), 0, true, false);
             campaign.addReport(skillCheckUtility.getResultsText());
