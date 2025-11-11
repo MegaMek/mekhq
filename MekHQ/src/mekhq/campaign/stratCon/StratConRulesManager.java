@@ -3362,8 +3362,16 @@ public class StratConRulesManager {
             }
 
             if (force.getCombatRoleInMemory().isPatrol()) {
+                boolean allLightUnits = true;
+                for (Unit unit : force.getAllUnitsAsUnits(campaign.getHangar(), false)) {
+                    if (unit.getEntity() != null && unit.getEntity().getWeight() > 35) {
+                        allLightUnits = false;
+                        break;
+                    }
+                }
+
                 int roll = d6();
-                if (roll == 6) {
+                if (allLightUnits && roll == 6) {
                     forcesToUndeploy.add(forceID);
                     campaign.addReport(String.format(resources.getString("patrol.undeployed"), force.getName()));
                     continue;
