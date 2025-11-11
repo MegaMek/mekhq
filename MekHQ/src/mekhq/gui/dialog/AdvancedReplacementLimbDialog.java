@@ -440,7 +440,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     }
 
     private void onDocumentation(ActionEvent e) {
-        GlossaryEntry glossaryEntry = GlossaryEntry.FATIGUE;
+        GlossaryEntry glossaryEntry = GlossaryEntry.PROSTHETICS;
 
         try {
             new NewGlossaryEntryDialog(this, glossaryEntry);

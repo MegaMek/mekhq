@@ -432,12 +432,15 @@ public enum ProstheticType {
     public boolean isAvailableInCurrentLocation(CurrentLocation currentLocation, LocalDate today) {
         // If the campaign is in transit, we treat them as Technology Rating B
         if (!currentLocation.isOnPlanet()) {
-            return !TechRating.B.isBetterThan(technologyRating);
+            return !technologyRating.isBetterThan(TechRating.B);
         }
         // Otherwise, we check based on the Technology Rating of the current planet
         Planet planet = currentLocation.getPlanet();
-        TechRating techRating = planet.getTechRating(today);
-        return !technologyRating.isBetterThan(techRating);
+        TechRating planetTechRating = planet.getTechRating(today);
+        // There is a minimum tech rating of B
+        planetTechRating = planetTechRating.isBetterThan(TechRating.B) ? planetTechRating : TechRating.B;
+
+        return !technologyRating.isBetterThan(planetTechRating);
     }
 
     public @Nullable Money getCost(int gameYear) {
