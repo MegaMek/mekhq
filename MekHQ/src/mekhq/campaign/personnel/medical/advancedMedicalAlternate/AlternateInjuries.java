@@ -77,6 +77,8 @@ public class AlternateInjuries {
     private static final int CLONED_LIMB_HEALING_DAYS = 21; // ATOW pg 316
     private static final int REPLACEMENT_LIMB_HEALING_DAYS = 42; // ATOW pg 316
     private static final int COSMETIC_SURGERY_RECOVERY_HEALING_DAYS = 7; // Internet says 2-3 weeks
+    private static final int ELECTIVE_IMPLANT_RECOVERY_HEALING_DAYS = 90; // ATOW pg 317
+    private static final int ENHANCED_IMAGING_IMPLANT_RECOVERY_HEALING_DAYS = 365; // ATOW pg 317
 
     private static final InjuryLevel SEVER_INJURY_LEVEL = CHRONIC;
     private static final InjuryLevel FRACTURE_INJURY_LEVEL = MAJOR;
@@ -228,6 +230,8 @@ public class AlternateInjuries {
     public static final InjuryType ELECTIVE_MYOMER_HAND = new ElectiveMyomerHand();
     public static final InjuryType ELECTIVE_MYOMER_LEG = new ElectiveMyomerLeg();
     public static final InjuryType ENHANCED_IMAGING = new EnhancedImagingImplant();
+    public static final InjuryType ELECTIVE_IMPLANT_RECOVERY = new ElectiveImplantRecovery();
+    public static final InjuryType EI_IMPLANT_RECOVERY = new EnhancedImagingImplant();
 
     // Base injury type classes with common behavior
     private abstract static class BaseInjury extends InjuryType {
@@ -1741,6 +1745,28 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ENHANCED_IMAGING.simpleName");
             this.allowedLocations = Set.of(HEAD);
             this.injuryEffect = NONE;
+        }
+    }
+
+    public static final class ElectiveImplantRecovery extends BaseInjury {
+        ElectiveImplantRecovery() {
+            super(ELECTIVE_IMPLANT_RECOVERY_HEALING_DAYS, // Not a mistake
+                  false,
+                  MINOR,
+                  NONE,
+                  Set.of(INTERNAL));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_IMPLANT_RECOVERY.simpleName");
+        }
+    }
+
+    public static final class EIImplantRecovery extends BaseInjury {
+        EIImplantRecovery() {
+            super(ENHANCED_IMAGING_IMPLANT_RECOVERY_HEALING_DAYS, // Not a mistake
+                  false,
+                  MINOR,
+                  NONE,
+                  Set.of(INTERNAL));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.EI_IMPLANT_RECOVERY.simpleName");
         }
     }
 }

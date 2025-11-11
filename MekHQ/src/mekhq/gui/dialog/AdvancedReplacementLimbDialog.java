@@ -41,10 +41,13 @@ import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_BIOLOGICAL_MA
 import static mekhq.campaign.personnel.medical.BodyLocation.*;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.CLONED_LIMB_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.COSMETIC_SURGERY_RECOVERY;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.EI_IMPLANT_RECOVERY;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.ELECTIVE_IMPLANT_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.FAILED_SURGERY_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.REPLACEMENT_LIMB_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.REPLACEMENT_ORGAN_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.COSMETIC_SURGERY;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.ENHANCED_IMAGING;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
@@ -788,11 +791,15 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         if (type == COSMETIC_SURGERY) {
             return COSMETIC_SURGERY_RECOVERY;
         } else if (surgery.location.isLimb()) {
-            if (type.getProstheticType() >= 6) {
+            if (type.isElectiveImplant()) {
+                return ELECTIVE_IMPLANT_RECOVERY;
+            } else if (type.getProstheticType() >= 6) {
                 return CLONED_LIMB_RECOVERY;
             } else {
                 return REPLACEMENT_LIMB_RECOVERY;
             }
+        } else if (type == ENHANCED_IMAGING) {
+            return EI_IMPLANT_RECOVERY;
         } else {
             return REPLACEMENT_ORGAN_RECOVERY;
         }

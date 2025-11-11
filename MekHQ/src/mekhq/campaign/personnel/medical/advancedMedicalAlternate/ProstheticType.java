@@ -535,6 +535,12 @@ public enum ProstheticType {
         return associatedPersonnelOptions;
     }
 
+    public boolean isElectiveImplant() {
+        return this == ELECTIVE_MYOMER_ARM ||
+                     this == ELECTIVE_MYOMER_HAND ||
+                     this == ELECTIVE_MYOMER_LEG;
+    }
+
     /**
      * Determines if the given faction can access this prosthetic type.
      *
