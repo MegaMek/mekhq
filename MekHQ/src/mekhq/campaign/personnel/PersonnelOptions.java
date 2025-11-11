@@ -81,6 +81,9 @@ public class PersonnelOptions extends PilotOptions {
     public static final String ATOW_ATTRACTIVE = "atow_attractive";
     public static final String FLAW_UNFIT = "flaw_unfit";
     public static final String ATOW_FIT = "atow_fit";
+    public static final String UNOFFICIAL_GHOST = "unofficial_ghost";
+    public static final String UNOFFICIAL_LOUD_MOUTH = "unofficial_loud_mouth";
+    public static final String UNOFFICIAL_RANGER = "unofficial_ranger";
     public static final String FLAW_POOR_HEARING = "flaw_poor_hearing";
     public static final String ATOW_GOOD_HEARING = "atow_good_hearing";
     public static final String FLAW_POOR_VISION = "flaw_poor_vision";
@@ -226,6 +229,9 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, ATOW_ATTRACTIVE, false);
         addOption(l3a, FLAW_UNFIT, false);
         addOption(l3a, ATOW_FIT, false);
+        addOption(l3a, UNOFFICIAL_GHOST, false);
+        addOption(l3a, UNOFFICIAL_LOUD_MOUTH, false);
+        addOption(l3a, UNOFFICIAL_RANGER, false);
         addOption(l3a, FLAW_POOR_HEARING, false);
         addOption(l3a, ATOW_GOOD_HEARING, false);
         addOption(l3a, FLAW_POOR_VISION, false);

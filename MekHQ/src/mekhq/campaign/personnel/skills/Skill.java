@@ -36,6 +36,7 @@ package mekhq.campaign.personnel.skills;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static megamek.common.options.OptionsConstants.UNOFFICIAL_SENSOR_GEEK;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_SKILL_MODIFIER;
 import static mekhq.campaign.personnel.skills.SkillType.*;
@@ -446,6 +447,31 @@ public class Skill {
         if (Objects.equals(S_INTEREST_THEOLOGY, name)) {
             if (hasReligiousFanaticism) {
                 modifier += 2;
+            }
+        }
+
+        // Sensor Geek
+        if (Objects.equals(S_SENSOR_OPERATIONS, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_SENSOR_GEEK)) {
+                modifier += 2;
+            }
+        }
+
+        // Ranger
+        if (Objects.equals(S_TRACKING, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_RANGER)) {
+                modifier += 1;
+            }
+        }
+
+        // Ranger
+        if (Objects.equals(S_STEALTH, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_GHOST)) {
+                modifier += 1;
+            }
+
+            if (characterOptions.booleanOption(UNOFFICIAL_LOUD_MOUTH)) {
+                modifier -= 1;
             }
         }
 
