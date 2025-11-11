@@ -46,6 +46,7 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.Alternat
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.COSMETIC_SURGERY;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
@@ -227,6 +228,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * @since 0.50.10
      */
     private void initializeUI() {
+        setTitle(getText("accessingTerminal.title"));
         setLayout(new BorderLayout());
 
         // Create center container to hold main panel and right panel side by side
