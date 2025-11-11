@@ -75,6 +75,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
+import mekhq.gui.campaignOptions.optionChangeDialogs.AdvancedScoutingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.FactionStandingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.FatigueTrackingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog;
@@ -518,6 +519,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         boolean oldIsUseFatigue = options.isUseFatigue();
         boolean oldIsUseAdvancedSalvage = options.isUseCamOpsSalvage();
         boolean oldIsUseStratCon = options.isUseStratCon();
+        boolean oldIsUseAdvancedScouting = options.isUseAdvancedScouting() && oldIsUseStratCon;
         boolean oldIsUseDiseases = options.isUseRandomDiseases();
 
         // Everything assumes general tab will be the first applied.
@@ -600,6 +602,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         boolean newIsUseStratCon = options.isUseStratCon();
         if (!isStartUp && newIsUseStratCon && !oldIsUseStratCon) { // Has tracking changed?
             new StratConConvoyCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseAdvancedScouting = options.isUseAdvancedScouting() && newIsUseStratCon;
+        if (!isStartUp && newIsUseAdvancedScouting && !oldIsUseAdvancedScouting) { // Has tracking changed?
+            new AdvancedScoutingCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
         boolean newIsUseDiseases = options.isUseRandomDiseases();

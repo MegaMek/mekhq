@@ -72,6 +72,7 @@ import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGener
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
+import mekhq.gui.campaignOptions.optionChangeDialogs.AdvancedScoutingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.FatigueTrackingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.SalvageCampaignOptionsChangedConfirmationDialog;
@@ -264,6 +265,10 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
                   resources.getString("CompanyGenerationDialog.campaignOptions.stratCon"),
                   true);
             StratConConvoyCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign);
+        }
+
+        if (campaignOptions.isUseAdvancedScouting() && campaignOptions.isUseStratCon()) {
+            AdvancedScoutingCampaignOptionsChangedConfirmationDialog.processFreeSkills(campaign, true);
         }
     }
 
