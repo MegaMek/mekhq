@@ -3,6 +3,7 @@ package mekhq.gui.dialog;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.personnel.medical.BodyLocation.*;
+import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -32,6 +33,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
 import mekhq.gui.view.PaperDoll;
@@ -41,7 +43,9 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvancedReplacementLimbDialog";
 
     private static final int PADDING = scaleForGUI(10);
-    private static final Dimension MAXIMUM_DIALOG_SIZE = scaleForGUI(600, 750);
+    private static final Dimension MAXIMUM_DIALOG_SIZE = scaleForGUI(600, 900);
+    private static final String MALE_PAPER_DOLL = "default_male_paperdoll";
+    private static final String FEMALE_PAPER_DOLL = "default_female_paperdoll";
 
     // The order here is important and any changes will be reflected in the gui
     private static final List<BodyLocation> VALID_BODY_LOCATIONS = List.of(
@@ -66,6 +70,9 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private final Campaign campaign;
     private final Person patient;
     private final Person surgeon; // can be null
+    private int surgeryLevelNeeded = 0;
+    private boolean isUseLocalSurgeon;
+    private Money totalCost = Money.zero();
     private PaperDoll doll;
     private PaperDoll defaultMaleDoll;
     private PaperDoll defaultFemaleDoll;
@@ -141,7 +148,6 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             gridBagConstraints.gridy = i;
             gridBagConstraints.weightx = 0.5;
             List<ProstheticType> options = treatmentOptions.get(bodyLocation);
-            LOGGER.info(bodyLocation.locationName());
             JComboBox<ProstheticType> treatmentComboBox = createTreatmentComboBox(options);
             treatmentSelections.put(bodyLocation, treatmentComboBox);
             mainPanel.add(treatmentComboBox, gridBagConstraints);
@@ -277,43 +283,81 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         return comboBox;
     }
 
-    /**
-     * Updates the summary text based on currently selected treatments in the comboboxes. This method can be called
-     * whenever combobox selections change to provide real-time feedback to the user.
-     */
     private void updateSummary() {
         if (summaryLabel == null) {
             return;
         }
 
-        StringBuilder summary = new StringBuilder("<html>");
-        Money totalCost = Money.zero();
-        int selectedCount = 0;
+        totalCost = Money.zero(); // Reset cost
+        surgeryLevelNeeded = 0; // Reset surgery level needs
+        int selectedCount = getSelectedTreatments().size();
 
-        for (Map.Entry<BodyLocation, JComboBox<ProstheticType>> entry : treatmentSelections.entrySet()) {
-            ProstheticType selected = (ProstheticType) entry.getValue().getSelectedItem();
-            if (selected != null) {
-                selectedCount++;
-                Money cost = selected.getCost(campaign.getGameYear());
-                if (cost != null) {
-                    totalCost = totalCost.plus(cost);
-                }
-            }
+        getSurgeryCostAndSkillRequirements();
+        isUseLocalSurgeon();
+
+        if (isUseLocalSurgeon) {
+            totalCost = totalCost.multipliedBy(10);
         }
 
+        List<String> summary = new ArrayList<>();
         if (selectedCount > 0) {
-            summary.append(getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.status.selected",
+            summary.add(getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.status.selected",
                   selectedCount));
+
+            summary.add(getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.status.difficulty",
+                  surgeryLevelNeeded));
+
+            if (isUseLocalSurgeon) {
+                if (campaign.getLocation().isOnPlanet()) {
+                    summary.add(getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.status.localSurgeon"));
+                } else {
+                    summary.add(getTextAt(RESOURCE_BUNDLE,
+                          "AdvancedReplacementLimbDialog.status.localSurgeon.transit"));
+                }
+            } else {
+                summary.add(getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.status.surgeon",
+                      surgeon.getFullTitle()));
+            }
+
             if (totalCost.isPositive()) {
-                summary.append(getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.status.total",
+                summary.add(getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.status.total",
                       totalCost.toAmountString()));
             }
         } else {
-            summary.append(getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.combo.none.label"));
+            summary.add(" "); // These just ensure the gui stays at the same height
+            summary.add(" ");
+            summary.add(" ");
+            summary.add(" ");
         }
 
-        summary.append("</html>");
-        summaryLabel.setText(summary.toString());
+        summaryLabel.setText("<html>" + String.join("<br>", summary) + "</html>");
+    }
+
+    private void getSurgeryCostAndSkillRequirements() {
+        for (ProstheticType surgeryType : getSelectedTreatments().values()) {
+            int neededSurgeryLevel = surgeryType.getSurgeryLevel();
+            if (neededSurgeryLevel > surgeryLevelNeeded) {
+                surgeryLevelNeeded = neededSurgeryLevel;
+            }
+
+            Money cost = surgeryType.getCost(campaign.getGameYear());
+            if (cost != null) {
+                totalCost = totalCost.plus(cost);
+            }
+        }
+    }
+
+    private void isUseLocalSurgeon() {
+        isUseLocalSurgeon = surgeon == null;
+        if (!isUseLocalSurgeon) {
+            Skill surgerySkill = surgeon.getSkill(S_SURGERY);
+            if (surgerySkill != null) {
+                int totalLevel = surgerySkill.getTotalSkillLevel(surgeon.getSkillModifierData());
+                isUseLocalSurgeon = totalLevel >= surgeryLevelNeeded;
+            } else {
+                isUseLocalSurgeon = true;
+            }
+        }
     }
 
     private String getExclusions(boolean isOnPlanet, ProstheticType selected, int gameYear) {
@@ -415,19 +459,29 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         List<ProstheticType> eligibleTreatments = new ArrayList<>();
         for (ProstheticType type : ProstheticType.values()) {
             if (type.getEligibleLocations().contains(injuryLocation)) {
-                LOGGER.info("VALID:{}", injuryLocation);
                 eligibleTreatments.add(type);
             }
         }
         return eligibleTreatments;
     }
 
+    public Map<BodyLocation, ProstheticType> getSelectedTreatments() {
+        Map<BodyLocation, ProstheticType> selections = new HashMap<>();
+        for (Map.Entry<BodyLocation, JComboBox<ProstheticType>> entry : treatmentSelections.entrySet()) {
+            ProstheticType selectedTreatment = (ProstheticType) entry.getValue().getSelectedItem();
+
+            if (selectedTreatment != null) {
+                selections.put(entry.getKey(), selectedTreatment);
+            }
+        }
+        return selections;
+    }
+
     public void paperDoll() {
         // Preload default paper dolls
         try (InputStream fis = new FileInputStream(campaign.getApp()
                                                          .getIconPackage()
-                                                         .getGuiElement("default_male_paperdoll"))) { // TODO : Remove inline file
-            // path
+                                                         .getGuiElement(MALE_PAPER_DOLL))) {
             defaultMaleDoll = new PaperDoll(fis);
         } catch (IOException e) {
             LOGGER.error("", e);
@@ -435,8 +489,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         try (InputStream fis = new FileInputStream(campaign.getApp()
                                                          .getIconPackage()
-                                                         .getGuiElement("default_female_paperdoll"))) { // TODO : Remove inline file
-            // path
+                                                         .getGuiElement(FEMALE_PAPER_DOLL))) {
             defaultFemaleDoll = new PaperDoll(fis);
         } catch (IOException e) {
             LOGGER.error("", e);
