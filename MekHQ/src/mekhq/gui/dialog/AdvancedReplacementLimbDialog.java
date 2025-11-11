@@ -199,8 +199,12 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 
+        JLabel patientName = new JLabel("<html><h2>" + patient.getFullTitle() + "</h2></html>");
+        mainPanel.add(patientName, gridBagConstraints);
+
+
         // Add location labels and treatment combos
-        int i = 0;
+        int i = 1;
         for (BodyLocation bodyLocation : VALID_BODY_LOCATIONS) {
             // Label
             gridBagConstraints.gridx = 0;
@@ -219,7 +223,6 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             mainPanel.add(treatmentComboBox, gridBagConstraints);
             i++;
         }
-
         leftContainer.add(mainPanel, BorderLayout.CENTER);
         centerContainer.add(leftContainer, BorderLayout.CENTER);
 
