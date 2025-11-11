@@ -224,6 +224,10 @@ public class AlternateInjuries {
     public static final InjuryType REPLACEMENT_ORGAN_RECOVERY = new ReplacementOrganRecovery();
     public static final InjuryType COSMETIC_SURGERY_RECOVERY = new CosmeticSurgeryRecovery();
     public static final InjuryType FAILED_SURGERY_RECOVERY = new FailedSurgeryRecovery();
+    public static final InjuryType ELECTIVE_MYOMER_ARM = new ElectiveMyomerArm();
+    public static final InjuryType ELECTIVE_MYOMER_HAND = new ElectiveMyomerHand();
+    public static final InjuryType ELECTIVE_MYOMER_LEG = new ElectiveMyomerLeg();
+    public static final InjuryType ENHANCED_IMAGING = new EnhancedImagingImplant();
 
     // Base injury type classes with common behavior
     private abstract static class BaseInjury extends InjuryType {
@@ -1683,6 +1687,60 @@ public class AlternateInjuries {
                   NONE,
                   Set.of(INTERNAL));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FAILED_SURGERY_RECOVERY.simpleName");
+        }
+    }
+
+    public static final class ElectiveMyomerArm extends Prosthetic {
+        ElectiveMyomerArm() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName");
+            this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
+            this.injuryEffect = MYOMER_IMPLANT_ARM;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName",
+                  Utilities.capitalize(loc.locationName()));
+        }
+    }
+
+    public static final class ElectiveMyomerHand extends Prosthetic {
+        ElectiveMyomerHand() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName");
+            this.allowedLocations = Set.of(LEFT_HAND, RIGHT_HAND);
+            this.injuryEffect = MYOMER_IMPLANT_HAND;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName",
+                  Utilities.capitalize(loc.locationName()));
+        }
+    }
+
+    public static final class ElectiveMyomerLeg extends Prosthetic {
+        ElectiveMyomerLeg() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName");
+            this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
+            this.injuryEffect = MYOMER_IMPLANT_LEG;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName",
+                  Utilities.capitalize(loc.locationName()));
+        }
+    }
+
+    public static final class EnhancedImagingImplant extends Prosthetic {
+        EnhancedImagingImplant() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ENHANCED_IMAGING.simpleName");
+            this.allowedLocations = Set.of(HEAD);
+            this.injuryEffect = NONE;
         }
     }
 }

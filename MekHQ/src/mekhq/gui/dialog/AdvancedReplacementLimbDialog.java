@@ -35,6 +35,7 @@ package mekhq.gui.dialog;
 import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_BIONIC_HATE;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_BIOLOGICAL_MACHINIST;
 import static mekhq.campaign.personnel.medical.BodyLocation.*;
@@ -111,7 +112,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvancedReplacementLimbDialog";
 
     private static final int PADDING = scaleForGUI(10);
-    private static final Dimension MAXIMUM_DIALOG_SIZE = scaleForGUI(600, 900);
+    private static final Dimension MAXIMUM_DIALOG_SIZE = scaleForGUI(700, 900);
     private static final String MALE_PAPER_DOLL = "default_male_paperdoll";
     private static final String FEMALE_PAPER_DOLL = "default_female_paperdoll";
 
@@ -360,6 +361,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
           List<ProstheticType> options) {
         int gameYear = campaign.getGameYear();
         boolean isOnPlanet = campaign.getLocation().isOnPlanet();
+        boolean isUseKinderMode = campaign.getCampaignOptions().isUseKinderAlternativeAdvancedMedical();
 
         JComboBox<ProstheticType> comboBox = new JComboBox<>();
 
@@ -394,7 +396,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                     setText(type.toString());
 
                     // Build tooltip with base info and exclusions
-                    String baseTooltip = type.getTooltip(gameYear);
+                    String baseTooltip = type.getTooltip(gameYear, isUseKinderMode);
                     String exclusions = getExclusions(isOnPlanet, type, gameYear);
 
                     if (!exclusions.isBlank()) {
@@ -419,7 +421,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             if (selected == null) {
                 comboBox.setToolTipText(defaultTooltip);
             } else {
-                String baseTooltip = selected.getTooltip(gameYear);
+                String baseTooltip = selected.getTooltip(gameYear, isUseKinderMode);
                 baseTooltip += getExclusions(isOnPlanet, selected, gameYear);
                 comboBox.setToolTipText(wordWrap(baseTooltip));
             }
@@ -630,9 +632,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         // Get a local surgeon (if applicable)
         getLocalSurgeon();
 
-        // First, prioritize surgeries based on difficulty and expense. This is
-        // so that any available Edge is used on the more important surgeries
-        // first.
+        // First, prioritize surgeries based on difficulty and expense. This is so that any available Edge is used on
+        // the more important surgeries first.
         List<PlannedSurgery> prioritizedSurgeries = getPrioritizedSurgeries();
 
         // Then perform the surgery skill checks
@@ -641,9 +642,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         performSurgerySkillChecks(prioritizedSurgeries, successfulSurgeries, unsuccessfulSurgeries);
 
         // Then perform the actual surgeries
-        boolean useKinderMode =
-              campaign.getCampaignOptions()
-                    .isUseKinderAlternativeAdvancedMedical();
+        boolean useKinderMode = campaign.getCampaignOptions().isUseKinderAlternativeAdvancedMedical();
         for (PlannedSurgery surgery : prioritizedSurgeries) {
             performSurgery(surgery, useKinderMode, successfulSurgeries);
         }
@@ -651,9 +650,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         // Notify the player of the results
         if (!successfulSurgeries.isEmpty()) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                  spanOpeningWithCustomColor(getPositiveColor()),
-                  CLOSING_SPAN_TAG,
                   "AdvancedReplacementLimbDialog.report.successful",
+                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG,
                   String.join(", ",
                         successfulSurgeries.stream()
                               .map(PlannedSurgery::getLabel)
@@ -663,9 +661,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         if (!unsuccessfulSurgeries.isEmpty()) {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                  spanOpeningWithCustomColor(getPositiveColor()),
-                  CLOSING_SPAN_TAG,
                   "AdvancedReplacementLimbDialog.report.unsuccessful",
+                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG,
                   String.join(", ",
                         unsuccessfulSurgeries.stream()
                               .map(PlannedSurgery::getLabel)
@@ -734,6 +731,18 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                         INTERNAL, 1);
             adjustForKinderMode(useKinderMode, recoveryInjury);
             patient.addInjury(recoveryInjury);
+
+            if (campaign.getCampaignOptions().isUseImplants()) {
+                for (String implant : type.getAssociatedPilotOptions()) {
+                    patient.getOptions().acquireAbility(LVL3_ADVANTAGES, implant, true);
+                }
+            }
+
+            if (campaign.getCampaignOptions().isUseAbilities()) {
+                for (String option : type.getAssociatedPersonnelOptions()) {
+                    patient.getOptions().acquireAbility(LVL3_ADVANTAGES, option, true);
+                }
+            }
         } else {
             // Add failed surgery injury
             Injury recoveryInjury =
