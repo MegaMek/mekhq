@@ -720,7 +720,7 @@ public class SalvagePostScenarioPicker {
      * <ul>
      *   <li>Any salvage assignment has invalid validation (insufficient capacity, missing naval tug)</li>
      *   <li>For contracts: the player's salvage percentage exceeds the contract limit</li>
-     *   <li>The available remaining minutes is less than or equal to zero</li>
+     *   <li>The used minutes exceed the available minutes</li>
      * </ul>
      *
      * <p>When the salvage percentage is exceeded, the unit salvage label is also colored red.</p>
@@ -736,7 +736,7 @@ public class SalvagePostScenarioPicker {
      */
     private void updateConfirmButtonState(List<SalvageComboBoxGroup> salvageComboBoxGroups, JButton confirmButton,
           JLabel unitSalvageLabel, JLabel salvageTimeLabel, boolean isContract) {
-        boolean shouldEnable = maximumSalvageTime > 0;
+        boolean shouldEnable = true;
 
         // Check for any invalid units
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
