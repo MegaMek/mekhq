@@ -35,7 +35,7 @@ package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
-import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
+import static mekhq.campaign.personnel.medical.BodyLocation.HEAD;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.ENHANCED_IMAGING_IMPLANT;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.ENHANCED_IMAGING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -73,7 +73,7 @@ public class AdvancedMedicalAlternate {
     static final int MAXIMUM_INJURY_DURATION_MULTIPLIER = 3;
 
     private static final Map<BodyLocation, BodyRegion> BODY_LOCATION_BODY_REGION_MAP = Map.ofEntries(
-          Map.entry(BodyLocation.HEAD, BodyRegion.HEAD),
+          Map.entry(HEAD, BodyRegion.HEAD),
           Map.entry(BodyLocation.LEFT_HAND, BodyRegion.LEFT_HAND),
           Map.entry(BodyLocation.LEFT_ARM, BodyRegion.LEFT_ARM),
           Map.entry(BodyLocation.RIGHT_HAND, BodyRegion.RIGHT_HAND),
@@ -470,7 +470,7 @@ public class AdvancedMedicalAlternate {
      * @param person   the {@link Person} receiving the Enhanced Imaging implant
      */
     public static void giveEIImplant(Campaign campaign, Person person) {
-        Injury injury = ENHANCED_IMAGING_IMPLANT.newInjury(campaign, person, INTERNAL, 0);
+        Injury injury = ENHANCED_IMAGING_IMPLANT.newInjury(campaign, person, HEAD, 0);
         person.addInjury(injury);
 
         if (campaign.getCampaignOptions().isUseImplants()) {
