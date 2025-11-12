@@ -398,7 +398,6 @@ class ForceTest {
             force1.addSubForce(force2, true);
             force1.defaultFormationLevelForForce(mockCampaign);
 
-
             // Assert
             assertEquals(FormationLevel.parseFromDepth(mockCampaign, 1), force1.getFormationLevel());
             assertEquals(FormationLevel.parseFromDepth(mockCampaign, 0), force2.getFormationLevel());
