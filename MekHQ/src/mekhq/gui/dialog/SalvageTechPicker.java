@@ -126,11 +126,12 @@ public class SalvageTechPicker extends JDialog {
      * @param techs                list of available technicians to display. When {@code null} or empty, only
      *                             instructions and a Cancel button are shown.
      * @param alreadySelectedTechs list of tech UUIDs that should start as pre-selected.
+     * @param isClanCampaign       {@code true} if the campaign is Clan affiliated
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public SalvageTechPicker(List<SalvageTechData> techs, List<UUID> alreadySelectedTechs) {
+    public SalvageTechPicker(List<SalvageTechData> techs, List<UUID> alreadySelectedTechs, boolean isClanCampaign) {
         setTitle(getText("accessingTerminal.title"));
         setModal(true);
         setLayout(new BorderLayout());
@@ -148,7 +149,7 @@ public class SalvageTechPicker extends JDialog {
         add(instructionsPanel, BorderLayout.NORTH);
 
         // Table in the center
-        tableModel = new SalvageTechTableModel(techs, alreadySelectedTechs);
+        tableModel = new SalvageTechTableModel(techs, alreadySelectedTechs, isClanCampaign);
         JTable table = new JTable(tableModel);
         table.setAutoCreateRowSorter(true);
 
@@ -209,11 +210,10 @@ public class SalvageTechPicker extends JDialog {
               });
 
         // Center align all other columns
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         for (int i = 0; i < table.getColumnCount(); i++) {
             if (i != SalvageTechTableModel.COL_SELECT) {
-                table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+                DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+                centerRenderer.setHorizontalAlignment(JLabel.CENTER);
             }
         }
     }
@@ -391,6 +391,7 @@ public class SalvageTechPicker extends JDialog {
 
         private final List<SalvageTechData> techs;
         private final boolean[] selected;
+        private final boolean isClanCampaign;
 
         private static final String[] COLUMN_NAMES = {
               getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.select"),
@@ -410,13 +411,16 @@ public class SalvageTechPicker extends JDialog {
          *
          * @param techs                list of rows to display (required, not {@code null})
          * @param alreadySelectedTechs UUIDs to pre-select; may be {@code null}
+         * @param isClanCampaign       {@code true} if the campaign is Clan affiliated
          *
          * @author Illiani
          * @since 0.50.10
          */
-        public SalvageTechTableModel(List<SalvageTechData> techs, List<UUID> alreadySelectedTechs) {
+        public SalvageTechTableModel(List<SalvageTechData> techs, List<UUID> alreadySelectedTechs,
+              boolean isClanCampaign) {
             this.techs = techs;
             this.selected = new boolean[techs.size()];
+            this.isClanCampaign = isClanCampaign;
 
             // Pre-select checkboxes for techs that are already selected
             for (int i = 0; i < techs.size(); i++) {
@@ -468,8 +472,8 @@ public class SalvageTechPicker extends JDialog {
                 case COL_FIRST_NAME -> data.firstName();
                 case COL_LAST_NAME -> data.lastName();
                 case COL_SKILL_LEVEL -> data.skillLevelName();
-                case COL_PRIMARY_PROFESSION -> data.primaryRole();
-                case COL_SECONDARY_PROFESSION -> data.secondaryRole();
+                case COL_PRIMARY_PROFESSION -> data.primaryRole().getLabel(isClanCampaign);
+                case COL_SECONDARY_PROFESSION -> data.secondaryRole().getLabel(isClanCampaign);
                 case COL_UNITS -> data.techUnits().size();
                 case COL_INJURIES -> data.injuries();
                 case COL_MINUTES_AVAILABLE -> data.minutesAvailable();

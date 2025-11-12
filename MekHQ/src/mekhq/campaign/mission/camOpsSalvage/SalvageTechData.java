@@ -58,7 +58,7 @@ public record SalvageTechData(Person tech, UUID techId, String rank, int rankNum
               tech.getRankNumeric(),
               tech.getPrimaryRole(),
               tech.getSecondaryRole(),
-              techUnits,
+              List.copyOf(techUnits),
               tech.getFirstName(),
               tech.getLastName(),
               tech.getSkillLevel(campaign, isSecondaryTech, true).toString(),
