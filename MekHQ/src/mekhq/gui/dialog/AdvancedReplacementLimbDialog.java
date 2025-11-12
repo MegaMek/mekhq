@@ -729,9 +729,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
             // Add recovery period injuries
             InjuryType recoveryInjuryType = getRecoveryInjuryType(surgery);
-            Injury recoveryInjury =
-                  recoveryInjuryType.newInjury(campaign, patient,
-                        INTERNAL, 1);
+            Injury recoveryInjury = recoveryInjuryType.newInjury(campaign, patient, INTERNAL, 1);
             adjustForKinderMode(useKinderMode, recoveryInjury);
             patient.addInjury(recoveryInjury);
 
@@ -754,6 +752,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             adjustForKinderMode(useKinderMode, recoveryInjury);
             patient.addInjury(recoveryInjury);
         }
+
+        campaign.personUpdated(patient);
     }
 
     /**

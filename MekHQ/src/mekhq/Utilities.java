@@ -435,12 +435,12 @@ public class Utilities {
         return max(target, 0);
     }
 
-    public static Map<CrewType, Collection<Person>> genRandomCrewWithCombinedSkill(Campaign c, Unit u,
+    public static Map<CrewType, Collection<Person>> genRandomCrewWithCombinedSkill(Campaign campaign, Unit unit,
           String factionCode) {
-        Objects.requireNonNull(c);
-        Objects.requireNonNull(u);
-        Objects.requireNonNull(u.getEntity(), "Unit needs to have a valid Entity attached");
-        Crew oldCrew = u.getEntity().getCrew();
+        Objects.requireNonNull(campaign);
+        Objects.requireNonNull(unit);
+        Objects.requireNonNull(unit.getEntity(), "Unit needs to have a valid Entity attached");
+        Crew oldCrew = unit.getEntity().getCrew();
 
         int numberPeopleGenerated = 0;
         List<Person> drivers = new ArrayList<>();
@@ -456,89 +456,91 @@ public class Utilities {
         // dialog
 
         // Generate solo crews
-        if (u.usesSoloPilot()) {
+        if (unit.usesSoloPilot()) {
             // region Solo Pilot
-            Person p;
-            if (u.getEntity() instanceof LandAirMek) {
-                p = c.newPerson(PersonnelRole.LAM_PILOT, factionCode, oldCrew.getGender());
-                p.addSkill(SkillType.S_PILOT_MEK,
+            Person person;
+            if (unit.getEntity() instanceof LandAirMek) {
+                person = campaign.newPerson(PersonnelRole.LAM_PILOT, factionCode, oldCrew.getGender());
+                person.addSkill(SkillType.S_PILOT_MEK,
                       SkillType.getType(SkillType.S_PILOT_MEK).getTarget() - oldCrew.getPiloting(),
                       0);
-                p.addSkill(SkillType.S_GUN_MEK,
+                person.addSkill(SkillType.S_GUN_MEK,
                       SkillType.getType(SkillType.S_GUN_MEK).getTarget() - oldCrew.getGunnery(),
                       0);
-                p.addSkill(SkillType.S_PILOT_AERO,
+                person.addSkill(SkillType.S_PILOT_AERO,
                       SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(),
                       0);
-                p.addSkill(SkillType.S_GUN_AERO,
+                person.addSkill(SkillType.S_GUN_AERO,
                       SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(),
                       0);
-            } else if (u.getEntity() instanceof Mek) {
-                p = c.newPerson(PersonnelRole.MEKWARRIOR, factionCode, oldCrew.getGender());
-                p.addSkill(SkillType.S_PILOT_MEK,
+            } else if (unit.getEntity() instanceof Mek) {
+                person = campaign.newPerson(PersonnelRole.MEKWARRIOR, factionCode, oldCrew.getGender());
+                person.addSkill(SkillType.S_PILOT_MEK,
                       SkillType.getType(SkillType.S_PILOT_MEK).getTarget() - oldCrew.getPiloting(),
                       0);
-                p.addSkill(SkillType.S_GUN_MEK,
+                person.addSkill(SkillType.S_GUN_MEK,
                       SkillType.getType(SkillType.S_GUN_MEK).getTarget() - oldCrew.getGunnery(),
                       0);
-            } else if (u.getEntity() instanceof Aero) {
-                p = c.newPerson(PersonnelRole.AEROSPACE_PILOT, factionCode, oldCrew.getGender());
-                p.addSkill(SkillType.S_PILOT_AERO,
+            } else if (unit.getEntity() instanceof Aero) {
+                person = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT, factionCode, oldCrew.getGender());
+                person.addSkill(SkillType.S_PILOT_AERO,
                       SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(),
                       0);
-                p.addSkill(SkillType.S_GUN_AERO,
+                person.addSkill(SkillType.S_GUN_AERO,
                       SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(),
                       0);
-            } else if (u.getEntity() instanceof ConvFighter) {
-                p = c.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT, factionCode, oldCrew.getGender());
-                p.addSkill(SkillType.S_PILOT_JET,
+            } else if (unit.getEntity() instanceof ConvFighter) {
+                person = campaign.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT,
+                      factionCode,
+                      oldCrew.getGender());
+                person.addSkill(SkillType.S_PILOT_JET,
                       SkillType.getType(SkillType.S_PILOT_JET).getTarget() - oldCrew.getPiloting(),
                       0);
-                p.addSkill(SkillType.S_GUN_JET,
+                person.addSkill(SkillType.S_GUN_JET,
                       SkillType.getType(SkillType.S_GUN_JET).getTarget() - oldCrew.getPiloting(),
                       0);
-            } else if (u.getEntity() instanceof ProtoMek) {
-                p = c.newPerson(PersonnelRole.PROTOMEK_PILOT, factionCode, oldCrew.getGender());
-                p.addSkill(SkillType.S_GUN_PROTO,
+            } else if (unit.getEntity() instanceof ProtoMek) {
+                person = campaign.newPerson(PersonnelRole.PROTOMEK_PILOT, factionCode, oldCrew.getGender());
+                person.addSkill(SkillType.S_GUN_PROTO,
                       SkillType.getType(SkillType.S_GUN_PROTO).getTarget() - oldCrew.getGunnery(),
                       0);
-            } else if (u.getEntity() instanceof VTOL) {
-                p = c.newPerson(PersonnelRole.VEHICLE_CREW_VTOL, factionCode, oldCrew.getGender());
-                p.addSkill(SkillType.S_PILOT_VTOL,
+            } else if (unit.getEntity() instanceof VTOL) {
+                person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL, factionCode, oldCrew.getGender());
+                person.addSkill(SkillType.S_PILOT_VTOL,
                       SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(),
                       0);
-                p.addSkill(SkillType.S_GUN_VEE,
+                person.addSkill(SkillType.S_GUN_VEE,
                       SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
                       0);
             } else {
                 // assume tanker if we got here
-                p = c.newPerson(PersonnelRole.VEHICLE_CREW_GROUND, factionCode, oldCrew.getGender());
-                p.addSkill(SkillType.S_PILOT_GVEE,
+                person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND, factionCode, oldCrew.getGender());
+                person.addSkill(SkillType.S_PILOT_GVEE,
                       SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(),
                       0);
-                p.addSkill(SkillType.S_GUN_VEE,
+                person.addSkill(SkillType.S_GUN_VEE,
                       SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
                       0);
             }
 
-            migrateCrewData(p, oldCrew, 0, true);
-            drivers.add(p);
+            migrateCrewData(person, oldCrew, 0, true);
+            drivers.add(person);
             // endregion Solo Pilot
         } else {
             if (oldCrew.getSlotCount() > 1) {
                 // region Multi-Slot Crew
                 for (int slot = 0; slot < oldCrew.getSlotCount(); slot++) {
                     Person p = null;
-                    if (u.getEntity() instanceof Mek) {
-                        p = c.newPerson(PersonnelRole.MEKWARRIOR, factionCode, oldCrew.getGender(slot));
+                    if (unit.getEntity() instanceof Mek) {
+                        p = campaign.newPerson(PersonnelRole.MEKWARRIOR, factionCode, oldCrew.getGender(slot));
                         p.addSkill(SkillType.S_PILOT_MEK,
                               SkillType.getType(SkillType.S_PILOT_MEK).getTarget() - oldCrew.getPiloting(slot),
                               0);
                         p.addSkill(SkillType.S_GUN_MEK,
                               SkillType.getType(SkillType.S_GUN_MEK).getTarget() - oldCrew.getGunnery(slot),
                               0);
-                    } else if (u.getEntity() instanceof Aero) {
-                        p = c.newPerson(PersonnelRole.AEROSPACE_PILOT, factionCode, oldCrew.getGender(slot));
+                    } else if (unit.getEntity() instanceof Aero) {
+                        p = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT, factionCode, oldCrew.getGender(slot));
                         p.addSkill(SkillType.S_PILOT_AERO,
                               SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(slot),
                               0);
@@ -576,37 +578,39 @@ public class Utilities {
                 // but we can't change that because lots of other stuff needs that to be right,
                 // so we will hack
                 // it here to make it the starting squad size
-                int driversNeeded = u.getTotalDriverNeeds();
-                if (u.getEntity() instanceof BattleArmor) {
-                    driversNeeded = ((BattleArmor) u.getEntity()).getSquadSize();
+                int driversNeeded = unit.getTotalDriverNeeds();
+                if (unit.getEntity() instanceof BattleArmor) {
+                    driversNeeded = ((BattleArmor) unit.getEntity()).getSquadSize();
                 }
 
                 for (int slot = 0; slot < driversNeeded; slot++) {
                     Person p;
-                    if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-                        p = c.newPerson(PersonnelRole.VESSEL_PILOT,
+                    if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
+                        p = campaign.newPerson(PersonnelRole.VESSEL_PILOT,
                               factionCode,
                               oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_SPACE,
                               randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() -
                                                           oldCrew.getPiloting()),
                               0);
-                    } else if (u.getEntity() instanceof BattleArmor) {
-                        p = c.newPerson(PersonnelRole.BATTLE_ARMOUR,
+                    } else if (unit.getEntity() instanceof BattleArmor) {
+                        p = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR,
                               factionCode,
                               oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_GUN_BA,
                               randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() -
                                                           oldCrew.getGunnery()),
                               0);
-                    } else if (u.getEntity() instanceof Infantry) {
-                        p = c.newPerson(PersonnelRole.SOLDIER, factionCode, oldCrew.getGender(numberPeopleGenerated));
+                    } else if (unit.getEntity() instanceof Infantry) {
+                        p = campaign.newPerson(PersonnelRole.SOLDIER,
+                              factionCode,
+                              oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_SMALL_ARMS,
                               randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() -
                                                           oldCrew.getGunnery()),
                               0);
-                    } else if (u.getEntity() instanceof VTOL) {
-                        p = c.newPerson(PersonnelRole.VEHICLE_CREW_VTOL,
+                    } else if (unit.getEntity() instanceof VTOL) {
+                        p = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL,
                               factionCode,
                               oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_VTOL,
@@ -615,8 +619,8 @@ public class Utilities {
                         p.addSkill(SkillType.S_GUN_VEE,
                               SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
                               0);
-                    } else if (u.getEntity() instanceof Mek) {
-                        p = c.newPerson(PersonnelRole.MEKWARRIOR,
+                    } else if (unit.getEntity() instanceof Mek) {
+                        p = campaign.newPerson(PersonnelRole.MEKWARRIOR,
                               factionCode,
                               oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_MEK,
@@ -627,7 +631,7 @@ public class Utilities {
                               0);
                     } else {
                         // assume tanker if we got here
-                        p = c.newPerson(PersonnelRole.VEHICLE_CREW_GROUND,
+                        p = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND,
                               factionCode,
                               oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_PILOT_GVEE,
@@ -644,29 +648,29 @@ public class Utilities {
 
                 // Re-balance as needed to balance
                 if (!drivers.isEmpty()) {
-                    if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+                    if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
                         rebalanceCrew(oldCrew.getPiloting(), drivers, SkillType.S_PILOT_SPACE);
-                    } else if (u.getEntity() instanceof BattleArmor) {
+                    } else if (unit.getEntity() instanceof BattleArmor) {
                         rebalanceCrew(oldCrew.getGunnery(), drivers, SkillType.S_GUN_BA);
-                    } else if (u.getEntity() instanceof Infantry) {
+                    } else if (unit.getEntity() instanceof Infantry) {
                         rebalanceCrew(oldCrew.getGunnery(), drivers, SkillType.S_SMALL_ARMS);
                     }
                 }
 
-                if (!u.usesSoldiers()) {
+                if (!unit.usesSoldiers()) {
                     // Generate gunners for multi-crew vehicles
-                    for (int slot = 0; slot < u.getTotalGunnerNeeds(); slot++) {
+                    for (int slot = 0; slot < unit.getTotalGunnerNeeds(); slot++) {
                         Person p;
-                        if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-                            p = c.newPerson(PersonnelRole.VESSEL_GUNNER,
+                        if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
+                            p = campaign.newPerson(PersonnelRole.VESSEL_GUNNER,
                                   factionCode,
                                   oldCrew.getGender(numberPeopleGenerated));
                             p.addSkill(SkillType.S_GUN_SPACE,
                                   randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() -
                                                               oldCrew.getGunnery()),
                                   0);
-                        } else if (u.getEntity() instanceof Mek) {
-                            p = c.newPerson(PersonnelRole.MEKWARRIOR,
+                        } else if (unit.getEntity() instanceof Mek) {
+                            p = campaign.newPerson(PersonnelRole.MEKWARRIOR,
                                   factionCode,
                                   oldCrew.getGender(numberPeopleGenerated));
                             p.addSkill(SkillType.S_PILOT_MEK,
@@ -676,23 +680,23 @@ public class Utilities {
                                   SkillType.getType(SkillType.S_GUN_MEK).getTarget() - oldCrew.getGunnery(),
                                   0);
                         } else {
-                            if (u.getEntity().getMovementMode().isMarine()) {
-                                p = c.newPerson(PersonnelRole.VEHICLE_CREW_NAVAL,
+                            if (unit.getEntity().getMovementMode().isMarine()) {
+                                p = campaign.newPerson(PersonnelRole.VEHICLE_CREW_NAVAL,
                                       factionCode,
                                       oldCrew.getGender(numberPeopleGenerated));
                                 p.addSkill(SkillType.S_PILOT_MEK,
                                       SkillType.getType(SkillType.S_PILOT_NVEE).getTarget() - oldCrew.getPiloting(),
                                       0);
-                            } else if (u.getEntity() instanceof VTOL) {
+                            } else if (unit.getEntity() instanceof VTOL) {
 
-                                p = c.newPerson(PersonnelRole.VEHICLE_CREW_VTOL,
+                                p = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL,
                                       factionCode,
                                       oldCrew.getGender(numberPeopleGenerated));
                                 p.addSkill(SkillType.S_PILOT_MEK,
                                       SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(),
                                       0);
                             } else {
-                                p = c.newPerson(PersonnelRole.VEHICLE_CREW_GROUND,
+                                p = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND,
                                       factionCode,
                                       oldCrew.getGender(numberPeopleGenerated));
                                 p.addSkill(SkillType.S_PILOT_MEK,
@@ -712,19 +716,19 @@ public class Utilities {
 
                     // Regenerate gunners as needed to balance
                     if (!gunners.isEmpty()) {
-                        if (u.getEntity() instanceof Tank) {
+                        if (unit.getEntity() instanceof Tank) {
                             rebalanceCrew(oldCrew.getGunnery(), gunners, SkillType.S_GUN_VEE);
-                        } else if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+                        } else if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
                             rebalanceCrew(oldCrew.getGunnery(), gunners, SkillType.S_GUN_SPACE);
                         }
                     }
                 }
             }
 
-            for (int slot = 0; slot < u.getTotalCrewNeeds(); slot++) {
-                Person p = c.newPerson(u.getEntity().isLargeCraft() ?
-                                             PersonnelRole.VESSEL_CREW :
-                                             PersonnelRole.COMBAT_TECHNICIAN,
+            for (int slot = 0; slot < unit.getTotalCrewNeeds(); slot++) {
+                Person p = campaign.newPerson(unit.getEntity().isLargeCraft() ?
+                                                    PersonnelRole.VESSEL_CREW :
+                                                    PersonnelRole.COMBAT_TECHNICIAN,
                       factionCode,
                       oldCrew.getGender(numberPeopleGenerated));
 
@@ -732,24 +736,24 @@ public class Utilities {
                 vesselCrew.add(p);
             }
 
-            if (u.canTakeNavigator()) {
-                navigator = c.newPerson(PersonnelRole.VESSEL_NAVIGATOR,
+            if (unit.canTakeNavigator()) {
+                navigator = campaign.newPerson(PersonnelRole.VESSEL_NAVIGATOR,
                       factionCode,
                       oldCrew.getGender(numberPeopleGenerated));
                 migrateCrewData(navigator, oldCrew, numberPeopleGenerated++, false);
             }
 
-            if (u.canTakeTechOfficer()) {
-                if (u.getEntity().getMovementMode().isMarine()) {
-                    consoleCmdr = c.newPerson(PersonnelRole.VEHICLE_CREW_NAVAL,
+            if (unit.canTakeTechOfficer()) {
+                if (unit.getEntity().getMovementMode().isMarine()) {
+                    consoleCmdr = campaign.newPerson(PersonnelRole.VEHICLE_CREW_NAVAL,
                           factionCode,
                           oldCrew.getGender(numberPeopleGenerated));
-                } else if (u.getEntity() instanceof VTOL) {
-                    consoleCmdr = c.newPerson(PersonnelRole.VEHICLE_CREW_VTOL,
+                } else if (unit.getEntity() instanceof VTOL) {
+                    consoleCmdr = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL,
                           factionCode,
                           oldCrew.getGender(numberPeopleGenerated));
                 } else {
-                    consoleCmdr = c.newPerson(PersonnelRole.VEHICLE_CREW_GROUND,
+                    consoleCmdr = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND,
                           factionCode,
                           oldCrew.getGender(numberPeopleGenerated));
                 }
@@ -761,9 +765,9 @@ public class Utilities {
         // region Data Gathering
         Map<CrewType, Collection<Person>> result = new HashMap<>();
         if (!drivers.isEmpty()) {
-            if (u.usesSoloPilot()) {
+            if (unit.usesSoloPilot()) {
                 result.put(CrewType.PILOT, drivers);
-            } else if (u.usesSoldiers()) {
+            } else if (unit.usesSoldiers()) {
                 result.put(CrewType.SOLDIER, drivers);
             } else {
                 result.put(CrewType.DRIVER, drivers);

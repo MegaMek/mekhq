@@ -176,6 +176,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             final boolean areAllSoldiers = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.SOLDIER));
             final boolean areAllBattleArmourPilots = Stream.of(people)
                                                            .allMatch(person -> person.hasRole(PersonnelRole.BATTLE_ARMOUR));
+            final boolean isUseAltAdvancedMedical = campaign.getCampaignOptions().isUseAlternativeAdvancedMedical();
+            final boolean isUseImplants = campaign.getCampaignOptions().isUseImplants();
 
             // Parsing Variables
             int unitType = -1;
@@ -447,7 +449,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     // For a vehicle command console we will require the commander to be a driver
                     // or a gunner, but not necessarily both
                     if (entity instanceof Tank) {
-                        if (people[0].canDrive(entity) || people[0].canGun(entity)) {
+                        if (people[0].canDrive(entity, isUseAltAdvancedMedical, isUseImplants) ||
+                                  people[0].canGun(entity)) {
                             final JMenuItem miConsoleCommander = new JMenuItem(unit.getName());
                             miConsoleCommander.setName("miConsoleCommander");
                             miConsoleCommander.addActionListener(evt -> {
@@ -464,7 +467,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                             });
                             consoleCommanderEntityWeightMenu.add(miConsoleCommander);
                         }
-                    } else if (people[0].canDrive(entity) && people[0].canGun(entity)) {
+                    } else if (people[0].canDrive(entity, isUseAltAdvancedMedical, isUseImplants) &&
+                                     people[0].canGun(entity)) {
                         final JMenuItem miTechOfficer = new JMenuItem(unit.getName());
                         miTechOfficer.setName("miTechOfficer");
                         miTechOfficer.addActionListener(evt -> {

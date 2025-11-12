@@ -45,6 +45,7 @@ import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.icons.Portrait.DEFAULT_IMAGE_WIDTH;
 import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
+import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
@@ -254,6 +255,7 @@ public class Person {
     private LocalDate retirement;
     private int loyalty;
     private int fatigue;
+    private int permanentFatigue;
     private Boolean isRecoveringFromFatigue;
 
     private Skills skills;
@@ -545,6 +547,7 @@ public class Person {
         retirement = null;
         loyalty = 9;
         fatigue = 0;
+        permanentFatigue = 0;
         isRecoveringFromFatigue = false;
         skills = new Skills();
         options = new PersonnelOptions();
@@ -2155,6 +2158,14 @@ public class Person {
         this.fatigue = fatigue;
     }
 
+    public int getPermanentFatigue() {
+        return permanentFatigue;
+    }
+
+    public void changePermanentFatigue(final int delta) {
+        permanentFatigue += delta;
+    }
+
     /**
      * Adjusts the current fatigue level by the specified amount, applying an SPA fatigue multiplier where applicable.
      *
@@ -3168,6 +3179,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getBaseLoyalty());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "permanentFatigue", getPermanentFatigue());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXML(pw, indent);
@@ -3657,6 +3669,8 @@ public class Person {
                     person.loyalty = MathUtility.parseInt(wn2.getTextContent(), 9);
                 } else if (nodeName.equalsIgnoreCase("fatigue")) {
                     person.fatigue = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("permanentFatigue")) {
+                    person.permanentFatigue = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("isRecoveringFromFatigue")) {
                     person.isRecoveringFromFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("advantages")) {
@@ -5610,11 +5624,14 @@ public class Person {
      * are assigned. Supported types include Land-Air Mek, Mek, VTOL, tank (including variants for marine and ground
      * modes), conventional fighter, small craft, jumpship, aerospace unit, battle armor, infantry, and ProtoMek.</p>
      *
-     * @param entity the entity to check for piloting/driving capability. If {@code null}, returns {@code false}.
+     * @param entity                  the entity to check for piloting/driving capability. If {@code null}, returns
+     *                                {@code false}.
+     * @param isUseAltAdvancedMedical {@code true} if the campaign has Alternate Advanced Medical enabled
+     * @param isUseImplants           {@code true} if the campaign has Implants enabled
      *
      * @return {@code true} if the user is qualified to pilot or drive the specified entity; {@code false} otherwise
      */
-    public boolean canDrive(final Entity entity) {
+    public boolean canDrive(final Entity entity, final boolean isUseAltAdvancedMedical, final boolean isUseImplants) {
         if (entity == null) {
             return false;
         }
@@ -5650,7 +5667,10 @@ public class Person {
 
             return false;
         } else if (entity instanceof ProtoMek) {
-            return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT);
+            boolean hasEIImplant = !isUseImplants ||
+                                         !isUseAltAdvancedMedical ||
+                                         options.booleanOption(UNOFFICIAL_EI_IMPLANT);
+            return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT) && hasEIImplant;
         } else {
             return false;
         }

@@ -39,6 +39,7 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.equipment.WeaponType.CLASS_ARTILLERY;
+import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static megamek.common.planetaryConditions.Atmosphere.THIN;
 import static megamek.common.planetaryConditions.Wind.TORNADO_F4;
 import static megamek.common.units.UnitType.*;
@@ -2900,6 +2901,12 @@ public class AtBDynamicScenarioFactory {
         }
 
         entity.setExternalIdAsString(UUID.randomUUID().toString());
+
+        if (campaignOptions.isUseImplants() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+            if (entity.isProtoMek()) {
+                entity.getCrew().getOptions().getOption(UNOFFICIAL_EI_IMPLANT).setValue(true);
+            }
+        }
 
         return entity;
     }

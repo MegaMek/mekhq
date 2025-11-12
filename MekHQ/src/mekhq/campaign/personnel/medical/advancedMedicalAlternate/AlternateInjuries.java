@@ -229,9 +229,9 @@ public class AlternateInjuries {
     public static final InjuryType ELECTIVE_MYOMER_ARM = new ElectiveMyomerArm();
     public static final InjuryType ELECTIVE_MYOMER_HAND = new ElectiveMyomerHand();
     public static final InjuryType ELECTIVE_MYOMER_LEG = new ElectiveMyomerLeg();
-    public static final InjuryType ENHANCED_IMAGING = new EnhancedImagingImplant();
+    public static final InjuryType ENHANCED_IMAGING_IMPLANT = new EnhancedImagingImplant();
     public static final InjuryType ELECTIVE_IMPLANT_RECOVERY = new ElectiveImplantRecovery();
-    public static final InjuryType EI_IMPLANT_RECOVERY = new EnhancedImagingImplant();
+    public static final InjuryType EI_IMPLANT_RECOVERY = new EIImplantRecovery();
 
     // Base injury type classes with common behavior
     private abstract static class BaseInjury extends InjuryType {

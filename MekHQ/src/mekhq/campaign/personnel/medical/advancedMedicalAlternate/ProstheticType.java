@@ -388,7 +388,7 @@ public enum ProstheticType {
     ENHANCED_IMAGING("ENHANCED_IMAGING",
           5,
           5,
-          AlternateInjuries.ENHANCED_IMAGING,
+          AlternateInjuries.ENHANCED_IMAGING_IMPLANT,
           Money.of(1500000),
           TechRating.A,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D,

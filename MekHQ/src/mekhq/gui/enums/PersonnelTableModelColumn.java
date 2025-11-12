@@ -1046,7 +1046,7 @@ public enum PersonnelTableModelColumn {
             case BLOODMARK:
                 return Integer.toString(person.getBloodmark());
             case FATIGUE:
-                return Integer.toString(getEffectiveFatigue(person.getFatigue(),
+                return Integer.toString(getEffectiveFatigue(person.getFatigue(), person.getPermanentFatigue(),
                       person.isClanPersonnel(),
                       person.getSkillLevel(campaign, false, true)));
             case SPA_COUNT:
