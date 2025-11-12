@@ -64,6 +64,7 @@ import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.MedicalViewDialog;
@@ -149,11 +150,15 @@ public final class InfirmaryTab extends CampaignGuiTab {
         RoundedJButton btnOptimizeAssignments = new RoundedJButton(resourceMap.getString("btnOptimizeAssignments.text"));
         btnOptimizeAssignments.addActionListener(ev -> new OptimizeInfirmaryAssignments(getCampaign()));
 
+        RoundedJButton btnVaccineMandate = new RoundedJButton(resourceMap.getString("btnVaccineMandate.text"));
+        btnVaccineMandate.addActionListener(ev -> Inoculations.triggerInoculationPrompt(getCampaign(), true));
+
         // Create a panel to group the buttons together horizontally
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         buttonPanel.add(btnAssignDoc);
         buttonPanel.add(btnUnassignDoc);
         buttonPanel.add(btnOptimizeAssignments);
+        buttonPanel.add(btnVaccineMandate);
 
         // Add the button panel to the layout
         gridBagConstraints = new GridBagConstraints();
@@ -431,14 +436,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         boolean useMASHTheatres = campaignOptions.isUseMASHTheatres();
         boolean isWithinTheatreCapacity = !useMASHTheatres;
         if (useMASHTheatres) {
-            final int mashTheatreCapacity = getCampaign().getMashTheatreCapacity();
-            final int patientsAssignedToDoctors = getCampaign().getPatientsAssignedToDoctors().size();
-
-            if (getCampaign().isOnContractAndPlanetside()) {
-                isWithinTheatreCapacity = mashTheatreCapacity > patientsAssignedToDoctors;
-            } else {
-                isWithinTheatreCapacity = true;
-            }
+            isWithinTheatreCapacity = getCampaign().getMashTheatresWithinCapacity();
         }
 
         return isWithinDoctorCapacity && isWithinTheatreCapacity;

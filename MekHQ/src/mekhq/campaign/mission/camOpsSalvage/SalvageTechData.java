@@ -49,7 +49,7 @@ public record SalvageTechData(Person tech, UUID techId, String rank, int rankNum
               tech.getRankNumeric(),
               tech.getFirstName(),
               tech.getLastName(),
-              tech.getSkillLevel(campaign, isSecondaryTech).toString(),
+              tech.getSkillLevel(campaign, isSecondaryTech, true).toString(),
               max(tech.getHits(), tech.getInjuries().size()),
               tech.getMinutesLeft());
     }

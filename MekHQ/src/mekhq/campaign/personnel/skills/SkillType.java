@@ -519,10 +519,10 @@ public class SkillType {
      *
      *                          <p>For example:</p>
      *                          <pre>
-     *                                                                                                                                                                                                                                                                                                                                                                                                                   Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                                                                                                                                                                                                                                   SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                                                                                                                                                                                                                                   SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                                                                                                                                                                                                                               </pre>
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                            Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                            SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                            SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                        </pre>
      * @param skillLevelsMatter if {@code true}, the skill's level will be displayed in Person View in addition to the
      *                          skill's Target Number
      *
@@ -680,13 +680,15 @@ public class SkillType {
     /**
      * Determines if this skill is classified as a support skill.
      *
+     * <p>Support skills include support, and support technician subtypes.</p>
+     *
      * @return {@code true} if the skill subtype is a support category; {@code false} otherwise
      *
      * @author Illiani
      * @since 0.50.06
      */
     public boolean isSupportSkill() {
-        return this.subType == SUPPORT;
+        return this.subType == SUPPORT || this.subType == SUPPORT_TECHNICIAN;
     }
 
     /**
@@ -735,11 +737,23 @@ public class SkillType {
     public boolean isAffectedByImpatientOrPatient() {
         return this.isSubTypeOf(ROLEPLAY_ART) ||
                      this.isSubTypeOf(ROLEPLAY_SECURITY) ||
+                     this.isSubTypeOf(ROLEPLAY_INTEREST) ||
+                     this.isSubTypeOf(ROLEPLAY_SCIENCE) ||
+                     this.isSubTypeOf(SUPPORT_TECHNICIAN) ||
+                     Objects.equals(this.name, S_ACTING) ||
+                     Objects.equals(this.name, S_APPRAISAL) ||
+                     Objects.equals(this.name, S_COMPUTERS) ||
                      Objects.equals(this.name, S_CRYPTOGRAPHY) ||
                      Objects.equals(this.name, S_DEMOLITIONS) ||
+                     Objects.equals(this.name, S_ESCAPE_ARTIST) ||
+                     Objects.equals(this.name, S_INTERROGATION) ||
                      Objects.equals(this.name, S_INVESTIGATION) ||
+                     Objects.equals(this.name, S_NEGOTIATION) ||
                      Objects.equals(this.name, S_PROTOCOLS) ||
                      Objects.equals(this.name, S_STRATEGY) ||
+                     Objects.equals(this.name, S_STREETWISE) ||
+                     Objects.equals(this.name, S_SURGERY) ||
+                     Objects.equals(this.name, S_SURVIVAL) ||
                      Objects.equals(this.name, S_TACTICS) ||
                      Objects.equals(this.name, S_TRAINING);
     }
@@ -1854,7 +1868,7 @@ public class SkillType {
         return new SkillType(S_TECH_MEK,
               10,
               false,
-              SUPPORT,
+              SUPPORT_TECHNICIAN,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1873,7 +1887,7 @@ public class SkillType {
         return new SkillType(S_TECH_MECHANIC,
               10,
               false,
-              SUPPORT,
+              SUPPORT_TECHNICIAN,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1892,7 +1906,7 @@ public class SkillType {
         return new SkillType(S_TECH_AERO,
               10,
               false,
-              SUPPORT,
+              SUPPORT_TECHNICIAN,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1911,7 +1925,7 @@ public class SkillType {
         return new SkillType(S_TECH_BA,
               10,
               false,
-              SUPPORT,
+              SUPPORT_TECHNICIAN,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1930,7 +1944,7 @@ public class SkillType {
         return new SkillType(S_TECH_VESSEL,
               10,
               false,
-              SUPPORT,
+              SUPPORT_TECHNICIAN,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1949,7 +1963,7 @@ public class SkillType {
         return new SkillType(S_ASTECH,
               10,
               false,
-              SUPPORT,
+              SUPPORT_TECHNICIAN,
               INTELLIGENCE,
               NONE,
               null,

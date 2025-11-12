@@ -75,6 +75,7 @@ import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Minefield;
 import megamek.common.event.Subscribe;
+import megamek.common.options.OptionsConstants;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
@@ -83,7 +84,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
@@ -721,15 +721,13 @@ public class StratConRulesManager {
      */
     private static void determineIfTurningPointScenario(AtBContract contract, StratConScenario scenario) {
         ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
-        boolean isResupply = scenarioType.isResupply();
-        boolean isJailBreak = scenarioType.isJailBreak();
+        boolean isObjective = scenario.isStrategicObjective();
+        boolean isSpecial = scenarioType.isSpecial();
 
-        if (isResupply || isJailBreak) {
+        if (isSpecial || isObjective) {
             scenario.setTurningPoint(false);
             return;
         }
-
-        boolean isObjective = scenario.isStrategicObjective();
 
         ContractCommandRights commandRights = contract.getCommandRights();
         switch (commandRights) {
@@ -1457,11 +1455,7 @@ public class StratConRulesManager {
         // we want to ensure we only increase Fatigue once
         boolean hasFatigueIncreased = false;
 
-        // Keep a set of visited coordinates to avoid redundancy
-        Set<StratConCoords> visited = new HashSet<>();
-        visited.add(coords);
-
-        // Determine scan range
+        // Determine scan range (this is the furthest a hex can be revealed)
         int scanRangeIncrease = track.getScanRangeIncrease();
         CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(forceID);
         if (combatTeam != null && combatTeam.getRole().isPatrol()) {
@@ -1503,83 +1497,115 @@ public class StratConRulesManager {
             return;
         }
 
-        // Build a map of scouts and whether they're in light units
+        // Build a map of scouts and their information
         Force force = campaign.getForce(forceID);
         Hangar hangar = campaign.getHangar();
         List<ScoutRecord> scouts = force == null ? new ArrayList<>() : buildScoutMap(force, hangar);
 
-        boolean isClanCampaign = campaign.isClanCampaign();
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean useAdvancedScouting = campaignOptions.isUseAdvancedScouting();
-        boolean isUsingAgeEffects = campaignOptions.isUseAgeEffects();
+        boolean useAdvancedScouting = campaign.getCampaignOptions().isUseAdvancedScouting();
         // Each scout may scan up to scanMultiplier hexes
+        // Each scout may scan up to a radius of individualScanRange hexes
         for (ScoutRecord scoutData : scouts) {
-            Person scout = scoutData.scout();
-            int hexesScouted = 0;
+            int individualScanRange = scoutData.entityWeight() <= 35 ? scanRangeIncrease + 1 : scanRangeIncrease;
+            int remainingScans = useAdvancedScouting ? 1 : Integer.MAX_VALUE;
 
-            // Set up per-scout BFS structures (do not revisit global revealed or visited hexes)
+            Person scout = scoutData.scout();
+
+            // Per-scout BFS structures
             Queue<Pair<StratConCoords, Integer>> scoutQueue = new LinkedList<>();
-            Set<StratConCoords> scoutVisited = new HashSet<>(visited);
+            Set<StratConCoords> scoutVisited = new HashSet<>();
 
             scoutQueue.add(new Pair<>(coords, 0));
-            scoutVisited.add(coords);
+            scoutVisited.add(coords); // starting hex is already processed separately
 
-            while (!scoutQueue.isEmpty() && hexesScouted < scanRangeIncrease) {
+            TargetRollModifier weightModifier = getUnitWeightModifier(scoutData.entityWeight());
+            TargetRollModifier speedModifier = getUnitSpeedModifier(scoutData.unitAtBSpeed());
+            TargetRollModifier skillModifier = getScoutComplementarySPAModifier(scout);
+            TargetRollModifier sensorsModifier = new TargetRollModifier(
+                  scoutData.hasEquipmentOrRelevantSPA() ? -1 : 0, "Unit Sensors");
+
+            while (!scoutQueue.isEmpty() && remainingScans > 0) {
                 Pair<StratConCoords, Integer> current = scoutQueue.poll();
                 StratConCoords currentCoords = current.getKey();
                 int distance = current.getValue();
 
-                // Only process neighbors if they're within the max distance
-                if (distance < scanRangeIncrease) {
-                    for (int direction = 0; direction < 6; direction++) {
-                        StratConCoords checkCoords = currentCoords.translate(direction);
+                // Do not expand beyond this scout's radius
+                if (distance >= individualScanRange) {
+                    continue;
+                }
 
-                        // Skip already visited coordinates (refer to per-scout AND global)
-                        if (scoutVisited.contains(checkCoords) ||
-                                  visited.contains(checkCoords) ||
-                                  track.getRevealedCoords().contains(checkCoords)) {
-                            continue;
-                        }
+                for (int direction = 0; direction < 6; direction++) {
+                    if (remainingScans == 0) {
+                        break;
+                    }
 
-                        TargetRollModifier weightModifier = getUnitWeightModifier(scoutData.entityWeight());
-                        TargetRollModifier speedModifier = getUnitSpeedModifier(scoutData.unitAtBSpeed());
-                        TargetRollModifier sensorsModifier = new TargetRollModifier(
-                              scoutData.hasSensorEquipment() ? -1 : 0, "Unit Sensors");
+                    StratConCoords checkCoords = currentCoords.translate(direction);
 
-                        SkillCheckUtility skillCheck = new SkillCheckUtility(scout, scoutData.skillName(),
-                              List.of(weightModifier, speedModifier, sensorsModifier), 0, false, false,
-                              isUsingAgeEffects, isClanCampaign, campaign.getLocalDate());
-                        campaign.addReport(skillCheck.getResultsText());
+                    // Per-scout: don't re-visit the same hex for this scout
+                    if (scoutVisited.contains(checkCoords)) {
+                        continue;
+                    }
+                    scoutVisited.add(checkCoords);
 
-                        // Mark the current coordinate as revealed (count only on success)
-                        boolean wasScoutingSuccessful = !useAdvancedScouting || skillCheck.isSuccess();
-                        if (wasScoutingSuccessful) {
-                            // Process facilities
-                            targetFacility = track.getFacility(checkCoords);
-                            if (targetFacility != null) {
-                                targetFacility.setVisible(true);
+                    int nextDistance = distance + 1;
+                    if (nextDistance <= individualScanRange) {
+                        // Always enqueue so we can reach further rings,
+                        // even through already-revealed hexes.
+                        scoutQueue.add(new Pair<>(checkCoords, nextDistance));
+                    }
+
+                    // Only roll if this hex is still unexplored in the global track
+                    if (track.getRevealedCoords().contains(checkCoords)) {
+                        continue;
+                    }
+
+                    SkillCheckUtility skillCheck = new SkillCheckUtility(
+                          scout,
+                          scoutData.skillName(),
+                          List.of(weightModifier, speedModifier, sensorsModifier, skillModifier),
+                          0,
+                          false,
+                          false,
+                          false, // Irrelevant
+                          false, // Irrelevant
+                          campaign.getLocalDate()
+                    );
+                    campaign.addReport(skillCheck.getResultsText());
+
+                    remainingScans--;
+
+                    if (!hasFatigueIncreased) {
+                        increaseFatigue(forceID, campaign);
+                        hasFatigueIncreased = true;
+                    }
+
+                    boolean wasScoutingSuccessful = !useAdvancedScouting || skillCheck.isSuccess();
+                    if (!wasScoutingSuccessful) {
+                        // Failed check: hex remains unrevealed, but future scouts may still try it
+                        continue;
+                    }
+
+                    // Success: reveal the hex globally
+                    StratConFacility neighborFacility = track.getFacility(checkCoords);
+                    if (neighborFacility != null) {
+                        neighborFacility.setVisible(true);
+                    }
+
+                    StratConScenario neighborScenario = track.getScenario(checkCoords);
+                    if (neighborScenario != null) {
+                        AtBDynamicScenario backingScenario = neighborScenario.getBackingScenario();
+                        if (backingScenario != null) {
+                            if (backingScenario.isCloaked()) {
+                                backingScenario.setCloaked(false);
                             }
-
-                            // Increase fatigue only once
-                            if (!track.getRevealedCoords().contains(checkCoords) && !hasFatigueIncreased) {
-                                increaseFatigue(forceID, campaign);
-                                hasFatigueIncreased = true;
+                            if (backingScenario.getDate() == null) {
+                                setScenarioDates(0, track, campaign, neighborScenario);
                             }
-
-                            track.getRevealedCoords().add(checkCoords);
-
-                            // Mark as visited in both sets
-                            scoutVisited.add(checkCoords);
-                            visited.add(checkCoords);
-                            scoutQueue.add(new Pair<>(checkCoords,
-                                  distance + 1)); // Add the neighbor with incremented distance
-                        }
-
-                        hexesScouted++;
-                        if (useAdvancedScouting && (hexesScouted >= scanRangeIncrease)) {
-                            break; // Stop scouting after reaching per-scout limit
+                            MekHQ.triggerEvent(new ScenarioChangedEvent(backingScenario));
                         }
                     }
+
+                    track.getRevealedCoords().add(checkCoords);
                 }
             }
         }
@@ -1599,9 +1625,7 @@ public class StratConRulesManager {
     private static TargetRollModifier getUnitWeightModifier(double unitWeight) {
         int modifier = 6; // default for anything greater than 100t
 
-        if (unitWeight <= 35) {
-            modifier = -2;
-        } else if (unitWeight <= 55) {
+        if (unitWeight <= 55) {
             modifier = 0;
         } else if (unitWeight <= 75) {
             modifier = 2;
@@ -1643,6 +1667,24 @@ public class StratConRulesManager {
         }
 
         return new TargetRollModifier(modifier, "Unit Speed Modifier");
+    }
+
+    /**
+     * Generates a {@link TargetRollModifier} representing the effect of complementary SPAs skills for a given scout.
+     *
+     * @param scout the {@link Person} whose scouting SPAs are being evaluated
+     *
+     * @return a {@link TargetRollModifier} reflecting bonuses from complementary scouting skills; will have a modifier
+     *       value of 0 if no qualifying skills are present
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static TargetRollModifier getScoutComplementarySPAModifier(Person scout) {
+        PersonnelOptions options = scout.getOptions();
+        int complementaryModifier = options.booleanOption(OptionsConstants.MISC_EAGLE_EYES) ? 1 : 0;
+
+        return new TargetRollModifier(complementaryModifier, "Complementary SPA Modifier");
     }
 
     /**
@@ -1702,7 +1744,13 @@ public class StratConRulesManager {
                 SkillModifierData skillModifierData = crewMember.getSkillModifierData();
 
                 Skill scoutSkill = crewMember.getSkill(scoutSkillName);
+                PersonnelOptions options = crewMember.getOptions();
+                int complementaryModifier = !hasSensorEquipment && // Doesn't stack with Sensor Equipment
+                                                  options.booleanOption(OptionsConstants.MISC_EAGLE_EYES) ?
+                                                  1 : 0;
+
                 int scoutSkillLevel = (scoutSkill == null) ? -1 : scoutSkill.getTotalSkillLevel(skillModifierData);
+                scoutSkillLevel += complementaryModifier;
                 if (scoutSkillLevel > bestScoutSkillLevel) {
                     bestScout = crewMember;
                     bestScoutSkillName = scoutSkillName;
@@ -3304,14 +3352,35 @@ public class StratConRulesManager {
         // "return to base", unless it's been told to stay in the field
         for (int forceID : track.getAssignedForceReturnDates().keySet()) {
             Force force = campaign.getForce(forceID);
+            if (force == null) {
+                continue;
+            }
+
+            if (track.getBackingScenariosMap().containsKey(force.getScenarioId()) ||
+                      track.getStickyForces().contains(forceID)) {
+                continue;
+            }
+
+            if (force.getCombatRoleInMemory().isPatrol()) {
+                boolean allLightUnits = true;
+                for (Unit unit : force.getAllUnitsAsUnits(campaign.getHangar(), false)) {
+                    if (unit.getEntity() != null && unit.getEntity().getWeight() > 35) {
+                        allLightUnits = false;
+                        break;
+                    }
+                }
+
+                int roll = d6();
+                if (allLightUnits && roll == 6) {
+                    forcesToUndeploy.add(forceID);
+                    campaign.addReport(String.format(resources.getString("patrol.undeployed"), force.getName()));
+                    continue;
+                }
+            }
 
             if ((track.getAssignedForceReturnDates().get(forceID).equals(date) ||
-                       track.getAssignedForceReturnDates().get(forceID).isBefore(date)) &&
-                      (force != null) &&
-                      !track.getBackingScenariosMap().containsKey(force.getScenarioId()) &&
-                      !track.getStickyForces().contains(forceID)) {
+                       track.getAssignedForceReturnDates().get(forceID).isBefore(date))) {
                 forcesToUndeploy.add(forceID);
-
                 campaign.addReport(String.format(resources.getString("force.undeployed"), force.getName()));
             }
         }

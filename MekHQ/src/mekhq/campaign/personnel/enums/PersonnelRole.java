@@ -1318,11 +1318,10 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Ground Vehicle Crew, Naval Vehicle Crew, or the VTOL
-     *       Pilot role, {@code false} otherwise.
+     * @return {@code true} if the character is assigned to the Vehicle Crew/x or Combat Technician role
      */
     public boolean isVehicleCrewMember() {
-        return isGroundVehicleCrew() || isVehicleCrewNaval() || isVehicleCrewVTOL();
+        return isGroundVehicleCrew() || isNavalVehicleCrew() || isVTOLCrew();
     }
 
     /**

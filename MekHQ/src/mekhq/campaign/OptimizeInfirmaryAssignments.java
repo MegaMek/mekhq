@@ -142,7 +142,7 @@ public class OptimizeInfirmaryAssignments {
                 continue;
             }
 
-            if (isOnContractAndPlanetside && useMASHTheatres && totalPatientCounter >= mashTheatreCapacity) {
+            if (campaign.getMashTheatresWithinCapacity() && totalPatientCounter >= mashTheatreCapacity) {
                 // Similar to the above, we're just unassigning doctors for any remaining patients.
                 continue;
             }

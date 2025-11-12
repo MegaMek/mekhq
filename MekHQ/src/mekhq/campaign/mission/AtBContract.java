@@ -40,7 +40,6 @@ import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.ELITE;
@@ -443,14 +442,11 @@ public class AtBContract extends Contract {
                     StratConContractDefinition contractDefinition = getContractDefinition(getContractType());
 
                     if (contractDefinition != null) {
-                        List<Integer> definedScenarioOdds = contractDefinition.getScenarioOdds();
-
-                        int scenarioOddsMultiplier = randomInt(20) == 0 ? 2 : 1;
-
                         for (StratConTrackState trackState : stratconCampaignState.getTracks()) {
-                            int baseScenarioOdds = getRandomItem(definedScenarioOdds);
+                            int scenarioOdds = StratConContractInitializer.getScenarioOdds(
+                                  campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(), contractDefinition);
 
-                            trackState.setScenarioOdds(baseScenarioOdds * scenarioOddsMultiplier);
+                            trackState.setScenarioOdds(scenarioOdds);
                         }
                     }
                 }
@@ -458,7 +454,7 @@ public class AtBContract extends Contract {
                 moraleLevel = newMoraleLevel;
                 routEnd = null;
 
-                if (contractType.isGarrisonDuty()) {
+                if (contractType.isGarrisonDuty() || contractType.isRetainer()) {
                     updateEnemy(campaign, today); // mix it up a little
                 }
             }
@@ -589,13 +585,41 @@ public class AtBContract extends Contract {
 
         AtBContractType contractType = getContractType();
 
-        if (contractType.isGuerrillaWarfare()) {
+        if (contractType.isGuerrillaType()) {
             repairLocation = Unit.SITE_IMPROVISED;
         } else if (contractType.isRaidType()) {
             repairLocation = Unit.SITE_FIELD_WORKSHOP;
         }
 
         return repairLocation;
+    }
+
+    /**
+     * Determines the best available repair location from a list of active contracts.
+     *
+     * <p>This method evaluates all active contracts and returns the highest quality repair facility available.
+     * Repair locations are ranked numerically, with higher values representing better facilities. If no active
+     * contracts exist, a basic facility is assumed to be available.</p>
+     *
+     * @param activeContracts the list of active contracts to evaluate for repair facilities
+     *
+     * @return the numeric value of the best available repair location; returns {@link Unit#SITE_FACILITY_BASIC} if no
+     *       contracts are active
+     */
+    public static int getBestRepairLocation(List<AtBContract> activeContracts) {
+        if (activeContracts.isEmpty()) {
+            return Unit.SITE_FACILITY_BASIC;
+        }
+
+        int bestSite = Unit.SITE_IMPROVISED;
+        for (AtBContract contract : activeContracts) {
+            int repairLocation = contract.getRepairLocation();
+            if (repairLocation > bestSite) {
+                bestSite = repairLocation;
+            }
+        }
+
+        return bestSite;
     }
 
     /**

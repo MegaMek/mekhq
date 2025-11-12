@@ -167,7 +167,7 @@ public class PersonTableModel extends AbstractTableModel {
                 }
             }
             case EXPERIENCE -> {
-                int experienceLevel = person.getExperienceLevel(campaign, false);
+                int experienceLevel = person.getExperienceLevel(campaign, false, true);
                 yield "<html>" + getColoredExperienceLevelName(experienceLevel) + "</html>";
             }
             case AGE -> Integer.toString(person.getAge(campaign.getLocalDate()));
@@ -196,7 +196,7 @@ public class PersonTableModel extends AbstractTableModel {
         ApplicantTableColumns column = ApplicantTableColumns.values()[columnIndex];
         return switch (column) {
             case AGE, HIRING_COST -> new IntegerStringSorter();
-            case POSITIVE_ABILITIES, NEGATIVE_ABILITIES, PERFORMANCE_EXAM -> new IntegerStringSorter();
+            case POSITIVE_ABILITIES, NEGATIVE_ABILITIES, PERFORMANCE_EXAM -> Comparator.naturalOrder();
             case EXPERIENCE -> new LevelSorter();
             default -> new NaturalOrderComparator();
         };

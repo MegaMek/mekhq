@@ -179,7 +179,7 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeUnit();
+            processFreeUnit(campaign);
             dispose();
         });
 
@@ -190,7 +190,7 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         return pnlButtons;
     }
 
-    private void processFreeUnit() {
+    public static void processFreeUnit(Campaign campaign) {
         MekSummary mekSummary = MekSummaryCache.getInstance().getMek("MASH Truck (Small)");
         if (mekSummary == null) {
             LOGGER.error("Cannot find entry for {}", "MASH Truck (Small)");

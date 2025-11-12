@@ -54,19 +54,19 @@ import mekhq.campaign.personnel.medical.BodyLocation;
 public class AlternateInjuries {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AlternateInjuries";
 
-    private static final int BURN_HEALING_DAYS = 7; // Internet says 1-3 weeks
-    private static final int DEAFNESS_HEALING_DAYS = 7; // Internet says around a week
-    private static final int BLINDNESS_HEALING_DAYS = 7; // Internet says this varies a lot, we went with a week
-    private static final int FRACTURE_HEALING_DAYS = 42; // Internet says 6-8 weeks
-    private static final int COMPOUND_FRACTURE_HEALING_DAYS = 42; // Internet says 6-12 weeks
-    private static final int SMOKE_INHALATION_HEALING_DAYS = 2; // Internet says 2-3 days
-    private static final int PUNCTURED_LUNG_HEALING_DAYS = 42; // Internet says 6-8 weeks
-    private static final int HEART_TRAUMA_HEALING_DAYS = 28; // Internet says 4-12 weeks
-    private static final int ORGAN_BRUISE_HEALING_DAYS = 28; // Internet says 4-6 weeks
-    private static final int ORGAN_TRAUMA_HEALING_DAYS = 42; // Internet says 6-8 weeks
-    private static final int DISEMBOWELED_HEALING_DAYS = 42; // Internet says 6-8 weeks
-    private static final int BONE_BRUISE_HEALING_DAYS = 42; // Internet says 6 weeks
-    private static final int BLOOD_LOSS_HEALING_DAYS = 28; // Internet says 4-6 weeks
+    private static final int BURN_HEALING_DAYS = 4; // Internet says 1-3 weeks
+    private static final int DEAFNESS_HEALING_DAYS = 4; // Internet says around a week
+    private static final int BLINDNESS_HEALING_DAYS = 4; // Internet says this varies a lot, we went with a week
+    private static final int FRACTURE_HEALING_DAYS = 21; // Internet says 6-8 weeks
+    private static final int COMPOUND_FRACTURE_HEALING_DAYS = 21; // Internet says 6-12 weeks
+    private static final int SMOKE_INHALATION_HEALING_DAYS = 1; // Internet says 2-3 days
+    private static final int PUNCTURED_LUNG_HEALING_DAYS = 21; // Internet says 6-8 weeks
+    private static final int HEART_TRAUMA_HEALING_DAYS = 14; // Internet says 4-12 weeks
+    private static final int ORGAN_BRUISE_HEALING_DAYS = 14; // Internet says 4-6 weeks
+    private static final int ORGAN_TRAUMA_HEALING_DAYS = 21; // Internet says 6-8 weeks
+    private static final int DISEMBOWELED_HEALING_DAYS = 21; // Internet says 6-8 weeks
+    private static final int BONE_BRUISE_HEALING_DAYS = 21; // Internet says 6 weeks
+    private static final int BLOOD_LOSS_HEALING_DAYS = 14; // Internet says 4-6 weeks
     private static final int SEVER_HEALING_DAYS = 180; // We need to have something here for Advanced Medical
 
     private static final InjuryLevel SEVERE_INJURY_LEVEL = InjuryLevel.CHRONIC;
@@ -122,6 +122,62 @@ public class AlternateInjuries {
     public static final InjuryType COMPOUND_FRACTURED_SHIN = new CompoundFracturedShin();
     // Any
     public static final InjuryType BLOOD_LOSS = new BloodLoss();
+    // Diseases
+    public static final InjuryType GROWTHS_DISCOMFORT = new GrowthsDiscomfort();
+    public static final InjuryType GROWTHS_SLIGHT = new GrowthsSlight();
+    public static final InjuryType GROWTHS_MODERATE = new GrowthsModerate();
+    public static final InjuryType GROWTHS_SEVERE = new GrowthsSevere();
+    public static final InjuryType GROWTHS_DEADLY = new GrowthsDeadly();
+    public static final InjuryType INFECTION_DISCOMFORT = new InfectionDiscomfort();
+    public static final InjuryType INFECTION_SLIGHT = new InfectionSlight();
+    public static final InjuryType INFECTION_MODERATE = new InfectionModerate();
+    public static final InjuryType INFECTION_SEVERE = new InfectionSevere();
+    public static final InjuryType INFECTION_DEADLY = new InfectionDeadly();
+    public static final InjuryType HEARING_DISCOMFORT = new HearingDiscomfort();
+    public static final InjuryType HEARING_SLIGHT = new HearingSlight();
+    public static final InjuryType HEARING_MODERATE = new HearingModerate();
+    public static final InjuryType HEARING_SEVERE = new HearingSevere();
+    public static final InjuryType HEARING_DEADLY = new HearingDeadly();
+    public static final InjuryType WEAKNESS_DISCOMFORT = new WeaknessDiscomfort();
+    public static final InjuryType WEAKNESS_SLIGHT = new WeaknessSlight();
+    public static final InjuryType WEAKNESS_MODERATE = new WeaknessModerate();
+    public static final InjuryType WEAKNESS_SEVERE = new WeaknessSevere();
+    public static final InjuryType WEAKNESS_DEADLY = new WeaknessDeadly();
+    public static final InjuryType SORES_DISCOMFORT = new SoresDiscomfort();
+    public static final InjuryType SORES_SLIGHT = new SoresSlight();
+    public static final InjuryType SORES_MODERATE = new SoresModerate();
+    public static final InjuryType SORES_SEVERE = new SoresSevere();
+    public static final InjuryType SORES_DEADLY = new SoresDeadly();
+    public static final InjuryType FLU_DISCOMFORT = new FluDiscomfort();
+    public static final InjuryType FLU_SLIGHT = new FluSlight();
+    public static final InjuryType FLU_MODERATE = new FluModerate();
+    public static final InjuryType FLU_SEVERE = new FluSevere();
+    public static final InjuryType FLU_DEADLY = new FluDeadly();
+    public static final InjuryType SIGHT_DISCOMFORT = new SightDiscomfort();
+    public static final InjuryType SIGHT_SLIGHT = new SightSlight();
+    public static final InjuryType SIGHT_MODERATE = new SightModerate();
+    public static final InjuryType SIGHT_SEVERE = new SightSevere();
+    public static final InjuryType SIGHT_DEADLY = new SightDeadly();
+    public static final InjuryType TREMORS_DISCOMFORT = new TremorsDiscomfort();
+    public static final InjuryType TREMORS_SLIGHT = new TremorsSlight();
+    public static final InjuryType TREMORS_MODERATE = new TremorsModerate();
+    public static final InjuryType TREMORS_SEVERE = new TremorsSevere();
+    public static final InjuryType TREMORS_DEADLY = new TremorsDeadly();
+    public static final InjuryType BREATHING_DISCOMFORT = new BreathingDiscomfort();
+    public static final InjuryType BREATHING_SLIGHT = new BreathingSlight();
+    public static final InjuryType BREATHING_MODERATE = new BreathingModerate();
+    public static final InjuryType BREATHING_SEVERE = new BreathingSevere();
+    public static final InjuryType BREATHING_DEADLY = new BreathingDeadly();
+    public static final InjuryType HEMOPHILIA_DISCOMFORT = new HemophiliaDiscomfort();
+    public static final InjuryType HEMOPHILIA_SLIGHT = new HemophiliaSlight();
+    public static final InjuryType HEMOPHILIA_MODERATE = new HemophiliaModerate();
+    public static final InjuryType HEMOPHILIA_SEVERE = new HemophiliaSevere();
+    public static final InjuryType HEMOPHILIA_DEADLY = new HemophiliaDeadly();
+    public static final InjuryType VENEREAL_DISCOMFORT = new VenerealDiscomfort();
+    public static final InjuryType VENEREAL_SLIGHT = new VenerealSlight();
+    public static final InjuryType VENEREAL_MODERATE = new VenerealModerate();
+    public static final InjuryType VENEREAL_SEVERE = new VenerealSevere();
+    public static final InjuryType VENEREAL_DEADLY = new VenerealDeadly();
 
     // Base injury type classes with common behavior
     private abstract static class BaseInjury extends InjuryType {
@@ -551,6 +607,513 @@ public class AlternateInjuries {
                   InjuryEffect.NONE, Set.of(BodyLocation.INTERNAL));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BLOOD_LOSS.simpleName");
             this.fluffText = simpleName;
+        }
+    }
+
+    // Diseases
+    private abstract static class Disease extends BaseInjury {
+        protected Disease() {
+            super(5, // This is just a placeholder value, we assign it elsewhere
+                  false,
+                  InjuryLevel.DISEASE,
+                  InjuryEffect.NONE,
+                  Set.of(BodyLocation.INTERNAL));
+            this.maxSeverity = 1;
+        }
+    }
+
+    public static final class GrowthsDiscomfort extends Disease {
+        GrowthsDiscomfort() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GROWTHS_DISCOMFORT.simpleName");
+        }
+    }
+
+    public static final class GrowthsSlight extends Disease {
+        GrowthsSlight() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GROWTHS_SLIGHT.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_GROWTHS_SLIGHT;
+        }
+    }
+
+    public static final class GrowthsModerate extends Disease {
+        GrowthsModerate() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GROWTHS_MODERATE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_GROWTHS_MODERATE;
+        }
+    }
+
+    public static final class GrowthsSevere extends Disease {
+        GrowthsSevere() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GROWTHS_SEVERE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_GROWTHS_SEVERE;
+        }
+    }
+
+    public static final class GrowthsDeadly extends Disease {
+        GrowthsDeadly() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GROWTHS_DEADLY.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class InfectionDiscomfort extends Disease {
+        InfectionDiscomfort() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.INFECTION_DISCOMFORT.simpleName");
+        }
+    }
+
+    public static final class InfectionSlight extends Disease {
+        InfectionSlight() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.INFECTION_SLIGHT.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_INFECTION_SLIGHT;
+        }
+    }
+
+    public static final class InfectionModerate extends Disease {
+        InfectionModerate() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.INFECTION_MODERATE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_INFECTION_MODERATE;
+        }
+    }
+
+    public static final class InfectionSevere extends Disease {
+        InfectionSevere() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.INFECTION_SEVERE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_INFECTION_SEVERE;
+        }
+    }
+
+    public static final class InfectionDeadly extends Disease {
+        InfectionDeadly() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.INFECTION_DEADLY.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class HearingDiscomfort extends Disease {
+        HearingDiscomfort() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEARING_DISCOMFORT.simpleName");
+        }
+    }
+
+    public static final class HearingSlight extends Disease {
+        HearingSlight() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEARING_SLIGHT.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_HEARING_SLIGHT;
+        }
+    }
+
+    public static final class HearingModerate extends Disease {
+        HearingModerate() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEARING_MODERATE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_HEARING_MODERATE;
+        }
+    }
+
+    public static final class HearingSevere extends Disease {
+        HearingSevere() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEARING_SEVERE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_HEARING_SEVERE;
+        }
+    }
+
+    public static final class HearingDeadly extends Disease {
+        HearingDeadly() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEARING_DEADLY.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class WeaknessDiscomfort extends Disease {
+        WeaknessDiscomfort() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WEAKNESS_DISCOMFORT.simpleName");
+        }
+    }
+
+    public static final class WeaknessSlight extends Disease {
+        WeaknessSlight() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WEAKNESS_SLIGHT.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_WEAKNESS_SLIGHT;
+        }
+    }
+
+    public static final class WeaknessModerate extends Disease {
+        WeaknessModerate() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WEAKNESS_MODERATE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_WEAKNESS_MODERATE;
+        }
+    }
+
+    public static final class WeaknessSevere extends Disease {
+        WeaknessSevere() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WEAKNESS_SEVERE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_WEAKNESS_SEVERE;
+        }
+    }
+
+    public static final class WeaknessDeadly extends Disease {
+        WeaknessDeadly() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WEAKNESS_DEADLY.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class SoresDiscomfort extends Disease {
+        SoresDiscomfort() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SORES_DISCOMFORT.simpleName");
+        }
+    }
+
+    public static final class SoresSlight extends Disease {
+        SoresSlight() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SORES_SLIGHT.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_SORES_SLIGHT;
+        }
+    }
+
+    public static final class SoresModerate extends Disease {
+        SoresModerate() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SORES_MODERATE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_SORES_MODERATE;
+        }
+    }
+
+    public static final class SoresSevere extends Disease {
+        SoresSevere() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SORES_SEVERE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_SORES_SEVERE;
+        }
+    }
+
+    public static final class SoresDeadly extends Disease {
+        SoresDeadly() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SORES_DEADLY.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class FluDiscomfort extends Disease {
+        FluDiscomfort() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FLU_DISCOMFORT.simpleName");
+        }
+    }
+
+    public static final class FluSlight extends Disease {
+        FluSlight() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FLU_SLIGHT.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_FLU_SLIGHT;
+        }
+    }
+
+    public static final class FluModerate extends Disease {
+        FluModerate() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FLU_MODERATE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_FLU_MODERATE;
+        }
+    }
+
+    public static final class FluSevere extends Disease {
+        FluSevere() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FLU_SEVERE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_FLU_SEVERE;
+        }
+    }
+
+    public static final class FluDeadly extends Disease {
+        FluDeadly() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FLU_DEADLY.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class SightDiscomfort extends Disease {
+        SightDiscomfort() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIGHT_DISCOMFORT.simpleName");
+        }
+    }
+
+    public static final class SightSlight extends Disease {
+        SightSlight() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIGHT_SLIGHT.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_SIGHT_SLIGHT;
+        }
+    }
+
+    public static final class SightModerate extends Disease {
+        SightModerate() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIGHT_MODERATE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_SIGHT_MODERATE;
+        }
+    }
+
+    public static final class SightSevere extends Disease {
+        SightSevere() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIGHT_SEVERE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_SIGHT_SEVERE;
+        }
+    }
+
+    public static final class SightDeadly extends Disease {
+        SightDeadly() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SIGHT_DEADLY.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class TremorsDiscomfort extends Disease {
+        TremorsDiscomfort() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TREMORS_DISCOMFORT.simpleName");
+        }
+    }
+
+    public static final class TremorsSlight extends Disease {
+        TremorsSlight() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TREMORS_SLIGHT.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_TREMORS_SLIGHT;
+        }
+    }
+
+    public static final class TremorsModerate extends Disease {
+        TremorsModerate() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TREMORS_MODERATE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_TREMORS_MODERATE;
+        }
+    }
+
+    public static final class TremorsSevere extends Disease {
+        TremorsSevere() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TREMORS_SEVERE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_TREMORS_SEVERE;
+        }
+    }
+
+    public static final class TremorsDeadly extends Disease {
+        TremorsDeadly() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TREMORS_DEADLY.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class BreathingDiscomfort extends Disease {
+        BreathingDiscomfort() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BREATHING_DISCOMFORT.simpleName");
+        }
+    }
+
+    public static final class BreathingSlight extends Disease {
+        BreathingSlight() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BREATHING_SLIGHT.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_BREATHING_SLIGHT;
+        }
+    }
+
+    public static final class BreathingModerate extends Disease {
+        BreathingModerate() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BREATHING_MODERATE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_BREATHING_MODERATE;
+        }
+    }
+
+    public static final class BreathingSevere extends Disease {
+        BreathingSevere() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BREATHING_SEVERE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_BREATHING_SEVERE;
+        }
+    }
+
+    public static final class BreathingDeadly extends Disease {
+        BreathingDeadly() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BREATHING_DEADLY.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class HemophiliaDiscomfort extends Disease {
+        HemophiliaDiscomfort() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEMOPHILIA_DISCOMFORT.simpleName");
+        }
+    }
+
+    public static final class HemophiliaSlight extends Disease {
+        HemophiliaSlight() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEMOPHILIA_SLIGHT.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_HEMOPHILIA_SLIGHT;
+        }
+    }
+
+    public static final class HemophiliaModerate extends Disease {
+        HemophiliaModerate() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEMOPHILIA_MODERATE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_HEMOPHILIA_MODERATE;
+        }
+    }
+
+    public static final class HemophiliaSevere extends Disease {
+        HemophiliaSevere() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEMOPHILIA_SEVERE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_HEMOPHILIA_SEVERE;
+        }
+    }
+
+    public static final class HemophiliaDeadly extends Disease {
+        HemophiliaDeadly() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HEMOPHILIA_DEADLY.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class VenerealDiscomfort extends Disease {
+        VenerealDiscomfort() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.VENEREAL_DISCOMFORT.simpleName");
+        }
+    }
+
+    public static final class VenerealSlight extends Disease {
+        VenerealSlight() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.VENEREAL_SLIGHT.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_VENEREAL_SLIGHT;
+        }
+    }
+
+    public static final class VenerealModerate extends Disease {
+        VenerealModerate() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.VENEREAL_MODERATE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_VENEREAL_MODERATE;
+        }
+    }
+
+    public static final class VenerealSevere extends Disease {
+        VenerealSevere() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.VENEREAL_SEVERE.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_VENEREAL_SEVERE;
+        }
+    }
+
+    public static final class VenerealDeadly extends Disease {
+        VenerealDeadly() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.VENEREAL_DEADLY.simpleName");
+            this.injuryEffect = InjuryEffect.DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
         }
     }
 }

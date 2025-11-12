@@ -65,7 +65,6 @@ import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUN
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
@@ -149,6 +148,7 @@ import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -322,6 +322,7 @@ public class Person {
 
     // region Advanced Medical
     private List<Injury> injuries;
+    private List<String> planetaryInoculations;
     // endregion Advanced Medical
 
     // region Against the Bot
@@ -556,6 +557,7 @@ public class Person {
         performanceLog = new ArrayList<>();
         awardController = new PersonAwardController(this);
         injuries = new ArrayList<>();
+        planetaryInoculations = new ArrayList<>();
         originalUnitWeight = EntityWeightClass.WEIGHT_ULTRA_LIGHT;
         originalUnitTech = TECH_IS1;
         originalUnitId = null;
@@ -2324,7 +2326,7 @@ public class Person {
         }
 
         // Is the character a veteran in their primary profession?
-        int experienceLevel = getExperienceLevel(campaign, false);
+        int experienceLevel = getExperienceLevel(campaign, false, true);
         if (experienceLevel < EXP_VETERAN) {
             return;
         }
@@ -3247,6 +3249,14 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "injuries");
             }
 
+            if (!planetaryInoculations.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "planetaryInoculations");
+                for (String planetaryInoculation : planetaryInoculations) {
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetaryInoculation", planetaryInoculation);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "planetaryInoculations");
+            }
+
             if (originalUnitWeight != EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "originalUnitWeight", originalUnitWeight);
             }
@@ -3898,6 +3908,22 @@ public class Person {
                     person.injuries.stream()
                           .filter(inj -> (null == inj.getStart()))
                           .forEach(inj -> inj.setStart(today.minusDays(inj.getOriginalTime() - inj.getTime())));
+                } else if (nodeName.equalsIgnoreCase("planetaryInoculations")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("planetaryInoculation")) {
+                            LOGGER.error("Unknown node type not loaded in Planetary Inoculations nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+                        person.planetaryInoculations.add(wn3.getTextContent());
+                    }
                 } else if (nodeName.equalsIgnoreCase("originalUnitWeight")) {
                     person.originalUnitWeight = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("originalUnitTech")) {
@@ -4121,16 +4147,6 @@ public class Person {
                 person.setJoinedCampaign(today);
             }
 
-            // <50.10 compatibility handler
-            if (updateSkillsForVehicleProfessions(today, person, person.getPrimaryRole(), true) ||
-                      updateSkillsForVehicleProfessions(today, person, person.getSecondaryRole(), false)) {
-                String report = getFormattedTextAt(RESOURCE_BUNDLE, "vehicleProfessionSkillChange",
-                      spanOpeningWithCustomColor(getWarningColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle());
-                campaign.addReport(report);
-            }
-
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
             if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
@@ -4186,12 +4202,8 @@ public class Person {
      * @author Illiani
      * @since 0.50.10
      */
-    private static boolean updateSkillsForVehicleProfessions(LocalDate today, Person person, PersonnelRole role,
+    public static boolean updateSkillsForVehicleProfessions(LocalDate today, Person person, PersonnelRole role,
           boolean isPrimary) {
-        if (role == PersonnelRole.VEHICLE_CREW) { // The old vehicle crew profession is handled differently
-            return updateSkillsForVehicleCrewProfession(today, person, role, isPrimary);
-        }
-
         PersonnelRole newProfession = null;
         String drivingSkillType = null;
         String gunnerySkillType = S_GUN_VEE;
@@ -4264,9 +4276,8 @@ public class Person {
      * Updates skills for personnel with the Vehicle Crew profession by ensuring they have the Mechanic skill.
      *
      * <p>This method is used during XML loading to migrate legacy data. If the person lacks the
-     * {@link SkillType#S_TECH_MECHANIC} skill, it will be added at a level equal to their highest existing vehicle
-     * crew-related skill (e.g., Tech Vee, Gunnery Vee, Piloting Vee, or Driving). This ensures backwards compatibility
-     * when loading older save files.</p>
+     * {@link SkillType#S_TECH_MECHANIC} skill, it will be added at a level 3. This ensures backwards compatibility when
+     * loading older save files.</p>
      *
      * @param today       the current date
      * @param person      the person whose skills should be updated
@@ -4278,7 +4289,7 @@ public class Person {
      * @author Illiani
      * @since 0.50.10
      */
-    private static boolean updateSkillsForVehicleCrewProfession(LocalDate today, Person person,
+    public static boolean updateSkillsForVehicleCrewProfession(LocalDate today, Person person,
           PersonnelRole currentRole,
           boolean isPrimary) {
         if (currentRole != PersonnelRole.VEHICLE_CREW) {
@@ -4287,7 +4298,6 @@ public class Person {
 
         if (!person.hasSkill(S_TECH_MECHANIC)) {
             person.addSkill(S_TECH_MECHANIC, 3, 0);
-            return true;
         }
 
         if (isPrimary) {
@@ -4296,7 +4306,7 @@ public class Person {
             person.setSecondaryRole(PersonnelRole.COMBAT_TECHNICIAN);
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -4402,7 +4412,7 @@ public class Person {
         // Experience multiplier
         primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions()
                                                      .getSalaryXPMultipliers()
-                                                     .get(getSkillLevel(campaign, false)));
+                                                     .get(getSkillLevel(campaign, false, true)));
 
         // Specialization multiplier
         if (getPrimaryRole().isSoldierOrBattleArmour()) {
@@ -4431,7 +4441,7 @@ public class Person {
             // Experience modifier
             secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions()
                                                              .getSalaryXPMultipliers()
-                                                             .get(getSkillLevel(campaign, true)));
+                                                             .get(getSkillLevel(campaign, true, true)));
 
             // Specialization
             if (getSecondaryRole().isSoldierOrBattleArmour()) {
@@ -4712,10 +4722,13 @@ public class Person {
             } else if (getRankLevel() < otherPerson.getRankLevel()) {
                 return false;
             } else {
-                if (getExperienceLevel(campaign, false) == otherPerson.getExperienceLevel(campaign, false)) {
-                    return getExperienceLevel(campaign, true) > otherPerson.getExperienceLevel(campaign, true);
+                if (getExperienceLevel(campaign, false, true) ==
+                          otherPerson.getExperienceLevel(campaign, false, true)) {
+                    return getExperienceLevel(campaign, true, true) >
+                                 otherPerson.getExperienceLevel(campaign, true, true);
                 } else {
-                    return getExperienceLevel(campaign, false) > otherPerson.getExperienceLevel(campaign, false);
+                    return getExperienceLevel(campaign, false, true) >
+                                 otherPerson.getExperienceLevel(campaign, false, true);
                 }
             }
         } else {
@@ -4753,7 +4766,16 @@ public class Person {
     }
 
     public SkillLevel getSkillLevel(final Campaign campaign, final boolean secondary) {
-        return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary) + 1];
+        return getSkillLevel(campaign, secondary, false);
+    }
+
+    public SkillLevel getSkillLevel(final Campaign campaign, final boolean secondary,
+          final boolean excludeInjuryEffects) {
+        return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary, excludeInjuryEffects) + 1];
+    }
+
+    public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
+        return getExperienceLevel(campaign, secondary, false);
     }
 
     /**
@@ -4779,13 +4801,14 @@ public class Person {
      *     </li>
      * </ul>
      *
-     * @param campaign  the campaign context, providing options and relevant configuration
-     * @param secondary if {@code true}, evaluates the person's secondary role; if {@code false}, evaluates the primary
-     *                  role
+     * @param campaign             the campaign context, providing options and relevant configuration
+     * @param secondary            if {@code true}, evaluates the person's secondary role; if {@code false}, evaluates
+     *                             the primary role
+     * @param excludeInjuryEffects if {@code true} injury effect modifiers will be excluded from calculations
      *
      * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
      */
-    public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
+    public int getExperienceLevel(final Campaign campaign, final boolean secondary, boolean excludeInjuryEffects) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
 
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -4796,7 +4819,10 @@ public class Person {
         final boolean isClanCampaign = campaign.isClanCampaign();
         final LocalDate today = campaign.getLocalDate();
 
-        final SkillModifierData skillModifierData = getSkillModifierData(isUseAgingEffects, isClanCampaign, today);
+        final SkillModifierData skillModifierData = getSkillModifierData(isUseAgingEffects,
+              isClanCampaign,
+              today,
+              excludeInjuryEffects);
 
         // Optional skills such as Admin for Techs are not counted towards the character's experience level, except
         // in the special case of Vehicle Gunners. So we only want to fetch the base professions.
@@ -4991,7 +5017,7 @@ public class Person {
      *       among other places
      */
     public String getFullDesc(final Campaign campaign) {
-        return "<b>" + getFullTitle() + "</b><br/>" + getSkillLevel(campaign, false) + ' ' + getRoleDesc();
+        return "<b>" + getFullTitle() + "</b><br/>" + getSkillLevel(campaign, false, true) + ' ' + getRoleDesc();
     }
 
     public String getHTMLTitle() {
@@ -5360,6 +5386,10 @@ public class Person {
         return options;
     }
 
+    public void setOptions(final PersonnelOptions options) {
+        this.options = options;
+    }
+
     /**
      * @return the options of the given category that this pilot has
      */
@@ -5698,29 +5728,35 @@ public class Person {
     }
 
     /**
-     * Calculates and retrieves the current daily available tech time for the person.
+     * Calculates the total available tech time per day for this person, including adjustments for skill level and
+     * administrative support.
      *
-     * <p>This calculation does not account for any expended time but incorporates potential administrative
-     * adjustments if specified.</p>
+     * <p>Primary role techs (with no secondary role) receive full base time, while secondary role or expanded tech
+     * roles receive reduced base time. Personnel without any tech role receive no tech time. The base time is then
+     * multiplied by factors based on the tech's skill level and whether administrative support is available.</p>
      *
-     * <p>The calculation follows these rules:</p>
-     * <ul>
-     *   <li>If the person's primary role is a technician, the base support time is determined from the primary
-     *   role.</li>
-     *   <li>Otherwise, the base support time is taken from the secondary role.</li>
-     * </ul>
+     * @param isTechsUseAdministration whether techs benefit from administrative support personnel, which increases
+     *                                 their available working time
      *
-     * <p>If administrative adjustments are enabled (via the {@code isTechsUseAdministration} parameter),
-     * the support time is multiplied by an administrative adjustment multiplier.</p>
-     *
-     * @param isTechsUseAdministration A boolean flag indicating whether administrative adjustments should be applied in
-     *                                 the calculation.
-     *
-     * @return The adjusted daily available tech time for the person, after factoring in the appropriate role support
-     *       time, applying the administrative multiplier (if enabled), and deducting maintenance time.
+     * @return the total available tech time in minutes per day, rounded to the nearest minute, or 0 if the person has
+     *       no tech role
      */
     public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
-        int baseTime = (getPrimaryRole().isTech() ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME);
+        int baseTime = 0;
+
+        if (primaryRole.isTech()) {
+            if (secondaryRole.isNone() || secondaryRole.isCivilian()) {
+                baseTime = PRIMARY_ROLE_SUPPORT_TIME;
+            } else {
+                baseTime = SECONDARY_ROLE_SUPPORT_TIME;
+            }
+        } else if (secondaryRole.isTechSecondary()) {
+            if (primaryRole.isNone() || primaryRole.isCivilian()) {
+                baseTime = PRIMARY_ROLE_SUPPORT_TIME;
+            } else {
+                baseTime = SECONDARY_ROLE_SUPPORT_TIME;
+            }
+        }
 
         return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration));
     }
@@ -5906,60 +5942,51 @@ public class Person {
     }
 
     /**
-     * Resets the number of minutes and overtime minutes a person has left for tasks, based on their primary or
-     * secondary role. Administrative adjustments may be applied for technicians if specified.
+     * Resets the available working time (minutes and overtime) for this person based on their role, deployment status,
+     * and administrative support.
      *
-     * <p>This method calculates and assigns task and overtime time values depending on whether
-     * the person is identified as a technician or doctor, and whether their role is primary or secondary. If
-     * administrative adjustments are enabled (via the {@code isTechsUseAdministration} parameter), a multiplier is
-     * applied to calculate the adjusted task time for technicians.</p>
+     * <p>Personnel deployed to combat or without support roles have no available time. Doctors receive standard
+     * support time, while techs receive time adjusted by skill and administration multipliers.</p>
      *
-     * <ul>
-     *   <li>If the primary role is a doctor, the base support time values for the primary role
-     *       are assigned without any adjustments.</li>
-     *   <li>If the secondary role is a doctor, the base support time values for the secondary role
-     *       are assigned without any adjustments.</li>
-     *   <li>If the primary role is a technician and administrative adjustments are enabled, the primary
-     *       role's support time is multiplied by the administrative adjustment multiplier and assigned.</li>
-     *   <li>If the secondary role is a technician (secondary-specific), and administrative adjustments
-     *       are enabled, the secondary role's support time is multiplied by the adjustment multiplier and assigned.</li>
-     *   <li>If administrative adjustments are not enabled for technicians, base (non-adjusted) time values
-     *       are used for both primary and secondary roles.</li>
-     * </ul>
-     *
-     * <p>If the person has both primary and secondary roles applicable (e.g., a doctor as the primary
-     * and a technician as the secondary), the logic prioritizes the roles as listed above, with primary roles
-     * taking precedence.</p>
-     *
-     * @param isTechsUseAdministration Indicates whether administrative adjustments should be applied to the time
-     *                                 calculations for technicians.
+     * @param isTechsUseAdministration whether techs benefit from administrative support personnel, which increases
+     *                                 their available working time
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
-        // Doctors
-        if (primaryRole.isDoctor()) {
+        // Units deployed to combat have no available time
+        if (unit != null && (unit.isDeployed() || StratConRulesManager.isUnitDeployedToStratCon(unit))) {
+            this.minutesLeft = 0;
+            this.overtimeLeft = 0;
+            return;
+        }
+
+        // Personnel without tech or doctor roles have no available time
+        if (!isTech() && !isDoctor()) {
+            this.minutesLeft = 0;
+            this.overtimeLeft = 0;
+            return;
+        }
+
+        if (primaryRole.isTech() || primaryRole.isDoctor()) {
+            getRoleMinutes(secondaryRole);
+        } else if (secondaryRole.isTechSecondary() || secondaryRole.isDoctor()) {
+            getRoleMinutes(primaryRole);
+        }
+
+        // Techs get support time adjusted by skill and administration multipliers
+        if (isTech() && isTechsUseAdministration) {
+            double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
+            this.minutesLeft = (int) Math.round(minutesLeft * multiplier);
+            this.overtimeLeft = (int) Math.round(overtimeLeft * multiplier);
+        }
+    }
+
+    private void getRoleMinutes(PersonnelRole comparisonRole) {
+        if (comparisonRole.isNone() || comparisonRole.isCivilian()) {
             this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
             this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-            return;
-        }
-
-        if (secondaryRole.isDoctor()) {
+        } else {
             this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
             this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
-            return;
-        }
-
-        // Technicians
-        if (primaryRole.isTech()) {
-            double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
-            this.minutesLeft = (int) Math.round(PRIMARY_ROLE_SUPPORT_TIME * multiplier);
-            this.overtimeLeft = (int) Math.round(PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * multiplier);
-            return;
-        }
-
-        if (secondaryRole.isTechSecondary()) {
-            double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
-            this.minutesLeft = (int) Math.round(SECONDARY_ROLE_SUPPORT_TIME * multiplier);
-            this.overtimeLeft = (int) Math.round(SECONDARY_ROLE_OVERTIME_SUPPORT_TIME * multiplier);
         }
     }
 
@@ -6922,6 +6949,20 @@ public class Person {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
+    public List<String> getPlanetaryInoculations() {
+        return planetaryInoculations;
+    }
+
+    public boolean hasPlanetaryInoculation(String planetId) {
+        return planetaryInoculations.contains(planetId);
+    }
+
+    public void addPlanetaryInoculation(String planetId) {
+        if (!hasPlanetaryInoculation(planetId)) {
+            planetaryInoculations.add(planetId);
+        }
+    }
+
     public void diagnose(final Campaign campaign, final int hits) {
         InjuryUtil.resolveAfterCombat(campaign, this, hits);
         InjuryUtil.resolveCombatDamage(campaign, this, hits);
@@ -7149,7 +7190,7 @@ public class Person {
         if (isFounder()) {
             shares++;
         }
-        shares += Math.max(-1, getExperienceLevel(campaign, false) - 2);
+        shares += Math.max(-1, getExperienceLevel(campaign, false, true) - 2);
 
         if (getRank().isOfficer()) {
             final Profession profession = Profession.getProfessionFromPersonnelRole(getPrimaryRole());
@@ -7193,7 +7234,7 @@ public class Person {
         // MekWarriors and aero pilots are worth more than the other types of scrubs
         return (getPrimaryRole().isMekWarriorGrouping() || getPrimaryRole().isAerospacePilot() ?
                       MEKWARRIOR_AERO_RANSOM_VALUES :
-                      OTHER_RANSOM_VALUES).get(getExperienceLevel(campaign, false));
+                      OTHER_RANSOM_VALUES).get(getExperienceLevel(campaign, false, true));
     }
 
     public static class PersonUnitRef extends Unit {
@@ -8181,14 +8222,9 @@ public class Person {
      * @since 0.50.07
      */
     public int getDarkSecretModifier(final boolean isReputation) {
-        // If the dark secret is not revealed and the character does not have a dark secret, return 0
-        if (!darkSecretRevealed && !hasDarkSecret()) {
+        // Only apply modifiers if the character has a dark secret AND it is revealed; otherwise, return 0
+        if (!darkSecretRevealed || !hasDarkSecret()) {
             return 0;
-        }
-
-        // If the character has a dark secret, but it is not revealed, return a default modifier (e.g., -1)
-        if (!darkSecretRevealed && hasDarkSecret()) {
-            return -1; // Default modifier for unrevealed dark secrets
         }
 
         // If the dark secret is revealed, calculate the appropriate modifier
@@ -8332,6 +8368,21 @@ public class Person {
     }
 
     /**
+     * Retrieves skill modifier data for this person with default settings.
+     *
+     * <p>This is a convenience method that calls {@link #getSkillModifierData(boolean)} with exclude injury effects
+     * disabled.</p>
+     *
+     * @return a {@link SkillModifierData} object containing the calculated skill modifiers
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public SkillModifierData getSkillModifierData() {
+        return getSkillModifierData(false);
+    }
+
+    /**
      * Gets skill modifier data for this person without reputation adjustments.
      *
      * <p>This is a convenience method that returns skill modifier data with:</p>
@@ -8346,13 +8397,39 @@ public class Person {
      * <p>Use {@link #getSkillModifierData(boolean, boolean, LocalDate)} if reputation adjustments based on age,
      * campaign type, and rank are needed.</p>
      *
+     * @param excludeInjuryEffects {@code true} to ignore all skill modifiers from injury effects.
+     *
      * @return a {@link SkillModifierData} object with reputation set to 0
+     *
+     * @author Illiani
+     * @since 0.50.10
      */
-    public SkillModifierData getSkillModifierData() {
+    public SkillModifierData getSkillModifierData(boolean excludeInjuryEffects) {
         boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
-        List<InjuryEffect> injuryEffects = AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
-              injuries);
+        List<InjuryEffect> injuryEffects = excludeInjuryEffects ? new ArrayList<>() :
+                                                 AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
+                                                       injuries);
         return new SkillModifierData(options, atowAttributes, 0, isIlliterate(), injuryEffects);
+    }
+
+    /**
+     * Retrieves skill modifier data for this person based on campaign settings and current date.
+     *
+     * <p>This is a convenience method that calls the full
+     * {@link #getSkillModifierData(boolean, boolean, LocalDate, boolean)} method with the exclude injury modifiers flag
+     * set to {@code false}.
+     *
+     * @param isUseAgingEffects {@code true} if aging effects should be applied to skill modifiers
+     * @param isClanCampaign    {@code true} if this is a Clan campaign, {@code false} otherwise
+     * @param today             the current date to use for calculating age-based modifiers
+     *
+     * @return a {@link SkillModifierData} object containing the calculated skill modifiers
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public SkillModifierData getSkillModifierData(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
+        return getSkillModifierData(isUseAgingEffects, isClanCampaign, today, false);
     }
 
     /**
@@ -8367,21 +8444,25 @@ public class Person {
      *   <li>Illiteracy status</li>
      * </ul>
      *
-     * @param isUseAgingEffects whether aging effects should be applied to reputation
-     * @param isClanCampaign    whether this is a Clan campaign (affects reputation calculation)
-     * @param today             the current campaign date (used for age-based calculations)
+     * @param isUseAgingEffects    whether aging effects should be applied to reputation
+     * @param isClanCampaign       whether this is a Clan campaign (affects reputation calculation)
+     * @param today                the current campaign date (used for age-based calculations)
+     * @param excludeInjuryEffects {@code true} to ignore all skill modifiers from injury effects.
      *
      * @return a {@link SkillModifierData} object containing all relevant modifiers
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public SkillModifierData getSkillModifierData(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
+    public SkillModifierData getSkillModifierData(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
+          boolean excludeInjuryEffects) {
         int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rank);
 
         boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
-        List<InjuryEffect> injuryEffects = AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
-              injuries);
+        List<InjuryEffect> injuryEffects = excludeInjuryEffects ?
+                                                 new ArrayList<>() :
+                                                 AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
+                                                       injuries);
 
         return new SkillModifierData(options, atowAttributes, adjustedReputation, isIlliterate(), injuryEffects);
     }

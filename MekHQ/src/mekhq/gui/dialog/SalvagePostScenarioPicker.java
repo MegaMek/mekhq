@@ -720,6 +720,7 @@ public class SalvagePostScenarioPicker {
      * <ul>
      *   <li>Any salvage assignment has invalid validation (insufficient capacity, missing naval tug)</li>
      *   <li>For contracts: the player's salvage percentage exceeds the contract limit</li>
+     *   <li>The used minutes exceed the available minutes</li>
      * </ul>
      *
      * <p>When the salvage percentage is exceeded, the unit salvage label is also colored red.</p>
@@ -735,6 +736,8 @@ public class SalvagePostScenarioPicker {
      */
     private void updateConfirmButtonState(List<SalvageComboBoxGroup> salvageComboBoxGroups, JButton confirmButton,
           JLabel unitSalvageLabel, JLabel salvageTimeLabel, boolean isContract) {
+        boolean shouldEnable = true;
+
         // Check for any invalid units
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
             group.unitLabel.setForeground(null); // reset
@@ -745,6 +748,7 @@ public class SalvagePostScenarioPicker {
             // If units are assigned, check validation state
             if ((unitName1 != null || unitName2 != null) && !isValidationValid(group)) {
                 disableConfirmAndColorName(confirmButton, group.unitLabel);
+                shouldEnable = false;
             }
         }
 
@@ -762,19 +766,23 @@ public class SalvagePostScenarioPicker {
 
                 if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0 && !isExchangeRights) {
                     disableConfirmAndColorName(confirmButton, unitSalvageLabel);
+                    shouldEnable = false;
                 }
             }
         }
 
         // Time budget check (disable and, ideally, color the time label in updateSalvageAllocation)
         if (usedSalvageTime > maximumSalvageTime) {
-            salvageTimeLabel.setForeground(null);
-            confirmButton.setEnabled(false);
             disableConfirmAndColorName(confirmButton, salvageTimeLabel);
+            shouldEnable = false;
+        } else {
+            if (salvageTimeLabel != null) {
+                salvageTimeLabel.setForeground(null);
+            }
         }
 
         // All checks passed
-        confirmButton.setEnabled(true);
+        confirmButton.setEnabled(shouldEnable);
     }
 
     private static void disableConfirmAndColorName(JButton confirmButton, JLabel unitSalvageLabel) {

@@ -61,6 +61,9 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
         ForceType forceType = force.getForceType();
         UUID techId = force.getTechID();
         Person tech = techId == null || !forceType.isSalvage() ? null : campaign.getPerson(techId);
+        if (tech != null && tech.isEngineer()) { // Engineers cannot salvage
+            tech = null;
+        }
 
         double maximumCargoCapacity = 0.0;
         double maximumTowCapacity = 0.0;
@@ -125,7 +128,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
             tooltip.append(tech.getFullTitle()).append("<br>");
 
             boolean isTechSecondary = tech.getSecondaryRole().isTechSecondary();
-            tooltip.append(tech.getSkillLevel(campaign, isTechSecondary)).append("<br>");
+            tooltip.append(tech.getSkillLevel(campaign, isTechSecondary, true)).append("<br>");
 
             String injuryLabelKey;
             int injuries;

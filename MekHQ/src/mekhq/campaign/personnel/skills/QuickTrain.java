@@ -102,7 +102,8 @@ public class QuickTrain {
 
             List<String> targetSkills = new ArrayList<>();
 
-            SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign, today);
+            SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
+                  today, true);
             processSkills(person, isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration,
                   isUseArtillery, targetSkills, skillModifierData);
 

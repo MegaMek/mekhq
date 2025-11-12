@@ -161,7 +161,7 @@ public class AverageExperienceRating {
             }
 
             Crew crew = entity.getCrew();
-            SkillModifierData skillModifierData = person.getSkillModifierData();
+            SkillModifierData skillModifierData = person.getSkillModifierData(true);
 
             // Experience calculation varies depending on the type of entity
             if (entity instanceof Infantry) {
@@ -280,7 +280,7 @@ public class AverageExperienceRating {
         int skillCount = 0;
 
         boolean isTank = entity instanceof Tank;
-        SkillModifierData skillModifierData = person.getSkillModifierData();
+        SkillModifierData skillModifierData = person.getSkillModifierData(true);
         if (isTank || unit.isDriver(person)) {
             skillType = SkillType.getDrivingSkillFor(entity);
             Skill skill = person.getSkill(skillType);

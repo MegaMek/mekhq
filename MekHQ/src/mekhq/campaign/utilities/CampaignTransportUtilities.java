@@ -42,6 +42,7 @@ import java.util.Vector;
 
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.Cargo;
+import megamek.common.equipment.HandheldWeapon;
 import megamek.common.equipment.ICarryable;
 import megamek.common.units.*;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -326,6 +327,28 @@ public class CampaignTransportUtilities {
                       // Add ROOF_RACK back once we can better handle how they impact MP
                       transporters.add(LIFT_HOIST);
                       transporters.add(ROOF_RACK);
+                  }
+
+                  return transporters;
+              }
+          },
+          new Visitor<HandheldWeapon>() {
+              @Override
+              public boolean isInterestedIn(ICarryable entity) {
+                  return entity instanceof HandheldWeapon;
+              }
+
+              @Override
+              public EnumSet<TransporterType> getTransporterTypes(HandheldWeapon handheldWeapon,
+                    CampaignTransportType
+                          campaignTransportType) {
+                  EnumSet<TransporterType> transporters = EnumSet.noneOf(TransporterType.class);
+
+                  //Ship transports can't use some transport types
+                  if (!(campaignTransportType.isShipTransport())) {
+                      // For now just MekArms. This should be expanded to include regular cargo bays and lift hoists
+                      // once those are supported for HHW in MHQ
+                      transporters.add(MEK_ARMS);
                   }
 
                   return transporters;

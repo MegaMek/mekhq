@@ -336,8 +336,7 @@ public class PartsInUseManager {
                 return;
             }
 
-            String stockKey = partInUse.getDescription();
-            stockKey += Part.getTechBaseName(partInUse.getTechBase());
+            String stockKey = getStockKey(partInUse);
 
             if (inUse.containsKey(partInUse)) {
                 partInUse = inUse.get(partInUse);
@@ -361,8 +360,7 @@ public class PartsInUseManager {
                 continue;
             }
 
-            String stockKey = partInUse.getDescription();
-            stockKey += Part.getTechBaseName(partInUse.getTechBase());
+            String stockKey = getStockKey(partInUse);
 
             if (inUse.containsKey(partInUse)) {
                 partInUse = inUse.get(partInUse);
@@ -463,5 +461,18 @@ public class PartsInUseManager {
         }
 
         return toBuy;
+    }
+
+    /**
+     * Generates a unique stock key for a part by combining its description and tech base name.
+     *
+     * @param partInUse the part to generate a stock key for
+     *
+     * @return a string combining the part's description and tech base name
+     */
+    public static String getStockKey(PartInUse partInUse) {
+        String stockKey = partInUse.getDescription();
+        stockKey += Part.getTechBaseName(partInUse.getTechBase());
+        return stockKey;
     }
 }

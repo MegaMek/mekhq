@@ -32,6 +32,10 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
+import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
+import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 
 import java.awt.Container;
@@ -45,9 +49,11 @@ import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.enums.ValidationState;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
@@ -55,6 +61,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -63,7 +70,13 @@ import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
 import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
 import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
+import mekhq.gui.campaignOptions.optionChangeDialogs.AdvancedScoutingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.FatigueTrackingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.SalvageCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.StratConConvoyCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.gui.panels.CompanyGenerationOptionsPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -201,6 +214,98 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         ReputationController reputationController = new ReputationController();
         reputationController.initializeReputation(campaign);
         campaign.setReputation(reputationController);
+
+        processBonusUnitsBasedOnCampaignOptions(trackers, options);
+    }
+
+    private void processBonusUnitsBasedOnCampaignOptions(List<CompanyGenerationPersonTracker> trackers,
+          CompanyGenerationOptions options) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+            int combatants = 0;
+            for (CompanyGenerationPersonTracker tracker : trackers) {
+                if (tracker.getPersonType().isCombat()) {
+                    combatants++;
+                }
+            }
+
+            if (combatants > 0) {
+                new ImmersiveDialogNotification(campaign,
+                      resources.getString("CompanyGenerationDialog.campaignOptions.altAdvancedMedical"),
+                      true);
+                for (int i = 0; i < combatants; i++) {
+                    generateSparePersonnel(options);
+                }
+            }
+        }
+
+        if (campaignOptions.isUseFatigue()) {
+            new ImmersiveDialogNotification(campaign,
+                  resources.getString("CompanyGenerationDialog.campaignOptions.fatigue"),
+                  true);
+            FatigueTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
+        }
+
+        if (campaignOptions.isUseMASHTheatres()) {
+            new ImmersiveDialogNotification(campaign,
+                  resources.getString("CompanyGenerationDialog.campaignOptions.mash"),
+                  true);
+            MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
+        }
+
+        if (campaignOptions.isUseCamOpsSalvage()) {
+            new ImmersiveDialogNotification(campaign,
+                  resources.getString("CompanyGenerationDialog.campaignOptions.salvage"),
+                  true);
+            SalvageCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign);
+        }
+
+        if (campaignOptions.isUseStratCon()) {
+            new ImmersiveDialogNotification(campaign,
+                  resources.getString("CompanyGenerationDialog.campaignOptions.stratCon"),
+                  true);
+            StratConConvoyCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign);
+        }
+
+        if (campaignOptions.isUseAdvancedScouting() && campaignOptions.isUseStratCon()) {
+            AdvancedScoutingCampaignOptionsChangedConfirmationDialog.processFreeSkills(campaign, true);
+        }
+    }
+
+    private void generateSparePersonnel(CompanyGenerationOptions options) {
+        Person person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+
+        RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
+        boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        overrideSkills(campaignOptions.isAdminsHaveNegotiation(),
+              campaignOptions.isDoctorsUseAdministration(),
+              campaignOptions.isTechsUseAdministration(),
+              campaignOptions.isUseArtillery(),
+              useExtraRandomness,
+              person,
+              PersonnelRole.MEKWARRIOR,
+              SkillLevel.GREEN);
+
+        SkillLevel actualSkillLevel = person.getSkillLevel(campaign, false);
+        if (campaign.getCampaignOptions().isUseAgeEffects()) {
+            updateAllSkillAgeModifiers(campaign.getLocalDate(), person);
+        }
+
+        reRollLoyalty(person, actualSkillLevel);
+        reRollAdvantages(campaign, person, actualSkillLevel);
+
+        if (options.isAutomaticallyAssignRanks()) {
+            final Faction faction = options.isUseSpecifiedFactionToAssignRanks()
+                                          ? options.getSpecifiedFaction()
+                                          : campaign.getFaction();
+            person.setRank((faction.isComStarOrWoB() || faction.isClan())
+                                 ? 4
+                                 : 12);
+        }
+
+        campaign.recruitPerson(person, true, true);
     }
 
     @Override

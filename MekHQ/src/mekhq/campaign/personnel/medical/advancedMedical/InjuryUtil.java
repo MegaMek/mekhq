@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.medical.advancedMedical;
 
+import static java.lang.Math.ceil;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -121,7 +123,8 @@ public final class InjuryUtil {
      */
     public static void resolveCombatDamage(Campaign campaign, Person person, int hits) {
         if (campaign.getCampaignOptions().isUseAlternativeAdvancedMedical()) {
-            resolveCombatDamageUsingAlternateModel(campaign, person, hits);
+            resolveCombatDamageUsingAlternateModel(campaign, person, hits,
+                  campaign.getCampaignOptions().isUseKinderAlternativeAdvancedMedical());
         } else {
             resolveCombatDamageUsingStandardModel(campaign, person, hits);
         }
@@ -158,16 +161,27 @@ public final class InjuryUtil {
      * <p>Injuries may be automatically removed during processing if the body location they affect has been severed
      * by another injury.</p>
      *
-     * @param campaign the current campaign
-     * @param person   the person who suffered combat damage
-     * @param hits     the number of TW-scale Hits taken
+     * @param campaign        the current campaign
+     * @param person          the person who suffered combat damage
+     * @param hits            the number of TW-scale Hits taken
+     * @param isUseKinderMode {@code true} to halve all recovery times
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static void resolveCombatDamageUsingAlternateModel(Campaign campaign, Person person, int hits) {
+    private static void resolveCombatDamageUsingAlternateModel(Campaign campaign, Person person, int hits,
+          boolean isUseKinderMode) {
         Collection<Injury> newInjuries = AdvancedMedicalAlternate.generateInjuriesFromHits(campaign, person, hits);
-        newInjuries.forEach(person::addInjury);
+        for (Injury injury : newInjuries) {
+            if (isUseKinderMode) {
+                int originalRecoveryTime = injury.getOriginalTime();
+                int newRecoveryTime = (int) ceil(originalRecoveryTime / 2.0);
+                injury.setOriginalTime(newRecoveryTime);
+                injury.setTime(newRecoveryTime);
+            }
+
+            person.addInjury(injury);
+        }
 
         // Remove injuries from limbs that have been severed
         AdvancedMedicalAlternate.purgeIllogicalInjuries(person);
@@ -427,7 +441,7 @@ public final class InjuryUtil {
                           GenderDescriptors.HIS_HER_THEIR.getDescriptor(p.getGender()),
                           i.getName()), rnd -> {
                         int time = i.getTime();
-                        i.setTime((int) Math.max(Math.ceil(time * 1.2), time + 5));
+                        i.setTime((int) Math.max(ceil(time * 1.2), time + 5));
                         MedicalLogger.docMadeAMistake(doc, p, i, c.getLocalDate());
 
                         // TODO: Add in special handling of the critical

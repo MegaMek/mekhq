@@ -226,7 +226,7 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING,
-              SUPPORT));
+              SUPPORT, SUPPORT_TECHNICIAN));
         if (!relevantSkills.isEmpty()) {
             JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.profession");
             gridBagConstraints = new GridBagConstraints();
@@ -1946,7 +1946,6 @@ public class PersonViewPanel extends JScrollablePanel {
               doctorsUseAdmin,
               techsUseAdmin,
               isUseArtillery));
-        secondaryProfessionSkills.removeAll(primaryProfessionSkills);
 
         // Calculate how many rows per column for even distribution
         double numColumns = 3.0;
@@ -2353,7 +2352,7 @@ public class PersonViewPanel extends JScrollablePanel {
         int baseFatigue = person.getFatigue();
         int effectiveFatigue = getEffectiveFatigue(person.getFatigue(),
               person.isClanPersonnel(),
-              person.getSkillLevel(campaign, false));
+              person.getSkillLevel(campaign, false, true));
         if (campaignOptions.isUseFatigue() && (baseFatigue != 0 || effectiveFatigue != 0)) {
             StringBuilder fatigueDisplay = new StringBuilder("<html>");
             int fatigueTurnoverModifier = MathUtility.clamp(((effectiveFatigue - 1) / 4) - 1, 0, 3);

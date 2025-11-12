@@ -55,6 +55,7 @@ import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLA
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_RECOVERY;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_EDGE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ARTILLERY;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
@@ -130,6 +131,8 @@ import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.DiseaseService;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -191,6 +194,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_EDIT_INJURIES = "EDIT_INJURIES";
     private static final String CMD_ADD_RANDOM_INJURY = "ADD_RANDOM_INJURY";
     private static final String CMD_ADD_RANDOM_INJURIES = "ADD_RANDOM_INJURIES";
+    private static final String CMD_ADD_RANDOM_DISEASE = "CMD_ADD_RANDOM_DISEASE";
     private static final String CMD_REMOVE_INJURY = "REMOVE_INJURY";
     private static final String CMD_REPLACE_MISSING_LIMB = "REPLACE_MISSING_LIMB";
     private static final String CMD_CLEAR_INJURIES = "CLEAR_INJURIES";
@@ -712,7 +716,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       true,
                       resources.getString("spendOnAttributes.score"),
                       selectedPerson.getAttributeScore(attribute),
-                      MINIMUM_ATTRIBUTE_SCORE);
+                      attribute == SkillAttribute.EDGE ? MINIMUM_EDGE_SCORE : MINIMUM_ATTRIBUTE_SCORE);
                 choiceDialog.setVisible(true);
 
                 int choice = choiceDialog.getValue();
@@ -1278,7 +1282,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                           person.getFullName());
                     getCampaign().getFinances().credit(TransactionType.RANSOM, today, bounty, bountyReport);
                     person.changeStatus(getCampaign(), today, PersonnelStatus.HOMICIDE);
-                    validBounty = true;
+                    if (person.getPrisonerStatus().isFree()) { // Deliberately excluding Bondsmen from this check
+                        validBounty = true;
+                    }
                 }
 
                 if (validBounty) {
@@ -1581,6 +1587,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ADD_RANDOM_INJURY: {
                 for (Person person : people) {
                     InjuryUtil.resolveCombatDamage(getCampaign(), person, 1);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_ADD_RANDOM_DISEASE: {
+                InjuryType disease = DiseaseService.catchRandomDisease();
+                Inoculations.triggerDiseaseSpreadMessages(getCampaign(), !getCampaign().getLocation().isOnPlanet(),
+                      Collections.singleton(disease.getSimpleName()));
+                for (Person person : people) {
+                    Inoculations.applyDisease(getCampaign(), person, disease);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -2212,7 +2228,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenu menuSupportPrimary = new JMenu(resources.getString("changeRole.support"));
         JMenu menuCivilianPrimary = new JMenu(resources.getString("changeRole.civilian"));
 
-
+        List<PersonnelRole> canPerformRoles = new ArrayList<>();
+        List<PersonnelRole> cannotPerformRoles = new ArrayList<>();
         for (final PersonnelRole role : roles) {
             boolean allCanPerform = true;
 
@@ -2224,23 +2241,38 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (allCanPerform) {
-                cbMenuItem = new JCheckBoxMenuItem(role.getLabel(getCampaign().isClanCampaign()));
-                cbMenuItem.setToolTipText(wordWrap(role.getTooltip(getCampaign().isClanCampaign()), 50));
-                cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_ROLE, role.name()));
-                cbMenuItem.addActionListener(this);
-                if (oneSelected && role == person.getPrimaryRole()) {
-                    cbMenuItem.setSelected(true);
-                }
-
-                if (role.isCombat()) {
-                    menuCombatPrimary.add(cbMenuItem);
-                } else if (role.isSupport(true)) {
-                    menuSupportPrimary.add(cbMenuItem);
-                } else {
-                    menuCivilianPrimary.add(cbMenuItem);
-                }
+                canPerformRoles.add(role);
+            } else {
+                cannotPerformRoles.add(role);
             }
         }
+
+        for (final PersonnelRole role : canPerformRoles) {
+            cbMenuItem = new JCheckBoxMenuItem(role.getLabel(getCampaign().isClanCampaign()));
+            cbMenuItem.setToolTipText(wordWrap(role.getTooltip(getCampaign().isClanCampaign())));
+            cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_ROLE, role.name()));
+            cbMenuItem.addActionListener(this);
+            if (oneSelected && role == person.getPrimaryRole()) {
+                cbMenuItem.setSelected(true);
+            }
+
+            addRoleToMenu(role, menuCombatPrimary, cbMenuItem, menuSupportPrimary, menuCivilianPrimary);
+        }
+
+        if (!canPerformRoles.isEmpty() && !cannotPerformRoles.isEmpty()) {
+            menuCombatPrimary.addSeparator();
+            menuSupportPrimary.addSeparator();
+            menuCivilianPrimary.addSeparator();
+        }
+
+        for (final PersonnelRole role : cannotPerformRoles) {
+            cbMenuItem = new JCheckBoxMenuItem(role.getLabel(getCampaign().isClanCampaign()));
+            cbMenuItem.setToolTipText(wordWrap(role.getTooltip(getCampaign().isClanCampaign())));
+            cbMenuItem.setEnabled(false);
+
+            addRoleToMenu(role, menuCombatPrimary, cbMenuItem, menuSupportPrimary, menuCivilianPrimary);
+        }
+
         if (menuCombatPrimary.getItemCount() > 0) {
             menu.add(menuCombatPrimary);
         }
@@ -2276,13 +2308,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     cbMenuItem.setSelected(true);
                 }
 
-                if (role.isCombat()) {
-                    menuCombatSecondary.add(cbMenuItem);
-                } else if (role.isSupport(true)) {
-                    menuSupportSecondary.add(cbMenuItem);
-                } else {
-                    menuCivilianSecondary.add(cbMenuItem);
-                }
+                addRoleToMenu(role, menuCombatSecondary, cbMenuItem, menuSupportSecondary, menuCivilianSecondary);
             }
         }
 
@@ -2778,432 +2804,51 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 List<SpecialAbility> specialAbilities = new ArrayList<>(SpecialAbility.getSpecialAbilities().values());
                 specialAbilities.sort(Comparator.comparing(SpecialAbility::getName));
 
+                List<SpecialAbility> eligibleAbilities = new ArrayList<>();
+                List<SpecialAbility> notEligibleAbilities = new ArrayList<>();
                 for (SpecialAbility spa : specialAbilities) {
                     if (null == spa) {
                         continue;
                     }
-                    if (!spa.isEligible(person)) {
-                        continue;
+                    if (spa.isEligible(person)) {
+                        eligibleAbilities.add(spa);
+                    } else {
+                        notEligibleAbilities.add(spa);
                     }
+                }
 
-                    // Reasoning cost changes should always take place before global changes
-                    int baseCost = spa.getCost();
-                    cost = (int) round(baseCost > 0 ? baseCost * reasoningXpCostMultiplier : baseCost);
-                    cost = (int) round(cost * xpCostMultiplier);
+                for (SpecialAbility spa : eligibleAbilities) {
+                    addSPAToMenu(spa,
+                          reasoningXpCostMultiplier,
+                          xpCostMultiplier,
+                          person,
+                          combatAbilityMenu,
+                          maneuveringAbilityMenu,
+                          utilityAbilityMenu,
+                          characterFlawMenu,
+                          characterOriginMenu,
+                          true);
+                }
 
-                    String costDesc = String.format(resources.getString("costValue.format"), cost);
-                    boolean available = person.getXP() >= cost;
-                    if (spa.getName().equals(OptionsConstants.GUNNERY_WEAPON_SPECIALIST)) {
-                        Unit unit = person.getUnit();
-                        if (null != unit) {
-                            JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_WEAPON_SPECIALIST));
-                            TreeSet<String> uniqueWeapons = new TreeSet<>();
-                            for (int j = 0; j < unit.getEntity().getWeaponList().size(); j++) {
-                                Mounted<?> m = unit.getEntity().getWeaponList().get(j);
-                                uniqueWeapons.add(m.getName());
-                            }
-                            boolean isSpecialist = person.getOptions().booleanOption(spa.getName());
-                            for (String name : uniqueWeapons) {
-                                if (!(isSpecialist &&
-                                            person.getOptions().getOption(spa.getName()).stringValue().equals(name))) {
-                                    menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                                          name,
-                                          costDesc));
-                                    menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                                           "<br><br>" +
-                                                                           spa.getAllPrereqDesc()));
-                                    menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_WEAPON_SPECIALIST,
-                                          name,
-                                          String.valueOf(cost)));
-                                    menuItem.addActionListener(this);
-                                    menuItem.setEnabled(available);
-                                    specialistMenu.add(menuItem);
-                                }
-                            }
+                if (!eligibleAbilities.isEmpty()) {
+                    combatAbilityMenu.addSeparator();
+                    maneuveringAbilityMenu.addSeparator();
+                    utilityAbilityMenu.addSeparator();
+                    characterFlawMenu.addSeparator();
+                    characterOriginMenu.addSeparator();
+                }
 
-                            if (specialistMenu.getMenuComponentCount() > 0) {
-                                placeInAppropriateSPASubMenu(spa,
-                                      specialistMenu,
-                                      combatAbilityMenu,
-                                      maneuveringAbilityMenu,
-                                      utilityAbilityMenu,
-                                      characterFlawMenu,
-                                      characterOriginMenu);
-                            }
-                        }
-                    } else if (spa.getName().equals(OptionsConstants.GUNNERY_SANDBLASTER)) {
-                        Unit u = person.getUnit();
-                        if (null != u) {
-                            JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_SANDBLASTER));
-                            TreeSet<String> uniqueWeapons = new TreeSet<>();
-                            for (int j = 0; j < u.getEntity().getWeaponList().size(); j++) {
-                                Mounted<?> m = u.getEntity().getWeaponList().get(j);
-                                if (SpecialAbility.isWeaponEligibleForSPA(m.getType(), person.getPrimaryRole(), true)) {
-                                    uniqueWeapons.add(m.getName());
-                                }
-                            }
-                            boolean isSpecialist = person.getOptions().booleanOption(spa.getName());
-                            for (String name : uniqueWeapons) {
-                                if (!(isSpecialist &&
-                                            person.getOptions().getOption(spa.getName()).stringValue().equals(name))) {
-                                    menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                                          name,
-                                          costDesc));
-                                    menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                                           "<br><br>" +
-                                                                           spa.getAllPrereqDesc()));
-                                    menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SANDBLASTER,
-                                          name,
-                                          String.valueOf(cost)));
-                                    menuItem.addActionListener(this);
-                                    menuItem.setEnabled(available);
-                                    specialistMenu.add(menuItem);
-                                }
-                            }
-                            if (specialistMenu.getMenuComponentCount() > 0) {
-                                placeInAppropriateSPASubMenu(spa,
-                                      specialistMenu,
-                                      combatAbilityMenu,
-                                      maneuveringAbilityMenu,
-                                      characterFlawMenu, utilityAbilityMenu,
-                                      characterOriginMenu);
-                            }
-                        }
-                    } else if (spa.getName().equals(OptionsConstants.MISC_ENV_SPECIALIST)) {
-                        JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.MISC_ENV_SPECIALIST));
-                        List<Object> tros = new ArrayList<>();
-                        if (person.getOptions().getOption(OptionsConstants.MISC_ENV_SPECIALIST).booleanValue()) {
-                            Object val = person.getOptions().getOption(OptionsConstants.MISC_ENV_SPECIALIST).getValue();
-                            if (val instanceof Collection<?>) {
-                                tros.addAll((Collection<?>) val);
-                            } else {
-                                tros.add(val);
-                            }
-                        }
-                        menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                              resources.getString("envspec_fog.text"),
-                              costDesc));
-                        menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
-                        if (!tros.contains(Crew.ENVIRONMENT_SPECIALIST_FOG)) {
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
-                                  Crew.ENVIRONMENT_SPECIALIST_FOG,
-                                  String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                        }
-
-                        if (!tros.contains(Crew.ENVIRONMENT_SPECIALIST_LIGHT)) {
-                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                                  resources.getString("envspec_light.text"),
-                                  costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                                   "<br><br>" +
-                                                                   spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
-                                  Crew.ENVIRONMENT_SPECIALIST_LIGHT,
-                                  String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                        }
-
-                        if (!tros.contains(Crew.ENVIRONMENT_SPECIALIST_RAIN)) {
-                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                                  resources.getString("envspec_rain.text"),
-                                  costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                                   "<br><br>" +
-                                                                   spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
-                                  Crew.ENVIRONMENT_SPECIALIST_RAIN,
-                                  String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                        }
-
-                        if (!tros.contains(Crew.ENVIRONMENT_SPECIALIST_SNOW)) {
-                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                                  resources.getString("envspec_snow.text"),
-                                  costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                                   "<br><br>" +
-                                                                   spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
-                                  Crew.ENVIRONMENT_SPECIALIST_SNOW,
-                                  String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                        }
-
-                        if (!tros.contains(Crew.ENVIRONMENT_SPECIALIST_WIND)) {
-                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                                  resources.getString("envspec_wind.text"),
-                                  costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                                   "<br><br>" +
-                                                                   spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
-                                  Crew.ENVIRONMENT_SPECIALIST_WIND,
-                                  String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                        }
-
-                        if (specialistMenu.getMenuComponentCount() > 0) {
-                            placeInAppropriateSPASubMenu(spa,
-                                  specialistMenu,
-                                  combatAbilityMenu,
-                                  maneuveringAbilityMenu,
-                                  characterFlawMenu, utilityAbilityMenu,
-                                  characterOriginMenu);
-                        }
-                    } else if (spa.getName().equals(OptionsConstants.MISC_HUMAN_TRO)) {
-                        JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.MISC_HUMAN_TRO));
-                        List<Object> tros = new ArrayList<>();
-                        if (person.getOptions().getOption(OptionsConstants.MISC_HUMAN_TRO).booleanValue()) {
-                            Object val = person.getOptions().getOption(OptionsConstants.MISC_HUMAN_TRO).getValue();
-                            if (val instanceof Collection<?>) {
-                                tros.addAll((Collection<?>) val);
-                            } else {
-                                tros.add(val);
-                            }
-                        }
-                        menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                              resources.getString("humantro_mek.text"),
-                              costDesc));
-                        menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
-                        if (!tros.contains(Crew.HUMAN_TRO_MEK)) {
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMAN_TRO,
-                                  Crew.HUMAN_TRO_MEK,
-                                  String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                        }
-
-                        if (!tros.contains(Crew.HUMAN_TRO_AERO)) {
-                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                                  resources.getString("humantro_aero.text"),
-                                  costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                                   "<br><br>" +
-                                                                   spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMAN_TRO,
-                                  Crew.HUMAN_TRO_AERO,
-                                  String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                        }
-
-                        if (!tros.contains(Crew.HUMAN_TRO_VEE)) {
-                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                                  resources.getString("humantro_vee.text"),
-                                  costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                                   "<br><br>" +
-                                                                   spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMAN_TRO,
-                                  Crew.HUMAN_TRO_VEE,
-                                  String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                        }
-
-                        if (!tros.contains(Crew.HUMAN_TRO_BA)) {
-                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                                  resources.getString("humantro_ba.text"),
-                                  costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                                   "<br><br>" +
-                                                                   spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMAN_TRO,
-                                  Crew.HUMAN_TRO_BA,
-                                  String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                        }
-
-                        if (specialistMenu.getMenuComponentCount() > 0) {
-                            placeInAppropriateSPASubMenu(spa,
-                                  specialistMenu,
-                                  combatAbilityMenu,
-                                  maneuveringAbilityMenu,
-                                  characterFlawMenu, utilityAbilityMenu,
-                                  characterOriginMenu);
-                        }
-                    } else if (spa.getName().equals(OptionsConstants.GUNNERY_SPECIALIST) &&
-                                     !person.getOptions().booleanOption(OptionsConstants.GUNNERY_SPECIALIST)) {
-                        JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_SPECIALIST));
-                        menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                              resources.getString("laserSpecialist.text"),
-                              costDesc));
-                        menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
-                        menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST,
-                              Crew.SPECIAL_ENERGY,
-                              String.valueOf(cost)));
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(available);
-                        specialistMenu.add(menuItem);
-                        menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                              resources.getString("missileSpecialist.text"),
-                              costDesc));
-                        menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
-                        menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST,
-                              Crew.SPECIAL_MISSILE,
-                              String.valueOf(cost)));
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(available);
-                        specialistMenu.add(menuItem);
-                        menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                              resources.getString("ballisticSpecialist.text"),
-                              costDesc));
-                        menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
-                        menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST,
-                              Crew.SPECIAL_BALLISTIC,
-                              String.valueOf(cost)));
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(available);
-                        specialistMenu.add(menuItem);
-
-                        if (specialistMenu.getMenuComponentCount() > 0) {
-                            placeInAppropriateSPASubMenu(spa,
-                                  specialistMenu,
-                                  combatAbilityMenu,
-                                  maneuveringAbilityMenu,
-                                  characterFlawMenu, utilityAbilityMenu,
-                                  characterOriginMenu);
-                        }
-                    } else if (spa.getName().equals(OptionsConstants.GUNNERY_RANGE_MASTER)) {
-                        JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_RANGE_MASTER));
-                        List<Object> ranges = new ArrayList<>();
-                        if (person.getOptions().getOption(OptionsConstants.GUNNERY_RANGE_MASTER).booleanValue()) {
-                            Object val = person.getOptions()
-                                               .getOption(OptionsConstants.GUNNERY_RANGE_MASTER)
-                                               .getValue();
-                            if (val instanceof Collection<?>) {
-                                ranges.addAll((Collection<?>) val);
-                            } else {
-                                ranges.add(val);
-                            }
-                        }
-
-                        if (!ranges.contains(Crew.RANGEMASTER_MEDIUM)) {
-                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                                  resources.getString("rangemaster_med.text"),
-                                  costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                                   "<br><br>" +
-                                                                   spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER,
-                                  Crew.RANGEMASTER_MEDIUM,
-                                  String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                        }
-
-                        if (!ranges.contains(Crew.RANGEMASTER_LONG)) {
-                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                                  resources.getString("rangemaster_lng.text"),
-                                  costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                                   "<br><br>" +
-                                                                   spa.getAllPrereqDesc()));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                                   "<br><br>" +
-                                                                   spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER,
-                                  Crew.RANGEMASTER_LONG,
-                                  String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                        }
-
-                        if (!ranges.contains(Crew.RANGEMASTER_EXTREME)) {
-                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                                  resources.getString("rangemaster_xtm.text"),
-                                  costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                                   "<br><br>" +
-                                                                   spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER,
-                                  Crew.RANGEMASTER_EXTREME,
-                                  String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                        }
-
-                        if (specialistMenu.getMenuComponentCount() > 0) {
-                            placeInAppropriateSPASubMenu(spa,
-                                  specialistMenu,
-                                  combatAbilityMenu,
-                                  maneuveringAbilityMenu,
-                                  characterFlawMenu, utilityAbilityMenu,
-                                  characterOriginMenu);
-                        }
-                    } else if (Optional.ofNullable((person.getOptions().getOption(spa.getName()))).isPresent() &&
-                                     (person.getOptions().getOption(spa.getName()).getType() == IOption.CHOICE) &&
-                                     !(person.getOptions().getOption(spa.getName()).booleanValue())) {
-                        JMenu specialistMenu = new JMenu(spa.getDisplayName());
-                        List<String> choices = spa.getChoiceValues();
-                        for (String s : choices) {
-                            if (s.equalsIgnoreCase("none")) {
-                                continue;
-                            }
-                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                                  s,
-                                  costDesc));
-                            menuItem.setToolTipText(wordWrap(spa.getDescription() +
-                                                                   "<br><br>" +
-                                                                   spa.getAllPrereqDesc()));
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_CUSTOM_CHOICE,
-                                  s,
-                                  String.valueOf(cost),
-                                  spa.getName()));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                        }
-                        if (specialistMenu.getMenuComponentCount() > 0) {
-                            placeInAppropriateSPASubMenu(spa,
-                                  specialistMenu,
-                                  combatAbilityMenu,
-                                  maneuveringAbilityMenu,
-                                  characterFlawMenu, utilityAbilityMenu,
-                                  characterOriginMenu);
-                        }
-                    } else if (!person.getOptions().booleanOption(spa.getName())) {
-                        menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
-                              spa.getDisplayName(),
-                              costDesc));
-                        menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
-
-                        menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ABILITY,
-                              spa.getName(),
-                              String.valueOf(cost)));
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(available);
-
-                        AbilityCategory category = getSpaCategory(spa);
-
-                        switch (category) {
-                            case COMBAT_ABILITY -> combatAbilityMenu.add(menuItem);
-                            case MANEUVERING_ABILITY -> maneuveringAbilityMenu.add(menuItem);
-                            case UTILITY_ABILITY -> utilityAbilityMenu.add(menuItem);
-                            case CHARACTER_FLAW -> characterFlawMenu.add(menuItem);
-                            case CHARACTER_CREATION_ONLY -> {
-                            }
-                        }
-                    }
+                for (SpecialAbility spa : notEligibleAbilities) {
+                    addSPAToMenu(spa,
+                          reasoningXpCostMultiplier,
+                          xpCostMultiplier,
+                          person,
+                          combatAbilityMenu,
+                          maneuveringAbilityMenu,
+                          utilityAbilityMenu,
+                          characterFlawMenu,
+                          characterOriginMenu,
+                          false);
                 }
             }
 
@@ -3303,7 +2948,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 case NONE -> currentMenu.add(menuItem);
                                 case COMBAT_GUNNERY -> combatGunnerySkillsCurrent.add(menuItem);
                                 case COMBAT_PILOTING -> combatPilotingSkillsCurrent.add(menuItem);
-                                case SUPPORT -> supportSkillsCurrent.add(menuItem);
+                                case SUPPORT, SUPPORT_TECHNICIAN -> supportSkillsCurrent.add(menuItem);
                                 case UTILITY, UTILITY_COMMAND -> utilitySkillsCurrent.add(menuItem);
                                 case ROLEPLAY_GENERAL -> roleplaySkillsCurrent.add(menuItem);
                                 case ROLEPLAY_ART -> roleplaySkillsArtCurrent.add(menuItem);
@@ -3327,7 +2972,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             case NONE -> newSkillsMenu.add(menuItem);
                             case COMBAT_GUNNERY -> combatGunnerySkillsNew.add(menuItem);
                             case COMBAT_PILOTING -> combatPilotingSkillsNew.add(menuItem);
-                            case SUPPORT -> supportSkillsNew.add(menuItem);
+                            case SUPPORT, SUPPORT_TECHNICIAN -> supportSkillsNew.add(menuItem);
                             case UTILITY, UTILITY_COMMAND -> utilitySkillsNew.add(menuItem);
                             case ROLEPLAY_GENERAL -> roleplaySkillsNew.add(menuItem);
                             case ROLEPLAY_ART -> roleplaySkillsArtNew.add(menuItem);
@@ -4418,6 +4063,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setActionCommand(CMD_ADD_RANDOM_INJURIES);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
+
+                menuItem = new JMenuItem(resources.getString("addRandomDisease.format"));
+                menuItem.setActionCommand(CMD_ADD_RANDOM_DISEASE);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
             }
 
             if (getCampaignOptions().isUseManualProcreation()) {
@@ -4596,6 +4246,444 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // endregion GM Menu
 
         return Optional.of(popup);
+    }
+
+    private void addSPAToMenu(SpecialAbility spa, double reasoningXpCostMultiplier, double xpCostMultiplier,
+          Person person,
+          JMenu combatAbilityMenu, JMenu maneuveringAbilityMenu, JMenu utilityAbilityMenu, JMenu characterFlawMenu,
+          JMenu characterOriginMenu, boolean isEligible) {
+        JMenuItem menuItem;
+        int cost;
+        // Reasoning cost changes should always take place before global changes
+        int baseCost = spa.getCost();
+        cost = (int) round(baseCost > 0 ? baseCost * reasoningXpCostMultiplier : baseCost);
+        cost = (int) round(cost * xpCostMultiplier);
+
+        String costDesc = String.format(resources.getString("costValue.format"), cost);
+        boolean available = person.getXP() >= cost;
+        if (spa.getName().equals(OptionsConstants.GUNNERY_WEAPON_SPECIALIST)) {
+            Unit unit = person.getUnit();
+            if (null != unit) {
+                JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_WEAPON_SPECIALIST));
+                TreeSet<String> uniqueWeapons = new TreeSet<>();
+                for (int j = 0; j < unit.getEntity().getWeaponList().size(); j++) {
+                    Mounted<?> m = unit.getEntity().getWeaponList().get(j);
+                    uniqueWeapons.add(m.getName());
+                }
+                boolean isSpecialist = person.getOptions().booleanOption(spa.getName());
+                for (String name : uniqueWeapons) {
+                    if (!(isSpecialist &&
+                                person.getOptions().getOption(spa.getName()).stringValue().equals(name))) {
+                        menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                              name,
+                              costDesc));
+                        menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                               "<br><br>" +
+                                                               spa.getAllPrereqDesc()));
+                        menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_WEAPON_SPECIALIST,
+                              name,
+                              String.valueOf(cost)));
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(available && isEligible);
+                        specialistMenu.add(menuItem);
+                    }
+                }
+
+                if (specialistMenu.getMenuComponentCount() > 0) {
+                    placeInAppropriateSPASubMenu(spa,
+                          specialistMenu,
+                          combatAbilityMenu,
+                          maneuveringAbilityMenu,
+                          utilityAbilityMenu,
+                          characterFlawMenu,
+                          characterOriginMenu);
+                }
+            }
+        } else if (spa.getName().equals(OptionsConstants.GUNNERY_SANDBLASTER)) {
+            Unit u = person.getUnit();
+            if (null != u) {
+                JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_SANDBLASTER));
+                TreeSet<String> uniqueWeapons = new TreeSet<>();
+                for (int j = 0; j < u.getEntity().getWeaponList().size(); j++) {
+                    Mounted<?> m = u.getEntity().getWeaponList().get(j);
+                    if (SpecialAbility.isWeaponEligibleForSPA(m.getType(), person.getPrimaryRole(), true)) {
+                        uniqueWeapons.add(m.getName());
+                    }
+                }
+                boolean isSpecialist = person.getOptions().booleanOption(spa.getName());
+                for (String name : uniqueWeapons) {
+                    if (!(isSpecialist &&
+                                person.getOptions().getOption(spa.getName()).stringValue().equals(name))) {
+                        menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                              name,
+                              costDesc));
+                        menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                               "<br><br>" +
+                                                               spa.getAllPrereqDesc()));
+                        menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SANDBLASTER,
+                              name,
+                              String.valueOf(cost)));
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(available && isEligible);
+                        specialistMenu.add(menuItem);
+                    }
+                }
+                if (specialistMenu.getMenuComponentCount() > 0) {
+                    placeInAppropriateSPASubMenu(spa,
+                          specialistMenu,
+                          combatAbilityMenu,
+                          maneuveringAbilityMenu,
+                          characterFlawMenu, utilityAbilityMenu,
+                          characterOriginMenu);
+                }
+            }
+        } else if (spa.getName().equals(OptionsConstants.MISC_ENV_SPECIALIST)) {
+            JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.MISC_ENV_SPECIALIST));
+            List<Object> tros = new ArrayList<>();
+            if (person.getOptions().getOption(OptionsConstants.MISC_ENV_SPECIALIST).booleanValue()) {
+                Object val = person.getOptions().getOption(OptionsConstants.MISC_ENV_SPECIALIST).getValue();
+                if (val instanceof Collection<?>) {
+                    tros.addAll((Collection<?>) val);
+                } else {
+                    tros.add(val);
+                }
+            }
+            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                  resources.getString("envspec_fog.text"),
+                  costDesc));
+            menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
+            if (!tros.contains(Crew.ENVIRONMENT_SPECIALIST_FOG)) {
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
+                      Crew.ENVIRONMENT_SPECIALIST_FOG,
+                      String.valueOf(cost)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+
+            if (!tros.contains(Crew.ENVIRONMENT_SPECIALIST_LIGHT)) {
+                menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                      resources.getString("envspec_light.text"),
+                      costDesc));
+                try {
+                    menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                           "<br><br>" +
+                                                           spa.getAllPrereqDesc()));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
+                      Crew.ENVIRONMENT_SPECIALIST_LIGHT,
+                      String.valueOf(cost)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+
+            if (!tros.contains(Crew.ENVIRONMENT_SPECIALIST_RAIN)) {
+                menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                      resources.getString("envspec_rain.text"),
+                      costDesc));
+                menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                       "<br><br>" +
+                                                       spa.getAllPrereqDesc()));
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
+                      Crew.ENVIRONMENT_SPECIALIST_RAIN,
+                      String.valueOf(cost)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+
+            if (!tros.contains(Crew.ENVIRONMENT_SPECIALIST_SNOW)) {
+                menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                      resources.getString("envspec_snow.text"),
+                      costDesc));
+                menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                       "<br><br>" +
+                                                       spa.getAllPrereqDesc()));
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
+                      Crew.ENVIRONMENT_SPECIALIST_SNOW,
+                      String.valueOf(cost)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+
+            if (!tros.contains(Crew.ENVIRONMENT_SPECIALIST_WIND)) {
+                menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                      resources.getString("envspec_wind.text"),
+                      costDesc));
+                menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                       "<br><br>" +
+                                                       spa.getAllPrereqDesc()));
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVIRONMENT_SPECIALIST,
+                      Crew.ENVIRONMENT_SPECIALIST_WIND,
+                      String.valueOf(cost)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+
+            if (specialistMenu.getMenuComponentCount() > 0) {
+                placeInAppropriateSPASubMenu(spa,
+                      specialistMenu,
+                      combatAbilityMenu,
+                      maneuveringAbilityMenu,
+                      characterFlawMenu, utilityAbilityMenu,
+                      characterOriginMenu);
+            }
+        } else if (spa.getName().equals(OptionsConstants.MISC_HUMAN_TRO)) {
+            JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.MISC_HUMAN_TRO));
+            List<Object> tros = new ArrayList<>();
+            if (person.getOptions().getOption(OptionsConstants.MISC_HUMAN_TRO).booleanValue()) {
+                Object val = person.getOptions().getOption(OptionsConstants.MISC_HUMAN_TRO).getValue();
+                if (val instanceof Collection<?>) {
+                    tros.addAll((Collection<?>) val);
+                } else {
+                    tros.add(val);
+                }
+            }
+            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                  resources.getString("humantro_mek.text"),
+                  costDesc));
+            menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
+            if (!tros.contains(Crew.HUMAN_TRO_MEK)) {
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMAN_TRO,
+                      Crew.HUMAN_TRO_MEK,
+                      String.valueOf(cost)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+
+            if (!tros.contains(Crew.HUMAN_TRO_AERO)) {
+                menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                      resources.getString("humantro_aero.text"),
+                      costDesc));
+                menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                       "<br><br>" +
+                                                       spa.getAllPrereqDesc()));
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMAN_TRO,
+                      Crew.HUMAN_TRO_AERO,
+                      String.valueOf(cost)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+
+            if (!tros.contains(Crew.HUMAN_TRO_VEE)) {
+                menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                      resources.getString("humantro_vee.text"),
+                      costDesc));
+                menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                       "<br><br>" +
+                                                       spa.getAllPrereqDesc()));
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMAN_TRO,
+                      Crew.HUMAN_TRO_VEE,
+                      String.valueOf(cost)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+
+            if (!tros.contains(Crew.HUMAN_TRO_BA)) {
+                menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                      resources.getString("humantro_ba.text"),
+                      costDesc));
+                menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                       "<br><br>" +
+                                                       spa.getAllPrereqDesc()));
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMAN_TRO,
+                      Crew.HUMAN_TRO_BA,
+                      String.valueOf(cost)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+
+            if (specialistMenu.getMenuComponentCount() > 0) {
+                placeInAppropriateSPASubMenu(spa,
+                      specialistMenu,
+                      combatAbilityMenu,
+                      maneuveringAbilityMenu,
+                      characterFlawMenu, utilityAbilityMenu,
+                      characterOriginMenu);
+            }
+        } else if (spa.getName().equals(OptionsConstants.GUNNERY_SPECIALIST) &&
+                         !person.getOptions().booleanOption(OptionsConstants.GUNNERY_SPECIALIST)) {
+            JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_SPECIALIST));
+            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                  resources.getString("laserSpecialist.text"),
+                  costDesc));
+            menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
+            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST,
+                  Crew.SPECIAL_ENERGY,
+                  String.valueOf(cost)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(available && isEligible);
+            specialistMenu.add(menuItem);
+            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                  resources.getString("missileSpecialist.text"),
+                  costDesc));
+            menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
+            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST,
+                  Crew.SPECIAL_MISSILE,
+                  String.valueOf(cost)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(available && isEligible);
+            specialistMenu.add(menuItem);
+            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                  resources.getString("ballisticSpecialist.text"),
+                  costDesc));
+            menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
+            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST,
+                  Crew.SPECIAL_BALLISTIC,
+                  String.valueOf(cost)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(available && isEligible);
+            specialistMenu.add(menuItem);
+
+            if (specialistMenu.getMenuComponentCount() > 0) {
+                placeInAppropriateSPASubMenu(spa,
+                      specialistMenu,
+                      combatAbilityMenu,
+                      maneuveringAbilityMenu,
+                      characterFlawMenu, utilityAbilityMenu,
+                      characterOriginMenu);
+            }
+        } else if (spa.getName().equals(OptionsConstants.GUNNERY_RANGE_MASTER)) {
+            JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_RANGE_MASTER));
+            List<Object> ranges = new ArrayList<>();
+            if (person.getOptions().getOption(OptionsConstants.GUNNERY_RANGE_MASTER).booleanValue()) {
+                Object val = person.getOptions()
+                                   .getOption(OptionsConstants.GUNNERY_RANGE_MASTER)
+                                   .getValue();
+                if (val instanceof Collection<?>) {
+                    ranges.addAll((Collection<?>) val);
+                } else {
+                    ranges.add(val);
+                }
+            }
+
+            if (!ranges.contains(Crew.RANGEMASTER_MEDIUM)) {
+                menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                      resources.getString("rangemaster_med.text"),
+                      costDesc));
+                menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                       "<br><br>" +
+                                                       spa.getAllPrereqDesc()));
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER,
+                      Crew.RANGEMASTER_MEDIUM,
+                      String.valueOf(cost)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+
+            if (!ranges.contains(Crew.RANGEMASTER_LONG)) {
+                menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                      resources.getString("rangemaster_lng.text"),
+                      costDesc));
+                menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                       "<br><br>" +
+                                                       spa.getAllPrereqDesc()));
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER,
+                      Crew.RANGEMASTER_LONG,
+                      String.valueOf(cost)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+
+            if (!ranges.contains(Crew.RANGEMASTER_EXTREME)) {
+                menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                      resources.getString("rangemaster_xtm.text"),
+                      costDesc));
+                menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                       "<br><br>" +
+                                                       spa.getAllPrereqDesc()));
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER,
+                      Crew.RANGEMASTER_EXTREME,
+                      String.valueOf(cost)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+
+            if (specialistMenu.getMenuComponentCount() > 0) {
+                placeInAppropriateSPASubMenu(spa,
+                      specialistMenu,
+                      combatAbilityMenu,
+                      maneuveringAbilityMenu,
+                      characterFlawMenu, utilityAbilityMenu,
+                      characterOriginMenu);
+            }
+        } else if (Optional.ofNullable((person.getOptions().getOption(spa.getName()))).isPresent() &&
+                         (person.getOptions().getOption(spa.getName()).getType() == IOption.CHOICE) &&
+                         !(person.getOptions().getOption(spa.getName()).booleanValue())) {
+            JMenu specialistMenu = new JMenu(spa.getDisplayName());
+            List<String> choices = spa.getChoiceValues();
+            for (String s : choices) {
+                if (s.equalsIgnoreCase("none")) {
+                    continue;
+                }
+                menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                      s,
+                      costDesc));
+                menuItem.setToolTipText(wordWrap(spa.getDescription() +
+                                                       "<br><br>" +
+                                                       spa.getAllPrereqDesc()));
+                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_CUSTOM_CHOICE,
+                      s,
+                      String.valueOf(cost),
+                      spa.getName()));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(available && isEligible);
+                specialistMenu.add(menuItem);
+            }
+            if (specialistMenu.getMenuComponentCount() > 0) {
+                placeInAppropriateSPASubMenu(spa,
+                      specialistMenu,
+                      combatAbilityMenu,
+                      maneuveringAbilityMenu,
+                      characterFlawMenu, utilityAbilityMenu,
+                      characterOriginMenu);
+            }
+        } else if (!person.getOptions().booleanOption(spa.getName())) {
+            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                  spa.getDisplayName(),
+                  costDesc));
+            menuItem.setToolTipText(wordWrap(spa.getDescription() + "<br><br>" + spa.getAllPrereqDesc()));
+
+            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ABILITY,
+                  spa.getName(),
+                  String.valueOf(cost)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(available && isEligible);
+
+            AbilityCategory category = getSpaCategory(spa);
+
+            switch (category) {
+                case COMBAT_ABILITY -> combatAbilityMenu.add(menuItem);
+                case MANEUVERING_ABILITY -> maneuveringAbilityMenu.add(menuItem);
+                case UTILITY_ABILITY -> utilityAbilityMenu.add(menuItem);
+                case CHARACTER_FLAW -> characterFlawMenu.add(menuItem);
+                case CHARACTER_CREATION_ONLY -> {
+                }
+            }
+        }
+    }
+
+    private static void addRoleToMenu(PersonnelRole role, JMenu menuCombatPrimary, JCheckBoxMenuItem cbMenuItem,
+          JMenu menuSupportPrimary, JMenu menuCivilianPrimary) {
+        if (role.isCombat()) {
+            menuCombatPrimary.add(cbMenuItem);
+        } else if (role.isSupport(true)) {
+            menuSupportPrimary.add(cbMenuItem);
+        } else {
+            menuCivilianPrimary.add(cbMenuItem);
+        }
     }
 
     /**

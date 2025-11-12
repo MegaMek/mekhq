@@ -448,30 +448,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LOGGER.info("[Campaign Load] Parts processed in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
 
-        boolean skipAllDeprecationChecks = false;
-        boolean refundAllDeprecatedSkills = false;
-        for (Person person : campaign.getPersonnel()) {
-            // skill types might need resetting
-            person.resetSkillTypes();
-
-            // Seeing as we're already looping through all personnel, we might as well have the deprecation checks
-            // here, too.
-            if (!DEPRECATED_SKILLS.isEmpty() && !skipAllDeprecationChecks) {
-                // This checks to ensure the character doesn't have any Deprecated skills.
-                SkillDeprecationTool deprecationTool = new SkillDeprecationTool(campaign,
-                      person,
-                      refundAllDeprecatedSkills);
-                skipAllDeprecationChecks = deprecationTool.isSkipAll();
-                refundAllDeprecatedSkills = deprecationTool.isRefundAll();
-            }
-
-            // Self-correct any invalid personnel statuses (handles <50.05 campaigns)
-            // Any characters with invalid statuses will have their status set to 'Active'
-            if (person.getPrisonerStatus().isCurrentPrisoner()) {
-                statusValidator(campaign, person, true);
-            }
-        }
-
         LOGGER.info("[Campaign Load] Rank references fixed in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
 
@@ -531,6 +507,50 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         LOGGER.info("[Campaign Load] Pilot references fixed in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
+
+        boolean skipAllDeprecationChecks = false;
+        boolean refundAllDeprecatedSkills = false;
+        for (Person person : campaign.getPersonnel()) {
+            // skill types might need resetting
+            person.resetSkillTypes();
+
+            // Seeing as we're already looping through all personnel, we might as well have the deprecation checks
+            // here, too.
+            if (!DEPRECATED_SKILLS.isEmpty() && !skipAllDeprecationChecks) {
+                // This checks to ensure the character doesn't have any Deprecated skills.
+                SkillDeprecationTool deprecationTool = new SkillDeprecationTool(campaign,
+                      person,
+                      refundAllDeprecatedSkills);
+                skipAllDeprecationChecks = deprecationTool.isSkipAll();
+                refundAllDeprecatedSkills = deprecationTool.isRefundAll();
+            }
+
+            // Self-correct any invalid personnel statuses (handles <50.05 campaigns)
+            // Any characters with invalid statuses will have their status set to 'Active'
+            if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                statusValidator(campaign, person, true);
+            }
+
+            // <50.10 compatibility handler
+            LocalDate today = campaign.getLocalDate();
+            if (Person.updateSkillsForVehicleProfessions(today, person, person.getPrimaryRole(), true) ||
+                      Person.updateSkillsForVehicleProfessions(today, person, person.getSecondaryRole(), false)) {
+                String report = getFormattedTextAt(RESOURCE_BUNDLE, "vehicleProfessionSkillChange",
+                      spanOpeningWithCustomColor(getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle());
+                campaign.addReport(report);
+            }
+
+            if (Person.updateSkillsForVehicleCrewProfession(today, person, person.getPrimaryRole(), true) ||
+                      Person.updateSkillsForVehicleCrewProfession(today, person, person.getSecondaryRole(), false)) {
+                String report = getFormattedTextAt(RESOURCE_BUNDLE, "vehicleCrewProfessionSkillChange",
+                      spanOpeningWithCustomColor(getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle());
+                campaign.addReport(report);
+            }
+        }
 
         campaign.getHangar().forEachUnit(unit -> {
             // Some units have been incorrectly assigned a null C3UUID as a string. This
