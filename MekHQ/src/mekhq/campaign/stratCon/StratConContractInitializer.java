@@ -303,7 +303,7 @@ public class StratConContractInitializer {
      * @author Illiani
      * @since 0.50.05
      */
-    private static int getScenarioOdds(StratConContractDefinition contractDefinition) {
+    public static int getScenarioOdds(StratConContractDefinition contractDefinition) {
         return contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
     }
 
