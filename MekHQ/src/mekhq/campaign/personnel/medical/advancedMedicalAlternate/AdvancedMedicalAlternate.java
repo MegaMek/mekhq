@@ -403,8 +403,9 @@ public class AdvancedMedicalAlternate {
                       person.getHyperlinkedFullTitle()));
             }
 
+            int resistanceModifier = person.getOptions().booleanOption(UNOFFICIAL_IMPLANT_RESISTANCE) ? -2 : 0;
             AttributeCheckUtility attributeCheckUtility = new AttributeCheckUtility(person, SkillAttribute.BODY,
-                  SkillAttribute.WILLPOWER, new ArrayList<>(), 0, true, false);
+                  SkillAttribute.WILLPOWER, new ArrayList<>(), resistanceModifier, true, false);
             campaign.addReport(attributeCheckUtility.getResultsText());
 
             if (!attributeCheckUtility.isSuccess() && useAbilities) {
@@ -437,6 +438,7 @@ public class AdvancedMedicalAlternate {
      *       selected Flaw
      */
     public static String getAndApplyEIDegradationFlaw(Person person) {
+
         String flaw = ObjectUtility.getRandomItem(POSSIBLE_FLAWS);
         if (flaw.equals(COMPULSION_PLACEHOLDER)) {
             flaw = ObjectUtility.getRandomItem(POSSIBLE_COMPULSIONS);

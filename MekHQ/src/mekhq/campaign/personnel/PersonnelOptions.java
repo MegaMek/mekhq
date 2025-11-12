@@ -84,6 +84,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String UNOFFICIAL_GHOST = "unofficial_ghost";
     public static final String UNOFFICIAL_LOUD_MOUTH = "unofficial_loud_mouth";
     public static final String UNOFFICIAL_RANGER = "unofficial_ranger";
+    public static final String UNOFFICIAL_IMPLANT_RESISTANCE = "unofficial_implant_resistance";
     public static final String FLAW_POOR_HEARING = "flaw_poor_hearing";
     public static final String ATOW_GOOD_HEARING = "atow_good_hearing";
     public static final String FLAW_POOR_VISION = "flaw_poor_vision";
