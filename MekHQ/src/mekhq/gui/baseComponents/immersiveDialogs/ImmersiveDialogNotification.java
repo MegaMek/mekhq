@@ -104,6 +104,7 @@ public class ImmersiveDialogNotification extends ImmersiveDialogCore {
      *
      * @param campaign      the current campaign context
      * @param centerMessage the main message to display in the center of the dialog
+     * @param bottomMessage the message to display in the bottom of the dialog
      * @param isModal       {@code true} if the dialog should be modal, {@code false} otherwise
      *
      * @author Illiani
