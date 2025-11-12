@@ -32,7 +32,9 @@
  */
 package mekhq.campaign.mission;
 
+import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_ASTAR;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_F;
@@ -48,9 +50,12 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import java.time.LocalDate;
 
 import megamek.common.rolls.TargetRoll;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 
 /**
  * Handles contract morale checks and morale/report calculation for campaign missions.
@@ -377,5 +382,49 @@ public class MHQMorale {
             return (defeats >= victories * 2) ? decisiveDefeatModifier : defeatModifier;
         }
         return 0;
+    }
+
+    public static void processCombatChallengeResults(Campaign campaign, AtBContract contract,
+          ScenarioStatus scenarioStatus) {
+        int forcedRoll = 7;
+
+        if (scenarioStatus.isOverallVictory()) {
+            forcedRoll = 8;
+        } else if (scenarioStatus.isOverallDefeat()) {
+            forcedRoll = 6;
+        }
+
+        getMoraleOutcome(contract, forcedRoll);
+
+        if (contract.getMoraleLevel().isRouted()) {
+            routedMoraleUpdate(campaign, contract);
+        }
+    }
+
+    public static void routedMoraleUpdate(Campaign campaign, AtBContract contract) {
+        LocalDate today = campaign.getLocalDate();
+        if (contract.getMoraleLevel().isRouted()) {
+            // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
+            if (contract.getContractType().isGarrisonType()) {
+                contract.setRoutEnd(today.plusMonths(max(1, d6() - 3)).minusDays(1));
+
+                PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(campaign, contract);
+                if (!campaign.getFriendlyPrisoners().isEmpty()) {
+                    prisoners.handlePrisoners(true, true);
+                }
+
+                if (!campaign.getCurrentPrisoners().isEmpty()) {
+                    prisoners.handlePrisoners(true, false);
+                }
+
+                campaign.setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
+            } else {
+                new ImmersiveDialogNotification(campaign, getFormattedTextAt(RESOURCE_BUNDLE,
+                      "stratCon.earlyContractEnd.objectives", contract.getName()), true);
+                int remainingMonths = contract.getMonthsLeft(campaign.getLocalDate().plusDays(1));
+                contract.setRoutedPayout(contract.getMonthlyPayOut().multipliedBy(remainingMonths));
+                contract.setEndDate(today.plusDays(1));
+            }
+        }
     }
 }

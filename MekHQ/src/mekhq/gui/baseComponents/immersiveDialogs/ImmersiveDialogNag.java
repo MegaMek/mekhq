@@ -99,6 +99,10 @@ public class ImmersiveDialogNag {
 
     private boolean cancelAdvanceDay;
 
+    protected String getResourceBundle() {
+        return RESOURCE_BUNDLE;
+    }
+
     /**
      * Constructs an {@code ImmersiveDialogNag} instance to display a nag dialog.
      *
@@ -227,7 +231,7 @@ public class ImmersiveDialogNag {
      *
      * @return A list of button-label and tooltip pairs for this dialog.
      */
-    private List<ButtonLabelTooltipPair> createButtons() {
+    protected List<ButtonLabelTooltipPair> createButtons() {
         List<ButtonLabelTooltipPair> buttons = new ArrayList<>();
 
         ButtonLabelTooltipPair btnCancel = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
