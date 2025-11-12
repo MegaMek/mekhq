@@ -100,6 +100,30 @@ public class ImmersiveDialogNotification extends ImmersiveDialogCore {
     }
 
     /**
+     * Constructs a notification dialog with the specified campaign context, message, custom width, and modality.
+     *
+     * @param campaign      the current campaign context
+     * @param centerMessage the main message to display in the center of the dialog
+     * @param isModal       {@code true} if the dialog should be modal, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public ImmersiveDialogNotification(Campaign campaign, String centerMessage, String bottomMessage, boolean isModal) {
+        super(campaign,
+              null,
+              null,
+              centerMessage,
+              createButtons(),
+              bottomMessage,
+              ImmersiveDialogWidth.MEDIUM.getWidth(),
+              false,
+              null,
+              null,
+              isModal);
+    }
+
+    /**
      * Creates the list of button(s) to display in the dialog.
      *
      * <p>This implementation always returns a single "Understood" button with no tooltip.</p>

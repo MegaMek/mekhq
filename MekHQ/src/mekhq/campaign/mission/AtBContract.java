@@ -466,7 +466,10 @@ public class AtBContract extends Contract {
         String moraleReport = MHQMorale.performMoraleCheck(today, this,
               campaignOptions.getMoraleDecisiveVictoryEffect(), campaignOptions.getMoraleVictoryEffect(),
               campaignOptions.getMoraleDecisiveDefeatEffect(), campaignOptions.getMoraleDefeatEffect());
-        campaign.addReport(moraleReport);
+        String flavorText = MHQMorale.getFormattedTitle()
+                                  + "<h2 style='text-align:center;'>" + getName() + "</h2>"
+                                  + moraleLevel.getToolTipText();
+        new ImmersiveDialogNotification(campaign, flavorText, moraleReport, true);
 
         // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
         if (moraleLevel.isRouted()) {
