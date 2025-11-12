@@ -684,7 +684,7 @@ public abstract class AbstractContractMarket {
      * @param year                      the year of the contract, used for applying historical context modifiers.
      * @param averageSkillLevel         the average skill level of the player, used to adjust the enemy contract
      *                                  difficulty.
-     * @param isUseBolsterContractSkill {@code true} to increase ally skill
+     * @param isUseBolsterContractSkill {@code true} to increase enemy skill
      */
     protected void setEnemyRating(AtBContract contract, int year, SkillLevel averageSkillLevel,
           boolean isUseBolsterContractSkill) {
