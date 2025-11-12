@@ -76,6 +76,7 @@ import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
 import mekhq.gui.campaignOptions.optionChangeDialogs.AdvancedScoutingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.FactionStandingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.FatigueTrackingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog;
@@ -520,7 +521,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         boolean oldIsUseAdvancedSalvage = options.isUseCamOpsSalvage();
         boolean oldIsUseStratCon = options.isUseStratCon();
         boolean oldIsUseAdvancedScouting = options.isUseAdvancedScouting() && oldIsUseStratCon;
-        boolean oldIsUseDiseases = options.isUseRandomDiseases();
+        boolean oldIsUseAltAdvancedMedical = options.isUseAlternativeAdvancedMedical();
+        boolean oldIsUseDiseases = oldIsUseAltAdvancedMedical && options.isUseRandomDiseases();
 
         // Everything assumes general tab will be the first applied.
         // While this shouldn't break anything, it's not worth moving around.
@@ -609,7 +611,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             new AdvancedScoutingCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
-        boolean newIsUseDiseases = options.isUseRandomDiseases();
+        boolean newIsUseAltAdvancedMedical = options.isUseAlternativeAdvancedMedical();
+        if (!isStartUp && newIsUseAltAdvancedMedical && !oldIsUseAltAdvancedMedical) { // Has tracking changed?
+            new AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseDiseases = newIsUseAltAdvancedMedical && options.isUseRandomDiseases();
         if (!isStartUp && newIsUseDiseases && !oldIsUseDiseases) { // Has tracking changed?
             inoculateAllCharacters();
         }
