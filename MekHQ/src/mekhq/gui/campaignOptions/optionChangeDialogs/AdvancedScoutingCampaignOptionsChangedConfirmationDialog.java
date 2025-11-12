@@ -35,6 +35,7 @@ package mekhq.gui.campaignOptions.optionChangeDialogs;
 import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
@@ -49,6 +50,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.time.LocalDate;
 import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -59,10 +61,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
+import mekhq.campaign.personnel.skills.ScoutingSkills;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -178,7 +184,7 @@ public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JD
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "AdvancedScoutingCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeImplants(campaign);
+            processFreeSkills(campaign, false);
             dispose();
         });
 
@@ -189,19 +195,37 @@ public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JD
         return pnlButtons;
     }
 
-    public static void processFreeImplants(Campaign campaign) {
-        if (!campaign.getCampaignOptions().isUseImplants()) {
-            return;
-        }
-
+    public static void processFreeSkills(Campaign campaign, boolean isSilent) {
         List<Person> personnel = campaign.getPersonnelFilteringOutDeparted();
+        boolean logSkillGain = campaign.getCampaignOptions().isPersonnelLogSkillGain();
+        LocalDate today = campaign.getLocalDate();
         for (Person person : personnel) {
-            if (!person.getPrimaryRole().isProtoMekPilot() && !person.getSecondaryRole().isProtoMekPilot()) {
+            if (!person.isCombat() || randomInt(4) != 0) {
                 continue;
             }
 
-            AdvancedMedicalAlternate.giveEIImplant(campaign, person);
+            String skillName = ObjectUtility.getRandomItem(ScoutingSkills.SCOUTING_SKILLS);
+            int bonus = 0;
+            if (person.hasSkill(skillName)) {
+                Skill skill = person.getSkill(skillName);
+                if (person.getSkill(skillName).getLevel() >= 1) {
+                    continue;
+                }
+                bonus = skill.getBonus();
+            }
 
+            person.addSkill(skillName, 1, bonus);
+
+            if (!isSilent) {
+                PerformanceLogger.improvedSkill(logSkillGain,
+                      person,
+                      today,
+                      skillName,
+                      1);
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "improved.format",
+                      person.getHyperlinkedName(),
+                      SkillType.getType(skillName)));
+            }
             campaign.personUpdated(person);
         }
     }
