@@ -193,9 +193,10 @@ public class MHQMorale {
 
 
     /**
-     * Determines the morale outcome based on the contract's current morale level and roll value.
+     * Determines the morale outcome based on the contract's current morale level and roll value. Updates the morale
+     * level in the contract if it changes.
      *
-     * <p>Updates the morale level in the contract if it changes.</p>
+     * <p>A lower roll is better for the OpFor.</p>
      *
      * @param contract The contract to check and update morale for.
      * @param roll     The result of the morale check roll.
@@ -275,6 +276,8 @@ public class MHQMorale {
     /**
      * Calculates the reliability modifier for the enemy based on contract parameters and faction characteristics.
      *
+     * <p>A lower modifier means the OpFor is less likely to lose morale.</p>
+     *
      * @param contract The contract to evaluate.
      *
      * @return The reliability modifier to use for this contract.
@@ -298,9 +301,9 @@ public class MHQMorale {
 
         // Adjust for special enemy traits
         if (enemy.isRebel() || enemy.isMinorPower() || enemy.isMercenary() || enemy.isPirate()) {
-            reliabilityModifier--;
-        } else if (enemy.isClan()) { // Clan forces get to double-dip
             reliabilityModifier++;
+        } else if (enemy.isClan()) { // Clan forces get to double-dip
+            reliabilityModifier--;
         }
 
         return reliabilityModifier;
@@ -308,6 +311,8 @@ public class MHQMorale {
 
     /**
      * Calculates the reliability modifier based on force quality rating.
+     *
+     * <p>A lower modifier means the OpFor is less likely to lose morale.</p>
      *
      * @param quality the Dragoon rating of the force, using {@code ForceDescriptor} constants (RATING_0 through
      *                RATING_5, representing F through A*)
@@ -322,16 +327,17 @@ public class MHQMorale {
         int reliabilityModifier;
         reliabilityModifier = switch (quality) {
             case DRAGOON_F -> -1;
-            case DRAGOON_A, DRAGOON_ASTAR -> +1;
+            case DRAGOON_A, DRAGOON_ASTAR -> 1;
             default -> 0; // DRAGOON_D, DRAGOON_C, DRAGOON_B
         };
         return reliabilityModifier;
     }
 
     /**
-     * Calculates the performance modifier for recent scenario outcomes within the contract.
+     * Calculates the performance modifier for recent scenario outcomes within the contract. Considers victories,
+     * defeats, and special outcome scenarios within the last month.
      *
-     * <p>Considers victories, defeats, and special outcome scenarios within the last month.</p>
+     * <p>A higher modifier means the OpFor is more likely to lose morale.</p>
      *
      * @param today                   The current date for modifier evaluation.
      * @param contract                The contract to evaluate scenarios for.
