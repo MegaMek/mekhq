@@ -38,14 +38,10 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
 
 import java.awt.GridBagConstraints;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.comboBoxes.MMComboBox;
@@ -54,10 +50,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.skills.Skills;
-import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -154,22 +147,9 @@ public class RulesetsTab {
     private JSpinner spnAutoResolveNumberOfScenarios;
     //end Universal Options
 
-    //start Legacy AtB
+    //start Legacy Options
     private CampaignOptionsHeaderPanel legacyHeader;
-    private JCheckBox chkUseAtB;
-
-    private JPanel pnlLegacyScenarioGenerationPanel;
-    private JLabel lblIntensity;
-    private JSpinner spnAtBBattleIntensity;
-    private JLabel lblFightChance;
-    private JLabel lblDefendChance;
-    private JLabel lblScoutChance;
-    private JLabel lblTrainingChance;
-    private JLabel lblCadreChance;
-    private JSpinner[] spnAtBBattleChance;
-    private JButton btnIntensityUpdate;
-    private JCheckBox chkGenerateChases;
-    //end Legacy AtB
+    // end Legacy Options
 
     private JCheckBox chkUseStratCon;
     private JCheckBox chkUseStratConMaplessMode;
@@ -854,25 +834,9 @@ public class RulesetsTab {
     }
 
     /**
-     * Initializes the Legacy AtB (Against the Bot) section of the tab.
+     * Initializes the Legacy Options section of the tab.
      */
-    private void initializeLegacyTab() {
-        // General
-        chkUseAtB = new JCheckBox();
-
-        // Scenarios
-        pnlLegacyScenarioGenerationPanel = new JPanel();
-        chkGenerateChases = new JCheckBox();
-        lblIntensity = new JLabel();
-        spnAtBBattleIntensity = new JSpinner();
-        lblFightChance = new JLabel();
-        lblDefendChance = new JLabel();
-        lblScoutChance = new JLabel();
-        lblTrainingChance = new JLabel();
-        lblCadreChance = new JLabel();
-        spnAtBBattleChance = new JSpinner[CombatRole.values().length - 1];
-        btnIntensityUpdate = new JButton();
-    }
+    private void initializeLegacyTab() {}
 
     /**
      * Creates the UI panel for the Legacy AtB configuration.
@@ -889,10 +853,6 @@ public class RulesetsTab {
               getImageDirectory() + "logo_free_rasalhague_republic.png",
               true, true, 5);
 
-        chkUseAtB = new CampaignOptionsCheckBox("UseAtB");
-        chkUseAtB.addMouseListener(createTipPanelUpdater(legacyHeader, "UseAtB"));
-        pnlLegacyScenarioGenerationPanel = createLegacyScenarioGenerationPanel();
-
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("LegacyTab", true);
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -902,196 +862,8 @@ public class RulesetsTab {
         layout.gridy = 0;
         panel.add(legacyHeader, layout);
 
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(chkUseAtB, layout);
-
-        layout.gridy++;
-        panel.add(pnlLegacyScenarioGenerationPanel, layout);
-
         // Create panel and return
         return createParentPanel(panel, "LegacyTab");
-    }
-
-    /**
-     * Creates the UI panel for configuring the Legacy AtB (Against the Bot) scenario generation settings.
-     * <p>
-     * This panel includes settings for enabling chase generation, adjusting battle role chances (Fight, Defend, Scout,
-     * Training), and updating these values based on a calculated intensity.
-     * </p>
-     *
-     * @return a {@link JPanel} containing controls to configure AtB scenario generation options
-     */
-    private JPanel createLegacyScenarioGenerationPanel() {
-        // Content
-        chkGenerateChases = new CampaignOptionsCheckBox("GenerateChases");
-        chkGenerateChases.addMouseListener(createTipPanelUpdater(legacyHeader, "GenerateChases"));
-        lblIntensity = new CampaignOptionsLabel("AtBBattleIntensity");
-        lblIntensity.addMouseListener(createTipPanelUpdater(legacyHeader, "AtBBattleIntensity"));
-        spnAtBBattleIntensity = new CampaignOptionsSpinner("AtBBattleIntensity",
-              0.0, 0.0, 100.0, 0.1);
-        spnAtBBattleIntensity.addMouseListener(createTipPanelUpdater(legacyHeader, "AtBBattleIntensity"));
-
-        lblFightChance = new JLabel(CombatRole.MANEUVER.toString());
-        lblDefendChance = new JLabel(CombatRole.FRONTLINE.toString());
-        lblScoutChance = new JLabel(CombatRole.PATROL.toString());
-        lblTrainingChance = new JLabel(CombatRole.TRAINING.toString());
-        lblCadreChance = new JLabel(CombatRole.CADRE.toString());
-        spnAtBBattleChance = new JSpinner[CombatRole.values().length - 1];
-
-        for (int i = 0; i < spnAtBBattleChance.length; i++) {
-            spnAtBBattleChance[i] = new JSpinner(
-                  new SpinnerNumberModel(0, 0, 100, 1));
-        }
-
-        btnIntensityUpdate = new CampaignOptionsButton("IntensityUpdate");
-        btnIntensityUpdate.addMouseListener(createTipPanelUpdater(legacyHeader, "IntensityUpdate"));
-        AtBBattleIntensityChangeListener atBBattleIntensityChangeListener = new AtBBattleIntensityChangeListener();
-        btnIntensityUpdate.addChangeListener(evt -> {
-            spnAtBBattleIntensity.removeChangeListener(atBBattleIntensityChangeListener);
-            spnAtBBattleIntensity.setValue(determineAtBBattleIntensity());
-            spnAtBBattleIntensity.addChangeListener(atBBattleIntensityChangeListener);
-        });
-
-        // Layout the Panel
-        final JPanel panelBattleChance = new CampaignOptionsStandardPanel("LegacyScenarioGenerationPanel");
-        final GridBagConstraints layoutBattleChance = new CampaignOptionsGridBagConstraints(panelBattleChance);
-
-        layoutBattleChance.gridx = 0;
-        layoutBattleChance.gridy = 0;
-        layoutBattleChance.gridwidth = 1;
-        panelBattleChance.add(lblFightChance, layoutBattleChance);
-        layoutBattleChance.gridx++;
-        panelBattleChance.add(spnAtBBattleChance[CombatRole.MANEUVER.ordinal()], layoutBattleChance);
-
-        layoutBattleChance.gridx = 0;
-        layoutBattleChance.gridy++;
-        panelBattleChance.add(lblDefendChance, layoutBattleChance);
-        layoutBattleChance.gridx++;
-        panelBattleChance.add(spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()], layoutBattleChance);
-
-        layoutBattleChance.gridx = 0;
-        layoutBattleChance.gridy++;
-        panelBattleChance.add(lblScoutChance, layoutBattleChance);
-        layoutBattleChance.gridx++;
-        panelBattleChance.add(spnAtBBattleChance[CombatRole.PATROL.ordinal()], layoutBattleChance);
-
-        layoutBattleChance.gridx = 0;
-        layoutBattleChance.gridy++;
-        panelBattleChance.add(lblTrainingChance, layoutBattleChance);
-        layoutBattleChance.gridy++;
-        panelBattleChance.add(lblCadreChance, layoutBattleChance);
-        layoutBattleChance.gridx++;
-        panelBattleChance.add(spnAtBBattleChance[CombatRole.CADRE.ordinal()], layoutBattleChance);
-
-        final JPanel panel = new CampaignOptionsStandardPanel("LegacyScenarioGenerationPanel", true,
-              "LegacyScenarioGenerationPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 2;
-        panel.add(chkGenerateChases, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblIntensity, layout);
-        layout.gridx++;
-        panel.add(spnAtBBattleIntensity, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(panelBattleChance, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(btnIntensityUpdate, layout);
-
-        return panel;
-    }
-
-    /**
-     * Determines the AtB (Against the Bot) battle intensity value based on the current settings of battle role chance
-     * spinners.
-     * <p>
-     * Each role (e.g., Maneuver, Frontline, Patrol, Training) contributes to the overall battle intensity value based
-     * on complex formulas. The result is normalized, capped at 100.0, and rounded to a single decimal place.
-     * </p>
-     *
-     * @return the calculated battle intensity value as a {@code double}
-     */
-    private double determineAtBBattleIntensity() {
-        double intensity = 0.0;
-
-        int x = (int) spnAtBBattleChance[CombatRole.MANEUVER.ordinal()].getValue();
-        intensity += ((-3.0 / 2.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
-
-        x = (int) spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].getValue();
-        intensity += ((-4.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
-
-        x = (int) spnAtBBattleChance[CombatRole.PATROL.ordinal()].getValue();
-        intensity += ((-2.0 / 3.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
-
-        x = (int) spnAtBBattleChance[CombatRole.TRAINING.ordinal()].getValue();
-        intensity += ((-9.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
-
-        x = (int) spnAtBBattleChance[CombatRole.CADRE.ordinal()].getValue();
-        intensity += ((-9.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
-
-        intensity = intensity / 4.0;
-
-        if (intensity > 100.0) {
-            intensity = 100.0;
-        }
-
-        return Math.round(intensity * 10.0) / 10.0;
-    }
-
-    /**
-     * A listener to manage changes in the AtB (Against the Bot) battle intensity spinner value.
-     * <p>
-     * It listens for changes in the battle intensity spinner, recalculates the values for different battle roles (e.g.,
-     * Maneuver, Frontline, Patrol, Training), and updates the corresponding spinners for the player to see the effects
-     * of the intensity change.
-     * </p>
-     */
-    private class AtBBattleIntensityChangeListener implements ChangeListener {
-        /**
-         * Called when the state of the AtB battle intensity spinner changes.
-         * <p>
-         * Updates the battle role chance spinners based on the current value of the battle intensity spinner. If the
-         * intensity is below the minimum defined in {@link AtBContract#MINIMUM_INTENSITY}, all role chance spinners are
-         * set to zero.
-         * </p>
-         *
-         * @param e the {@link ChangeEvent} triggered when the spinner value changes
-         */
-        @Override
-        public void stateChanged(ChangeEvent e) {
-            double intensity = (double) spnAtBBattleIntensity.getValue();
-
-            if (intensity >= AtBContract.MINIMUM_INTENSITY) {
-                int value = (int) Math.min(
-                      Math.round(400.0 * intensity / (4.0 * intensity + 6.0) + 0.05), 100);
-                spnAtBBattleChance[CombatRole.MANEUVER.ordinal()].setValue(value);
-                value = (int) Math.min(Math.round(200.0 * intensity / (2.0 * intensity + 8.0) + 0.05),
-                      100);
-                spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].setValue(value);
-                value = (int) Math.min(Math.round(600.0 * intensity / (6.0 * intensity + 4.0) + 0.05),
-                      100);
-                spnAtBBattleChance[CombatRole.PATROL.ordinal()].setValue(value);
-                value = (int) Math.min(Math.round(100.0 * intensity / (intensity + 9.0) + 0.05), 100);
-                spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(value);
-                spnAtBBattleChance[CombatRole.CADRE.ordinal()].setValue(value);
-            } else {
-                spnAtBBattleChance[CombatRole.MANEUVER.ordinal()].setValue(0);
-                spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].setValue(0);
-                spnAtBBattleChance[CombatRole.PATROL.ordinal()].setValue(0);
-                spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(0);
-                spnAtBBattleChance[CombatRole.CADRE.ordinal()].setValue(0);
-            }
-        }
     }
 
     /**
@@ -1147,14 +919,6 @@ public class RulesetsTab {
         options.setUseAdvancedScouting(chkUseAdvancedScouting.isSelected());
         options.setUseGenericBattleValue(chkUseGenericBattleValue.isSelected());
         options.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
-
-        // Legacy
-        options.setUseAtB(chkUseAtB.isSelected() && !chkUseStratCon.isSelected());
-        options.setGenerateChases(chkGenerateChases.isSelected());
-
-        for (int i = 0; i < spnAtBBattleChance.length; i++) {
-            options.setAtBBattleChance(i, (int) spnAtBBattleChance[i].getValue());
-        }
     }
 
     /**
@@ -1217,14 +981,5 @@ public class RulesetsTab {
         chkUseAdvancedScouting.setSelected(options.isUseAdvancedScouting());
         chkUseGenericBattleValue.setSelected(options.isUseGenericBattleValue());
         chkUseVerboseBidding.setSelected(options.isUseVerboseBidding());
-
-        // Legacy
-        chkUseAtB.setSelected(options.isUseAtB() && !options.isUseStratCon());
-        chkGenerateChases.setSelected(options.isGenerateChases());
-        for (CombatRole role : CombatRole.values()) {
-            if (role.ordinal() <= CombatRole.CADRE.ordinal()) {
-                spnAtBBattleChance[role.ordinal()].setValue(options.getAtBBattleChance(role));
-            }
-        }
     }
 }
