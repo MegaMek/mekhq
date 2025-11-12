@@ -2285,11 +2285,16 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlOther.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlSkills.traits")));
 
         JLabel lblConnections = null;
-        int connections = person.getAdjustedConnections();
+        int connections = person.getAdjustedConnections(true);
         if (connections != 0) {
+            String connectionsDisplayValue = Integer.toString(connections);
+            if (person.getBurnedConnectionsEndDate() != null) {
+                connectionsDisplayValue = "<html><b><font color='gray'>" + connections + "</font></b></html>";
+            }
+
             String connectionsLabel = String.format(resourceMap.getString("format.traitValue"),
                   resourceMap.getString("lblConnections.text"),
-                  connections,
+                  connectionsDisplayValue,
                   "");
             lblConnections = new JLabel(connectionsLabel);
             lblConnections.setToolTipText(wordWrap(resourceMap.getString("lblConnections.tooltip")));
