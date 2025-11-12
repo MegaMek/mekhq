@@ -254,7 +254,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
         }
 
-        if (campaignOptions.isUseMASHTheatres()) {
+        if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
             new ImmersiveDialogNotification(campaign,
                   resources.getString("CompanyGenerationDialog.campaignOptions.security"),
                   true);
