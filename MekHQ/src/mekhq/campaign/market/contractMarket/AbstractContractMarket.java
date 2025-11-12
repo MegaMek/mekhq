@@ -35,6 +35,9 @@ package mekhq.campaign.market.contractMarket;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.enums.SkillLevel.ELITE;
+import static megamek.common.enums.SkillLevel.GREEN;
+import static megamek.common.enums.SkillLevel.HEROIC;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -373,15 +376,29 @@ public abstract class AbstractContractMarket {
         return baseStrategyDeployment + additionalStrategyDeployment * commanderStrategy;
     }
 
-    protected SkillLevel getSkillRating(int roll) {
+    /**
+     * Determines the {@link SkillLevel} corresponding to a given roll result (TW pg 273), optionally applying the
+     * Bolster Contract skill adjustment.
+     *
+     * <p>This method maps a numerical {@code roll} value to a {@link SkillLevel} according to fixed thresholds. If
+     * {@code isUseBolsterContractSkill} is {@code true}, the resulting level is shifted one tier higher to reflect the
+     * benefit of the Bolster Contract skill.</p>
+     *
+     * @param roll                      the numeric roll determining the base skill rating
+     * @param isUseBolsterContractSkill {@code true} to apply the Bolster Contract bonus, {@code false} for the standard
+     *                                  progression
+     *
+     * @return the {@link SkillLevel} corresponding to the roll and modifier
+     */
+    protected SkillLevel getSkillRating(int roll, boolean isUseBolsterContractSkill) {
         if (roll <= 5) {
-            return SkillLevel.GREEN;
+            return isUseBolsterContractSkill ? REGULAR : GREEN;
         } else if (roll <= 9) {
-            return SkillLevel.REGULAR;
+            return isUseBolsterContractSkill ? VETERAN : REGULAR;
         } else if (roll <= 11) {
-            return VETERAN;
+            return isUseBolsterContractSkill ? ELITE : VETERAN;
         } else {
-            return SkillLevel.ELITE;
+            return isUseBolsterContractSkill ? HEROIC : ELITE;
         }
     }
 
@@ -595,12 +612,14 @@ public abstract class AbstractContractMarket {
      *
      * <p>After all the calculations, the resulting ally skill and quality ratings are assigned to the contract.</p>
      *
-     * @param contract          the {@link AtBContract} instance for which the ally ratings are being calculated and
-     *                          assigned.
-     * @param year              the year of the contract, used for applying historical context modifiers.
-     * @param averageSkillLevel the average skill level of the player, used to adjust contract difficulty.
+     * @param contract                  the {@link AtBContract} instance for which the ally ratings are being calculated
+     *                                  and assigned.
+     * @param year                      the year of the contract, used for applying historical context modifiers.
+     * @param averageSkillLevel         the average skill level of the player, used to adjust contract difficulty.
+     * @param isUseBolsterContractSkill {@code true} to increase ally skill
      */
-    protected void setAllyRating(AtBContract contract, int year, SkillLevel averageSkillLevel) {
+    protected void setAllyRating(AtBContract contract, int year, SkillLevel averageSkillLevel,
+          boolean isUseBolsterContractSkill) {
         final Faction employerFaction = contract.getEmployerFaction();
 
         int mod = calculateFactionModifiers(contract.getEmployerFaction());
@@ -610,7 +629,7 @@ public abstract class AbstractContractMarket {
         mod += REGULAR.getExperienceLevel() - averageSkillLevel.getExperienceLevel();
 
         // Assign ally skill rating
-        contract.setAllySkill(getSkillRating(d6(2) + mod));
+        contract.setAllySkill(getSkillRating(d6(2) + mod, isUseBolsterContractSkill));
 
         // Apply faction modifiers
         if (employerFaction.isClan()) {
@@ -659,13 +678,16 @@ public abstract class AbstractContractMarket {
      * or easier when the enemy's overall experience level is lower.</p>
      *
      * <p>After the calculations, the resulting enemy skill and quality ratings are applied to the contract.</p>
-     *
-     * @param contract          the {@link AtBContract} instance for which the enemy ratings are being calculated and
+     *  @param contract          the {@link AtBContract} instance for which the enemy ratings are being calculated and
      *                          assigned.
-     * @param year              the year of the contract, used for applying historical context modifiers.
-     * @param averageSkillLevel the average skill level of the player, used to adjust the enemy contract difficulty.
+     *
+     * @param year                      the year of the contract, used for applying historical context modifiers.
+     * @param averageSkillLevel         the average skill level of the player, used to adjust the enemy contract
+     *                                  difficulty.
+     * @param isUseBolsterContractSkill {@code true} to increase ally skill
      */
-    protected void setEnemyRating(AtBContract contract, int year, SkillLevel averageSkillLevel) {
+    protected void setEnemyRating(AtBContract contract, int year, SkillLevel averageSkillLevel,
+          boolean isUseBolsterContractSkill) {
         Faction enemyFaction = Factions.getInstance().getFaction(contract.getEnemyCode());
         int mod = calculateFactionModifiers(enemyFaction);
 
@@ -678,7 +700,7 @@ public abstract class AbstractContractMarket {
         mod += averageSkillLevel.getExperienceLevel() - REGULAR.getExperienceLevel();
 
         // Assign enemy skill rating
-        contract.setEnemySkill(getSkillRating(d6(2) + mod));
+        contract.setEnemySkill(getSkillRating(d6(2) + mod, isUseBolsterContractSkill));
 
         // Apply faction modifiers
         if (enemyFaction.isClan()) {

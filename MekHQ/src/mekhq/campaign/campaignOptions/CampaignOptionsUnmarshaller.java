@@ -801,6 +801,7 @@ public class CampaignOptionsUnmarshaller {
             case "contractSearchRadius" -> campaignOptions.setContractSearchRadius(parseInt(nodeContents));
             case "variableContractLength" -> campaignOptions.setVariableContractLength(parseBoolean(nodeContents));
             case "useDynamicDifficulty" -> campaignOptions.setUseDynamicDifficulty(parseBoolean(nodeContents));
+            case "useBolsterContractSkill" -> campaignOptions.setUseBolsterContractSkill(parseBoolean(nodeContents));
             case "contractMarketReportRefresh" -> campaignOptions.setContractMarketReportRefresh(parseBoolean(
                   nodeContents));
             case "contractMaxSalvagePercentage" -> campaignOptions.setContractMaxSalvagePercentage(parseInt(
