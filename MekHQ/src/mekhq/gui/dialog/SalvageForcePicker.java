@@ -567,7 +567,7 @@ public class SalvageForcePicker extends JDialog {
             int counter = 0;
             for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
                 for (Person crew : unit.getCrew()) {
-                    if (crew.isTech() && !crew.isEngineer()) {
+                    if (crew.isTechExpanded() && !crew.isEngineer()) {
                         counter++;
                     }
                 }
