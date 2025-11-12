@@ -621,7 +621,6 @@ public class CampaignOptions {
     // endregion Markets Tab
 
     // region Against the Bot Tab
-    private boolean useAtB;
     private boolean useStratCon;
     private boolean useMaplessStratCon;
     private boolean useAdvancedScouting;
@@ -1275,7 +1274,6 @@ public class CampaignOptions {
         // endregion Markets Tab
 
         // region Against the Bot Tab
-        useAtB = false;
         useStratCon = false;
         useMaplessStratCon = false;
         useAdvancedScouting = false;
@@ -4814,12 +4812,9 @@ public class CampaignOptions {
         this.autoLogisticsOther = autoLogisticsOther;
     }
 
+    @Deprecated(since = "0.50.10", forRemoval = false)
     public boolean isUseAtB() {
-        return useAtB || useStratCon;
-    }
-
-    public void setUseAtB(final boolean useAtB) {
-        this.useAtB = useAtB;
+        return useStratCon;
     }
 
     public boolean isUseStratCon() {
