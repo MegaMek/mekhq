@@ -81,6 +81,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -863,8 +864,10 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             campaign.addReport(skillCheckUtility.getResultsText());
             if (skillCheckUtility.isSuccess()) {
                 successfulSurgeries.add(surgery);
+                MedicalLogger.successfulSurgery(patient, campaign.getLocalDate(), surgery.type.toString());
             } else {
                 unsuccessfulSurgeries.add(surgery);
+                MedicalLogger.failedSurgery(patient, campaign.getLocalDate(), surgery.type.toString());
             }
         }
     }
