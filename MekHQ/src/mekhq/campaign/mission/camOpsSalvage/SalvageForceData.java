@@ -118,7 +118,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
               hasTug);
     }
 
-    public String getTechTooltip(Campaign campaign) {
+    public String getTechTooltip(Campaign campaign, Person tech) {
         StringBuilder tooltip = new StringBuilder();
 
         if (tech == null) {
@@ -141,6 +141,21 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
             }
             String injuriesLabel = getFormattedTextAt(RESOURCE_BUNDLE, injuryLabelKey, injuries);
             tooltip.append(injuriesLabel);
+        }
+
+        return tooltip.toString();
+    }
+
+    public String getAllCrewTechTooltip(Campaign campaign, Force force) {
+        Hangar hangar = campaign.getHangar();
+
+        StringBuilder tooltip = new StringBuilder();
+        for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+            for (Person crew : unit.getCrew()) {
+                if (crew.isTech() && !crew.isEngineer()) {
+                    tooltip.append(getTechTooltip(campaign, crew));
+                }
+            }
         }
 
         return tooltip.toString();
