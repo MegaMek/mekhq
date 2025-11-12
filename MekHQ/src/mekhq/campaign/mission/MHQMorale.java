@@ -358,7 +358,7 @@ public class MHQMorale {
                 LOGGER.info("{} has not been found yet. Skipping", scenario.getName());
                 continue;
             }
-            // Scenario date can be null if the scenario hasn't been found in StratCon
+            // Skip scenarios that occurred more than a month ago
             if (lastMonth.isAfter(scenarioDate)) {
                 LOGGER.info("{} occurred more than a month ago. Skipping", scenario.getName());
                 continue;
