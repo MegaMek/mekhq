@@ -1037,7 +1037,7 @@ public enum PersonnelTableModelColumn {
                 if (person.getBurnedConnectionsEndDate() != null) {
                     return "<html><b><font color='gray'>" +
                                  person.getAdjustedConnections(true) +
-                                 "</font></s></b></html>";
+                                 "</font></b></html>";
                 } else {
                     return Integer.toString(person.getAdjustedConnections(true));
                 }
