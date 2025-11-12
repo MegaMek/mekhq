@@ -152,7 +152,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
         StringBuilder tooltip = new StringBuilder();
         for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
             for (Person crew : unit.getCrew()) {
-                if (crew.isTech() && !crew.isEngineer()) {
+                if (crew.isTechExpanded() && !crew.isEngineer()) {
                     tooltip.append(getTechTooltip(campaign, crew));
                 }
             }
