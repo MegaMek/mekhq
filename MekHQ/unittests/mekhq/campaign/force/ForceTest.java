@@ -40,6 +40,7 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Stream;
 
+import megamek.codeUtilities.MathUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeAll;
@@ -410,7 +411,7 @@ class ForceTest {
 
         private Force newTeam() {
             Force force = new Force("Test Team");
-            for (int i = 0; i < Math.floor(mockFaction.getFormationBaseSize() / 2.0); i++) {
+            for (int i = 0; i < MathUtility.roundTowardsZero(mockFaction.getFormationBaseSize() / 2.0); i++) {
                 UUID unit = UUID.randomUUID();
                 force.addUnit(unit);
             }
