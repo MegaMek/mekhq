@@ -469,11 +469,18 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         final ReputationController reputation = campaign.getReputation();
         final SkillLevel campaignSkillLevel = reputation == null ? REGULAR : reputation.getAverageSkillLevel();
         final boolean useDynamicDifficulty = campaign.getCampaignOptions().isUseDynamicDifficulty();
-        setAllyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
-        setEnemyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
+        final boolean useBolsterContractSkill = campaign.getCampaignOptions().isUseBolsterContractSkill();
+        setAllyRating(contract,
+              campaign.getGameYear(),
+              useDynamicDifficulty ? campaignSkillLevel : REGULAR,
+              useBolsterContractSkill);
+        setEnemyRating(contract,
+              campaign.getGameYear(),
+              useDynamicDifficulty ? campaignSkillLevel : REGULAR,
+              useBolsterContractSkill);
 
         if (contract.getContractType().isCadreDuty()) {
-            contract.setAllySkill(GREEN);
+            contract.setAllySkill(campaign.getCampaignOptions().isUseBolsterContractSkill() ? REGULAR : GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
 
@@ -558,11 +565,18 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         setAttacker(contract);
         contract.setSystemId(parent.getSystemId());
-        setAllyRating(contract, campaign.getGameYear(), campaign.getReputation().getAverageSkillLevel());
-        setEnemyRating(contract, campaign.getGameYear(), campaign.getReputation().getAverageSkillLevel());
+        final boolean useBolsterContractSkill = campaign.getCampaignOptions().isUseBolsterContractSkill();
+        setAllyRating(contract,
+              campaign.getGameYear(),
+              campaign.getReputation().getAverageSkillLevel(),
+              useBolsterContractSkill);
+        setEnemyRating(contract,
+              campaign.getGameYear(),
+              campaign.getReputation().getAverageSkillLevel(),
+              useBolsterContractSkill);
 
         if (contract.getContractType().isCadreDuty()) {
-            contract.setAllySkill(GREEN);
+            contract.setAllySkill(campaign.getCampaignOptions().isUseBolsterContractSkill() ? REGULAR : GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
