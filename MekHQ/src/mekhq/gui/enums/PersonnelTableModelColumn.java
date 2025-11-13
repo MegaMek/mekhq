@@ -1034,7 +1034,13 @@ public enum PersonnelTableModelColumn {
             case TOUGHNESS:
                 return Integer.toString(person.getToughness());
             case CONNECTIONS:
-                return Integer.toString(person.getAdjustedConnections());
+                if (person.getBurnedConnectionsEndDate() != null) {
+                    return "<html><b><font color='gray'>" +
+                                 person.getAdjustedConnections(true) +
+                                 "</font></b></html>";
+                } else {
+                    return Integer.toString(person.getAdjustedConnections(true));
+                }
             case WEALTH:
                 return Integer.toString(person.getWealth());
             case EXTRA_INCOME:

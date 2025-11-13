@@ -6467,18 +6467,23 @@ public class Person {
      *
      * <p>The Connections value is clamped within the allowed minimum and maximum range before being returned.</p>
      *
+     * @param excludeTemporaryAdjustments if {@code true} temporary adjustments, such as from paranoia or connections
+     *                                    burning, are excluded from the returned value
+     *
      * @return the character's Connections value, clamped within the minimum and maximum limits
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public int getAdjustedConnections() {
-        if (burnedConnectionsEndDate != null) {
-            return 0;
-        }
+    public int getAdjustedConnections(boolean excludeTemporaryAdjustments) {
+        if (!excludeTemporaryAdjustments) {
+            if (burnedConnectionsEndDate != null) {
+                return 0;
+            }
 
-        if (sufferingFromClinicalParanoia) {
-            return 0;
+            if (sufferingFromClinicalParanoia) {
+                return 0;
+            }
         }
 
         boolean hasXenophobia = options.booleanOption(COMPULSION_XENOPHOBIA);
@@ -8322,7 +8327,7 @@ public class Person {
             return "";
         }
 
-        int adjustedConnections = getAdjustedConnections();
+        int adjustedConnections = getAdjustedConnections(false);
         ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
 
         if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {
@@ -8360,7 +8365,7 @@ public class Person {
      * @since 0.50.07
      */
     public String checkForBurnedContacts(LocalDate today) {
-        int adjustedConnections = getAdjustedConnections();
+        int adjustedConnections = getAdjustedConnections(false);
         ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
 
         if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {
