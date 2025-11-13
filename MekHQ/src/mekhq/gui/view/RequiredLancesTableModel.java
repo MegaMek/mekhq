@@ -116,13 +116,15 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
             int t = 0;
             for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
                 AtBContract assignedContract = combatTeam.getContract(campaign);
-                boolean isCadreDuty = assignedContract.getContractType().isCadreDuty();
-                CombatRole role = combatTeam.getRole();
-                boolean isRoleSuitable = (isCadreDuty && role.isCadre()) || role.isCombatRole();
-                boolean isDeploymentEligible = combatTeam.isEligible(campaign);
+                if (assignedContract != null) {
+                    boolean isCadreDuty = assignedContract.getContractType().isCadreDuty();
+                    CombatRole role = combatTeam.getRole();
+                    boolean isRoleSuitable = (isCadreDuty && role.isCadre()) || role.isCombatRole();
+                    boolean isDeploymentEligible = combatTeam.isEligible(campaign);
 
-                if ((data.get(row).equals(assignedContract)) && isRoleSuitable && isDeploymentEligible) {
-                    t += combatTeam.getSize(campaign);
+                    if ((data.get(row).equals(assignedContract)) && isRoleSuitable && isDeploymentEligible) {
+                        t += combatTeam.getSize(campaign);
+                    }
                 }
             }
             if (t < contract.getRequiredCombatElements()) {
