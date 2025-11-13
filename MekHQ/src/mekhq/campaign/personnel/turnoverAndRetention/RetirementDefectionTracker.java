@@ -659,10 +659,20 @@ public class RetirementDefectionTracker {
         int maximumStrain = campaign.getCampaignOptions().getHRCapacity() *
                                   getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
+        /** rewrite by Trent1098S to fix HR strain modifier
+         * divide by zero protection */
         if (maximumStrain != 0) {
-            return 1 - (personnel / maximumStrain);
+            double personnelPct = (double) personnel / maximumStrain;
+
+            /** return modifier of 1 per 100% over hr capacity limit */
+            if (personnelPct >= 1) {
+                return (int) personnelPct;
+            } else {
+                return 0; /** personnel is within capacity, no modifier */
+            }
         } else {
-            return personnel;
+            /** return whatever arbitrary maximum penalty here, tossed in placeholder 10 */
+            return 10;
         }
     }
 
