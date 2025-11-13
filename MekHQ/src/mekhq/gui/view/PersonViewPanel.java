@@ -2330,7 +2330,7 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         JLabel lblToughness = null;
-        int totalToughness = person.getToughness();
+        int totalToughness = person.getAdjustedToughness();
         if ((campaignOptions.isUseToughness()) && (totalToughness != 0)) {
             String toughnessLabel = String.format(resourceMap.getString("format.traitValue"),
                   resourceMap.getString("lblToughness.text"),

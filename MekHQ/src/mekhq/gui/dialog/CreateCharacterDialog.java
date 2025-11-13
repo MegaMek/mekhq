@@ -649,7 +649,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         lblToughness.setText(resourceMap.getString("lblToughness.text")); // NOI18N
         lblToughness.setName("lblToughness"); // NOI18N
 
-        textToughness.setText(Integer.toString(person.getToughness()));
+        textToughness.setText(Integer.toString(person.getDirectToughness()));
         textToughness.setName("textToughness"); // NOI18N
 
         if (campaign.getCampaignOptions().isUseToughness()) {
@@ -1715,7 +1715,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         person.setClanPersonnel(chkClan.isSelected());
 
         if (campaign.getCampaignOptions().isUseToughness()) {
-            person.setToughness(MathUtility.parseInt(textToughness.getText(), person.getToughness()));
+            person.setToughness(MathUtility.parseInt(textToughness.getText(), person.getDirectToughness()));
         }
 
         int newValue = MathUtility.parseInt(textConnections.getText(), person.getConnections());
