@@ -1990,7 +1990,7 @@ public class AlternateInjuries {
             super(DISCONTINUATION_SYNDROME_HEALING_DAYS,
                   false,
                   CHRONIC,
-                  DISCONTINUATION_SYNDROME,
+                  InjuryEffect.DISCONTINUATION_SYNDROME,
                   Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DISCONTINUATION_SYNDROME.simpleName");
             this.maxSeverity = 0;
