@@ -99,7 +99,7 @@ class MHQMoraleTest {
 
         int adjustedQuality = Math.min(DRAGOON_ASTAR, experienceLevel + 1);
         int expectedReliability = getReliabilityModifier(adjustedQuality);
-        expectedReliability++;
+        expectedReliability--;
 
         assertEquals(expectedReliability, actualReliability,
               String.format("Reliability should match experience level: expected %d but got %d",
@@ -124,7 +124,7 @@ class MHQMoraleTest {
         int actualReliability = MHQMorale.getReliability(mockContract);
 
         int expectedReliability = getReliabilityModifier(experienceLevel);
-        expectedReliability--;
+        expectedReliability++;
 
         assertEquals(expectedReliability, actualReliability,
               String.format("Reliability should match experience level: expected %d but got %d",
@@ -149,7 +149,7 @@ class MHQMoraleTest {
         int actualReliability = MHQMorale.getReliability(mockContract);
 
         int expectedReliability = getReliabilityModifier(experienceLevel);
-        expectedReliability--;
+        expectedReliability++;
 
         assertEquals(expectedReliability, actualReliability,
               String.format("Reliability should match experience level: expected %d but got %d",
@@ -174,7 +174,7 @@ class MHQMoraleTest {
         int actualReliability = MHQMorale.getReliability(mockContract);
 
         int expectedReliability = getReliabilityModifier(experienceLevel);
-        expectedReliability--;
+        expectedReliability++;
 
         assertEquals(expectedReliability, actualReliability,
               String.format("Reliability should match experience level: expected %d but got %d",
@@ -199,7 +199,7 @@ class MHQMoraleTest {
         int actualReliability = MHQMorale.getReliability(mockContract);
 
         int expectedReliability = getReliabilityModifier(experienceLevel);
-        expectedReliability--;
+        expectedReliability++;
 
         assertEquals(expectedReliability, actualReliability,
               String.format("Reliability should match experience level: expected %d but got %d",

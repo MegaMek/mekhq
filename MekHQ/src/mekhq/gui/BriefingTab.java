@@ -36,7 +36,7 @@ import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
-import static mekhq.campaign.mission.enums.ScenarioStatus.REFUSED_ENGAGEMENT;
+import static mekhq.campaign.mission.enums.ScenarioStatus.DRAW;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
@@ -600,7 +600,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Resolve any outstanding scenarios
         for (Scenario scenario : mission.getCurrentScenarios()) {
-            scenario.setStatus(REFUSED_ENGAGEMENT);
+            scenario.setStatus(DRAW);
         }
 
         if (getCampaign().getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
