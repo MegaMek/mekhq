@@ -866,7 +866,7 @@ public class MRMSDialog extends JDialog {
 
     private void btnUnitsSelectNoneActionPerformed(ActionEvent evt) {
         int removalRowCount = unitTable.getRowCount() - 1;
-        if (removalRowCount > 0) {
+        if (removalRowCount >= 0) {
             unitTable.removeRowSelectionInterval(0, unitTable.getRowCount() - 1);
         }
     }
