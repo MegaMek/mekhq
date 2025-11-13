@@ -443,8 +443,7 @@ public class AtBContract extends Contract {
 
                     if (contractDefinition != null) {
                         for (StratConTrackState trackState : stratconCampaignState.getTracks()) {
-                            int scenarioOdds = StratConContractInitializer.getScenarioOdds(
-                                  campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(), contractDefinition);
+                            int scenarioOdds = StratConContractInitializer.getScenarioOdds(contractDefinition);
 
                             trackState.setScenarioOdds(scenarioOdds);
                         }
