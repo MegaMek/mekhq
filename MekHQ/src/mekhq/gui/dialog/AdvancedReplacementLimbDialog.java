@@ -116,7 +116,6 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvancedReplacementLimbDialog";
 
     private static final int PADDING = scaleForGUI(10);
-    private static final Dimension MAXIMUM_DIALOG_SIZE = scaleForGUI(700, 900);
     private static final String MALE_PAPER_DOLL = "default_male_paperdoll";
     private static final String FEMALE_PAPER_DOLL = "default_female_paperdoll";
 
@@ -126,6 +125,9 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      */
     private static final List<BodyLocation> VALID_BODY_LOCATIONS = List.of(
           HEAD,
+          BRAIN,
+          FACE,
+          MOUTH,
           EYES,
           EARS,
           LEFT_ARM,
@@ -137,10 +139,13 @@ public class AdvancedReplacementLimbDialog extends JDialog {
           LUNGS,
           ORGANS,
           ABDOMEN,
+          RUMP,
           LEFT_LEG,
           RIGHT_LEG,
           LEFT_FOOT,
-          RIGHT_FOOT
+          RIGHT_FOOT,
+          BONES,
+          INTERNAL
     );
 
     private final Campaign campaign;
@@ -218,7 +223,6 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         initializeUI();
         pack();
-        setMaximumSize(MAXIMUM_DIALOG_SIZE);
         setLocationRelativeTo(null);
         setModal(true);
         setPreferences(this); // Must be before setVisible
@@ -711,11 +715,9 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         if (successfulSurgeries.contains(surgery)) {
             // Remove injuries based on the surgery type
-            boolean isBurnRemovalOnly = type == COSMETIC_SURGERY;
-            for (Injury injury : relevantInjuries.getOrDefault(location,
-                  new ArrayList<>())) {
-                if (injury != null
-                          && (injury.getSubType().isBurn() || !isBurnRemovalOnly)) {
+            boolean isBurnRemovalOnly = type.isBurnRemoveOnly();
+            for (Injury injury : relevantInjuries.getOrDefault(location, new ArrayList<>())) {
+                if (injury != null && (injury.getSubType().isBurn() || !isBurnRemovalOnly)) {
                     patient.removeInjury(injury);
                 }
             }

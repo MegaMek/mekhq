@@ -64,7 +64,7 @@ public class InjuryLocationService {
 
     private static final Map<BodyLocation, Map<Integer, SecondaryLocation>> SECONDARY_LOCATION_TABLE = Map.ofEntries(
           Map.entry(BodyLocation.HEAD, Map.of(
-                1, new SecondaryLocation(AlternateInjuries.BURN_FACE, BodyLocation.HEAD),
+                1, new SecondaryLocation(AlternateInjuries.BURN_FACE, BodyLocation.FACE),
                 2, new SecondaryLocation(AlternateInjuries.HEARING_LOSS, BodyLocation.EARS),
                 3, new SecondaryLocation(AlternateInjuries.BLINDNESS, BodyLocation.EYES),
                 4, new SecondaryLocation(AlternateInjuries.FRACTURED_JAW, BodyLocation.JAW),
