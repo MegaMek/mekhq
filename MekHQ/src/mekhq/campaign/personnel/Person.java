@@ -1883,7 +1883,6 @@ public class Person {
     }
 
     public @Nullable LocalDate getRecruitment() {
-
         return recruitment;
     }
 
