@@ -5995,7 +5995,7 @@ public class Person {
         }
 
         // Personnel without tech or doctor roles have no available time
-        if (!isTech() && !isDoctor()) {
+        if (!isTechExpanded() && !isDoctor()) {
             this.minutesLeft = 0;
             this.overtimeLeft = 0;
             return;
