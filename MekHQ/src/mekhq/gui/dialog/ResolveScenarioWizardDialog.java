@@ -79,8 +79,10 @@ import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
+import mekhq.campaign.mission.MHQMorale;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjectiveProcessor;
 import mekhq.campaign.mission.enums.ScenarioStatus;
@@ -1651,6 +1653,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
                   tracker.getScenario().getLinkedScenario() != 0) {
 
             StratConRulesManager.linkedScenarioProcessing(tracker, linkedForces);
+        }
+
+        if (tracker.getScenario() instanceof AtBScenario atBScenario) {
+            if (atBScenario.getStratConScenarioType().isOfficialChallenge()) {
+                MHQMorale.processCombatChallengeResults(campaign, atBScenario.getContract(campaign),
+                      atBScenario.getStatus());
+            }
         }
 
         aborted = false;

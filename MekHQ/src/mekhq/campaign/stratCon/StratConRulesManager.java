@@ -117,6 +117,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
 import mekhq.utilities.EntityUtilities;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.math3.util.Pair;
@@ -634,14 +635,22 @@ public class StratConRulesManager {
         final AtBDynamicScenario backingScenario = scenario.getBackingScenario();
 
         // First determine if the scenario is a Turning Point (that win/lose will affect CVP)
-        determineIfTurningPointScenario(contract, scenario);
+        boolean isCombatChallenge = scenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge();
+        boolean showNag = !MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_COMBAT_CHALLENGE);
+        if (isCombatChallenge && showNag) {
+            new CombatChallengeNagDialog(campaign);
+        }
+
+        determineIfTurningPointScenario(contract, scenario, isCombatChallenge);
         if (!scenario.isTurningPoint()) {
-            determineIfCrisisScenario(contract.getMoraleLevel(), backingScenario);
+            determineIfCrisisScenario(contract.getMoraleLevel(), backingScenario, isCombatChallenge);
         }
 
         // Then add any Cadre Duty units
-        if (contract.getContractType().isCadreDuty()) {
-            addCadreDutyTrainees(backingScenario);
+        if (!isCombatChallenge) {
+            if (contract.getContractType().isCadreDuty()) {
+                addCadreDutyTrainees(backingScenario);
+            }
         }
 
         // Finally, finish scenario set up
@@ -715,35 +724,40 @@ public class StratConRulesManager {
      *     non-resupply scenarios have a 25% chance (1 in 4) to be marked as required. An attached
      *     units modifier is also set if the scenario becomes required.</li>
      * </ul>
+     *  @param contract The {@link AtBContract} representing the current contract.
      *
-     * @param contract The {@link AtBContract} representing the current contract.
-     * @param scenario The {@link StratConScenario} being evaluated to determine if it is a Turning Point.
+     * @param scenario          The {@link StratConScenario} being evaluated to determine if it is a Turning Point.
+     * @param isCombatChallenge {@code true} if attached units should be skipped, and if the scenario is barred from
+     *                          being a Turning Point
      */
-    private static void determineIfTurningPointScenario(AtBContract contract, StratConScenario scenario) {
+    private static void determineIfTurningPointScenario(AtBContract contract, StratConScenario scenario,
+          boolean isCombatChallenge) {
         ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
         boolean isObjective = scenario.isStrategicObjective();
         boolean isSpecial = scenarioType.isSpecial();
 
-        if (isSpecial || isObjective) {
+        if (isSpecial || isObjective || isCombatChallenge) {
             scenario.setTurningPoint(false);
             return;
         }
 
-        ContractCommandRights commandRights = contract.getCommandRights();
-        switch (commandRights) {
-            case INTEGRATED -> {
-                scenario.setTurningPoint(true);
-                setAttachedUnitsModifier(scenario, contract);
-            }
-            case HOUSE, LIAISON -> {
-                if (randomInt(3) == 0 || isObjective) {
+        if (!isCombatChallenge) {
+            ContractCommandRights commandRights = contract.getCommandRights();
+            switch (commandRights) {
+                case INTEGRATED -> {
                     scenario.setTurningPoint(true);
                     setAttachedUnitsModifier(scenario, contract);
                 }
-            }
-            case INDEPENDENT -> {
-                if (randomInt(3) == 0 || isObjective) {
-                    scenario.setTurningPoint(true);
+                case HOUSE, LIAISON -> {
+                    if (randomInt(3) == 0 || isObjective) {
+                        scenario.setTurningPoint(true);
+                        setAttachedUnitsModifier(scenario, contract);
+                    }
+                }
+                case INDEPENDENT -> {
+                    if (randomInt(3) == 0 || isObjective) {
+                        scenario.setTurningPoint(true);
+                    }
                 }
             }
         }
@@ -765,16 +779,18 @@ public class StratConRulesManager {
      *   <li>If the roll results in {@code 0} (the minimum value), the scenario is marked as a crisis scenario.</li>
      *   <li>If the roll results in any other value, the scenario is not marked as a crisis.</li>
      * </ul>
-     *
-     * @param morale          The {@link AtBMoraleLevel} representing the current morale state, which determines the
+     *  @param morale          The {@link AtBMoraleLevel} representing the current morale state, which determines the
      *                        size of the die used for the crisis check.
-     * @param backingScenario The {@link AtBDynamicScenario} being evaluated. This scenario will be marked as a crisis
-     *                        if the conditions are met.
+     *
+     * @param backingScenario   The {@link AtBDynamicScenario} being evaluated. This scenario will be marked as a crisis
+     *                          if the conditions are met.
+     * @param isCombatChallenge {@code true} if the scenario is barred from being a Crisis
      */
-    private static void determineIfCrisisScenario(AtBMoraleLevel morale, AtBDynamicScenario backingScenario) {
+    private static void determineIfCrisisScenario(AtBMoraleLevel morale, AtBDynamicScenario backingScenario,
+          boolean isCombatChallenge) {
         ScenarioType scenarioType = backingScenario.getStratConScenarioType();
         boolean isSpecial = scenarioType.isSpecial();
-        if (isSpecial) {
+        if (isSpecial || isCombatChallenge) {
             return;
         }
 
@@ -2180,11 +2196,14 @@ public class StratConRulesManager {
         }
 
         // set the # of rerolls based on the actual lance assigned.
-        int tactics = scenario.getBackingScenario().getLanceCommanderSkill(S_TACTICS, campaign);
-        scenario.getBackingScenario().setRerolls(tactics);
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        int tactics = backingScenario.getLanceCommanderSkill(S_TACTICS, campaign);
+        backingScenario.setRerolls(tactics);
         // The number of defensive points available to a force entering a scenario is
         // 2 x tactics. By default, those points are spent on conventional minefields.
-        if (commanderLanceHasDefensiveAssignment(scenario.getBackingScenario(), campaign)) {
+        if (commanderLanceHasDefensiveAssignment(backingScenario, campaign) &&
+                  // No minefields or bonus units during official challenges.
+                  !backingScenario.getStratConScenarioType().isOfficialChallenge()) {
             scenario.setNumDefensivePoints(tactics * 2);
             scenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, tactics * 2);
         }
@@ -2650,21 +2669,23 @@ public class StratConRulesManager {
      * </ul>
      * Forces that meet all conditions are returned as a list of unique force IDs.
      *
-     * @param unitType        the desired type of unit to evaluate for deployment eligibility.
-     * @param campaign        the {@link Campaign} containing the forces to evaluate.
-     * @param currentTrack    the {@link StratConTrackState} representing the current track, used to filter eligible
-     *                        forces.
-     * @param reinforcements  {@code true} if the forces are being deployed as reinforcements; otherwise {@code false}.
-     * @param currentScenario the current {@link StratConScenario}, if any, used to exclude failed reinforcements. Can
-     *                        be {@code null}.
-     * @param campaignState   the current {@link StratConCampaignState} representing the campaign state for further
-     *                        filtering of eligible forces.
+     * @param unitType          the desired type of unit to evaluate for deployment eligibility.
+     * @param campaign          the {@link Campaign} containing the forces to evaluate.
+     * @param currentTrack      the {@link StratConTrackState} representing the current track, used to filter eligible
+     *                          forces.
+     * @param reinforcements    {@code true} if the forces are being deployed as reinforcements; otherwise
+     *                          {@code false}.
+     * @param currentScenario   the current {@link StratConScenario}, if any, used to exclude failed reinforcements. Can
+     *                          be {@code null}.
+     * @param campaignState     the current {@link StratConCampaignState} representing the campaign state for further
+     *                          filtering of eligible forces.
+     * @param isCombatChallenge {@code true} to restrict the player to deploying a single formation of ground units.
      *
      * @return a {@link List} of unique force IDs that meet all deployment criteria.
      */
     public static List<Integer> getAvailableForceIDsForManualDeployment(int unitType, Campaign campaign,
           StratConTrackState currentTrack, boolean reinforcements, @Nullable StratConScenario currentScenario,
-          StratConCampaignState campaignState) {
+          StratConCampaignState campaignState, boolean isCombatChallenge) {
         List<Integer> retVal = new ArrayList<>();
 
         // assemble a set of all force IDs that are currently assigned to tracks that are not this one
@@ -2709,14 +2730,35 @@ public class StratConRulesManager {
                                                              campaign,
                                                              campaignState) != ReinforcementEligibilityType.NONE);
 
+            List<Unit> allUnits = force.getAllUnitsAsUnits(campaign.getHangar(), false);
             if ((force.getScenarioId() <= 0) &&
-                      !force.getAllUnits(true).isEmpty() &&
+                      !allUnits.isEmpty() &&
                       !forcesInTracks.contains(force.getId()) &&
                       forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType) &&
                       noReinforcementRestriction &&
                       !subElementsOrSelfDeployed(force, campaign)) {
+                if (isCombatChallenge) {
+                    boolean hasOnlyGroundUnits = true;
+                    for (Unit unit : allUnits) {
+                        Entity entity = unit.getEntity();
+                        if (entity != null && entity.isAerospace()) {
+                            hasOnlyGroundUnits = false;
+                            break;
+                        }
+                    }
 
-                retVal.add(force.getId());
+                    if (!hasOnlyGroundUnits) {
+                        continue;
+                    }
+
+                    int standardForceSize = CombatTeam.getStandardForceSize(campaign.getFaction());
+                    int formationSize = formation.getSize(campaign);
+                    if (formationSize <= standardForceSize) {
+                        retVal.add(force.getId());
+                    }
+                } else {
+                    retVal.add(force.getId());
+                }
             }
         }
 

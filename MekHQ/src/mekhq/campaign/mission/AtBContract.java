@@ -59,7 +59,6 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
-import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_C;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_F;
@@ -130,7 +129,6 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.randomEvents.MercenaryAuction;
 import mekhq.campaign.randomEvents.RoninOffer;
-import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConContractDefinition;
 import mekhq.campaign.stratCon.StratConContractInitializer;
@@ -470,29 +468,7 @@ public class AtBContract extends Contract {
                                   + moraleLevel.getToolTipText();
         new ImmersiveDialogNotification(campaign, flavorText, moraleReport, true);
 
-        // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
-        if (moraleLevel.isRouted()) {
-            if (contractType.isGarrisonType()) {
-                routEnd = today.plusMonths(max(1, d6() - 3)).minusDays(1);
-
-                PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(campaign, this);
-                if (!campaign.getFriendlyPrisoners().isEmpty()) {
-                    prisoners.handlePrisoners(true, true);
-                }
-
-                if (!campaign.getCurrentPrisoners().isEmpty()) {
-                    prisoners.handlePrisoners(true, false);
-                }
-
-                campaign.setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
-            } else {
-                new ImmersiveDialogNotification(campaign,
-                      String.format(resources.getString("stratCon.earlyContractEnd.objectives"), getName()), true);
-                int remainingMonths = getMonthsLeft(campaign.getLocalDate().plusDays(1));
-                routedPayout = getMonthlyPayOut().multipliedBy(remainingMonths);
-                setEndDate(today.plusDays(1));
-            }
-        }
+        MHQMorale.routedMoraleUpdate(campaign, this);
 
         // Reset external morale modifier
         moraleMod = 0;
@@ -1463,6 +1439,14 @@ public class AtBContract extends Contract {
 
     public boolean isPeaceful() {
         return getContractType().isGarrisonType() && getMoraleLevel().isRouted();
+    }
+
+    public LocalDate getRoutEnd() {
+        return routEnd;
+    }
+
+    public void setRoutEnd(LocalDate routEnd) {
+        this.routEnd = routEnd;
     }
 
     @Override
