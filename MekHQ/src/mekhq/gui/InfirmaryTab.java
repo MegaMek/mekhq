@@ -46,8 +46,10 @@ import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -67,6 +69,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.AdvancedReplacementLimbDialog;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.DocTableModel;
@@ -82,6 +85,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
     private JTable docTable;
     private RoundedJButton btnAssignDoc;
     private RoundedJButton btnUnassignDoc;
+    private RoundedJButton btnAdvancedSurgery;
     private JList<Person> listAssignedPatient;
     private JList<Person> listUnassignedPatient;
 
@@ -153,12 +157,21 @@ public final class InfirmaryTab extends CampaignGuiTab {
         RoundedJButton btnVaccineMandate = new RoundedJButton(resourceMap.getString("btnVaccineMandate.text"));
         btnVaccineMandate.addActionListener(ev -> Inoculations.triggerInoculationPrompt(getCampaign(), true));
 
+        btnAdvancedSurgery = new RoundedJButton(resourceMap.getString("btnAdvancedSurgery.text"));
+        btnAdvancedSurgery.setEnabled(false);
+        btnAdvancedSurgery.addActionListener(ev -> {
+            for (Person person : getAllSelectedPatients()) {
+                new AdvancedReplacementLimbDialog(getCampaign(), person);
+            }
+        });
+
         // Create a panel to group the buttons together horizontally
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         buttonPanel.add(btnAssignDoc);
         buttonPanel.add(btnUnassignDoc);
         buttonPanel.add(btnOptimizeAssignments);
         buttonPanel.add(btnVaccineMandate);
+        buttonPanel.add(btnAdvancedSurgery);
 
         // Add the button panel to the layout
         gridBagConstraints = new GridBagConstraints();
@@ -379,6 +392,13 @@ public final class InfirmaryTab extends CampaignGuiTab {
         return patients;
     }
 
+    private Set<Person> getAllSelectedPatients() {
+        Set<Person> allPatients = new HashSet<>();
+        allPatients.addAll(getSelectedUnassignedPatients());
+        allPatients.addAll(getSelectedAssignedPatients());
+        return allPatients;
+    }
+
     /**
      * Updates the enabled or disabled state of the doctor assignment-related buttons.
      *
@@ -407,6 +427,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
         }
 
         btnUnassignDoc.setEnabled(!getSelectedAssignedPatients().isEmpty());
+        btnAdvancedSurgery.setEnabled(getCampaignOptions().isUseAlternativeAdvancedMedical() &&
+                                            !getAllSelectedPatients().isEmpty());
     }
 
     /**

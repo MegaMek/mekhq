@@ -33,12 +33,14 @@
 package mekhq.campaign.force;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Stream;
 
+import megamek.codeUtilities.MathUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeAll;
@@ -246,6 +248,20 @@ class ForceTest {
 
         @ParameterizedTest
         @MethodSource(value = "factions")
+        void testGetDefaultFormationDepth0(Faction faction) {
+            // Arrange
+            setFaction(faction);
+
+            // Act
+            Force force = newTeam();
+            force.defaultFormationLevelForForce(mockCampaign);
+
+            // Assert
+            assertEquals(FormationLevel.parseFromDepth(mockCampaign, 0), force.getFormationLevel());
+        }
+
+        @ParameterizedTest
+        @MethodSource(value = "factions")
         void testGetDefaultFormationDepth1(Faction faction) {
             // Arrange
             setFaction(faction);
@@ -271,7 +287,6 @@ class ForceTest {
             // Assert
             assertEquals(FormationLevel.parseFromDepth(mockCampaign, 2), force.getFormationLevel());
         }
-
 
 
         @ParameterizedTest
@@ -370,14 +385,41 @@ class ForceTest {
             assertEquals(FormationLevel.parseFromDepth(mockCampaign, 2), force.getFormationLevel());
         }
 
+        @ParameterizedTest
+        @MethodSource(value = "factions")
+        void testGetDefaultFormationTeamAttachedToLance(Faction faction) {
+            // Arrange
+            setFaction(faction);
+
+            // Act
+            Force force1 = new Force("Test Lance");
+            Force force2 = newTeam();
+            force2.defaultFormationLevelForForce(mockCampaign); //Shouldn't change anything
+            force1.addSubForce(force2, true);
+            force1.defaultFormationLevelForForce(mockCampaign);
+
+            // Assert
+            assertEquals(FormationLevel.parseFromDepth(mockCampaign, 1), force1.getFormationLevel());
+            assertEquals(FormationLevel.parseFromDepth(mockCampaign, 0), force2.getFormationLevel());
+        }
+
         private void setFaction(Faction faction) {
             mockFaction = faction;
             when(mockCampaign.getFaction()).thenReturn(mockFaction);
         }
 
+        private Force newTeam() {
+            Force force = new Force("Test Team");
+            for (int i = 0; i < MathUtility.roundTowardsZero(mockFaction.getFormationBaseSize() / 2.0); i++) {
+                UUID unit = UUID.randomUUID();
+                force.addUnit(unit);
+            }
+            return force;
+        }
+
         private Force newLance() {
             Force force = new Force("Test Lance");
-            for(int i = 0; i < mockFaction.getFormationBaseSize(); i++) {
+            for (int i = 0; i < mockFaction.getFormationBaseSize(); i++) {
                 UUID unit = UUID.randomUUID();
                 force.addUnit(unit);
             }
