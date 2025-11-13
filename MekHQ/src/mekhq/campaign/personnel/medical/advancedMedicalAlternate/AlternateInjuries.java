@@ -79,6 +79,7 @@ public class AlternateInjuries {
     private static final int COSMETIC_SURGERY_RECOVERY_HEALING_DAYS = 7; // Internet says 2-3 weeks
     private static final int ELECTIVE_IMPLANT_RECOVERY_HEALING_DAYS = 90; // ATOW pg 317
     private static final int ENHANCED_IMAGING_IMPLANT_RECOVERY_HEALING_DAYS = 365; // ATOW pg 317
+    private static final int DISCONTINUATION_SYNDROME_HEALING_DAYS = 7; // We check for this weekly
 
     private static final InjuryLevel SEVER_INJURY_LEVEL = CHRONIC;
     private static final InjuryLevel FRACTURE_INJURY_LEVEL = MAJOR;
@@ -133,6 +134,7 @@ public class AlternateInjuries {
     public static final InjuryType COMPOUND_FRACTURED_SHIN = new CompoundFracturedShin();
     // Any
     public static final InjuryType BLOOD_LOSS = new BloodLoss();
+    public static final InjuryType DISCONTINUATION_SYNDROME = new DiscontinuationSyndrome();
     // Diseases
     public static final InjuryType GROWTHS_DISCOMFORT = new GrowthsDiscomfort();
     public static final InjuryType GROWTHS_SLIGHT = new GrowthsSlight();
@@ -1980,6 +1982,18 @@ public class AlternateInjuries {
                   NONE,
                   Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.EI_IMPLANT_RECOVERY.simpleName");
+        }
+    }
+
+    public static final class DiscontinuationSyndrome extends BaseInjury {
+        DiscontinuationSyndrome() {
+            super(DISCONTINUATION_SYNDROME_HEALING_DAYS,
+                  false,
+                  CHRONIC,
+                  DISCONTINUATION_SYNDROME,
+                  Set.of(GENERIC));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DISCONTINUATION_SYNDROME.simpleName");
+            this.maxSeverity = 0;
         }
     }
 }

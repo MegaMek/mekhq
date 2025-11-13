@@ -53,11 +53,11 @@ import static mekhq.campaign.log.LogEntryType.PATIENT;
 import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CATATONIA;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CHILDLIKE_REGRESSION;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CRIPPLING_FLASHBACKS;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.DISCONTINUATION_SYNDROME;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.getAllActiveInjuryEffects;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
@@ -128,6 +128,7 @@ import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -7537,27 +7538,36 @@ public class Person {
      *   to {@link PersonnelStatus#MEDICAL_COMPLICATIONS} (killed).</li>
      * </ul>
      *
-     * @param campaign               the active {@link Campaign} in which the discontinuation syndrome is processed
-     * @param useAdvancedMedical     {@code true} if Advanced Medical is enabled
-     * @param useFatigue             {@code true} if Fatigue should be increased
-     * @param hasCompulsionAddiction specifies if the character has the {@link PersonnelOptions#COMPULSION_ADDICTION}
-     *                               Flaw.
-     * @param failedWillpowerCheck   {@code true} if the character failed the check to resist their compulsion
+     * @param campaign                the active {@link Campaign} in which the discontinuation syndrome is processed
+     * @param useAdvancedMedical      {@code true} if Advanced Medical is enabled
+     * @param isUseAltAdvancedMedical {@code true} if Alt Advanced Medical is enabled
+     * @param useFatigue              {@code true} if Fatigue should be increased
+     * @param hasCompulsionAddiction  specifies if the character has the {@link PersonnelOptions#COMPULSION_ADDICTION}
+     *                                Flaw.
+     * @param failedWillpowerCheck    {@code true} if the character failed the check to resist their compulsion
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public void processDiscontinuationSyndrome(Campaign campaign, boolean useAdvancedMedical, boolean useFatigue,
+    public void processDiscontinuationSyndrome(Campaign campaign, boolean useAdvancedMedical,
+          boolean isUseAltAdvancedMedical, boolean useFatigue,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasCompulsionAddiction, boolean failedWillpowerCheck) {
         final int FATIGUE_INCREASE = 2;
         final int DEATH_THRESHOLD = 5;
 
-
         if (hasCompulsionAddiction && failedWillpowerCheck) {
-            if (useAdvancedMedical) {
-                Injury injury = DISCONTINUATION_SYNDROME.newInjury(campaign, this, INTERNAL, 1);
-                addInjury(injury);
+            if (useAdvancedMedical || isUseAltAdvancedMedical) {
+                Injury injury;
+                if (useAdvancedMedical) {
+                    injury = InjuryTypes.DISCONTINUATION_SYNDROME.newInjury(campaign, this, INTERNAL, 1);
+                } else {
+                    injury = AlternateInjuries.DISCONTINUATION_SYNDROME.newInjury(campaign, this, GENERIC, 0);
+                }
+
+                if (injury != null) {
+                    addInjury(injury);
+                }
             } else {
                 hits++;
             }

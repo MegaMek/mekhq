@@ -1418,7 +1418,26 @@ public enum InjuryEffect {
           0,
           0,
           0,
-          1);
+          1),
+    DISCONTINUATION_SYNDROME("DISCONTINUATION_SYNDROME",
+          "",
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          false,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.InjuryEffect";
 

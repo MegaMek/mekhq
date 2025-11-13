@@ -69,6 +69,7 @@ import static mekhq.campaign.stratCon.SupportPointNegotiation.negotiateAdditiona
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -181,6 +182,9 @@ import mekhq.utilities.ReportingUtilities;
  */
 public class CampaignNewDayManager {
     private static final MMLogger LOGGER = MMLogger.create(CampaignNewDayManager.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignNewDayManager";
+
+    // Deprecated since 0.50.10, for removal false
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
           MekHQ.getMHQOptions().getLocale());
 
@@ -553,6 +557,7 @@ public class CampaignNewDayManager {
                                         campaignOptions.isShowLifeEventDialogCelebrations();
         boolean isCampaignPlanetside = updatedLocation.isOnPlanet();
         boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
+        boolean isUseAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
         boolean isUseFatigue = campaignOptions.isUseFatigue();
         boolean useBetterMonthlyIncome = campaignOptions.isUseBetterExtraIncome();
         for (Person person : personnel) {
@@ -605,7 +610,8 @@ public class CampaignNewDayManager {
                     processFatigueRecovery(campaign, person, isWithinCapacity);
                 }
 
-                processCompulsionsAndMadness(person, personnelOptions, isUseAdvancedMedical, isUseFatigue);
+                processCompulsionsAndMadness(person, personnelOptions, isUseAdvancedMedical, isUseAltAdvancedMedical,
+                      isUseFatigue);
             }
 
             // Monthly events
@@ -1393,30 +1399,31 @@ public class CampaignNewDayManager {
      * as appropriate. If certain conditions are no longer present, some status flags (such as clinical paranoia) may be
      * reset.</p>
      *
-     * @param person               the person whose conditions are being processed
-     * @param personnelOptions     the set of personnel options or traits affecting which conditions are relevant
-     * @param isUseAdvancedMedical {@code true} if advanced medical rules are applied, {@code false} otherwise
-     * @param isUseFatigue         {@code true} if fatigue rules are applied, {@code false} otherwise
+     * @param person                  the person whose conditions are being processed
+     * @param personnelOptions        the set of personnel options or traits affecting which conditions are relevant
+     * @param isUseAdvancedMedical    {@code true} if advanced medical rules are applied, {@code false} otherwise
+     * @param isUseAltAdvancedMedical {@code true} if alt advanced medical rules are applied, {@code false} otherwise
+     * @param isUseFatigue            {@code true} if fatigue rules are applied, {@code false} otherwise
      *
      * @author Illiani
      * @since 0.50.07
      */
     private void processCompulsionsAndMadness(Person person, PersonnelOptions personnelOptions,
-          boolean isUseAdvancedMedical, boolean isUseFatigue) {
+          boolean isUseAdvancedMedical, boolean isUseAltAdvancedMedical, boolean isUseFatigue) {
         String gamblingReport = person.gambleWealth();
         if (!gamblingReport.isBlank()) {
             campaign.addReport(gamblingReport);
         }
 
+        if (personnelOptions.booleanOption(COMPULSION_PAINKILLER_ADDICTION)) {
+            if (!finances.debit(TransactionType.MEDICAL_EXPENSES, today, Money.of(PersonnelOptions.PAINKILLER_COST),
+                  getFormattedTextAt(RESOURCE_BUNDLE, "painkillerAddiction.transaction", person.getFullTitle()))) {
+                checkForDiscontinuationSyndrome(person, isUseAdvancedMedical, isUseAltAdvancedMedical, isUseFatigue);
+            }
+        }
+
         if (personnelOptions.booleanOption(COMPULSION_ADDICTION)) {
-            int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            person.processDiscontinuationSyndrome(campaign,
-                  isUseAdvancedMedical,
-                  isUseFatigue,
-                  true,
-                  failedWillpowerCheck);
+            checkForDiscontinuationSyndrome(person, isUseAdvancedMedical, isUseAltAdvancedMedical, isUseFatigue);
         }
 
         if (personnelOptions.booleanOption(MADNESS_FLASHBACKS)) {
@@ -1510,6 +1517,19 @@ public class CampaignNewDayManager {
         if (resetClinicalParanoia) {
             person.setSufferingFromClinicalParanoia(false);
         }
+    }
+
+    private void checkForDiscontinuationSyndrome(Person person, boolean isUseAdvancedMedical,
+          boolean isUseAltAdvancedMedical, boolean isUseFatigue) {
+        int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
+        boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+              null, modifier);
+        person.processDiscontinuationSyndrome(campaign,
+              isUseAdvancedMedical,
+              isUseAltAdvancedMedical,
+              isUseFatigue,
+              true,
+              failedWillpowerCheck);
     }
 
     @Deprecated(since = "0.50.10", forRemoval = true)
