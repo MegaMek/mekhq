@@ -1011,7 +1011,9 @@ public final class BriefingTab extends CampaignGuiTab {
                 techData.add(data);
             }
 
-            SalvageTechPicker techPicker = new SalvageTechPicker(techData, priorSelectedTechs);
+            SalvageTechPicker techPicker = new SalvageTechPicker(techData,
+                  priorSelectedTechs,
+                  getCampaign().isClanCampaign());
             boolean wasConfirmed = techPicker.wasConfirmed();
             if (wasConfirmed) {
                 List<UUID> selectedTechs = techPicker.getSelectedTechs();
