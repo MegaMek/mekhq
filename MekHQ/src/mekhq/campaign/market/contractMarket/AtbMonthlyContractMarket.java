@@ -971,7 +971,12 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         mods.mods[CLAUSE_SUPPORT] -= modifier;
         mods.mods[CLAUSE_TRANSPORT] -= modifier;
 
-        rollCommandClause(contract, mods.mods[CLAUSE_COMMAND], campaign.getFaction().isMercenary());
+        if (contract.getContractType().isGuerrillaType()) {
+            contract.setCommandRights(ContractCommandRights.INDEPENDENT);
+        } else {
+            rollCommandClause(contract, mods.mods[CLAUSE_COMMAND], campaign.getFaction().isMercenary());
+        }
+
         rollSalvageClause(contract,
               mods.mods[CLAUSE_SALVAGE],
               campaign.getCampaignOptions().getContractMaxSalvagePercentage());
