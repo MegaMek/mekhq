@@ -481,7 +481,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         if (contract.getContractType().isCadreDuty()) {
             contract.setAllySkill(campaign.getCampaignOptions().isUseBolsterContractSkill() ? REGULAR : GREEN);
-            contract.setAllyQuality(DragoonRating.DRAGOON_F);
+            contract.setAllyQuality(DragoonRating.DRAGOON_F.getRating());
         }
 
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
@@ -577,7 +577,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         if (contract.getContractType().isCadreDuty()) {
             contract.setAllySkill(campaign.getCampaignOptions().isUseBolsterContractSkill() ? REGULAR : GREEN);
-            contract.setAllyQuality(DragoonRating.DRAGOON_F);
+            contract.setAllyQuality(DragoonRating.DRAGOON_F.getRating());
         }
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
 

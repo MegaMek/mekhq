@@ -34,10 +34,10 @@ package mekhq.campaign.mission;
 
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
+import static mekhq.campaign.camOpsReputation.IUnitRating.DRAGOON_A;
+import static mekhq.campaign.camOpsReputation.IUnitRating.DRAGOON_ASTAR;
+import static mekhq.campaign.camOpsReputation.IUnitRating.DRAGOON_F;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_ASTAR;
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_F;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -50,8 +50,8 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import java.time.LocalDate;
 
 import megamek.common.rolls.TargetRoll;
-import mekhq.campaign.Campaign;
 import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;

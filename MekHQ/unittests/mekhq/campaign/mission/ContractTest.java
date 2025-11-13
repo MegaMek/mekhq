@@ -176,7 +176,6 @@ public class ContractTest {
         when(mockCampaignOptions.isUsePeacetimeCost()).thenReturn(true);
         when(mockCampaignOptions.isPayForTransport()).thenReturn(true);
         when(mockCampaignOptions.isUseTwoWayPay()).thenReturn(true);
-        when(mockCampaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.CAMPAIGN_OPS);
 
         Money jumpCost = Money.of(5);
         Money contractBase = Money.of(10);

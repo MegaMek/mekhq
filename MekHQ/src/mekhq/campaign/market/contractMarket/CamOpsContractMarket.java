@@ -282,7 +282,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
               useBolsterContractSkill);
         if (contract.getContractType().isCadreDuty()) {
             contract.setAllySkill(campaign.getCampaignOptions().isUseBolsterContractSkill() ? REGULAR : GREEN);
-            contract.setAllyQuality(DragoonRating.DRAGOON_F);
+            contract.setAllyQuality(DragoonRating.DRAGOON_F.getRating());
         }
         // Step 5: Determine the contract length (Not CamOps RAW)
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
