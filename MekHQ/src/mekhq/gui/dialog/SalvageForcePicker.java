@@ -49,6 +49,7 @@ import java.util.Objects;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -62,10 +63,12 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.mission.camOpsSalvage.SalvageForceData;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
 /**
@@ -227,7 +230,8 @@ public class SalvageForcePicker extends JDialog {
         table.getColumnModel().getColumn(SalvageForceTableModel.COL_SELECT).setPreferredWidth(WIDTH_60);
         table.getColumnModel().getColumn(SalvageForceTableModel.COL_FORCE_NAME).setPreferredWidth(WIDTH_150);
         table.getColumnModel().getColumn(SalvageForceTableModel.COL_FORCE_TYPE).setPreferredWidth(WIDTH_100);
-        table.getColumnModel().getColumn(SalvageForceTableModel.COL_TECH).setPreferredWidth(WIDTH_150);
+        table.getColumnModel().getColumn(SalvageForceTableModel.COL_TOE_TECH).setPreferredWidth(WIDTH_150);
+        table.getColumnModel().getColumn(SalvageForceTableModel.COL_CREW_TECHS).setPreferredWidth(WIDTH_60);
         table.getColumnModel().getColumn(SalvageForceTableModel.COL_CARGO_CAPACITY).setPreferredWidth(WIDTH_100);
         table.getColumnModel().getColumn(SalvageForceTableModel.COL_TOW_CAPACITY).setPreferredWidth(WIDTH_80);
         table.getColumnModel().getColumn(SalvageForceTableModel.COL_SALVAGE_UNITS).setPreferredWidth(WIDTH_80);
@@ -276,7 +280,7 @@ public class SalvageForcePicker extends JDialog {
             sorter.setComparator(SalvageForceTableModel.COL_FORCE_TYPE,
                   (s1, s2) -> forceTypeComparator((String) s1, (String) s2));
             // Sort by experience level, then rank numeric, then full name
-            sorter.setComparator(SalvageForceTableModel.COL_TECH,
+            sorter.setComparator(SalvageForceTableModel.COL_TOE_TECH,
                   (o1, o2) -> {
                       SalvageForceTableModel model = (SalvageForceTableModel) table.getModel();
                       int row1 = -1;
@@ -284,10 +288,10 @@ public class SalvageForcePicker extends JDialog {
 
                       // Find which rows have these values
                       for (int i = 0; i < model.getRowCount(); i++) {
-                          if (Objects.equals(model.getValueAt(i, SalvageForceTableModel.COL_TECH), o1)) {
+                          if (Objects.equals(model.getValueAt(i, SalvageForceTableModel.COL_TOE_TECH), o1)) {
                               row1 = i;
                           }
-                          if (Objects.equals(model.getValueAt(i, SalvageForceTableModel.COL_TECH), o2)) {
+                          if (Objects.equals(model.getValueAt(i, SalvageForceTableModel.COL_TOE_TECH), o2)) {
                               row2 = i;
                           }
                       }
@@ -303,6 +307,8 @@ public class SalvageForcePicker extends JDialog {
             sorter.setComparator(SalvageForceTableModel.COL_TOW_CAPACITY,
                   Comparator.comparingDouble(d -> ((double) d)));
             sorter.setComparator(SalvageForceTableModel.COL_SALVAGE_UNITS,
+                  Comparator.comparingInt(i -> ((int) i)));
+            sorter.setComparator(SalvageForceTableModel.COL_CREW_TECHS,
                   Comparator.comparingInt(i -> ((int) i)));
             sorter.setComparator(SalvageForceTableModel.COL_HAS_TUG, (b1, b2) ->
                                                                            Boolean.compare(((Boolean) b1),
@@ -437,15 +443,17 @@ public class SalvageForcePicker extends JDialog {
         /** Column index for the force type display. */
         private static final int COL_FORCE_TYPE = 2;
         /** Column index for the assigned tech. */
-        private static final int COL_TECH = 3;
+        private static final int COL_TOE_TECH = 3;
+        /** Column index for the techs as part of a vehicle crew. */
+        private static final int COL_CREW_TECHS = 4;
         /** Column index for maximum cargo capacity. */
-        private static final int COL_CARGO_CAPACITY = 4;
+        private static final int COL_CARGO_CAPACITY = 5;
         /** Column index for maximum tow capacity. */
-        private static final int COL_TOW_CAPACITY = 5;
+        private static final int COL_TOW_CAPACITY = 6;
         /** Column index for salvage-capable unit count. */
-        private static final int COL_SALVAGE_UNITS = 6;
+        private static final int COL_SALVAGE_UNITS = 7;
         /** Column index for tug availability. */
-        private static final int COL_HAS_TUG = 7;
+        private static final int COL_HAS_TUG = 8;
 
         private final Campaign campaign;
         private final List<SalvageForceData> forces;
@@ -456,6 +464,7 @@ public class SalvageForcePicker extends JDialog {
               getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.force"),
               getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.type"),
               getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.tech"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.crewTechs"),
               getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.cargo"),
               getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.tow"),
               getTextAt(RESOURCE_BUNDLE, "SalvageForcePicker.column.picks"),
@@ -496,9 +505,9 @@ public class SalvageForcePicker extends JDialog {
         public Class<?> getColumnClass(int columnIndex) {
             return switch (columnIndex) {
                 case COL_SELECT, COL_HAS_TUG -> Boolean.class;
-                case COL_FORCE_NAME, COL_FORCE_TYPE, COL_TECH -> String.class;
+                case COL_FORCE_NAME, COL_FORCE_TYPE, COL_TOE_TECH -> String.class;
                 case COL_CARGO_CAPACITY, COL_TOW_CAPACITY -> Double.class;
-                case COL_SALVAGE_UNITS -> Integer.class;
+                case COL_SALVAGE_UNITS, COL_CREW_TECHS -> Integer.class;
                 default -> Object.class;
             };
         }
@@ -516,7 +525,8 @@ public class SalvageForcePicker extends JDialog {
                 case COL_SELECT -> selected[rowIndex];
                 case COL_FORCE_NAME -> data.force().getName();
                 case COL_FORCE_TYPE -> data.forceType().getDisplayName();
-                case COL_TECH -> getTechLabel(data.tech());
+                case COL_TOE_TECH -> getTechLabel(data.tech());
+                case COL_CREW_TECHS -> getCrewTechCount(campaign.getHangar(), data.force());
                 case COL_CARGO_CAPACITY -> data.maximumCargoCapacity();
                 case COL_TOW_CAPACITY -> data.maximumTowCapacity();
                 case COL_SALVAGE_UNITS -> data.salvageCapableUnits();
@@ -551,6 +561,19 @@ public class SalvageForcePicker extends JDialog {
             } else {
                 return label;
             }
+        }
+
+        private int getCrewTechCount(Hangar hangar, Force force) {
+            int counter = 0;
+            for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+                for (Person crew : unit.getCrew()) {
+                    if (crew.isTechExpanded() && !crew.isEngineer()) {
+                        counter++;
+                    }
+                }
+            }
+
+            return counter;
         }
 
         @Override
@@ -608,7 +631,7 @@ public class SalvageForcePicker extends JDialog {
          */
         public SalvageForceTableCellRenderer(Campaign campaign) {
             this.campaign = campaign;
-            checkBox.setHorizontalAlignment(javax.swing.JLabel.CENTER);
+            checkBox.setHorizontalAlignment(JLabel.CENTER);
         }
 
         @Override
@@ -642,7 +665,9 @@ public class SalvageForcePicker extends JDialog {
             if (component instanceof JComponent jComponent) {
                 String tooltip = switch (modelColumn) {
                     case SalvageForceTableModel.COL_FORCE_NAME -> wordWrap(data.force().getFullName());
-                    case SalvageForceTableModel.COL_TECH -> wordWrap(data.getTechTooltip(campaign));
+                    case SalvageForceTableModel.COL_TOE_TECH -> wordWrap(data.getTechTooltip(campaign, data.tech()));
+                    case SalvageForceTableModel.COL_CREW_TECHS ->
+                          wordWrap(data.getAllCrewTechTooltip(campaign, data.force()));
                     case SalvageForceTableModel.COL_CARGO_CAPACITY ->
                           wordWrap(data.getCargoCapacityTooltip(campaign.getHangar()));
                     case SalvageForceTableModel.COL_TOW_CAPACITY ->

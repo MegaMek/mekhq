@@ -865,18 +865,28 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
-        if (hasSalvageOpportunity) {
-            if (!displaySalvageForcePicker(scenario)) {
-                return;
-            }
-
-            if (!displaySalvageTechPicker(scenario)) {
-                return;
-            }
+        if (handleSalvageAssignments(scenario)) {
+            return;
         }
 
         startScenario(scenario, null);
+    }
+
+    private boolean handleSalvageAssignments(Scenario scenario) {
+        boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
+        if (hasSalvageOpportunity) {
+            // Reset old information
+            scenario.clearSalvageForces();
+            scenario.clearSalvageTechs();
+
+            if (!displaySalvageForcePicker(scenario)) {
+                return true;
+            }
+
+            return !displaySalvageTechPicker(scenario);
+        }
+
+        return false;
     }
 
     /**
@@ -917,49 +927,45 @@ public final class BriefingTab extends CampaignGuiTab {
             return true;
         }
 
-        if (scenario.getSalvageForces().isEmpty()) {
-            boolean isSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
-            List<SalvageForceData> salvageForceOptions = getSalvageForces(getCampaign(), isSpace);
+        boolean isSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
+        List<SalvageForceData> salvageForceOptions = getSalvageForces(getCampaign(), isSpace);
 
-            SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), salvageForceOptions, isSpace);
-            boolean wasConfirmed = forcePicker.wasConfirmed();
-            if (wasConfirmed) {
-                Hangar hangar = getCampaign().getHangar();
-                List<Force> selectedForces = forcePicker.getSelectedForces();
-                for (Force force : selectedForces) {
-                    scenario.addSalvageForce(force.getId());
-                    if (force.getTechID() != null) {
-                        Person tech = getCampaign().getPerson(force.getTechID());
-                        if (tech != null && !tech.isEngineer()) {
-                            scenario.addSalvageTech(force.getTechID());
-                        }
-                    }
-
-                    for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
-                        if (unit.isSelfCrewed()) {
-                            continue;
-                        }
-
-                        // Add tech crew members (excluding engineers) from non-self-crewed units to the salvage tech list.
-                        // This ensures that all available technical personnel who are not engineers and are not assigned to self-crewed units
-                        // are included for salvage operations, as they may be needed for post-battle recovery and repair tasks.
-                        for (Person person : unit.getCrew()) {
-                            if (person.isTechExpanded() && !person.isEngineer()) {
-                                scenario.addSalvageTech(person.getId());
-                            }
-                        }
+        SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), salvageForceOptions, isSpace);
+        boolean wasConfirmed = forcePicker.wasConfirmed();
+        if (wasConfirmed) {
+            Hangar hangar = getCampaign().getHangar();
+            List<Force> selectedForces = forcePicker.getSelectedForces();
+            for (Force force : selectedForces) {
+                scenario.addSalvageForce(force.getId());
+                if (force.getTechID() != null) {
+                    Person tech = getCampaign().getPerson(force.getTechID());
+                    if (tech != null && !tech.isEngineer()) {
+                        scenario.addSalvageTech(force.getTechID());
                     }
                 }
 
-                if (getCampaign().getCampaignOptions().isUseStratCon()) {
-                    CamOpsSalvageUtilities.deploySalvageTeams(getCampaign(), scenario);
+                for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+                    if (unit.isSelfCrewed()) {
+                        continue;
+                    }
+
+                    // Add tech crew members (excluding engineers) from non-self-crewed units to the salvage tech list.
+                    // This ensures that all available technical personnel who are not engineers and are not assigned to self-crewed units
+                    // are included for salvage operations, as they may be needed for post-battle recovery and repair tasks.
+                    for (Person person : unit.getCrew()) {
+                        if (person.isTechExpanded() && !person.isEngineer()) {
+                            scenario.addSalvageTech(person.getId());
+                        }
+                    }
                 }
             }
 
-            return forcePicker.wasConfirmed();
+            if (getCampaign().getCampaignOptions().isUseStratCon()) {
+                CamOpsSalvageUtilities.deploySalvageTeams(getCampaign(), scenario);
+            }
         }
 
-        return true;
+        return forcePicker.wasConfirmed();
     }
 
 
@@ -982,34 +988,33 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         List<UUID> priorSelectedTechs = new ArrayList<>();
-        if (scenario.getSalvageTechs().isEmpty()) {
-            List<Integer> forceIds = scenario.getSalvageForces();
-            for (Integer forceId : forceIds) {
-                Force force = getCampaign().getForce(forceId);
-                if (force != null && force.getForceType().isSalvage()) {
-                    if (force.getTechID() != null) {
-                        Person tech = getCampaign().getPerson(force.getTechID());
-                        if (tech != null && !tech.isEngineer()) {
-                            priorSelectedTechs.add(force.getTechID());
-                        }
+        List<Integer> forceIds = scenario.getSalvageForces();
+        for (Integer forceId : forceIds) {
+            Force force = getCampaign().getForce(forceId);
+            if (force != null && force.getForceType().isSalvage()) {
+                if (force.getTechID() != null) {
+                    Person tech = getCampaign().getPerson(force.getTechID());
+                    if (tech != null && !tech.isEngineer()) {
+                        priorSelectedTechs.add(force.getTechID());
                     }
                 }
             }
+        }
 
-            List<Person> availableTechs = getAvailableTechs();
-            List<UUID> assignedTechs = scenario.getSalvageTechs();
-            for (UUID techID : assignedTechs) {
-                Person tech = getCampaign().getPerson(techID);
-                if (tech != null && !availableTechs.contains(tech) && !tech.isEngineer()) {
-                    availableTechs.add(0, tech);
-                }
+        List<Person> availableTechs = getAvailableTechs();
+        List<UUID> assignedTechs = scenario.getSalvageTechs();
+        for (UUID techID : assignedTechs) {
+            Person tech = getCampaign().getPerson(techID);
+            if (tech != null && !availableTechs.contains(tech) && !tech.isEngineer()) {
+                availableTechs.add(0, tech);
             }
+        }
 
-            List<SalvageTechData> techData = new ArrayList<>();
-            for (Person tech : availableTechs) {
-                SalvageTechData data = SalvageTechData.buildData(getCampaign(), tech);
-                techData.add(data);
-            }
+        List<SalvageTechData> techData = new ArrayList<>();
+        for (Person tech : availableTechs) {
+            SalvageTechData data = SalvageTechData.buildData(getCampaign(), tech);
+            techData.add(data);
+        }
 
             SalvageTechPicker techPicker = new SalvageTechPicker(techData,
                   priorSelectedTechs,
@@ -1022,10 +1027,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 }
             }
 
-            return techPicker.wasConfirmed();
-        }
-
-        return true;
+        return techPicker.wasConfirmed();
     }
 
     /**
@@ -1249,15 +1251,8 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void runAbstractCombatAutoResolve(Scenario scenario) {
-        boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
-        if (hasSalvageOpportunity) {
-            if (!displaySalvageForcePicker(scenario)) {
-                return;
-            }
-
-            if (!displaySalvageTechPicker(scenario)) {
-                return;
-            }
+        if (handleSalvageAssignments(scenario)) {
+            return;
         }
 
         List<Unit> chosen = playerUnits(scenario, new StringBuilder());
@@ -1273,15 +1268,8 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
-        if (hasSalvageOpportunity) {
-            if (!displaySalvageForcePicker(scenario)) {
-                return;
-            }
-
-            if (!displaySalvageTechPicker(scenario)) {
-                return;
-            }
+        if (handleSalvageAssignments(scenario)) {
+            return;
         }
 
         startScenario(scenario, getCampaign().getAutoResolveBehaviorSettings());
