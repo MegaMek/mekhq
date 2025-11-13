@@ -76,9 +76,11 @@ import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
 import mekhq.gui.campaignOptions.optionChangeDialogs.AdvancedScoutingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.FactionStandingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.FatigueTrackingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.PrisonerTrackingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.SalvageCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.StratConConvoyCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.VeterancyAwardsCampaignOptionsChangedConfirmationDialog;
@@ -520,12 +522,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Store old values for use if we want to trigger certain dialogs
         boolean oldAwardVeterancySPAs = options.isAwardVeterancySPAs();
         boolean oldIsTrackFactionStanding = options.isTrackFactionStanding();
+        boolean oldIsTrackPrisoners = !options.getPrisonerCaptureStyle().isNone();
         boolean oldIsUseMASHTheatres = options.isUseMASHTheatres();
         boolean oldIsUseFatigue = options.isUseFatigue();
         boolean oldIsUseAdvancedSalvage = options.isUseCamOpsSalvage();
         boolean oldIsUseStratCon = options.isUseStratCon();
         boolean oldIsUseAdvancedScouting = options.isUseAdvancedScouting() && oldIsUseStratCon;
-        boolean oldIsUseDiseases = options.isUseRandomDiseases();
+        boolean oldIsUseAltAdvancedMedical = options.isUseAlternativeAdvancedMedical();
+        boolean oldIsUseDiseases = oldIsUseAltAdvancedMedical && options.isUseRandomDiseases();
 
         // Everything assumes general tab will be the first applied.
         // While this shouldn't break anything, it's not worth moving around.
@@ -565,7 +569,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
 
         boolean newIsTrackFactionStandings = options.isTrackFactionStanding();
-        if (!isStartUp && newIsTrackFactionStandings != oldIsTrackFactionStanding) { // Has tracking changed?
+        if (!isStartUp && newIsTrackFactionStandings && !oldIsTrackFactionStanding) { // Has tracking changed?
             FactionStandingCampaignOptionsChangedConfirmationDialog dialog = new FactionStandingCampaignOptionsChangedConfirmationDialog(
                   null,
                   campaign.getCampaignFactionIcon(),
@@ -594,6 +598,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             new MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
+        boolean newIsTrackPrisoners = !options.getPrisonerCaptureStyle().isNone();
+        if (!isStartUp && newIsTrackPrisoners && !oldIsTrackPrisoners) { // Has tracking changed?
+            new PrisonerTrackingCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
         boolean newIsUseFatigue = options.isUseFatigue();
         if (!isStartUp && newIsUseFatigue && !oldIsUseFatigue) { // Has tracking changed?
             new FatigueTrackingCampaignOptionsChangedConfirmationDialog(campaign);
@@ -614,7 +623,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             new AdvancedScoutingCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
-        boolean newIsUseDiseases = options.isUseRandomDiseases();
+        boolean newIsUseAltAdvancedMedical = options.isUseAlternativeAdvancedMedical();
+        if (!isStartUp && newIsUseAltAdvancedMedical && !oldIsUseAltAdvancedMedical) { // Has tracking changed?
+            new AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseDiseases = newIsUseAltAdvancedMedical && options.isUseRandomDiseases();
         if (!isStartUp && newIsUseDiseases && !oldIsUseDiseases) { // Has tracking changed?
             inoculateAllCharacters();
         }

@@ -48,6 +48,7 @@ import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 
 /**
  * Flyweight design pattern implementation. InjuryType instances should be singletons and never hold any data related to
@@ -141,6 +142,7 @@ public class InjuryType {
     protected String simpleName = "injured";
     protected InjuryLevel level = InjuryLevel.MINOR;
     protected InjuryEffect injuryEffect = InjuryEffect.NONE;
+    protected InjurySubType injurySubType = InjurySubType.NORMAL;
     protected Set<BodyLocation> allowedLocations = null;
 
     protected InjuryType() {
@@ -153,6 +155,10 @@ public class InjuryType {
 
     public final String getKey() {
         return InjuryType.REV_REGISTRY.get(this);
+    }
+
+    public Set<BodyLocation> getAllowedLocations() {
+        return allowedLocations;
     }
 
     public boolean isValidInLocation(BodyLocation loc) {
@@ -218,6 +224,10 @@ public class InjuryType {
 
     public InjuryEffect getInjuryEffect() {
         return injuryEffect;
+    }
+
+    public InjurySubType getSubType() {
+        return injurySubType;
     }
 
     public Injury newInjury(Campaign campaign, Person person, BodyLocation bodyLocation, int severity) {

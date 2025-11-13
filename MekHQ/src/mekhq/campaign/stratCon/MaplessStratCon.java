@@ -41,6 +41,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.StratConPanel;
@@ -185,8 +186,11 @@ public class MaplessStratCon {
 
         boolean isPrimaryForce = false;
         StratConScenario.ScenarioState currentState = stratConScenario.getCurrentState();
+        AtBDynamicScenario backingScenario = stratConScenario.getBackingScenario();
+        boolean restrictToSingleForce = backingScenario != null &&
+                                              backingScenario.getStratConScenarioType().isOfficialChallenge();
         if (currentState.equals(UNRESOLVED)) {
-            assignmentUI.display(campaign, campaignState, scenarioCoords);
+            assignmentUI.display(campaign, campaignState, scenarioCoords, restrictToSingleForce);
             assignmentUI.setVisible(true);
             isPrimaryForce = true;
         }

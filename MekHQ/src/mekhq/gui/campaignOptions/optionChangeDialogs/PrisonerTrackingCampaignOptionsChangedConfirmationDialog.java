@@ -35,7 +35,6 @@ package mekhq.gui.campaignOptions.optionChangeDialogs;
 import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.common.compute.Compute.randomInt;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
@@ -50,8 +49,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.time.LocalDate;
-import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -61,20 +58,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import megamek.codeUtilities.ObjectUtility;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.log.PerformanceLogger;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.ScoutingSkills;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
-public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(AdvancedScoutingCampaignOptionsChangedConfirmationDialog.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvancedScoutingCampaignOptionsChangedConfirmationDialog";
+public class PrisonerTrackingCampaignOptionsChangedConfirmationDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(PrisonerTrackingCampaignOptionsChangedConfirmationDialog.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerTrackingCampaignOptionsChangedConfirmationDialog";
 
     private final int PADDING = scaleForGUI(10);
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
@@ -83,7 +78,7 @@ public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JD
     private ImageIcon campaignIcon;
     private final Campaign campaign;
 
-    public AdvancedScoutingCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
+    public PrisonerTrackingCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
         this.campaignIcon = campaign.getCampaignFactionIcon();
         this.campaign = campaign;
 
@@ -158,7 +153,7 @@ public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JD
         editorPane.setFocusable(false);
 
         String description = getFormattedTextAt(RESOURCE_BUNDLE,
-              "AdvancedScoutingCampaignOptionsChangedConfirmationDialog.description",
+              "PrisonerTrackingCampaignOptionsChangedConfirmationDialog.description",
               spanOpeningWithCustomColor(getWarningColor()),
               CLOSING_SPAN_TAG);
         String fontStyle = "font-family: Noto Sans;";
@@ -178,13 +173,13 @@ public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JD
         pnlButtons.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         RoundedJButton btnCancel = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "AdvancedScoutingCampaignOptionsChangedConfirmationDialog.cancel"));
+              "PrisonerTrackingCampaignOptionsChangedConfirmationDialog.cancel"));
         btnCancel.addActionListener(evt -> dispose());
 
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "AdvancedScoutingCampaignOptionsChangedConfirmationDialog.confirm"));
+              "PrisonerTrackingCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeSkills(campaign, false);
+            processFreeUnit(campaign);
             dispose();
         });
 
@@ -195,38 +190,30 @@ public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JD
         return pnlButtons;
     }
 
-    public static void processFreeSkills(Campaign campaign, boolean isSilent) {
-        List<Person> personnel = campaign.getPersonnelFilteringOutDeparted();
-        boolean logSkillGain = campaign.getCampaignOptions().isPersonnelLogSkillGain();
-        LocalDate today = campaign.getLocalDate();
-        for (Person person : personnel) {
-            if (!person.isCombat() || randomInt(4) != 0) {
-                continue;
-            }
+    public static void processFreeUnit(Campaign campaign) {
+        String unitName;
+        if (campaign.isClanCampaign()) {
+            unitName = "Clan Foot Point (Rifle Light)";
+        } else {
+            unitName = "Foot Platoon (Rifle)";
+        }
 
-            String skillName = ObjectUtility.getRandomItem(ScoutingSkills.SCOUTING_SKILLS);
-            int bonus = 0;
-            if (person.hasSkill(skillName)) {
-                Skill skill = person.getSkill(skillName);
-                if (person.getSkill(skillName).getLevel() >= 1) {
-                    continue;
-                }
-                bonus = skill.getBonus();
-            }
+        MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unitName);
+        if (mekSummary == null) {
+            LOGGER.error("Cannot find entry for {}", unitName);
+            return;
+        }
 
-            person.addSkill(skillName, 1, bonus);
-
-            if (!isSilent) {
-                PerformanceLogger.improvedSkill(logSkillGain,
-                      person,
-                      today,
-                      skillName,
-                      1);
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "improved.format",
-                      person.getHyperlinkedName(),
-                      SkillType.getType(skillName).getName()));
+        try {
+            PartQuality quality = PartQuality.QUALITY_D;
+            if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+                quality = UnitOrder.getRandomUnitQuality(0);
             }
-            campaign.personUpdated(person);
+            campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
+        } catch (Exception e) {
+            LOGGER.error(e, "Unable to load entity: {}: {}. Returning none.",
+                  mekSummary.getSourceFile(),
+                  mekSummary.getEntryName());
         }
     }
 }

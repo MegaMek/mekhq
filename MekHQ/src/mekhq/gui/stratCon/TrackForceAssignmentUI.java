@@ -65,6 +65,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
 
     private Campaign campaign;
     private StratConCampaignState currentCampaignState;
+    private boolean restrictToSingleForce;
     private final JList<Force> availableForceList = new JList<>();
     private final JButton btnConfirm;
     private final StratConPanel ownerPanel;
@@ -101,7 +102,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         // if we're waiting to assign primary forces, we can only do so from the current track
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
               StratConRulesManager.getAvailableForceIDsForManualDeployment(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX,
-                    campaign, ownerPanel.getCurrentTrack(), false, null, currentCampaignState));
+                    campaign, ownerPanel.getCurrentTrack(), false, null, currentCampaignState, restrictToSingleForce));
 
         availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         availableForceList.setModel(lanceModel);
@@ -129,9 +130,11 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
     /**
      * Display the track force assignment UI.
      */
-    public void display(Campaign campaign, StratConCampaignState campaignState, StratConCoords coords) {
+    public void display(Campaign campaign, StratConCampaignState campaignState, StratConCoords coords,
+          boolean restrictToSingleForce) {
         this.campaign = campaign;
         this.currentCampaignState = campaignState;
+        this.restrictToSingleForce = restrictToSingleForce;
 
         initializeUI();
     }

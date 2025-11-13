@@ -57,7 +57,8 @@ public enum ScenarioType {
     SPECIAL_RESUPPLY,
     SPECIAL_JAIL_BREAK,
     CONVOY,
-    RIOT;
+    RIOT,
+    OFFICIAL_CHALLENGE;
 
     /**
      * @return {@code true} if the scenario is considered a LosTech scenario, {@code false} otherwise.
@@ -89,6 +90,13 @@ public enum ScenarioType {
     }
 
     /**
+     * @return {@code true} if the scenario is considered an Official Challenge scenario, {@code false} otherwise.
+     */
+    public boolean isOfficialChallenge() {
+        return this == OFFICIAL_CHALLENGE;
+    }
+
+    /**
      * @return {@code true} if the scenario is considered a Riot scenario, {@code false} otherwise.
      */
     public boolean isRiot() {
@@ -99,7 +107,11 @@ public enum ScenarioType {
      * @return {@code true} if the instance is one of the special types; {@code false} otherwise.
      */
     public boolean isSpecial() {
-        return this == SPECIAL_LOS_TECH || this == SPECIAL_RESUPPLY || this == SPECIAL_JAIL_BREAK || this == RIOT;
+        return this == SPECIAL_LOS_TECH ||
+                     this == SPECIAL_RESUPPLY ||
+                     this == SPECIAL_JAIL_BREAK ||
+                     this == RIOT;
+        // Official Challenge is purposefully left off here
     }
 
     /**

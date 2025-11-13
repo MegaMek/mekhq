@@ -211,6 +211,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_INSUFFICIENT_AS_TECH_TIME = "nagInsufficientAstechTime";
     public static final String NAG_INSUFFICIENT_MEDICS = "nagInsufficientMedics";
     public static final String NAG_SHORT_DEPLOYMENT = "nagShortDeployment";
+    public static final String NAG_COMBAT_CHALLENGE = "nagCombatChallenge";
     public static final String NAG_UNRESOLVED_STRAT_CON_CONTACTS = "nagUnresolvedStratConContacts";
     public static final String NAG_OUTSTANDING_SCENARIOS = "nagOutstandingScenarios";
     public static final String NAG_INVALID_FACTION = "nagInvalidFaction";

@@ -150,6 +150,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         final boolean canTakeTechOfficer = units[0].canTakeTechOfficer();
         final boolean usesSoldiers = units[0].usesSoldiers();
         final boolean isConventionalInfantry = units[0].isConventionalInfantry();
+        final boolean isUseAltAdvancedMedical = campaign.getCampaignOptions().isUseAlternativeAdvancedMedical();
+        final boolean isUseImplants = campaign.getCampaignOptions().isUseImplants();
 
         // Skip People (by filtering them out) if they are:
         // 1) Inactive
@@ -597,14 +599,16 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                 // For a vehicle command console we will require the commander to be a driver
                 // or a gunner, but not necessarily both
                 if (isTank) {
-                    if (person.canDrive(units[0].getEntity()) || person.canGun(units[0].getEntity())) {
+                    if (person.canDrive(units[0].getEntity(), isUseAltAdvancedMedical, isUseImplants) ||
+                              person.canGun(units[0].getEntity())) {
                         final JMenuItem miConsoleCommander = getMiConsoleCommander(person,
                               "miConsoleCommander",
                               campaign,
                               units);
                         consoleCommanderMenu.add(miConsoleCommander);
                     }
-                } else if (person.canDrive(units[0].getEntity()) && person.canGun(units[0].getEntity())) {
+                } else if (person.canDrive(units[0].getEntity(), isUseAltAdvancedMedical, isUseImplants) &&
+                                 person.canGun(units[0].getEntity())) {
                     final JMenuItem miTechOfficer = getMiConsoleCommander(person, "miTechOfficer", campaign, units);
                     techOfficerMenu.add(miTechOfficer);
                 }

@@ -139,10 +139,11 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
                     boolean isStrategic = stratconScenario.isStrategicObjective();
                     boolean isTurningPoint = stratconScenario.isTurningPoint();
                     boolean isCrisis = scenario.isCrisis() || scenario.getStratConScenarioType().isSpecial();
+                    boolean isDual = scenario.getStratConScenarioType().isOfficialChallenge();
 
                     // Set the opening span color based on scenario type (Strategic, Crisis, or Turning Point)
                     String openingSpan = "";
-                    if (isCrisis || isStrategic) {
+                    if (isCrisis || isStrategic || isDual) {
                         openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
                     } else if (isTurningPoint) {
                         openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
@@ -156,6 +157,8 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
                         scenarioSeverityText = resources.getString("col_status.turningPoint");
                     } else if (isCrisis) {
                         scenarioSeverityText = resources.getString("col_status.crisis");
+                    } else if (isDual) {
+                        scenarioSeverityText = resources.getString("col_status.dual");
                     } else {
                         scenarioSeverityText = "";
                     }
@@ -165,7 +168,8 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
 
                     // Wrap in HTML and include bold formatting for accessibility
                     return String.format(
-                          "<html>%s%s<b>%s</b>%s</html>", scenario.getStatus().toString(),
+                          "<html>%s%s<b> %s</b>%s</html>",
+                          scenario.getStatus().toString(),
                           openingSpan,
                           scenarioSeverityText,
                           closingSpan

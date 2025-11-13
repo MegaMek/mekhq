@@ -175,8 +175,8 @@ public class Fatigue {
      * @param person   the person whose fatigue actions are being processed.
      */
     public static void processFatigueActions(Campaign campaign, Person person) {
-        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
-              person.getSkillLevel(campaign, false, true));
+        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.getPermanentFatigue(),
+              person.isClanPersonnel(), person.getSkillLevel(campaign, false, true));
 
         if (!campaign.getCampaignOptions().isUseFatigue()) {
             return;
@@ -260,9 +260,10 @@ public class Fatigue {
 
                 for (Person person : unit.getCrew()) {
                     int fatigue = person.getFatigue();
+                    int permanentFatigue = person.getPermanentFatigue();
                     boolean isClan = person.isClanPersonnel();
                     SkillLevel experienceLevel = person.getSkillLevel(campaign, false, true);
-                    int effectiveFatigue = getEffectiveFatigue(fatigue, isClan, experienceLevel);
+                    int effectiveFatigue = getEffectiveFatigue(fatigue, permanentFatigue, isClan, experienceLevel);
 
                     if (effectiveFatigue >= leaveThreshold) {
                         fatiguedUnits++;
@@ -290,7 +291,7 @@ public class Fatigue {
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static int getEffectiveFatigue(int fatigue, boolean isClan, SkillLevel skillLevel,
           boolean areFieldKitchensWithinCapacity) {
-        return getEffectiveFatigue(fatigue, isClan, skillLevel);
+        return getEffectiveFatigue(fatigue, 0, isClan, skillLevel);
     }
 
 
@@ -304,14 +305,17 @@ public class Fatigue {
      *     <li>Whether field kitchens are operating within their required capacity.</li>
      * </ul>
      *
-     * @param fatigue    the base fatigue level of the person.
-     * @param isClan     flag indicating whether the person is Clan personnel.
-     * @param skillLevel the person's skill level.
+     * @param fatigue              the base fatigue level of the person.
+     * @param permanentFatigueLoss how many points of fatigue have been permanently applied to the character (usually
+     *                             from an EI Implant)
+     * @param isClan               flag indicating whether the person is Clan personnel.
+     * @param skillLevel           the person's skill level.
      *
      * @return the calculated effective fatigue value.
      */
-    public static int getEffectiveFatigue(int fatigue, boolean isClan, SkillLevel skillLevel) {
-        int effectiveFatigue = fatigue;
+    public static int getEffectiveFatigue(int fatigue, int permanentFatigueLoss, boolean isClan,
+          SkillLevel skillLevel) {
+        int effectiveFatigue = fatigue + permanentFatigueLoss;
 
         if (isClan) {
             effectiveFatigue -= 2;

@@ -34,7 +34,6 @@ package mekhq.campaign.stratCon;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.lang.Math.round;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static mekhq.campaign.stratCon.SupportPointNegotiation.negotiateInitialSupportPoints;
 
@@ -98,9 +97,7 @@ public class StratConContractInitializer {
         int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
 
         for (int x = 0; x < maximumTrackIndex; x++) {
-            int scenarioOdds = getScenarioOdds(campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(),
-                  contractDefinition);
-
+            int scenarioOdds = getScenarioOdds(contractDefinition);
             int deploymentTime = getDeploymentTime(contractDefinition);
 
             StratConTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK,
@@ -116,9 +113,7 @@ public class StratConContractInitializer {
         // required lances.
         int oddLanceCount = contract.getRequiredCombatTeams() % NUM_LANCES_PER_TRACK;
         if (oddLanceCount > 0) {
-            int scenarioOdds = getScenarioOdds(campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(),
-                  contractDefinition);
-
+            int scenarioOdds = getScenarioOdds(contractDefinition);
             int deploymentTime = getDeploymentTime(contractDefinition);
 
             StratConTrackState track = initializeTrackState(oddLanceCount,
@@ -131,9 +126,7 @@ public class StratConContractInitializer {
 
         // Last chance generation, to ensure we never generate a StratCon map with 0 tracks
         if (campaignState.getTrackCount() == 0) {
-            int scenarioOdds = getScenarioOdds(campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(),
-                  contractDefinition);
-
+            int scenarioOdds = getScenarioOdds(contractDefinition);
             int deploymentTime = getDeploymentTime(contractDefinition);
 
             StratConTrackState track = initializeTrackState(1, scenarioOdds, deploymentTime, planetaryTemperature);
@@ -276,28 +269,6 @@ public class StratConContractInitializer {
     }
 
     /**
-     * Calculates the scenario odds with optional adjustment for alternate advanced medical rules.
-     *
-     * <p>This method retrieves the base scenario odds from the contract definition and applies a reduction modifier
-     * when alternate advanced medical rules are enabled. The reduction accounts for the increased danger of scenarios
-     * under these rules by lowering the scenario frequency to 66% of the base rate, with a minimum threshold of 5.</p>
-     *
-     * @param isUseAltAdvancedMedical if true, applies a 0.66 multiplier to reduce scenario frequency due to increased
-     *                                danger; if false, returns base odds
-     * @param contractDefinition      the contract definition containing base scenario odds configuration
-     *
-     * @return the calculated scenario odds, minimum of 5 if alternate medical rules are active
-     */
-    public static int getScenarioOdds(boolean isUseAltAdvancedMedical, StratConContractDefinition contractDefinition) {
-        int scenarioOdds = getScenarioOdds(contractDefinition);
-        if (isUseAltAdvancedMedical) {
-            // With Alt Advanced medical scenarios are much more dangerous, we reduce the tempo to account for this
-            scenarioOdds = max(5, (int) round(scenarioOdds * 0.66));
-        }
-        return scenarioOdds;
-    }
-
-    /**
      * Retrieves a random deployment time from the provided {@link StratConContractDefinition}.
      *
      * <p>The deployment time is selected randomly from the list of deployment times in the
@@ -332,7 +303,7 @@ public class StratConContractInitializer {
      * @author Illiani
      * @since 0.50.05
      */
-    private static int getScenarioOdds(StratConContractDefinition contractDefinition) {
+    public static int getScenarioOdds(StratConContractDefinition contractDefinition) {
         return contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
     }
 

@@ -1017,6 +1017,10 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDynamicDifficulty", campaignOptions.isUseDynamicDifficulty());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
+              "useBolsterContractSkill",
+              campaignOptions.isUseBolsterContractSkill());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
               "contractMarketReportRefresh",
               campaignOptions.isContractMarketReportRefresh());
         MHQXMLUtility.writeSimpleXMLTag(pw,

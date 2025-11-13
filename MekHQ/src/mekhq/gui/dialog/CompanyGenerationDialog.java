@@ -75,6 +75,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.optionChangeDialogs.AdvancedScoutingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.FatigueTrackingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.PrisonerTrackingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.SalvageCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.StratConConvoyCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
@@ -251,6 +252,13 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
                   resources.getString("CompanyGenerationDialog.campaignOptions.mash"),
                   true);
             MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
+        }
+
+        if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
+            new ImmersiveDialogNotification(campaign,
+                  resources.getString("CompanyGenerationDialog.campaignOptions.security"),
+                  true);
+            PrisonerTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
         }
 
         if (campaignOptions.isUseCamOpsSalvage()) {
