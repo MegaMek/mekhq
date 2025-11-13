@@ -449,7 +449,9 @@ public class PersonnelMarketDialog extends JDialog {
             unit.addPilotOrSoldier(selectedPerson);
         } else if (unit.usesSoldiers()) {
             unit.addPilotOrSoldier(selectedPerson);
-        } else if (selectedPerson.canDrive(en)) {
+        } else if (selectedPerson.canDrive(en,
+              campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(),
+              campaign.getCampaignOptions().isUseImplants())) {
             unit.addDriver(selectedPerson);
         } else if (selectedPerson.canGun(en)) {
             unit.addGunner(selectedPerson);

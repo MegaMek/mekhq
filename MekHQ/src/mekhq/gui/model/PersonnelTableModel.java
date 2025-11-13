@@ -190,8 +190,11 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                 personIsDamaged = person.getHits() > 0;
             }
             boolean personIsFatigued = (campaign.getCampaignOptions().isUseFatigue()
-                                              && (getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
-                  person.getSkillLevel(campaign, false, true)) >= 5));
+                                              &&
+                                              (getEffectiveFatigue(person.getFatigue(),
+                                                    person.getPermanentFatigue(),
+                                                    person.isClanPersonnel(),
+                                                    person.getSkillLevel(campaign, false, true)) >= 5));
 
             if (!isSelected) {
                 if (person.getStatus().isAbsent()) {

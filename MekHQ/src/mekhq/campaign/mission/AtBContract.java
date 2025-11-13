@@ -440,8 +440,7 @@ public class AtBContract extends Contract {
 
                     if (contractDefinition != null) {
                         for (StratConTrackState trackState : stratconCampaignState.getTracks()) {
-                            int scenarioOdds = StratConContractInitializer.getScenarioOdds(
-                                  campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(), contractDefinition);
+                            int scenarioOdds = StratConContractInitializer.getScenarioOdds(contractDefinition);
 
                             trackState.setScenarioOdds(scenarioOdds);
                         }
@@ -463,7 +462,10 @@ public class AtBContract extends Contract {
         String moraleReport = MHQMorale.performMoraleCheck(today, this,
               campaignOptions.getMoraleDecisiveVictoryEffect(), campaignOptions.getMoraleVictoryEffect(),
               campaignOptions.getMoraleDecisiveDefeatEffect(), campaignOptions.getMoraleDefeatEffect());
-        campaign.addReport(moraleReport);
+        String flavorText = MHQMorale.getFormattedTitle()
+                                  + "<h2 style='text-align:center;'>" + getName() + "</h2>"
+                                  + moraleLevel.getToolTipText();
+        new ImmersiveDialogNotification(campaign, flavorText, moraleReport, true);
 
         MHQMorale.routedMoraleUpdate(campaign, this);
 
