@@ -7576,7 +7576,12 @@ public class Person {
                 changeFatigue(FATIGUE_INCREASE);
             }
 
-            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+            int severity = 0;
+            for (Injury injury : injuries) {
+                severity += injury.getHits();
+            }
+
+            if ((severity > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
         }

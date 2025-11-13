@@ -121,6 +121,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Bloodmark;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.RandomDependents;
@@ -1416,7 +1417,15 @@ public class CampaignNewDayManager {
         }
 
         if (personnelOptions.booleanOption(COMPULSION_PAINKILLER_ADDICTION)) {
-            if (!finances.debit(TransactionType.MEDICAL_EXPENSES, today, Money.of(PersonnelOptions.PAINKILLER_COST),
+            int prostheticCount = 1; // Minimum of 1
+            for (Injury injury : person.getInjuries()) {
+                if (injury.getSubType().isProsthetic()) {
+                    prostheticCount++;
+                }
+            }
+
+            Money cost = Money.of(PersonnelOptions.PAINKILLER_COST * prostheticCount);
+            if (!finances.debit(TransactionType.MEDICAL_EXPENSES, today, cost,
                   getFormattedTextAt(RESOURCE_BUNDLE, "painkillerAddiction.transaction", person.getFullTitle()))) {
                 checkForDiscontinuationSyndrome(person, isUseAdvancedMedical, isUseAltAdvancedMedical, isUseFatigue);
             }
