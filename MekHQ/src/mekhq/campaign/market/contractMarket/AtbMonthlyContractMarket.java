@@ -126,7 +126,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
             Person campaignCommander = campaign.getCommander();
             if (campaignCommander != null && !newCampaign) {
-                if (campaignCommander.getConnections() > 0) {
+                if (campaignCommander.getAdjustedConnections(false) > 0) {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                           "AtbMonthlyContractMarket.connectionsReport.normal",
                           campaignCommander.getHyperlinkedFullTitle()));
@@ -635,7 +635,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         int connections = 0;
         int negotiationsMarginOfSuccess = 0;
         if (campaignCommander != null) {
-            connections = campaignCommander.getConnections();
+            connections = campaignCommander.getAdjustedConnections(false);
 
             boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
             boolean isClanCampaign = campaign.isClanCampaign();
