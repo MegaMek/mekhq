@@ -6411,12 +6411,12 @@ public class Person {
 
 
     /**
-     * Returns the character's adjusted Connections value.
+     * Returns the character's base (unadjusted) Connections value.
      *
      * <p><b>Usage:</b> Generally, you want to use {@link #getAdjustedConnections(boolean)} instead as that includes
      * additional adjustments and modifiers.</p>
      *
-     * @return the character's Connections value
+     * @return the character's base Connections value
      */
     public int getConnections() {
         return connections;
