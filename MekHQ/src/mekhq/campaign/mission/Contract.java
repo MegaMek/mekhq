@@ -610,14 +610,14 @@ public class Contract extends Mission {
      * monthly expenses is the contract duration plus the travel time from the unit's current world to the contract
      * world and back.
      *
-     * @param c The campaign with which this contract is associated.
+     * @param campaign The campaign with which this contract is associated.
      *
      * @return The estimated profit in the current default currency.
      */
-    public Money getEstimatedTotalProfit(Campaign c) {
+    public Money getEstimatedTotalProfit(Campaign campaign) {
         return getTotalAdvanceAmount()
-                     .plus(getTotalMonthlyPayOut(c))
-                     .minus(getTotalTransportationFees(c));
+                     .plus(getTotalMonthlyPayOut(campaign))
+                     .minus(getTransportCost(campaign, false));
     }
 
     /**
