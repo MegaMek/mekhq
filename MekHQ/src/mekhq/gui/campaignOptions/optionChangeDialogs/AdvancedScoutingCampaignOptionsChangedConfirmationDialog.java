@@ -224,7 +224,7 @@ public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JD
                       1);
                 campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "improved.format",
                       person.getHyperlinkedName(),
-                      SkillType.getType(skillName)));
+                      SkillType.getType(skillName).getName()));
             }
             campaign.personUpdated(person);
         }
