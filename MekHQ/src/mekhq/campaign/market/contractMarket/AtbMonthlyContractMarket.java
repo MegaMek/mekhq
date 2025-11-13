@@ -126,7 +126,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
             Person campaignCommander = campaign.getCommander();
             if (campaignCommander != null && !newCampaign) {
-                if (campaignCommander.getConnections() > 0) {
+                if (campaignCommander.getAdjustedConnections(false) > 0) {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                           "AtbMonthlyContractMarket.connectionsReport.normal",
                           campaignCommander.getHyperlinkedFullTitle()));
@@ -469,11 +469,18 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         final ReputationController reputation = campaign.getReputation();
         final SkillLevel campaignSkillLevel = reputation == null ? REGULAR : reputation.getAverageSkillLevel();
         final boolean useDynamicDifficulty = campaign.getCampaignOptions().isUseDynamicDifficulty();
-        setAllyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
-        setEnemyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
+        final boolean useBolsterContractSkill = campaign.getCampaignOptions().isUseBolsterContractSkill();
+        setAllyRating(contract,
+              campaign.getGameYear(),
+              useDynamicDifficulty ? campaignSkillLevel : REGULAR,
+              useBolsterContractSkill);
+        setEnemyRating(contract,
+              campaign.getGameYear(),
+              useDynamicDifficulty ? campaignSkillLevel : REGULAR,
+              useBolsterContractSkill);
 
         if (contract.getContractType().isCadreDuty()) {
-            contract.setAllySkill(GREEN);
+            contract.setAllySkill(campaign.getCampaignOptions().isUseBolsterContractSkill() ? REGULAR : GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
 
@@ -558,11 +565,18 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         setAttacker(contract);
         contract.setSystemId(parent.getSystemId());
-        setAllyRating(contract, campaign.getGameYear(), campaign.getReputation().getAverageSkillLevel());
-        setEnemyRating(contract, campaign.getGameYear(), campaign.getReputation().getAverageSkillLevel());
+        final boolean useBolsterContractSkill = campaign.getCampaignOptions().isUseBolsterContractSkill();
+        setAllyRating(contract,
+              campaign.getGameYear(),
+              campaign.getReputation().getAverageSkillLevel(),
+              useBolsterContractSkill);
+        setEnemyRating(contract,
+              campaign.getGameYear(),
+              campaign.getReputation().getAverageSkillLevel(),
+              useBolsterContractSkill);
 
         if (contract.getContractType().isCadreDuty()) {
-            contract.setAllySkill(GREEN);
+            contract.setAllySkill(campaign.getCampaignOptions().isUseBolsterContractSkill() ? REGULAR : GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
@@ -621,7 +635,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         int connections = 0;
         int negotiationsMarginOfSuccess = 0;
         if (campaignCommander != null) {
-            connections = campaignCommander.getConnections();
+            connections = campaignCommander.getAdjustedConnections(false);
 
             boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
             boolean isClanCampaign = campaign.isClanCampaign();
@@ -971,7 +985,12 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         mods.mods[CLAUSE_SUPPORT] -= modifier;
         mods.mods[CLAUSE_TRANSPORT] -= modifier;
 
-        rollCommandClause(contract, mods.mods[CLAUSE_COMMAND], campaign.getFaction().isMercenary());
+        if (contract.getContractType().isGuerrillaType()) {
+            contract.setCommandRights(ContractCommandRights.INDEPENDENT);
+        } else {
+            rollCommandClause(contract, mods.mods[CLAUSE_COMMAND], campaign.getFaction().isMercenary());
+        }
+
         rollSalvageClause(contract,
               mods.mods[CLAUSE_SALVAGE],
               campaign.getCampaignOptions().getContractMaxSalvagePercentage());

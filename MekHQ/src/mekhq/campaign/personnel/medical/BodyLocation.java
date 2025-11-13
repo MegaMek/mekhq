@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.medical;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -56,6 +57,7 @@ public enum BodyLocation {
     RIBS(16, "BodyLocation.RIBS.text", false, CHEST),
     LUNGS(17, "BodyLocation.LUNGS.text", false, CHEST),
     HEART(18, "BodyLocation.HEART.text", false, CHEST),
+    ORGANS(44, "BodyLocation.ORGANS.text", false, CHEST),
     ABDOMEN(4, "BodyLocation.ABDOMEN.text"),
     GROIN(19, "BodyLocation.GROIN.text", false, ABDOMEN),
     RIGHT_ARM(5, "BodyLocation.RIGHT_ARM.text", true),
@@ -99,6 +101,20 @@ public enum BodyLocation {
     private final boolean limb; // Includes everything attached to a limb
     private final String locationName;
     private final BodyLocation parent;
+
+    public static final List<BodyLocation> PRIMARY_LOCATIONS = List.of(
+          HEAD,
+          CHEST,
+          ABDOMEN,
+          LEFT_ARM,
+          RIGHT_ARM,
+          LEFT_HAND,
+          RIGHT_HAND,
+          LEFT_LEG,
+          RIGHT_LEG,
+          LEFT_FOOT,
+          RIGHT_FOOT
+    );
 
     /**
      * We can't use an EnumSet here because it requires the whole enum to be initialised. We fix it later, in the static
@@ -204,7 +220,11 @@ public enum BodyLocation {
     }
 
     public boolean isChildOf(BodyLocation parent) {
-        return ((null != this.parent) && ((this.parent == parent) || this.parent.isChildOf(parent)));
+        return ((null != this.parent) && (isImmediateChildOf(parent) || this.parent.isChildOf(parent)));
+    }
+
+    public boolean isImmediateChildOf(BodyLocation parent) {
+        return null != this.parent && this.parent == parent;
     }
 
     public static final class XMLAdapter extends XmlAdapter<String, BodyLocation> {

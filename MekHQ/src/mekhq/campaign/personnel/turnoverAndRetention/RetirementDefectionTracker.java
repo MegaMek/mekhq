@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.personnel.turnoverAndRetention;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
@@ -268,7 +269,7 @@ public class RetirementDefectionTracker {
                 }
 
                 if (contract != null) {
-                    targetNumber.addModifier(-Math.max(0, ((contract.getSharesPercent() / 10) - 2)),
+                    targetNumber.addModifier(-max(0, ((contract.getSharesPercent() / 10) - 2)),
                           resources.getString("shares.text"));
                 }
             }
@@ -301,7 +302,8 @@ public class RetirementDefectionTracker {
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
                       (!campaign.getCampaignOptions().isUseHideLoyalty())) {
 
-                int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction());
+                int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction(),
+                      campaign.getCampaignOptions().isUseAlternativeAdvancedMedical());
 
                 if (person.isCommander()) {
                     loyaltyScore += 2;
@@ -658,7 +660,7 @@ public class RetirementDefectionTracker {
                                   getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
         if (maximumStrain != 0) {
-            return personnel / maximumStrain;
+            return 1 - (personnel / maximumStrain);
         } else {
             return personnel;
         }
@@ -739,7 +741,8 @@ public class RetirementDefectionTracker {
     private int getBaseTargetNumber(Campaign campaign, Person person) {
         if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
                   (campaign.getCampaignOptions().isUseHideLoyalty())) {
-            int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction());
+            int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction(),
+                  campaign.getCampaignOptions().isUseAlternativeAdvancedMedical());
 
             if (person.isCommander()) {
                 loyaltyScore += 2;

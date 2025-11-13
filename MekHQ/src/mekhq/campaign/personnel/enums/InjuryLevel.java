@@ -57,11 +57,7 @@ public enum InjuryLevel {
     /**
      * Life-threatening injuries, professional medical attention required on a daily basis.
      */
-    DEADLY,
-    /**
-     * A virulent disease of some kind.
-     */
-    DISEASE;
+    DEADLY;
     //endregion Enum Declarations
 
     //region Boolean Comparison Methods
@@ -85,12 +81,8 @@ public enum InjuryLevel {
         return this == DEADLY;
     }
 
-    public boolean isDisease() {
-        return this == DISEASE;
-    }
-
     public boolean isMajorOrDeadly() {
-        return isMajor() || isDeadly() || isDisease();
+        return isMajor() || isDeadly();
     }
     //endregion Boolean Comparison Methods
 }

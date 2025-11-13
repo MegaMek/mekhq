@@ -1017,6 +1017,10 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDynamicDifficulty", campaignOptions.isUseDynamicDifficulty());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
+              "useBolsterContractSkill",
+              campaignOptions.isUseBolsterContractSkill());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
               "contractMarketReportRefresh",
               campaignOptions.isContractMarketReportRefresh());
         MHQXMLUtility.writeSimpleXMLTag(pw,
@@ -1065,7 +1069,6 @@ public class CampaignOptionsMarshaller {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities",
               campaignOptions.getPhenotypeProbabilities());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtB", campaignOptions.isUseAtB());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStratCon", campaignOptions.isUseStratCon());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMaplessStratCon", campaignOptions.isUseStratConMaplessMode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedScouting", campaignOptions.isUseAdvancedScouting());

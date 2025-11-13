@@ -858,7 +858,8 @@ public class RetirementDefectionDialog extends JDialog {
                 } else {
                     Unit unit = ((UnitAssignmentTableModel) unitAssignmentTable.getModel()).getUnit(unitAssignmentTable.convertRowIndexToModel(
                           unitAssignmentTable.getSelectedRow()));
-                    btnAddUnit.setEnabled(hqView.getCampaign().getPerson(pid).canDrive(unit.getEntity()));
+                    // We bypass the Alt AM & Implant use check here
+                    btnAddUnit.setEnabled(hqView.getCampaign().getPerson(pid).canDrive(unit.getEntity(), false, false));
                 }
                 btnRemoveUnit.setEnabled(false);
             } else {

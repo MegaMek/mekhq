@@ -146,6 +146,7 @@ public class MarketsTab {
     private JCheckBox chkUseCamOpsSalvage;
     private JCheckBox chkUseRiskySalvage;
     private JCheckBox chkUseDynamicDifficulty;
+    private JCheckBox chkUseBolsterContractSkill;
     private JCheckBox chkContractMarketReportRefresh;
     private JLabel lblContractMaxSalvagePercentage;
     private JSpinner spnContractMaxSalvagePercentage;
@@ -546,6 +547,7 @@ public class MarketsTab {
         chkUseCamOpsSalvage = new JCheckBox();
         chkUseRiskySalvage = new JCheckBox();
         chkUseDynamicDifficulty = new JCheckBox();
+        chkUseBolsterContractSkill = new JCheckBox();
         chkContractMarketReportRefresh = new JCheckBox();
         lblContractMaxSalvagePercentage = new JLabel();
         spnContractMaxSalvagePercentage = new JSpinner();
@@ -646,6 +648,10 @@ public class MarketsTab {
         chkUseDynamicDifficulty = new CampaignOptionsCheckBox("UseDynamicDifficulty");
         chkUseDynamicDifficulty.addMouseListener(createTipPanelUpdater(contractMarketHeader, "UseDynamicDifficulty"));
 
+        chkUseBolsterContractSkill = new CampaignOptionsCheckBox("UseBolsterContractSkill");
+        chkUseBolsterContractSkill.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "UseBolsterContractSkill"));
+
         chkContractMarketReportRefresh = new CampaignOptionsCheckBox("ContractMarketReportRefresh");
         chkContractMarketReportRefresh.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "ContractMarketReportRefresh"));
@@ -697,6 +703,9 @@ public class MarketsTab {
 
         layout.gridy++;
         panel.add(chkUseDynamicDifficulty, layout);
+
+        layout.gridy++;
+        panel.add(chkUseBolsterContractSkill, layout);
 
         layout.gridy++;
         panel.add(chkContractMarketReportRefresh, layout);
@@ -912,6 +921,7 @@ public class MarketsTab {
         chkUseCamOpsSalvage.setSelected(options.isUseCamOpsSalvage());
         chkUseRiskySalvage.setSelected(options.isUseRiskySalvage());
         chkUseDynamicDifficulty.setSelected(options.isUseDynamicDifficulty());
+        chkUseBolsterContractSkill.setSelected(options.isUseBolsterContractSkill());
         chkContractMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
         spnContractMaxSalvagePercentage.setValue(options.getContractMaxSalvagePercentage());
         spnDropShipBonusPercentage.setValue(options.getDropShipBonusPercentage());
@@ -982,6 +992,7 @@ public class MarketsTab {
         options.setUseCamOpsSalvage(chkUseCamOpsSalvage.isSelected());
         options.setUseRiskySalvage(chkUseRiskySalvage.isSelected());
         options.setUseDynamicDifficulty(chkUseDynamicDifficulty.isSelected());
+        options.setUseBolsterContractSkill(chkUseBolsterContractSkill.isSelected());
         options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
         options.setContractMaxSalvagePercentage((int) spnContractMaxSalvagePercentage.getValue());
         options.setDropShipBonusPercentage((int) spnDropShipBonusPercentage.getValue());

@@ -207,6 +207,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionInsufficientAsTechTimeNag;
     private JCheckBox optionInsufficientMedicsNag;
     private JCheckBox optionShortDeploymentNag;
+    private JCheckBox optionCombatChallengeNag;
     private JCheckBox optionUnresolvedStratConContactsNag;
     private JCheckBox optionOutstandingScenariosNag;
     private JCheckBox optionInvalidFactionNag;
@@ -1112,6 +1113,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionShortDeploymentNag.setToolTipText(resources.getString("optionShortDeploymentNag.toolTipText"));
         optionShortDeploymentNag.setName("optionShortDeploymentNag");
 
+        optionCombatChallengeNag = new JCheckBox(resources.getString("optionCombatChallengeNag.text"));
+        optionCombatChallengeNag.setToolTipText(resources.getString("optionCombatChallengeNag.toolTipText"));
+        optionCombatChallengeNag.setName("optionCombatChallengeNag");
+
         optionUnresolvedStratConContactsNag = new JCheckBox(resources.getString(
               "optionUnresolvedStratConContactsNag.text"));
         optionUnresolvedStratConContactsNag.setToolTipText(resources.getString(
@@ -1170,6 +1175,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(optionInsufficientAsTechTimeNag)
                                       .addComponent(optionInsufficientMedicsNag)
                                       .addComponent(optionShortDeploymentNag)
+                                      .addComponent(optionCombatChallengeNag)
                                       .addComponent(optionUnresolvedStratConContactsNag)
                                       .addComponent(optionOutstandingScenariosNag)
                                       .addComponent(optionInvalidFactionNag)
@@ -1191,6 +1197,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(optionInsufficientAsTechTimeNag)
                                         .addComponent(optionInsufficientMedicsNag)
                                         .addComponent(optionShortDeploymentNag)
+                                        .addComponent(optionCombatChallengeNag)
                                         .addComponent(optionUnresolvedStratConContactsNag)
                                         .addComponent(optionOutstandingScenariosNag)
                                         .addComponent(optionInvalidFactionNag)
@@ -1507,6 +1514,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_SHORT_DEPLOYMENT, optionShortDeploymentNag.isSelected());
         MekHQ.getMHQOptions()
+              .setNagDialogIgnore(MHQConstants.NAG_COMBAT_CHALLENGE, optionCombatChallengeNag.isSelected());
+        MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS,
                     optionUnresolvedStratConContactsNag.isSelected());
         MekHQ.getMHQOptions()
@@ -1675,6 +1684,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                       .getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_MEDICS));
         optionShortDeploymentNag.setSelected(MekHQ.getMHQOptions()
                                                    .getNagDialogIgnore(MHQConstants.NAG_SHORT_DEPLOYMENT));
+        optionCombatChallengeNag.setSelected(MekHQ.getMHQOptions()
+                                                   .getNagDialogIgnore(MHQConstants.NAG_COMBAT_CHALLENGE));
         optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMHQOptions()
                                                               .getNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS));
         optionOutstandingScenariosNag.setSelected(MekHQ.getMHQOptions()

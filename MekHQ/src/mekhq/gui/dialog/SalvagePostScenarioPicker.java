@@ -80,6 +80,7 @@ import mekhq.campaign.mission.camOpsSalvage.RecoveryTimeData;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -258,7 +259,7 @@ public class SalvagePostScenarioPicker {
             isExchangeRights = ((Contract) mission).isSalvageExchange();
         }
 
-        List<SalvageComboBoxGroup> selectedGroups = showSalvageDialog(isContract);
+        List<SalvageComboBoxGroup> selectedGroups = showSalvageDialog(campaign, isContract);
         if (selectedGroups != null) {
             processSalvageAssignments(selectedGroups);
         }
@@ -428,6 +429,7 @@ public class SalvagePostScenarioPicker {
      * For contract missions, also displays salvage percentage information and enforces salvage limits. The dialog
      * validates all assignments and prevents confirmation if any assignments are invalid.</p>
      *
+     * @param campaign   the current campaign
      * @param isContract whether this is a contract mission (affects displayed information and validation)
      *
      * @return list of combo box groups with user selections, or null if the dialog was canceled
@@ -435,7 +437,7 @@ public class SalvagePostScenarioPicker {
      * @author Illiani
      * @since 0.50.10
      */
-    private List<SalvageComboBoxGroup> showSalvageDialog(boolean isContract) {
+    private List<SalvageComboBoxGroup> showSalvageDialog(Campaign campaign, boolean isContract) {
         JDialog dialog = new JDialog((Frame) null, getText("accessingTerminal.title"), true);
         dialog.setLayout(new BorderLayout());
         dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // We don't want the player to cancel out
@@ -628,11 +630,11 @@ public class SalvagePostScenarioPicker {
 
         dialog.add(mainPanel, BorderLayout.CENTER);
 
-        confirmButton.addActionListener(e -> {
-            confirmed[0] = true;
-            resultHolder.groups = salvageComboBoxGroups;
-            dialog.dispose();
-        });
+        confirmButton.addActionListener(e -> confirmationAction(campaign,
+              dialog,
+              confirmed,
+              resultHolder,
+              salvageComboBoxGroups));
 
         buttonPanel.add(confirmButton);
 
@@ -649,6 +651,23 @@ public class SalvagePostScenarioPicker {
         dialog.setVisible(true);
 
         return confirmed[0] ? resultHolder.groups : null;
+    }
+
+    private static void confirmationAction(Campaign campaign, JDialog dialog, boolean[] confirmed,
+          ResultHolder resultHolder,
+          List<SalvageComboBoxGroup> salvageComboBoxGroups) {
+        dialog.setVisible(false);
+        ImmersiveDialogSimple confirmationDialog = new ImmersiveDialogSimple(campaign, null, null,
+              getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.confirmation.text"),
+              List.of(getText("Cancel.text"), getText("Confirm.text")), null, null, false);
+        if (confirmationDialog.getDialogChoice() == 0) { // Cancelled
+            dialog.setVisible(true);
+            return;
+        }
+
+        confirmed[0] = true;
+        resultHolder.groups = salvageComboBoxGroups;
+        dialog.dispose();
     }
 
     /**

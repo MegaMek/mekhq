@@ -296,7 +296,7 @@ public class NewPersonnelMarket {
             return 0;
         }
 
-        int adjustedConnections = commander.getAdjustedConnections();
+        int adjustedConnections = commander.getAdjustedConnections(false);
         ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
 
         if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {

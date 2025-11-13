@@ -45,6 +45,7 @@ import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.icons.Portrait.DEFAULT_IMAGE_WIDTH;
 import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
+import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
@@ -254,6 +255,7 @@ public class Person {
     private LocalDate retirement;
     private int loyalty;
     private int fatigue;
+    private int permanentFatigue;
     private Boolean isRecoveringFromFatigue;
 
     private Skills skills;
@@ -545,6 +547,7 @@ public class Person {
         retirement = null;
         loyalty = 9;
         fatigue = 0;
+        permanentFatigue = 0;
         isRecoveringFromFatigue = false;
         skills = new Skills();
         options = new PersonnelOptions();
@@ -2047,7 +2050,7 @@ public class Person {
     /**
      * This method returns the character's base loyalty score.
      *
-     * <p><b>Usage:</b> In most cases you will want to use {@link #getAdjustedLoyalty(Faction)} instead.</p>
+     * <p><b>Usage:</b> In most cases you will want to use {@link #getAdjustedLoyalty(Faction, boolean)} instead.</p>
      *
      * @return the loyalty value as an {@link Integer}
      */
@@ -2058,14 +2061,16 @@ public class Person {
     /**
      * Calculates and returns the adjusted loyalty value for the given campaign faction.
      *
-     * @param campaignFaction the campaign {@link Faction} being compared with the origin {@link Faction}
+     * @param campaignFaction                     the campaign {@link Faction} being compared with the origin
+     *                                            {@link Faction}
+     * @param isAlternativeAdvancedMedicalEnabled {@code true} if advanced medical's alternate mode is enabled
      *
      * @return the loyalty value adjusted based on the provided campaign {@link Faction}
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public int getAdjustedLoyalty(Faction campaignFaction) {
+    public int getAdjustedLoyalty(Faction campaignFaction, boolean isAlternativeAdvancedMedicalEnabled) {
         final int LOYALTY_PENALTY_FOR_ANARCHIST = -2;
 
         boolean campaignFactionMatchesOriginFaction = originFaction.equals(campaignFaction);
@@ -2084,6 +2089,19 @@ public class Person {
         boolean hasFactionLoyalty = options.booleanOption(COMPULSION_FACTION_LOYALTY);
         if (hasFactionLoyalty) {
             modifier += campaignFactionMatchesOriginFaction ? 1 : -4;
+        }
+
+        boolean hasBodyModAddiction = options.booleanOption(COMPULSION_BODY_MOD_ADDICTION);
+        if (isAlternativeAdvancedMedicalEnabled && hasBodyModAddiction) {
+            boolean hasProsthetic = false;
+            for (Injury injury : getPermanentInjuries()) {
+                if (injury.getSubType().isProsthetic()) {
+                    hasProsthetic = true;
+                    break;
+                }
+            }
+
+            modifier += hasProsthetic ? 0 : -2;
         }
 
         return loyalty + modifier;
@@ -2138,6 +2156,14 @@ public class Person {
 
     public void setFatigue(final int fatigue) {
         this.fatigue = fatigue;
+    }
+
+    public int getPermanentFatigue() {
+        return permanentFatigue;
+    }
+
+    public void changePermanentFatigue(final int delta) {
+        permanentFatigue += delta;
     }
 
     /**
@@ -3153,6 +3179,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getBaseLoyalty());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "permanentFatigue", getPermanentFatigue());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXML(pw, indent);
@@ -3642,6 +3669,8 @@ public class Person {
                     person.loyalty = MathUtility.parseInt(wn2.getTextContent(), 9);
                 } else if (nodeName.equalsIgnoreCase("fatigue")) {
                     person.fatigue = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("permanentFatigue")) {
+                    person.permanentFatigue = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("isRecoveringFromFatigue")) {
                     person.isRecoveringFromFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("advantages")) {
@@ -5595,11 +5624,14 @@ public class Person {
      * are assigned. Supported types include Land-Air Mek, Mek, VTOL, tank (including variants for marine and ground
      * modes), conventional fighter, small craft, jumpship, aerospace unit, battle armor, infantry, and ProtoMek.</p>
      *
-     * @param entity the entity to check for piloting/driving capability. If {@code null}, returns {@code false}.
+     * @param entity                  the entity to check for piloting/driving capability. If {@code null}, returns
+     *                                {@code false}.
+     * @param isUseAltAdvancedMedical {@code true} if the campaign has Alternate Advanced Medical enabled
+     * @param isUseImplants           {@code true} if the campaign has Implants enabled
      *
      * @return {@code true} if the user is qualified to pilot or drive the specified entity; {@code false} otherwise
      */
-    public boolean canDrive(final Entity entity) {
+    public boolean canDrive(final Entity entity, final boolean isUseAltAdvancedMedical, final boolean isUseImplants) {
         if (entity == null) {
             return false;
         }
@@ -5635,7 +5667,10 @@ public class Person {
 
             return false;
         } else if (entity instanceof ProtoMek) {
-            return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT);
+            boolean hasEIImplant = !isUseImplants ||
+                                         !isUseAltAdvancedMedical ||
+                                         options.booleanOption(UNOFFICIAL_EI_IMPLANT);
+            return hasSkill(S_GUN_PROTO) && isRole(PersonnelRole.PROTOMEK_PILOT) && hasEIImplant;
         } else {
             return false;
         }
@@ -5960,7 +5995,7 @@ public class Person {
         }
 
         // Personnel without tech or doctor roles have no available time
-        if (!isTech() && !isDoctor()) {
+        if (!isTechExpanded() && !isDoctor()) {
             this.minutesLeft = 0;
             this.overtimeLeft = 0;
             return;
@@ -6409,6 +6444,15 @@ public class Person {
         this.hasGainedVeterancySPA = hasGainedVeterancySPA;
     }
 
+
+    /**
+     * Returns the character's base (unadjusted) Connections value.
+     *
+     * <p><b>Usage:</b> Generally, you want to use {@link #getAdjustedConnections(boolean)} instead as that includes
+     * additional adjustments and modifiers.</p>
+     *
+     * @return the character's base Connections value
+     */
     public int getConnections() {
         return connections;
     }
@@ -6432,18 +6476,23 @@ public class Person {
      *
      * <p>The Connections value is clamped within the allowed minimum and maximum range before being returned.</p>
      *
+     * @param excludeTemporaryAdjustments if {@code true} temporary adjustments, such as from paranoia or connections
+     *                                    burning, are excluded from the returned value
+     *
      * @return the character's Connections value, clamped within the minimum and maximum limits
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public int getAdjustedConnections() {
-        if (burnedConnectionsEndDate != null) {
-            return 0;
-        }
+    public int getAdjustedConnections(boolean excludeTemporaryAdjustments) {
+        if (!excludeTemporaryAdjustments) {
+            if (burnedConnectionsEndDate != null) {
+                return 0;
+            }
 
-        if (sufferingFromClinicalParanoia) {
-            return 0;
+            if (sufferingFromClinicalParanoia) {
+                return 0;
+            }
         }
 
         boolean hasXenophobia = options.booleanOption(COMPULSION_XENOPHOBIA);
@@ -8287,7 +8336,7 @@ public class Person {
             return "";
         }
 
-        int adjustedConnections = getAdjustedConnections();
+        int adjustedConnections = getAdjustedConnections(false);
         ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
 
         if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {
@@ -8325,7 +8374,7 @@ public class Person {
      * @since 0.50.07
      */
     public String checkForBurnedContacts(LocalDate today) {
-        int adjustedConnections = getAdjustedConnections();
+        int adjustedConnections = getAdjustedConnections(false);
         ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
 
         if (!ConnectionsLevel.CONNECTIONS_ZERO.equals(connectionsLevel)) {

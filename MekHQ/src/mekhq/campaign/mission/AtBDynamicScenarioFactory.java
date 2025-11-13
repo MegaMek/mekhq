@@ -39,6 +39,7 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.equipment.WeaponType.CLASS_ARTILLERY;
+import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static megamek.common.planetaryConditions.Atmosphere.THIN;
 import static megamek.common.planetaryConditions.Wind.TORNADO_F4;
 import static megamek.common.units.UnitType.*;
@@ -250,7 +251,9 @@ public class AtBDynamicScenarioFactory {
             scenario.removeBotForce(x);
         }
 
-        applyScenarioModifiers(scenario, campaign, EventTiming.PreForceGeneration);
+        if (!scenario.getStratConScenarioType().isOfficialChallenge()) {
+            applyScenarioModifiers(scenario, campaign, EventTiming.PreForceGeneration);
+        }
 
         // Now we can clear the other related lists
         scenario.getAlliesPlayer().clear();
@@ -270,7 +273,9 @@ public class AtBDynamicScenarioFactory {
         setDeploymentZones(scenario);
         setDestinationZones(scenario);
 
-        applyScenarioModifiers(scenario, campaign, EventTiming.PostForceGeneration);
+        if (!scenario.getStratConScenarioType().isOfficialChallenge()) {
+            applyScenarioModifiers(scenario, campaign, EventTiming.PostForceGeneration);
+        }
 
         setScenarioRerolls(scenario, campaign);
 
@@ -482,7 +487,12 @@ public class AtBDynamicScenarioFactory {
                 // enemy or "Unidentified Hostiles" which are considered pirates or bandit caste
                 // with random quality and skill
             case Third:
-                skill = scenario.getEffectiveOpForSkill();
+                if (scenario.getStratConScenarioType().isOfficialChallenge()) {
+                    skill = SkillLevel.changeByDelta(scenario.getEffectiveOpForSkill(), 2);
+                } else {
+                    skill = scenario.getEffectiveOpForSkill();
+                }
+
                 quality = scenario.getEffectiveOpForQuality();
                 if (forceTemplate.getForceName().toLowerCase().contains("unidentified")) {
                     unidentifiedThirdPartyPresent = true;
@@ -950,13 +960,18 @@ public class AtBDynamicScenarioFactory {
                 forceBV = 0;
 
                 boolean isClan = faction.isClan();
+                boolean isOfficialChallenge = scenario.getStratConScenarioType().isOfficialChallenge();
 
                 if (isClan) {
                     LOGGER.info("Faction is Clan, skipping culling");
                 }
 
+                if (isOfficialChallenge) {
+                    LOGGER.info("This is a combat challenge, skipping culling");
+                }
+
                 for (Entity entity : generatedEntities) {
-                    if (isClan) {
+                    if (isClan || isOfficialChallenge) {
                         forceComposition.add(entity);
                         int battleValue = getBattleValue(campaign, entity, false);
                         forceBV += battleValue;
@@ -2900,6 +2915,12 @@ public class AtBDynamicScenarioFactory {
         }
 
         entity.setExternalIdAsString(UUID.randomUUID().toString());
+
+        if (campaignOptions.isUseImplants() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+            if (entity.isProtoMek()) {
+                entity.getCrew().getOptions().getOption(UNOFFICIAL_EI_IMPLANT).setValue(true);
+            }
+        }
 
         return entity;
     }

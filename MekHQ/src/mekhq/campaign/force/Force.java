@@ -491,7 +491,6 @@ public class Force {
     /**
      * Add a unit id to the units vector. In general, this should not be called directly to add unid because they will
      * not be assigned a force id. Use {@link Campaign#addUnitToForce(Unit, int)} instead
-     *
      */
     public void addUnit(UUID uid) {
         addUnit(null, uid, false, null);
@@ -520,7 +519,6 @@ public class Force {
 
     /**
      * This should not be directly called except by {@link Campaign#removeUnitFromForce(Unit)} instead
-     *
      */
     public void removeUnit(Campaign campaign, UUID id, boolean log) {
         int idx = 0;
@@ -1131,8 +1129,7 @@ public class Force {
                   depth)));
         } else {
             int depth = largestSubForce.getFormationLevel().getDepth();
-            setFormationLevel(FormationLevel.parseFromDepth(campaign,
-                  depth + 1 + getOddFormationSizeModifier(campaign, depth + 1)));
+            setFormationLevel(FormationLevel.parseFromDepth(campaign, depth + 1));
         }
     }
 
