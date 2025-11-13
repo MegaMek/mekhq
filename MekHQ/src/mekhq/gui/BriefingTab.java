@@ -875,10 +875,6 @@ public final class BriefingTab extends CampaignGuiTab {
     private boolean handleSalvageAssignments(Scenario scenario) {
         boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
         if (hasSalvageOpportunity) {
-            // Reset old information
-            scenario.clearSalvageForces();
-            scenario.clearSalvageTechs();
-
             if (!displaySalvageForcePicker(scenario)) {
                 return true;
             }
@@ -1016,16 +1012,15 @@ public final class BriefingTab extends CampaignGuiTab {
             techData.add(data);
         }
 
-            SalvageTechPicker techPicker = new SalvageTechPicker(techData,
-                  priorSelectedTechs,
-                  getCampaign().isClanCampaign());
-            boolean wasConfirmed = techPicker.wasConfirmed();
-            if (wasConfirmed) {
-                List<UUID> selectedTechs = techPicker.getSelectedTechs();
-                for (UUID techId : selectedTechs) {
-                    scenario.addSalvageTech(techId);
-                }
+        SalvageTechPicker techPicker = new SalvageTechPicker(techData, priorSelectedTechs,
+              getCampaign().isClanCampaign());
+        boolean wasConfirmed = techPicker.wasConfirmed();
+        if (wasConfirmed) {
+            List<UUID> selectedTechs = techPicker.getSelectedTechs();
+            for (UUID techId : selectedTechs) {
+                scenario.addSalvageTech(techId);
             }
+        }
 
         return techPicker.wasConfirmed();
     }
