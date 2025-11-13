@@ -55,122 +55,50 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
  */
 public enum PersonnelRole {
     // region Enum Declarations
-    /**
-     * Individual roles with corresponding name texts and mnemonics.
-     */
-    // I used an average of the modifiers from the MekWarrior, Hot Shot, and Grizzled Veteran ATOW Archetypes
-    MEKWARRIOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_M, 4, 5, 6, 6, 4, 4, 4),
-
-    // I used an average of the modifiers from the MekWarrior, and Aerospace Pilot ATOW Archetypes
-    LAM_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 3, 4, 6, 6, 4, 4, 5),
-
-    // ATOW: Tanker Archetype
+    MEKWARRIOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_M, 5, 5, 6, 6, 5, 5, 5),
+    LAM_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
     @Deprecated(since = "0.50.10", forRemoval = true)
-    GROUND_VEHICLE_DRIVER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_V, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Tanker Archetype
+    GROUND_VEHICLE_DRIVER(KeyEvent.VK_UNDEFINED),
     @Deprecated(since = "0.50.10", forRemoval = true)
-    NAVAL_VEHICLE_DRIVER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_N, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Companion Chopper Pilot Archetype
+    NAVAL_VEHICLE_DRIVER(KeyEvent.VK_UNDEFINED),
     @Deprecated(since = "0.50.10", forRemoval = true)
-    VTOL_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
-
-    // ATOW: Tanker Archetype
+    VTOL_PILOT(KeyEvent.VK_UNDEFINED),
     @Deprecated(since = "0.50.10", forRemoval = true)
-    VEHICLE_GUNNER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_G, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
+    VEHICLE_GUNNER(KeyEvent.VK_UNDEFINED),
     @Deprecated(since = "0.50.10", forRemoval = true)
-    VEHICLE_CREW(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    COMBAT_TECHNICIAN(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Tanker Archetype
-    VEHICLE_CREW_GROUND(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Tanker Archetype
-    VEHICLE_CREW_NAVAL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Tanker Archetype
-    VEHICLE_CREW_VTOL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Aerospace Pilot Archetype
-    AEROSPACE_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_A, 2, 3, 5, 5, 4, 4, 5),
-
-    // ATOW: Aerospace Pilot Archetype
-    CONVENTIONAL_AIRCRAFT_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_C, 2, 3, 5, 5, 4, 4, 5),
-
-    // ATOW: Aerospace Pilot Archetype (most ProtoMek pilots are Aerospace Sibkbo washouts, so this made the most sense)
-    PROTOMEK_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_P, 2, 3, 5, 5, 4, 4, 5),
-
-    // ATOW: Battle Armor Specialist Archetype
-    BATTLE_ARMOUR(PersonnelRoleSubType.COMBAT, true, KeyEvent.VK_B, 7, 6, 4, 5, 3, 4, 4),
-
-    // ATOW: Renegade Warrior Archetype
-    SOLDIER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_S, 5, 5, 4, 5, 4, 6, 3),
-
-    // ATOW: Tanker Archetype
-    VESSEL_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_I, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Tanker Archetype
-    VESSEL_GUNNER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_U, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    VESSEL_CREW(PersonnelRoleSubType.COMBAT, KeyEvent.VK_W, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype
-    VESSEL_NAVIGATOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_Y, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    MEK_TECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_T, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    MECHANIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_E, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    AERO_TEK(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_O, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    BA_TECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    ASTECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Communications Specialist Archetype (this might seem like an odd choice, but the Attributes for this Archetype
-    // work really well for this profession). However, we have switched Dexterity and Reflexes.
-    DOCTOR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_D, 3, 4, 5, 4, 6, 4, 4),
-
-    // ATOW: Communications Specialist Archetype (this might seem like an odd choice, but the Attributes for this Archetype
-    // work really well for this profession
-    MEDIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 4, 5, 6, 4, 4),
-
-    // ATOW: Faceman Archetype
-    ADMINISTRATOR_COMMAND(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 3, 3, 4, 6, 3, 5),
-
-    // ATOW: Faceman Archetype
-    ADMINISTRATOR_LOGISTICS(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_L, 3, 3, 3, 4, 6, 3, 5),
-
-    // ATOW: Faceman Archetype
-    ADMINISTRATOR_TRANSPORT(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_R, 3, 3, 3, 4, 6, 3, 5),
-
-    // ATOW: Faceman Archetype
-    ADMINISTRATOR_HR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_H, 3, 3, 3, 4, 6, 3, 5),
+    VEHICLE_CREW(KeyEvent.VK_UNDEFINED),
+    COMBAT_TECHNICIAN(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 4, 6, 6, 5),
+    VEHICLE_CREW_GROUND(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
+    VEHICLE_CREW_NAVAL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
+    VEHICLE_CREW_VTOL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
+    AEROSPACE_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_A, 5, 5, 6, 4, 6, 6, 5),
+    CONVENTIONAL_AIRCRAFT_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_C, 5, 5, 6, 4, 6, 6, 5),
+    PROTOMEK_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_P, 5, 5, 6, 4, 6, 6, 5),
+    BATTLE_ARMOUR(PersonnelRoleSubType.COMBAT, true, KeyEvent.VK_B, 5, 5, 6, 4, 6, 6, 5),
+    SOLDIER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_S, 5, 6, 6, 5, 5, 5, 5),
+    VESSEL_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_I, 5, 5, 6, 4, 6, 6, 5),
+    VESSEL_GUNNER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_U, 5, 5, 6, 4, 6, 6, 5),
+    VESSEL_CREW(PersonnelRoleSubType.COMBAT, KeyEvent.VK_W, 4, 5, 6, 5, 6, 6, 5),
+    VESSEL_NAVIGATOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_Y, 5, 5, 5, 5, 7, 5, 5),
+    MEK_TECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_T, 5, 5, 6, 4, 6, 6, 5),
+    MECHANIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_E, 5, 5, 6, 4, 6, 6, 5),
+    AERO_TEK(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_O, 5, 5, 6, 4, 6, 6, 5),
+    BA_TECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 4, 6, 6, 5),
+    ASTECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 4, 6, 6, 5),
+    DOCTOR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_D, 4, 5, 6, 5, 6, 6, 5),
+    MEDIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 4, 5, 6, 5, 6, 6, 5),
+    ADMINISTRATOR_COMMAND(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 4, 5, 5, 5, 6, 6, 6),
+    ADMINISTRATOR_LOGISTICS(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_L, 4, 5, 5, 5, 6, 6, 6),
+    ADMINISTRATOR_TRANSPORT(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_R, 4, 5, 5, 5, 6, 6, 6),
+    ADMINISTRATOR_HR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_H, 4, 5, 5, 5, 6, 6, 6),
 
     // If we're generating a character without a Profession, we're just going to leave them with middle of the road
     // Attribute scores (5 in everything)
     NONE(PersonnelRoleSubType.CIVILIAN, false, KeyEvent.VK_UNDEFINED, 5, 5, 5, 5, 5, 5, 5),
 
-    // No archetype, but ATOW pg 35 states that the Attribute scores for an average person are 4
+    // No archetype, but ATOW pg 35 states that the Attribute scores for an average person are 4. We've gone with 5
+    // because otherwise it takes +2 levels to get a modifier, but only -1 to get a penalty and players didn't like
+    // that.
     DEPENDENT(KeyEvent.VK_UNDEFINED),
     ADULT_ENTERTAINER(KeyEvent.VK_UNDEFINED),
     ANTIQUARIAN(KeyEvent.VK_UNDEFINED),
@@ -448,7 +376,7 @@ public enum PersonnelRole {
 
     // region Constructors
     PersonnelRole(final int mnemonic) {
-        this(PersonnelRoleSubType.CIVILIAN, false, mnemonic, 4, 4, 4, 4, 4, 4, 4);
+        this(PersonnelRoleSubType.CIVILIAN, false, mnemonic, 5, 5, 5, 5, 5, 5, 5);
     }
 
     PersonnelRole(final PersonnelRoleSubType subType, final int mnemonic, final int strength, final int body,
