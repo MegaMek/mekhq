@@ -486,7 +486,7 @@ public class Inoculations {
         Set<InjuryType> activeDiseases = new HashSet<>();
         for (Person person : allPersonnel) {
             for (Injury injury : person.getInjuries()) {
-                if (injury.getLevel().isDisease()) {
+                if (injury.getSubType().isDisease()) {
                     activeDiseases.add(injury.getType());
                 }
             }

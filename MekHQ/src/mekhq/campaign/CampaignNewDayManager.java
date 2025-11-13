@@ -138,6 +138,7 @@ import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.medical.MedicalController;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.QuickTrain;
@@ -669,6 +670,10 @@ public class CampaignNewDayManager {
                 if (campaignOptions.isUseFunctionalEscapeArtist() && person.getStatus().isPoW()) {
                     EscapeSkills.performEscapeAttemptCheck(campaign, person);
                 }
+            }
+
+            if (today.getDayOfYear() == 1 && campaignOptions.isUseAlternativeAdvancedMedical()) {
+                AdvancedMedicalAlternate.performEnhancedImagingDegradationCheck(campaign, person);
             }
 
             if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {

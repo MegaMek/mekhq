@@ -2336,7 +2336,8 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         JLabel lblLoyalty = null;
-        int loyaltyModifier = person.getLoyaltyModifier(person.getAdjustedLoyalty(campaign.getFaction()));
+        int loyaltyModifier = person.getLoyaltyModifier(person.getAdjustedLoyalty(campaign.getFaction(),
+              campaignOptions.isUseAlternativeAdvancedMedical()));
         if ((campaignOptions.isUseLoyaltyModifiers()) &&
                   (!campaignOptions.isUseHideLoyalty()) &&
                   (loyaltyModifier != 0)) {
@@ -2350,7 +2351,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         JLabel lblFatigue = null;
         int baseFatigue = person.getFatigue();
-        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(),
+        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.getPermanentFatigue(),
               person.isClanPersonnel(),
               person.getSkillLevel(campaign, false, true));
         if (campaignOptions.isUseFatigue() && (baseFatigue != 0 || effectiveFatigue != 0)) {
