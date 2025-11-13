@@ -3223,7 +3223,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       attribute.getLabel(),
                       current,
                       target,
-                      traitCost));
+                      attributeCost));
                 menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnAttributes.tooltip"))));
                 menuItem.setActionCommand(makeCommand(CMD_CHANGE_ATTRIBUTE,
                       String.valueOf(attribute),
