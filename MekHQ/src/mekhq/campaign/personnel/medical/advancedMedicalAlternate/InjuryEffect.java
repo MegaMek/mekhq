@@ -51,63 +51,63 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 public enum InjuryEffect {
     NONE("NONE"),
-    BLINDED("BLINDED", getWarningColor(), -3, 0, 0, 0, 0, 0, 0, 0, false),
-    COMPOUND_FRACTURE("COMPOUND_FRACTURE", getNegativeColor(), 0, 0, 0, -3, -3, 0, 0, 0, false),
-    DEAFENED("DEAFENED", getWarningColor(), -3, 0, 0, 0, 0, 0, 0, 0, false),
-    FRACTURE_JAW("FRACTURE_JAW", getWarningColor(), 0, 0, 0, 0, 0, 0, 0, -3, false),
-    FRACTURE_LIMB("FRACTURE_LIMB", getWarningColor(), 0, 0, 0, -2, -2, 0, 0, 0, false),
-    FRACTURE_RIB("FRACTURE_RIB", getWarningColor(), 0, -1, -1, -1, 0, 0, 0, 0, false),
-    FRACTURE_SKULL("FRACTURE_SKULL", getWarningColor(), 0, 0, 0, 0, 0, -2, -2, -2, false),
-    INTERNAL_BLEEDING("INTERNAL_BLEEDING", getNegativeColor(), 0, 0, 0, 0, 0, 0, 0, 0, true),
-    PUNCTURED("PUNCTURED", getNegativeColor(), 0, -2, -2, -2, 0, 0, 0, 0, false),
-    SEVERED("SEVERED", getNegativeColor(), 0, 0, 0, -5, -5, 0, 0, 0, false),
-    BLOOD_LOSS("BLOOD_LOSS", getNegativeColor(), 0, -1, -1, -1, -1, -1, -1, -1, false),
-    DISEASE_DEADLY("DISEASE_DEADLY", getNegativeColor(), 0, 0, 0, 0, 0, 0, 0, 0, false),
-    DISEASE_GROWTHS_SLIGHT("DISEASE_GROWTHS_SLIGHT", getWarningColor(), 0, 0, -1, 0, -1, 0, 0, 0, false),
-    DISEASE_GROWTHS_MODERATE("DISEASE_GROWTHS_MODERATE", getWarningColor(), 0, 0, -2, 0, -2, 0, 0, 0, false),
-    DISEASE_GROWTHS_SEVERE("DISEASE_GROWTHS_SEVERE", getNegativeColor(), 0, 0, -3, 0, -3, 0, 0, 0, false),
-    DISEASE_INFECTION_SLIGHT("DISEASE_INFECTION_SLIGHT", getWarningColor(), 0, 0, -1, 0, 0, 0, 0, -1, false),
-    DISEASE_INFECTION_MODERATE("DISEASE_INFECTION_MODERATE", getWarningColor(), 0, 0, -2, 0, 0, 0, 0, -2, false),
-    DISEASE_INFECTION_SEVERE("DISEASE_INFECTION_SEVERE", getNegativeColor(), 0, 0, -3, 0, 0, 0, 0, -3, false),
-    DISEASE_HEARING_SLIGHT("DISEASE_HEARING_SLIGHT", getWarningColor(), -1, 0, 0, 0, 0, 0, 0, 0, false),
-    DISEASE_HEARING_MODERATE("DISEASE_HEARING_MODERATE", getWarningColor(), -2, 0, 0, 0, 0, 0, 0, 0, false),
-    DISEASE_HEARING_SEVERE("DISEASE_HEARING_SEVERE", getNegativeColor(), -3, 0, 0, 0, 0, 0, 0, 0, false),
-    DISEASE_WEAKNESS_SLIGHT("DISEASE_WEAKNESS_SLIGHT", getWarningColor(), 0, -1, -1, 0, 0, 0, 0, 0, false),
-    DISEASE_WEAKNESS_MODERATE("DISEASE_WEAKNESS_MODERATE", getWarningColor(), 0, -2, -2, 0, 0, 0, 0, 0, false),
-    DISEASE_WEAKNESS_SEVERE("DISEASE_WEAKNESS_SEVERE", getNegativeColor(), 0, -3, -3, 0, 0, 0, 0, 0, false),
-    DISEASE_SORES_SLIGHT("DISEASE_SORES_SLIGHT", getWarningColor(), 0, 0, 0, 0, 0, 0, 0, -1, false),
-    DISEASE_SORES_MODERATE("DISEASE_SORES_MODERATE", getWarningColor(), 0, 0, 0, 0, 0, 0, 0, -2, false),
-    DISEASE_SORES_SEVERE("DISEASE_SORES_SEVERE", getNegativeColor(), 0, 0, 0, 0, 0, 0, 0, -3, false),
-    DISEASE_FLU_SLIGHT("DISEASE_FLU_SLIGHT", getWarningColor(), 0, -1, -1, 0, 0, 0, 0, 0, false),
-    DISEASE_FLU_MODERATE("DISEASE_FLU_MODERATE", getWarningColor(), 0, -2, -2, 0, 0, 0, 0, 0, false),
-    DISEASE_FLU_SEVERE("DISEASE_FLU_SEVERE", getNegativeColor(), 0, -3, -3, 0, 0, 0, 0, 0, false),
-    DISEASE_SIGHT_SLIGHT("DISEASE_SIGHT_SLIGHT", getWarningColor(), -1, 0, 0, 0, 0, 0, 0, 0, false),
-    DISEASE_SIGHT_MODERATE("DISEASE_SIGHT_MODERATE", getWarningColor(), -2, 0, 0, 0, 0, 0, 0, 0, false),
-    DISEASE_SIGHT_SEVERE("DISEASE_SIGHT_SEVERE", getNegativeColor(), -3, 0, 0, 0, 0, 0, 0, 0, false),
-    DISEASE_TREMORS_SLIGHT("DISEASE_TREMORS_SLIGHT", getWarningColor(), 0, 0, -1, -1, 0, 0, 0, 0, false),
-    DISEASE_TREMORS_MODERATE("DISEASE_TREMORS_MODERATE", getWarningColor(), 0, 0, -2, -2, 0, 0, 0, 0, false),
-    DISEASE_TREMORS_SEVERE("DISEASE_TREMORS_SEVERE", getNegativeColor(), 0, 0, -3, -3, 0, 0, 0, 0, false),
-    DISEASE_BREATHING_SLIGHT("DISEASE_BREATHING_SLIGHT", getWarningColor(), 0, -1, -1, 0, 0, 0, 0, 0, false),
-    DISEASE_BREATHING_MODERATE("DISEASE_BREATHING_MODERATE", getWarningColor(), 0, -2, -2, 0, 0, 0, 0, 0, false),
-    DISEASE_BREATHING_SEVERE("DISEASE_BREATHING_SEVERE", getNegativeColor(), 0, -3, -3, 0, 0, 0, 0, 0, false),
-    DISEASE_HEMOPHILIA_SLIGHT("DISEASE_HEMOPHILIA_SLIGHT", getWarningColor(), 0, 0, -1, 0, 0, 0, 0, 0, false),
-    DISEASE_HEMOPHILIA_MODERATE("DISEASE_HEMOPHILIA_MODERATE", getWarningColor(), 0, 0, -2, 0, 0, 0, 0, 0, false),
-    DISEASE_HEMOPHILIA_SEVERE("DISEASE_HEMOPHILIA_SEVERE", getNegativeColor(), 0, 0, -3, 0, 0, 0, 0, 0, true),
-    DISEASE_VENEREAL_SLIGHT("DISEASE_VENEREAL_SLIGHT", getWarningColor(), 0, 0, 0, 0, 0, 0, 0, -1, false),
-    DISEASE_VENEREAL_MODERATE("DISEASE_VENEREAL_MODERATE", getWarningColor(), 0, 0, 0, 0, 0, 0, 0, -2, false),
-    DISEASE_VENEREAL_SEVERE("DISEASE_VENEREAL_SEVERE", getNegativeColor(), 0, 0, 0, 0, 0, 0, 0, -3, false),
-    TYPE_1_LIMB_REPLACEMENT("TYPE_1_LIMB_REPLACEMENT", "", 0, -2, 0, -4, -4, 0, 0, 0, false),
-    TYPE_2_LIMB_REPLACEMENT("TYPE_2_LIMB_REPLACEMENT", "", 0, -1, 0, -3, -3, 0, 0, 0, false),
-    TYPE_3_LIMB_REPLACEMENT("TYPE_3_LIMB_REPLACEMENT", "", 0, 0, 0, -2, -2, 0, 0, 0, false),
-    TYPE_4_LIMB_REPLACEMENT("TYPE_4_LIMB_REPLACEMENT", "", 0, 0, 0, -1, -1, 0, 0, 0, false),
-    TYPE_5_LIMB_REPLACEMENT("TYPE_5_LIMB_REPLACEMENT", "", 0, 1, 0, 0, 0, 0, 0, 0, false),
-    TYPE_6_LIMB_REPLACEMENT("TYPE_6_LIMB_REPLACEMENT", "", 0, 0, 0, 0, 0, 0, 0, 0, false),
-    TYPE_2_SENSORY_REPLACEMENT("TYPE_2_SENSORY_REPLACEMENT", "", -1, 0, 0, 0, 0, 0, 0, 0, false),
-    TYPE_3_SENSORY_REPLACEMENT("TYPE_3_SENSORY_REPLACEMENT", "", 0, 0, 0, 0, 0, 0, 0, 0, false),
-    TYPE_4_SENSORY_REPLACEMENT("TYPE_4_SENSORY_REPLACEMENT", "", 1, 0, 0, 0, 0, 0, 0, 0, false),
-    MYOMER_IMPLANT_ARM("MYOMER_IMPLANT_ARM", "", 0, 1, 0, 0, 1, 0, 0, -1, false),
-    MYOMER_IMPLANT_HAND("MYOMER_IMPLANT_HAND", "", 0, 0, 0, 0, 1, 0, 0, -1, false),
-    MYOMER_IMPLANT_LEG("MYOMER_IMPLANT_LEG", "", 0, 1, 0, 1, 0, 0, 0, -1, false);
+    BLINDED("BLINDED", getWarningColor(), -3, 0, 0, 0, 0, 0, 0, 0, false, 0),
+    COMPOUND_FRACTURE("COMPOUND_FRACTURE", getNegativeColor(), 0, 0, 0, -3, -3, 0, 0, 0, false, 0),
+    DEAFENED("DEAFENED", getWarningColor(), -3, 0, 0, 0, 0, 0, 0, 0, false, 0),
+    FRACTURE_JAW("FRACTURE_JAW", getWarningColor(), 0, 0, 0, 0, 0, 0, 0, -3, false, 0),
+    FRACTURE_LIMB("FRACTURE_LIMB", getWarningColor(), 0, 0, 0, -2, -2, 0, 0, 0, false, 0),
+    FRACTURE_RIB("FRACTURE_RIB", getWarningColor(), 0, -1, -1, -1, 0, 0, 0, 0, false, 0),
+    FRACTURE_SKULL("FRACTURE_SKULL", getWarningColor(), 0, 0, 0, 0, 0, -2, -2, -2, false, 0),
+    INTERNAL_BLEEDING("INTERNAL_BLEEDING", getNegativeColor(), 0, 0, 0, 0, 0, 0, 0, 0, true, 0),
+    PUNCTURED("PUNCTURED", getNegativeColor(), 0, -2, -2, -2, 0, 0, 0, 0, false, 0),
+    SEVERED("SEVERED", getNegativeColor(), 0, 0, 0, -5, -5, 0, 0, 0, false, 0),
+    BLOOD_LOSS("BLOOD_LOSS", getNegativeColor(), 0, -1, -1, -1, -1, -1, -1, -1, false, 0),
+    DISEASE_DEADLY("DISEASE_DEADLY", getNegativeColor(), 0, 0, 0, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_GROWTHS_SLIGHT("DISEASE_GROWTHS_SLIGHT", getWarningColor(), 0, 0, -1, 0, -1, 0, 0, 0, false, 0),
+    DISEASE_GROWTHS_MODERATE("DISEASE_GROWTHS_MODERATE", getWarningColor(), 0, 0, -2, 0, -2, 0, 0, 0, false, 0),
+    DISEASE_GROWTHS_SEVERE("DISEASE_GROWTHS_SEVERE", getNegativeColor(), 0, 0, -3, 0, -3, 0, 0, 0, false, 0),
+    DISEASE_INFECTION_SLIGHT("DISEASE_INFECTION_SLIGHT", getWarningColor(), 0, 0, -1, 0, 0, 0, 0, -1, false, 0),
+    DISEASE_INFECTION_MODERATE("DISEASE_INFECTION_MODERATE", getWarningColor(), 0, 0, -2, 0, 0, 0, 0, -2, false, 0),
+    DISEASE_INFECTION_SEVERE("DISEASE_INFECTION_SEVERE", getNegativeColor(), 0, 0, -3, 0, 0, 0, 0, -3, false, 0),
+    DISEASE_HEARING_SLIGHT("DISEASE_HEARING_SLIGHT", getWarningColor(), -1, 0, 0, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_HEARING_MODERATE("DISEASE_HEARING_MODERATE", getWarningColor(), -2, 0, 0, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_HEARING_SEVERE("DISEASE_HEARING_SEVERE", getNegativeColor(), -3, 0, 0, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_WEAKNESS_SLIGHT("DISEASE_WEAKNESS_SLIGHT", getWarningColor(), 0, -1, -1, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_WEAKNESS_MODERATE("DISEASE_WEAKNESS_MODERATE", getWarningColor(), 0, -2, -2, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_WEAKNESS_SEVERE("DISEASE_WEAKNESS_SEVERE", getNegativeColor(), 0, -3, -3, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_SORES_SLIGHT("DISEASE_SORES_SLIGHT", getWarningColor(), 0, 0, 0, 0, 0, 0, 0, -1, false, 0),
+    DISEASE_SORES_MODERATE("DISEASE_SORES_MODERATE", getWarningColor(), 0, 0, 0, 0, 0, 0, 0, -2, false, 0),
+    DISEASE_SORES_SEVERE("DISEASE_SORES_SEVERE", getNegativeColor(), 0, 0, 0, 0, 0, 0, 0, -3, false, 0),
+    DISEASE_FLU_SLIGHT("DISEASE_FLU_SLIGHT", getWarningColor(), 0, -1, -1, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_FLU_MODERATE("DISEASE_FLU_MODERATE", getWarningColor(), 0, -2, -2, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_FLU_SEVERE("DISEASE_FLU_SEVERE", getNegativeColor(), 0, -3, -3, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_SIGHT_SLIGHT("DISEASE_SIGHT_SLIGHT", getWarningColor(), -1, 0, 0, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_SIGHT_MODERATE("DISEASE_SIGHT_MODERATE", getWarningColor(), -2, 0, 0, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_SIGHT_SEVERE("DISEASE_SIGHT_SEVERE", getNegativeColor(), -3, 0, 0, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_TREMORS_SLIGHT("DISEASE_TREMORS_SLIGHT", getWarningColor(), 0, 0, -1, -1, 0, 0, 0, 0, false, 0),
+    DISEASE_TREMORS_MODERATE("DISEASE_TREMORS_MODERATE", getWarningColor(), 0, 0, -2, -2, 0, 0, 0, 0, false, 0),
+    DISEASE_TREMORS_SEVERE("DISEASE_TREMORS_SEVERE", getNegativeColor(), 0, 0, -3, -3, 0, 0, 0, 0, false, 0),
+    DISEASE_BREATHING_SLIGHT("DISEASE_BREATHING_SLIGHT", getWarningColor(), 0, -1, -1, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_BREATHING_MODERATE("DISEASE_BREATHING_MODERATE", getWarningColor(), 0, -2, -2, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_BREATHING_SEVERE("DISEASE_BREATHING_SEVERE", getNegativeColor(), 0, -3, -3, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_HEMOPHILIA_SLIGHT("DISEASE_HEMOPHILIA_SLIGHT", getWarningColor(), 0, 0, -1, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_HEMOPHILIA_MODERATE("DISEASE_HEMOPHILIA_MODERATE", getWarningColor(), 0, 0, -2, 0, 0, 0, 0, 0, false, 0),
+    DISEASE_HEMOPHILIA_SEVERE("DISEASE_HEMOPHILIA_SEVERE", getNegativeColor(), 0, 0, -3, 0, 0, 0, 0, 0, true, 0),
+    DISEASE_VENEREAL_SLIGHT("DISEASE_VENEREAL_SLIGHT", getWarningColor(), 0, 0, 0, 0, 0, 0, 0, -1, false, 0),
+    DISEASE_VENEREAL_MODERATE("DISEASE_VENEREAL_MODERATE", getWarningColor(), 0, 0, 0, 0, 0, 0, 0, -2, false, 0),
+    DISEASE_VENEREAL_SEVERE("DISEASE_VENEREAL_SEVERE", getNegativeColor(), 0, 0, 0, 0, 0, 0, 0, -3, false, 0),
+    TYPE_1_LIMB_REPLACEMENT("TYPE_1_LIMB_REPLACEMENT", "", 0, -2, 0, -4, -4, 0, 0, 0, false, 0),
+    TYPE_2_LIMB_REPLACEMENT("TYPE_2_LIMB_REPLACEMENT", "", 0, -1, 0, -3, -3, 0, 0, 0, false, 0),
+    TYPE_3_LIMB_REPLACEMENT("TYPE_3_LIMB_REPLACEMENT", "", 0, 0, 0, -2, -2, 0, 0, 0, false, 0),
+    TYPE_4_LIMB_REPLACEMENT("TYPE_4_LIMB_REPLACEMENT", "", 0, 0, 0, -1, -1, 0, 0, 0, false, 0),
+    TYPE_5_LIMB_REPLACEMENT("TYPE_5_LIMB_REPLACEMENT", "", 0, 1, 0, 0, 0, 0, 0, 0, false, 0),
+    TYPE_6_LIMB_REPLACEMENT("TYPE_6_LIMB_REPLACEMENT", "", 0, 0, 0, 0, 0, 0, 0, 0, false, 0),
+    TYPE_2_SENSORY_REPLACEMENT("TYPE_2_SENSORY_REPLACEMENT", "", -1, 0, 0, 0, 0, 0, 0, 0, false, 0),
+    TYPE_3_SENSORY_REPLACEMENT("TYPE_3_SENSORY_REPLACEMENT", "", 0, 0, 0, 0, 0, 0, 0, 0, false, 0),
+    TYPE_4_SENSORY_REPLACEMENT("TYPE_4_SENSORY_REPLACEMENT", "", 1, 0, 0, 0, 0, 0, 0, 0, false, 0),
+    MYOMER_IMPLANT_ARM("MYOMER_IMPLANT_ARM", "", 0, 1, 0, 0, 1, 0, 0, -1, false, 0),
+    MYOMER_IMPLANT_HAND("MYOMER_IMPLANT_HAND", "", 0, 0, 0, 0, 1, 0, 0, -1, false, 0),
+    MYOMER_IMPLANT_LEG("MYOMER_IMPLANT_LEG", "", 0, 1, 0, 1, 0, 0, 0, -1, false, 0);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.InjuryEffect";
 
@@ -121,6 +121,7 @@ public enum InjuryEffect {
     private final int intelligenceModifier;
     private final int willpowerModifier;
     private final int charismaModifier;
+    private final int toughnessModifier;
     private final boolean inflictsPostScenarioInjury;
 
     InjuryEffect(String lookupName) {
@@ -135,11 +136,12 @@ public enum InjuryEffect {
         this.willpowerModifier = 0;
         this.charismaModifier = 0;
         this.inflictsPostScenarioInjury = false;
+        this.toughnessModifier = 0;
     }
 
     InjuryEffect(String lookupName, String textColor, int perceptionModifier, int strengthModifier, int bodyModifier,
           int reflexesModifier, int dexterityModifier, int intelligenceModifier, int willpowerModifier,
-          int charismaModifier, boolean inflictsPostScenarioInjury) {
+          int charismaModifier, boolean inflictsPostScenarioInjury, int toughnessModifier) {
         this.lookupName = lookupName;
         this.textColor = textColor;
         this.perceptionModifier = perceptionModifier;
@@ -150,6 +152,7 @@ public enum InjuryEffect {
         this.intelligenceModifier = intelligenceModifier;
         this.willpowerModifier = willpowerModifier;
         this.charismaModifier = charismaModifier;
+        this.toughnessModifier = toughnessModifier;
         this.inflictsPostScenarioInjury = inflictsPostScenarioInjury;
     }
 
@@ -185,6 +188,10 @@ public enum InjuryEffect {
         return charismaModifier;
     }
 
+    public int getToughnessModifier() {
+        return toughnessModifier;
+    }
+
     public boolean isInflictsPostScenarioInjury() {
         return inflictsPostScenarioInjury;
     }
@@ -202,11 +209,13 @@ public enum InjuryEffect {
         // Map attributes to their aggregated modifiers
         Map<SkillAttribute, Integer> attributeTotals = new EnumMap<>(SkillAttribute.class);
         int perceptionTotal = 0;
+        int toughnessTotal = 0;
         int postScenarioInjuries = 0;
 
         // Aggregate modifiers
         for (InjuryEffect effect : injuryEffects) {
             perceptionTotal += effect.getPerceptionModifier();
+            toughnessTotal += effect.getToughnessModifier();
             addToMap(attributeTotals, SkillAttribute.STRENGTH, effect.getStrengthModifier());
             addToMap(attributeTotals, SkillAttribute.BODY, effect.getBodyModifier());
             addToMap(attributeTotals, SkillAttribute.REFLEXES, effect.getReflexesModifier());
@@ -226,6 +235,11 @@ public enum InjuryEffect {
         if (perceptionTotal != 0) {
             tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
                   "InjuryEffect.tooltip.perception", perceptionTotal));
+        }
+
+        if (toughnessTotal != 0) {
+            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "InjuryEffect.tooltip.toughness", toughnessTotal));
         }
 
         for (SkillAttribute attribute : SkillAttribute.values()) {
