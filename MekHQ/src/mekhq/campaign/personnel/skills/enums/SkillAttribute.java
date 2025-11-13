@@ -59,7 +59,9 @@ public enum SkillAttribute {
     /** Represents mental willpower and determination. */
     WILLPOWER("WILLPOWER"),
     /** Represents social skills and personal magnetism. */
-    CHARISMA("CHARISMA");
+    CHARISMA("CHARISMA"),
+    /** Represents exceptional destiny or skill. */
+    EDGE("EDGE");
 
     public static final int NO_SKILL_ATTRIBUTE = -1;
 

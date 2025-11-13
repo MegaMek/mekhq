@@ -36,6 +36,7 @@ import static java.lang.Math.min;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_EDGE_SCORE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
@@ -220,7 +221,11 @@ public class AttributesTest {
                 continue;
             }
 
-            assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(attribute));
+            if (attribute != SkillAttribute.EDGE) {
+                assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(attribute));
+            } else {
+                assertEquals(MINIMUM_EDGE_SCORE, attributes.getAttributeScore(attribute));
+            }
         }
     }
 

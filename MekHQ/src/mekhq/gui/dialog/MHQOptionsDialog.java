@@ -87,6 +87,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JTextField optionDisplayDateFormat;
     private JTextField optionLongDisplayDateFormat;
     private final JSlider guiScale = new JSlider();
+    private JCheckBox optionHideUnitFluff;
     private JCheckBox optionHistoricalDailyLog;
     private JCheckBox chkCompanyGeneratorStartup;
     private JCheckBox chkShowCompanyGenerator;
@@ -182,6 +183,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkNewDayMedicPoolFill;
     private JCheckBox chkNewDayMRMS;
     private JCheckBox chkNewDayOptimizeMedicalAssignments;
+    private JCheckBox chkNewMonthQuickTrain;
+    private JCheckBox chkSelfCorrectMaintenance;
     private JCheckBox chkNewDayForceIconOperationalStatus;
     private MMComboBox<ForceIconOperationalStatusStyle> comboNewDayForceIconOperationalStatusStyle;
     // endregion New Day
@@ -204,10 +207,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionInsufficientAsTechTimeNag;
     private JCheckBox optionInsufficientMedicsNag;
     private JCheckBox optionShortDeploymentNag;
+    private JCheckBox optionCombatChallengeNag;
     private JCheckBox optionUnresolvedStratConContactsNag;
     private JCheckBox optionOutstandingScenariosNag;
     private JCheckBox optionInvalidFactionNag;
     private JCheckBox optionUnableToAffordExpensesNag;
+    private JCheckBox optionUnableToAffordRentNag;
     private JCheckBox optionUnableToAffordLoanPaymentNag;
     private JCheckBox optionUnableToAffordJumpNag;
     private JCheckBox optionUnableToAffordShoppingListNag;
@@ -304,6 +309,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                           .format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText())
                                         .withLocale(MekHQ.getMHQOptions().getDateLocale())) :
                     resources.getString("invalidDateFormat.error")));
+
+        optionHideUnitFluff = new JCheckBox(resources.getString("optionHideUnitFluff.text"));
+        optionHideUnitFluff.setToolTipText(resources.getString("optionHideUnitFluff.toolTipText"));
 
         optionHistoricalDailyLog = new JCheckBox(resources.getString("optionHistoricalDailyLog.text"));
         optionHistoricalDailyLog.setToolTipText(resources.getString("optionHistoricalDailyLog.toolTipText"));
@@ -462,6 +470,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                       .addComponent(labelLongDisplayDateFormatExample,
                                                             Alignment.TRAILING))
                                       .addComponent(scaleLine)
+                                      .addComponent(optionHideUnitFluff)
                                       .addComponent(optionHistoricalDailyLog)
                                       .addComponent(chkCompanyGeneratorStartup)
                                       .addComponent(chkShowCompanyGenerator)
@@ -504,6 +513,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                         .addComponent(optionLongDisplayDateFormat)
                                                         .addComponent(labelLongDisplayDateFormatExample))
                                         .addComponent(scaleLine)
+                                        .addComponent(optionHideUnitFluff)
                                         .addComponent(optionHistoricalDailyLog)
                                         .addComponent(chkCompanyGeneratorStartup)
                                         .addComponent(chkShowCompanyGenerator)
@@ -935,6 +945,18 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "chkNewDayOptimizeMedicalAssignments.toolTipText"));
         chkNewDayOptimizeMedicalAssignments.setName("chkNewDayOptimizeMedicalAssignments.text");
 
+        chkNewMonthQuickTrain = new JCheckBox(resources.getString(
+              "chkNewMonthQuickTrain.text"));
+        chkNewMonthQuickTrain.setToolTipText(resources.getString(
+              "chkNewMonthQuickTrain.toolTipText"));
+        chkNewMonthQuickTrain.setName("chkNewMonthQuickTrain.text");
+
+        chkSelfCorrectMaintenance = new JCheckBox(resources.getString(
+              "chkSelfCorrectMaintenance.text"));
+        chkSelfCorrectMaintenance.setToolTipText(resources.getString(
+              "chkSelfCorrectMaintenance.toolTipText"));
+        chkSelfCorrectMaintenance.setName("chkSelfCorrectMaintenance.text");
+
         chkNewDayForceIconOperationalStatus = new JCheckBox(resources.getString(
               "chkNewDayForceIconOperationalStatus.text"));
         chkNewDayForceIconOperationalStatus.setToolTipText(resources.getString(
@@ -987,6 +1009,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(chkNewDayMedicPoolFill)
                                       .addComponent(chkNewDayMRMS)
                                       .addComponent(chkNewDayOptimizeMedicalAssignments)
+                                      .addComponent(chkNewMonthQuickTrain)
+                                      .addComponent(chkSelfCorrectMaintenance)
                                       .addComponent(chkNewDayForceIconOperationalStatus)
                                       .addGroup(layout.createParallelGroup(Alignment.LEADING)
                                                       .addComponent(lblNewDayForceIconOperationalStatusStyle)
@@ -1000,6 +1024,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(chkNewDayMedicPoolFill)
                                         .addComponent(chkNewDayMRMS)
                                         .addComponent(chkNewDayOptimizeMedicalAssignments)
+                                        .addComponent(chkNewMonthQuickTrain)
+                                        .addComponent(chkSelfCorrectMaintenance)
                                         .addComponent(chkNewDayForceIconOperationalStatus)
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(lblNewDayForceIconOperationalStatusStyle)
@@ -1087,6 +1113,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionShortDeploymentNag.setToolTipText(resources.getString("optionShortDeploymentNag.toolTipText"));
         optionShortDeploymentNag.setName("optionShortDeploymentNag");
 
+        optionCombatChallengeNag = new JCheckBox(resources.getString("optionCombatChallengeNag.text"));
+        optionCombatChallengeNag.setToolTipText(resources.getString("optionCombatChallengeNag.toolTipText"));
+        optionCombatChallengeNag.setName("optionCombatChallengeNag");
+
         optionUnresolvedStratConContactsNag = new JCheckBox(resources.getString(
               "optionUnresolvedStratConContactsNag.text"));
         optionUnresolvedStratConContactsNag.setToolTipText(resources.getString(
@@ -1104,6 +1134,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionUnableToAffordExpensesNag = new JCheckBox(resources.getString("optionUnableToAffordExpensesNag.text"));
         optionUnableToAffordExpensesNag.setToolTipText(resources.getString("optionUnableToAffordExpensesNag.toolTipText"));
         optionUnableToAffordExpensesNag.setName("optionUnableToAffordExpensesNag");
+
+        optionUnableToAffordRentNag = new JCheckBox(resources.getString("optionUnableToAffordRentNag.text"));
+        optionUnableToAffordRentNag.setToolTipText(resources.getString("optionUnableToAffordRentNag.toolTipText"));
+        optionUnableToAffordRentNag.setName("optionUnableToAffordRentNag");
 
         optionUnableToAffordLoanPaymentNag = new JCheckBox(resources.getString("optionUnableToAffordLoanPaymentNag.text"));
         optionUnableToAffordLoanPaymentNag.setToolTipText(resources.getString(
@@ -1141,10 +1175,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(optionInsufficientAsTechTimeNag)
                                       .addComponent(optionInsufficientMedicsNag)
                                       .addComponent(optionShortDeploymentNag)
+                                      .addComponent(optionCombatChallengeNag)
                                       .addComponent(optionUnresolvedStratConContactsNag)
                                       .addComponent(optionOutstandingScenariosNag)
                                       .addComponent(optionInvalidFactionNag)
                                       .addComponent(optionUnableToAffordExpensesNag)
+                                      .addComponent(optionUnableToAffordRentNag)
                                       .addComponent(optionUnableToAffordLoanPaymentNag)
                                       .addComponent(optionUnableToAffordJumpNag)
                                       .addComponent(optionUnableToAffordShoppingListNag));
@@ -1161,10 +1197,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(optionInsufficientAsTechTimeNag)
                                         .addComponent(optionInsufficientMedicsNag)
                                         .addComponent(optionShortDeploymentNag)
+                                        .addComponent(optionCombatChallengeNag)
                                         .addComponent(optionUnresolvedStratConContactsNag)
                                         .addComponent(optionOutstandingScenariosNag)
                                         .addComponent(optionInvalidFactionNag)
                                         .addComponent(optionUnableToAffordExpensesNag)
+                                        .addComponent(optionUnableToAffordRentNag)
                                         .addComponent(optionUnableToAffordLoanPaymentNag)
                                         .addComponent(optionUnableToAffordJumpNag)
                                         .addComponent(optionUnableToAffordShoppingListNag));
@@ -1351,6 +1389,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         if (validateDateFormat(optionLongDisplayDateFormat.getText())) {
             MekHQ.getMHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
         }
+        MekHQ.getMHQOptions().setHideUnitFluff(optionHideUnitFluff.isSelected());
         MekHQ.getMHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
         MekHQ.getMHQOptions().setCompanyGeneratorStartup(chkCompanyGeneratorStartup.isSelected());
         MekHQ.getMHQOptions().setShowCompanyGenerator(chkShowCompanyGenerator.isSelected());
@@ -1444,6 +1483,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNewDayMedicPoolFill(chkNewDayMedicPoolFill.isSelected());
         MekHQ.getMHQOptions().setNewDayMRMS(chkNewDayMRMS.isSelected());
         MekHQ.getMHQOptions().setNewDayOptimizeMedicalAssignments(chkNewDayOptimizeMedicalAssignments.isSelected());
+        MekHQ.getMHQOptions().setNewMonthQuickTrain(chkNewMonthQuickTrain.isSelected());
+        MekHQ.getMHQOptions().setSelfCorrectMaintenance(chkSelfCorrectMaintenance.isSelected());
         MekHQ.getMHQOptions().setNewDayForceIconOperationalStatus(chkNewDayForceIconOperationalStatus.isSelected());
         MekHQ.getMHQOptions()
               .setNewDayForceIconOperationalStatusStyle(Objects.requireNonNull(
@@ -1473,6 +1514,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_SHORT_DEPLOYMENT, optionShortDeploymentNag.isSelected());
         MekHQ.getMHQOptions()
+              .setNagDialogIgnore(MHQConstants.NAG_COMBAT_CHALLENGE, optionCombatChallengeNag.isSelected());
+        MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS,
                     optionUnresolvedStratConContactsNag.isSelected());
         MekHQ.getMHQOptions()
@@ -1482,6 +1525,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_EXPENSES,
                     optionUnableToAffordExpensesNag.isSelected());
+        MekHQ.getMHQOptions()
+              .setNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_RENT,
+                    optionUnableToAffordRentNag.isSelected());
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT,
                     optionUnableToAffordLoanPaymentNag.isSelected());
@@ -1508,6 +1554,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         guiScale.setValue((int) (GUIPreferences.getInstance().getGUIScale() * 10));
         optionDisplayDateFormat.setText(MekHQ.getMHQOptions().getDisplayDateFormat());
         optionLongDisplayDateFormat.setText(MekHQ.getMHQOptions().getLongDisplayDateFormat());
+        optionHideUnitFluff.setSelected(MekHQ.getMHQOptions().getHideUnitFluff());
         optionHistoricalDailyLog.setSelected(MekHQ.getMHQOptions().getHistoricalDailyLog());
         chkCompanyGeneratorStartup.setSelected(MekHQ.getMHQOptions().getCompanyGeneratorStartup());
         chkShowCompanyGenerator.setSelected(MekHQ.getMHQOptions().getShowCompanyGenerator());
@@ -1606,6 +1653,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkNewDayMedicPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayMedicPoolFill());
         chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
         chkNewDayOptimizeMedicalAssignments.setSelected(MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments());
+        chkNewMonthQuickTrain.setSelected(MekHQ.getMHQOptions().getNewMonthQuickTrain());
+        chkSelfCorrectMaintenance.setSelected(MekHQ.getMHQOptions().getSelfCorrectMaintenance());
         if (chkNewDayForceIconOperationalStatus.isSelected() !=
                   MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {
             chkNewDayForceIconOperationalStatus.doClick();
@@ -1635,6 +1684,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                       .getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_MEDICS));
         optionShortDeploymentNag.setSelected(MekHQ.getMHQOptions()
                                                    .getNagDialogIgnore(MHQConstants.NAG_SHORT_DEPLOYMENT));
+        optionCombatChallengeNag.setSelected(MekHQ.getMHQOptions()
+                                                   .getNagDialogIgnore(MHQConstants.NAG_COMBAT_CHALLENGE));
         optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMHQOptions()
                                                               .getNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS));
         optionOutstandingScenariosNag.setSelected(MekHQ.getMHQOptions()
@@ -1642,6 +1693,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionInvalidFactionNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INVALID_FACTION));
         optionUnableToAffordExpensesNag.setSelected(MekHQ.getMHQOptions()
                                                           .getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_EXPENSES));
+        optionUnableToAffordRentNag.setSelected(MekHQ.getMHQOptions()
+                                                      .getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_RENT));
         optionUnableToAffordLoanPaymentNag.setSelected(MekHQ.getMHQOptions()
                                                              .getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT));
         optionUnableToAffordJumpNag.setSelected(MekHQ.getMHQOptions()

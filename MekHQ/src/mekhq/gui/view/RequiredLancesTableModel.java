@@ -33,10 +33,10 @@
  */
 package mekhq.gui.view;
 
+import static mekhq.campaign.mission.enums.CombatRole.CADRE;
 import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
 import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
 import static mekhq.campaign.mission.enums.CombatRole.PATROL;
-import static mekhq.campaign.mission.enums.CombatRole.TRAINING;
 
 import java.util.ArrayList;
 import javax.swing.SwingConstants;
@@ -62,7 +62,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
         this.campaign = campaign;
         data = new ArrayList<>();
         columnNames = new String[] { "Contract", "Total", MANEUVER.toString(), FRONTLINE.toString(), PATROL.toString(),
-                                     TRAINING.toString() };
+                                     CADRE.toString() };
     }
 
     @Override
@@ -114,27 +114,39 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
 
         if (column == COL_TOTAL) {
             int t = 0;
-            for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
+            for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
                 AtBContract assignedContract = combatTeam.getContract(campaign);
-                boolean isCadreDuty = assignedContract.getContractType().isCadreDuty();
-                CombatRole role = combatTeam.getRole();
-                boolean isRoleSuitable = (isCadreDuty && role.isTraining()) || role.isCombatRole();
-                boolean isDeploymentEligible = combatTeam.isEligible(campaign);
+                if (assignedContract != null) {
+                    boolean isCadreDuty = assignedContract.getContractType().isCadreDuty();
+                    CombatRole role = combatTeam.getRole();
+                    boolean isRoleSuitable = (isCadreDuty && role.isCadre()) || role.isCombatRole();
+                    boolean isDeploymentEligible = combatTeam.isEligible(campaign);
 
-                if ((data.get(row).equals(assignedContract)) && isRoleSuitable && isDeploymentEligible) {
-                    t += combatTeam.getSize(campaign);
+                    if ((data.get(row).equals(assignedContract)) && isRoleSuitable && isDeploymentEligible) {
+                        t += combatTeam.getSize(campaign);
+                    }
                 }
             }
             if (t < contract.getRequiredCombatElements()) {
                 return t + "/" + contract.getRequiredCombatElements();
             }
             return Integer.toString(contract.getRequiredCombatElements());
-        } else if (contract.getContractType().getRequiredCombatRole().ordinal() == column - 2) {
+        }
+
+        CombatRole requiredRole = contract.getContractType().getRequiredCombatRole();
+        CombatRole columnRole = switch (column) {
+            case COL_FIGHT -> MANEUVER;
+            case COL_DEFEND -> FRONTLINE;
+            case COL_SCOUT -> PATROL;
+            case COL_TRAINING -> CADRE;
+            default -> null;
+        };
+
+        if (columnRole != null && requiredRole == columnRole) {
             int t = 0;
-            for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
+            for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
                 if (data.get(row).equals(combatTeam.getContract(campaign)) &&
-                          (combatTeam.getRole() ==
-                                 combatTeam.getContract(campaign).getContractType().getRequiredCombatRole()) &&
+                          (combatTeam.getRole() == requiredRole) &&
                           combatTeam.isEligible(campaign)) {
                     t += combatTeam.getSize(campaign);
                 }

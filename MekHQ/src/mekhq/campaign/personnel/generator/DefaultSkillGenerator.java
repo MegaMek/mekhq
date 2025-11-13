@@ -32,9 +32,15 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_EDGE_SCORE;
+import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
@@ -54,8 +60,10 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
@@ -111,7 +119,11 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // roll artillery skill
         if (campaignOptions.isUseArtillery() &&
-                  (primaryRole.isMekWarrior() || primaryRole.isVehicleGunner() || primaryRole.isSoldier()) &&
+                  (primaryRole.isMekWarrior() ||
+                         primaryRole.isVehicleCrewGround() ||
+                         primaryRole.isVehicleCrewNaval() ||
+                         primaryRole.isVehicleCrewVTOL() ||
+                         primaryRole.isSoldier()) &&
                   Utilities.rollProbability(skillPreferences.getArtilleryProb())) {
             generateArtillerySkill(person, bonus);
         }
@@ -128,6 +140,18 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         if (campaignOptions.isDoctorsUseAdministration() && (primaryRole.isDoctor())) {
             addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+        }
+
+        // roll Infantry Gunnery Skills
+        if (!campaignOptions.isUseSmallArmsOnly()) {
+            if (primaryRole.isSoldier() || secondaryRole.isSoldier()) {
+                Skills skills = person.getSkills();
+                for (String skillName : INFANTRY_GUNNERY_SKILLS) {
+                    if (!skills.hasSkill(skillName) && (d6(1) == 1)) {
+                        addSkill(person, skillName, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+                    }
+                }
+            }
         }
 
         // roll random secondary skill
@@ -169,8 +193,33 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         }
     }
 
+    /**
+     * Generates and assigns attribute scores for the specified person based on their profession, phenotype, and
+     * randomization settings.
+     *
+     * <p>This method performs the following steps:</p>
+     * <ol>
+     *     <li><b>Reset:</b> All attributes are reset to {@link Attributes#DEFAULT_ATTRIBUTE_SCORE}</li>
+     *     <li><b>Early Exit:</b> If attributes are disabled via {@link RandomSkillPreferences#isUseAttributes()},
+     *         the method returns immediately</li>
+     *     <li><b>Base Assignment:</b> Attribute scores are calculated by combining:
+     *         <ul>
+     *             <li>Profession-based modifiers from {@link PersonnelRole#getAttributeModifier(SkillAttribute)}</li>
+     *             <li>Phenotype-based modifiers from {@link Phenotype#getAttributeModifier(SkillAttribute)}</li>
+     *         </ul>
+     *     </li>
+     *     <li><b>Randomization:</b> If enabled via {@link RandomSkillPreferences#isRandomizeAttributes()}, each
+     *     attribute receives an additional random adjustment using {@link #performTraitRoll()}, which produces
+     *     values ranging from -2 to +2</li>
+     * </ol>
+     *
+     * <p>All final attribute scores are clamped within the valid range defined by
+     * {@link Attributes#MINIMUM_ATTRIBUTE_SCORE} and {@link Attributes#MAXIMUM_ATTRIBUTE_SCORE}.</p>
+     *
+     * @param person the {@link Person} whose attributes will be generated and assigned
+     */
     @Override
-    public void generateAttributes(Person person) {
+    public void generateAttributes(Person person, boolean isUseEdge) {
         RandomSkillPreferences skillPreferences = getSkillPreferences();
 
         // Reset Attribute Scores to default
@@ -179,7 +228,11 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
                 continue;
             }
 
-            person.setAttributeScore(attribute, DEFAULT_ATTRIBUTE_SCORE);
+            if (attribute != SkillAttribute.EDGE) {
+                person.setAttributeScore(attribute, DEFAULT_ATTRIBUTE_SCORE);
+            } else {
+                person.setAttributeScore(attribute, 0);
+            }
         }
 
         // If we're not using attributes, early exit
@@ -202,25 +255,49 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             person.setAttributeScore(attribute, baseAttributeScore + attributeModifier);
 
             // Attribute randomization
-            int roll = d6();
             if (randomizeAttributes) {
-                if (roll == 1) {
-                    person.changeAttributeScore(attribute, -1);
-                } else if (roll == 6) {
-                    person.changeAttributeScore(attribute, 1);
+                boolean isEdge = attribute == SkillAttribute.EDGE;
+                int delta;
+                if (isEdge && isUseEdge) {
+                    delta = d6(2) == 12 ? 1 : 0;
+                } else {
+                    delta = clamp(performTraitRoll(), MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+                }
+
+                if (delta != 0) {
+                    person.changeAttributeScore(attribute, delta);
                 }
             }
         }
     }
 
     /**
-     * Generates traits for the specified person based on random or pre-determined criteria.
+     * Generates traits for the specified person based on random rolls.
      *
-     * <p>When randomization is enabled, this method calculates and assigns specific traits such as connections,
-     * reputation, wealth, and bad luck using random rolls. Each trait has its own set of rules for adjustment.</p>
+     * <p>When randomization is enabled via {@link RandomSkillPreferences#isRandomizeTraits()}, this method
+     * assigns the following traits using 2d6-based rolls that produce values ranging from -2 to +2:</p>
      *
-     * @param person The person whose traits will be updated. Traits are adjusted based on random rolls when
-     *               randomization is enabled.
+     * <ul>
+     *     <li><b>Connections</b>: Social network strength (clamped to valid range)</li>
+     *     <li><b>Reputation</b>: Public standing and renown (clamped to valid range)</li>
+     *     <li><b>Wealth</b>: Personal financial resources (clamped to valid range)</li>
+     *     <li><b>Unlucky</b>: Degree of bad fortune (clamped to valid range)</li>
+     *     <li><b>Bloodmark</b>: Clan honor debt (assigned only on rare occasions)</li>
+     * </ul>
+     *
+     * <p><b>Bloodmark Assignment:</b></p>
+     * <ul>
+     *     <li>Pirates: ~11.11% chance of receiving a bloodmark</li>
+     *     <li>Non-pirates: ~1.11% chance of receiving a bloodmark</li>
+     *     <li>Severity is determined by {@link #performBloodmarkRoll()}, producing values 0-2</li>
+     * </ul>
+     *
+     * <p>If trait randomization is disabled, no traits are modified.</p>
+     *
+     * @param person the {@link Person} whose traits will be generated and assigned
+     *
+     * @see #performTraitRoll()
+     * @see #performBloodmarkRoll()
      */
     @Override
     public void generateTraits(Person person) {
@@ -228,45 +305,84 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             return;
         }
 
-        // Connections
-        if (d6() == 6) {
-            person.setConnections(1);
-        } else {
-            person.setConnections(0);
-        }
+        person.setConnections(clamp(performTraitRoll(), MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
+        person.setReputation(clamp(performTraitRoll(), MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
+        person.setWealth(clamp(performTraitRoll(), MINIMUM_WEALTH, MAXIMUM_WEALTH));
+        person.setExtraIncomeFromTraitLevel(clamp(performTraitRoll(), MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
 
-        // Reputation
-        int roll = d6();
-        if (roll == 6 || roll == 1) {
-            person.setReputation(roll == 6 ? 1 : -1);
-        } else {
-            person.setReputation(0);
+        int baseUnluckyDiceSize = 5;
+        int unluckyRoll = randomInt(baseUnluckyDiceSize);
+        if (unluckyRoll == 0) { // 5% chance of positive value
+            person.setUnlucky(clamp(performTraitRoll(), MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
         }
-
-        // Wealth
-        roll = d6();
-        if (roll == 6 || roll == 1) {
-            person.setWealth(roll == 6 ? 1 : -1);
-        } else {
-            person.setWealth(0);
-        }
-
-        // Unlucky
-        roll = randomInt(20);
-        if (roll == 0) {
-            person.setUnlucky(1);
-        } else {
-            person.setUnlucky(0);
-        }
-
-        // Bloodmark
         // We want the chance of a Bloodmark to be low as it can be quite disruptive
-        roll = randomInt(person.getOriginFaction().isPirate() ? 50 : 100);
-        if (roll == 0) {
-            person.setBloodmark(1);
-        } else {
-            person.setBloodmark(0);
+        int baseBloodmarkDiceSize = person.getOriginFaction().isPirate() ? 5 : 50;
+        // pirates = approx 11.11% chance of a bloodmark
+        // non-pirates = approx 1.11% chance of a bloodmark
+        int bloodmarkRoll = randomInt(baseBloodmarkDiceSize);
+        if (bloodmarkRoll == 0) {
+            person.setBloodmark(clamp(performBloodmarkRoll(), MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
         }
+    }
+
+    /**
+     * Performs a 2d6 roll to determine a trait modifier value.
+     *
+     * <p>This method rolls two six-sided dice and converts the result into a trait modifier
+     * using the following distribution:</p>
+     * <ul>
+     *     <li><b>2</b>: returns {@code -2} (exceptional negative trait)</li>
+     *     <li><b>3-5</b>: returns {@code -1} (below average trait)</li>
+     *     <li><b>6-8</b>: returns {@code 0} (average trait)</li>
+     *     <li><b>9-11</b>: returns {@code 1} (above average trait)</li>
+     *     <li><b>12</b>: returns {@code 2} (exceptional positive trait)</li>
+     * </ul>
+     *
+     * <p>This creates a bell curve distribution centered on average (0), with exceptional results being rare.</p>
+     *
+     * @return a trait modifier value ranging from {@code -2} to {@code 2}
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static int performTraitRoll() {
+        int roll = d6(2);
+        return switch (roll) {
+            case 2 -> -2;
+            case 3, 4, 5 -> -1;
+            case 9, 10, 11 -> 1;
+            case 12 -> 2;
+            default -> 0;
+        };
+    }
+
+    /**
+     * Performs a 2d6 roll to determine a bloodmark severity value.
+     *
+     * <p>This method rolls two six-sided dice and converts the result into a bloodmark value
+     * using the following distribution:</p>
+     *
+     * <ul>
+     *     <li><b>2 or 12</b>: returns {@code 2} (~5.56% chance) - severe bloodmark</li>
+     *     <li><b>3-5 or 9-11</b>: returns {@code 1} (~50% chance) - moderate bloodmark</li>
+     *     <li><b>6-8</b>: returns {@code 0} (~44.44% chance) - no bloodmark assigned</li>
+     * </ul>
+     *
+     * <p>This creates a bell curve distribution where most results produce a moderate bloodmark, with severe
+     * bloodmarks being rare and no bloodmark being moderately common.</p>
+     *
+     * @return a bloodmark severity value: {@code 0} (none), {@code 1} (moderate), or {@code 2} (severe)
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static int performBloodmarkRoll() {
+        int roll = d6(2);
+        return switch (roll) {
+            case 2, 12 -> 2;
+            case 3, 4, 5, 9, 10, 11 -> 1;
+            default -> 0;
+        };
     }
 
     /**

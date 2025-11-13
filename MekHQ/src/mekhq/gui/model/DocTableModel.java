@@ -42,6 +42,7 @@ import javax.swing.table.TableCellRenderer;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.BasicInfo;
 import mekhq.utilities.ReportingUtilities;
@@ -81,7 +82,8 @@ public class DocTableModel extends DataTableModel<Person> {
 
         Skill skill = doctor.getSkill(SkillType.S_SURGERY);
         if (null != skill) {
-            int experienceLevel = skill.getExperienceLevel(doctor.getOptions(), doctor.getATOWAttributes());
+            SkillModifierData skillModifierData = doctor.getSkillModifierData();
+            int experienceLevel = skill.getExperienceLevel(skillModifierData);
 
             toReturn.append("<b>").append(getColoredExperienceLevelName(experienceLevel))
                   .append("</b> " + SkillType.S_SURGERY);

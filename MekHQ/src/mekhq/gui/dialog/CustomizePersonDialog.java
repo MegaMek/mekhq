@@ -78,6 +78,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Crew;
 import megamek.common.units.Entity;
 import megamek.common.universe.FactionTag;
@@ -91,6 +92,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
@@ -110,7 +112,6 @@ import mekhq.gui.control.EditKillLogControl;
 import mekhq.gui.control.EditLogControl;
 import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.control.EditScenarioLogControl;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 
 /**
@@ -150,6 +151,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JTextField textReputation;
     private JTextField textUnlucky;
     private JTextField textBloodmark;
+    private JTextField textExtraIncome;
     private JTextField textFatigue;
     private JComboBox<EducationLevel> textEducationLevel;
     private JTextField textLoyalty;
@@ -259,14 +261,16 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         JLabel lblUnlucky = new JLabel();
         textBloodmark = new JTextField();
         JLabel lblBloodmark = new JLabel();
+        textExtraIncome = new JTextField();
+        JLabel lblExtraIncome = new JLabel();
         textFatigue = new JTextField();
         JLabel lblLoyalty = new JLabel();
         textLoyalty = new JTextField();
         JLabel lblToughness = new JLabel();
         textEducationLevel = new JComboBox<>();
         JLabel lblEducationLevel = new JLabel();
-        JScrollPane scrOptions = new JScrollPaneWithSpeed();
-        JScrollPane scrSkills = new JScrollPaneWithSpeed();
+        FastJScrollPane scrOptions = new FastJScrollPane();
+        FastJScrollPane scrSkills = new FastJScrollPane();
         JPanel panButtons = new JPanel();
         JButton btnOk = new JButton();
 
@@ -832,6 +836,27 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         y++;
 
+        lblExtraIncome.setText(resourceMap.getString("lblExtraIncome.text"));
+        lblExtraIncome.setName("lblExtraIncome");
+
+        textExtraIncome.setText(Integer.toString(person.getExtraIncomeTraitLevel()));
+        textExtraIncome.setName("textExtraIncome");
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        panDemographics.add(lblExtraIncome, gridBagConstraints);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        panDemographics.add(textExtraIncome, gridBagConstraints);
+
+        y++;
+
         if (campaign.getCampaignOptions().isUseFatigue()) {
             lblFatigue.setText(resourceMap.getString("lblFatigue.text"));
             lblFatigue.setName("lblFatigue");
@@ -1223,7 +1248,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panDemographics.add(txtBio, gridBagConstraints);
 
-        JScrollPane scrollPane = new JScrollPane(panDemographics);
+        FastJScrollPane scrollPane = new FastJScrollPane(panDemographics);
         scrollPane.setMinimumSize(UIUtil.scaleForGUI(600, 500));
         scrollPane.setPreferredSize(UIUtil.scaleForGUI(600, 500));
 
@@ -1320,7 +1345,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             }
 
             // Add units to the combo box based on the person's capabilities
-            if (person.canDrive(entity)) {
+            if (person.canDrive(entity,
+                  campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(),
+                  campaign.getCampaignOptions().isUseImplants())) {
                 choiceOriginalUnit.addItem(unit);
                 continue; // Skip further checks if already added
             }
@@ -1508,6 +1535,10 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         newValue = MathUtility.parseInt(textBloodmark.getText(), currentValue);
         person.setBloodmark(clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
 
+        currentValue = person.getExtraIncomeTraitLevel();
+        newValue = MathUtility.parseInt(textExtraIncome.getText(), currentValue);
+        person.setExtraIncomeFromTraitLevel(clamp(newValue, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
+
         if (campaign.getCampaignOptions().isUseEducationModule()) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
         }
@@ -1620,6 +1651,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         constraints.gridx = 0;
 
         AgingMilestone milestone = getMilestone(person.getAge(campaign.getLocalDate()));
+        SkillModifierData skillModifierData = person.getSkillModifierData(
+              campaign.getCampaignOptions().isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate(),
+              true);
 
         List<String> sortedSkillNames = getSortedSkills();
         for (int index = 0; index < sortedSkillNames.size(); index++) {
@@ -1636,10 +1670,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             lblName = new JLabel(type);
             lblValue = new JLabel();
             if (person.hasSkill(type)) {
-                lblValue.setText(person.getSkill(type)
-                                       .toString(person.getOptions(),
-                                             person.getATOWAttributes(),
-                                             person.getReputation()));
+                lblValue.setText(person.getSkill(type).toString(skillModifierData));
             } else {
                 lblValue.setText("-");
             }

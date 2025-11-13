@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.mission;
 
+import static mekhq.campaign.force.Force.FORCE_NONE;
+
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -45,6 +47,7 @@ import java.util.Vector;
 
 import megamek.Version;
 import megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.board.Board;
 import megamek.common.loaders.MapSettings;
@@ -95,9 +98,12 @@ public class Scenario implements IPlayerSettings {
     private String desc;
     private String report;
     private ScenarioStatus status;
+    private boolean isCrisis;
     private LocalDate date;
     private List<Integer> subForceIds;
     private List<UUID> unitIds;
+    private final List<Integer> salvageForces;
+    private final List<UUID> salvageTechs;
     private int id = S_DEFAULT_ID;
     private int missionId;
     private ForceStub stub;
@@ -168,9 +174,12 @@ public class Scenario implements IPlayerSettings {
         desc = "";
         report = "";
         setStatus(ScenarioStatus.CURRENT);
+        isCrisis = false;
         date = null;
         subForceIds = new ArrayList<>();
         unitIds = new ArrayList<>();
+        salvageForces = new ArrayList<>();
+        salvageTechs = new ArrayList<>();
         loots = new ArrayList<>();
         scenarioObjectives = new ArrayList<>();
         playerTransportLinkages = new HashMap<>();
@@ -258,6 +267,14 @@ public class Scenario implements IPlayerSettings {
 
     public void setStatus(final ScenarioStatus status) {
         this.status = status;
+    }
+
+    public boolean isCrisis() {
+        return isCrisis;
+    }
+
+    public void setIsCrisis(final boolean isCrisis) {
+        this.isCrisis = isCrisis;
     }
 
     public @Nullable LocalDate getDate() {
@@ -628,6 +645,30 @@ public class Scenario implements IPlayerSettings {
         return force;
     }
 
+    public List<Integer> getSalvageForces() {
+        return new ArrayList<>(salvageForces);
+    }
+
+    public void addSalvageForce(int forceId) {
+        salvageForces.add(forceId);
+    }
+
+    public void clearSalvageForces() {
+        salvageForces.clear();
+    }
+
+    public List<UUID> getSalvageTechs() {
+        return new ArrayList<>(salvageTechs);
+    }
+
+    public void addSalvageTech(UUID personId) {
+        salvageTechs.add(personId);
+    }
+
+    public void clearSalvageTechs() {
+        salvageTechs.clear();
+    }
+
     /**
      * Gets the IDs of units deployed to this scenario individually.
      */
@@ -946,6 +987,7 @@ public class Scenario implements IPlayerSettings {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingAnySEx", startingAnySEx);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingAnySEy", startingAnySEy);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "status", getStatus().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isCrisis", isCrisis);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "linkedScenarioID", linkedScenarioID);
         if (null != stub) {
@@ -985,6 +1027,22 @@ public class Scenario implements IPlayerSettings {
                 l.writeToXML(pw, indent);
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "loots");
+        }
+
+        if (!salvageForces.isEmpty() && getStatus().isCurrent()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "salvageForces");
+            for (Integer forceId : salvageForces) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageForce", forceId);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salvageForces");
+        }
+
+        if (!salvageTechs.isEmpty() && getStatus().isCurrent()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "salvageTechs");
+            for (UUID techId : salvageTechs) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageTech", techId);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salvageTechs");
         }
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", date);
@@ -1075,6 +1133,8 @@ public class Scenario implements IPlayerSettings {
                     retVal.setStratConScenarioType(ScenarioType.parseFromString(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
                     retVal.setStatus(ScenarioStatus.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("isCrisis")) {
+                    retVal.setIsCrisis(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.id = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
@@ -1105,6 +1165,38 @@ public class Scenario implements IPlayerSettings {
                         }
                         Loot loot = Loot.generateInstanceFromXML(wn3, c, version);
                         retVal.loots.add(loot);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("salvageForces")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("salvageForce")) {
+                            // Error condition of sorts!
+                            LOGGER.error("Unknown node type loaded in salvageForces nodes: {}", wn3.getNodeName());
+                            continue;
+                        }
+                        retVal.salvageForces.add(MathUtility.parseInt(wn3.getTextContent().trim(), FORCE_NONE));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("salvageTechs")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("salvageTech")) {
+                            // Error condition of sorts!
+                            LOGGER.error("Unknown node type loaded in salvageTechs nodes: {}", wn3.getNodeName());
+                            continue;
+                        }
+                        retVal.salvageTechs.add(UUID.fromString(wn3.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase(ScenarioObjective.ROOT_XML_ELEMENT_NAME)) {
                     retVal.getScenarioObjectives().add(ScenarioObjective.Deserialize(wn2));

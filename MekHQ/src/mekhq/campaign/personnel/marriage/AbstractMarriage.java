@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
@@ -301,18 +302,7 @@ public abstract class AbstractMarriage {
         }
 
         if (randomMarriage()) {
-            boolean isSameSex = false;
-
-            int sameSexDiceSize = campaign.getCampaignOptions().getRandomSameSexMarriageDiceSize();
-
-            if (sameSexDiceSize == 1) {
-                isSameSex = true;
-            } else if ((sameSexDiceSize != 0) && (Compute.randomInt(sameSexDiceSize) == 0)) {
-                isSameSex = true;
-            }
-
             boolean isInterUnit = false;
-
             int interUnitDiceSize = campaign.getCampaignOptions().getRandomNewDependentMarriage();
 
             if (interUnitDiceSize == 1) {
@@ -321,7 +311,7 @@ public abstract class AbstractMarriage {
                 isInterUnit = true;
             }
 
-            marryRandomSpouse(campaign, today, person, isSameSex, isInterUnit, isBackground);
+            marryRandomSpouse(campaign, today, person, isInterUnit, isBackground);
         }
     }
 
@@ -338,18 +328,7 @@ public abstract class AbstractMarriage {
         }
 
         if (randomMarriage()) {
-            boolean isSameSex = false;
-
-            int sameSexDiceSize = campaign.getCampaignOptions().getRandomSameSexMarriageDiceSize();
-
-            if (sameSexDiceSize == 1) {
-                isSameSex = true;
-            } else if ((sameSexDiceSize != 0) && (Compute.randomInt(sameSexDiceSize) == 0)) {
-                isSameSex = true;
-            }
-
-
-            marryRandomSpouse(campaign, today, person, isSameSex, false, true);
+            marryRandomSpouse(campaign, today, person, false, true);
         }
     }
 
@@ -368,20 +347,14 @@ public abstract class AbstractMarriage {
      * @param campaign     the campaign the person is a part of
      * @param today        the current date
      * @param person       the person who is getting randomly married
-     * @param sameSex      whether the marriage is between same-sex partners
      * @param isInterUnit  whether the marriage is to another character chosen from among potential partners already in
      *                     the campaign unit.
      * @param isBackground whether the marriage occurred in a character's background
      */
     protected void marryRandomSpouse(final Campaign campaign, final LocalDate today, final Person person,
-          final boolean sameSex, boolean isInterUnit, boolean isBackground) {
-        Gender personGender = person.getGender();
-        Gender spouseGender;
-        if (sameSex) {
-            spouseGender = personGender.isMale() ? Gender.MALE : Gender.FEMALE;
-        } else {
-            spouseGender = personGender.isMale() ? Gender.FEMALE : Gender.MALE;
-        }
+          boolean isInterUnit, boolean isBackground) {
+        boolean prefersMen = person.isPrefersMen();
+        boolean prefersWomen = person.isPrefersWomen();
 
         List<Person> potentialSpouses;
         Person spouse = null;
@@ -391,7 +364,7 @@ public abstract class AbstractMarriage {
             potentialSpouses = new ArrayList<>();
 
             for (Person potentialSpouse : activePersonnel) {
-                if (isPotentialRandomSpouse(campaign, today, person, potentialSpouse, spouseGender)) {
+                if (isPotentialRandomSpouse(campaign, today, person, potentialSpouse, prefersMen, prefersWomen)) {
                     potentialSpouses.add(potentialSpouse);
                 }
             }
@@ -402,6 +375,13 @@ public abstract class AbstractMarriage {
         }
 
         if (!isInterUnit && campaign.getLocation().isOnPlanet()) {
+            List<Gender> possibleGenders = new ArrayList<>();
+            if (prefersMen) {
+                possibleGenders.add(Gender.MALE);
+            } else {
+                possibleGenders.add(Gender.FEMALE);
+            }
+            Gender spouseGender = ObjectUtility.getRandomItem(possibleGenders);
             spouse = createExternalSpouse(campaign, today, person, spouseGender);
         }
 
@@ -428,8 +408,8 @@ public abstract class AbstractMarriage {
 
         if (isNonBinary) {
             gender = gender.isMale() ?
-                           megamek.common.enums.Gender.OTHER_MALE :
-                           megamek.common.enums.Gender.OTHER_FEMALE;
+                           Gender.OTHER_MALE :
+                           Gender.OTHER_FEMALE;
         }
 
         Person externalSpouse = campaign.newDependent(gender);
@@ -456,6 +436,14 @@ public abstract class AbstractMarriage {
             updateAllSkillAgeModifiers(campaign.getLocalDate(), externalSpouse);
         }
 
+        // update sexual preferences
+        Gender originGender = person.getGender();
+        boolean isSpouseBisexual = externalSpouse.isPrefersMen() && externalSpouse.isPrefersWomen();
+        if (!isSpouseBisexual) {
+            externalSpouse.setPrefersMen(originGender == Gender.MALE);
+            externalSpouse.setPrefersWomen(originGender == Gender.FEMALE);
+        }
+
         return externalSpouse;
     }
 
@@ -466,20 +454,18 @@ public abstract class AbstractMarriage {
      * @param today           the current day
      * @param person          the person who is trying to find a random spouse
      * @param potentialSpouse the person to determine if they are a valid potential random spouse
-     * @param desiredGender   the desired gender to be married to
      *
      * @return true if they are a valid potential random spouse
      */
     protected boolean isPotentialRandomSpouse(final Campaign campaign, final LocalDate today, final Person person,
-          final Person potentialSpouse, final Gender desiredGender) {
+          final Person potentialSpouse, final boolean prefersMen, final boolean prefersWomen) {
         // A Potential Spouse must:
-        // 1. Be the specified gender
+        // 1. Be a compatible gender
         Gender potentialSpouseGender = potentialSpouse.getGender();
-        if (desiredGender.isMale() && !potentialSpouseGender.isMale()) {
-            return false;
-        }
+        boolean isCompatibleGender = (prefersMen && potentialSpouseGender.isMale())
+                                           || (prefersWomen && potentialSpouseGender.isFemale());
 
-        if (desiredGender.isFemale() && !potentialSpouseGender.isFemale()) {
+        if (!isCompatibleGender) {
             return false;
         }
 
@@ -494,4 +480,20 @@ public abstract class AbstractMarriage {
     }
     //endregion Random Marriage
     //endregion New Day
+
+    /**
+     * Determines if two people are romantically compatible based on their gender preferences.
+     *
+     * @param person          the person seeking a spouse
+     * @param potentialSpouse the potential romantic partner
+     *
+     * @return {@code true} if their orientations are compatible; {@code false} otherwise
+     */
+    public static boolean isGenderCompatible(Person person, Person potentialSpouse) {
+        boolean spouseIsMale = potentialSpouse.getGender().isMale();
+        boolean spouseIsFemale = potentialSpouse.getGender().isFemale();
+
+        return (person.isPrefersMen() && spouseIsMale)
+                     || (person.isPrefersWomen() && spouseIsFemale);
+    }
 }

@@ -388,7 +388,7 @@ public final class BatchXPDialog extends JDialog {
 
                 // Improve the skill and deduce the cost
                 person.improveSkill(skillName);
-                person.spendXP(cost);
+                person.spendXPOnSkills(campaign, cost);
 
                 Skill skill = person.getSkill(skillName);
                 PerformanceLogger.improvedSkill(campaignOptions.isPersonnelLogSkillGain(),
@@ -435,7 +435,7 @@ public final class BatchXPDialog extends JDialog {
                 return false;
             } else if ((null != primaryRole) && (person.getPrimaryRole() != primaryRole)) {
                 return false;
-            } else if ((null != expLevel) && (person.getExperienceLevel(campaign, false) != expLevel)) {
+            } else if ((null != expLevel) && (person.getExperienceLevel(campaign, false, true) != expLevel)) {
                 return false;
             } else if (onlyOfficers && !person.getRank().isOfficer()) {
                 return false;

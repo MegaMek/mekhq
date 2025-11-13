@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.stratCon;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static mekhq.campaign.stratCon.SupportPointNegotiation.negotiateInitialSupportPoints;
@@ -92,7 +93,7 @@ public class StratConContractInitializer {
         // scenarios
         // when objective is allied/hostile facility, place those facilities
 
-        int maximumTrackIndex = Math.max(0, contract.getRequiredCombatTeams() / NUM_LANCES_PER_TRACK);
+        int maximumTrackIndex = max(0, contract.getRequiredCombatTeams() / NUM_LANCES_PER_TRACK);
         int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
 
         for (int x = 0; x < maximumTrackIndex; x++) {
@@ -134,60 +135,63 @@ public class StratConContractInitializer {
         }
 
         // now seed the tracks with objectives and facilities
-        for (ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
-            int objectiveCount = objectiveParams.objectiveCount > 0 ?
-                                       (int) objectiveParams.objectiveCount :
-                                       (int) Math.max(1,
-                                             -objectiveParams.objectiveCount * contract.getRequiredCombatTeams());
+        boolean isNotUsingMaplessMode = !campaign.getCampaignOptions().isUseStratConMaplessMode();
+        if (isNotUsingMaplessMode) {
+            for (ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
+                int objectiveCount = objectiveParams.objectiveCount > 0 ?
+                                           (int) objectiveParams.objectiveCount :
+                                           (int) max(1,
+                                                 -objectiveParams.objectiveCount * contract.getRequiredCombatTeams());
 
-            List<Integer> trackObjects = trackObjectDistribution(objectiveCount, campaignState.getTrackCount());
+                List<Integer> trackObjects = trackObjectDistribution(objectiveCount, campaignState.getTrackCount());
 
-            for (int x = 0; x < trackObjects.size(); x++) {
-                int numObjects = trackObjects.get(x);
+                for (int x = 0; x < trackObjects.size(); x++) {
+                    int numObjects = trackObjects.get(x);
 
-                switch (objectiveParams.objectiveType) {
-                    case SpecificScenarioVictory:
-                        initializeObjectiveScenarios(campaign,
-                              contract,
-                              campaignState.getTrack(x),
-                              numObjects,
-                              objectiveParams.objectiveScenarios,
-                              objectiveParams.objectiveScenarioModifiers);
-                        break;
-                    case AlliedFacilityControl:
-                        initializeTrackFacilities(campaignState.getTrack(x),
-                              numObjects,
-                              ForceAlignment.Allied,
-                              true,
-                              objectiveParams.objectiveScenarioModifiers);
-                        break;
-                    case HostileFacilityControl:
-                    case FacilityDestruction:
-                        initializeTrackFacilities(campaignState.getTrack(x),
-                              numObjects,
-                              ForceAlignment.Opposing,
-                              true,
-                              objectiveParams.objectiveScenarioModifiers);
-                        break;
-                    case AnyScenarioVictory:
-                        // set up a "win X scenarios" objective
-                        StratConStrategicObjective sso = new StratConStrategicObjective();
-                        sso.setDesiredObjectiveCount(numObjects);
-                        sso.setObjectiveType(StrategicObjectiveType.AnyScenarioVictory);
-                        campaignState.getTrack(x).addStrategicObjective(sso);
+                    switch (objectiveParams.objectiveType) {
+                        case SpecificScenarioVictory:
+                            initializeObjectiveScenarios(campaign,
+                                  contract,
+                                  campaignState.getTrack(x),
+                                  numObjects,
+                                  objectiveParams.objectiveScenarios,
+                                  objectiveParams.objectiveScenarioModifiers);
+                            break;
+                        case AlliedFacilityControl:
+                            initializeTrackFacilities(campaignState.getTrack(x),
+                                  numObjects,
+                                  ForceAlignment.Allied,
+                                  true,
+                                  objectiveParams.objectiveScenarioModifiers);
+                            break;
+                        case HostileFacilityControl:
+                        case FacilityDestruction:
+                            initializeTrackFacilities(campaignState.getTrack(x),
+                                  numObjects,
+                                  ForceAlignment.Opposing,
+                                  true,
+                                  objectiveParams.objectiveScenarioModifiers);
+                            break;
+                        case AnyScenarioVictory:
+                            // set up a "win X scenarios" objective
+                            StratConStrategicObjective sso = new StratConStrategicObjective();
+                            sso.setDesiredObjectiveCount(numObjects);
+                            sso.setObjectiveType(StrategicObjectiveType.AnyScenarioVictory);
+                            campaignState.getTrack(x).addStrategicObjective(sso);
 
-                        // modifiers defined for "any scenario" by definition apply to any scenario
-                        // so they get added to the global campaign modifiers. Use sparingly since
-                        // this can snowball pretty quickly.
-                        if (objectiveParams.objectiveScenarioModifiers != null) {
-                            for (String modifier : objectiveParams.objectiveScenarioModifiers) {
-                                if (!campaignState.getGlobalScenarioModifiers().contains(modifier)) {
-                                    campaignState.getGlobalScenarioModifiers().add(modifier);
+                            // modifiers defined for "any scenario" by definition apply to any scenario
+                            // so they get added to the global campaign modifiers. Use sparingly since
+                            // this can snowball pretty quickly.
+                            if (objectiveParams.objectiveScenarioModifiers != null) {
+                                for (String modifier : objectiveParams.objectiveScenarioModifiers) {
+                                    if (!campaignState.getGlobalScenarioModifiers().contains(modifier)) {
+                                        campaignState.getGlobalScenarioModifiers().add(modifier);
+                                    }
                                 }
                             }
-                        }
 
-                        break;
+                            break;
+                    }
                 }
             }
         }
@@ -203,45 +207,48 @@ public class StratConContractInitializer {
         }
 
         // non-objective allied facilities
-        int facilityCount = contractDefinition.getAlliedFacilityCount() > 0 ?
-                                  (int) contractDefinition.getAlliedFacilityCount() :
-                                  (int) (-contractDefinition.getAlliedFacilityCount() *
+        if (isNotUsingMaplessMode) {
+            int facilityCount = contractDefinition.getAlliedFacilityCount() > 0 ?
+                                      (int) contractDefinition.getAlliedFacilityCount() :
+                                      (int) (-contractDefinition.getAlliedFacilityCount() *
+                                                   contract.getRequiredCombatTeams());
+
+            List<Integer> trackObjects = trackObjectDistribution(facilityCount, campaignState.getTrackCount());
+
+            for (int x = 0; x < trackObjects.size(); x++) {
+                int numObjects = trackObjects.get(x);
+
+                initializeTrackFacilities(campaignState.getTrack(x),
+                      numObjects,
+                      ForceAlignment.Allied,
+                      false,
+                      Collections.emptyList());
+            }
+
+            // non-objective hostile facilities
+            facilityCount = contractDefinition.getHostileFacilityCount() > 0 ?
+                                  (int) contractDefinition.getHostileFacilityCount() :
+                                  (int) (-contractDefinition.getHostileFacilityCount() *
                                                contract.getRequiredCombatTeams());
 
-        List<Integer> trackObjects = trackObjectDistribution(facilityCount, campaignState.getTrackCount());
+            trackObjects = trackObjectDistribution(facilityCount, campaignState.getTrackCount());
 
-        for (int x = 0; x < trackObjects.size(); x++) {
-            int numObjects = trackObjects.get(x);
+            for (int x = 0; x < trackObjects.size(); x++) {
+                int numObjects = trackObjects.get(x);
 
-            initializeTrackFacilities(campaignState.getTrack(x),
-                  numObjects,
-                  ForceAlignment.Allied,
-                  false,
-                  Collections.emptyList());
-        }
-
-        // non-objective hostile facilities
-        facilityCount = contractDefinition.getHostileFacilityCount() > 0 ?
-                              (int) contractDefinition.getHostileFacilityCount() :
-                              (int) (-contractDefinition.getHostileFacilityCount() * contract.getRequiredCombatTeams());
-
-        trackObjects = trackObjectDistribution(facilityCount, campaignState.getTrackCount());
-
-        for (int x = 0; x < trackObjects.size(); x++) {
-            int numObjects = trackObjects.get(x);
-
-            initializeTrackFacilities(campaignState.getTrack(x),
-                  numObjects,
-                  ForceAlignment.Opposing,
-                  false,
-                  Collections.emptyList());
+                initializeTrackFacilities(campaignState.getTrack(x),
+                      numObjects,
+                      ForceAlignment.Opposing,
+                      false,
+                      Collections.emptyList());
+            }
         }
 
         // Determine starting morale
-        if (contract.getContractType().isGarrisonDuty()) {
+        if (contract.getContractType().isGarrisonDuty() || contract.getContractType().isRetainer()) {
             contract.setMoraleLevel(AtBMoraleLevel.ROUTED);
 
-            LocalDate routEnd = contract.getStartDate().plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
+            LocalDate routEnd = contract.getStartDate().plusMonths(max(1, Compute.d6() - 3)).minusDays(1);
             contract.setRoutEndDate(routEnd);
         } else {
             contract.checkMorale(campaign, campaign.getLocalDate());
@@ -296,7 +303,7 @@ public class StratConContractInitializer {
      * @author Illiani
      * @since 0.50.05
      */
-    private static int getScenarioOdds(StratConContractDefinition contractDefinition) {
+    public static int getScenarioOdds(StratConContractDefinition contractDefinition) {
         return contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
     }
 
@@ -344,7 +351,7 @@ public class StratConContractInitializer {
      */
     private static List<Integer> trackObjectDistribution(int numObjects, int numTracks) {
         // This ensures we're not at risk of dividing by 0
-        numTracks = Math.max(1, numTracks);
+        numTracks = max(1, numTracks);
 
         List<Integer> retVal = new ArrayList<>();
         int leftOver = numObjects % numTracks;
@@ -497,7 +504,7 @@ public class StratConContractInitializer {
                 scenario.setActionDate(null);
                 scenario.setReturnDate(null);
                 scenario.setStrategicObjective(true);
-                scenario.setTurningPoint(true);
+                scenario.setTurningPoint(false);
                 scenario.getBackingScenario().setCloaked(true);
                 // apply objective mods
                 if (objectiveModifiers != null) {
@@ -540,22 +547,22 @@ public class StratConContractInitializer {
     /**
      * Searches for a suitable, random unoccupied coordinate on the specified {@link StratConTrackState}.
      *
-     * <p>A coordinate is considered suitable based on the absence of any existing scenario, and depending
-     * on the input parameters, may also depend on the presence or absence of facilities, player forces, or an emphasis
-     * on strategic locations.</p>
+     * <p>A coordinate is considered suitable based on the absence of any existing scenario, and depending on the
+     * input parameters, may also depend on the presence or absence of facilities, player forces, or an emphasis on
+     * strategic locations.</p>
      *
      * <p>The method performs the following steps:</p>
      * <ol>
      *   <li>Iterates over all possible coordinates on the provided track.</li>
      *   <li>Filters the coordinates based on the following criteria:
      *     <ul>
-     *       <li>A coordinate is not occupied by a scenario.</li>
+     *       <li>A scenario does not occupy the coordinate.</li>
      *       <li>{@code allowPlayerFacilities = true}: Locations with facilities owned by the player
      *           are suitable and factored into the result.</li>
      *       <li>{@code allowPlayerForces = true}: Coordinates with forces assigned to them are also
      *           included in the result.</li>
      *       <li>{@code emphasizeStrategicTargets = true}: Strategic locations, such as those containing
-     *           facilities not owned by players, are given additional weight to increase their chance
+     *           facilities owned by players, are given additional weight to increase their chance
      *           of being selected.</li>
      *     </ul>
      *   </li>
@@ -587,7 +594,6 @@ public class StratConContractInitializer {
         for (int y = 0; y < trackHeight; y++) {
             for (int x = 0; x < trackWidth; x++) {
                 StratConCoords coords = new StratConCoords(x, y);
-
                 if (trackState.getScenario(coords) != null) {
                     continue;
                 }
@@ -595,7 +601,7 @@ public class StratConContractInitializer {
                 StratConFacility facility = trackState.getFacility(coords);
                 if (facility == null) {
                     suitableCoords.add(coords);
-                } else if (allowPlayerFacilities && !facility.isOwnerAlliedToPlayer()) {
+                } else if (allowPlayerFacilities && facility.isOwnerAlliedToPlayer()) {
                     if (emphasizeStrategicTargets) {
                         for (int weight = 0; weight < weightingMultiplier; weight++) {
                             suitableCoords.add(coords);
@@ -607,7 +613,6 @@ public class StratConContractInitializer {
 
                 if (allowPlayerForces && trackState.getAssignedForceCoords().containsValue(coords)) {
                     if (emphasizeStrategicTargets) {
-                        weightingMultiplier /= 2;
                         for (int weight = 0; weight < weightingMultiplier; weight++) {
                             suitableCoords.add(coords);
                         }

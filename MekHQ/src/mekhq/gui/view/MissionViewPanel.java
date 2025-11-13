@@ -495,44 +495,43 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtBLC, gridBagConstraints);
 
         int i = 9;
-        if ((contract.getSalvagePct() > 0) && !contract.isSalvageExchange()) {
-            lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = i;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblSalvageValueMerc, gridBagConstraints);
-            txtSalvageValueMerc = new JLabel();
-            txtSalvageValueMerc.setText(contract.getSalvagedByUnit().toAmountAndSymbolString());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = i;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(txtSalvageValueMerc, gridBagConstraints);
-            i++;
-            lblSalvageValueEmployer = new JLabel(resourceMap.getString("lblSalvageValueEmployer.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = i;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblSalvageValueEmployer, gridBagConstraints);
-            txtSalvageValueEmployer = new JLabel();
-            txtSalvageValueEmployer.setText(contract.getSalvagedByEmployer().toAmountAndSymbolString());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = i;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(txtSalvageValueEmployer, gridBagConstraints);
-            i++;
-        }
+        lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = i;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblSalvageValueMerc, gridBagConstraints);
+        txtSalvageValueMerc = new JLabel();
+        txtSalvageValueMerc.setText(contract.getSalvagedByUnit().toAmountAndSymbolString());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = i;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(txtSalvageValueMerc, gridBagConstraints);
+        i++;
+        lblSalvageValueEmployer = new JLabel(resourceMap.getString("lblSalvageValueEmployer.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = i;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblSalvageValueEmployer, gridBagConstraints);
+        txtSalvageValueEmployer = new JLabel();
+        txtSalvageValueEmployer.setText(contract.getSalvagedByEmployer().toAmountAndSymbolString());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = i;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(txtSalvageValueEmployer, gridBagConstraints);
+        i++;
+
         JLabel lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvage.text"));
         JLabel lblSalvagePct2 = new JLabel();
 
@@ -904,43 +903,44 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtBLC, gridBagConstraints);
 
-        if ((contract.getSalvagePct() > 0) && !contract.isSalvageExchange()) {
-            lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblSalvageValueMerc, gridBagConstraints);
-            txtSalvageValueMerc = new JLabel();
-            txtSalvageValueMerc.setText(contract.getSalvagedByUnit().toAmountAndSymbolString());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(txtSalvageValueMerc, gridBagConstraints);
+        lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblSalvageValueMerc, gridBagConstraints);
 
-            lblSalvageValueEmployer = new JLabel(resourceMap.getString("lblSalvageValueEmployer.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblSalvageValueEmployer, gridBagConstraints);
-            txtSalvageValueEmployer = new JLabel();
-            txtSalvageValueEmployer.setText(contract.getSalvagedByEmployer().toAmountAndSymbolString());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(txtSalvageValueEmployer, gridBagConstraints);
-        }
+        txtSalvageValueMerc = new JLabel();
+        txtSalvageValueMerc.setText(contract.getSalvagedByUnit().toAmountAndSymbolString());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(txtSalvageValueMerc, gridBagConstraints);
+
+        lblSalvageValueEmployer = new JLabel(resourceMap.getString("lblSalvageValueEmployer.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblSalvageValueEmployer, gridBagConstraints);
+
+        txtSalvageValueEmployer = new JLabel();
+        txtSalvageValueEmployer.setText(contract.getSalvagedByEmployer().toAmountAndSymbolString());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(txtSalvageValueEmployer, gridBagConstraints);
+
         JLabel lblSalvagePct = new JLabel(resourceMap.getString("lblSalvage.text"));
         JLabel txtSalvagePct = new JLabel();
         txtSalvagePct.setName("txtSalvagePct");
@@ -985,7 +985,8 @@ public class MissionViewPanel extends JScrollablePanel {
 
         txtMorale.setName("txtMorale");
 
-        if (contract.getContractType().isGarrisonDuty() && contract.getMoraleLevel().isRouted()) {
+        if ((contract.getContractType().isGarrisonDuty() || contract.getContractType().isRetainer()) &&
+                  contract.getMoraleLevel().isRouted()) {
             txtMorale.setText(resourceMap.getString("txtGarrisonMoraleRouted.text"));
             txtMorale.setToolTipText(wordWrap(resourceMap.getString("txtGarrisonMoraleRouted.tooltip")));
         } else {
@@ -1047,33 +1048,26 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtCargoRequirement, gridBagConstraints);
         }
 
-        // for StratCon, contract score is irrelevant and only leads to confusion, so we
-        // do not display it in that situation
-        boolean showContractScore = !gui.getCampaign().getCampaignOptions().isUseStratCon()
-                                          && (mission instanceof AtBContract)
-                                          && (((AtBContract) mission).getStratconCampaignState() == null);
+        lblScore.setName("lblScore");
+        lblScore.setText(resourceMap.getString("lblScore.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblScore, gridBagConstraints);
 
-        if (showContractScore) {
-            lblScore.setName("lblScore");
-            lblScore.setText(resourceMap.getString("lblScore.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblScore, gridBagConstraints);
-
-            txtScore.setName("txtScore");
-            txtScore.setText(Integer.toString(contract.getScore()));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(txtScore, gridBagConstraints);
-        }
+        txtScore.setName("txtScore");
+        txtScore.setText(Integer.toString(contract.getContractScore(campaign.getCampaignOptions()
+                                                                          .isUseStratConMaplessMode())));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(txtScore, gridBagConstraints);
 
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(false);

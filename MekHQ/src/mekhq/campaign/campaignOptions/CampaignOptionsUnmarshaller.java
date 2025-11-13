@@ -72,6 +72,7 @@ public class CampaignOptionsUnmarshaller {
         CampaignOptions campaignOptions = new CampaignOptions();
         NodeList childNodes = parentNod.getChildNodes();
 
+        boolean wasUsingAtB = false;
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node childNode = childNodes.item(i);
 
@@ -88,17 +89,25 @@ public class CampaignOptionsUnmarshaller {
             }
 
             try {
-                parseNodeName(version, nodeName, campaignOptions, nodeContents, childNode);
+                if (parseNodeName(version, nodeName, campaignOptions, nodeContents, childNode)) {
+                    wasUsingAtB = true;
+                }
             } catch (Exception ex) {
                 LOGGER.error(ex, "Exception parsing campaign option node: {}", nodeName);
             }
+        }
+
+        //  < 50.10 compatibility handler
+        if (wasUsingAtB && !campaignOptions.isUseStratCon()) {
+            // Mapless StratCon replaced AtB in 50.10
+            campaignOptions.setUseStratConMaplessMode(true);
         }
 
         LOGGER.debug("Load Campaign Options Complete!");
         return campaignOptions;
     }
 
-    private static void parseNodeName(Version version, String nodeName, CampaignOptions campaignOptions,
+    private static boolean parseNodeName(Version version, String nodeName, CampaignOptions campaignOptions,
           String nodeContents, Node childNode) {
         switch (nodeName) {
             case "checkMaintenance" -> campaignOptions.setCheckMaintenance(parseBoolean(nodeContents));
@@ -151,10 +160,12 @@ public class CampaignOptionsUnmarshaller {
             case "missionXpOutstandingSuccess" -> campaignOptions.setMissionXpOutstandingSuccess(parseInt(
                   nodeContents));
             case "edgeCost" -> campaignOptions.setEdgeCost(parseInt(nodeContents));
+            case "attributeCost" -> campaignOptions.setAttributeCost(parseInt(nodeContents));
             case "waitingPeriod" -> campaignOptions.setWaitingPeriod(parseInt(nodeContents));
             case "acquisitionSkill" -> campaignOptions.setAcquisitionSkill(nodeContents);
             case "useFunctionalAppraisal" -> campaignOptions.setUseFunctionalAppraisal(parseBoolean(nodeContents));
             case "unitTransitTime" -> campaignOptions.setUnitTransitTime(parseInt(nodeContents));
+            case "noDeliveriesInTransit" -> campaignOptions.setNoDeliveriesInTransit(parseBoolean(nodeContents));
             case "clanAcquisitionPenalty" -> campaignOptions.setClanAcquisitionPenalty(parseInt(nodeContents));
             case "isAcquisitionPenalty" -> campaignOptions.setIsAcquisitionPenalty(parseInt(nodeContents));
             case "usePlanetaryAcquisition" -> campaignOptions.setPlanetaryAcquisition(parseBoolean(nodeContents));
@@ -300,7 +311,11 @@ public class CampaignOptionsUnmarshaller {
             case "useRandomToughness" -> campaignOptions.setUseRandomToughness(parseBoolean(nodeContents));
             case "useArtillery" -> campaignOptions.setUseArtillery(parseBoolean(nodeContents));
             case "useAbilities" -> campaignOptions.setUseAbilities(parseBoolean(nodeContents));
-            case "useCommanderAbilitiesOnly" -> campaignOptions.setUseCommanderAbilitiesOnly(parseBoolean(
+            case "onlyCommandersMatterVehicles" -> campaignOptions.setOnlyCommandersMatterVehicles(parseBoolean(
+                  nodeContents));
+            case "onlyCommandersMatterInfantry" -> campaignOptions.setOnlyCommandersMatterInfantry(parseBoolean(
+                  nodeContents));
+            case "onlyCommandersMatterBattleArmor" -> campaignOptions.setOnlyCommandersMatterBattleArmor(parseBoolean(
                   nodeContents));
             case "useEdge" -> campaignOptions.setUseEdge(parseBoolean(nodeContents));
             case "useSupportEdge" -> campaignOptions.setUseSupportEdge(parseBoolean(nodeContents));
@@ -323,6 +338,8 @@ public class CampaignOptionsUnmarshaller {
             case "displayAssignmentRecord" -> campaignOptions.setDisplayAssignmentRecord(parseBoolean(
                   nodeContents));
             case "displayPerformanceRecord" -> campaignOptions.setDisplayPerformanceRecord(parseBoolean(
+                  nodeContents));
+            case "awardVeterancySPAs" -> campaignOptions.setAwardVeterancySPAs(parseBoolean(
                   nodeContents));
             case "rewardComingOfAgeAbilities" -> campaignOptions.setRewardComingOfAgeAbilities(parseBoolean(
                   nodeContents));
@@ -350,10 +367,17 @@ public class CampaignOptionsUnmarshaller {
             case "useRandomHitsForVehicles" -> campaignOptions.setUseRandomHitsForVehicles(parseBoolean(
                   nodeContents));
             case "tougherHealing" -> campaignOptions.setTougherHealing(parseBoolean(nodeContents));
+            case "useAlternativeAdvancedMedical" ->
+                  campaignOptions.setUseAlternativeAdvancedMedical(parseBoolean(nodeContents));
+            case "useKinderAlternativeAdvancedMedical" ->
+                  campaignOptions.setUseKinderAlternativeAdvancedMedical(parseBoolean(nodeContents));
+            case "useRandomDiseases" -> campaignOptions.setUseRandomDiseases(parseBoolean(nodeContents));
             case "maximumPatients" -> campaignOptions.setMaximumPatients(parseInt(nodeContents));
             case "doctorsUseAdministration" -> campaignOptions.setDoctorsUseAdministration(parseBoolean(
                   nodeContents));
             case "useUsefulMedics" -> campaignOptions.setIsUseUsefulMedics(parseBoolean(nodeContents));
+            case "useMASHTheatres" -> campaignOptions.setIsUseMASHTheatres(parseBoolean(nodeContents));
+            case "mashTheatreCapacity" -> campaignOptions.setMASHTheatreCapacity(parseInt(nodeContents));
             case "prisonerCaptureStyle" -> campaignOptions.setPrisonerCaptureStyle(PrisonerCaptureStyle.fromString(
                   nodeContents));
             case "useFunctionalEscapeArtist" -> campaignOptions.setUseFunctionalEscapeArtist(parseBoolean(
@@ -379,7 +403,7 @@ public class CampaignOptionsUnmarshaller {
                         nodeContents));
             case "salaryXPMultipliers" -> {
                 if (!childNode.hasChildNodes()) {
-                    return;
+                    return false;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int j = 0; j < nl2.getLength(); j++) {
@@ -438,12 +462,12 @@ public class CampaignOptionsUnmarshaller {
             case "nonBinaryDiceSize" -> campaignOptions.setNonBinaryDiceSize(parseInt(nodeContents));
             case "randomOriginOptions" -> {
                 if (!childNode.hasChildNodes()) {
-                    return;
+                    return false;
                 }
                 final RandomOriginOptions randomOriginOptions = RandomOriginOptions.parseFromXML(childNode.getChildNodes(),
                       true);
                 if (randomOriginOptions == null) {
-                    return;
+                    return false;
                 }
                 campaignOptions.setRandomOriginOptions(randomOriginOptions);
             }
@@ -474,12 +498,16 @@ public class CampaignOptionsUnmarshaller {
             case "usePrisonerMarriages" -> campaignOptions.setUsePrisonerMarriages(parseBoolean(nodeContents));
             case "checkMutualAncestorsDepth" -> campaignOptions.setCheckMutualAncestorsDepth(parseInt(
                   nodeContents));
-            case "noInterestInMarriageDiceSize" -> campaignOptions.setNoInterestInMarriageDiceSize(parseInt(
-                  nodeContents));
+            case "noInterestInRelationshipsDiceSize", "noInterestInMarriageDiceSize" ->
+                  campaignOptions.setNoInterestInRelationshipsDiceSize(parseInt(nodeContents));
+            case "interestedInSameSexDiceSize", "randomSameSexMarriageDiceSize" ->
+                  campaignOptions.setInterestedInSameSexDiceSize(parseInt(nodeContents));
+            case "interestedInBothSexesDiceSize" ->
+                  campaignOptions.setInterestedInBothSexesDiceSize(parseInt(nodeContents));
             case "logMarriageNameChanges" -> campaignOptions.setLogMarriageNameChanges(parseBoolean(nodeContents));
             case "marriageSurnameWeights" -> {
                 if (!childNode.hasChildNodes()) {
-                    return;
+                    return false;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int j = 0; j < nl2.getLength(); j++) {
@@ -500,8 +528,6 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "randomMarriageAgeRange" -> campaignOptions.setRandomMarriageAgeRange(parseInt(nodeContents));
             case "randomMarriageDiceSize" -> campaignOptions.setRandomMarriageDiceSize(parseInt(nodeContents));
-            case "randomSameSexMarriageDiceSize" -> campaignOptions.setRandomSameSexMarriageDiceSize(parseInt(
-                  nodeContents));
             case "randomNewDependentMarriage" -> campaignOptions.setRandomNewDependentMarriage(parseInt(
                   nodeContents));
             case "useManualDivorce" -> campaignOptions.setUseManualDivorce(parseBoolean(nodeContents));
@@ -510,7 +536,7 @@ public class CampaignOptionsUnmarshaller {
             case "usePrisonerDivorce" -> campaignOptions.setUsePrisonerDivorce(parseBoolean(nodeContents));
             case "divorceSurnameWeights" -> {
                 if (!childNode.hasChildNodes()) {
-                    return;
+                    return false;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int j = 0; j < nl2.getLength(); j++) {
@@ -593,7 +619,7 @@ public class CampaignOptionsUnmarshaller {
             case "militaryAcademyAccidents" -> campaignOptions.setMilitaryAcademyAccidents(parseInt(nodeContents));
             case "enabledRandomDeathAgeGroups" -> {
                 if (!childNode.hasChildNodes()) {
-                    return;
+                    return false;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int i = 0; i < nl2.getLength(); i++) {
@@ -660,6 +686,8 @@ public class CampaignOptionsUnmarshaller {
             case "fieldKitchenCapacity" -> campaignOptions.setFieldKitchenCapacity(parseInt(nodeContents));
             case "fieldKitchenIgnoreNonCombatants" -> campaignOptions.setFieldKitchenIgnoreNonCombatants(parseBoolean(
                   nodeContents));
+            case "fatigueUndeploymentThreshold" ->
+                  campaignOptions.setFatigueUndeploymentThreshold(parseInt(nodeContents));
             case "fatigueLeaveThreshold" -> campaignOptions.setFatigueLeaveThreshold(parseInt(nodeContents));
             case "payForParts" -> campaignOptions.setPayForParts(parseBoolean(nodeContents));
             case "payForRepairs" -> campaignOptions.setPayForRepairs(parseBoolean(nodeContents));
@@ -673,6 +701,14 @@ public class CampaignOptionsUnmarshaller {
             case "payForRecruitment" -> campaignOptions.setPayForRecruitment(parseBoolean(nodeContents));
             case "payForFood" -> campaignOptions.setPayForFood(parseBoolean(nodeContents));
             case "payForHousing" -> campaignOptions.setPayForHousing(parseBoolean(nodeContents));
+            case "rentedFacilitiesCostHospitalBeds" ->
+                  campaignOptions.setRentedFacilitiesCostHospitalBeds(parseInt(nodeContents));
+            case "rentedFacilitiesCostKitchens" ->
+                  campaignOptions.setRentedFacilitiesCostKitchens(parseInt(nodeContents));
+            case "rentedFacilitiesCostHoldingCells" ->
+                  campaignOptions.setRentedFacilitiesCostHoldingCells(parseInt(nodeContents));
+            case "rentedFacilitiesCostRepairBays" ->
+                  campaignOptions.setRentedFacilitiesCostRepairBays(parseInt(nodeContents));
             case "useLoanLimits" -> campaignOptions.setLoanLimits(parseBoolean(nodeContents));
             case "usePercentageMaint" -> campaignOptions.setUsePercentageMaintenance(parseBoolean(nodeContents));
             case "infantryDontCount" -> campaignOptions.setUseInfantryDontCount(parseBoolean(nodeContents));
@@ -693,6 +729,9 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "allowMonthlyConnections" -> campaignOptions.setAllowMonthlyConnections(parseBoolean(
                   nodeContents));
+            case "useBetterExtraIncome" -> campaignOptions.setUseBetterExtraIncome(parseBoolean(
+                  nodeContents));
+            case "useSmallArmsOnly" -> campaignOptions.setUseSmallArmsOnly(parseBoolean(nodeContents));
             case "commonPartPriceMultiplier" -> campaignOptions.setCommonPartPriceMultiplier(parseDouble(
                   nodeContents));
             case "innerSphereUnitPriceMultiplier" -> campaignOptions.setInnerSphereUnitPriceMultiplier(parseDouble(
@@ -737,7 +776,7 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "personnelMarketRandomRemovalTargets" -> {
                 if (!childNode.hasChildNodes()) {
-                    return;
+                    return false;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int j = 0; j < nl2.getLength(); j++) {
@@ -771,11 +810,15 @@ public class CampaignOptionsUnmarshaller {
             case "contractSearchRadius" -> campaignOptions.setContractSearchRadius(parseInt(nodeContents));
             case "variableContractLength" -> campaignOptions.setVariableContractLength(parseBoolean(nodeContents));
             case "useDynamicDifficulty" -> campaignOptions.setUseDynamicDifficulty(parseBoolean(nodeContents));
+            case "useBolsterContractSkill" -> campaignOptions.setUseBolsterContractSkill(parseBoolean(nodeContents));
             case "contractMarketReportRefresh" -> campaignOptions.setContractMarketReportRefresh(parseBoolean(
                   nodeContents));
             case "contractMaxSalvagePercentage" -> campaignOptions.setContractMaxSalvagePercentage(parseInt(
                   nodeContents));
             case "dropShipBonusPercentage" -> campaignOptions.setDropShipBonusPercentage(parseInt(nodeContents));
+            case "isUseTwoWayPay" -> campaignOptions.setUseTwoWayPay(parseBoolean(nodeContents));
+            case "isUseCamOpsSalvage" -> campaignOptions.setUseCamOpsSalvage(parseBoolean(nodeContents));
+            case "isUseRiskySalvage" -> campaignOptions.setUseRiskySalvage(parseBoolean(nodeContents));
             case "skillLevel" -> campaignOptions.setSkillLevel(SkillLevel.parseFromString(nodeContents));
             case "autoResolveMethod" -> campaignOptions.setAutoResolveMethod(AutoResolveMethod.valueOf(nodeContents));
             case "autoResolveVictoryChanceEnabled" -> campaignOptions.setAutoResolveVictoryChanceEnabled(parseBoolean(
@@ -792,22 +835,24 @@ public class CampaignOptionsUnmarshaller {
                     campaignOptions.setPhenotypeProbability(i, parseInt(values[i]));
                 }
             }
-            case "useAtB" -> campaignOptions.setUseAtB(parseBoolean(nodeContents));
+            case "useAtB" -> {
+                return true; // < 50.10 compatibility handler
+            }
             case "useStratCon" -> campaignOptions.setUseStratCon(parseBoolean(nodeContents));
+            case "useMaplessStratCon" -> campaignOptions.setUseStratConMaplessMode(parseBoolean(nodeContents));
             case "useAdvancedScouting" -> campaignOptions.setUseAdvancedScouting(parseBoolean(nodeContents));
-            case "useAero" -> campaignOptions.setUseAero(parseBoolean(nodeContents));
-            case "useVehicles" -> campaignOptions.setUseVehicles(parseBoolean(nodeContents));
-            case "clanVehicles" -> campaignOptions.setClanVehicles(parseBoolean(nodeContents));
             case "useGenericBattleValue" -> campaignOptions.setUseGenericBattleValue(parseBoolean(nodeContents));
             case "useVerboseBidding" -> campaignOptions.setUseVerboseBidding(parseBoolean(nodeContents));
-            case "doubleVehicles" -> campaignOptions.setDoubleVehicles(parseBoolean(nodeContents));
-            case "adjustPlayerVehicles" -> campaignOptions.setAdjustPlayerVehicles(parseBoolean(nodeContents));
             case "opForLanceTypeMeks" -> campaignOptions.setOpForLanceTypeMeks(parseInt(nodeContents));
             case "opForLanceTypeMixed" -> campaignOptions.setOpForLanceTypeMixed(parseInt(nodeContents));
             case "opForLanceTypeVehicles" -> campaignOptions.setOpForLanceTypeVehicles(parseInt(nodeContents));
-            case "opForUsesVTOLs" -> campaignOptions.setOpForUsesVTOLs(parseBoolean(nodeContents));
             case "useDropShips" -> campaignOptions.setUseDropShips(parseBoolean(nodeContents));
             case "mercSizeLimited" -> campaignOptions.setMercSizeLimited(parseBoolean(nodeContents));
+            case "moraleVictoryEffect" -> campaignOptions.setMoraleVictoryEffect(parseInt(nodeContents));
+            case "moraleDecisiveVictoryEffect" ->
+                  campaignOptions.setMoraleDecisiveVictoryEffect(parseInt(nodeContents));
+            case "moraleDefeatEffect" -> campaignOptions.setMoraleDefeatEffect(parseInt(nodeContents));
+            case "moraleDecisiveDefeatEffect" -> campaignOptions.setMoraleDecisiveDefeatEffect(parseInt(nodeContents));
             case "regionalMekVariations" -> campaignOptions.setRegionalMekVariations(parseBoolean(nodeContents));
             case "attachedPlayerCamouflage" -> campaignOptions.setAttachedPlayerCamouflage(parseBoolean(
                   nodeContents));
@@ -830,10 +875,6 @@ public class CampaignOptionsUnmarshaller {
             case "useLightConditions" -> campaignOptions.setUseLightConditions(parseBoolean(nodeContents));
             case "usePlanetaryConditions" -> campaignOptions.setUsePlanetaryConditions(parseBoolean(nodeContents));
             case "restrictPartsByMission" -> campaignOptions.setRestrictPartsByMission(parseBoolean(nodeContents));
-            case "allowOpForLocalUnits" -> campaignOptions.setAllowOpForLocalUnits(parseBoolean(nodeContents));
-            case "allowOpForAeros" -> campaignOptions.setAllowOpForAerospace(parseBoolean(nodeContents));
-            case "opForAeroChance" -> campaignOptions.setOpForAeroChance(parseInt(nodeContents));
-            case "opForLocalUnitChance" -> campaignOptions.setOpForLocalUnitChance(parseInt(nodeContents));
             case "fixedMapChance" -> campaignOptions.setFixedMapChance(parseInt(nodeContents));
             case "spaUpgradeIntensity" -> campaignOptions.setSpaUpgradeIntensity(parseInt(nodeContents));
             case "scenarioModMax" -> campaignOptions.setScenarioModMax(parseInt(nodeContents));
@@ -873,5 +914,7 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents, 1.0));
             default -> LOGGER.warn("Potentially unexpected entry in campaign options: {}", nodeName);
         }
+
+        return false;
     }
 }

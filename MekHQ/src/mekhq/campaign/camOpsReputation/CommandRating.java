@@ -136,7 +136,7 @@ public class CommandRating {
         PersonnelOptions options = commander.getOptions();
 
         // Connections
-        traitScore += commander.getAdjustedConnections();
+        traitScore += commander.getAdjustedConnections(false);
 
         // Wealth
         traitScore += commander.getWealth() >= 7 ? 1 : 0;

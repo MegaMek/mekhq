@@ -32,6 +32,8 @@
  */
 package mekhq.gui.menus;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JMenuItem;
@@ -62,12 +64,11 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
         // 2) Person must be free
         // 3) Person cannot be deployed
         // 4) Person must be a tech
-        // 5) Person must have free maintenance time
         if (!person.getStatus().isActive() || !person.getPrisonerStatus().isFree()
-                  || person.isDeployed() || !person.isTech()
-                  || (person.getMaintenanceTimeUsing() >= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
+                  || person.isDeployed() || !person.isTech()) {
             return;
         }
+        boolean techsUseAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
 
         // Initialize Menu
         setText(resources.getString("AssignTechToUnitMenu.title"));
@@ -89,8 +90,7 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
                                                    .filter(unit -> person.canTech(unit.getEntity()))
                                                    .filter(unit -> unit.canTakeTech()
                                                                          &&
-                                                                         (person.getMaintenanceTimeUsing() +
-                                                                                unit.getMaintenanceTime() <=
+                                                                         (unit.getMaintenanceTime() <=
                                                                                 Person.PRIMARY_ROLE_SUPPORT_TIME)))
                                        .toList();
         for (final Unit unit : units) {
@@ -121,10 +121,10 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
                       EntityWeightClass.getClassName(weightClass, unit.getEntity()));
             }
 
-            final JMenuItem miUnit = new JMenuItem(unit.getName());
+            String display = getFormattedText("AssignTechToUnitMenu.display", unit.getName(),
+                  unit.getMaintenanceTime(), person.getDailyAvailableTechTime(techsUseAdmin));
+            final JMenuItem miUnit = new JMenuItem(display);
             miUnit.setName("miUnit");
-            miUnit.setForeground(unit.determineForegroundColor("Menu"));
-            miUnit.setBackground(unit.determineBackgroundColor("Menu"));
             miUnit.addActionListener(evt -> unit.setTech(person));
             entityWeightClassMenu.add(miUnit);
         }

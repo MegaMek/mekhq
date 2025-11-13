@@ -42,8 +42,10 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getHRStrainModifier;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.calculatePrisonerCapacity;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.calculatePrisonerCapacityUsage;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.math.BigDecimal;
@@ -57,18 +59,21 @@ import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.rentals.ContractRentalType;
+import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
-import mekhq.utilities.ReportingUtilities;
 
 /**
  * calculates and stores summary information on a campaign for use in reporting, mostly for the command center
  */
 public class CampaignSummary {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignSummary";
 
     private static final String WARNING_ICON = "\u26A0";
 
@@ -331,7 +336,7 @@ public class CampaignSummary {
         StringBuilder report = new StringBuilder("<html>");
 
         if (comparison > 0) {
-            report.append("<font color='").append(ReportingUtilities.getWarningColor()).append("'>");
+            report.append("<font color='").append(getWarningColor()).append("'>");
         }
 
         report.append(roundedCargo).append(" tons (").append(roundedCapacity).append(" tons capacity)");
@@ -417,7 +422,7 @@ public class CampaignSummary {
         final String WARNING = " " + WARNING_ICON;
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
-        boolean exceedsCapacity;
+        boolean exceedsDoctorCapacity;
         String color;
         String closingSpan;
         String colorBlindWarning;
@@ -425,21 +430,23 @@ public class CampaignSummary {
         StringBuilder report = new StringBuilder("<html>");
 
         // Field Kitchens
+        List<Unit> unitsInToe = campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(), false);
         if (campaignOptions.isUseFatigue()) {
-            List<Unit> unitsInToe = campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(), false);
-
             int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.getFieldKitchenCapacity());
+            fieldKitchenCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
+                  ContractRentalType.KITCHENS);
+
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, true),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
-            boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
 
+            boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
             color = isWithinCapacity ?
                           "" :
-                          spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
+                          spanOpeningWithCustomColor(getWarningColor());
             closingSpan = isWithinCapacity ? "" : CLOSING_SPAN_TAG;
             colorBlindWarning = isWithinCapacity ? "" : WARNING;
 
-            report.append(String.format("Field Kitchens %s(%s/%s)%s%s",
+            report.append(getFormattedTextAt(RESOURCE_BUNDLE, "CampaignSummary.facilityReport.fieldKitchens",
                   color,
                   fieldKitchenUsage,
                   fieldKitchenCapacity,
@@ -453,10 +460,10 @@ public class CampaignSummary {
                 report.append("<br>");
             }
 
-            int patients = (int) campaign.getPatients()
-                                       .stream()
-                                       .filter(patient -> patient.getDoctorId() != null)
-                                       .count();
+            int injuredPersonnel = campaign.getPatients().size();
+            boolean useMASHTheatres = campaignOptions.isUseMASHTheatres();
+            int mashTheatreCapacity = useMASHTheatres ? MASHCapacity.checkMASHCapacity(unitsInToe,
+                  campaignOptions.getMASHTheatreCapacity()) : Integer.MAX_VALUE;
 
             final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
             final int maximumPatients = campaignOptions.getMaximumPatients();
@@ -465,20 +472,38 @@ public class CampaignSummary {
                 doctorCapacity += person.getDoctorMedicalCapacity(isDoctorsUseAdministration, maximumPatients);
             }
 
-            exceedsCapacity = patients > doctorCapacity;
+            exceedsDoctorCapacity = injuredPersonnel > doctorCapacity;
+            boolean exceedsMASHCapacity = injuredPersonnel > mashTheatreCapacity;
 
-            color = exceedsCapacity ?
-                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
-                          "";
-            closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
-            colorBlindWarning = exceedsCapacity ? WARNING : "";
+            color = exceedsDoctorCapacity ? spanOpeningWithCustomColor(getNegativeColor()) : "";
+            closingSpan = exceedsDoctorCapacity ? CLOSING_SPAN_TAG : "";
+            colorBlindWarning = exceedsDoctorCapacity ? WARNING : "";
 
-            report.append(String.format("Hospital Beds %s(%s/%s)%s%s",
-                  color,
-                  patients,
-                  doctorCapacity,
-                  closingSpan,
-                  colorBlindWarning));
+            String mashColor = exceedsMASHCapacity ? spanOpeningWithCustomColor(getNegativeColor()) : "";
+            String mashColorBlindWarning = exceedsMASHCapacity ? WARNING : "";
+            String mashClosingSpan = exceedsMASHCapacity ? CLOSING_SPAN_TAG : "";
+
+            if (useMASHTheatres) {
+                report.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "CampaignSummary.facilityReport.hospitalBeds.mashTracking",
+                      color,
+                      injuredPersonnel,
+                      doctorCapacity,
+                      closingSpan,
+                      colorBlindWarning,
+                      mashColor,
+                      mashTheatreCapacity,
+                      mashClosingSpan,
+                      mashColorBlindWarning));
+            } else {
+                report.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "CampaignSummary.facilityReport.hospitalBeds.normal",
+                      color,
+                      injuredPersonnel,
+                      doctorCapacity,
+                      closingSpan,
+                      colorBlindWarning));
+            }
         }
 
         // Prisoners
@@ -489,16 +514,16 @@ public class CampaignSummary {
             int capacityUsage = calculatePrisonerCapacityUsage(campaign);
             int prisonerCapacity = calculatePrisonerCapacity(campaign);
 
-            exceedsCapacity = capacityUsage > prisonerCapacity;
+            exceedsDoctorCapacity = capacityUsage > prisonerCapacity;
 
             color = capacityUsage > (prisonerCapacity * 0.75) // at risk of a minor event
-                          ? spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()) : "";
-            color = exceedsCapacity // at risk of a major event
-                          ? spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) : color;
-            closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
-            colorBlindWarning = exceedsCapacity ? WARNING : "";
+                          ? spanOpeningWithCustomColor(getWarningColor()) : "";
+            color = exceedsDoctorCapacity // at risk of a major event
+                          ? spanOpeningWithCustomColor(getNegativeColor()) : color;
+            closingSpan = exceedsDoctorCapacity ? CLOSING_SPAN_TAG : "";
+            colorBlindWarning = exceedsDoctorCapacity ? WARNING : "";
 
-            report.append(String.format("Prisoner Capacity %s(%s/%s)%s%s",
+            report.append(getFormattedTextAt(RESOURCE_BUNDLE, "CampaignSummary.facilityReport.prisonerCapacity",
                   color,
                   capacityUsage,
                   prisonerCapacity,

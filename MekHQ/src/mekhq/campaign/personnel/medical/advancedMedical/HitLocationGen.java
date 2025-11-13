@@ -39,7 +39,7 @@ import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
 
 import megamek.codeUtilities.ObjectUtility;
-import mekhq.campaign.personnel.BodyLocation;
+import mekhq.campaign.personnel.medical.BodyLocation;
 
 /**
  * Home to static methods returning a random hit location given a random integer value generator and a function to check

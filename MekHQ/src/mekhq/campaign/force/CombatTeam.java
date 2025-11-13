@@ -122,7 +122,7 @@ public class CombatTeam {
         int multiplier = faction.isComStar() ? 6 : 3;
         int base = faction.getFormationBaseSize();
 
-        return (int) (base * Math.pow(multiplier, formationLevelDepth));
+        return (int) (base * Math.pow(multiplier, formationLevelDepth - 1));
     }
 
     /**
@@ -133,7 +133,10 @@ public class CombatTeam {
 
     public CombatTeam(int forceId, Campaign campaign) {
         this.forceId = forceId;
-        role = CombatRole.RESERVE;
+
+        Force force = campaign.getForce(forceId);
+        role = force != null ? force.getCombatRoleInMemory() : CombatRole.FRONTLINE;
+
         missionId = -1;
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
             missionId = ((contract.getParentContract() == null) ? contract : contract.getParentContract()).getId();
@@ -644,7 +647,7 @@ public class CombatTeam {
                           getBattleDate(campaign.getLocalDate()));
                 }
             }
-            case TRAINING: {
+            case TRAINING, CADRE: {
                 roll = Compute.randomInt(10) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(campaign,
@@ -764,7 +767,7 @@ public class CombatTeam {
                 CampaignOptions campaignOptions = campaign.getCampaignOptions();
                 if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
                     if (entityType == ETYPE_TANK) {
-                        if (isClan || campaignOptions.isAdjustPlayerVehicles()) {
+                        if (isClan) {
                             weight += entity.getWeight() * 0.5;
                         } else {
                             weight += entity.getWeight();
@@ -795,7 +798,7 @@ public class CombatTeam {
      * @param campaign the current campaign.
      */
     public static void recalculateCombatTeams(Campaign campaign) {
-        Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsTable();
+        Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsAsMap();
         CombatTeam combatTeam = combatTeamsTable.get(0); // This is the origin node
         Force force = campaign.getForce(0);
 
@@ -822,7 +825,7 @@ public class CombatTeam {
 
         // Update the TO&E and then begin recursively walking it
         MekHQ.triggerEvent(new OrganizationChangedEvent(force));
-        recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsTable(), force);
+        recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsAsMap(), force);
     }
 
     /**
@@ -865,7 +868,7 @@ public class CombatTeam {
 
             // Update the TO&E and then continue recursively walking it
             MekHQ.triggerEvent(new OrganizationChangedEvent(force));
-            recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsTable(), force);
+            recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsAsMap(), force);
         }
     }
 

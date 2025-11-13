@@ -48,6 +48,7 @@ public enum ScenarioStatus {
     MARGINAL_DEFEAT("ScenarioStatus.MARGINAL_DEFEAT.text", "ScenarioStatus.MARGINAL_DEFEAT.toolTipText"),
     DEFEAT("ScenarioStatus.DEFEAT.text", "ScenarioStatus.DEFEAT.toolTipText"),
     DECISIVE_DEFEAT("ScenarioStatus.DECISIVE_DEFEAT.text", "ScenarioStatus.DECISIVE_DEFEAT.toolTipText"),
+    FLEET_IN_BEING("ScenarioStatus.FLEET_IN_BEING.text", "ScenarioStatus.FLEET_IN_BEING.toolTipText"),
     REFUSED_ENGAGEMENT("ScenarioStatus.REFUSED_ENGAGEMENT.text", "ScenarioStatus.REFUSED_ENGAGEMENT.toolTipText");
     // endregion Enum Declarations
 
@@ -112,12 +113,16 @@ public enum ScenarioStatus {
         return this == REFUSED_ENGAGEMENT;
     }
 
+    public boolean isFleetInBeing() {
+        return this == FLEET_IN_BEING;
+    }
+
     public boolean isOverallVictory() {
         return isDecisiveVictory() || isVictory() || isMarginalVictory() || isPyrrhicVictory();
     }
 
     public boolean isOverallDefeat() {
-        return isDecisiveDefeat() || isDefeat() || isMarginalDefeat() || isRefusedEngagement();
+        return isDecisiveDefeat() || isDefeat() || isMarginalDefeat() || isRefusedEngagement() || isFleetInBeing();
     }
     // endregion Boolean Comparison Methods
 
@@ -134,15 +139,25 @@ public enum ScenarioStatus {
                 case 0:
                     return CURRENT;
                 case 1:
-                    return VICTORY;
+                    return DECISIVE_VICTORY;
                 case 2:
-                    return MARGINAL_VICTORY;
+                    return VICTORY;
                 case 3:
-                    return DEFEAT;
+                    return MARGINAL_VICTORY;
                 case 4:
-                    return MARGINAL_DEFEAT;
+                    return PYRRHIC_VICTORY;
                 case 5:
                     return DRAW;
+                case 6:
+                    return MARGINAL_DEFEAT;
+                case 7:
+                    return DEFEAT;
+                case 8:
+                    return DECISIVE_DEFEAT;
+                case 9:
+                    return FLEET_IN_BEING;
+                case 10:
+                    return REFUSED_ENGAGEMENT;
                 default:
                     break;
             }

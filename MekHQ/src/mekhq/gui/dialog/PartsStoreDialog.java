@@ -34,20 +34,14 @@
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.ArrayList;
-import java.util.Objects;
 import java.util.ResourceBundle;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -55,15 +49,14 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechBase;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.kfs.KFBoom;
@@ -78,13 +71,10 @@ import mekhq.campaign.parts.protomeks.ProtoMekJumpJet;
 import mekhq.campaign.parts.protomeks.ProtoMekLegActuator;
 import mekhq.campaign.parts.protomeks.ProtoMekLocation;
 import mekhq.campaign.parts.protomeks.ProtoMekSensor;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.PartsStoreModel;
 import mekhq.gui.model.PartsStoreModel.PartProxy;
 import mekhq.gui.sorter.PartsDetailSorter;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Taharqa
@@ -165,7 +155,7 @@ public class PartsStoreDialog extends JDialog {
         }
         partsTable.setIntercellSpacing(new Dimension(0, 0));
         partsTable.setShowGrid(false);
-        JScrollPane scrollPartsTable = new JScrollPaneWithSpeed();
+        JScrollPane scrollPartsTable = new FastJScrollPane();
         scrollPartsTable.setName("scrollPartsTable");
         scrollPartsTable.setViewportView(partsTable);
         getContentPane().add(scrollPartsTable, BorderLayout.CENTER);

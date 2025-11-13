@@ -858,7 +858,8 @@ public class RetirementDefectionDialog extends JDialog {
                 } else {
                     Unit unit = ((UnitAssignmentTableModel) unitAssignmentTable.getModel()).getUnit(unitAssignmentTable.convertRowIndexToModel(
                           unitAssignmentTable.getSelectedRow()));
-                    btnAddUnit.setEnabled(hqView.getCampaign().getPerson(pid).canDrive(unit.getEntity()));
+                    // We bypass the Alt AM & Implant use check here
+                    btnAddUnit.setEnabled(hqView.getCampaign().getPerson(pid).canDrive(unit.getEntity(), false, false));
                 }
                 btnRemoveUnit.setEnabled(false);
             } else {
@@ -892,38 +893,16 @@ public class RetirementDefectionDialog extends JDialog {
         if (!chkShowAllUnits.isSelected() && (retireeTable.getSelectedRow() >= 0)) {
             Person p = ((RetirementTableModel) retireeTable.getModel()).getPerson(retireeTable.convertRowIndexToModel(
                   retireeTable.getSelectedRow()));
-            switch (p.getPrimaryRole()) {
-                case MEKWARRIOR:
-                    cbUnitCategory.setSelectedIndex(UnitType.MEK + 1);
-                    break;
-                case GROUND_VEHICLE_DRIVER:
-                case VEHICLE_GUNNER:
-                    cbUnitCategory.setSelectedIndex(UnitType.TANK + 1);
-                    break;
-                case NAVAL_VEHICLE_DRIVER:
-                    cbUnitCategory.setSelectedIndex(UnitType.NAVAL + 1);
-                    break;
-                case VTOL_PILOT:
-                    cbUnitCategory.setSelectedIndex(UnitType.VTOL + 1);
-                    break;
-                case AEROSPACE_PILOT:
-                    cbUnitCategory.setSelectedIndex(UnitType.AEROSPACE_FIGHTER + 1);
-                    break;
-                case CONVENTIONAL_AIRCRAFT_PILOT:
-                    cbUnitCategory.setSelectedIndex(UnitType.CONV_FIGHTER + 1);
-                    break;
-                case PROTOMEK_PILOT:
-                    cbUnitCategory.setSelectedIndex(UnitType.PROTOMEK + 1);
-                    break;
-                case BATTLE_ARMOUR:
-                    cbUnitCategory.setSelectedIndex(UnitType.BATTLE_ARMOR + 1);
-                    break;
-                case SOLDIER:
-                    cbUnitCategory.setSelectedIndex(UnitType.INFANTRY + 1);
-                    break;
-                default:
-                    cbUnitCategory.setSelectedIndex(0);
-            }
+            cbUnitCategory.setSelectedIndex(switch (p.getPrimaryRole()) {
+                case MEKWARRIOR -> UnitType.MEK + 1;
+                case VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL -> UnitType.TANK + 1;
+                case AEROSPACE_PILOT -> UnitType.AEROSPACE_FIGHTER + 1;
+                case CONVENTIONAL_AIRCRAFT_PILOT -> UnitType.CONV_FIGHTER + 1;
+                case PROTOMEK_PILOT -> UnitType.PROTOMEK + 1;
+                case BATTLE_ARMOUR -> UnitType.BATTLE_ARMOR + 1;
+                case SOLDIER -> UnitType.INFANTRY + 1;
+                default -> 0;
+            });
             filterUnits();
         }
     }

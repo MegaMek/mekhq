@@ -46,8 +46,10 @@ import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -64,8 +66,10 @@ import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.AdvancedReplacementLimbDialog;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.DocTableModel;
@@ -81,6 +85,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
     private JTable docTable;
     private RoundedJButton btnAssignDoc;
     private RoundedJButton btnUnassignDoc;
+    private RoundedJButton btnAdvancedSurgery;
     private JList<Person> listAssignedPatient;
     private JList<Person> listUnassignedPatient;
 
@@ -149,11 +154,24 @@ public final class InfirmaryTab extends CampaignGuiTab {
         RoundedJButton btnOptimizeAssignments = new RoundedJButton(resourceMap.getString("btnOptimizeAssignments.text"));
         btnOptimizeAssignments.addActionListener(ev -> new OptimizeInfirmaryAssignments(getCampaign()));
 
+        RoundedJButton btnVaccineMandate = new RoundedJButton(resourceMap.getString("btnVaccineMandate.text"));
+        btnVaccineMandate.addActionListener(ev -> Inoculations.triggerInoculationPrompt(getCampaign(), true));
+
+        btnAdvancedSurgery = new RoundedJButton(resourceMap.getString("btnAdvancedSurgery.text"));
+        btnAdvancedSurgery.setEnabled(false);
+        btnAdvancedSurgery.addActionListener(ev -> {
+            for (Person person : getAllSelectedPatients()) {
+                new AdvancedReplacementLimbDialog(getCampaign(), person);
+            }
+        });
+
         // Create a panel to group the buttons together horizontally
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         buttonPanel.add(btnAssignDoc);
         buttonPanel.add(btnUnassignDoc);
         buttonPanel.add(btnOptimizeAssignments);
+        buttonPanel.add(btnVaccineMandate);
+        buttonPanel.add(btnAdvancedSurgery);
 
         // Add the button panel to the layout
         gridBagConstraints = new GridBagConstraints();
@@ -374,6 +392,13 @@ public final class InfirmaryTab extends CampaignGuiTab {
         return patients;
     }
 
+    private Set<Person> getAllSelectedPatients() {
+        Set<Person> allPatients = new HashSet<>();
+        allPatients.addAll(getSelectedUnassignedPatients());
+        allPatients.addAll(getSelectedAssignedPatients());
+        return allPatients;
+    }
+
     /**
      * Updates the enabled or disabled state of the doctor assignment-related buttons.
      *
@@ -393,20 +418,50 @@ public final class InfirmaryTab extends CampaignGuiTab {
      */
     private void updateAssignDoctorEnabled() {
         Person doctor = getSelectedDoctor();
-        final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        final int baseBedCount = campaignOptions.getMaximumPatients();
-        final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
 
         if (doctor == null) {
             btnAssignDoc.setEnabled(false);
         } else {
-            final int doctorCapacity = doctor.getDoctorMedicalCapacity(isDoctorsUseAdministration, baseBedCount);
-
-            btnAssignDoc.setEnabled((getCampaign().getPatientsFor(doctor) < doctorCapacity) &&
-                                          (unassignedPatientModel.getSize() > 0));
+            boolean canAssignToDoctor = canAssignToDoctor(doctor);
+            btnAssignDoc.setEnabled(unassignedPatientModel.getSize() > 0 && canAssignToDoctor);
         }
 
         btnUnassignDoc.setEnabled(!getSelectedAssignedPatients().isEmpty());
+        btnAdvancedSurgery.setEnabled(getCampaignOptions().isUseAlternativeAdvancedMedical() &&
+                                            !getAllSelectedPatients().isEmpty());
+    }
+
+    /**
+     * Determines if the given doctor can be assigned an additional patient.
+     *
+     * <p>This method checks whether assigning another patient to the specified doctor is within both the doctor's
+     * individual capacity and the global MASH theatre capacity (if MASH theatres are being used). The doctor's capacity
+     * is calculated based on campaign options and the doctor's qualifications. The global theatre constraint is only
+     * considered if MASH theatres are enabled.</p>
+     *
+     * @param doctor the {@link Person} representing the doctor to check for assignment eligibility
+     *
+     * @return {@code true} if the doctor can be assigned another patient according to all capacity constraints
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private boolean canAssignToDoctor(Person doctor) {
+        final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        final int baseBedCount = campaignOptions.getMaximumPatients();
+        final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
+
+        final int doctorCapacity = doctor.getDoctorMedicalCapacity(isDoctorsUseAdministration, baseBedCount);
+        final int patientsForDoctor = getCampaign().getPatientsFor(doctor);
+        final boolean isWithinDoctorCapacity = doctorCapacity > patientsForDoctor;
+
+        boolean useMASHTheatres = campaignOptions.isUseMASHTheatres();
+        boolean isWithinTheatreCapacity = !useMASHTheatres;
+        if (useMASHTheatres) {
+            isWithinTheatreCapacity = getCampaign().getMashTheatresWithinCapacity();
+        }
+
+        return isWithinDoctorCapacity && isWithinTheatreCapacity;
     }
 
     private void docTableValueChanged() {
@@ -421,33 +476,27 @@ public final class InfirmaryTab extends CampaignGuiTab {
         }
 
         final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
-        final int baseBedCount = campaignOptions.getMaximumPatients();
         final int healingWaitingPeriod = campaignOptions.getHealingWaitingPeriod();
-
-        final int doctorCapacity = doctor.getDoctorMedicalCapacity(isDoctorsUseAdministration, baseBedCount);
 
         Collection<Person> selectedPatients = getSelectedUnassignedPatients();
         if (selectedPatients.isEmpty()) {
             // Pick the first in the list ... if there are any
             int patientSize = unassignedPatientModel.getSize();
             for (int i = 0; i < patientSize; ++i) {
+                boolean canAssignToDoctor = canAssignToDoctor(doctor);
                 Person patient = unassignedPatientModel.getElementAt(i);
 
-                if ((null != patient) &&
-                          (patient.needsFixing()) &&
-                          (getCampaign().getPatientsFor(doctor) < doctorCapacity)) {
+                if (null != patient && patient.needsFixing() && canAssignToDoctor) {
                     patient.setDoctorId(doctor.getId(), healingWaitingPeriod);
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
                     break;
                 }
             }
-
         } else {
             for (Person patient : selectedPatients) {
-                if ((null != patient) &&
-                          (patient.needsFixing()) &&
-                          (getCampaign().getPatientsFor(doctor) < doctorCapacity)) {
+                boolean canAssignToDoctor = canAssignToDoctor(doctor);
+
+                if (null != patient && patient.needsFixing() && canAssignToDoctor) {
                     patient.setDoctorId(doctor.getId(), healingWaitingPeriod);
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
                 }

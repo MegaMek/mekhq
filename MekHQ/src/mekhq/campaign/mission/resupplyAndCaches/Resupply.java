@@ -59,6 +59,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.market.procurement.Procurement;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.*;
@@ -73,6 +74,7 @@ import mekhq.campaign.parts.meks.MekGyro;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -406,7 +408,7 @@ public class Resupply {
         // First, calculate the total tonnage across all combat units in the campaign.
         // We define a 'combat unit' as any unit not flagged as non-combat who is both in a Combat
         // Team and not in a Force flagged as non-combat
-        for (CombatTeam formation : campaign.getCombatTeamsTable().values()) {
+        for (CombatTeam formation : campaign.getCombatTeamsAsMap().values()) {
             Force force = campaign.getForce(formation.getForceId());
 
             if (force == null) {
@@ -551,7 +553,8 @@ public class Resupply {
      */
 
     private Map<Part, PartDetails> collectParts() {
-        Set<PartInUse> partsInUse = campaign.getPartsInUse(true, true, PartQuality.QUALITY_A);
+        PartsInUseManager partsInUseManager = new PartsInUseManager(campaign);
+        Set<PartInUse> partsInUse = partsInUseManager.getPartsInUse(true, true, PartQuality.QUALITY_A);
 
         Faction campaignFaction = campaign.getFaction();
         LocalDate today = campaign.getLocalDate();
@@ -798,7 +801,7 @@ public class Resupply {
         Person negotiator;
         negotiatorSkill = NONE.ordinal();
 
-        if (contract.getContractType().isGuerrillaWarfare() || PIRATE_FACTION_CODE.equals(contract.getEmployerCode())) {
+        if (contract.getContractType().isGuerrillaType() || PIRATE_FACTION_CODE.equals(contract.getEmployerCode())) {
             negotiator = campaign.getCommander();
         } else {
             negotiator = null;
@@ -817,13 +820,10 @@ public class Resupply {
             Skill skill = negotiator.getSkill(SkillType.S_NEGOTIATION);
 
             if (skill != null) {
-                int reputation = negotiator.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
-                      campaign.isClanCampaign(),
-                      campaign.getLocalDate(),
-                      negotiator.getRankNumeric());
-                int skillLevel = skill.getFinalSkillValue(negotiator.getOptions(),
-                      negotiator.getATOWAttributes(),
-                      reputation);
+                SkillModifierData skillModifierData = negotiator.getSkillModifierData(campaign.getCampaignOptions()
+                                                                                            .isUseAgeEffects(),
+                      campaign.isClanCampaign(), campaign.getLocalDate());
+                int skillLevel = skill.getFinalSkillValue(skillModifierData);
                 negotiatorSkill = skill.getType().getExperienceLevel(skillLevel);
             }
         }
@@ -858,7 +858,7 @@ public class Resupply {
                         continue;
                     }
 
-                    double individualCargo = unit.getCargoCapacity();
+                    double individualCargo = unit.getCargoCapacityForConvoy();
 
                     if (individualCargo > 0) {
                         hasCargo = true;

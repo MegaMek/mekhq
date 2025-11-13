@@ -78,6 +78,7 @@ public enum PersonnelStatus {
     HOMICIDE(NotificationSeverity.NEGATIVE, true, true),
     WOUNDS(NotificationSeverity.NEGATIVE, true, true),
     DISEASE(NotificationSeverity.NEGATIVE, true, true),
+    CONTAGIOUS_DISEASE(NotificationSeverity.NEGATIVE, true, true),
     ACCIDENTAL(NotificationSeverity.NEGATIVE, true, true),
     NATURAL_CAUSES(NotificationSeverity.NEGATIVE, true, true),
     OLD_AGE(NotificationSeverity.NEGATIVE, true, true),
@@ -431,6 +432,16 @@ public enum PersonnelStatus {
     }
 
     /**
+     * Checks if the character has the {@link #CONTAGIOUS_DISEASE} personnel status.
+     *
+     * @return {@code true} if the character has the {@link #CONTAGIOUS_DISEASE} personnel status {@code false}
+     *       otherwise.
+     */
+    public boolean isContagiousDisease() {
+        return this == CONTAGIOUS_DISEASE;
+    }
+
+    /**
      * Checks if the character has the {@link #ACCIDENTAL} personnel status.
      *
      * @return {@code true} if the character has the {@link #ACCIDENTAL} personnel status {@code false} otherwise.
@@ -611,6 +622,7 @@ public enum PersonnelStatus {
                      isHomicide() ||
                      isWounds() ||
                      isDisease() ||
+                     isContagiousDisease() ||
                      isAccidental() ||
                      isNaturalCauses() ||
                      isOldAge() ||

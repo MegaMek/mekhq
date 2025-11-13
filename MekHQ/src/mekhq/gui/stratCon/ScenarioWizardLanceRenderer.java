@@ -97,7 +97,7 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         String statusCloseFormat = operationalStatus == NOT_OPERATIONAL ? "</s>" : CLOSING_SPAN_TAG;
 
         // Get combat role
-        CombatTeam combatTeam = campaign.getCombatTeamsTable().get(force.getId());
+        CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(force.getId());
         String roleString = "";
         if (combatTeam != null) {
             roleString = combatTeam.getRole().toString() + ", ";
@@ -120,8 +120,10 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
 
                 for (Person person : unit.getCrew()) {
                     if (person.getFatigue() > highestFatigue) {
-                        highestFatigue = getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
-                              person.getSkillLevel(campaign, false));
+                        highestFatigue = getEffectiveFatigue(person.getFatigue(),
+                              person.getPermanentFatigue(),
+                              person.isClanPersonnel(),
+                              person.getSkillLevel(campaign, false, true));
                     }
                 }
             }

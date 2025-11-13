@@ -2037,7 +2037,7 @@ public class EducationController {
         }
 
         // Get the person's experience level and role (combat or non-combat)
-        final int experienceLevel = person.getExperienceLevel(campaign, false);
+        final int experienceLevel = person.getExperienceLevel(campaign, false, true);
         final boolean isCombatRole = person.getPrimaryRole().isCombat();
 
         // We base passRate on US averages

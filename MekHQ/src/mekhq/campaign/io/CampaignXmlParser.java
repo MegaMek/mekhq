@@ -37,6 +37,10 @@ import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 import java.io.File;
@@ -47,6 +51,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
@@ -63,11 +69,14 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import megamek.common.enums.TechBase;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.MekSummaryCache;
+import megamek.common.options.IOption;
+import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Jumpship;
@@ -127,6 +136,7 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.Unit;
@@ -148,6 +158,7 @@ import org.w3c.dom.NodeList;
 
 
 public record CampaignXmlParser(InputStream is, MekHQ app) {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignXmlParser";
     private static final MMLogger LOGGER = MMLogger.create(CampaignXmlParser.class);
 
     public void close() throws IOException {
@@ -367,7 +378,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     //TODO: deal with this
                     updatePlanetaryEventsFromXML(workingNode);
                 } else if (nodeName.equalsIgnoreCase("partsInUse")) {
-                    processPartsInUse(campaign, workingNode);
+                    processPartsInUse(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("temporaryPrisonerCapacity")) {
                     campaign.setTemporaryPrisonerCapacity(MathUtility.parseInt(workingNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("processProcurement")) {
@@ -418,7 +429,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // determine if we've missed any lances and add those back into the campaign
         if (options.isUseAtB()) {
-            Hashtable<Integer, CombatTeam> lances = campaign.getCombatTeamsTable();
+            Hashtable<Integer, CombatTeam> lances = campaign.getCombatTeamsAsMap();
             for (Force f : campaign.getAllForces()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
                     lances.put(f.getId(), new CombatTeam(f.getId(), campaign));
@@ -436,30 +447,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         LOGGER.info("[Campaign Load] Parts processed in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
-
-        boolean skipAllDeprecationChecks = false;
-        boolean refundAllDeprecatedSkills = false;
-        for (Person person : campaign.getPersonnel()) {
-            // skill types might need resetting
-            person.resetSkillTypes();
-
-            // Seeing as we're already looping through all personnel, we might as well have the deprecation checks
-            // here, too.
-            if (!DEPRECATED_SKILLS.isEmpty() && !skipAllDeprecationChecks) {
-                // This checks to ensure the character doesn't have any Deprecated skills.
-                SkillDeprecationTool deprecationTool = new SkillDeprecationTool(campaign,
-                      person,
-                      refundAllDeprecatedSkills);
-                skipAllDeprecationChecks = deprecationTool.isSkipAll();
-                refundAllDeprecatedSkills = deprecationTool.isRefundAll();
-            }
-
-            // Self-correct any invalid personnel statuses (handles <50.05 campaigns)
-            // Any characters with invalid statuses will have their status set to 'Active'
-            if (person.getPrisonerStatus().isCurrentPrisoner()) {
-                statusValidator(campaign, person, true);
-            }
-        }
 
         LOGGER.info("[Campaign Load] Rank references fixed in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
@@ -521,6 +508,50 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LOGGER.info("[Campaign Load] Pilot references fixed in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
 
+        boolean skipAllDeprecationChecks = false;
+        boolean refundAllDeprecatedSkills = false;
+        for (Person person : campaign.getPersonnel()) {
+            // skill types might need resetting
+            person.resetSkillTypes();
+
+            // Seeing as we're already looping through all personnel, we might as well have the deprecation checks
+            // here, too.
+            if (!DEPRECATED_SKILLS.isEmpty() && !skipAllDeprecationChecks) {
+                // This checks to ensure the character doesn't have any Deprecated skills.
+                SkillDeprecationTool deprecationTool = new SkillDeprecationTool(campaign,
+                      person,
+                      refundAllDeprecatedSkills);
+                skipAllDeprecationChecks = deprecationTool.isSkipAll();
+                refundAllDeprecatedSkills = deprecationTool.isRefundAll();
+            }
+
+            // Self-correct any invalid personnel statuses (handles <50.05 campaigns)
+            // Any characters with invalid statuses will have their status set to 'Active'
+            if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                statusValidator(campaign, person, true);
+            }
+
+            // <50.10 compatibility handler
+            LocalDate today = campaign.getLocalDate();
+            if (Person.updateSkillsForVehicleProfessions(today, person, person.getPrimaryRole(), true) ||
+                      Person.updateSkillsForVehicleProfessions(today, person, person.getSecondaryRole(), false)) {
+                String report = getFormattedTextAt(RESOURCE_BUNDLE, "vehicleProfessionSkillChange",
+                      spanOpeningWithCustomColor(getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle());
+                campaign.addReport(report);
+            }
+
+            if (Person.updateSkillsForVehicleCrewProfession(today, person, person.getPrimaryRole(), true) ||
+                      Person.updateSkillsForVehicleCrewProfession(today, person, person.getSecondaryRole(), false)) {
+                String report = getFormattedTextAt(RESOURCE_BUNDLE, "vehicleCrewProfessionSkillChange",
+                      spanOpeningWithCustomColor(getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle());
+                campaign.addReport(report);
+            }
+        }
+
         campaign.getHangar().forEachUnit(unit -> {
             // Some units have been incorrectly assigned a null C3UUID as a string. This
             // should
@@ -558,6 +589,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else {
                     unit.setSalvage(true);
                 }
+            }
+
+            List<String> reports = unit.checkForOverCrewing();
+            for (String report : reports) {
+                campaign.addReport(report);
             }
         });
 
@@ -674,6 +710,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Reset Random Death to match current campaign options
         campaign.resetRandomDeath();
+
+        // Fix sexual preferences
+        if (version.isLowerThan(new Version("0.50.10"))) {
+            correctSexualPreferencesForCurrentSpouse(campaign.getPersonnel());
+        }
 
         LOGGER.info("Load of campaign file complete!");
 
@@ -851,6 +892,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     campaign.setAsTechPoolOvertime(MathUtility.parseInt(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("medicPool")) {
                     campaign.setMedicPool(MathUtility.parseInt(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("fieldKitchenWithinCapacity")) {
+                    campaign.setFieldKitchenWithinCapacity(Boolean.parseBoolean(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("mashTheatreCapacity")) {
+                    campaign.setMashTheatreCapacity(MathUtility.parseInt(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("repairBaysRented")) {
+                    campaign.setRepairBaysRented(MathUtility.parseInt(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("id")) {
                     campaign.setId(UUID.fromString(childNode.getTextContent().trim()));
                 }
@@ -1040,6 +1087,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
             if (p != null) {
                 campaign.importPerson(p);
+
+                // <50.10 compatibility handler (moves old SPA-based Edge to current Attribute-based
+                performEdgeConversion(campaign, p);
             }
         }
 
@@ -1063,6 +1113,76 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
         LOGGER.info("Load Personnel Nodes Complete!");
+    }
+
+    private static void performEdgeConversion(Campaign campaign, Person person) {
+        for (Enumeration<IOption> i = person.getOptions().getOptions(); i.hasMoreElements(); ) {
+            IOption ability = i.nextElement();
+            if (OptionsConstants.EDGE.equals(ability.getName())) {
+                Object object = ability.getValue();
+                if (object instanceof Integer oldEdge) {
+                    // Either we've already converted, or there is nothing to convert. Regardless, we're done here.
+                    if (oldEdge == 0) {
+                        return;
+                    }
+
+                    person.setAttributeScore(SkillAttribute.EDGE, oldEdge);
+                    int newEdge = person.getAttributeScore(SkillAttribute.EDGE);
+                    int difference = oldEdge - newEdge;
+                    if (difference > 0) { // We were unable to convert some over
+                        int edgeCost = campaign.getCampaignOptions().getEdgeCost();
+                        int rebate = edgeCost * difference;
+                        person.awardXP(campaign, rebate);
+                        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                              "CampaignXmlParser.compatibility.edge",
+                              spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG,
+                              person.getHyperlinkedFullTitle(), difference, rebate));
+                    }
+
+                    person.setCurrentEdge(person.getEdge()); // We're resetting everyone's Edge as a kindness
+                    ability.setValue(0); // This is our marker that conversion has been done.
+                } else {
+                    LOGGER.error("Unknown Object type {} loaded into Edge compatibility handler from {}",
+                          object.getClass().getSimpleName(), ability.getName());
+                }
+                return;
+            }
+        }
+    }
+
+    /**
+     * Ensures that married personnel have sexual preferences compatible with their current spouse.
+     *
+     * <p>This method iterates through all personnel and, for those who are married, updates their romantic
+     * preferences to include their spouse's gender. This is used to bring campaigns older than 0.50.10 up to date with
+     * the new sexuality tracking.</p>
+     *
+     * <p><b>Note A:</b> This method adds to existing preferences rather than replacing them, allowing characters
+     * to remain bisexual if they were previously attracted to multiple genders.</p>
+     *
+     * <p><b>Note B:</b> This approach has to be used, rather than self-correcting during person-load, as the spouse
+     * may not have been substantiated when person is loaded.</p>
+     * </p>
+     *
+     * @param personnel the collection of {@link Person} objects to process
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void correctSexualPreferencesForCurrentSpouse(Collection<Person> personnel) {
+        for (Person person : personnel) {
+            Person spouse = person.getGenealogy().getSpouse();
+
+            if (spouse != null) {
+                Gender spouseGender = spouse.getGender();
+
+                if (spouseGender.isMale()) { // the Male/Female checks include n.b. persons
+                    person.setPrefersMen(true);
+                } else if (spouseGender.isFemale()) {
+                    person.setPrefersWomen(true);
+                }
+            }
+        }
     }
 
     private static void processSkillTypeNodes(Node wn, Version version) {
@@ -1209,7 +1329,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 LOGGER.error("Unknown node type not loaded in Special Ability nodes: {}", wn2.getNodeName());
                 continue;
             }
-            SpecialAbility.generateInstanceFromXML(wn2, options, version);
+            SpecialAbility.generateInstanceFromCampaignXML(wn2, options, version);
         }
 
         LOGGER.info("Load Special Ability Nodes Complete!");
@@ -1728,7 +1848,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // will actually happen here.
     }
 
-    private static void processPartsInUse(Campaign retVal, Node wn) {
+    private static void processPartsInUse(Campaign retVal, Node wn, Version version) {
         NodeList wList = wn.getChildNodes();
 
         for (int i = 0; i < wList.getLength(); i++) {
@@ -1746,7 +1866,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 PartQuality ignoreQuality = PartQuality.valueOf(wn2.getTextContent());
                 retVal.setIgnoreSparesUnderQuality(ignoreQuality);
             } else if (wn2.getNodeName().equalsIgnoreCase("partInUseMap")) {
-                processPartsInUseRequestedStockMap(retVal, wn2);
+                if (version.isHigherThan(new Version("0.50.07"))) { // <50.10 compatibility handler
+                    processPartsInUseRequestedStockMap(retVal, wn2);
+                }
             } else {
                 LOGGER.error("Unknown node type not loaded in PartInUse nodes: {}", wn2.getNodeName());
             }

@@ -36,7 +36,6 @@ import java.util.List;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
 
 public class ScoutingSkills {
     /**
@@ -49,11 +48,10 @@ public class ScoutingSkills {
         String bestSkill = null;
         int highestLevel = -1;
 
-        PersonnelOptions options = person.getOptions();
-        Attributes attributes = person.getATOWAttributes();
+        SkillModifierData skillModifierData = person.getSkillModifierData();
         for (String skillName : SCOUTING_SKILLS) {
             if (person.hasSkill(skillName)) {
-                int skillLevel = person.getSkill(skillName).getTotalSkillLevel(options, attributes);
+                int skillLevel = person.getSkill(skillName).getTotalSkillLevel(skillModifierData);
 
                 if (skillLevel > highestLevel) {
                     highestLevel = skillLevel;

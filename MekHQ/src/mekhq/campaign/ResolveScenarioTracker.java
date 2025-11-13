@@ -75,8 +75,8 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.enums.ScenarioStatus;
-import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -88,6 +88,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.FileDialogs;
+import mekhq.gui.dialog.SalvagePostScenarioPicker;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -1087,11 +1088,12 @@ public class ResolveScenarioTracker {
             if (entity instanceof Tank) {
                 // Prefer gunner to driver, as in Unit::getCommander
                 for (Person p : crew) {
-                    if (p.getPrimaryRole().isVehicleGunner()) {
+                    boolean isGunner = unit.isGunner(p);
+                    if (isGunner) {
                         commander = p;
-                    } else if (p.getPrimaryRole().isGroundVehicleDriver() ||
-                                     p.getPrimaryRole().isNavalVehicleDriver() ||
-                                     p.getPrimaryRole().isVTOLPilot()) {
+                    } else if (p.getPrimaryRole().isVehicleCrewGround() ||
+                                     p.getPrimaryRole().isVehicleCrewNaval() ||
+                                     p.getPrimaryRole().isVehicleCrewVTOL()) {
                         driver = p;
                     }
                 }
@@ -1716,7 +1718,7 @@ public class ResolveScenarioTracker {
                 }
                 if (campaign.getCampaignOptions().isPayForRepairs()) {
                     Money amount = unit.getValueOfAllDamagedParts()
-                        .multipliedBy(DAMANGED_PART_COMPENSATION_MODIFIER);
+                                         .multipliedBy(DAMANGED_PART_COMPENSATION_MODIFIER);
                     repairBLC = repairBLC.minus(amount);
                 }
                 unit.setEntity(en);
@@ -1742,7 +1744,7 @@ public class ResolveScenarioTracker {
                 }
                 if (campaignOptions.isPayForRepairs()) {
                     Money amount = unit.getValueOfAllDamagedParts()
-                        .multipliedBy(DAMANGED_PART_COMPENSATION_MODIFIER);
+                                         .multipliedBy(DAMANGED_PART_COMPENSATION_MODIFIER);
                     repairBLC = repairBLC.minus(amount);
                 }
                 blcValue = blcValue.plus(repairBLC);
@@ -1761,70 +1763,21 @@ public class ResolveScenarioTracker {
             }
         }
 
-        // now lets take care of salvage
-        for (TestUnit salvageUnit : getActualSalvage()) {
-            UnitStatus salvageStatus = new UnitStatus(salvageUnit);
-            // FIXME: Need to implement a "fuel" part just like the "armor" part
-            if (salvageUnit.getEntity() instanceof Aero) {
-                ((Aero) salvageUnit.getEntity()).setFuelTonnage(((Aero) salvageStatus.getBaseEntity()).getFuelTonnage());
-            }
-            campaign.clearGameData(salvageUnit.getEntity());
-            campaign.addTestUnit(salvageUnit);
-            // if this is a contract, add to the salvaged value
-            if (isContract) {
-                ((Contract) mission).addSalvageByUnit(salvageUnit.getSellValue());
-            }
-        }
+        if (campaignOptions.isUseCamOpsSalvage()) {
+            SalvagePostScenarioPicker picker = new SalvagePostScenarioPicker(campaign, mission, scenario,
+                  getActualSalvage(), getSoldSalvage());
 
-        // And any ransomed salvaged units
-        if (!getSoldSalvage().isEmpty()) {
-            for (Unit ransomedUnit : getSoldSalvage()) {
-                unitRansoms = unitRansoms.plus(ransomedUnit.getSellValue());
+            List<UUID> techUUIDs = scenario.getSalvageTechs();
+            if (campaignOptions.isUseRiskySalvage()) {
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign,
+                      techUUIDs,
+                      picker.getCountOfSalvageUnits());
             }
 
-            if (unitRansoms.isGreaterThan(Money.zero())) {
-                getCampaign().getFinances()
-                      .credit(TransactionType.SALVAGE,
-                            getCampaign().getLocalDate(),
-                            unitRansoms,
-                            "Unit sales for " + getScenario().getName());
-                getCampaign().addReport(unitRansoms.toAmountAndSymbolString() +
-                                              " has been credited to your account from unit salvage sold following " +
-                                              getScenario().getHyperlinkedName() +
-                                              '.');
-                if (isContract) {
-                    ((Contract) mission).addSalvageByUnit(unitRansoms);
-                }
-            }
-        }
-
-        if (isContract) {
-            Money value = Money.zero();
-            for (Unit salvageUnit : getLeftoverSalvage()) {
-                value = value.plus(salvageUnit.getSellValue());
-            }
-            if (usesSalvageExchange()) {
-                value = value.multipliedBy(((Contract) mission).getSalvagePct()).dividedBy(100);
-                campaign.getFinances()
-                      .credit(TransactionType.SALVAGE_EXCHANGE,
-                            getCampaign().getLocalDate(),
-                            value,
-                            "Salvage exchange for " + scenario.getName());
-                campaign.addReport(value.toAmountAndSymbolString() +
-                                         " have been credited to your account for salvage exchange.");
-            } else {
-                ((Contract) mission).addSalvageByEmployer(value);
-            }
-        }
-
-        if (campaignOptions.isUseAtB() && isAtBContract) {
-            final int unitRatingMod = campaign.getAtBUnitRatingMod();
-            for (Unit unit : getUnits()) {
-                unit.setSite(((AtBContract) mission).getRepairLocation(unitRatingMod));
-            }
-            for (Unit unit : getActualSalvage()) {
-                unit.setSite(((AtBContract) mission).getRepairLocation(unitRatingMod));
-            }
+            CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs);
+        } else {
+            CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, getActualSalvage(), getSoldSalvage(),
+                  getLeftoverSalvage());
         }
 
         for (Loot loot : actualLoot) {

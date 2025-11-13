@@ -63,8 +63,10 @@ import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -73,7 +75,15 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
-import mekhq.gui.dialog.factionStanding.CampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.AdvancedScoutingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.FactionStandingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.FatigueTrackingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.PrisonerTrackingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.SalvageCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.StratConConvoyCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.VeterancyAwardsCampaignOptionsChangedConfirmationDialog;
 
 /**
  * The {@code CampaignOptionsPane} class represents a tabbed pane used for displaying and managing various campaign
@@ -460,9 +470,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         rulesetsTab = new RulesetsTab(campaignOptions);
 
         JTabbedPane rulesetsContentTabs = createSubTabs(Map.of("stratConGeneralTab",
-              rulesetsTab.createStratConTab(),
-              "legacyTab",
-              rulesetsTab.createLegacyTab()));
+              rulesetsTab.createStratConTab()));
+
+        // Enable the below section and remove the above in the event we have Legacy Options. In 50.10 all legacy
+        // options (at that time) were removed, so this section got commented out.
+        //        JTabbedPane rulesetsContentTabs = createSubTabs(Map.of("stratConGeneralTab",
+        //              rulesetsTab.createStratConTab(),
+        //              "legacyTab",
+        //              rulesetsTab.createLegacyTab()));
         rulesetsTab.loadValuesFromCampaignOptions();
 
         // Add tabs
@@ -504,6 +519,18 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             presetSkills = preset.getSkills();
         }
 
+        // Store old values for use if we want to trigger certain dialogs
+        boolean oldAwardVeterancySPAs = options.isAwardVeterancySPAs();
+        boolean oldIsTrackFactionStanding = options.isTrackFactionStanding();
+        boolean oldIsTrackPrisoners = !options.getPrisonerCaptureStyle().isNone();
+        boolean oldIsUseMASHTheatres = options.isUseMASHTheatres();
+        boolean oldIsUseFatigue = options.isUseFatigue();
+        boolean oldIsUseAdvancedSalvage = options.isUseCamOpsSalvage();
+        boolean oldIsUseStratCon = options.isUseStratCon();
+        boolean oldIsUseAdvancedScouting = options.isUseAdvancedScouting() && oldIsUseStratCon;
+        boolean oldIsUseAltAdvancedMedical = options.isUseAlternativeAdvancedMedical();
+        boolean oldIsUseDiseases = oldIsUseAltAdvancedMedical && options.isUseRandomDiseases();
+
         // Everything assumes general tab will be the first applied.
         // While this shouldn't break anything, it's not worth moving around.
         // For all other tabs, it makes sense to apply them in the order they
@@ -530,8 +557,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         financesTab.applyCampaignOptionsToCampaign(options);
         marketsTab.applyCampaignOptionsToCampaign(options);
         rulesetsTab.applyCampaignOptionsToCampaign(options);
-
-        boolean oldIsTrackFactionStanding = options.isTrackFactionStanding();
         systemsTab.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
 
         // Tidy up
@@ -544,8 +569,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
 
         boolean newIsTrackFactionStandings = options.isTrackFactionStanding();
-        if (!isStartUp && newIsTrackFactionStandings != oldIsTrackFactionStanding) { // Has tracking changed?
-            CampaignOptionsChangedConfirmationDialog dialog = new CampaignOptionsChangedConfirmationDialog(null,
+        if (!isStartUp && newIsTrackFactionStandings && !oldIsTrackFactionStanding) { // Has tracking changed?
+            FactionStandingCampaignOptionsChangedConfirmationDialog dialog = new FactionStandingCampaignOptionsChangedConfirmationDialog(
+                  null,
                   campaign.getCampaignFactionIcon(),
                   campaign.getFaction(),
                   campaign.getLocalDate(),
@@ -562,9 +588,85 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
         }
 
+        boolean newIsAwardVeterancySPAs = options.isAwardVeterancySPAs();
+        if (!isStartUp && newIsAwardVeterancySPAs && !oldAwardVeterancySPAs) { // Has tracking changed?
+            new VeterancyAwardsCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseMASHTheatres = options.isUseMASHTheatres();
+        if (!isStartUp && newIsUseMASHTheatres && !oldIsUseMASHTheatres) { // Has tracking changed?
+            new MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsTrackPrisoners = !options.getPrisonerCaptureStyle().isNone();
+        if (!isStartUp && newIsTrackPrisoners && !oldIsTrackPrisoners) { // Has tracking changed?
+            new PrisonerTrackingCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseFatigue = options.isUseFatigue();
+        if (!isStartUp && newIsUseFatigue && !oldIsUseFatigue) { // Has tracking changed?
+            new FatigueTrackingCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseAdvancedSalvage = options.isUseCamOpsSalvage();
+        if (!isStartUp && newIsUseAdvancedSalvage && !oldIsUseAdvancedSalvage) { // Has tracking changed?
+            new SalvageCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseStratCon = options.isUseStratCon();
+        if (!isStartUp && newIsUseStratCon && !oldIsUseStratCon) { // Has tracking changed?
+            new StratConConvoyCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseAdvancedScouting = options.isUseAdvancedScouting() && newIsUseStratCon;
+        if (!isStartUp && newIsUseAdvancedScouting && !oldIsUseAdvancedScouting) { // Has tracking changed?
+            new AdvancedScoutingCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseAltAdvancedMedical = options.isUseAlternativeAdvancedMedical();
+        if (!isStartUp && newIsUseAltAdvancedMedical && !oldIsUseAltAdvancedMedical) { // Has tracking changed?
+            new AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseDiseases = newIsUseAltAdvancedMedical && options.isUseRandomDiseases();
+        if (!isStartUp && newIsUseDiseases && !oldIsUseDiseases) { // Has tracking changed?
+            inoculateAllCharacters();
+        }
+
         campaign.resetRandomDeath();
         if (campaignGui != null) {
             campaignGui.refreshMarketButtonLabels();
+        }
+    }
+
+    /**
+     * Inoculates all campaign personnel for their current planet and origin planet.
+     *
+     * <p>This method adds planetary inoculation records for:</p>
+     *
+     * <ul>
+     *   <li>The current planet (if the campaign is on a planet, not in transit)</li>
+     *   <li>Each person's origin planet</li>
+     * </ul>
+     *
+     * <p>Personnel are assumed to have prior inoculation for their home planet, while current planet inoculation
+     * requires campaign location tracking.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void inoculateAllCharacters() {
+        String currentPlanetId = null;
+        CurrentLocation location = campaign.getLocation();
+        if (location.isOnPlanet()) {
+            currentPlanetId = location.getPlanet().getId();
+        }
+        for (Person person : campaign.getPersonnel()) {
+            if (currentPlanetId != null) {
+                person.addPlanetaryInoculation(currentPlanetId);
+            }
+            String originPlanetId = person.getOriginPlanet().getId();
+            person.addPlanetaryInoculation(originPlanetId);
         }
     }
 

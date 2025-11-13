@@ -347,8 +347,8 @@ class MekLocationTest {
               hasTSM, isQuad, hasSensors, hasLifeSupport, mockCampaign);
         other = new MekLocation(location, tonnage, structureType, isClan,
               hasTSM, !isQuad, hasSensors, hasLifeSupport, mockCampaign);
-        assertTrue(mekLocation.isSamePartType(other));
-        assertTrue(other.isSamePartType(mekLocation));
+        assertFalse(mekLocation.isSamePartType(other));
+        assertFalse(other.isSamePartType(mekLocation));
 
         // Restore the original setup
         mekLocation = new MekLocation(location, tonnage, structureType, isClan,

@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.generator;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Vector;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
@@ -58,20 +59,49 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
     }
 
     /**
-     * @param person the person to roll and assign the SPA for
+     * Rolls and assigns a random Special Personnel Ability (SPA) to the specified person within the given campaign,
+     * using default behavior (eligibility and weighting are both considered).
      *
-     * @return the display name of the rolled SPA, or null if one wasn't rolled
+     * @param campaign the campaign context to use for ability selection
+     * @param person   the person to whom the special ability should be assigned
+     *
+     * @return the display name of the assigned special ability, or {@code null} if no ability was assigned
      */
     public @Nullable String rollSPA(final Campaign campaign, final Person person) {
-        final List<SpecialAbility> abilityList = getEligibleSPAs(person);
+        return rollSPA(campaign, person, false, false, false);
+    }
+
+    /**
+     * Rolls and assigns a random Special Personnel Ability (SPA) to the specified person within the given campaign,
+     * using the provided weighting and eligibility criteria.
+     *
+     * <p>This method selects an available special ability for the person according to the specified options,
+     * acquires that ability (and any required specialization) for the person, and returns its display name.</p>
+     *
+     * <p>If the selected ability requires a specialization, one is chosen and appended to the display name.</p>
+     *
+     * @param campaign                the campaign context to use for ability selection and related criteria
+     * @param person                  the person to whom the special ability should be assigned
+     * @param useAlternativeWeighting if {@code true}, positive-cost abilities are weighted more heavily in the
+     *                                selection
+     * @param ignoreEligibility       if {@code true}, skips eligibility checks and considers all abilities available
+     * @param isVeterancyAward        if {@code true}, some SPAs may be excluded based on veterancy award eligibility
+     *                                status
+     *
+     * @return the display name (including specialization if applicable) of the assigned special ability, or
+     *       {@code null} if no ability could be rolled or assigned
+     */
+    public @Nullable String rollSPA(final Campaign campaign, final Person person, boolean useAlternativeWeighting,
+          boolean ignoreEligibility, boolean isVeterancyAward) {
+        List<SpecialAbility> abilityList = getSpecialAbilities(person,
+              useAlternativeWeighting,
+              ignoreEligibility,
+              isVeterancyAward);
         if (abilityList.isEmpty()) {
             return null;
         }
 
-        // create a weighted list based on XP
-        final List<SpecialAbility> weightedList = SpecialAbility.getWeightedSpecialAbilities(abilityList);
-
-        final String name = ObjectUtility.getRandomItem(weightedList).getName();
+        final String name = ObjectUtility.getRandomItem(abilityList).getName();
         String displayName = SpecialAbility.getDisplayName(name);
         switch (name) {
             case OptionsConstants.GUNNERY_SPECIALIST: {
@@ -140,12 +170,96 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
         return displayName;
     }
 
-    private List<SpecialAbility> getEligibleSPAs(Person person) {
+    /**
+     * Compiles and returns a list of {@link SpecialAbility} objects available to the given person, according to
+     * eligibility and weighting rules.
+     *
+     * <p>If {@code ignoreEligibility} is true, all valid special abilities (excluding those limited to character
+     * creation or restricted by currently present invalid abilities) are considered, and positive-cost abilities may be
+     * emphasized using alternative weighting if specified. Otherwise, the list of eligible special abilities is
+     * determined by {@link #getEligibleSPAs(Person, boolean)}.</p>
+     *
+     * <p>If the resulting list is empty, {@code null} is returned.</p>
+     *
+     * @param person                  the person for whom to collect available special abilities
+     * @param useAlternativeWeighting if {@code true}, positive-cost abilities are weighted more heavily (reducing the
+     *                                chance of characters receiving flaws)
+     * @param ignoreEligibility       if {@code true}, all valid abilities are considered regardless of other
+     *                                eligibility requirements
+     * @param isVeterancyAward        if {@code true}, some SPAs may be excluded based on veterancy award eligibility
+     *                                status
+     *
+     * @return a list of available special abilities based on the criteria, or an empty list is none are found
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private List<SpecialAbility> getSpecialAbilities(Person person, boolean useAlternativeWeighting,
+          boolean ignoreEligibility, boolean isVeterancyAward) {
+        final PersonnelOptions options = person.getOptions();
+        List<SpecialAbility> abilityList = new ArrayList<>();
+        final List<SpecialAbility> positiveAbilities = new ArrayList<>();
+        final List<SpecialAbility> negativeAbilities = new ArrayList<>();
+
+        if (ignoreEligibility) {
+            for (SpecialAbility ability : SpecialAbility.getSpecialAbilities().values()) {
+                if (isVeterancyAward && ability.getOriginOnly()) {
+                    continue;
+                }
+
+                Vector<String> invalidAbilities = ability.getInvalidAbilities();
+                boolean isValid = true;
+                if (!invalidAbilities.isEmpty()) {
+                    for (String abilityCode : invalidAbilities) {
+                        if (options.booleanOption(abilityCode)) {
+                            isValid = false;
+                            break; // Invalid if any code is present
+                        }
+                    }
+                }
+                if (isValid) {
+                    abilityList.add(ability);
+                    if (ability.getCost() >= 0) {
+                        positiveAbilities.add(ability);
+                    } else {
+                        negativeAbilities.add(ability);
+                    }
+                }
+            }
+        } else {
+            abilityList = getEligibleSPAs(person, isVeterancyAward);
+        }
+
+        // Alternative weighting will pre-determine whether the SPA is positive or negative.
+        if (useAlternativeWeighting) {
+            if (negativeAbilities.isEmpty()) {
+                return positiveAbilities;
+            } else if (positiveAbilities.isEmpty()) {
+                return negativeAbilities;
+            } else {
+                int roll = Compute.randomInt(40);
+                if (roll == 0) {
+                    abilityList.addAll(negativeAbilities);
+                } else {
+                    abilityList.addAll(positiveAbilities);
+                }
+            }
+        } else {
+            abilityList = SpecialAbility.getWeightedSpecialAbilities(abilityList);
+        }
+        return abilityList;
+    }
+
+    private List<SpecialAbility> getEligibleSPAs(Person person, boolean isVeterancyAward) {
         List<SpecialAbility> eligible = new ArrayList<>();
         for (Enumeration<IOption> i = person.getOptions(PersonnelOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (!ability.booleanValue()) {
                 SpecialAbility spa = SpecialAbility.getAbility(ability.getName());
+                if (isVeterancyAward && spa.getOriginOnly()) {
+                    continue;
+                }
+
                 if ((spa == null) || (spa.getWeight() <= 0)
                           || (!spa.isEligible(person.isClanPersonnel(), person.getSkills(), person.getOptions()))) {
                     continue;

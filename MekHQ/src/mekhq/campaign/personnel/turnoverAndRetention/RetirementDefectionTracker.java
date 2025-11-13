@@ -33,9 +33,11 @@
  */
 package mekhq.campaign.personnel.turnoverAndRetention;
 
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_MEDIATOR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 
 import java.io.PrintWriter;
@@ -62,9 +64,10 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.FactionHints;
+import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -181,21 +184,19 @@ public class RetirementDefectionTracker {
             // Desirability modifier
             if ((campaign.getCampaignOptions().isUseSkillModifiers()) &&
                       (person.getAge(campaign.getLocalDate()) < RETIREMENT_AGE)) {
-                targetNumber.addModifier(person.getExperienceLevel(campaign, false) - 2,
+                targetNumber.addModifier(min(EXP_ELITE - 2, person.getExperienceLevel(campaign, false, true) - 2),
                       resources.getString("desirability.text"));
             }
 
             // Recent Promotion Modifier
-            if (campaign.getCampaignOptions().isUseSkillModifiers()) {
-                LocalDate today = campaign.getLocalDate();
-                LocalDate lastPromotionDate = person.getLastRankChangeDate();
+            LocalDate today = campaign.getLocalDate();
+            LocalDate lastPromotionDate = person.getLastRankChangeDate();
 
-                if (lastPromotionDate != null) {
-                    long monthsBetween = ChronoUnit.MONTHS.between(lastPromotionDate, today);
+            if (lastPromotionDate != null) {
+                long monthsBetween = ChronoUnit.MONTHS.between(lastPromotionDate, today);
 
-                    if (monthsBetween <= 6) {
-                        targetNumber.addModifier(-1, resources.getString("recentPromotion.text"));
-                    }
+                if (monthsBetween <= 6) {
+                    targetNumber.addModifier(-1, resources.getString("recentPromotion.text"));
                 }
             }
 
@@ -226,9 +227,10 @@ public class RetirementDefectionTracker {
                 if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
                     Person commander = campaign.getCommander();
                     if (commander != null && commander.hasSkill((SkillType.S_LEADER))) {
+                        SkillModifierData skillModifierData = commander.getSkillModifierData(true);
+
                         modifier -= commander.getSkill(SkillType.S_LEADER)
-                                          .getFinalSkillValue(commander.getOptions(),
-                                                commander.getATOWAttributes());
+                                          .getFinalSkillValue(skillModifierData);
                     }
                 } else {
                     modifier -= getManagementSkillModifier(person);
@@ -299,7 +301,8 @@ public class RetirementDefectionTracker {
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
                       (!campaign.getCampaignOptions().isUseHideLoyalty())) {
 
-                int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction());
+                int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction(),
+                      campaign.getCampaignOptions().isUseAlternativeAdvancedMedical());
 
                 if (person.isCommander()) {
                     loyaltyScore += 2;
@@ -343,7 +346,7 @@ public class RetirementDefectionTracker {
                 }
 
                 // wartime modifier
-                if (FactionHints.defaultFactionHints()
+                if (FactionHints.getInstance()
                           .isAtWarWith(campaign.getFaction(), person.getOriginFaction(), campaign.getLocalDate())) {
                     targetNumber.addModifier(4, resources.getString("factionEnemy.text"));
                 }
@@ -626,8 +629,9 @@ public class RetirementDefectionTracker {
      */
     private static int getIndividualCommanderLeadership(Person commander) {
         if (commander.hasSkill(SkillType.S_LEADER)) {
-            return commander.getSkill(SkillType.S_LEADER)
-                         .getFinalSkillValue(commander.getOptions(), commander.getATOWAttributes());
+            SkillModifierData skillModifierData = commander.getSkillModifierData();
+
+            return commander.getSkill(SkillType.S_LEADER).getFinalSkillValue(skillModifierData);
         } else {
             return 0;
         }
@@ -702,10 +706,6 @@ public class RetirementDefectionTracker {
     public static int getCombinedSkillValues(Campaign campaign, String skillType) {
         int combinedSkillValues = 0;
 
-        boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
-        boolean isClanCampaign = campaign.isClanCampaign();
-        LocalDate today = campaign.getLocalDate();
-
         for (Person person : campaign.getActivePersonnel(false, false)) {
             boolean isAdmin = person.getPrimaryRole().isAdministratorHR() ||
                                     person.getSecondaryRole().isAdministratorHR();
@@ -721,13 +721,8 @@ public class RetirementDefectionTracker {
                 continue;
             }
 
-            int adjustedReputation = person.getAdjustedReputation(isUseAgingEffects,
-                  isClanCampaign,
-                  today,
-                  person.getRankNumeric());
-            int skillLevel = skill.getTotalSkillLevel(person.getOptions(),
-                  person.getATOWAttributes(),
-                  adjustedReputation);
+            SkillModifierData skillModifierData = person.getSkillModifierData();
+            int skillLevel = skill.getTotalSkillLevel(skillModifierData);
 
             combinedSkillValues += skillLevel + mediatorModifier;
         }
@@ -745,7 +740,8 @@ public class RetirementDefectionTracker {
     private int getBaseTargetNumber(Campaign campaign, Person person) {
         if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
                   (campaign.getCampaignOptions().isUseHideLoyalty())) {
-            int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction());
+            int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction(),
+                  campaign.getCampaignOptions().isUseAlternativeAdvancedMedical());
 
             if (person.isCommander()) {
                 loyaltyScore += 2;

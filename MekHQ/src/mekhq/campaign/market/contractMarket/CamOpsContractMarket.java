@@ -33,6 +33,7 @@
 package mekhq.campaign.market.contractMarket;
 
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
@@ -270,19 +271,28 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         // Step 4: Populate some information about enemies and allies
         final SkillLevel campaignSkillLevel = reputation.getAverageSkillLevel();
         final boolean useDynamicDifficulty = campaign.getCampaignOptions().isUseDynamicDifficulty();
-        setAllyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
-        setEnemyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
+        final boolean useBolsterContractSkill = campaign.getCampaignOptions().isUseBolsterContractSkill();
+        setAllyRating(contract,
+              campaign.getGameYear(),
+              useDynamicDifficulty ? campaignSkillLevel : REGULAR,
+              useBolsterContractSkill);
+        setEnemyRating(contract,
+              campaign.getGameYear(),
+              useDynamicDifficulty ? campaignSkillLevel : REGULAR,
+              useBolsterContractSkill);
         if (contract.getContractType().isCadreDuty()) {
-            contract.setAllySkill(SkillLevel.GREEN);
-            contract.setAllyQuality(DragoonRating.DRAGOON_F.getRating());
+            contract.setAllySkill(campaign.getCampaignOptions().isUseBolsterContractSkill() ? REGULAR : GREEN);
+            contract.setAllyQuality(DragoonRating.DRAGOON_F);
         }
         // Step 5: Determine the contract length (Not CamOps RAW)
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         // Step 6: Determine the initial contract clauses
         setContractClauses(contract, contractTerms);
         // Step 7: Determine the number of required lances (Not CamOps RAW)
-        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
-        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false));
+        double varianceFactor = ContractUtilities.calculateVarianceFactor();
+        contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
+              contract.getContractType().isCadreDuty(), false, varianceFactor));
+        contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false, varianceFactor));
         // Step 8: Calculate the payment
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
         // Step 9: Determine parts availability

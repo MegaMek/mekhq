@@ -64,11 +64,11 @@ import mekhq.campaign.ExtraData.StringKey;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryType;
-import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.InjuryLevel;
+import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PaperDoll;
 

@@ -39,6 +39,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
+import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.gui.dialog.glossary.NewGlossaryDialog.DOCUMENTATION_COMMAND_STRING;
@@ -57,7 +58,6 @@ import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -68,6 +68,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -329,7 +330,7 @@ public class ImmersiveDialogCore extends JDialog {
         JPanel northPanel = new JPanel(new BorderLayout());
 
         // Buttons panel
-        JPanel buttonPanel = populateButtonPanel(buttons, isVerticalLayout, supplementalPanel);
+        JPanel buttonPanel = populateButtonPanel(buttons, isVerticalLayout);
 
         // Create a JEditorPane for the center message
         JEditorPane editorPane = getJEditorPane(centerMessage, buttonPanel);
@@ -338,11 +339,17 @@ public class ImmersiveDialogCore extends JDialog {
         // Add a HyperlinkListener to capture hyperlink clicks
         editorPane.addHyperlinkListener(this::hyperlinkEventListenerActions);
 
-        // Wrap the JEditorPane in a JScrollPane
-        JScrollPane scrollPane = new JScrollPane(editorPane);
-        scrollPane.setMinimumSize(scaleForGUI(CENTER_WIDTH, scrollPane.getHeight()));
+        JPanel viewport = new JPanel(new BorderLayout());
+        viewport.add(editorPane, BorderLayout.CENTER);
+        if (supplementalPanel != null) {
+            viewport.add(supplementalPanel, BorderLayout.SOUTH);
+            fetchSpinnerFromPanel(supplementalPanel);
+            fetchComboBoxFromPanel(supplementalPanel);
+        }
+
+        FastJScrollPane scrollPane = new FastJScrollPane();
+        scrollPane.setViewportView(viewport);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        // This line ensures the scroll pane starts scrolled to the top, not bottom.
         SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
 
         // Create a container with a border for the padding
@@ -534,25 +541,16 @@ public class ImmersiveDialogCore extends JDialog {
      * (`isVerticalLayout`).
      * </p>
      *
-     * @param buttons          A {@link List} of {@link ButtonLabelTooltipPair} instances, where each pair defines the
-     *                         label and tooltip for a button.
-     * @param isVerticalLayout A {@code boolean} value indicating the layout style: {@code true} for vertical stacking,
-     *                         {@code false} for horizontal arrangement.
+     * @param buttons A {@link List} of {@link ButtonLabelTooltipPair} instances, where each pair defines the label and
+     *                tooltip for a button.
+     * @param isVerticalLayout A {@code boolean} value indicating the layout style: {@code true} for vertical stacking, {@code false} for horizontal arrangement.
      */
-    protected JPanel populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
-          @Nullable JPanel supplementalPanel) {
+    protected JPanel populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout) {
         final int padding = getPadding();
 
-        // Main container panel to hold the spinner and button panel
+        // Main container panel to hold the button panel
         JPanel containerPanel = new JPanel();
         containerPanel.setLayout(new BorderLayout(padding, padding));
-
-        // Add the spinner panel to the top of the container
-        if (supplementalPanel != null) {
-            containerPanel.add(supplementalPanel, BorderLayout.NORTH);
-            fetchSpinnerFromPanel(supplementalPanel);
-            fetchComboBoxFromPanel(supplementalPanel);
-        }
 
         // Create button panel
         JPanel buttonPanel = new JPanel();
@@ -841,7 +839,9 @@ public class ImmersiveDialogCore extends JDialog {
         if (campaign.getPersonnel().contains(speaker)) {
             Portrait portrait = speaker.getPortrait();
 
-            if (portrait == null || Objects.equals(portrait.getFilename(), DEFAULT_PORTRAIT_FILENAME)) {
+            if (portrait == null ||
+                      portrait.getFilename().equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
+                      portrait.getFilename().equalsIgnoreCase(NO_PORTRAIT_NAME)) {
                 return campaign.getCampaignFactionIcon();
             }
 

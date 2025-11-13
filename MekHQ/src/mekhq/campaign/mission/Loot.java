@@ -207,7 +207,7 @@ public class Loot {
                         }
                     }
 
-                    cargo += unit.getCargoCapacity();
+                    cargo += unit.getCargoCapacityForConvoy();
                 }
             }
             LOGGER.debug("cargo capacity: {}", cargo);

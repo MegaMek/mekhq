@@ -103,6 +103,8 @@ public class SkillsTab {
     private JPanel pnlEdgeCost;
     private JLabel lblEdgeCost;
     private JSpinner spnEdgeCost;
+    private JLabel lblAttributeCost;
+    private JSpinner spnAttributeCost;
 
     private static final MMLogger LOGGER = MMLogger.create(SkillsTab.class);
 
@@ -142,6 +144,8 @@ public class SkillsTab {
         pnlEdgeCost = new JPanel();
         lblEdgeCost = new JLabel();
         spnEdgeCost = new JSpinner();
+        lblAttributeCost = new JLabel();
+        spnAttributeCost = new JSpinner();
     }
 
     /**
@@ -200,7 +204,8 @@ public class SkillsTab {
             boolean isCorrectType = switch (category) {
                 case NONE, COMBAT_GUNNERY -> subType == COMBAT_GUNNERY;
                 case COMBAT_PILOTING -> subType == COMBAT_PILOTING;
-                case SUPPORT -> subType == SUPPORT;
+                case SUPPORT -> subType == SUPPORT ||
+                                      subType == SUPPORT_TECHNICIAN;
                 case UTILITY -> subType == UTILITY ||
                                       subType == UTILITY_COMMAND;
                 case ROLEPLAY_GENERAL -> subType == ROLEPLAY_GENERAL ||
@@ -209,6 +214,7 @@ public class SkillsTab {
                                                subType == ROLEPLAY_SCIENCE ||
                                                subType == ROLEPLAY_SECURITY;
                 // These next few cases shouldn't get hit, but we include them just in case
+                case SUPPORT_TECHNICIAN -> subType == SUPPORT_TECHNICIAN;
                 case UTILITY_COMMAND, SUPPORT_COMMAND -> subType == UTILITY_COMMAND;
                 case ROLEPLAY_ART -> subType == ROLEPLAY_ART;
                 case ROLEPLAY_INTEREST -> subType == ROLEPLAY_INTEREST;
@@ -304,6 +310,9 @@ public class SkillsTab {
         lblEdgeCost = new CampaignOptionsLabel("EdgeCost");
         spnEdgeCost = new CampaignOptionsSpinner("EdgeCost", 100, 0, 500, 1);
 
+        lblAttributeCost = new CampaignOptionsLabel("AttributeCost");
+        spnAttributeCost = new CampaignOptionsSpinner("AttributeCost", 100, 0, 500, 1);
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("EdgeCostPanel", true, "EdgeCostPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -311,6 +320,12 @@ public class SkillsTab {
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
+        panel.add(lblEdgeCost, layout);
+        layout.gridx++;
+        panel.add(spnEdgeCost, layout);
+
+        layout.gridy++;
+        layout.gridx = 0;
         panel.add(lblEdgeCost, layout);
         layout.gridx++;
         panel.add(spnEdgeCost, layout);

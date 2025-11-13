@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 
@@ -109,7 +110,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(getSkillPreferences());
         skillGenerator.generateSkills(campaign, person, expLvl);
-        skillGenerator.generateAttributes(person);
+        skillGenerator.generateAttributes(person, campaignOptions.isUseEdge());
         skillGenerator.generateTraits(person);
 
         // Limit skills by age for children and adolescents
@@ -133,13 +134,12 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
             specialAbilityGenerator.generateSpecialAbilities(campaign, person, expLvl);
         }
 
-        // set interest in marriage and children flags
-        int interestInMarriageDiceSize = campaignOptions.getNoInterestInMarriageDiceSize();
-        person.setMarriageable(((interestInMarriageDiceSize != 0) &&
-                                      (Compute.randomInt(interestInMarriageDiceSize)) != 0));
+        // Set relationship flags
+        determineOrientation(person, campaignOptions.getNoInterestInRelationshipsDiceSize(),
+              campaignOptions.getInterestedInSameSexDiceSize(), campaignOptions.getInterestedInBothSexesDiceSize());
 
         int interestInChildren = campaignOptions.getNoInterestInChildrenDiceSize();
-        person.setTryingToConceive(((interestInChildren != 0) && (Compute.randomInt(interestInChildren)) != 0));
+        person.setTryingToConceive(((interestInChildren != 0) && (randomInt(interestInChildren)) != 0));
 
         // Do naming at the end, to ensure the keys are set
         generateNameAndGender(campaign, person, gender);
@@ -182,5 +182,61 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         }
 
         return person;
+    }
+
+    /**
+     * Determines a person's sexual orientation based on weighted random rolls.
+     *
+     * <p>Orientations are checked in priority order (no interest → same-sex → both sexes → opposite-sex). The first
+     * successful roll determines the orientation, ensuring mutual exclusivity.</p>
+     *
+     * <p>Each dice size parameter represents the probability denominator for that orientation:
+     * a value of {@code 0} means the orientation never occurs, {@code 1} means it always occurs, and higher values
+     * reduce the probability (e.g., {@code 100} gives a 1% chance).</p>
+     *
+     * @param person                            the {@link Person} whose orientation is being determined
+     * @param noInterestInRelationshipsDiceSize dice size for aromantic/asexual orientation (rolled first)
+     * @param interestedInSameSexDiceSize       dice size for homosexual orientation (rolled second)
+     * @param interestedInBothSexesDiceSize     dice size for bisexual/pansexual orientation (rolled third)
+     */
+    public static void determineOrientation(Person person, int noInterestInRelationshipsDiceSize,
+          int interestedInSameSexDiceSize, int interestedInBothSexesDiceSize) {
+        boolean isMale = person.getGender().isMale();
+
+        // Based on default campaign options:
+        // Aromantic (die size 100): 1.00%
+        // Homosexual (die size 14): 7.07%
+        // Bisexual (die size 33): 2.82%
+        // Heterosexual: 89.11%
+
+        // Check orientations in priority order - first match wins
+        if (rollsOrientation(noInterestInRelationshipsDiceSize)) {
+            // Aromantic/Asexual
+            person.setPrefersMen(false);
+            person.setPrefersWomen(false);
+        } else if (rollsOrientation(interestedInSameSexDiceSize)) {
+            // Homosexual
+            person.setPrefersMen(isMale);
+            person.setPrefersWomen(!isMale);
+        } else if (rollsOrientation(interestedInBothSexesDiceSize)) {
+            // Bisexual/Pansexual
+            person.setPrefersMen(true);
+            person.setPrefersWomen(true);
+        } else {
+            // Heterosexual
+            person.setPrefersMen(!isMale);
+            person.setPrefersWomen(isMale);
+        }
+    }
+
+    /**
+     * Performs a weighted random roll to determine if an orientation applies.
+     *
+     * @param diceSize the size of the die (0 means never applies, 1 means always applies)
+     *
+     * @return {@code true} if the roll succeeds (rolls a 1), {@code false} otherwise
+     */
+    private static boolean rollsOrientation(int diceSize) {
+        return (diceSize != 0) && (Compute.randomInt(diceSize) == 0);
     }
 }

@@ -82,6 +82,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
@@ -801,9 +802,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 } else if (tech.getMinutesLeft() <= 0) {
                     return false;
                 } else {
+                    SkillModifierData skillModifierData = tech.getSkillModifierData();
                     return getCampaign().getCampaignOptions().isDestroyByMargin() ||
                                  (part.getSkillMin() <=
-                                        (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) -
+                                        (skill.getExperienceLevel(skillModifierData) -
                                                modePenalty));
                 }
             }

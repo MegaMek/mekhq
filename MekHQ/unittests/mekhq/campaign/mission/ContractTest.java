@@ -33,8 +33,9 @@
  */
 package mekhq.campaign.mission;
 
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -43,6 +44,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Accountant;
@@ -79,7 +81,7 @@ public class ContractTest {
     @Test
     public void testGetTransportAmount() {
         initializeTest();
-        assertEquals(Money.of(20), contract.getTransportAmount());
+        assertEquals(Money.of(0), contract.getTransportAmount());
     }
 
     @Test
@@ -91,43 +93,43 @@ public class ContractTest {
     @Test
     public void testSigningBonusAmount() {
         initializeTest();
-        assertEquals(Money.of(20), contract.getSigningBonusAmount());
+        assertEquals(Money.of(18.0), contract.getSigningBonusAmount());
     }
 
     @Test
     public void testGetFeeAmount() {
         initializeTest();
-        assertEquals(Money.of(10), contract.getFeeAmount());
+        assertEquals(Money.of(9.0), contract.getFeeAmount());
     }
 
     @Test
     public void testGetTotalAmount() {
         initializeTest();
-        assertEquals(Money.of(200), contract.getTotalAmount());
+        assertEquals(Money.of(180.0), contract.getTotalAmount());
     }
 
     @Test
     public void testGetTotalAmountPlusFees() {
         initializeTest();
-        assertEquals(Money.of(190), contract.getTotalAmountPlusFees());
+        assertEquals(Money.of(171.0), contract.getTotalAmountPlusFees());
     }
 
     @Test
     public void testGetAdvanceAmount() {
         initializeTest();
-        assertEquals(Money.of(19), contract.getAdvanceAmount());
+        assertEquals(Money.of(17.1), contract.getAdvanceAmount());
     }
 
     @Test
     public void testGetTotalAmountPlusFeesAndBonuses() {
         initializeTest();
-        assertEquals(Money.of(210), contract.getTotalAmountPlusFeesAndBonuses());
+        assertEquals(Money.of(189.0), contract.getTotalAmountPlusFeesAndBonuses());
     }
 
     @Test
     public void testGetMonthlyPayout() {
         initializeTest();
-        assertEquals(Money.of(17.10), contract.getMonthlyPayOut());
+        assertEquals(Money.of(15.39), contract.getMonthlyPayOut());
     }
 
     @Test
@@ -164,6 +166,7 @@ public class ContractTest {
         contract.setAdvancePct(10);
 
         when(contract.getSystem()).thenReturn(new PlanetarySystem());
+        when(mockCampaign.isUseCommandCircuitForContract(contract)).thenReturn(false);
     }
 
     private void initCampaign(final JumpPath mockJumpPath) {
@@ -172,6 +175,8 @@ public class ContractTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaignOptions.isUsePeacetimeCost()).thenReturn(true);
         when(mockCampaignOptions.isPayForTransport()).thenReturn(true);
+        when(mockCampaignOptions.isUseTwoWayPay()).thenReturn(true);
+        when(mockCampaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.CAMPAIGN_OPS);
 
         Money jumpCost = Money.of(5);
         Money contractBase = Money.of(10);
@@ -185,10 +190,17 @@ public class ContractTest {
 
         when(mockCampaign.calculateJumpPath(nullable(PlanetarySystem.class),
               nullable(PlanetarySystem.class))).thenReturn(mockJumpPath);
-        when(mockCampaign.calculateCostPerJump(anyBoolean(), anyBoolean())).thenReturn(jumpCost);
         when(mockCampaign.getAtBUnitRatingMod()).thenReturn(10);
         when(mockCampaign.getAccountant()).thenReturn(mockAccountant);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
+
+        CurrentLocation mockCurrentLocation = mock(CurrentLocation.class);
+        when(mockCampaign.getLocation()).thenReturn(mockCurrentLocation);
+
+        TransportCostCalculations mockTransportCostCalculation = mock(TransportCostCalculations.class);
+        when(mockCampaign.getTransportCostCalculation(EXP_REGULAR)).thenReturn(mockTransportCostCalculation);
+        when(mockTransportCostCalculation.calculateJumpCostForEntireJourney(any(Integer.class),
+              any(Integer.class))).thenReturn(jumpCost);
     }
 }

@@ -36,17 +36,16 @@ import static megamek.client.ui.util.UIUtil.scaleForGUI;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import javax.swing.DropMode;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTree;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import javax.swing.*;
 import javax.swing.tree.TreeSelectionModel;
 
 import megamek.common.event.Subscribe;
@@ -60,10 +59,19 @@ import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.stratCon.MaplessStratCon;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.TOEMouseAdapter;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
+import mekhq.gui.dialog.MaplessStratConForcePicker;
+import mekhq.gui.dialog.MaplessStratConScenarioPicker;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.handler.TOETransferHandler;
 import mekhq.gui.model.CrewListModel;
@@ -118,6 +126,13 @@ public final class TOETab extends CampaignGuiTab {
 
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setBorder(null);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton btnDeploy = new RoundedJButton("Deploy Directly to Scenario");
+        btnDeploy.addActionListener(evt -> deploymentButton());
+        buttonPanel.add(btnDeploy);
+        leftPanel.add(buttonPanel, BorderLayout.NORTH);
+
         JScrollPane orgScrollPane = new JScrollPane(orgTree);
         orgScrollPane.setBorder(null);
         leftPanel.add(orgScrollPane, BorderLayout.CENTER);
@@ -146,6 +161,115 @@ public final class TOETab extends CampaignGuiTab {
         add(splitOrg, gridBagConstraints);
 
         tabUnitLastSelectedIndex = 0;
+    }
+
+    /**
+     * Handles the deployment button action by allowing the player to select a scenario and deploy forces to it.
+     *
+     * <p>This method presents a dialog with all current scenarios from active missions, sorted by date (newest
+     * first). After the player selects a scenario, the method determines whether it's a StratCon scenario or a regular
+     * scenario and delegates to the appropriate deployment handler.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void deploymentButton() {
+        // Build scenario list with mission mapping
+        Map<Scenario, Mission> scenarioMissionMap = new HashMap<>();
+        for (Mission mission : getCampaign().getActiveMissions(false)) {
+            for (Scenario scenario : mission.getCurrentScenarios()) {
+                scenarioMissionMap.put(scenario, mission);
+            }
+        }
+
+        List<Scenario> sortedScenarios = new ArrayList<>(scenarioMissionMap.keySet());
+        // A scenario will have a null date if it hasn't been found in StratCon yet
+        sortedScenarios.removeIf(scenario -> scenario.getDate() == null);
+        sortedScenarios.sort(Comparator.comparing(Scenario::getDate).reversed());
+
+        // Show scenario picker
+        MaplessStratConScenarioPicker scenarioPicker = new MaplessStratConScenarioPicker(getCampaign(),
+              sortedScenarios);
+        if (!scenarioPicker.wasConfirmed()) {
+            return;
+        }
+
+        Scenario selectedScenario = sortedScenarios.get(scenarioPicker.getComboBoxChoiceIndex());
+        Mission selectedMission = scenarioMissionMap.get(selectedScenario);
+
+        // Check if this is a StratCon scenario
+        boolean isStratConScenario = selectedScenario instanceof AtBDynamicScenario &&
+                                           selectedMission instanceof AtBContract atbContract &&
+                                           atbContract.getStratconCampaignState() != null;
+
+        if (isStratConScenario) {
+            deployToStratCon(selectedScenario);
+        } else {
+            deployToRegularScenario(selectedScenario);
+        }
+    }
+
+    /**
+     * Deploys forces to a StratCon scenario using the mapless StratCon deployment interface.
+     *
+     * <p>This method retrieves the StratCon tab and delegates to the mapless deployment system, which handles force
+     * assignment through the StratCon scenario wizard.</p>
+     *
+     * @param selectedScenario the StratCon scenario to deploy forces to
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void deployToStratCon(Scenario selectedScenario) {
+        if (getCampaignGui().getTab(MHQTabType.STRAT_CON) instanceof StratConTab stratConTab) {
+            MaplessStratCon.deployWithoutMap(stratConTab.getStratconPanel(), getCampaign(), selectedScenario);
+        }
+    }
+
+    /**
+     * Deploys forces to a regular (non-StratCon) scenario.
+     *
+     * <p>This method presents a dialog allowing the player to select from available combat teams that are not
+     * currently deployed. For AtB dynamic scenarios, it opens the force template assignment dialog. For standard
+     * scenarios, it directly assigns the selected force to the scenario and triggers the appropriate deployment
+     * events.</p>
+     *
+     * @param selectedScenario the scenario to deploy forces to
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void deployToRegularScenario(Scenario selectedScenario) {
+        // Get available forces
+        List<Force> forceOptions = getCampaign().getCombatTeamsAsList().stream()
+                                         .map(combatTeam -> getCampaign().getForce(combatTeam.getForceId()))
+                                         .filter(force -> force != null && !force.isDeployed())
+                                         .sorted(Comparator.comparing(Force::getFullName))
+                                         .toList();
+
+        // Show force picker
+        MaplessStratConForcePicker forcePicker = new MaplessStratConForcePicker(getCampaign(), forceOptions);
+        if (!forcePicker.wasConfirmed()) {
+            return;
+        }
+
+        Force selectedForce = forceOptions.get(forcePicker.getComboBoxChoiceIndex());
+
+        // Deploy force to scenario
+        if (selectedScenario instanceof AtBDynamicScenario dynamicScenario) {
+            new ForceTemplateAssignmentDialog(getCampaignGui(),
+                  new Vector<>(List.of(selectedForce)),
+                  null,
+                  dynamicScenario);
+        } else {
+            getCampaignGui().undeployForce(selectedForce);
+            selectedForce.clearScenarioIds(getCampaign(), true);
+            if (selectedScenario != null) {
+                selectedScenario.addForces(selectedForce.getId());
+                selectedForce.setScenarioId(selectedScenario.getId(), getCampaign());
+            }
+            MekHQ.triggerEvent(new DeploymentChangedEvent(selectedForce, selectedScenario));
+        }
     }
 
     @Override
@@ -181,7 +305,7 @@ public final class TOETab extends CampaignGuiTab {
                 scrollPerson.setBorder(null);
                 crewPanel.add(scrollPerson, BorderLayout.CENTER);
                 CrewListModel model = new CrewListModel();
-                model.setData(unit);
+                model.setData(unit, getCampaign().getCampaignOptions().isUseSmallArmsOnly());
                 /* For units with multiple crew members, present a horizontal list above the PersonViewPanel.
                  * This custom version of JList was the only way I could figure out how to limit the JList
                  * to a single row with a horizontal scrollbar.

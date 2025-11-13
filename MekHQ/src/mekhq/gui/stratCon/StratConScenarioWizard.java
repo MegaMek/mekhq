@@ -48,6 +48,7 @@ import static mekhq.campaign.stratCon.StratConRulesManager.processReinforcementD
 import static mekhq.campaign.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.stratCon.StratConScenario.ScenarioState.REINFORCEMENTS_COMMITTED;
 import static mekhq.campaign.utilities.CampaignTransportUtilities.getLeadershipDropdownVectorPair;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -64,6 +65,7 @@ import javax.swing.event.ListSelectionListener;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Minefield;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -72,6 +74,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
@@ -84,9 +87,9 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.StratConPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.StratConReinforcementsConfirmationDialog;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.ArrayUtils;
@@ -96,13 +99,16 @@ import org.apache.commons.math3.util.Pair;
  * UI for managing force/unit assignments for individual StratCon scenarios.
  */
 public class StratConScenarioWizard extends JDialog {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBStratCon";
     private static final MMLogger LOGGER = MMLogger.create(StratConScenarioWizard.class);
 
     private StratConScenario currentScenario;
     private final Campaign campaign;
     private StratConTrackState currentTrackState;
     private StratConCampaignState currentCampaignState;
+    @Deprecated(since = "0.50.10", forRemoval = false)
     private final String resourcePath = "mekhq.resources.AtBStratCon";
+    @Deprecated(since = "0.50.10", forRemoval = false)
     private final transient ResourceBundle resources = ResourceBundle.getBundle(resourcePath,
           MekHQ.getMHQOptions().getLocale());
 
@@ -115,8 +121,6 @@ public class StratConScenarioWizard extends JDialog {
     private CampaignTransportType selectedCampaignTransportType = null;
 
     private JComboBox<String> cboTransportType = new JComboBox<>();
-
-    private boolean wasCanceled;
 
     private JPanel contentPanel;
     private JButton btnCommit;
@@ -163,14 +167,6 @@ public class StratConScenarioWizard extends JDialog {
         setUI(isPrimaryForce);
     }
 
-    public boolean isWasCanceled() {
-        return wasCanceled;
-    }
-
-    public void setWasCanceled(boolean wasCancelled) {
-        this.wasCanceled = wasCancelled;
-    }
-
     /**
      * Configures and initializes the user interface for the scenario setup wizard. This method dynamically assembles
      * various UI components based on the scenario's state and whether the primary force is being assigned.
@@ -207,6 +203,7 @@ public class StratConScenarioWizard extends JDialog {
     private void setUI(boolean isPrimaryForce) {
         setTitle(resources.getString("scenarioSetupWizard.title"));
         getContentPane().removeAll();
+        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
         // Create a new panel to hold all components
         contentPanel = new JPanel(new CardLayout());
@@ -229,7 +226,13 @@ public class StratConScenarioWizard extends JDialog {
         // Handle optional UI for eligible leadership, defensive points, etc.
         if (isPrimaryForce) {
             gbc.gridy++;
-            int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(S_LEADER, campaign);
+            AtBDynamicScenario backingScenario = currentScenario.getBackingScenario();
+            int leadershipSkill = backingScenario.getLanceCommanderSkill(S_LEADER, campaign);
+
+            if (backingScenario.getStratConScenarioType().isOfficialChallenge()) {
+                leadershipSkill = 0; // No leadership units for combat challenges, that'd be cheating
+            }
+
             eligibleLeadershipUnits = getEligibleLeadershipUnits(campaign, currentScenario, leadershipSkill);
             eligibleLeadershipUnits.sort(Comparator.comparing(this::getForceNameReversed));
 
@@ -467,7 +470,7 @@ public class StratConScenarioWizard extends JDialog {
 
         // Transport Type
         gbc.gridy++;
-        JLabel lblTransportInstructions = new JLabel(MHQInternationalization.getTextAt(resourcePath,
+        JLabel lblTransportInstructions = new JLabel(getTextAt(resourcePath,
               "lblLeadershipTransportInstructions.text"));
         contentPanel.add(lblTransportInstructions, gbc);
 
@@ -497,7 +500,7 @@ public class StratConScenarioWizard extends JDialog {
      */
     private JList<Force> addAvailableForceList(JPanel parent, GridBagConstraints gbc,
           ScenarioForceTemplate forceTemplate) {
-        JScrollPane forceListContainer = new JScrollPaneWithSpeed();
+        JScrollPane forceListContainer = new FastJScrollPane();
 
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
               StratConRulesManager.getAvailableForceIDsForManualDeployment(forceTemplate.getAllowedUnitType(),
@@ -505,7 +508,8 @@ public class StratConScenarioWizard extends JDialog {
                     currentTrackState,
                     (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS),
                     currentScenario,
-                    currentCampaignState));
+                    currentCampaignState,
+                    false));
 
         JList<Force> availableForceList = new JList<>();
         availableForceList.setModel(lanceModel);
@@ -703,7 +707,7 @@ public class StratConScenarioWizard extends JDialog {
      */
     private void setNavigationButtons(GridBagConstraints constraints, boolean isPrimaryForce) {
         // Create the commit button
-        btnCommit = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCommit.text"));
+        btnCommit = new JButton(getTextAt(resourcePath, "leadershipCommit.text"));
         btnCommit.setActionCommand("COMMIT_CLICK");
         if (isPrimaryForce) {
             btnCommit.addActionListener(evt -> btnCommitClicked(null, false, true));
@@ -711,13 +715,10 @@ public class StratConScenarioWizard extends JDialog {
             btnCommit.addActionListener(evt -> reinforcementConfirmDialog());
         }
 
-        JButton btnCancel = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCancel.text"));
+        JButton btnCancel = new JButton(getTextAt(resourcePath, "leadershipCancel.text"));
         btnCancel.setActionCommand("CANCEL_CLICK");
-        btnCancel.addActionListener(evt -> {
-            wasCanceled = true;
-            closeWizard();
-        });
-        btnCancel.setEnabled(true);
+        btnCancel.setVisible(!isPrimaryForce);
+        btnCancel.addActionListener(evt -> closeWizard());
 
         // Configure layout constraints for the buttons
         constraints.gridwidth = GridBagConstraints.REMAINDER;
@@ -737,7 +738,7 @@ public class StratConScenarioWizard extends JDialog {
                       "lblLeadershipCommitForces.text",
                       primaryForce.getName());
             } else {
-                instructions = MHQInternationalization.getTextAt(resourcePath,
+                instructions = getTextAt(resourcePath,
                       "lblLeadershipCommitForces.fallback.text");
             }
 
@@ -782,6 +783,11 @@ public class StratConScenarioWizard extends JDialog {
         // The dialog will be 'disposed' if the confirmation dialog is confirmed and re-shown if the dialog is canceled
         setVisible(false);
         final int SUPPORT_POINTS_MODIFIER = -2;
+
+        if (currentScenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge()) {
+            new ImmersiveDialogNotification(campaign, getTextAt(RESOURCE_BUNDLE, "officialChallenge.notice"), true);
+            return;
+        }
 
         Person commandLiaison = campaign.getSeniorAdminPerson(AdministratorSpecialization.COMMAND);
         TargetRoll targetNumber = calculateReinforcementTargetNumber(commandLiaison,

@@ -69,6 +69,7 @@ import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
+import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EnginePart;
@@ -83,6 +84,7 @@ import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
@@ -239,7 +241,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panSupplies.add(btnPartsReport, gridBagConstraints);
 
-        Set<PartInUse> partsInUse = getCampaign().getPartsInUse(true, false, QUALITY_A);
+        PartsInUseManager partsInUseManager = new PartsInUseManager(getCampaign());
+        Set<PartInUse> partsInUse = partsInUseManager.getPartsInUse(true, false, QUALITY_A);
         partsModel = new PartsTableModel(partsInUse);
         partsTable = new JTable(partsModel);
         partsSorter = new TableRowSorter<>(partsModel);
@@ -550,9 +553,10 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 } else if (tech.getMinutesLeft() <= 0) {
                     return false;
                 } else {
+                    SkillModifierData skillModifierData = tech.getSkillModifierData();
                     return getCampaign().getCampaignOptions().isDestroyByMargin() ||
                                  (part.getSkillMin() <=
-                                        (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) -
+                                        (skill.getExperienceLevel(skillModifierData) -
                                                modePenalty));
                 }
             }

@@ -146,7 +146,7 @@ public class ContractMarketMethodTest {
             // Arrange
 
             // Act
-            int teams = contractMarket.calculateRequiredCombatElements(mockCampaign, mockAtBContract, true);
+            int teams = contractMarket.calculateRequiredCombatElements(mockCampaign, mockAtBContract, true, 0);
 
             // Assert
             assertEquals(1, teams);
@@ -162,10 +162,11 @@ public class ContractMarketMethodTest {
             try (MockedStatic<ContractUtilities> contractUtilities = Mockito.mockStatic(ContractUtilities.class)) {
                 contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(
                       mockCampaign)).thenReturn(UNITS_IN_COMBAT_TEAMS);
-                contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign))
+                contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign,
+                            false, true, 0))
                       .thenReturn(COMBAT_TEAMS);
                 // Act
-                teams = contractMarket.calculateRequiredCombatElements(mockCampaign, mockAtBContract, true);
+                teams = contractMarket.calculateRequiredCombatElements(mockCampaign, mockAtBContract, true, 0);
             }
             // Assert
             assertEquals(24,
@@ -231,22 +232,25 @@ public class ContractMarketMethodTest {
               int UNITS_IN_COMBAT_TEAMS, int COMBAT_TEAMS) {
             ArrayList<Integer> requiredUnitInCombatTeams = new ArrayList<>();
             // Arrange
-            try (MockedStatic<ContractUtilities> contractUtilities = Mockito.mockStatic(ContractUtilities.class)) {
-                contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(
-                      mockCampaign)).thenReturn(Math.max(UNITS_IN_COMBAT_TEAMS, 1));
-                contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign))
-                      .thenReturn(Math.max(COMBAT_TEAMS, 1));
-                try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
-                    // Let's go from the lowest possible roll to the highest and collect all the required unit counts
-                    for (int varianceRoll = REQUIRED_UNITS_IN_COMBAT_TEAMS_VARIANCE_DICE;
-                          varianceRoll < REQUIRED_UNITS_IN_COMBAT_TEAMS_VARIANCE_DICE * 6;
-                          varianceRoll++) {
-                        compute.when(() -> Compute.d6(anyInt())).thenReturn(varianceRoll);
+            try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
+                // Let's go from the lowest possible roll to the highest and collect all the required unit counts
+                for (int varianceRoll = REQUIRED_UNITS_IN_COMBAT_TEAMS_VARIANCE_DICE;
+                      varianceRoll < REQUIRED_UNITS_IN_COMBAT_TEAMS_VARIANCE_DICE * 6;
+                      varianceRoll++) {
+                    compute.when(() -> Compute.d6(anyInt())).thenReturn(varianceRoll);
+
+                    double varianceFactor = ContractUtilities.calculateVarianceFactor();
+                    try (MockedStatic<ContractUtilities> contractUtilities = Mockito.mockStatic(ContractUtilities.class)) {
+                        contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(
+                              mockCampaign)).thenReturn(Math.max(UNITS_IN_COMBAT_TEAMS, 1));
+                        contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign,
+                                    false, true, 0))
+                              .thenReturn(Math.max(COMBAT_TEAMS, 1));
 
                         // Act (this is the method we are testing!)
                         requiredUnitInCombatTeams.add(contractMarket.calculateRequiredCombatElements(mockCampaign,
                               mockAtBContract,
-                              false));
+                              false, varianceFactor));
                     }
                 }
             }

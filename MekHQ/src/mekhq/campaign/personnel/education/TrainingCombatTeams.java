@@ -60,9 +60,13 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
+import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 
@@ -109,7 +113,7 @@ public class TrainingCombatTeams {
      */
     public static void processTrainingCombatTeams(final Campaign campaign) {
         final LocalDate today = campaign.getLocalDate();
-        final List<CombatTeam> combatTeams = campaign.getAllCombatTeams();
+        final List<CombatTeam> combatTeams = campaign.getCombatTeamsAsList();
 
         for (CombatTeam combatTeam : combatTeams) {
             if (!combatTeam.getRole().isTraining()) {
@@ -121,9 +125,16 @@ public class TrainingCombatTeams {
                 continue;
             }
 
-            if (campaign.getCampaignOptions().isUseStratCon() &&
-                      !contract.getStratconCampaignState().isForceDeployedHere(combatTeam.getForceId())) {
-                continue;
+            CampaignOptions campaignOptions = campaign.getCampaignOptions();
+            boolean isUsingStratCon = campaignOptions.isUseStratCon();
+            boolean isUsingMaplessMode = campaignOptions.isUseStratConMaplessMode();
+            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            boolean isForceDeployed = campaignState != null &&
+                                            campaignState.isForceDeployedHere(combatTeam.getForceId());
+            if (isUsingStratCon) {
+                if (!isUsingMaplessMode && !isForceDeployed) {
+                    continue;
+                }
             }
 
             Force force = combatTeam.getForce(campaign);
@@ -359,14 +370,14 @@ public class TrainingCombatTeams {
                 String skillName = targetSkill.getType().getName();
 
                 PerformanceLogger.improvedSkill(isLogSkillChange, trainee, today, skillName, newSkillLevel);
-
+                SkillModifierData skillModifierData = trainee.getSkillModifierData();
                 return String.format(resources.getString("learnedNewSkill.text"),
                       educator.getFullTitle(),
                       trainee.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG,
                       skillName,
-                      targetSkill.getFinalSkillValue(trainee.getOptions(), trainee.getATOWAttributes()));
+                      targetSkill.getFinalSkillValue(skillModifierData));
             }
         }
 
@@ -404,37 +415,92 @@ public class TrainingCombatTeams {
      * @return a {@link Map} of skill names to experience levels representing the available skills for teaching
      */
     private static Map<String, Integer> createSkillsList(Campaign campaign, Set<Person> educators) {
-        Map<String, Integer> educatorSkills = new HashMap<>();
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean isUseArtillery = campaignOptions.isUseArtillery();
+        final boolean isUseAdvancedScouting = campaign.getCampaignOptions().isUseAdvancedScouting();
+
+        Set<String> professionSkills = new HashSet<>();
         for (Person educator : educators) {
-            // First, collect all the skills. We use a Set, as we don't want duplicates
-            Set<String> professionSkills = new HashSet<>();
+            // Collect all unique skills from all educators. We use a Set to avoid duplicates.
 
-            if (educator.getPrimaryRole().isCombat()) {
-                professionSkills.addAll(educator.getProfessionSkills(campaign, false));
-            }
+            PersonnelRole primaryRole = educator.getPrimaryRole();
+            PersonnelRole secondaryRole = educator.getSecondaryRole();
+            getSkillsForProfession(
+                  primaryRole,
+                  professionSkills,
+                  isUseArtillery,
+                  secondaryRole,
+                  isUseAdvancedScouting);
+        }
 
-            if (educator.getSecondaryRole().isCombat()) {
-                professionSkills.addAll(educator.getProfessionSkills(campaign, true));
-            }
+        // Then, find the best experience level available among educators in the commander's unit
 
-            // Then, find the best experience level available among educators in the commander's unit
+        return getEducatorSkills(educators, professionSkills);
+    }
+
+    /**
+     * Determines the highest skill level available among all educators for each profession skill.
+     *
+     * <p>Iterates through all educators and profession skills to find the maximum skill level that can be taught for
+     * each skill. Only skills that at least one educator possesses are included in the result.</p>
+     *
+     * @param educators        the set of educators to evaluate
+     * @param professionSkills the set of skill names relevant to the profession
+     *
+     * @return a map of skill names to their highest available level among all educators, containing only skills that at
+     *       least one educator possesses
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static Map<String, Integer> getEducatorSkills(Set<Person> educators, Set<String> professionSkills) {
+        Map<String, Integer> educatorSkills = new HashMap<>();
+
+        for (Person educator : educators) {
             for (String professionSkill : professionSkills) {
                 Skill skill = educator.getSkill(professionSkill);
 
                 if (skill != null) {
-                    if (!educatorSkills.containsKey(professionSkill)) {
-                        educatorSkills.put(professionSkill, skill.getLevel());
-                    } else {
-                        int educatorSkillLevel = educatorSkills.get(professionSkill);
-
-                        if (educatorSkillLevel < skill.getLevel()) {
-                            educatorSkills.put(professionSkill, skill.getLevel());
-                        }
-                    }
+                    educatorSkills.merge(professionSkill, skill.getLevel(), Math::max);
                 }
             }
         }
 
         return educatorSkills;
+    }
+
+    /**
+     * Collects the relevant skills for a given profession based on an educator's roles.
+     *
+     * <p>For combat roles (primary or secondary), adds all combat-related profession skills. If advanced scouting is
+     * enabled, it also adds any scouting skills the educator possesses. Non-combat roles are not processed and will
+     * cause an early return.</p>
+     *
+     * @param primaryRole           the educator's primary role
+     * @param professionSkills      the set to add relevant skill names to (additive)
+     * @param isUseArtillery        whether artillery skills should be included
+     * @param secondaryRole         the educator's secondary role
+     * @param isUseAdvancedScouting whether to include advanced scouting skills
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void getSkillsForProfession(PersonnelRole primaryRole, Set<String> professionSkills,
+          boolean isUseArtillery, PersonnelRole secondaryRole, boolean isUseAdvancedScouting) {
+        if (primaryRole.isCombat()) {
+            professionSkills.addAll(primaryRole.getSkillsForProfession(false, false, false,
+                  isUseArtillery, true));
+        } else if (secondaryRole.isCombat()) { // Primary overrides secondary, so no double-dipping
+            professionSkills.addAll(secondaryRole.getSkillsForProfession(false, false, false,
+                  isUseArtillery, true));
+        } else {
+            // support professions cannot teach skills through training forces
+            return;
+        }
+
+        // Add all scouting skills if advanced scouting is enabled
+        if (isUseAdvancedScouting) {
+            professionSkills.addAll(ScoutingSkills.SCOUTING_SKILLS);
+        }
     }
 }

@@ -115,7 +115,7 @@ public class MissingMekLocation extends MissingPart {
                 this.name = forQuad ? "Mek Front Left Leg" : "Mek Left Arm";
                 break;
             case Mek.LOC_RIGHT_ARM:
-                this.name = forQuad ? "Mek Front Left Leg" : "Mek Right Arm";
+                this.name = forQuad ? "Mek Front Right Leg" : "Mek Right Arm";
                 break;
             case Mek.LOC_LEFT_LEG:
                 this.name = forQuad ? "Mek Rear Left Leg" : "Mek Left Leg";

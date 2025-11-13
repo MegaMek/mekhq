@@ -54,6 +54,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 
@@ -128,7 +129,7 @@ public class CampaignUpgradeDialog {
               getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.inCharacter", campaign.getCommanderAddress()),
               BUTTONS,
               getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.outOfCharacter"),
-              null,
+              ImmersiveDialogWidth.LARGE.getWidth(),
               false,
               supplementalPanel,
               null,
@@ -179,37 +180,45 @@ public class CampaignUpgradeDialog {
      * @author Illiani
      * @since 0.50.07
      */
+    /**
+     * Triggers a loading dialog while upgrading campaign options. This method can be called from any thread and will
+     * ensure all Swing operations occur on the Event Dispatch Thread.
+     *
+     * @param campaign          the campaign to upgrade
+     * @param chosenPreset      the preset to apply
+     * @param onUpgradeComplete callback to run after upgrade completes
+     */
     private static void triggerLoadingDialog(Campaign campaign, CampaignPreset chosenPreset,
           Runnable onUpgradeComplete) {
-        JDialog loadingDialog = new JDialog((Frame) null, true);
-        loadingDialog.setUndecorated(true);
-
-        JLabel loadingLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.upgrading",
-              MHQConstants.VERSION.toString()));
-        loadingLabel.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        loadingDialog.add(loadingLabel);
-        loadingDialog.pack();
-        loadingDialog.setLocationRelativeTo(null);
-
-        SwingWorker<Void, Void> worker = new SwingWorker<>() {
-            @Override
-            protected Void doInBackground() {
-                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(campaign, chosenPreset);
-                optionsDialog.processApplyAction();
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                loadingDialog.setVisible(false);
-                loadingDialog.dispose();
-                onUpgradeComplete.run(); // trigger the external options update
-            }
-        };
-
         SwingUtilities.invokeLater(() -> {
+            JDialog loadingDialog = new JDialog((Frame) null, true);
+            loadingDialog.setUndecorated(true);
+
+            JLabel loadingLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.upgrading",
+                  MHQConstants.VERSION.toString()));
+            loadingLabel.setBorder(RoundedLineBorder.createRoundedLineBorder());
+            loadingDialog.add(loadingLabel);
+            loadingDialog.pack();
+            loadingDialog.setLocationRelativeTo(null);
+
+            SwingWorker<Void, Void> worker = new SwingWorker<>() {
+                @Override
+                protected Void doInBackground() {
+                    CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(campaign, chosenPreset);
+                    optionsDialog.processApplyAction();
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    loadingDialog.setVisible(false);
+                    loadingDialog.dispose();
+                    onUpgradeComplete.run();
+                }
+            };
+
             worker.execute();
-            loadingDialog.setVisible(true);
+            loadingDialog.setVisible(true); // Blocks EDT until worker.done() closes dialog
         });
     }
 

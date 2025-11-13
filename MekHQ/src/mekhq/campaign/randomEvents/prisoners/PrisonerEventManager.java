@@ -59,6 +59,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.rentals.ContractRentalType;
+import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
@@ -743,10 +745,14 @@ public class PrisonerEventManager {
         otherUnitMultiplier = min(otherUnitMultiplier, PRISONER_CAPACITY_OTHER_UNIT_MAX_MULTIPLIER);
         double modifier = (double) campaign.getTemporaryPrisonerCapacity() / 100;
 
+        int rentedCapacity = FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
+              ContractRentalType.HOLDING_CELLS);
+
         if (isMekHQCaptureStyle) {
-            return max(0, (int) round(prisonerCapacity * otherUnitMultiplier * modifier));
+            int calculatedTotal = max(0, (int) round(prisonerCapacity * otherUnitMultiplier * modifier));
+            return calculatedTotal + rentedCapacity;
         } else {
-            return max(0, prisonerCapacity);
+            return max(0, prisonerCapacity + rentedCapacity);
         }
     }
 

@@ -32,24 +32,18 @@
  */
 package mekhq.campaign.camOpsReputation;
 
-import static java.lang.Math.max;
-import static megamek.common.force.Force.NO_FORCE;
-
 import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.SkillLevel;
-import megamek.common.units.Crew;
 import megamek.common.units.Entity;
-import megamek.common.units.Infantry;
 import megamek.common.units.Jumpship;
-import megamek.common.units.ProtoMek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 
@@ -115,100 +109,60 @@ public class AverageExperienceRating {
      * @return the average experience rating of personnel in the campaign
      */
     private static int calculateAverageExperienceRating(Campaign campaign, boolean log) {
-        int personnelCount = 0;
-        double totalExperience = 0.0;
+        int unitCount = 0;
+        double totalExperience = 0;
 
-        for (Person person : campaign.getActivePersonnel(false, false)) {
-            Unit unit = person.getUnit();
-
-            // if the person does not belong to a unit, then skip this person
-            if (unit == null) {
-                continue;
-            }
-
-            // If the unit does not belong to a force, skip it
-            int forceId = unit.getForceId();
-            if (forceId == NO_FORCE) {
-                continue;
-            }
-            Force force = campaign.getForce(forceId);
+        Hangar hangar = campaign.getHangar();
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+            Force force = combatTeam.getForce(campaign);
             if (force == null) {
-                LOGGER.warn("Force returned null for forceId {}", forceId);
+                LOGGER.warn("Force returned null for forceId {}", combatTeam.getForceId());
                 continue;
             }
 
-            // If the unit does not belong to a standard force, skip it
-            if (!force.isForceType(ForceType.STANDARD)) {
+            // CamOps is explicit in that we should only be counting combat forces. A decision was made during 50.10
+            // to not consider Training forces combat forces. We're extending that logic here, too.
+            if (force.getCombatRoleInMemory().isTraining()) {
                 continue;
             }
 
-            Entity entity = unit.getEntity();
-            // if the unit's entity is a JumpShip, then it is not considered a combatant.
-            if (entity instanceof Jumpship) {
-                continue;
-            }
-
-            // if both primary and secondary roles are support roles, skip this person
-            // as they are also not considered combat personnel
-            if (person.getPrimaryRole().isSupport() && person.getSecondaryRole().isSupport()) {
-                continue;
-            }
-
-            Crew crew = entity.getCrew();
-
-            // Experience calculation varies depending on the type of entity
-            if (entity instanceof Infantry) {
-                // we only want to parse infantry units once, as CamOps treats them as an
-                // individual entity
-                if (!unit.isCommander(person)) {
+            for (Unit unit : force.getAllUnitsAsUnits(hangar, true)) {
+                Entity entity = unit.getEntity();
+                if (entity == null || entity instanceof Jumpship) {
                     continue;
                 }
 
-                // For Infantry, average experience is calculated using a different method.
-                totalExperience += calculateInfantryExperience((Infantry) entity, crew); // add the average experience
-                // to the total
-                personnelCount++;
-            } else if (entity instanceof ProtoMek) {
-                // ProtoMek entities only use gunnery for calculation
-                if (person.hasSkill(SkillType.S_GUN_PROTO)) {
-                    totalExperience += max(0,
-                          person.getSkill(SkillType.S_GUN_PROTO)
-                                .getFinalSkillValue(person.getOptions(), person.getATOWAttributes()));
+                // CamOps treats all units as single entities. Tracking down to the individual crew level is a MekHQ
+                // invention. To keep as close to CamOps as possible, we only consider the unit commander when
+                // calculating experience rating.
+                Person commander = unit.getCommander();
+                if (commander == null) { // Unit is uncrewed
+                    continue;
                 }
 
-                personnelCount++;
-            } else {
-                // For regular entities, another method calculates the average experience
-                if (unit.isGunner(person) || unit.isDriver(person)) {
-                    totalExperience += calculateRegularExperience(person, entity, unit);
-
-                    if (totalExperience > 0) {
-                        personnelCount++;
-                    }
-                }
+                SkillModifierData skillModifierData = commander.getSkillModifierData(true);
+                int pilotingTargetNumber = getSkillTargetNumber(commander, entity, skillModifierData, true);
+                int gunneryTargetNumber = getSkillTargetNumber(commander, entity, skillModifierData, false);
+                totalExperience += pilotingTargetNumber + gunneryTargetNumber;
+                unitCount++;
             }
         }
 
-        if (personnelCount == 0) {
-            return 7;
-        }
+        // CamOps states that we need to divide the skill target numbers by twice the unit count.
+        unitCount *= 2;
 
-        // Calculate the average experience rating across all personnel. If there are no
-        // personnel, return 0
-        double rawAverage = personnelCount > 0 ? (totalExperience / personnelCount) : 0;
+        // Calculate the average experience rating across all personnel.
+        double rawAverage = totalExperience / unitCount;
 
-        // CamOps wants us to round down from 0.5 and up from >0.5, so we need to do an
-        // extra step here
+        // CamOps wants us to round down from 0.5 and up from >0.5, so we need to do an extra step here
         double fractionalPart = rawAverage - Math.floor(rawAverage);
-
         int averageExperienceRating = (int) (fractionalPart > 0.5 ? Math.ceil(rawAverage) : Math.floor(rawAverage));
 
-        // Log the details of the calculation to aid debugging,
-        // and so the user can easily see if there is a mistake
+        // Log the details of the calculation to aid debugging, and so the user can easily see if there is a mistake
         if (log) {
-            LOGGER.debug("Average Experience Rating: {} / {} = {}",
+            LOGGER.info("Average Experience Rating: {} / {} = {}",
                   totalExperience,
-                  personnelCount,
+                  unitCount,
                   averageExperienceRating);
         }
 
@@ -217,70 +171,45 @@ public class AverageExperienceRating {
     }
 
     /**
-     * Calculates the average experience of an Infantry entity's crew.
+     * Returns the target number associated with the driving or gunnery skill for the given person when operating the
+     * specified entity.
      *
-     * @param infantry The Infantry entity, which also includes some crew details.
-     * @param crew     The unit crew.
+     * <p>The appropriate skill type is determined based on whether the caller requests a driving skill or a gunnery
+     * skill. The method then attempts to retrieve the corresponding {@link Skill} from the person.</p>
      *
-     * @return The average experience of the Infantry crew.
+     * <p>If the skill is missing, a warning is logged and the method returns the base target number for that skill
+     * type plus one. This effectively penalizes entities missing an expected skill, ensuring they do not benefit from
+     * an uninitialized value.</p>
+     *
+     * <p>If the skill exists, the method returns its final skill value after applying any relevant modifiers, but
+     * never below zero.</p>
+     *
+     * @param person            the person whose skill value is being evaluated
+     * @param entity            the entity for which the driving or gunnery skill is required
+     * @param skillModifierData modifier data used to compute the final effective skill value
+     * @param isDriving         {@code true} to fetch the driving skill target number; {@code false} to fetch the
+     *                          gunnery skill target number
+     *
+     * @return the effective target number for the selected skill, adjusted for modifiers; or the base target number +1
+     *       if the skill cannot be retrieved
+     *
+     * @author Illiani
+     * @since 0.50.10
      */
-    private static double calculateInfantryExperience(Infantry infantry, Crew crew) {
-        // Average of gunnery and antiMek skill
-        int gunnery = max(0, crew.getGunnery());
-        int antiMek = max(0, infantry.getAntiMekSkill());
+    private static int getSkillTargetNumber(Person person, Entity entity,
+          SkillModifierData skillModifierData, boolean isDriving) {
 
-        return (double) (gunnery + antiMek) / 2;
-    }
+        String skillType = isDriving
+                                 ? SkillType.getDrivingSkillFor(entity)
+                                 : SkillType.getGunnerySkillFor(entity);
 
-    /**
-     * Calculates the average experience of a (non-Infantry, non-ProtoMek) crew.
-     *
-     * @param person The person in the crew.
-     * @param entity The entity associated with the crew.
-     * @param unit   The unit the crew belongs to.
-     *
-     * @return The average experience of the crew.
-     */
-    private static double calculateRegularExperience(Person person, Entity entity, Unit unit) {
-        String skillType;
-
-        int skillValue = 0;
-        int skillCount = 0;
-
-        PersonnelOptions options = person.getOptions();
-        Attributes attributes = person.getATOWAttributes();
-        if (unit.isDriver(person)) {
-            skillType = SkillType.getDrivingSkillFor(entity);
-            Skill skill = person.getSkill(skillType);
-
-            if (skill != null) {
-                skillValue += max(0, skill.getFinalSkillValue(options, attributes));
-                skillCount++;
-            } else {
-                LOGGER.warn("(calculateRegularExperience) unable to fetch diving skill {} for {}. Skipping",
-                      skillType,
-                      entity);
-            }
+        Skill skill = person.getSkill(skillType);
+        if (skill == null) {
+            LOGGER.warn("(calculateRegularExperience) unable to fetch skill {} for {}. Skipping",
+                  skillType, entity);
+            return SkillType.getType(skillType).getTarget() + 1; // Returning the base target number +1
+        } else {
+            return Math.max(0, skill.getFinalSkillValue(skillModifierData));
         }
-
-        if (unit.isGunner(person)) {
-            skillType = SkillType.getGunnerySkillFor(entity);
-
-            Skill skill = person.getSkill(skillType);
-            if (skill != null) {
-                skillValue += max(0, skill.getFinalSkillValue(options, attributes));
-                skillCount++;
-            } else {
-                LOGGER.warn("(calculateRegularExperience) unable to fetch gunnery skill {} for {}. Skipping",
-                      skillType,
-                      entity);
-            }
-        }
-
-        if (skillCount == 0) {
-            return 0;
-        }
-
-        return (double) skillValue / skillCount;
     }
 }

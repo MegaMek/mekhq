@@ -94,7 +94,12 @@ public class OptimizeInfirmaryAssignments {
         organizePatients();
 
         // Assign doctors to patients
-        assignDoctors(isDoctorsUseAdministration, maximumPatients, healingWaitingPeriod, patients, doctors);
+        assignDoctors(isDoctorsUseAdministration,
+              maximumPatients,
+              healingWaitingPeriod,
+              patients,
+              doctors,
+              campaign.isOnContractAndPlanetside());
     }
 
     /**
@@ -116,9 +121,16 @@ public class OptimizeInfirmaryAssignments {
      *                                   cannot be assigned due to insufficient doctor capacity remain unassigned.
      * @param doctors                    The list of available doctors, ordered by priority (e.g., experience level or
      *                                   suitability). Doctors higher on the list are assigned first.
+     * @param isOnContractAndPlanetside  {@code true} if the campaign has an active mission and is planetside (i.e., not
+     *                                   in transit).
      */
-    private static void assignDoctors(final boolean isDoctorsUseAdministration, final int maximumPatients,
-          final int healingWaitingPeriod, final List<Person> patients, List<Person> doctors) {
+    private void assignDoctors(final boolean isDoctorsUseAdministration, final int maximumPatients,
+          final int healingWaitingPeriod, final List<Person> patients, List<Person> doctors,
+          final boolean isOnContractAndPlanetside) {
+        boolean useMASHTheatres = campaign.getCampaignOptions().isUseMASHTheatres();
+        int mashTheatreCapacity = useMASHTheatres ? campaign.getMashTheatreCapacity() : Integer.MAX_VALUE;
+
+        int totalPatientCounter = 0;
         int patientCounter = 0;
         int doctorCapacity = 0;
 
@@ -127,6 +139,11 @@ public class OptimizeInfirmaryAssignments {
 
             if (doctors.isEmpty()) {
                 // At this point, we're just unassigning the doctor assignments for any remaining personnel.
+                continue;
+            }
+
+            if (campaign.getMashTheatresWithinCapacity() && totalPatientCounter >= mashTheatreCapacity) {
+                // Similar to the above, we're just unassigning doctors for any remaining patients.
                 continue;
             }
 
@@ -141,6 +158,7 @@ public class OptimizeInfirmaryAssignments {
 
             // Make the assignment
             patient.setDoctorId(doctor.getId(), healingWaitingPeriod);
+            totalPatientCounter++;
             MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
 
             // Check if the current doctor has reached their patient limit

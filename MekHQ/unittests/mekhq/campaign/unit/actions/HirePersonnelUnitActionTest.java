@@ -35,6 +35,7 @@ package mekhq.campaign.unit.actions;
 import static org.mockito.Mockito.*;
 
 import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Jumpship;
 import megamek.common.units.LandAirMek;
 import megamek.common.units.Mek;
@@ -231,6 +232,7 @@ public class HirePersonnelUnitActionTest {
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
         doReturn(false).when(mockOptions).isUseArtillery();
         Entity mockEntity = mock(Tank.class);
+        when(mockEntity.getMovementMode()).thenReturn(EntityMovementMode.TRACKED);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
 
         doReturn(false).when(unit).canTakeMoreDrivers();
@@ -243,13 +245,13 @@ public class HirePersonnelUnitActionTest {
 
         Person mockGunner = mock(Person.class);
         doNothing().when(unit).addGunner(eq(mockGunner));
-        when(mockCampaign.newPerson(PersonnelRole.VEHICLE_GUNNER)).thenReturn(mockGunner);
+        when(mockCampaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND)).thenReturn(mockGunner);
         when(mockCampaign.recruitPerson(eq(mockGunner), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
-        verify(mockCampaign, times(1)).newPerson(PersonnelRole.VEHICLE_GUNNER);
+        verify(mockCampaign, times(1)).newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).addGunner(eq(mockGunner));
     }
@@ -366,13 +368,13 @@ public class HirePersonnelUnitActionTest {
 
         Person mockCrew = mock(Person.class);
         doNothing().when(unit).addVesselCrew(eq(mockCrew));
-        when(mockCampaign.newPerson(PersonnelRole.VEHICLE_CREW)).thenReturn(mockCrew);
+        when(mockCampaign.newPerson(PersonnelRole.COMBAT_TECHNICIAN)).thenReturn(mockCrew);
         when(mockCampaign.recruitPerson(eq(mockCrew), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
-        verify(mockCampaign, times(1)).newPerson(PersonnelRole.VEHICLE_CREW);
+        verify(mockCampaign, times(1)).newPerson(PersonnelRole.COMBAT_TECHNICIAN);
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).addVesselCrew(eq(mockCrew));
     }
@@ -445,6 +447,7 @@ public class HirePersonnelUnitActionTest {
         doReturn(mockOptions).when(mockCampaign).getCampaignOptions();
         doReturn(false).when(mockOptions).isUseArtillery();
         Entity mockEntity = mock(Tank.class);
+        when(mockEntity.getMovementMode()).thenReturn(EntityMovementMode.TRACKED);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
 
         doReturn(false).when(unit).canTakeMoreDrivers();
@@ -457,13 +460,13 @@ public class HirePersonnelUnitActionTest {
 
         Person mockTechOfficer = mock(Person.class);
         doNothing().when(unit).setTechOfficer(eq(mockTechOfficer));
-        when(mockCampaign.newPerson(PersonnelRole.VEHICLE_GUNNER)).thenReturn(mockTechOfficer);
+        when(mockCampaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND)).thenReturn(mockTechOfficer);
         when(mockCampaign.recruitPerson(eq(mockTechOfficer), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
-        verify(mockCampaign, times(1)).newPerson(PersonnelRole.VEHICLE_GUNNER);
+        verify(mockCampaign, times(1)).newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).setTechOfficer(eq(mockTechOfficer));
     }

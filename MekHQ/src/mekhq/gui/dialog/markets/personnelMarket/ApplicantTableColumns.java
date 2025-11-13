@@ -67,9 +67,25 @@ public enum ApplicantTableColumns {
     /**
      * The applicant's gender
      */
-    GENDER(4);
+    GENDER(4),
+    /**
+     * How many positive SPAs the character has
+     */
+    POSITIVE_ABILITIES(5),
+    /**
+     * How many negative SPAs (Flaws) the character has
+     */
+    NEGATIVE_ABILITIES(6),
+    /**
+     * How highly the character scored on their performance exam (a measure of how high their Talent score it)
+     */
+    PERFORMANCE_EXAM(6),
+    /**
+     * The cost to hire the applicant
+     */
+    HIRING_COST(7);
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + ApplicantTableColumns.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ApplicantTableColumns";
 
     public final int columnIndex;
 

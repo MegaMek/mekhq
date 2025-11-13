@@ -186,6 +186,7 @@ public class CampaignOptions {
 
     // Delivery
     private int unitTransitTime;
+    private boolean noDeliveriesInTransit;
 
     // Planetary Acquisition
     private boolean usePlanetaryAcquisition;
@@ -223,7 +224,9 @@ public class CampaignOptions {
     private boolean useRandomToughness;
     private boolean useArtillery;
     private boolean useAbilities;
-    private boolean useCommanderAbilitiesOnly;
+    private boolean onlyCommandersMatterVehicles;
+    private boolean onlyCommandersMatterInfantry;
+    private boolean onlyCommandersMatterBattleArmor;
     private boolean useEdge;
     private boolean useSupportEdge;
     private boolean useImplants;
@@ -241,6 +244,7 @@ public class CampaignOptions {
     private boolean displayPatientRecord;
     private boolean displayAssignmentRecord;
     private boolean displayPerformanceRecord;
+    private boolean awardVeterancySPAs;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -262,9 +266,14 @@ public class CampaignOptions {
     private int minimumHitsForVehicles;
     private boolean useRandomHitsForVehicles;
     private boolean tougherHealing;
+    private boolean useAlternativeAdvancedMedical;
+    private boolean useKinderAlternativeAdvancedMedical;
+    private boolean useRandomDiseases;
     private int maximumPatients;
     private boolean doctorsUseAdministration;
     private boolean useUsefulMedics;
+    private boolean useMASHTheatres;
+    private int mashTheatreCapacity;
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
@@ -345,7 +354,6 @@ public class CampaignOptions {
     private boolean useClanPersonnelMarriages;
     private boolean usePrisonerMarriages;
     private int checkMutualAncestorsDepth;
-    private int noInterestInMarriageDiceSize;
     private boolean logMarriageNameChanges;
     private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
     private RandomMarriageMethod randomMarriageMethod;
@@ -353,7 +361,6 @@ public class CampaignOptions {
     private boolean useRandomPrisonerMarriages;
     private int randomMarriageAgeRange;
     private int randomMarriageDiceSize;
-    private int randomSameSexMarriageDiceSize;
     private int randomNewDependentMarriage;
 
     // Divorce
@@ -387,6 +394,9 @@ public class CampaignOptions {
     private boolean useRandomPrisonerProcreation;
     private int randomProcreationRelationshipDiceSize;
     private int randomProcreationRelationshiplessDiceSize;
+    private int noInterestInRelationshipsDiceSize;
+    private int interestedInBothSexesDiceSize;
+    private int interestedInSameSexDiceSize;
 
     // Education
     private boolean useEducationModule;
@@ -458,6 +468,7 @@ public class CampaignOptions {
     private boolean useInjuryFatigue;
     private int fieldKitchenCapacity;
     private boolean fieldKitchenIgnoreNonCombatants;
+    private int fatigueUndeploymentThreshold;
     private int fatigueLeaveThreshold;
     // endregion Turnover and Retention
 
@@ -486,6 +497,8 @@ public class CampaignOptions {
     private boolean displayAllAttributes;
     private boolean allowMonthlyReinvestment;
     private boolean allowMonthlyConnections;
+    private boolean useBetterExtraIncome;
+    private boolean useSmallArmsOnly;
 
     // Price Multipliers
     private double commonPartPriceMultiplier;
@@ -506,6 +519,12 @@ public class CampaignOptions {
     // Shares
     private boolean useShareSystem;
     private boolean sharesForAll;
+
+    // Rented Facilities
+    private int rentedFacilitiesCostHospitalBeds;
+    private int rentedFacilitiesCostKitchens;
+    private int rentedFacilitiesCostHoldingCells;
+    private int rentedFacilitiesCostRepairBays;
     // endregion Finance Tab
 
     // region Mercenary Tab
@@ -538,6 +557,7 @@ public class CampaignOptions {
     private int missionXpSuccess;
     private int missionXpOutstandingSuccess;
 
+    private int attributeCost;
     private int edgeCost;
     // endregion Experience Tab
 
@@ -590,23 +610,26 @@ public class CampaignOptions {
     private int contractSearchRadius;
     private boolean variableContractLength;
     private boolean useDynamicDifficulty;
+    private boolean useBolsterContractSkill;
     private boolean contractMarketReportRefresh;
     private int contractMaxSalvagePercentage;
     private int dropShipBonusPercentage;
+    private boolean isUseTwoWayPay;
+    private boolean isUseCamOpsSalvage;
+    private boolean isUseRiskySalvage;
     // endregion Markets Tab
 
     // region Against the Bot Tab
-    private boolean useAtB;
     private boolean useStratCon;
+    private boolean useMaplessStratCon;
     private boolean useAdvancedScouting;
     private SkillLevel skillLevel;
 
-    // Unit Administration
-    private boolean useAero;
-    private boolean useVehicles;
-    private boolean clanVehicles;
-
     // Contract Operations
+    private int moraleVictoryEffect;
+    private int moraleDecisiveVictoryEffect;
+    private int moraleDefeatEffect;
+    private int moraleDecisiveDefeatEffect;
     private boolean mercSizeLimited;
     private boolean restrictPartsByMission;
     private final int[] atbBattleChance;
@@ -615,16 +638,9 @@ public class CampaignOptions {
     // Scenarios
     private boolean useGenericBattleValue;
     private boolean useVerboseBidding;
-    private boolean doubleVehicles;
     private int opForLanceTypeMeks;
     private int opForLanceTypeMixed;
     private int opForLanceTypeVehicles;
-    private boolean opForUsesVTOLs;
-    private boolean allowOpForAerospace;
-    private int opForAeroChance;
-    private boolean allowOpForLocalUnits;
-    private int opForLocalUnitChance;
-    private boolean adjustPlayerVehicles;
     private boolean regionalMekVariations;
     private boolean attachedPlayerCamouflage;
     private boolean playerControlsAttachedUnits;
@@ -742,6 +758,7 @@ public class CampaignOptions {
 
         // Delivery
         unitTransitTime = TRANSIT_UNIT_MONTH;
+        noDeliveriesInTransit = false;
 
         // Planetary Acquisition
         usePlanetaryAcquisition = false;
@@ -792,7 +809,9 @@ public class CampaignOptions {
         setUseRandomToughness(false);
         setUseArtillery(false);
         setUseAbilities(false);
-        setUseCommanderAbilitiesOnly(false);
+        setOnlyCommandersMatterVehicles(false);
+        setOnlyCommandersMatterInfantry(false);
+        setOnlyCommandersMatterBattleArmor(false);
         setUseEdge(false);
         setUseSupportEdge(false);
         setUseImplants(false);
@@ -831,9 +850,14 @@ public class CampaignOptions {
         setMinimumHitsForVehicles(1);
         setUseRandomHitsForVehicles(false);
         setTougherHealing(false);
+        useAlternativeAdvancedMedical = false;
+        useKinderAlternativeAdvancedMedical = false;
+        useRandomDiseases = false;
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
         useUsefulMedics = false;
+        useMASHTheatres = false;
+        mashTheatreCapacity = 25;
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
@@ -869,11 +893,10 @@ public class CampaignOptions {
         }
         setRoleBaseSalary(PersonnelRole.MEKWARRIOR, 1500);
         setRoleBaseSalary(PersonnelRole.LAM_PILOT, 2250);
-        setRoleBaseSalary(PersonnelRole.GROUND_VEHICLE_DRIVER, 900);
-        setRoleBaseSalary(PersonnelRole.NAVAL_VEHICLE_DRIVER, 900);
-        setRoleBaseSalary(PersonnelRole.VTOL_PILOT, 900);
-        setRoleBaseSalary(PersonnelRole.VEHICLE_GUNNER, 900);
-        setRoleBaseSalary(PersonnelRole.VEHICLE_CREW, 900);
+        setRoleBaseSalary(PersonnelRole.VEHICLE_CREW_GROUND, 900);
+        setRoleBaseSalary(PersonnelRole.VEHICLE_CREW_NAVAL, 900);
+        setRoleBaseSalary(PersonnelRole.VEHICLE_CREW_VTOL, 900);
+        setRoleBaseSalary(PersonnelRole.COMBAT_TECHNICIAN, 900);
         setRoleBaseSalary(PersonnelRole.AEROSPACE_PILOT, 1500);
         setRoleBaseSalary(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT, 900);
         setRoleBaseSalary(PersonnelRole.PROTOMEK_PILOT, 960);
@@ -952,7 +975,9 @@ public class CampaignOptions {
         setUseClanPersonnelMarriages(false);
         setUsePrisonerMarriages(true);
         setCheckMutualAncestorsDepth(4);
-        setNoInterestInMarriageDiceSize(10);
+        setNoInterestInRelationshipsDiceSize(100);
+        setInterestedInSameSexDiceSize(14);
+        setInterestedInBothSexesDiceSize(33);
         setLogMarriageNameChanges(false);
         setMarriageSurnameWeights(new HashMap<>());
         getMarriageSurnameWeights().put(MergingSurnameStyle.NO_CHANGE, 100);
@@ -973,7 +998,6 @@ public class CampaignOptions {
         setUseRandomPrisonerMarriages(false);
         setRandomMarriageAgeRange(10);
         setRandomMarriageDiceSize(5000);
-        setRandomSameSexMarriageDiceSize(14);
         setRandomNewDependentMarriage(20);
 
         // Divorce
@@ -1009,7 +1033,7 @@ public class CampaignOptions {
         setUseRelationshiplessRandomProcreation(false);
         setUseRandomClanPersonnelProcreation(false);
         setUseRandomPrisonerProcreation(true);
-        setRandomProcreationRelationshipDiceSize(500);
+        setRandomProcreationRelationshipDiceSize(150);
         setRandomProcreationRelationshiplessDiceSize(2000);
 
         // Education
@@ -1089,6 +1113,7 @@ public class CampaignOptions {
         setUseInjuryFatigue(true);
         setFieldKitchenCapacity(150);
         setFieldKitchenIgnoreNonCombatants(true);
+        fatigueUndeploymentThreshold = 9;
         setFatigueLeaveThreshold(13);
         // endregion Turnover and Retention
 
@@ -1117,6 +1142,8 @@ public class CampaignOptions {
         displayAllAttributes = false;
         allowMonthlyReinvestment = false;
         allowMonthlyConnections = false;
+        useBetterExtraIncome = false;
+        useSmallArmsOnly = false;
 
         // Price Multipliers
         setCommonPartPriceMultiplier(1.0);
@@ -1137,6 +1164,12 @@ public class CampaignOptions {
         // Shares
         setUseShareSystem(false);
         setSharesForAll(true);
+
+        // Rented Facilities
+        rentedFacilitiesCostHospitalBeds = 0;
+        rentedFacilitiesCostKitchens = 0;
+        rentedFacilitiesCostHoldingCells = 0;
+        rentedFacilitiesCostRepairBays = 0;
         // endregion Finances Tab
 
         // region Mercenary Tab
@@ -1169,6 +1202,7 @@ public class CampaignOptions {
         missionXpSuccess = 3;
         missionXpOutstandingSuccess = 5;
         edgeCost = 10;
+        attributeCost = 100;
         // endregion Experience Tab
 
         // region Skills Tab
@@ -1229,14 +1263,18 @@ public class CampaignOptions {
         setContractSearchRadius(800);
         setVariableContractLength(true);
         setUseDynamicDifficulty(false);
+        useBolsterContractSkill = false;
         setContractMarketReportRefresh(true);
         setContractMaxSalvagePercentage(100);
         setDropShipBonusPercentage(0);
+        isUseTwoWayPay = true;
+        isUseCamOpsSalvage = false;
+        isUseRiskySalvage = false;
         // endregion Markets Tab
 
         // region Against the Bot Tab
-        useAtB = false;
         useStratCon = false;
+        useMaplessStratCon = false;
         useAdvancedScouting = false;
         setSkillLevel(SkillLevel.REGULAR);
         autoResolveMethod = AutoResolveMethod.PRINCESS;
@@ -1244,10 +1282,12 @@ public class CampaignOptions {
         autoResolveNumberOfScenarios = 100;
         autoResolveExperimentalPacarGuiEnabled = false;
         strategicViewMinimapTheme = "gbc green.theme";
-        // Unit Administration
-        useAero = false;
-        useVehicles = true;
-        clanVehicles = false;
+
+        // Morale
+        moraleDecisiveVictoryEffect = 2;
+        moraleVictoryEffect = 1;
+        moraleDefeatEffect = -2;
+        moraleDecisiveDefeatEffect = -3;
 
         // Contract Operations
         mercSizeLimited = false;
@@ -1257,23 +1297,17 @@ public class CampaignOptions {
         atbBattleChance[CombatRole.FRONTLINE.ordinal()] = 20;
         atbBattleChance[CombatRole.PATROL.ordinal()] = 60;
         atbBattleChance[CombatRole.TRAINING.ordinal()] = 10;
+        atbBattleChance[CombatRole.CADRE.ordinal()] = 10;
         generateChases = true;
 
         // Scenarios
         useGenericBattleValue = true;
         useVerboseBidding = false;
-        doubleVehicles = false;
         setOpForLanceTypeMeks(1);
         setOpForLanceTypeMixed(2);
         setOpForLanceTypeVehicles(3);
-        setOpForUsesVTOLs(true);
-        setAllowOpForAerospace(false);
-        setOpForAeroChance(5);
-        setAllowOpForLocalUnits(false);
-        setOpForLocalUnitChance(5);
         setFixedMapChance(25);
         setSpaUpgradeIntensity(0);
-        adjustPlayerVehicles = false;
         regionalMekVariations = false;
         attachedPlayerCamouflage = true;
         playerControlsAttachedUnits = false;
@@ -1575,12 +1609,28 @@ public class CampaignOptions {
         this.useAbilities = useAbilities;
     }
 
-    public boolean isUseCommanderAbilitiesOnly() {
-        return useCommanderAbilitiesOnly;
+    public boolean isOnlyCommandersMatterVehicles() {
+        return onlyCommandersMatterVehicles;
     }
 
-    public void setUseCommanderAbilitiesOnly(final boolean useCommanderAbilitiesOnly) {
-        this.useCommanderAbilitiesOnly = useCommanderAbilitiesOnly;
+    public void setOnlyCommandersMatterVehicles(final boolean onlyCommandersMatterVehicles) {
+        this.onlyCommandersMatterVehicles = onlyCommandersMatterVehicles;
+    }
+
+    public boolean isOnlyCommandersMatterInfantry() {
+        return onlyCommandersMatterInfantry;
+    }
+
+    public void setOnlyCommandersMatterInfantry(final boolean onlyCommandersMatterInfantry) {
+        this.onlyCommandersMatterInfantry = onlyCommandersMatterInfantry;
+    }
+
+    public boolean isOnlyCommandersMatterBattleArmor() {
+        return onlyCommandersMatterBattleArmor;
+    }
+
+    public void setOnlyCommandersMatterBattleArmor(final boolean onlyCommandersMatterBattleArmor) {
+        this.onlyCommandersMatterBattleArmor = onlyCommandersMatterBattleArmor;
     }
 
     public boolean isUseEdge() {
@@ -1719,6 +1769,14 @@ public class CampaignOptions {
         this.displayPerformanceRecord = displayPerformanceRecord;
     }
 
+    public boolean isAwardVeterancySPAs() {
+        return awardVeterancySPAs;
+    }
+
+    public void setAwardVeterancySPAs(final boolean awardVeterancySPAs) {
+        this.awardVeterancySPAs = awardVeterancySPAs;
+    }
+
     public boolean isRewardComingOfAgeAbilities() {
         return rewardComingOfAgeAbilities;
     }
@@ -1773,6 +1831,14 @@ public class CampaignOptions {
 
     public void setFieldKitchenIgnoreNonCombatants(final boolean fieldKitchenIgnoreNonCombatants) {
         this.fieldKitchenIgnoreNonCombatants = fieldKitchenIgnoreNonCombatants;
+    }
+
+    public Integer getFatigueUndeploymentThreshold() {
+        return fatigueUndeploymentThreshold;
+    }
+
+    public void setFatigueUndeploymentThreshold(final Integer fatigueUndeploymentThreshold) {
+        this.fatigueUndeploymentThreshold = fatigueUndeploymentThreshold;
     }
 
     public Integer getFatigueLeaveThreshold() {
@@ -1904,7 +1970,32 @@ public class CampaignOptions {
     // endregion Expanded Personnel Information
 
     // region Medical
+
+    /**
+     * Checks if any form of advanced medical system is enabled.
+     *
+     * <p>This method returns {@code true} if either the standard advanced medical system or the alternative advanced
+     * medical system is enabled.</p>
+     *
+     * @return {@code true} if either advanced medical system is in use, {@code false} otherwise
+     *
+     * @see #isUseAdvancedMedicalDirect()
+     */
     public boolean isUseAdvancedMedical() {
+        return useAdvancedMedical || useAlternativeAdvancedMedical;
+    }
+
+    /**
+     * Checks if the standard advanced medical system is enabled.
+     *
+     * <p>This method specifically checks only the standard advanced medical system, ignoring the alternative
+     * advanced medical system setting.</p>
+     *
+     * @return {@code true} if the standard advanced medical system is enabled, {@code false} otherwise
+     *
+     * @see #isUseAdvancedMedical()
+     */
+    public boolean isUseAdvancedMedicalDirect() {
         return useAdvancedMedical;
     }
 
@@ -1952,6 +2043,30 @@ public class CampaignOptions {
         this.tougherHealing = tougherHealing;
     }
 
+    public boolean isUseAlternativeAdvancedMedical() {
+        return useAlternativeAdvancedMedical;
+    }
+
+    public void setUseAlternativeAdvancedMedical(final boolean useAlternativeAdvancedMedical) {
+        this.useAlternativeAdvancedMedical = useAlternativeAdvancedMedical;
+    }
+
+    public boolean isUseKinderAlternativeAdvancedMedical() {
+        return useKinderAlternativeAdvancedMedical;
+    }
+
+    public void setUseKinderAlternativeAdvancedMedical(final boolean useKinderAlternativeAdvancedMedical) {
+        this.useKinderAlternativeAdvancedMedical = useKinderAlternativeAdvancedMedical;
+    }
+
+    public boolean isUseRandomDiseases() {
+        return useRandomDiseases;
+    }
+
+    public void setUseRandomDiseases(final boolean useRandomDiseases) {
+        this.useRandomDiseases = useRandomDiseases;
+    }
+
     public int getMaximumPatients() {
         return maximumPatients;
     }
@@ -1974,6 +2089,22 @@ public class CampaignOptions {
 
     public void setIsUseUsefulMedics(final boolean useUsefulMedics) {
         this.useUsefulMedics = useUsefulMedics;
+    }
+
+    public boolean isUseMASHTheatres() {
+        return useMASHTheatres;
+    }
+
+    public void setIsUseMASHTheatres(final boolean useMASHTheatres) {
+        this.useMASHTheatres = useMASHTheatres;
+    }
+
+    public int getMASHTheatreCapacity() {
+        return mashTheatreCapacity;
+    }
+
+    public void setMASHTheatreCapacity(final int mashTheatreCapacity) {
+        this.mashTheatreCapacity = mashTheatreCapacity;
     }
 
     // endregion Medical
@@ -2610,12 +2741,12 @@ public class CampaignOptions {
         this.checkMutualAncestorsDepth = checkMutualAncestorsDepth;
     }
 
-    public int getNoInterestInMarriageDiceSize() {
-        return noInterestInMarriageDiceSize;
+    public int getNoInterestInRelationshipsDiceSize() {
+        return noInterestInRelationshipsDiceSize;
     }
 
-    public void setNoInterestInMarriageDiceSize(final int noInterestInMarriageDiceSize) {
-        this.noInterestInMarriageDiceSize = noInterestInMarriageDiceSize;
+    public void setNoInterestInRelationshipsDiceSize(final int noInterestInRelationshipsDiceSize) {
+        this.noInterestInRelationshipsDiceSize = noInterestInRelationshipsDiceSize;
     }
 
     /**
@@ -2707,17 +2838,25 @@ public class CampaignOptions {
     /**
      * @return the number of sides on the die used to determine random same-sex marriage
      */
-    public int getRandomSameSexMarriageDiceSize() {
-        return randomSameSexMarriageDiceSize;
+    public int getInterestedInSameSexDiceSize() {
+        return interestedInSameSexDiceSize;
     }
 
     /**
      * Sets the size of the random same-sex marriage die.
      *
-     * @param randomSameSexMarriageDiceSize the size of the random same-sex marriage die
+     * @param interestedInSameSexDiceSize the size of the random same-sex marriage die
      */
-    public void setRandomSameSexMarriageDiceSize(final int randomSameSexMarriageDiceSize) {
-        this.randomSameSexMarriageDiceSize = randomSameSexMarriageDiceSize;
+    public void setInterestedInSameSexDiceSize(final int interestedInSameSexDiceSize) {
+        this.interestedInSameSexDiceSize = interestedInSameSexDiceSize;
+    }
+
+    public int getInterestedInBothSexesDiceSize() {
+        return interestedInBothSexesDiceSize;
+    }
+
+    public void setInterestedInBothSexesDiceSize(final int interestedInBothSexesDiceSize) {
+        this.interestedInBothSexesDiceSize = interestedInBothSexesDiceSize;
     }
 
     /**
@@ -3427,6 +3566,38 @@ public class CampaignOptions {
         this.payForHousing = payForHousing;
     }
 
+    public int getRentedFacilitiesCostHospitalBeds() {
+        return rentedFacilitiesCostHospitalBeds;
+    }
+
+    public void setRentedFacilitiesCostHospitalBeds(final int rentedFacilitiesCostHospitalBeds) {
+        this.rentedFacilitiesCostHospitalBeds = rentedFacilitiesCostHospitalBeds;
+    }
+
+    public int getRentedFacilitiesCostKitchens() {
+        return rentedFacilitiesCostKitchens;
+    }
+
+    public void setRentedFacilitiesCostKitchens(final int rentedFacilitiesCostKitchens) {
+        this.rentedFacilitiesCostKitchens = rentedFacilitiesCostKitchens;
+    }
+
+    public int getRentedFacilitiesCostHoldingCells() {
+        return rentedFacilitiesCostHoldingCells;
+    }
+
+    public void setRentedFacilitiesCostHoldingCells(final int rentedFacilitiesCostHoldingCells) {
+        this.rentedFacilitiesCostHoldingCells = rentedFacilitiesCostHoldingCells;
+    }
+
+    public int getRentedFacilitiesCostRepairBays() {
+        return rentedFacilitiesCostRepairBays;
+    }
+
+    public void setRentedFacilitiesCostRepairBays(final int rentedFacilitiesCostRepairBays) {
+        this.rentedFacilitiesCostRepairBays = rentedFacilitiesCostRepairBays;
+    }
+
     public boolean isUseLoanLimits() {
         return useLoanLimits;
     }
@@ -3533,6 +3704,22 @@ public class CampaignOptions {
 
     public void setAllowMonthlyConnections(final boolean allowMonthlyConnections) {
         this.allowMonthlyConnections = allowMonthlyConnections;
+    }
+
+    public boolean isUseBetterExtraIncome() {
+        return useBetterExtraIncome;
+    }
+
+    public void setUseBetterExtraIncome(final boolean useBetterExtraIncome) {
+        this.useBetterExtraIncome = useBetterExtraIncome;
+    }
+
+    public boolean isUseSmallArmsOnly() {
+        return useSmallArmsOnly;
+    }
+
+    public void setUseSmallArmsOnly(final boolean useSmallArmsOnly) {
+        this.useSmallArmsOnly = useSmallArmsOnly;
     }
 
     // region Price Multipliers
@@ -3779,6 +3966,14 @@ public class CampaignOptions {
         this.useDynamicDifficulty = useDynamicDifficulty;
     }
 
+    public boolean isUseBolsterContractSkill() {
+        return useBolsterContractSkill;
+    }
+
+    public void setUseBolsterContractSkill(final boolean useBolsterContractSkill) {
+        this.useBolsterContractSkill = useBolsterContractSkill;
+    }
+
     public boolean isContractMarketReportRefresh() {
         return contractMarketReportRefresh;
     }
@@ -3801,6 +3996,30 @@ public class CampaignOptions {
 
     public void setDropShipBonusPercentage(final int dropShipBonusPercentage) {
         this.dropShipBonusPercentage = dropShipBonusPercentage;
+    }
+
+    public boolean isUseTwoWayPay() {
+        return isUseTwoWayPay;
+    }
+
+    public void setUseTwoWayPay(final boolean isUseTwoWayPay) {
+        this.isUseTwoWayPay = isUseTwoWayPay;
+    }
+
+    public boolean isUseCamOpsSalvage() {
+        return isUseCamOpsSalvage;
+    }
+
+    public void setUseCamOpsSalvage(final boolean isUseCamOpsSalvage) {
+        this.isUseCamOpsSalvage = isUseCamOpsSalvage;
+    }
+
+    public boolean isUseRiskySalvage() {
+        return isUseRiskySalvage;
+    }
+
+    public void setUseRiskySalvage(final boolean isUseRiskySalvage) {
+        this.isUseRiskySalvage = isUseRiskySalvage;
     }
     // endregion Contract Market
     // endregion Markets Tab
@@ -4196,6 +4415,14 @@ public class CampaignOptions {
         this.edgeCost = edgeCost;
     }
 
+    public int getAttributeCost() {
+        return attributeCost;
+    }
+
+    public void setAttributeCost(final int attributeCost) {
+        this.attributeCost = attributeCost;
+    }
+
     public int getWaitingPeriod() {
         return waitingPeriod;
     }
@@ -4265,6 +4492,14 @@ public class CampaignOptions {
 
     public void setUnitTransitTime(final int unitTransitTime) {
         this.unitTransitTime = unitTransitTime;
+    }
+
+    public boolean isNoDeliveriesInTransit() {
+        return noDeliveriesInTransit;
+    }
+
+    public void setNoDeliveriesInTransit(final boolean noDeliveriesInTransit) {
+        this.noDeliveriesInTransit = noDeliveriesInTransit;
     }
 
     public boolean isUsePlanetaryAcquisition() {
@@ -4567,12 +4802,9 @@ public class CampaignOptions {
         this.autoLogisticsOther = autoLogisticsOther;
     }
 
+    @Deprecated(since = "0.50.10", forRemoval = false)
     public boolean isUseAtB() {
-        return useAtB || useStratCon;
-    }
-
-    public void setUseAtB(final boolean useAtB) {
-        this.useAtB = useAtB;
+        return useStratCon;
     }
 
     public boolean isUseStratCon() {
@@ -4583,36 +4815,20 @@ public class CampaignOptions {
         this.useStratCon = useStratCon;
     }
 
+    public boolean isUseStratConMaplessMode() {
+        return useMaplessStratCon;
+    }
+
+    public void setUseStratConMaplessMode(boolean useMaplessStratCon) {
+        this.useMaplessStratCon = useMaplessStratCon;
+    }
+
     public boolean isUseAdvancedScouting() {
         return useAdvancedScouting;
     }
 
     public void setUseAdvancedScouting(final boolean useAdvancedScouting) {
         this.useAdvancedScouting = useAdvancedScouting;
-    }
-
-    public boolean isUseAero() {
-        return useAero;
-    }
-
-    public void setUseAero(final boolean useAero) {
-        this.useAero = useAero;
-    }
-
-    public boolean isUseVehicles() {
-        return useVehicles;
-    }
-
-    public void setUseVehicles(final boolean useVehicles) {
-        this.useVehicles = useVehicles;
-    }
-
-    public boolean isClanVehicles() {
-        return clanVehicles;
-    }
-
-    public void setClanVehicles(final boolean clanVehicles) {
-        this.clanVehicles = clanVehicles;
     }
 
     /**
@@ -4651,22 +4867,6 @@ public class CampaignOptions {
         this.useVerboseBidding = useVerboseBidding;
     }
 
-    public boolean isDoubleVehicles() {
-        return doubleVehicles;
-    }
-
-    public void setDoubleVehicles(final boolean doubleVehicles) {
-        this.doubleVehicles = doubleVehicles;
-    }
-
-    public boolean isAdjustPlayerVehicles() {
-        return adjustPlayerVehicles;
-    }
-
-    public void setAdjustPlayerVehicles(final boolean adjustPlayerVehicles) {
-        this.adjustPlayerVehicles = adjustPlayerVehicles;
-    }
-
     public int getOpForLanceTypeMeks() {
         return opForLanceTypeMeks;
     }
@@ -4689,14 +4889,6 @@ public class CampaignOptions {
 
     public void setOpForLanceTypeVehicles(final int opForLanceTypeVehicles) {
         this.opForLanceTypeVehicles = opForLanceTypeVehicles;
-    }
-
-    public boolean isOpForUsesVTOLs() {
-        return opForUsesVTOLs;
-    }
-
-    public void setOpForUsesVTOLs(final boolean opForUsesVTOLs) {
-        this.opForUsesVTOLs = opForUsesVTOLs;
     }
 
     public boolean isUseDropShips() {
@@ -4745,6 +4937,38 @@ public class CampaignOptions {
 
     public void setTrackOriginalUnit(final boolean trackOriginalUnit) {
         this.trackOriginalUnit = trackOriginalUnit;
+    }
+
+    public int getMoraleVictoryEffect() {
+        return moraleVictoryEffect;
+    }
+
+    public void setMoraleVictoryEffect(final int moraleVictoryEffect) {
+        this.moraleVictoryEffect = moraleVictoryEffect;
+    }
+
+    public int getMoraleDecisiveVictoryEffect() {
+        return moraleDecisiveVictoryEffect;
+    }
+
+    public void setMoraleDecisiveVictoryEffect(final int moraleDecisiveVictoryEffect) {
+        this.moraleDecisiveVictoryEffect = moraleDecisiveVictoryEffect;
+    }
+
+    public int getMoraleDefeatEffect() {
+        return moraleDefeatEffect;
+    }
+
+    public void setMoraleDefeatEffect(final int moraleDefeatEffect) {
+        this.moraleDefeatEffect = moraleDefeatEffect;
+    }
+
+    public int getMoraleDecisiveDefeatEffect() {
+        return moraleDecisiveDefeatEffect;
+    }
+
+    public void setMoraleDecisiveDefeatEffect(final int moraleDecisiveDefeatEffect) {
+        this.moraleDecisiveDefeatEffect = moraleDecisiveDefeatEffect;
     }
 
     public boolean isMercSizeLimited() {
@@ -4944,38 +5168,6 @@ public class CampaignOptions {
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public void setLimitLanceNumUnits(final boolean limitLanceNumUnits) {
-    }
-
-    public boolean isAllowOpForAerospace() {
-        return allowOpForAerospace;
-    }
-
-    public void setAllowOpForAerospace(final boolean allowOpForAerospace) {
-        this.allowOpForAerospace = allowOpForAerospace;
-    }
-
-    public boolean isAllowOpForLocalUnits() {
-        return allowOpForLocalUnits;
-    }
-
-    public void setAllowOpForLocalUnits(final boolean allowOpForLocalUnits) {
-        this.allowOpForLocalUnits = allowOpForLocalUnits;
-    }
-
-    public int getOpForAeroChance() {
-        return opForAeroChance;
-    }
-
-    public void setOpForAeroChance(final int opForAeroChance) {
-        this.opForAeroChance = opForAeroChance;
-    }
-
-    public int getOpForLocalUnitChance() {
-        return opForLocalUnitChance;
-    }
-
-    public void setOpForLocalUnitChance(final int opForLocalUnitChance) {
-        this.opForLocalUnitChance = opForLocalUnitChance;
     }
 
     public int getFixedMapChance() {

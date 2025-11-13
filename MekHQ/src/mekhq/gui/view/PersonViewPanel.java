@@ -41,6 +41,7 @@ import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_AMBIDEXTROUS;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
@@ -120,8 +121,11 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
@@ -222,7 +226,7 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING,
-              SUPPORT));
+              SUPPORT, SUPPORT_TECHNICIAN));
         if (!relevantSkills.isEmpty()) {
             JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.profession");
             gridBagConstraints = new GridBagConstraints();
@@ -706,12 +710,22 @@ public class PersonViewPanel extends JScrollablePanel {
                 continue;
             }
 
+            if (attribute == SkillAttribute.EDGE) {
+                relevantAttributes.put(attribute, 0); // modifier is irrelevant for Edge
+                continue;
+            }
+
             int attributeScore = person.getAttributeScore(attribute);
             int modifier = getIndividualAttributeModifier(attributeScore);
             if (modifier != 0) {
                 relevantAttributes.put(attribute, modifier);
             }
         }
+
+        if (!campaignOptions.isUseEdge()) {
+            relevantAttributes.remove(SkillAttribute.EDGE);
+        }
+
         return relevantAttributes;
     }
 
@@ -1932,7 +1946,6 @@ public class PersonViewPanel extends JScrollablePanel {
               doctorsUseAdmin,
               techsUseAdmin,
               isUseArtillery));
-        secondaryProfessionSkills.removeAll(primaryProfessionSkills);
 
         // Calculate how many rows per column for even distribution
         double numColumns = 3.0;
@@ -1959,16 +1972,22 @@ public class PersonViewPanel extends JScrollablePanel {
                 label = formattedSkillName;
             }
             JLabel lblName = new JLabel(label);
-
+            boolean isIlliterate = person.isIlliterate();
+            boolean isAmbidextrous = person.getOptions().booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
+            List<InjuryEffect> injuryEffects = AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
+                  person.getInjuries());
+            SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
+                  isIlliterate, injuryEffects);
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
-            String adjustment = getAdjustment(skill, attributeModifier, spaModifier);
+            int injuryModifier = Skill.getTotalInjuryModifier(skillModifierData, skill.getType());
+            String adjustment = getAdjustment(skill, attributeModifier, spaModifier, injuryModifier);
 
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
-                  skill.toString(options, attributes, adjustedReputation),
+                  skill.toString(skillModifierData),
                   adjustment));
             lblName.setLabelFor(lblValue);
-            String tooltip = wordWrap(skill.getTooltip(options, attributes, adjustedReputation));
+            String tooltip = wordWrap(skill.getTooltip(skillModifierData));
             lblName.setToolTipText(tooltip);
             lblValue.setToolTipText(tooltip);
 
@@ -1993,9 +2012,9 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlSkills;
     }
 
-    private static String getAdjustment(Skill skill, int attributeModifier, int spaModifier) {
+    private static String getAdjustment(Skill skill, int attributeModifier, int spaModifier, int injuryModifier) {
         int ageModifier = skill.getAgingModifier();
-        int totalModifier = attributeModifier + spaModifier + ageModifier;
+        int totalModifier = attributeModifier + spaModifier + ageModifier + injuryModifier;
 
         String color = "";
         String icon = "";
@@ -2033,21 +2052,44 @@ public class PersonViewPanel extends JScrollablePanel {
         int skillsPerColumn = (int) ceil(relevantAttributes.size() / numColumns);
 
         int i = 0;
-        for (SkillAttribute attribute : relevantAttributes.keySet()) {
+        for (SkillAttribute attribute : SkillAttribute.values()) {
+            if (!relevantAttributes.containsKey(attribute)) {
+                continue;
+            }
+
             int column = i / skillsPerColumn; // 0, 1, 2
             int row = i % skillsPerColumn;
             int gridX = column * 2; // Each column takes 2 grid positions: name + value
 
-            String attributeName = attribute.getLabel();
-            int attributeModifier = relevantAttributes.get(attribute);
+            int baseEdge = person.getEdge();
+            int adjustedEdge = person.getAdjustedEdge();
+            int currentEdge = person.getCurrentEdge();
 
-            JLabel lblName = new JLabel(attributeName);
-            JLabel lblValue = new JLabel((attributeModifier > 0 ? "+" : "") + attributeModifier);
-            lblName.setLabelFor(lblValue);
+            JLabel lblName = new JLabel();
+            JLabel lblValue = new JLabel();
+            if (attribute != SkillAttribute.EDGE) {
+                String attributeName = attribute.getLabel();
+                int attributeModifier = relevantAttributes.get(attribute);
 
-            String tooltip = wordWrap(attribute.getDescription());
-            lblName.setToolTipText(tooltip);
-            lblValue.setToolTipText(tooltip);
+                lblName.setText(attributeName);
+                lblValue.setText((attributeModifier > 0 ? "+" : "") + attributeModifier);
+                lblName.setLabelFor(lblValue);
+
+                String tooltip = wordWrap(attribute.getDescription());
+                lblName.setToolTipText(tooltip);
+                lblValue.setToolTipText(tooltip);
+            } else {
+                String attributeName = attribute.getLabel();
+                String adjustment = getTraitAdjustmentIcon(baseEdge, adjustedEdge);
+                String value = "<html>" + currentEdge + "/" + adjustedEdge + adjustment + "</html>";
+
+                lblName.setText(attributeName);
+                lblValue.setText(value);
+
+                String tooltip = wordWrap(attribute.getDescription());
+                lblName.setToolTipText(tooltip);
+                lblValue.setToolTipText(tooltip);
+            }
 
             // Name label constraints
             GridBagConstraints nameConstraints = new GridBagConstraints();
@@ -2109,22 +2151,41 @@ public class PersonViewPanel extends JScrollablePanel {
             int row = i % skillsPerColumn;
             int gridX = column * 2; // Each column takes 2 grid positions: name + value
 
-            String attributeName = attribute.getLabel();
-            int attributeScore = attributes.getAttributeScore(attribute);
-            int attributeModifier = attributes.getAttributeModifier(attribute);
+            int baseEdge = person.getEdge();
+            int adjustedEdge = person.getAdjustedEdge();
+            int currentEdge = person.getCurrentEdge();
 
-            JLabel lblName = new JLabel(attributeName);
-            String value = String.valueOf(attributeScore);
-            if (attributeModifier != 0) {
-                value += " (" + (attributeModifier > 0 ? "+" : "") + attributeModifier + ")";
+            JLabel lblName = new JLabel();
+            JLabel lblValue = new JLabel();
+            if (attribute != SkillAttribute.EDGE) {
+                String attributeName = attribute.getLabel();
+                int attributeScore = attributes.getAttributeScore(attribute);
+                int attributeModifier = attributes.getAttributeModifier(attribute);
+
+                lblName.setText(attributeName);
+                String value = String.valueOf(attributeScore);
+                if (attributeModifier != 0) {
+                    value += " (" + (attributeModifier > 0 ? "+" : "") + attributeModifier + ")";
+                }
+
+                lblValue.setText(value);
+                lblName.setLabelFor(lblValue);
+
+                String tooltip = wordWrap(attribute.getDescription());
+                lblName.setToolTipText(tooltip);
+                lblValue.setToolTipText(tooltip);
+            } else if (campaignOptions.isUseEdge() && (baseEdge != 0 || adjustedEdge != 0)) {
+                String attributeName = attribute.getLabel();
+                String adjustment = getTraitAdjustmentIcon(baseEdge, adjustedEdge);
+                String value = "<html>" + currentEdge + "/" + adjustedEdge + adjustment + "</html>";
+
+                lblName.setText(attributeName);
+                lblValue.setText(value);
+
+                String tooltip = wordWrap(attribute.getDescription());
+                lblName.setToolTipText(tooltip);
+                lblValue.setToolTipText(tooltip);
             }
-
-            JLabel lblValue = new JLabel(value);
-            lblName.setLabelFor(lblValue);
-
-            String tooltip = wordWrap(attribute.getDescription());
-            lblName.setToolTipText(tooltip);
-            lblValue.setToolTipText(tooltip);
 
             // Name label constraints
             GridBagConstraints nameConstraints = new GridBagConstraints();
@@ -2224,11 +2285,16 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlOther.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlSkills.traits")));
 
         JLabel lblConnections = null;
-        int connections = person.getAdjustedConnections();
+        int connections = person.getAdjustedConnections(true);
         if (connections != 0) {
+            String connectionsDisplayValue = Integer.toString(connections);
+            if (person.getBurnedConnectionsEndDate() != null) {
+                connectionsDisplayValue = "<html><b><font color='gray'>" + connections + "</font></b></html>";
+            }
+
             String connectionsLabel = String.format(resourceMap.getString("format.traitValue"),
                   resourceMap.getString("lblConnections.text"),
-                  connections,
+                  connectionsDisplayValue,
                   "");
             lblConnections = new JLabel(connectionsLabel);
             lblConnections.setToolTipText(wordWrap(resourceMap.getString("lblConnections.tooltip")));
@@ -2274,22 +2340,9 @@ public class PersonViewPanel extends JScrollablePanel {
             lblToughness.setToolTipText(wordWrap(resourceMap.getString("lblToughness.tooltip")));
         }
 
-        JLabel lblEdge = null;
-        int baseEdge = person.getEdge();
-        int adjustedEdge = person.getAdjustedEdge();
-        int currentEdge = person.getCurrentEdge();
-        if (campaignOptions.isUseEdge() && (baseEdge != 0 || adjustedEdge != 0)) {
-            String adjustment = getTraitAdjustmentIcon(baseEdge, adjustedEdge);
-            String edgeLabel = String.format(resourceMap.getString("format.traitValue"),
-                  resourceMap.getString("lblEdge.text"),
-                  currentEdge + "/" + adjustedEdge,
-                  adjustment);
-            lblEdge = new JLabel(edgeLabel);
-            lblEdge.setToolTipText(wordWrap(resourceMap.getString("lblEdge.tooltip")));
-        }
-
         JLabel lblLoyalty = null;
-        int loyaltyModifier = person.getLoyaltyModifier(person.getAdjustedLoyalty(campaign.getFaction()));
+        int loyaltyModifier = person.getLoyaltyModifier(person.getAdjustedLoyalty(campaign.getFaction(),
+              campaignOptions.isUseAlternativeAdvancedMedical()));
         if ((campaignOptions.isUseLoyaltyModifiers()) &&
                   (!campaignOptions.isUseHideLoyalty()) &&
                   (loyaltyModifier != 0)) {
@@ -2303,9 +2356,9 @@ public class PersonViewPanel extends JScrollablePanel {
 
         JLabel lblFatigue = null;
         int baseFatigue = person.getFatigue();
-        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(),
+        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.getPermanentFatigue(),
               person.isClanPersonnel(),
-              person.getSkillLevel(campaign, false));
+              person.getSkillLevel(campaign, false, true));
         if (campaignOptions.isUseFatigue() && (baseFatigue != 0 || effectiveFatigue != 0)) {
             StringBuilder fatigueDisplay = new StringBuilder("<html>");
             int fatigueTurnoverModifier = MathUtility.clamp(((effectiveFatigue - 1) / 4) - 1, 0, 3);
@@ -2406,9 +2459,6 @@ public class PersonViewPanel extends JScrollablePanel {
         }
         if (lblToughness != null) {
             components.add(lblToughness);
-        }
-        if (lblEdge != null) {
-            components.add(lblEdge);
         }
         if (lblLoyalty != null) {
             components.add(lblLoyalty);
@@ -2604,32 +2654,32 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblAdvancedMedical1 = new JLabel();
         JLabel lblAdvancedMedical2 = new JLabel();
 
-        lblAdvancedMedical1.setName("lblAdvancedMedical1");
-        lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text"));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlInjuryDetails.add(lblAdvancedMedical1, gridBagConstraints);
 
         double vWeight = 1.0;
         if (person.hasInjuries(true)) {
             vWeight = 0.0;
         }
 
-        lblAdvancedMedical2.setName("lblAdvancedMedical2");
-        lblAdvancedMedical2.setText(getAdvancedMedalEffectString(person));
-        lblAdvancedMedical1.setLabelFor(lblAdvancedMedical2);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = vWeight;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlInjuryDetails.add(lblAdvancedMedical2, gridBagConstraints);
+        if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+            getAlternativeAdvancedMedicalDisplay(injuries,
+                  lblAdvancedMedical2,
+                  lblAdvancedMedical1,
+                  gridBagConstraints,
+                  vWeight,
+                  pnlInjuryDetails);
+        } else {
+            getAdvancedMedicalDisplay(lblAdvancedMedical1,
+                  pnlInjuryDetails,
+                  gridBagConstraints,
+                  lblAdvancedMedical2,
+                  vWeight);
+        }
 
         // This adds a dummy/invisible label to column 2, row 0 to prevent column 3 from being pushed away
         JLabel dummy = new JLabel();
@@ -2637,7 +2687,8 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -2646,7 +2697,6 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblInjury;
         int columns = 3;
         int rowsPerColumn = (int) Math.ceil((double) injuries.size() / columns);
-
         for (int i = 0; i < injuries.size(); ++i) {
             Injury injury = injuries.get(i);
 
@@ -2661,9 +2711,10 @@ public class PersonViewPanel extends JScrollablePanel {
             lblInjury = new JLabel(label);
             gridBagConstraints.gridx = col;
             gridBagConstraints.gridy = displayRow;
-            gridBagConstraints.weightx = 0.0;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInjuryDetails.add(lblInjury, gridBagConstraints);
         }
@@ -2671,6 +2722,47 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlInjuries.add(pnlInjuryDetails, BorderLayout.CENTER);
 
         return pnlInjuries;
+    }
+
+    private void getAlternativeAdvancedMedicalDisplay(List<Injury> injuries, JLabel lblAdvancedMedical2,
+          JLabel lblAdvancedMedical1,
+          GridBagConstraints gridBagConstraints, double vWeight, JPanel pnlInjuryDetails) {
+        lblAdvancedMedical2.setName("lblAdvancedMedical2");
+        boolean isAmbidextrous = person.getOptions().booleanOption(ATOW_AMBIDEXTROUS);
+        List<InjuryEffect> injuryEffects = AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous, injuries);
+        lblAdvancedMedical2.setText(InjuryEffect.getEffectsLabel(injuryEffects));
+        String injuryEffectTooltip = wordWrap(InjuryEffect.getTooltip(injuryEffects));
+        lblAdvancedMedical2.setToolTipText(injuryEffectTooltip);
+        lblAdvancedMedical1.setLabelFor(lblAdvancedMedical2);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = vWeight;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlInjuryDetails.add(lblAdvancedMedical2, gridBagConstraints);
+    }
+
+    private void getAdvancedMedicalDisplay(JLabel lblAdvancedMedical1, JPanel pnlInjuryDetails,
+          GridBagConstraints gridBagConstraints,
+          JLabel lblAdvancedMedical2, double vWeight) {
+        lblAdvancedMedical1.setName("lblAdvancedMedical1");
+        lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text"));
+        pnlInjuryDetails.add(lblAdvancedMedical1, gridBagConstraints);
+
+        lblAdvancedMedical2.setName("lblAdvancedMedical2");
+        lblAdvancedMedical2.setText(getAdvancedMedalEffectString(person));
+        lblAdvancedMedical1.setLabelFor(lblAdvancedMedical2);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = vWeight;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlInjuryDetails.add(lblAdvancedMedical2, gridBagConstraints);
     }
 
     /**

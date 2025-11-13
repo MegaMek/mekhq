@@ -32,6 +32,7 @@
  */
 package mekhq.gui.view;
 
+import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -48,6 +49,7 @@ import megamek.client.ui.util.FluffImageHelper;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.util.ViewFormatting;
 import megamek.common.TechConstants;
+import megamek.common.preference.PreferenceManager;
 import megamek.common.units.Entity;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
@@ -55,6 +57,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.ImgLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
@@ -69,6 +72,7 @@ public class UnitViewPanel extends JScrollablePanel {
     private final Campaign campaign;
 
     private JPanel pnlStats;
+    private JPanel pnlCrew;
 
     public UnitViewPanel(Unit u, Campaign c) {
         super();
@@ -84,21 +88,25 @@ public class UnitViewPanel extends JScrollablePanel {
         JTextPane txtReadout = new JTextPane();
         JTextPane txtFluff = new JTextPane();
         pnlStats = new JPanel();
+        pnlCrew = new JPanel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel",
               MekHQ.getMHQOptions().getLocale());
 
         setLayout(new GridBagLayout());
 
+        boolean isSpritesOnly = PreferenceManager.getClientPreferences().getSpritesOnly();
         int compWidth = 1;
-        Image image = FluffImageHelper.getFluffImage(entity);
+        Image image = isSpritesOnly ? null : FluffImageHelper.getFluffImage(entity);
         JLabel lblImage;
+
+        int y = 0;
         if (null != image) {
             // fluff image exists so use custom ImgLabel to get full mek porn
             lblImage = new ImgLabel(image);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = 0;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.gridheight = 3;
             gridBagConstraints.weightx = 0.5;
             gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -116,7 +124,7 @@ public class UnitViewPanel extends JScrollablePanel {
                 lblImage.setIcon(icon);
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 1;
-                gridBagConstraints.gridy = 0;
+                gridBagConstraints.gridy = y;
                 gridBagConstraints.gridheight = 1;
                 gridBagConstraints.weightx = 0.0;
                 gridBagConstraints.fill = GridBagConstraints.BOTH;
@@ -130,13 +138,49 @@ public class UnitViewPanel extends JScrollablePanel {
         fillStats(resourceMap);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
+        y++;
+
+        pnlCrew.setName("pnlCrew");
+        pnlCrew.setLayout(new BorderLayout());
+        pnlCrew.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("lblCrew.text")));
+        JLabel lblCrew = new JLabel(UnitTableModel.getCrewTooltip(unit));
+        pnlCrew.add(lblCrew, BorderLayout.WEST);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        add(pnlCrew, gridBagConstraints);
+        y++;
+
+        if (!unit.getHistory().isBlank()) {
+            txtFluff.setName("txtFluff");
+            txtFluff.setEditable(false);
+            txtFluff.setContentType("text/html");
+            txtFluff.setText(MarkdownRenderer.getRenderedHtml(unit.getHistory()));
+            txtFluff.setBorder(RoundedLineBorder.createRoundedLineBorder("Unit History"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.gridwidth = compWidth;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(txtFluff, gridBagConstraints);
+            y++;
+        }
 
         EntityReadout entityReadout = EntityReadout.createReadout(entity, false, true);
         txtReadout.setName("txtReadout");
@@ -151,7 +195,7 @@ public class UnitViewPanel extends JScrollablePanel {
         txtReadout.setBorder(RoundedLineBorder.createRoundedLineBorder("Technical Readout"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.gridwidth = compWidth;
         if (unit.getHistory().isBlank()) {
@@ -161,24 +205,6 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(txtReadout, gridBagConstraints);
-
-        if (!unit.getHistory().isBlank()) {
-            txtFluff.setName("txtFluff");
-            txtFluff.setEditable(false);
-            txtFluff.setContentType("text/html");
-            txtFluff.setText(MarkdownRenderer.getRenderedHtml(unit.getHistory()));
-            txtFluff.setBorder(RoundedLineBorder.createRoundedLineBorder("Unit History"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 2;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.gridwidth = compWidth;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(txtFluff, gridBagConstraints);
-        }
     }
 
     private void fillStats(ResourceBundle resourceMap) {

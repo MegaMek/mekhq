@@ -558,16 +558,6 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(txtBattleLossComp, gridBagConstraintsText);
 
         if (contract instanceof AtBContract) {
-            JLabel lblRequiredLances = new JLabel(resourceMap.getString("lblRequiredLances.text"));
-            lblRequiredLances.setName("lblRequiredLances");
-            gridBagConstraintsLabels.gridy = ++y;
-            mainPanel.add(lblRequiredLances, gridBagConstraintsLabels);
-
-            JLabel txtRequiredLances = new JLabel(String.valueOf(((AtBContract) contract).getRequiredCombatTeams()));
-            txtRequiredLances.setName("txtRequiredLances");
-            gridBagConstraintsText.gridy = y;
-            mainPanel.add(txtRequiredLances, gridBagConstraintsText);
-
             JLabel lblRequiredCombatElements = new JLabel(resourceMap.getString("lblRequiredCombatElements.text"));
             lblRequiredCombatElements.setName("lblRequiredCombatElements");
             gridBagConstraintsLabels.gridy = ++y;

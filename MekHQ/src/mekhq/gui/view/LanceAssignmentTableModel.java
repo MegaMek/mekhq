@@ -117,6 +117,11 @@ class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
         } else if (col == COL_ROLE) {
             if (value instanceof CombatRole) {
                 data.get(row).setRole((CombatRole) value);
+                Force chosenForce = (Force) getValueAt(row, COL_FORCE);
+                chosenForce.setCombatRoleInMemory((CombatRole) value);
+                for (Force force : chosenForce.getSubForces()) {
+                    force.setCombatRoleInMemory((CombatRole) value);
+                }
             }
         }
         fireTableDataChanged();

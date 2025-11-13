@@ -100,7 +100,7 @@ import mekhq.gui.displayWrappers.FactionDisplay;
  * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */
 public class GeneralTab {
-    private static final LocalDate RANDOM_DATE_EARLIEST = LocalDate.of(2470, 1, 1);
+    private static final LocalDate RANDOM_DATE_EARLIEST = LocalDate.of(2775, 1, 1);
     private static final LocalDate RANDOM_DATE_LATEST = LocalDate.of(3151, 1, 1);
 
     private final JFrame frame;

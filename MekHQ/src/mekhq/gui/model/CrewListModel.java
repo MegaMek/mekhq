@@ -45,9 +45,8 @@ import megamek.common.units.Entity;
 import megamek.common.units.Tank;
 import megamek.common.units.VTOL;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
@@ -112,11 +111,13 @@ public class CrewListModel extends AbstractListModel<Person> {
 
     Unit unit;
     List<Person> crew;
+    boolean soldiersUseSmallArmsOnly;
 
-    public void setData(final Unit u) {
-        this.unit = u;
-        this.crew = new ArrayList<>(u.getCrew());
-        crew.sort(Comparator.comparingInt(p -> CrewRole.getCrewRole(p, u).getSortOrder()));
+    public void setData(final Unit unit, final boolean soldiersUseSmallArmsOnly) {
+        this.unit = unit;
+        this.crew = new ArrayList<>(unit.getCrew());
+        this.soldiersUseSmallArmsOnly = soldiersUseSmallArmsOnly;
+        crew.sort(Comparator.comparingInt(p -> CrewRole.getCrewRole(p, unit).getSortOrder()));
         fireContentsChanged(this, 0, crew.size());
     }
 
@@ -153,28 +154,26 @@ public class CrewListModel extends AbstractListModel<Person> {
             if (entity != null &&
                       entity.hasETypeFlag(Entity.ETYPE_INFANTRY) &&
                       !entity.hasETypeFlag(Entity.ETYPE_BATTLEARMOR)) {
-                gunSkill = InfantryGunnerySkills.getBestInfantryGunnerySkill(person);
+                gunSkill = InfantryGunnerySkills.getBestInfantryGunnerySkill(person, soldiersUseSmallArmsOnly);
                 if (gunSkill == null) {
                     gunSkill = SkillType.S_SMALL_ARMS;
                 }
             }
             String driveSkill = SkillType.getDrivingSkillFor(unit.getEntity());
 
-            PersonnelOptions options = person.getOptions();
-            Attributes attributes = person.getATOWAttributes();
+            SkillModifierData skillModifierData = person.getSkillModifierData();
             String sb = "<html><font><b>" +
                               person.getFullTitle() +
                               "</b><br/>" +
                               CrewRole.getCrewRole(person, unit).getDisplayName() +
                               " ("
-                              // Shooting and driving don't benefit from Reputation, so no need to pass that in.
                               +
                               (person.hasSkill(gunSkill) ?
-                                     person.getSkill(gunSkill).getFinalSkillValue(options, attributes, 0) :
+                                     person.getSkill(gunSkill).getFinalSkillValue(skillModifierData) :
                                      "-") +
                               '/' +
                               (person.hasSkill(driveSkill) ?
-                                     person.getSkill(driveSkill).getFinalSkillValue(options, attributes, 0) :
+                                     person.getSkill(driveSkill).getFinalSkillValue(skillModifierData) :
                                      "-") +
                               ")</font></html>";
             setHtmlText(sb);

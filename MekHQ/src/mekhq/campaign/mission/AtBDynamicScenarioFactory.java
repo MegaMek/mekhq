@@ -39,6 +39,7 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.equipment.WeaponType.CLASS_ARTILLERY;
+import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static megamek.common.planetaryConditions.Atmosphere.THIN;
 import static megamek.common.planetaryConditions.Wind.TORNADO_F4;
 import static megamek.common.units.UnitType.*;
@@ -251,7 +252,9 @@ public class AtBDynamicScenarioFactory {
             scenario.removeBotForce(x);
         }
 
-        applyScenarioModifiers(scenario, campaign, EventTiming.PreForceGeneration);
+        if (!scenario.getStratConScenarioType().isOfficialChallenge()) {
+            applyScenarioModifiers(scenario, campaign, EventTiming.PreForceGeneration);
+        }
 
         // Now we can clear the other related lists
         scenario.getAlliesPlayer().clear();
@@ -271,7 +274,9 @@ public class AtBDynamicScenarioFactory {
         setDeploymentZones(scenario);
         setDestinationZones(scenario);
 
-        applyScenarioModifiers(scenario, campaign, EventTiming.PostForceGeneration);
+        if (!scenario.getStratConScenarioType().isOfficialChallenge()) {
+            applyScenarioModifiers(scenario, campaign, EventTiming.PostForceGeneration);
+        }
 
         setScenarioRerolls(scenario, campaign);
 
@@ -483,7 +488,12 @@ public class AtBDynamicScenarioFactory {
                 // enemy or "Unidentified Hostiles" which are considered pirates or bandit caste
                 // with random quality and skill
             case Third:
-                skill = scenario.getEffectiveOpForSkill();
+                if (scenario.getStratConScenarioType().isOfficialChallenge()) {
+                    skill = SkillLevel.changeByDelta(scenario.getEffectiveOpForSkill(), 2);
+                } else {
+                    skill = scenario.getEffectiveOpForSkill();
+                }
+
                 quality = scenario.getEffectiveOpForQuality();
                 if (forceTemplate.getForceName().toLowerCase().contains("unidentified")) {
                     unidentifiedThirdPartyPresent = true;
@@ -951,13 +961,18 @@ public class AtBDynamicScenarioFactory {
                 forceBV = 0;
 
                 boolean isClan = faction.isClan();
+                boolean isOfficialChallenge = scenario.getStratConScenarioType().isOfficialChallenge();
 
                 if (isClan) {
                     LOGGER.info("Faction is Clan, skipping culling");
                 }
 
+                if (isOfficialChallenge) {
+                    LOGGER.info("This is a combat challenge, skipping culling");
+                }
+
                 for (Entity entity : generatedEntities) {
-                    if (isClan) {
+                    if (isClan || isOfficialChallenge) {
                         forceComposition.add(entity);
                         int battleValue = getBattleValue(campaign, entity, false);
                         forceBV += battleValue;
@@ -1014,17 +1029,19 @@ public class AtBDynamicScenarioFactory {
                         int baseFighterCount = getAeroLanceSize(faction);
                         int fighterMultiplier = 0;
 
-                        try {
-                            StratConTrackState scenarioHomeTrack = getStratconTrackState(scenario, contract);
+                        if (!campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+                            try {
+                                StratConTrackState scenarioHomeTrack = getStratconTrackState(scenario, contract);
 
-                            if (scenarioHomeTrack != null) {
-                                for (StratConFacility facility : scenarioHomeTrack.getFacilities().values()) {
-                                    if (facility.getFacilityType().equals(FacilityType.AirBase)) {
-                                        fighterMultiplier++;
+                                if (scenarioHomeTrack != null) {
+                                    for (StratConFacility facility : scenarioHomeTrack.getFacilities().values()) {
+                                        if (facility.getFacilityType().equals(FacilityType.AirBase)) {
+                                            fighterMultiplier++;
+                                        }
                                     }
                                 }
+                            } catch (Exception ignored) {
                             }
-                        } catch (Exception ignored) {
                         }
 
                         boolean allowConventionalAircraft = scenario.getTemplate().mapParameters.getMapLocation() !=
@@ -2076,15 +2093,7 @@ public class AtBDynamicScenarioFactory {
         // return getEntityByName("Heavy Tracked APC", params.getFaction(), skill, campaign);
         // return getEntityByName("Badger (C) Tracked Transport B", params.getFaction(), skill, campaign);
 
-        if (campaign.getCampaignOptions().isOpForUsesVTOLs()) {
-            params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
-        } else {
-            if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
-                params.setFilter(mekSummary -> !mekSummary.isClan() && !mekSummary.getUnitType().equals("VTOL"));
-            } else {
-                params.setFilter(mekSummary -> !mekSummary.getUnitType().equals("VTOL"));
-            }
-        }
+        params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
 
         MekSummary unitData = campaign.getUnitGenerator().generate(params);
 
@@ -2908,6 +2917,12 @@ public class AtBDynamicScenarioFactory {
 
         entity.setExternalIdAsString(UUID.randomUUID().toString());
 
+        if (campaignOptions.isUseImplants() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+            if (entity.isProtoMek()) {
+                entity.getCrew().getOptions().getOption(UNOFFICIAL_EI_IMPLANT).setValue(true);
+            }
+        }
+
         return entity;
     }
 
@@ -3079,9 +3094,7 @@ public class AtBDynamicScenarioFactory {
 
             // If ground vehicles are permitted in general and by environmental conditions,
             // and for Clans if this is a Clan faction, then use them. Otherwise, only use Meks.
-            if (campaign.getCampaignOptions().isUseVehicles() &&
-                      allowTanks &&
-                      (!faction.isClan() || (faction.isClan() && campaign.getCampaignOptions().isClanVehicles()))) {
+            if (allowTanks) {
 
                 // some specialized logic for clan op fors
                 // if we're in the late republic or dark ages, clans no longer have the luxury
@@ -3249,7 +3262,7 @@ public class AtBDynamicScenarioFactory {
 
         // Random determination of Mek or ground vehicle
         int roll = d6(2);
-        int unitType = campaign.getCampaignOptions().isClanVehicles() && (roll <= vehicleTarget) ? TANK : MEK;
+        int unitType = roll <= vehicleTarget ? TANK : MEK;
 
         if ((campaign.getGameYear() >= 3057) && (randomInt(100) < 6)) {
             unitType = PROTOMEK;
@@ -4566,7 +4579,7 @@ public class AtBDynamicScenarioFactory {
 
         if (entity.getAnyTypeMaxJumpMP() > 0) {
             // If the entity has jump capability, adjust the speed
-            if (entity instanceof Infantry) {
+            if (entity.isInfantry()) {
                 // For infantry, use jump MP instead of walk MP
                 speed = entity.getJumpMP();
             } else {
@@ -4576,7 +4589,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         // For aerospace units, multiply the walk MP
-        if (entity.isAerospace() && !entity.isSpheroid()) {
+        if (entity instanceof LandAirMek || entity.isAerospace() && !entity.isSpheroid()) {
             speed *= 2;
         }
 

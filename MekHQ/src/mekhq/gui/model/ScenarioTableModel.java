@@ -136,32 +136,42 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
 
                 if (stratconScenario != null) {
                     // Determine attributes of the scenario
+                    boolean isStrategic = stratconScenario.isStrategicObjective();
                     boolean isTurningPoint = stratconScenario.isTurningPoint();
-                    boolean isCrisis = scenario.getStratConScenarioType().isSpecial();
+                    boolean isCrisis = scenario.isCrisis() || scenario.getStratConScenarioType().isSpecial();
+                    boolean isDual = scenario.getStratConScenarioType().isOfficialChallenge();
 
-                    // Set the opening span color based on scenario type (Crisis or Turning Point)
+                    // Set the opening span color based on scenario type (Strategic, Crisis, or Turning Point)
                     String openingSpan = "";
-                    if (isCrisis) {
+                    if (isCrisis || isStrategic || isDual) {
                         openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
                     } else if (isTurningPoint) {
                         openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
                     }
 
-                    // Add appropriate label for Crisis or Turning Point
-                    String turningPointText = isCrisis
-                                                    ? ' ' + resources.getString("col_status.crisis")
-                                                    : isTurningPoint
-                                                            ? ' ' + resources.getString("col_status.turningPoint")
-                                                            : "";
+                    // Generate an appropriate label
+                    String scenarioSeverityText;
+                    if (isStrategic) {
+                        scenarioSeverityText = resources.getString("col_status.strategic");
+                    } else if (isTurningPoint) {
+                        scenarioSeverityText = resources.getString("col_status.turningPoint");
+                    } else if (isCrisis) {
+                        scenarioSeverityText = resources.getString("col_status.crisis");
+                    } else if (isDual) {
+                        scenarioSeverityText = resources.getString("col_status.dual");
+                    } else {
+                        scenarioSeverityText = "";
+                    }
 
                     // Add closing span tag if there is an opening span
                     String closingSpan = openingSpan.isEmpty() ? "" : CLOSING_SPAN_TAG;
 
                     // Wrap in HTML and include bold formatting for accessibility
                     return String.format(
-                          "<html>%s%s<b>%s</b>%s</html>", scenario.getStatus().toString(),
+                          "<html>%s%s<b> %s</b>%s</html>",
+                          scenario.getStatus().toString(),
                           openingSpan,
-                          turningPointText,
+                          scenarioSeverityText,
                           closingSpan
                     );
                 }

@@ -32,8 +32,12 @@
  */
 package mekhq.campaign.market.contractMarket;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.enums.SkillLevel.ELITE;
+import static megamek.common.enums.SkillLevel.GREEN;
+import static megamek.common.enums.SkillLevel.HEROIC;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -48,18 +52,20 @@ import java.util.Objects;
 import java.util.Set;
 
 import megamek.Version;
-import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.Faction;
@@ -85,12 +91,6 @@ public abstract class AbstractContractMarket {
     private static final int MERCENARY_THRESHOLD_HOUSE = 8;
     private static final int MERCENARY_THRESHOLD_LIAISON = 12;
     private static final int NON_MERCENARY_THRESHOLD = 12;
-
-    /**
-     * The portion of combat teams we expect to be performing combat actions. This is one in 'x' where 'x' is the value
-     * set here.
-     */
-    static final double BASE_VARIANCE_FACTOR = 0.7;
 
 
     protected List<Contract> contracts = new ArrayList<>();
@@ -191,8 +191,13 @@ public abstract class AbstractContractMarket {
         final boolean isMercenary = faction.isMercenary();
         if (null != clauseMods.get(contract.getId())) {
             switch (clause) {
-                case CLAUSE_COMMAND ->
-                      rollCommandClause(contract, clauseMods.get(contract.getId()).mods[clause], isMercenary);
+                case CLAUSE_COMMAND -> {
+                    if (contract.getContractType().isGuerrillaType()) {
+                        contract.setCommandRights(ContractCommandRights.INDEPENDENT);
+                    } else {
+                        rollCommandClause(contract, clauseMods.get(contract.getId()).mods[clause], isMercenary);
+                    }
+                }
                 case CLAUSE_SALVAGE -> {
                     rollSalvageClause(contract,
                           clauseMods.get(contract.getId()).mods[clause],
@@ -260,10 +265,12 @@ public abstract class AbstractContractMarket {
      * @param campaign       the campaign containing relevant options and faction information
      * @param contract       the contract that specifies details such as subcontract status
      * @param bypassVariance a flag indicating whether variance adjustments should be bypassed
+     * @param varianceFactor the degree of variance to apply to required combat elements
      *
      * @return the calculated number of required units in combat teams, ensuring it meets game rules and constraints
      */
-    public int calculateRequiredCombatElements(Campaign campaign, AtBContract contract, boolean bypassVariance) {
+    public int calculateRequiredCombatElements(Campaign campaign, AtBContract contract, boolean bypassVariance,
+          double varianceFactor) {
         // Return 1 combat team if the contract is a subcontract
         if (contract.isSubcontract()) {
             return 1;
@@ -274,12 +281,8 @@ public abstract class AbstractContractMarket {
 
         // If bypassing variance, apply flat reduction (reduce force by 1/3)
         if (bypassVariance) {
-            return Math.max(effectiveForces - calculateBypassVarianceReduction(effectiveForces), 1);
+            return max(effectiveForces - calculateBypassVarianceReduction(effectiveForces), 1);
         }
-
-        // Apply variance based on a die roll
-        int varianceRoll = d6(2);
-        double varianceFactor = calculateVarianceFactor(varianceRoll);
 
         // Adjust available forces based on variance, ensuring minimum clamping
         int adjustedForces = (int) Math.floor((double) effectiveForces * varianceFactor);
@@ -293,43 +296,60 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Calculates the variance factor based on the given roll value and a fixed formation size divisor.
+     * Calculates the required number of combat teams (intensity) for a contract based on campaign options, contract
+     * details, and variance factors.
      *
-     * <p>
-     * The variance factor is determined by applying a multiplier to the fixed formation size divisor. The multiplier
-     * varies based on the roll value:
+     * <p>This method determines the number of combat elements needed to deploy, taking into account factors such
+     * as:</p>
      * <ul>
-     *   <li><b>Roll 2:</b> Multiplier is 0.575.</li>
-     *   <li><b>Roll 3:</b> Multiplier is 0.6.</li>
-     *   <li><b>Roll 4:</b> Multiplier is 0.625</li>
-     *   <li><b>Roll 5:</b> Multiplier is 0.65.</li>
-     *   <li><b>Roll 6:</b> Multiplier is 0.675.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.7.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.725.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.75.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.775.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.8.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.825.</li>
+     *   <li>Whether the contract is a subcontract (returns 1 as a base case).</li>
+     *   <li>The effective unit forces.</li>
+     *   <li>Whether variance bypass is enabled, applying a flat reduction to available forces.</li>
+     *   <li>Variance adjustments applied through a die roll, affecting the availability of forces.</li>
      * </ul>
      *
-     * @param roll the roll value used to determine the multiplier
+     * <p>The method ensures values are clamped to maintain a minimum deployment of at least 1 combat element while
+     * not exceeding the maximum deployable combat elements.</p>
      *
-     * @return the calculated variance factor as a double
+     * @param campaign       the campaign containing relevant options and faction information
+     * @param contract       the contract that specifies details such as subcontract status
+     * @param bypassVariance a flag indicating whether variance adjustments should be bypassed
+     * @param varianceFactor the degree of variance to apply to required combat elements
+     *
+     * @return the calculated number of required units in combat teams, ensuring it meets game rules and constraints
+     *
+     * @since 0.50.10
      */
-    private double calculateVarianceFactor(int roll) {
-        return switch (roll) {
-            case 2 -> BASE_VARIANCE_FACTOR - 0.125;
-            case 3 -> BASE_VARIANCE_FACTOR - 0.1;
-            case 4 -> BASE_VARIANCE_FACTOR - 0.075;
-            case 5 -> BASE_VARIANCE_FACTOR - 0.05;
-            case 6 -> BASE_VARIANCE_FACTOR - 0.025;
-            case 8 -> BASE_VARIANCE_FACTOR + 0.025;
-            case 9 -> BASE_VARIANCE_FACTOR + 0.05;
-            case 10 -> BASE_VARIANCE_FACTOR + 0.075;
-            case 11 -> BASE_VARIANCE_FACTOR + 0.1;
-            case 12 -> BASE_VARIANCE_FACTOR + 0.125;
-            default -> BASE_VARIANCE_FACTOR; // 7
-        };
+    public int calculateRequiredCombatTeams(Campaign campaign, AtBContract contract, boolean bypassVariance,
+          double varianceFactor) {
+        // Return 1 combat team if the contract is a subcontract
+        if (contract.isSubcontract()) {
+            return 1;
+        }
+
+        // Calculate base formation size and effective unit force
+        int effectCombatTeams = 0;
+        for (Map.Entry<Integer, CombatTeam> combatTeam : campaign.getCombatTeamsAsMap().entrySet()) {
+            Force force = campaign.getForce(combatTeam.getKey());
+            if (force != null) {
+                CombatRole combatRoleInMemory = force.getCombatRoleInMemory();
+                if (combatRoleInMemory != CombatRole.TRAINING) {
+                    effectCombatTeams++;
+                }
+            }
+        }
+
+        // If bypassing variance, apply flat reduction (reduce force by 1/3)
+        if (bypassVariance) {
+            return max(effectCombatTeams - calculateBypassVarianceReduction(effectCombatTeams), 1);
+        }
+
+        // Adjust available forces based on variance, ensuring minimum clamping
+        int adjustedCombatTeams = (int) Math.floor((double) effectCombatTeams * varianceFactor);
+        adjustedCombatTeams = max(adjustedCombatTeams, 1);
+
+        // Return the clamped value, ensuring it does not exceed max-deployable forces
+        return Math.min(adjustedCombatTeams, effectCombatTeams);
     }
 
     /**
@@ -361,15 +381,29 @@ public abstract class AbstractContractMarket {
         return baseStrategyDeployment + additionalStrategyDeployment * commanderStrategy;
     }
 
-    protected SkillLevel getSkillRating(int roll) {
+    /**
+     * Determines the {@link SkillLevel} corresponding to a given roll result (TW pg 273), optionally applying the
+     * Bolster Contract skill adjustment.
+     *
+     * <p>This method maps a numerical {@code roll} value to a {@link SkillLevel} according to fixed thresholds. If
+     * {@code isUseBolsterContractSkill} is {@code true}, the resulting level is shifted one tier higher to reflect the
+     * benefit of the Bolster Contract skill.</p>
+     *
+     * @param roll                      the numeric roll determining the base skill rating
+     * @param isUseBolsterContractSkill {@code true} to apply the Bolster Contract bonus, {@code false} for the standard
+     *                                  progression
+     *
+     * @return the {@link SkillLevel} corresponding to the roll and modifier
+     */
+    protected SkillLevel getSkillRating(int roll, boolean isUseBolsterContractSkill) {
         if (roll <= 5) {
-            return SkillLevel.GREEN;
+            return isUseBolsterContractSkill ? REGULAR : GREEN;
         } else if (roll <= 9) {
-            return SkillLevel.REGULAR;
+            return isUseBolsterContractSkill ? VETERAN : REGULAR;
         } else if (roll <= 11) {
-            return VETERAN;
+            return isUseBolsterContractSkill ? ELITE : VETERAN;
         } else {
-            return SkillLevel.ELITE;
+            return isUseBolsterContractSkill ? HEROIC : ELITE;
         }
     }
 
@@ -511,22 +545,6 @@ public abstract class AbstractContractMarket {
         }
     }
 
-    protected AtBContractType findMissionType(int unitRatingMod, boolean majorPower) {
-        final AtBContractType[][] table = {
-              // col 0: IS Houses
-              { AtBContractType.GUERRILLA_WARFARE, AtBContractType.RECON_RAID, AtBContractType.PIRATE_HUNTING,
-                AtBContractType.PLANETARY_ASSAULT, AtBContractType.OBJECTIVE_RAID, AtBContractType.OBJECTIVE_RAID,
-                AtBContractType.EXTRACTION_RAID, AtBContractType.RECON_RAID, AtBContractType.GARRISON_DUTY,
-                AtBContractType.CADRE_DUTY, AtBContractType.RELIEF_DUTY },
-              // col 1: Others
-              { AtBContractType.GUERRILLA_WARFARE, AtBContractType.RECON_RAID, AtBContractType.PLANETARY_ASSAULT,
-                AtBContractType.OBJECTIVE_RAID, AtBContractType.EXTRACTION_RAID, AtBContractType.PIRATE_HUNTING,
-                AtBContractType.SECURITY_DUTY, AtBContractType.OBJECTIVE_RAID, AtBContractType.GARRISON_DUTY,
-                AtBContractType.CADRE_DUTY, AtBContractType.DIVERSIONARY_RAID } };
-        int roll = MathUtility.clamp(d6(2) + unitRatingMod - DragoonRating.DRAGOON_C.getRating(), 2, 12);
-        return table[majorPower ? 0 : 1][roll - 2];
-    }
-
     protected void setEnemyCode(AtBContract contract) {
         if (contract.getContractType().isPirateHunting()) {
             Faction employer = contract.getEmployerFaction();
@@ -599,12 +617,14 @@ public abstract class AbstractContractMarket {
      *
      * <p>After all the calculations, the resulting ally skill and quality ratings are assigned to the contract.</p>
      *
-     * @param contract          the {@link AtBContract} instance for which the ally ratings are being calculated and
-     *                          assigned.
-     * @param year              the year of the contract, used for applying historical context modifiers.
-     * @param averageSkillLevel the average skill level of the player, used to adjust contract difficulty.
+     * @param contract                  the {@link AtBContract} instance for which the ally ratings are being calculated
+     *                                  and assigned.
+     * @param year                      the year of the contract, used for applying historical context modifiers.
+     * @param averageSkillLevel         the average skill level of the player, used to adjust contract difficulty.
+     * @param isUseBolsterContractSkill {@code true} to increase ally skill
      */
-    protected void setAllyRating(AtBContract contract, int year, SkillLevel averageSkillLevel) {
+    protected void setAllyRating(AtBContract contract, int year, SkillLevel averageSkillLevel,
+          boolean isUseBolsterContractSkill) {
         final Faction employerFaction = contract.getEmployerFaction();
 
         int mod = calculateFactionModifiers(contract.getEmployerFaction());
@@ -614,7 +634,7 @@ public abstract class AbstractContractMarket {
         mod += REGULAR.getExperienceLevel() - averageSkillLevel.getExperienceLevel();
 
         // Assign ally skill rating
-        contract.setAllySkill(getSkillRating(d6(2) + mod));
+        contract.setAllySkill(getSkillRating(d6(2) + mod, isUseBolsterContractSkill));
 
         // Apply faction modifiers
         if (employerFaction.isClan()) {
@@ -663,13 +683,16 @@ public abstract class AbstractContractMarket {
      * or easier when the enemy's overall experience level is lower.</p>
      *
      * <p>After the calculations, the resulting enemy skill and quality ratings are applied to the contract.</p>
-     *
-     * @param contract          the {@link AtBContract} instance for which the enemy ratings are being calculated and
+     *  @param contract          the {@link AtBContract} instance for which the enemy ratings are being calculated and
      *                          assigned.
-     * @param year              the year of the contract, used for applying historical context modifiers.
-     * @param averageSkillLevel the average skill level of the player, used to adjust the enemy contract difficulty.
+     *
+     * @param year                      the year of the contract, used for applying historical context modifiers.
+     * @param averageSkillLevel         the average skill level of the player, used to adjust the enemy contract
+     *                                  difficulty.
+     * @param isUseBolsterContractSkill {@code true} to increase enemy skill
      */
-    protected void setEnemyRating(AtBContract contract, int year, SkillLevel averageSkillLevel) {
+    protected void setEnemyRating(AtBContract contract, int year, SkillLevel averageSkillLevel,
+          boolean isUseBolsterContractSkill) {
         Faction enemyFaction = Factions.getInstance().getFaction(contract.getEnemyCode());
         int mod = calculateFactionModifiers(enemyFaction);
 
@@ -682,7 +705,7 @@ public abstract class AbstractContractMarket {
         mod += averageSkillLevel.getExperienceLevel() - REGULAR.getExperienceLevel();
 
         // Assign enemy skill rating
-        contract.setEnemySkill(getSkillRating(d6(2) + mod));
+        contract.setEnemySkill(getSkillRating(d6(2) + mod, isUseBolsterContractSkill));
 
         // Apply faction modifiers
         if (enemyFaction.isClan()) {
@@ -765,7 +788,7 @@ public abstract class AbstractContractMarket {
     private int calculateContractTypeModifiers(AtBContractType contractType, boolean isAttacker) {
         int mod = 0;
 
-        if (contractType.isGuerrillaWarfare() || contractType.isCadreDuty()) {
+        if (contractType.isGuerrillaType() || contractType.isCadreDuty()) {
             mod -= 3;
         } else if (contractType.isGarrisonDuty() || contractType.isSecurityDuty()) {
             mod -= 2;

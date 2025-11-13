@@ -94,11 +94,37 @@ public class SkillCheckUtility {
     private boolean usedEdge;
 
     /**
-     * Use
-     * {@link SkillCheckUtility#SkillCheckUtility(Person, String, List, int, boolean, boolean, boolean, boolean,
-     * LocalDate)} instead
+     * Executes a skill check for the specified person and skill type.
+     *
+     * <p>This constructor creates a {@code SkillCheckUtility} instance which calculates the target number for the
+     * skill check and performs the roll, determining the outcome based on factors such as the person's skill level,
+     * external modifiers, miscellaneous modifiers, and whether edge is used.</p>
+     *
+     * <p>External modifiers can optionally influence the target number, while miscellaneous modifiers alter the
+     * target based on whether the skill is classified as 'count up' or not. Using edge allows the person to attempt a
+     * re-roll if the initial roll fails. Additionally, the constructor can include margins of success text as part of
+     * the results, if desired.</p>
+     *
+     * <p><b>Usage:</b> This is a convenience constructor that excludes Reputation modifiers. Reputation modifiers
+     * are only applied to Negotiation, Protocols/Any, and Streetwise/Any checks.</p>
+     *
+     * @param person                      the {@link Person} performing the skill check
+     * @param skillName                   the name of the skill being used, corresponding to a {@link SkillType}
+     * @param externalModifiers           an optional list of {@link TargetRollModifier}s that affect the target number
+     * @param miscModifier                a miscellaneous modifier that affects the target number:
+     *                                    <ul>
+     *                                        <li>For 'count up' skills, this value is subtracted from
+     *                                            the target number (i.e., negative values are bonuses,
+     *                                            positive values are penalties).</li>
+     *                                        <li>For non-'count up' skills, this value is added to the
+     *                                            target number (i.e., positive values are penalties).</li>
+     *                                    </ul>
+     * @param useEdge                     whether the person should use edge to re-roll if the initial attempt fails
+     * @param includeMarginsOfSuccessText whether to include detailed margins of success information in the results
+     *
+     * @author Illiani
+     * @since 0.50.05
      */
-    @Deprecated(since = "0.50.07", forRemoval = true)
     public SkillCheckUtility(final Person person, final String skillName,
           @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier, final boolean useEdge,
           final boolean includeMarginsOfSuccessText) {
@@ -491,9 +517,8 @@ public class SkillCheckUtility {
                   getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.untrained.skill"));
         } else {
             Skill skill = person.getSkill(skillName);
-            int skillValue = skill.getFinalSkillValue(person.getOptions(),
-                  person.getATOWAttributes(),
-                  person.getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, person.getRankNumeric()));
+            int skillValue = skill.getFinalSkillValue(person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
+                  today));
             targetNumber.addModifier(skillValue, skillName);
         }
 

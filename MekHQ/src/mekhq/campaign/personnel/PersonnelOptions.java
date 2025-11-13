@@ -81,6 +81,10 @@ public class PersonnelOptions extends PilotOptions {
     public static final String ATOW_ATTRACTIVE = "atow_attractive";
     public static final String FLAW_UNFIT = "flaw_unfit";
     public static final String ATOW_FIT = "atow_fit";
+    public static final String UNOFFICIAL_GHOST = "unofficial_ghost";
+    public static final String UNOFFICIAL_LOUD_MOUTH = "unofficial_loud_mouth";
+    public static final String UNOFFICIAL_RANGER = "unofficial_ranger";
+    public static final String UNOFFICIAL_IMPLANT_RESISTANCE = "unofficial_implant_resistance";
     public static final String FLAW_POOR_HEARING = "flaw_poor_hearing";
     public static final String ATOW_GOOD_HEARING = "atow_good_hearing";
     public static final String FLAW_POOR_VISION = "flaw_poor_vision";
@@ -100,6 +104,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String UNOFFICIAL_COUNTERFEITER = "unofficial_counterfeiter";
     public static final String UNOFFICIAL_PICK_POCKET = "unofficial_pick_pocket";
     public static final String UNOFFICIAL_NATURAL_THESPIAN = "unofficial_natural_thespian";
+    public static final String UNOFFICIAL_BIOLOGICAL_MACHINIST = "unofficial_biological_machinist";
 
     public static final String DARK_SECRET_TRIVIAL = "dark_secret_trivial";
     public static final String DARK_SECRET_SIGNIFICANT = "dark_secret_significant";
@@ -122,6 +127,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE = "exceptional_attribute_intelligence";
     public static final String EXCEPTIONAL_ATTRIBUTE_WILLPOWER = "exceptional_attribute_willpower";
     public static final String EXCEPTIONAL_ATTRIBUTE_CHARISMA = "exceptional_attribute_charisma";
+    public static final String EXCEPTIONAL_ATTRIBUTE_EDGE = "exceptional_attribute_edge";
 
     public static final String ADMIN_MEDIATOR = "admin_mediator";
     public static final String ADMIN_LOGISTICIAN = "admin_logistician";
@@ -143,6 +149,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String COMPULSION_PATHOLOGIC_RACISM = "compulsion_pathologic_racism";
     public static final String COMPULSION_XENOPHOBIA = "compulsion_xenophobia";
     public static final String COMPULSION_ADDICTION = "compulsion_addiction";
+    public static final String COMPULSION_BIONIC_HATE = "compulsion_bionic_hate";
+    public static final String COMPULSION_BODY_MOD_ADDICTION = "compulsion_body_mod_addiction";
 
     public static final String MADNESS_FLASHBACKS = "madness_flashbacks";
     public static final String MADNESS_CONFUSION = "madness_confusion";
@@ -225,6 +233,9 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, ATOW_ATTRACTIVE, false);
         addOption(l3a, FLAW_UNFIT, false);
         addOption(l3a, ATOW_FIT, false);
+        addOption(l3a, UNOFFICIAL_GHOST, false);
+        addOption(l3a, UNOFFICIAL_LOUD_MOUTH, false);
+        addOption(l3a, UNOFFICIAL_RANGER, false);
         addOption(l3a, FLAW_POOR_HEARING, false);
         addOption(l3a, ATOW_GOOD_HEARING, false);
         addOption(l3a, FLAW_POOR_VISION, false);
@@ -243,6 +254,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, UNOFFICIAL_MASTER_IMPERSONATOR, false);
         addOption(l3a, UNOFFICIAL_COUNTERFEITER, false);
         addOption(l3a, UNOFFICIAL_NATURAL_THESPIAN, false);
+        addOption(l3a, UNOFFICIAL_BIOLOGICAL_MACHINIST, false);
         addOption(l3a, UNOFFICIAL_PICK_POCKET, false);
 
         addOption(l3a, DARK_SECRET_TRIVIAL, false);
@@ -266,6 +278,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE, false);
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_WILLPOWER, false);
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_CHARISMA, false);
+        addOption(l3a, EXCEPTIONAL_ATTRIBUTE_EDGE, false);
 
         addOption(l3a, ADMIN_MEDIATOR, false);
         addOption(l3a, ADMIN_LOGISTICIAN, false);
@@ -287,6 +300,8 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, COMPULSION_PATHOLOGIC_RACISM, false);
         addOption(l3a, COMPULSION_XENOPHOBIA, false);
         addOption(l3a, COMPULSION_ADDICTION, false);
+        addOption(l3a, COMPULSION_BIONIC_HATE, false);
+        addOption(l3a, COMPULSION_BODY_MOD_ADDICTION, false);
 
         addOption(l3a, MADNESS_FLASHBACKS, false);
         addOption(l3a, MADNESS_CONFUSION, false);

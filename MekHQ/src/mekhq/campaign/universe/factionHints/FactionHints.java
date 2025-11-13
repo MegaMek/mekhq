@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.universe;
+package mekhq.campaign.universe.factionHints;
 
 import static mekhq.MHQConstants.FACTION_HINTS_FILE;
 
@@ -48,6 +48,8 @@ import javax.xml.parsers.DocumentBuilder;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -64,6 +66,8 @@ public class FactionHints {
     private static final String TEST_DIR = "testresources/" + FACTION_HINTS_FILE.replaceAll("factionhints",
           "factionhints_test");
 
+    private static volatile FactionHints instance;
+
     private final Set<Faction> neutralFactions;
 
     private final Map<Faction, Map<Faction, List<FactionHint>>> wars;
@@ -73,9 +77,51 @@ public class FactionHints {
     private final Map<Faction, Map<Faction, List<AltLocation>>> containedFactions;
 
     /**
+     * Returns the singleton instance of {@link FactionHints}, initializing it if necessary.
+     *
+     * @return The singleton FactionHints instance, loaded from default data.
+     */
+    public static FactionHints getInstance() {
+        return getOrInitializeInstance(false);
+    }
+
+    /**
+     * For test purposes only. Loads the singleton using test directory instead of main data. Call this ONLY in tests,
+     * never in production code.
+     */
+    public static FactionHints initializeTestInstance() {
+        return getOrInitializeInstance(true);
+    }
+
+    /**
+     * Returns the singleton instance of {@link FactionHints}, initializing it if necessary.
+     *
+     * <p>This method ensures that the instance is fully constructed and loaded with data before being published to
+     * other threads.</p>
+     *
+     * @param useTestDirectory whether to load data from the test directory (for testing only)
+     *
+     * @return the singleton {@link FactionHints} instance, loaded from the specified data source
+     */
+    private static FactionHints getOrInitializeInstance(boolean useTestDirectory) {
+        if (instance == null) {
+            synchronized (FactionHints.class) {
+                if (instance == null) {
+                    // The use of tempHints here ensures that the instance is never seen by any other thread until it's
+                    // fully constructed and initialized, eliminating any risk of a race condition.
+                    FactionHints tempHints = new FactionHints();
+                    tempHints.loadData(useTestDirectory);
+                    instance = tempHints;
+                }
+            }
+        }
+        return instance;
+    }
+
+    /**
      * Protected constructor that initializes empty data structures.
      */
-    protected FactionHints() {
+    public FactionHints() {
         neutralFactions = new HashSet<>();
         wars = new HashMap<>();
         alliances = new HashMap<>();
@@ -84,24 +130,34 @@ public class FactionHints {
         containedFactions = new HashMap<>();
     }
 
+    public Map<Faction, Map<Faction, List<FactionHint>>> getWars() {
+        return wars;
+    }
+
+    public Map<Faction, Map<Faction, List<FactionHint>>> getAlliances() {
+        return alliances;
+    }
+
+    public Map<Faction, Map<Faction, List<FactionHint>>> getRivals() {
+        return rivals;
+    }
+
+    public Map<Faction, Map<Faction, List<FactionHint>>> getNeutralExceptions() {
+        return neutralExceptions;
+    }
+
     /**
-     * Generates the default set of {@link FactionHints} by loading relevant data using the main data directory.
-     *
-     * @return A {@link FactionHints} object containing the loaded data.
+     * @deprecated use {@link #getInstance()} instead.
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public static FactionHints defaultFactionHints() {
         return defaultFactionHints(false);
     }
 
     /**
-     * Generates the default set of {@link FactionHints} by loading relevant data. This can be configured to use either
-     * the main data directory or a test data directory based on the input parameter.
-     *
-     * @param useTestDirectory A boolean indicating whether to load data from a test directory. If {@code true}, test
-     *                         data will be used; otherwise, the main data will be loaded.
-     *
-     * @return A {@link FactionHints} object containing the loaded data.
+     * @deprecated use {@link #getInstance()} instead.
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public static FactionHints defaultFactionHints(boolean useTestDirectory) {
         FactionHints hints = new FactionHints();
         hints.loadData(useTestDirectory);
@@ -134,7 +190,8 @@ public class FactionHints {
      *
      * @return Whether the factions are allies
      */
-    public boolean isAlliedWith(Faction f1, Faction f2, LocalDate date) {
+    public boolean isAlliedWith(Faction f1, Faction f2,
+          LocalDate date) {
         return hintApplies(alliances, f1, f2, date);
     }
 
@@ -168,7 +225,8 @@ public class FactionHints {
      *       at war.
      */
     @Nullable
-    public String getCurrentWar(Faction f1, Faction f2, LocalDate date) {
+    public String getCurrentWar(Faction f1, Faction f2,
+          LocalDate date) {
         if (wars.get(f1) != null && wars.get(f1).get(f2) != null) {
             for (FactionHint fh : wars.get(f1).get(f2)) {
                 if (fh.isInDateRange(date)) {
@@ -209,13 +267,15 @@ public class FactionHints {
      *
      * @return true if the potential opponent should not be considered as an enemy
      */
-    public boolean isNeutral(Faction faction, Faction opponent, LocalDate date) {
+    public boolean isNeutral(Faction faction, Faction opponent,
+          LocalDate date) {
         return neutralFactions.contains(faction)
                      && !hintApplies(neutralExceptions, faction, opponent, date)
                      && !isAtWarWith(faction, opponent, date);
     }
 
-    private boolean hintApplies(Map<Faction, Map<Faction, List<FactionHint>>> hints,
+    private boolean hintApplies(
+          Map<Faction, Map<Faction, List<FactionHint>>> hints,
           Faction f1, Faction f2, LocalDate date) {
         if (hints.get(f1) != null && hints.get(f1).get(f2) != null) {
             for (FactionHint fh : hints.get(f1).get(f2)) {
@@ -244,7 +304,8 @@ public class FactionHints {
      *
      * @return A Set of all factions (if any) contained within the borders of the host faction.
      */
-    public Set<Faction> getContainedFactions(Faction f, LocalDate date) {
+    public Set<Faction> getContainedFactions(Faction f,
+          LocalDate date) {
         HashSet<Faction> retVal = new HashSet<>();
         if (containedFactions.get(f) != null) {
             for (Faction f2 : containedFactions.get(f).keySet()) {
@@ -267,7 +328,8 @@ public class FactionHints {
      *       faction is not contained within another at the time.
      */
     @Nullable
-    public Faction getContainedFactionHost(Faction contained, LocalDate date) {
+    public Faction getContainedFactionHost(Faction contained,
+          LocalDate date) {
         for (Faction f : containedFactions.keySet()) {
             List<AltLocation> locs = containedFactions.get(f).get(contained);
             if (null != locs) {
@@ -290,7 +352,8 @@ public class FactionHints {
      *
      * @return The ratio of space taken up by the contained faction to that of the host.
      */
-    public double getAltLocationFraction(Faction host, Faction contained, LocalDate date) {
+    public double getAltLocationFraction(Faction host,
+          Faction contained, LocalDate date) {
         if (containedFactions.get(host) != null && containedFactions.get(host).get(contained) != null) {
             for (AltLocation l : containedFactions.get(host).get(contained)) {
                 if (l.isInDateRange(date)) {
@@ -316,7 +379,8 @@ public class FactionHints {
      *
      * @return Whether {@code opponent} can be treated as an enemy of {@code inner}.
      */
-    public boolean isContainedFactionOpponent(Faction outer, Faction inner, Faction opponent, LocalDate date) {
+    public boolean isContainedFactionOpponent(Faction outer,
+          Faction inner, Faction opponent, LocalDate date) {
         if (containedFactions.get(outer) != null && containedFactions.get(outer).get(inner) != null) {
             for (AltLocation l : containedFactions.get(outer).get(inner)) {
                 if (l.isInDateRange(date)) {
@@ -343,7 +407,7 @@ public class FactionHints {
      * @param end          The alliance end date
      * @param parties      All the factions involved in the alliance
      */
-    protected void addAlliance(String allianceName, @Nullable LocalDate start, @Nullable LocalDate end,
+    public void addAlliance(String allianceName, @Nullable LocalDate start, @Nullable LocalDate end,
           Faction... parties) {
         addFactionHint(alliances, allianceName, start, end, parties);
     }
@@ -357,7 +421,8 @@ public class FactionHints {
      * @param end     The war end date
      * @param parties All the factions involved in the war.
      */
-    protected void addWar(String warName, @Nullable LocalDate start, @Nullable LocalDate end, Faction... parties) {
+    public void addWar(String warName, @Nullable LocalDate start, @Nullable LocalDate end,
+          Faction... parties) {
         addFactionHint(wars, warName, start, end, parties);
     }
 
@@ -382,8 +447,9 @@ public class FactionHints {
      * @param faction    The generally neutral faction
      * @param exceptions The factions that should be considered exceptions to neutrality
      */
-    protected void addNeutralExceptions(String exceptionName, @Nullable LocalDate start,
-          @Nullable LocalDate end, Faction faction, Faction... exceptions) {
+    public void addNeutralExceptions(String exceptionName, @Nullable LocalDate start,
+          @Nullable LocalDate end, Faction faction,
+          Faction... exceptions) {
         neutralExceptions.putIfAbsent(faction, new HashMap<>());
         for (Faction exception : exceptions) {
             neutralExceptions.get(faction).putIfAbsent(exception, new ArrayList<>());
@@ -395,7 +461,7 @@ public class FactionHints {
      * Adds faction to list of non-combatants
      *
      */
-    protected void addNeutralFaction(Faction faction) {
+    public void addNeutralFaction(Faction faction) {
         if (null != faction) {
             neutralFactions.add(faction);
         }
@@ -410,7 +476,8 @@ public class FactionHints {
      * @param end       The end date
      * @param ratio     The ratio of the size of the contained faction to that of the host
      */
-    protected void addContainedFaction(Faction host, Faction contained, LocalDate start,
+    public void addContainedFaction(Faction host, Faction contained,
+          LocalDate start,
           LocalDate end, double ratio) {
         addContainedFaction(host, contained, start, end, ratio, null);
     }
@@ -427,14 +494,17 @@ public class FactionHints {
      * @param opponents If non-null, all possible opponents based on the position within the other faction should be
      *                  restricted to this list.
      */
-    protected void addContainedFaction(Faction host, Faction contained, LocalDate start, LocalDate end,
+    public void addContainedFaction(Faction host, Faction contained,
+          LocalDate start, LocalDate end,
           double ratio, @Nullable List<Faction> opponents) {
         containedFactions.putIfAbsent(host, new HashMap<>());
         containedFactions.get(host).putIfAbsent(contained, new ArrayList<>());
         containedFactions.get(host).get(contained).add(new AltLocation(start, end, ratio, opponents));
     }
 
-    private void addFactionHint(Map<Faction, Map<Faction, List<FactionHint>>> hintMap, String name,
+    private void addFactionHint(
+          Map<Faction, Map<Faction, List<FactionHint>>> hintMap,
+          String name,
           LocalDate start, LocalDate end, Faction[] parties) {
         FactionHint hint = new FactionHint(name, start, end);
         for (int i = 0; i < parties.length - 1; i++) {
@@ -479,7 +549,8 @@ public class FactionHints {
                 switch (nodeName) {
                     case "neutral" -> {
                         String fKey = wn.getAttributes().getNamedItem("faction").getTextContent().trim();
-                        Faction f = Factions.getInstance().getFaction(fKey);
+                        Faction f = Factions.getInstance()
+                                          .getFaction(fKey);
                         if (f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
                             LOGGER.error("Invalid faction code in factionhints.xml: {}", fKey);
                         } else {
@@ -523,8 +594,10 @@ public class FactionHints {
                                     case "opponents":
                                         opponents = new ArrayList<>();
                                         for (String fKey : wn2.getTextContent().trim().split(",")) {
-                                            Faction f = Factions.getInstance().getFaction(fKey);
-                                            if (!f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
+                                            Faction f = Factions.getInstance()
+                                                              .getFaction(fKey);
+                                            if (!f.getShortName()
+                                                       .equalsIgnoreCase(Faction.DEFAULT_CODE)) {
                                                 opponents.add(f);
                                             }
                                         }
@@ -535,10 +608,13 @@ public class FactionHints {
                             }
                         }
 
-                        final Faction outer = Factions.getInstance().getFaction(outerCode);
-                        final Faction inner = Factions.getInstance().getFaction(innerCode);
+                        final Faction outer = Factions.getInstance()
+                                                    .getFaction(outerCode);
+                        final Faction inner = Factions.getInstance()
+                                                    .getFaction(innerCode);
                         if (outer.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)
-                                  || inner.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
+                                  ||
+                                  inner.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
                             LOGGER.error("Invalid faction code in factionhints.xml: {}/{}", outerCode, innerCode);
                         } else {
                             addContainedFaction(outer, inner, start, end, fraction, opponents);
@@ -549,7 +625,9 @@ public class FactionHints {
         }
     }
 
-    private void setFactionHint(Map<Faction, Map<Faction, List<FactionHint>>> hint, Node node) throws DOMException {
+    private void setFactionHint(
+          Map<Faction, Map<Faction, List<FactionHint>>> hint, Node node)
+          throws DOMException {
         String name = "";
         LocalDate start = null;
         LocalDate end = null;
@@ -578,7 +656,8 @@ public class FactionHints {
                 String[] factionKeys = wn.getTextContent().trim().split(",");
                 Faction[] parties = new Faction[factionKeys.length];
                 for (int i = 0; i < factionKeys.length; i++) {
-                    final Faction faction = Factions.getInstance().getFaction(factionKeys[i]);
+                    final Faction faction = Factions.getInstance()
+                                                  .getFaction(factionKeys[i]);
                     if (faction.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
                         LOGGER.error("Invalid faction code in factionhints.xml: {}", factionKeys[i]);
                         continue;
@@ -613,7 +692,8 @@ public class FactionHints {
                 String[] parties = wn.getTextContent().trim().split(",");
 
                 for (String party : parties) {
-                    final Faction f = Factions.getInstance().getFaction(party);
+                    final Faction f = Factions.getInstance()
+                                            .getFaction(party);
                     if (f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
                         LOGGER.error("Invalid faction code in factionhints.xml: {}", party);
                         continue;
@@ -621,50 +701,6 @@ public class FactionHints {
                     addNeutralExceptions("", localStart, localEnd, faction, f);
                 }
             }
-        }
-    }
-
-    /**
-     * Each participant in a war or an alliance has one instance of this class for each of the other factions involved.
-     */
-    static class FactionHint {
-        private final String name;
-        private final LocalDate start;
-        private final LocalDate end;
-
-        public FactionHint(final String name, final @Nullable LocalDate start, final @Nullable LocalDate end) {
-            this.name = name;
-            this.start = start;
-            this.end = end;
-        }
-
-        public boolean isInDateRange(final LocalDate date) {
-            return ((start == null) || date.isAfter(start)) && ((end == null) || date.isBefore(end));
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
-
-    static class AltLocation extends FactionHint {
-        private final double fraction;
-        private final List<Faction> opponents;
-
-        public AltLocation(final @Nullable LocalDate start, final @Nullable LocalDate end,
-              final double fraction, final @Nullable List<Faction> opponents) {
-            super("", start, end);
-            this.fraction = fraction;
-            this.opponents = (opponents == null) ? new ArrayList<>() : new ArrayList<>(opponents);
-        }
-
-        public double getFraction() {
-            return fraction;
-        }
-
-        public List<Faction> getOpponents() {
-            return opponents;
         }
     }
 }
