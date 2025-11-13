@@ -149,15 +149,15 @@ public class SalvageForcePicker extends JDialog {
         setLayout(new BorderLayout());
 
         // Instructions at the top
-        JPanel instructionsPanel = new JPanel();
+        JPanel instructionsPanel = new JPanel(new BorderLayout());
         JTextArea instructionsLabel = new JTextArea(getInstructions());
         instructionsLabel.setLineWrap(true);
         instructionsLabel.setWrapStyleWord(true);
         instructionsLabel.setEditable(false);
         instructionsLabel.setOpaque(false);
-        instructionsLabel.setColumns(60);
-        instructionsLabel.setRows(0);
-        instructionsPanel.add(instructionsLabel);
+        instructionsLabel.setColumns(70);
+        instructionsLabel.setRows(4);
+        instructionsPanel.add(instructionsLabel, BorderLayout.CENTER);
         add(instructionsPanel, BorderLayout.NORTH);
 
         // Table in the center

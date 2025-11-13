@@ -48,6 +48,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import java.time.LocalDate;
 
 import megamek.common.rolls.TargetRoll;
+import megamek.logging.MMLogger;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.universe.Faction;
@@ -62,7 +63,12 @@ import mekhq.campaign.universe.Faction;
  * @since 0.50.10
  */
 public class MHQMorale {
+    private static final MMLogger LOGGER = MMLogger.create(MHQMorale.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MHQMorale";
+
+    public static String getFormattedTitle() {
+        return getTextAt(RESOURCE_BUNDLE, "MHQMorale.check.title");
+    }
 
     /**
      * Represents possible performance outcomes for a contract's recent scenarios.
@@ -111,52 +117,56 @@ public class MHQMorale {
     public static String performMoraleCheck(final LocalDate today, final AtBContract contract,
           final int decisiveVictoryModifier, final int victoryModifier, final int decisiveDefeatModifier,
           final int defeatModifier) {
-        // We invert the polarity of the modifiers as we display positive for good, negative for bad in campaign
-        // options. That decision was made to reduce potential confusion among the playerbase.
-        int adjustedDecisiveVictoryModifier = -decisiveVictoryModifier;
-        int adjustedVictoryModifier = -victoryModifier;
-        int adjustedDecisiveDefeatModifier = -decisiveDefeatModifier;
-        int adjustedDefeatModifier = -defeatModifier;
-
         final TargetRoll targetNumber = new TargetRoll();
 
         // Add modifiers to the target number
         int reliability = getReliability(contract);
-        targetNumber.addModifier(reliability, "Enemy Reliability");
+        targetNumber.addModifier(reliability, getTextAt(RESOURCE_BUNDLE, "MHQMorale.modifier.reliability"));
 
-        int performanceModifier = getPerformanceModifier(today, contract, adjustedDecisiveVictoryModifier,
-              adjustedVictoryModifier, adjustedDecisiveDefeatModifier, adjustedDefeatModifier);
-        targetNumber.addModifier(performanceModifier, "Performance Modifier");
+        int performanceModifier = getPerformanceModifier(today, contract, decisiveVictoryModifier, victoryModifier,
+              decisiveDefeatModifier, defeatModifier);
+        targetNumber.addModifier(performanceModifier, getTextAt(RESOURCE_BUNDLE, "MHQMorale.modifier.performance"));
 
         // The actual check
         int roll = d6(2) + targetNumber.getValue();
         MoraleOutcome moraleOutcome = getMoraleOutcome(contract, roll);
 
         // Generate and return the report
-        PerformanceOutcome performanceOutcome = getOutcome(adjustedDecisiveVictoryModifier, adjustedVictoryModifier,
-              adjustedDecisiveDefeatModifier, adjustedDefeatModifier, performanceModifier);
-        return getReport(performanceOutcome, moraleOutcome, roll);
+        PerformanceOutcome performanceOutcome = getOutcome(decisiveVictoryModifier, victoryModifier,
+              decisiveDefeatModifier, defeatModifier, performanceModifier);
+        return getReport(reliability, performanceOutcome, performanceModifier, moraleOutcome, roll);
     }
 
     /**
      * Creates a formatted morale report string based on the performance and morale outcomes.
      *
-     * @param performanceOutcome The result of performance evaluation.
-     * @param moraleOutcome      The result of the morale check.
-     * @param roll               The final morale check roll value.
+     * @param reliability         The reliability modifier for the OpFor
+     * @param performanceOutcome  The result of performance evaluation.
+     * @param performanceModifier The performance modifier
+     * @param moraleOutcome       The result of the morale check.
+     * @param roll                The final morale check roll value.
      *
      * @return The formatted morale check report.
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static String getReport(PerformanceOutcome performanceOutcome, MoraleOutcome moraleOutcome, int roll) {
+    private static String getReport(int reliability, PerformanceOutcome performanceOutcome, int performanceModifier,
+          MoraleOutcome moraleOutcome, int roll) {
+        String reliabilityColor = getWarningColor();
+        if (reliability < -1) {
+            reliabilityColor = getPositiveColor();
+        } else if (reliability > 1) {
+            reliabilityColor = getNegativeColor();
+        }
+
         String performanceColor = switch (performanceOutcome) {
             case DECISIVE_VICTORY -> getAmazingColor();
             case VICTORY -> getPositiveColor();
             case DRAW -> getWarningColor();
             case DEFEAT, DECISIVE_DEFEAT -> getNegativeColor();
         };
+
         String performanceText = getTextAt(RESOURCE_BUNDLE,
               "MHQMorale.performanceOutcome." + performanceOutcome.name());
 
@@ -165,25 +175,28 @@ public class MHQMorale {
             case WAVERING -> getPositiveColor();
             case UNCHANGED -> getWarningColor();
         };
-        String moraleText = getTextAt(RESOURCE_BUNDLE, "MHQMorale.moraleOutcome." + moraleOutcome.name());
+        String outcome = getTextAt(RESOURCE_BUNDLE, "MHQMorale.moraleOutcome." + moraleOutcome.name());
 
-        return getFormattedTextAt(
-              RESOURCE_BUNDLE,
-              "MHQMorale.check.report",
+        return getFormattedTextAt(RESOURCE_BUNDLE, "MHQMorale.check.report",
+              spanOpeningWithCustomColor(getWarningColor()),
+              CLOSING_SPAN_TAG,
+              spanOpeningWithCustomColor(reliabilityColor),
+              reliability >= 0 ? "+" + reliability : reliability,
               spanOpeningWithCustomColor(performanceColor),
               performanceText,
-              CLOSING_SPAN_TAG,
+              performanceModifier >= 0 ? "+" + performanceModifier : performanceModifier,
               roll,
               spanOpeningWithCustomColor(moraleColor),
-              moraleText
+              outcome
         );
     }
 
 
     /**
-     * Determines the morale outcome based on the contract's current morale level and roll value.
+     * Determines the morale outcome based on the contract's current morale level and roll value. Updates the morale
+     * level in the contract if it changes.
      *
-     * <p>Updates the morale level in the contract if it changes.</p>
+     * <p>A lower roll is better for the OpFor.</p>
      *
      * @param contract The contract to check and update morale for.
      * @param roll     The result of the morale check roll.
@@ -263,6 +276,8 @@ public class MHQMorale {
     /**
      * Calculates the reliability modifier for the enemy based on contract parameters and faction characteristics.
      *
+     * <p>A lower modifier means the OpFor is less likely to lose morale.</p>
+     *
      * @param contract The contract to evaluate.
      *
      * @return The reliability modifier to use for this contract.
@@ -286,9 +301,9 @@ public class MHQMorale {
 
         // Adjust for special enemy traits
         if (enemy.isRebel() || enemy.isMinorPower() || enemy.isMercenary() || enemy.isPirate()) {
-            reliabilityModifier--;
-        } else if (enemy.isClan()) { // Clan forces get to double-dip
             reliabilityModifier++;
+        } else if (enemy.isClan()) { // Clan forces get to double-dip
+            reliabilityModifier--;
         }
 
         return reliabilityModifier;
@@ -296,6 +311,8 @@ public class MHQMorale {
 
     /**
      * Calculates the reliability modifier based on force quality rating.
+     *
+     * <p>A lower modifier means the OpFor is less likely to lose morale.</p>
      *
      * @param quality the Dragoon rating of the force, using {@code ForceDescriptor} constants (RATING_0 through
      *                RATING_5, representing F through A*)
@@ -310,16 +327,17 @@ public class MHQMorale {
         int reliabilityModifier;
         reliabilityModifier = switch (quality) {
             case DRAGOON_F -> -1;
-            case DRAGOON_A, DRAGOON_ASTAR -> +1;
+            case DRAGOON_A, DRAGOON_ASTAR -> 1;
             default -> 0; // DRAGOON_D, DRAGOON_C, DRAGOON_B
         };
         return reliabilityModifier;
     }
 
     /**
-     * Calculates the performance modifier for recent scenario outcomes within the contract.
+     * Calculates the performance modifier for recent scenario outcomes within the contract. Considers victories,
+     * defeats, and special outcome scenarios within the last month.
      *
-     * <p>Considers victories, defeats, and special outcome scenarios within the last month.</p>
+     * <p>A higher modifier means the OpFor is more likely to lose morale.</p>
      *
      * @param today                   The current date for modifier evaluation.
      * @param contract                The contract to evaluate scenarios for.
@@ -341,11 +359,34 @@ public class MHQMorale {
 
         for (Scenario scenario : contract.getScenarios()) {
             LocalDate scenarioDate = scenario.getDate();
-            if (scenarioDate != null && lastMonth.isAfter(scenarioDate)) {
+            // Scenario date can be null if the scenario hasn't been found in StratCon
+            if (scenarioDate == null) {
+                LOGGER.info("{} has not been found yet. Skipping", scenario.getName());
+                continue;
+            }
+            // Skip scenarios that occurred more than a month ago
+            if (lastMonth.isAfter(scenarioDate)) {
+                LOGGER.info("{} occurred more than a month ago. Skipping", scenario.getName());
                 continue;
             }
 
             ScenarioStatus scenarioStatus = scenario.getStatus();
+            // We're trying to track down an instance where a scenario can be both resolved and current. This is
+            // logging that will be de-escalated to debug once we've got enough information to track the cause.
+            LOGGER.info("Processing scenario {} ({}) date={} resolved={} ovlVic={} ovlDef={} decVic={} decDef={} " +
+                              "pyrrhic={} fib={}",
+                  scenario.getName(),
+                  scenario.getId(),
+                  scenario.getDate(),
+                  scenario.getStatus(),
+                  scenario.getStatus().isOverallVictory(),
+                  scenario.getStatus().isOverallDefeat(),
+                  scenario.getStatus().isDecisiveVictory(),
+                  scenario.getStatus().isDecisiveDefeat(),
+                  scenario.getStatus().isPyrrhicVictory(),
+                  scenario.getStatus().isFleetInBeing());
+            LOGGER.info("Read in status for {} this should match the block above: {}", scenario.getName(),
+                  scenarioStatus);
 
             // Decisive Defeat or Refused Engagement count as 2 defeats
             if (scenarioStatus.isDecisiveDefeat() || scenarioStatus.isRefusedEngagement()) {
@@ -358,7 +399,7 @@ public class MHQMorale {
                 continue;
             }
             // Pyrrhic Victory reduces victory count (negative consequence)
-            if (scenarioStatus.isPyrrhicVictory()) {
+            if (scenarioStatus.isPyrrhicVictory() || scenarioStatus.isFleetInBeing()) {
                 defeats++;
                 continue;
             }
@@ -369,6 +410,9 @@ public class MHQMorale {
                 defeats++;
             }
         }
+
+        LOGGER.info("Total victory points for Morale: {}", victories);
+        LOGGER.info("Total defeat points for Morale: {}", defeats);
 
         // Compute performance modifier using concise math logic
         if (victories > defeats) {

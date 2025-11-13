@@ -50,6 +50,7 @@ import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.giveEIImplant;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ASTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
@@ -2157,6 +2158,27 @@ public class Campaign implements ITechManager {
         // Assign a random portrait after we generate a new person
         if (getCampaignOptions().isUsePortraitForRole(primaryRole)) {
             assignRandomPortraitFor(person);
+        }
+
+        // Handle EI Implant distribution for ProtoMek Pilots & Clan MekWarriors
+        if (getCampaignOptions().isUseImplants() && getCampaignOptions().isUseAlternativeAdvancedMedical()) {
+            if (primaryRole.isProtoMekPilot() || secondaryRole.isProtoMekPilot()) {
+                giveEIImplant(this, person);
+            } else if (primaryRole.isMekWarrior() && person.isClanPersonnel()) {
+                boolean isOver40 = person.getAge(currentDay) >= 40;
+                boolean isOver30 = person.getAge(currentDay) >= 30;
+
+                int implantChance = 100;
+                if (isOver40) {
+                    implantChance = 50;
+                } else if (isOver30) {
+                    implantChance = 75;
+                }
+
+                if (randomInt(implantChance) == 0) {
+                    giveEIImplant(this, person);
+                }
+            }
         }
 
         return person;

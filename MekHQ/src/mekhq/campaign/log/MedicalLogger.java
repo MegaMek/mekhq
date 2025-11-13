@@ -58,6 +58,20 @@ public class MedicalLogger {
         person.addMedicalLogEntry(medicalLogEntry);
     }
 
+    public static void successfulSurgery(Person person, LocalDate date, String surgeryName) {
+        String message = String.format(logEntriesResourceMap.getString("surgery.text"), surgeryName);
+        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date,
+              MessageFormat.format(message, surgeryName));
+        person.addMedicalLogEntry(medicalLogEntry);
+    }
+
+    public static void failedSurgery(Person person, LocalDate date, String surgeryName) {
+        String message = String.format(logEntriesResourceMap.getString("surgery.failed"), surgeryName);
+        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date,
+              MessageFormat.format(message, surgeryName));
+        person.addMedicalLogEntry(medicalLogEntry);
+    }
+
     public static MedicalLogEntry severedSpine(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("severedSpine.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date,
