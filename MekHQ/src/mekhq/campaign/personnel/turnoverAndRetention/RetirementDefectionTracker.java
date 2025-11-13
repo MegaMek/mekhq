@@ -84,6 +84,7 @@ public class RetirementDefectionTracker {
     private static final MMLogger LOGGER = MMLogger.create(RetirementDefectionTracker.class);
 
     public static final int RETIREMENT_AGE = 50;
+    public static final int HR_DEFAULT_NOADMIN_PENALTY = 10;
 
     /*
      * In case the dialog is closed after making the retirement rolls
@@ -659,10 +660,19 @@ public class RetirementDefectionTracker {
         int maximumStrain = campaign.getCampaignOptions().getHRCapacity() *
                                   getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
+        // divide by zero protection - uses HR_DEFAULT_NOADMIN_PENALTY
         if (maximumStrain != 0) {
-            return 1 - (personnel / maximumStrain);
+            double personnelPct = (double) personnel / maximumStrain;
+
+            // return modifier of 1 per 100% over hr capacity limit
+            if (personnelPct >= 1) {
+                return (int) Math.floor(personnelPct);
+            } else {
+                return 0; // personnel is within capacity, no modifier
+            }
         } else {
-            return personnel;
+            // return penalty here on no Admin/HR staff, based on constant
+            return HR_DEFAULT_NOADMIN_PENALTY;
         }
     }
 
