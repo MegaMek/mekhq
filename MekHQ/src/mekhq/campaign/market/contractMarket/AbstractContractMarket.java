@@ -191,8 +191,13 @@ public abstract class AbstractContractMarket {
         final boolean isMercenary = faction.isMercenary();
         if (null != clauseMods.get(contract.getId())) {
             switch (clause) {
-                case CLAUSE_COMMAND ->
-                      rollCommandClause(contract, clauseMods.get(contract.getId()).mods[clause], isMercenary);
+                case CLAUSE_COMMAND -> {
+                    if (contract.getContractType().isGuerrillaType()) {
+                        contract.setCommandRights(ContractCommandRights.INDEPENDENT);
+                    } else {
+                        rollCommandClause(contract, clauseMods.get(contract.getId()).mods[clause], isMercenary);
+                    }
+                }
                 case CLAUSE_SALVAGE -> {
                     rollSalvageClause(contract,
                           clauseMods.get(contract.getId()).mods[clause],
