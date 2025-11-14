@@ -68,7 +68,7 @@ public class MASHCapacity {
 
             for (MiscMounted item : unit.getEntity().getMisc()) {
                 if (item.getType().hasFlag(MiscType.F_MASH)) {
-                    mashTheatreCount++;
+                    mashTheatreCount += (int) Math.floor(item.getSize());
                 }
             }
         }
