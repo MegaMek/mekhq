@@ -350,15 +350,20 @@ public class CamOpsSalvageUtilities {
             }
             Person victim = ObjectUtility.getRandomItem(techs);
 
-            int newHits = d6(1);
-            if (campaignOptions.isUseEdge() && victim.getCurrentEdge() > 0 && newHits > 5) {
-                if (victim.getOptions().booleanOption(PersonnelOptions.EDGE_FATAL_SALVAGE_ACCIDENTS)) {
-                    newHits = d6(1);
+            if (campaignOptions.isUseEdge() && victim.getCurrentEdge() > 0) {
+                if (victim.getOptions().booleanOption(PersonnelOptions.EDGE_SALVAGE_ACCIDENTS)) {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.reroll",
                           victim.getHyperlinkedName()));
                     victim.changeCurrentEdge(-1);
+
+                    int roll = d6(2);
+                    if (roll != 2) {
+                        continue;
+                    }
                 }
             }
+
+            int newHits = d6(1);
 
             newHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(victim, useInjuryFatigue, fatigueRate, newHits);
 
