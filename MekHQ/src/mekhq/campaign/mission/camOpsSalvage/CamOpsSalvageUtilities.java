@@ -66,6 +66,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
@@ -350,6 +351,15 @@ public class CamOpsSalvageUtilities {
             Person victim = ObjectUtility.getRandomItem(techs);
 
             int newHits = d6(1);
+            if (campaignOptions.isUseEdge() && victim.getCurrentEdge() > 0 && newHits > 5) {
+                if (victim.getOptions().booleanOption(PersonnelOptions.EDGE_FATAL_SALVAGE_ACCIDENTS)) {
+                    newHits = d6(1);
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.reroll",
+                          victim.getHyperlinkedName()));
+                    victim.changeCurrentEdge(-1);
+                }
+            }
+
             newHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(victim, useInjuryFatigue, fatigueRate, newHits);
 
             if (isUseAdvancedMedical) {
