@@ -61,7 +61,7 @@ public class HirePersonnelUnitActionTest {
 
         doReturn(false).when(unit).canTakeMoreDrivers();
         doReturn(false).when(unit).canTakeMoreGunners();
-        doReturn(false).when(unit).canTakeMoreVesselCrew();
+        doReturn(false).when(unit).canTakeMoreGenericCrew();
         doReturn(false).when(unit).canTakeNavigator();
         doReturn(false).when(unit).canTakeTechOfficer();
         doNothing().when(unit).resetPilotAndEntity();
@@ -86,7 +86,7 @@ public class HirePersonnelUnitActionTest {
         doReturn(true).doReturn(false).when(unit).canTakeMoreDrivers();
         doReturn(true).when(unit).usesSoloPilot();
         doReturn(false).when(unit).canTakeMoreGunners();
-        doReturn(false).when(unit).canTakeMoreVesselCrew();
+        doReturn(false).when(unit).canTakeMoreGenericCrew();
         doReturn(false).when(unit).canTakeNavigator();
         doReturn(false).when(unit).canTakeTechOfficer();
         doNothing().when(unit).resetPilotAndEntity();
@@ -117,7 +117,7 @@ public class HirePersonnelUnitActionTest {
         doReturn(true).doReturn(false).when(unit).canTakeMoreDrivers();
         doReturn(true).when(unit).usesSoloPilot();
         doReturn(false).when(unit).canTakeMoreGunners();
-        doReturn(false).when(unit).canTakeMoreVesselCrew();
+        doReturn(false).when(unit).canTakeMoreGenericCrew();
         doReturn(false).when(unit).canTakeNavigator();
         doReturn(false).when(unit).canTakeTechOfficer();
         doNothing().when(unit).resetPilotAndEntity();
@@ -145,7 +145,7 @@ public class HirePersonnelUnitActionTest {
         doReturn(true).doReturn(false).when(unit).canTakeMoreDrivers();
         doReturn(true).when(unit).usesSoloPilot();
         doReturn(false).when(unit).canTakeMoreGunners();
-        doReturn(false).when(unit).canTakeMoreVesselCrew();
+        doReturn(false).when(unit).canTakeMoreGenericCrew();
         doReturn(false).when(unit).canTakeNavigator();
         doReturn(false).when(unit).canTakeTechOfficer();
         doNothing().when(unit).resetPilotAndEntity();
@@ -176,7 +176,7 @@ public class HirePersonnelUnitActionTest {
         doReturn(true).doReturn(false).when(unit).canTakeMoreDrivers();
         doReturn(true).when(unit).usesSoloPilot();
         doReturn(false).when(unit).canTakeMoreGunners();
-        doReturn(false).when(unit).canTakeMoreVesselCrew();
+        doReturn(false).when(unit).canTakeMoreGenericCrew();
         doReturn(false).when(unit).canTakeNavigator();
         doReturn(false).when(unit).canTakeTechOfficer();
         doNothing().when(unit).resetPilotAndEntity();
@@ -206,7 +206,7 @@ public class HirePersonnelUnitActionTest {
 
         doReturn(false).when(unit).canTakeMoreDrivers();
         doReturn(true).doReturn(false).when(unit).canTakeMoreGunners();
-        doReturn(false).when(unit).canTakeMoreVesselCrew();
+        doReturn(false).when(unit).canTakeMoreGenericCrew();
         doReturn(false).when(unit).canTakeNavigator();
         doReturn(false).when(unit).canTakeTechOfficer();
         doNothing().when(unit).resetPilotAndEntity();
@@ -237,7 +237,7 @@ public class HirePersonnelUnitActionTest {
 
         doReturn(false).when(unit).canTakeMoreDrivers();
         doReturn(true).doReturn(false).when(unit).canTakeMoreGunners();
-        doReturn(false).when(unit).canTakeMoreVesselCrew();
+        doReturn(false).when(unit).canTakeMoreGenericCrew();
         doReturn(false).when(unit).canTakeNavigator();
         doReturn(false).when(unit).canTakeTechOfficer();
         doNothing().when(unit).resetPilotAndEntity();
@@ -267,7 +267,7 @@ public class HirePersonnelUnitActionTest {
 
         doReturn(false).when(unit).canTakeMoreDrivers();
         doReturn(true).doReturn(false).when(unit).canTakeMoreGunners();
-        doReturn(false).when(unit).canTakeMoreVesselCrew();
+        doReturn(false).when(unit).canTakeMoreGenericCrew();
         doReturn(false).when(unit).canTakeNavigator();
         doReturn(false).when(unit).canTakeTechOfficer();
         doNothing().when(unit).resetPilotAndEntity();
@@ -297,7 +297,7 @@ public class HirePersonnelUnitActionTest {
 
         doReturn(false).when(unit).canTakeMoreDrivers();
         doReturn(true).doReturn(false).when(unit).canTakeMoreGunners();
-        doReturn(false).when(unit).canTakeMoreVesselCrew();
+        doReturn(false).when(unit).canTakeMoreGenericCrew();
         doReturn(false).when(unit).canTakeNavigator();
         doReturn(false).when(unit).canTakeTechOfficer();
         doNothing().when(unit).resetPilotAndEntity();
@@ -329,14 +329,14 @@ public class HirePersonnelUnitActionTest {
 
         doReturn(false).when(unit).canTakeMoreDrivers();
         doReturn(false).when(unit).canTakeMoreGunners();
-        doReturn(true).doReturn(false).when(unit).canTakeMoreVesselCrew();
+        doReturn(true).doReturn(false).when(unit).canTakeMoreGenericCrew();
         doReturn(false).when(unit).canTakeNavigator();
         doReturn(false).when(unit).canTakeTechOfficer();
         doNothing().when(unit).resetPilotAndEntity();
         doNothing().when(unit).runDiagnostic(false);
 
         Person mockCrew = mock(Person.class);
-        doNothing().when(unit).addVesselCrew(eq(mockCrew));
+        doNothing().when(unit).addGenericCrew(eq(mockCrew));
         when(mockCampaign.newPerson(PersonnelRole.VESSEL_CREW)).thenReturn(mockCrew);
         when(mockCampaign.recruitPerson(eq(mockCrew), anyBoolean(), eq(true))).thenReturn(true);
 
@@ -345,7 +345,7 @@ public class HirePersonnelUnitActionTest {
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.VESSEL_CREW);
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
-        verify(unit, times(1)).addVesselCrew(eq(mockCrew));
+        verify(unit, times(1)).addGenericCrew(eq(mockCrew));
     }
 
     @Test
@@ -360,14 +360,14 @@ public class HirePersonnelUnitActionTest {
 
         doReturn(false).when(unit).canTakeMoreDrivers();
         doReturn(false).when(unit).canTakeMoreGunners();
-        doReturn(true).doReturn(false).when(unit).canTakeMoreVesselCrew();
+        doReturn(true).doReturn(false).when(unit).canTakeMoreGenericCrew();
         doReturn(false).when(unit).canTakeNavigator();
         doReturn(false).when(unit).canTakeTechOfficer();
         doNothing().when(unit).resetPilotAndEntity();
         doNothing().when(unit).runDiagnostic(false);
 
         Person mockCrew = mock(Person.class);
-        doNothing().when(unit).addVesselCrew(eq(mockCrew));
+        doNothing().when(unit).addGenericCrew(eq(mockCrew));
         when(mockCampaign.newPerson(PersonnelRole.COMBAT_TECHNICIAN)).thenReturn(mockCrew);
         when(mockCampaign.recruitPerson(eq(mockCrew), anyBoolean(), eq(true))).thenReturn(true);
 
@@ -376,7 +376,7 @@ public class HirePersonnelUnitActionTest {
 
         verify(mockCampaign, times(1)).newPerson(PersonnelRole.COMBAT_TECHNICIAN);
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
-        verify(unit, times(1)).addVesselCrew(eq(mockCrew));
+        verify(unit, times(1)).addGenericCrew(eq(mockCrew));
     }
 
     @Test
@@ -391,7 +391,7 @@ public class HirePersonnelUnitActionTest {
 
         doReturn(false).when(unit).canTakeMoreDrivers();
         doReturn(false).when(unit).canTakeMoreGunners();
-        doReturn(false).when(unit).canTakeMoreVesselCrew();
+        doReturn(false).when(unit).canTakeMoreGenericCrew();
         doReturn(true).when(unit).canTakeNavigator();
         doReturn(false).when(unit).canTakeTechOfficer();
         doNothing().when(unit).resetPilotAndEntity();
@@ -421,7 +421,7 @@ public class HirePersonnelUnitActionTest {
 
         doReturn(false).when(unit).canTakeMoreDrivers();
         doReturn(false).when(unit).canTakeMoreGunners();
-        doReturn(false).when(unit).canTakeMoreVesselCrew();
+        doReturn(false).when(unit).canTakeMoreGenericCrew();
         doReturn(false).when(unit).canTakeNavigator();
         doReturn(true).when(unit).canTakeTechOfficer();
         doNothing().when(unit).resetPilotAndEntity();
@@ -452,7 +452,7 @@ public class HirePersonnelUnitActionTest {
 
         doReturn(false).when(unit).canTakeMoreDrivers();
         doReturn(false).when(unit).canTakeMoreGunners();
-        doReturn(false).when(unit).canTakeMoreVesselCrew();
+        doReturn(false).when(unit).canTakeMoreGenericCrew();
         doReturn(false).when(unit).canTakeNavigator();
         doReturn(true).when(unit).canTakeTechOfficer();
         doNothing().when(unit).resetPilotAndEntity();

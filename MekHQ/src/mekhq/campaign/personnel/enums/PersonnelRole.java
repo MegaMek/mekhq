@@ -88,6 +88,7 @@ public enum PersonnelRole {
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
     COMBAT_TECHNICIAN(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
+    COMMS_OPERATOR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 5, 5, 5, 6, 6, 5),
 
     // ATOW: Tanker Archetype
     VEHICLE_CREW_GROUND(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
@@ -315,7 +316,6 @@ public enum PersonnelRole {
     FIELD_HOSPITAL_ADMINISTRATOR(KeyEvent.VK_UNDEFINED),
     CIVILIAN_REQUISITION_OFFICER(KeyEvent.VK_UNDEFINED),
     TRAINING_SIM_DESIGNER(KeyEvent.VK_UNDEFINED),
-    COMMS_OPERATOR(KeyEvent.VK_UNDEFINED),
     DECOMMISSIONING_SPECIALIST(KeyEvent.VK_UNDEFINED),
     WAR_CRIME_INVESTIGATOR(KeyEvent.VK_UNDEFINED),
     SECURITY_ADVISOR(KeyEvent.VK_UNDEFINED),
@@ -1106,6 +1106,9 @@ public enum PersonnelRole {
                      this == CHEF;
     }
 
+    public boolean isCommsOperator() {
+        return this == COMMS_OPERATOR;
+    }
 
     /**
      * @return {@code true} if the personnel has the Aerospace Pilot role, {@code false} otherwise.

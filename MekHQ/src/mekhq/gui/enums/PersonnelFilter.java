@@ -68,6 +68,10 @@ public enum PersonnelFilter {
           "PersonnelFilter.COMBAT_TECHNICIANS.toolTipText",
           false,
           true),
+    COMMS_OPERATORS("PersonnelFilter.COMMS_OPERATORS.text",
+          "PersonnelFilter.COMMS_OPERATORS.toolTipText",
+          false,
+          true),
     AEROSPACE_PILOT("PersonnelFilter.AEROSPACE_PILOT.text", "PersonnelFilter.AEROSPACE_PILOT.toolTipText"),
     CONVENTIONAL_AIRCRAFT_PILOT("PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT.text",
           "PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT.toolTipText"),
@@ -216,8 +220,12 @@ public enum PersonnelFilter {
         return this == VEHICLE_CREW_VTOL;
     }
 
-    public boolean isVehicleCrew() {
+    public boolean isCombatTechnician() {
         return this == COMBAT_TECHNICIANS;
+    }
+
+    public boolean isCommsOperator() {
+        return this == COMMS_OPERATORS;
     }
 
     public boolean isAerospacePilot() {
@@ -432,6 +440,9 @@ public enum PersonnelFilter {
             case COMBAT_TECHNICIANS -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                                         person.getPrimaryRole().isCombatTechnician() :
                                                         person.hasRole(PersonnelRole.COMBAT_TECHNICIAN));
+            case COMMS_OPERATORS -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
+                                                     person.getPrimaryRole().isCommsOperator() :
+                                                     person.hasRole(PersonnelRole.COMMS_OPERATOR));
             case VEHICLE_CREW_VTOL -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                                        person.getPrimaryRole().isVehicleCrewVTOL() :
                                                        person.hasRole(PersonnelRole.VEHICLE_CREW_VTOL));

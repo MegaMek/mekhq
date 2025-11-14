@@ -123,8 +123,10 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         final JScrollableMenu pilotMenu = new JScrollableMenu("pilotMenu", resources.getString("pilotMenu.text"));
         final JScrollableMenu driverMenu = new JScrollableMenu("driverMenu", resources.getString("driverMenu.text"));
         final JScrollableMenu gunnerMenu = new JScrollableMenu("gunnerMenu", resources.getString("gunnerMenu.text"));
-        final JScrollableMenu crewmemberMenu = new JScrollableMenu("crewmemberMenu",
-              resources.getString("crewmemberMenu.text"));
+        final JScrollableMenu genericCrewMenu = new JScrollableMenu("genericCrewMenu",
+              resources.getString("genericCrewMenu.text"));
+        final JScrollableMenu communicationsCrewMenu = new JScrollableMenu("communicationsCrewMenu",
+              resources.getString("communicationsCrewMenu.text"));
         final JScrollableMenu techOfficerMenu = new JScrollableMenu("techOfficerMenu",
               resources.getString("techOfficerMenu.text"));
         final JScrollableMenu consoleCommanderMenu = new JScrollableMenu("consoleCommanderMenu",
@@ -525,8 +527,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
             }
         }
 
-        // Crewmember Menu
-        if (units[0].canTakeMoreVesselCrew()) {
+        // Generic Crew Menu
+        if (units[0].canTakeMoreGenericCrew()) {
             filteredPersonnel = personnel.stream()
                                       .filter(person -> {
                                           if (isAero && !isConventionalAircraftCrew) {
@@ -570,18 +572,77 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     };
 
                     if (subMenu != null) {
-                        final JMenuItem miCrewmember = getMiCrewmember(campaign, units, person);
+                        final JMenuItem miCrewmember = getMiGenericCrew(campaign, units, person);
                         subMenu.add(miCrewmember);
                     }
                 }
 
-                crewmemberMenu.add(legendaryMenu);
-                crewmemberMenu.add(heroicMenu);
-                crewmemberMenu.add(eliteMenu);
-                crewmemberMenu.add(veteranMenu);
-                crewmemberMenu.add(regularMenu);
-                crewmemberMenu.add(greenMenu);
-                crewmemberMenu.add(ultraGreenMenu);
+                genericCrewMenu.add(legendaryMenu);
+                genericCrewMenu.add(heroicMenu);
+                genericCrewMenu.add(eliteMenu);
+                genericCrewMenu.add(veteranMenu);
+                genericCrewMenu.add(regularMenu);
+                genericCrewMenu.add(greenMenu);
+                genericCrewMenu.add(ultraGreenMenu);
+            }
+        }
+
+        // Communications Crew Menu
+        if (units[0].canTakeMoreCommunicationsCrew()) {
+            filteredPersonnel = personnel.stream()
+                                      .filter(person -> {
+                                          if (isAero && !isConventionalAircraftCrew) {
+                                              return person.hasRole(PersonnelRole.VESSEL_CREW);
+                                          } else {
+                                              return person.hasRole(PersonnelRole.COMMS_OPERATOR);
+                                          }
+                                      })
+                                      .collect(Collectors.toList());
+            if (!filteredPersonnel.isEmpty()) {
+                // Create the SkillLevel Submenus
+                final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu",
+                      SkillLevel.LEGENDARY.toString());
+                final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
+                final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
+                final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
+                final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
+                final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
+                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu",
+                      SkillLevel.ULTRA_GREEN.toString());
+
+                // Add the person to the proper menu
+                for (final Person person : filteredPersonnel) {
+                    final JScrollableMenu subMenu = switch (person.getSkillLevel(
+                          campaign,
+                          isAero && !isConventionalAircraftCrew
+                                ?
+                                !person.hasRole(PersonnelRole.VESSEL_CREW)
+                                :
+                                !(person.getPrimaryRole().isCommsOperator() ||
+                                        person.getSecondaryRole().isCommsOperator()), true)) {
+                        case LEGENDARY -> legendaryMenu;
+                        case HEROIC -> heroicMenu;
+                        case ELITE -> eliteMenu;
+                        case VETERAN -> veteranMenu;
+                        case REGULAR -> regularMenu;
+                        case GREEN -> greenMenu;
+                        case ULTRA_GREEN -> ultraGreenMenu;
+                        default -> null;
+                    };
+
+                    if (subMenu != null) {
+                        final JMenuItem miCommunicationsCrew = getMiCommunicationsCrew(campaign, units, person);
+                        subMenu.add(miCommunicationsCrew);
+                    }
+                }
+
+                communicationsCrewMenu.add(legendaryMenu);
+                communicationsCrewMenu.add(heroicMenu);
+                communicationsCrewMenu.add(eliteMenu);
+                communicationsCrewMenu.add(veteranMenu);
+                communicationsCrewMenu.add(regularMenu);
+                communicationsCrewMenu.add(greenMenu);
+                communicationsCrewMenu.add(ultraGreenMenu);
             }
         }
 
@@ -718,7 +779,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         add(pilotMenu);
         add(driverMenu);
         add(gunnerMenu);
-        add(crewmemberMenu);
+        add(genericCrewMenu);
+        add(communicationsCrewMenu);
         add(techOfficerMenu);
         add(consoleCommanderMenu);
         add(soldierMenu);
@@ -762,9 +824,27 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         return miConsoleCommander;
     }
 
-    private static JMenuItem getMiCrewmember(Campaign campaign, Unit[] units, Person person) {
+    private static JMenuItem getMiGenericCrew(Campaign campaign, Unit[] units, Person person) {
+        final JMenuItem miGenericCrew = new JMenuItem(person.getFullTitleAndProfessions());
+        miGenericCrew.setName("miGenericCrew");
+        miGenericCrew.addActionListener(evt -> {
+            final Unit oldUnit = person.getUnit();
+            boolean useTransfers = false;
+            if (oldUnit != null) {
+                oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                useTransfers = campaign.getCampaignOptions().isUseTransfers();
+            }
+
+            ensureRecruitmentDate(campaign.getLocalDate(), person);
+
+            units[0].addGenericCrew(person, useTransfers);
+        });
+        return miGenericCrew;
+    }
+
+    private static JMenuItem getMiCommunicationsCrew(Campaign campaign, Unit[] units, Person person) {
         final JMenuItem miCrewmember = new JMenuItem(person.getFullTitleAndProfessions());
-        miCrewmember.setName("miCrewmember");
+        miCrewmember.setName("miCommunicationsCrew");
         miCrewmember.addActionListener(evt -> {
             final Unit oldUnit = person.getUnit();
             boolean useTransfers = false;
@@ -775,7 +855,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
 
             ensureRecruitmentDate(campaign.getLocalDate(), person);
 
-            units[0].addVesselCrew(person, useTransfers);
+            units[0].addCommunicationsCrew(person, useTransfers);
         });
         return miCrewmember;
     }

@@ -362,7 +362,7 @@ public class UnitPersonTest {
         doNothing().when(unit).resetPilotAndEntity();
 
         // Units do not start with a vessel crew
-        assertTrue(unit.getVesselCrew().isEmpty());
+        assertTrue(unit.getGenericCrew().isEmpty());
 
         // Create the vessel crew
         UUID id = UUID.randomUUID();
@@ -372,14 +372,14 @@ public class UnitPersonTest {
         when(mockVesselCrew.getUnit()).thenReturn(unit);
 
         // Add the vessel crew
-        unit.addVesselCrew(mockVesselCrew);
+        unit.addGenericCrew(mockVesselCrew);
 
         // Ensure we were added to the unit
         verify(mockVesselCrew, times(1)).setUnit(eq(unit));
         verify(unit, times(1)).resetPilotAndEntity();
 
         // Ensure when getting the vessel crew that it is the same vessel crew
-        List<Person> vesselCrew = unit.getVesselCrew();
+        List<Person> vesselCrew = unit.getGenericCrew();
         assertTrue(vesselCrew.contains(mockVesselCrew));
 
         // Make sure we're part of the crew!
@@ -396,7 +396,7 @@ public class UnitPersonTest {
         verify(unit, times(2)).resetPilotAndEntity();
 
         // Make sure we were removed from the unit
-        assertTrue(unit.getVesselCrew().isEmpty());
+        assertTrue(unit.getGenericCrew().isEmpty());
         assertTrue(unit.getCrew().isEmpty());
     }
 

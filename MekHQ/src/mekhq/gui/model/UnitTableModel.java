@@ -203,8 +203,11 @@ public class UnitTableModel extends DataTableModel<Unit> {
         int navigatorsNeeded = entity instanceof Jumpship && !(entity instanceof SpaceStation) ? 1 : 0;
         int navigatorsAssigned = unit.getNavigator() == null ? 0 : 1;
 
-        int crewNeeded = unit.getTotalCrewNeeds();
-        int crewAssigned = unit.getActiveCrew().size() - (gunnersAssigned + driversAssigned + navigatorsAssigned);
+        int genericCrewNeeded = unit.getTotalGenericCrewNeeds();
+        int genericCrewAssigned = unit.getGenericCrew().size();
+
+        int communicationsCrewNeeded = unit.getTotalCommunicationCrewNeeds();
+        int communicationsCrewAssigned = unit.getCommunicationsCrew().size();
 
         List<String> reports = new ArrayList<>();
 
@@ -236,9 +239,17 @@ public class UnitTableModel extends DataTableModel<Unit> {
                   soldiersNeeded);
         }
 
-        if (crewNeeded > 0) {
+        if (communicationsCrewNeeded > 0) {
+            String key = "UnitTableModel.crewNeeds.communications";
+            appendReport(reports,
+                  getTextAt(RESOURCE_BUNDLE, key),
+                  communicationsCrewAssigned,
+                  communicationsCrewNeeded);
+        }
+
+        if (genericCrewNeeded > 0) {
             String key = entity.isLargeCraft() ? "UnitTableModel.crewNeeds.crew" : "UnitTableModel.crewNeeds.other";
-            appendReport(reports, getTextAt(RESOURCE_BUNDLE, key), crewAssigned, crewNeeded);
+            appendReport(reports, getTextAt(RESOURCE_BUNDLE, key), genericCrewAssigned, genericCrewNeeded);
         }
 
         if (navigatorsNeeded > 0) {

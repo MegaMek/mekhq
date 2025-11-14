@@ -114,10 +114,14 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                   resources.getString("asGunnerMenu.text"));
             JScrollableMenu gunnerUnitTypeMenu = new JScrollableMenu("gunnerUnitTypeMenu");
             JMenu gunnerEntityWeightMenu = new JMenu();
-            final JScrollableMenu crewmemberMenu = new JScrollableMenu("crewmemberMenu",
-                  resources.getString("asCrewmemberMenu.text"));
-            JScrollableMenu crewmemberUnitTypeMenu = new JScrollableMenu("crewmemberUnitTypeMenu");
-            JMenu crewmemberEntityWeightMenu = new JMenu();
+            final JScrollableMenu genericCrewMenu = new JScrollableMenu("genericCrewMenu",
+                  resources.getString("asGenericMenu.text"));
+            JScrollableMenu genericCrewUnitTypeMenu = new JScrollableMenu("genericCrewUnitTypeMenu");
+            JMenu genericEntityWeightMenu = new JMenu();
+            final JScrollableMenu communicationsCrewMenu = new JScrollableMenu("communicationsCrewMenu",
+                  resources.getString("asCommunicationsMenu.text"));
+            JScrollableMenu communicationsCrewUnitTypeMenu = new JScrollableMenu("communicationsCrewUnitTypeMenu");
+            JMenu communicationsEntityWeightMenu = new JMenu();
             final JScrollableMenu techOfficerMenu = new JScrollableMenu("techOfficerMenu",
                   resources.getString("asTechOfficerMenu.text"));
             JScrollableMenu techOfficerUnitTypeMenu = new JScrollableMenu("techOfficerUnitTypeMenu");
@@ -173,6 +177,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                                                               .isVehicleCrewExtended() ||
                                                                               person.getSecondaryRole()
                                                                                     .isVehicleCrewExtended());
+            final boolean areAllCommunicationsCrew =
+                  Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.COMMS_OPERATOR));
             final boolean areAllSoldiers = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.SOLDIER));
             final boolean areAllBattleArmourPilots = Stream.of(people)
                                                            .allMatch(person -> person.hasRole(PersonnelRole.BATTLE_ARMOUR));
@@ -197,8 +203,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     driverMenu.add(driverUnitTypeMenu);
                     gunnerUnitTypeMenu.add(gunnerEntityWeightMenu);
                     gunnerMenu.add(gunnerUnitTypeMenu);
-                    crewmemberUnitTypeMenu.add(crewmemberEntityWeightMenu);
-                    crewmemberMenu.add(crewmemberUnitTypeMenu);
+                    genericCrewUnitTypeMenu.add(genericEntityWeightMenu);
+                    genericCrewMenu.add(genericCrewUnitTypeMenu);
+                    communicationsCrewMenu.add(communicationsCrewUnitTypeMenu);
+                    communicationsCrewMenu.add(communicationsCrewUnitTypeMenu);
                     techOfficerUnitTypeMenu.add(techOfficerEntityWeightMenu);
                     techOfficerMenu.add(techOfficerUnitTypeMenu);
                     consoleCommanderUnitTypeMenu.add(consoleCommanderEntityWeightMenu);
@@ -221,8 +229,12 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     driverEntityWeightMenu = new JScrollableMenu("driverEntityWeightMenu", entityWeightClassName);
                     gunnerUnitTypeMenu = new JScrollableMenu("gunnerUnitTypeMenu", unitTypeName);
                     gunnerEntityWeightMenu = new JScrollableMenu("gunnerEntityWeightMenu", entityWeightClassName);
-                    crewmemberUnitTypeMenu = new JScrollableMenu("crewmemberUnitTypeMenu", unitTypeName);
-                    crewmemberEntityWeightMenu = new JScrollableMenu("crewmemberEntityWeightMenu",
+                    genericCrewUnitTypeMenu = new JScrollableMenu("genericCrewUnitTypeMenu", unitTypeName);
+                    genericEntityWeightMenu = new JScrollableMenu("genericEntityWeightMenu",
+                          entityWeightClassName);
+                    communicationsCrewUnitTypeMenu = new JScrollableMenu("communicationsCrewUnitTypeMenu",
+                          unitTypeName);
+                    communicationsEntityWeightMenu = new JScrollableMenu("communicationsEntityWeightMenu",
                           entityWeightClassName);
                     techOfficerUnitTypeMenu = new JScrollableMenu("techOfficerUnitTypeMenu", unitTypeName);
                     techOfficerEntityWeightMenu = new JScrollableMenu("techOfficerEntityWeightMenu",
@@ -239,7 +251,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     pilotUnitTypeMenu.add(pilotEntityWeightMenu);
                     driverUnitTypeMenu.add(driverEntityWeightMenu);
                     gunnerUnitTypeMenu.add(gunnerEntityWeightMenu);
-                    crewmemberUnitTypeMenu.add(crewmemberEntityWeightMenu);
+                    genericCrewUnitTypeMenu.add(genericEntityWeightMenu);
+                    communicationsCrewUnitTypeMenu.add(communicationsEntityWeightMenu);
                     techOfficerUnitTypeMenu.add(techOfficerEntityWeightMenu);
                     consoleCommanderUnitTypeMenu.add(consoleCommanderEntityWeightMenu);
                     soldierUnitTypeMenu.add(soldierEntityWeightMenu);
@@ -254,7 +267,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     driverEntityWeightMenu = new JScrollableMenu("driverEntityWeightMenu", entityWeightClassName);
                     gunnerEntityWeightMenu = new JScrollableMenu("gunnerEntityWeightMenu", entityWeightClassName);
                     techOfficerUnitTypeMenu = new JScrollableMenu("techOfficerUnitTypeMenu", entityWeightClassName);
-                    crewmemberEntityWeightMenu = new JScrollableMenu("crewmemberEntityWeightMenu",
+                    genericEntityWeightMenu = new JScrollableMenu("genericEntityWeightMenu",
+                          entityWeightClassName);
+                    communicationsEntityWeightMenu = new JScrollableMenu("communicationsEntityWeightMenu",
                           entityWeightClassName);
                     consoleCommanderEntityWeightMenu = new JScrollableMenu("consoleCommanderEntityWeightMenu",
                           entityWeightClassName);
@@ -404,24 +419,21 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     }
                 }
 
-                // Crewmember Menu
-                // TODO : Rename the method to canTakeMoreCrewmembers, and update the variable names to
-                // TODO : also be based on crewmembers
-                if (unit.canTakeMoreVesselCrew()) {
+                // Generic Crew Menu
+                if (unit.canTakeMoreGenericCrew()) {
                     final boolean valid;
                     if (entity instanceof Aero && !(entity instanceof ConvFighter)) {
                         valid = areAllVesselCrew;
                     } else {
-                        // TODO : Expand for Command and Control, Medical, Technician, and Salvage Assignments
                         valid = areAllVehicleCrew;
                     }
 
                     if (valid) {
                         final JMenuItem miCrewmember = new JMenuItem(unit.getName());
-                        miCrewmember.setName("miCrewmember");
+                        miCrewmember.setName("miGenericCrew");
                         miCrewmember.addActionListener(evt -> {
                             for (final Person person : people) {
-                                if (!unit.canTakeMoreVesselCrew()) {
+                                if (!unit.canTakeMoreGenericCrew()) {
                                     return;
                                 } else if (!unit.equals(person.getUnit())) {
                                     final Unit oldUnit = person.getUnit();
@@ -430,13 +442,36 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                         oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
                                         useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                     }
-                                    unit.addVesselCrew(person, useTransfers);
+                                    unit.addGenericCrew(person, useTransfers);
                                     ensureRecruitmentDate(campaign.getLocalDate(), person);
                                 }
                             }
                         });
-                        crewmemberEntityWeightMenu.add(miCrewmember);
+                        genericEntityWeightMenu.add(miCrewmember);
+                    }
+                }
 
+                if (unit.canTakeMoreCommunicationsCrew()) {
+                    if (areAllCommunicationsCrew) {
+                        final JMenuItem miCrewmember = new JMenuItem(unit.getName());
+                        miCrewmember.setName("miCommunicationsCrew");
+                        miCrewmember.addActionListener(evt -> {
+                            for (final Person person : people) {
+                                if (!unit.canTakeMoreCommunicationsCrew()) {
+                                    return;
+                                } else if (!unit.equals(person.getUnit())) {
+                                    final Unit oldUnit = person.getUnit();
+                                    boolean useTransfers = false;
+                                    if (oldUnit != null) {
+                                        oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                                        useTransfers = campaign.getCampaignOptions().isUseTransfers();
+                                    }
+                                    unit.addCommunicationsCrew(person, useTransfers);
+                                    ensureRecruitmentDate(campaign.getLocalDate(), person);
+                                }
+                            }
+                        });
+                        communicationsEntityWeightMenu.add(miCrewmember);
                     }
                 }
 
@@ -544,9 +579,12 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             gunnerUnitTypeMenu.add(gunnerEntityWeightMenu);
             gunnerMenu.add(gunnerUnitTypeMenu);
             add(gunnerMenu);
-            crewmemberUnitTypeMenu.add(crewmemberEntityWeightMenu);
-            crewmemberMenu.add(crewmemberUnitTypeMenu);
-            add(crewmemberMenu);
+            genericCrewUnitTypeMenu.add(genericEntityWeightMenu);
+            genericCrewMenu.add(genericCrewUnitTypeMenu);
+            add(genericCrewMenu);
+            communicationsCrewUnitTypeMenu.add(communicationsEntityWeightMenu);
+            communicationsCrewMenu.add(communicationsCrewUnitTypeMenu);
+            add(communicationsCrewMenu);
             techOfficerUnitTypeMenu.add(techOfficerEntityWeightMenu);
             techOfficerMenu.add(techOfficerUnitTypeMenu);
             add(techOfficerMenu);

@@ -39,7 +39,8 @@ import mekhq.campaign.personnel.Person;
 public enum CrewType {
     DRIVER(Unit::addDriver),
     GUNNER(Unit::addGunner),
-    VESSEL_CREW(Unit::addVesselCrew),
+    GENERIC_CREW(Unit::addGenericCrew),
+    COMMUNICATIONS_CREW(Unit::addCommunicationsCrew),
     NAVIGATOR(Unit::setNavigator),
     PILOT(Unit::addPilotOrSoldier),
     SOLDIER(Unit::addPilotOrSoldier),

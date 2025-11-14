@@ -445,7 +445,8 @@ public class Utilities {
         int numberPeopleGenerated = 0;
         List<Person> drivers = new ArrayList<>();
         List<Person> gunners = new ArrayList<>();
-        List<Person> vesselCrew = new ArrayList<>();
+        List<Person> genericCrew = new ArrayList<>();
+        List<Person> communicationsCrew = new ArrayList<>();
         Person navigator = null;
         Person consoleCmdr = null;
 
@@ -725,7 +726,7 @@ public class Utilities {
                 }
             }
 
-            for (int slot = 0; slot < unit.getTotalCrewNeeds(); slot++) {
+            for (int slot = 0; slot < unit.getTotalGenericCrewNeeds(); slot++) {
                 Person p = campaign.newPerson(unit.getEntity().isLargeCraft() ?
                                                     PersonnelRole.VESSEL_CREW :
                                                     PersonnelRole.COMBAT_TECHNICIAN,
@@ -733,7 +734,42 @@ public class Utilities {
                       oldCrew.getGender(numberPeopleGenerated));
 
                 migrateCrewData(p, oldCrew, numberPeopleGenerated++, false);
-                vesselCrew.add(p);
+                genericCrew.add(p);
+            }
+
+            for (int slot = 0; slot < unit.getTotalCommunicationCrewNeeds(); slot++) {
+                PersonnelRole role;
+                if (unit.getEntity().isLargeCraft()) {
+                    role = PersonnelRole.VESSEL_CREW;
+                } else if (unit.getEntity() instanceof Tank) {
+                    if (unit.getEntity().getMovementMode().isMarine()) {
+                        role = PersonnelRole.VEHICLE_CREW_NAVAL;
+                    } else if (unit.getEntity().getMovementMode().isVTOL()) {
+                        role = PersonnelRole.VEHICLE_CREW_VTOL;
+                    } else {
+                        role = PersonnelRole.VEHICLE_CREW_GROUND;
+                    }
+                } else if (unit.getEntity().isConventionalFighter()) {
+                    role = PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
+                } else {
+                    role = PersonnelRole.COMBAT_TECHNICIAN;
+                }
+
+                Person person = campaign.newPerson(role, factionCode, oldCrew.getGender(numberPeopleGenerated));
+
+                migrateCrewData(person, oldCrew, numberPeopleGenerated++, false);
+                communicationsCrew.add(person);
+            }
+
+            for (int slot = 0; slot < unit.getTotalGenericCrewNeeds(); slot++) {
+                Person p = campaign.newPerson(unit.getEntity().isLargeCraft() ?
+                                                    PersonnelRole.VESSEL_CREW :
+                                                    PersonnelRole.COMMS_OPERATOR,
+                      factionCode,
+                      oldCrew.getGender(numberPeopleGenerated));
+
+                migrateCrewData(p, oldCrew, numberPeopleGenerated++, false);
+                genericCrew.add(p);
             }
 
             if (unit.canTakeNavigator()) {
@@ -776,8 +812,11 @@ public class Utilities {
         if (!gunners.isEmpty()) {
             result.put(CrewType.GUNNER, gunners);
         }
-        if (!vesselCrew.isEmpty()) {
-            result.put(CrewType.VESSEL_CREW, vesselCrew);
+        if (!genericCrew.isEmpty()) {
+            result.put(CrewType.GENERIC_CREW, genericCrew);
+        }
+        if (!communicationsCrew.isEmpty()) {
+            result.put(CrewType.COMMUNICATIONS_CREW, communicationsCrew);
         }
         if (null != navigator) {
             result.put(CrewType.NAVIGATOR, Collections.singletonList(navigator));
