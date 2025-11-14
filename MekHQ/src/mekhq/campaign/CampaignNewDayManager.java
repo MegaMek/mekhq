@@ -149,7 +149,6 @@ import mekhq.campaign.randomEvents.GrayMonday;
 import mekhq.campaign.randomEvents.RiotScenario;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
@@ -312,9 +311,7 @@ public class CampaignNewDayManager {
             processNewDayATB();
         }
 
-        if (campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
-            processReputationChanges();
-        }
+        processReputationChanges();
 
         if (campaignOptions.isUseEducationModule()) {
             processEducationNewDay();
@@ -768,11 +765,6 @@ public class CampaignNewDayManager {
             /*
              * First of the month; roll Morale.
              */
-            if (campaignOptions.getUnitRatingMethod().isFMMR()) {
-                IUnitRating rating = campaign.getUnitRating();
-                rating.reInitialize();
-            }
-
             for (AtBContract contract : campaign.getActiveAtBContracts()) {
                 AtBMoraleLevel oldMorale = contract.getMoraleLevel();
 

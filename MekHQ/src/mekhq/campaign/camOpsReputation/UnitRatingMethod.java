@@ -31,7 +31,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.rating;
+package mekhq.campaign.camOpsReputation;
 
 import java.util.ResourceBundle;
 
@@ -41,6 +41,7 @@ import mekhq.MekHQ;
  * @author Deric Page (deric (dot) page (at) usa.net)
  * @since 9/24/2013
  */
+@Deprecated(since = "0.50.10", forRemoval = true)
 public enum UnitRatingMethod {
     //region Enum Declarations
     @Deprecated(since = "0.50.10", forRemoval = true)

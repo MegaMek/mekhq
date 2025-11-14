@@ -33,7 +33,6 @@
 package mekhq.campaign.mission;
 
 import static mekhq.campaign.mission.MHQMorale.getReliabilityModifier;
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_ASTAR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -44,6 +43,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import megamek.client.ratgenerator.ForceDescriptor;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
@@ -97,7 +97,7 @@ class MHQMoraleTest {
 
         int actualReliability = MHQMorale.getReliability(mockContract);
 
-        int adjustedQuality = Math.min(DRAGOON_ASTAR, experienceLevel + 1);
+        int adjustedQuality = Math.min(DragoonRating.DRAGOON_ASTAR.getRating(), experienceLevel + 1);
         int expectedReliability = getReliabilityModifier(adjustedQuality);
         expectedReliability--;
 

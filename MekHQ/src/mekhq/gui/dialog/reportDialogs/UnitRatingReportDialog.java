@@ -39,6 +39,7 @@ import javax.swing.JTextPane;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 
+@Deprecated(since = "0.50.10", forRemoval = true)
 public class UnitRatingReportDialog extends AbstractReportDialog {
     //region Variable Declarations
     private final Campaign campaign;

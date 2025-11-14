@@ -55,6 +55,7 @@ import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
@@ -62,7 +63,6 @@ import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -130,13 +130,11 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         ArrayList<Faction> interestedFactions = new ArrayList<>();
 
         boolean filterOutLegalFactions = false;
-        if (getCampaign().getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-            if (getCampaign().getReputation().getReputationRating() < getUnitReputationRecruitmentCutoff()) {
-                getLogger().debug(
-                      "Only pirates & mercenaries will be considered for applicants, as the campaign's unit " +
-                            "rating is below the cutoff.");
-                filterOutLegalFactions = true;
-            }
+        if (getCampaign().getReputation().getReputationRating() < getUnitReputationRecruitmentCutoff()) {
+            getLogger().debug(
+                  "Only pirates & mercenaries will be considered for applicants, as the campaign's unit " +
+                        "rating is below the cutoff.");
+            filterOutLegalFactions = true;
         }
 
         if (getCampaign().isClanCampaign()) {

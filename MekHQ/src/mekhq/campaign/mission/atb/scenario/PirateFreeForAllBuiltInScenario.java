@@ -42,13 +42,13 @@ import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 
@@ -122,7 +122,7 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
         final Faction faction = Factions.getInstance().getFaction("PIR");
         for (int i = 0; i < 12; i++) {
             otherForce.add(getEntity(faction.getShortName(), SkillLevel.REGULAR,
-                  IUnitRating.DRAGOON_C, UnitType.MEK,
+                  DragoonRating.DRAGOON_C.getRating(), UnitType.MEK,
                   AtBStaticWeightGenerator.getRandomWeight(campaign, UnitType.MEK, faction), campaign));
         }
 

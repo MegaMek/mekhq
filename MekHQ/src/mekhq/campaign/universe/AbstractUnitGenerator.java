@@ -43,7 +43,7 @@ import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.enums.SkillLevel;
 import megamek.common.loaders.MekSummary;
 import megamek.logging.MMLogger;
-import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.enums.DragoonRating;
 
 /**
  * Base class for unit generators containing common functionality. Currently, only turret-related code.
@@ -65,12 +65,12 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
         // TODO : Switch this with a call to a new IUnitRating array
         if (ratRatingMappings == null) {
             ratRatingMappings = new HashMap<>();
-            ratRatingMappings.put(IUnitRating.DRAGOON_ASTAR, "A");
-            ratRatingMappings.put(IUnitRating.DRAGOON_A, "A");
-            ratRatingMappings.put(IUnitRating.DRAGOON_B, "B");
-            ratRatingMappings.put(IUnitRating.DRAGOON_C, "C");
-            ratRatingMappings.put(IUnitRating.DRAGOON_D, "D");
-            ratRatingMappings.put(IUnitRating.DRAGOON_F, "F");
+            ratRatingMappings.put(DragoonRating.DRAGOON_ASTAR.getRating(), "A");
+            ratRatingMappings.put(DragoonRating.DRAGOON_A.getRating(), "A");
+            ratRatingMappings.put(DragoonRating.DRAGOON_B.getRating(), "B");
+            ratRatingMappings.put(DragoonRating.DRAGOON_C.getRating(), "C");
+            ratRatingMappings.put(DragoonRating.DRAGOON_D.getRating(), "D");
+            ratRatingMappings.put(DragoonRating.DRAGOON_F.getRating(), "F");
         }
     }
 
