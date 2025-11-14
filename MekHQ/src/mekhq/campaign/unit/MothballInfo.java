@@ -63,6 +63,7 @@ public class MothballInfo {
     private final List<UUID> gunnerIds = new ArrayList<>();
     private final List<UUID> genericCrewIds = new ArrayList<>();
     private final List<UUID> communicationsCrewIds = new ArrayList<>();
+    private final List<UUID> doctorCrewIds = new ArrayList<>();
     private UUID techOfficerId;
     private UUID navigatorId;
 
@@ -123,6 +124,13 @@ public class MothballInfo {
             }
         }
 
+        List<Person> doctorCrews = new ArrayList<>(unit.getDoctorCrew());
+        for (Person crew : doctorCrews) {
+            if (crew != null) {
+                doctorCrewIds.add(crew.getId());
+            }
+        }
+
         Person techOfficer = unit.getTechOfficer();
         if (techOfficer != null) {
             techOfficerId = techOfficer.getId();
@@ -176,6 +184,13 @@ public class MothballInfo {
             Person crew = campaign.getPerson(crewId);
             if (crew != null && crew.getStatus().isActive() && (crew.getUnit() == null)) {
                 unit.addCommunicationsCrew(crew);
+            }
+        }
+
+        for (UUID crewId : doctorCrewIds) {
+            Person crew = campaign.getPerson(crewId);
+            if (crew != null && crew.getStatus().isActive() && (crew.getUnit() == null)) {
+                unit.addDoctorCrew(crew);
             }
         }
 
@@ -245,6 +260,10 @@ public class MothballInfo {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "communicationsCrewIds", crew);
         }
 
+        for (UUID crew : doctorCrewIds) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doctorCrewIds", crew);
+        }
+
         if (navigatorId != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "navigatorId", navigatorId);
         }
@@ -282,6 +301,8 @@ public class MothballInfo {
                     retVal.genericCrewIds.add(UUID.fromString(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("communicationsCrewIds")) {
                     retVal.communicationsCrewIds.add(UUID.fromString(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("doctorCrewIds")) {
+                    retVal.doctorCrewIds.add(UUID.fromString(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("techOfficerID")) {
                     retVal.techOfficerId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("navigatorID")) {

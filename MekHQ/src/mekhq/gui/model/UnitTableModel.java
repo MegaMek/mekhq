@@ -209,6 +209,9 @@ public class UnitTableModel extends DataTableModel<Unit> {
         int communicationsCrewNeeded = unit.getTotalCommunicationCrewNeeds();
         int communicationsCrewAssigned = unit.getCommunicationsCrew().size();
 
+        int doctorCrewNeeded = unit.getTotalDoctorCrewNeeds();
+        int doctorCrewAssigned = unit.getDoctorCrew().size();
+
         List<String> reports = new ArrayList<>();
 
         Campaign campaign = unit.getCampaign();
@@ -245,6 +248,14 @@ public class UnitTableModel extends DataTableModel<Unit> {
                   getTextAt(RESOURCE_BUNDLE, key),
                   communicationsCrewAssigned,
                   communicationsCrewNeeded);
+        }
+
+        if (doctorCrewNeeded > 0) {
+            String key = "UnitTableModel.crewNeeds.doctor";
+            appendReport(reports,
+                  getTextAt(RESOURCE_BUNDLE, key),
+                  doctorCrewAssigned,
+                  doctorCrewNeeded);
         }
 
         if (genericCrewNeeded > 0) {

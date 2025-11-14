@@ -127,6 +127,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
               resources.getString("genericCrewMenu.text"));
         final JScrollableMenu communicationsCrewMenu = new JScrollableMenu("communicationsCrewMenu",
               resources.getString("communicationsCrewMenu.text"));
+        final JScrollableMenu doctorCrewMenu = new JScrollableMenu("doctorCrewMenu",
+              resources.getString("doctorCrewMenu.text"));
         final JScrollableMenu techOfficerMenu = new JScrollableMenu("techOfficerMenu",
               resources.getString("techOfficerMenu.text"));
         final JScrollableMenu consoleCommanderMenu = new JScrollableMenu("consoleCommanderMenu",
@@ -646,6 +648,65 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
             }
         }
 
+        // Doctor Crew Menu
+        if (units[0].canTakeMoreDoctorCrew()) {
+            filteredPersonnel = personnel.stream()
+                                      .filter(person -> {
+                                          if (isAero && !isConventionalAircraftCrew) {
+                                              return person.hasRole(PersonnelRole.VESSEL_CREW);
+                                          } else {
+                                              return person.hasRole(PersonnelRole.DOCTOR);
+                                          }
+                                      })
+                                      .collect(Collectors.toList());
+            if (!filteredPersonnel.isEmpty()) {
+                // Create the SkillLevel Submenus
+                final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu",
+                      SkillLevel.LEGENDARY.toString());
+                final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
+                final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
+                final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
+                final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
+                final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
+                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu",
+                      SkillLevel.ULTRA_GREEN.toString());
+
+                // Add the person to the proper menu
+                for (final Person person : filteredPersonnel) {
+                    final JScrollableMenu subMenu = switch (person.getSkillLevel(
+                          campaign,
+                          isAero && !isConventionalAircraftCrew
+                                ?
+                                !person.hasRole(PersonnelRole.VESSEL_CREW)
+                                :
+                                !(person.getPrimaryRole().isDoctor() ||
+                                        person.getSecondaryRole().isDoctor()), true)) {
+                        case LEGENDARY -> legendaryMenu;
+                        case HEROIC -> heroicMenu;
+                        case ELITE -> eliteMenu;
+                        case VETERAN -> veteranMenu;
+                        case REGULAR -> regularMenu;
+                        case GREEN -> greenMenu;
+                        case ULTRA_GREEN -> ultraGreenMenu;
+                        default -> null;
+                    };
+
+                    if (subMenu != null) {
+                        final JMenuItem miDoctorCrew = getMiDoctorCrew(campaign, units, person);
+                        subMenu.add(miDoctorCrew);
+                    }
+                }
+
+                doctorCrewMenu.add(legendaryMenu);
+                doctorCrewMenu.add(heroicMenu);
+                doctorCrewMenu.add(eliteMenu);
+                doctorCrewMenu.add(veteranMenu);
+                doctorCrewMenu.add(regularMenu);
+                doctorCrewMenu.add(greenMenu);
+                doctorCrewMenu.add(ultraGreenMenu);
+            }
+        }
+
         // Tech Officer and Console Commander Menu, currently combined as required by
         // the current setup
         // TODO : Our implementation for Console Commanders in MekHQ makes this a
@@ -781,6 +842,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         add(gunnerMenu);
         add(genericCrewMenu);
         add(communicationsCrewMenu);
+        add(doctorCrewMenu);
         add(techOfficerMenu);
         add(consoleCommanderMenu);
         add(soldierMenu);
@@ -856,6 +918,24 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
             ensureRecruitmentDate(campaign.getLocalDate(), person);
 
             units[0].addCommunicationsCrew(person, useTransfers);
+        });
+        return miCrewmember;
+    }
+
+    private static JMenuItem getMiDoctorCrew(Campaign campaign, Unit[] units, Person person) {
+        final JMenuItem miCrewmember = new JMenuItem(person.getFullTitleAndProfessions());
+        miCrewmember.setName("miDoctorCrew");
+        miCrewmember.addActionListener(evt -> {
+            final Unit oldUnit = person.getUnit();
+            boolean useTransfers = false;
+            if (oldUnit != null) {
+                oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                useTransfers = campaign.getCampaignOptions().isUseTransfers();
+            }
+
+            ensureRecruitmentDate(campaign.getLocalDate(), person);
+
+            units[0].addDoctorsCrew(person, useTransfers);
         });
         return miCrewmember;
     }
