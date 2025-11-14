@@ -590,6 +590,8 @@ public class CampaignNewDayManager {
 
             processAnniversaries(person);
 
+            person.checkForIlliterateRemoval();
+
             // Weekly events
             if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
                 if (!campaign.getRandomDeath().processNewWeek(campaign, today, person)) {
