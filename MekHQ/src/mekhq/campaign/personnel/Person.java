@@ -5988,11 +5988,15 @@ public class Person {
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
         // Units deployed to combat have no available time
-        if (unit != null && (unit.isDeployed() || StratConRulesManager.isUnitDeployedToStratCon(unit))) {
-            this.minutesLeft = 0;
-            this.overtimeLeft = 0;
-            return;
-        }
+
+        // Commented out to allow crew assigned to Salvage vehicles to do salvage
+        // TODO: possibly revisit for exclusion only for techs crewing a vehicle which has mobile field base?
+        //       those are designed specifically for repair / refit / salvage per TO
+        // if (unit != null && (unit.isDeployed() || StratConRulesManager.isUnitDeployedToStratCon(unit))) {
+        //    this.minutesLeft = 0;
+        //    this.overtimeLeft = 0;
+        //    return;
+        // }
 
         // Personnel without tech or doctor roles have no available time
         if (!isTechExpanded() && !isDoctor()) {
