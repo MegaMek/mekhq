@@ -457,9 +457,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             unit.setCampaign(campaign);
             unit.fixReferences(campaign);
 
-            // reset the pilot and entity, to reflect newly assigned personnel
-            unit.resetPilotAndEntity();
-
             if (null != unit.getRefit()) {
                 unit.getRefit().fixReferences(campaign);
 
@@ -562,6 +559,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 unit.getEntity().setC3UUID();
                 unit.getEntity().setC3NetIdSelf();
             }
+
+            // This needs to be down here so that it can factor in any changes made to personnel prior to this point.
+            unit.resetPilotAndEntity();
         });
         campaign.refreshNetworks();
 

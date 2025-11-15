@@ -50,6 +50,9 @@ public enum BodyLocation {
     //region Enum Declarations
     HEAD(0, "BodyLocation.HEAD.text"),
     SKULL(12, "BodyLocation.SKULL.text", false, HEAD),
+    BRAIN(47, "BodyLocation.BRAIN.text", false, HEAD),
+    FACE(45, "BodyLocation.FACE.text", false, HEAD),
+    MOUTH(46, "BodyLocation.MOUTH.text", false, HEAD),
     EARS(13, "BodyLocation.EARS.text", false, HEAD),
     EYES(14, "BodyLocation.EYES.text", false, HEAD),
     JAW(15, "BodyLocation.JAW.text", false, HEAD),
@@ -60,6 +63,7 @@ public enum BodyLocation {
     ORGANS(44, "BodyLocation.ORGANS.text", false, CHEST),
     ABDOMEN(4, "BodyLocation.ABDOMEN.text"),
     GROIN(19, "BodyLocation.GROIN.text", false, ABDOMEN),
+    RUMP(46, "BodyLocation.RUMP.text", false, ABDOMEN),
     RIGHT_ARM(5, "BodyLocation.RIGHT_ARM.text", true),
     UPPER_RIGHT_ARM(23, "BodyLocation.UPPER_RIGHT_ARM.text", true, RIGHT_ARM),
     RIGHT_ELBOW(24, "BodyLocation.RIGHT_ELBOW.text", true, RIGHT_ARM),
@@ -93,6 +97,7 @@ public enum BodyLocation {
     RIGHT_KNEE(42, "BodyLocation.RIGHT_KNEE.text", true, RIGHT_FOOT),
     RIGHT_SHIN(43, "BodyLocation.RIGHT_SHIN.text", true, RIGHT_FOOT),
     INTERNAL(7, "BodyLocation.INTERNAL.text"),
+    BONES(44, "BodyLocation.BONES.text"),
     GENERIC(-1, "BodyLocation.GENERIC.text");
     //endregion Enum Declarations
 

@@ -43,6 +43,6 @@ public class TestSkillModifierData {
      * <p><b>Warning:</b> this is intended for use in Unit Tests only.</p>
      */
     public static SkillModifierData createDefault() {
-        return new SkillModifierData(new PersonnelOptions(), new Attributes(), 0, false, new ArrayList<>());
+        return new SkillModifierData(new PersonnelOptions(), new Attributes(), 0, new ArrayList<>());
     }
 }

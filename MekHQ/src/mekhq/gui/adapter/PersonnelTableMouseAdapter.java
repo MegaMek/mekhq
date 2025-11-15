@@ -1217,7 +1217,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_EMPLOY: {
                 for (Person person : people) {
-                    getCampaign().recruitPerson(person);
+                    getCampaign().employCampFollower(person);
                 }
 
                 break;
@@ -3376,6 +3376,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                                  .booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT));
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
                           PersonnelOptions.EDGE_REPAIR_FAILED_REFIT));
+                    if (!person.getPrimaryRole().isTech()) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+
+                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerFatalAccident.text"));
+                    cbMenuItem.setSelected(person.getOptions()
+                                                 .booleanOption(PersonnelOptions.EDGE_SALVAGE_ACCIDENTS));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                          PersonnelOptions.EDGE_SALVAGE_ACCIDENTS));
                     if (!person.getPrimaryRole().isTech()) {
                         cbMenuItem.setForeground(new Color(150, 150, 150));
                     }

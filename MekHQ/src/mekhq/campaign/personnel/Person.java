@@ -53,11 +53,12 @@ import static mekhq.campaign.log.LogEntryType.PATIENT;
 import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CATATONIA;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CHILDLIKE_REGRESSION;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CRIPPLING_FLASHBACKS;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.DISCONTINUATION_SYNDROME;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.getAllActiveInjuryEffects;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
@@ -127,7 +128,7 @@ import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
-import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -1883,7 +1884,6 @@ public class Person {
     }
 
     public @Nullable LocalDate getRecruitment() {
-
         return recruitment;
     }
 
@@ -5756,7 +5756,7 @@ public class Person {
         } else if (entity instanceof BattleArmor) {
             return hasSkill(S_TECH_BA) && isTechBA();
         } else if (entity instanceof Tank) {
-            return hasSkill(S_TECH_MECHANIC) && (isTechMechanic() || isVehicleCrew());
+            return hasSkill(S_TECH_MECHANIC) && (isTechMechanic() || isCombatTechnician());
         } else {
             return false;
         }
@@ -6056,7 +6056,7 @@ public class Person {
     }
 
     public boolean isTech() {
-        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA() || isVehicleCrew();
+        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA() || isCombatTechnician();
     }
 
     /**
@@ -6065,7 +6065,12 @@ public class Person {
      * @return true if the person is a tech
      */
     public boolean isTechExpanded() {
-        return isTechMek() || isTechAero() || isTechMechanic() || isVehicleCrew() || isTechBA() || isTechLargeVessel();
+        return isTechMek() ||
+                     isTechAero() ||
+                     isTechMechanic() ||
+                     isCombatTechnician() ||
+                     isTechBA() ||
+                     isTechLargeVessel();
     }
 
     public boolean isTechLargeVessel() {
@@ -6093,7 +6098,7 @@ public class Person {
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
     }
 
-    public boolean isVehicleCrew() {
+    public boolean isCombatTechnician() {
         boolean hasSkill = hasSkill(S_TECH_MECHANIC);
         return hasSkill && (getPrimaryRole().isCombatTechnician() || getSecondaryRole().isCombatTechnician());
     }
@@ -6423,9 +6428,43 @@ public class Person {
         return doctorId;
     }
 
-    public int getToughness() {
+    /**
+     * Returns this character's effective Toughness value after applying all active injury-based modifiers.
+     *
+     * <p>This method sums the base Toughness with the Toughness modifiers from all currently active
+     * {@link InjuryEffect InjuryEffects}. Ambidextrous is explicitly ignored in this calculation, as it does not impact
+     * Toughness.</p>
+     *
+     * @return the modified Toughness value after all applicable injury effects are applied
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public int getAdjustedToughness() {
+        int adjustedToughness = toughness;
+
+        // Ambidextrous is irrelevant here
+        for (InjuryEffect injuryEffect : getAllActiveInjuryEffects(false, injuries)) {
+            adjustedToughness += injuryEffect.getToughnessModifier();
+        }
+
+        return adjustedToughness;
+    }
+
+    /**
+     * Returns this character's unmodified, base Toughness value.
+     *
+     * <p>This value does not include any adjustments from injury effects or other modifiers. It represents the raw
+     * Toughness rating found on the character.</p>
+     *
+     * <p><b>Usage:</b> generally you will want to call {@link #getAdjustedToughness()} instead.</p>
+     *
+     * @return the character's base Toughness
+     */
+    public int getDirectToughness() {
         return toughness;
     }
+
 
     public void setToughness(final int toughness) {
         this.toughness = toughness;
@@ -7016,10 +7055,10 @@ public class Person {
     public int getAbilityTimeModifier(final Campaign campaign) {
         int modifier = 100;
         if (campaign.getCampaignOptions().isUseToughness()) {
-            if (getToughness() == 1) {
+            if (getAdjustedToughness() == 1) {
                 modifier -= 10;
             }
-            if (getToughness() > 1) {
+            if (getAdjustedToughness() > 1) {
                 modifier -= 15;
             }
         } // TODO: Fully implement this for advanced healing
@@ -7498,27 +7537,36 @@ public class Person {
      *   to {@link PersonnelStatus#MEDICAL_COMPLICATIONS} (killed).</li>
      * </ul>
      *
-     * @param campaign               the active {@link Campaign} in which the discontinuation syndrome is processed
-     * @param useAdvancedMedical     {@code true} if Advanced Medical is enabled
-     * @param useFatigue             {@code true} if Fatigue should be increased
-     * @param hasCompulsionAddiction specifies if the character has the {@link PersonnelOptions#COMPULSION_ADDICTION}
-     *                               Flaw.
-     * @param failedWillpowerCheck   {@code true} if the character failed the check to resist their compulsion
+     * @param campaign                the active {@link Campaign} in which the discontinuation syndrome is processed
+     * @param useAdvancedMedical      {@code true} if Advanced Medical is enabled
+     * @param isUseAltAdvancedMedical {@code true} if Alt Advanced Medical is enabled
+     * @param useFatigue              {@code true} if Fatigue should be increased
+     * @param hasCompulsionAddiction  specifies if the character has the {@link PersonnelOptions#COMPULSION_ADDICTION}
+     *                                Flaw.
+     * @param failedWillpowerCheck    {@code true} if the character failed the check to resist their compulsion
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public void processDiscontinuationSyndrome(Campaign campaign, boolean useAdvancedMedical, boolean useFatigue,
+    public void processDiscontinuationSyndrome(Campaign campaign, boolean useAdvancedMedical,
+          boolean isUseAltAdvancedMedical, boolean useFatigue,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasCompulsionAddiction, boolean failedWillpowerCheck) {
         final int FATIGUE_INCREASE = 2;
         final int DEATH_THRESHOLD = 5;
 
-
         if (hasCompulsionAddiction && failedWillpowerCheck) {
-            if (useAdvancedMedical) {
-                Injury injury = DISCONTINUATION_SYNDROME.newInjury(campaign, this, INTERNAL, 1);
-                addInjury(injury);
+            if (useAdvancedMedical || isUseAltAdvancedMedical) {
+                Injury injury;
+                if (useAdvancedMedical) {
+                    injury = InjuryTypes.DISCONTINUATION_SYNDROME.newInjury(campaign, this, INTERNAL, 1);
+                } else {
+                    injury = AlternateInjuries.DISCONTINUATION_SYNDROME.newInjury(campaign, this, GENERIC, 0);
+                }
+
+                if (injury != null) {
+                    addInjury(injury);
+                }
             } else {
                 hits++;
             }
@@ -7527,7 +7575,12 @@ public class Person {
                 changeFatigue(FATIGUE_INCREASE);
             }
 
-            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+            int severity = 0;
+            for (Injury injury : injuries) {
+                severity += injury.getHits();
+            }
+
+            if ((severity > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
         }
@@ -8386,29 +8439,32 @@ public class Person {
     }
 
     /**
-     * Determines whether the character is considered illiterate.
+     * Checks whether the character should lose the Illiterate flaw.
      *
-     * <p>A person is regarded as illiterate if they possess the {@link PersonnelOptions#FLAW_ILLITERATE} flaw, and
-     * their base level in the {@link SkillType#S_LANGUAGES} skill is below
-     * {@link PersonnelOptions#ILLITERACY_LANGUAGES_THRESHOLD}.</p>
+     * <p>If the Illiterate flaw is not currently active, this method returns immediately. Otherwise, it inspects the
+     * character's Languages skill. If the character has no Languages skill, the flaw remains.</p>
      *
-     * @return {@code true} if the person is considered illiterate; {@code false} otherwise.
+     * <p>If the character's base Languages skill level is greater than or equal to
+     * {@code ILLITERACY_LANGUAGES_THRESHOLD}, the Illiterate flaw is removed by setting its option value to
+     * {@code false}.</p>
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.10
      */
-    public boolean isIlliterate() {
+    public void checkForIlliterateRemoval() {
         if (!options.booleanOption(FLAW_ILLITERATE)) {
-            return false;
+            return;
         }
 
         Skill languages = skills.getSkill(S_LANGUAGES);
         if (languages == null) {
-            return true;
+            return;
         }
 
-        int level = languages.getLevel();
-        return level < ILLITERACY_LANGUAGES_THRESHOLD;
+        int baseLevel = languages.getLevel();
+        if (baseLevel >= ILLITERACY_LANGUAGES_THRESHOLD) {
+            options.getOption(FLAW_ILLITERATE).setValue(false);
+        }
     }
 
     /**
@@ -8451,9 +8507,9 @@ public class Person {
     public SkillModifierData getSkillModifierData(boolean excludeInjuryEffects) {
         boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
         List<InjuryEffect> injuryEffects = excludeInjuryEffects ? new ArrayList<>() :
-                                                 AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
+                                                 getAllActiveInjuryEffects(isAmbidextrous,
                                                        injuries);
-        return new SkillModifierData(options, atowAttributes, 0, isIlliterate(), injuryEffects);
+        return new SkillModifierData(options, atowAttributes, 0, injuryEffects);
     }
 
     /**
@@ -8505,9 +8561,9 @@ public class Person {
         boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
         List<InjuryEffect> injuryEffects = excludeInjuryEffects ?
                                                  new ArrayList<>() :
-                                                 AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
+                                                 getAllActiveInjuryEffects(isAmbidextrous,
                                                        injuries);
 
-        return new SkillModifierData(options, atowAttributes, adjustedReputation, isIlliterate(), injuryEffects);
+        return new SkillModifierData(options, atowAttributes, adjustedReputation, injuryEffects);
     }
 }

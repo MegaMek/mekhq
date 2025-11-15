@@ -712,7 +712,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             lblToughness.setText(resourceMap.getString("lblToughness.text"));
             lblToughness.setName("lblToughness");
 
-            textToughness.setText(Integer.toString(person.getToughness()));
+            textToughness.setText(Integer.toString(person.getDirectToughness()));
             textToughness.setName("textToughness");
 
             gridBagConstraints = new GridBagConstraints();
@@ -1511,7 +1511,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setClanPersonnel(chkClan.isSelected());
 
         if (campaign.getCampaignOptions().isUseToughness()) {
-            int currentValue = person.getToughness();
+            int currentValue = person.getDirectToughness();
             person.setToughness(MathUtility.parseInt(textToughness.getText(), currentValue));
         }
 

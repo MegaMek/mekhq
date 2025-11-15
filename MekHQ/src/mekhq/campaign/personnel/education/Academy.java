@@ -1019,9 +1019,7 @@ public class Academy implements Comparable<Academy> {
             case "interest/other" -> SkillType.S_INTEREST_OTHER;
             case "interrogation" -> SkillType.S_INTERROGATION;
             case "investigation" -> SkillType.S_INVESTIGATION;
-            //skill string is stored both plural and not plural in some cases
             case "language/any" -> SkillType.S_LANGUAGES;
-            case "languages/any" -> SkillType.S_LANGUAGES;
             case "protocols/any" -> SkillType.S_PROTOCOLS;
             case "science/biology" -> SkillType.S_SCIENCE_BIOLOGY;
             case "science/chemistry" -> SkillType.S_SCIENCE_CHEMISTRY;

@@ -118,7 +118,7 @@ class PersonnelRoleTest {
     }
 
     @Test
-    void testIsVehicleCrewGround() {
+    void testIsCombatTechnicianGround() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.VEHICLE_CREW_GROUND) {
                 assertTrue(personnelRole.isVehicleCrewGround());
@@ -140,7 +140,7 @@ class PersonnelRoleTest {
     }
 
     @Test
-    void testIsVehicleCrewVTOL() {
+    void testIsCombatTechnicianVTOL() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.VEHICLE_CREW_VTOL) {
                 assertTrue(personnelRole.isVehicleCrewVTOL());
@@ -151,7 +151,7 @@ class PersonnelRoleTest {
     }
 
     @Test
-    void testIsVehicleCrew() {
+    void testIsCombatTechnician() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.COMBAT_TECHNICIAN) {
                 assertTrue(personnelRole.isCombatTechnician());
@@ -477,7 +477,7 @@ class PersonnelRoleTest {
 
     @ParameterizedTest
     @EnumSource(PersonnelRole.class)
-    void testIsVehicleCrewMember(PersonnelRole personnelRole) {
+    void testIsCombatTechnicianMember(PersonnelRole personnelRole) {
         boolean expected = switch (personnelRole) {
             case VEHICLE_CREW_GROUND,
                  VEHICLE_CREW_NAVAL,

@@ -2428,6 +2428,41 @@ public class Campaign implements ITechManager {
         return true;
     }
 
+    /**
+     * Employs the given camp follower and integrates them into the campaign.
+     *
+     * <p>This method:</p>
+     * <ul>
+     *   <li>Validates that the person is non-null (logging a warning and exiting otherwise).</li>
+     *   <li>Changes the person's status to {@link PersonnelStatus#ACTIVE} effective on the current campaign day.</li>
+     *   <li>Records the recruitment date.</li>
+     *   <li>Increases the campaign's Astech support-time pools if the person has an Astech role (primary or
+     *   secondary).</li>
+     *   <li>Fires a {@link PersonNewEvent} to notify listeners about the new camp follower.</li>
+     * </ul>
+     *
+     * @param person the {@code Person} being employed; may be {@code null}
+     */
+    public void employCampFollower(Person person) {
+        if (person == null) {
+            LOGGER.warn("A null person was passed into employCampFollower.");
+            return;
+        }
+
+        person.changeStatus(this, currentDay, PersonnelStatus.ACTIVE);
+        person.setRecruitment(currentDay);
+
+        if (person.getPrimaryRole().isAstech()) {
+            asTechPoolMinutes += Person.PRIMARY_ROLE_SUPPORT_TIME;
+            asTechPoolOvertime += Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
+        } else if (person.getSecondaryRole().isAstech()) {
+            asTechPoolMinutes += Person.SECONDARY_ROLE_SUPPORT_TIME;
+            asTechPoolOvertime += Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
+        }
+
+        MekHQ.triggerEvent(new PersonNewEvent(person));
+    }
+
     private void simulateRelationshipHistory(Person person) {
         // how many weeks should the simulation run?
         LocalDate localDate = getLocalDate();
