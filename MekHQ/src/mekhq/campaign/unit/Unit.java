@@ -4517,8 +4517,13 @@ public class Unit implements ITechnology {
             return null;
         }
 
+        List<Person> validCrew = new ArrayList<>(drivers);
+        if (!entity.isInfantry() && !usesSoldiers()) { // No need to add gunners for these units
+            validCrew.addAll(gunners);
+        }
+
         Person commander = null;
-        for (Person potentialCommander : getCrew()) {
+        for (Person potentialCommander : validCrew) {
             if (commander == null) {
                 commander = potentialCommander;
                 continue;
@@ -7440,4 +7445,6 @@ public class Unit implements ITechnology {
             return null;
         }
     }
+
+
 }
