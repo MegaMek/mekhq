@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import static mekhq.campaign.personnel.enums.PersonnelRole.COMBAT_TECHNICIAN;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -84,6 +86,8 @@ public class RandomPortraitGenerator {
         String primaryRoleLabel;
         if (primaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
             primaryRoleLabel = "Civilian";
+        } else if (primaryRole.isCommsOperator()) {
+            primaryRoleLabel = COMBAT_TECHNICIAN.getLabel(person.isClanPersonnel());
         } else {
             primaryRoleLabel = primaryRole.getLabel(person.isClanPersonnel());
         }
