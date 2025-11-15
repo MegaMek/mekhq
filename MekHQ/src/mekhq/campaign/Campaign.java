@@ -2384,12 +2384,9 @@ public class Campaign implements ITechManager {
         }
 
         if (employ) {
-            if (person.getPrimaryRole().isAstech()) {
+            if (person.isAstech()) {
                 asTechPoolMinutes += Person.PRIMARY_ROLE_SUPPORT_TIME;
                 asTechPoolOvertime += Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-            } else if (person.getSecondaryRole().isAstech()) {
-                asTechPoolMinutes += Person.SECONDARY_ROLE_SUPPORT_TIME;
-                asTechPoolOvertime += Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
             }
         } else {
             person.setStatus(PersonnelStatus.CAMP_FOLLOWER);
@@ -2452,12 +2449,9 @@ public class Campaign implements ITechManager {
         person.changeStatus(this, currentDay, PersonnelStatus.ACTIVE);
         person.setRecruitment(currentDay);
 
-        if (person.getPrimaryRole().isAstech()) {
+        if (person.isAstech()) {
             asTechPoolMinutes += Person.PRIMARY_ROLE_SUPPORT_TIME;
             asTechPoolOvertime += Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-        } else if (person.getSecondaryRole().isAstech()) {
-            asTechPoolMinutes += Person.SECONDARY_ROLE_SUPPORT_TIME;
-            asTechPoolOvertime += Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
 
         MekHQ.triggerEvent(new PersonNewEvent(person));
@@ -5215,12 +5209,9 @@ public class Campaign implements ITechManager {
         personnel.remove(person.getId());
 
         // Deal with Astech Pool Minutes
-        if (person.getPrimaryRole().isAstech()) {
+        if (person.isAstech()) {
             asTechPoolMinutes = max(0, asTechPoolMinutes - Person.PRIMARY_ROLE_SUPPORT_TIME);
             asTechPoolOvertime = max(0, asTechPoolOvertime - Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME);
-        } else if (person.getSecondaryRole().isAstech()) {
-            asTechPoolMinutes = max(0, asTechPoolMinutes - Person.SECONDARY_ROLE_SUPPORT_TIME);
-            asTechPoolOvertime = max(0, asTechPoolOvertime - Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME);
         }
         MekHQ.triggerEvent(new PersonRemovedEvent(person));
     }
@@ -7070,10 +7061,8 @@ public class Campaign implements ITechManager {
     }
 
     public void resetAsTechMinutes() {
-        asTechPoolMinutes = Person.PRIMARY_ROLE_SUPPORT_TIME * getNumberPrimaryAsTechs() +
-                                  Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * getNumberSecondaryAsTechs();
-        asTechPoolOvertime = Person.SECONDARY_ROLE_SUPPORT_TIME * getNumberPrimaryAsTechs() +
-                                   Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME * getNumberSecondaryAsTechs();
+        asTechPoolMinutes = Person.PRIMARY_ROLE_SUPPORT_TIME * getNumberAsTechs();
+        asTechPoolOvertime = Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * getNumberAsTechs();
     }
 
     public void setAsTechPoolMinutes(int minutes) {

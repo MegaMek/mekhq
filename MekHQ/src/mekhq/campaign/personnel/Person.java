@@ -150,7 +150,6 @@ import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
-import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -320,8 +319,6 @@ public class Person {
     private boolean engineer;
     public static final int PRIMARY_ROLE_SUPPORT_TIME = 480;
     public static final int PRIMARY_ROLE_OVERTIME_SUPPORT_TIME = 240;
-    public static final int SECONDARY_ROLE_SUPPORT_TIME = 240;
-    public static final int SECONDARY_ROLE_OVERTIME_SUPPORT_TIME = 120;
 
     // region Advanced Medical
     private List<Injury> injuries;
@@ -5779,18 +5776,8 @@ public class Person {
     public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
         int baseTime = 0;
 
-        if (primaryRole.isTech()) {
-            if (secondaryRole.isNone() || secondaryRole.isCivilian()) {
-                baseTime = PRIMARY_ROLE_SUPPORT_TIME;
-            } else {
-                baseTime = SECONDARY_ROLE_SUPPORT_TIME;
-            }
-        } else if (secondaryRole.isTechSecondary()) {
-            if (primaryRole.isNone() || primaryRole.isCivilian()) {
-                baseTime = PRIMARY_ROLE_SUPPORT_TIME;
-            } else {
-                baseTime = SECONDARY_ROLE_SUPPORT_TIME;
-            }
+        if (isTechExpanded()) {
+            baseTime = PRIMARY_ROLE_SUPPORT_TIME;
         }
 
         return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration));
@@ -5994,12 +5981,9 @@ public class Person {
             this.minutesLeft = 0;
             this.overtimeLeft = 0;
             return;
-        }
-
-        if (primaryRole.isTech() || primaryRole.isDoctor()) {
-            getRoleMinutes(secondaryRole);
-        } else if (secondaryRole.isTechSecondary() || secondaryRole.isDoctor()) {
-            getRoleMinutes(primaryRole);
+        } else {
+            this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
+            this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
 
         // Techs get support time adjusted by skill and administration multipliers
@@ -6007,16 +5991,6 @@ public class Person {
             double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
             this.minutesLeft = (int) Math.round(minutesLeft * multiplier);
             this.overtimeLeft = (int) Math.round(overtimeLeft * multiplier);
-        }
-    }
-
-    private void getRoleMinutes(PersonnelRole comparisonRole) {
-        if (comparisonRole.isNone() || comparisonRole.isCivilian()) {
-            this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
-            this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-        } else {
-            this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
-            this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
     }
 
@@ -6103,7 +6077,7 @@ public class Person {
         return hasSkill && (getPrimaryRole().isCombatTechnician() || getSecondaryRole().isCombatTechnician());
     }
 
-    public boolean isAsTech() {
+    public boolean isAstech() {
         boolean hasSkill = hasSkill(S_ASTECH);
         return hasSkill && (getPrimaryRole().isAstech() || getSecondaryRole().isAstech());
     }
