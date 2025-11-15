@@ -218,6 +218,9 @@ public class UnitTableModel extends DataTableModel<Unit> {
         int combatTechCrewNeeded = unit.getTotalCombatTechCrewNeeds();
         int combatTechCrewAssigned = unit.getCombatTechCrew().size();
 
+        int astechCrewNeeded = unit.getTotalAstechCrewNeeds();
+        int astechCrewAssigned = unit.getAstechCrew().size();
+
         List<String> reports = new ArrayList<>();
 
         Campaign campaign = unit.getCampaign();
@@ -278,6 +281,14 @@ public class UnitTableModel extends DataTableModel<Unit> {
                   getTextAt(RESOURCE_BUNDLE, key),
                   combatTechCrewAssigned,
                   combatTechCrewNeeded);
+        }
+
+        if (astechCrewNeeded > 0) {
+            String key = "UnitTableModel.crewNeeds.astech";
+            appendReport(reports,
+                  getTextAt(RESOURCE_BUNDLE, key),
+                  astechCrewAssigned,
+                  astechCrewNeeded);
         }
 
         if (genericCrewNeeded > 0) {

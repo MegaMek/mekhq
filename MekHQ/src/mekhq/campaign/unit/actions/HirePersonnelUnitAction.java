@@ -236,6 +236,24 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
             unit.addCombatTechCrew(person);
         }
 
+        while (unit.canTakeMoreAstechCrew()) {
+            PersonnelRole role;
+            if (unit.getEntity().isLargeCraft()) {
+                role = PersonnelRole.VESSEL_CREW;
+            } else {
+                role = PersonnelRole.COMBAT_TECHNICIAN;
+            }
+
+            Person person = campaign.newPerson(role);
+            if (person == null) {
+                break;
+            }
+            if (!campaign.recruitPerson(person, isGM, true)) {
+                return;
+            }
+            unit.addAstechCrew(person);
+        }
+
         if (unit.canTakeNavigator()) {
             Person person = campaign.newPerson(PersonnelRole.VESSEL_NAVIGATOR);
             if (!campaign.recruitPerson(person, isGM, true)) {

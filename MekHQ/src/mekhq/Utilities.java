@@ -450,6 +450,7 @@ public class Utilities {
         List<Person> doctorCrew = new ArrayList<>();
         List<Person> medicCrew = new ArrayList<>();
         List<Person> combatTechCrew = new ArrayList<>();
+        List<Person> astechCrew = new ArrayList<>();
         Person navigator = null;
         Person consoleCmdr = null;
 
@@ -797,6 +798,17 @@ public class Utilities {
                 combatTechCrew.add(person);
             }
 
+            for (int slot = 0; slot < unit.getTotalAstechCrewNeeds(); slot++) {
+                Person person = campaign.newPerson(unit.getEntity().isLargeCraft() ?
+                                                         PersonnelRole.VESSEL_CREW :
+                                                         PersonnelRole.ASTECH,
+                      factionCode,
+                      oldCrew.getGender(numberPeopleGenerated));
+
+                migrateCrewData(person, oldCrew, numberPeopleGenerated++, false);
+                astechCrew.add(person);
+            }
+
             if (unit.canTakeNavigator()) {
                 navigator = campaign.newPerson(PersonnelRole.VESSEL_NAVIGATOR,
                       factionCode,
@@ -851,6 +863,9 @@ public class Utilities {
         }
         if (!combatTechCrew.isEmpty()) {
             result.put(CrewType.COMBAT_TECHNICIAN_CREW, communicationsCrew);
+        }
+        if (!astechCrew.isEmpty()) {
+            result.put(CrewType.ASTECH_CREW, communicationsCrew);
         }
         if (null != navigator) {
             result.put(CrewType.NAVIGATOR, Collections.singletonList(navigator));

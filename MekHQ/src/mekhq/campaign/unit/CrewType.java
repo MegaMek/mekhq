@@ -44,6 +44,7 @@ public enum CrewType {
     DOCTOR_CREW(Unit::addDoctorCrew),
     MEDIC_CREW(Unit::addMedicCrew),
     COMBAT_TECHNICIAN_CREW(Unit::addCombatTechCrew),
+    ASTECH_CREW(Unit::addAstechCrew),
     NAVIGATOR(Unit::setNavigator),
     PILOT(Unit::addPilotOrSoldier),
     SOLDIER(Unit::addPilotOrSoldier),

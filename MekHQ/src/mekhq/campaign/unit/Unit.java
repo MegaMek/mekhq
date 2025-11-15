@@ -205,6 +205,7 @@ public class Unit implements ITechnology {
     private final List<Person> doctorCrew;
     private final List<Person> medicCrew;
     private final List<Person> combatTechCrew;
+    private final List<Person> astechCrew;
     // Contains unique Id of each Infantry/BA Entity assigned to this unit as
     // marines
     // Used to calculate marine points (which are based on equipment) as well as
@@ -264,6 +265,7 @@ public class Unit implements ITechnology {
         this.doctorCrew = new ArrayList<>();
         this.medicCrew = new ArrayList<>();
         this.combatTechCrew = new ArrayList<>();
+        this.astechCrew = new ArrayList<>();
         forceId = Force.FORCE_NONE;
         scenarioId = Scenario.S_DEFAULT_ID;
         this.history = "";
@@ -368,6 +370,7 @@ public class Unit implements ITechnology {
                              canTakeMoreDoctorCrew() ||
                              canTakeMoreMedicCrew() ||
                              canTakeMoreCombatTechCrew() ||
+                             canTakeMoreAstechCrew() ||
                              canTakeTechOfficer() ||
                              canTakeMoreGunners() ||
                              canTakeNavigator()) {
@@ -2582,6 +2585,10 @@ public class Unit implements ITechnology {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatTechCrewId", crew.getId());
         }
 
+        for (Person crew : astechCrew) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechCrewId", crew.getId());
+        }
+
         if (navigator != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "navigatorId", navigator.getId());
         }
@@ -2791,6 +2798,8 @@ public class Unit implements ITechnology {
                     retVal.medicCrew.add(new UnitPersonRef(UUID.fromString(wn2.getTextContent())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatTechCrewId")) {
                     retVal.combatTechCrew.add(new UnitPersonRef(UUID.fromString(wn2.getTextContent())));
+                } else if (wn2.getNodeName().equalsIgnoreCase("astechCrewId")) {
+                    retVal.astechCrew.add(new UnitPersonRef(UUID.fromString(wn2.getTextContent())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("navigatorId")) {
                     if (!wn2.getTextContent().equals("null")) {
                         retVal.navigator = new UnitPersonRef(UUID.fromString(wn2.getTextContent()));
@@ -5028,6 +5037,12 @@ public class Unit implements ITechnology {
             }
         }
 
+        for (Person person : astechCrew) {
+            if (person.getHits() == 0) {
+                nCrew++;
+            }
+        }
+
         if ((getNavigator() != null) && (getNavigator().getHits() == 0)) {
             nCrew++;
         }
@@ -5437,7 +5452,8 @@ public class Unit implements ITechnology {
                      getTotalCommunicationCrewNeeds() -
                      getTotalDoctorCrewNeeds() -
                      getTotalMedicCrewNeeds() -
-                     getTotalCombatTechCrewNeeds();
+                     getTotalCombatTechCrewNeeds() -
+                     getTotalAstechCrewNeeds();
     }
 
     public int getTotalCommunicationCrewNeeds() {
@@ -5472,6 +5488,14 @@ public class Unit implements ITechnology {
         return Compute.getCombatTechCrew(entity);
     }
 
+    public int getTotalAstechCrewNeeds() {
+        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
+            return 0; // These always use Generic Crew
+        }
+
+        return Compute.getAstechCrew(entity);
+    }
+
     public boolean canTakeMoreDrivers() {
         int nDrivers = drivers.size();
         return nDrivers < getTotalDriverNeeds();
@@ -5500,6 +5524,11 @@ public class Unit implements ITechnology {
     public boolean canTakeMoreCombatTechCrew() {
         int nCrew = combatTechCrew.size();
         return nCrew < getTotalCombatTechCrewNeeds();
+    }
+
+    public boolean canTakeMoreAstechCrew() {
+        int nCrew = astechCrew.size();
+        return nCrew < getTotalAstechCrewNeeds();
     }
 
     public boolean canTakeNavigator() {
@@ -5706,6 +5735,25 @@ public class Unit implements ITechnology {
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
+    public void addAstechCrew(Person person) {
+        addAstechCrew(person, false);
+    }
+
+    public void addAstechCrew(Person person, boolean useTransfers) {
+        Objects.requireNonNull(person);
+
+        ensurePersonIsRegistered(person);
+        astechCrew.add(person);
+        person.setUnit(this);
+        resetPilotAndEntity();
+        if (useTransfers) {
+            AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
+        } else {
+            AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
+        }
+        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
+    }
+
     public void setNavigator(Person p) {
         setNavigator(p, false);
     }
@@ -5841,6 +5889,7 @@ public class Unit implements ITechnology {
         wasCrew |= doctorCrew.remove(person);
         wasCrew |= medicCrew.remove(person);
         wasCrew |= combatTechCrew.remove(person);
+        wasCrew |= astechCrew.remove(person);
         if (person.equals(navigator)) {
             wasCrew = true;
             navigator = null;
@@ -5918,6 +5967,7 @@ public class Unit implements ITechnology {
         crew.addAll(doctorCrew);
         crew.addAll(medicCrew);
         crew.addAll(combatTechCrew);
+        crew.addAll(astechCrew);
 
         if (navigator != null) {
             crew.add(navigator);
@@ -5971,6 +6021,10 @@ public class Unit implements ITechnology {
 
     public List<Person> getCombatTechCrew() {
         return Collections.unmodifiableList(combatTechCrew);
+    }
+
+    public List<Person> getAstechCrew() {
+        return Collections.unmodifiableList(astechCrew);
     }
 
     public @Nullable Person getTechOfficer() {
@@ -6299,6 +6353,7 @@ public class Unit implements ITechnology {
         crew.addAll(doctorCrew);
         crew.addAll(medicCrew);
         crew.addAll(combatTechCrew);
+        crew.addAll(astechCrew);
 
         if (navigator != null) {
             crew.add(navigator);
@@ -7483,6 +7538,18 @@ public class Unit implements ITechnology {
             }
         }
 
+        for (int ii = astechCrew.size() - 1; ii >= 0; --ii) {
+            Person crew = astechCrew.get(ii);
+            if (crew instanceof UnitPersonRef) {
+                astechCrew.set(ii, campaign.getPerson(crew.getId()));
+                if (astechCrew.get(ii) == null) {
+                    LOGGER.error("Unit {} ('{}') references missing Combat Tech crew {}", getId(), getName(),
+                          crew.getId());
+                    astechCrew.remove(ii);
+                }
+            }
+        }
+
         if (engineer instanceof UnitPersonRef) {
             UUID id = engineer.getId();
             engineer = campaign.getPerson(id);
@@ -7635,6 +7702,16 @@ public class Unit implements ITechnology {
             Person removedPerson = combatTechCrew.get(0);
             remove(removedPerson, true);
             String report = getFormattedTextAt(RESOURCE_BUNDLE, "Unit.excessCrew.combatTech", warningString,
+                  CLOSING_SPAN_TAG, getHyperlinkedName(), removedPerson.getHyperlinkedName());
+            reports.add(report);
+        }
+
+        // Astech Crew
+        int targetAstechCrewCount = getTotalAstechCrewNeeds();
+        while (!astechCrew.isEmpty() && (astechCrew.size() > targetAstechCrewCount)) {
+            Person removedPerson = astechCrew.get(0);
+            remove(removedPerson, true);
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "Unit.excessCrew.astech", warningString,
                   CLOSING_SPAN_TAG, getHyperlinkedName(), removedPerson.getHyperlinkedName());
             reports.add(report);
         }
