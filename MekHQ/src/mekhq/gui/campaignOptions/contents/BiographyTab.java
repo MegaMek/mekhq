@@ -270,7 +270,7 @@ public class BiographyTab {
         pnlRandomPortrait = new JPanel();
         personnelRoles = PersonnelRole.getCombatRoles();
         personnelRoles.addAll(PersonnelRole.getSupportRoles());
-        chkUsePortrait = new JCheckBox[PersonnelRole.values().length];
+        chkUsePortrait = new JCheckBox[personnelRoles.size() + 1]; // We're going to properly initialize this later
         btnEnableAllPortraits = new JButton();
         btnDisableAllPortraits = new JButton();
     }
@@ -1414,6 +1414,8 @@ public class BiographyTab {
      */
     private JPanel createRandomPortraitPanel() {
         // Contents
+        chkUsePortrait = new JCheckBox[personnelRoles.size() + 1];
+
         btnEnableAllPortraits = new CampaignOptionsButton("EnableAllPortraits");
         btnEnableAllPortraits.addActionListener(evt -> {
             for (JCheckBox checkBox : chkUsePortrait) {

@@ -43,6 +43,7 @@ public enum CrewType {
     COMMUNICATIONS_CREW(Unit::addCommunicationsCrew),
     DOCTOR_CREW(Unit::addDoctorCrew),
     MEDIC_CREW(Unit::addMedicCrew),
+    COMBAT_TECHNICIAN_CREW(Unit::addCombatTechCrew),
     NAVIGATOR(Unit::setNavigator),
     PILOT(Unit::addPilotOrSoldier),
     SOLDIER(Unit::addPilotOrSoldier),

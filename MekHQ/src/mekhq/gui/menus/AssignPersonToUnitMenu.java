@@ -130,6 +130,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                   resources.getString("asMedicMenu.text"));
             JScrollableMenu medicCrewUnitTypeMenu = new JScrollableMenu("medicCrewUnitTypeMenu");
             JMenu medicEntityWeightMenu = new JMenu();
+            final JScrollableMenu combatTechCrewMenu = new JScrollableMenu("combatTechCrewMenu",
+                  resources.getString("asCombatTechMenu.text"));
+            JScrollableMenu combatTechCrewUnitTypeMenu = new JScrollableMenu("combatTechCrewUnitTypeMenu");
+            JMenu combatTechEntityWeightMenu = new JMenu();
             final JScrollableMenu techOfficerMenu = new JScrollableMenu("techOfficerMenu",
                   resources.getString("asTechOfficerMenu.text"));
             JScrollableMenu techOfficerUnitTypeMenu = new JScrollableMenu("techOfficerUnitTypeMenu");
@@ -191,6 +195,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                   Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.DOCTOR));
             final boolean areAllMedicCrew =
                   Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.MEDIC));
+            final boolean areAllCombatTechCrew =
+                  Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.COMBAT_TECHNICIAN));
             final boolean areAllSoldiers = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.SOLDIER));
             final boolean areAllBattleArmourPilots = Stream.of(people)
                                                            .allMatch(person -> person.hasRole(PersonnelRole.BATTLE_ARMOUR));
@@ -223,6 +229,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     doctorCrewMenu.add(doctorCrewUnitTypeMenu);
                     medicCrewMenu.add(communicationsCrewUnitTypeMenu);
                     medicCrewMenu.add(medicCrewUnitTypeMenu);
+                    combatTechCrewMenu.add(communicationsCrewUnitTypeMenu);
+                    combatTechCrewMenu.add(combatTechCrewUnitTypeMenu);
                     techOfficerUnitTypeMenu.add(techOfficerEntityWeightMenu);
                     techOfficerMenu.add(techOfficerUnitTypeMenu);
                     consoleCommanderUnitTypeMenu.add(consoleCommanderEntityWeightMenu);
@@ -260,6 +268,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                           unitTypeName);
                     medicEntityWeightMenu = new JScrollableMenu("medicEntityWeightMenu",
                           entityWeightClassName);
+                    combatTechCrewUnitTypeMenu = new JScrollableMenu("combatTechCrewUnitTypeMenu",
+                          unitTypeName);
+                    combatTechEntityWeightMenu = new JScrollableMenu("combatTechEntityWeightMenu",
+                          entityWeightClassName);
                     techOfficerUnitTypeMenu = new JScrollableMenu("techOfficerUnitTypeMenu", unitTypeName);
                     techOfficerEntityWeightMenu = new JScrollableMenu("techOfficerEntityWeightMenu",
                           entityWeightClassName);
@@ -279,6 +291,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     communicationsCrewUnitTypeMenu.add(communicationsEntityWeightMenu);
                     doctorCrewUnitTypeMenu.add(doctorEntityWeightMenu);
                     medicCrewUnitTypeMenu.add(medicEntityWeightMenu);
+                    combatTechCrewUnitTypeMenu.add(combatTechEntityWeightMenu);
                     techOfficerUnitTypeMenu.add(techOfficerEntityWeightMenu);
                     consoleCommanderUnitTypeMenu.add(consoleCommanderEntityWeightMenu);
                     soldierUnitTypeMenu.add(soldierEntityWeightMenu);
@@ -300,6 +313,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     doctorEntityWeightMenu = new JScrollableMenu("doctorEntityWeightMenu",
                           entityWeightClassName);
                     medicEntityWeightMenu = new JScrollableMenu("medicEntityWeightMenu",
+                          entityWeightClassName);
+                    combatTechEntityWeightMenu = new JScrollableMenu("combatTechEntityWeightMenu",
                           entityWeightClassName);
                     consoleCommanderEntityWeightMenu = new JScrollableMenu("consoleCommanderEntityWeightMenu",
                           entityWeightClassName);
@@ -481,6 +496,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     }
                 }
 
+                // Communications Crew Menu
                 if (unit.canTakeMoreCommunicationsCrew()) {
                     if (areAllCommunicationsCrew) {
                         final JMenuItem miCrewmember = new JMenuItem(unit.getName());
@@ -505,6 +521,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     }
                 }
 
+                // Doctor Crew Menu
                 if (unit.canTakeMoreDoctorCrew()) {
                     if (areAllDoctorCrew) {
                         final JMenuItem miCrewmember = new JMenuItem(unit.getName());
@@ -529,6 +546,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     }
                 }
 
+                // Medic Crew Menu
                 if (unit.canTakeMoreMedicCrew()) {
                     if (areAllMedicCrew) {
                         final JMenuItem miCrewmember = new JMenuItem(unit.getName());
@@ -550,6 +568,31 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                             }
                         });
                         medicEntityWeightMenu.add(miCrewmember);
+                    }
+                }
+
+                // Combat Technician Crew Menu
+                if (unit.canTakeMoreCombatTechCrew()) {
+                    if (areAllCombatTechCrew) {
+                        final JMenuItem miCrewmember = new JMenuItem(unit.getName());
+                        miCrewmember.setName("miCombatTechCrew");
+                        miCrewmember.addActionListener(evt -> {
+                            for (final Person person : people) {
+                                if (!unit.canTakeMoreCombatTechCrew()) {
+                                    return;
+                                } else if (!unit.equals(person.getUnit())) {
+                                    final Unit oldUnit = person.getUnit();
+                                    boolean useTransfers = false;
+                                    if (oldUnit != null) {
+                                        oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                                        useTransfers = campaign.getCampaignOptions().isUseTransfers();
+                                    }
+                                    unit.addCombatTechCrew(person, useTransfers);
+                                    ensureRecruitmentDate(campaign.getLocalDate(), person);
+                                }
+                            }
+                        });
+                        combatTechEntityWeightMenu.add(miCrewmember);
                     }
                 }
 
@@ -669,6 +712,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             medicCrewUnitTypeMenu.add(medicEntityWeightMenu);
             medicCrewMenu.add(medicCrewUnitTypeMenu);
             add(medicCrewMenu);
+            combatTechCrewUnitTypeMenu.add(combatTechEntityWeightMenu);
+            combatTechCrewMenu.add(combatTechCrewUnitTypeMenu);
+            add(combatTechCrewMenu);
             techOfficerUnitTypeMenu.add(techOfficerEntityWeightMenu);
             techOfficerMenu.add(techOfficerUnitTypeMenu);
             add(techOfficerMenu);
