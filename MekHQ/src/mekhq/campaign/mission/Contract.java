@@ -791,7 +791,7 @@ public class Contract extends Mission {
               jumpPath.getJumps());
 
         // Is the employer paying for both ways?
-        transportCost.multipliedBy(useTwoWayPay ? 2 : 1);
+        transportCost = transportCost.multipliedBy(useTwoWayPay ? 2 : 1);
 
         if (includeTransportCompensation) {
             Money transportCompensation = transportCost.multipliedBy(transportComp / 100);
