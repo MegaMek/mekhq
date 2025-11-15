@@ -1032,7 +1032,7 @@ public enum PersonnelTableModelColumn {
             case EMPLOYED:
                 return resources.getString(person.isEmployed() ? "Yes.text" : "No.text");
             case TOUGHNESS:
-                return Integer.toString(person.getToughness());
+                return Integer.toString(person.getAdjustedToughness());
             case CONNECTIONS:
                 if (person.getBurnedConnectionsEndDate() != null) {
                     return "<html><b><font color='gray'>" +

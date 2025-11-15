@@ -652,7 +652,24 @@ public class Skill {
             int firstAttributeModifier = getAttributeModifierFromInjuryEffect(injuryEffect, type.getFirstAttribute());
             int secondAttributeModifier = getAttributeModifierFromInjuryEffect(injuryEffect, type.getSecondAttribute());
             int perceptionModifier = type.getName().equals(S_PERCEPTION) ? injuryEffect.getPerceptionModifier() : 0;
-            totalInjuryModifier += firstAttributeModifier + secondAttributeModifier + perceptionModifier;
+            int survivalModifier = type.getName().equals(S_SURVIVAL) ? injuryEffect.getSurvivalModifier() : 0;
+            int actingModifier = type.getName().equals(S_ACTING) ? injuryEffect.getActingModifier() : 0;
+            int negotiationModifier = type.getName().equals(S_NEGOTIATION) ? injuryEffect.getNegotiationModifier() : 0;
+            int leadershipModifier = type.getName().equals(S_LEADER) ? injuryEffect.getLeadershipModifier() : 0;
+            int interrogationModifier = type.getName().equals(S_INTERROGATION) ?
+                                              injuryEffect.getInterrogationModifier() :
+                                              0;
+            int acrobaticsModifier = type.getName().equals(S_ACROBATICS) ? injuryEffect.getInterrogationModifier() : 0;
+
+            totalInjuryModifier += firstAttributeModifier +
+                                         secondAttributeModifier +
+                                         perceptionModifier +
+                                         survivalModifier +
+                                         actingModifier +
+                                         negotiationModifier +
+                                         leadershipModifier +
+                                         interrogationModifier +
+                                         acrobaticsModifier;
         }
         return totalInjuryModifier;
     }
