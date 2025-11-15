@@ -244,7 +244,6 @@ public enum PersonnelRole {
     FIELD_HOSPITAL_ADMINISTRATOR(KeyEvent.VK_UNDEFINED),
     CIVILIAN_REQUISITION_OFFICER(KeyEvent.VK_UNDEFINED),
     TRAINING_SIM_DESIGNER(KeyEvent.VK_UNDEFINED),
-    COMMS_OPERATOR(KeyEvent.VK_UNDEFINED),
     DECOMMISSIONING_SPECIALIST(KeyEvent.VK_UNDEFINED),
     WAR_CRIME_INVESTIGATOR(KeyEvent.VK_UNDEFINED),
     SECURITY_ADVISOR(KeyEvent.VK_UNDEFINED),
@@ -639,6 +638,7 @@ public enum PersonnelRole {
                     yield List.of(SkillType.S_TECH_MECHANIC);
                 }
             }
+            case COMMS_OPERATOR -> List.of(SkillType.S_COMMUNICATIONS, SkillType.S_ADMIN);
             case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
             case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO);
@@ -843,7 +843,6 @@ public enum PersonnelRole {
             case FIELD_HOSPITAL_ADMINISTRATOR -> List.of(SkillType.S_ADMIN, SkillType.S_MEDTECH);
             case CIVILIAN_REQUISITION_OFFICER -> List.of(SkillType.S_NEGOTIATION, SkillType.S_ADMIN);
             case TRAINING_SIM_DESIGNER -> List.of(SkillType.S_COMPUTERS, SkillType.S_TACTICS);
-            case COMMS_OPERATOR -> List.of(SkillType.S_COMMUNICATIONS, SkillType.S_ADMIN);
             case DECOMMISSIONING_SPECIALIST -> List.of(SkillType.S_TECH_MEK, SkillType.S_APPRAISAL);
             case WAR_CRIME_INVESTIGATOR -> List.of(SkillType.S_INVESTIGATION, SkillType.S_INTEREST_HISTORY);
             case SECURITY_ADVISOR -> List.of(SkillType.S_TACTICS, SkillType.S_SECURITY_SYSTEMS_ELECTRONIC);
