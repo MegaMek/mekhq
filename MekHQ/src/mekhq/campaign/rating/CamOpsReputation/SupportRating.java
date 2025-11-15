@@ -300,6 +300,7 @@ public class SupportRating {
         for (Person person : campaign.getActivePersonnel(false, false)) {
             updateCount(person::isTechMek, "techMekCount", techCounts);
             updateCount(person::isTechMechanic, "techMechanicCount", techCounts);
+            updateCount(person::isCombatTechnician, "techMechanicCount", techCounts); // Counts as Mechanic
             updateCount(person::isTechAero, "techAeroCount", techCounts);
             updateCount(person::isTechBA, "techBattleArmorCount", techCounts);
         }

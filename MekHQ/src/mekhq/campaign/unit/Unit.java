@@ -4536,8 +4536,13 @@ public class Unit implements ITechnology {
             return null;
         }
 
+        List<Person> validCrew = new ArrayList<>(drivers);
+        if (!entity.isInfantry() && !usesSoldiers()) { // No need to add gunners for these units
+            validCrew.addAll(gunners);
+        }
+
         Person commander = null;
-        for (Person potentialCommander : getCrew()) {
+        for (Person potentialCommander : validCrew) {
             if (commander == null) {
                 commander = potentialCommander;
                 continue;
@@ -4658,7 +4663,7 @@ public class Unit implements ITechnology {
             entity.getCrew().setClanPilot(commander.isClanPersonnel(), 0);
             entity.getCrew().setPortrait(commander.getPortrait().clone(), 0);
             entity.getCrew().setExternalIdAsString(commander.getId().toString(), 0);
-            entity.getCrew().setToughness(commander.getToughness(), 0);
+            entity.getCrew().setToughness(commander.getAdjustedToughness(), 0);
 
             if (entity instanceof Tank) {
                 ((Tank) entity).setCommanderHit(commander.getHits() > 0);
@@ -5210,7 +5215,7 @@ public class Unit implements ITechnology {
         entity.getCrew().setGunneryM(Math.min(max(gunnery, 0), 8), slot);
         entity.getCrew().setGunneryB(Math.min(max(gunnery, 0), 8), slot);
         entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), slot);
-        entity.getCrew().setToughness(person.getToughness(), slot);
+        entity.getCrew().setToughness(person.getAdjustedToughness(), slot);
 
         entity.getCrew().setExternalIdAsString(person.getId().toString(), slot);
         entity.getCrew().setMissing(false, slot);
@@ -7602,4 +7607,6 @@ public class Unit implements ITechnology {
             return null;
         }
     }
+
+
 }

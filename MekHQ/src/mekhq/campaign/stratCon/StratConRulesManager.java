@@ -1522,7 +1522,9 @@ public class StratConRulesManager {
         // Each scout may scan up to scanMultiplier hexes
         // Each scout may scan up to a radius of individualScanRange hexes
         for (ScoutRecord scoutData : scouts) {
-            int individualScanRange = scoutData.entityWeight() <= 35 ? scanRangeIncrease + 1 : scanRangeIncrease;
+            int individualScanRange = useAdvancedScouting && scoutData.entityWeight() <= 35 ?
+                                            scanRangeIncrease + 1 :
+                                            scanRangeIncrease;
             int remainingScans = useAdvancedScouting ? 1 : Integer.MAX_VALUE;
 
             Person scout = scoutData.scout();
@@ -1575,18 +1577,21 @@ public class StratConRulesManager {
                         continue;
                     }
 
-                    SkillCheckUtility skillCheck = new SkillCheckUtility(
-                          scout,
-                          scoutData.skillName(),
-                          List.of(weightModifier, speedModifier, sensorsModifier, skillModifier),
-                          0,
-                          false,
-                          false,
-                          false, // Irrelevant
-                          false, // Irrelevant
-                          campaign.getLocalDate()
-                    );
-                    campaign.addReport(skillCheck.getResultsText());
+                    SkillCheckUtility skillCheck = null;
+                    if (useAdvancedScouting) {
+                        skillCheck = new SkillCheckUtility(
+                              scout,
+                              scoutData.skillName(),
+                              List.of(weightModifier, speedModifier, sensorsModifier, skillModifier),
+                              0,
+                              false,
+                              false,
+                              false, // Irrelevant
+                              false, // Irrelevant
+                              campaign.getLocalDate()
+                        );
+                        campaign.addReport(skillCheck.getResultsText());
+                    }
 
                     remainingScans--;
 

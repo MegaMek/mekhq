@@ -50,6 +50,7 @@ import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
@@ -106,6 +107,7 @@ public final class HangarTab extends CampaignGuiTab {
     private JTable unitTable;
     private JComboBox<String> choiceUnit;
     private JComboBox<String> choiceUnitView;
+    private JCheckBox chkHideMothballed;
     private JScrollPane scrollUnitView;
 
     private UnitTableModel unitModel;
@@ -167,8 +169,20 @@ public final class HangarTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(choiceUnit, gridBagConstraints);
 
+        chkHideMothballed = new JCheckBox(resourceMap.getString("chkHideMothballed.text"));
+        chkHideMothballed.setToolTipText(resourceMap.getString("chkHideMothballed.toolTipText"));
+        chkHideMothballed.addActionListener(ev -> filterUnits());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        add(chkHideMothballed, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
@@ -182,7 +196,7 @@ public final class HangarTab extends CampaignGuiTab {
         choiceUnitView.setSelectedIndex(UV_GENERAL);
         choiceUnitView.addActionListener(ev -> changeUnitView());
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
@@ -265,6 +279,9 @@ public final class HangarTab extends CampaignGuiTab {
             choiceUnit.setName("unitType");
             preferences.manage(new JComboBoxPreference(choiceUnit));
 
+            chkHideMothballed.setName("hideMothballed");
+            preferences.manage(new JToggleButtonPreference(chkHideMothballed));
+
             choiceUnitView.setName("unitView");
             preferences.manage(new JComboBoxPreference(choiceUnitView));
 
@@ -292,14 +309,22 @@ public final class HangarTab extends CampaignGuiTab {
 
     public void filterUnits() {
         final int nGroup = choiceUnit.getSelectedIndex() - 1;
+        final boolean hideMothballed = chkHideMothballed.isSelected();
         RowFilter<UnitTableModel, Integer> unitTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends UnitTableModel, ? extends Integer> entry) {
+                UnitTableModel unitModel = entry.getModel();
+                Unit unit = unitModel.getUnit(entry.getIdentifier());
+
+                // Apply "Hide Mothballed" checkbox filter first
+                if (hideMothballed && unit.isMothballed()) {
+                    return false;
+                }
+
+                // If "All Units" is selected, show all (unless filtered by checkbox above)
                 if (nGroup < 0) {
                     return true;
                 }
-                UnitTableModel unitModel = entry.getModel();
-                Unit unit = unitModel.getUnit(entry.getIdentifier());
 
                 if (nGroup < UnitType.SIZE) {
                     Entity en = unit.getEntity();

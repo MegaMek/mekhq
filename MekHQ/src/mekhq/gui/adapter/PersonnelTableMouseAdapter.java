@@ -1217,7 +1217,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_EMPLOY: {
                 for (Person person : people) {
-                    getCampaign().recruitPerson(person);
+                    getCampaign().employCampFollower(person);
                 }
 
                 break;
