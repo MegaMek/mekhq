@@ -7224,7 +7224,7 @@ public class Campaign implements ITechManager {
             // It is possible for very poorly skilled characters to actually be a detriment to their teams. This is
             // by design.
             SkillModifierData skillModifierData = person.getSkillModifierData();
-            int totalSkillLevel = asTechSkill.getFinalSkillValue(skillModifierData);
+            int totalSkillLevel = asTechSkill.getTotalSkillLevel(skillModifierData);
             return (int) floor(totalSkillLevel / ASSISTANT_SKILL_LEVEL_DIVIDER);
         }
 
