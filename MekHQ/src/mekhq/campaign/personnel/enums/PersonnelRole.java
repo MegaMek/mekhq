@@ -57,16 +57,6 @@ public enum PersonnelRole {
     // region Enum Declarations
     MEKWARRIOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_M, 5, 5, 6, 6, 5, 5, 5),
     LAM_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    GROUND_VEHICLE_DRIVER(KeyEvent.VK_UNDEFINED),
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    NAVAL_VEHICLE_DRIVER(KeyEvent.VK_UNDEFINED),
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    VTOL_PILOT(KeyEvent.VK_UNDEFINED),
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    VEHICLE_GUNNER(KeyEvent.VK_UNDEFINED),
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    VEHICLE_CREW(KeyEvent.VK_UNDEFINED),
     COMBAT_TECHNICIAN(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 4, 6, 6, 5),
     VEHICLE_CREW_GROUND(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
     VEHICLE_CREW_NAVAL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
@@ -355,7 +345,17 @@ public enum PersonnelRole {
     LOCAL_WARLORD(KeyEvent.VK_UNDEFINED),
     MISCELLANEOUS_JOB(KeyEvent.VK_UNDEFINED),
     NOBLE(KeyEvent.VK_UNDEFINED),
-    COMMON_CRIMINAL(KeyEvent.VK_UNDEFINED);
+    COMMON_CRIMINAL(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    GROUND_VEHICLE_DRIVER(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    NAVAL_VEHICLE_DRIVER(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    VTOL_PILOT(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    VEHICLE_GUNNER(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    VEHICLE_CREW(KeyEvent.VK_UNDEFINED);
     // endregion Enum Declarations
 
     // region Variable Declarations
