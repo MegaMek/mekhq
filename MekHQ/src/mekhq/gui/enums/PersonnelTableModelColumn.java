@@ -129,6 +129,7 @@ public enum PersonnelTableModelColumn {
     ZERO_G("PersonnelTableModelColumn.ZERO_G.text"),
     MEDTECH("PersonnelTableModelColumn.MEDTECH.text"),
     MEDICAL("PersonnelTableModelColumn.MEDICAL.text"),
+    WORK_MINUTES("PersonnelTableModelColumn.WORK_MINUTES.text"),
     TECH_MINUTES("PersonnelTableModelColumn.TECH_MINUTES.text"),
     MEDICAL_CAPACITY("PersonnelTableModelColumn.MEDICAL_CAPACITY.text"),
     APPRAISAL("PersonnelTableModelColumn.APPRAISAL.text"),
@@ -379,6 +380,10 @@ public enum PersonnelTableModelColumn {
 
     public boolean isTechMinutes() {
         return this == TECH_MINUTES;
+    }
+
+    public boolean isWorkMinutes() {
+        return this == WORK_MINUTES;
     }
 
     public boolean isMedicalCapacity() {
@@ -944,6 +949,12 @@ public enum PersonnelTableModelColumn {
                 } else {
                     return "0";
                 }
+            case WORK_MINUTES:
+                if (person.isTechExpanded()) {
+                    return String.valueOf(person.getMinutesLeft());
+                } else {
+                    return "0";
+                }
             case MEDTECH:
                 return person.hasSkill(SkillType.S_MEDTECH) ?
                              Integer.toString(person.getSkill(SkillType.S_MEDTECH)
@@ -1253,6 +1264,7 @@ public enum PersonnelTableModelColumn {
                      TECH_BA,
                      TECH_VESSEL,
                      ZERO_G,
+                     WORK_MINUTES,
                      TECH_MINUTES -> true;
                 default -> false;
             };
