@@ -90,7 +90,6 @@ public class Fatigue {
             if ((unit.getCrewState().isFullyCrewed())) {
                 for (MiscMounted item : unit.getEntity().getMisc()) {
                     if (item.getType().hasFlag(MiscType.F_FIELD_KITCHEN)) {
-                        //final int crewAssignmentState = unit.getCrewState();
                         fieldKitchenCount++;
                     }
                 }
