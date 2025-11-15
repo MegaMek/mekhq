@@ -794,7 +794,7 @@ public class Contract extends Mission {
         transportCost = transportCost.multipliedBy(useTwoWayPay ? 2 : 1);
 
         if (includeTransportCompensation) {
-            Money transportCompensation = transportCost.multipliedBy(transportComp / 100);
+            Money transportCompensation = transportCost.multipliedBy(transportComp / 100.0);
             transportCost = transportCost.minus(transportCompensation);
         }
 
