@@ -3382,6 +3382,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
 
+                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerFatalAccident.text"));
+                    cbMenuItem.setSelected(person.getOptions()
+                                                 .booleanOption(PersonnelOptions.EDGE_SALVAGE_ACCIDENTS));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                          PersonnelOptions.EDGE_SALVAGE_ACCIDENTS));
+                    if (!person.getPrimaryRole().isTech()) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+
                     // Admins
                     cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAcquireCheck.text"));
                     cbMenuItem.setSelected(person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL));

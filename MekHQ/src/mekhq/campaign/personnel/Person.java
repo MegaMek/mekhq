@@ -5987,12 +5987,7 @@ public class Person {
      *                                 their available working time
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
-        // Units deployed to combat have no available time
-        if (unit != null && (unit.isDeployed() || StratConRulesManager.isUnitDeployedToStratCon(unit))) {
-            this.minutesLeft = 0;
-            this.overtimeLeft = 0;
-            return;
-        }
+        // Removed - Units deployed to combat have no available time
 
         // Personnel without tech or doctor roles have no available time
         if (!isTechExpanded() && !isDoctor()) {

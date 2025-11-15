@@ -191,9 +191,9 @@ public class FatigueTrackingCampaignOptionsChangedConfirmationDialog extends JDi
     }
 
     public static void processFreeUnit(Campaign campaign) {
-        MekSummary mekSummary = MekSummaryCache.getInstance().getMek("Flatbed Truck (Kitchen)");
+        MekSummary mekSummary = MekSummaryCache.getInstance().getMek("Sherpa Armored Truck (Mobile Canteen)");
         if (mekSummary == null) {
-            LOGGER.error("Cannot find entry for {}", "Flatbed Truck (Kitchen)");
+            LOGGER.error("Cannot find entry for {}", "Sherpa Armored Truck (Mobile Canteen)");
             return;
         }
 
