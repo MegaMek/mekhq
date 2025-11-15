@@ -5964,18 +5964,16 @@ public class Person {
     }
 
     /**
-     * Resets the available working time (minutes and overtime) for this person based on their role, deployment status,
-     * and administrative support.
+     * Resets the available working time (minutes and overtime) for this person based on their role and administrative
+     * support.
      *
-     * <p>Personnel deployed to combat or without support roles have no available time. Doctors receive standard
-     * support time, while techs receive time adjusted by skill and administration multipliers.</p>
+     * <p>Doctors receive standard support time, while techs receive time adjusted by skill and administration
+     * multipliers.</p>
      *
      * @param isTechsUseAdministration whether techs benefit from administrative support personnel, which increases
      *                                 their available working time
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
-        // Removed - Units deployed to combat have no available time
-
         // Personnel without tech or doctor roles have no available time
         if (!isTechExpanded() && !isDoctor()) {
             this.minutesLeft = 0;
