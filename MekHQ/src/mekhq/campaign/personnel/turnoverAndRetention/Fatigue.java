@@ -87,16 +87,12 @@ public class Fatigue {
         int fieldKitchenCount = 0;
 
         for (Unit unit : units) {
-            if ((unit.isDeployed())
-                      || (unit.isDamaged())
-                      || (unit.getCrewState().isUncrewed())
-                      || (unit.getCrewState().isPartiallyCrewed())) {
-                continue;
-            }
-
-            for (MiscMounted item : unit.getEntity().getMisc()) {
-                if (item.getType().hasFlag(MiscType.F_FIELD_KITCHEN)) {
-                    fieldKitchenCount++;
+            if ((unit.getCrewState().isFullyCrewed())) {
+                for (MiscMounted item : unit.getEntity().getMisc()) {
+                    if (item.getType().hasFlag(MiscType.F_FIELD_KITCHEN)) {
+                        //final int crewAssignmentState = unit.getCrewState();
+                        fieldKitchenCount++;
+                    }
                 }
             }
         }
