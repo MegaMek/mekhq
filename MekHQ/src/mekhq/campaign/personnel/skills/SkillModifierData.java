@@ -49,12 +49,11 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
  * @param characterOptions   the person's options and special traits
  * @param attributes         the person's physical and mental attributes
  * @param adjustedReputation the calculated reputation modifier (0 if not applicable)
- * @param isIlliterate       whether the person is illiterate
  * @param injuryEffects      a list of injury effects currently affecting the character
  *
  * @author Illiani
  * @since 0.50.11
  */
 public record SkillModifierData(PersonnelOptions characterOptions, Attributes attributes, int adjustedReputation,
-      boolean isIlliterate, List<InjuryEffect> injuryEffects) {
+      List<InjuryEffect> injuryEffects) {
 }

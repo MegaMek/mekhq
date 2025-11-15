@@ -8444,29 +8444,32 @@ public class Person {
     }
 
     /**
-     * Determines whether the character is considered illiterate.
+     * Checks whether the character should lose the Illiterate flaw.
      *
-     * <p>A person is regarded as illiterate if they possess the {@link PersonnelOptions#FLAW_ILLITERATE} flaw, and
-     * their base level in the {@link SkillType#S_LANGUAGES} skill is below
-     * {@link PersonnelOptions#ILLITERACY_LANGUAGES_THRESHOLD}.</p>
+     * <p>If the Illiterate flaw is not currently active, this method returns immediately. Otherwise, it inspects the
+     * character's Languages skill. If the character has no Languages skill, the flaw remains.</p>
      *
-     * @return {@code true} if the person is considered illiterate; {@code false} otherwise.
+     * <p>If the character's base Languages skill level is greater than or equal to
+     * {@code ILLITERACY_LANGUAGES_THRESHOLD}, the Illiterate flaw is removed by setting its option value to
+     * {@code false}.</p>
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.10
      */
-    public boolean isIlliterate() {
+    public void checkForIlliterateRemoval() {
         if (!options.booleanOption(FLAW_ILLITERATE)) {
-            return false;
+            return;
         }
 
         Skill languages = skills.getSkill(S_LANGUAGES);
         if (languages == null) {
-            return true;
+            return;
         }
 
-        int level = languages.getLevel();
-        return level < ILLITERACY_LANGUAGES_THRESHOLD;
+        int baseLevel = languages.getLevel();
+        if (baseLevel >= ILLITERACY_LANGUAGES_THRESHOLD) {
+            options.getOption(FLAW_ILLITERATE).setValue(false);
+        }
     }
 
     /**
@@ -8511,7 +8514,7 @@ public class Person {
         List<InjuryEffect> injuryEffects = excludeInjuryEffects ? new ArrayList<>() :
                                                  getAllActiveInjuryEffects(isAmbidextrous,
                                                        injuries);
-        return new SkillModifierData(options, atowAttributes, 0, isIlliterate(), injuryEffects);
+        return new SkillModifierData(options, atowAttributes, 0, injuryEffects);
     }
 
     /**
@@ -8566,6 +8569,6 @@ public class Person {
                                                  getAllActiveInjuryEffects(isAmbidextrous,
                                                        injuries);
 
-        return new SkillModifierData(options, atowAttributes, adjustedReputation, isIlliterate(), injuryEffects);
+        return new SkillModifierData(options, atowAttributes, adjustedReputation, injuryEffects);
     }
 }

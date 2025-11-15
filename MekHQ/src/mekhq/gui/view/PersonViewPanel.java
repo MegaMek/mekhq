@@ -1972,12 +1972,11 @@ public class PersonViewPanel extends JScrollablePanel {
                 label = formattedSkillName;
             }
             JLabel lblName = new JLabel(label);
-            boolean isIlliterate = person.isIlliterate();
             boolean isAmbidextrous = person.getOptions().booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
             List<InjuryEffect> injuryEffects = AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous,
                   person.getInjuries());
             SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
-                  isIlliterate, injuryEffects);
+                  injuryEffects);
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
             int injuryModifier = Skill.getTotalInjuryModifier(skillModifierData, skill.getType());
