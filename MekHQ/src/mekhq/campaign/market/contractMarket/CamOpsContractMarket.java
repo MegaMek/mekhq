@@ -33,6 +33,7 @@
 package mekhq.campaign.market.contractMarket;
 
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
@@ -270,10 +271,17 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         // Step 4: Populate some information about enemies and allies
         final SkillLevel campaignSkillLevel = reputation.getAverageSkillLevel();
         final boolean useDynamicDifficulty = campaign.getCampaignOptions().isUseDynamicDifficulty();
-        setAllyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
-        setEnemyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
+        final boolean useBolsterContractSkill = campaign.getCampaignOptions().isUseBolsterContractSkill();
+        setAllyRating(contract,
+              campaign.getGameYear(),
+              useDynamicDifficulty ? campaignSkillLevel : REGULAR,
+              useBolsterContractSkill);
+        setEnemyRating(contract,
+              campaign.getGameYear(),
+              useDynamicDifficulty ? campaignSkillLevel : REGULAR,
+              useBolsterContractSkill);
         if (contract.getContractType().isCadreDuty()) {
-            contract.setAllySkill(SkillLevel.GREEN);
+            contract.setAllySkill(campaign.getCampaignOptions().isUseBolsterContractSkill() ? REGULAR : GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
         // Step 5: Determine the contract length (Not CamOps RAW)

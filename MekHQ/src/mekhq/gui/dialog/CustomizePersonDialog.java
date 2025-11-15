@@ -1345,7 +1345,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             }
 
             // Add units to the combo box based on the person's capabilities
-            if (person.canDrive(entity)) {
+            if (person.canDrive(entity,
+                  campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(),
+                  campaign.getCampaignOptions().isUseImplants())) {
                 choiceOriginalUnit.addItem(unit);
                 continue; // Skip further checks if already added
             }

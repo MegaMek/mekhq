@@ -612,6 +612,7 @@ public class CampaignOptions {
     private int contractSearchRadius;
     private boolean variableContractLength;
     private boolean useDynamicDifficulty;
+    private boolean useBolsterContractSkill;
     private boolean contractMarketReportRefresh;
     private int contractMaxSalvagePercentage;
     private int dropShipBonusPercentage;
@@ -1265,6 +1266,7 @@ public class CampaignOptions {
         setContractSearchRadius(800);
         setVariableContractLength(true);
         setUseDynamicDifficulty(false);
+        useBolsterContractSkill = false;
         setContractMarketReportRefresh(true);
         setContractMaxSalvagePercentage(100);
         setDropShipBonusPercentage(0);
@@ -3982,6 +3984,14 @@ public class CampaignOptions {
 
     public void setUseDynamicDifficulty(final boolean useDynamicDifficulty) {
         this.useDynamicDifficulty = useDynamicDifficulty;
+    }
+
+    public boolean isUseBolsterContractSkill() {
+        return useBolsterContractSkill;
+    }
+
+    public void setUseBolsterContractSkill(final boolean useBolsterContractSkill) {
+        this.useBolsterContractSkill = useBolsterContractSkill;
     }
 
     public boolean isContractMarketReportRefresh() {

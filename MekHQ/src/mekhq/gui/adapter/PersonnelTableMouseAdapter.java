@@ -2340,6 +2340,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(menuItem);
         }
 
+        boolean isUseAltAdvancedMedical = getCampaignOptions().isUseAlternativeAdvancedMedical();
         if (oneSelected && getCampaignOptions().isUseAdvancedMedical()) {
             List<Injury> missingLimbInjuries = new ArrayList<>();
 
@@ -2350,7 +2351,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
 
-            if (!missingLimbInjuries.isEmpty()) {
+            if (!missingLimbInjuries.isEmpty() && !isUseAltAdvancedMedical) {
                 JMenu subMenu = new JMenu(resources.getString("replaceMissingLimb.text"));
 
                 for (Injury injury : missingLimbInjuries) {
@@ -2363,6 +2364,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 popup.add(subMenu);
             }
+        }
+
+        if (isUseAltAdvancedMedical) {
+            menuItem = new JMenuItem(resources.getString("performAdvancedSurgery.text"));
+            menuItem.addActionListener(ev -> {
+                for (Person selectedPerson : getSelectedPeople()) {
+                    new AdvancedReplacementLimbDialog(getCampaign(), selectedPerson);
+                }
+            });
+            popup.add(menuItem);
         }
 
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(getCampaign(), selected));
@@ -3212,7 +3223,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       attribute.getLabel(),
                       current,
                       target,
-                      traitCost));
+                      attributeCost));
                 menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnAttributes.tooltip"))));
                 menuItem.setActionCommand(makeCommand(CMD_CHANGE_ATTRIBUTE,
                       String.valueOf(attribute),

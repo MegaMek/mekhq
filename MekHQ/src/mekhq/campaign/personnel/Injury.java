@@ -59,6 +59,7 @@ import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import org.w3c.dom.Node;
 
 /**
@@ -222,7 +223,7 @@ public class Injury {
     }
 
     public int getHits() {
-        return hits;
+        return getSubType().isProsthetic() ? 0 : hits;
     }
 
     public void setHits(int num) {
@@ -270,6 +271,10 @@ public class Injury {
 
     public InjuryLevel getLevel() {
         return type.getLevel(this);
+    }
+
+    public InjurySubType getSubType() {
+        return type.getSubType();
     }
 
     public Collection<Modifier> getModifiers() {
