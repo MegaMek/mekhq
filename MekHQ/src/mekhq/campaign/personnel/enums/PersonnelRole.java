@@ -631,13 +631,14 @@ public enum PersonnelRole {
                     yield List.of(SkillType.S_PILOT_VTOL, SkillType.S_GUN_VEE);
                 }
             }
-            case MECHANIC, COMBAT_TECHNICIAN -> {
+            case MECHANIC -> {
                 if (isTechsUseAdministration) {
                     yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_ADMIN);
                 } else {
                     yield List.of(SkillType.S_TECH_MECHANIC);
                 }
             }
+            case COMBAT_TECHNICIAN -> List.of(SkillType.S_TECH_MECHANIC, SkillType.S_TECH_MEK);
             case COMMS_OPERATOR -> List.of(SkillType.S_COMMUNICATIONS, SkillType.S_ADMIN);
             case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
