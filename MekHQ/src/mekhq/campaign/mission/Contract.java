@@ -774,7 +774,7 @@ public class Contract extends Mission {
      *
      * @param campaign                     the current {@link Campaign} used for jump path, transport options, and cost
      *                                     calculation
-     * @param includeTransportCompensation whether to apply the contract's transport ompensation percentage to reduce
+     * @param includeTransportCompensation whether to apply the contract's transport compensation percentage to reduce
      *                                     the cost
      *
      * @return the total {@link Money} required for transport, after applying all applicable modifiers
