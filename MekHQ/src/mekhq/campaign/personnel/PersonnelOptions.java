@@ -61,6 +61,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EDGE_REPAIR_BREAK_PART = "edge_when_repair_break_part";
     public static final String EDGE_REPAIR_FAILED_REFIT = "edge_when_fail_refit_check";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL = "edge_when_admin_acquire_fail";
+    public static final String EDGE_SALVAGE_ACCIDENTS = "edge_when_salvage_accident";
 
     public static final String TECH_WEAPON_SPECIALIST = "tech_weapon_specialist";
     public static final String TECH_ARMOR_SPECIALIST = "tech_armor_specialist";
@@ -320,6 +321,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);
         addOption(edge, EDGE_REPAIR_FAILED_REFIT, true);
         addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL, true);
+        addOption(edge, EDGE_SALVAGE_ACCIDENTS, true);
 
         List<CustomOption> customs = CustomOption.getCustomAbilities();
         for (CustomOption option : customs) {
