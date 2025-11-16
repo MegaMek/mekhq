@@ -33,6 +33,7 @@
 package mekhq.campaign.mission;
 
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.MissionRole.*;
 import static megamek.codeUtilities.MathUtility.clamp;
@@ -50,6 +51,10 @@ import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
+import static mekhq.campaign.mission.enums.CombatRole.CADRE;
+import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
+import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
+import static mekhq.campaign.mission.enums.CombatRole.PATROL;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.universe.IUnitGenerator.unitTypeSupportsWeightClass;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
@@ -103,6 +108,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
@@ -113,6 +119,7 @@ import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -2834,7 +2841,7 @@ public class AtBDynamicScenarioFactory {
         if (skillRoll == 1) {
             skillValue = max(1, skillValue - 1);
         } else if (skillRoll == 6) {
-            skillValue = Math.min(7, skillValue + 1);
+            skillValue = min(7, skillValue + 1);
         }
 
         skill = SkillLevel.parseFromInteger(skillValue);
@@ -2973,7 +2980,7 @@ public class AtBDynamicScenarioFactory {
           Faction faction) {
         int skillLevel = 0;
         if (skill.isGreenOrGreater()) {
-            int adjustedValue = Math.min(skill.getAdjustedValue(), EXP_LEGENDARY);
+            int adjustedValue = min(skill.getAdjustedValue(), EXP_LEGENDARY);
             int commandSkillsModifier = randomSkillPreferences.getCommandSkillsModifier(adjustedValue);
 
             int skillRoll = clamp(d6(2) + commandSkillsModifier, 2, 12);
@@ -3392,38 +3399,44 @@ public class AtBDynamicScenarioFactory {
         // BV budget
         int bvBudget = 0;
 
-        boolean isGenericBattleValue = campaign.getCampaignOptions().isUseGenericBattleValue() &&
-                                             !forceStandardBattleValue;
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isGenericBattleValue = campaignOptions.isUseGenericBattleValue() && !forceStandardBattleValue;
+        boolean isUseNoSeedForce = campaignOptions.isNoSeedForces();
+
         String generationMethod = isGenericBattleValue ? "Generic BV" : "BV2";
 
-        // deployed player forces:
-        for (int forceID : scenario.getForceIDs()) {
-            ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
-            if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                Force force = campaign.getForce(forceID);
-                if (force != null) {
-                    bvBudget += campaign.getForce(forceID).getTotalBV(campaign, forceStandardBattleValue);
-                    LOGGER.info("Forced BV contribution for {}: {}", force.getName(), bvBudget);
+        // average player forces
+        if (isUseNoSeedForce) {
+            bvBudget = getBVBudgetWithoutUsingASeedForce(campaign, forceStandardBattleValue);
+        } else {
+            // deployed player forces
+            for (int forceID : scenario.getForceIDs()) {
+                ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+                if (forceTemplate != null && forceTemplate.getContributesToBV()) {
+                    Force force = campaign.getForce(forceID);
+                    if (force != null) {
+                        bvBudget += campaign.getForce(forceID).getTotalBV(campaign, forceStandardBattleValue);
+                        LOGGER.info("Forced BV contribution for {}: {}", force.getName(), bvBudget);
+                    }
                 }
             }
-        }
 
-        // deployed individual player units
-        for (UUID unitID : scenario.getIndividualUnitIDs()) {
-            ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
-            if ((forceTemplate != null) && forceTemplate.getContributesToBV()) {
-                if (isGenericBattleValue && !forceStandardBattleValue) {
-                    bvBudget += campaign.getUnit(unitID).getEntity().getGenericBattleValue();
-                } else {
-                    bvBudget += campaign.getUnit(unitID).getEntity().calculateBattleValue();
+            // deployed individual player units
+            for (UUID unitID : scenario.getIndividualUnitIDs()) {
+                ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
+                if ((forceTemplate != null) && forceTemplate.getContributesToBV()) {
+                    if (isGenericBattleValue) {
+                        bvBudget += campaign.getUnit(unitID).getEntity().getGenericBattleValue();
+                    } else {
+                        bvBudget += campaign.getUnit(unitID).getEntity().calculateBattleValue();
+                    }
                 }
             }
-        }
 
-        LOGGER.info("Total Seed Force {}: {}", generationMethod, bvBudget);
+            LOGGER.info("Total Seed Force {}: {}", generationMethod, bvBudget);
+        }
 
         double bvMultiplier = scenario.getEffectivePlayerBVMultiplier();
-
         if (bvMultiplier > 0) {
             bvBudget = (int) round(bvBudget * scenario.getEffectivePlayerBVMultiplier());
         }
@@ -3462,6 +3475,90 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
+     * Calculates an average Battle Value (BV) budget for the player's forces without relying on a seed force. The
+     * calculation considers only Combat Teams belonging to specific frontline-relevant roles:
+     * {@link CombatRole#FRONTLINE}, {@link CombatRole#MANEUVER}, {@link CombatRole#CADRE}, and
+     * {@link CombatRole#PATROL}.
+     *
+     * <p>The method iterates over all Combat Teams in the campaign and retrieves the BV of each team's associated
+     * {@link Force}. Teams whose forces have a BV of 0 or whose forces are {@code null} are ignored. Valid teams are
+     * separated into two categories:</p>
+     *
+     * <ul>
+     *   <li><b>Patrol Teams</b> – BV contributes only to the "patrol" pool.</li>
+     *   <li><b>Non-Patrol Teams</b> – BV contributes to both the "non-patrol" pool and the combined pool used when
+     *   only patrol forces are present.</li>
+     * </ul>
+     *
+     * <p>Once BV and team counts have been accumulated, the method selects a budget according to the following
+     * rules:</p>
+     *
+     * <ol>
+     *   <li>If no qualifying teams with BV > 0 are found, return the default budget (10,000).</li>
+     *   <li>If no non-patrol teams are found, compute and return the rounded average BV of patrol teams.</li>
+     *   <li>Otherwise, compute and return the rounded average BV of non-patrol teams.</li>
+     * </ol>
+     *
+     * <p>To guard against pathological values, the returned average is clamped using
+     * {@link Math#max(double, double)} with {@link Integer#MAX_VALUE} as one of the operands. Due to the use of
+     * {@code min}, any computed average over {@code Integer.MAX_VALUE} will be replaced with
+     * {@code Integer.MAX_VALUE}.</p>
+     *
+     * @param campaign                 the campaign whose Combat Teams are used to compute the average BV
+     * @param forceStandardBattleValue if {@code true}, uses standard BV calculation for all forces
+     *
+     * @return the calculated BV budget, or 10,000 if no qualifying forces exist
+     */
+    private static int getBVBudgetWithoutUsingASeedForce(Campaign campaign, boolean forceStandardBattleValue) {
+        int defaultBVBudget = 10000; // We use this value in the event the player has no valid forces
+
+        double totalBVWithPatrol = 0;
+        double teamCountWithPatrol = 0;
+
+        double totalBVWithoutPatrol = 0;
+        double teamCountWithoutPatrol = 0;
+
+        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+            CombatRole role = combatTeam.getRole();
+            if (!validRoles.contains(role)) {
+                continue;
+            }
+
+            Force force = combatTeam.getForce(campaign);
+            if (force != null) {
+                int battleValue = force.getTotalBV(campaign, forceStandardBattleValue);
+                if (battleValue > 0) {
+                    if (role.isPatrol()) {
+                        totalBVWithPatrol += battleValue;
+                        teamCountWithPatrol++;
+                    } else {
+                        totalBVWithoutPatrol += battleValue;
+                        totalBVWithPatrol += battleValue;
+                        teamCountWithoutPatrol++;
+                    }
+                }
+            }
+        }
+
+        if (teamCountWithoutPatrol + teamCountWithPatrol == 0) {
+            LOGGER.info("Found no player forces with BV. Returning default budget {}.", defaultBVBudget);
+            return defaultBVBudget;
+        } else if (teamCountWithoutPatrol == 0) {
+            // Doubles can exceed ints, so we're adding a safety to protect us against insanely large player campaigns.
+            int average = (int) min(Integer.MAX_VALUE, round(totalBVWithPatrol / teamCountWithPatrol));
+            LOGGER.info("Only patrol forces found: total bv {} / force count {} = {} budget",
+                  totalBVWithPatrol, teamCountWithPatrol, average);
+            return average;
+        } else {
+            int average = (int) min(Integer.MAX_VALUE, round(totalBVWithoutPatrol / teamCountWithoutPatrol));
+            LOGGER.info("Excluding patrols: total bv {} / force count {} = {} budget",
+                  totalBVWithoutPatrol, teamCountWithoutPatrol, average);
+            return average;
+        }
+    }
+
+    /**
      * Calculates the current effective player and allied unit count present in the given scenario.
      *
      * @param scenario      The scenario to process.
@@ -3472,25 +3569,31 @@ public class AtBDynamicScenarioFactory {
      */
     public static int calculateEffectiveUnitCount(AtBDynamicScenario scenario, Campaign campaign,
           boolean isClanBidding) {
-        // for each deployed player and bot force that's marked as contributing to the
-        // unit count budget
+        // for each deployed player and bot force that's marked as contributing to the unit count budget
         int unitCount = 0;
 
-        // deployed player forces:
-        for (int forceID : scenario.getForceIDs()) {
-            ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
-            Force force = campaign.getForce(forceID);
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseNoSeedForce = campaignOptions.isNoSeedForces();
 
-            if (forceTemplate != null && forceTemplate.getContributesToUnitCount()) {
-                unitCount += force.getTotalUnitCount(campaign, isClanBidding);
+        if (isUseNoSeedForce) {
+            unitCount = getUnitCountWithoutUsingASeedForce(campaign);
+        } else {
+            // deployed player forces:
+            for (int forceID : scenario.getForceIDs()) {
+                ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+                Force force = campaign.getForce(forceID);
+
+                if (forceTemplate != null && forceTemplate.getContributesToUnitCount()) {
+                    unitCount += force.getTotalUnitCount(campaign, isClanBidding);
+                }
             }
-        }
 
-        // deployed individual player units
-        for (UUID unitID : scenario.getIndividualUnitIDs()) {
-            ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
-            if ((forceTemplate != null) && forceTemplate.getContributesToUnitCount()) {
-                unitCount++;
+            // deployed individual player units
+            for (UUID unitID : scenario.getIndividualUnitIDs()) {
+                ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
+                if ((forceTemplate != null) && forceTemplate.getContributesToUnitCount()) {
+                    unitCount++;
+                }
             }
         }
 
@@ -3505,6 +3608,55 @@ public class AtBDynamicScenarioFactory {
         }
 
         return unitCount;
+    }
+
+    private static int getUnitCountWithoutUsingASeedForce(Campaign campaign) {
+        int defaultUnitCount = CombatTeam.getStandardForceSize(campaign.getFaction());
+
+        double totalUnitsWithPatrol = 0;
+        double teamCountWithPatrol = 0;
+
+        double totalUnitsWithoutPatrol = 0;
+        double teamCountWithoutPatrol = 0;
+
+        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+            CombatRole role = combatTeam.getRole();
+            if (!validRoles.contains(role)) {
+                continue;
+            }
+
+            Force force = combatTeam.getForce(campaign);
+            if (force != null) {
+                int size = force.getUnits().size();
+                if (size > 0) {
+                    if (role.isPatrol()) {
+                        totalUnitsWithPatrol += size;
+                        teamCountWithPatrol++;
+                    } else {
+                        totalUnitsWithoutPatrol += size;
+                        totalUnitsWithPatrol += size;
+                        teamCountWithoutPatrol++;
+                    }
+                }
+            }
+        }
+
+        if (teamCountWithoutPatrol + teamCountWithPatrol == 0) {
+            LOGGER.info("Found no player forces with units. Returning default budget {}.", defaultUnitCount);
+            return defaultUnitCount;
+        } else if (teamCountWithoutPatrol == 0) {
+            // Doubles can exceed ints, so we're adding a safety to protect us against insanely large player campaigns.
+            int average = (int) min(Integer.MAX_VALUE, round(totalUnitsWithPatrol / teamCountWithPatrol));
+            LOGGER.info("Only patrol forces found: total units {} / force count {} = {} budget",
+                  totalUnitsWithPatrol, teamCountWithPatrol, average);
+            return average;
+        } else {
+            int average = (int) min(Integer.MAX_VALUE, round(totalUnitsWithoutPatrol / teamCountWithoutPatrol));
+            LOGGER.info("Excluding patrols: total units {} / force count {} = {} budget",
+                  totalUnitsWithoutPatrol, teamCountWithoutPatrol, average);
+            return average;
+        }
     }
 
     /**

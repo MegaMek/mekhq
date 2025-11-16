@@ -154,6 +154,7 @@ public class RulesetsTab {
     private JCheckBox chkUseStratCon;
     private JCheckBox chkUseStratConMaplessMode;
     private JCheckBox chkUseAdvancedScouting;
+    private JCheckBox chkNoSeedForces;
     private JCheckBox chkUseGenericBattleValue;
     private JCheckBox chkUseVerboseBidding;
     //end StratCon
@@ -693,6 +694,7 @@ public class RulesetsTab {
         chkUseStratCon = new JCheckBox();
         chkUseStratConMaplessMode = new JCheckBox();
         chkUseAdvancedScouting = new JCheckBox();
+        chkNoSeedForces = new JCheckBox();
         chkUseGenericBattleValue = new JCheckBox();
         chkUseVerboseBidding = new JCheckBox();
     }
@@ -776,6 +778,8 @@ public class RulesetsTab {
         chkUseStratConMaplessMode.addMouseListener(createTipPanelUpdater(stratConHeader, "UseStratConMaplessMode"));
         chkUseAdvancedScouting = new CampaignOptionsCheckBox("UseAdvancedScouting");
         chkUseAdvancedScouting.addMouseListener(createTipPanelUpdater(stratConHeader, "UseAdvancedScouting"));
+        chkNoSeedForces = new CampaignOptionsCheckBox("NoSeedForces");
+        chkNoSeedForces.addMouseListener(createTipPanelUpdater(stratConHeader, "NoSeedForces"));
         chkUseGenericBattleValue = new CampaignOptionsCheckBox("UseGenericBattleValue");
         chkUseGenericBattleValue.addMouseListener(createTipPanelUpdater(stratConHeader, "UseGenericBattleValue"));
         chkUseVerboseBidding = new CampaignOptionsCheckBox("UseVerboseBidding");
@@ -795,6 +799,8 @@ public class RulesetsTab {
         panel.add(chkUseStratCon, layout);
         layout.gridx++;
         panel.add(chkUseAdvancedScouting, layout);
+        layout.gridx++;
+        panel.add(chkNoSeedForces, layout);
         layout.gridx++;
         panel.add(chkUseStratConMaplessMode, layout);
 
@@ -917,6 +923,7 @@ public class RulesetsTab {
         options.setUseStratCon(chkUseStratCon.isSelected());
         options.setUseStratConMaplessMode(chkUseStratConMaplessMode.isSelected());
         options.setUseAdvancedScouting(chkUseAdvancedScouting.isSelected());
+        options.setNoSeedForces(chkNoSeedForces.isSelected());
         options.setUseGenericBattleValue(chkUseGenericBattleValue.isSelected());
         options.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
     }
@@ -979,6 +986,7 @@ public class RulesetsTab {
         chkUseStratCon.setSelected(options.isUseStratCon());
         chkUseStratConMaplessMode.setSelected(options.isUseStratConMaplessMode());
         chkUseAdvancedScouting.setSelected(options.isUseAdvancedScouting());
+        chkNoSeedForces.setSelected(options.isNoSeedForces());
         chkUseGenericBattleValue.setSelected(options.isUseGenericBattleValue());
         chkUseVerboseBidding.setSelected(options.isUseVerboseBidding());
     }
