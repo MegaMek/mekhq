@@ -140,8 +140,10 @@ public class PersonUtility {
     public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
           boolean isTechsUseAdministration, boolean isUseArtillery, boolean isUseExtraRandom, Person person,
           PersonnelRole primaryRole, SkillLevel skillLevel) {
-        List<String> skills = primaryRole.getSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
-              isTechsUseAdministration, isUseArtillery);
+        List<String> skills = primaryRole.getSkillsForProfession(isAdminsHaveNegotiation,
+              isDoctorsUseAdministration,
+              isTechsUseAdministration,
+              isUseArtillery);
 
         if (!skills.isEmpty()) {
             addSkillsAndRandomize(person, skills, skillLevel, isUseExtraRandom);
