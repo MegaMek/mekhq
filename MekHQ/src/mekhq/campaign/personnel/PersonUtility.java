@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.personnel;
 
-import static java.lang.Math.max;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
@@ -49,7 +48,6 @@ import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 
 /**
  * Utility class that provides methods for managing and modifying the skills, loyalty, and advantages of personnel in
@@ -202,19 +200,16 @@ public class PersonUtility {
      * Otherwise, the skill is added with the specified experience level.</p>
      *
      * @param person     the {@link Person} to whom the skill is being added.
-     * @param skillName  the name of the skill to add.
+     * @param skill      the name of the skill to add.
      * @param skillLevel the {@link SkillLevel} used to set the skill's experience level.
      */
-    private static void addSkillFixedExperienceLevel(Person person, String skillName, SkillLevel skillLevel) {
+    private static void addSkillFixedExperienceLevel(Person person, String skill, SkillLevel skillLevel) {
         int bonus = 0;
 
-        if (person.hasSkill(skillName)) {
-            bonus = person.getSkill(skillName).getBonus();
+        if (person.hasSkill(skill)) {
+            bonus = person.getSkill(skill).getBonus();
         }
 
-        SkillType skillType = SkillType.getType(skillName);
-        int targetLevel = skillType.getLevelFromExperience(skillLevel);
-
-        addSkill(person, skillName, targetLevel, bonus);
+        addSkill(person, skill, skillLevel.getAdjustedValue(), bonus);
     }
 }
