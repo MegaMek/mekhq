@@ -213,16 +213,7 @@ public class PersonUtility {
         }
 
         SkillType skillType = SkillType.getType(skillName);
-        int targetLevel = switch (skillLevel) {
-            case ULTRA_GREEN -> max(0, skillType.getGreenLevel() - 1);
-            case GREEN -> skillType.getGreenLevel();
-            case REGULAR -> skillType.getRegularLevel();
-            case VETERAN -> skillType.getVeteranLevel();
-            case ELITE -> skillType.getEliteLevel();
-            case HEROIC -> skillType.getHeroicLevel();
-            case LEGENDARY -> skillType.getLegendaryLevel();
-            default -> 0;
-        };
+        int targetLevel = skillType.getLevelFromExperience(skillLevel);
 
         addSkill(person, skillName, targetLevel, bonus);
     }
