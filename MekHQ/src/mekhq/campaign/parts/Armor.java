@@ -191,7 +191,7 @@ public class Armor extends Part implements IAcquisitionWork {
             if (amountAvailable == 0) {
                 toReturn.append(messageSurroundedBySpanWithColor(getNegativeColor(),
                       "None in stock"));
-            } else if (amountAvailable < amountNeeded) {
+            } else if (!isSalvaging() && amountAvailable < amountNeeded) {
                 toReturn.append(spanOpeningWithCustomColor(getNegativeColor()))
                       .append("Only ")
                       .append(amountAvailable)
