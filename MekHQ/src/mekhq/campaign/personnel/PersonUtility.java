@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel;
 
+import static java.lang.Math.max;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
@@ -48,6 +49,7 @@ import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 
 /**
  * Utility class that provides methods for managing and modifying the skills, loyalty, and advantages of personnel in
@@ -140,10 +142,8 @@ public class PersonUtility {
     public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
           boolean isTechsUseAdministration, boolean isUseArtillery, boolean isUseExtraRandom, Person person,
           PersonnelRole primaryRole, SkillLevel skillLevel) {
-        List<String> skills = primaryRole.getSkillsForProfession(isAdminsHaveNegotiation,
-              isDoctorsUseAdministration,
-              isTechsUseAdministration,
-              isUseArtillery);
+        List<String> skills = primaryRole.getSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
+              isTechsUseAdministration, isUseArtillery);
 
         if (!skills.isEmpty()) {
             addSkillsAndRandomize(person, skills, skillLevel, isUseExtraRandom);
@@ -202,16 +202,28 @@ public class PersonUtility {
      * Otherwise, the skill is added with the specified experience level.</p>
      *
      * @param person     the {@link Person} to whom the skill is being added.
-     * @param skill      the name of the skill to add.
+     * @param skillName  the name of the skill to add.
      * @param skillLevel the {@link SkillLevel} used to set the skill's experience level.
      */
-    private static void addSkillFixedExperienceLevel(Person person, String skill, SkillLevel skillLevel) {
+    private static void addSkillFixedExperienceLevel(Person person, String skillName, SkillLevel skillLevel) {
         int bonus = 0;
 
-        if (person.hasSkill(skill)) {
-            bonus = person.getSkill(skill).getBonus();
+        if (person.hasSkill(skillName)) {
+            bonus = person.getSkill(skillName).getBonus();
         }
 
-        addSkill(person, skill, skillLevel.getExperienceLevel(), bonus);
+        SkillType skillType = SkillType.getType(skillName);
+        int targetLevel = switch (skillLevel) {
+            case ULTRA_GREEN -> max(0, skillType.getGreenLevel() - 1);
+            case GREEN -> skillType.getGreenLevel();
+            case REGULAR -> skillType.getRegularLevel();
+            case VETERAN -> skillType.getVeteranLevel();
+            case ELITE -> skillType.getEliteLevel();
+            case HEROIC -> skillType.getHeroicLevel();
+            case LEGENDARY -> skillType.getLegendaryLevel();
+            default -> 0;
+        };
+
+        addSkill(person, skillName, targetLevel, bonus);
     }
 }

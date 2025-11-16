@@ -32,7 +32,15 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import static java.lang.Math.max;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 import static mekhq.campaign.personnel.skills.SkillType.getRoleplaySkills;
 import static mekhq.campaign.personnel.skills.SkillType.getUtilitySkills;
 
@@ -103,10 +111,24 @@ public abstract class AbstractSkillGenerator {
      */
     protected void generateDefaultSkills(Person person, PersonnelRole primaryRole, int expLvl, int bonus,
           int rollModifier) {
+
         // For default skills, we just want the base skills, excluding any campaign option related supplementary
         // skills, such as artillery or admin for techs.
         for (String skillName : primaryRole.getSkillsForProfession()) {
-            addSkill(person, skillName, expLvl, randomSkillPreferences.randomizeSkill(), bonus, rollModifier);
+            SkillType skillType = SkillType.getType(skillName);
+
+            int skillLevel = switch (expLvl) {
+                case EXP_ULTRA_GREEN -> max(0, skillType.getGreenLevel() - 1);
+                case EXP_GREEN -> skillType.getGreenLevel();
+                case EXP_REGULAR -> skillType.getRegularLevel();
+                case EXP_VETERAN -> skillType.getVeteranLevel();
+                case EXP_ELITE -> skillType.getEliteLevel();
+                case EXP_HEROIC -> skillType.getHeroicLevel();
+                case EXP_LEGENDARY -> skillType.getLegendaryLevel();
+                default -> 0;
+            };
+
+            addSkill(person, skillName, skillLevel, randomSkillPreferences.randomizeSkill(), bonus, rollModifier);
         }
     }
 
@@ -116,7 +138,7 @@ public abstract class AbstractSkillGenerator {
 
     protected void generateArtillerySkill(final Person person, final int bonus) {
         final int experienceLevel = Utilities.generateExpLevel(randomSkillPreferences.getArtilleryBonus());
-        if (experienceLevel > SkillType.EXP_ULTRA_GREEN) {
+        if (experienceLevel > EXP_ULTRA_GREEN) {
             addSkill(person, SkillType.S_ARTILLERY, experienceLevel, randomSkillPreferences.randomizeSkill(), bonus);
         }
     }
@@ -133,7 +155,7 @@ public abstract class AbstractSkillGenerator {
             }
 
             int roleplaySkillLevel = Utilities.generateExpLevel(randomSkillPreferences.getRoleplaySkillModifier());
-            if (roleplaySkillLevel > SkillType.EXP_ULTRA_GREEN) {
+            if (roleplaySkillLevel > EXP_ULTRA_GREEN) {
                 addSkill(person, skillType.getName(), roleplaySkillLevel, randomSkillPreferences.randomizeSkill(), 0);
             }
         }
@@ -151,7 +173,7 @@ public abstract class AbstractSkillGenerator {
             }
 
             int utilitySkillLevel = Utilities.generateExpLevel(randomSkillPreferences.getUtilitySkillsModifier(expLvl));
-            if (utilitySkillLevel > SkillType.EXP_ULTRA_GREEN) {
+            if (utilitySkillLevel > EXP_ULTRA_GREEN) {
                 addSkill(person, skillType.getName(), utilitySkillLevel, randomSkillPreferences.randomizeSkill(), 0);
             }
         }
