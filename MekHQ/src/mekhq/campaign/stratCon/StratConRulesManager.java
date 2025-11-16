@@ -2620,13 +2620,13 @@ public class StratConRulesManager {
                 continue;
             }
 
-            // If the combat team doesn't have a valid force (somehow) skip it.
+            // If the combat team doesn't have a valid force (somehow), skip it.
             Force force = combatTeam.getForce(campaign);
             if (force == null) {
                 continue;
             }
 
-            // Skip any that are already assigned to a scenario.
+            // Skip any that are already assigned to a scenario
             if (force.isDeployed()) {
                 continue;
             }
@@ -2637,9 +2637,7 @@ public class StratConRulesManager {
                 suitableForces.add(combatTeam.getForceId());
             } else if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
                 if (!combatRole.isTraining()) {
-                    if (!combatRole.isCadre() || contract.getContractType().isCadreDuty()) {
-                        suitableForces.add(combatTeam.getForceId());
-                    }
+                    suitableForces.add(combatTeam.getForceId());
                 }
             }
         }
