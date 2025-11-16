@@ -178,36 +178,30 @@ public class Armor extends Part implements IAcquisitionWork {
     public String getDetails(boolean includeRepairDetails) {
         StringBuilder toReturn = new StringBuilder();
         if (null != unit) {
-            if (isSalvaging()) {
-                toReturn.append(unit.getEntity().getLocationName(location))
-                      .append(rear ? " (Rear)" : "")
-                      .append(", ")
-                      .append(amount)
-                      .append(amount == 1 ? " point" : " points");
-            } else {
+            if (!isSalvaging()) {
                 toReturn.append(unit.getEntity().getLocationName(location))
                       .append(rear ? " (Rear)" : "")
                       .append(", ")
                       .append(amountNeeded)
                       .append(amountNeeded == 1 ? " point" : " points")
                       .append("<br/>");
+            }
 
-                int amountAvailable = getAmountAvailable();
-                if (amountAvailable == 0) {
-                    toReturn.append(messageSurroundedBySpanWithColor(getNegativeColor(),
-                          "None in stock"));
-                } else if (amountAvailable < amountNeeded) {
-                    toReturn.append(spanOpeningWithCustomColor(getNegativeColor()))
-                          .append("Only ")
-                          .append(amountAvailable)
-                          .append(" in stock")
-                          .append(CLOSING_SPAN_TAG);
-                } else {
-                    toReturn.append(spanOpeningWithCustomColor(getPositiveColor()))
-                          .append(amountAvailable)
-                          .append(" in stock")
-                          .append(CLOSING_SPAN_TAG);
-                }
+            int amountAvailable = getAmountAvailable();
+            if (amountAvailable == 0) {
+                toReturn.append(messageSurroundedBySpanWithColor(getNegativeColor(),
+                      "None in stock"));
+            } else if (amountAvailable < amountNeeded) {
+                toReturn.append(spanOpeningWithCustomColor(getNegativeColor()))
+                      .append("Only ")
+                      .append(amountAvailable)
+                      .append(" in stock")
+                      .append(CLOSING_SPAN_TAG);
+            } else {
+                toReturn.append(spanOpeningWithCustomColor(getPositiveColor()))
+                      .append(amountAvailable)
+                      .append(" in stock")
+                      .append(CLOSING_SPAN_TAG);
             }
 
             PartInventory inventories = campaign.getPartInventory(getNewPart());
