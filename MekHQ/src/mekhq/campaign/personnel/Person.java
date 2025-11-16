@@ -7167,10 +7167,10 @@ public class Person {
      *
      * <ul>
      *     <li>If {@code permanentCheck} is {@code false}, this method returns {@code true} if the person has any
-     *     recorded injuries.</li>
+     *     recorded injuries with remaining recovery time greater than zero.</li>
      *     <li>If {@code permanentCheck} is {@code true}, it will return {@code true} only if the person has at least
-     *     one injury that is either non-permanent or has a remaining recovery time greater than zero. Otherwise, it
-     *     returns {@code false}.</li>
+     *     one injury that is non-permanent and has remaining recovery time greater than zero. Otherwise, it returns
+     *     {@code false}.</li>
      * </ul>
      *
      * @param permanentCheck if {@code true}, only injuries that are not permanent or have time remaining are
