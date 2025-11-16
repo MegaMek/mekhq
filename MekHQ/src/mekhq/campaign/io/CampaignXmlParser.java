@@ -562,7 +562,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
             if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
-                person.setSecondaryRole(PersonnelRole.DEPENDENT);
+                person.setSecondaryRole(PersonnelRole.NONE);
 
                 campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "ineligibleForSecondaryRole",
                       spanOpeningWithCustomColor(getWarningColor()),
@@ -571,7 +571,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
 
             if (!person.canPerformRole(today, person.getPrimaryRole(), true)) {
-                person.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.NONE);
+                person.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.DEPENDENT);
 
                 campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "ineligibleForPrimaryRole",
                       spanOpeningWithCustomColor(getNegativeColor()),
