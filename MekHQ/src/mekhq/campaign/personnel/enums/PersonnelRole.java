@@ -57,7 +57,7 @@ public enum PersonnelRole {
     // region Enum Declarations
     MEKWARRIOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_M, 5, 5, 6, 6, 5, 5, 5),
     LAM_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
-    COMBAT_TECHNICIAN(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 3, 5, 5, 4),
+    COMBAT_TECHNICIAN(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 4, 6, 6, 5),
     VEHICLE_CREW_GROUND(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
     VEHICLE_CREW_NAVAL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
     VEHICLE_CREW_VTOL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
