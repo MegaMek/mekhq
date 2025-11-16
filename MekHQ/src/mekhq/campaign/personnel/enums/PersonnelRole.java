@@ -362,6 +362,10 @@ public enum PersonnelRole {
     private static final MMLogger logger = MMLogger.create(PersonnelRole.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelRole";
 
+    public static final List<PersonnelRole> VEHICLE_CREW_EXTENDED_ROLES = List.of(COMBAT_TECHNICIAN, MEK_TECH,
+          AERO_TEK, MECHANIC, BA_TECH, ASTECH, DOCTOR, MEDIC, COMMS_OPERATOR, TECH_COMMUNICATIONS, SENSOR_TECHNICIAN,
+          SOLDIER, ADMINISTRATOR_COMMAND, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_HR, CHEF);
+
     private final PersonnelRoleSubType subType;
     private final boolean hasClanName;
     private final int mnemonic; // Unused: J, K, Q, X, Z
@@ -638,8 +642,13 @@ public enum PersonnelRole {
                     yield List.of(SkillType.S_TECH_MECHANIC);
                 }
             }
-            case COMBAT_TECHNICIAN -> List.of(SkillType.S_TECH_MECHANIC, SkillType.S_TECH_MEK);
-            case COMMS_OPERATOR -> List.of(SkillType.S_COMMUNICATIONS, SkillType.S_ADMIN);
+            case COMBAT_TECHNICIAN -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_TECH_MEK, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_TECH_MEK);
+                }
+            }
             case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
             case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO);
@@ -1016,23 +1025,7 @@ public enum PersonnelRole {
      * @since 0.50.07
      */
     public boolean isVehicleCrewExtended() {
-        return this == COMBAT_TECHNICIAN ||
-                     this == MEK_TECH ||
-                     this == AERO_TEK ||
-                     this == MECHANIC ||
-                     this == BA_TECH ||
-                     this == ASTECH ||
-                     this == DOCTOR ||
-                     this == MEDIC ||
-                     this == COMMS_OPERATOR ||
-                     this == TECH_COMMUNICATIONS ||
-                     this == SENSOR_TECHNICIAN ||
-                     this == SOLDIER ||
-                     this == ADMINISTRATOR_COMMAND ||
-                     this == ADMINISTRATOR_TRANSPORT ||
-                     this == ADMINISTRATOR_LOGISTICS ||
-                     this == ADMINISTRATOR_HR ||
-                     this == CHEF;
+        return VEHICLE_CREW_EXTENDED_ROLES.contains(this);
     }
 
     public boolean isCommsOperator() {
