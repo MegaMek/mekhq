@@ -150,7 +150,6 @@ import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
-import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -7180,9 +7179,17 @@ public class Person {
      * @return {@code true} if the person has injuries matching the specified criteria; {@code false} otherwise
      */
     public boolean hasInjuries(final boolean permanentCheck) {
-        return !injuries.isEmpty() &&
-                     (!permanentCheck ||
-                            injuries.stream().anyMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0)));
+        for (Injury injury : injuries) {
+            if (injury.isPermanent() && permanentCheck) {
+                continue;
+            }
+
+            if (injury.getTime() > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public boolean hasOnlyHealedPermanentInjuries() {
