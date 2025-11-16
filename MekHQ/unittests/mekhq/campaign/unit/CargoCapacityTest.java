@@ -415,8 +415,8 @@ class CargoCapacityTest {
                 continue;
             }
 
-            if (unit.getTotalCrewNeeds() > 0) {
-                unit.addVesselCrew(crewMember);
+            if (unit.getTotalGenericCrewNeeds() > 0) {
+                unit.addGenericCrew(crewMember);
             }
         }
 

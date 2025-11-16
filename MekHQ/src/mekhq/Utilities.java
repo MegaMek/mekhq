@@ -35,6 +35,7 @@ package mekhq;
 
 import static java.lang.Math.max;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
+import static mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_EXTENDED_ROLES;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
@@ -445,7 +446,12 @@ public class Utilities {
         int numberPeopleGenerated = 0;
         List<Person> drivers = new ArrayList<>();
         List<Person> gunners = new ArrayList<>();
-        List<Person> vesselCrew = new ArrayList<>();
+        List<Person> genericCrew = new ArrayList<>();
+        List<Person> communicationsCrew = new ArrayList<>();
+        List<Person> doctorCrew = new ArrayList<>();
+        List<Person> medicCrew = new ArrayList<>();
+        List<Person> combatTechCrew = new ArrayList<>();
+        List<Person> astechCrew = new ArrayList<>();
         Person navigator = null;
         Person consoleCmdr = null;
 
@@ -584,66 +590,66 @@ public class Utilities {
                 }
 
                 for (int slot = 0; slot < driversNeeded; slot++) {
-                    Person p;
+                    Person person;
                     if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
-                        p = campaign.newPerson(PersonnelRole.VESSEL_PILOT,
+                        person = campaign.newPerson(PersonnelRole.VESSEL_PILOT,
                               factionCode,
                               oldCrew.getGender(numberPeopleGenerated));
-                        p.addSkill(SkillType.S_PILOT_SPACE,
+                        person.addSkill(SkillType.S_PILOT_SPACE,
                               randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() -
                                                           oldCrew.getPiloting()),
                               0);
                     } else if (unit.getEntity() instanceof BattleArmor) {
-                        p = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR,
+                        person = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR,
                               factionCode,
                               oldCrew.getGender(numberPeopleGenerated));
-                        p.addSkill(SkillType.S_GUN_BA,
+                        person.addSkill(SkillType.S_GUN_BA,
                               randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() -
                                                           oldCrew.getGunnery()),
                               0);
                     } else if (unit.getEntity() instanceof Infantry) {
-                        p = campaign.newPerson(PersonnelRole.SOLDIER,
+                        person = campaign.newPerson(PersonnelRole.SOLDIER,
                               factionCode,
                               oldCrew.getGender(numberPeopleGenerated));
-                        p.addSkill(SkillType.S_SMALL_ARMS,
+                        person.addSkill(SkillType.S_SMALL_ARMS,
                               randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() -
                                                           oldCrew.getGunnery()),
                               0);
                     } else if (unit.getEntity() instanceof VTOL) {
-                        p = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL,
+                        person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL,
                               factionCode,
                               oldCrew.getGender(numberPeopleGenerated));
-                        p.addSkill(SkillType.S_PILOT_VTOL,
+                        person.addSkill(SkillType.S_PILOT_VTOL,
                               SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(),
                               0);
-                        p.addSkill(SkillType.S_GUN_VEE,
+                        person.addSkill(SkillType.S_GUN_VEE,
                               SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
                               0);
                     } else if (unit.getEntity() instanceof Mek) {
-                        p = campaign.newPerson(PersonnelRole.MEKWARRIOR,
+                        person = campaign.newPerson(PersonnelRole.MEKWARRIOR,
                               factionCode,
                               oldCrew.getGender(numberPeopleGenerated));
-                        p.addSkill(SkillType.S_PILOT_MEK,
+                        person.addSkill(SkillType.S_PILOT_MEK,
                               SkillType.getType(SkillType.S_PILOT_MEK).getTarget() - oldCrew.getPiloting(),
                               0);
-                        p.addSkill(SkillType.S_GUN_MEK,
+                        person.addSkill(SkillType.S_GUN_MEK,
                               SkillType.getType(SkillType.S_GUN_MEK).getTarget() - oldCrew.getGunnery(),
                               0);
                     } else {
                         // assume tanker if we got here
-                        p = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND,
+                        person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND,
                               factionCode,
                               oldCrew.getGender(numberPeopleGenerated));
-                        p.addSkill(SkillType.S_PILOT_GVEE,
+                        person.addSkill(SkillType.S_PILOT_GVEE,
                               SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(),
                               0);
-                        p.addSkill(SkillType.S_GUN_VEE,
+                        person.addSkill(SkillType.S_GUN_VEE,
                               SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
                               0);
                     }
 
-                    migrateCrewData(p, oldCrew, numberPeopleGenerated++, true);
-                    drivers.add(p);
+                    migrateCrewData(person, oldCrew, numberPeopleGenerated++, true);
+                    drivers.add(person);
                 }
 
                 // Re-balance as needed to balance
@@ -725,15 +731,73 @@ public class Utilities {
                 }
             }
 
-            for (int slot = 0; slot < unit.getTotalCrewNeeds(); slot++) {
-                Person p = campaign.newPerson(unit.getEntity().isLargeCraft() ?
-                                                    PersonnelRole.VESSEL_CREW :
-                                                    PersonnelRole.COMBAT_TECHNICIAN,
+            List<PersonnelRole> viableProfessions = VEHICLE_CREW_EXTENDED_ROLES;
+            for (int slot = 0; slot < unit.getTotalGenericCrewNeeds(); slot++) {
+                PersonnelRole role;
+                if (unit.getEntity().isLargeCraft()) {
+                    role = PersonnelRole.VESSEL_CREW;
+                } else {
+                    role = ObjectUtility.getRandomItem(viableProfessions);
+                }
+                Person person = campaign.newPerson(role, factionCode, oldCrew.getGender(numberPeopleGenerated));
+
+                migrateCrewData(person, oldCrew, numberPeopleGenerated++, false);
+                genericCrew.add(person);
+            }
+
+            for (int slot = 0; slot < unit.getTotalCommunicationCrewNeeds(); slot++) {
+                Person person = campaign.newPerson(unit.getEntity().isLargeCraft() ?
+                                                         PersonnelRole.VESSEL_CREW :
+                                                         PersonnelRole.COMMS_OPERATOR,
                       factionCode,
                       oldCrew.getGender(numberPeopleGenerated));
 
-                migrateCrewData(p, oldCrew, numberPeopleGenerated++, false);
-                vesselCrew.add(p);
+                migrateCrewData(person, oldCrew, numberPeopleGenerated++, false);
+                communicationsCrew.add(person);
+            }
+
+            for (int slot = 0; slot < unit.getTotalDoctorCrewNeeds(); slot++) {
+                Person person = campaign.newPerson(unit.getEntity().isLargeCraft() ?
+                                                         PersonnelRole.VESSEL_CREW :
+                                                         PersonnelRole.DOCTOR,
+                      factionCode,
+                      oldCrew.getGender(numberPeopleGenerated));
+
+                migrateCrewData(person, oldCrew, numberPeopleGenerated++, false);
+                doctorCrew.add(person);
+            }
+
+            for (int slot = 0; slot < unit.getTotalMedicCrewNeeds(); slot++) {
+                Person person = campaign.newPerson(unit.getEntity().isLargeCraft() ?
+                                                         PersonnelRole.VESSEL_CREW :
+                                                         PersonnelRole.MEDIC,
+                      factionCode,
+                      oldCrew.getGender(numberPeopleGenerated));
+
+                migrateCrewData(person, oldCrew, numberPeopleGenerated++, false);
+                medicCrew.add(person);
+            }
+
+            for (int slot = 0; slot < unit.getTotalCombatTechCrewNeeds(); slot++) {
+                Person person = campaign.newPerson(unit.getEntity().isLargeCraft() ?
+                                                         PersonnelRole.VESSEL_CREW :
+                                                         PersonnelRole.COMBAT_TECHNICIAN,
+                      factionCode,
+                      oldCrew.getGender(numberPeopleGenerated));
+
+                migrateCrewData(person, oldCrew, numberPeopleGenerated++, false);
+                combatTechCrew.add(person);
+            }
+
+            for (int slot = 0; slot < unit.getTotalAstechCrewNeeds(); slot++) {
+                Person person = campaign.newPerson(unit.getEntity().isLargeCraft() ?
+                                                         PersonnelRole.VESSEL_CREW :
+                                                         PersonnelRole.ASTECH,
+                      factionCode,
+                      oldCrew.getGender(numberPeopleGenerated));
+
+                migrateCrewData(person, oldCrew, numberPeopleGenerated++, false);
+                astechCrew.add(person);
             }
 
             if (unit.canTakeNavigator()) {
@@ -776,8 +840,23 @@ public class Utilities {
         if (!gunners.isEmpty()) {
             result.put(CrewType.GUNNER, gunners);
         }
-        if (!vesselCrew.isEmpty()) {
-            result.put(CrewType.VESSEL_CREW, vesselCrew);
+        if (!genericCrew.isEmpty()) {
+            result.put(CrewType.GENERIC_CREW, genericCrew);
+        }
+        if (!communicationsCrew.isEmpty()) {
+            result.put(CrewType.COMMUNICATIONS_CREW, communicationsCrew);
+        }
+        if (!doctorCrew.isEmpty()) {
+            result.put(CrewType.DOCTOR_CREW, communicationsCrew);
+        }
+        if (!medicCrew.isEmpty()) {
+            result.put(CrewType.MEDIC_CREW, communicationsCrew);
+        }
+        if (!combatTechCrew.isEmpty()) {
+            result.put(CrewType.COMBAT_TECHNICIAN_CREW, communicationsCrew);
+        }
+        if (!astechCrew.isEmpty()) {
+            result.put(CrewType.ASTECH_CREW, communicationsCrew);
         }
         if (null != navigator) {
             result.put(CrewType.NAVIGATOR, Collections.singletonList(navigator));

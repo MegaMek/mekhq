@@ -97,7 +97,7 @@
          when(unit.getTotalGunnerNeeds()).thenReturn(totalGunnerNeeds);
 
          when(unit.getActiveCrew()).thenReturn(crew);
-         when(unit.getTotalCrewNeeds()).thenReturn(totalCrewNeeds);
+         when(unit.getTotalGenericCrewNeeds()).thenReturn(totalCrewNeeds);
 
          when(unit.getEntity()).thenReturn(entity);
          Person navigator = hasNavigator ? mock(Person.class) : null;

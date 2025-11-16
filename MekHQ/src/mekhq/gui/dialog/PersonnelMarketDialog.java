@@ -458,7 +458,7 @@ public class PersonnelMarketDialog extends JDialog {
         } else if (selectedPerson.getPrimaryRole().isVesselNavigator()) {
             unit.setNavigator(selectedPerson);
         } else {
-            unit.addVesselCrew(selectedPerson);
+            unit.addGenericCrew(selectedPerson);
         }
 
         if (unit.isCommander(selectedPerson)) {

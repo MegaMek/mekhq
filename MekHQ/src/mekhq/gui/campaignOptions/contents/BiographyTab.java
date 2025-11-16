@@ -1340,7 +1340,7 @@ public class BiographyTab {
         // Header
         nameAndPortraitGenerationHeader = new CampaignOptionsHeaderPanel("NameAndPortraitGenerationTab",
               getImageDirectory() + "logo_clan_nova_cat.png",
-              2);
+              3);
 
         // Contents
         chkAssignPortraitOnRoleChange = new CampaignOptionsCheckBox("AssignPortraitOnRoleChange");

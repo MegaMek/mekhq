@@ -185,9 +185,9 @@ class PersonnelFilterTest {
     void testIsCombatTechnician() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.COMBAT_TECHNICIANS) {
-                assertTrue(personnelFilter.isVehicleCrew());
+                assertTrue(personnelFilter.isCombatTechnician());
             } else {
-                assertFalse(personnelFilter.isVehicleCrew());
+                assertFalse(personnelFilter.isCombatTechnician());
             }
         }
     }

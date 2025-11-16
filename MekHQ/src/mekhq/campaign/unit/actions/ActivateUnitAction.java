@@ -79,12 +79,12 @@ public record ActivateUnitAction(Person tech, boolean isGM) implements IUnitActi
                     return;
                 }
 
-                if (!unit.canTakeMoreVesselCrew()) {
+                if (!unit.canTakeMoreGenericCrew()) {
                     LOGGER.warn("Unit has too many vessel crew members: {}", unit.getName());
                     return;
                 }
 
-                unit.addVesselCrew(tech, true);
+                unit.addGenericCrew(tech, true);
             }
 
             unit.startActivating(tech);

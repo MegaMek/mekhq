@@ -61,7 +61,12 @@ public class MothballInfo {
     private int forceId;
     private final List<UUID> driverIds = new ArrayList<>();
     private final List<UUID> gunnerIds = new ArrayList<>();
-    private final List<UUID> vesselCrewIds = new ArrayList<>();
+    private final List<UUID> genericCrewIds = new ArrayList<>();
+    private final List<UUID> communicationsCrewIds = new ArrayList<>();
+    private final List<UUID> doctorCrewIds = new ArrayList<>();
+    private final List<UUID> medicCrewIds = new ArrayList<>();
+    private final List<UUID> combatTechCrewIds = new ArrayList<>();
+    private final List<UUID> astechCrewIds = new ArrayList<>();
     private UUID techOfficerId;
     private UUID navigatorId;
 
@@ -108,10 +113,47 @@ public class MothballInfo {
             }
         }
 
-        List<Person> vesselCrews = new ArrayList<>(unit.getVesselCrew());
-        for (Person vesselCrew : vesselCrews) {
-            if (vesselCrew != null) {
-                vesselCrewIds.add(vesselCrew.getId());
+        List<Person> genericCrews = new ArrayList<>(unit.getGenericCrew());
+        for (Person crew : genericCrews) {
+            if (crew != null) {
+                genericCrewIds.add(crew.getId());
+            }
+        }
+
+        List<Person> communicationsCrews = new ArrayList<>(unit.getCommunicationsCrew());
+        for (Person crew : communicationsCrews) {
+            if (crew != null) {
+                communicationsCrewIds.add(crew.getId());
+            }
+        }
+
+        List<Person> doctorCrews = new ArrayList<>(unit.getDoctorCrew());
+        for (Person crew : doctorCrews) {
+            if (crew != null) {
+                doctorCrewIds.add(crew.getId());
+            }
+        }
+
+        List<Person> medicCrews = new ArrayList<>(unit.getMedicCrew());
+        for (Person crew : medicCrews) {
+            if (crew != null) {
+                medicCrewIds.add(crew.getId());
+            }
+        }
+
+
+        List<Person> combatTechCrews = new ArrayList<>(unit.getCombatTechCrew());
+        for (Person crew : combatTechCrews) {
+            if (crew != null) {
+                combatTechCrewIds.add(crew.getId());
+            }
+        }
+
+
+        List<Person> astechCrews = new ArrayList<>(unit.getAstechCrew());
+        for (Person crew : astechCrews) {
+            if (crew != null) {
+                astechCrewIds.add(crew.getId());
             }
         }
 
@@ -157,10 +199,45 @@ public class MothballInfo {
             }
         }
 
-        for (UUID crewId : vesselCrewIds) {
+        for (UUID crewId : genericCrewIds) {
             Person crew = campaign.getPerson(crewId);
             if (crew != null && crew.getStatus().isActive() && (crew.getUnit() == null)) {
-                unit.addVesselCrew(crew);
+                unit.addGenericCrew(crew);
+            }
+        }
+
+        for (UUID crewId : communicationsCrewIds) {
+            Person crew = campaign.getPerson(crewId);
+            if (crew != null && crew.getStatus().isActive() && (crew.getUnit() == null)) {
+                unit.addCommunicationsCrew(crew);
+            }
+        }
+
+        for (UUID crewId : doctorCrewIds) {
+            Person crew = campaign.getPerson(crewId);
+            if (crew != null && crew.getStatus().isActive() && (crew.getUnit() == null)) {
+                unit.addDoctorCrew(crew);
+            }
+        }
+
+        for (UUID crewId : medicCrewIds) {
+            Person crew = campaign.getPerson(crewId);
+            if (crew != null && crew.getStatus().isActive() && (crew.getUnit() == null)) {
+                unit.addMedicCrew(crew);
+            }
+        }
+
+        for (UUID crewId : combatTechCrewIds) {
+            Person crew = campaign.getPerson(crewId);
+            if (crew != null && crew.getStatus().isActive() && (crew.getUnit() == null)) {
+                unit.addCombatTechCrew(crew);
+            }
+        }
+
+        for (UUID crewId : astechCrewIds) {
+            Person crew = campaign.getPerson(crewId);
+            if (crew != null && crew.getStatus().isActive() && (crew.getUnit() == null)) {
+                unit.addAstechCrew(crew);
             }
         }
 
@@ -222,8 +299,28 @@ public class MothballInfo {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gunnerId", gunner);
         }
 
-        for (UUID crew : vesselCrewIds) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vesselCrewId", crew);
+        for (UUID crew : genericCrewIds) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "genericCrewIds", crew);
+        }
+
+        for (UUID crew : communicationsCrewIds) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "communicationsCrewIds", crew);
+        }
+
+        for (UUID crew : doctorCrewIds) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doctorCrewIds", crew);
+        }
+
+        for (UUID crew : medicCrewIds) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "medicCrewIds", crew);
+        }
+
+        for (UUID crew : combatTechCrewIds) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatTechCrewIds", crew);
+        }
+
+        for (UUID crew : astechCrewIds) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechCrewIds", crew);
         }
 
         if (navigatorId != null) {
@@ -258,8 +355,19 @@ public class MothballInfo {
                     retVal.driverIds.add(UUID.fromString(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("gunnerID")) {
                     retVal.gunnerIds.add(UUID.fromString(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("vesselCrewID")) {
-                    retVal.vesselCrewIds.add(UUID.fromString(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("genericCrewID") ||
+                                 wn2.getNodeName().equalsIgnoreCase("vesselCrewID")) {
+                    retVal.genericCrewIds.add(UUID.fromString(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("communicationsCrewIds")) {
+                    retVal.communicationsCrewIds.add(UUID.fromString(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("doctorCrewIds")) {
+                    retVal.doctorCrewIds.add(UUID.fromString(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("medicCrewIds")) {
+                    retVal.medicCrewIds.add(UUID.fromString(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("combatTechCrewIds")) {
+                    retVal.combatTechCrewIds.add(UUID.fromString(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("astechCrewIds")) {
+                    retVal.astechCrewIds.add(UUID.fromString(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("techOfficerID")) {
                     retVal.techOfficerId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("navigatorID")) {

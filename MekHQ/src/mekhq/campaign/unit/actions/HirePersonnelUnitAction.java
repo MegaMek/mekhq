@@ -136,16 +136,122 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
             unit.addGunner(person);
         }
 
-        while (unit.canTakeMoreVesselCrew()) {
-            Person person = campaign.newPerson(unit.getEntity().isLargeCraft()
-                                                     ? PersonnelRole.VESSEL_CREW : PersonnelRole.COMBAT_TECHNICIAN);
+        while (unit.canTakeMoreGenericCrew()) {
+            PersonnelRole role;
+            if (unit.getEntity().isLargeCraft()) {
+                role = PersonnelRole.VESSEL_CREW;
+            } else if (unit.getEntity() instanceof Tank) {
+                if (unit.getEntity().getMovementMode().isMarine()) {
+                    role = PersonnelRole.VEHICLE_CREW_NAVAL;
+                } else if (unit.getEntity().getMovementMode().isVTOL()) {
+                    role = PersonnelRole.VEHICLE_CREW_VTOL;
+                } else {
+                    role = PersonnelRole.VEHICLE_CREW_GROUND;
+                }
+            } else if (unit.getEntity().isConventionalFighter()) {
+                role = PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
+            } else {
+                role = PersonnelRole.COMBAT_TECHNICIAN;
+            }
+
+            Person person = campaign.newPerson(role);
             if (person == null) {
                 break;
             }
             if (!campaign.recruitPerson(person, isGM, true)) {
                 return;
             }
-            unit.addVesselCrew(person);
+            unit.addGenericCrew(person);
+        }
+
+        while (unit.canTakeMoreCommunicationsCrew()) {
+            PersonnelRole role;
+            if (unit.getEntity().isLargeCraft()) {
+                role = PersonnelRole.VESSEL_CREW;
+            } else {
+                role = PersonnelRole.COMMS_OPERATOR;
+            }
+
+            Person person = campaign.newPerson(role);
+            if (person == null) {
+                break;
+            }
+            if (!campaign.recruitPerson(person, isGM, true)) {
+                return;
+            }
+            unit.addCommunicationsCrew(person);
+        }
+
+        while (unit.canTakeMoreDoctorCrew()) {
+            PersonnelRole role;
+            if (unit.getEntity().isLargeCraft()) {
+                role = PersonnelRole.VESSEL_CREW;
+            } else {
+                role = PersonnelRole.DOCTOR;
+            }
+
+            Person person = campaign.newPerson(role);
+            if (person == null) {
+                break;
+            }
+            if (!campaign.recruitPerson(person, isGM, true)) {
+                return;
+            }
+            unit.addDoctorCrew(person);
+        }
+
+        while (unit.canTakeMoreMedicCrew()) {
+            PersonnelRole role;
+            if (unit.getEntity().isLargeCraft()) {
+                role = PersonnelRole.VESSEL_CREW;
+            } else {
+                role = PersonnelRole.MEDIC;
+            }
+
+            Person person = campaign.newPerson(role);
+            if (person == null) {
+                break;
+            }
+            if (!campaign.recruitPerson(person, isGM, true)) {
+                return;
+            }
+            unit.addMedicCrew(person);
+        }
+
+        while (unit.canTakeMoreCombatTechCrew()) {
+            PersonnelRole role;
+            if (unit.getEntity().isLargeCraft()) {
+                role = PersonnelRole.VESSEL_CREW;
+            } else {
+                role = PersonnelRole.COMBAT_TECHNICIAN;
+            }
+
+            Person person = campaign.newPerson(role);
+            if (person == null) {
+                break;
+            }
+            if (!campaign.recruitPerson(person, isGM, true)) {
+                return;
+            }
+            unit.addCombatTechCrew(person);
+        }
+
+        while (unit.canTakeMoreAstechCrew()) {
+            PersonnelRole role;
+            if (unit.getEntity().isLargeCraft()) {
+                role = PersonnelRole.VESSEL_CREW;
+            } else {
+                role = PersonnelRole.COMBAT_TECHNICIAN;
+            }
+
+            Person person = campaign.newPerson(role);
+            if (person == null) {
+                break;
+            }
+            if (!campaign.recruitPerson(person, isGM, true)) {
+                return;
+            }
+            unit.addAstechCrew(person);
         }
 
         if (unit.canTakeNavigator()) {
