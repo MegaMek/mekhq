@@ -83,7 +83,7 @@ public enum PersonnelRole {
     ADMINISTRATOR_HR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_H, 3, 4, 4, 4, 5, 5, 5),
 
     // If we're generating a character without a Profession, we're just going to leave them with middle of the road
-    // Attribute scores (5 in everything)
+    // Attribute scores (4 in everything)
     NONE(PersonnelRoleSubType.CIVILIAN, false, KeyEvent.VK_UNDEFINED, 4, 4, 4, 4, 4, 4, 4),
 
     // No archetype, but ATOW pg 35 states that the Attribute scores for an average person are 4. We've gone with 5
