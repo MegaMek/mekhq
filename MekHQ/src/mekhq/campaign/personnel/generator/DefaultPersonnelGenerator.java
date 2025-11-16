@@ -36,6 +36,7 @@ import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 
 import java.util.Objects;
 
@@ -121,9 +122,12 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
             person.removeAllSkills();
             expLvl = EXP_NONE;
             person.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.DEPENDENT);
-        } else if (age < 18) {
-            person.limitSkills(1);
-            // regenerate expLvl to factor in skill changes from age
+        } else {
+            if (age < 18) {
+                person.limitSkills(1);
+            }
+            // regenerate expLvl to factor in skill additions (as this can modify character experience level beyond
+            // the requested level)
             expLvl = person.getExperienceLevel(campaign, false);
         }
 
