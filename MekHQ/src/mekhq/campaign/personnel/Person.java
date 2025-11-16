@@ -4329,7 +4329,7 @@ public class Person {
             }
         }
 
-        return true;
+        return didChangeOccur;
     }
 
     /**
