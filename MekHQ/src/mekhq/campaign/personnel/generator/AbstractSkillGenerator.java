@@ -117,16 +117,7 @@ public abstract class AbstractSkillGenerator {
         for (String skillName : primaryRole.getSkillsForProfession()) {
             SkillType skillType = SkillType.getType(skillName);
 
-            int skillLevel = switch (expLvl) {
-                case EXP_ULTRA_GREEN -> max(0, skillType.getGreenLevel() - 1);
-                case EXP_GREEN -> skillType.getGreenLevel();
-                case EXP_REGULAR -> skillType.getRegularLevel();
-                case EXP_VETERAN -> skillType.getVeteranLevel();
-                case EXP_ELITE -> skillType.getEliteLevel();
-                case EXP_HEROIC -> skillType.getHeroicLevel();
-                case EXP_LEGENDARY -> skillType.getLegendaryLevel();
-                default -> 0;
-            };
+            int skillLevel = SkillType.getLevelFromExperience(expLvl, skillType);
 
             addSkill(person, skillName, skillLevel, randomSkillPreferences.randomizeSkill(), bonus, rollModifier);
         }
