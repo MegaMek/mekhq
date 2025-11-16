@@ -4174,26 +4174,6 @@ public class Person {
             if (person.getJoinedCampaign() == null) {
                 person.setJoinedCampaign(today);
             }
-
-            // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
-            // potentially as far back as 2014. The next two handlers should never be removed.
-            if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
-                person.setSecondaryRole(PersonnelRole.NONE);
-
-                campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
-                      spanOpeningWithCustomColor(getWarningColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
-            }
-
-            if (!person.canPerformRole(today, person.getPrimaryRole(), true)) {
-                person.setPrimaryRole(campaign, PersonnelRole.NONE);
-
-                campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
-                      spanOpeningWithCustomColor(getNegativeColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
-            }
         } catch (Exception e) {
             LOGGER.error(e, "Failed to read person {} from file", person.getFullName());
             person = null;
