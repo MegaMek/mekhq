@@ -57,7 +57,7 @@ public enum PersonnelRole {
     // region Enum Declarations
     MEKWARRIOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_M, 5, 5, 6, 6, 5, 5, 5),
     LAM_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
-    COMBAT_TECHNICIAN(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 4, 6, 6, 5),
+    COMBAT_TECHNICIAN(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 3, 5, 5, 4),
     VEHICLE_CREW_GROUND(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
     VEHICLE_CREW_NAVAL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
     VEHICLE_CREW_VTOL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 5, 6, 6, 5, 5, 5),
@@ -362,6 +362,10 @@ public enum PersonnelRole {
     private static final MMLogger logger = MMLogger.create(PersonnelRole.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelRole";
 
+    public static final List<PersonnelRole> VEHICLE_CREW_EXTENDED_ROLES = List.of(COMBAT_TECHNICIAN, MEK_TECH,
+          AERO_TEK, MECHANIC, BA_TECH, ASTECH, DOCTOR, MEDIC, COMMS_OPERATOR, TECH_COMMUNICATIONS, SENSOR_TECHNICIAN,
+          SOLDIER, ADMINISTRATOR_COMMAND, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_HR, CHEF);
+
     private final PersonnelRoleSubType subType;
     private final boolean hasClanName;
     private final int mnemonic; // Unused: J, K, Q, X, Z
@@ -631,11 +635,18 @@ public enum PersonnelRole {
                     yield List.of(SkillType.S_PILOT_VTOL, SkillType.S_GUN_VEE);
                 }
             }
-            case MECHANIC, COMBAT_TECHNICIAN -> {
+            case MECHANIC -> {
                 if (isTechsUseAdministration) {
                     yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_ADMIN);
                 } else {
                     yield List.of(SkillType.S_TECH_MECHANIC);
+                }
+            }
+            case COMBAT_TECHNICIAN -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_TECH_MEK, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_TECH_MEK);
                 }
             }
             case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
@@ -1015,23 +1026,7 @@ public enum PersonnelRole {
      * @since 0.50.07
      */
     public boolean isVehicleCrewExtended() {
-        return this == COMBAT_TECHNICIAN ||
-                     this == MEK_TECH ||
-                     this == AERO_TEK ||
-                     this == MECHANIC ||
-                     this == BA_TECH ||
-                     this == ASTECH ||
-                     this == DOCTOR ||
-                     this == MEDIC ||
-                     this == COMMS_OPERATOR ||
-                     this == TECH_COMMUNICATIONS ||
-                     this == SENSOR_TECHNICIAN ||
-                     this == SOLDIER ||
-                     this == ADMINISTRATOR_COMMAND ||
-                     this == ADMINISTRATOR_TRANSPORT ||
-                     this == ADMINISTRATOR_LOGISTICS ||
-                     this == ADMINISTRATOR_HR ||
-                     this == CHEF;
+        return VEHICLE_CREW_EXTENDED_ROLES.contains(this);
     }
 
 

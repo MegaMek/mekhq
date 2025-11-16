@@ -150,7 +150,6 @@ import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
-import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -4319,20 +4318,35 @@ public class Person {
      * @since 0.50.10
      */
     public static boolean updateSkillsForVehicleCrewProfession(LocalDate today, Person person,
-          PersonnelRole currentRole,
-          boolean isPrimary) {
-        if (currentRole != PersonnelRole.VEHICLE_CREW) {
+          PersonnelRole currentRole, boolean isPrimary, boolean includeAdmin) {
+        if (currentRole != PersonnelRole.VEHICLE_CREW && currentRole != PersonnelRole.COMBAT_TECHNICIAN) {
             return false;
         }
 
+        boolean didChangeOccur = false;
         if (!person.hasSkill(S_TECH_MECHANIC)) {
             person.addSkill(S_TECH_MECHANIC, 3, 0);
+            didChangeOccur = true;
         }
 
-        if (isPrimary) {
-            person.setPrimaryRole(today, PersonnelRole.COMBAT_TECHNICIAN);
-        } else {
-            person.setSecondaryRole(PersonnelRole.COMBAT_TECHNICIAN);
+        if (includeAdmin && !person.hasSkill(S_ADMIN)) {
+            person.addSkill(S_ADMIN, 3, 0);
+            didChangeOccur = true;
+        }
+
+        if (!person.hasSkill(S_TECH_MEK)) {
+            person.addSkill(S_TECH_MEK, 3, 0);
+            didChangeOccur = true;
+        }
+
+        if (currentRole != PersonnelRole.COMBAT_TECHNICIAN) {
+            if (isPrimary) {
+                person.setPrimaryRole(today, PersonnelRole.COMBAT_TECHNICIAN);
+                didChangeOccur = true;
+            } else {
+                person.setSecondaryRole(PersonnelRole.COMBAT_TECHNICIAN);
+                didChangeOccur = true;
+            }
         }
 
         return true;

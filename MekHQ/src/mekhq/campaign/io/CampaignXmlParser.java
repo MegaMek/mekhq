@@ -539,8 +539,17 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 campaign.addReport(report);
             }
 
-            if (Person.updateSkillsForVehicleCrewProfession(today, person, person.getPrimaryRole(), true) ||
-                      Person.updateSkillsForVehicleCrewProfession(today, person, person.getSecondaryRole(), false)) {
+            boolean includeAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
+            if (Person.updateSkillsForVehicleCrewProfession(today,
+                  person,
+                  person.getPrimaryRole(),
+                  true,
+                  includeAdmin) ||
+                      Person.updateSkillsForVehicleCrewProfession(today,
+                            person,
+                            person.getSecondaryRole(),
+                            false,
+                            includeAdmin)) {
                 String report = getFormattedTextAt(RESOURCE_BUNDLE, "vehicleCrewProfessionSkillChange",
                       spanOpeningWithCustomColor(getWarningColor()),
                       CLOSING_SPAN_TAG,

@@ -4522,6 +4522,11 @@ public class Unit implements ITechnology {
             validCrew.addAll(gunners);
         }
 
+        // In the event there are no drivers and gunners vessel crew are used as an option of last resort
+        if (drivers.isEmpty() && gunners.isEmpty()) {
+            validCrew.addAll(vesselCrew);
+        }
+
         Person commander = null;
         for (Person potentialCommander : validCrew) {
             if (commander == null) {
