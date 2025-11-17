@@ -149,7 +149,7 @@ public class StratConReinforcementsConfirmationDialog {
         ImmersiveDialogCore dialog = new ImmersiveDialogCore(campaign,
               getSpeaker(campaign),
               null,
-              getInCharacterMessage(commanderAddress),
+              getInCharacterMessage(commanderAddress, canReinforce),
               getButtons(campaign.isGM(), canReinforce, canInstantReinforce),
               getOutOfCharacterMessage(),
               null,
