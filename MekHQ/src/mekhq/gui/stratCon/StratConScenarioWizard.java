@@ -868,6 +868,8 @@ public class StratConScenarioWizard extends JDialog {
         }
 
         // go through all the force lists and add the selected forces to the scenario
+        List<UUID> delayedReinforcements = currentScenario.getBackingScenario().getFriendlyDelayedReinforcements();
+        List<UUID> instantReinforcements = currentScenario.getBackingScenario().getFriendlyInstantReinforcements();
         for (String templateID : availableForceLists.keySet()) {
             for (Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
                 if (currentScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
@@ -893,17 +895,12 @@ public class StratConScenarioWizard extends JDialog {
                     currentScenario.addForce(force, templateID, campaign);
 
                     if (reinforcementResults == DELAYED) {
-                        List<UUID> delayedReinforcements = currentScenario.getBackingScenario()
-                                                                 .getFriendlyDelayedReinforcements();
-
                         for (UUID unitId : force.getAllUnits(true)) {
                             if (campaign.getUnit(unitId) != null) {
                                 delayedReinforcements.add(unitId);
                             }
                         }
                     } else if (reinforcementResults == INSTANT) {
-                        List<UUID> instantReinforcements = currentScenario.getBackingScenario()
-                                                                 .getFriendlyInstantReinforcements();
 
                         for (UUID unitId : force.getAllUnits(true)) {
                             if (campaign.getUnit(unitId) != null) {
@@ -922,10 +919,12 @@ public class StratConScenarioWizard extends JDialog {
         }
 
         for (Unit unit : availableInfantryUnits.getSelectedValuesList()) {
+            instantReinforcements.add(unit.getId());
             currentScenario.addUnit(unit, ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID, false);
         }
 
         for (Unit unit : availableLeadershipUnits.getSelectedValuesList()) {
+            instantReinforcements.add(unit.getId());
             currentScenario.addUnit(unit, ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID, true);
         }
 
