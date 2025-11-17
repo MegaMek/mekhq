@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog;
 
+import static java.lang.Math.floor;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.personnel.enums.PersonnelRole.INTELLIGENCE_ANALYST;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MILITARY_ANALYST;
@@ -131,24 +132,29 @@ public class StratConReinforcementsConfirmationDialog {
      * @param campaign             the current campaign context
      * @param targetNumber         the base {@link TargetRoll} representing the reaction difficulty
      * @param maximumSupportPoints the maximum number of support points that can be spent
+     * @param costMultiplier       the multiplier applied to all support point costs
      *
      * @author Illiani
      * @since 0.50.07
      */
     public StratConReinforcementsConfirmationDialog(Campaign campaign, TargetRoll targetNumber,
-          int maximumSupportPoints) {
+          int maximumSupportPoints, int costMultiplier) {
         final String commanderAddress = campaign.getCommanderAddress();
+
+        // Base reinforcement cost is equal to costMultiplier (which will always be at least 1)
+        boolean canReinforce = costMultiplier <= maximumSupportPoints;
+        int instantReinforcementCost = costMultiplier * 2;
+        boolean canInstantReinforce = instantReinforcementCost <= maximumSupportPoints;
 
         ImmersiveDialogCore dialog = new ImmersiveDialogCore(campaign,
               getSpeaker(campaign),
               null,
               getInCharacterMessage(commanderAddress),
-              // +1 is to account for the 1 SP needed for the actual attempt
-              getButtons(campaign.isGM(), maximumSupportPoints + 1),
+              getButtons(campaign.isGM(), canReinforce, canInstantReinforce),
               getOutOfCharacterMessage(),
               null,
               false,
-              getSpinnerPanel(maximumSupportPoints, targetNumber),
+              canReinforce ? getSpinnerPanel(maximumSupportPoints, targetNumber, costMultiplier) : null,
               null,
               true);
 
@@ -213,15 +219,21 @@ public class StratConReinforcementsConfirmationDialog {
      * Generates the in-character message to use in the dialog, based on the available speaker type.
      *
      * @param commanderAddress the address or title of the commander
+     * @param canReinforce     {@code true} if the campaign has sufficient Support Points to make the attempt.
      *
      * @return the formatted, localized in-character message
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private String getInCharacterMessage(String commanderAddress) {
-        final String key = "StratConReinforcementsConfirmationDialog.inCharacter."
-                                 + (hasTacticalOfficer ? "tactical" : "transport");
+    private String getInCharacterMessage(String commanderAddress, boolean canReinforce) {
+        final String key;
+        if (canReinforce) {
+            key = "StratConReinforcementsConfirmationDialog.inCharacter." +
+                        (hasTacticalOfficer ? "tactical" : "transport");
+        } else {
+            key = "StratConReinforcementsConfirmationDialog.inCharacter.cannotReinforce";
+        }
 
         return getFormattedTextAt(RESOURCE_BUNDLE, key, commanderAddress);
     }
@@ -229,26 +241,30 @@ public class StratConReinforcementsConfirmationDialog {
     /**
      * Builds the list of button definitions for the dialog, including any GM-specific options.
      *
-     * @param isGM                 true if the player is a GM, showing more buttons
-     * @param maximumSupportPoints the max allowed support points
+     * @param isGM                {@code true} if the player is a GM, showing more buttons
+     * @param canReinforce        {@code true} if the player has enough Support Points to reinforce
+     * @param canInstantReinforce {@code true} if the player has enough Support Points to instantly reinforce
      *
      * @return list of button/tooltip pairs to show in the dialog
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private List<ImmersiveDialogCore.ButtonLabelTooltipPair> getButtons(boolean isGM, int maximumSupportPoints) {
+    private List<ImmersiveDialogCore.ButtonLabelTooltipPair> getButtons(boolean isGM, boolean canReinforce,
+          boolean canInstantReinforce) {
         List<ImmersiveDialogCore.ButtonLabelTooltipPair> buttons = new ArrayList<>();
 
         String label = getTextAt(RESOURCE_BUNDLE,
               "StratConReinforcementsConfirmationDialog.button.cancel");
         buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
 
-        if (maximumSupportPoints > 0) {
+        if (canReinforce) {
             label = getTextAt(RESOURCE_BUNDLE,
                   "StratConReinforcementsConfirmationDialog.button.reinforce");
             buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
+        }
 
+        if (canInstantReinforce) {
             label = getTextAt(RESOURCE_BUNDLE,
                   "StratConReinforcementsConfirmationDialog.button.reinforce.instantly");
             buttons.add(new ImmersiveDialogCore.ButtonLabelTooltipPair(label, null));
@@ -287,75 +303,76 @@ public class StratConReinforcementsConfirmationDialog {
      *
      * @param maximumSupportPoints the max allowed support points
      * @param targetNumber         the base target number (before modifiers)
+     * @param costMultiplier       the multiplier applied to all Support Point costs
      *
      * @return a {@link JPanel} for embedding in the main dialog
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private JPanel getSpinnerPanel(int maximumSupportPoints, TargetRoll targetNumber) {
+    private JPanel getSpinnerPanel(double maximumSupportPoints, TargetRoll targetNumber, int costMultiplier) {
         final int PADDING = scaleForGUI(10);
+        int maximum = (int) floor(maximumSupportPoints / costMultiplier);
 
-        lblBreakdown = new JLabel("<html>" + getTargetNumberBreakdown(targetNumber) + "</html>");
+        lblBreakdown = new JLabel("<html>" + getTargetNumberBreakdown(targetNumber, costMultiplier) + "</html>");
 
-        if (maximumSupportPoints >= 0) { // This prevents an illegal state
-            JLabel lblSupportPoints = new JLabel(getTextAt(RESOURCE_BUNDLE,
-                  "StratConReinforcementsConfirmationDialog.inCharacter.supportPoints"));
-            spnSupportPoints = new JSpinner(new SpinnerNumberModel(0, 0, maximumSupportPoints, 1));
-            spnSupportPoints.addChangeListener(e -> {
-                supportPoints = (int) spnSupportPoints.getValue();
-                lblBreakdown.setText("<html>" + getTargetNumberBreakdown(targetNumber) + "</html>");
-            });
+        JLabel lblSupportPoints = new JLabel(getTextAt(RESOURCE_BUNDLE,
+              "StratConReinforcementsConfirmationDialog.inCharacter.supportPoints"));
+        spnSupportPoints = new JSpinner(new SpinnerNumberModel(0, 0, maximum, costMultiplier));
+        spnSupportPoints.addChangeListener(e -> {
+            supportPoints = (int) spnSupportPoints.getValue();
+            lblBreakdown.setText("<html>" + getTargetNumberBreakdown(targetNumber, costMultiplier) + "</html>");
+        });
 
-            JPanel panel = new JPanel(new GridBagLayout());
-            GridBagConstraints gbc = new GridBagConstraints();
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
 
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            gbc.gridwidth = 2; // The label takes up two spaces horizontally
-            gbc.anchor = GridBagConstraints.WEST;
-            gbc.insets = new Insets(PADDING, 0, PADDING, 0);
-            panel.add(lblBreakdown, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2; // The label takes up two spaces horizontally
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(PADDING, 0, PADDING, 0);
+        panel.add(lblBreakdown, gbc);
 
-            gbc.gridwidth = 1;
-            gbc.gridy = 1;
-            panel.add(lblSupportPoints, gbc);
+        gbc.gridwidth = 1;
+        gbc.gridy = 1;
+        panel.add(lblSupportPoints, gbc);
 
-            gbc.gridx = 1;
-            panel.add(spnSupportPoints, gbc);
+        gbc.gridx = 1;
+        panel.add(spnSupportPoints, gbc);
 
-            return panel;
-        } else {
-            return new JPanel();
-        }
+        return panel;
     }
 
     /**
      * Produces a formatted HTML breakdown of the target number calculation, including all relevant modifiers and the
      * effect of current support point selection.
      *
-     * @param targetNumber base target roll object
+     * @param targetNumber   base target roll object
+     * @param costMultiplier the multiplier applied to all Support Point costs
      *
      * @return breakdown string in HTML format
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private String getTargetNumberBreakdown(TargetRoll targetNumber) {
+    private String getTargetNumberBreakdown(TargetRoll targetNumber, int costMultiplier) {
         StringBuilder breakdown = new StringBuilder();
         for (TargetRollModifier modifier : targetNumber.getModifiers()) {
             breakdown.append("<br><b>").append(modifier.getDesc()).append(":</b> ").append(modifier.value());
         }
 
+        int modifier = supportPoints / costMultiplier * SUPPORT_POINTS_MODIFIER;
+
         breakdown.append("<br><b>")
               .append(getTextAt(RESOURCE_BUNDLE,
                     "StratConReinforcementsConfirmationDialog.inCharacter.supportPoints"))
               .append(" </b> ")
-              .append(supportPoints * SUPPORT_POINTS_MODIFIER);
+              .append(modifier);
 
         breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "StratConReinforcementsConfirmationDialog.inCharacter.total",
-              targetNumber.getValue() + (supportPoints * SUPPORT_POINTS_MODIFIER)));
+              targetNumber.getValue() + modifier));
 
         return breakdown.toString();
     }
