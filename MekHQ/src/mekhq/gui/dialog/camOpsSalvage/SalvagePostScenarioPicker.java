@@ -785,7 +785,9 @@ public class SalvagePostScenarioPicker {
 
                 if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0 && !isExchangeRights) {
                     disableConfirmAndColorName(confirmButton, unitSalvageLabel);
-                    shouldEnable = false;
+
+                    // If we've gone over our %, we only block progression if the player is trying to salvage even more.
+                    shouldEnable = !unitSalvageMoneyCurrent.equals(unitSalvageMoneyInitial);
                 }
             }
         }
