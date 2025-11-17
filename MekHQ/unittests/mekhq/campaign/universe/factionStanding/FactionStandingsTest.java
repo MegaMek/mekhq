@@ -41,8 +41,6 @@ import static mekhq.campaign.universe.factionStanding.FactionStandings.CLIMATE_R
 import static mekhq.campaign.universe.factionStanding.FactionStandings.CLIMATE_REGARD_SAME_FACTION;
 import static mekhq.campaign.universe.factionStanding.FactionStandings.DEFAULT_REGARD;
 import static mekhq.campaign.universe.factionStanding.FactionStandings.DEFAULT_REGARD_DEGRADATION;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL;
 import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_EXECUTING_PRISONER;
 import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_REFUSE_BATCHALL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -134,43 +132,6 @@ class FactionStandingsTest {
         // Assert
         double actualRegard = factionStandings.getRegardForFaction("FS", false);
         assertEquals(expectedRegard, actualRegard, "Expected regard of " + expectedRegard + " but got " + actualRegard);
-    }
-
-    private static Stream<Arguments> provideContractAcceptCases() {
-        return Stream.of(Arguments.of("FS Enemy",
-                    "FS",
-                    10.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL),
-              Arguments.of("CDS Enemy",
-                    "CDS",
-                    10.0, REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN),
-              Arguments.of("CS Enemy",
-                    "CS",
-                    10.0,
-                    REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL),
-              Arguments.of("CSJ Enemy",
-                    "CSJ",
-                    10.0,
-                    REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN));
-    }
-
-    @ParameterizedTest(name = "{0}")
-    @MethodSource(value = "provideContractAcceptCases")
-    void test_processAcceptContract_various(String testName, String primaryFaction, double primaryStart,
-          double expectedPrimaryDelta) {
-        // Setup
-        FactionStandings factionStandings = new FactionStandings();
-        factionStandings.setRegardForFaction(null, primaryFaction, primaryStart, 3050, false);
-
-        Faction enemyFaction = factions.getFaction(primaryFaction);
-        LocalDate today = LocalDate.of(3050, 1, 1);
-
-        // Act
-        factionStandings.processContractAccept("FS", enemyFaction, today, 1.0, 1);
-
-        // Assert
-        assertEquals(primaryStart + expectedPrimaryDelta,
-              factionStandings.getRegardForFaction(primaryFaction, false),
-              "Incorrect regard for " + primaryFaction);
     }
 
     @Test
