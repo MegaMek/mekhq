@@ -37,6 +37,7 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.MissionRole.*;
 import static megamek.codeUtilities.MathUtility.clamp;
+import static megamek.codeUtilities.MathUtility.getGaussianAverage;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.equipment.WeaponType.CLASS_ARTILLERY;
@@ -75,6 +76,7 @@ import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
+import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.OffBoardDirection;
@@ -3475,49 +3477,44 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Calculates an average Battle Value (BV) budget for the player's forces without relying on a seed force. The
-     * calculation considers only Combat Teams belonging to specific frontline-relevant roles:
-     * {@link CombatRole#FRONTLINE}, {@link CombatRole#MANEUVER}, {@link CombatRole#CADRE}, and
-     * {@link CombatRole#PATROL}.
+     * Determines an appropriate Battle Value (BV) budget when generating a force without using a designated seed
+     * force.
      *
-     * <p>The method iterates over all Combat Teams in the campaign and retrieves the BV of each team's associated
-     * {@link Force}. Teams whose forces have a BV of 0 or whose forces are {@code null} are ignored. Valid teams are
-     * separated into two categories:</p>
+     * <p>This method scans all player-controlled {@link CombatTeam}s that belong to a set of valid combat roles
+     * (Frontline, Maneuver, Cadre, and Patrol). For each qualifying team, the method retrieves the team's associated
+     * {@link Force} and collects its total BV. These values are then combined to compute a Gaussian-weighted average,
+     * which serves as a representative BV budget for force generation.</p>
      *
+     * <p><b>Why Gaussian Weighting?</b></p>
+     * <p>A simple arithmetic mean can be disproportionately influenced by unusually large or unusually small
+     * BVs—common in campaigns where mixed-quality lances, ad hoc forces, or partially repaired assets coexist. A
+     * Gaussian-weighted average reduces the impact of such outliers by assigning more weight to values near the center
+     * of the distribution. This produces a more stable and intuitive BV budget for seedless generation.</p>
+     *
+     * <p><b>Behavior</b></p>
      * <ul>
-     *   <li><b>Patrol Teams</b> – BV contributes only to the "patrol" pool.</li>
-     *   <li><b>Non-Patrol Teams</b> – BV contributes to both the "non-patrol" pool and the combined pool used when
-     *   only patrol forces are present.</li>
+     *     <li>Only BVs from valid roles are considered.</li>
+     *     <li>Any force returning a BV of {@code 0} or less is ignored.</li>
+     *     <li>If no valid forces are found, a default BV budget of {@code 10,000} is returned.</li>
+     *     <li>Otherwise, the method delegates to {@link MathUtility#getGaussianAverage(List)} to compute the
+     *     weighted BV budget.</li>
      * </ul>
      *
-     * <p>Once BV and team counts have been accumulated, the method selects a budget according to the following
-     * rules:</p>
+     * @param campaign                 the current {@link Campaign} context used to resolve combat teams and forces
+     * @param forceStandardBattleValue whether to calculate BV using standardized values rather than full modifiers
      *
-     * <ol>
-     *   <li>If no qualifying teams with BV > 0 are found, return the default budget (10,000).</li>
-     *   <li>If no non-patrol teams are found, compute and return the rounded average BV of patrol teams.</li>
-     *   <li>Otherwise, compute and return the rounded average BV of non-patrol teams.</li>
-     * </ol>
+     * @return the Gaussian-weighted BV budget, or a default value if no valid forces exist
      *
-     * <p>To guard against pathological values, the returned average is clamped using
-     * {@link Math#max(double, double)} with {@link Integer#MAX_VALUE} as one of the operands. Due to the use of
-     * {@code min}, any computed average over {@code Integer.MAX_VALUE} will be replaced with
-     * {@code Integer.MAX_VALUE}.</p>
-     *
-     * @param campaign                 the campaign whose Combat Teams are used to compute the average BV
-     * @param forceStandardBattleValue if {@code true}, uses standard BV calculation for all forces
-     *
-     * @return the calculated BV budget, or 10,000 if no qualifying forces exist
+     * @author Illiani
+     * @since 0.50.10
      */
     private static int getBVBudgetWithoutUsingASeedForce(Campaign campaign, boolean forceStandardBattleValue) {
-        int defaultBVBudget = 10000; // We use this value in the event the player has no valid forces
+        int defaultBVBudget = 10000; // We use this value if the player has no valid forces
 
-        double totalBVWithPatrol = 0;
-        double teamCountWithPatrol = 0;
-
-        double totalBVWithoutPatrol = 0;
-        double teamCountWithoutPatrol = 0;
-
+        // We need to start by gathering the different battle values. This is because we need that information for
+        // calculating the gaussian-weighted average. Specifically, we need it to calculate the crude mean (which the
+        // averages will be weighted against).
+        List<Integer> battleValues = new ArrayList<>();
         List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
         for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
             CombatRole role = combatTeam.getRole();
@@ -3529,44 +3526,23 @@ public class AtBDynamicScenarioFactory {
             if (force != null) {
                 int battleValue = force.getTotalBV(campaign, forceStandardBattleValue);
                 if (battleValue > 0) {
-                    if (role.isPatrol()) {
-                        totalBVWithPatrol += battleValue;
-                        teamCountWithPatrol++;
-                    } else {
-                        totalBVWithoutPatrol += battleValue;
-                        totalBVWithPatrol += battleValue;
-                        teamCountWithoutPatrol++;
-                    }
+                    battleValues.add(battleValue);
                 }
             }
         }
 
-        if (teamCountWithoutPatrol + teamCountWithPatrol == 0) {
-            LOGGER.info("Found no player forces with BV. Returning default budget {}.", defaultBVBudget);
+        if (battleValues.isEmpty()) {
+            LOGGER.info("Found no player forces with BV. Returning default budget {}.",
+                  defaultBVBudget);
             return defaultBVBudget;
-        } else if (teamCountWithoutPatrol == 0) {
-            // Doubles can exceed ints, so we're adding a safety to protect us against insanely large player campaigns.
-            int average = (int) min(Integer.MAX_VALUE, round(totalBVWithPatrol / teamCountWithPatrol));
-            LOGGER.info("Only patrol forces found: total bv {} / force count {} = {} budget",
-                  totalBVWithPatrol, teamCountWithPatrol, average);
-            return average;
         } else {
-            int average = (int) min(Integer.MAX_VALUE, round(totalBVWithoutPatrol / teamCountWithoutPatrol));
-            LOGGER.info("Excluding patrols: total bv {} / force count {} = {} budget",
-                  totalBVWithoutPatrol, teamCountWithoutPatrol, average);
-            return average;
+            int gaussianAverage = getGaussianAverage(battleValues);
+            LOGGER.info("Not using a seed force: gaussian-weighted BV budget {} from {} forces",
+                  gaussianAverage, battleValues.size());
+            return gaussianAverage;
         }
     }
 
-    /**
-     * Calculates the current effective player and allied unit count present in the given scenario.
-     *
-     * @param scenario      The scenario to process.
-     * @param campaign      The campaign in which the scenario resides.
-     * @param isClanBidding {@link Boolean} flag indicating if Clan bidding is enabled.
-     *
-     * @return The effective unit count for the scenario.
-     */
     public static int calculateEffectiveUnitCount(AtBDynamicScenario scenario, Campaign campaign,
           boolean isClanBidding) {
         // for each deployed player and bot force that's marked as contributing to the unit count budget
@@ -3610,15 +3586,43 @@ public class AtBDynamicScenarioFactory {
         return unitCount;
     }
 
+    /**
+     * Determines an appropriate unit-count budget when generating a force without using a designated seed force.
+     *
+     * <p>This method reviews all player-controlled {@link CombatTeam}s whose roles fall within a predefined set of
+     * valid combat roles (Frontline, Maneuver, Cadre, and Patrol). For each qualifying team, the method retrieves the
+     * associated {@link Force} and records the number of units currently assigned to that force.</p>
+     *
+     * <p><b>Why Gaussian Weighting?</b></p>
+     * <p>A simple arithmetic mean can be disproportionately influenced by unusually large or unusually small
+     * unit counts—common in campaigns where mixed-quality lances, ad hoc forces, or partially repaired assets coexist.
+     * A Gaussian-weighted average reduces the impact of such outliers by assigning more weight to values near the
+     * center of the distribution. This produces a more stable and intuitive unit budget for seedless generation.</p>
+     *
+     * <h3>Behavior</h3>
+     * <ul>
+     *     <li>Only forces belonging to valid roles are considered.</li>
+     *     <li>Any force with a unit count of {@code 0} is ignored.</li>
+     *     <li>If no qualifying forces are found, a default unit count is returned. This default is derived from
+     *     {@link CombatTeam#getStandardForceSize(Faction)}, using the faction of the current campaign.</li>
+     *     <li>If valid forces exist, their unit counts are combined using the Gaussian-weighted averaging method to
+     *     produce a representative force size.</li>
+     * </ul>
+     *
+     * @param campaign the current {@link Campaign} context used to gather combat teams and forces
+     *
+     * @return the Gaussian-weighted unit-count budget, or a default value if no valid forces exist
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private static int getUnitCountWithoutUsingASeedForce(Campaign campaign) {
         int defaultUnitCount = CombatTeam.getStandardForceSize(campaign.getFaction());
 
-        double totalUnitsWithPatrol = 0;
-        double teamCountWithPatrol = 0;
-
-        double totalUnitsWithoutPatrol = 0;
-        double teamCountWithoutPatrol = 0;
-
+        // We need to start by gathering the different unit counts. This is because we need that information for
+        // calculating the gaussian-weighted average. Specifically, we need it to calculate the crude mean (which the
+        // averages will be weighted against).
+        List<Integer> unitCounts = new ArrayList<>();
         List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
         for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
             CombatRole role = combatTeam.getRole();
@@ -3628,34 +3632,21 @@ public class AtBDynamicScenarioFactory {
 
             Force force = combatTeam.getForce(campaign);
             if (force != null) {
-                int size = force.getUnits().size();
-                if (size > 0) {
-                    if (role.isPatrol()) {
-                        totalUnitsWithPatrol += size;
-                        teamCountWithPatrol++;
-                    } else {
-                        totalUnitsWithoutPatrol += size;
-                        totalUnitsWithPatrol += size;
-                        teamCountWithoutPatrol++;
-                    }
+                int unitCount = force.getAllUnits(false).size();
+                if (unitCount > 0) {
+                    unitCounts.add(unitCount);
                 }
             }
         }
 
-        if (teamCountWithoutPatrol + teamCountWithPatrol == 0) {
+        if (unitCounts.isEmpty()) {
             LOGGER.info("Found no player forces with units. Returning default budget {}.", defaultUnitCount);
             return defaultUnitCount;
-        } else if (teamCountWithoutPatrol == 0) {
-            // Doubles can exceed ints, so we're adding a safety to protect us against insanely large player campaigns.
-            int average = (int) min(Integer.MAX_VALUE, round(totalUnitsWithPatrol / teamCountWithPatrol));
-            LOGGER.info("Only patrol forces found: total units {} / force count {} = {} budget",
-                  totalUnitsWithPatrol, teamCountWithPatrol, average);
-            return average;
         } else {
-            int average = (int) min(Integer.MAX_VALUE, round(totalUnitsWithoutPatrol / teamCountWithoutPatrol));
-            LOGGER.info("Excluding patrols: total units {} / force count {} = {} budget",
-                  totalUnitsWithoutPatrol, teamCountWithoutPatrol, average);
-            return average;
+            int gaussianAverage = getGaussianAverage(unitCounts);
+            LOGGER.info("Not using a seed force: gaussian-weighted unit count {} from {} forces",
+                  gaussianAverage, unitCounts.size());
+            return gaussianAverage;
         }
     }
 
