@@ -564,8 +564,10 @@ public class SalvagePostScenarioPicker {
             claimedSalvageForSale.setEnabled(false);
 
             JComboBox<String> comboBox1 = new JComboBox<>();
-            JComboBox<String> comboBox2 = new JComboBox<>();
+            fixComboBoxWidth(comboBox1);
             comboBox1.addItem(null); // Allow empty selection
+            JComboBox<String> comboBox2 = new JComboBox<>();
+            fixComboBoxWidth(comboBox2);
             comboBox2.addItem(null); // Allow empty selection
 
             // Build the mapping and populate combo boxes
@@ -1185,5 +1187,12 @@ public class SalvagePostScenarioPicker {
         private void showUnit(TestUnit unit) {
             new EntityReadoutDialog(null, true, unit.getEntity()).setVisible(true);
         }
+    }
+
+    private static void fixComboBoxWidth(JComboBox<?> combo) {
+        Dimension dimension = scaleForGUI(250, combo.getPreferredSize().height);
+        combo.setPreferredSize(dimension);
+        combo.setMinimumSize(dimension);
+        combo.setMaximumSize(dimension);
     }
 }
