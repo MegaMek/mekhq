@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
+import java.util.ArrayList;
+
 import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;
@@ -113,7 +115,13 @@ public class AverageExperienceRating {
         double totalExperience = 0;
 
         Hangar hangar = campaign.getHangar();
-        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+        ArrayList<CombatTeam> combatTeams = campaign.getCombatTeamsAsList();
+
+        if (combatTeams.isEmpty()) {
+            return 7; // No campaign experience
+        }
+
+        for (CombatTeam combatTeam : combatTeams) {
             Force force = combatTeam.getForce(campaign);
             if (force == null) {
                 LOGGER.warn("Force returned null for forceId {}", combatTeam.getForceId());
@@ -146,6 +154,10 @@ public class AverageExperienceRating {
                 totalExperience += pilotingTargetNumber + gunneryTargetNumber;
                 unitCount++;
             }
+        }
+
+        if (unitCount == 0 || totalExperience == 0) {
+            return 7; // No campaign experience
         }
 
         // CamOps states that we need to divide the skill target numbers by twice the unit count.
