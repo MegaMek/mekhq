@@ -61,6 +61,7 @@ import javax.swing.*;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.annotations.Nullable;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
@@ -444,6 +445,7 @@ public class SalvagePostScenarioPicker {
 
         // Info panel at the top (only for contracts)
         JLabel employerSalvageLabel = null;
+        JLabel salvagePercentLabel = null;
         JLabel unitSalvageLabel = null;
         JLabel availableTimeLabel = null;
 
@@ -454,8 +456,16 @@ public class SalvagePostScenarioPicker {
             // Left column (existing info labels)
             JPanel infoPanel = new JPanel(new GridLayout(4, 1, 5, 5));
 
-            JLabel salvagePercentLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "SalvagePostScenarioPicker.salvagePercent", salvagePercent));
+            if (isExchangeRights) {
+                salvagePercentLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "SalvagePostScenarioPicker.salvagePercent.exchange",
+                      salvagePercent));
+            } else {
+                salvagePercentLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "SalvagePostScenarioPicker.salvagePercent.normal",
+                      getCurrentPercentAsBigDecimal(),
+                      salvagePercent));
+            }
             employerSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
                   "SalvagePostScenarioPicker.employerSalvage", employerSalvageMoneyCurrent.toAmountString()));
             if (isExchangeRights) {
@@ -495,6 +505,7 @@ public class SalvagePostScenarioPicker {
         }
 
         // Final references for use in lambdas
+        final JLabel finalSalvagePercentLabel = salvagePercentLabel;
         final JLabel finalEmployerSalvageLabel = employerSalvageLabel;
         final JLabel finalUnitSalvageLabel = unitSalvageLabel;
         final JLabel finalAvailableTimeLabel = availableTimeLabel;
@@ -596,15 +607,17 @@ public class SalvagePostScenarioPicker {
 
             // These need to be after the above lines, as we're going to use 'group' in the listeners.
             comboBox1.addActionListener(e -> performComboChangeAction(isContract, salvageComboBoxGroups,
-                  group, finalEmployerSalvageLabel, finalUnitSalvageLabel, finalAvailableTimeLabel, confirmButton));
+                  group, finalSalvagePercentLabel, finalEmployerSalvageLabel, finalUnitSalvageLabel,
+                  finalAvailableTimeLabel, confirmButton));
             comboBox2.addActionListener(e -> performComboChangeAction(isContract, salvageComboBoxGroups,
-                  group, finalEmployerSalvageLabel, finalUnitSalvageLabel, finalAvailableTimeLabel, confirmButton));
+                  group, finalSalvagePercentLabel, finalEmployerSalvageLabel, finalUnitSalvageLabel,
+                  finalAvailableTimeLabel, confirmButton));
             claimedSalvageForKeeps.addActionListener(e -> performComboChangeAction(isContract,
-                  salvageComboBoxGroups, group, finalEmployerSalvageLabel, finalUnitSalvageLabel,
-                  finalAvailableTimeLabel, confirmButton));
+                  salvageComboBoxGroups, group, finalSalvagePercentLabel, finalEmployerSalvageLabel,
+                  finalUnitSalvageLabel, finalAvailableTimeLabel, confirmButton));
             claimedSalvageForSale.addActionListener(e -> performComboChangeAction(isContract,
-                  salvageComboBoxGroups, group, finalEmployerSalvageLabel, finalUnitSalvageLabel,
-                  finalAvailableTimeLabel, confirmButton));
+                  salvageComboBoxGroups, group, finalSalvagePercentLabel, finalEmployerSalvageLabel,
+                  finalUnitSalvageLabel, finalAvailableTimeLabel, confirmButton));
             viewButton.addActionListener(new ViewUnitListener(group.targetUnit));
 
             fieldStripButton.addActionListener(e -> fieldStrip(group));
@@ -703,8 +716,8 @@ public class SalvagePostScenarioPicker {
      * @since 0.50.10
      */
     private void performComboChangeAction(boolean isContract, List<SalvageComboBoxGroup> salvageComboBoxGroups,
-          SalvageComboBoxGroup group, JLabel finalEmployerSalvageLabel, JLabel finalUnitSalvageLabel,
-          JLabel finalAvailableTimeLabel, JButton confirmButton) {
+          SalvageComboBoxGroup group, JLabel finalSalvagePercentLabel, JLabel finalEmployerSalvageLabel,
+          JLabel finalUnitSalvageLabel, JLabel finalAvailableTimeLabel, JButton confirmButton) {
         // Prevent recursive calls
         if (group.isUpdating) {
             return;
@@ -722,6 +735,7 @@ public class SalvagePostScenarioPicker {
             syncMembershipForGroup(group, isValid);
 
             updateSalvageAllocation(salvageComboBoxGroups,
+                  finalSalvagePercentLabel,
                   finalEmployerSalvageLabel,
                   finalUnitSalvageLabel,
                   finalAvailableTimeLabel);
@@ -774,19 +788,10 @@ public class SalvagePostScenarioPicker {
         // Check salvage percentage if this is a contract
         if (isContract) {
             unitSalvageLabel.setForeground(null);
-            Money totalSalvage = employerSalvageMoneyCurrent.plus(unitSalvageMoneyCurrent);
-
-            if (totalSalvage.isPositive()) {
-                // Calculate percentage: (unitSalvage / totalSalvage) * 100
-                BigDecimal hundred = BigDecimal.valueOf(100);
-                BigDecimal currentPercent = unitSalvageMoneyCurrent.getAmount()
-                                                  .multiply(hundred)
-                                                  .divide(totalSalvage.getAmount(), 4, RoundingMode.HALF_UP);
-
-                if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0 && !isExchangeRights) {
-                    disableConfirmAndColorName(confirmButton, unitSalvageLabel);
-                    shouldEnable = false;
-                }
+            BigDecimal currentPercent = getCurrentPercentAsBigDecimal();
+            if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0 && !isExchangeRights) {
+                disableConfirmAndColorName(confirmButton, unitSalvageLabel);
+                shouldEnable = false;
             }
         }
 
@@ -802,6 +807,19 @@ public class SalvagePostScenarioPicker {
 
         // All checks passed
         confirmButton.setEnabled(shouldEnable);
+    }
+
+    private BigDecimal getCurrentPercentAsBigDecimal() {
+        Money totalSalvage = employerSalvageMoneyCurrent.plus(unitSalvageMoneyCurrent);
+        BigDecimal currentPercent = BigDecimal.valueOf(0);
+        if (totalSalvage.isPositive()) {
+            // Calculate percentage: (unitSalvage / totalSalvage) * 100
+            BigDecimal hundred = BigDecimal.valueOf(100);
+            currentPercent = unitSalvageMoneyCurrent.getAmount()
+                                   .multiply(hundred)
+                                   .divide(totalSalvage.getAmount(), 4, RoundingMode.HALF_UP);
+        }
+        return currentPercent;
     }
 
     private static void disableConfirmAndColorName(JButton confirmButton, JLabel unitSalvageLabel) {
@@ -840,6 +858,7 @@ public class SalvagePostScenarioPicker {
      * <p>Updates the provided labels with the new values.</p>
      *
      * @param salvageComboBoxGroups list of all combo box groups
+     * @param salvagePercentLabel   label showing employer-unit salvage percent (can be null)
      * @param employerSalvageLabel  label showing employer salvage value (can be null)
      * @param unitSalvageLabel      label showing unit salvage value (can be null)
      * @param availableTimeLabel    label showing time usage (can be null)
@@ -848,7 +867,8 @@ public class SalvagePostScenarioPicker {
      * @since 0.50.10
      */
     private void updateSalvageAllocation(List<SalvageComboBoxGroup> salvageComboBoxGroups,
-          JLabel employerSalvageLabel, JLabel unitSalvageLabel, JLabel availableTimeLabel) {
+          @Nullable JLabel salvagePercentLabel, @Nullable JLabel employerSalvageLabel,
+          @Nullable JLabel unitSalvageLabel, @Nullable JLabel availableTimeLabel) {
         usedSalvageTime = 0;
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
             String unitName1 = (String) group.comboBoxLeft.getSelectedItem();
@@ -881,6 +901,10 @@ public class SalvagePostScenarioPicker {
         unitSalvageMoneyCurrent = unitSalvageMoneyInitial.plus(tempUnitSalvage);
 
         // Update labels if they exist
+        if (salvagePercentLabel != null && !isExchangeRights) {
+            salvagePercentLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.salvagePercent.normal", getCurrentPercentAsBigDecimal(), salvagePercent));
+        }
         if (employerSalvageLabel != null) {
             employerSalvageLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE,
                   "SalvagePostScenarioPicker.employerSalvage", employerSalvageMoneyCurrent.toAmountString()));
