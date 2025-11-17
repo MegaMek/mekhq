@@ -138,15 +138,15 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
             specialAbilityGenerator.generateSpecialAbilities(campaign, person, expLvl);
         }
 
+        // Do naming at the end, to ensure the keys are set
+        generateNameAndGender(campaign, person, gender);
+
         // Set relationship flags
         determineOrientation(person, campaignOptions.getNoInterestInRelationshipsDiceSize(),
               campaignOptions.getInterestedInSameSexDiceSize(), campaignOptions.getInterestedInBothSexesDiceSize());
 
         int interestInChildren = campaignOptions.getNoInterestInChildrenDiceSize();
         person.setTryingToConceive(((interestInChildren != 0) && (randomInt(interestInChildren)) != 0));
-
-        // Do naming at the end, to ensure the keys are set
-        generateNameAndGender(campaign, person, gender);
 
         //check for Bloodname
         campaign.checkBloodnameAdd(person, false);
