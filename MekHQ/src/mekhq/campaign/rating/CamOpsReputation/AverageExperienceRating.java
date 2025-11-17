@@ -121,6 +121,7 @@ public class AverageExperienceRating {
             return 7; // No campaign experience
         }
 
+        boolean hasAtLeastOneCrew = false;
         for (CombatTeam combatTeam : combatTeams) {
             Force force = combatTeam.getForce(campaign);
             if (force == null) {
@@ -146,6 +147,8 @@ public class AverageExperienceRating {
                 Person commander = unit.getCommander();
                 if (commander == null) { // Unit is uncrewed
                     continue;
+                } else {
+                    hasAtLeastOneCrew = true;
                 }
 
                 SkillModifierData skillModifierData = commander.getSkillModifierData(true);
@@ -156,7 +159,7 @@ public class AverageExperienceRating {
             }
         }
 
-        if (unitCount == 0 || totalExperience == 0) {
+        if (unitCount == 0 && !hasAtLeastOneCrew) {
             return 7; // No campaign experience
         }
 
