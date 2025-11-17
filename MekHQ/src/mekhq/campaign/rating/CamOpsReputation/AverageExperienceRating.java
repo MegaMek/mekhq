@@ -159,7 +159,7 @@ public class AverageExperienceRating {
             }
         }
 
-        if (unitCount == 0 && !hasAtLeastOneCrew) {
+        if (unitCount == 0 || !hasAtLeastOneCrew) {
             return 7; // No campaign experience
         }
 
