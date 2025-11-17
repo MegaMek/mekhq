@@ -59,10 +59,9 @@ public class MASHCapacity {
         int mashTheatreCount = 0;
 
         for (Unit unit : units) {
-            if ((unit.isDeployed())
-                      || (unit.isDamaged())
-                      || (unit.getCrewState().isUncrewed())
-                      || (unit.getCrewState().isPartiallyCrewed())) {
+            if (unit.isDeployed()
+                      || unit.isDamaged()
+                      || !unit.isFullyCrewed()) {
                 continue;
             }
 
