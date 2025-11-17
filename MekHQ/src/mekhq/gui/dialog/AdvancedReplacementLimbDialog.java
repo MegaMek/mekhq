@@ -977,7 +977,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                 }
 
                 if (PRIMARY_LOCATIONS.contains(mappedLocation)) {
-                    if (location.isImmediateChildOf(mappedLocation)) {
+                    if (location.isImmediateChildOf(mappedLocation) || location.equals(mappedLocation)) {
                         injuriesMappedToPrimaryLocations
                               .computeIfAbsent(mappedLocation,
                                     k -> new ArrayList<>())

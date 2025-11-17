@@ -236,7 +236,7 @@ public class MedicalViewDialog extends JDialog {
         for (Injury injury : injuries) {
             BodyLocation location = injury.getLocation();
             for (BodyLocation mappedLocation : PRIMARY_LOCATIONS) {
-                if (location.isImmediateChildOf(mappedLocation)) {
+                if (location.isImmediateChildOf(mappedLocation) || location.equals(mappedLocation)) {
                     injuriesMappedToPrimaryLocations
                           .computeIfAbsent(mappedLocation,
                                 k -> new ArrayList<>())
