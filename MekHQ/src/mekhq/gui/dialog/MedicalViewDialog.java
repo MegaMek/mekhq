@@ -196,9 +196,17 @@ public class MedicalViewDialog extends JDialog {
                 remove.setEnabled(false);
             } else {
                 remove.addActionListener(rae -> {
-                    for (Injury injury : getInjuriesAtLocation(bodyLocation)) {
-                        person.removeInjury(injury);
+                    if (!locationPicked) {
+                        // Heal all injuries
+                        for (Injury injury : new ArrayList<>(person.getInjuries())) {
+                            person.removeInjury(injury);
+                        }
+                    } else {
+                        for (Injury injury : getInjuriesAtLocation(bodyLocation)) {
+                            person.removeInjury(injury);
+                        }
                     }
+                    revalidate();
                 });
             }
             popup.add(remove);
