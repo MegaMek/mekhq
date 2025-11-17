@@ -32,6 +32,8 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.personnel.medical.BodyLocation.PRIMARY_LOCATIONS;
+
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -40,6 +42,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -89,6 +92,7 @@ public class MedicalViewDialog extends JDialog {
     private JPanel injuryPanel;
     private JTextArea notesArea;
 
+    private final Map<BodyLocation, List<Injury>> injuriesMappedToPrimaryLocations = new HashMap<>();
     private final ActionListener dollActionListener;
 
     private final transient Font labelFont;
@@ -98,13 +102,14 @@ public class MedicalViewDialog extends JDialog {
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog",
           MekHQ.getMHQOptions().getLocale());
 
-    public MedicalViewDialog(Window parent, Campaign c, Person p) {
+    public MedicalViewDialog(Window parent, Campaign campaign, Person person) {
         super();
-        this.campaign = Objects.requireNonNull(c);
-        this.person = Objects.requireNonNull(p);
+        this.campaign = Objects.requireNonNull(campaign);
+        this.person = Objects.requireNonNull(person);
+        gatherRelevantInjuries(person.getInjuries());
 
         // Preload default paper dolls
-        try (InputStream fis = new FileInputStream(c.getApp()
+        try (InputStream fis = new FileInputStream(campaign.getApp()
                                                          .getIconPackage()
                                                          .getGuiElement("default_male_paperdoll"))) { // TODO : Remove inline file
             // path
@@ -113,7 +118,7 @@ public class MedicalViewDialog extends JDialog {
             LOGGER.error("", e);
         }
 
-        try (InputStream fis = new FileInputStream(c.getApp()
+        try (InputStream fis = new FileInputStream(campaign.getApp()
                                                          .getIconPackage()
                                                          .getGuiElement("default_female_paperdoll"))) { // TODO : Remove inline file
             // path
@@ -136,28 +141,40 @@ public class MedicalViewDialog extends JDialog {
                                                   Image.SCALE_DEFAULT)); // TODO : Remove inline file path
 
         dollActionListener = ae -> {
-            final BodyLocation loc = BodyLocation.of(ae.getActionCommand());
-            final boolean locationPicked = !loc.locationName().isEmpty();
+            final BodyLocation bodyLocation = BodyLocation.of(ae.getActionCommand());
+            final boolean locationPicked = !bodyLocation.locationName().isEmpty();
             Point mousePos = doll.getMousePosition();
             JPopupMenu popup = new JPopupMenu();
             if (locationPicked) {
-                JLabel header = new JLabel(Utilities.capitalize(loc.locationName()));
-                header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD));
+                JLabel header = new JLabel(
+                      Utilities.capitalize(bodyLocation.locationName()));
+                header.setFont(UIManager.getDefaults()
+                                     .getFont("Menu.font")
+                                     .deriveFont(Font.BOLD));
                 popup.add(header);
                 popup.addSeparator();
+
+                if (injuriesMappedToPrimaryLocations.containsKey(
+                      bodyLocation)) {
+                    for (Injury injury :
+                          injuriesMappedToPrimaryLocations.get(
+                                bodyLocation)) {
+                        popup.add(injury.getName());
+                    }
+                }
             }
             if (locationPicked) {
                 ActionListener addActionListener = addEvent -> {
                     String[] commands = addEvent.getActionCommand().split(MENU_CMD_SEPARATOR, 2);
                     InjuryType addIType = InjuryType.byKey(commands[0]);
                     int severity = Integer.parseInt(commands[1]);
-                    person.addInjury(addIType.newInjury(c, person, loc, severity));
+                    this.person.addInjury(addIType.newInjury(campaign, this.person, bodyLocation, severity));
                     revalidate();
                 };
                 JMenu addMenu = new JMenu(resourceMap.getString("menuAdd.text"));
                 InjuryType.getAllTypes()
                       .stream()
-                      .filter(it -> it.isValidInLocation(loc))
+                      .filter(it -> it.isValidInLocation(bodyLocation))
                       .sorted((it1, it2) -> it1.getSimpleName().compareToIgnoreCase(it2.getSimpleName()))
                       .forEach(it -> IntStream.range(1, it.getMaxSeverity() + 1).forEach(severity -> {
                           JMenuItem add = new JMenuItem(resourceMap.getString("menuMore.text") +
@@ -172,18 +189,16 @@ public class MedicalViewDialog extends JDialog {
                       UIManager.getIcon("FileView.fileIcon"));
                 popup.add(edit);
             }
-            JMenuItem remove = new JMenuItem(loc.locationName().isEmpty() ?
+            JMenuItem remove = new JMenuItem(bodyLocation.locationName().isEmpty() ?
                                                    resourceMap.getString("menuHealAll.text") :
                                                    resourceMap.getString("menuHeal.text"), healImageIcon);
-            if (locationPicked && p.getInjuriesByLocation(loc).isEmpty()) {
+            if (locationPicked && getInjuriesAtLocation(bodyLocation).isEmpty()) {
                 remove.setEnabled(false);
             } else {
                 remove.addActionListener(rae -> {
-                    person.getInjuries()
-                          .stream()
-                          .filter(inj -> !locationPicked || (inj.getLocation() == loc))
-                          .forEach(person::removeInjury);
-                    revalidate();
+                    for (Injury injury : getInjuriesAtLocation(bodyLocation)) {
+                        person.removeInjury(injury);
+                    }
                 });
             }
             popup.add(remove);
@@ -201,7 +216,7 @@ public class MedicalViewDialog extends JDialog {
         JButton okayButton = new JButton(resourceMap.getString("buttonDone.text"));
         okayButton.addActionListener(ae -> {
             if (!notesArea.getText().isEmpty()) {
-                p.getExtraData().set(DOCTOR_NOTES, notesArea.getText());
+                person.getExtraData().set(DOCTOR_NOTES, notesArea.getText());
             }
             setVisible(false);
         });
@@ -210,6 +225,25 @@ public class MedicalViewDialog extends JDialog {
         pack();
         setUserPreferences();
         setModal(true);
+    }
+
+    private List<Injury> getInjuriesAtLocation(BodyLocation bodyLocation) {
+        return injuriesMappedToPrimaryLocations.getOrDefault(bodyLocation, new ArrayList<>());
+    }
+
+    private void gatherRelevantInjuries(List<Injury> injuries) {
+        injuries.sort(Comparator.comparing(Injury::getName)); // consistent order
+        for (Injury injury : injuries) {
+            BodyLocation location = injury.getLocation();
+            for (BodyLocation mappedLocation : PRIMARY_LOCATIONS) {
+                if (location.isImmediateChildOf(mappedLocation)) {
+                    injuriesMappedToPrimaryLocations
+                          .computeIfAbsent(mappedLocation,
+                                k -> new ArrayList<>())
+                          .add(injury);
+                }
+            }
+        }
     }
 
     private void initComponents(Container cont) {
@@ -286,7 +320,7 @@ public class MedicalViewDialog extends JDialog {
         super.validate();
     }
 
-    private void fillDoll(JPanel panel, Campaign c, Person p) {
+    private void fillDoll(JPanel panel, Campaign campaign, Person person) {
         panel.removeAll();
 
         if (null != doll) {
@@ -296,11 +330,12 @@ public class MedicalViewDialog extends JDialog {
         doll.clearLocColors();
         doll.clearLocTags();
         doll.setHighlightColor(new Color(170, 170, 255));
-        Arrays.stream(BodyLocation.values()).filter(p::hasInjury).forEach(bl -> {
-            if (person.isLocationMissing(bl) && !person.isLocationMissing(bl.Parent())) {
-                doll.setLocTag(bl, "lost");
-            } else if (!person.isLocationMissing(bl)) {
-                InjuryLevel level = getMaxInjuryLevel(person, bl);
+        PRIMARY_LOCATIONS.forEach(bodyLocation -> {
+            if (person.isLocationMissing(bodyLocation)
+                      && !person.isLocationMissing(bodyLocation.Parent())) {
+                doll.setLocTag(bodyLocation, "lost");
+            } else if (!person.isLocationMissing(bodyLocation)) {
+                InjuryLevel level = getMaxInjuryLevel(bodyLocation, injuriesMappedToPrimaryLocations);
                 Color col = switch (level) {
                     case CHRONIC -> new Color(255, 204, 255);
                     case DEADLY -> Color.RED;
@@ -308,11 +343,11 @@ public class MedicalViewDialog extends JDialog {
                     case MINOR -> Color.YELLOW;
                     default -> Color.WHITE;
                 };
-                doll.setLocColor(bl, col);
+                doll.setLocColor(bodyLocation, col);
             }
         });
 
-        if (c.isGM()) {
+        if (campaign.isGM()) {
             doll.addActionListener(dollActionListener);
         }
         panel.add(doll);
@@ -431,24 +466,42 @@ public class MedicalViewDialog extends JDialog {
         return panel;
     }
 
-    /** Get the maximum injury level in the specified location */
-    private InjuryLevel getMaxInjuryLevel(Person person, BodyLocation bodyLocation) {
-        return person.getInjuries()
-                     .stream()
-                     .filter(inj -> !inj.isHidden() && (inj.getLocation() == bodyLocation))
-                     .min((inj1, inj2) -> Integer.compare(inj2.getLevel().ordinal(), inj1.getLevel().ordinal()))
-                     .map(Injury::getLevel)
-                     .orElse(InjuryLevel.NONE);
+    /**
+     * Determines the highest visible injury level found amongst injuries mapped to the given primary body location.
+     *
+     * @param bodyLocation                     the location to check
+     * @param injuriesMappedToPrimaryLocations all injuries mapped to primary locations
+     *
+     * @return the maximum {@link InjuryLevel}, or {@link InjuryLevel#NONE} if no visible injuries are present
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public static InjuryLevel getMaxInjuryLevel(BodyLocation bodyLocation,
+          Map<BodyLocation, List<Injury>> injuriesMappedToPrimaryLocations) {
+        InjuryLevel maxLevel = InjuryLevel.NONE;
+
+        for (Injury injury :
+              injuriesMappedToPrimaryLocations.getOrDefault(
+                    bodyLocation, new ArrayList<>())) {
+            if (!injury.isHidden()) {
+                if (injury.getLevel().ordinal() > maxLevel.ordinal()) {
+                    maxLevel = injury.getLevel();
+                }
+            }
+        }
+
+        return maxLevel;
     }
 
     /**
      * Compiles a list of body locations stream ordered by the maximum injury level in that location
      */
-    private Stream<BodyLocation> maxInjuryLevelLocationStream(Person p) {
+    private Stream<BodyLocation> maxInjuryLevelLocationStream(Person person) {
         Map<BodyLocation, InjuryLevel> levelMap = new HashMap<>();
         Arrays.stream(BodyLocation.values())
-              .filter(p::hasInjury)
-              .forEach(bl -> levelMap.put(bl, getMaxInjuryLevel(p, bl)));
+              .filter(person::hasInjury)
+              .forEach(bl -> levelMap.put(bl, getMaxInjuryLevel(bl, injuriesMappedToPrimaryLocations)));
         return levelMap.entrySet()
                      .stream()
                      .sorted((entry1, entry2) -> Integer.compare(entry2.getValue().ordinal(),
@@ -456,54 +509,51 @@ public class MedicalViewDialog extends JDialog {
                      .map(Entry::getKey);
     }
 
-    private void fillInjuries(JPanel panel, Campaign c, Person p) {
+    private void fillInjuries(JPanel panel, Campaign campaign, Person person) {
         panel.removeAll();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(genLabel(resourceMap.getString("injuries.text")));
 
-        maxInjuryLevelLocationStream(p).forEachOrdered(bl -> {
+        maxInjuryLevelLocationStream(person).forEachOrdered(bodyLocation -> {
             JPanel blWrapper = new JPanel();
             blWrapper.setLayout(new BoxLayout(blWrapper, BoxLayout.X_AXIS));
             blWrapper.setOpaque(false);
             blWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
             blWrapper.add(Box.createHorizontalStrut(30));
-            blWrapper.add(genWrittenText(Utilities.capitalize(bl.locationName())));
+            blWrapper.add(genWrittenText(Utilities.capitalize(bodyLocation.locationName())));
             panel.add(blWrapper);
 
-            p.getInjuriesByLocation(bl)
-                  .stream()
-                  .sorted((inj1, inj2) -> Integer.compare(inj2.getLevel().ordinal(), inj1.getLevel().ordinal()))
-                  .forEachOrdered(inj -> {
-                      JLabel injLabel;
-                      if (inj.getType().isPermanent()) {
-                          injLabel = genWrittenText(String.format(resourceMap.getString("injuriesText.format"),
-                                inj.getType().getSimpleName(),
-                                MekHQ.getMHQOptions().getDisplayFormattedDate(inj.getStart())));
-                      } else if (inj.isPermanent() || (inj.getTime() <= 0)) {
-                          injLabel = genWrittenText(String.format(resourceMap.getString("injuriesPermanent.format"),
-                                inj.getType().getSimpleName(),
-                                MekHQ.getMHQOptions().getDisplayFormattedDate(inj.getStart())));
-                      } else {
-                          injLabel = genWrittenText(String.format(resourceMap.getString("injuriesTextAndDuration.format"),
-                                inj.getType().getSimpleName(),
-                                MekHQ.getMHQOptions().getDisplayFormattedDate(inj.getStart()),
-                                genTimePeriod(inj.getTime())));
-                      }
+            for (Injury injury : getInjuriesAtLocation(bodyLocation)) {
+                JLabel injuryLabel;
+                if (injury.getType().isPermanent()) {
+                    injuryLabel = genWrittenText(String.format(resourceMap.getString("injuriesText.format"),
+                          injury.getType().getSimpleName(),
+                          MekHQ.getMHQOptions().getDisplayFormattedDate(injury.getStart())));
+                } else if (injury.isPermanent() || (injury.getTime() <= 0)) {
+                    injuryLabel = genWrittenText(String.format(resourceMap.getString("injuriesPermanent.format"),
+                          injury.getType().getSimpleName(),
+                          MekHQ.getMHQOptions().getDisplayFormattedDate(injury.getStart())));
+                } else {
+                    injuryLabel = genWrittenText(String.format(resourceMap.getString("injuriesTextAndDuration.format"),
+                          injury.getType().getSimpleName(),
+                          MekHQ.getMHQOptions().getDisplayFormattedDate(injury.getStart()),
+                          genTimePeriod(injury.getTime())));
+                }
 
-                      if (c.isGM()) {
-                          injLabel.addMouseListener(new InjuryLabelMouseAdapter(injLabel, p, inj));
-                      }
+                if (campaign.isGM()) {
+                    injuryLabel.addMouseListener(new InjuryLabelMouseAdapter(injuryLabel, person, injury));
+                }
 
-                      JPanel wrapper = new JPanel();
-                      wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
-                      wrapper.setOpaque(false);
-                      wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
-                      wrapper.add(Box.createHorizontalStrut(60));
-                      wrapper.add(injLabel);
+                JPanel wrapper = new JPanel();
+                wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
+                wrapper.setOpaque(false);
+                wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+                wrapper.add(Box.createHorizontalStrut(60));
+                wrapper.add(injuryLabel);
 
-                      panel.add(wrapper);
-                  });
+                panel.add(wrapper);
+            }
         });
 
     }
