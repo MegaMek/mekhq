@@ -159,7 +159,7 @@ public class AverageExperienceRating {
             }
         }
 
-        if (unitCount == 0 || !hasAtLeastOneCrew) {
+        if (unitCount == 0 || !hasAtLeastOneCrew) { // this can equal false no matter what IDEA says
             return 7; // No campaign experience
         }
 
