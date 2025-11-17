@@ -2037,7 +2037,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menuItem.addActionListener(this);
         popup.add(menuItem);
 
-        if (getCampaignOptions().isUseAdvancedMedical() && oneSelected) {
+        if (getCampaignOptions().isUseAdvancedMedical() &&
+                  !getCampaignOptions().isUseAlternativeAdvancedMedical()
+                  && oneSelected) {
             menuItem = new JMenuItem(resources.getString("viewMedicalRecords.text"));
             menuItem.setActionCommand(makeCommand(CMD_MEDICAL_RECORDS));
             menuItem.addActionListener(this);
