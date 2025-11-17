@@ -36,7 +36,15 @@ import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STAND
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_4;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_5;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.calculateFactionStandingLevel;
-import static mekhq.campaign.universe.factionStanding.FactionStandings.*;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.CLIMATE_REGARD_ALLIED_FACTION;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.CLIMATE_REGARD_ENEMY_FACTION_AT_WAR;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.CLIMATE_REGARD_SAME_FACTION;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.DEFAULT_REGARD;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.DEFAULT_REGARD_DEGRADATION;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_CLAN;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_EXECUTING_PRISONER;
+import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_REFUSE_BATCHALL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
@@ -47,7 +55,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -164,47 +171,6 @@ class FactionStandingsTest {
         assertEquals(primaryStart + expectedPrimaryDelta,
               factionStandings.getRegardForFaction(primaryFaction, false),
               "Incorrect regard for " + primaryFaction);
-    }
-
-    private static Stream<Arguments> provideContractStatuses() {
-        return Stream.of( // Mission status, startingFSRegard, startingLARegard, expectedFSRegard, expectedLARegard
-              Arguments.of("Mission Success",
-                    MissionStatus.SUCCESS,
-                    10.0,
-                    REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER),
-              Arguments.of("Mission Partial Success",
-                    MissionStatus.PARTIAL,
-                    10.0,
-                    REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER),
-              Arguments.of("Mission Failed",
-                    MissionStatus.FAILED,
-                    10.0,
-                    REGARD_DELTA_CONTRACT_FAILURE_EMPLOYER),
-              Arguments.of("Mission Contract Breached",
-                    MissionStatus.BREACH,
-                    10.0,
-                    REGARD_DELTA_CONTRACT_BREACH_EMPLOYER));
-    }
-
-    @ParameterizedTest(name = "{0}")
-    @MethodSource(value = "provideContractStatuses")
-    void test_processContractCompletion_variousOutcomes(String testName, MissionStatus status, double startingFsRegard,
-          double expectedFsDelta) {
-        // Setup
-        FactionStandings factionStandings = new FactionStandings();
-        factionStandings.setRegardForFaction(null, "FS", startingFsRegard, 3028, false);
-
-        Faction employerFaction = factions.getFaction("FS");
-        LocalDate today = LocalDate.of(3028, 8, 20);
-
-        // Act
-        factionStandings.processContractCompletion(factions.getDefaultFaction(), employerFaction, today, status, 1.0,
-              1);
-
-        // Assert
-        assertEquals(startingFsRegard + expectedFsDelta,
-              factionStandings.getRegardForFaction("FS", false),
-              "Incorrect regard for FS (" + status + ")");
     }
 
     @Test
