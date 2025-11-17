@@ -150,7 +150,6 @@ import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
-import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -7168,10 +7167,10 @@ public class Person {
      *
      * <ul>
      *     <li>If {@code permanentCheck} is {@code false}, this method returns {@code true} if the person has any
-     *     recorded injuries.</li>
+     *     recorded injuries with remaining recovery time greater than zero.</li>
      *     <li>If {@code permanentCheck} is {@code true}, it will return {@code true} only if the person has at least
-     *     one injury that is either non-permanent or has a remaining recovery time greater than zero. Otherwise, it
-     *     returns {@code false}.</li>
+     *     one injury that is non-permanent and has remaining recovery time greater than zero. Otherwise, it returns
+     *     {@code false}.</li>
      * </ul>
      *
      * @param permanentCheck if {@code true}, only injuries that are not permanent or have time remaining are
@@ -7180,9 +7179,17 @@ public class Person {
      * @return {@code true} if the person has injuries matching the specified criteria; {@code false} otherwise
      */
     public boolean hasInjuries(final boolean permanentCheck) {
-        return !injuries.isEmpty() &&
-                     (!permanentCheck ||
-                            injuries.stream().anyMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0)));
+        for (Injury injury : injuries) {
+            if (injury.isPermanent() && permanentCheck) {
+                continue;
+            }
+
+            if (injury.getTime() > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public boolean hasOnlyHealedPermanentInjuries() {
