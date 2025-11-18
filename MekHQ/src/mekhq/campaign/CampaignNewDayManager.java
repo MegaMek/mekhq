@@ -890,7 +890,7 @@ public class CampaignNewDayManager {
             if (campaignState != null && !contract.getEndingDate().equals(today)) {
                 boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
                 int victoryPoints = contract.getContractScore(isUseMaplessMode);
-                int requiredVictoryPoints = (int) ceil(contract.getRequiredCombatTeams() * contract.getLength() * 0.66);
+                int requiredVictoryPoints = (int) ceil(contract.getRequiredCombatTeams() * contract.getLength());
 
                 if (campaignState.canEndContractEarly() && victoryPoints >= requiredVictoryPoints) {
                     new ImmersiveDialogNotification(campaign,
