@@ -244,7 +244,8 @@ public class SalvagePostScenarioPicker {
 
         setAvailableTechTime(campaign, scenario);
         List<Integer> salvageForces = setSalvageUnits(campaign, scenario);
-        sanitizeOtherScenarioAssignments(campaign.getActiveScenarios(), scenario.getSalvageTechs(), salvageForces);
+        sanitizeOtherScenarioAssignments(campaign.getActiveScenarios(), scenario, scenario.getSalvageTechs(),
+              salvageForces);
 
         arrangeUnits(actualSalvage, soldSalvage);
         setRecoveryTimeDataMap(campaign, scenario);
