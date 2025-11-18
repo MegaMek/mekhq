@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.education;
 
+import static java.lang.Math.min;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -495,6 +497,31 @@ public class Academy implements Comparable<Academy> {
      */
     public List<String> getQualifications() {
         return qualifications;
+    }
+
+    /**
+     * Returns a clamped course index based on the size of the qualification list.
+     *
+     * <p>This method ensures the returned index is always within the valid range of the underlying {@code
+     * qualifications} list. If the provided {@code index} is greater than the last valid position, the maximum
+     * allowable index is returned instead.</p>
+     *
+     * <p><b>Usage:</b> This method was introduced due to the manner in which courses are stored in the
+     * {@link Person} object. The course a character is enrolled is stored as an integer which matches the index of the
+     * course in the {@link Academy}. If the number of courses is reduced in the source XML any characters with a course
+     * index larger than the new array length will prompt a series of {@link IndexOutOfBoundsException} errors. To avoid
+     * that, we instead shunt the character into the last possible course.</p>
+     *
+     * @param index the requested course index
+     *
+     * @return the provided index if within bounds, otherwise the highest valid index
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public int getAdjustedCourseIndex(int index) {
+        int maximumIndex = qualifications.size() - 1;
+        return min(index, maximumIndex);
     }
 
     /**
