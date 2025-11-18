@@ -62,7 +62,7 @@ import javax.swing.border.EmptyBorder;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -200,7 +200,7 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
                 continue;
             }
 
-            AdvancedMedicalAlternate.giveEIImplant(campaign, person);
+            AdvancedMedicalAlternateImplants.giveEIImplant(campaign, person);
 
             campaign.personUpdated(person);
         }
