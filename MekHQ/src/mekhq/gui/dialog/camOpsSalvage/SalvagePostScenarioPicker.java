@@ -64,10 +64,12 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
+import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBScenario;
@@ -78,6 +80,7 @@ import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.camOpsSalvage.RecoveryTimeCalculations;
 import mekhq.campaign.mission.camOpsSalvage.RecoveryTimeData;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -239,8 +242,10 @@ public class SalvagePostScenarioPicker {
           List<TestUnit> actualSalvage, List<TestUnit> soldSalvage) {
         this.isInSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
 
-        setSalvageUnits(campaign, scenario);
         setAvailableTechTime(campaign, scenario);
+        List<Integer> salvageForces = setSalvageUnits(campaign, scenario);
+        sanitizeOtherScenarioAssignments(campaign.getActiveScenarios(), scenario.getSalvageTechs(), salvageForces);
+
         arrangeUnits(actualSalvage, soldSalvage);
         setRecoveryTimeDataMap(campaign, scenario);
 
@@ -267,6 +272,26 @@ public class SalvagePostScenarioPicker {
         // Process selected units
         CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, this.keptSalvage, this.soldSalvage,
               this.employerSalvage);
+    }
+
+    /**
+     * If the player follows a very convoluted stream of steps, it's possible for them to assign the same force or tech
+     * to multiple salvage operations on the same day. This method ensures this doesn't happen by removing the force/s
+     * (and tech/s) from any other scenarios they have been assigned to.
+     *
+     * @param activeScenarios a list of scenarios marked as 'current' (i.e., unresolved)
+     * @param salvageTechs    a list of techs assigned to the salvage operation
+     * @param salvageForces   a list of forces assigned to the salvage operation
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void sanitizeOtherScenarioAssignments(List<Scenario> activeScenarios, List<UUID> salvageTechs,
+          List<Integer> salvageForces) {
+        for (Scenario activeScenario : activeScenarios) {
+            activeScenario.getSalvageForces().removeAll(salvageForces);
+            activeScenario.getSalvageTechs().removeAll(salvageTechs);
+        }
     }
 
     /**
@@ -306,13 +331,18 @@ public class SalvagePostScenarioPicker {
      * @param campaign the campaign containing the salvage forces
      * @param scenario the scenario being resolved
      *
+     * @return the ID numbers of the forces involved in the salvage operation
+     *
      * @author Illiani
      * @since 0.50.10
      */
-    private void setSalvageUnits(Campaign campaign, Scenario scenario) {
+    private List<Integer> setSalvageUnits(Campaign campaign, Scenario scenario) {
+        List<Integer> salvageForces = new ArrayList<>();
         salvageUnits = new ArrayList<>();
         Hangar hangar = campaign.getHangar();
         for (Integer forceId : scenario.getSalvageForces()) {
+            salvageForces.add(forceId);
+
             Force force = campaign.getForce(forceId);
             if (force == null) {
                 LOGGER.error("Force {} not found in campaign", forceId);
@@ -320,11 +350,25 @@ public class SalvagePostScenarioPicker {
             }
 
             for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
-                if (unit.canSalvage(isInSpace)) {
+                Entity entity = unit.getEntity();
+                if (entity == null) {
+                    continue;
+                }
+
+                if (entity instanceof Tank tank && tank.isTrailer()) {
+                    ITransportAssignment transportAssignment = unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT);
+                    if (transportAssignment == null || !transportAssignment.hasTransport()) {
+                        continue; // If nothing is towing the trailer, it can't reach the salvage operation
+                    }
+                }
+
+                if (unit.isFullyCrewed() && unit.canSalvage(isInSpace)) {
                     salvageUnits.add(unit);
                 }
             }
         }
+
+        return salvageForces;
     }
 
     /**
@@ -1042,8 +1086,8 @@ public class SalvagePostScenarioPicker {
 
         // If two units selected, must use towing
         if (isTwoUnitsSelected) {
-            double weightLeft = unitLeftEntity != null ? unitLeftEntity.getWeight() : 0;
-            double weightRight = unitRightEntity != null ? unitRightEntity.getWeight() : 0;
+            double weightLeft = getTowCapacity(unitLeftEntity);
+            double weightRight = getTowCapacity(unitRightEntity);
 
             boolean hasTowageCapacity = (weightLeft + weightRight) >= targetWeight;
             if (!hasTowageCapacity) {
@@ -1063,6 +1107,16 @@ public class SalvagePostScenarioPicker {
         }
 
         validate(group);
+    }
+
+    private static double getTowCapacity(Entity selectedEntity) {
+        if (selectedEntity == null) {
+            return 0.0;
+        } else if (selectedEntity instanceof Tank tank && tank.isTrailer()) {
+            return 0.0;
+        } else {
+            return selectedEntity.getWeight();
+        }
     }
 
     private boolean useTowageOrCargo(SalvageComboBoxGroup group, Entity entity, Unit unit, double targetWeight) {
