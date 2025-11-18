@@ -1013,7 +1013,7 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return {@code true} if the personnel has the Combat Technician role, {@code false} otherwise.
+     * @return {@code true} if the personnel has the Combat Technician/Engineer role, {@code false} otherwise.
      */
     public boolean isCombatTechnician() {
         return this == COMBAT_TECHNICIAN;
@@ -1220,28 +1220,31 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Vehicle Crew/Ground, or the Combat Technician role
+     * @return {@code true} if the character is assigned to the Vehicle Crew/Ground, or the Combat Technician/Engineer
+     *       role
      */
     public boolean isGroundVehicleCrew() {
         return isVehicleCrewGround() || isCombatTechnician();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Vehicle Crew/Naval, or the Combat Technician role
+     * @return {@code true} if the character is assigned to the Vehicle Crew/Naval, or the Combat Technician/Engineer
+     *       role
      */
     public boolean isNavalVehicleCrew() {
         return isVehicleCrewNaval() || isCombatTechnician();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Vehicle Crew/VTOL, or the Combat Technician role
+     * @return {@code true} if the character is assigned to the Vehicle Crew/VTOL, or the Combat Technician/Engineer
+     *       role
      */
     public boolean isVTOLCrew() {
         return isVehicleCrewVTOL() || isCombatTechnician();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Vehicle Crew/x or Combat Technician role
+     * @return {@code true} if the character is assigned to the Vehicle Crew/x or Combat Technician/Engineer role
      */
     public boolean isVehicleCrewMember() {
         return isGroundVehicleCrew() || isNavalVehicleCrew() || isVTOLCrew();
