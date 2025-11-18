@@ -123,6 +123,7 @@ import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.*;
 import mekhq.campaign.events.loans.LoanNewEvent;
 import mekhq.campaign.events.loans.LoanPaidEvent;
@@ -334,13 +335,16 @@ public class Campaign implements ITechManager {
     private transient String currentReportHTML;
     private transient List<String> newReports;
 
+    private final ArrayList<String> skillReport;
+    private transient String skillReportHTML;
+    private transient List<String> newSkillReports;
+
     private boolean fieldKitchenWithinCapacity;
     private int mashTheatreCapacity;
     private int repairBaysRented;
 
-    // this is updated and used per gaming session, it is enabled/disabled via the
-    // Campaign options
-    // we're re-using the LogEntry class that is used to store Personnel entries
+    // this is updated and used per gaming session, it is enabled/disabled via the Campaign options we're re-using
+    // the LogEntry class used to store Personnel entries
     public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<>();
 
     private boolean overtime;
@@ -581,6 +585,10 @@ public class Campaign implements ITechManager {
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
+
+        skillReport = new ArrayList<>();
+        skillReportHTML = "";
+        newSkillReports = new ArrayList<>();
 
         // Secondary initialization from passed / derived values
         news = new News(getGameYear(), id.getLeastSignificantBits());
@@ -3198,6 +3206,32 @@ public class Campaign implements ITechManager {
         return oldReports;
     }
 
+    public List<String> getSkillReport() {
+        return skillReport;
+    }
+
+    public void setSkillReportHTML(String html) {
+        skillReportHTML = html;
+    }
+
+    public String getSkillReportHTML() {
+        return skillReportHTML;
+    }
+
+    public List<String> getNewSkillReports() {
+        return newSkillReports;
+    }
+
+    public void setNewSkillReports(List<String> reports) {
+        newSkillReports = reports;
+    }
+
+    public List<String> fetchAndClearNewSkillReports() {
+        List<String> oldSkillReports = newSkillReports;
+        setNewSkillReports(new ArrayList<>());
+        return oldSkillReports;
+    }
+
     /**
      * Finds the active person in a particular role with the highest level in a given, with an optional secondary skill
      * to break ties.
@@ -5640,14 +5674,17 @@ public class Campaign implements ITechManager {
     /**
      * Starts a new day for the daily log
      *
-     * @param r - the report String
+     * @param report - the report String
      */
-    public void beginReport(String r) {
+    public void beginReport(String report) {
         if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
             // add the new items to our in-memory cache
             addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), ""));
         }
-        addReportInternal(r);
+
+        for (DailyReportType type : DailyReportType.values()) {
+            addReportInternal(type, report);
+        }
     }
 
     /**
@@ -5657,31 +5694,71 @@ public class Campaign implements ITechManager {
      * @param objects Variable list of objects to format into {@code format}
      */
     public void addReport(final String format, final Object... objects) {
-        addReport(String.format(format, objects));
+        addReport(DailyReportType.GENERAL, String.format(format, objects));
     }
 
     /**
      * Adds a report to the daily log
      *
-     * @param r - the report String
+     * @param report - the report String
      */
-    public void addReport(String r) {
+    public void addReport(String report) {
         if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
-            addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), r));
+            addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), report));
         }
-        addReportInternal(r);
+        addReportInternal(DailyReportType.GENERAL, report);
     }
 
-    private void addReportInternal(String r) {
-        currentReport.add(r);
-        if (!currentReportHTML.isEmpty()) {
-            currentReportHTML = currentReportHTML + REPORT_LINEBREAK + r;
-            newReports.add(REPORT_LINEBREAK);
-        } else {
-            currentReportHTML = r;
+    /**
+     * Formats and then adds a report to the daily log
+     *
+     * @param type    what log to place the report in
+     * @param format  String with format markers.
+     * @param objects Variable list of objects to format into {@code format}
+     */
+    public void addReport(final DailyReportType type, final String format, final Object... objects) {
+        addReport(type, String.format(format, objects));
+    }
+
+    /**
+     * Adds a report to the daily log
+     *
+     * @param type   what log to place the report in
+     * @param report - the report String
+     */
+    public void addReport(final DailyReportType type, String report) {
+        if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
+            addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), report));
         }
-        newReports.add(r);
-        MekHQ.triggerEvent(new ReportEvent(this, r));
+        addReportInternal(type, report);
+    }
+
+    private void addReportInternal(final DailyReportType type, final String report) {
+        switch (type) {
+            case GENERAL -> {
+                currentReport.add(report);
+                if (!currentReportHTML.isEmpty()) {
+                    currentReportHTML = currentReportHTML + REPORT_LINEBREAK + report;
+                    newReports.add(REPORT_LINEBREAK);
+                } else {
+                    currentReportHTML = report;
+                }
+
+                newReports.add(report);
+            }
+            case SKILL -> {
+                skillReport.add(report);
+                if (!skillReportHTML.isEmpty()) {
+                    skillReportHTML = skillReportHTML + REPORT_LINEBREAK + report;
+                    newReports.add(REPORT_LINEBREAK);
+                } else {
+                    skillReportHTML = report;
+                }
+
+                newSkillReports.add(report);
+            }
+        }
+        MekHQ.triggerEvent(new ReportEvent(this, report));
     }
 
     public Camouflage getCamouflage() {
@@ -5922,11 +5999,18 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "nameGen");
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "currentReport");
-        for (String s : currentReport) {
+        for (String report : currentReport) {
             // This cannot use the MHQXMLUtility as it cannot be escaped
-            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + s + "]]></reportLine>");
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "currentReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "skillReport");
+        for (String report : skillReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "skillReport");
 
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "info");
         // endregion Basic Campaign Info

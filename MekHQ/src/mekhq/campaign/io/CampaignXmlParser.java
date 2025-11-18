@@ -859,6 +859,27 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                             campaign.getCurrentReport().add(wn2.getTextContent());
                         }
                     }
+                } else if (nodeName.equalsIgnoreCase("skillReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getSkillReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getSkillReport().add(wn2.getTextContent());
+                        }
+                    }
                 } else if (nodeName.equalsIgnoreCase("faction")) {
                     Faction faction = Factions.getInstance().getFaction(childNode.getTextContent());
                     campaign.setFaction(faction);
@@ -937,21 +958,32 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
         }
 
-        // TODO: this could probably be better
+        // Update daily reports
         campaign.setCurrentReportHTML(Utilities.combineString(campaign.getCurrentReport(), Campaign.REPORT_LINEBREAK));
-
-        // Everything's new
         List<String> newReports = new ArrayList<>(campaign.getCurrentReport().size() * 2);
-        boolean firstReport = true;
+        boolean firstGeneralReport = true;
         for (String report : campaign.getCurrentReport()) {
-            if (firstReport) {
-                firstReport = false;
+            if (firstGeneralReport) {
+                firstGeneralReport = false;
             } else {
                 newReports.add(Campaign.REPORT_LINEBREAK);
             }
             newReports.add(report);
         }
         campaign.setNewReports(newReports);
+
+        campaign.setSkillReportHTML(Utilities.combineString(campaign.getSkillReport(), Campaign.REPORT_LINEBREAK));
+        List<String> newSkillReports = new ArrayList<>(campaign.getSkillReport().size() * 2);
+        boolean firstSkillReport = true;
+        for (String report : campaign.getSkillReport()) {
+            if (firstSkillReport) {
+                firstSkillReport = false;
+            } else {
+                newSkillReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newSkillReports.add(report);
+        }
+        campaign.setNewSkillReports(newSkillReports);
     }
 
     private static void processCombatTeamNodes(Campaign campaign, Node workingNode) {
