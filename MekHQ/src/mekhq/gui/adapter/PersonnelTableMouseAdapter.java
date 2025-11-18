@@ -1909,6 +1909,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         boolean applicationFailed = false;
 
         for (Person person : people) {
+            if (!person.isEmployed()) {
+                String question = String.format(resources.getString("eduEducation.employment"), person.getFullTitle());
+
+                if (JOptionPane.NO_OPTION ==
+                          JOptionPane.showConfirmDialog(null,
+                                question,
+                                resources.getString("eduEducation.text"),
+                                JOptionPane.YES_NO_OPTION)) {
+                    continue;
+                } else {
+                    getCampaign().employCampFollower(person);
+                }
+            }
+
             if (makeEnrollmentCheck(getCampaign(), person, data[1], data[2])) {
                 EducationController.performEducationPreEnrollmentActions(getCampaign(),
                       person,
@@ -2735,6 +2749,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                             JMenuItem reEnroll;
 
                                             if (improvementPossible > 0) {
+
+
                                                 reEnroll = new JMenuItem(resources.getString("eduReEnroll.text"));
                                                 reEnroll.setToolTipText(resources.getString("eduReEnroll.toolTip"));
                                                 reEnroll.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_RE_ENROLLMENT,

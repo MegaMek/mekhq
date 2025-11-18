@@ -55,7 +55,6 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.sorter.PersonTitleSorter;
@@ -155,15 +154,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
 
         // Skip People (by filtering them out) if they are:
         // 1) Inactive
-        // 2) A Prisoner
+        // 2) Prisoner
         // 3) Already assigned to a unit
-        // 4) Civilian Primary Role
-        // 5) Astech Primary role with the Medical, Administrator, or None Secondary
-        // Roles
-        // 6) Medical Primary role with the Astech, Administrator, or None Secondary
-        // Roles
-        // 7) Administrator Primary Role with Astech, Medical, Administrator, or None
-        // Secondary Roles
         // Then sorts the remainder based on their full title
         List<Person> personnel = campaign.getPersonnel()
                                        .stream()
@@ -171,21 +163,6 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                        .filter(person -> !person.getPrisonerStatus().isCurrentPrisoner())
                                        .filter(Person::isEmployed)
                                        .filter(person -> person.getUnit() == null)
-                                       .filter(person -> !Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())
-                                                                .isCivilian())
-                                       .filter(person -> !person.getPrimaryRole().isAstech() ||
-                                                               !(person.getSecondaryRole().isMedicalStaff() ||
-                                                                       person.getSecondaryRole().isAdministrator() ||
-                                                                       person.getSecondaryRole().isNone()))
-                                       .filter(person -> !person.getPrimaryRole().isMedicalStaff() ||
-                                                               !(person.getSecondaryRole().isAstech() ||
-                                                                       person.getSecondaryRole().isAdministrator() ||
-                                                                       person.getSecondaryRole().isNone()))
-                                       .filter(person -> !person.getPrimaryRole().isAdministrator() ||
-                                                               !(person.getSecondaryRole().isAstech() ||
-                                                                       person.getSecondaryRole().isMedicalStaff() ||
-                                                                       person.getSecondaryRole().isAdministrator() ||
-                                                                       person.getSecondaryRole().isNone()))
                                        .sorted(new PersonTitleSorter().reversed())
                                        .collect(Collectors.toList());
 

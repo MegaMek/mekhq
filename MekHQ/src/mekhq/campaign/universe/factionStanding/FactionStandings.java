@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static java.lang.Math.max;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -199,7 +198,7 @@ public class FactionStandings {
     /**
      * Regard penalty for breaching a contract (employer).
      */
-    static final double REGARD_DELTA_CONTRACT_BREACH_EMPLOYER = -(REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER * 3);
+    static final double REGARD_DELTA_CONTRACT_BREACH_EMPLOYER = -(REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER * 2.75);
 
     /**
      * Regard penalty for breaching a contract (employer's allies).
@@ -251,7 +250,7 @@ public class FactionStandings {
     /**
      * How much we should divide contract duration by when determining Duration Multiplier
      */
-    static final int CONTRACT_DURATION_LENGTH_DIVISOR = 6;
+    static final double CONTRACT_DURATION_LENGTH_DIVISOR = 6.0;
 
     /**
      * A mapping of faction names to their respective standing levels.
@@ -1241,7 +1240,8 @@ public class FactionStandings {
             regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL;
         }
 
-        double durationMultiplier = max((double) contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1.0);
+        double modifiedContractDuration = contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR;
+        double durationMultiplier = 1.0 + Math.log1p(Math.sqrt(modifiedContractDuration));
         regardDelta *= durationMultiplier;
 
         return changeRegardForFaction(campaignFactionCode, enemyFaction.getShortName(), regardDelta, gameYear,
@@ -1338,7 +1338,8 @@ public class FactionStandings {
             default -> throw new IllegalStateException("Unexpected value: " + missionStatus);
         };
 
-        double durationMultiplier = max(contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1.0);
+        double modifiedContractDuration = contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR;
+        double durationMultiplier = 1.0 + Math.log1p(Math.sqrt(modifiedContractDuration));
         regardDeltaEmployer *= durationMultiplier;
         return regardDeltaEmployer;
     }

@@ -468,7 +468,7 @@ public enum PersonnelFilter {
                                                       person.hasRole(PersonnelRole.VESSEL_NAVIGATOR));
             case TECH -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                           (person.getPrimaryRole().isTech() || person.getPrimaryRole().isAstech()) :
-                                          (person.isTech() || person.isAsTech()));
+                                          (person.isTech() || person.isAstech()));
             case MEK_TECH -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                               person.getPrimaryRole().isMekTech() :
                                               person.hasRole(PersonnelRole.MEK_TECH));

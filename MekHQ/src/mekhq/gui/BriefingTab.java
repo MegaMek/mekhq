@@ -130,7 +130,16 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.CompleteMissionDialog;
+import mekhq.gui.dialog.CustomizeAtBContractDialog;
+import mekhq.gui.dialog.CustomizeMissionDialog;
+import mekhq.gui.dialog.CustomizeScenarioDialog;
+import mekhq.gui.dialog.MissionTypeDialog;
+import mekhq.gui.dialog.NewAtBContractDialog;
+import mekhq.gui.dialog.NewContractDialog;
+import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.dialog.camOpsSalvage.SalvageForcePicker;
+import mekhq.gui.dialog.camOpsSalvage.SalvageTechPicker;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog;
 import mekhq.gui.enums.MHQTabType;
@@ -926,9 +935,11 @@ public final class BriefingTab extends CampaignGuiTab {
         boolean isSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
         List<SalvageForceData> salvageForceOptions = getSalvageForces(getCampaign(), isSpace);
 
-        SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), salvageForceOptions, isSpace);
+        SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), salvageForceOptions, isSpace,
+              scenario.getSalvageForces());
         boolean wasConfirmed = forcePicker.wasConfirmed();
         if (wasConfirmed) {
+            scenario.clearSalvageForces();
             Hangar hangar = getCampaign().getHangar();
             List<Force> selectedForces = forcePicker.getSelectedForces();
             for (Force force : selectedForces) {
@@ -1012,10 +1023,18 @@ public final class BriefingTab extends CampaignGuiTab {
             techData.add(data);
         }
 
+        // Add any other techs that were previously selected
+        for (UUID techID : scenario.getSalvageTechs()) {
+            if (!priorSelectedTechs.contains(techID)) {
+                priorSelectedTechs.add(techID);
+            }
+        }
+
         SalvageTechPicker techPicker = new SalvageTechPicker(techData, priorSelectedTechs,
               getCampaign().isClanCampaign());
         boolean wasConfirmed = techPicker.wasConfirmed();
         if (wasConfirmed) {
+            scenario.clearSalvageTechs();
             List<UUID> selectedTechs = techPicker.getSelectedTechs();
             for (UUID techId : selectedTechs) {
                 scenario.addSalvageTech(techId);

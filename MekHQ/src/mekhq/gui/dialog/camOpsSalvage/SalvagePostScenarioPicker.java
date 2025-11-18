@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog;
+package mekhq.gui.dialog.camOpsSalvage;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
@@ -791,7 +791,8 @@ public class SalvagePostScenarioPicker {
             BigDecimal currentPercent = getCurrentPercentAsBigDecimal();
             if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0 && !isExchangeRights) {
                 disableConfirmAndColorName(confirmButton, unitSalvageLabel);
-                shouldEnable = false;
+                // If we've gone over our %, we only block progression if the player is trying to salvage even more.
+                shouldEnable = !unitSalvageMoneyCurrent.equals(unitSalvageMoneyInitial);
             }
         }
 

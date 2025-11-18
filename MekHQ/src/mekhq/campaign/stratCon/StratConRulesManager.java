@@ -2587,7 +2587,6 @@ public class StratConRulesManager {
      *   <li>Excluding combat teams that are already actively deployed.</li>
      *   <li>Ensuring that combat teams have roles other than "In Reserve" or "Auxiliary"
      *       (unless role restrictions are bypassed).</li>
-     *   <li>If the team role is "Training," it is included only when the contract type is a Cadre Duty.</li>
      * </ul>
      *
      * @param campaign               The {@link Campaign} containing data regarding contracts, combat teams, and their
@@ -2620,7 +2619,7 @@ public class StratConRulesManager {
                 continue;
             }
 
-            // If the combat team doesn't have a valid force (somehow) skip it.
+            // If the combat team doesn't have a valid force (somehow), skip it.
             Force force = combatTeam.getForce(campaign);
             if (force == null) {
                 continue;
@@ -2637,9 +2636,7 @@ public class StratConRulesManager {
                 suitableForces.add(combatTeam.getForceId());
             } else if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
                 if (!combatRole.isTraining()) {
-                    if (!combatRole.isCadre() || contract.getContractType().isCadreDuty()) {
-                        suitableForces.add(combatTeam.getForceId());
-                    }
+                    suitableForces.add(combatTeam.getForceId());
                 }
             }
         }

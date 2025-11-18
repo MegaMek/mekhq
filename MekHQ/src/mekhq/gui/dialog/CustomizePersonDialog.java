@@ -32,14 +32,12 @@
  */
 package mekhq.gui.dialog;
 
-import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.Aging.getAgeModifier;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
-import static mekhq.campaign.personnel.skills.Skill.getCountDownMaxValue;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -1670,7 +1668,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             lblName = new JLabel(type);
             lblValue = new JLabel();
             if (person.hasSkill(type)) {
-                lblValue.setText(person.getSkill(type).toString(skillModifierData));
+                lblValue.setText(person.getSkill(type).getFinalSkillValue(skillModifierData) + "+");
             } else {
                 lblValue.setText("-");
             }
@@ -1932,24 +1930,31 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             skillValues.get(type).setText("-");
             return;
         }
+
+        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        LocalDate today = campaign.getLocalDate();
+
         SkillType skillType = SkillType.getType(type);
 
         int level = (Integer) skillLevels.get(type).getModel().getValue();
         int bonus = (Integer) skillBonus.get(type).getModel().getValue();
+
         int ageModifier = 0;
-        if (campaign.getCampaignOptions().isUseAgeEffects()) {
-            ageModifier = getAgeModifier(getMilestone(person.getAge(campaign.getLocalDate())),
-                  skillType.getFirstAttribute(),
-                  skillType.getSecondAttribute());
+        if (isUseAgeEffects) {
+            ageModifier = getAgeModifier(getMilestone(person.getAge(today)),
+                  skillType.getFirstAttribute(), skillType.getSecondAttribute());
         }
 
-        if (skillType.isCountUp()) {
-            int target = min(getCountUpMaxValue(), skillType.getTarget() + level + bonus + ageModifier);
-            skillValues.get(type).setText("+" + target);
-        } else {
-            int target = max(getCountDownMaxValue(), skillType.getTarget() - level - bonus - ageModifier);
-            skillValues.get(type).setText(target + "+");
-        }
+        Skill skill = new Skill(type);
+        skill.setLevel(level);
+        skill.setBonus(bonus);
+        skill.setAgingModifier(ageModifier);
+
+        SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgeEffects, isClanCampaign, today, true);
+
+        int target = min(getCountUpMaxValue(), skill.getFinalSkillValue(skillModifierData));
+        skillValues.get(type).setText(target + "+");
     }
 
     private void changeValueEnabled(String type) {
