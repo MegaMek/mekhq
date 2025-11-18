@@ -841,6 +841,7 @@ public class CampaignOptionsUnmarshaller {
             case "useStratCon" -> campaignOptions.setUseStratCon(parseBoolean(nodeContents));
             case "useMaplessStratCon" -> campaignOptions.setUseStratConMaplessMode(parseBoolean(nodeContents));
             case "useAdvancedScouting" -> campaignOptions.setUseAdvancedScouting(parseBoolean(nodeContents));
+            case "noSeedForces" -> campaignOptions.setNoSeedForces(parseBoolean(nodeContents));
             case "useGenericBattleValue" -> campaignOptions.setUseGenericBattleValue(parseBoolean(nodeContents));
             case "useVerboseBidding" -> campaignOptions.setUseVerboseBidding(parseBoolean(nodeContents));
             case "opForLanceTypeMeks" -> campaignOptions.setOpForLanceTypeMeks(parseInt(nodeContents));

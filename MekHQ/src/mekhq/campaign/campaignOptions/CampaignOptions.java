@@ -625,6 +625,7 @@ public class CampaignOptions {
     private boolean useStratCon;
     private boolean useMaplessStratCon;
     private boolean useAdvancedScouting;
+    private boolean noSeedForces;
     private SkillLevel skillLevel;
 
     // Contract Operations
@@ -1279,6 +1280,7 @@ public class CampaignOptions {
         useStratCon = false;
         useMaplessStratCon = false;
         useAdvancedScouting = false;
+        noSeedForces = false;
         setSkillLevel(SkillLevel.REGULAR);
         autoResolveMethod = AutoResolveMethod.PRINCESS;
         autoResolveVictoryChanceEnabled = false;
@@ -4849,6 +4851,14 @@ public class CampaignOptions {
 
     public void setUseAdvancedScouting(final boolean useAdvancedScouting) {
         this.useAdvancedScouting = useAdvancedScouting;
+    }
+
+    public boolean isNoSeedForces() {
+        return noSeedForces;
+    }
+
+    public void setNoSeedForces(final boolean noSeedForces) {
+        this.noSeedForces = noSeedForces;
     }
 
     /**
