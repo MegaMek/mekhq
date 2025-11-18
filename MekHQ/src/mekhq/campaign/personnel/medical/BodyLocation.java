@@ -42,6 +42,7 @@ import java.util.Set;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.medical.BodyLocation.XMLAdapter;
 
@@ -185,8 +186,26 @@ public enum BodyLocation {
         return locationName;
     }
 
-    public BodyLocation Parent() {
+    public BodyLocation getParent() {
         return parent;
+    }
+
+    /**
+     * Fetches the first parent location (or the param location) that is included in {@link #PRIMARY_LOCATIONS}.
+     *
+     * @return the first associated primary location or {@code null} if the location has no associated primary location.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public @Nullable BodyLocation getPrimaryLocation() {
+        BodyLocation location = this;
+
+        while (!PRIMARY_LOCATIONS.contains(location) && location != null) {
+            location = location.getParent();
+        }
+
+        return location;
     }
     //endregion Getters
 

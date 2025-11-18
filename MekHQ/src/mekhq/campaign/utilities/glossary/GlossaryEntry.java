@@ -55,6 +55,7 @@ public enum GlossaryEntry {
     ADMIN_STRAIN("HR_STRAIN", new Version("0.50.06")),
     ADVANCED_SCOUTING("ADVANCED_SCOUTING", new Version("0.50.10")),
     AGING("AGING", new Version("0.50.06")),
+    ALT_ADVANCED_MEDICAL("ALT_ADVANCED_MEDICAL", new Version("0.50.10")),
     AREA_OF_OPERATIONS("AREA_OF_OPERATIONS", new Version("0.50.06")),
     ATB("ATB", new Version("0.50.06")),
     ATOW_TRAITS("ATOW_TRAITS", new Version("0.50.06")),

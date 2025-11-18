@@ -220,10 +220,10 @@ public class InjuryLocationService {
     }
 
     private InjuryLocationData getSecondaryBodyLocation(BodyLocation primaryLocation) {
-        InjuryDurationRoll durationRoll = calculateInjuryDuration();
+        InjuryDurationRoll durationAndLocationRoll = rollForSecondaryLocationAndDurationMultiplier();
 
         boolean isSevered = primaryLocation.isLimb()
-                                  && (durationRoll.multiplier() == MAXIMUM_INJURY_DURATION_MULTIPLIER);
+                                  && (durationAndLocationRoll.multiplier() == MAXIMUM_INJURY_DURATION_MULTIPLIER);
 
         SecondaryLocation secondaryLocation = null;
         if (isSevered) {
@@ -247,15 +247,17 @@ public class InjuryLocationService {
         if (secondaryLocation == null) {
             secondaryLocation = SECONDARY_LOCATION_TABLE
                                       .getOrDefault(primaryLocation, Map.of())
-                                      .getOrDefault(durationRoll.roll(),
+                                      .getOrDefault(durationAndLocationRoll.roll(),
                                             new SecondaryLocation(AlternateInjuries.BURNED_CHEST,
                                                   BodyLocation.CHEST));
         }
 
-        return new InjuryLocationData(secondaryLocation.injury, secondaryLocation.location, durationRoll.multiplier());
+        return new InjuryLocationData(secondaryLocation.injury,
+              secondaryLocation.location,
+              durationAndLocationRoll.multiplier());
     }
 
-    private InjuryDurationRoll calculateInjuryDuration() {
+    private InjuryDurationRoll rollForSecondaryLocationAndDurationMultiplier() {
         int injuryDurationMultiplier = 1;
         int roll = d6(1);
 

@@ -1142,7 +1142,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         doll.setHighlightColor(new Color(170, 170, 255));
         PRIMARY_LOCATIONS.forEach(bodyLocation -> {
             if (patient.isLocationMissing(bodyLocation)
-                      && !patient.isLocationMissing(bodyLocation.Parent())) {
+                      && !patient.isLocationMissing(bodyLocation.getParent())) {
                 doll.setLocTag(bodyLocation, "lost");
             } else if (!patient.isLocationMissing(bodyLocation)) {
                 InjuryLevel level = MedicalViewDialog.getMaxInjuryLevel(bodyLocation, injuriesMappedToPrimaryLocations);

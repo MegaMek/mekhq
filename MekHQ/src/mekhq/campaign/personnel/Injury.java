@@ -196,6 +196,10 @@ public class Injury {
         days = time;
     }
 
+    public void changeTime(int delta) {
+        days += delta;
+    }
+
     public int getOriginalTime() {
         return originalDays;
     }

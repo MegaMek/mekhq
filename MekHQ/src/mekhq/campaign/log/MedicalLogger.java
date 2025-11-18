@@ -222,4 +222,14 @@ public class MedicalLogger {
 
         patient.addMedicalLogEntry(new MedicalLogEntry(date, message));
     }
+
+    public static void unsuccessfullyTreatedAltAdvancedMedical(Person patient, LocalDate date, String injuryName) {
+        String message = logEntriesResourceMap.getString("unsuccessfullyTreatedAltAdvancedMedical.text");
+        patient.addMedicalLogEntry(new MedicalLogEntry(date, MessageFormat.format(message, injuryName)));
+    }
+
+    public static void permanentInjuryAltAdvancedMedical(Person patient, LocalDate date, String injuryName) {
+        String message = logEntriesResourceMap.getString("permanentInjuryAltAdvancedMedical.text");
+        patient.addMedicalLogEntry(new MedicalLogEntry(date, MessageFormat.format(message, injuryName)));
+    }
 }
