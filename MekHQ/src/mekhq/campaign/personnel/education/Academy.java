@@ -520,6 +520,9 @@ public class Academy implements Comparable<Academy> {
      * @since 0.50.10
      */
     public int getAdjustedCourseIndex(int index) {
+        if (qualifications.isEmpty()) {
+            return 0;
+        }
         int maximumIndex = qualifications.size() - 1;
         return min(index, maximumIndex);
     }
