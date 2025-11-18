@@ -926,9 +926,11 @@ public final class BriefingTab extends CampaignGuiTab {
         boolean isSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
         List<SalvageForceData> salvageForceOptions = getSalvageForces(getCampaign(), isSpace);
 
-        SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), salvageForceOptions, isSpace);
+        SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), salvageForceOptions, isSpace,
+              scenario.getSalvageForces());
         boolean wasConfirmed = forcePicker.wasConfirmed();
         if (wasConfirmed) {
+            scenario.clearSalvageForces();
             Hangar hangar = getCampaign().getHangar();
             List<Force> selectedForces = forcePicker.getSelectedForces();
             for (Force force : selectedForces) {
@@ -1012,10 +1014,18 @@ public final class BriefingTab extends CampaignGuiTab {
             techData.add(data);
         }
 
+        // Add any other techs that were previously selected
+        for (UUID techID : scenario.getSalvageTechs()) {
+            if (!priorSelectedTechs.contains(techID)) {
+                priorSelectedTechs.add(techID);
+            }
+        }
+
         SalvageTechPicker techPicker = new SalvageTechPicker(techData, priorSelectedTechs,
               getCampaign().isClanCampaign());
         boolean wasConfirmed = techPicker.wasConfirmed();
         if (wasConfirmed) {
+            scenario.clearSalvageTechs();
             List<UUID> selectedTechs = techPicker.getSelectedTechs();
             for (UUID techId : selectedTechs) {
                 scenario.addSalvageTech(techId);
