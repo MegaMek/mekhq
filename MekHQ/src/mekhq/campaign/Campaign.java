@@ -50,7 +50,7 @@ import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.giveEIImplant;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ASTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
