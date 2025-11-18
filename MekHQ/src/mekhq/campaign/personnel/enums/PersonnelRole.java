@@ -33,7 +33,6 @@
 package mekhq.campaign.personnel.enums;
 
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.KeyEvent;
@@ -424,7 +423,7 @@ public enum PersonnelRole {
      */
     public String getLabel(final boolean isClan) {
         final boolean useClan = isClan && hasClanName;
-        return getFormattedTextAt(RESOURCE_BUNDLE, name() + ".label" + (useClan ? ".clan" : ""));
+        return getTextAt(RESOURCE_BUNDLE, name() + ".label" + (useClan ? ".clan" : ""));
     }
 
     /**

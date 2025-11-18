@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.randomEvents.prisoners.enums;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.logging.MMLogger;
 
@@ -56,7 +56,23 @@ public enum PrisonerCaptureStyle {
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
+    private final String label;
+    private final String tooltip;
+
+    PrisonerCaptureStyle() {
+        this.label = this.generateLabel();
+        this.tooltip = this.generateTooltip();
+    }
+
     //region Getters
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getTooltip() {
+        return tooltip;
+    }
 
     /**
      * Retrieves the localized label for the current capture style.
@@ -66,10 +82,10 @@ public enum PrisonerCaptureStyle {
      *
      * @return A {@link String} containing the localized label for the capture style.
      */
-    public String getLabel() {
+    private String generateLabel() {
         final String RESOURCE_KEY = name() + ".label";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**
@@ -80,10 +96,10 @@ public enum PrisonerCaptureStyle {
      *
      * @return A {@link String} containing the localized tooltip for the capture style.
      */
-    public String getTooltip() {
+    private String generateTooltip() {
         final String RESOURCE_KEY = name() + ".tooltip";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
     //endregion Getters
 

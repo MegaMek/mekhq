@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +76,9 @@ public enum Phenotype {
     private static final MMLogger logger = MMLogger.create(Phenotype.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Phenotype";
 
+    private final String shortName;
+    private final String label;
+    private final String tooltip;
     private final boolean isTrueborn;
     private final boolean external;
     private final int strength;
@@ -93,6 +96,9 @@ public enum Phenotype {
 
     Phenotype(final boolean isTrueborn, final boolean external, final int strength, final int body, final int reflexes,
           final int dexterity, final Attributes attributeCaps, final List<String> bonusTraits) {
+        this.shortName = generateShortName();
+        this.label = generateLabel();
+        this.tooltip = generateTooltip();
         this.isTrueborn = isTrueborn;
         this.external = external;
         this.strength = strength;
@@ -105,6 +111,18 @@ public enum Phenotype {
     // endregion Constructors
 
     // region Getters
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getTooltip() {
+        return tooltip;
+    }
 
     /**
      * Retrieves the cap (maximum allowable score) for a specified {@link SkillAttribute}.
@@ -194,10 +212,10 @@ public enum Phenotype {
      * @author Illiani
      * @since 0.50.05
      */
-    public String getShortName() {
+    private String generateShortName() {
         String key = "shortName." + (isTrueborn ? "trueborn" : "freeborn");
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, key);
+        return getTextAt(RESOURCE_BUNDLE, key);
     }
 
     /**
@@ -213,8 +231,8 @@ public enum Phenotype {
      * @author Illiani
      * @since 0.50.05
      */
-    public String getLabel() {
-        return getFormattedTextAt(RESOURCE_BUNDLE, name() + ".label");
+    private String generateLabel() {
+        return getTextAt(RESOURCE_BUNDLE, name() + ".label");
     }
 
     /**
@@ -230,8 +248,8 @@ public enum Phenotype {
      * @author Illiani
      * @since 0.50.05
      */
-    public String getTooltip() {
-        return getFormattedTextAt(RESOURCE_BUNDLE, name() + ".tooltip");
+    private String generateTooltip() {
+        return getTextAt(RESOURCE_BUNDLE, name() + ".tooltip");
     }
     // endregion Getters
 

@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.randomEvents.prisoners.enums;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.logging.MMLogger;
 
@@ -47,17 +47,33 @@ public enum PrisonerStatus {
 
     final private String RESOURCE_BUNDLE = "mekhq.resources.PrisonerStatus";
 
+    private final String label;
+    private final String titleExtension;
+
+    PrisonerStatus() {
+        this.label = this.generateLabel();
+        this.titleExtension = this.generateTitleExtension();
+    }
+
     // region Getters
     public String getLabel() {
-        final String RESOURCE_KEY = name() + ".label";
-
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return this.label;
     }
 
     public String getTitleExtension() {
+        return this.titleExtension;
+    }
+
+    private String generateLabel() {
+        final String RESOURCE_KEY = name() + ".label";
+
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
+    private String generateTitleExtension() {
         final String RESOURCE_KEY = name() + ".titleExtension";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
     // endregion Getters
 
