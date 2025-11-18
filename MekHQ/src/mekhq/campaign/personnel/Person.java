@@ -52,6 +52,7 @@ import static mekhq.campaign.log.LogEntryType.MEDICAL;
 import static mekhq.campaign.log.LogEntryType.PATIENT;
 import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
+import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
@@ -67,6 +68,7 @@ import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUN
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
@@ -119,6 +121,7 @@ import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
@@ -4002,6 +4005,12 @@ public class Person {
                     if (academyNameInSet != null) {
                         person.eduAcademyNameInSet = switch (academyNameInSet) {
                             case "Boot Camp" -> "Bootcamp"; // <50.10 compatibility handler
+                            case "In-House Boot Camp" -> "In-House Bootcamp"; // <50.10 compatibility handler
+                            case "Aitutaki Academy" -> "Aitutaki Academy (Officer)"; // <50.10 compatibility handler
+                            case "Coventry Military Academy" ->
+                                  "Coventry Military Academy [3060]"; // <50.10 compatibility handler
+                            case "Coventry Military Academy (Officer)" ->
+                                  "Coventry Military Academy (Officer) [3060]"; // <50.10 compatibility handler
                             default -> academyNameInSet;
                         };
                     } else {
@@ -4172,12 +4181,49 @@ public class Person {
             if (person.getJoinedCampaign() == null) {
                 person.setJoinedCampaign(today);
             }
+
+            // Self-correcting Education course index
+            selfCorrectEducationCourseIndexes(campaign, person);
         } catch (Exception e) {
             LOGGER.error(e, "Failed to read person {} from file", person.getFullName());
             person = null;
         }
 
         return person;
+    }
+
+    /**
+     * Ensures that a person's education course index is valid for their assigned academy and corrects it if necessary.
+     *
+     * <p>This method retrieves the {@link Academy} associated with the person's stored academy identifier. If the
+     * academy exists, the person's current course index is compared against the academy's valid range. If the value
+     * falls outside that range, it is clamped to the nearest valid index. The corrected value is written back to the
+     * {@link Person}, and a report entry is added to the {@link Campaign} describing the adjustment.</p>
+     *
+     * <p>If the academy reference is {@code null}, no correction is performed. Such issues are expected to be caught
+     * later during campaign loading. It's important to note that a {@code null} is not necessarily indicative of a
+     * problem. A character not enrolled in any academy will have a {@code null} {@link Academy}.</p>
+     *
+     * @param campaign the campaign used to record correction reports
+     * @param person   the person whose education course index should be validated and corrected
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void selfCorrectEducationCourseIndexes(Campaign campaign, Person person) {
+        Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+        // If academy is null due to an actual issue this will be picked up later in the campaign loading process.
+        if (academy != null) {
+            int currentCourseIndex = person.eduCourseIndex;
+            int adjustedCourseIndex = academy.getAdjustedCourseIndex(currentCourseIndex);
+            if (currentCourseIndex != adjustedCourseIndex) {
+                person.setEduCourseIndex(adjustedCourseIndex);
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "Person.education.transfer",
+                      spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle(), academy.getQualifications().get(adjustedCourseIndex)));
+            }
+        }
     }
 
     /**
