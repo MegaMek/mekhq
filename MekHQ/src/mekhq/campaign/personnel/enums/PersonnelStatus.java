@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.enums;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -131,6 +132,9 @@ public enum PersonnelStatus {
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
     // region Variable Declarations
+    private final String label;
+    private final String tooltip;
+    private final String logText;
     private final NotificationSeverity severity;
     private final boolean isPrisonerSuitableStatus;
     private final boolean isCauseOfDeath;
@@ -150,11 +154,26 @@ public enum PersonnelStatus {
      */
     PersonnelStatus(final NotificationSeverity severity, final boolean isPrisonerSuitableStatus,
           final boolean isCauseOfDeath) {
+        this.label = generateLabel();
+        this.tooltip = generateTooltip();
+        this.logText = generateLogText();
         this.severity = severity;
         this.isPrisonerSuitableStatus = isPrisonerSuitableStatus;
         this.isCauseOfDeath = isCauseOfDeath;
     }
     // endregion Constructors
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getToolTipText() {
+        return tooltip;
+    }
+
+    public String getLogText() {
+        return logText;
+    }
 
     /**
      * Retrieves the severity level of this status.
@@ -195,10 +214,10 @@ public enum PersonnelStatus {
      *
      * @return the localized label text
      */
-    public String getLabel() {
+    private String generateLabel() {
         final String RESOURCE_KEY = name() + ".label";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**
@@ -209,10 +228,10 @@ public enum PersonnelStatus {
      *
      * @return the localized tooltip text
      */
-    public String getToolTipText() {
+    private String generateTooltip() {
         final String RESOURCE_KEY = name() + ".tooltip";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**
@@ -246,10 +265,10 @@ public enum PersonnelStatus {
      *
      * @return the localized log text
      */
-    public String getLogText() {
+    private String generateLogText() {
         final String RESOURCE_KEY = name() + ".log";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
     // endregion Getters
 

@@ -35,6 +35,7 @@ package mekhq.campaign.personnel;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.floor;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
@@ -52,6 +53,7 @@ import static mekhq.campaign.log.LogEntryType.MEDICAL;
 import static mekhq.campaign.log.LogEntryType.PATIENT;
 import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
+import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
@@ -67,6 +69,7 @@ import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUN
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
@@ -119,6 +122,7 @@ import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
@@ -319,8 +323,6 @@ public class Person {
     private boolean engineer;
     public static final int PRIMARY_ROLE_SUPPORT_TIME = 480;
     public static final int PRIMARY_ROLE_OVERTIME_SUPPORT_TIME = 240;
-    public static final int SECONDARY_ROLE_SUPPORT_TIME = 240;
-    public static final int SECONDARY_ROLE_OVERTIME_SUPPORT_TIME = 120;
 
     // region Advanced Medical
     private List<Injury> injuries;
@@ -350,6 +352,7 @@ public class Person {
     private int eduDaysOfTravel;
     private List<UUID> eduTagAlongs;
     private List<String> eduFailedApplications;
+    private double trainingForceEducationTime;
     // endregion Education
 
     // region Personality
@@ -578,6 +581,7 @@ public class Person {
         eduAcademySet = null;
         eduAcademyNameInSet = null;
         eduAcademyFaction = null;
+        trainingForceEducationTime = 0.0;
         aggression = Aggression.NONE;
         aggressionDescriptionIndex = randomInt(Aggression.MAXIMUM_VARIATIONS);
         ambition = Ambition.NONE;
@@ -2586,6 +2590,18 @@ public class Person {
         return eduAcademySet;
     }
 
+    public double getTrainingForceEducationTime() {
+        return trainingForceEducationTime;
+    }
+
+    public void setTrainingForceEducationTime(final double trainingForceEducationTime) {
+        this.trainingForceEducationTime = trainingForceEducationTime;
+    }
+
+    public void changeTrainingForceEducationTime(final double delta) {
+        this.trainingForceEducationTime = max(0.0, trainingForceEducationTime + delta);
+    }
+
     public Aggression getAggression() {
         return aggression;
     }
@@ -3359,6 +3375,8 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEducationTime", eduEducationTime);
             }
 
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trainingForceEducationTime", trainingForceEducationTime);
+
             if (aggression != Aggression.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggression", aggression.name());
             }
@@ -4004,6 +4022,12 @@ public class Person {
                     if (academyNameInSet != null) {
                         person.eduAcademyNameInSet = switch (academyNameInSet) {
                             case "Boot Camp" -> "Bootcamp"; // <50.10 compatibility handler
+                            case "In-House Boot Camp" -> "In-House Bootcamp"; // <50.10 compatibility handler
+                            case "Aitutaki Academy" -> "Aitutaki Academy (Officer)"; // <50.10 compatibility handler
+                            case "Coventry Military Academy" ->
+                                  "Coventry Military Academy [3060]"; // <50.10 compatibility handler
+                            case "Coventry Military Academy (Officer)" ->
+                                  "Coventry Military Academy (Officer) [3060]"; // <50.10 compatibility handler
                             default -> academyNameInSet;
                         };
                     } else {
@@ -4017,6 +4041,8 @@ public class Person {
                     person.eduEducationStage = EducationStage.parseFromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduEducationTime")) {
                     person.eduEducationTime = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("trainingForceEducationTime")) {
+                    person.trainingForceEducationTime = MathUtility.parseDouble(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("aggression")) {
                     person.aggression = Aggression.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("aggressionDescriptionIndex")) {
@@ -4175,31 +4201,48 @@ public class Person {
                 person.setJoinedCampaign(today);
             }
 
-            // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
-            // potentially as far back as 2014. The next two handlers should never be removed.
-            if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
-                person.setSecondaryRole(PersonnelRole.NONE);
-
-                campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
-                      spanOpeningWithCustomColor(getWarningColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
-            }
-
-            if (!person.canPerformRole(today, person.getPrimaryRole(), true)) {
-                person.setPrimaryRole(campaign, PersonnelRole.NONE);
-
-                campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
-                      spanOpeningWithCustomColor(getNegativeColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
-            }
+            // Self-correcting Education course index
+            selfCorrectEducationCourseIndexes(campaign, person);
         } catch (Exception e) {
             LOGGER.error(e, "Failed to read person {} from file", person.getFullName());
             person = null;
         }
 
         return person;
+    }
+
+    /**
+     * Ensures that a person's education course index is valid for their assigned academy and corrects it if necessary.
+     *
+     * <p>This method retrieves the {@link Academy} associated with the person's stored academy identifier. If the
+     * academy exists, the person's current course index is compared against the academy's valid range. If the value
+     * falls outside that range, it is clamped to the nearest valid index. The corrected value is written back to the
+     * {@link Person}, and a report entry is added to the {@link Campaign} describing the adjustment.</p>
+     *
+     * <p>If the academy reference is {@code null}, no correction is performed. Such issues are expected to be caught
+     * later during campaign loading. It's important to note that a {@code null} is not necessarily indicative of a
+     * problem. A character not enrolled in any academy will have a {@code null} {@link Academy}.</p>
+     *
+     * @param campaign the campaign used to record correction reports
+     * @param person   the person whose education course index should be validated and corrected
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void selfCorrectEducationCourseIndexes(Campaign campaign, Person person) {
+        Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+        // If academy is null due to an actual issue this will be picked up later in the campaign loading process.
+        if (academy != null) {
+            int currentCourseIndex = person.eduCourseIndex;
+            int adjustedCourseIndex = academy.getAdjustedCourseIndex(currentCourseIndex);
+            if (currentCourseIndex != adjustedCourseIndex) {
+                person.setEduCourseIndex(adjustedCourseIndex);
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "Person.education.transfer",
+                      spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle(), academy.getQualifications().get(adjustedCourseIndex)));
+            }
+        }
     }
 
     /**
@@ -4318,23 +4361,38 @@ public class Person {
      * @since 0.50.10
      */
     public static boolean updateSkillsForVehicleCrewProfession(LocalDate today, Person person,
-          PersonnelRole currentRole,
-          boolean isPrimary) {
-        if (currentRole != PersonnelRole.VEHICLE_CREW) {
+          PersonnelRole currentRole, boolean isPrimary, boolean includeAdmin) {
+        if (currentRole != PersonnelRole.VEHICLE_CREW && currentRole != PersonnelRole.COMBAT_TECHNICIAN) {
             return false;
         }
 
+        boolean didChangeOccur = false;
         if (!person.hasSkill(S_TECH_MECHANIC)) {
             person.addSkill(S_TECH_MECHANIC, 3, 0);
+            didChangeOccur = true;
         }
 
-        if (isPrimary) {
-            person.setPrimaryRole(today, PersonnelRole.COMBAT_TECHNICIAN);
-        } else {
-            person.setSecondaryRole(PersonnelRole.COMBAT_TECHNICIAN);
+        if (includeAdmin && !person.hasSkill(S_ADMIN)) {
+            person.addSkill(S_ADMIN, 3, 0);
+            didChangeOccur = true;
         }
 
-        return true;
+        if (!person.hasSkill(S_TECH_MEK)) {
+            person.addSkill(S_TECH_MEK, 3, 0);
+            didChangeOccur = true;
+        }
+
+        if (currentRole != PersonnelRole.COMBAT_TECHNICIAN) {
+            if (isPrimary) {
+                person.setPrimaryRole(today, PersonnelRole.COMBAT_TECHNICIAN);
+                didChangeOccur = true;
+            } else {
+                person.setSecondaryRole(PersonnelRole.COMBAT_TECHNICIAN);
+                didChangeOccur = true;
+            }
+        }
+
+        return didChangeOccur;
     }
 
     /**
@@ -4920,7 +4978,7 @@ public class Person {
                 if (levelSum == -divisor) {
                     yield EXP_NONE;
                 } else {
-                    yield Math.max(0, levelSum / divisor);
+                    yield max(0, levelSum / divisor);
                 }
             }
             default -> calculateExperienceLevelForProfession(associatedSkillNames,
@@ -5155,7 +5213,7 @@ public class Person {
     }
 
     public int getHealingDifficulty(final Campaign campaign) {
-        return campaign.getCampaignOptions().isTougherHealing() ? Math.max(0, getHits() - 2) : 0;
+        return campaign.getCampaignOptions().isTougherHealing() ? max(0, getHits() - 2) : 0;
     }
 
     public TargetRollModifier getHealingMods(final Campaign campaign) {
@@ -5388,7 +5446,7 @@ public class Person {
     }
 
     public void heal() {
-        hits = Math.max(hits - 1, 0);
+        hits = max(hits - 1, 0);
         if (!needsFixing()) {
             doctorId = null;
         }
@@ -5778,18 +5836,8 @@ public class Person {
     public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
         int baseTime = 0;
 
-        if (primaryRole.isTech()) {
-            if (secondaryRole.isNone() || secondaryRole.isCivilian()) {
-                baseTime = PRIMARY_ROLE_SUPPORT_TIME;
-            } else {
-                baseTime = SECONDARY_ROLE_SUPPORT_TIME;
-            }
-        } else if (secondaryRole.isTechSecondary()) {
-            if (primaryRole.isNone() || primaryRole.isCivilian()) {
-                baseTime = PRIMARY_ROLE_SUPPORT_TIME;
-            } else {
-                baseTime = SECONDARY_ROLE_SUPPORT_TIME;
-            }
+        if (isTechExpanded()) {
+            baseTime = PRIMARY_ROLE_SUPPORT_TIME;
         }
 
         return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration));
@@ -5976,29 +6024,24 @@ public class Person {
     }
 
     /**
-     * Resets the available working time (minutes and overtime) for this person based on their role, deployment status,
-     * and administrative support.
+     * Resets the available working time (minutes and overtime) for this person based on their role and administrative
+     * support.
      *
-     * <p>Personnel deployed to combat or without support roles have no available time. Doctors receive standard
-     * support time, while techs receive time adjusted by skill and administration multipliers.</p>
+     * <p>Doctors receive standard support time, while techs receive time adjusted by skill and administration
+     * multipliers.</p>
      *
      * @param isTechsUseAdministration whether techs benefit from administrative support personnel, which increases
      *                                 their available working time
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
-        // Removed - Units deployed to combat have no available time
-
         // Personnel without tech or doctor roles have no available time
         if (!isTechExpanded() && !isDoctor()) {
             this.minutesLeft = 0;
             this.overtimeLeft = 0;
             return;
-        }
-
-        if (primaryRole.isTech() || primaryRole.isDoctor()) {
-            getRoleMinutes(secondaryRole);
-        } else if (secondaryRole.isTechSecondary() || secondaryRole.isDoctor()) {
-            getRoleMinutes(primaryRole);
+        } else {
+            this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
+            this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
 
         // Techs get support time adjusted by skill and administration multipliers
@@ -6006,16 +6049,6 @@ public class Person {
             double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
             this.minutesLeft = (int) Math.round(minutesLeft * multiplier);
             this.overtimeLeft = (int) Math.round(overtimeLeft * multiplier);
-        }
-    }
-
-    private void getRoleMinutes(PersonnelRole comparisonRole) {
-        if (comparisonRole.isNone() || comparisonRole.isCivilian()) {
-            this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
-            this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-        } else {
-            this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
-            this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
     }
 
@@ -6102,7 +6135,7 @@ public class Person {
         return hasSkill && (getPrimaryRole().isCombatTechnician() || getSecondaryRole().isCombatTechnician());
     }
 
-    public boolean isAsTech() {
+    public boolean isAstech() {
         boolean hasSkill = hasSkill(S_ASTECH);
         return hasSkill && (getPrimaryRole().isAstech() || getSecondaryRole().isAstech());
     }
@@ -7293,7 +7326,7 @@ public class Person {
         if (isFounder()) {
             shares++;
         }
-        shares += Math.max(-1, getExperienceLevel(campaign, false, true) - 2);
+        shares += max(-1, getExperienceLevel(campaign, false, true) - 2);
 
         if (getRank().isOfficer()) {
             final Profession profession = Profession.getProfessionFromPersonnelRole(getPrimaryRole());

@@ -4522,6 +4522,11 @@ public class Unit implements ITechnology {
             validCrew.addAll(gunners);
         }
 
+        // In the event there are no drivers and gunners vessel crew are used as an option of last resort
+        if (drivers.isEmpty() && gunners.isEmpty()) {
+            validCrew.addAll(vesselCrew);
+        }
+
         Person commander = null;
         for (Person potentialCommander : validCrew) {
             if (commander == null) {
@@ -4843,7 +4848,7 @@ public class Unit implements ITechnology {
      * applies it to the entity's crew option. Solo pilots and infantry units are handled specially to avoid
      * double-counting personnel who serve in multiple roles.</p>
      *
-     * <p>Non-combat crew members (such as vessel crew and combat technicians) are excluded from this calculation as
+     * <p>Non-combat crew members (such as vessel crew and combat engineers) are excluded from this calculation as
      * their Edge is handled separately through MekHQ's non-combat personnel system.</p>
      *
      * @param crewSize         the total size of the crew to use for calculating the average Edge value
@@ -4873,7 +4878,7 @@ public class Unit implements ITechnology {
         }
 
         // Average the edge values of pilots and gunners. Non-Gunners, non-drivers (i.e. Vessel Crewmembers and
-        // Combat Technicians mostly) handle edge solely through MHQ as noncombat personnel, so aren't considered here
+        // Combat Engineers mostly) handle edge solely through MHQ as noncombat personnel, so aren't considered here
         int edge = (int) Math.round(sumEdge / crewSize);
         IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
         edgeOption.setValue(edge);
@@ -7380,7 +7385,7 @@ public class Unit implements ITechnology {
             } else {
                 return PersonnelRole.VEHICLE_CREW_GROUND;
             }
-        } else if (entity.isConventionalFighter()) {
+        } else if (entity instanceof ConvFighter) { // do not use entity.isConventionalFighter here
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
         } else if (entity.isLargeCraft()) {
             return PersonnelRole.VESSEL_PILOT;
@@ -7428,7 +7433,7 @@ public class Unit implements ITechnology {
             } else {
                 return PersonnelRole.VEHICLE_CREW_GROUND;
             }
-        } else if (entity.isConventionalInfantry()) {
+        } else if (entity instanceof ConvFighter) { // do not use entity.isConventionalFighter here
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
         } else if (entity.isSmallCraft() || entity.isLargeCraft()) {
             return PersonnelRole.VESSEL_GUNNER;

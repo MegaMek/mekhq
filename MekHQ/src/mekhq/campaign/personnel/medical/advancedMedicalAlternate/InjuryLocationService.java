@@ -79,8 +79,8 @@ public class InjuryLocationService {
           )),
           Map.entry(BodyLocation.ABDOMEN, Map.of(
                 1, new SecondaryLocation(AlternateInjuries.BURN_ABDOMINAL, BodyLocation.ABDOMEN),
-                2, new SecondaryLocation(AlternateInjuries.BRUISED_ORGAN, BodyLocation.CHEST),
-                3, new SecondaryLocation(AlternateInjuries.ORGAN_TRAUMA, BodyLocation.CHEST),
+                2, new SecondaryLocation(AlternateInjuries.BRUISED_ORGAN, BodyLocation.ORGANS),
+                3, new SecondaryLocation(AlternateInjuries.ORGAN_TRAUMA, BodyLocation.ORGANS),
                 4, new SecondaryLocation(AlternateInjuries.FRACTURED_GROIN, BodyLocation.GROIN),
                 5, new SecondaryLocation(AlternateInjuries.DISEMBOWELED, BodyLocation.ABDOMEN)
           )),

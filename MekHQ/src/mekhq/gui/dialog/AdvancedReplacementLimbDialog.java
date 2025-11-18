@@ -732,7 +732,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
             // Add recovery period injuries
             InjuryType recoveryInjuryType = getRecoveryInjuryType(surgery);
-            Injury recoveryInjury = recoveryInjuryType.newInjury(campaign, patient, INTERNAL, 1);
+            Injury recoveryInjury = recoveryInjuryType.newInjury(campaign, patient, GENERIC, 1);
             adjustForKinderMode(useKinderMode, recoveryInjury);
             patient.addInjury(recoveryInjury);
 
@@ -977,7 +977,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                 }
 
                 if (PRIMARY_LOCATIONS.contains(mappedLocation)) {
-                    if (location.isImmediateChildOf(mappedLocation)) {
+                    if (location.isImmediateChildOf(mappedLocation) || location.equals(mappedLocation)) {
                         injuriesMappedToPrimaryLocations
                               .computeIfAbsent(mappedLocation,
                                     k -> new ArrayList<>())
@@ -1145,7 +1145,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                       && !patient.isLocationMissing(bodyLocation.getParent())) {
                 doll.setLocTag(bodyLocation, "lost");
             } else if (!patient.isLocationMissing(bodyLocation)) {
-                InjuryLevel level = getMaxInjuryLevel(bodyLocation);
+                InjuryLevel level = MedicalViewDialog.getMaxInjuryLevel(bodyLocation, injuriesMappedToPrimaryLocations);
                 Color color = switch (level) {
                     case CHRONIC -> new Color(255, 204, 255, 128); // 50% alpha
                     case DEADLY -> new Color(Color.RED.getRed(),
@@ -1164,32 +1164,6 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         doll.addActionListener(dollActionListener);
         panel.add(doll);
-    }
-
-    /**
-     * Determines the highest visible injury level found amongst injuries mapped to the given primary body location.
-     *
-     * @param bodyLocation the location to check
-     *
-     * @return the maximum {@link InjuryLevel}, or {@link InjuryLevel#NONE} if no visible injuries are present
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private InjuryLevel getMaxInjuryLevel(BodyLocation bodyLocation) {
-        InjuryLevel maxLevel = InjuryLevel.NONE;
-
-        for (Injury injury :
-              injuriesMappedToPrimaryLocations.getOrDefault(
-                    bodyLocation, new ArrayList<>())) {
-            if (!injury.isHidden()) {
-                if (injury.getLevel().ordinal() > maxLevel.ordinal()) {
-                    maxLevel = injury.getLevel();
-                }
-            }
-        }
-
-        return maxLevel;
     }
 
     /**

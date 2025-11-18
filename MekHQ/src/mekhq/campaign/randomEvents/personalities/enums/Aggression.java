@@ -35,6 +35,7 @@ package mekhq.campaign.randomEvents.personalities.enums;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.AGGRESSION;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
@@ -88,12 +89,14 @@ public enum Aggression {
     // endregion Enum Declarations
 
     // region Variable Declarations
+    private final String label;
     private final boolean isPositive;
     private final boolean isMajor;
     // endregion Variable Declarations
 
     // region Constructors
     Aggression(boolean isPositive, boolean isMajor) {
+        this.label = this.generateLabel();
         this.isPositive = isPositive;
         this.isMajor = isMajor;
     }
@@ -131,6 +134,12 @@ public enum Aggression {
         return getPersonalityTraitType().getLabel();
     }
 
+    public String getLabel() {
+        return label;
+    }
+
+    // region Getters
+
     /**
      * Retrieves the label associated with the current enumeration value.
      *
@@ -139,11 +148,10 @@ public enum Aggression {
      *
      * @return the localized label string corresponding to the enumeration value.
      */
-    // region Getters
-    public String getLabel() {
+    private String generateLabel() {
         final String RESOURCE_KEY = name() + ".label";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**

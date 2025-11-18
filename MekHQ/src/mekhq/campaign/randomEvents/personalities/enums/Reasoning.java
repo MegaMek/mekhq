@@ -37,6 +37,7 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.REASONING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.Gender;
@@ -109,6 +110,7 @@ public enum Reasoning {
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
+    private final String label;
     private final ReasoningComparison comparison;
     private final int level;
 
@@ -125,8 +127,13 @@ public enum Reasoning {
      * @param level      The integer score associated with this {@link Reasoning} enum value
      */
     Reasoning(ReasoningComparison comparison, int level) {
+        this.label = generateLabel();
         this.comparison = comparison;
         this.level = level;
+    }
+
+    public String getLabel() {
+        return label;
     }
 
     /**
@@ -152,9 +159,9 @@ public enum Reasoning {
      * @return the localized label string corresponding to the enumeration value.
      */
     // region Getters
-    public String getLabel() {
+    private String generateLabel() {
         final String RESOURCE_KEY = name() + ".label";
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY) + " (" + level + ")";
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY) + " (" + level + ")";
     }
 
     /**

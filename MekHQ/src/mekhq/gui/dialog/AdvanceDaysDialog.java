@@ -32,6 +32,8 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.utilities.MHQInternationalization.getText;
+
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -54,6 +56,7 @@ import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.event.Subscribe;
+import megamek.common.ui.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.events.ReportEvent;
@@ -77,6 +80,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
     private JButton btnNewYear;
     private JButton btnNewQuinquennial;
     private DailyReportLogPanel dailyLogPanel;
+    private DailyReportLogPanel skillLogPanel;
     // endregion Variable Declarations
 
     // region Constructors
@@ -171,6 +175,14 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
     public void setDailyLogPanel(final DailyReportLogPanel dailyLogPanel) {
         this.dailyLogPanel = dailyLogPanel;
     }
+
+    public DailyReportLogPanel getSkillLogPanel() {
+        return skillLogPanel;
+    }
+
+    public void setSkillLogPanel(final DailyReportLogPanel skillLogPanel) {
+        this.skillLogPanel = skillLogPanel;
+    }
     // endregion Getters/Setters
 
     // region Initialization
@@ -180,7 +192,14 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         final JPanel advanceDaysDurationPanel = createDurationPanel();
 
         setDailyLogPanel(new DailyReportLogPanel(getGUI()));
-        getDailyLogPanel().refreshLog(gui.getCommandCenterTab().getPanLog().getLogText());
+        getDailyLogPanel().refreshLog(gui.getCommandCenterTab().getGeneralLog().getLogText());
+
+        setSkillLogPanel(new DailyReportLogPanel(getGUI()));
+        getSkillLogPanel().refreshLog(gui.getCommandCenterTab().getSkillLog().getLogText());
+
+        EnhancedTabbedPane dailyReportTab = new EnhancedTabbedPane();
+        dailyReportTab.addTab(getText("tabLogs.general"), getDailyLogPanel());
+        dailyReportTab.addTab(getText("tabLogs.skill"), getSkillLogPanel());
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -194,12 +213,12 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         layout.setVerticalGroup(
               layout.createSequentialGroup()
                     .addComponent(advanceDaysDurationPanel)
-                    .addComponent(getDailyLogPanel()));
+                    .addComponent(dailyReportTab));
 
         layout.setHorizontalGroup(
               layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addComponent(advanceDaysDurationPanel)
-                    .addComponent(getDailyLogPanel()));
+                    .addComponent(dailyReportTab));
 
         return panel;
     }
@@ -317,22 +336,29 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
 
         setRunning(true);
         boolean firstDay = true;
-        final List<String> reports = new ArrayList<>();
+        final List<String> generalReports = new ArrayList<>();
+        final List<String> skillReports = new ArrayList<>();
         for (; days > 0; days--) {
             try {
                 if (!getGUI().getCampaign().newDay()) {
                     break;
                 }
 
-                final String report = getGUI().getCampaign().getCurrentReportHTML();
+                final String generalReport = getGUI().getCampaign().getCurrentReportHTML();
+                final String skillReport = getGUI().getCampaign().getSkillReportHTML();
                 if (firstDay) {
-                    getDailyLogPanel().refreshLog(report);
+                    getDailyLogPanel().refreshLog(generalReport);
+                    getSkillLogPanel().refreshLog(skillReport);
                     firstDay = false;
                 } else {
-                    reports.add("<hr>");
-                    reports.add(report);
+                    generalReports.add("<hr>");
+                    generalReports.add(generalReport);
+
+                    skillReports.add("<hr>");
+                    skillReports.add(skillReport);
                 }
-                reports.addAll(getGUI().getCampaign().fetchAndClearNewReports());
+                generalReports.addAll(getGUI().getCampaign().fetchAndClearNewReports());
+                skillReports.addAll(getGUI().getCampaign().fetchAndClearNewSkillReports());
             } catch (Exception ex) {
                 LOGGER.error("", ex);
                 break;
@@ -340,7 +366,8 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         }
 
         setRunning(false);
-        getDailyLogPanel().appendLog(reports);
+        getDailyLogPanel().appendLog(generalReports);
+        getSkillLogPanel().appendLog(skillReports);
 
         // We couldn't advance all days for some reason,
         // set the spinner to the number of remaining days
@@ -359,6 +386,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
             evt.cancel();
         } else {
             getDailyLogPanel().refreshLog(getGUI().getCampaign().getCurrentReportHTML());
+            getSkillLogPanel().refreshLog(getGUI().getCampaign().getSkillReportHTML());
         }
     }
 }
