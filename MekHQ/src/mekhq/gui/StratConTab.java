@@ -32,8 +32,6 @@
  */
 package mekhq.gui;
 
-import static java.lang.Math.ceil;
-
 import java.awt.BorderLayout;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
@@ -501,7 +499,7 @@ public class StratConTab extends CampaignGuiTab {
             }
 
             sb.append(" Maintain Campaign Victory Point count above <b>")
-                  .append((int) ceil(contract.getRequiredCombatTeams() * contract.getLength()))
+                  .append(contract.getRequiredCombatTeams() * contract.getLength())
                   .append("</b> by completing Turning Point scenarios")
                   .append("</span><br/>");
         }
