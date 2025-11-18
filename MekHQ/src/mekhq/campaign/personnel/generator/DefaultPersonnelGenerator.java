@@ -35,6 +35,8 @@ package mekhq.campaign.personnel.generator;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 
 import java.util.Objects;
 
@@ -99,7 +101,6 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         person.setPrimaryRoleDirect(primaryRole);
         person.setSecondaryRoleDirect(secondaryRole);
-
         int expLvl = generateExperienceLevel(person);
 
         generateXp(campaign, person);
@@ -109,6 +110,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         generateBirthday(campaign, person, expLvl, person.isClanPersonnel() && !person.getPhenotype().isNone());
 
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(getSkillPreferences());
+
         skillGenerator.generateSkills(campaign, person, expLvl);
         skillGenerator.generateAttributes(person, campaignOptions.isUseEdge());
         skillGenerator.generateTraits(person);
@@ -118,21 +120,26 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         if (age < 16) {
             person.removeAllSkills();
-            // regenerate expLvl to factor in skill changes from age
-            expLvl = generateExperienceLevel(person);
-            person.setPrimaryRole(campaign, PersonnelRole.DEPENDENT);
-        } else if (age < 18) {
-            person.limitSkills(1);
-
-            expLvl = generateExperienceLevel(person);
+            expLvl = EXP_NONE;
+            person.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.DEPENDENT);
+        } else {
+            if (age < 18) {
+                person.limitSkills(1);
+            }
+            // regenerate expLvl to factor in skill additions (as this can modify character experience level beyond
+            // the requested level)
+            expLvl = person.getExperienceLevel(campaign, false);
         }
 
         // set SPAs
-        if (expLvl >= 0) {
+        if (expLvl >= EXP_ULTRA_GREEN) {
             AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
             specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
             specialAbilityGenerator.generateSpecialAbilities(campaign, person, expLvl);
         }
+
+        // Do naming at the end, to ensure the keys are set
+        generateNameAndGender(campaign, person, gender);
 
         // Set relationship flags
         determineOrientation(person, campaignOptions.getNoInterestInRelationshipsDiceSize(),
@@ -140,9 +147,6 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         int interestInChildren = campaignOptions.getNoInterestInChildrenDiceSize();
         person.setTryingToConceive(((interestInChildren != 0) && (randomInt(interestInChildren)) != 0));
-
-        // Do naming at the end, to ensure the keys are set
-        generateNameAndGender(campaign, person, gender);
 
         //check for Bloodname
         campaign.checkBloodnameAdd(person, false);

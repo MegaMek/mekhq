@@ -97,7 +97,7 @@ public class SalvageForcePicker extends JDialog {
     private static final int WIDTH_150 = scaleForGUI(150);
 
     private boolean wasConfirmed;
-    private SalvageForceTableModel tableModel;
+    private final SalvageForceTableModel tableModel;
 
     /**
      * Checks whether the user confirmed their force selection.
@@ -134,16 +134,19 @@ public class SalvageForcePicker extends JDialog {
      * operations. A read-only instruction panel is shown at the top, and Confirm/Cancel controls are placed at the
      * bottom.</p>
      *
-     * @param campaign         current campaign context; used for tech labels, experience, tooltips, and hangar lookups
-     * @param forces           the candidate salvage-capable forces with precomputed stats; may be {@code null} or
-     *                         empty
-     * @param isSpaceOperation {@code true} to show space-specific columns (e.g., tug availability); {@code false} to
-     *                         hide them
+     * @param campaign            current campaign context; used for tech labels, experience, tooltips, and hangar
+     *                            lookups
+     * @param forces              the candidate salvage-capable forces with precomputed stats; may be {@code null} or
+     *                            empty
+     * @param isSpaceOperation    {@code true} to show space-specific columns (e.g., tug availability); {@code false} to
+     *                            hide them
+     * @param priorSelectedForces a list of forces that were previously selected
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public SalvageForcePicker(Campaign campaign, List<SalvageForceData> forces, boolean isSpaceOperation) {
+    public SalvageForcePicker(Campaign campaign, List<SalvageForceData> forces, boolean isSpaceOperation,
+          List<Integer> priorSelectedForces) {
         setTitle(getText("accessingTerminal.title"));
         setModal(true);
         setLayout(new BorderLayout());
@@ -161,7 +164,7 @@ public class SalvageForcePicker extends JDialog {
         add(instructionsPanel, BorderLayout.NORTH);
 
         // Table in the center
-        tableModel = new SalvageForceTableModel(campaign, forces);
+        tableModel = new SalvageForceTableModel(campaign, forces, priorSelectedForces);
         JTable table = new JTable(tableModel);
         table.setAutoCreateRowSorter(true);
 
@@ -474,16 +477,28 @@ public class SalvageForcePicker extends JDialog {
         /**
          * Creates a new table model over the provided data.
          *
-         * @param campaign campaign context for skill/experience labels and tooltips
-         * @param forces   row data; one entry per force
+         * @param campaign            campaign context for skill/experience labels and tooltips
+         * @param forces              row data; one entry per force
+         * @param priorSelectedForces a list of forces that were previously selected
          *
          * @author Illiani
          * @since 0.50.10
          */
-        public SalvageForceTableModel(Campaign campaign, List<SalvageForceData> forces) {
+        public SalvageForceTableModel(Campaign campaign, List<SalvageForceData> forces,
+              List<Integer> priorSelectedForces) {
             this.campaign = campaign;
             this.forces = forces;
             this.selected = new boolean[forces.size()];
+
+            // Pre-select rows where the force ID is in priorSelectedForces
+            if (priorSelectedForces != null && !priorSelectedForces.isEmpty()) {
+                for (int i = 0; i < forces.size(); i++) {
+                    Force f = forces.get(i).force();
+                    if (priorSelectedForces.contains(f.getId())) {
+                        selected[i] = true;
+                    }
+                }
+            }
         }
 
         @Override

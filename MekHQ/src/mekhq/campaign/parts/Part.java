@@ -443,7 +443,7 @@ public abstract class Part implements IPartWork, ITechnology {
         if (this instanceof MekGyro gyro) {
             // We only want to display the decimal point if it's not zero
             String tonnage = TONNAGE_FORMATTER.format(gyro.getTonnage());
-            toReturn.append(tonnage).append(" ton");
+            toReturn.append(" (").append(tonnage).append(" ton)");
         }
 
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
