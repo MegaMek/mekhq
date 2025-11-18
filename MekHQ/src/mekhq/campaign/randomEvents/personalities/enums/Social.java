@@ -35,6 +35,7 @@ package mekhq.campaign.randomEvents.personalities.enums;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.SOCIAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
@@ -87,12 +88,14 @@ public enum Social {
     // endregion Enum Declarations
 
     // region Variable Declarations
+    private final String label;
     private final boolean isPositive;
     private final boolean isMajor;
     // endregion Variable Declarations
 
     // region Constructors
     Social(boolean isPositive, boolean isMajor) {
+        this.label = generateLabel();
         this.isPositive = isPositive;
         this.isMajor = isMajor;
     }
@@ -109,6 +112,10 @@ public enum Social {
      * The index at which major traits begin within the enumeration.
      */
     public final static int MAJOR_TRAITS_START_INDEX = 25;
+
+    public String getLabel() {
+        return label;
+    }
 
     /**
      * @return the {@link PersonalityTraitType} representing social aptitude
@@ -139,10 +146,10 @@ public enum Social {
      * @return the localized label string corresponding to the enumeration value.
      */
     // region Getters
-    public String getLabel() {
+    private String generateLabel() {
         final String RESOURCE_KEY = name() + ".label";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**

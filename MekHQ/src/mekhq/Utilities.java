@@ -726,14 +726,26 @@ public class Utilities {
             }
 
             for (int slot = 0; slot < unit.getTotalCrewNeeds(); slot++) {
-                Person p = campaign.newPerson(unit.getEntity().isLargeCraft() ?
-                                                    PersonnelRole.VESSEL_CREW :
-                                                    PersonnelRole.COMBAT_TECHNICIAN,
-                      factionCode,
-                      oldCrew.getGender(numberPeopleGenerated));
+                PersonnelRole role;
+                if (unit.getEntity().isLargeCraft()) {
+                    role = PersonnelRole.VESSEL_CREW;
+                } else if (unit.getEntity() instanceof Tank) {
+                    if (unit.getEntity().getMovementMode().isMarine()) {
+                        role = PersonnelRole.VEHICLE_CREW_NAVAL;
+                    } else if (unit.getEntity().getMovementMode().isVTOL()) {
+                        role = PersonnelRole.VEHICLE_CREW_VTOL;
+                    } else {
+                        role = PersonnelRole.VEHICLE_CREW_GROUND;
+                    }
+                } else if (unit.getEntity().isConventionalFighter()) {
+                    role = PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
+                } else {
+                    role = PersonnelRole.COMBAT_TECHNICIAN;
+                }
+                Person person = campaign.newPerson(role, factionCode, oldCrew.getGender(numberPeopleGenerated));
 
-                migrateCrewData(p, oldCrew, numberPeopleGenerated++, false);
-                vesselCrew.add(p);
+                migrateCrewData(person, oldCrew, numberPeopleGenerated++, false);
+                vesselCrew.add(person);
             }
 
             if (unit.canTakeNavigator()) {

@@ -84,18 +84,17 @@ public final class InjuryUtil {
     */
 
     /** Run a daily healing check */
-    public static void resolveDailyHealing(Campaign c, Person p) {
-        Person doc = c.getPerson(p.getDoctorId());
-        // TODO: Reporting
-        if ((null != doc) && doc.isDoctor()) {
-            if (p.getDaysToWaitForHealing() <= 0) {
-                genMedicalTreatment(c, p, doc).forEach(GameEffect::apply);
+    public static void resolveDailyHealing(Campaign campaign, Person person) {
+        Person doctor = campaign.getPerson(person.getDoctorId());
+        if (null != doctor && doctor.isDoctor()) {
+            if (person.getDaysToWaitForHealing() <= 0) {
+                genMedicalTreatment(campaign, person, doctor).forEach(GameEffect::apply);
             }
         } else {
-            genUntreatedEffects(c, p).forEach(GameEffect::apply);
+            genUntreatedEffects(campaign, person).forEach(GameEffect::apply);
         }
-        genNaturalHealing(c, p).forEach(GameEffect::apply);
-        p.decrementDaysToWaitForHealing();
+        genNaturalHealing(campaign, person).forEach(GameEffect::apply);
+        person.decrementDaysToWaitForHealing();
     }
 
     /** Resolve injury modifications in case of entering combat with active ones */
@@ -393,10 +392,10 @@ public final class InjuryUtil {
     }
 
     /** Generate the effects of a doctor dealing with injuries (frequency depends on campaign settings) */
-    public static List<GameEffect> genMedicalTreatment(Campaign c, Person p, Person doc) {
-        Objects.requireNonNull(c);
-        Objects.requireNonNull(p);
-        Skill skill = doc.getSkill(SkillType.S_SURGERY);
+    public static List<GameEffect> genMedicalTreatment(Campaign campaign, Person person, Person doctor) {
+        Objects.requireNonNull(campaign);
+        Objects.requireNonNull(person);
+        Skill skill = doctor.getSkill(SkillType.S_SURGERY);
         int level = skill.getLevel();
         final int fumbleLimit = FUMBLE_LIMITS[(level >= 0) && (level <= 10) ? level : 0];
         final int critLimit = CRIT_LIMITS[(level >= 0) && (level <= 10) ? level : 0];
@@ -408,41 +407,41 @@ public final class InjuryUtil {
 
         List<GameEffect> result = new ArrayList<>();
 
-        for (Injury i : p.getInjuries()) {
-            if (!i.isWorkedOn()) {
+        for (Injury injury : person.getInjuries()) {
+            if (!injury.isWorkedOn()) {
                 int roll = Compute.randomInt(100);
                 // Determine XP, if any
                 if (roll < Math.max(1, fumbleLimit / 10)) {
-                    mistakeXP += c.getCampaignOptions().getMistakeXP();
+                    mistakeXP += campaign.getCampaignOptions().getMistakeXP();
                     xpGained += mistakeXP;
                 } else if (roll > Math.min(98, 99 - (int) Math.round((99 - critLimit) / 10.0))) {
-                    successXP += c.getCampaignOptions().getSuccessXP();
+                    successXP += campaign.getCampaignOptions().getSuccessXP();
                     xpGained += successXP;
                 }
-                final int critTimeReduction = i.getTime() - (int) Math.floor(i.getTime() * 0.9);
+                final int critTimeReduction = injury.getTime() - (int) Math.floor(injury.getTime() * 0.9);
                 // Reroll fumbled treatment check with Edge if applicable
-                if (c.getCampaignOptions().isUseSupportEdge() &&
+                if (campaign.getCampaignOptions().isUseSupportEdge() &&
                           (roll < fumbleLimit) &&
-                          doc.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL) &&
-                          (doc.getCurrentEdge() > 0)) {
+                          doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL) &&
+                          (doctor.getCurrentEdge() > 0)) {
                     result.add(new GameEffect(String.format(
                           "%s made a mistake in the treatment of %s, but used Edge to reroll.",
-                          doc.getHyperlinkedFullTitle(),
-                          p.getHyperlinkedName())));
-                    doc.changeCurrentEdge(-1);
+                          doctor.getHyperlinkedFullTitle(),
+                          person.getHyperlinkedName())));
+                    doctor.changeCurrentEdge(-1);
                     roll = Compute.randomInt(100);
                 }
 
                 if (roll < fumbleLimit) {
                     result.add(new GameEffect(String.format(
                           "%s made a mistake in the treatment of %s and caused %s %s to worsen.",
-                          doc.getHyperlinkedFullTitle(),
-                          p.getHyperlinkedName(),
-                          GenderDescriptors.HIS_HER_THEIR.getDescriptor(p.getGender()),
-                          i.getName()), rnd -> {
-                        int time = i.getTime();
-                        i.setTime((int) Math.max(ceil(time * 1.2), time + 5));
-                        MedicalLogger.docMadeAMistake(doc, p, i, c.getLocalDate());
+                          doctor.getHyperlinkedFullTitle(),
+                          person.getHyperlinkedName(),
+                          GenderDescriptors.HIS_HER_THEIR.getDescriptor(person.getGender()),
+                          injury.getName()), rnd -> {
+                        int time = injury.getTime();
+                        injury.setTime((int) Math.max(ceil(time * 1.2), time + 5));
+                        MedicalLogger.docMadeAMistake(doctor, person, injury, campaign.getLocalDate());
 
                         // TODO: Add in special handling of the critical
                         //if (rnd.applyAsInt(100) < (fumbleLimit / 4)) {
@@ -454,46 +453,50 @@ public final class InjuryUtil {
                 } else if ((roll > critLimit) && (critTimeReduction > 0)) {
                     result.add(new GameEffect(String.format(
                           "%s performed some amazing work in treating %s of %s (%d fewer day(s) to heal).",
-                          doc.getHyperlinkedFullTitle(),
-                          i.getName(),
-                          p.getHyperlinkedName(),
+                          doctor.getHyperlinkedFullTitle(),
+                          injury.getName(),
+                          person.getHyperlinkedName(),
                           critTimeReduction), rnd -> {
-                        i.setTime(i.getTime() - critTimeReduction);
-                        MedicalLogger.docAmazingWork(doc, p, i, c.getLocalDate(), critTimeReduction);
+                        injury.setTime(injury.getTime() - critTimeReduction);
+                        MedicalLogger.docAmazingWork(doctor,
+                              person,
+                              injury,
+                              campaign.getLocalDate(),
+                              critTimeReduction);
                     }));
                 } else {
-                    final int xpChance = (int) Math.round(100.0 / c.getCampaignOptions().getNTasksXP());
+                    final int xpChance = (int) Math.round(100.0 / campaign.getCampaignOptions().getNTasksXP());
                     result.add(new GameEffect(String.format("%s successfully treated %s [%d%% chance of gaining %d XP]",
-                          doc.getHyperlinkedFullTitle(),
-                          p.getHyperlinkedName(),
+                          doctor.getHyperlinkedFullTitle(),
+                          person.getHyperlinkedName(),
                           xpChance,
-                          c.getCampaignOptions().getTaskXP()), rnd -> {
-                        int taskXP = c.getCampaignOptions().getTaskXP();
-                        if ((taskXP > 0) && (doc.getNTasks() >= c.getCampaignOptions().getNTasksXP())) {
-                            doc.awardXP(c, taskXP);
-                            doc.setNTasks(0);
+                          campaign.getCampaignOptions().getTaskXP()), rnd -> {
+                        int taskXP = campaign.getCampaignOptions().getTaskXP();
+                        if ((taskXP > 0) && (doctor.getNTasks() >= campaign.getCampaignOptions().getNTasksXP())) {
+                            doctor.awardXP(campaign, taskXP);
+                            doctor.setNTasks(0);
                         } else {
-                            doc.setNTasks(doc.getNTasks() + 1);
+                            doctor.setNTasks(doctor.getNTasks() + 1);
                         }
-                        i.setWorkedOn(true);
-                        MedicalLogger.successfullyTreated(doc, p, c.getLocalDate(), i);
-                        Unit u = p.getUnit();
+                        injury.setWorkedOn(true);
+                        MedicalLogger.successfullyTreated(doctor, person, campaign.getLocalDate(), injury);
+                        Unit u = person.getUnit();
                         if (null != u) {
                             u.resetPilotAndEntity();
                         }
                     }));
                 }
-                i.setWorkedOn(true);
-                Unit u = p.getUnit();
+                injury.setWorkedOn(true);
+                Unit u = person.getUnit();
                 if (null != u) {
                     u.resetPilotAndEntity();
                 }
                 numTreated++;
             } else {
                 result.add(new GameEffect(String.format("%s spent time resting to heal %s %s.",
-                      p.getHyperlinkedName(),
-                      GenderDescriptors.HIS_HER_THEIR.getDescriptor(p.getGender()),
-                      i.getName()), rnd -> {
+                      person.getHyperlinkedName(),
+                      GenderDescriptors.HIS_HER_THEIR.getDescriptor(person.getGender()),
+                      injury.getName()), rnd -> {
 
                 }));
                 numResting++;
@@ -505,29 +508,29 @@ public final class InjuryUtil {
             final String treatmentSummary = (xpGained > 0) ?
                                                   String.format("%s successfully treated %s for %d injuries " +
                                                                       "(%d XP gained, %d for mistakes, %d for critical successes, and %d for tasks).",
-                                                        doc.getHyperlinkedFullTitle(),
-                                                        p.getHyperlinkedName(),
+                                                        doctor.getHyperlinkedFullTitle(),
+                                                        person.getHyperlinkedName(),
                                                         numTreated,
                                                         xp,
                                                         mistakeXP,
                                                         successXP,
                                                         xp - mistakeXP - successXP) :
                                                   String.format("%s successfully treated %s for %d injuries.",
-                                                        doc.getHyperlinkedFullTitle(),
-                                                        p.getHyperlinkedName(),
+                                                        doctor.getHyperlinkedFullTitle(),
+                                                        person.getHyperlinkedName(),
                                                         numTreated);
 
             result.add(new GameEffect(treatmentSummary, rnd -> {
                 if (xp > 0) {
-                    doc.awardXP(c, xp);
+                    doctor.awardXP(campaign, xp);
                 }
-                PatientLogger.successfullyTreated(doc, p, c.getLocalDate(), injuries);
-                p.setDaysToWaitForHealing(c.getCampaignOptions().getHealingWaitingPeriod());
+                PatientLogger.successfullyTreated(doctor, person, campaign.getLocalDate(), injuries);
+                person.setDaysToWaitForHealing(campaign.getCampaignOptions().getHealingWaitingPeriod());
             }));
         }
         if (numResting > 0) {
             result.add(new GameEffect(String.format("%s spent time resting to heal %d injuries.",
-                  p.getHyperlinkedName(),
+                  person.getHyperlinkedName(),
                   numResting)));
         }
         return result;

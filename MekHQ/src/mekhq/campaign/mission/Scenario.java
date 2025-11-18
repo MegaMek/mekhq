@@ -649,8 +649,14 @@ public class Scenario implements IPlayerSettings {
         return new ArrayList<>(salvageForces);
     }
 
+    public void removeSalvageForce(List<Integer> forceIds) {
+        salvageForces.removeAll(forceIds);
+    }
+
     public void addSalvageForce(int forceId) {
-        salvageForces.add(forceId);
+        if (!salvageForces.contains(forceId)) {
+            salvageForces.add(forceId);
+        }
     }
 
     public void clearSalvageForces() {
@@ -662,7 +668,13 @@ public class Scenario implements IPlayerSettings {
     }
 
     public void addSalvageTech(UUID personId) {
-        salvageTechs.add(personId);
+        if (!salvageTechs.contains(personId)) {
+            salvageTechs.add(personId);
+        }
+    }
+
+    public void removeSalvageTechs(List<UUID> personIds) {
+        salvageTechs.removeAll(personIds);
     }
 
     public void clearSalvageTechs() {
@@ -1180,7 +1192,8 @@ public class Scenario implements IPlayerSettings {
                             LOGGER.error("Unknown node type loaded in salvageForces nodes: {}", wn3.getNodeName());
                             continue;
                         }
-                        retVal.salvageForces.add(MathUtility.parseInt(wn3.getTextContent().trim(), FORCE_NONE));
+                        // We need to use this method, as it includes additional safeties
+                        retVal.addSalvageForce(MathUtility.parseInt(wn3.getTextContent().trim(), FORCE_NONE));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("salvageTechs")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -1196,7 +1209,8 @@ public class Scenario implements IPlayerSettings {
                             LOGGER.error("Unknown node type loaded in salvageTechs nodes: {}", wn3.getNodeName());
                             continue;
                         }
-                        retVal.salvageTechs.add(UUID.fromString(wn3.getTextContent().trim()));
+                        // We need to use this method, as it includes additional safeties
+                        retVal.addSalvageTech(UUID.fromString(wn3.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase(ScenarioObjective.ROOT_XML_ELEMENT_NAME)) {
                     retVal.getScenarioObjectives().add(ScenarioObjective.Deserialize(wn2));

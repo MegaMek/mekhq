@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.camOpsSalvage;
 
+import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.equipment.MiscType.F_NAVAL_TUG_ADAPTOR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -51,12 +52,14 @@ import megamek.common.units.Aero;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
+import megamek.common.units.Tank;
 import megamek.common.units.Warship;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -76,6 +79,7 @@ import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.enums.TransporterType;
 
 public class CamOpsSalvageUtilities {
     private static final MMLogger LOGGER = MMLogger.create(CamOpsSalvageUtilities.class);
@@ -112,12 +116,21 @@ public class CamOpsSalvageUtilities {
                     }
 
                     boolean isLargeVessel = entity instanceof Dropship || entity instanceof Warship;
+                    boolean isTrailer = entity instanceof Tank tank && tank.isTrailer();
                     tooltip.append(unit.getName());
 
-                    double tonnage = entity.getTonnage();
-                    if (!isLargeVessel) {
-                        tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
-                              "CamOpsSalvageUtilities.tooltip.drag", tonnage)).append(")");
+                    double towCapacity = entity.getTonnage();
+                    if (!isLargeVessel && !isTrailer) {
+                        double currentTowWeight = unit.getTotalWeightOfUnitsAssignedToBeTransported(
+                              CampaignTransportType.TOW_TRANSPORT,
+                              TransporterType.TANK_TRAILER_HITCH);
+
+                        towCapacity = max(0.0, towCapacity - currentTowWeight);
+
+                        if (towCapacity > 0.0) {
+                            tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
+                                  "CamOpsSalvageUtilities.tooltip.drag", towCapacity)).append(")");
+                        }
                     }
 
                     double cargoCapacity = unit.getCargoCapacityForSalvage();

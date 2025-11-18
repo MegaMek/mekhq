@@ -638,6 +638,8 @@ public class MissionViewPanel extends JScrollablePanel {
         JLabel txtCargoRequirement = new JLabel();
         JLabel lblScore = new JLabel();
         JLabel txtScore = new JLabel();
+        JLabel lblSupportPoints = new JLabel();
+        JLabel txtSupport = new JLabel();
 
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
@@ -1046,16 +1048,15 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtCargoRequirement, gridBagConstraints);
-        }
 
-        lblScore.setName("lblScore");
-        lblScore.setText(resourceMap.getString("lblScore.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblScore, gridBagConstraints);
+            lblScore.setName("lblScore");
+            lblScore.setText(resourceMap.getString("lblScore.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblScore, gridBagConstraints);
 
         txtScore.setName("txtScore");
         int currentScore = contract.getContractScore(campaign.getCampaignOptions().isUseStratConMaplessMode());
@@ -1069,6 +1070,27 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtScore, gridBagConstraints);
+
+            lblSupportPoints.setName("lblSupportPoints");
+            lblSupportPoints.setText(resourceMap.getString("lblSupportPoints.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblSupportPoints, gridBagConstraints);
+
+            txtSupport.setName("txtSupport");
+            txtSupport.setText(Integer.toString(contract.getCurrentSupportPoints()));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtSupport, gridBagConstraints);
+        }
 
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(false);

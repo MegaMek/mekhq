@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel.skills.enums;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.logging.MMLogger;
 import mekhq.utilities.ReportingUtilities;
@@ -69,9 +69,10 @@ public enum MarginOfSuccess {
     TERRIBLE(-6, -5, -3, ReportingUtilities.getNegativeColor()),
     DISASTROUS(Integer.MIN_VALUE, -7, -4, ReportingUtilities.getNegativeColor());
 
-    private static final MMLogger logger = MMLogger.create(MarginOfSuccess.class);
+    private static final MMLogger LOGGER = MMLogger.create(MarginOfSuccess.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MarginOfSuccess";
 
+    private final String label;
     private final int lowerBound;
     private final int upperBound;
     private final int margin;
@@ -89,6 +90,7 @@ public enum MarginOfSuccess {
      * @since 0.50.05
      */
     MarginOfSuccess(int lowerBound, int upperBound, int margin, String color) {
+        this.label = generateMarginOfSuccessString();
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
         this.margin = margin;
@@ -171,7 +173,7 @@ public enum MarginOfSuccess {
                 return margin;
             }
         }
-        logger.error("No valid MarginOfSuccess found for roll: {}. Returning DISASTROUS",
+        LOGGER.error("No valid MarginOfSuccess found for roll: {}. Returning DISASTROUS",
               differenceBetweenRollAndTarget);
         return DISASTROUS;
     }
@@ -200,7 +202,7 @@ public enum MarginOfSuccess {
             }
         }
 
-        logger.error("No valid MarginOfSuccess found for marginValue: {}. Returning DISASTROUS", marginValue);
+        LOGGER.error("No valid MarginOfSuccess found for marginValue: {}. Returning DISASTROUS", marginValue);
         return DISASTROUS;
     }
 
@@ -218,6 +220,10 @@ public enum MarginOfSuccess {
      * @since 0.50.05
      */
     public static String getMarginOfSuccessString(MarginOfSuccess marginOfSuccess) {
-        return getFormattedTextAt(RESOURCE_BUNDLE, marginOfSuccess + ".label");
+        return marginOfSuccess.label;
+    }
+
+    private String generateMarginOfSuccessString() {
+        return getTextAt(RESOURCE_BUNDLE, margin + ".label");
     }
 }

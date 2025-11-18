@@ -71,7 +71,7 @@ public class MedicalController {
     final private int healingWaitingPeriod;
     final private int naturalHealingWaitingPeriod;
     final private boolean isUseSupportEdge;
-    final private boolean isUseMedicalController;
+    final private boolean isUseAdvancedMedical;
 
 
     /**
@@ -89,7 +89,7 @@ public class MedicalController {
         healingWaitingPeriod = campaignOptions.getHealingWaitingPeriod();
         naturalHealingWaitingPeriod = campaignOptions.getNaturalHealingWaitingPeriod();
         isUseSupportEdge = campaignOptions.isUseSupportEdge();
-        isUseMedicalController = campaignOptions.isUseAdvancedMedical();
+        isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
     }
 
     /**
@@ -133,20 +133,22 @@ public class MedicalController {
             doctor = verifyTheatreAvailability(patient, doctor);
             patient.decrementDaysToWaitForHealing();
 
-            if (doctor != null && patient.getDaysToWaitForHealing() <= 0) {
-                healPerson(patient, doctor, isUseAgingEffects, isClanCampaign, today);
-            } else if (checkNaturalHealing(patient)) {
-                LOGGER.debug(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.natural",
-                      patient.getHyperlinkedFullTitle()));
-                Unit unit = patient.getUnit();
-                if (unit != null) {
-                    unit.resetPilotAndEntity();
+            if (!isUseAdvancedMedical) {
+                if (doctor != null && patient.getDaysToWaitForHealing() <= 0) {
+                    healPerson(patient, doctor, isUseAgingEffects, isClanCampaign, today);
+                } else if (checkNaturalHealing(patient)) {
+                    LOGGER.debug(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.natural",
+                          patient.getHyperlinkedFullTitle()));
+                    Unit unit = patient.getUnit();
+                    if (unit != null) {
+                        unit.resetPilotAndEntity();
+                    }
                 }
             }
         }
 
         // Handle Advanced Medical
-        if (isUseMedicalController) {
+        if (isUseAdvancedMedical) {
             resolveDailyHealing(campaign, patient);
             Unit unit = patient.getUnit();
             if (unit != null) {

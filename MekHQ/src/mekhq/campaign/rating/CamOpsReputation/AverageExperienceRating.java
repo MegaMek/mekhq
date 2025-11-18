@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
+import java.util.ArrayList;
+
 import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;
@@ -50,6 +52,8 @@ import mekhq.campaign.unit.Unit;
 public class AverageExperienceRating {
     private static final MMLogger LOGGER = MMLogger.create(AverageExperienceRating.class);
 
+    private static final int NO_CAMPAIGN_EXPERIENCE = 7;
+
     /**
      * Calculates the skill level based on the average experience rating of a campaign.
      *
@@ -63,10 +67,12 @@ public class AverageExperienceRating {
     protected static SkillLevel getSkillLevel(Campaign campaign, boolean log) {
         // values below 0 are treated as 'Legendary',
         // values above 7 are treated as 'wet behind the ears' which we call 'None'
-        int experienceScore = MathUtility.clamp(calculateAverageExperienceRating(campaign, log), 0, 7);
+        int experienceScore = MathUtility.clamp(calculateAverageExperienceRating(campaign, log),
+              0,
+              NO_CAMPAIGN_EXPERIENCE);
 
         return switch (experienceScore) {
-            case 7 -> SkillLevel.NONE;
+            case NO_CAMPAIGN_EXPERIENCE -> SkillLevel.NONE;
             case 6 -> SkillLevel.ULTRA_GREEN;
             case 5 -> SkillLevel.GREEN;
             case 4 -> SkillLevel.REGULAR;
@@ -113,7 +119,14 @@ public class AverageExperienceRating {
         double totalExperience = 0;
 
         Hangar hangar = campaign.getHangar();
-        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+        ArrayList<CombatTeam> combatTeams = campaign.getCombatTeamsAsList();
+
+        if (combatTeams.isEmpty()) {
+            return NO_CAMPAIGN_EXPERIENCE;
+        }
+
+        boolean hasAtLeastOneCrew = false;
+        for (CombatTeam combatTeam : combatTeams) {
             Force force = combatTeam.getForce(campaign);
             if (force == null) {
                 LOGGER.warn("Force returned null for forceId {}", combatTeam.getForceId());
@@ -138,6 +151,8 @@ public class AverageExperienceRating {
                 Person commander = unit.getCommander();
                 if (commander == null) { // Unit is uncrewed
                     continue;
+                } else {
+                    hasAtLeastOneCrew = true;
                 }
 
                 SkillModifierData skillModifierData = commander.getSkillModifierData(true);
@@ -146,6 +161,10 @@ public class AverageExperienceRating {
                 totalExperience += pilotingTargetNumber + gunneryTargetNumber;
                 unitCount++;
             }
+        }
+
+        if (unitCount == 0 || !hasAtLeastOneCrew) { // this can equal false no matter what IDEA says
+            return NO_CAMPAIGN_EXPERIENCE;
         }
 
         // CamOps states that we need to divide the skill target numbers by twice the unit count.

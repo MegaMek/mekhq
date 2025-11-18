@@ -400,7 +400,7 @@ public class StratConScenarioWizard extends JDialog {
                 localGbc.gridy = 1;
                 JLabel selectedForceInfo = new JLabel();
                 JList<Force> availableForceList = addAvailableForceList(forcePanel, localGbc, forceTemplate);
-                availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                availableForceList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
                 // Add a listener to handle changes to the selected force
                 availableForceList.addListSelectionListener(e -> {
                     availableForceSelectorChanged(e, selectedForceInfo, false);
@@ -792,8 +792,7 @@ public class StratConScenarioWizard extends JDialog {
         Person commandLiaison = campaign.getSeniorAdminPerson(AdministratorSpecialization.COMMAND);
         TargetRoll targetNumber = calculateReinforcementTargetNumber(commandLiaison,
               currentCampaignState.getContract());
-        // The -1 is due to the default cost for reinforcing
-        int availableSupportPoints = currentCampaignState.getSupportPoints() - 1;
+        int availableSupportPoints = currentCampaignState.getSupportPoints();
 
         AtBContract contract = currentScenario.getBackingContract(campaign);
         Faction enemy = contract.getEnemy();
@@ -810,27 +809,34 @@ public class StratConScenarioWizard extends JDialog {
             brokeBatchallTerms = true;
         }
 
+        int costMultiplier = 0;
+        for (String templateID : availableForceLists.keySet()) {
+            costMultiplier += availableForceLists.get(templateID).getSelectedValuesList().size();
+        }
+
         StratConReinforcementsConfirmationDialog dialog = new StratConReinforcementsConfirmationDialog(campaign,
-              targetNumber, availableSupportPoints);
+              targetNumber, availableSupportPoints, costMultiplier);
         StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType responseType =
               dialog.getResponseType();
         switch (responseType) {
             case CANCEL -> setVisible(true);
             case REINFORCE -> {
-                int supportPointsSpent = dialog.getSupportPoints();
-                int supportPointModifier = supportPointsSpent * SUPPORT_POINTS_MODIFIER;
+                // The costMultiplier addition here is to cover the base cost
+                int supportPointsSpent = dialog.getSupportPoints() + costMultiplier;
+                int supportPointModifier = (supportPointsSpent / costMultiplier) * SUPPORT_POINTS_MODIFIER;
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
-                currentCampaignState.changeSupportPoints(-(supportPointsSpent + 1));
+                currentCampaignState.changeSupportPoints(-supportPointsSpent);
                 btnCommitClicked(finalTargetNumber, false, false);
                 if (brokeBatchallTerms) {
                     processBatchallBreach(contract, enemy.getShortName());
                 }
             }
             case REINFORCE_INSTANTLY -> {
-                int supportPointsSpent = dialog.getSupportPoints();
-                int supportPointModifier = supportPointsSpent * SUPPORT_POINTS_MODIFIER;
+                // The costMultiplier addition here is to cover the base cost. Instant reinforcing doubles the cost.
+                int supportPointsSpent = (dialog.getSupportPoints() + costMultiplier) * 2;
+                int supportPointModifier = (supportPointsSpent / costMultiplier) * SUPPORT_POINTS_MODIFIER;
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
-                currentCampaignState.changeSupportPoints(-(supportPointsSpent + 1) * 2);
+                currentCampaignState.changeSupportPoints(-supportPointsSpent);
                 btnCommitClicked(finalTargetNumber, false, true);
                 if (brokeBatchallTerms) {
                     processBatchallBreach(contract, enemy.getShortName());
@@ -868,6 +874,8 @@ public class StratConScenarioWizard extends JDialog {
         }
 
         // go through all the force lists and add the selected forces to the scenario
+        List<UUID> delayedReinforcements = currentScenario.getBackingScenario().getFriendlyDelayedReinforcements();
+        List<UUID> instantReinforcements = currentScenario.getBackingScenario().getFriendlyInstantReinforcements();
         for (String templateID : availableForceLists.keySet()) {
             for (Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
                 if (currentScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
@@ -893,17 +901,12 @@ public class StratConScenarioWizard extends JDialog {
                     currentScenario.addForce(force, templateID, campaign);
 
                     if (reinforcementResults == DELAYED) {
-                        List<UUID> delayedReinforcements = currentScenario.getBackingScenario()
-                                                                 .getFriendlyDelayedReinforcements();
-
                         for (UUID unitId : force.getAllUnits(true)) {
                             if (campaign.getUnit(unitId) != null) {
                                 delayedReinforcements.add(unitId);
                             }
                         }
                     } else if (reinforcementResults == INSTANT) {
-                        List<UUID> instantReinforcements = currentScenario.getBackingScenario()
-                                                                 .getFriendlyInstantReinforcements();
 
                         for (UUID unitId : force.getAllUnits(true)) {
                             if (campaign.getUnit(unitId) != null) {
@@ -922,10 +925,12 @@ public class StratConScenarioWizard extends JDialog {
         }
 
         for (Unit unit : availableInfantryUnits.getSelectedValuesList()) {
+            instantReinforcements.add(unit.getId());
             currentScenario.addUnit(unit, ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID, false);
         }
 
         for (Unit unit : availableLeadershipUnits.getSelectedValuesList()) {
+            instantReinforcements.add(unit.getId());
             currentScenario.addUnit(unit, ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID, true);
         }
 

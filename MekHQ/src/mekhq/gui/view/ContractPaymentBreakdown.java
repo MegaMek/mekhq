@@ -336,7 +336,8 @@ public class ContractPaymentBreakdown {
     }
 
     private void setLblTransportAmount2() {
-        lblTransportAmount2.setText(contract.getTransportAmount().toAmountAndSymbolString());
+        lblTransportAmount2.setText("-" + contract.getTotalTransportationFees(campaign)
+                                                .toAmountAndSymbolString());
     }
 
     private void setLblFeeAmount2() {
@@ -397,8 +398,7 @@ public class ContractPaymentBreakdown {
 
     private void setLblTransportationExpenses2() {
         lblTransportationExpenses2.setText("-" +
-                                                 contract.getTotalTransportationFees(campaign)
-                                                       .toAmountAndSymbolString());
+                                                 contract.getTransportAmount().toAmountAndSymbolString());
     }
 
     private void setLblEstimatedProfit2() {

@@ -141,7 +141,7 @@ import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.medical.MedicalController;
-import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.QuickTrain;
@@ -257,8 +257,14 @@ public class CampaignNewDayManager {
         campaign.getCurrentReport().clear();
         campaign.setCurrentReportHTML("");
         campaign.getNewReports().clear();
-        campaign.getPersonnelWhoAdvancedInXP().clear();
+
+        campaign.getSkillReport().clear();
+        campaign.setSkillReportHTML("");
+        campaign.getNewSkillReports().clear();
+
         campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(today) + "</b>");
+
+        campaign.getPersonnelWhoAdvancedInXP().clear();
 
         // New Year Changes
         if (isNewYear) {
@@ -683,7 +689,7 @@ public class CampaignNewDayManager {
             }
 
             if (today.getDayOfYear() == 1 && campaignOptions.isUseAlternativeAdvancedMedical()) {
-                AdvancedMedicalAlternate.performEnhancedImagingDegradationCheck(campaign, person);
+                AdvancedMedicalAlternateImplants.performEnhancedImagingDegradationCheck(campaign, person);
             }
 
             if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
