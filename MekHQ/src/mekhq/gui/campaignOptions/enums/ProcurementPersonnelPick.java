@@ -32,7 +32,7 @@
  */
 package mekhq.gui.campaignOptions.enums;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
@@ -56,6 +56,22 @@ public enum ProcurementPersonnelPick {
 
     final private String RESOURCE_BUNDLE = "mekhq.resources.ProcurementPersonnelPick";
 
+    private final String label;
+    private final String description;
+
+    ProcurementPersonnelPick() {
+        this.label = this.generateLabel();
+        this.description = this.generateDescription();
+    }
+
+    public String getLabel() {
+        return this.label;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
     /**
      * Retrieves the label associated with the current enumeration value.
      *
@@ -64,10 +80,10 @@ public enum ProcurementPersonnelPick {
      *
      * @return the localized label string corresponding to the enumeration value.
      */
-    public String getLabel() {
+    private String generateLabel() {
         final String RESOURCE_KEY = name() + ".label";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**
@@ -78,9 +94,9 @@ public enum ProcurementPersonnelPick {
      *
      * @return The formatted description text for the current enum value, or a fallback value if the key is not found.
      */
-    public String getDescription() {
+    private String generateDescription() {
         final String RESOURCE_KEY = name() + ".description";
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**
