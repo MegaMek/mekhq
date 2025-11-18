@@ -87,7 +87,8 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
                     continue;
                 }
 
-                if (entity instanceof Tank tank && tank.isTrailer()) {
+                boolean isTrailer = entity instanceof Tank tank && tank.isTrailer();
+                if (isTrailer) {
                     ITransportAssignment transportAssignment = unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT);
                     if (transportAssignment == null || !transportAssignment.hasTransport()) {
                         continue; // If nothing is towing the trailer, it can't reach the salvage operation
@@ -108,7 +109,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
 
                     hasTug = hasNavalTug;
                 } else {
-                    boolean isTowCapable = entity instanceof Mek || entity instanceof Tank;
+                    boolean isTowCapable = entity instanceof Mek || (entity instanceof Tank && !isTrailer);
                     if (cargoCapacity > 0.0) {
                         salvageCapableUnits++;
                     } else if (isTowCapable) {

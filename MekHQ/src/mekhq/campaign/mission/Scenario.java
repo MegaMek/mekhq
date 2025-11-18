@@ -649,6 +649,10 @@ public class Scenario implements IPlayerSettings {
         return new ArrayList<>(salvageForces);
     }
 
+    public void removeSalvageForce(List<Integer> forceIds) {
+        salvageForces.removeAll(forceIds);
+    }
+
     public void addSalvageForce(int forceId) {
         if (!salvageForces.contains(forceId)) {
             salvageForces.add(forceId);
@@ -667,6 +671,10 @@ public class Scenario implements IPlayerSettings {
         if (!salvageTechs.contains(personId)) {
             salvageTechs.add(personId);
         }
+    }
+
+    public void removeSalvageTechs(List<UUID> personIds) {
+        salvageTechs.removeAll(personIds);
     }
 
     public void clearSalvageTechs() {

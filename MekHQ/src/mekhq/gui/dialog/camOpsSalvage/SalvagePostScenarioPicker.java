@@ -280,17 +280,23 @@ public class SalvagePostScenarioPicker {
      * (and tech/s) from any other scenarios they have been assigned to.
      *
      * @param activeScenarios a list of scenarios marked as 'current' (i.e., unresolved)
+     * @param currentScenario the current scenario, techs and forces won't be sanitized from this scenario
      * @param salvageTechs    a list of techs assigned to the salvage operation
      * @param salvageForces   a list of forces assigned to the salvage operation
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static void sanitizeOtherScenarioAssignments(List<Scenario> activeScenarios, List<UUID> salvageTechs,
+    private static void sanitizeOtherScenarioAssignments(List<Scenario> activeScenarios, Scenario currentScenario,
+          List<UUID> salvageTechs,
           List<Integer> salvageForces) {
         for (Scenario activeScenario : activeScenarios) {
-            activeScenario.getSalvageForces().removeAll(salvageForces);
-            activeScenario.getSalvageTechs().removeAll(salvageTechs);
+            if (activeScenario == currentScenario) {
+                continue;
+            }
+
+            activeScenario.removeSalvageForce(salvageForces);
+            activeScenario.removeSalvageTechs(salvageTechs);
         }
     }
 
