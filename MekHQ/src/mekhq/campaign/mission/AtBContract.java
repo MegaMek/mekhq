@@ -620,6 +620,21 @@ public class AtBContract extends Contract {
         return ContractScore.getContractScore(getCompletedScenarios()) + contractScoreArbitraryModifier;
     }
 
+
+    /**
+     * @return the total available support points, or 0 if StratCon is not enabled for this contract
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public int getCurrentSupportPoints() {
+        if (stratconCampaignState == null) {
+            return 0;
+        }
+
+        return stratconCampaignState.getSupportPoints();
+    }
+
     public int getContractScoreArbitraryModifier() {
         return contractScoreArbitraryModifier;
     }
