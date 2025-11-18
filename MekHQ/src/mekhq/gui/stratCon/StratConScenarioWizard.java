@@ -823,7 +823,7 @@ public class StratConScenarioWizard extends JDialog {
             case REINFORCE -> {
                 // The costMultiplier addition here is to cover the base cost
                 int supportPointsSpent = dialog.getSupportPoints() + costMultiplier;
-                int supportPointModifier = supportPointsSpent / costMultiplier * SUPPORT_POINTS_MODIFIER;
+                int supportPointModifier = (supportPointsSpent / costMultiplier) * SUPPORT_POINTS_MODIFIER;
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
                 currentCampaignState.changeSupportPoints(-supportPointsSpent);
                 btnCommitClicked(finalTargetNumber, false, false);
@@ -834,7 +834,7 @@ public class StratConScenarioWizard extends JDialog {
             case REINFORCE_INSTANTLY -> {
                 // The costMultiplier addition here is to cover the base cost. Instant reinforcing doubles the cost.
                 int supportPointsSpent = (dialog.getSupportPoints() + costMultiplier) * 2;
-                int supportPointModifier = supportPointsSpent / costMultiplier * SUPPORT_POINTS_MODIFIER;
+                int supportPointModifier = (supportPointsSpent / costMultiplier) * SUPPORT_POINTS_MODIFIER;
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
                 currentCampaignState.changeSupportPoints(-supportPointsSpent);
                 btnCommitClicked(finalTargetNumber, false, true);
