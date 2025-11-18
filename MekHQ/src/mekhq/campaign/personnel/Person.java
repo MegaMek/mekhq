@@ -4172,26 +4172,6 @@ public class Person {
             if (person.getJoinedCampaign() == null) {
                 person.setJoinedCampaign(today);
             }
-
-            // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
-            // potentially as far back as 2014. The next two handlers should never be removed.
-            if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
-                person.setSecondaryRole(PersonnelRole.NONE);
-
-                campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
-                      spanOpeningWithCustomColor(getWarningColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
-            }
-
-            if (!person.canPerformRole(today, person.getPrimaryRole(), true)) {
-                person.setPrimaryRole(campaign, PersonnelRole.NONE);
-
-                campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
-                      spanOpeningWithCustomColor(getNegativeColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
-            }
         } catch (Exception e) {
             LOGGER.error(e, "Failed to read person {} from file", person.getFullName());
             person = null;
@@ -4316,23 +4296,38 @@ public class Person {
      * @since 0.50.10
      */
     public static boolean updateSkillsForVehicleCrewProfession(LocalDate today, Person person,
-          PersonnelRole currentRole,
-          boolean isPrimary) {
-        if (currentRole != PersonnelRole.VEHICLE_CREW) {
+          PersonnelRole currentRole, boolean isPrimary, boolean includeAdmin) {
+        if (currentRole != PersonnelRole.VEHICLE_CREW && currentRole != PersonnelRole.COMBAT_TECHNICIAN) {
             return false;
         }
 
+        boolean didChangeOccur = false;
         if (!person.hasSkill(S_TECH_MECHANIC)) {
             person.addSkill(S_TECH_MECHANIC, 3, 0);
+            didChangeOccur = true;
         }
 
-        if (isPrimary) {
-            person.setPrimaryRole(today, PersonnelRole.COMBAT_TECHNICIAN);
-        } else {
-            person.setSecondaryRole(PersonnelRole.COMBAT_TECHNICIAN);
+        if (includeAdmin && !person.hasSkill(S_ADMIN)) {
+            person.addSkill(S_ADMIN, 3, 0);
+            didChangeOccur = true;
         }
 
-        return true;
+        if (!person.hasSkill(S_TECH_MEK)) {
+            person.addSkill(S_TECH_MEK, 3, 0);
+            didChangeOccur = true;
+        }
+
+        if (currentRole != PersonnelRole.COMBAT_TECHNICIAN) {
+            if (isPrimary) {
+                person.setPrimaryRole(today, PersonnelRole.COMBAT_TECHNICIAN);
+                didChangeOccur = true;
+            } else {
+                person.setSecondaryRole(PersonnelRole.COMBAT_TECHNICIAN);
+                didChangeOccur = true;
+            }
+        }
+
+        return didChangeOccur;
     }
 
     /**

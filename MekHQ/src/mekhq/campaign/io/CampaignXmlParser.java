@@ -39,6 +39,7 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
@@ -129,6 +130,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.education.EducationController;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -539,13 +541,42 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 campaign.addReport(report);
             }
 
-            if (Person.updateSkillsForVehicleCrewProfession(today, person, person.getPrimaryRole(), true) ||
-                      Person.updateSkillsForVehicleCrewProfession(today, person, person.getSecondaryRole(), false)) {
+            boolean includeAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
+            if (Person.updateSkillsForVehicleCrewProfession(today,
+                  person,
+                  person.getPrimaryRole(),
+                  true,
+                  includeAdmin) ||
+                      Person.updateSkillsForVehicleCrewProfession(today,
+                            person,
+                            person.getSecondaryRole(),
+                            false,
+                            includeAdmin)) {
                 String report = getFormattedTextAt(RESOURCE_BUNDLE, "vehicleCrewProfessionSkillChange",
                       spanOpeningWithCustomColor(getWarningColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle());
                 campaign.addReport(report);
+            }
+
+            // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
+            // potentially as far back as 2014. The next two handlers should never be removed.
+            if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
+                person.setSecondaryRole(PersonnelRole.NONE);
+
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "ineligibleForSecondaryRole",
+                      spanOpeningWithCustomColor(getWarningColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
+            }
+
+            if (!person.canPerformRole(today, person.getPrimaryRole(), true)) {
+                person.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.DEPENDENT);
+
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "ineligibleForPrimaryRole",
+                      spanOpeningWithCustomColor(getNegativeColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
             }
         }
 
