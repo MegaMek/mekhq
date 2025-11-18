@@ -358,7 +358,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
                     skillReports.add(skillReport);
                 }
                 generalReports.addAll(getGUI().getCampaign().fetchAndClearNewReports());
-                skillReports.addAll(getGUI().getCampaign().fetchAndClearNewReports());
+                skillReports.addAll(getGUI().getCampaign().fetchAndClearNewSkillReports());
             } catch (Exception ex) {
                 LOGGER.error("", ex);
                 break;
