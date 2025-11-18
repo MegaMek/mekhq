@@ -33,6 +33,7 @@
  */
 package mekhq.campaign;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
@@ -889,7 +890,7 @@ public class CampaignNewDayManager {
             if (campaignState != null && !contract.getEndingDate().equals(today)) {
                 boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
                 int victoryPoints = contract.getContractScore(isUseMaplessMode);
-                int requiredVictoryPoints = isUseMaplessMode ? contract.getRequiredCombatTeams() * 10 : 1;
+                int requiredVictoryPoints = (int) ceil(contract.getRequiredCombatTeams() * contract.getLength() * 0.66);
 
                 if (campaignState.canEndContractEarly() && victoryPoints >= requiredVictoryPoints) {
                     new ImmersiveDialogNotification(campaign,
@@ -1740,7 +1741,7 @@ public class CampaignNewDayManager {
                       !updatedLocation.getJumpPath().isEmpty() &&
                       updatedLocation.getJumpPath().getLastSystem().getId().equals(contract.getSystemId())) {
                 // transitTime is measured in days; so we round up to the next whole day
-                contract.setStartAndEndDate(today.plusDays((int) Math.ceil(updatedLocation.getTransitTime())));
+                contract.setStartAndEndDate(today.plusDays((int) ceil(updatedLocation.getTransitTime())));
                 campaign.addReport("The start and end dates of " +
                                          contract.getHyperlinkedName() +
                                          " have been shifted to reflect the current ETA.");
