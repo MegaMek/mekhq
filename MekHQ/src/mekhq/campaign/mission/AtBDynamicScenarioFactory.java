@@ -3559,7 +3559,7 @@ public class AtBDynamicScenarioFactory {
                 ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
                 Force force = campaign.getForce(forceID);
 
-                if (forceTemplate != null && forceTemplate.getContributesToUnitCount()) {
+                if (forceTemplate != null && forceTemplate.getContributesToUnitCount() && force != null) {
                     unitCount += force.getTotalUnitCount(campaign, isClanBidding);
                 }
             }
