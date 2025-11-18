@@ -256,8 +256,14 @@ public class CampaignNewDayManager {
         campaign.getCurrentReport().clear();
         campaign.setCurrentReportHTML("");
         campaign.getNewReports().clear();
-        campaign.getPersonnelWhoAdvancedInXP().clear();
+
+        campaign.getSkillReport().clear();
+        campaign.setSkillReportHTML("");
+        campaign.getNewSkillReports().clear();
+
         campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(today) + "</b>");
+
+        campaign.getPersonnelWhoAdvancedInXP().clear();
 
         // New Year Changes
         if (isNewYear) {
