@@ -1058,17 +1058,18 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblScore, gridBagConstraints);
 
-            txtScore.setName("txtScore");
-            txtScore.setText(Integer.toString(contract.getContractScore(campaign.getCampaignOptions()
-                                                                              .isUseStratConMaplessMode())));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(txtScore, gridBagConstraints);
+        txtScore.setName("txtScore");
+        int currentScore = contract.getContractScore(campaign.getCampaignOptions().isUseStratConMaplessMode());
+        int neededScore = contract.getRequiredCombatTeams() * contract.getLength();
+        txtScore.setText(currentScore + " / " + neededScore);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(txtScore, gridBagConstraints);
 
             lblSupportPoints.setName("lblSupportPoints");
             lblSupportPoints.setText(resourceMap.getString("lblSupportPoints.text"));
