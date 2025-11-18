@@ -312,7 +312,7 @@ public class StratConReinforcementsConfirmationDialog {
      */
     private JPanel getSpinnerPanel(double maximumSupportPoints, TargetRoll targetNumber, int costMultiplier) {
         final int PADDING = scaleForGUI(10);
-        int maximum = (int) floor(maximumSupportPoints / costMultiplier);
+        int maximum = (int) floor((maximumSupportPoints - costMultiplier) / costMultiplier);
 
         lblBreakdown = new JLabel("<html>" + getTargetNumberBreakdown(targetNumber, costMultiplier) + "</html>");
 
