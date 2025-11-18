@@ -725,14 +725,13 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             // Add the new surgery 'injury'. This is a semi-permanent record of
             // the surgery on the character
             InjuryType injuryType = type.getInjuryType();
-            Injury injury = injuryType.newInjury(campaign, patient, location,
-                  0);
+            Injury injury = injuryType.newInjury(campaign, patient, location, 0);
             adjustForKinderMode(useKinderMode, injury);
             patient.addInjury(injury);
 
             // Add recovery period injuries
             InjuryType recoveryInjuryType = getRecoveryInjuryType(surgery);
-            Injury recoveryInjury = recoveryInjuryType.newInjury(campaign, patient, INTERNAL, 1);
+            Injury recoveryInjury = recoveryInjuryType.newInjury(campaign, patient, GENERIC, 1);
             adjustForKinderMode(useKinderMode, recoveryInjury);
             patient.addInjury(recoveryInjury);
 
