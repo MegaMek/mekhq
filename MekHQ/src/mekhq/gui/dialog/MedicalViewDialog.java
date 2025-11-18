@@ -297,7 +297,7 @@ public class MedicalViewDialog extends JDialog {
         doll.clearLocTags();
         doll.setHighlightColor(new Color(170, 170, 255));
         Arrays.stream(BodyLocation.values()).filter(p::hasInjury).forEach(bl -> {
-            if (person.isLocationMissing(bl) && !person.isLocationMissing(bl.Parent())) {
+            if (person.isLocationMissing(bl) && !person.isLocationMissing(bl.getParent())) {
                 doll.setLocTag(bl, "lost");
             } else if (!person.isLocationMissing(bl)) {
                 InjuryLevel level = getMaxInjuryLevel(person, bl);

@@ -75,7 +75,7 @@ public class NewGlossaryEntryDialog extends JDialog {
     private static final int PADDING = UIUtil.scaleForGUI(10);
     private static final Dimension DIALOG_SIZE = UIUtil.scaleForGUI(1200, 500);
     private static final int CENTER_PANEL_MINIMUM_WIDTH = UIUtil.scaleForGUI(900);
-    private static final int TEXT_WIDTH = UIUtil.scaleForGUI(600);
+    private static final int TEXT_WIDTH = UIUtil.scaleForGUI(800);
     private static final Dimension BUTTON_SIZE = UIUtil.scaleForGUI(100, 30);
     private static final int CONTENTS_INDENT = UIUtil.scaleForGUI(300);
 

@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.personnel.medical;
 
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil.resolveDailyHealing;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -50,6 +49,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateHealing;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.unit.Unit;
 
@@ -71,7 +72,8 @@ public class MedicalController {
     final private int healingWaitingPeriod;
     final private int naturalHealingWaitingPeriod;
     final private boolean isUseSupportEdge;
-    final private boolean isUseMedicalController;
+    final private boolean isUseAdvancedMedical;
+    final private boolean isUseAltAdvancedMedical;
 
 
     /**
@@ -89,7 +91,8 @@ public class MedicalController {
         healingWaitingPeriod = campaignOptions.getHealingWaitingPeriod();
         naturalHealingWaitingPeriod = campaignOptions.getNaturalHealingWaitingPeriod();
         isUseSupportEdge = campaignOptions.isUseSupportEdge();
-        isUseMedicalController = campaignOptions.isUseAdvancedMedical();
+        isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
+        isUseAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
     }
 
     /**
@@ -127,27 +130,29 @@ public class MedicalController {
             doctor = isValidDoctor(patient, doctor) ? doctor : null;
         }
 
-        // Handle non-Advanced Medical healing
+
         if (patient.needsFixing()) {
             // This will trigger for both AM-enabled and AM-disabled campaigns
             doctor = verifyTheatreAvailability(patient, doctor);
             patient.decrementDaysToWaitForHealing();
 
-            if (doctor != null && patient.getDaysToWaitForHealing() <= 0) {
-                healPerson(patient, doctor, isUseAgingEffects, isClanCampaign, today);
-            } else if (checkNaturalHealing(patient)) {
-                LOGGER.debug(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.natural",
-                      patient.getHyperlinkedFullTitle()));
-                Unit unit = patient.getUnit();
-                if (unit != null) {
-                    unit.resetPilotAndEntity();
+            // Handle Advanced Medical
+            if (isUseAdvancedMedical) {
+                if (isUseAltAdvancedMedical) {
+                    AdvancedMedicalAlternateHealing.processNewDay(campaign.getLocalDate(),
+                          campaign.getCampaignOptions().isUseFatigue(), patient, doctor);
+                } else {
+                    InjuryUtil.resolveDailyHealing(campaign, patient);
+                }
+            } else {
+                if (doctor != null && patient.getDaysToWaitForHealing() <= 0) {
+                    healPerson(patient, doctor, isUseAgingEffects, isClanCampaign, today);
+                } else if (checkNaturalHealing(patient)) {
+                    LOGGER.debug(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.natural",
+                          patient.getHyperlinkedFullTitle()));
                 }
             }
-        }
 
-        // Handle Advanced Medical
-        if (isUseMedicalController) {
-            resolveDailyHealing(campaign, patient);
             Unit unit = patient.getUnit();
             if (unit != null) {
                 unit.resetPilotAndEntity();

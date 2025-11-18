@@ -5384,7 +5384,7 @@ public class Person {
         return (location != null) &&
                      (getInjuriesByLocation(location).stream()
                             .anyMatch(injury -> injury.getType().impliesMissingLocation()) ||
-                            isLocationMissing(location.Parent()));
+                            isLocationMissing(location.getParent()));
     }
 
     public void heal() {
@@ -6934,6 +6934,10 @@ public class Person {
         this.nTasks = nTasks;
     }
 
+    public void changeNTasks(int delta) {
+        nTasks += delta;
+    }
+
     /**
      * @deprecated use {@link #getPersonalLog()} instead.
      */
@@ -7012,6 +7016,15 @@ public class Person {
 
     public List<Injury> getInjuries() {
         return new ArrayList<>(injuries);
+    }
+
+    public int getTotalInjurySeverity() {
+        int totalSeverity = 0;
+        for (Injury injury : injuries) {
+            totalSeverity += injury.getHits();
+        }
+
+        return totalSeverity;
     }
 
     public List<Injury> getPermanentInjuries() {
