@@ -7380,7 +7380,7 @@ public class Unit implements ITechnology {
             } else {
                 return PersonnelRole.VEHICLE_CREW_GROUND;
             }
-        } else if (entity.isConventionalFighter()) {
+        } else if (entity instanceof ConvFighter) { // do not use entity.isConventionalFighter here
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
         } else if (entity.isLargeCraft()) {
             return PersonnelRole.VESSEL_PILOT;
@@ -7428,7 +7428,7 @@ public class Unit implements ITechnology {
             } else {
                 return PersonnelRole.VEHICLE_CREW_GROUND;
             }
-        } else if (entity.isConventionalInfantry()) {
+        } else if (entity instanceof ConvFighter) { // do not use entity.isConventionalFighter here
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
         } else if (entity.isSmallCraft() || entity.isLargeCraft()) {
             return PersonnelRole.VESSEL_GUNNER;
