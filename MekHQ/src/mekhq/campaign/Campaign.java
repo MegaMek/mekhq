@@ -5750,7 +5750,7 @@ public class Campaign implements ITechManager {
                 skillReport.add(report);
                 if (!skillReportHTML.isEmpty()) {
                     skillReportHTML = skillReportHTML + REPORT_LINEBREAK + report;
-                    newReports.add(REPORT_LINEBREAK);
+                    newSkillReports.add(REPORT_LINEBREAK);
                 } else {
                     skillReportHTML = report;
                 }
