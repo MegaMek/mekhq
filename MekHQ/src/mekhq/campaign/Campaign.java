@@ -1717,6 +1717,10 @@ public class Campaign implements ITechManager {
         return scenarios.values();
     }
 
+    public List<Scenario> getActiveScenarios() {
+        return scenarios.values().stream().filter(s -> s.getStatus().isCurrent()).toList();
+    }
+
     public void setLocation(CurrentLocation l) {
         location = l;
     }
