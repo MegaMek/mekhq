@@ -83,6 +83,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -1093,8 +1094,8 @@ public class SalvagePostScenarioPicker {
 
         // If two units selected, must use towing
         if (isTwoUnitsSelected) {
-            double weightLeft = getTowCapacity(unitLeftEntity);
-            double weightRight = getTowCapacity(unitRightEntity);
+            double weightLeft = getTowCapacity(unitLeftEntity, salvageUnitLeft);
+            double weightRight = getTowCapacity(unitRightEntity, salvageUnitRight);
 
             boolean hasTowageCapacity = (weightLeft + weightRight) >= targetWeight;
             if (!hasTowageCapacity) {
@@ -1124,7 +1125,7 @@ public class SalvagePostScenarioPicker {
         } else {
             double currentTowWeight = selectedUnit.getTotalWeightOfUnitsAssignedToBeTransported(
                   CampaignTransportType.TOW_TRANSPORT,
-                  mekhq.campaign.unit.TransporterType.TANK_TRAILER_HITCH);
+                  TransporterType.TANK_TRAILER_HITCH);
             return Math.max(0.0, selectedEntity.getWeight() - currentTowWeight);
         }
     }
