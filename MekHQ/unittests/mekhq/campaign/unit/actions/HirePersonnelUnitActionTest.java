@@ -356,6 +356,7 @@ public class HirePersonnelUnitActionTest {
         doReturn(false).when(mockOptions).isUseArtillery();
         Entity mockEntity = mock(SupportTank.class);
         when(mockEntity.isSupportVehicle()).thenReturn(true);
+        when(mockEntity.getMovementMode()).thenReturn(EntityMovementMode.HOVER);
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
 
         doReturn(false).when(unit).canTakeMoreDrivers();
@@ -368,13 +369,13 @@ public class HirePersonnelUnitActionTest {
 
         Person mockCrew = mock(Person.class);
         doNothing().when(unit).addVesselCrew(eq(mockCrew));
-        when(mockCampaign.newPerson(PersonnelRole.COMBAT_TECHNICIAN)).thenReturn(mockCrew);
+        when(mockCampaign.newPerson(any(PersonnelRole.class))).thenReturn(mockCrew);
         when(mockCampaign.recruitPerson(eq(mockCrew), anyBoolean(), eq(true))).thenReturn(true);
 
         HirePersonnelUnitAction action = new HirePersonnelUnitAction(false);
         action.execute(mockCampaign, unit);
 
-        verify(mockCampaign, times(1)).newPerson(PersonnelRole.COMBAT_TECHNICIAN);
+        verify(mockCampaign, times(1)).newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
         verify(mockCampaign, times(1)).recruitPerson(any(Person.class), eq(false), eq(true));
         verify(unit, times(1)).addVesselCrew(eq(mockCrew));
     }

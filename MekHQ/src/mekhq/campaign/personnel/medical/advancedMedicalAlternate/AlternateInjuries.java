@@ -391,7 +391,7 @@ public class AlternateInjuries {
 
     public static final class SeveredHead extends FormattedSever {
         public SeveredHead() {
-            super(Set.of(SKULL));
+            super(Set.of(HEAD));
         }
 
         @Override
@@ -439,7 +439,7 @@ public class AlternateInjuries {
         @Override
         public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
             return Collections.singletonList(new GameEffect("Blood Loss", operator -> {
-                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, INTERNAL, 1);
+                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, GENERIC, 1);
                 person.addInjury(bleeding);
                 MedicalLogger.internalBleedingWorsened(person, campaign.getLocalDate());
             }));
@@ -470,7 +470,7 @@ public class AlternateInjuries {
         @Override
         public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
             return Collections.singletonList(new GameEffect("Blood Loss", operator -> {
-                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, INTERNAL, 1);
+                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, GENERIC, 1);
                 person.addInjury(bleeding);
                 MedicalLogger.internalBleedingWorsened(person, campaign.getLocalDate());
             }));
@@ -495,7 +495,7 @@ public class AlternateInjuries {
         @Override
         public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
             return Collections.singletonList(new GameEffect("Blood Loss", operator -> {
-                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, INTERNAL, 1);
+                Injury bleeding = BLOOD_LOSS.newInjury(campaign, person, GENERIC, 1);
                 person.addInjury(bleeding);
                 MedicalLogger.internalBleedingWorsened(person, campaign.getLocalDate());
             }));
@@ -681,7 +681,7 @@ public class AlternateInjuries {
     public static final class BloodLoss extends BaseInjury {
         public BloodLoss() {
             super(BLOOD_LOSS_HEALING_DAYS, false, MAJOR,
-                  NONE, Set.of(INTERNAL));
+                  NONE, Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BLOOD_LOSS.simpleName");
             this.fluffText = simpleName;
         }

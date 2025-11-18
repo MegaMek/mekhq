@@ -319,8 +319,6 @@ public class Person {
     private boolean engineer;
     public static final int PRIMARY_ROLE_SUPPORT_TIME = 480;
     public static final int PRIMARY_ROLE_OVERTIME_SUPPORT_TIME = 240;
-    public static final int SECONDARY_ROLE_SUPPORT_TIME = 240;
-    public static final int SECONDARY_ROLE_OVERTIME_SUPPORT_TIME = 120;
 
     // region Advanced Medical
     private List<Injury> injuries;
@@ -4174,26 +4172,6 @@ public class Person {
             if (person.getJoinedCampaign() == null) {
                 person.setJoinedCampaign(today);
             }
-
-            // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
-            // potentially as far back as 2014. The next two handlers should never be removed.
-            if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
-                person.setSecondaryRole(PersonnelRole.NONE);
-
-                campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
-                      spanOpeningWithCustomColor(getWarningColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
-            }
-
-            if (!person.canPerformRole(today, person.getPrimaryRole(), true)) {
-                person.setPrimaryRole(campaign, PersonnelRole.NONE);
-
-                campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
-                      spanOpeningWithCustomColor(getNegativeColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
-            }
         } catch (Exception e) {
             LOGGER.error(e, "Failed to read person {} from file", person.getFullName());
             person = null;
@@ -4318,23 +4296,38 @@ public class Person {
      * @since 0.50.10
      */
     public static boolean updateSkillsForVehicleCrewProfession(LocalDate today, Person person,
-          PersonnelRole currentRole,
-          boolean isPrimary) {
-        if (currentRole != PersonnelRole.VEHICLE_CREW) {
+          PersonnelRole currentRole, boolean isPrimary, boolean includeAdmin) {
+        if (currentRole != PersonnelRole.VEHICLE_CREW && currentRole != PersonnelRole.COMBAT_TECHNICIAN) {
             return false;
         }
 
+        boolean didChangeOccur = false;
         if (!person.hasSkill(S_TECH_MECHANIC)) {
             person.addSkill(S_TECH_MECHANIC, 3, 0);
+            didChangeOccur = true;
         }
 
-        if (isPrimary) {
-            person.setPrimaryRole(today, PersonnelRole.COMBAT_TECHNICIAN);
-        } else {
-            person.setSecondaryRole(PersonnelRole.COMBAT_TECHNICIAN);
+        if (includeAdmin && !person.hasSkill(S_ADMIN)) {
+            person.addSkill(S_ADMIN, 3, 0);
+            didChangeOccur = true;
         }
 
-        return true;
+        if (!person.hasSkill(S_TECH_MEK)) {
+            person.addSkill(S_TECH_MEK, 3, 0);
+            didChangeOccur = true;
+        }
+
+        if (currentRole != PersonnelRole.COMBAT_TECHNICIAN) {
+            if (isPrimary) {
+                person.setPrimaryRole(today, PersonnelRole.COMBAT_TECHNICIAN);
+                didChangeOccur = true;
+            } else {
+                person.setSecondaryRole(PersonnelRole.COMBAT_TECHNICIAN);
+                didChangeOccur = true;
+            }
+        }
+
+        return didChangeOccur;
     }
 
     /**
@@ -5778,18 +5771,8 @@ public class Person {
     public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
         int baseTime = 0;
 
-        if (primaryRole.isTech()) {
-            if (secondaryRole.isNone() || secondaryRole.isCivilian()) {
-                baseTime = PRIMARY_ROLE_SUPPORT_TIME;
-            } else {
-                baseTime = SECONDARY_ROLE_SUPPORT_TIME;
-            }
-        } else if (secondaryRole.isTechSecondary()) {
-            if (primaryRole.isNone() || primaryRole.isCivilian()) {
-                baseTime = PRIMARY_ROLE_SUPPORT_TIME;
-            } else {
-                baseTime = SECONDARY_ROLE_SUPPORT_TIME;
-            }
+        if (isTechExpanded()) {
+            baseTime = PRIMARY_ROLE_SUPPORT_TIME;
         }
 
         return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration));
@@ -5976,29 +5959,24 @@ public class Person {
     }
 
     /**
-     * Resets the available working time (minutes and overtime) for this person based on their role, deployment status,
-     * and administrative support.
+     * Resets the available working time (minutes and overtime) for this person based on their role and administrative
+     * support.
      *
-     * <p>Personnel deployed to combat or without support roles have no available time. Doctors receive standard
-     * support time, while techs receive time adjusted by skill and administration multipliers.</p>
+     * <p>Doctors receive standard support time, while techs receive time adjusted by skill and administration
+     * multipliers.</p>
      *
      * @param isTechsUseAdministration whether techs benefit from administrative support personnel, which increases
      *                                 their available working time
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
-        // Removed - Units deployed to combat have no available time
-
         // Personnel without tech or doctor roles have no available time
         if (!isTechExpanded() && !isDoctor()) {
             this.minutesLeft = 0;
             this.overtimeLeft = 0;
             return;
-        }
-
-        if (primaryRole.isTech() || primaryRole.isDoctor()) {
-            getRoleMinutes(secondaryRole);
-        } else if (secondaryRole.isTechSecondary() || secondaryRole.isDoctor()) {
-            getRoleMinutes(primaryRole);
+        } else {
+            this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
+            this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
 
         // Techs get support time adjusted by skill and administration multipliers
@@ -6006,16 +5984,6 @@ public class Person {
             double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
             this.minutesLeft = (int) Math.round(minutesLeft * multiplier);
             this.overtimeLeft = (int) Math.round(overtimeLeft * multiplier);
-        }
-    }
-
-    private void getRoleMinutes(PersonnelRole comparisonRole) {
-        if (comparisonRole.isNone() || comparisonRole.isCivilian()) {
-            this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
-            this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-        } else {
-            this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
-            this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
     }
 
@@ -6102,7 +6070,7 @@ public class Person {
         return hasSkill && (getPrimaryRole().isCombatTechnician() || getSecondaryRole().isCombatTechnician());
     }
 
-    public boolean isAsTech() {
+    public boolean isAstech() {
         boolean hasSkill = hasSkill(S_ASTECH);
         return hasSkill && (getPrimaryRole().isAstech() || getSecondaryRole().isAstech());
     }

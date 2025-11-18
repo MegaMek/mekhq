@@ -34,7 +34,7 @@ Vehicle Crew/Ground:			/Vehicle Crew/Ground                /Vehicle Driver
 Vehicle Crew/Naval:             /Vehicle Crew/Naval                 /Naval Driver
 Vehicle Crew/VTOL:              /Vehicle Crew/VTOL                  /VTOL Pilot
 Vehicle Gunner:					MOVED TO /Vehicle Crew/Ground       /Vehicle Gunner
-Combat Technician:			    /Combat Technician                  /Vehicle Crewmember
+Combat Engineer:			    /Combat Technician                  /Vehicle Crewmember
 Aerospace Pilot:				/Aerospace Pilot
 Conventional Aircraft Pilot:	/Conventional Aircraft Crew        /Conventional Aircraft Pilot
 ProtoMek Pilot:				    /ProtoMek Pilot
