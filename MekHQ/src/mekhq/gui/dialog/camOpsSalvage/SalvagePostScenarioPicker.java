@@ -564,8 +564,10 @@ public class SalvagePostScenarioPicker {
             claimedSalvageForSale.setEnabled(false);
 
             JComboBox<String> comboBox1 = new JComboBox<>();
-            JComboBox<String> comboBox2 = new JComboBox<>();
+            fixComboBoxWidth(comboBox1);
             comboBox1.addItem(null); // Allow empty selection
+            JComboBox<String> comboBox2 = new JComboBox<>();
+            fixComboBoxWidth(comboBox2);
             comboBox2.addItem(null); // Allow empty selection
 
             // Build the mapping and populate combo boxes
@@ -1187,5 +1189,24 @@ public class SalvagePostScenarioPicker {
         private void showUnit(TestUnit unit) {
             new EntityReadoutDialog(null, true, unit.getEntity()).setVisible(true);
         }
+    }
+
+    /**
+     * Fixes the width of a combo box to prevent resizing when items are added or selected.
+     *
+     * <p>This method sets the preferred, minimum, and maximum sizes of the combo box to a fixed
+     * width while preserving the component's preferred height. This prevents the combo box from
+     * resizing dynamically based on its content, providing a consistent user interface.</p>
+     *
+     * @param combo the {@link JComboBox} to fix the width of
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void fixComboBoxWidth(JComboBox<?> combo) {
+        Dimension dimension = scaleForGUI(250, combo.getPreferredSize().height);
+        combo.setPreferredSize(dimension);
+        combo.setMinimumSize(dimension);
+        combo.setMaximumSize(dimension);
     }
 }
