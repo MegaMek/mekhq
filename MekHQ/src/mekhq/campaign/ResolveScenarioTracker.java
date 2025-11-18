@@ -88,7 +88,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.dialog.SalvagePostScenarioPicker;
+import mekhq.gui.dialog.camOpsSalvage.SalvagePostScenarioPicker;
 import mekhq.utilities.ReportingUtilities;
 
 /**
