@@ -2626,7 +2626,7 @@ public class StratConRulesManager {
                 continue;
             }
 
-            // Skip any that are already assigned to a scenario
+            // Skip any that are already assigned to a scenario.
             if (force.isDeployed()) {
                 continue;
             }
