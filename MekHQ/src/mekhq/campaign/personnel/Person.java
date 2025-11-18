@@ -35,6 +35,7 @@ package mekhq.campaign.personnel;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.floor;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
@@ -351,6 +352,7 @@ public class Person {
     private int eduDaysOfTravel;
     private List<UUID> eduTagAlongs;
     private List<String> eduFailedApplications;
+    private double trainingForceEducationTime;
     // endregion Education
 
     // region Personality
@@ -579,6 +581,7 @@ public class Person {
         eduAcademySet = null;
         eduAcademyNameInSet = null;
         eduAcademyFaction = null;
+        trainingForceEducationTime = 0.0;
         aggression = Aggression.NONE;
         aggressionDescriptionIndex = randomInt(Aggression.MAXIMUM_VARIATIONS);
         ambition = Ambition.NONE;
@@ -2587,6 +2590,18 @@ public class Person {
         return eduAcademySet;
     }
 
+    public double getTrainingForceEducationTime() {
+        return trainingForceEducationTime;
+    }
+
+    public void setTrainingForceEducationTime(final double trainingForceEducationTime) {
+        this.trainingForceEducationTime = trainingForceEducationTime;
+    }
+
+    public void changeTrainingForceEducationTime(final double delta) {
+        this.trainingForceEducationTime = max(0.0, trainingForceEducationTime + delta);
+    }
+
     public Aggression getAggression() {
         return aggression;
     }
@@ -3360,6 +3375,8 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEducationTime", eduEducationTime);
             }
 
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trainingForceEducationTime", trainingForceEducationTime);
+
             if (aggression != Aggression.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggression", aggression.name());
             }
@@ -4024,6 +4041,8 @@ public class Person {
                     person.eduEducationStage = EducationStage.parseFromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduEducationTime")) {
                     person.eduEducationTime = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("trainingForceEducationTime")) {
+                    person.trainingForceEducationTime = MathUtility.parseDouble(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("aggression")) {
                     person.aggression = Aggression.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("aggressionDescriptionIndex")) {
@@ -4959,7 +4978,7 @@ public class Person {
                 if (levelSum == -divisor) {
                     yield EXP_NONE;
                 } else {
-                    yield Math.max(0, levelSum / divisor);
+                    yield max(0, levelSum / divisor);
                 }
             }
             default -> calculateExperienceLevelForProfession(associatedSkillNames,
@@ -5194,7 +5213,7 @@ public class Person {
     }
 
     public int getHealingDifficulty(final Campaign campaign) {
-        return campaign.getCampaignOptions().isTougherHealing() ? Math.max(0, getHits() - 2) : 0;
+        return campaign.getCampaignOptions().isTougherHealing() ? max(0, getHits() - 2) : 0;
     }
 
     public TargetRollModifier getHealingMods(final Campaign campaign) {
@@ -5427,7 +5446,7 @@ public class Person {
     }
 
     public void heal() {
-        hits = Math.max(hits - 1, 0);
+        hits = max(hits - 1, 0);
         if (!needsFixing()) {
             doctorId = null;
         }
@@ -7294,7 +7313,7 @@ public class Person {
         if (isFounder()) {
             shares++;
         }
-        shares += Math.max(-1, getExperienceLevel(campaign, false, true) - 2);
+        shares += max(-1, getExperienceLevel(campaign, false, true) - 2);
 
         if (getRank().isOfficer()) {
             final Profession profession = Profession.getProfessionFromPersonnelRole(getPrimaryRole());
