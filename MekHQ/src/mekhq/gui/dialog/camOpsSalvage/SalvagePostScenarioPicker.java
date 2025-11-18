@@ -1116,13 +1116,16 @@ public class SalvagePostScenarioPicker {
         validate(group);
     }
 
-    private static double getTowCapacity(Entity selectedEntity) {
+    private static double getTowCapacity(Entity selectedEntity, Unit selectedUnit) {
         if (selectedEntity == null) {
             return 0.0;
         } else if (selectedEntity instanceof Tank tank && tank.isTrailer()) {
             return 0.0;
         } else {
-            return selectedEntity.getWeight();
+            double currentTowWeight = selectedUnit.getTotalWeightOfUnitsAssignedToBeTransported(
+                  CampaignTransportType.TOW_TRANSPORT,
+                  mekhq.campaign.unit.TransporterType.TANK_TRAILER_HITCH);
+            return Math.max(0.0, selectedEntity.getWeight() - currentTowWeight);
         }
     }
 
