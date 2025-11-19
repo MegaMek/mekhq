@@ -621,6 +621,12 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
+        // Clear out any old StratCon campaign data (it's not going to be used, moving forward). We do this near the
+        // end to ensure there isn't any risk of us accidentally killing the data when it's still required.
+        if (mission instanceof AtBContract contract) {
+            contract.setStratConCampaignState(null);
+        }
+
         final List<Mission> missions = getCampaign().getSortedMissions();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));
     }
