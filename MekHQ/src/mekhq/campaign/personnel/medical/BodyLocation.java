@@ -108,7 +108,9 @@ public enum BodyLocation {
     private final String locationName;
     private final BodyLocation parent;
 
-    public static final List<BodyLocation> PRIMARY_LOCATIONS = List.of(
+    // Never use List.of() here it will cause NPEs as null values are a valid comparison to the contents of this list
+    // and List.of() disallows the passing in of null values.
+    public static final List<BodyLocation> PRIMARY_LOCATIONS = Arrays.asList(
           HEAD,
           CHEST,
           ABDOMEN,
@@ -201,7 +203,7 @@ public enum BodyLocation {
     public @Nullable BodyLocation getPrimaryLocation() {
         BodyLocation location = this;
 
-        while (!PRIMARY_LOCATIONS.contains(location) && location != null) {
+        while (location != null && !PRIMARY_LOCATIONS.contains(location)) {
             location = location.getParent();
         }
 
