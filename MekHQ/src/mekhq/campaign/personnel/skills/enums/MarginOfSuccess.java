@@ -59,19 +59,20 @@ import mekhq.utilities.ReportingUtilities;
  * @since 0.50.05
  */
 public enum MarginOfSuccess {
-    SPECTACULAR(7, Integer.MAX_VALUE, 4, ReportingUtilities.getAmazingColor()),
-    EXTRAORDINARY(5, 6, 3, ReportingUtilities.getPositiveColor()),
-    GOOD(3, 4, 2, ReportingUtilities.getPositiveColor()),
-    IT_WILL_DO(1, 2, 1, ReportingUtilities.getWarningColor()),
-    BARELY_MADE_IT(0, 0, 0, ReportingUtilities.getWarningColor()),
-    ALMOST(-2, -1, -1, ReportingUtilities.getWarningColor()),
-    BAD(-4, -3, -2, ReportingUtilities.getNegativeColor()),
-    TERRIBLE(-6, -5, -3, ReportingUtilities.getNegativeColor()),
-    DISASTROUS(Integer.MIN_VALUE, -7, -4, ReportingUtilities.getNegativeColor());
+    SPECTACULAR("SPECTACULAR", 7, Integer.MAX_VALUE, 4, ReportingUtilities.getAmazingColor()),
+    EXTRAORDINARY("EXTRAORDINARY", 5, 6, 3, ReportingUtilities.getPositiveColor()),
+    GOOD("GOOD", 3, 4, 2, ReportingUtilities.getPositiveColor()),
+    IT_WILL_DO("IT_WILL_DO", 1, 2, 1, ReportingUtilities.getWarningColor()),
+    BARELY_MADE_IT("BARELY_MADE_IT", 0, 0, 0, ReportingUtilities.getWarningColor()),
+    ALMOST("ALMOST", -2, -1, -1, ReportingUtilities.getWarningColor()),
+    BAD("BAD", -4, -3, -2, ReportingUtilities.getNegativeColor()),
+    TERRIBLE("TERRIBLE", -6, -5, -3, ReportingUtilities.getNegativeColor()),
+    DISASTROUS("DISASTROUS", Integer.MIN_VALUE, -7, -4, ReportingUtilities.getNegativeColor());
 
     private static final MMLogger LOGGER = MMLogger.create(MarginOfSuccess.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MarginOfSuccess";
 
+    private final String lookupName;
     private final String label;
     private final int lowerBound;
     private final int upperBound;
@@ -81,6 +82,7 @@ public enum MarginOfSuccess {
     /**
      * Constructs a {@link MarginOfSuccess} enum constant with the specified bounds and margin value.
      *
+     * @param lookupName the key used to retrieve resource bundle entries
      * @param lowerBound the lower inclusive bound for this margin of success
      * @param upperBound the upper inclusive bound for this margin of success
      * @param margin     the margin value associated with this range
@@ -89,7 +91,8 @@ public enum MarginOfSuccess {
      * @author Illiani
      * @since 0.50.05
      */
-    MarginOfSuccess(int lowerBound, int upperBound, int margin, String color) {
+    MarginOfSuccess(String lookupName, int lowerBound, int upperBound, int margin, String color) {
+        this.lookupName = lookupName;
         this.label = generateMarginOfSuccessString();
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
@@ -224,6 +227,6 @@ public enum MarginOfSuccess {
     }
 
     private String generateMarginOfSuccessString() {
-        return getTextAt(RESOURCE_BUNDLE, margin + ".label");
+        return getTextAt(RESOURCE_BUNDLE, lookupName + ".label");
     }
 }
