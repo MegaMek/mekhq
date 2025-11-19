@@ -37,7 +37,6 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.REASONING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.Gender;
@@ -127,9 +126,9 @@ public enum Reasoning {
      * @param level      The integer score associated with this {@link Reasoning} enum value
      */
     Reasoning(ReasoningComparison comparison, int level) {
-        this.label = generateLabel();
         this.comparison = comparison;
         this.level = level;
+        this.label = generateLabel();
     }
 
     public String getLabel() {
@@ -161,7 +160,7 @@ public enum Reasoning {
     // region Getters
     private String generateLabel() {
         final String RESOURCE_KEY = name() + ".label";
-        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY) + " (" + level + ")";
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY) + " (" + level + ")";
     }
 
     /**
