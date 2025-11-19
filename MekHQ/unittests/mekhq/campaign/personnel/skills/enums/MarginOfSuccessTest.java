@@ -33,7 +33,7 @@
 package mekhq.campaign.personnel.skills.enums;
 
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -42,13 +42,7 @@ class MarginOfSuccessTest {
     public void testGetLabel_notInvalid() {
         for (MarginOfSuccess marginOfSuccess : MarginOfSuccess.values()) {
             String label = marginOfSuccess.getLabel();
-
-            String results = "";
-            if (!isResourceKeyValid(label)) {
-                results = "Found Error in: " + label;
-            }
-
-            assertEquals("", results);
+            assertTrue(isResourceKeyValid(label), marginOfSuccess.name() + " is missing a label.");
         }
     }
 }
