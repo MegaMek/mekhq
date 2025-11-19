@@ -130,16 +130,9 @@ public enum ForceType {
      * a localization resource key in the {@code ForceType} resource bundle, with keys formatted as
      * {@code [enumName].symbol}.</p>
      *
-     * <p>If the current instance is {@code STANDARD}, an empty string is returned as the symbol.</p>
-     *
-     * @return The localized symbol associated with the current instance, or an empty string if the instance is
-     *       {@code STANDARD}.
+     * @return The localized symbol associated with the current instance.
      */
     private String generateSymbol() {
-        if (this == STANDARD) {
-            return "";
-        }
-
         final String RESOURCE_BUNDLE = "mekhq.resources.ForceType";
         final String RESOURCE_KEY = name() + ".symbol";
 
