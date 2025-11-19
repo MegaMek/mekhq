@@ -4848,8 +4848,8 @@ public class Unit implements ITechnology {
      * applies it to the entity's crew option. Solo pilots and infantry units are handled specially to avoid
      * double-counting personnel who serve in multiple roles.</p>
      *
-     * <p>Non-combat crew members (such as vessel crew and combat engineers) are excluded from this calculation as
-     * their Edge is handled separately through MekHQ's non-combat personnel system.</p>
+     * <p>Non-combat crew members (such as vessel crew ) are excluded from this calculation as their Edge is handled
+     * separately through MekHQ's non-combat personnel system.</p>
      *
      * @param crewSize         the total size of the crew to use for calculating the average Edge value
      * @param isCommandersOnly {@code true} if the 'Commanders Only' option is enabled for this unit type
@@ -4877,8 +4877,8 @@ public class Unit implements ITechnology {
             }
         }
 
-        // Average the edge values of pilots and gunners. Non-Gunners, non-drivers (i.e. Vessel Crewmembers and
-        // Combat Engineers mostly) handle edge solely through MHQ as noncombat personnel, so aren't considered here
+        // Average the edge values of pilots and gunners. Non-Gunners, non-drivers (i.e., Vessel Crewmembers) handle
+        // edge solely through MHQ as noncombat personnel, so aren't considered here
         int edge = (int) Math.round(sumEdge / crewSize);
         IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
         edgeOption.setValue(edge);
