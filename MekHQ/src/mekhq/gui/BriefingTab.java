@@ -582,7 +582,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        // Undeploy forces
+        // Undeploy forces & units
         boolean isCadreDuty = mission instanceof AtBContract && ((AtBContract) mission).getContractType().isCadreDuty();
         boolean hadCadreForces = false;
         for (Force force : getCampaign().getAllForces()) {
@@ -593,7 +593,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
             int scenarioAssignment = force.getScenarioId();
             if (scenarioAssignment != NO_ASSIGNED_SCENARIO) {
-                Scenario scenario = getCampaign().getScenario(force.getScenarioId());
+                Scenario scenario = getCampaign().getScenario(scenarioAssignment);
 
                 // This shouldn't be necessary, but now is as good a time as any to check for null scenarios
                 if (scenario == null || scenario.getMissionId() == mission.getId()) {
@@ -605,6 +605,18 @@ public final class BriefingTab extends CampaignGuiTab {
         if (hadCadreForces) {
             new ImmersiveDialogNotification(getCampaign(), resourceMap.getString("cadreReassignment.text"),
                   true);
+        }
+
+        for (Unit unit : getCampaign().getUnits()) {
+            int scenarioAssignment = unit.getScenarioId();
+            if (scenarioAssignment != NO_ASSIGNED_SCENARIO) {
+                Scenario scenario = getCampaign().getScenario(scenarioAssignment);
+
+                // This shouldn't be necessary, but now is as good a time as any to check for null scenarios
+                if (scenario == null || scenario.getMissionId() == mission.getId()) {
+                    unit.setScenarioId(NO_ASSIGNED_SCENARIO);
+                }
+            }
         }
 
         // Resolve any outstanding scenarios
