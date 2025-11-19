@@ -541,24 +541,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 campaign.addReport(report);
             }
 
-            boolean includeAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
-            if (Person.updateSkillsForVehicleCrewProfession(today,
-                  person,
-                  person.getPrimaryRole(),
-                  true,
-                  includeAdmin) ||
-                      Person.updateSkillsForVehicleCrewProfession(today,
-                            person,
-                            person.getSecondaryRole(),
-                            false,
-                            includeAdmin)) {
-                String report = getFormattedTextAt(RESOURCE_BUNDLE, "vehicleCrewProfessionSkillChange",
-                      spanOpeningWithCustomColor(getWarningColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle());
-                campaign.addReport(report);
-            }
-
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
             if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {

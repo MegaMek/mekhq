@@ -900,7 +900,6 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.VEHICLE_CREW_GROUND, 900);
         setRoleBaseSalary(PersonnelRole.VEHICLE_CREW_NAVAL, 900);
         setRoleBaseSalary(PersonnelRole.VEHICLE_CREW_VTOL, 900);
-        setRoleBaseSalary(PersonnelRole.COMBAT_TECHNICIAN, 900);
         setRoleBaseSalary(PersonnelRole.AEROSPACE_PILOT, 1500);
         setRoleBaseSalary(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT, 900);
         setRoleBaseSalary(PersonnelRole.PROTOMEK_PILOT, 960);

@@ -4257,8 +4257,9 @@ public class Person {
      *   <li>Updates the person's role (primary or secondary) to the new profession</li>
      * </ul>
      *
-     * <p>For {@link PersonnelRole#VEHICLE_GUNNER}, the new role is determined by examining the person's currently
-     * assigned entity. If no entity is assigned, defaults to ground vehicle crew.</p>
+     * <p>For {@link PersonnelRole#VEHICLE_GUNNER}, {@link PersonnelRole#COMBAT_TECHNICIAN} or
+     * {@link PersonnelRole#VEHICLE_CREW}, the new role is determined by examining the person's currently assigned
+     * entity. If no entity is assigned, defaults to ground vehicle crew.</p>
      *
      * <p>Skills are added at level 3 if the complementary skill is missing, otherwise they are added at the same
      * level as the existing complementary skill.</p>
@@ -4292,7 +4293,7 @@ public class Person {
                 newProfession = PersonnelRole.VEHICLE_CREW_GROUND;
                 drivingSkillType = S_PILOT_GVEE;
             }
-            case VEHICLE_GUNNER -> {
+            case VEHICLE_GUNNER, VEHICLE_CREW, COMBAT_TECHNICIAN -> {
                 // Vehicle gunners need special handling to guesstimate what they should be. We base this on the unit
                 // they are currently assigned to.
                 Entity assignedEntity = person.getEntity();
@@ -4323,8 +4324,8 @@ public class Person {
         Skill drivingSkill = person.getSkill(drivingSkillType);
         Skill gunnerySkill = person.getSkill(gunnerySkillType);
 
-        int drivingTargetLevel = gunnerySkill == null ? 3 : gunnerySkill.getLevel();
-        int gunneryTargetLevel = drivingSkill == null ? 3 : drivingSkill.getLevel();
+        int drivingTargetLevel = gunnerySkill == null ? 1 : gunnerySkill.getLevel();
+        int gunneryTargetLevel = drivingSkill == null ? 1 : drivingSkill.getLevel();
 
         if (gunnerySkill == null) {
             person.addSkill(gunnerySkillType, gunneryTargetLevel, 0);
@@ -4341,58 +4342,6 @@ public class Person {
         }
 
         return true;
-    }
-
-    /**
-     * Updates skills for personnel with the Vehicle Crew profession by ensuring they have the Mechanic skill.
-     *
-     * <p>This method is used during XML loading to migrate legacy data. If the person lacks the
-     * {@link SkillType#S_TECH_MECHANIC} skill, it will be added at a level 3. This ensures backwards compatibility when
-     * loading older save files.</p>
-     *
-     * @param today       the current date
-     * @param person      the person whose skills should be updated
-     * @param currentRole the role to check
-     * @param isPrimary   if the role is the characters' primary profession
-     *
-     * @return {@code true} if the Mechanic skill was added, {@code false} otherwise
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    public static boolean updateSkillsForVehicleCrewProfession(LocalDate today, Person person,
-          PersonnelRole currentRole, boolean isPrimary, boolean includeAdmin) {
-        if (currentRole != PersonnelRole.VEHICLE_CREW && currentRole != PersonnelRole.COMBAT_TECHNICIAN) {
-            return false;
-        }
-
-        boolean didChangeOccur = false;
-        if (!person.hasSkill(S_TECH_MECHANIC)) {
-            person.addSkill(S_TECH_MECHANIC, 3, 0);
-            didChangeOccur = true;
-        }
-
-        if (includeAdmin && !person.hasSkill(S_ADMIN)) {
-            person.addSkill(S_ADMIN, 3, 0);
-            didChangeOccur = true;
-        }
-
-        if (!person.hasSkill(S_TECH_MEK)) {
-            person.addSkill(S_TECH_MEK, 3, 0);
-            didChangeOccur = true;
-        }
-
-        if (currentRole != PersonnelRole.COMBAT_TECHNICIAN) {
-            if (isPrimary) {
-                person.setPrimaryRole(today, PersonnelRole.COMBAT_TECHNICIAN);
-                didChangeOccur = true;
-            } else {
-                person.setSecondaryRole(PersonnelRole.COMBAT_TECHNICIAN);
-                didChangeOccur = true;
-            }
-        }
-
-        return didChangeOccur;
     }
 
     /**
@@ -5813,7 +5762,7 @@ public class Person {
         } else if (entity instanceof BattleArmor) {
             return hasSkill(S_TECH_BA) && isTechBA();
         } else if (entity instanceof Tank) {
-            return hasSkill(S_TECH_MECHANIC) && (isTechMechanic() || isCombatTechnician());
+            return hasSkill(S_TECH_MECHANIC) && isTechMechanic();
         } else {
             return false;
         }
@@ -6088,7 +6037,7 @@ public class Person {
     }
 
     public boolean isTech() {
-        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA() || isCombatTechnician();
+        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA();
     }
 
     /**
@@ -6100,7 +6049,6 @@ public class Person {
         return isTechMek() ||
                      isTechAero() ||
                      isTechMechanic() ||
-                     isCombatTechnician() ||
                      isTechBA() ||
                      isTechLargeVessel();
     }
@@ -6128,11 +6076,6 @@ public class Person {
     public boolean isTechBA() {
         boolean hasSkill = hasSkill(S_TECH_BA);
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
-    }
-
-    public boolean isCombatTechnician() {
-        boolean hasSkill = hasSkill(S_TECH_MECHANIC);
-        return hasSkill && (getPrimaryRole().isCombatTechnician() || getSecondaryRole().isCombatTechnician());
     }
 
     public boolean isAstech() {

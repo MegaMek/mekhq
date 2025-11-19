@@ -740,7 +740,7 @@ public class Utilities {
                 } else if (unit.getEntity().isConventionalFighter()) {
                     role = PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
                 } else {
-                    role = PersonnelRole.COMBAT_TECHNICIAN;
+                    role = PersonnelRole.ASTECH;
                 }
                 Person person = campaign.newPerson(role, factionCode, oldCrew.getGender(numberPeopleGenerated));
 

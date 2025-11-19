@@ -151,17 +151,6 @@ class PersonnelRoleTest {
     }
 
     @Test
-    void testIsCombatTechnician() {
-        for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.COMBAT_TECHNICIAN) {
-                assertTrue(personnelRole.isCombatTechnician());
-            } else {
-                assertFalse(personnelRole.isCombatTechnician());
-            }
-        }
-    }
-
-    @Test
     void testIsAerospacePilot() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.AEROSPACE_PILOT) {
@@ -440,8 +429,7 @@ class PersonnelRoleTest {
     @EnumSource(PersonnelRole.class)
     void testIsGroundVehicleCrew(PersonnelRole personnelRole) {
         boolean expected = switch (personnelRole) {
-            case VEHICLE_CREW_GROUND,
-                 COMBAT_TECHNICIAN -> true;
+            case VEHICLE_CREW_GROUND -> true;
             default -> false;
         };
 
@@ -453,8 +441,7 @@ class PersonnelRoleTest {
     @EnumSource(PersonnelRole.class)
     void testIsNavalVehicleCrew(PersonnelRole personnelRole) {
         boolean expected = switch (personnelRole) {
-            case VEHICLE_CREW_NAVAL,
-                 COMBAT_TECHNICIAN -> true;
+            case VEHICLE_CREW_NAVAL -> true;
             default -> false;
         };
 
@@ -466,8 +453,7 @@ class PersonnelRoleTest {
     @EnumSource(PersonnelRole.class)
     void testIsVTOLCrew(PersonnelRole personnelRole) {
         boolean expected = switch (personnelRole) {
-            case VEHICLE_CREW_VTOL,
-                 COMBAT_TECHNICIAN -> true;
+            case VEHICLE_CREW_VTOL -> true;
             default -> false;
         };
 
@@ -481,8 +467,7 @@ class PersonnelRoleTest {
         boolean expected = switch (personnelRole) {
             case VEHICLE_CREW_GROUND,
                  VEHICLE_CREW_NAVAL,
-                 VEHICLE_CREW_VTOL,
-                 COMBAT_TECHNICIAN -> true;
+                 VEHICLE_CREW_VTOL -> true;
             default -> false;
         };
 
@@ -545,7 +530,6 @@ class PersonnelRoleTest {
                 case AERO_TEK:
                 case BA_TECH:
                 case VESSEL_CREW:
-                case COMBAT_TECHNICIAN:
                     assertTrue(personnelRole.isTech());
                     break;
                 default:
@@ -563,7 +547,6 @@ class PersonnelRoleTest {
                 case MECHANIC:
                 case AERO_TEK:
                 case BA_TECH:
-                case COMBAT_TECHNICIAN:
                     assertTrue(personnelRole.isTechSecondary());
                     break;
                 default:
@@ -633,7 +616,6 @@ class PersonnelRoleTest {
 
         // Valid inputs with variations in casing
         assertEquals(PersonnelRole.MEKWARRIOR, PersonnelRole.fromString("MekWarrior"));
-        assertEquals(PersonnelRole.COMBAT_TECHNICIAN, PersonnelRole.fromString("combat_technician"));
 
         // Valid inputs with Clan variance
         assertEquals(BATTLE_ARMOUR, PersonnelRole.fromString("elemental"));
@@ -669,7 +651,6 @@ class PersonnelRoleTest {
     @Test
     void testGetTechRoles() {
         final List<PersonnelRole> expected = new ArrayList<>();
-        expected.add(PersonnelRole.COMBAT_TECHNICIAN);
         expected.add(PersonnelRole.VESSEL_CREW);
         expected.add(PersonnelRole.MEK_TECH);
         expected.add(PersonnelRole.MECHANIC);

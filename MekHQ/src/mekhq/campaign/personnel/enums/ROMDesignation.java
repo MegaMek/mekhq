@@ -162,7 +162,6 @@ public enum ROMDesignation {
             case VEHICLE_CREW_GROUND,
                  VEHICLE_CREW_NAVAL,
                  VEHICLE_CREW_VTOL,
-                 COMBAT_TECHNICIAN,
                  CONVENTIONAL_AIRCRAFT_PILOT -> LAMBDA.toString();
             case AEROSPACE_PILOT -> PI.toString();
             case BATTLE_ARMOUR, SOLDIER -> IOTA.toString();
