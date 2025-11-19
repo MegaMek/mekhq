@@ -252,7 +252,6 @@ public class NewGlossaryEntryDialog extends JDialog {
               TEXT_WIDTH, fontStyle, formatedGlossaryText));
         FlatLafStyleBuilder.setFontScaling(txtDefinition, false, 1.1);
         txtDefinition.setEditable(false);
-        txtDefinition.setBorder(null);
         txtDefinition.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         txtDefinition.setCaretPosition(0);
         txtDefinition.setAlignmentX(Component.CENTER_ALIGNMENT);
