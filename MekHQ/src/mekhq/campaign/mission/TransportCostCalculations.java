@@ -558,7 +558,7 @@ public class TransportCostCalculations {
         dockingCollarCost = round(additionalCollarsRequired * JUMP_SHIP_COLLAR_COST);
         totalCost = totalCost.plus(dockingCollarCost);
 
-        jumpShipsRequired = (int) Math.ceil(additionalCollarsRequired / COLLARS_PER_JUMPSHIP);
+        jumpShipsRequired = Math.ceil(additionalCollarsRequired / COLLARS_PER_JUMPSHIP);
     }
 
     /**
