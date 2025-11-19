@@ -483,7 +483,7 @@ public class CampaignNewDayManager {
                         false), campaignOptions.getFieldKitchenCapacity());
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, false),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
-            boolean withinCapacity = campaign.isOnContractAndPlanetside() ||
+            boolean withinCapacity = !campaign.isOnContractAndPlanetside() ||
                                            areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
             campaign.setFieldKitchenWithinCapacity(withinCapacity);
         } else {
