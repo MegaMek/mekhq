@@ -101,20 +101,48 @@ public enum MarginOfSuccess {
     }
 
     /**
+     * Retrieves the localized string label for a given margin of success.
+     *
+     * <p>This method looks up the label from the associated resource bundle, using the specified margin of success
+     * as a key, suffixed with {@code .label}.</p>
+     *
+     * @return the localized string representing the given margin of success
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
      * Retrieves the margin value associated with the specified {@link MarginOfSuccess}.
      *
      * <p>The margin value represents the numerical value tied to a specific margin of success, typically used to
      * measure the degree of success or failure of a skill check.</p>
-     *
-     * @param marginOfSuccess the {@link MarginOfSuccess} whose margin value is to be retrieved
      *
      * @return the margin value associated with the given {@link MarginOfSuccess}
      *
      * @author Illiani
      * @since 0.50.05
      */
-    public static int getMarginValue(MarginOfSuccess marginOfSuccess) {
-        return marginOfSuccess.margin;
+    public int getValue() {
+        return margin;
+    }
+
+    /**
+     * Returns the color associated with the specified {@link MarginOfSuccess} value.
+     *
+     * <p>This method allows retrieval of a string representing a display color associated with a given margin of
+     * success outcome, which is typically used for formatting or UI rendering purposes.</p>
+     *
+     * @return The color string defined for the given margin of success.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getColor() {
+        return color;
     }
 
     /**
@@ -133,23 +161,6 @@ public enum MarginOfSuccess {
      */
     public static int getMarginOfSuccess(int differenceBetweenRollAndTarget) {
         return getMarginOfSuccessObject(differenceBetweenRollAndTarget).margin;
-    }
-
-    /**
-     * Returns the color associated with the specified {@link MarginOfSuccess} value.
-     *
-     * <p>This method allows retrieval of a string representing a display color associated with a given margin of
-     * success outcome, which is typically used for formatting or UI rendering purposes.</p>
-     *
-     * @param marginOfSuccess The {@link MarginOfSuccess} for which to retrieve the associated color string.
-     *
-     * @return The color string defined for the given margin of success.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public static String getMarginOfSuccessColor(MarginOfSuccess marginOfSuccess) {
-        return marginOfSuccess.color;
     }
 
     /**
@@ -207,23 +218,6 @@ public enum MarginOfSuccess {
 
         LOGGER.error("No valid MarginOfSuccess found for marginValue: {}. Returning DISASTROUS", marginValue);
         return DISASTROUS;
-    }
-
-    /**
-     * Retrieves the localized string label for a given margin of success.
-     *
-     * <p>This method looks up the label from the associated resource bundle, using the specified margin of success
-     * as a key, suffixed with {@code .label}.</p>
-     *
-     * @param marginOfSuccess the margin of success for which to retrieve the label
-     *
-     * @return the localized string representing the given margin of success
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public static String getMarginOfSuccessString(MarginOfSuccess marginOfSuccess) {
-        return marginOfSuccess.label;
     }
 
     private String generateMarginOfSuccessString() {
