@@ -34,7 +34,10 @@ package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
 import static java.lang.Math.max;
 import static java.lang.Math.round;
-import static megamek.common.options.OptionsConstants.MISC_EAGLE_EYES;
+import static megamek.common.options.OptionsConstants.MD_BOOST_COMM_IMPLANT;
+import static megamek.common.options.OptionsConstants.MD_COMM_IMPLANT;
+import static megamek.common.options.OptionsConstants.MD_CYBER_IMP_LASER;
+import static megamek.common.options.OptionsConstants.MD_CYBER_IMP_VISUAL;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ATTRACTIVE;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
@@ -49,14 +52,16 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.TechRating;
+import megamek.common.options.IOption;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.InjuryType;
-import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
@@ -464,8 +469,8 @@ public enum ProstheticType {
           AvailabilityValue.D, AvailabilityValue.E, AvailabilityValue.C,
           false,
           false,
-          List.of(),
-          List.of(MISC_EAGLE_EYES, COMPULSION_PAINKILLER_ADDICTION)),
+          List.of(MD_CYBER_IMP_VISUAL),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EYE_TELESCOPE("CYBERNETIC_EYE_TELESCOPE",
           5,
           5,
@@ -475,7 +480,7 @@ public enum ProstheticType {
           AvailabilityValue.D, AvailabilityValue.E, AvailabilityValue.C,
           false,
           false,
-          List.of(),
+          List.of(MD_CYBER_IMP_LASER),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EYE_LASER("CYBERNETIC_EYE_LASER",
           5,
@@ -486,7 +491,7 @@ public enum ProstheticType {
           AvailabilityValue.D, AvailabilityValue.E, AvailabilityValue.C,
           false,
           false,
-          List.of(),
+          List.of(MD_CYBER_IMP_LASER),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EYE_MULTI("CYBERNETIC_EYE_MULTI",
           5,
@@ -497,7 +502,7 @@ public enum ProstheticType {
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D,
           false,
           true,
-          List.of(),
+          List.of(MD_CYBER_IMP_LASER),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EYE_MULTI_ENHANCED("CYBERNETIC_EYE_MULTI_ENHANCED",
           5,
@@ -508,8 +513,8 @@ public enum ProstheticType {
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D,
           false,
           true,
-          List.of(),
-          List.of(MISC_EAGLE_EYES, COMPULSION_PAINKILLER_ADDICTION)),
+          List.of(MD_CYBER_IMP_LASER, MD_CYBER_IMP_VISUAL),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EAR_SIGNAL("CYBERNETIC_EAR_SIGNAL",
           5,
           5,
@@ -519,7 +524,7 @@ public enum ProstheticType {
           AvailabilityValue.E, AvailabilityValue.F, AvailabilityValue.C,
           false,
           false,
-          List.of(),
+          List.of(MD_COMM_IMPLANT),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EAR_MULTI("CYBERNETIC_EAR_MULTI",
           5,
@@ -530,7 +535,7 @@ public enum ProstheticType {
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D,
           false,
           true,
-          List.of(),
+          List.of(MD_BOOST_COMM_IMPLANT),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_SPEECH_IMPLANT("CYBERNETIC_SPEECH_IMPLANT",
           5,
@@ -879,6 +884,9 @@ public enum ProstheticType {
      * Builds a localized tooltip summarizing key information about this prosthetic, including cost, surgical
      * requirements, and attribute modifiers.
      *
+     * <p><b>Note:</b> For consistency, the order shown in the tooltip is meant to mirror that of
+     * {@link InjuryEffect#getTooltip(List)}.</p>
+     *
      * @param gameYear the current in-game year for cost and availability calculation
      *
      * @return a formatted tooltip string suitable for UI display
@@ -887,9 +895,78 @@ public enum ProstheticType {
      * @since 0.50.10
      */
     public String getTooltip(int gameYear, boolean isUseKinderMode) {
-        Map<SkillAttribute, Integer> attributeTotals = new EnumMap<>(SkillAttribute.class);
+        StringJoiner tooltipPortion = new StringJoiner("<br>- ");
+
+        // 1) Surgery level required
+        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.skill", surgeryLevel));
+
+        // 2) Base cost
+        Money cost = getCost(gameYear);
+        if (cost != null) {
+            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.cost",
+                  cost.toAmountString()));
+        }
+
+        // 3) Required planetary tech rating
+        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.techLevel",
+              technologyRating.getName()));
+
+        // 4) Estimated recovery time
+        int recoveryTime = (int) round(injuryType.getBaseRecoveryTime() * (isUseKinderMode ? 0.5 : 1.0));
+        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.recovery", recoveryTime));
+
+        // 5) Misc
         InjuryEffect effect = injuryType.getInjuryEffect();
+        int toughness = effect.getToughnessModifier();
+        if (toughness != 0) {
+            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.toughness", toughness));
+        }
+
+        // 6) Skills
+        int gunnery = effect.getGunneryModifier();
+        if (gunnery != 0) {
+            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.gunnery", gunnery));
+        }
+
+        int leadership = effect.getLeadershipModifier();
+        if (leadership != 0) {
+            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.leadership", leadership));
+        }
+
+        int negotiation = effect.getNegotiationModifier();
+        if (negotiation != 0) {
+            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.negotiation", negotiation));
+        }
+
         int perception = effect.getPerceptionModifier();
+        if (perception != 0) {
+            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.perception", perception));
+        }
+
+        int survival = effect.getSurvivalModifier();
+        if (survival != 0) {
+            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.survival", survival));
+        }
+
+        int interrogation = effect.getInterrogationModifier();
+        if (interrogation != 0) {
+            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "ProstheticType.tooltip.interrogation",
+                  interrogation));
+        }
+
+        int acting = effect.getActingModifier();
+        if (acting != 0) {
+            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.acting", acting));
+        }
+
+        int acrobatics = effect.getAcrobaticsModifier();
+        if (acrobatics != 0) {
+            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.acrobatics", acrobatics));
+        }
+
+        // 7) Attribute modifiers
+        Map<SkillAttribute, Integer> attributeTotals = new EnumMap<>(SkillAttribute.class);
 
         addToMap(attributeTotals, SkillAttribute.STRENGTH, effect.getStrengthModifier());
         addToMap(attributeTotals, SkillAttribute.BODY, effect.getBodyModifier());
@@ -899,21 +976,6 @@ public enum ProstheticType {
         addToMap(attributeTotals, SkillAttribute.WILLPOWER, effect.getWillpowerModifier());
         addToMap(attributeTotals, SkillAttribute.CHARISMA, effect.getCharismaModifier());
 
-        List<String> tooltipPortion = new ArrayList<>();
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.skill", surgeryLevel));
-
-        Money cost = getCost(gameYear);
-        if (cost != null) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.cost",
-                  cost.toAmountString()));
-        }
-
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.techLevel",
-              technologyRating.getName()));
-
-        int recoveryTime = (int) round(injuryType.getBaseRecoveryTime() * (isUseKinderMode ? 0.5 : 1.0));
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.recovery", recoveryTime));
-
         for (SkillAttribute attribute : SkillAttribute.values()) {
             int modifier = attributeTotals.getOrDefault(attribute, 0);
             if (modifier != 0) {
@@ -922,30 +984,34 @@ public enum ProstheticType {
             }
         }
 
-        if (perception != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.perception", perception));
-        }
+        // 8) Implants
+        PersonnelOptions options = new PersonnelOptions();
+        for (String lookupName : associatedPilotOptions) {
+            IOption option = options.getOption(lookupName);
 
-        for (String option : associatedPilotOptions) {
-            String label = switch (option) {
-                case UNOFFICIAL_EI_IMPLANT -> getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.label.ei");
-                default -> option;
-            };
+            String label = option == null ? lookupName : option.getDisplayableName();
+            String description = option == null ? "-" : option.getDescription();
 
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.spa", label));
-
-            if (option.equals(UNOFFICIAL_EI_IMPLANT)) {
-                tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.ei", label));
+            // Special handlers
+            switch (lookupName) {
+                case UNOFFICIAL_EI_IMPLANT -> {
+                    description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.label.ei");
+                }
+                default -> {}
             }
+
+            tooltipPortion.add("<b>" + label + ":</b> " + description);
         }
 
-        for (String option : associatedPersonnelOptions) {
-            SpecialAbility ability = SpecialAbility.getAbility(option);
-            String label = ability == null ? option : ability.getDisplayName();
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.spa", label));
+        // 9) Abilities
+        for (String lookupName : getAssociatedPersonnelOptions()) {
+            IOption ability = options.getOption(lookupName);
+            String label = ability == null ? lookupName : ability.getDisplayableName();
+            String description = ability == null ? "-" : ability.getDescription();
+            tooltipPortion.add("<b>" + label + ":</b> " + description);
         }
 
-        return String.join(" ", tooltipPortion);
+        return tooltipPortion.toString();
     }
 
     /**
