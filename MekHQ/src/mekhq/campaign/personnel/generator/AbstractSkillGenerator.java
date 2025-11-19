@@ -189,7 +189,7 @@ public abstract class AbstractSkillGenerator {
 
         return switch (person.getPrimaryRole()) {
             case MEKWARRIOR, LAM_PILOT -> person.getPhenotype().isMekWarrior() ? 1 : 0;
-            case VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL, COMBAT_TECHNICIAN ->
+            case VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL ->
                   person.getPhenotype().isVehicle() ? 1 : 0;
             case AEROSPACE_PILOT, CONVENTIONAL_AIRCRAFT_PILOT -> person.getPhenotype().isAerospace() ? 1 : 0;
             case PROTOMEK_PILOT -> person.getPhenotype().isProtoMek() ? 1 : 0;

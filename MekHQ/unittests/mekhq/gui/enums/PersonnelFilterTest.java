@@ -182,17 +182,6 @@ class PersonnelFilterTest {
     }
 
     @Test
-    void testIsCombatTechnician() {
-        for (final PersonnelFilter personnelFilter : filters) {
-            if (personnelFilter == PersonnelFilter.COMBAT_TECHNICIANS) {
-                assertTrue(personnelFilter.isVehicleCrew());
-            } else {
-                assertFalse(personnelFilter.isVehicleCrew());
-            }
-        }
-    }
-
-    @Test
     void testIsAerospacePilot() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.AEROSPACE_PILOT) {

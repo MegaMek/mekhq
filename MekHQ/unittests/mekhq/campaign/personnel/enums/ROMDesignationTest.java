@@ -261,10 +261,6 @@ class ROMDesignationTest {
         when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_CREW_VTOL);
         assertEquals(" " + ROMDesignation.LAMBDA, ROMDesignation.getComStarBranchDesignation(mockPerson));
 
-        // Vehicle Crew - Expect " Lambda"
-        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.COMBAT_TECHNICIAN);
-        assertEquals(" " + ROMDesignation.LAMBDA, ROMDesignation.getComStarBranchDesignation(mockPerson));
-
         // Conventional Aircraft Pilot - Expect " Lambda"
         when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
         assertEquals(" " + ROMDesignation.LAMBDA, ROMDesignation.getComStarBranchDesignation(mockPerson));
