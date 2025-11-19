@@ -293,6 +293,12 @@ public final class InjuryTypes {
                   "alt:COSMETIC_ANIMAL_LEG_PROSTHETIC",
                   AlternateInjuries.COSMETIC_ANIMAL_LEG_PROSTHETIC);
             InjuryType.register(172, "alt:DISCONTINUATION_SYNDROME", AlternateInjuries.DISCONTINUATION_SYNDROME);
+            InjuryType.register(173, "alt:DERMAL_MYOMER_ARM_ARMOR", AlternateInjuries.DERMAL_MYOMER_ARM_ARMOR);
+            InjuryType.register(174, "alt:DERMAL_MYOMER_ARM_CAMO", AlternateInjuries.DERMAL_MYOMER_ARM_CAMO);
+            InjuryType.register(175, "alt:DERMAL_MYOMER_ARM_TRIPLE", AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE);
+            InjuryType.register(176, "alt:DERMAL_MYOMER_LEG_ARMOR", AlternateInjuries.DERMAL_MYOMER_LEG_ARMOR);
+            InjuryType.register(177, "alt:DERMAL_MYOMER_LEG_CAMO", AlternateInjuries.DERMAL_MYOMER_LEG_CAMO);
+            InjuryType.register(178, "alt:DERMAL_MYOMER_LEG_TRIPLE", AlternateInjuries.DERMAL_MYOMER_LEG_TRIPLE);
 
             InjuryType.register("am:severed_spine", SEVERED_SPINE);
             InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);

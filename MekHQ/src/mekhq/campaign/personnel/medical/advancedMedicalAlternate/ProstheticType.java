@@ -38,9 +38,11 @@ import static megamek.common.options.OptionsConstants.MD_BOOST_COMM_IMPLANT;
 import static megamek.common.options.OptionsConstants.MD_COMM_IMPLANT;
 import static megamek.common.options.OptionsConstants.MD_CYBER_IMP_LASER;
 import static megamek.common.options.OptionsConstants.MD_CYBER_IMP_VISUAL;
+import static megamek.common.options.OptionsConstants.MISC_PAIN_RESISTANCE;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ATTRACTIVE;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_PAINKILLER_ADDICTION;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_UNATTRACTIVE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -613,7 +615,73 @@ public enum ProstheticType {
           false,
           false,
           List.of(),
-          List.of(COMPULSION_PAINKILLER_ADDICTION));
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
+    DERMAL_MYOMER_ARM_ARMOR("DERMAL_MYOMER_ARM_ARMOR",
+          5,
+          5,
+          AlternateInjuries.DERMAL_MYOMER_ARM_ARMOR,
+          Money.of(450000),
+          TechRating.B,
+          AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.E,
+          false,
+          false,
+          List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE)),
+    DERMAL_MYOMER_ARM_CAMO("DERMAL_MYOMER_LEG_CAMO",
+          5,
+          5,
+          AlternateInjuries.DERMAL_MYOMER_ARM_CAMO,
+          Money.of(330000),
+          TechRating.A,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
+          false,
+          List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, MISC_PAIN_RESISTANCE)),
+    DERMAL_MYOMER_ARM_TRIPLE("DERMAL_MYOMER_LEG_TRIPLE",
+          5,
+          5,
+          AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE,
+          Money.of(750000),
+          TechRating.A,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          false,
+          false,
+          List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, ATOW_TOUGHNESS)),
+    DERMAL_MYOMER_LEG_ARMOR("DERMAL_MYOMER_LEG_ARMOR",
+          5,
+          5,
+          AlternateInjuries.DERMAL_MYOMER_LEG_ARMOR,
+          Money.of(562500),
+          TechRating.B,
+          AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.E,
+          false,
+          false,
+          List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, MISC_PAIN_RESISTANCE)),
+    DERMAL_MYOMER_LEG_CAMO("DERMAL_MYOMER_LEG_CAMO",
+          5,
+          5,
+          AlternateInjuries.DERMAL_MYOMER_LEG_CAMO,
+          Money.of(412500),
+          TechRating.A,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
+          false,
+          List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE)),
+    DERMAL_MYOMER_LEG_TRIPLE("DERMAL_MYOMER_LEG_TRIPLE",
+          5,
+          5,
+          AlternateInjuries.DERMAL_MYOMER_LEG_TRIPLE,
+          Money.of(937500),
+          TechRating.A,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          false,
+          false,
+          List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, ATOW_TOUGHNESS));
 
     private final String lookupName;
     private final int prostheticType;
@@ -994,13 +1062,21 @@ public enum ProstheticType {
 
             // Special handlers
             switch (lookupName) {
-                case UNOFFICIAL_EI_IMPLANT -> {
-                    description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.label.ei");
-                }
+                case UNOFFICIAL_EI_IMPLANT ->
+                      description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.label.ei");
                 default -> {}
             }
 
             tooltipPortion.add("<b>" + label + ":</b> " + description);
+        }
+
+        switch (this) { // Covers special cases
+            case DERMAL_MYOMER_ARM_ARMOR, DERMAL_MYOMER_LEG_ARMOR ->
+                  tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.armor"));
+            case DERMAL_MYOMER_ARM_CAMO, DERMAL_MYOMER_LEG_CAMO ->
+                  tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.camo"));
+            case DERMAL_MYOMER_ARM_TRIPLE, DERMAL_MYOMER_LEG_TRIPLE ->
+                  tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.triple"));
         }
 
         // 9) Abilities
