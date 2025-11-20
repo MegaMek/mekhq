@@ -1019,14 +1019,19 @@ public final class BriefingTab extends CampaignGuiTab {
 
         List<SalvageTechData> techData = new ArrayList<>();
         for (Person tech : availableTechs) {
-            SalvageTechData data = SalvageTechData.buildData(getCampaign(), tech);
-            techData.add(data);
+            if (tech.isSalvageSupervisor()) {
+                SalvageTechData data = SalvageTechData.buildData(getCampaign(), tech);
+                techData.add(data);
+            }
         }
 
         // Add any other techs that were previously selected
         for (UUID techID : scenario.getSalvageTechs()) {
             if (!priorSelectedTechs.contains(techID)) {
-                priorSelectedTechs.add(techID);
+                Person tech = getCampaign().getPerson(techID);
+                if (tech != null && tech.isSalvageSupervisor()) {
+                    priorSelectedTechs.add(techID);
+                }
             }
         }
 
