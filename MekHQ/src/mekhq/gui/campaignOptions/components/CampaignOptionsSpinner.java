@@ -35,8 +35,8 @@ package mekhq.gui.campaignOptions.components;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -70,15 +70,16 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param noTooltip      if {@code true}, the spinner will not have a tooltip
      */
     public CampaignOptionsSpinner(String name, @Nullable Integer customWrapSize,
-          Number defaultValue, Number minimum,
-          Number maximum, Number stepSize, boolean noTooltip) {
+          Number defaultValue, Number minimum, Number maximum, Number stepSize, boolean noTooltip) {
         super(createSpinnerModel(defaultValue, minimum, maximum, stepSize));
 
         if (!noTooltip) {
             String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
-            if (isResourceKeyValid(tooltipText) && !tooltipText.isEmpty()) {
-                setToolTipText(wordWrap(tooltipText));
-            }
+            tooltipText += getFormattedTextAt(getCampaignOptionsResourceBundle(), "lblMinimum.text", minimum);
+            tooltipText += getFormattedTextAt(getCampaignOptionsResourceBundle(), "lblMaximum.text", maximum);
+            tooltipText += getFormattedTextAt(getCampaignOptionsResourceBundle(), "lblDefault.text", defaultValue);
+
+            setToolTipText(wordWrap(tooltipText));
         }
 
         configureSpinner(name);
