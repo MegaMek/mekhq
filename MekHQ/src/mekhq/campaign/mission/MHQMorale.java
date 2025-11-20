@@ -149,13 +149,14 @@ public class MHQMorale {
         targetNumber.addModifier(performanceModifier, getTextAt(RESOURCE_BUNDLE, "MHQMorale.modifier.performance"));
 
         // The actual check
-        int roll = d6(2) + targetNumber.getValue();
-        MoraleOutcome moraleOutcome = getMoraleOutcome(contract, roll);
+        int roll = d6(2);
+        int modifiedRoll = roll + targetNumber.getValue();
+        MoraleOutcome moraleOutcome = getMoraleOutcome(contract, modifiedRoll);
 
         // Generate and return the report
         PerformanceOutcome performanceOutcome = getOutcome(decisiveVictoryModifier, victoryModifier,
               decisiveDefeatModifier, defeatModifier, performanceModifier);
-        return getReport(reliability, performanceOutcome, performanceModifier, moraleOutcome, roll);
+        return getReport(reliability, performanceOutcome, performanceModifier, moraleOutcome, roll, modifiedRoll);
     }
 
     /**
@@ -165,7 +166,8 @@ public class MHQMorale {
      * @param performanceOutcome  The result of performance evaluation.
      * @param performanceModifier The performance modifier
      * @param moraleOutcome       The result of the morale check.
-     * @param roll                The final morale check roll value.
+     * @param roll                The 2d6 roll without modifiers
+     * @param modifiedRoll        The final morale check roll value.
      *
      * @return The formatted morale check report.
      *
@@ -173,7 +175,7 @@ public class MHQMorale {
      * @since 0.50.10
      */
     private static String getReport(int reliability, PerformanceOutcome performanceOutcome, int performanceModifier,
-          MoraleOutcome moraleOutcome, int roll) {
+          MoraleOutcome moraleOutcome, int roll, int modifiedRoll) {
         String reliabilityColor = getWarningColor();
         if (reliability < -1) {
             reliabilityColor = getPositiveColor();
@@ -206,7 +208,9 @@ public class MHQMorale {
               spanOpeningWithCustomColor(performanceColor),
               performanceText,
               performanceModifier >= 0 ? "+" + performanceModifier : performanceModifier,
+              modifiedRoll,
               roll,
+              modifiedRoll - roll,
               spanOpeningWithCustomColor(moraleColor),
               outcome
         );
