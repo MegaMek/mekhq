@@ -227,6 +227,10 @@ public class Injury {
     }
 
     public int getHits() {
+        // Alt Advanced Medical always has an injury count as 1 hit regardless of severity
+        if (type.getKey().contains("alt:")) {
+            return getSubType().isProsthetic() ? 0 : 1;
+        }
         return getSubType().isProsthetic() ? 0 : hits;
     }
 
