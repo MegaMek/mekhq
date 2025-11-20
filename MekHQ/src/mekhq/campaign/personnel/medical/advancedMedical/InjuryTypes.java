@@ -303,6 +303,7 @@ public final class InjuryTypes {
             InjuryType.register(180, "alt:BUFFERED_VDNI", AlternateInjuries.BUFFERED_VDNI);
             InjuryType.register(181, "alt:BUFFERED_VDNI_TRIPLE_CORE", AlternateInjuries.BUFFERED_VDNI_TRIPLE_CORE);
             InjuryType.register(182, "alt:PAIN_SHUNT", AlternateInjuries.PAIN_SHUNT);
+            InjuryType.register(183, "alt:PAIN_SHUNT_RECOVERY", AlternateInjuries.PAIN_SHUNT_RECOVERY);
 
             InjuryType.register("am:severed_spine", SEVERED_SPINE);
             InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);
