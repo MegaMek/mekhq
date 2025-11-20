@@ -234,6 +234,7 @@ public class Injury {
      *
      * <ul>
      *     <li><b>Prosthetic injuries</b> always count as zero hits.</li>
+     *     <li><b>Flaw injuries</b> always count as zero hits.</li>
      *     <li>If the injury's type key contains {@code "alt:"}, then the injury always counts as one hit (unless it
      *     is prosthetic), regardless of severity. This reflects the Alternate Advanced Medical rule that normalizes
      *     hit values.</li>
@@ -251,7 +252,9 @@ public class Injury {
         try {
             // Alt Advanced Medical always has an injury count as 1 hit regardless of severity
             if (type.getKey().contains("alt:")) {
-                return getSubType().isProsthetic() ? 0 : 1;
+                InjurySubType subType = getSubType();
+                // Prosthetic and Flaw injuries don't count towards a character's total
+                return subType.isProsthetic() || subType.isFlaw() ? 0 : 1;
             }
         } catch (Exception e) {
             LOGGER.error("", e);
