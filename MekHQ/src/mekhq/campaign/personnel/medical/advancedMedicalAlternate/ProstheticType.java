@@ -895,7 +895,7 @@ public enum ProstheticType {
      * @since 0.50.10
      */
     public String getTooltip(int gameYear, boolean isUseKinderMode) {
-        StringJoiner tooltipPortion = new StringJoiner("<br>- ");
+        StringJoiner tooltipPortion = new StringJoiner("<br>- ", "- ", "");
 
         // 1) Surgery level required
         tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.skill", surgeryLevel));
