@@ -35,8 +35,8 @@ package mekhq.campaign.personnel.procreation;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.enums.BloodGroup.getInheritedBloodGroup;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.POSTPARTUM_RECOVERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -69,6 +69,8 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.lifeEvents.BirthAnnouncement;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -469,7 +471,12 @@ public abstract class AbstractProcreation {
 
             // Apply postpartum effects
             if (campaignOptions.isUseAdvancedMedical()) {
-                Injury injury = POSTPARTUM_RECOVERY.newInjury(campaign, mother, INTERNAL, 1);
+                Injury injury;
+                if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+                    injury = AlternateInjuries.POSTPARTUM_RECOVERY.newInjury(campaign, mother, GENERIC, 1);
+                } else {
+                    injury = InjuryTypes.POSTPARTUM_RECOVERY.newInjury(campaign, mother, INTERNAL, 1);
+                }
                 mother.addInjury(injury);
             } else {
                 int currentHits = mother.getHits();

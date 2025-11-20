@@ -79,7 +79,9 @@ public class AlternateInjuries {
     private static final int COSMETIC_SURGERY_RECOVERY_HEALING_DAYS = 7; // Internet says 2-3 weeks
     private static final int ELECTIVE_IMPLANT_RECOVERY_HEALING_DAYS = 90; // ATOW pg 317
     private static final int ENHANCED_IMAGING_IMPLANT_RECOVERY_HEALING_DAYS = 365; // ATOW pg 317
-    private static final int DISCONTINUATION_SYNDROME_HEALING_DAYS = 7; // We check for this weekly
+    private static final int WEEKLY_CHECK_ILLNESS_HEALING_DAYS = 7;
+    private static final int POSTPARTUM_RECOVERY_HEALING_DAYS = 21; // Internet says 6 weeks
+    private static final int TRANSIT_DISORIENTATION_SYNDROME_HEALING_DAYS = 1;
 
     private static final InjuryLevel SEVER_INJURY_LEVEL = CHRONIC;
     private static final InjuryLevel FRACTURE_INJURY_LEVEL = MAJOR;
@@ -253,6 +255,11 @@ public class AlternateInjuries {
     public static final InjuryType COSMETIC_TAIL_PROSTHETIC = new CosmeticTailProsthetic();
     public static final InjuryType COSMETIC_ANIMAL_EAR_PROSTHETIC = new CosmeticAnimalEarProsthetic();
     public static final InjuryType COSMETIC_ANIMAL_LEG_PROSTHETIC = new CosmeticLegProsthetic();
+    public static final InjuryType POSTPARTUM_RECOVERY = new PostpartumRecovery();
+    public static final InjuryType TRANSIT_DISORIENTATION_SYNDROME = new TransitDisorientationSyndrome();
+    public static final InjuryType CRIPPLING_FLASHBACKS = new CripplingFlashbacks();
+    public static final InjuryType CHILDLIKE_REGRESSION = new ChildlikeRegression();
+    public static final InjuryType CATATONIA = new ChronicDisassociation();
 
     // Base injury type classes with common behavior
     private abstract static class BaseInjury extends InjuryType {
@@ -1987,13 +1994,71 @@ public class AlternateInjuries {
 
     public static final class DiscontinuationSyndrome extends BaseInjury {
         DiscontinuationSyndrome() {
-            super(DISCONTINUATION_SYNDROME_HEALING_DAYS,
+            super(WEEKLY_CHECK_ILLNESS_HEALING_DAYS,
                   false,
                   CHRONIC,
-                  InjuryEffect.DISCONTINUATION_SYNDROME,
+                  InjuryEffect.STRESS,
                   Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DISCONTINUATION_SYNDROME.simpleName");
-            this.maxSeverity = 0;
+        }
+    }
+
+    public static final class PostpartumRecovery extends BaseInjury {
+        PostpartumRecovery() {
+            super(POSTPARTUM_RECOVERY_HEALING_DAYS,
+                  false,
+                  CHRONIC,
+                  InjuryEffect.STRESS,
+                  Set.of(GENERIC));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.POSTPARTUM_RECOVERY.simpleName");
+        }
+    }
+
+    public static final class TransitDisorientationSyndrome extends BaseInjury {
+        TransitDisorientationSyndrome() {
+            super(TRANSIT_DISORIENTATION_SYNDROME_HEALING_DAYS,
+                  false,
+                  CHRONIC,
+                  InjuryEffect.STRESS,
+                  Set.of(GENERIC));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.TRANSIT_DISORIENTATION_SYNDROME.simpleName");
+        }
+    }
+
+    public static final class CripplingFlashbacks extends BaseInjury {
+        CripplingFlashbacks() {
+            super(WEEKLY_CHECK_ILLNESS_HEALING_DAYS,
+                  false,
+                  CHRONIC,
+                  InjuryEffect.STRESS,
+                  Set.of(GENERIC));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.CRIPPLING_FLASHBACKS.simpleName");
+        }
+    }
+
+    public static final class ChildlikeRegression extends BaseInjury {
+        ChildlikeRegression() {
+            super(WEEKLY_CHECK_ILLNESS_HEALING_DAYS,
+                  false,
+                  CHRONIC,
+                  InjuryEffect.STRESS,
+                  Set.of(GENERIC));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.CHILDLIKE_REGRESSION.simpleName");
+        }
+    }
+
+    public static final class ChronicDisassociation extends BaseInjury {
+        ChronicDisassociation() {
+            super(WEEKLY_CHECK_ILLNESS_HEALING_DAYS,
+                  false,
+                  CHRONIC,
+                  InjuryEffect.STRESS,
+                  Set.of(GENERIC));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.CATATONIA.simpleName");
         }
     }
 }
