@@ -70,6 +70,7 @@ import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.lifeEvents.BirthAnnouncement;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
@@ -472,7 +473,10 @@ public abstract class AbstractProcreation {
             // Apply postpartum effects
             if (campaignOptions.isUseAdvancedMedical()) {
                 Injury injury;
-                if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+                if (campaignOptions.isUseAlternativeAdvancedMedical() &&
+                          // These injury types don't stack
+                          !AdvancedMedicalAlternate.hasInjuryOfType(mother.getInjuries(),
+                                AlternateInjuries.POSTPARTUM_RECOVERY)) {
                     injury = AlternateInjuries.POSTPARTUM_RECOVERY.newInjury(campaign, mother, GENERIC, 1);
                 } else {
                     injury = InjuryTypes.POSTPARTUM_RECOVERY.newInjury(campaign, mother, INTERNAL, 1);

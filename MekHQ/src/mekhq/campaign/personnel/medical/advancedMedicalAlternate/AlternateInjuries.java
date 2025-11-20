@@ -39,6 +39,7 @@ import static mekhq.campaign.personnel.enums.InjuryLevel.MINOR;
 import static mekhq.campaign.personnel.medical.BodyLocation.*;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.MAXIMUM_INJURY_DURATION_MULTIPLIER;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect.*;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.FLAW;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -137,6 +138,11 @@ public class AlternateInjuries {
     // Any
     public static final InjuryType BLOOD_LOSS = new BloodLoss();
     public static final InjuryType DISCONTINUATION_SYNDROME = new DiscontinuationSyndrome();
+    public static final InjuryType POSTPARTUM_RECOVERY = new PostpartumRecovery();
+    public static final InjuryType TRANSIT_DISORIENTATION_SYNDROME = new TransitDisorientationSyndrome();
+    public static final InjuryType CRIPPLING_FLASHBACKS = new CripplingFlashbacks();
+    public static final InjuryType CHILDLIKE_REGRESSION = new ChildlikeRegression();
+    public static final InjuryType CATATONIA = new ChronicDisassociation();
     // Diseases
     public static final InjuryType GROWTHS_DISCOMFORT = new GrowthsDiscomfort();
     public static final InjuryType GROWTHS_SLIGHT = new GrowthsSlight();
@@ -255,11 +261,6 @@ public class AlternateInjuries {
     public static final InjuryType COSMETIC_TAIL_PROSTHETIC = new CosmeticTailProsthetic();
     public static final InjuryType COSMETIC_ANIMAL_EAR_PROSTHETIC = new CosmeticAnimalEarProsthetic();
     public static final InjuryType COSMETIC_ANIMAL_LEG_PROSTHETIC = new CosmeticLegProsthetic();
-    public static final InjuryType POSTPARTUM_RECOVERY = new PostpartumRecovery();
-    public static final InjuryType TRANSIT_DISORIENTATION_SYNDROME = new TransitDisorientationSyndrome();
-    public static final InjuryType CRIPPLING_FLASHBACKS = new CripplingFlashbacks();
-    public static final InjuryType CHILDLIKE_REGRESSION = new ChildlikeRegression();
-    public static final InjuryType CATATONIA = new ChronicDisassociation();
 
     // Base injury type classes with common behavior
     private abstract static class BaseInjury extends InjuryType {
@@ -2000,6 +2001,7 @@ public class AlternateInjuries {
                   InjuryEffect.STRESS,
                   Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DISCONTINUATION_SYNDROME.simpleName");
+            this.injurySubType = FLAW;
         }
     }
 
@@ -2011,6 +2013,7 @@ public class AlternateInjuries {
                   InjuryEffect.STRESS,
                   Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.POSTPARTUM_RECOVERY.simpleName");
+            this.injurySubType = FLAW;
         }
     }
 
@@ -2023,6 +2026,7 @@ public class AlternateInjuries {
                   Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.TRANSIT_DISORIENTATION_SYNDROME.simpleName");
+            this.injurySubType = FLAW;
         }
     }
 
@@ -2035,6 +2039,7 @@ public class AlternateInjuries {
                   Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CRIPPLING_FLASHBACKS.simpleName");
+            this.injurySubType = FLAW;
         }
     }
 
@@ -2047,6 +2052,7 @@ public class AlternateInjuries {
                   Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CHILDLIKE_REGRESSION.simpleName");
+            this.injurySubType = FLAW;
         }
     }
 
@@ -2059,6 +2065,7 @@ public class AlternateInjuries {
                   Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CATATONIA.simpleName");
+            this.injurySubType = FLAW;
         }
     }
 }

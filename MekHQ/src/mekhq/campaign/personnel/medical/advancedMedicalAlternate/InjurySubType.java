@@ -57,8 +57,11 @@ public enum InjurySubType {
     /** Illness or infection-related conditions. */
     DISEASE,
 
-    /** Mechanical or artificial body replacements. */
-    PROSTHETIC;
+    /** Mechanical or artificial body replacements. Always count as 0 TW-scale 'Hits.' */
+    PROSTHETIC,
+
+    /** Special injuries caused by Flaws. Always count as 0 TW-scale 'Hits.' */
+    FLAW;
 
     /**
      * Checks whether this subtype represents a normal injury.

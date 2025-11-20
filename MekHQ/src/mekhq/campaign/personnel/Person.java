@@ -129,6 +129,7 @@ import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.ranks.Rank;
@@ -7551,7 +7552,10 @@ public class Person {
         if (hasCompulsionAddiction && failedWillpowerCheck) {
             if (useAdvancedMedical) {
                 Injury injury;
-                if (isUseAltAdvancedMedical) {
+                if (isUseAltAdvancedMedical &&
+                          // These injury types don't stack
+                          !AdvancedMedicalAlternate.hasInjuryOfType(injuries,
+                                AlternateInjuries.DISCONTINUATION_SYNDROME)) {
                     injury = AlternateInjuries.DISCONTINUATION_SYNDROME.newInjury(campaign, this, GENERIC, 1);
                 } else {
                     injury = InjuryTypes.DISCONTINUATION_SYNDROME.newInjury(campaign, this, INTERNAL, 1);
@@ -7609,7 +7613,9 @@ public class Person {
         if (hasFlashbacks && failedWillpowerCheck) {
             if (useAdvancedMedical) {
                 Injury injury;
-                if (isUseAltAdvancedMedical) {
+                if (isUseAltAdvancedMedical &&
+                          // These injury types don't stack
+                          !AdvancedMedicalAlternate.hasInjuryOfType(injuries, AlternateInjuries.CRIPPLING_FLASHBACKS)) {
                     injury = AlternateInjuries.CRIPPLING_FLASHBACKS.newInjury(campaign, this, GENERIC, 1);
                 } else {
                     injury = InjuryTypes.CRIPPLING_FLASHBACKS.newInjury(campaign, this, INTERNAL, 1);
@@ -7886,7 +7892,9 @@ public class Person {
         if (hasRegression && failedWillpowerCheck) {
             if (useAdvancedMedical) {
                 Injury injury;
-                if (isUseAltAdvancedMedical) {
+                if (isUseAltAdvancedMedical &&
+                          // These injury types don't stack
+                          !AdvancedMedicalAlternate.hasInjuryOfType(injuries, AlternateInjuries.CHILDLIKE_REGRESSION)) {
                     injury = AlternateInjuries.CHILDLIKE_REGRESSION.newInjury(campaign, this, GENERIC, 1);
                 } else {
                     injury = InjuryTypes.CHILDLIKE_REGRESSION.newInjury(campaign, this, INTERNAL, 1);
@@ -7935,7 +7943,9 @@ public class Person {
         if (hasCatatonia && failedWillpowerCheck) {
             if (useAdvancedMedical) {
                 Injury injury;
-                if (isUseAltAdvancedMedical) {
+                if (isUseAltAdvancedMedical &&
+                          // These injury types don't stack
+                          !AdvancedMedicalAlternate.hasInjuryOfType(injuries, AlternateInjuries.CATATONIA)) {
                     injury = AlternateInjuries.CATATONIA.newInjury(campaign, this, GENERIC, 1);
                 } else {
                     injury = InjuryTypes.CATATONIA.newInjury(campaign, this, INTERNAL, 1);
