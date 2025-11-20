@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import megamek.client.ratgenerator.ForceDescriptor;
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
@@ -59,162 +59,158 @@ class MHQMoraleTest {
     private static final int DEFEAT_MODIFIER = -1;
 
     @ParameterizedTest
-    @MethodSource("dragoonRatings")
-    void testGetReliability_normal(int experienceLevel) {
+    @MethodSource("adjustedSkillLevels")
+    void testGetReliability_normal(int adjustedSkillLevel) {
         AtBContract mockContract = mock(AtBContract.class);
-        when(mockContract.getEnemyQuality()).thenReturn(experienceLevel);
+        when(mockContract.getEnemyQuality()).thenReturn(adjustedSkillLevel);
 
         Faction mockFaction = mock(Faction.class);
-        when(mockContract.getEnemy()).thenReturn(mockFaction);
         when(mockFaction.isClan()).thenReturn(false);
         when(mockFaction.isRebel()).thenReturn(false);
         when(mockFaction.isMinorPower()).thenReturn(false);
         when(mockFaction.isMercenary()).thenReturn(false);
         when(mockFaction.isPirate()).thenReturn(false);
 
-        int actualReliability = MHQMorale.getReliability(mockContract);
-        int expectedReliability = getReliabilityModifier(experienceLevel);
+        int actualReliability = MHQMorale.getReliability(adjustedSkillLevel, mockFaction);
+        int expectedReliability = getReliabilityModifier(adjustedSkillLevel);
 
         assertEquals(expectedReliability, actualReliability,
               String.format("Reliability should match experience level: expected %d but got %d",
-                    experienceLevel,
+                    adjustedSkillLevel,
                     actualReliability));
     }
 
     @ParameterizedTest
-    @MethodSource("dragoonRatings")
-    void testGetReliability_clan(int experienceLevel) {
+    @MethodSource("adjustedSkillLevels")
+    void testGetReliability_clan(int adjustedSkillLevel) {
         AtBContract mockContract = mock(AtBContract.class);
-        when(mockContract.getEnemyQuality()).thenReturn(experienceLevel);
+        when(mockContract.getEnemyQuality()).thenReturn(adjustedSkillLevel);
 
         Faction mockFaction = mock(Faction.class);
-        when(mockContract.getEnemy()).thenReturn(mockFaction);
         when(mockFaction.isClan()).thenReturn(true);
         when(mockFaction.isRebel()).thenReturn(false);
         when(mockFaction.isMinorPower()).thenReturn(false);
         when(mockFaction.isMercenary()).thenReturn(false);
         when(mockFaction.isPirate()).thenReturn(false);
 
-        int actualReliability = MHQMorale.getReliability(mockContract);
+        int actualReliability = MHQMorale.getReliability(adjustedSkillLevel, mockFaction);
 
-        int adjustedQuality = Math.min(DRAGOON_ASTAR, experienceLevel + 1);
+        int adjustedQuality = Math.min(DRAGOON_ASTAR, adjustedSkillLevel + 1);
         int expectedReliability = getReliabilityModifier(adjustedQuality);
         expectedReliability--;
 
         assertEquals(expectedReliability, actualReliability,
               String.format("Reliability should match experience level: expected %d but got %d",
-                    experienceLevel,
+                    adjustedSkillLevel,
                     actualReliability));
     }
 
     @ParameterizedTest
-    @MethodSource("dragoonRatings")
-    void testGetReliability_rebel(int experienceLevel) {
+    @MethodSource("adjustedSkillLevels")
+    void testGetReliability_rebel(int adjustedSkillLevel) {
         AtBContract mockContract = mock(AtBContract.class);
-        when(mockContract.getEnemyQuality()).thenReturn(experienceLevel);
+        when(mockContract.getEnemyQuality()).thenReturn(adjustedSkillLevel);
 
         Faction mockFaction = mock(Faction.class);
-        when(mockContract.getEnemy()).thenReturn(mockFaction);
         when(mockFaction.isClan()).thenReturn(false);
         when(mockFaction.isRebel()).thenReturn(true);
         when(mockFaction.isMinorPower()).thenReturn(false);
         when(mockFaction.isMercenary()).thenReturn(false);
         when(mockFaction.isPirate()).thenReturn(false);
 
-        int actualReliability = MHQMorale.getReliability(mockContract);
+        int actualReliability = MHQMorale.getReliability(adjustedSkillLevel, mockFaction);
 
-        int expectedReliability = getReliabilityModifier(experienceLevel);
+        int expectedReliability = getReliabilityModifier(adjustedSkillLevel);
         expectedReliability++;
 
         assertEquals(expectedReliability, actualReliability,
               String.format("Reliability should match experience level: expected %d but got %d",
-                    experienceLevel,
+                    adjustedSkillLevel,
                     actualReliability));
     }
 
     @ParameterizedTest
-    @MethodSource("dragoonRatings")
-    void testGetReliability_minor(int experienceLevel) {
+    @MethodSource("adjustedSkillLevels")
+    void testGetReliability_minor(int adjustedSkillLevel) {
         AtBContract mockContract = mock(AtBContract.class);
-        when(mockContract.getEnemyQuality()).thenReturn(experienceLevel);
+        when(mockContract.getEnemyQuality()).thenReturn(adjustedSkillLevel);
 
         Faction mockFaction = mock(Faction.class);
-        when(mockContract.getEnemy()).thenReturn(mockFaction);
         when(mockFaction.isClan()).thenReturn(false);
         when(mockFaction.isRebel()).thenReturn(false);
         when(mockFaction.isMinorPower()).thenReturn(true);
         when(mockFaction.isMercenary()).thenReturn(false);
         when(mockFaction.isPirate()).thenReturn(false);
 
-        int actualReliability = MHQMorale.getReliability(mockContract);
+        int actualReliability = MHQMorale.getReliability(adjustedSkillLevel, mockFaction);
 
-        int expectedReliability = getReliabilityModifier(experienceLevel);
+        int expectedReliability = getReliabilityModifier(adjustedSkillLevel);
         expectedReliability++;
 
         assertEquals(expectedReliability, actualReliability,
               String.format("Reliability should match experience level: expected %d but got %d",
-                    experienceLevel,
+                    adjustedSkillLevel,
                     actualReliability));
     }
 
     @ParameterizedTest
-    @MethodSource("dragoonRatings")
-    void testGetReliability_mercenary(int experienceLevel) {
+    @MethodSource("adjustedSkillLevels")
+    void testGetReliability_mercenary(int adjustedSkillLevel) {
         AtBContract mockContract = mock(AtBContract.class);
-        when(mockContract.getEnemyQuality()).thenReturn(experienceLevel);
+        when(mockContract.getEnemyQuality()).thenReturn(adjustedSkillLevel);
 
         Faction mockFaction = mock(Faction.class);
-        when(mockContract.getEnemy()).thenReturn(mockFaction);
         when(mockFaction.isClan()).thenReturn(false);
         when(mockFaction.isRebel()).thenReturn(false);
         when(mockFaction.isMinorPower()).thenReturn(false);
         when(mockFaction.isMercenary()).thenReturn(true);
         when(mockFaction.isPirate()).thenReturn(false);
 
-        int actualReliability = MHQMorale.getReliability(mockContract);
+        int actualReliability = MHQMorale.getReliability(adjustedSkillLevel, mockFaction);
 
-        int expectedReliability = getReliabilityModifier(experienceLevel);
+        int expectedReliability = getReliabilityModifier(adjustedSkillLevel);
         expectedReliability++;
 
         assertEquals(expectedReliability, actualReliability,
               String.format("Reliability should match experience level: expected %d but got %d",
-                    experienceLevel,
+                    adjustedSkillLevel,
                     actualReliability));
     }
 
     @ParameterizedTest
-    @MethodSource("dragoonRatings")
-    void testGetReliability_pirate(int experienceLevel) {
+    @MethodSource("adjustedSkillLevels")
+    void testGetReliability_pirate(int adjustedSkillLevel) {
         AtBContract mockContract = mock(AtBContract.class);
-        when(mockContract.getEnemyQuality()).thenReturn(experienceLevel);
+        when(mockContract.getEnemyQuality()).thenReturn(adjustedSkillLevel);
 
         Faction mockFaction = mock(Faction.class);
-        when(mockContract.getEnemy()).thenReturn(mockFaction);
         when(mockFaction.isClan()).thenReturn(false);
         when(mockFaction.isRebel()).thenReturn(false);
         when(mockFaction.isMinorPower()).thenReturn(false);
         when(mockFaction.isMercenary()).thenReturn(false);
         when(mockFaction.isPirate()).thenReturn(true);
 
-        int actualReliability = MHQMorale.getReliability(mockContract);
+        int actualReliability = MHQMorale.getReliability(adjustedSkillLevel, mockFaction);
 
-        int expectedReliability = getReliabilityModifier(experienceLevel);
+        int expectedReliability = getReliabilityModifier(adjustedSkillLevel);
         expectedReliability++;
 
         assertEquals(expectedReliability, actualReliability,
               String.format("Reliability should match experience level: expected %d but got %d",
-                    experienceLevel,
+                    adjustedSkillLevel,
                     actualReliability));
     }
 
-    private static Stream<Integer> dragoonRatings() {
+    private static Stream<Integer> adjustedSkillLevels() {
         return Stream.of(
-              ForceDescriptor.RATING_0,  // DRAGOON_F
-              ForceDescriptor.RATING_1,  // DRAGOON_D
-              ForceDescriptor.RATING_2,  // DRAGOON_C
-              ForceDescriptor.RATING_3,  // DRAGOON_B
-              ForceDescriptor.RATING_4,  // DRAGOON_A
-              ForceDescriptor.RATING_5   // DRAGOON_ASTAR
+              SkillLevel.NONE.getAdjustedValue(),
+              SkillLevel.ULTRA_GREEN.getAdjustedValue(),
+              SkillLevel.GREEN.getAdjustedValue(),
+              SkillLevel.REGULAR.getAdjustedValue(),
+              SkillLevel.VETERAN.getAdjustedValue(),
+              SkillLevel.ELITE.getAdjustedValue(),
+              SkillLevel.HEROIC.getAdjustedValue(),
+              SkillLevel.LEGENDARY.getAdjustedValue()
         );
     }
 
