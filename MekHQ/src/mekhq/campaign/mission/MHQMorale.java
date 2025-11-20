@@ -72,6 +72,10 @@ public class MHQMorale {
     private static final MMLogger LOGGER = MMLogger.create(MHQMorale.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MHQMorale";
 
+    static final int RALLYING_TARGET_NUMBER = 6;
+    static final int NO_CHANGE_TARGET_NUMBER = 7;
+    static final int WAVERING_TARGET_NUMBER = 8;
+
     /**
      * Returns the localized title used for the morale check report UI.
      *
@@ -223,12 +227,12 @@ public class MHQMorale {
      * @author Illiani
      * @since 0.50.10
      */
-    private static MoraleOutcome getMoraleOutcome(AtBContract contract, int roll) {
+    static MoraleOutcome getMoraleOutcome(AtBContract contract, int roll) {
         AtBMoraleLevel currentMoraleLevel = contract.getMoraleLevel();
         AtBMoraleLevel updatedMoraleLevel = currentMoraleLevel;
         MoraleOutcome moraleOutcome;
 
-        if (roll <= 6) {
+        if (roll <= RALLYING_TARGET_NUMBER) {
             moraleOutcome = MoraleOutcome.RALLYING;
             updatedMoraleLevel = switch (currentMoraleLevel) {
                 case ROUTED -> AtBMoraleLevel.CRITICAL;
@@ -238,7 +242,7 @@ public class MHQMorale {
                 case ADVANCING -> AtBMoraleLevel.DOMINATING;
                 case DOMINATING, OVERWHELMING -> AtBMoraleLevel.OVERWHELMING;
             };
-        } else if (roll >= 8) {
+        } else if (roll >= WAVERING_TARGET_NUMBER) {
             moraleOutcome = MoraleOutcome.WAVERING;
             updatedMoraleLevel = switch (currentMoraleLevel) {
                 case ROUTED, CRITICAL -> AtBMoraleLevel.ROUTED;
@@ -486,10 +490,9 @@ public class MHQMorale {
      * <p>This method does <em>not</em> use the full morale calculation. Instead, it forces a fixed roll based on the
      * overall outcome of the most recent scenario:</p>
      * <ul>
-     *     <li>Overall victory: roll is treated as {@code 8} (more likely to degrade morale for the player’s
-     *     force).</li>
-     *     <li>Overall defeat: roll is treated as {@code 6} (more likely to improve morale for the OpFor).</li>
-     *     <li>Otherwise: roll defaults to {@code 7} (no change threshold).</li>
+     *     <li>Overall victory: roll is treated as {@link #WAVERING_TARGET_NUMBER} (OpFor morale declines).</li>
+     *     <li>Overall defeat: roll is treated as {@link #RALLYING_TARGET_NUMBER} (OpFor morale improves).</li>
+     *     <li>Otherwise: roll defaults to {@link #NO_CHANGE_TARGET_NUMBER}.</li>
      * </ul>
      *
      * <p>After applying the morale outcome, if the contract's morale level is routed,
@@ -505,12 +508,12 @@ public class MHQMorale {
      */
     public static void processCombatChallengeResults(Campaign campaign, AtBContract contract,
           ScenarioStatus scenarioStatus) {
-        int forcedRoll = 7;
+        int forcedRoll = NO_CHANGE_TARGET_NUMBER;
 
         if (scenarioStatus.isOverallVictory()) {
-            forcedRoll = 8;
+            forcedRoll = WAVERING_TARGET_NUMBER;
         } else if (scenarioStatus.isOverallDefeat()) {
-            forcedRoll = 6;
+            forcedRoll = RALLYING_TARGET_NUMBER;
         }
 
         getMoraleOutcome(contract, forcedRoll);
