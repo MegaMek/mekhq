@@ -35,7 +35,6 @@ package mekhq.gui.campaignOptions.components;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import javax.swing.JSpinner;
@@ -75,10 +74,6 @@ public class CampaignOptionsSpinner extends JSpinner {
 
         if (!noTooltip) {
             String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
-            tooltipText += getFormattedTextAt(getCampaignOptionsResourceBundle(), "lblMinimum.text", minimum);
-            tooltipText += getFormattedTextAt(getCampaignOptionsResourceBundle(), "lblMaximum.text", maximum);
-            tooltipText += getFormattedTextAt(getCampaignOptionsResourceBundle(), "lblDefault.text", defaultValue);
-
             setToolTipText(wordWrap(tooltipText));
         }
 

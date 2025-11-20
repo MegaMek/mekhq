@@ -35,7 +35,6 @@ package mekhq.gui.campaignOptions;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel.getTipPanelName;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -330,11 +329,6 @@ public class CampaignOptionsUtilities {
                 String tipText = replacementText;
                 if (replacementText == null) {
                     tipText = getTextAt(RESOURCE_BUNDLE, "lbl" + sourceComponentBaseName + ".tooltip");
-
-                    // JSpinners only
-                    tipText += getFormattedTextAt(getCampaignOptionsResourceBundle(), "lblMinimum.text", minimumValue);
-                    tipText += getFormattedTextAt(getCampaignOptionsResourceBundle(), "lblMaximum.text", maximumValue);
-                    tipText += getFormattedTextAt(getCampaignOptionsResourceBundle(), "lblDefault.text", defaultValue);
                 }
 
                 if (tipText.isBlank()) {
