@@ -846,7 +846,7 @@ public class SalvagePostScenarioPicker {
             if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0 && !isExchangeRights) {
                 disableConfirmAndColorName(confirmButton, unitSalvageLabel);
                 // If we've gone over our %, we only block progression if the player is trying to salvage even more.
-                shouldEnable = !unitSalvageMoneyCurrent.equals(unitSalvageMoneyInitial);
+                shouldEnable = unitSalvageMoneyCurrent.compareTo(unitSalvageMoneyInitial) <= 0;
             }
         }
 
@@ -1244,7 +1244,7 @@ public class SalvagePostScenarioPicker {
 
         // Enforce mutual exclusivity (don’t allow both)
         if (group.claimedSalvageForSale.isSelected() && group.claimedSalvageForKeeps.isSelected()) {
-            // Prefer the most recently toggled? We can keep simple: if sale is checked, uncheck keeps.
+            // Sale takes priority over keeps
             group.claimedSalvageForKeeps.setSelected(false);
         }
 
@@ -1282,9 +1282,9 @@ public class SalvagePostScenarioPicker {
     /**
      * Fixes the width of a combo box to prevent resizing when items are added or selected.
      *
-     * <p>This method sets the preferred, minimum, and maximum sizes of the combo box to a fixed
-     * width while preserving the component's preferred height. This prevents the combo box from
-     * resizing dynamically based on its content, providing a consistent user interface.</p>
+     * <p>This method sets the preferred, minimum, and maximum sizes of the combo box to a fixed width while
+     * preserving the component's preferred height. This prevents the combo box from resizing dynamically based on its
+     * content, providing a consistent user interface.</p>
      *
      * @param combo the {@link JComboBox} to fix the width of
      *
