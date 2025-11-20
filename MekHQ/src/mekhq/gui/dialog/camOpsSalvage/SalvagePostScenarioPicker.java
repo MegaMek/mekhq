@@ -1244,7 +1244,7 @@ public class SalvagePostScenarioPicker {
 
         // Enforce mutual exclusivity (don’t allow both)
         if (group.claimedSalvageForSale.isSelected() && group.claimedSalvageForKeeps.isSelected()) {
-            // Salvage takes priority over keeps
+            // Sale takes priority over keeps
             group.claimedSalvageForKeeps.setSelected(false);
         }
 
