@@ -267,7 +267,7 @@ public class CampaignOptionsUtilities {
      */
     public static MouseAdapter createTipPanelUpdater(CampaignOptionsHeaderPanel associatedHeaderPanel,
           @Nullable String sourceComponentBaseName) {
-        return createTipPanelUpdater(associatedHeaderPanel, sourceComponentBaseName, null, null, null, null);
+        return createTipPanelUpdater(associatedHeaderPanel, sourceComponentBaseName, null);
     }
 
     /**
@@ -293,36 +293,6 @@ public class CampaignOptionsUtilities {
      */
     public static MouseAdapter createTipPanelUpdater(CampaignOptionsHeaderPanel associatedHeaderPanel,
           @Nullable String sourceComponentBaseName, @Nullable String replacementText) {
-        return createTipPanelUpdater(associatedHeaderPanel, sourceComponentBaseName, replacementText, null, null, null);
-    }
-
-    /**
-     * Creates a {@link MouseAdapter} that updates the text of a {@link JLabel} within the specified panel to display a
-     * tip string when the mouse enters a related component.
-     *
-     * <p>
-     * When the mouse enters a component with the specified name, this adapter retrieves a localized tip string
-     * associated with that component. If the tip contains fewer than five HTML line break tags ({@code <br>}), extra
-     * line breaks are appended to ensure a minimum number of lines. The formatted tip is then set as the text of a
-     * {@link JLabel} within the provided panel, specifically targeting labels whose name matches the required pattern.
-     * </p>
-     *
-     * @param associatedHeaderPanel   the {@link JPanel} containing the label to update
-     * @param sourceComponentBaseName the name of the component whose tip string will be shown in the label
-     * @param replacementText         the specific text to use, or {@code null} if the text should be dynamically
-     *                                fetched from the source component.
-     * @param minimumValue            the minimum value of the associated JSpinner, or {@code null} to exclude
-     * @param maximumValue            the maximum value of the associated JSpinner, or {@code null} to exclude
-     * @param defaultValue            the default value of the associated JSpinner, or {@code null} to exclude
-     *
-     * @return a {@link MouseAdapter} instance that updates the label with formatted tip text on mouse enter
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    public static MouseAdapter createTipPanelUpdater(CampaignOptionsHeaderPanel associatedHeaderPanel,
-          @Nullable String sourceComponentBaseName, @Nullable String replacementText, @Nullable Number minimumValue,
-          @Nullable Number maximumValue, @Nullable Number defaultValue) {
         return new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent mouseEvent) {
