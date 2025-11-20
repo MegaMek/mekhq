@@ -122,8 +122,7 @@ public class FacilityRentals {
         boolean wasConfirmedOverall = false;
         ContractStartRentalDialog offerDialog;
         while (!wasConfirmedOverall) {
-            offerDialog = new ContractStartRentalDialog(campaign, contract, hospitalCost, kitchenCost, holdingCellCost);
-            wasRentConfirmed = offerDialog.wasConfirmed();
+            new ContractStartRentalDialog(campaign, contract, hospitalCost, kitchenCost, holdingCellCost);
 
             if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_CONTRACT_RENTAL)) {
                 ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign,
@@ -134,11 +133,9 @@ public class FacilityRentals {
             }
         }
 
-        if (wasRentConfirmed) {
-            contract.setHospitalBedsRented(ContractStartRentalDialog.getHospitalSpinnerValue());
-            contract.setKitchensRented(ContractStartRentalDialog.getKitchensSpinnerValue());
-            contract.setHoldingCellsRented(ContractStartRentalDialog.getSecuritySpinnerValue());
-        }
+        contract.setHospitalBedsRented(ContractStartRentalDialog.getHospitalSpinnerValue());
+        contract.setKitchensRented(ContractStartRentalDialog.getKitchensSpinnerValue());
+        contract.setHoldingCellsRented(ContractStartRentalDialog.getSecuritySpinnerValue());
     }
 
     /**
