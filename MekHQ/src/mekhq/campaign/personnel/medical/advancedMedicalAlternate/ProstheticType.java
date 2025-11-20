@@ -995,7 +995,7 @@ public enum ProstheticType {
             // Special handlers
             switch (lookupName) {
                 case UNOFFICIAL_EI_IMPLANT -> {
-                    description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.label.ei");
+                    description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.ei");
                 }
                 default -> {}
             }
