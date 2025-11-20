@@ -140,7 +140,6 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
      */
     private static List<ButtonLabelTooltipPair> getButtons() {
         return List.of(
-              new ButtonLabelTooltipPair(getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.button.cancel"), null),
               new ButtonLabelTooltipPair(getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.button.confirm"), null)
         );
     }
