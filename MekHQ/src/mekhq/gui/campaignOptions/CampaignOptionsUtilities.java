@@ -86,7 +86,7 @@ public class CampaignOptionsUtilities {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsDialog";
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
-    public final static int CAMPAIGN_OPTIONS_PANEL_WIDTH = scaleForGUI(800);
+    public final static int CAMPAIGN_OPTIONS_PANEL_WIDTH = scaleForGUI(950);
 
     public static String getCampaignOptionsResourceBundle() {
         return RESOURCE_BUNDLE;

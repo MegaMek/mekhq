@@ -715,7 +715,7 @@ public class RulesetsTab {
               getImageDirectory() + "logo_clan_wolf.png",
               false,
               true,
-              6);
+              4);
 
         // Universal Content
 
