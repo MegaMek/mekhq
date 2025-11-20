@@ -1280,7 +1280,7 @@ public enum InjuryEffect {
           false,
           0,
           0,
-          1,
+          0,
           0,
           0,
           0,
@@ -1299,7 +1299,7 @@ public enum InjuryEffect {
           false,
           0,
           0,
-          2,
+          1,
           0,
           0,
           0,
@@ -1318,7 +1318,7 @@ public enum InjuryEffect {
           false,
           0,
           0,
-          2,
+          1,
           0,
           0,
           0,
@@ -1624,6 +1624,19 @@ public enum InjuryEffect {
         return getTextAt(RESOURCE_BUNDLE, "InjuryEffect." + lookupName + ".name");
     }
 
+    /**
+     * Builds a localized tooltip summarizing key information about all active injury effects.
+     *
+     * <p><b>Note:</b> For consistency, the order shown in the tooltip is meant to mirror that of
+     * {@link ProstheticType#getTooltip(int, boolean)}.</p>
+     *
+     * @param injuryEffects A list of currently active injury effects
+     *
+     * @return a formatted tooltip string suitable for UI display
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public static String getTooltip(List<InjuryEffect> injuryEffects) {
         // Map attributes to their aggregated modifiers
         Map<SkillAttribute, Integer> attributeTotals = new EnumMap<>(SkillAttribute.class);

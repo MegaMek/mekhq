@@ -963,7 +963,7 @@ public enum ProstheticType {
      * @since 0.50.10
      */
     public String getTooltip(int gameYear, boolean isUseKinderMode) {
-        StringJoiner tooltipPortion = new StringJoiner("<br>- ");
+        StringJoiner tooltipPortion = new StringJoiner("<br>- ", "- ", "");
 
         // 1) Surgery level required
         tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.skill", surgeryLevel));
@@ -1063,7 +1063,7 @@ public enum ProstheticType {
             // Special handlers
             switch (lookupName) {
                 case UNOFFICIAL_EI_IMPLANT ->
-                      description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.label.ei");
+                    description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.ei");
                 default -> {}
             }
 
@@ -1080,7 +1080,7 @@ public enum ProstheticType {
         }
 
         // 9) Abilities
-        for (String lookupName : getAssociatedPersonnelOptions()) {
+        for (String lookupName : associatedPersonnelOptions) {
             IOption ability = options.getOption(lookupName);
             String label = ability == null ? lookupName : ability.getDisplayableName();
             String description = ability == null ? "-" : ability.getDescription();
