@@ -1004,7 +1004,7 @@ public enum ProstheticType {
         }
 
         // 9) Abilities
-        for (String lookupName : getAssociatedPersonnelOptions()) {
+        for (String lookupName : associatedPersonnelOptions) {
             IOption ability = options.getOption(lookupName);
             String label = ability == null ? lookupName : ability.getDisplayableName();
             String description = ability == null ? "-" : ability.getDescription();
