@@ -186,9 +186,9 @@ public class CompanyGenerationOptions {
             supportPersonnel.put(PersonnelRole.AERO_TEK, 1);
             supportPersonnel.put(PersonnelRole.DOCTOR, 1);
             supportPersonnel.put(PersonnelRole.ADMINISTRATOR_COMMAND, 1);
-            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_LOGISTICS, 3);
+            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_LOGISTICS, 5);
             supportPersonnel.put(PersonnelRole.ADMINISTRATOR_TRANSPORT, 1);
-            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_HR, 2);
+            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_HR, 3);
         } else { // Defaults to AtB
             supportPersonnel.put(PersonnelRole.MEK_TECH, 10);
             supportPersonnel.put(PersonnelRole.DOCTOR, 1);
