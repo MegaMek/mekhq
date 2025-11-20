@@ -34,12 +34,7 @@ package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
 import static java.lang.Math.max;
 import static java.lang.Math.round;
-import static megamek.common.options.OptionsConstants.MD_BOOST_COMM_IMPLANT;
-import static megamek.common.options.OptionsConstants.MD_COMM_IMPLANT;
-import static megamek.common.options.OptionsConstants.MD_CYBER_IMP_LASER;
-import static megamek.common.options.OptionsConstants.MD_CYBER_IMP_VISUAL;
-import static megamek.common.options.OptionsConstants.MISC_PAIN_RESISTANCE;
-import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
+import static megamek.common.options.OptionsConstants.*;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ATTRACTIVE;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
@@ -681,7 +676,51 @@ public enum ProstheticType {
           false,
           false,
           List.of(),
-          List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, ATOW_TOUGHNESS));
+          List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, ATOW_TOUGHNESS)),
+    VDNI("VDNI",
+          5,
+          5,
+          AlternateInjuries.VEHICULAR_DNI,
+          Money.of(1400000),
+          TechRating.A,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          false,
+          true,
+          List.of(MD_VDNI),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
+    BUFFERED_VDNI("BUFFERED_VDNI",
+          5,
+          5,
+          AlternateInjuries.BUFFERED_VDNI,
+          Money.of(2000000),
+          TechRating.A,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          false,
+          true,
+          List.of(MD_BVDNI),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
+    BUFFERED_VDNI_TRIPLE_CORE("BUFFERED_VDNI_TRIPLE_CORE",
+          5,
+          5,
+          AlternateInjuries.BUFFERED_VDNI_TRIPLE_CORE,
+          Money.of(5000000),
+          TechRating.B,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
+          true,
+          List.of(MD_BVDNI, MD_TRIPLE_CORE_PROCESSOR),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
+    PAIN_SHUNT("PAIN_SHUNT",
+          5,
+          5,
+          AlternateInjuries.PAIN_SHUNT,
+          Money.of(50000),
+          TechRating.B,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
+          true,
+          List.of(MD_PAIN_SHUNT),
+          List.of(COMPULSION_PAINKILLER_ADDICTION));
 
     private final String lookupName;
     private final int prostheticType;
@@ -1063,7 +1102,9 @@ public enum ProstheticType {
             // Special handlers
             switch (lookupName) {
                 case UNOFFICIAL_EI_IMPLANT ->
-                    description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.ei");
+                      description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.ei");
+                case MD_VDNI -> description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.vdni");
+                case MD_BVDNI -> description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.bvdni");
                 default -> {}
             }
 
@@ -1075,8 +1116,6 @@ public enum ProstheticType {
                   tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.armor"));
             case DERMAL_MYOMER_ARM_CAMO, DERMAL_MYOMER_LEG_CAMO ->
                   tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.camo"));
-            case DERMAL_MYOMER_ARM_TRIPLE, DERMAL_MYOMER_LEG_TRIPLE ->
-                  tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.triple"));
         }
 
         // 9) Abilities
