@@ -126,7 +126,6 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * controls the ordering in the GUI.
      */
     private static final List<BodyLocation> VALID_BODY_LOCATIONS = List.of(
-          HEAD,
           BRAIN,
           FACE,
           MOUTH,
