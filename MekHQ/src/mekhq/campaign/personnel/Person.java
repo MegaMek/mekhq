@@ -5402,7 +5402,7 @@ public class Person {
     }
 
     public boolean needsFixing() {
-        return ((hits > 0) || needsAMFixing()) && getStatus().isActiveFlexible();
+        return (hits > 0) || needsAMFixing();
     }
 
     /**
