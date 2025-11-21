@@ -5404,7 +5404,7 @@ public class Unit implements ITechnology {
 
     // TODO : Switch similar tables in person to use this one instead
     public String determineUnitTechSkillType() {
-        if ((entity instanceof Mek) || (entity instanceof ProtoMek)) {
+        if ((entity instanceof Mek) || (entity instanceof ProtoMek) || (entity instanceof HandheldWeapon)) {
             return SkillType.S_TECH_MEK;
         } else if (entity instanceof BattleArmor) {
             return SkillType.S_TECH_BA;
@@ -6386,6 +6386,10 @@ public class Unit implements ITechnology {
 
         if (entity instanceof Jumpship) {
             return 360 * maintenanceMultiplier;
+        }
+
+        if (entity instanceof HandheldWeapon) { // Unofficial
+            return 30;
         }
 
         // Anything that didn't fall into one of the above classifications is self-maintaining, meaning zero.
