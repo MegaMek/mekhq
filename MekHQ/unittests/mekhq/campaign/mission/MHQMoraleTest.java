@@ -223,7 +223,7 @@ class MHQMoraleTest {
               DECISIVE_VICTORY_MODIFIER, VICTORY_MODIFIER, DECISIVE_DEFEAT_MODIFIER, DEFEAT_MODIFIER);
 
         assertEquals(expectedModifier, actualPerformanceModifier,
-              String.format("Performance modifier should match experience level: expected %d but got %d",
+              String.format("Expected %d but got %d",
                     expectedModifier, actualPerformanceModifier));
     }
 
@@ -232,12 +232,12 @@ class MHQMoraleTest {
               // expectedModifier, daysToSubtract, decisiveV, victories, pyrrhicV, decisiveD, defeats, fleetInBeing, refusedEng
               Arguments.of(DECISIVE_VICTORY_MODIFIER, 7, 1, 2, 0, 0, 2, 0, 0),
               Arguments.of(VICTORY_MODIFIER, 7, 1, 1, 0, 0, 2, 0, 0),
-              Arguments.of(VICTORY_MODIFIER, 7, 1, 1, 1, 0, 1, 0, 0),
+              Arguments.of(VICTORY_MODIFIER, 7, 1, 1, 1, 0, 2, 0, 0),
               Arguments.of(DECISIVE_DEFEAT_MODIFIER, 7, 0, 1, 0, 1, 2, 0, 0),
               Arguments.of(DEFEAT_MODIFIER, 7, 0, 2, 0, 1, 1, 0, 0),
               Arguments.of(DECISIVE_DEFEAT_MODIFIER, 7, 0, 1, 0, 0, 0, 0, 2),
               Arguments.of(DEFEAT_MODIFIER, 7, 0, 2, 0, 1, 0, 1, 0),
-              Arguments.of(0, 7, 3, 5, 1, 2, 3, 1, 1)
+              Arguments.of(0, 7, 3, 5, 1, 2, 4, 1, 1)
         );
     }
 
@@ -253,7 +253,7 @@ class MHQMoraleTest {
               DECISIVE_VICTORY_MODIFIER, VICTORY_MODIFIER, DECISIVE_DEFEAT_MODIFIER, DEFEAT_MODIFIER);
 
         assertEquals(expectedPerformanceModifier, actualPerformanceModifier,
-              String.format("Performance modifier should match experience level: expected %d but got %d",
+              String.format("Expected %d but got %d",
                     expectedPerformanceModifier, actualPerformanceModifier));
     }
 
