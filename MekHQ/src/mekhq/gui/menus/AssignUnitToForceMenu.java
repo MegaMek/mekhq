@@ -41,7 +41,6 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
@@ -67,8 +66,6 @@ import mekhq.utilities.MHQInternationalization;
  * @since 0.50.10
  */
 public class AssignUnitToForceMenu extends JScrollableMenu {
-    private static final MMLogger LOGGER = MMLogger.create(AssignUnitToForceMenu.class);
-
     /**
      * Constructs a new {@code AssignUnitToForceMenu} and initializes all force assignment options based on the given
      * campaign and units.
