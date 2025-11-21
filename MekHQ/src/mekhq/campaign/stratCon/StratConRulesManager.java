@@ -289,7 +289,7 @@ public class StratConRulesManager {
                       track);
                 // otherwise, pick a random force from the avail
             } else {
-                int randomForceID = getRandomItem(availableForceIDs);
+                Integer randomForceID = getRandomItem(availableForceIDs); // Can be null
 
                 // two scenarios on the same coordinates wind up increasing in size
                 if (track.getScenarios().containsKey(scenarioCoords)) {
@@ -1298,8 +1298,8 @@ public class StratConRulesManager {
      *
      * @return The newly set up {@link StratConScenario}.
      */
-    public static @Nullable StratConScenario setupScenario(StratConCoords coords, int forceID, Campaign campaign,
-          AtBContract contract, StratConTrackState track) {
+    public static @Nullable StratConScenario setupScenario(StratConCoords coords, @Nullable Integer forceID,
+          Campaign campaign, AtBContract contract, StratConTrackState track) {
         return setupScenario(coords,
               forceID,
               campaign,
@@ -1332,9 +1332,9 @@ public class StratConRulesManager {
      *
      * @return The newly set up {@link StratConScenario}.
      */
-    public static @Nullable StratConScenario setupScenario(StratConCoords coords, int forceID, Campaign campaign,
-          AtBContract contract, StratConTrackState track, @Nullable ScenarioTemplate template, boolean ignoreFacilities,
-          @Nullable Integer daysTilDeployment) {
+    public static @Nullable StratConScenario setupScenario(StratConCoords coords, @Nullable Integer forceID,
+          Campaign campaign, AtBContract contract, StratConTrackState track, @Nullable ScenarioTemplate template,
+          boolean ignoreFacilities, @Nullable Integer daysTilDeployment) {
         StratConScenario scenario;
 
         if (track.getFacilities().containsKey(coords) && !ignoreFacilities) {
@@ -2334,8 +2334,14 @@ public class StratConRulesManager {
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation fails
      */
     private static @Nullable StratConScenario generateScenario(Campaign campaign, AtBContract contract,
-          StratConTrackState track, int forceID, StratConCoords coords, @Nullable Integer daysTilDeployment) {
-        int unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
+          StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
+          @Nullable Integer daysTilDeployment) {
+        int unitType = MEK;
+        ;
+        if (forceID != null) {
+            unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
+        }
+
         ScenarioTemplate template = StratConScenarioFactory.getRandomScenario(unitType);
         // useful for debugging specific scenario types
         // template = StratConScenarioFactory.getSpecificScenario("Defend Grounded
@@ -2376,9 +2382,13 @@ public class StratConRulesManager {
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation failed
      */
     static @Nullable StratConScenario generateScenario(Campaign campaign, AtBContract contract,
-          StratConTrackState track, int forceID, StratConCoords coords, ScenarioTemplate template,
+          StratConTrackState track, @Nullable Integer forceID, StratConCoords coords, ScenarioTemplate template,
           @Nullable Integer daysTilDeployment) {
         StratConScenario scenario = new StratConScenario();
+
+        if (forceID == null) {
+            forceID = FORCE_NONE;
+        }
 
         if (template == null) {
             int unitType = MEK;
