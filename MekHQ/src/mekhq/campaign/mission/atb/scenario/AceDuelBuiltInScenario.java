@@ -78,7 +78,7 @@ public class AceDuelBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setWeatherConditions() {
+    public void setWeatherConditions(boolean isNoTornadoes) {
         setWeather(Weather.CLEAR);
         setWind(Wind.CALM);
         setFog(Fog.FOG_NONE);

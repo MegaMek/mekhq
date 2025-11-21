@@ -651,6 +651,7 @@ public class CampaignOptions {
     private boolean useWeatherConditions;
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
+    private boolean useNoTornadoes;
     private int fixedMapChance;
     private int spaUpgradeIntensity;
     private int scenarioModMax;
@@ -717,6 +718,7 @@ public class CampaignOptions {
         reverseQualityNames = false;
         setUseRandomUnitQualities(true);
         setUsePlanetaryModifiers(true);
+        useNoTornadoes = false;
         useUnofficialMaintenance = false;
         logMaintenance = false;
         defaultMaintenanceTime = 4;
@@ -5118,6 +5120,14 @@ public class CampaignOptions {
 
     public void setUsePlanetaryConditions(final boolean usePlanetaryConditions) {
         this.usePlanetaryConditions = usePlanetaryConditions;
+    }
+
+    public boolean isUseNoTornadoes() {
+        return useNoTornadoes;
+    }
+
+    public void setUseNoTornadoes(final boolean useNoTornadoes) {
+        this.useNoTornadoes = useNoTornadoes;
     }
 
     /**
