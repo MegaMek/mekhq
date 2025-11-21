@@ -32,7 +32,6 @@
  */
 package mekhq.gui.menus;
 
-import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
 
@@ -41,9 +40,12 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.adapter.TOEMouseAdapter;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.utilities.MHQInternationalization;
 
@@ -130,7 +132,17 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
         JMenuItem clearAssignment = new JMenuItem(MHQInternationalization.getText("AssignUnitToForceMenu.clear"));
         clearAssignment.addActionListener(ev -> {
             for (Unit unit : units) {
-                campaign.addUnitToForce(unit, FORCE_NONE);
+                Force parentForce = campaign.getForceFor(unit);
+                if (null != parentForce) {
+                    campaign.removeUnitFromForce(unit);
+                    if (null != parentForce.getTechID()) {
+                        unit.removeTech();
+                    }
+                }
+                // Clear any transport assignments of units in the deleted force
+                TOEMouseAdapter.clearTransportAssignment(campaign, unit);
+
+                MekHQ.triggerEvent(new OrganizationChangedEvent(campaign, parentForce, unit));
             }
         });
         add(clearAssignment);

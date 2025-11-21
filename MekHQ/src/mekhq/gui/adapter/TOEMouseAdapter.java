@@ -62,6 +62,7 @@ import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.NetworkChangedEvent;
@@ -582,19 +583,20 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleForce));
             }
         } else if (command.contains(TOEMouseAdapter.REMOVE_UNIT)) {
+            Campaign campaign = gui.getCampaign();
             for (Unit unit : units) {
                 if (null != unit) {
-                    Force parentForce = gui.getCampaign().getForceFor(unit);
+                    Force parentForce = campaign.getForceFor(unit);
                     if (null != parentForce) {
-                        gui.getCampaign().removeUnitFromForce(unit);
+                        campaign.removeUnitFromForce(unit);
                         if (null != parentForce.getTechID()) {
                             unit.removeTech();
                         }
                     }
                     // Clear any transport assignments of units in the deleted force
-                    clearTransportAssignment(unit);
+                    clearTransportAssignment(campaign, unit);
 
-                    MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), parentForce, unit));
+                    MekHQ.triggerEvent(new OrganizationChangedEvent(campaign, parentForce, unit));
                 }
             }
         } else if (command.contains(TOEMouseAdapter.UNDEPLOY_UNIT)) {
@@ -1591,10 +1593,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
      *                      the player has selected or all units in a given force
      */
     private void clearTransportAssignment(Vector<UUID> unitsToUpdate) {
+        Campaign campaign = gui.getCampaign();
         for (UUID id : unitsToUpdate) {
-            Unit unit = gui.getCampaign().getUnit(id);
+            Unit unit = campaign.getUnit(id);
             if (unit != null) {
-                clearTransportAssignment(unit);
+                clearTransportAssignment(campaign, unit);
             }
         }
     }
@@ -1602,15 +1605,16 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     /**
      * Worker function to make sure transport assignment data gets cleared out when unit(s) are removed from the TO&E
      *
+     * @param campaign    The current campaign instance
      * @param currentUnit The unit currently being processed
      */
-    private void clearTransportAssignment(@Nullable Unit currentUnit) {
+    public static void clearTransportAssignment(Campaign campaign, @Nullable Unit currentUnit) {
         if (currentUnit != null) {
             for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
                 if (currentUnit.hasTransportAssignment(campaignTransportType)) {
                     Unit oldTransport = currentUnit.unloadFromTransport(campaignTransportType);
                     oldTransport.initializeTransportSpace(campaignTransportType);
-                    gui.getCampaign().updateTransportInTransports(campaignTransportType, oldTransport);
+                    campaign.updateTransportInTransports(campaignTransportType, oldTransport);
                 }
 
                 if (currentUnit.hasTransportedUnits(campaignTransportType)) {
