@@ -1047,7 +1047,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         }
                     } else if ((u.getForceId() < 1) &&
                                      (u.isPresent()) &&
-                                     (u.isUnmannedTrailer() || u.isHandheldWeapon())) {
+                                     (u.isNotCrewedEntityType())) {
                         JMenuItem menuItem0 = new JMenuItem(u.getName());
                         menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + '|' + forceIds);
                         menuItem0.addActionListener(this);
