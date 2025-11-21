@@ -66,9 +66,9 @@ import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
  * @since 0.50.10
  */
 public class NonCombatPrisoners {
-    public static WeightedIntMap<PersonnelRole> SUPPORT_ROLES = buildSupportRoles();
-    public static List<PersonnelRole> CIVILIAN_ROLES = PersonnelRole.getCivilianRoles();
-    public static int INJURY_CHANCE = 10;
+    private final static WeightedIntMap<PersonnelRole> SUPPORT_ROLES = buildSupportRoles();
+    private final static List<PersonnelRole> CIVILIAN_ROLES = PersonnelRole.getCivilianRoles();
+    private final static int INJURY_CHANCE = 10;
 
     /**
      * Builds the weighted map of support roles used when generating support personnel captives.
