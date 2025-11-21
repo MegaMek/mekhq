@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
+import static java.lang.Math.max;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FIT;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_MEDICAL;
@@ -188,7 +189,7 @@ public class AdvancedMedicalAlternateHealing {
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
             if (!injury.isPermanent()) {
                 // This needs to be refetched each cycle as the number of concurrent injuries might have changed
-                int injuryPenalty = patient.getTotalInjurySeverity();
+                int injuryPenalty = max(0, patient.getTotalInjurySeverity() - patient.getAdjustedToughness());
 
                 injury.changeTime(-1);
                 int miscPenalty = getMiscPenalty(injuryPenalty, prostheticPenalties, injury.getLocation());
@@ -299,7 +300,7 @@ public class AdvancedMedicalAlternateHealing {
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
             if (!injury.isPermanent()) {
                 // This needs to be refetched each cycle as the number of concurrent injuries might have changed
-                int injuryPenalty = patient.getTotalInjurySeverity();
+                int injuryPenalty = max(0, patient.getTotalInjurySeverity() - patient.getAdjustedToughness());
 
                 injury.changeTime(-1);
 
