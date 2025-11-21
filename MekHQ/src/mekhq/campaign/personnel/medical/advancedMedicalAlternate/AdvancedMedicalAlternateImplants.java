@@ -195,7 +195,7 @@ public class AdvancedMedicalAlternateImplants {
 
             String key = "AlternateInjuries.report." +
                                (isTooManyProsthetics ? "prosthetics" : "implant") +
-                               "fatigue";
+                               ".fatigue";
 
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                   key,
