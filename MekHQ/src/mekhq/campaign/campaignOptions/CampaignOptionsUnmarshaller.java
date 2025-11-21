@@ -117,6 +117,7 @@ public class CampaignOptionsUnmarshaller {
             case "reverseQualityNames" -> campaignOptions.setReverseQualityNames(parseBoolean(nodeContents));
             case "useRandomUnitQualities" -> campaignOptions.setUseRandomUnitQualities(parseBoolean(nodeContents));
             case "usePlanetaryModifiers" -> campaignOptions.setUsePlanetaryModifiers(parseBoolean(nodeContents));
+            case "useNoTornadoes" -> campaignOptions.setUseNoTornadoes(parseBoolean(nodeContents));
             case "useUnofficialMaintenance" -> campaignOptions.setUseUnofficialMaintenance(parseBoolean(
                   nodeContents));
             case "logMaintenance" -> campaignOptions.setLogMaintenance(parseBoolean(nodeContents));

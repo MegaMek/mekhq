@@ -196,7 +196,8 @@ public class AtBDynamicScenarioFactory {
 
         boolean planetsideScenario = template.isPlanetSurface();
 
-        if (campaign.getCampaignOptions().isUsePlanetaryConditions() && planetsideScenario) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isUsePlanetaryConditions() && planetsideScenario) {
             setPlanetaryConditions(scenario, contract, campaign);
         }
 
@@ -206,14 +207,14 @@ public class AtBDynamicScenarioFactory {
         // ground map
         // theoretically some lighting conditions apply to space maps as well, but
         // requires additional work to implement properly
-        if (campaign.getCampaignOptions().isUseLightConditions() && planetsideScenario) {
+        if (campaignOptions.isUseLightConditions() && planetsideScenario) {
             setLightConditions(scenario);
         }
 
         // set weather conditions if the user wants to play with them and is on a ground
         // map
-        if (campaign.getCampaignOptions().isUseWeatherConditions() && planetsideScenario) {
-            setWeather(scenario);
+        if (campaignOptions.isUseWeatherConditions() && planetsideScenario) {
+            setWeather(scenario, campaignOptions.isUseNoTornadoes());
         }
 
         // apply a default "reinforcements" force template if a scenario-specific one
@@ -1780,10 +1781,11 @@ public class AtBDynamicScenarioFactory {
     /**
      * Handles random determination of weather/wind/fog conditions for the given scenario, as per AtB rules
      *
-     * @param scenario The scenario for which to set weather conditions.
+     * @param scenario      The scenario for which to set weather conditions.
+     * @param isNoTornadoes {@code true} if tornadoes should be suppressed into less intense wind levels
      */
-    private static void setWeather(AtBDynamicScenario scenario) {
-        scenario.setWeatherConditions();
+    private static void setWeather(AtBDynamicScenario scenario, boolean isNoTornadoes) {
+        scenario.setWeatherConditions(isNoTornadoes);
     }
 
     /**

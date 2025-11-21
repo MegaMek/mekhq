@@ -655,7 +655,7 @@ public class StratConRulesManager {
 
         // Finally, finish scenario set up
         finalizeScenario(backingScenario, contract, campaign);
-        setScenarioParametersFromBiome(track, scenario);
+        setScenarioParametersFromBiome(track, scenario, campaign.getCampaignOptions().isUseNoTornadoes());
         swapInPlayerUnits(scenario, campaign, FORCE_NONE);
 
         if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
@@ -803,7 +803,8 @@ public class StratConRulesManager {
      * Picks the scenario terrain based on the scenario coordinates' biome Note that "finalizeScenario" currently wipes
      * out temperature/map info so this method must be called afterward.
      */
-    public static void setScenarioParametersFromBiome(StratConTrackState track, StratConScenario scenario) {
+    public static void setScenarioParametersFromBiome(StratConTrackState track, StratConScenario scenario,
+          boolean isNoTornadoes) {
         StratConCoords coords = scenario.getCoords();
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
         StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
@@ -856,7 +857,7 @@ public class StratConRulesManager {
                 backingScenario.setMap(mapTypeList.get(randomInt(mapTypeList.size())));
             }
             backingScenario.setLightConditions();
-            backingScenario.setWeatherConditions();
+            backingScenario.setWeatherConditions(isNoTornadoes);
         }
     }
 
@@ -1152,7 +1153,9 @@ public class StratConRulesManager {
             commitPrimaryForces(campaign, revealedScenario, track);
             if (!revealedScenario.getBackingScenario().isFinalized()) {
                 finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
-                setScenarioParametersFromBiome(track, revealedScenario);
+                setScenarioParametersFromBiome(track,
+                      revealedScenario,
+                      campaign.getCampaignOptions().isUseNoTornadoes());
             }
             return;
         }
