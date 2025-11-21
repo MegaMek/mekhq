@@ -197,7 +197,7 @@ public class CrewSkillUpgrader {
                         break;
                     default:
                         // If there's no crew, stop looking for SPAs
-                        if (entity.getCrew() == null) {
+                        if (entity.isUncrewed()) {
                             return 0;
                             // If we can't access the option, try a different one
                         } else if ((entity.getCrew().getOptions() == null) ||
@@ -257,7 +257,6 @@ public class CrewSkillUpgrader {
 
     /**
      * Contains "special" logic to ensure SPA is appropriate for the entity, beyond the simple unit type check.
-     *
      */
     private boolean extraEligibilityCheck(SpecialAbility spa, Entity entity) {
         if (spa.getName().equals(OptionsConstants.PILOT_ANIMAL_MIMIC)) {
