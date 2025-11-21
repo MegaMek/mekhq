@@ -1587,7 +1587,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     }
 
     /**
-     * Worker function to make sure transport assignment data gets cleared out when unit(s) are removed from the TO&E
+     * Worker function to make sure transport assignment data gets cleared out when unit(s) are removed from the TOE
      *
      * @param unitsToUpdate A vector of UUIDs of the units that we need to update. This can be either a collection that
      *                      the player has selected or all units in a given force
@@ -1603,7 +1603,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     }
 
     /**
-     * Worker function to make sure transport assignment data gets cleared out when unit(s) are removed from the TO&E
+     * Worker function to make sure transport assignment data gets cleared out when unit(s) are removed from the TOE
      *
      * @param campaign    The current campaign instance
      * @param currentUnit The unit currently being processed
