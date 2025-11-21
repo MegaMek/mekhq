@@ -214,7 +214,7 @@ public class AdvancedMedicalAlternateImplants {
             if (!flaw.isBlank()) {
                 String key = "AlternateInjuries.report." +
                                    (isTooManyProsthetics ? "prosthetics" : "implant") +
-                                   "degradation";
+                                   ".degradation";
                 
                 campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                       key,
