@@ -48,6 +48,7 @@ import java.util.List;
 
 import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -189,6 +190,7 @@ public class SkillCheckUtility {
         }
 
         final SkillType skillType = SkillType.getType(skillName);
+        boolean hasNaturalAptitude = person.hasSkill(skillName) && person.getSkill(skillName).getHasNaturalAptitude();
         isCountUp = skillType.isCountUp();
         targetNumber = determineTargetNumber(person, skillType, miscModifier, isUseAgingEffects, isClanCampaign, today);
 
@@ -198,7 +200,7 @@ public class SkillCheckUtility {
             }
         }
 
-        performCheck(useEdge, includeMarginsOfSuccessText);
+        performCheck(useEdge, hasNaturalAptitude, includeMarginsOfSuccessText);
     }
 
     /**
@@ -549,18 +551,44 @@ public class SkillCheckUtility {
      *                                    availability.
      * @param includeMarginsOfSuccessText whether to include detailed information about the margin of success in the
      *                                    final results text
+     * @param hasNaturalAptitude          whether the character has a Natural Aptitude ability in this skill
      *
      * @author Illiani
      * @since 0.50.05
      */
-    void performCheck(boolean useEdge, boolean includeMarginsOfSuccessText) {
-        roll = d6(2);
+    void performCheck(boolean useEdge, boolean hasNaturalAptitude, boolean includeMarginsOfSuccessText) {
+        getRoll(hasNaturalAptitude);
+
         if (performInitialRoll(useEdge, includeMarginsOfSuccessText)) {
             return;
         }
 
-        roll = d6(2);
-        rollWithEdge(includeMarginsOfSuccessText);
+        // Prevent us from burning Edge on impossible checks
+        if (!targetNumber.cannotSucceed() || targetNumber.getValue() <= 12) {
+            getRoll(hasNaturalAptitude);
+            rollWithEdge(includeMarginsOfSuccessText);
+        }
+    }
+
+    /**
+     * Generates the roll value for this check, applying the natural aptitude rule if applicable.
+     *
+     * <p>This method rolls two six-sided dice by default. If the character has the {@code Natural Aptitude} trait
+     * for this skill, a third die is rolled. The final roll value is the sum of the highest two dice, determined using
+     * {@link Compute#highestTwoIntegers(int...)}.</p>
+     *
+     * @param hasNaturalAptitude {@code true} if the character receives an additional die for this roll, {@code false}
+     *                           otherwise
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void getRoll(boolean hasNaturalAptitude) {
+        int roll1 = d6(1);
+        int roll2 = d6(1);
+        int roll3 = hasNaturalAptitude ? d6(1) : 0;
+
+        roll = Compute.highestTwoIntegers(roll1, roll2, roll3);
     }
 
     /**

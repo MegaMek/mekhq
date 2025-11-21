@@ -505,9 +505,11 @@ public class AttributeCheckUtility {
         if (performInitialRoll(useEdge, includeMarginsOfSuccessText)) {
             return;
         }
-
-        roll = d6(2);
-        rollWithEdge(includeMarginsOfSuccessText);
+        // Prevent us from burning Edge on impossible checks
+        if (!targetNumber.cannotSucceed() || targetNumber.getValue() <= 12) {
+            roll = d6(2);
+            rollWithEdge(includeMarginsOfSuccessText);
+        }
     }
 
     /**

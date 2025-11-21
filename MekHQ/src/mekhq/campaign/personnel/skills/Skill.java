@@ -106,6 +106,7 @@ public class Skill {
     private int level;
     private int bonus;
     private int agingModifier;
+    private boolean hasNaturalAptitude;
 
     protected Skill() {
 
@@ -116,25 +117,44 @@ public class Skill {
         this.level = this.type.getLevelFromExperience(EXP_REGULAR);
     }
 
+    public Skill(String type, int level) {
+        this(SkillType.getType(type), level, 0, 0, false);
+    }
+
     public Skill(String type, int level, int bonus) {
-        this(SkillType.getType(type), level, bonus);
+        this(SkillType.getType(type), level, bonus, 0, false);
+    }
+
+    public Skill(String type, int level, int bonus, boolean hasNaturalAptitude) {
+        this(SkillType.getType(type), level, bonus, 0, hasNaturalAptitude);
     }
 
     public Skill(String type, int level, int bonus, int agingModifier) {
-        this(SkillType.getType(type), level, bonus, agingModifier);
+        this(SkillType.getType(type), level, bonus, agingModifier, false);
+    }
+
+    public Skill(String type, int level, int bonus, int agingModifier, boolean hasNaturalAptitude) {
+        this(SkillType.getType(type), level, bonus, agingModifier, hasNaturalAptitude);
     }
 
     public Skill(SkillType type, int level, int bonus) {
-        this.type = type;
-        this.level = level;
-        this.bonus = bonus;
+        this(type, level, bonus, 0, false);
+    }
+
+    public Skill(SkillType type, int level, int bonus, boolean hasNaturalAptitude) {
+        this(type, level, bonus, 0, hasNaturalAptitude);
     }
 
     public Skill(SkillType type, int level, int bonus, int agingModifier) {
+        this(type, level, bonus, agingModifier, false);
+    }
+
+    public Skill(SkillType type, int level, int bonus, int agingModifier, boolean hasNaturalAptitude) {
         this.type = type;
         this.level = level;
         this.bonus = bonus;
         this.agingModifier = agingModifier;
+        this.hasNaturalAptitude = hasNaturalAptitude;
     }
 
     /**
@@ -239,6 +259,14 @@ public class Skill {
 
     public void setAgingModifier(int agingModifier) {
         this.agingModifier = agingModifier;
+    }
+
+    public boolean getHasNaturalAptitude() {
+        return hasNaturalAptitude;
+    }
+
+    public void setHasNaturalAptitude(boolean hasNaturalAptitude) {
+        this.hasNaturalAptitude = hasNaturalAptitude;
     }
 
     public SkillType getType() {
