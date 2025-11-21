@@ -36,6 +36,8 @@ package mekhq.campaign;
 import static java.lang.Math.ceil;
 import static mekhq.campaign.mission.Scenario.T_SPACE;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
+import static mekhq.campaign.randomEvents.prisoners.NonCombatPrisoners.getCivilianCaptives;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.File;
 import java.util.*;
@@ -98,6 +100,7 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ResolveScenarioTracker {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ResolveScenarioTracker";
     public static final double DAMANGED_PART_COMPENSATION_MODIFIER = 0.2;
 
     Map<UUID, Entity> entities;
@@ -1670,6 +1673,26 @@ public class ResolveScenarioTracker {
                 if (campaignOptions.isUseAdvancedMedical()) {
                     person.diagnose(getCampaign(), status.getHits());
                 }
+
+                ServiceLogger.capturedInScenarioDuringMission(person,
+                      campaign.getLocalDate(),
+                      scenario.getName(),
+                      mission.getName());
+            }
+        }
+
+        if (scenario.getStratConScenarioType().isHostileFacility() && control) {
+            campaign.addReport(getTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.civilianCaptives"));
+
+            Hashtable<UUID, OppositionPersonnelStatus> civilianPersonnel = getCivilianCaptives(campaign, mission);
+            for (UUID pid : civilianPersonnel.keySet()) {
+                OppositionPersonnelStatus status = civilianPersonnel.get(pid);
+                Person person = status.getPerson();
+                if (person == null) {
+                    continue;
+                }
+                MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
+                capturePrisoners.processCaptureOfNPC(person);
 
                 ServiceLogger.capturedInScenarioDuringMission(person,
                       campaign.getLocalDate(),
