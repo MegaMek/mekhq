@@ -557,7 +557,6 @@ public class ResolveScenarioTracker {
      * <p>
      * This method should be run the first time an entity is loaded into the tracker, either from the game or from a MUL
      * file.
-     *
      */
     private void checkForLostLimbs(Entity en, boolean controlsField) {
         for (int loc = 0; loc < en.locations(); loc++) {
@@ -666,7 +665,7 @@ public class ResolveScenarioTracker {
                     }
                 }
                 // No crew? All's good, no personnel, next.
-                if (u.isUnmannedTrailer()) {
+                if (u.isNotCrewedEntityType()) {
                     continue;
                 }
 
