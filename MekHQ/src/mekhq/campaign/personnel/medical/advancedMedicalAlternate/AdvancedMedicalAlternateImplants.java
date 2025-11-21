@@ -261,7 +261,7 @@ public class AdvancedMedicalAlternateImplants {
             }
         }
 
-        return eligibleProstheticsCount == prostheticThreshold;
+        return eligibleProstheticsCount >= prostheticThreshold;
     }
 
     /**
