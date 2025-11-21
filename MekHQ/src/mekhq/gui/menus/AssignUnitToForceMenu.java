@@ -48,7 +48,7 @@ import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.utilities.MHQInternationalization;
 
 /**
- * A dynamic, scrollable menu for assigning one or more {@link Unit} objects to forces within a {@link Campaign}'s TO&E
+ * A dynamic, scrollable menu for assigning one or more {@link Unit} objects to forces within a {@link Campaign}'s TOE
  * structure.
  *
  * <p>This menu provides:</p>
