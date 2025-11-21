@@ -58,7 +58,8 @@ public enum ScenarioType {
     SPECIAL_JAIL_BREAK,
     CONVOY,
     RIOT,
-    OFFICIAL_CHALLENGE;
+    OFFICIAL_CHALLENGE,
+    HOSTILE_FACILITY;
 
     /**
      * @return {@code true} if the scenario is considered a LosTech scenario, {@code false} otherwise.
@@ -101,6 +102,14 @@ public enum ScenarioType {
      */
     public boolean isRiot() {
         return this == RIOT;
+    }
+
+
+    /**
+     * @return {@code true} if the scenario is considered a hostile facility scenario, {@code false} otherwise.
+     */
+    public boolean isHostileFacility() {
+        return this == HOSTILE_FACILITY;
     }
 
     /**
