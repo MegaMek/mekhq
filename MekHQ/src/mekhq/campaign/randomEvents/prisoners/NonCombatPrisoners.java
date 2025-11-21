@@ -216,7 +216,7 @@ public class NonCombatPrisoners {
         int injuryDieSize = role.isCombat() ? INJURY_CHANCE / 2 : INJURY_CHANCE;
         if (randomInt(injuryDieSize) == 0) {
             if (isUseAdvancedMedical) {
-                InjuryUtil.resolveAfterCombat(campaign, captive, 1);
+                InjuryUtil.resolveCombatDamage(campaign, captive, 1);
             } else {
                 captive.setHits(1);
             }
