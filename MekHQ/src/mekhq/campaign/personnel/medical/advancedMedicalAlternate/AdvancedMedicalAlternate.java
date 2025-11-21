@@ -271,5 +271,13 @@ public class AdvancedMedicalAlternate {
         }
     }
 
+    public static boolean hasInjuryOfType(List<Injury> injuries, InjuryType injuryType) {
+        for (Injury injury : injuries) {
+            if (injury.getType() == injuryType) {
+                return true;
+            }
+        }
 
+        return false;
+    }
 }

@@ -293,6 +293,24 @@ public final class InjuryTypes {
                   "alt:COSMETIC_ANIMAL_LEG_PROSTHETIC",
                   AlternateInjuries.COSMETIC_ANIMAL_LEG_PROSTHETIC);
             InjuryType.register(172, "alt:DISCONTINUATION_SYNDROME", AlternateInjuries.DISCONTINUATION_SYNDROME);
+            InjuryType.register(173, "alt:DERMAL_MYOMER_ARM_ARMOR", AlternateInjuries.DERMAL_MYOMER_ARM_ARMOR);
+            InjuryType.register(174, "alt:DERMAL_MYOMER_ARM_CAMO", AlternateInjuries.DERMAL_MYOMER_ARM_CAMO);
+            InjuryType.register(175, "alt:DERMAL_MYOMER_ARM_TRIPLE", AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE);
+            InjuryType.register(176, "alt:DERMAL_MYOMER_LEG_ARMOR", AlternateInjuries.DERMAL_MYOMER_LEG_ARMOR);
+            InjuryType.register(177, "alt:DERMAL_MYOMER_LEG_CAMO", AlternateInjuries.DERMAL_MYOMER_LEG_CAMO);
+            InjuryType.register(178, "alt:DERMAL_MYOMER_LEG_TRIPLE", AlternateInjuries.DERMAL_MYOMER_LEG_TRIPLE);
+            InjuryType.register(179, "alt:VEHICULAR_DNI", AlternateInjuries.VEHICULAR_DNI);
+            InjuryType.register(180, "alt:BUFFERED_VDNI", AlternateInjuries.BUFFERED_VDNI);
+            InjuryType.register(181, "alt:BUFFERED_VDNI_TRIPLE_CORE", AlternateInjuries.BUFFERED_VDNI_TRIPLE_CORE);
+            InjuryType.register(182, "alt:PAIN_SHUNT", AlternateInjuries.PAIN_SHUNT);
+            InjuryType.register(183, "alt:PAIN_SHUNT_RECOVERY", AlternateInjuries.PAIN_SHUNT_RECOVERY);
+            InjuryType.register(184, "alt:POSTPARTUM_RECOVERY", AlternateInjuries.POSTPARTUM_RECOVERY);
+            InjuryType.register(185,
+                  "alt:TRANSIT_DISORIENTATION_SYNDROME",
+                  AlternateInjuries.TRANSIT_DISORIENTATION_SYNDROME);
+            InjuryType.register(186, "alt:CRIPPLING_FLASHBACKS", AlternateInjuries.CRIPPLING_FLASHBACKS);
+            InjuryType.register(187, "alt:CHILDLIKE_REGRESSION", AlternateInjuries.CHILDLIKE_REGRESSION);
+            InjuryType.register(188, "alt:CATATONIA", AlternateInjuries.CATATONIA);
 
             InjuryType.register("am:severed_spine", SEVERED_SPINE);
             InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);

@@ -1419,7 +1419,7 @@ public enum InjuryEffect {
           0,
           0,
           1),
-    DISCONTINUATION_SYNDROME("DISCONTINUATION_SYNDROME",
+    STRESS("STRESS",
           "",
           0,
           -1,
