@@ -1368,6 +1368,14 @@ public class Campaign implements ITechManager {
             return;
         }
 
+        if (id == FORCE_NONE) {
+            Force currentForce = getForce(unit.getForceId());
+            unit.setForceId(FORCE_NONE);
+            unit.setScenarioId(NO_ASSIGNED_SCENARIO);
+            MekHQ.triggerEvent(new OrganizationChangedEvent(this, currentForce, unit));
+            return;
+        }
+
         Force force = forceIds.get(id);
         Force prevForce = forceIds.get(unit.getForceId());
         boolean useTransfers = false;
