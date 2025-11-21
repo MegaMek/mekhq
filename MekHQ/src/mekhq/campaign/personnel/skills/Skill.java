@@ -811,10 +811,10 @@ public class Skill {
         SkillLevel skillLevel = getSkillLevel(skillModifierData);
         String skillLevelLabel = skillLevel.getShortName();
         if (baseSkillLevel != totalSkillLevel) {
-            display += String.format(" (<s><font color='gray'>%d</font></s> %d%s)",
+            display += String.format(" (<s><font color='gray'>%d</font></s> %d %s)",
                   baseSkillLevel, totalSkillLevel, skillLevelLabel);
         } else {
-            display += String.format(" (%d%s)", baseSkillLevel, skillLevelLabel);
+            display += String.format(" (%d %s)", baseSkillLevel, skillLevelLabel);
         }
 
         return display;

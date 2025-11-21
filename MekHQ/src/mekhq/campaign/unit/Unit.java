@@ -94,7 +94,6 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.*;
-import megamek.common.units.CrewType;
 import megamek.common.util.C3Util;
 import megamek.common.weapons.attacks.InfantryAttack;
 import megamek.common.weapons.bayWeapons.BayWeapon;
@@ -1223,7 +1222,7 @@ public class Unit implements ITechnology {
         if (!isFunctional()) {
             return "unit is not functional";
         }
-        if (isUnmanned() && !(isUnmannedTrailer())) {
+        if (isUnmanned() && isNotCrewedEntityType()) {
             return "unit has no pilot";
         }
         if (isRefitting()) {
@@ -5675,6 +5674,9 @@ public class Unit implements ITechnology {
         }
     }
 
+    /**
+     * @return true if the unit has no commander
+     */
     public boolean isUnmanned() {
         return (null == getCommander());
     }
@@ -5685,8 +5687,8 @@ public class Unit implements ITechnology {
      * @return true if this Unit is an unmanned trailer, false if it isn't a trailer or has a crew
      */
     public boolean isUnmannedTrailer() {
-        if (getEntity() instanceof Tank tank) {
-            return tank.isTrailer() && (tank.defaultCrewType().equals(CrewType.NONE));
+        if (isNotCrewedEntityType() && getEntity() instanceof Tank tank) {
+            return tank.isTrailer();
         }
 
         return false;
@@ -5694,6 +5696,14 @@ public class Unit implements ITechnology {
 
     public boolean isHandheldWeapon() {
         return entity instanceof HandheldWeapon;
+    }
+
+    /**
+     * @return true if the unit is always uncrewed, like a Handheld Weapon or unarmed, unpowered trailer. Should not
+     *       return true for remote drone OS. False if the entity is null.
+     */
+    public boolean isNotCrewedEntityType() {
+        return entity != null && entity.isNotCrewedEntityType();
     }
 
     public int getForceId() {
