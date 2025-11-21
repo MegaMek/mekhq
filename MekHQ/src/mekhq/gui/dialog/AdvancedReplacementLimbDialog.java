@@ -712,6 +712,9 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * @since 0.50.10
      */
     private void onGMConfirm(ActionEvent event) {
+        if (!campaign.isGM()) {
+            return;
+        }
         dispose();
 
         for (PlannedSurgery surgery : getPlannedSurgeries()) {
