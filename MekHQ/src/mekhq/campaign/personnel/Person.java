@@ -1305,7 +1305,7 @@ public class Person {
                 return false;
             }
 
-            if (role.isTech() && (secondaryRole.isTech() || secondaryRole.isAstech())) {
+            if ((role.isTech() || role.isAstech()) && (secondaryRole.isTechSecondary() || secondaryRole.isAstech())) {
                 return false;
             }
 
@@ -1336,7 +1336,7 @@ public class Person {
                 return false;
             }
 
-            if (role.isTech() && (primaryRole.isTech() || primaryRole.isAstech())) {
+            if ((role.isTechSecondary() || role.isAstech()) && (primaryRole.isTech() || primaryRole.isAstech())) {
                 return false;
             }
 
