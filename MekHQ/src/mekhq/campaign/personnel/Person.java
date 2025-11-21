@@ -7029,6 +7029,14 @@ public class Person {
         return injuries.stream().filter(Injury::isPermanent).collect(Collectors.toList());
     }
 
+    public List<Injury> getProstheticInjuries() {
+        return injuries.stream().filter(i -> i.getSubType().isProsthetic()).collect(Collectors.toList());
+    }
+
+    public List<Injury> getNonProstheticInjuries() {
+        return injuries.stream().filter(i -> !i.getSubType().isProsthetic()).collect(Collectors.toList());
+    }
+
     public void clearInjuries() {
         injuries.clear();
 
