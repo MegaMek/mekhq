@@ -69,7 +69,7 @@ public class RandomPortraitGenerator {
      *
      * <p>Portrait search order:</p>
      * <ol>
-     *     <li>{@code /<gender>/<primary role>} (e.g., {@code /Male/MechWarrior}, {@code /Female/Civilian})</li>
+     *     <li>{@code /<gender>/<primary role>} (e.g., {@code /Male/MekWarrior}, {@code /Female/Civilian})</li>
      *     <li>{@code /<gender>/<role group>} (e.g., {@code /Male/Tech}, {@code /Female/Officer})</li>
      *     <li>{@code /<gender>/Combat} or {@code /<gender>/Support}</li>
      *     <li>{@code /<gender>} (fallback: any portrait for the correct gender)</li>
