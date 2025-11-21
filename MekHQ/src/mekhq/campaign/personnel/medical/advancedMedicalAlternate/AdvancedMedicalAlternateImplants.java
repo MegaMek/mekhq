@@ -368,7 +368,7 @@ public class AdvancedMedicalAlternateImplants {
         PersonnelOptions options = person.getOptions();
         int requiredLimbCount = 4;
         options.getOption(MD_DERMAL_ARMOR).setValue(dermalArmorCount >= requiredLimbCount);
-        options.getOption(MD_DERMAL_CAMO_ARMOR).setValue(dermalArmorCount >= requiredLimbCount);
+        options.getOption(MD_DERMAL_CAMO_ARMOR).setValue(dermalCamoCount >= requiredLimbCount);
     }
 
     /**
