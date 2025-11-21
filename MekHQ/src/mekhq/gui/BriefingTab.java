@@ -582,7 +582,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        // Undeploy forces
+        // Undeploy forces & units
         boolean isCadreDuty = mission instanceof AtBContract && ((AtBContract) mission).getContractType().isCadreDuty();
         boolean hadCadreForces = false;
         for (Force force : getCampaign().getAllForces()) {
@@ -593,7 +593,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
             int scenarioAssignment = force.getScenarioId();
             if (scenarioAssignment != NO_ASSIGNED_SCENARIO) {
-                Scenario scenario = getCampaign().getScenario(force.getScenarioId());
+                Scenario scenario = getCampaign().getScenario(scenarioAssignment);
 
                 // This shouldn't be necessary, but now is as good a time as any to check for null scenarios
                 if (scenario == null || scenario.getMissionId() == mission.getId()) {
@@ -605,6 +605,18 @@ public final class BriefingTab extends CampaignGuiTab {
         if (hadCadreForces) {
             new ImmersiveDialogNotification(getCampaign(), resourceMap.getString("cadreReassignment.text"),
                   true);
+        }
+
+        for (Unit unit : getCampaign().getUnits()) {
+            int scenarioAssignment = unit.getScenarioId();
+            if (scenarioAssignment != NO_ASSIGNED_SCENARIO) {
+                Scenario scenario = getCampaign().getScenario(scenarioAssignment);
+
+                // This shouldn't be necessary, but now is as good a time as any to check for null scenarios
+                if (scenario == null || scenario.getMissionId() == mission.getId()) {
+                    unit.setScenarioId(NO_ASSIGNED_SCENARIO);
+                }
+            }
         }
 
         // Resolve any outstanding scenarios
@@ -619,6 +631,12 @@ public final class BriefingTab extends CampaignGuiTab {
                     getCampaign().changeCrimePirateModifier(10);
                 }
             }
+        }
+
+        // Clear out any old StratCon campaign data (it's not going to be used, moving forward). We do this near the
+        // end to ensure there isn't any risk of us accidentally killing the data when it's still required.
+        if (mission instanceof AtBContract contract) {
+            contract.setStratConCampaignState(null);
         }
 
         final List<Mission> missions = getCampaign().getSortedMissions();

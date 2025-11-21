@@ -1210,30 +1210,56 @@ public class Person {
     }
 
     /**
-     * Returns an HTML-formatted string describing the primary and, if applicable, secondary personnel roles. Civilian
-     * roles are displayed in italics. If a secondary role is present and is not {@code NONE}, it is appended to the
-     * description, separated by a slash. The description is wrapped in HTML tags.
+     * Builds a formatted description string of this person's primary and secondary roles as they should appear in UI
+     * lists and reports.
      *
-     * @return an HTML-formatted string describing the personnel roles, with civilian roles shown in italics
+     * <p>The returned description may include several special-case behaviors:</p>
+     * <ul>
+     *     <li>If the person is not employed, a black dot prefix ({@code \u25CF}) is added.</li>
+     *     <li>The primary role description is determined first. If the primary role is a civilian subtype:
+     *     <ul>
+     *         <li>If the role is {@code NONE}, the description is emphasized by being converted to uppercase
+     *         (error-state indicator).</li>
+     *         <li>If the person is a dependent:
+     *         <ul>
+     *             <li>If their status marks them as a student, the status label is used.</li>
+     *             <li>If they qualify as a child as of the supplied date, the localized "child" label is used.</li>
+     *             <li>Otherwise, the normal civilian description is used.</li>
+     *         </ul>
+     *         </li>
+     *         <li>All other civilian primary roles use their normal description.</li>
+     *     </ul>
+     *     </li>
+     *     <li>If a secondary role exists (i.e., is not {@code NONE}), it is appended to the result after {@code "/"}.
+     *     Secondary roles do not require special handling for civilian subtypes.</li>
+     * </ul>
+     *
+     * @param today the current in-campaign date, used to determine whether the person qualifies as a child for
+     *              dependent-role labeling
+     *
+     * @return a formatted role description string combining primary and (if present) secondary roles, with all
+     *       applicable special-case rules applied
      *
      * @author Illiani
      * @since 0.50.06
      */
     public String getFormatedRoleDescriptions(LocalDate today) {
-        StringBuilder description = new StringBuilder("<html>");
+        StringBuilder description = new StringBuilder();
 
+        // Add dot prefix if unemployed
         if (!isEmployed()) {
             description.append("\u25CF ");
         }
 
+        // Handle primary role
         String primaryDesc = getPrimaryRoleDesc();
-
         if (primaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
             if (primaryRole.isNone()) {
-                // Error state: emphasize the issue
-                description.append("<b><i><u>").append(primaryDesc.toUpperCase()).append("</u></i></b>");
+                // Error state: emphasize
+                description.append(primaryDesc.toUpperCase());
             } else if (primaryRole.isDependent()) {
                 String label;
+
                 if (status.isStudent()) {
                     label = status.getLabel();
                 } else if (isChild(today)) {
@@ -1241,25 +1267,21 @@ public class Person {
                 } else {
                     label = primaryDesc;
                 }
-                description.append("<i>").append(label).append("</i>");
+
+                description.append(label);
             } else {
-                description.append("<i>").append(primaryDesc).append("</i>");
+                description.append(primaryDesc);
             }
         } else {
             description.append(primaryDesc);
         }
 
+        // Handle secondary role
         if (!secondaryRole.isNone()) {
             description.append(" / ");
-            String secondaryDesc = getSecondaryRoleDesc();
-            if (secondaryRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
-                description.append("<i>").append(secondaryDesc).append("</i>");
-            } else {
-                description.append(secondaryDesc);
-            }
+            description.append(getSecondaryRoleDesc());
         }
 
-        description.append("</html>");
         return description.toString();
     }
 
@@ -1307,7 +1329,7 @@ public class Person {
                 return false;
             }
 
-            if (role.isTech() && (secondaryRole.isTech() || secondaryRole.isAstech())) {
+            if ((role.isTech() || role.isAstech()) && (secondaryRole.isTechSecondary() || secondaryRole.isAstech())) {
                 return false;
             }
 
@@ -1338,7 +1360,7 @@ public class Person {
                 return false;
             }
 
-            if (role.isTech() && (primaryRole.isTech() || primaryRole.isAstech())) {
+            if ((role.isTechSecondary() || role.isAstech()) && (primaryRole.isTech() || primaryRole.isAstech())) {
                 return false;
             }
 
@@ -7018,6 +7040,14 @@ public class Person {
 
     public List<Injury> getPermanentInjuries() {
         return injuries.stream().filter(Injury::isPermanent).collect(Collectors.toList());
+    }
+
+    public List<Injury> getProstheticInjuries() {
+        return injuries.stream().filter(i -> i.getSubType().isProsthetic()).collect(Collectors.toList());
+    }
+
+    public List<Injury> getNonProstheticInjuries() {
+        return injuries.stream().filter(i -> !i.getSubType().isProsthetic()).collect(Collectors.toList());
     }
 
     public void clearInjuries() {
