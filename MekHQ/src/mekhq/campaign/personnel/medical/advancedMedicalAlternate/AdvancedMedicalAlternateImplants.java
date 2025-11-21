@@ -356,11 +356,11 @@ public class AdvancedMedicalAlternateImplants {
         int dermalCamoCount = 0;
         for (Injury injury : injuries) {
             InjuryType injuryType = injury.getType();
-            if (injuryType == DERMAL_MYOMER_ARM_ARMOR || injuries == DERMAL_MYOMER_LEG_ARMOR) {
+            if (injuryType == DERMAL_MYOMER_ARM_ARMOR || injuryType == DERMAL_MYOMER_LEG_ARMOR) {
                 dermalArmorCount++;
             }
 
-            if (injuryType == DERMAL_MYOMER_ARM_CAMO || injuries == DERMAL_MYOMER_LEG_CAMO) {
+            if (injuryType == DERMAL_MYOMER_ARM_CAMO || injuryType == DERMAL_MYOMER_LEG_CAMO) {
                 dermalCamoCount++;
             }
         }
