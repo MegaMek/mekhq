@@ -581,6 +581,7 @@ public class CampaignOptions {
     private final boolean[] usePortraitForRole;
     private boolean assignPortraitOnRoleChange;
     private boolean allowDuplicatePortraits;
+    private boolean useGenderedPortraitsOnly;
     // endregion Name and Portrait Generation
 
     // region Markets Tab
@@ -1234,6 +1235,7 @@ public class CampaignOptions {
         usePortraitForRole[PersonnelRole.MEKWARRIOR.ordinal()] = true;
         assignPortraitOnRoleChange = false;
         allowDuplicatePortraits = true;
+        useGenderedPortraitsOnly = false;
         // endregion Name and Portrait Generation Tab
 
         // region Markets Tab
@@ -4354,6 +4356,14 @@ public class CampaignOptions {
 
     public void setAllowDuplicatePortraits(final boolean allowDuplicatePortraits) {
         this.allowDuplicatePortraits = allowDuplicatePortraits;
+    }
+
+    public boolean isUseGenderedPortraitsOnly() {
+        return useGenderedPortraitsOnly;
+    }
+
+    public void setUseGenderedPortraitsOnly(final boolean useGenderedPortraitsOnly) {
+        this.useGenderedPortraitsOnly = useGenderedPortraitsOnly;
     }
 
     public int getVocationalXP() {
