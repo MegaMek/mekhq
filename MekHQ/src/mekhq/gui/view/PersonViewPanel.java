@@ -302,9 +302,9 @@ public class PersonViewPanel extends JScrollablePanel {
         add(pnlOther, gridBagConstraints);
         gridY++;
 
-        List<Injury> injuries = person.getInjuries();
-        if (campaignOptions.isUseAdvancedMedical() && !injuries.isEmpty()) {
-            JPanel pnlInjuries = fillInjuries(injuries);
+        List<Injury> injuries = person.getNonProstheticInjuries();
+        if (!injuries.isEmpty()) {
+            JPanel pnlInjuries = fillInjuries(injuries, false);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -313,6 +313,20 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlInjuries, gridBagConstraints);
+            gridY++;
+        }
+
+        List<Injury> prosthetics = person.getProstheticInjuries();
+        if (!prosthetics.isEmpty()) {
+            JPanel pnlProsthetics = fillInjuries(prosthetics, true);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlProsthetics, gridBagConstraints);
             gridY++;
         }
 
@@ -2640,11 +2654,17 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlScenariosLog;
     }
 
-    private JPanel fillInjuries(List<Injury> injuries) {
-        final String WARNING_ICON = "\u26A0";
-
+    private JPanel fillInjuries(List<Injury> injuries, boolean isProstheticReport) {
         JPanel pnlInjuries = new JPanel(new BorderLayout());
-        pnlInjuries.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlInjuries.title")));
+
+        String title;
+        if (isProstheticReport) {
+            title = resourceMap.getString("pnlProsthetics.title");
+        } else {
+            title = resourceMap.getString("pnlInjuries.title");
+        }
+
+        pnlInjuries.setBorder(RoundedLineBorder.createRoundedLineBorder(title));
 
         JPanel pnlInjuryDetails = new JPanel(new GridBagLayout());
         pnlInjuryDetails.getAccessibleContext().setAccessibleName("Injury Details for " + person.getFullName());
@@ -2702,12 +2722,7 @@ public class PersonViewPanel extends JScrollablePanel {
             int col = i / rowsPerColumn;
             int displayRow = (i % rowsPerColumn) + 1; // Start rows at 1 as we have a header
 
-            String durationValue = injury.isPermanent() ? WARNING_ICON : String.valueOf(injury.getTime());
-            String durationColor = injury.isPermanent() ? getNegativeColor() : getWarningColor();
-            String durationText = messageSurroundedBySpanWithColor(durationColor, durationValue);
-            String label = String.format(resourceMap.getString("format.injuryLabel"), injury.getName(), durationText);
-
-            lblInjury = new JLabel(label);
+            lblInjury = new JLabel(getInjuryLabel(injury));
             gridBagConstraints.gridx = col;
             gridBagConstraints.gridy = displayRow;
             gridBagConstraints.weightx = 1.0;
@@ -2721,6 +2736,40 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlInjuries.add(pnlInjuryDetails, BorderLayout.CENTER);
 
         return pnlInjuries;
+    }
+
+    /**
+     * Builds a formatted label for the given injury, including its name and a visual indication of duration or
+     * permanence.
+     *
+     * <p>Permanent injuries are rendered with a warning symbol (⚠) and use the negative color, while non-permanent
+     * injuries display their remaining time and use the warning color. Prosthetic injuries use a specialized format
+     * that omits duration.</p>
+     *
+     * @param injury the injury to describe
+     *
+     * @return a localized, HTML-formatted label string for the injury
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private String getInjuryLabel(Injury injury) {
+        String durationValue = injury.isPermanent() ? "\u26A0" : String.valueOf(injury.getTime());
+        String durationColor = injury.isPermanent() ? getNegativeColor() : getWarningColor();
+        String durationText = messageSurroundedBySpanWithColor(durationColor, durationValue);
+
+        String label;
+        if (injury.getSubType().isProsthetic()) {
+            label = String.format(resourceMap.getString("format.injuryLabel.prosthetic"), injury.getName());
+        } else if (injury.isPermanent()) {
+            label = String.format(resourceMap.getString("format.injuryLabel.permanent"), injury.getName(),
+                  durationText);
+        } else {
+            label = String.format(resourceMap.getString("format.injuryLabel.injury"), injury.getName(),
+                  durationText);
+        }
+
+        return label;
     }
 
     private void getAlternativeAdvancedMedicalDisplay(List<Injury> injuries, JLabel lblAdvancedMedical2,
