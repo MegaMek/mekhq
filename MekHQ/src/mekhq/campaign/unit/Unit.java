@@ -5674,6 +5674,9 @@ public class Unit implements ITechnology {
         }
     }
 
+    /**
+     * @return true if the unit has no commander
+     */
     public boolean isUnmanned() {
         return (null == getCommander());
     }
