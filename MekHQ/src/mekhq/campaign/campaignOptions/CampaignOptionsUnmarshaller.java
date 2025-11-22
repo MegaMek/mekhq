@@ -101,7 +101,7 @@ public class CampaignOptionsUnmarshaller {
         //  < 50.10 compatibility handler
         if (wasUsingAtB && !campaignOptions.isUseStratCon()) {
             // Mapless StratCon replaced AtB in 50.10
-            campaignOptions.setUseStratConMaplessMode(true);
+            campaignOptions.setStratConPlayType(StratConPlayType.MAPLESS);
         }
 
         LOGGER.debug("Load Campaign Options Complete!");

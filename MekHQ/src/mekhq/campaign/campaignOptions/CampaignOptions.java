@@ -626,7 +626,6 @@ public class CampaignOptions {
 
     // region Against the Bot Tab
     private StratConPlayType stratConPlayType;
-    private boolean useMaplessStratCon;
     private boolean useAdvancedScouting;
     private boolean noSeedForces;
     private SkillLevel skillLevel;
@@ -1284,7 +1283,6 @@ public class CampaignOptions {
 
         // region Against the Bot Tab
         stratConPlayType = StratConPlayType.DISABLED;
-        useMaplessStratCon = false;
         useAdvancedScouting = false;
         noSeedForces = false;
         setSkillLevel(SkillLevel.REGULAR);
@@ -4864,11 +4862,11 @@ public class CampaignOptions {
     }
 
     public boolean isUseStratConMaplessMode() {
-        return useMaplessStratCon;
+        return getStratConPlayType() == StratConPlayType.MAPLESS;
     }
 
-    public void setUseStratConMaplessMode(boolean useMaplessStratCon) {
-        this.useMaplessStratCon = useMaplessStratCon;
+    public boolean isUseStratConSinglesMode() {
+        return getStratConPlayType() == StratConPlayType.SINGLES;
     }
 
     public boolean isUseAdvancedScouting() {
