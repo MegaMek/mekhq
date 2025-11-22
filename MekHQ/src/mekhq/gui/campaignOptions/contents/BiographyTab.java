@@ -430,7 +430,7 @@ public class BiographyTab {
         // Header
         generalHeader = new CampaignOptionsHeaderPanel("BiographyGeneralTab",
               getImageDirectory() + "logo_clan_blood_spirit.png",
-              8);
+              6);
 
         // Contents
         chkUseDylansRandomXP = new CampaignOptionsCheckBox("UseDylansRandomXP");
@@ -632,7 +632,7 @@ public class BiographyTab {
         // Header
         backgroundHeader = new CampaignOptionsHeaderPanel("BackgroundsTab",
               getImageDirectory() + "logo_nueva_castile.png",
-              5);
+              3);
 
         // Contents
         pnlRandomOriginOptions = createRandomOriginOptionsPanel();
@@ -1041,7 +1041,7 @@ public class BiographyTab {
         // Header
         educationHeader = new CampaignOptionsHeaderPanel("EducationTab",
               getImageDirectory() + "logo_taurian_concordat.png",
-              4);
+              3);
 
         // Contents
         chkUseEducationModule = new CampaignOptionsCheckBox("UseEducationModule");

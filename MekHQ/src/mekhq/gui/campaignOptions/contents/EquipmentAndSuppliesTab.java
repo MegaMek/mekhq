@@ -344,7 +344,7 @@ public class EquipmentAndSuppliesTab {
         // Header
         acquisitionHeader = new CampaignOptionsHeaderPanel("AcquisitionTab",
               getImageDirectory() + "logo_clan_cloud_cobra.png",
-              4);
+              3);
 
         pnlAcquisitions = createAcquisitionPanel();
         pnlAutoLogistics = createAutoLogisticsPanel();
@@ -591,7 +591,7 @@ public class EquipmentAndSuppliesTab {
         // Header
         planetaryAcquisitionHeader = new CampaignOptionsHeaderPanel("PlanetaryAcquisitionTab",
               getImageDirectory() + "logo_rim_worlds_republic.png",
-              14);
+              12);
 
         // Sub-Panels
         JPanel options = createOptionsPanel();
@@ -1011,7 +1011,7 @@ public class EquipmentAndSuppliesTab {
         //start Tech Limits Tab
         CampaignOptionsHeaderPanel techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsTab",
               getImageDirectory() + "logo_clan_ghost_bear.png",
-              3);
+              2);
 
         limitByYearBox = new CampaignOptionsCheckBox("LimitByYearBox");
         limitByYearBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "LimitByYearBox"));

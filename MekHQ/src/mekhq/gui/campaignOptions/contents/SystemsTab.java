@@ -134,7 +134,7 @@ public class SystemsTab {
         // Header
         reputationHeader = new CampaignOptionsHeaderPanel("ReputationTab",
               getImageDirectory() + "logo_morgrains_valkyrate.png",
-              10);
+              8);
 
         // Contents
         JPanel pnlReputationGeneralOptions = createReputationGeneralPanel();
@@ -252,7 +252,7 @@ public class SystemsTab {
         // Header
         factionStandingHeader = new CampaignOptionsHeaderPanel("FactionStandingTab",
               getImageDirectory() + "logo_morgrains_valkyrate.png",
-              4);
+              3);
 
         // Contents
         chkTrackFactionStanding = new CampaignOptionsCheckBox("TrackFactionStanding");
@@ -400,7 +400,7 @@ public class SystemsTab {
         // Header
         atowHeader = new CampaignOptionsHeaderPanel("ATimeOfWarTab",
               getImageDirectory() + "logo_elysian_fields.png",
-              9);
+              8);
 
         // Contents
         JPanel pnlATOWAttributes = createATOWAttributesPanel();
