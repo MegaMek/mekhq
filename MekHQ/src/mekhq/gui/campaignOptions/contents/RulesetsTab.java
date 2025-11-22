@@ -716,7 +716,6 @@ public class RulesetsTab {
                       list, value, index, isSelected, cellHasFocus);
 
                 if (value instanceof StratConPlayType type) {
-                    // Whatever you want your tooltip to be
                     label.setToolTipText(type.getTooltip());
                 }
 

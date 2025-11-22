@@ -3567,6 +3567,7 @@ public class StratConRulesManager {
 
             if (campaignState != null) {
                 List<StratConTrackState> tracks = campaignState.getTracks();
+                boolean hasAssignedSingleDropScenario = false;
                 for (StratConTrackState track : tracks) {
                     cleanupPhantomScenarios(track);
 
@@ -3591,13 +3592,13 @@ public class StratConRulesManager {
                     }
 
                     // on monday, generate new scenario dates
-                    if (isMonday) {
+                    if (isMonday && !hasAssignedSingleDropScenario) {
                         generateScenariosDatesForWeek(campaign, campaignState, contract, track, isUseStratConSingles);
                     }
 
                     // Only one scenario/week for Single Drop
                     if (isUseStratConSingles) {
-                        break;
+                        hasAssignedSingleDropScenario = true;
                     }
                 }
 

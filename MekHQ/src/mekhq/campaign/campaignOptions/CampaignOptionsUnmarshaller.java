@@ -848,7 +848,11 @@ public class CampaignOptionsUnmarshaller {
                   campaignOptions.setStratConPlayType(StratConPlayType.fromLookupName(nodeContents));
             case "useStratCon" -> { // < 50.10 compatibility handler
                 if (parseBoolean(nodeContents)) {
-                    campaignOptions.setStratConPlayType(StratConPlayType.NORMAL);
+                    // We want to be able to overwrite this with 'useMaplessStratCon' if that clause is hit before
+                    // this one.
+                    if (campaignOptions.getStratConPlayType() == StratConPlayType.DISABLED) {
+                        campaignOptions.setStratConPlayType(StratConPlayType.NORMAL);
+                    }
                 }
             }
             case "useMaplessStratCon" -> { // < 50.10 compatibility handler

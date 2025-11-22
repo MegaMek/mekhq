@@ -43,12 +43,15 @@ import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
- * {@link StratConSinglesReinforcementsDialog} displays a confirmation dialog for the player to deploy reinforcements to
- * StratCon scenarios. It allows the player to select the number of Support Points to spend and handles the calculation
- * of target number difficulties and summary breakdowns.
+ * Displays a confirmation dialog for deploying reinforcements in StratCon Single Drop scenarios.
+ *
+ * <p>This dialog presents the commander’s message, offers Cancel and Confirm options, and returns a
+ * {@link StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType} based on the player’s choice. It is
+ * used when the GM needs to instantly approve reinforcements during a Single Drop scenario, where all reinforcements
+ * are free and automatic.</p>
  *
  * @author Illiani
- * @since 0.50.07
+ * @since 0.50.10
  */
 public class StratConSinglesReinforcementsDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.StratConSinglesReinforcementsDialog";
@@ -56,12 +59,19 @@ public class StratConSinglesReinforcementsDialog {
     private final StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType reinforcementDialogResponseType;
 
     /**
-     * Gets the response type selected by the user.
+     * Returns the response selected by the user.
      *
-     * @return the {@link StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType} chosen
+     * <p>The response corresponds directly to the button clicked in the dialog:</p>
+     * <ul>
+     *   <li>{@code CANCEL} – user chose to abort</li>
+     *   <li>{@code REINFORCE_GM_INSTANTLY} – user confirmed deployment</li>
+     * </ul>
+     * </p>
+     *
+     * @return the chosen {@link StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType}
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.10
      */
     public StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType getResponseType() {
         return reinforcementDialogResponseType;
