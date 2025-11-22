@@ -275,7 +275,7 @@ public class TurnoverAndRetentionTab {
         //start Fatigue Tab
         CampaignOptionsHeaderPanel fatigueHeader = new CampaignOptionsHeaderPanel("FatigueTab",
               getImageDirectory() + "logo_clan_mongoose.png",
-              true, true, 7);
+              true, true, 5);
 
         // Contents
         chkUseFatigue = new CampaignOptionsCheckBox("UseFatigue");

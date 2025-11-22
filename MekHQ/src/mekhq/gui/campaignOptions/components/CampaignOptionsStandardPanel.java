@@ -32,13 +32,14 @@
  */
 package mekhq.gui.campaignOptions.components;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Dimension;
 import javax.swing.JPanel;
 
-import megamek.client.ui.util.UIUtil;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
@@ -49,7 +50,6 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * parameter.
  */
 public class CampaignOptionsStandardPanel extends JPanel {
-
     /**
      * Constructs a {@link CampaignOptionsStandardPanel} without a border.
      * <p>
@@ -98,7 +98,13 @@ public class CampaignOptionsStandardPanel extends JPanel {
             @Override
             public Dimension getPreferredSize() {
                 Dimension standardSize = super.getPreferredSize();
-                return UIUtil.scaleForGUI(Math.max(standardSize.width, 500), standardSize.height);
+                return scaleForGUI(Math.max(standardSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), standardSize.height);
+            }
+
+            @Override
+            public Dimension getMinimumSize() {
+                Dimension standardSize = super.getPreferredSize();
+                return scaleForGUI(Math.max(standardSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), standardSize.height);
             }
         };
 

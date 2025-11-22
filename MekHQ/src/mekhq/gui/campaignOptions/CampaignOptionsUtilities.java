@@ -33,9 +33,9 @@
 package mekhq.gui.campaignOptions;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel.getTipPanelName;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -86,6 +86,7 @@ public class CampaignOptionsUtilities {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsDialog";
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
+    public final static int CAMPAIGN_OPTIONS_PANEL_WIDTH = scaleForGUI(950);
 
     public static String getCampaignOptionsResourceBundle() {
         return RESOURCE_BUNDLE;
@@ -300,14 +301,14 @@ public class CampaignOptionsUtilities {
                     tipText = getTextAt(RESOURCE_BUNDLE, "lbl" + sourceComponentBaseName + ".tooltip");
                 }
 
-                if (tipText.isBlank() || !isResourceKeyValid(tipText)) {
+                if (tipText.isBlank()) {
                     return;
                 }
 
                 // This might seem really weird, and it is, but the wordWrap method uses '<br>' to create its new
                 // lines. This allows us to more easily account for line width when counting instances of '<br>' in
                 // the section below.
-                tipText = wordWrap(tipText, 75);
+                tipText = wordWrap(tipText, 120);
 
                 // We have to remove the opening tag so that the extra '<br>' we're adding can be factored into the
                 // display
