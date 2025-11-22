@@ -36,6 +36,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -78,13 +79,7 @@ public class SkillAttributeTest {
     public void testGetLabel_notInvalid() {
         for (SkillAttribute attribute : SkillAttribute.values()) {
             String label = attribute.getLabel();
-
-            String results = "";
-            if (!isResourceKeyValid(label)) {
-                results = "Found Error in: " + label;
-            }
-
-            assertEquals("", results);
+            assertTrue(isResourceKeyValid(label), attribute.name() + " is missing a label.");
         }
     }
 
@@ -92,13 +87,7 @@ public class SkillAttributeTest {
     public void testGetShortName_notInvalid() {
         for (SkillAttribute attribute : SkillAttribute.values()) {
             String label = attribute.getShortName();
-
-            String results = "";
-            if (!isResourceKeyValid(label)) {
-                results = "Found Error in: " + label;
-            }
-
-            assertEquals("", results);
+            assertTrue(isResourceKeyValid(label), attribute.name() + " is missing a short name.");
         }
     }
 
@@ -106,13 +95,7 @@ public class SkillAttributeTest {
     public void testGetDescription_notInvalid() {
         for (SkillAttribute attribute : SkillAttribute.values()) {
             String label = attribute.getDescription();
-
-            String results = "";
-            if (!isResourceKeyValid(label)) {
-                results = "Found Error in: " + label;
-            }
-
-            assertEquals("", results);
+            assertTrue(isResourceKeyValid(label), attribute.name() + " is missing a description.");
         }
     }
 }

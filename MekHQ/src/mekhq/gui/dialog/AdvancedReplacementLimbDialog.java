@@ -44,10 +44,12 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.Alternat
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.EI_IMPLANT_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.ELECTIVE_IMPLANT_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.FAILED_SURGERY_RECOVERY;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.PAIN_SHUNT_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.REPLACEMENT_LIMB_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.REPLACEMENT_ORGAN_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.COSMETIC_SURGERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.ENHANCED_IMAGING;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.PAIN_SHUNT;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
@@ -124,7 +126,6 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * controls the ordering in the GUI.
      */
     private static final List<BodyLocation> VALID_BODY_LOCATIONS = List.of(
-          HEAD,
           BRAIN,
           FACE,
           MOUTH,
@@ -760,21 +761,15 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     }
 
     /**
-     * Determines whether accumulated injury hits after surgery result in the patient's death (medical complications)
+     * Determines whether accumulated injury hits after surgery results in the patient's death (medical complications)
      * and updates their status accordingly.
      *
      * @author Illiani
      * @since 0.50.10
      */
     private void checkForDeath() {
-        int deathThreshold = 5;
-        for (Injury injury : patient.getInjuries()) {
-            deathThreshold -= injury.getHits();
-        }
-
-        if (deathThreshold < 0) {
-            patient.changeStatus(campaign, campaign.getLocalDate(),
-                  PersonnelStatus.MEDICAL_COMPLICATIONS);
+        if (patient.getTotalInjurySeverity() > 5) {
+            patient.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
         }
     }
 
@@ -801,6 +796,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             } else {
                 return REPLACEMENT_LIMB_RECOVERY;
             }
+        } else if (type == PAIN_SHUNT) {
+            return PAIN_SHUNT_RECOVERY;
         } else if (type == ENHANCED_IMAGING) {
             return EI_IMPLANT_RECOVERY;
         } else {

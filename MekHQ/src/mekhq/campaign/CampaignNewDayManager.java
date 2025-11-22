@@ -605,6 +605,8 @@ public class CampaignNewDayManager {
 
             person.checkForIlliterateRemoval();
 
+            AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+
             // Weekly events
             if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
                 if (!campaign.getRandomDeath().processNewWeek(campaign, today, person)) {
@@ -1450,6 +1452,7 @@ public class CampaignNewDayManager {
                   null, modifier);
             person.processCripplingFlashbacks(campaign,
                   isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
                   true,
                   failedWillpowerCheck);
         }
@@ -1485,6 +1488,7 @@ public class CampaignNewDayManager {
                   null, modifier);
             String report = person.processChildlikeRegression(campaign,
                   isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
                   true,
                   failedWillpowerCheck);
             if (!report.isBlank()) {
@@ -1498,6 +1502,7 @@ public class CampaignNewDayManager {
                   null, modifier);
             String report = person.processCatatonia(campaign,
                   isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
                   true,
                   failedWillpowerCheck);
             if (!report.isBlank()) {

@@ -38,7 +38,6 @@ import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessColor;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObject;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessString;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginValue;
@@ -331,7 +330,7 @@ public class TrainingCombatTeams {
         }
 
         double successMultiplier = 1.0;
-        if (marginOfSuccess >= getMarginValue(BARELY_MADE_IT)) {
+        if (marginOfSuccess >= BARELY_MADE_IT.getValue()) {
             successMultiplier += (marginOfSuccess * 0.25);
         } else {
             successMultiplier -= (abs(marginOfSuccess) * 0.25);
@@ -396,8 +395,8 @@ public class TrainingCombatTeams {
         MarginOfSuccess marginOfSuccess = getMarginOfSuccessObject(raw);
 
         String report = String.format(resources.getString("learnedProgress.text"),
-              educator.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(getMarginOfSuccessColor(marginOfSuccess)),
-              getMarginOfSuccessString(marginOfSuccess), CLOSING_SPAN_TAG);
+              educator.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(marginOfSuccess.getColor()),
+              marginOfSuccess.getLabel(), CLOSING_SPAN_TAG);
         campaign.addReport(report);
 
         return raw;

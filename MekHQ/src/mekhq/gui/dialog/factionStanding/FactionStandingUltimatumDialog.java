@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.factionStanding;
 
+import static mekhq.MHQConstants.CONFIRMATION_FACTION_STANDINGS_ULTIMATUM;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getInCharacterText;
@@ -42,6 +43,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.util.List;
 
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -119,8 +121,9 @@ public class FactionStandingUltimatumDialog {
               campaignName, commanderAddress);
 
         // Ultimatum decision dialog loop
-        ImmersiveDialogSimple ultimatumDialog;
-        do {
+        boolean overallConfirmed = false;
+        ImmersiveDialogSimple ultimatumDialog = null;
+        while (!overallConfirmed) {
             List<String> buttons = List.of(
                   getFormattedTextAt(RESOURCE_BUNDLE,
                         "FactionStandingUltimatumDialog.support",
@@ -138,7 +141,14 @@ public class FactionStandingUltimatumDialog {
                   getTextAt(RESOURCE_BUNDLE, "FactionStandingUltimatumDialog.ultimatum"),
                   buttons, null, null, true, ImmersiveDialogWidth.SMALL
             );
-        } while (!new ImmersiveDialogConfirmation(campaign).wasConfirmed());
+
+            if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_FACTION_STANDINGS_ULTIMATUM)) {
+                overallConfirmed = new ImmersiveDialogConfirmation(campaign,
+                      CONFIRMATION_FACTION_STANDINGS_ULTIMATUM).wasConfirmed();
+            } else {
+                overallConfirmed = true;
+            }
+        }
 
         int dialogChoice = ultimatumDialog.getDialogChoice();
         boolean mercenaryChoice = dialogChoice == CHOICE_INDEX_GO_MERCENARY;
@@ -245,7 +255,7 @@ public class FactionStandingUltimatumDialog {
         Faction oldFaction = campaign.getFaction();
         Faction newFaction = Factions.getInstance()
                                    .getFaction(isMercenary ? MERCENARY_FACTION_CODE : PIRATE_FACTION_CODE);
-        GoingRogue.processGoingRogue(campaign, newFaction, commander, secondInCommand,
+        processGoingRogue(campaign, newFaction, commander, secondInCommand,
               isViolentTransition, true, campaign.getCampaignOptions().isTrackFactionStanding());
 
         if (secondInCommand != null &&

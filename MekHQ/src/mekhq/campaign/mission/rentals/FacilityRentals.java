@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.rentals;
 
+import static mekhq.MHQConstants.CONFIRMATION_CONTRACT_RENTAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -121,17 +122,20 @@ public class FacilityRentals {
         boolean wasConfirmedOverall = false;
         ContractStartRentalDialog offerDialog;
         while (!wasConfirmedOverall) {
-            offerDialog = new ContractStartRentalDialog(campaign, contract, hospitalCost, kitchenCost, holdingCellCost);
-            wasRentConfirmed = offerDialog.wasConfirmed();
-            ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign);
-            wasConfirmedOverall = confirmation.wasConfirmed();
+            new ContractStartRentalDialog(campaign, contract, hospitalCost, kitchenCost, holdingCellCost);
+
+            if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_CONTRACT_RENTAL)) {
+                ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign,
+                      CONFIRMATION_CONTRACT_RENTAL);
+                wasConfirmedOverall = confirmation.wasConfirmed();
+            } else {
+                wasConfirmedOverall = true;
+            }
         }
 
-        if (wasRentConfirmed) {
-            contract.setHospitalBedsRented(ContractStartRentalDialog.getHospitalSpinnerValue());
-            contract.setKitchensRented(ContractStartRentalDialog.getKitchensSpinnerValue());
-            contract.setHoldingCellsRented(ContractStartRentalDialog.getSecuritySpinnerValue());
-        }
+        contract.setHospitalBedsRented(ContractStartRentalDialog.getHospitalSpinnerValue());
+        contract.setKitchensRented(ContractStartRentalDialog.getKitchensSpinnerValue());
+        contract.setHoldingCellsRented(ContractStartRentalDialog.getSecuritySpinnerValue());
     }
 
     /**
@@ -178,32 +182,18 @@ public class FacilityRentals {
     }
 
     /**
-     * Presents a dialog to the user for confirming bay rental costs, with immersive confirmation workflow.
-     *
-     * <p>This method displays a {@link BayRentalDialog} showing the rental cost and repeatedly prompts
-     * the user through an {@link ImmersiveDialogConfirmation} workflow until the overall confirmation process is
-     * complete. The user may need to confirm multiple times depending on the immersive dialog's requirements.</p>
-     *
-     * <p><b>Note:</b> The method loops until the immersive confirmation workflow is satisfied,
-     * which may involve multiple user interactions.</p>
+     * Presents a dialog to the user for confirming bay rental costs.
      *
      * @param campaign   the {@link Campaign} context for the rental operation
      * @param rentalCost the {@link Money} amount representing the bay rental cost to display
      *
-     * @return {@code true} if the user confirmed the bay rental in the final dialog; {@code false} if declined
+     * @return {@code true} if the user confirmed the bay rental; {@code false} if declined
      *
      * @author Illiani
      * @since 0.50.10
      */
     private static boolean presentBayRentDialog(Campaign campaign, Money rentalCost) {
-        boolean wasConfirmedOverall = false;
-        BayRentalDialog offerDialog = null;
-        while (!wasConfirmedOverall) {
-            offerDialog = new BayRentalDialog(campaign, rentalCost);
-            ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign);
-            wasConfirmedOverall = confirmation.wasConfirmed();
-        }
-
+        BayRentalDialog offerDialog = new BayRentalDialog(campaign, rentalCost);
         return offerDialog.wasConfirmed();
     }
 

@@ -119,7 +119,7 @@ public class Appraisal {
      */
     public static String getAppraisalReport(double appraisalCostMultiplier) {
         MarginOfSuccess marginOfSuccess = getMarginOfSuccess(appraisalCostMultiplier);
-        String reportColor = MarginOfSuccess.getMarginOfSuccessColor(marginOfSuccess);
+        String reportColor = marginOfSuccess.getColor();
         String reportKey = "Appraisal.report." + marginOfSuccess.name();
 
         return getFormattedTextAt(RESOURCE_BUNDLE,
