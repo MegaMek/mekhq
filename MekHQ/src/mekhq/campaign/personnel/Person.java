@@ -7600,7 +7600,7 @@ public class Person {
                 if (useAdvancedMedical) {
                     injury = InjuryTypes.DISCONTINUATION_SYNDROME.newInjury(campaign, this, INTERNAL, 1);
                 } else {
-                    injury = AlternateInjuries.DISCONTINUATION_SYNDROME.newInjury(campaign, this, GENERIC, 0);
+                    injury = AlternateInjuries.DISCONTINUATION_SYNDROME.newInjury(campaign, this, GENERIC, 1);
                 }
 
                 if (injury != null) {
@@ -7614,11 +7614,7 @@ public class Person {
                 changeFatigue(FATIGUE_INCREASE);
             }
 
-            int severity = 0;
-            for (Injury injury : injuries) {
-                severity += injury.getHits();
-            }
-
+            int severity = getTotalInjurySeverity();
             if ((severity > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
