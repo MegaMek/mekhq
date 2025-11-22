@@ -1043,6 +1043,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "isUseRiskySalvage",
               campaignOptions.isUseRiskySalvage());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "isEnableSalvageFlagByDefault",
+              campaignOptions.isEnableSalvageFlagByDefault());
         // endregion Contract Market
         // endregion Markets Tab
 

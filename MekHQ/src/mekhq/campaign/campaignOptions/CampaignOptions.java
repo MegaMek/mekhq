@@ -619,6 +619,7 @@ public class CampaignOptions {
     private boolean isUseTwoWayPay;
     private boolean isUseCamOpsSalvage;
     private boolean isUseRiskySalvage;
+    private boolean isEnableSalvageFlagByDefault;
     // endregion Markets Tab
 
     // region Against the Bot Tab
@@ -1273,6 +1274,7 @@ public class CampaignOptions {
         isUseTwoWayPay = true;
         isUseCamOpsSalvage = false;
         isUseRiskySalvage = false;
+        isEnableSalvageFlagByDefault = true;
         // endregion Markets Tab
 
         // region Against the Bot Tab
@@ -4041,6 +4043,14 @@ public class CampaignOptions {
 
     public void setUseRiskySalvage(final boolean isUseRiskySalvage) {
         this.isUseRiskySalvage = isUseRiskySalvage;
+    }
+
+    public boolean isEnableSalvageFlagByDefault() {
+        return isEnableSalvageFlagByDefault;
+    }
+
+    public void setEnableSalvageFlagByDefault(final boolean isEnableSalvageFlagByDefault) {
+        this.isEnableSalvageFlagByDefault = isEnableSalvageFlagByDefault;
     }
     // endregion Contract Market
     // endregion Markets Tab
