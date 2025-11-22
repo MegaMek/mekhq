@@ -40,7 +40,6 @@ import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
-import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
@@ -83,7 +82,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
@@ -1787,12 +1785,6 @@ public class CampaignNewDayManager {
                                              " requirements resulted in " +
                                              deficit +
                                              ((deficit == 1) ? " minor contract breach" : " minor contract breaches"));
-                }
-            }
-
-            if (Objects.equals(updatedLocation.getCurrentSystem(), contract.getSystem())) {
-                if (!campaign.getAutomatedMothballUnits().isEmpty()) {
-                    performAutomatedActivation(campaign);
                 }
             }
 

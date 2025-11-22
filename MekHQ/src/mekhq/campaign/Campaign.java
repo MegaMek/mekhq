@@ -45,6 +45,7 @@ import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.force.ForceType.STANDARD;
+import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
@@ -201,6 +202,7 @@ import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -1734,13 +1736,31 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Moves immediately to a {@link PlanetarySystem}.
+     * Relocates the campaign immediately to the specified {@link PlanetarySystem}, updating the current location and
+     * firing any associated events or automated behaviors.
      *
-     * @param s The {@link PlanetarySystem} the campaign has been moved to.
+     * <p>This method performs the following actions:</p>
+     * <ul>
+     *     <li>Updates the campaign's {@link CurrentLocation} to the given planetary system.</li>
+     *     <li>Triggers a {@link LocationChangedEvent} to notify listeners of the move.</li>
+     *     <li>If there are no units in automated mothball mode, performs automated activation.</li>
+     *     <li>If enabled by campaign options, checks for possible inoculation prompts related to the Random Diseases
+     *     and Alternative Advanced Medical systems.</li>
+     * </ul>
+     *
+     * @param planetarySystem the destination {@link PlanetarySystem} to move the campaign to
      */
-    public void moveToPlanetarySystem(PlanetarySystem s) {
-        setLocation(new CurrentLocation(s, 0.0));
+    public void moveToPlanetarySystem(PlanetarySystem planetarySystem) {
+        setLocation(new CurrentLocation(planetarySystem, 0.0));
         MekHQ.triggerEvent(new LocationChangedEvent(getLocation(), false));
+
+        if (getAutomatedMothballUnits().isEmpty()) {
+            performAutomatedActivation(this);
+        }
+
+        if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+            Inoculations.triggerInoculationPrompt(this, false);
+        }
     }
 
     public CurrentLocation getLocation() {
