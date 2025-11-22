@@ -567,6 +567,7 @@ public class CampaignNewDayManager {
         boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         boolean isUseAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
         boolean isUseFatigue = campaignOptions.isUseFatigue();
+        int fatigueRate = campaignOptions.getFatigueRate();
         boolean useBetterMonthlyIncome = campaignOptions.isUseBetterExtraIncome();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
@@ -623,7 +624,7 @@ public class CampaignNewDayManager {
                 }
 
                 processCompulsionsAndMadness(person, personnelOptions, isUseAdvancedMedical, isUseAltAdvancedMedical,
-                      isUseFatigue);
+                      isUseFatigue, fatigueRate);
             }
 
             // Monthly events
@@ -1416,12 +1417,13 @@ public class CampaignNewDayManager {
      * @param isUseAdvancedMedical    {@code true} if advanced medical rules are applied, {@code false} otherwise
      * @param isUseAltAdvancedMedical {@code true} if alt advanced medical rules are applied, {@code false} otherwise
      * @param isUseFatigue            {@code true} if fatigue rules are applied, {@code false} otherwise
+     * @param fatigueRate             the user-defined rate at which fatigue is gained
      *
      * @author Illiani
      * @since 0.50.07
      */
     private void processCompulsionsAndMadness(Person person, PersonnelOptions personnelOptions,
-          boolean isUseAdvancedMedical, boolean isUseAltAdvancedMedical, boolean isUseFatigue) {
+          boolean isUseAdvancedMedical, boolean isUseAltAdvancedMedical, boolean isUseFatigue, int fatigueRate) {
         String gamblingReport = person.gambleWealth();
         if (!gamblingReport.isBlank()) {
             campaign.addReport(gamblingReport);
@@ -1438,12 +1440,20 @@ public class CampaignNewDayManager {
             Money cost = Money.of(PersonnelOptions.PAINKILLER_COST * prostheticCount);
             if (!finances.debit(TransactionType.MEDICAL_EXPENSES, today, cost,
                   getFormattedTextAt(RESOURCE_BUNDLE, "painkillerAddiction.transaction", person.getFullTitle()))) {
-                checkForDiscontinuationSyndrome(person, isUseAdvancedMedical, isUseAltAdvancedMedical, isUseFatigue);
+                checkForDiscontinuationSyndrome(person,
+                      isUseAdvancedMedical,
+                      isUseAltAdvancedMedical,
+                      isUseFatigue,
+                      fatigueRate);
             }
         }
 
         if (personnelOptions.booleanOption(COMPULSION_ADDICTION)) {
-            checkForDiscontinuationSyndrome(person, isUseAdvancedMedical, isUseAltAdvancedMedical, isUseFatigue);
+            checkForDiscontinuationSyndrome(person,
+                  isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
+                  isUseFatigue,
+                  fatigueRate);
         }
 
         if (personnelOptions.booleanOption(MADNESS_FLASHBACKS)) {
@@ -1540,7 +1550,7 @@ public class CampaignNewDayManager {
     }
 
     private void checkForDiscontinuationSyndrome(Person person, boolean isUseAdvancedMedical,
-          boolean isUseAltAdvancedMedical, boolean isUseFatigue) {
+          boolean isUseAltAdvancedMedical, boolean isUseFatigue, int fatigueRate) {
         int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
         boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
               null, modifier);
@@ -1548,6 +1558,7 @@ public class CampaignNewDayManager {
               isUseAdvancedMedical,
               isUseAltAdvancedMedical,
               isUseFatigue,
+              fatigueRate,
               true,
               failedWillpowerCheck);
     }
