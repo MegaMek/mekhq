@@ -61,7 +61,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.universe.Planet;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -132,18 +131,12 @@ public class Inoculations {
         Money civilianInoculationCost = Money.of(INOCULATION_COST_PER_PERSON).multipliedBy(civilianPersonnel.size());
         Money totalInoculationCost = militaryInoculationCost.plus(civilianInoculationCost);
 
-        ImmersiveDialogSimple dialog = null;
-        boolean wasConfirmed = false;
-        while (!wasConfirmed) {
-            dialog = triggerDialog(campaign,
-                  planetName,
-                  militaryInoculationCost.toAmountString(),
-                  civilianInoculationCost.toAmountString(),
-                  totalInoculationCost.toAmountString(),
-                  isAdHoc);
-            ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign);
-            wasConfirmed = confirmation.wasConfirmed();
-        }
+        ImmersiveDialogSimple dialog = triggerDialog(campaign,
+              planetName,
+              militaryInoculationCost.toAmountString(),
+              civilianInoculationCost.toAmountString(),
+              totalInoculationCost.toAmountString(),
+              isAdHoc);
 
         int dialogChoice = dialog.getDialogChoice();
         if (dialogChoice == DIALOG_CHOICE_NOBODY) {

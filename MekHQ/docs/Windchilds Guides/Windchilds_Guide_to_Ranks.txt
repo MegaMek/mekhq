@@ -21,7 +21,7 @@ Aerospace:
 	Personnel Roles: Aerospace Pilot, Conventional Aircraft Pilot
 	Profession Code: "ASF"
 Vehicle:
-	Personnel Roles: Ground Driver, Naval Driver, VTOL Pilot, Vehicle Gunner, Combat Engineer
+	Personnel Roles: Vehicle Crew/Ground, Vehicle Crew/Naval, Vehicle Crew/VTOL
 	Profession Code: "VEE"
 Naval:
 	Personnel Roles: Vessel Pilot, Vessel Crewmember, Vessel Gunner, Hyperspace Navigator

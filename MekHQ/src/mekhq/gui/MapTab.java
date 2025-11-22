@@ -34,6 +34,7 @@ package mekhq.gui;
 
 import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.MHQConstants.CONFIRMATION_BEGIN_TRANSIT;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.outOfContractMothballAutomation;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
@@ -272,10 +273,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
             return;
         }
 
-        // Confirmation
-        ImmersiveDialogConfirmation dialog = new ImmersiveDialogConfirmation(getCampaign());
-        if (!dialog.wasConfirmed()) {
-            return;
+        if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_BEGIN_TRANSIT)) {
+            ImmersiveDialogConfirmation dialog = new ImmersiveDialogConfirmation(getCampaign(),
+                  CONFIRMATION_BEGIN_TRANSIT);
+            if (!dialog.wasConfirmed()) {
+                return;
+            }
         }
 
         // Mothballing
