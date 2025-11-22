@@ -254,7 +254,7 @@ public class EscapeSkills {
      * @since 0.50.07
      */
     private static String getEscapeAttemptReport(Person prisoner, MarginOfSuccess marginOfSuccess) {
-        String reportColor = MarginOfSuccess.getMarginOfSuccessColor(marginOfSuccess);
+        String reportColor = marginOfSuccess.getColor();
         String reportKey = "EscapeArtist.report." + marginOfSuccess.name();
 
         return getFormattedTextAt(RESOURCE_BUNDLE,
