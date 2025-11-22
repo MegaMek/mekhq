@@ -3134,7 +3134,13 @@ public class Person {
             if (nTasks > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nTasks", nTasks);
             }
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doctorId", doctorId);
+
+            // Empty check is to self-correct instances where we didn't cleanly remove the doctor following injuries
+            // getting healed
+            if (!injuries.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doctorId", doctorId);
+            }
+
             if (getUnit() != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", getUnit().getId());
             }
@@ -5435,7 +5441,7 @@ public class Person {
     }
 
     public boolean needsFixing() {
-        return ((hits > 0) || needsAMFixing()) && getStatus().isActiveFlexible();
+        return (hits > 0) || needsAMFixing();
     }
 
     /**
@@ -7048,11 +7054,57 @@ public class Person {
         return injuries.stream().filter(i -> !i.getSubType().isProsthetic()).collect(Collectors.toList());
     }
 
-    public void clearInjuries() {
-        injuries.clear();
+    /**
+     * Removes all non-prosthetic injuries from this person.
+     *
+     * <p>Any injury whose subtype does <em>not</em> identify as a prosthetic is removed via
+     * {@link #removeInjury(Injury)}. Prosthetic injuries are left intact. If removal results in the person having no
+     * remaining injuries, the assigned {@code doctorId} is cleared.</p>
+     *
+     * <p>After modifications are complete, a {@link PersonChangedEvent} is fired to notify the campaign of the
+     * update.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public void clearInjuriesExcludingProsthetics() {
+        for (Injury injury : injuries) {
+            if (!injury.getSubType().isProsthetic()) {
+                removeInjury(injury);
+            }
+        }
 
-        // Clear the doctor if there is one
-        doctorId = null;
+        if (injuries.isEmpty()) {
+            doctorId = null;
+        }
+
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    /**
+     * Removes all prosthetic-related injuries from this person.
+     *
+     * <p>Any injury whose subtype identifies as a prosthetic is removed via {@link #removeInjury(Injury)}.
+     * Non-prosthetic injuries remain untouched. If removal results in the person having no remaining injuries, the
+     * assigned {@code doctorId} is cleared.</p>
+     *
+     * <p>After modifications are complete, a {@link PersonChangedEvent} is fired to notify the campaign of the
+     * update.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public void clearProstheticInjuries() {
+        for (Injury injury : injuries) {
+            if (injury.getSubType().isProsthetic()) {
+                removeInjury(injury);
+            }
+        }
+
+        if (injuries.isEmpty()) {
+            doctorId = null;
+        }
+
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 

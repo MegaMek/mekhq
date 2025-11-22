@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
+import static java.lang.Math.min;
 import static megamek.common.compute.Compute.d6;
 
 import megamek.codeUtilities.MathUtility;
@@ -132,13 +133,15 @@ public enum HealingMarginOfSuccessEffects {
      * <p>If this outcome indicates a delayed recovery, a single d6 is rolled and added to the injury's remaining
      * healing time. Otherwise, the delay is {@code 0}.</p>
      *
+     * @param originalTime the original length of the injury. New healing time cannot exceed this value.
+     *
      * @return a random delay in days if healing is delayed, or {@code 0} if there is no delay
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public int getHealingDelay() {
-        return isDelayed ? d6(1) : 0;
+    public int getHealingDelay(int originalTime) {
+        return isDelayed ? min(d6(1), originalTime) : 0;
     }
 
     /**
