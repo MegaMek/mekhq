@@ -506,35 +506,19 @@ public class PrisonerEventManager {
             return; // No risk of event
         }
 
-        AtBContract relevantContract = ObjectUtility.getRandomItem(activeContracts);
-
+        // Did a intel breach occur?
         int baseChance = 50;
-        int negativeEvents = 0;
+        boolean hadIntelBreach = freedPrisonerCount > 0 && Compute.randomInt(baseChance) < freedPrisonerCount;
 
-        int remainingFree = freedPrisonerCount;
-        // One roll per up to 50 freed prisoners
-        int rollCount = (int) Math.ceil(remainingFree / (double) baseChance);
-        for (int i = 0; i < rollCount; i++) {
-            // How many freed prisoners are in this group of 50?
-            int freeInThisGroup = Math.min(baseChance, remainingFree);
-
-            // Did a intel breach occur?
-            if (remainingFree > 0 && Compute.randomInt(baseChance) < remainingFree) {
-                negativeEvents++;
-            }
-
-            remainingFree -= freeInThisGroup;
-        }
-
-        if (negativeEvents > 0) {
+        if (hadIntelBreach) {
+            AtBContract relevantContract = ObjectUtility.getRandomItem(activeContracts);
             AtBMoraleLevel oldMorale = relevantContract.getMoraleLevel();
-            AtBMoraleLevel newMorale = relevantContract.changeMoraleLevel(negativeEvents);
+            AtBMoraleLevel newMorale = relevantContract.changeMoraleLevel(1);
 
             String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "intelBreach.ic",
                   spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
             String bottomMessage = getFormattedTextAt(RESOURCE_BUNDLE,
                   "intelBreach.occ",
-                  negativeEvents,
                   relevantContract.getName(),
                   oldMorale.toString(),
                   spanOpeningWithCustomColor(getNegativeColor()),
