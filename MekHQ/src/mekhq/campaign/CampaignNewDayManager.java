@@ -1452,6 +1452,7 @@ public class CampaignNewDayManager {
                   null, modifier);
             person.processCripplingFlashbacks(campaign,
                   isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
                   true,
                   failedWillpowerCheck);
         }
@@ -1487,6 +1488,7 @@ public class CampaignNewDayManager {
                   null, modifier);
             String report = person.processChildlikeRegression(campaign,
                   isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
                   true,
                   failedWillpowerCheck);
             if (!report.isBlank()) {
@@ -1500,6 +1502,7 @@ public class CampaignNewDayManager {
                   null, modifier);
             String report = person.processCatatonia(campaign,
                   isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
                   true,
                   failedWillpowerCheck);
             if (!report.isBlank()) {
