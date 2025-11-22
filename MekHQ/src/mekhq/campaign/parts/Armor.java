@@ -191,17 +191,19 @@ public class Armor extends Part implements IAcquisitionWork {
             if (amountAvailable == 0) {
                 toReturn.append(messageSurroundedBySpanWithColor(getNegativeColor(),
                       "None in stock"));
-            } else if (!isSalvaging() && amountAvailable < amountNeeded) {
-                toReturn.append(spanOpeningWithCustomColor(getNegativeColor()))
-                      .append("Only ")
-                      .append(amountAvailable)
-                      .append(" in stock")
-                      .append(CLOSING_SPAN_TAG);
-            } else {
-                toReturn.append(spanOpeningWithCustomColor(getPositiveColor()))
-                      .append(amountAvailable)
-                      .append(" in stock")
-                      .append(CLOSING_SPAN_TAG);
+            } else if (!isSalvaging()) {
+                if (amountAvailable < amountNeeded) {
+                    toReturn.append(spanOpeningWithCustomColor(getNegativeColor()))
+                          .append("Only ")
+                          .append(amountAvailable)
+                          .append(" in stock")
+                          .append(CLOSING_SPAN_TAG);
+                } else {
+                    toReturn.append(spanOpeningWithCustomColor(getPositiveColor()))
+                          .append(amountAvailable)
+                          .append(" in stock")
+                          .append(CLOSING_SPAN_TAG);
+                }
             }
 
             PartInventory inventories = campaign.getPartInventory(getNewPart());

@@ -475,7 +475,7 @@ public abstract class Part implements IPartWork, ITechnology {
                                                                                                  .getFontColorPositiveHexColor(),
                                              inStock + " in stock");
 
-            toReturn.append(inStockText).append("<br>");
+            toReturn.append("<br>").append(inStockText).append("<br>");
         } else {
             toReturn.append("<br>");
         }
