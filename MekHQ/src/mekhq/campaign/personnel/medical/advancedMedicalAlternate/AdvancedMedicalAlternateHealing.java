@@ -40,6 +40,7 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.HealingM
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -71,6 +72,7 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
  * @since 0.50.10
  */
 public class AdvancedMedicalAlternateHealing {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvancedMedicalAlternateHealing";
     private static final int PROSTHETIC_PENALTY = 4; // Interstellar Operations page 70
 
     /**
@@ -257,14 +259,28 @@ public class AdvancedMedicalAlternateHealing {
      */
     private static int getMarginOfSuccessForUnassistedHealing(Person patient, List<TargetRollModifier> modifiers,
           int miscPenalty, boolean useEdge) {
-        AttributeCheckUtility naturalHealing = new AttributeCheckUtility(patient, BODY, NONE, modifiers, miscPenalty,
-              false, true);
+        AttributeCheckUtility naturalHealing = new AttributeCheckUtility(
+              getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.naturalHealing.normal"),
+              patient,
+              BODY,
+              NONE,
+              modifiers,
+              miscPenalty,
+              false,
+              true);
         int marginOfSuccess = naturalHealing.getMarginOfSuccess();
 
         // Edge
         if (marginOfSuccess <= -6 && useEdge) { // Attempt to reroll a permanent injury
-            AttributeCheckUtility edgeReroll = new AttributeCheckUtility(patient, BODY, NONE, modifiers, miscPenalty,
-                  false, true);
+            AttributeCheckUtility edgeReroll = new AttributeCheckUtility(
+                  getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.naturalHealing.edge"),
+                  patient,
+                  BODY,
+                  NONE,
+                  modifiers,
+                  miscPenalty,
+                  false,
+                  true);
             marginOfSuccess = edgeReroll.getMarginOfSuccess(); // Edge always replaces the original
         }
         return marginOfSuccess;
@@ -336,12 +352,25 @@ public class AdvancedMedicalAlternateHealing {
      */
     private static int getMarginOfSuccessForAssistedHealing(Person doctor, List<TargetRollModifier> modifiers,
           int miscPenalty, boolean useEdge) {
-        SkillCheckUtility surgery = new SkillCheckUtility(doctor, S_SURGERY, modifiers, miscPenalty, false, true);
+        SkillCheckUtility surgery = new SkillCheckUtility(
+              getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.assistedHealing.normal"),
+              doctor,
+              S_SURGERY,
+              modifiers,
+              miscPenalty,
+              false,
+              true);
         int marginOfSuccess = surgery.getMarginOfSuccess();
 
         // Edge
         if (marginOfSuccess <= -6 && useEdge) { // Permanent injury
-            SkillCheckUtility edgeReroll = new SkillCheckUtility(doctor, S_SURGERY, modifiers, miscPenalty, false,
+            SkillCheckUtility edgeReroll = new SkillCheckUtility(
+                  getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.assistedHealing.edge"),
+                  doctor,
+                  S_SURGERY,
+                  modifiers,
+                  miscPenalty,
+                  false,
                   true);
             marginOfSuccess = edgeReroll.getMarginOfSuccess(); // Edge always replaces the original
         }

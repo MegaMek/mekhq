@@ -861,8 +861,14 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         for (PlannedSurgery surgery : new ArrayList<>(prioritizedSurgeries)) {
             int spaModifier = surgery.type != COSMETIC_SURGERY && hasMachinistSPA ? -2 : 0;
-            SkillCheckUtility skillCheckUtility = new SkillCheckUtility(surgeon, S_SURGERY, List.of(),
-                  spaModifier, true, false);
+            SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
+                  getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.skillCheck"),
+                  surgeon,
+                  S_SURGERY,
+                  List.of(),
+                  spaModifier,
+                  true,
+                  false);
             campaign.addReport(skillCheckUtility.getResultsText());
             if (skillCheckUtility.isSuccess()) {
                 successfulSurgeries.add(surgery);

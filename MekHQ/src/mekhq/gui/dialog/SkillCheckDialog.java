@@ -163,8 +163,16 @@ public class SkillCheckDialog {
           boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
         String skillName = skillNames.get(selectedSkill);
         boolean useEdge = choiceIndex == DIALOG_USE_EDGE_INDEX;
-        SkillCheckUtility utility = new SkillCheckUtility(character, skillName, null, selectedModifier, useEdge, true,
-              isUseAgingEffects, isClanCampaign, today);
+        SkillCheckUtility utility = new SkillCheckUtility(null,
+              character,
+              skillName,
+              null,
+              selectedModifier,
+              useEdge,
+              true,
+              isUseAgingEffects,
+              isClanCampaign,
+              today);
         isSuccess = utility.isSuccess();
 
         return utility.getResultsText();
