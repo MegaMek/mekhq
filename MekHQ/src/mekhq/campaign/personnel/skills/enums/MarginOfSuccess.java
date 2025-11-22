@@ -59,19 +59,20 @@ import mekhq.utilities.ReportingUtilities;
  * @since 0.50.05
  */
 public enum MarginOfSuccess {
-    SPECTACULAR(7, Integer.MAX_VALUE, 4, ReportingUtilities.getAmazingColor()),
-    EXTRAORDINARY(5, 6, 3, ReportingUtilities.getPositiveColor()),
-    GOOD(3, 4, 2, ReportingUtilities.getPositiveColor()),
-    IT_WILL_DO(1, 2, 1, ReportingUtilities.getWarningColor()),
-    BARELY_MADE_IT(0, 0, 0, ReportingUtilities.getWarningColor()),
-    ALMOST(-2, -1, -1, ReportingUtilities.getWarningColor()),
-    BAD(-4, -3, -2, ReportingUtilities.getNegativeColor()),
-    TERRIBLE(-6, -5, -3, ReportingUtilities.getNegativeColor()),
-    DISASTROUS(Integer.MIN_VALUE, -7, -4, ReportingUtilities.getNegativeColor());
+    SPECTACULAR("SPECTACULAR", 7, Integer.MAX_VALUE, 4, ReportingUtilities.getAmazingColor()),
+    EXTRAORDINARY("EXTRAORDINARY", 5, 6, 3, ReportingUtilities.getPositiveColor()),
+    GOOD("GOOD", 3, 4, 2, ReportingUtilities.getPositiveColor()),
+    IT_WILL_DO("IT_WILL_DO", 1, 2, 1, ReportingUtilities.getWarningColor()),
+    BARELY_MADE_IT("BARELY_MADE_IT", 0, 0, 0, ReportingUtilities.getWarningColor()),
+    ALMOST("ALMOST", -2, -1, -1, ReportingUtilities.getWarningColor()),
+    BAD("BAD", -4, -3, -2, ReportingUtilities.getNegativeColor()),
+    TERRIBLE("TERRIBLE", -6, -5, -3, ReportingUtilities.getNegativeColor()),
+    DISASTROUS("DISASTROUS", Integer.MIN_VALUE, -7, -4, ReportingUtilities.getNegativeColor());
 
     private static final MMLogger LOGGER = MMLogger.create(MarginOfSuccess.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MarginOfSuccess";
 
+    private final String lookupName;
     private final String label;
     private final int lowerBound;
     private final int upperBound;
@@ -81,6 +82,7 @@ public enum MarginOfSuccess {
     /**
      * Constructs a {@link MarginOfSuccess} enum constant with the specified bounds and margin value.
      *
+     * @param lookupName the key used to retrieve resource bundle entries
      * @param lowerBound the lower inclusive bound for this margin of success
      * @param upperBound the upper inclusive bound for this margin of success
      * @param margin     the margin value associated with this range
@@ -89,7 +91,8 @@ public enum MarginOfSuccess {
      * @author Illiani
      * @since 0.50.05
      */
-    MarginOfSuccess(int lowerBound, int upperBound, int margin, String color) {
+    MarginOfSuccess(String lookupName, int lowerBound, int upperBound, int margin, String color) {
+        this.lookupName = lookupName;
         this.label = generateMarginOfSuccessString();
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
@@ -98,20 +101,48 @@ public enum MarginOfSuccess {
     }
 
     /**
+     * Retrieves the localized string label for a given margin of success.
+     *
+     * <p>This method looks up the label from the associated resource bundle, using the specified margin of success
+     * as a key, suffixed with {@code .label}.</p>
+     *
+     * @return the localized string representing the given margin of success
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
      * Retrieves the margin value associated with the specified {@link MarginOfSuccess}.
      *
      * <p>The margin value represents the numerical value tied to a specific margin of success, typically used to
      * measure the degree of success or failure of a skill check.</p>
-     *
-     * @param marginOfSuccess the {@link MarginOfSuccess} whose margin value is to be retrieved
      *
      * @return the margin value associated with the given {@link MarginOfSuccess}
      *
      * @author Illiani
      * @since 0.50.05
      */
-    public static int getMarginValue(MarginOfSuccess marginOfSuccess) {
-        return marginOfSuccess.margin;
+    public int getValue() {
+        return margin;
+    }
+
+    /**
+     * Returns the color associated with the specified {@link MarginOfSuccess} value.
+     *
+     * <p>This method allows retrieval of a string representing a display color associated with a given margin of
+     * success outcome, which is typically used for formatting or UI rendering purposes.</p>
+     *
+     * @return The color string defined for the given margin of success.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getColor() {
+        return color;
     }
 
     /**
@@ -130,23 +161,6 @@ public enum MarginOfSuccess {
      */
     public static int getMarginOfSuccess(int differenceBetweenRollAndTarget) {
         return getMarginOfSuccessObject(differenceBetweenRollAndTarget).margin;
-    }
-
-    /**
-     * Returns the color associated with the specified {@link MarginOfSuccess} value.
-     *
-     * <p>This method allows retrieval of a string representing a display color associated with a given margin of
-     * success outcome, which is typically used for formatting or UI rendering purposes.</p>
-     *
-     * @param marginOfSuccess The {@link MarginOfSuccess} for which to retrieve the associated color string.
-     *
-     * @return The color string defined for the given margin of success.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public static String getMarginOfSuccessColor(MarginOfSuccess marginOfSuccess) {
-        return marginOfSuccess.color;
     }
 
     /**
@@ -206,24 +220,7 @@ public enum MarginOfSuccess {
         return DISASTROUS;
     }
 
-    /**
-     * Retrieves the localized string label for a given margin of success.
-     *
-     * <p>This method looks up the label from the associated resource bundle, using the specified margin of success
-     * as a key, suffixed with {@code .label}.</p>
-     *
-     * @param marginOfSuccess the margin of success for which to retrieve the label
-     *
-     * @return the localized string representing the given margin of success
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public static String getMarginOfSuccessString(MarginOfSuccess marginOfSuccess) {
-        return marginOfSuccess.label;
-    }
-
     private String generateMarginOfSuccessString() {
-        return getTextAt(RESOURCE_BUNDLE, margin + ".label");
+        return getTextAt(RESOURCE_BUNDLE, lookupName + ".label");
     }
 }
