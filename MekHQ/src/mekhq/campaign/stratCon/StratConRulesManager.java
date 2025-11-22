@@ -63,6 +63,7 @@ import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsT
 import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.INTERCEPTED;
 import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.SUCCESS;
 import static mekhq.campaign.stratCon.StratConScenarioFactory.convertSpecificUnitTypeToGeneral;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -130,6 +131,7 @@ import org.apache.commons.math3.util.Pair;
  * @author NickAragua
  */
 public class StratConRulesManager {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.StratConRulesManager";
     public final static int BASE_LEADERSHIP_BUDGET = 500;
 
     private static final MMLogger LOGGER = MMLogger.create(StratConRulesManager.class);
@@ -1584,6 +1586,7 @@ public class StratConRulesManager {
                     SkillCheckUtility skillCheck = null;
                     if (useAdvancedScouting) {
                         skillCheck = new SkillCheckUtility(
+                              getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.scoutingSkillCheck"),
                               scout,
                               scoutData.skillName(),
                               List.of(weightModifier, speedModifier, sensorsModifier, skillModifier),
@@ -1997,8 +2000,14 @@ public class StratConRulesManager {
         int targetNumber = 9;
         Skill tactics = commander.getSkill(S_TACTICS);
 
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(commander, S_TACTICS, null, 0, true, false,
-              campaign.getCampaignOptions().isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate());
+        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
+              getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.tacticsSkillCheck"),
+              commander,
+              S_TACTICS,
+              null,
+              0,
+              true,
+              false);
         campaign.addReport(skillCheckUtility.getResultsText());
 
         if (skillCheckUtility.isSuccess()) {

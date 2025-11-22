@@ -50,6 +50,7 @@ import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -639,8 +640,17 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
             boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
             boolean isClanCampaign = campaign.isClanCampaign();
-            SkillCheckUtility checkUtility = new SkillCheckUtility(campaignCommander, S_NEGOTIATION, null,
-                  0, false, true, isUseAgingEffects, isClanCampaign, campaign.getLocalDate());
+            SkillCheckUtility checkUtility = new SkillCheckUtility(
+                  getTextAt(RESOURCE_BUNDLE, "AtbMonthlyContractMarket.contractSkillCheck"),
+                  campaignCommander,
+                  S_NEGOTIATION,
+                  null,
+                  0,
+                  false,
+                  true,
+                  isUseAgingEffects,
+                  isClanCampaign,
+                  campaign.getLocalDate());
             negotiationsMarginOfSuccess = max(0, checkUtility.getMarginOfSuccess());
 
             campaign.addReport(checkUtility.getResultsText());

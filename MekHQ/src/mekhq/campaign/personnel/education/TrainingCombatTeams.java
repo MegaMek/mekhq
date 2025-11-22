@@ -41,6 +41,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObject;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -96,8 +97,9 @@ import mekhq.utilities.ReportingUtilities;
 public class TrainingCombatTeams {
     private static final MMLogger LOGGER = MMLogger.create(TrainingCombatTeams.class);
 
-    private static final String BUNDLE_NAME = "mekhq.resources.Education";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME,
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Education";
+    @Deprecated(since = "0.50.10", forRemoval = false)
+    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_BUNDLE,
           MekHQ.getMHQOptions().getLocale());
 
     /**
@@ -390,8 +392,17 @@ public class TrainingCombatTeams {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean useAgingEffects = campaignOptions.isUseAgeEffects();
 
-        SkillCheckUtility skillCheck = new SkillCheckUtility(educator, S_TRAINING, new ArrayList<>(), 0, true,
-              false, useAgingEffects, isClanCampaign, today);
+        SkillCheckUtility skillCheck = new SkillCheckUtility(
+              getTextAt(RESOURCE_BUNDLE, "trainingCombatTeam.skillCheck"),
+              educator,
+              S_TRAINING,
+              new ArrayList<>(),
+              0,
+              true,
+              false,
+              useAgingEffects,
+              isClanCampaign,
+              today);
         int raw = skillCheck.getMarginOfSuccess();
         MarginOfSuccess marginOfSuccess = getMarginOfSuccessObject(raw);
 

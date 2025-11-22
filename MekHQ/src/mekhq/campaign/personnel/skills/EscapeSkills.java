@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.skills;
 import static java.lang.Math.floor;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -88,8 +89,17 @@ public class EscapeSkills {
         }
 
         LocalDate today = campaign.getLocalDate();
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(person, skillToUse, List.of(), 0,
-              true, false, false, false, today);
+        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
+              getTextAt(RESOURCE_BUNDLE, "EscapeArtist.skillCheck"),
+              person,
+              skillToUse,
+              List.of(),
+              0,
+              true,
+              false,
+              false,
+              false,
+              today);
         int marginOfSuccessValue = skillCheckUtility.getMarginOfSuccess();
         MarginOfSuccess marginOfSuccess = MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue(marginOfSuccessValue);
 

@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.medical;
 
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -216,11 +217,17 @@ public class MedicalController {
         LOGGER.debug(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.intro",
               doctor.getHyperlinkedFullTitle(), patient.getHyperlinkedFullTitle()));
 
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(doctor, S_SURGERY,
+        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
+              getTextAt(RESOURCE_BUNDLE, "MedicalController.report.skillCheck"),
+              doctor,
+              S_SURGERY,
               getAdditionalHealingModifiers(patient),
               0,
               isUseSupportEdge,
-              false, isUseAgingEffects, isClanCampaign, today);
+              false,
+              isUseAgingEffects,
+              isClanCampaign,
+              today);
 
         LOGGER.debug(skillCheckUtility.getResultsText());
 

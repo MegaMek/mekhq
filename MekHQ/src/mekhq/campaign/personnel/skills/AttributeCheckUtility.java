@@ -38,6 +38,7 @@ import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -80,6 +81,7 @@ public class AttributeCheckUtility {
      */
     protected static final int TARGET_NUMBER_TWO_LINKED_ATTRIBUTES = 18; // ATOW pg 43
 
+    private final String reason;
     private final Person person;
     private final SkillAttribute firstSkillAttribute;
     private final SkillAttribute secondSkillAttribute;
@@ -107,6 +109,7 @@ public class AttributeCheckUtility {
      * use-cases, the {@link #performQuickAttributeCheck(Person, SkillAttribute, SkillAttribute, List, int)} provides a
      * more streamlined approach.</p>
      *
+     * @param reason                      the reason for the check; can be {@code null}
      * @param person                      the {@link Person} performing the attribute check
      * @param firstSkillAttribute         the primary attribute to be used in the check.
      * @param secondSkillAttribute        the secondary optional attribute to be used in the check. Can be null.
@@ -125,9 +128,11 @@ public class AttributeCheckUtility {
      * @author Illiani
      * @since 0.50.07
      */
-    public AttributeCheckUtility(final Person person, final SkillAttribute firstSkillAttribute,
-          final @Nullable SkillAttribute secondSkillAttribute, @Nullable List<TargetRollModifier> externalModifiers,
-          final int miscModifier, final boolean useEdge, final boolean includeMarginsOfSuccessText) {
+    public AttributeCheckUtility(final @Nullable String reason, final Person person,
+          final SkillAttribute firstSkillAttribute, final @Nullable SkillAttribute secondSkillAttribute,
+          @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier, final boolean useEdge,
+          final boolean includeMarginsOfSuccessText) {
+        this.reason = reason;
         this.person = person;
         this.firstSkillAttribute = firstSkillAttribute;
         this.secondSkillAttribute = secondSkillAttribute;
@@ -183,14 +188,15 @@ public class AttributeCheckUtility {
           final @Nullable SkillAttribute secondSkillAttribute,
           final @Nullable List<TargetRollModifier> externalModifiers,
           final int miscModifier) {
-        AttributeCheckUtility AttributeCheck = new AttributeCheckUtility(person,
+        AttributeCheckUtility attributeCheck = new AttributeCheckUtility(null,
+              person,
               firstSkillAttribute,
               secondSkillAttribute,
               externalModifiers,
               miscModifier,
               false,
               false);
-        return AttributeCheck.isSuccess();
+        return attributeCheck.isSuccess();
     }
 
     /**
@@ -266,7 +272,6 @@ public class AttributeCheckUtility {
         }
 
         String fullTitle = person.getHyperlinkedFullTitle();
-        String firstName = person.getFirstName();
         String genderedReferenced = HIS_HER_THEIR.getDescriptor(person.getGender());
 
         String colorOpen;
@@ -278,11 +283,13 @@ public class AttributeCheckUtility {
         } else {
             colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
         }
-        String status = getFormattedTextAt(RESOURCE_BUNDLE,
-              "AttributeCheck.results." + (isSuccess() ? "success" : "failure"));
+
+        String status = getTextAt(RESOURCE_BUNDLE, "AttributeCheck.results." + (isSuccess() ? "success" : "failure"));
+
         String label = getAttributeCheckLabel();
-        String mainMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+        StringBuilder resultsText = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
               "AttributeCheck.results",
+              reason == null ? "" : "<b>" + reason + ":</b> ",
               fullTitle,
               colorOpen,
               status,
@@ -290,21 +297,19 @@ public class AttributeCheckUtility {
               genderedReferenced,
               label,
               roll,
-              targetNumber.getValue());
+              targetNumber.getValue()));
 
-        String edgeUseText = !usedEdge ? "" : getFormattedTextAt(RESOURCE_BUNDLE, "AttributeCheck.rerolled", firstName);
-
-        if (!edgeUseText.isBlank()) {
-            mainMessage = mainMessage + "<p>" + edgeUseText + "</p>";
+        if (usedEdge) {
+            resultsText.append(" ").append(getTextAt(RESOURCE_BUNDLE, "AttributeCheck.rerolled"));
         }
 
         if (includeMarginsOfSuccessText) {
             MarginOfSuccess marginOfSuccessObject = getMarginOfSuccessObjectFromMarginValue(marginOfSuccess);
             String marginOfSuccessText = marginOfSuccessObject.getLabel();
-            return mainMessage + "<p>" + marginOfSuccessText + "</p>";
-        } else {
-            return mainMessage;
+            resultsText.append(" ").append(marginOfSuccessText);
         }
+
+        return resultsText.toString();
     }
 
     /**
@@ -503,9 +508,11 @@ public class AttributeCheckUtility {
         if (performInitialRoll(useEdge, includeMarginsOfSuccessText)) {
             return;
         }
-
-        roll = d6(2);
-        rollWithEdge(includeMarginsOfSuccessText);
+        // Prevent us from burning Edge on impossible checks
+        if (!targetNumber.cannotSucceed() || targetNumber.getValue() <= 12) {
+            roll = d6(2);
+            rollWithEdge(includeMarginsOfSuccessText);
+        }
     }
 
     /**

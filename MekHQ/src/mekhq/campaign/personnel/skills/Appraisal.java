@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.skills;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -70,8 +71,17 @@ public class Appraisal {
      * @since 0.50.07
      */
     public static double performAppraisalMultiplierCheck(Person person, LocalDate currentDay) {
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(person, SkillType.S_APPRAISAL, List.of(), 0,
-              false, false, false, false, currentDay);
+        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
+              getTextAt(RESOURCE_BUNDLE, "Appraisal.skillCheck"),
+              person,
+              SkillType.S_APPRAISAL,
+              List.of(),
+              0,
+              false,
+              false,
+              false,
+              false,
+              currentDay);
         int marginOfSuccessValue = skillCheckUtility.getMarginOfSuccess();
 
         return getAppraisalCostMultiplier(marginOfSuccessValue);

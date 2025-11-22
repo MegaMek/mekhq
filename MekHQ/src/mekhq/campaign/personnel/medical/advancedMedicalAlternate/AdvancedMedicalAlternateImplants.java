@@ -49,6 +49,7 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.Alternat
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.ENHANCED_IMAGING;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.getProstheticTypeFromInjuryType;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
@@ -204,10 +205,17 @@ public class AdvancedMedicalAlternateImplants {
                   person.getHyperlinkedFullTitle()));
         }
 
-        int resistanceModifier = person.getOptions().booleanOption(UNOFFICIAL_IMPLANT_RESISTANCE) ? -2 : 0;
-        AttributeCheckUtility attributeCheckUtility = new AttributeCheckUtility(person, SkillAttribute.BODY,
-              SkillAttribute.WILLPOWER, new ArrayList<>(), resistanceModifier, true, false);
-        campaign.addReport(attributeCheckUtility.getResultsText());
+            int resistanceModifier = person.getOptions().booleanOption(UNOFFICIAL_IMPLANT_RESISTANCE) ? -2 : 0;
+            AttributeCheckUtility attributeCheckUtility = new AttributeCheckUtility(
+                  getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.skillCheck.degradation"),
+                  person,
+                  SkillAttribute.BODY,
+                  SkillAttribute.WILLPOWER,
+                  new ArrayList<>(),
+                  resistanceModifier,
+                  true,
+                  false);
+            campaign.addReport(attributeCheckUtility.getResultsText());
 
         if (!attributeCheckUtility.isSuccess() && useAbilities) {
             String flaw = getAndApplyEIDegradationFlaw(person);
