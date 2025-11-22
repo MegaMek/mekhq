@@ -54,7 +54,6 @@ import javax.swing.*;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
@@ -207,6 +206,7 @@ public class BiographyTab {
     private JButton btnDisableAllPortraits;
     private JCheckBox chkAssignPortraitOnRoleChange;
     private JCheckBox chkAllowDuplicatePortraits;
+    private JCheckBox chkUseGenderedPortraitsOnly;
     //end Name and Portrait Tab
 
     //start Rank Tab
@@ -266,6 +266,7 @@ public class BiographyTab {
         comboFactionNames = new MMComboBox<>("comboFactionNames", getFactionNamesModel());
         chkAssignPortraitOnRoleChange = new JCheckBox();
         chkAllowDuplicatePortraits = new JCheckBox();
+        chkUseGenderedPortraitsOnly = new JCheckBox();
 
         pnlRandomPortrait = new JPanel();
         personnelRoles = PersonnelRole.getCombatRoles();
@@ -1340,7 +1341,7 @@ public class BiographyTab {
         // Header
         nameAndPortraitGenerationHeader = new CampaignOptionsHeaderPanel("NameAndPortraitGenerationTab",
               getImageDirectory() + "logo_clan_nova_cat.png",
-              2);
+              5);
 
         // Contents
         chkAssignPortraitOnRoleChange = new CampaignOptionsCheckBox("AssignPortraitOnRoleChange");
@@ -1350,6 +1351,10 @@ public class BiographyTab {
         chkAllowDuplicatePortraits = new CampaignOptionsCheckBox("AllowDuplicatePortraits");
         chkAllowDuplicatePortraits.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
               "AllowDuplicatePortraits"));
+
+        chkUseGenderedPortraitsOnly = new CampaignOptionsCheckBox("UseGenderedPortraitsOnly");
+        chkUseGenderedPortraitsOnly.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
+              "UseGenderedPortraitsOnly"));
 
         chkUseOriginFactionForNames = new CampaignOptionsCheckBox("UseOriginFactionForNames");
         chkUseOriginFactionForNames.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
@@ -1369,13 +1374,14 @@ public class BiographyTab {
         layoutTop.gridx = 0;
         layoutTop.gridy = 0;
         panelTop.add(chkAssignPortraitOnRoleChange, layoutTop);
-        layoutTop.gridy++;
+        layoutTop.gridx++;
         panelTop.add(chkAllowDuplicatePortraits, layoutTop);
+        layoutTop.gridx++;
+        panelTop.add(chkUseGenderedPortraitsOnly, layoutTop);
 
+        layoutTop.gridx = 0;
         layoutTop.gridy++;
         panelTop.add(chkUseOriginFactionForNames, layoutTop);
-        layoutTop.gridx++;
-        panelTop.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(25)));
         layoutTop.gridx++;
         panelTop.add(lblFactionNames, layoutTop);
         layoutTop.gridx++;
@@ -1595,6 +1601,7 @@ public class BiographyTab {
         comboFactionNames.setSelectedItem(RandomNameGenerator.getInstance().getChosenFaction());
         chkAssignPortraitOnRoleChange.setSelected(options.isAssignPortraitOnRoleChange());
         chkAllowDuplicatePortraits.setSelected(options.isAllowDuplicatePortraits());
+        chkUseGenderedPortraitsOnly.setSelected(options.isUseGenderedPortraitsOnly());
 
         final boolean[] usePortraitForRole = options.isUsePortraitForRoles();
         for (int i = 0; i < chkUsePortrait.length; i++) {
@@ -1700,6 +1707,7 @@ public class BiographyTab {
         options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
         options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
         options.setAllowDuplicatePortraits(chkAllowDuplicatePortraits.isSelected());
+        options.setUseGenderedPortraitsOnly(chkUseGenderedPortraitsOnly.isSelected());
         RandomNameGenerator.getInstance().setChosenFaction(comboFactionNames.getSelectedItem());
 
         for (int i = 0; i < chkUsePortrait.length; i++) {

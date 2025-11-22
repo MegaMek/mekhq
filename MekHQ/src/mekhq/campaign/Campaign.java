@@ -7732,8 +7732,12 @@ public class Campaign implements ITechManager {
      * @param person The {@link Person} who should receive a randomized portrait.
      */
     public void assignRandomPortraitFor(final Person person) {
-        final Boolean allowDuplicatePortraits = getCampaignOptions().isAllowDuplicatePortraits();
-        final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(), person, allowDuplicatePortraits);
+        final boolean allowDuplicatePortraits = campaignOptions.isAllowDuplicatePortraits();
+        final boolean genderedPortraitsOnly = campaignOptions.isUseGenderedPortraitsOnly();
+        final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(),
+              person,
+              allowDuplicatePortraits,
+              genderedPortraitsOnly);
         if (!portrait.isDefault()) {
             person.setPortrait(portrait);
         }

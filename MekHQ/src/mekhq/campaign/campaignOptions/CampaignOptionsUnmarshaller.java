@@ -287,6 +287,8 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "allowDuplicatePortraits" -> campaignOptions.setAllowDuplicatePortraits(parseBoolean(
                   nodeContents));
+            case "useGenderedPortraitsOnly" -> campaignOptions.setUseGenderedPortraitsOnly(parseBoolean(
+                  nodeContents));
             case "destroyByMargin" -> campaignOptions.setDestroyByMargin(parseBoolean(nodeContents));
             case "destroyMargin" -> campaignOptions.setDestroyMargin(parseInt(nodeContents));
             case "destroyPartTarget" -> campaignOptions.setDestroyPartTarget(parseInt(nodeContents));
