@@ -3555,7 +3555,7 @@ public class StratConRulesManager {
         }
 
         boolean isUseStratConSingles = campaignOptions.isUseStratConSinglesMode();
-        boolean isUseStratConMapless = campaignOptions.isUseStratConSinglesMode();
+        boolean isUseStratConMapless = campaignOptions.isUseStratConMaplessMode();
 
         LocalDate today = campaign.getLocalDate();
         boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
@@ -3567,8 +3567,6 @@ public class StratConRulesManager {
 
             if (campaignState != null) {
                 List<StratConTrackState> tracks = campaignState.getTracks();
-                StratConTrackState stratConSinglesTargetTrack = isUseStratConSingles ? getRandomItem(tracks) : null;
-
                 for (StratConTrackState track : tracks) {
                     cleanupPhantomScenarios(track);
 
@@ -3593,8 +3591,13 @@ public class StratConRulesManager {
                     }
 
                     // on monday, generate new scenario dates
-                    if (isMonday && track == stratConSinglesTargetTrack) {
+                    if (isMonday) {
                         generateScenariosDatesForWeek(campaign, campaignState, contract, track, isUseStratConSingles);
+                    }
+
+                    // Only one scenario/week for Single Drop
+                    if (isUseStratConSingles) {
+                        break;
                     }
                 }
 
