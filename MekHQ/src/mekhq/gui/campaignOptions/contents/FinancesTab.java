@@ -253,7 +253,7 @@ public class FinancesTab {
     public JPanel createFinancesGeneralOptionsTab() {
         // Header
         financesGeneralOptions = new CampaignOptionsHeaderPanel("FinancesGeneralTab",
-              getImageDirectory() + "logo_star_league.png", 10);
+              getImageDirectory() + "logo_star_league.png", 8);
 
         // Contents
         pnlGeneralOptions = createGeneralOptionsPanel();
@@ -322,9 +322,9 @@ public class FinancesTab {
         payForRecruitmentBox = new CampaignOptionsCheckBox("PayForRecruitmentBox");
         payForRecruitmentBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForRecruitmentBox"));
         payForFoodBox = new CampaignOptionsCheckBox("PayForFoodBox");
-        payForRecruitmentBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForFoodBox"));
+        payForFoodBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForFoodBox"));
         payForHousingBox = new CampaignOptionsCheckBox("PayForHousingBox");
-        payForRecruitmentBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForHousingBox"));
+        payForHousingBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForHousingBox"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PaymentsPanel", true, "PaymentsPanel");
@@ -671,7 +671,7 @@ public class FinancesTab {
     public JPanel createPriceMultipliersTab() {
         // Header
         priceMultipliersHeader = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
-              getImageDirectory() + "logo_clan_stone_lion.png", true, true, 2);
+              getImageDirectory() + "logo_clan_stone_lion.png", true, true, 1);
 
         // Contents
         pnlGeneralMultipliers = createGeneralMultipliersPanel();

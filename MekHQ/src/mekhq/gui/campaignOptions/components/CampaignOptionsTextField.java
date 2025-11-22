@@ -37,7 +37,6 @@ import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import javax.swing.JTextField;
 
@@ -79,7 +78,7 @@ public class CampaignOptionsTextField extends JTextField {
 
         // Set the tooltip text with word wrapping
         String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
-        if (isResourceKeyValid(tooltipText) && !tooltipText.isEmpty()) {
+        if (!tooltipText.isEmpty()) {
             setToolTipText(wordWrap(tooltipText, processWrapSize(customWrapSize)));
         }
 

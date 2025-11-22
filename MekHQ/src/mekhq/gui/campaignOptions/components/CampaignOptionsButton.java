@@ -37,7 +37,6 @@ import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import megamek.common.annotations.Nullable;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -87,7 +86,7 @@ public class CampaignOptionsButton extends RoundedJButton {
 
         // Sets the button's tooltip, applying word wrapping based on customWrapSize
         String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
-        if (isResourceKeyValid(tooltipText) && !tooltipText.isEmpty()) {
+        if (!tooltipText.isEmpty()) {
             setToolTipText(wordWrap(tooltipText, processWrapSize(customWrapSize)));
         }
 

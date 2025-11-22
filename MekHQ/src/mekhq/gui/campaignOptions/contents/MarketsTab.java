@@ -248,7 +248,7 @@ public class MarketsTab {
     public JPanel createPersonnelMarketTab() {
         // Header
         personnelMarketHeader = new CampaignOptionsHeaderPanel("PersonnelMarketTab",
-              getImageDirectory() + "logo_st_ives_compact.png", 11);
+              getImageDirectory() + "logo_st_ives_compact.png", 9);
 
         // Contents
         pnlPersonnelMarketGeneralOptions = createPersonnelMarketGeneralOptionsPanel();
@@ -446,7 +446,7 @@ public class MarketsTab {
         //start Unit Market
         CampaignOptionsHeaderPanel unitMarketHeader = new CampaignOptionsHeaderPanel("UnitMarketTab",
               getImageDirectory() + "logo_clan_ice_hellion.png",
-              5);
+              4);
 
         // Contents
         lblUnitMarketMethod = new CampaignOptionsLabel("UnitMarketMethod");
@@ -584,7 +584,7 @@ public class MarketsTab {
         // Header
         contractMarketHeader = new CampaignOptionsHeaderPanel("ContractMarketTab",
               getImageDirectory() + "logo_federated_suns.png",
-              5);
+              3);
         // Contents
         pnlContractMarketGeneralOptions = createContractMarketGeneralOptionsPanel();
         pnlContractPay = createContractPayPanel();

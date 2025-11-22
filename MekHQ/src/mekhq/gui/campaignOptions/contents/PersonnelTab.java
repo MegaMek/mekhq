@@ -606,7 +606,7 @@ public class PersonnelTab {
         // Header
         awardsHeader = new CampaignOptionsHeaderPanel("AwardsTab",
               getImageDirectory() + "logo_outworld_alliance.png",
-              5);
+              4);
 
         // Contents
         pnlAwardsGeneralOptions = createAwardsGeneralOptionsPanel();
@@ -821,7 +821,7 @@ public class PersonnelTab {
         //start Medical Tab
         CampaignOptionsHeaderPanel medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab",
               getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
-              4);
+              3);
 
         // Contents
         chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical");
@@ -977,7 +977,7 @@ public class PersonnelTab {
         // Header
         personnelInformationHeader = new CampaignOptionsHeaderPanel("PersonnelInformation",
               getImageDirectory() + "logo_rasalhague_dominion.png",
-              4);
+              3);
 
         // Contents
         chkUseTimeInService = new CampaignOptionsCheckBox("UseTimeInService");
@@ -1149,7 +1149,7 @@ public class PersonnelTab {
         // Header
         prisonersAndDependentsHeader = new CampaignOptionsHeaderPanel("PrisonersAndDependentsTab",
               getImageDirectory() + "logo_illyrian_palatinate.png",
-              9);
+              6);
 
         // Contents
         prisonerPanel = createPrisonersPanel();

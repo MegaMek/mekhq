@@ -34,12 +34,15 @@ package mekhq.gui.campaignOptions.components;
 
 import static java.awt.Color.BLACK;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -148,15 +151,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
             setFontScaling(lblBody, false, 1);
         }
 
-        JLabel lblTip = new JLabel();
-        if (includeTipPanel) {
-            // This stops the tip panel from bouncing around too much as new options are selected
-            String lineBreaks = "<br>".repeat(Math.max(0, tipPanelHeight));
-
-            lblTip.setName("lbl" + name + TIP_PANEL_NAME);
-            lblTip.setText("<html>" + lineBreaks + "</html>");
-            lblTip.setHorizontalAlignment(SwingConstants.CENTER);
-        }
+        JLabel lblTip = getTooltipJLabel(name, includeTipPanel, tipPanelHeight);
 
         // Initialize the panel's layout using a GridBagLayout
         new CampaignOptionsStandardPanel("pnl" + name + "HeaderPanel");
@@ -186,5 +181,31 @@ public class CampaignOptionsHeaderPanel extends JPanel {
             layout.gridy++;
             this.add(new JSeparator(SwingConstants.HORIZONTAL), layout);
         }
+    }
+
+    private JLabel getTooltipJLabel(String name, boolean includeTipPanel, int tipPanelHeight) {
+        JLabel lblTip = new JLabel() {
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension standardSize = super.getPreferredSize();
+                return scaleForGUI(Math.max(standardSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), standardSize.height);
+            }
+
+            @Override
+            public Dimension getMinimumSize() {
+                Dimension standardSize = super.getPreferredSize();
+                return scaleForGUI(Math.max(standardSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), standardSize.height);
+            }
+        };
+
+        if (includeTipPanel) {
+            // This stops the tip panel from bouncing around too much as new options are selected
+            String lineBreaks = "<br>".repeat(Math.max(0, tipPanelHeight));
+
+            lblTip.setName("lbl" + name + TIP_PANEL_NAME);
+            lblTip.setText("<html>" + lineBreaks + "</html>");
+            lblTip.setHorizontalAlignment(SwingConstants.CENTER);
+        }
+        return lblTip;
     }
 }
