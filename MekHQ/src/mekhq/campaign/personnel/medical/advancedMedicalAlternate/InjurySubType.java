@@ -98,4 +98,13 @@ public enum InjurySubType {
     public boolean isProsthetic() {
         return this == PROSTHETIC;
     }
+
+    /**
+     * Checks whether this subtype represents an injury caused by a Flaw.
+     *
+     * @return {@code true} if this subtype is {@link #FLAW}, otherwise {@code false}.
+     */
+    public boolean isFlaw() {
+        return this == FLAW;
+    }
 }

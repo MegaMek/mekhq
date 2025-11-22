@@ -80,6 +80,8 @@ public class AlternateInjuries {
     private static final int COSMETIC_SURGERY_RECOVERY_HEALING_DAYS = 7; // Internet says 2-3 weeks
     private static final int ELECTIVE_IMPLANT_RECOVERY_HEALING_DAYS = 90; // ATOW pg 317
     private static final int ENHANCED_IMAGING_IMPLANT_RECOVERY_HEALING_DAYS = 365; // ATOW pg 317
+    private static final int PAIN_SHUNT_RECOVERY_HEALING_DAYS = 365; // ATOW:Companion pg 182
+    private static final int DISCONTINUATION_SYNDROME_HEALING_DAYS = 7; // We check for this weekly
     private static final int WEEKLY_CHECK_ILLNESS_HEALING_DAYS = 7;
     private static final int POSTPARTUM_RECOVERY_HEALING_DAYS = 21; // Internet says 6 weeks
     private static final int TRANSIT_DISORIENTATION_SYNDROME_HEALING_DAYS = 1;
@@ -242,6 +244,7 @@ public class AlternateInjuries {
     public static final InjuryType ENHANCED_IMAGING_IMPLANT = new EnhancedImagingImplant();
     public static final InjuryType ELECTIVE_IMPLANT_RECOVERY = new ElectiveImplantRecovery();
     public static final InjuryType EI_IMPLANT_RECOVERY = new EIImplantRecovery();
+    public static final InjuryType PAIN_SHUNT_RECOVERY = new PainShuntRecovery();
     public static final InjuryType BONE_REINFORCEMENT = new BoneReinforcement();
     public static final InjuryType LIVER_FILTRATION_IMPLANT = new OrganFiltrationImplant();
     public static final InjuryType BIONIC_LUNGS_WITH_TYPE_1_FILTER = new BionicLungsWithType1Filter();
@@ -261,11 +264,21 @@ public class AlternateInjuries {
     public static final InjuryType COSMETIC_TAIL_PROSTHETIC = new CosmeticTailProsthetic();
     public static final InjuryType COSMETIC_ANIMAL_EAR_PROSTHETIC = new CosmeticAnimalEarProsthetic();
     public static final InjuryType COSMETIC_ANIMAL_LEG_PROSTHETIC = new CosmeticLegProsthetic();
+    public static final InjuryType DERMAL_MYOMER_ARM_ARMOR = new DermalMyomerArmorArm();
+    public static final InjuryType DERMAL_MYOMER_ARM_CAMO = new DermalMyomerCamoArm();
+    public static final InjuryType DERMAL_MYOMER_ARM_TRIPLE = new DermalMyomerTripleArm();
+    public static final InjuryType DERMAL_MYOMER_LEG_ARMOR = new DermalMyomerArmorLeg();
+    public static final InjuryType DERMAL_MYOMER_LEG_CAMO = new DermalMyomerCamoLeg();
+    public static final InjuryType DERMAL_MYOMER_LEG_TRIPLE = new DermalMyomerTripleLeg();
+    public static final InjuryType VEHICULAR_DNI = new VehicularDNI();
+    public static final InjuryType BUFFERED_VDNI = new BufferedVDNI();
+    public static final InjuryType BUFFERED_VDNI_TRIPLE_CORE = new BufferedVDNITripleCore();
+    public static final InjuryType PAIN_SHUNT = new PainShunt();
 
     // Base injury type classes with common behavior
     private abstract static class BaseInjury extends InjuryType {
-        protected BaseInjury(int recoveryTime, boolean permanent, InjuryLevel level,
-              InjuryEffect effect, Set<BodyLocation> locations) {
+        protected BaseInjury(int recoveryTime, boolean permanent, InjuryLevel level, InjuryEffect effect,
+              Set<BodyLocation> locations) {
             this.recoveryTime = recoveryTime;
             this.permanent = permanent;
             this.maxSeverity = MAXIMUM_INJURY_DURATION_MULTIPLIER;
@@ -1738,6 +1751,51 @@ public class AlternateInjuries {
         }
     }
 
+    public static final class DermalMyomerArmorArm extends Prosthetic {
+        DermalMyomerArmorArm() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_ARMOR.simpleName");
+            this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
+            this.injuryEffect = MYOMER_IMPLANT_ARM;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_ARMOR.simpleName",
+                  Utilities.capitalize(loc.locationName()));
+        }
+    }
+
+    public static final class DermalMyomerCamoArm extends Prosthetic {
+        DermalMyomerCamoArm() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_CAMO.simpleName");
+            this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
+            this.injuryEffect = MYOMER_IMPLANT_ARM;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_CAMO.simpleName",
+                  Utilities.capitalize(loc.locationName()));
+        }
+    }
+
+    public static final class DermalMyomerTripleArm extends Prosthetic {
+        DermalMyomerTripleArm() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_TRIPLE.simpleName");
+            this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
+            this.injuryEffect = TRIPLE_STRENGTH_MYOMER_IMPLANT_ARM;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_TRIPLE.simpleName",
+                  Utilities.capitalize(loc.locationName()));
+        }
+    }
+
     public static final class ElectiveMyomerHand extends Prosthetic {
         ElectiveMyomerHand() {
             super();
@@ -1764,6 +1822,51 @@ public class AlternateInjuries {
         @Override
         public String getName(BodyLocation loc, int severity) {
             return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName",
+                  Utilities.capitalize(loc.locationName()));
+        }
+    }
+
+    public static final class DermalMyomerArmorLeg extends Prosthetic {
+        DermalMyomerArmorLeg() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_LEGOR.simpleName");
+            this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
+            this.injuryEffect = MYOMER_IMPLANT_LEG;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_LEGOR.simpleName",
+                  Utilities.capitalize(loc.locationName()));
+        }
+    }
+
+    public static final class DermalMyomerCamoLeg extends Prosthetic {
+        DermalMyomerCamoLeg() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_CAMO.simpleName");
+            this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
+            this.injuryEffect = MYOMER_IMPLANT_LEG;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_CAMO.simpleName",
+                  Utilities.capitalize(loc.locationName()));
+        }
+    }
+
+    public static final class DermalMyomerTripleLeg extends Prosthetic {
+        DermalMyomerTripleLeg() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_TRIPLE.simpleName");
+            this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
+            this.injuryEffect = TRIPLE_STRENGTH_MYOMER_IMPLANT_LEG;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_TRIPLE.simpleName",
                   Utilities.capitalize(loc.locationName()));
         }
     }
@@ -1946,6 +2049,46 @@ public class AlternateInjuries {
         }
     }
 
+    public static final class VehicularDNI extends Prosthetic {
+        VehicularDNI() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.VEHICULAR_DNI.simpleName");
+            this.allowedLocations = Set.of(BRAIN);
+            this.injuryEffect = NONE;
+        }
+    }
+
+    public static final class BufferedVDNI extends Prosthetic {
+        BufferedVDNI() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.BUFFERED_VDNI.simpleName");
+            this.allowedLocations = Set.of(BRAIN);
+            this.injuryEffect = NONE;
+        }
+    }
+
+    public static final class BufferedVDNITripleCore extends Prosthetic {
+        BufferedVDNITripleCore() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.BUFFERED_VDNI_TRIPLE_CORE.simpleName");
+            this.allowedLocations = Set.of(BRAIN);
+            this.injuryEffect = TRIPLE_CORE_PROCESSOR;
+        }
+    }
+
+    public static final class PainShunt extends Prosthetic {
+        PainShunt() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.PAIN_SHUNT.simpleName");
+            this.allowedLocations = Set.of(BRAIN);
+            this.injuryEffect = InjuryEffect.PAIN_SHUNT;
+        }
+    }
+
     public static final class CosmeticLegProsthetic extends Prosthetic {
         CosmeticLegProsthetic() {
             super();
@@ -1990,6 +2133,17 @@ public class AlternateInjuries {
                   NONE,
                   Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.EI_IMPLANT_RECOVERY.simpleName");
+        }
+    }
+
+    public static final class PainShuntRecovery extends BaseInjury {
+        PainShuntRecovery() {
+            super(PAIN_SHUNT_RECOVERY_HEALING_DAYS, // Not a mistake
+                  false,
+                  MINOR,
+                  NONE,
+                  Set.of(GENERIC));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PAIN_SHUNT_RECOVERY.simpleName");
         }
     }
 

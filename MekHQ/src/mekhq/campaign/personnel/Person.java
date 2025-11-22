@@ -398,6 +398,7 @@ public class Person {
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
     private boolean quickTrainIgnore;
+    private boolean salvageSupervisor;
     // this is a flag used in determine whether a person is a potential marriage candidate provided that they are not
     // married, are old enough, etc.
     @Deprecated(since = "0.50.10", forRemoval = true)
@@ -619,6 +620,7 @@ public class Person {
 
             if (campaignOptions != null) {
                 resetMinutesLeft(campaignOptions.isTechsUseAdministration());
+                salvageSupervisor = campaignOptions.isEnableSalvageFlagByDefault();
             }
         }
 
@@ -2951,6 +2953,14 @@ public class Person {
         this.quickTrainIgnore = quickTrainIgnore;
     }
 
+    public boolean isSalvageSupervisor() {
+        return salvageSupervisor;
+    }
+
+    public void setSalvageSupervisor(final boolean salvageSupervisor) {
+        this.salvageSupervisor = salvageSupervisor;
+    }
+
     public boolean isEmployed() {
         return status != PersonnelStatus.CAMP_FOLLOWER;
     }
@@ -3543,6 +3553,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "founder", founder);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageSupervisor", salvageSupervisor);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersMen", prefersMen);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersWomen", prefersWomen);
@@ -4149,6 +4160,8 @@ public class Person {
                     person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("quickTrainIgnore")) {
                     person.setQuickTrainIgnore(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("salvageSupervisor")) {
+                    person.setSalvageSupervisor(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageable")) { // Legacy: <50.10
                     boolean marriageable = Boolean.parseBoolean(wn2.getTextContent().trim());
                     CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -7602,11 +7615,7 @@ public class Person {
                 changeFatigue(FATIGUE_INCREASE);
             }
 
-            int severity = 0;
-            for (Injury injury : injuries) {
-                severity += injury.getHits();
-            }
-
+            int severity = getTotalInjurySeverity();
             if ((severity > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
