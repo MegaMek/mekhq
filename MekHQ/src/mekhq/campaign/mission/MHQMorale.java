@@ -457,16 +457,26 @@ public class MHQMorale {
                 defeats += 2;
                 continue;
             }
+
             // Decisive Victory counts as 2 victories
             if (scenarioStatus.isDecisiveVictory()) {
                 victories += 2;
                 continue;
             }
-            // Pyrrhic Victory reduces victory count (negative consequence)
-            if (scenarioStatus.isPyrrhicVictory() || scenarioStatus.isFleetInBeing()) {
+
+            // Pyrrhic Victory counts as both a victory and a defeat (neutral consequence)
+            if (scenarioStatus.isPyrrhicVictory()) {
+                defeats++;
+                victories++;
+                continue;
+            }
+
+            // Fleet in being counts as a single defeat
+            if (scenarioStatus.isFleetInBeing()) {
                 defeats++;
                 continue;
             }
+
             // Overall Victory/Defeat, if not otherwise noted above
             if (scenarioStatus.isOverallVictory()) {
                 victories++;
