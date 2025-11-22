@@ -6354,11 +6354,10 @@ public class Campaign implements ITechManager {
 
         List<AtBContract> activeAtBContracts = getActiveAtBContracts();
 
-        if (!skipAccessCheck
-                  && campaignOptions.isUseFactionStandingOutlawedSafe()) {
-            FactionHints factionHints = FactionHints.getInstance();
+        FactionHints factionHints = FactionHints.getInstance();
+        if (!skipAccessCheck && campaignOptions.isUseFactionStandingOutlawedSafe()) {
             boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
-                  getCurrentSystem(), end, currentDay, activeAtBContracts, factionHints);
+                  start, end, currentDay, activeAtBContracts, factionHints);
             if (!canAccessSystem) {
                 new ImmersiveDialogSimple(this, getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT), null,
                       String.format(resources.getString("unableToEnterSystem.outlawed.ic"), getCommanderAddress()),
@@ -6391,7 +6390,11 @@ public class Campaign implements ITechManager {
         scoreG.put(current, 0.0);
         closed.add(current);
 
-        FactionHints factionHints = FactionHints.getInstance();
+        // We need this additional check as later we're going to be comparing neighbors, rather than start point.
+        // Which means that if we're passing through more than one Outlawed system en route to our escape our
+        // progress will be blocked.
+        boolean isEscapingOutlawing = !FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
+              null, start, currentDay, activeAtBContracts, factionHints);
 
         // A* search
         final int MAX_JUMPS = 10000;
@@ -6420,10 +6423,11 @@ public class Campaign implements ITechManager {
                 }
 
                 // Skip systems where the campaign is outlawed
-                if (!skipAccessCheck
-                          && campaignOptions.isUseFactionStandingOutlawedSafe()) {
+                if (!skipAccessCheck &&
+                          !isEscapingOutlawing &&
+                          campaignOptions.isUseFactionStandingOutlawedSafe()) {
                     boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
-                          getCurrentSystem(), neighborSystem, currentDay, activeAtBContracts, factionHints);
+                          currentSystem, neighborSystem, currentDay, activeAtBContracts, factionHints);
                     if (!canAccessSystem) {
                         return;
                     }
