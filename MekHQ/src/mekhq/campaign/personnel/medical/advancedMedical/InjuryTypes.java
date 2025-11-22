@@ -304,6 +304,13 @@ public final class InjuryTypes {
             InjuryType.register(181, "alt:BUFFERED_VDNI_TRIPLE_CORE", AlternateInjuries.BUFFERED_VDNI_TRIPLE_CORE);
             InjuryType.register(182, "alt:PAIN_SHUNT", AlternateInjuries.PAIN_SHUNT);
             InjuryType.register(183, "alt:PAIN_SHUNT_RECOVERY", AlternateInjuries.PAIN_SHUNT_RECOVERY);
+            InjuryType.register(184, "alt:POSTPARTUM_RECOVERY", AlternateInjuries.POSTPARTUM_RECOVERY);
+            InjuryType.register(185,
+                  "alt:TRANSIT_DISORIENTATION_SYNDROME",
+                  AlternateInjuries.TRANSIT_DISORIENTATION_SYNDROME);
+            InjuryType.register(186, "alt:CRIPPLING_FLASHBACKS", AlternateInjuries.CRIPPLING_FLASHBACKS);
+            InjuryType.register(187, "alt:CHILDLIKE_REGRESSION", AlternateInjuries.CHILDLIKE_REGRESSION);
+            InjuryType.register(188, "alt:CATATONIA", AlternateInjuries.CATATONIA);
 
             InjuryType.register("am:severed_spine", SEVERED_SPINE);
             InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);

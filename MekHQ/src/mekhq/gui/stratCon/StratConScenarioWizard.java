@@ -32,6 +32,7 @@
  */
 package mekhq.gui.stratCon;
 
+import static mekhq.MHQConstants.CONFIRMATION_STRATCON_BATCHALL_BREACH;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
@@ -984,8 +985,13 @@ public class StratConScenarioWizard extends JDialog {
                   null, true);
             backedOutOfBatchall = dialog.getDialogChoice() == CONTINUE_OPTION;
 
-            ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign);
-            dialogAccepted = confirmation.wasConfirmed();
+            if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_STRATCON_BATCHALL_BREACH)) {
+                ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign,
+                      CONFIRMATION_STRATCON_BATCHALL_BREACH);
+                dialogAccepted = confirmation.wasConfirmed();
+            } else {
+                dialogAccepted = true;
+            }
         }
 
         return !backedOutOfBatchall;

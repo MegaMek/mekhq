@@ -47,6 +47,7 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.Alternat
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_LEG_CAMO;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.ENHANCED_IMAGING_IMPLANT;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.ENHANCED_IMAGING;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.getProstheticTypeFromInjuryType;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -160,8 +161,9 @@ public class AdvancedMedicalAlternateImplants {
         boolean hasEnhancedImaging = options.booleanOption(UNOFFICIAL_EI_IMPLANT);
         boolean hasVDNI = options.booleanOption(MD_VDNI);
         boolean hasBufferedVDNI = options.booleanOption(MD_BVDNI);
+        boolean hasTooManyProsthetics = isHasTooManyProsthetics(person);
 
-        if (!hasEnhancedImaging && !hasVDNI && !hasBufferedVDNI) {
+        if (!hasEnhancedImaging && !hasVDNI && !hasBufferedVDNI && !hasTooManyProsthetics) {
             return;
         }
 
@@ -173,47 +175,141 @@ public class AdvancedMedicalAlternateImplants {
             return;
         }
 
+        int frequency = getFrequency(person.getPhenotype().isAerospace(), hasBufferedVDNI, hasVDNI, hasEnhancedImaging);
+
         int gameYear = campaign.getGameYear();
-
-        // Occurs every year for most characters, but every 3rd year for the Aerospace phenotype (ATOW pg 317). ATOW
-        // states that this occurs every 3rd full year, but I didn't want to add even more tracking to Person for
-        // such a niche thing, so instead it hits every 3rd canonical year.
-        int frequency = 1;
-        if (person.getPhenotype().isAerospace() || hasBufferedVDNI) {
-            frequency = 3;
+        if (gameYear % frequency == 0) {
+            processDegradationEffects(campaign, person, useFatigue, useAbilities, false);
         }
 
-        if (hasVDNI) {
-            frequency = 2;
+        frequency = 3;
+        if (hasTooManyProsthetics && gameYear % frequency == 0) {
+            processDegradationEffects(campaign, person, useFatigue, useAbilities, true);
+        }
+    }
+
+    private static void processDegradationEffects(Campaign campaign, Person person, boolean useFatigue,
+          boolean useAbilities, boolean isTooManyProsthetics) {
+        if (useFatigue) {
+            person.changePermanentFatigue(1);
+
+            String key = "AlternateInjuries.report." +
+                               (isTooManyProsthetics ? "prosthetics" : "implant") +
+                               ".fatigue";
+
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  key,
+                  spanOpeningWithCustomColor(getWarningColor()),
+                  CLOSING_SPAN_TAG,
+                  person.getHyperlinkedFullTitle()));
         }
 
-        boolean incrementPermanentFatigueDamage = !person.getPhenotype().isAerospace() || gameYear % frequency == 0;
-        if (incrementPermanentFatigueDamage) {
-            if (useFatigue) {
-                person.changePermanentFatigue(1);
+        int resistanceModifier = person.getOptions().booleanOption(UNOFFICIAL_IMPLANT_RESISTANCE) ? -2 : 0;
+        AttributeCheckUtility attributeCheckUtility = new AttributeCheckUtility(person, SkillAttribute.BODY,
+              SkillAttribute.WILLPOWER, new ArrayList<>(), resistanceModifier, true, false);
+        campaign.addReport(attributeCheckUtility.getResultsText());
+
+        if (!attributeCheckUtility.isSuccess() && useAbilities) {
+            String flaw = getAndApplyEIDegradationFlaw(person);
+            if (!flaw.isBlank()) {
+                String key = "AlternateInjuries.report." +
+                                   (isTooManyProsthetics ? "prosthetics" : "implant") +
+                                   ".degradation";
+
                 campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "AlternateInjuries.report.implant.fatigue",
-                      spanOpeningWithCustomColor(getWarningColor()),
+                      key,
+                      spanOpeningWithCustomColor(getNegativeColor()),
                       CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
+                      person.getHyperlinkedFullTitle(), flaw));
             }
+        }
+    }
 
-            int resistanceModifier = person.getOptions().booleanOption(UNOFFICIAL_IMPLANT_RESISTANCE) ? -2 : 0;
-            AttributeCheckUtility attributeCheckUtility = new AttributeCheckUtility(person, SkillAttribute.BODY,
-                  SkillAttribute.WILLPOWER, new ArrayList<>(), resistanceModifier, true, false);
-            campaign.addReport(attributeCheckUtility.getResultsText());
+    /**
+     * Determines whether the given person has exceeded the allowed number of high-impact prosthetics.
+     *
+     * <p>This method evaluates all active injuries for the person and counts how many of them map to a
+     * {@link ProstheticType} whose prosthetic category value is greater than {@code 3}. These represent major or
+     * invasive prosthetics that meaningfully affect the individual's physiology.</p>
+     *
+     * <p>Once the count reaches three, the method stops early and reports {@code true}. Otherwise, it returns {@code
+     * false}, indicating the person does not yet meet the threshold.</p>
+     *
+     * @param person the person whose prosthetic load is being checked
+     *
+     * @return {@code true} if the person has at least three qualifying prosthetics; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static boolean isHasTooManyProsthetics(Person person) {
+        int prostheticThreshold = 3;
+        int eligibleProstheticsCount = 0;
 
-            if (!attributeCheckUtility.isSuccess() && useAbilities) {
-                String flaw = getAndApplyEIDegradationFlaw(person);
-                if (!flaw.isBlank()) {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                          "AlternateInjuries.report.implant.degradation",
-                          spanOpeningWithCustomColor(getNegativeColor()),
-                          CLOSING_SPAN_TAG,
-                          person.getHyperlinkedFullTitle(), flaw));
+        for (Injury injury : person.getInjuries()) {
+            ProstheticType prostheticType = getProstheticTypeFromInjuryType(injury.getType());
+
+            if (prostheticType != null) {
+                int type = prostheticType.getProstheticType();
+                if (type == 4 || type == 5) {
+                    eligibleProstheticsCount++;
+                }
+
+                if (eligibleProstheticsCount >= prostheticThreshold) {
+                    break;
                 }
             }
         }
+
+        return eligibleProstheticsCount >= prostheticThreshold;
+    }
+
+    /**
+     * Computes how often a character must perform their neurological stability check, based on phenotype and implanted
+     * systems.
+     *
+     * <p>The returned value represents how frequently (in years) the check should occur. A base frequency of
+     * {@code 1} year is used unless modified by specific augmentations:</p>
+     *
+     * <ul>
+     *     <li><b>Buffered VDNI</b> — Increases the interval to every 3 years.</li>
+     *     <li><b>Standard VDNI</b> — Sets the interval to every 2 years.</li>
+     *     <li><b>Enhanced Imaging (EI)</b> — Occurs every year for most characters, but every 3rd year for those
+     *     with the Aerospace phenotype. This follows ATOW p. 317, though MekHQ simplifies the “every 3rd full year”
+     *     rule to every 3 canonical years to avoid additional state tracking.</li>
+     * </ul>
+     *
+     * <p>Priority is applied in the order listed: EI overrides VDNI, which overrides buffered VDNI and prosthetic
+     * overload.</p>
+     *
+     * @param isAerospacePhenotype whether the character uses an aerospace phenotype body
+     * @param hasBufferedVDNI      whether the character possesses buffered VDNI
+     * @param hasVDNI              whether the character has standard VDNI
+     * @param hasEnhancedImaging   whether the character has Enhanced Imaging installed
+     *
+     * @return the number of years between required neurological stability checks
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static int getFrequency(boolean isAerospacePhenotype, boolean hasBufferedVDNI, boolean hasVDNI,
+          boolean hasEnhancedImaging) {
+        if (hasBufferedVDNI) {
+            return 3;
+        }
+
+        if (hasVDNI) {
+            return 2;
+        }
+
+        if (hasEnhancedImaging) {
+            // Occurs every year for most characters, but every 3rd year for the Aerospace phenotype (ATOW pg 317). ATOW
+            // states that this occurs every 3rd full year, but I didn't want to add even more tracking to Person for
+            // such a niche thing, so instead it hits every 3rd canonical year.
+            return isAerospacePhenotype ? 3 : 1;
+        }
+
+        return 1;
     }
 
     /**
@@ -260,11 +356,11 @@ public class AdvancedMedicalAlternateImplants {
         int dermalCamoCount = 0;
         for (Injury injury : injuries) {
             InjuryType injuryType = injury.getType();
-            if (injuryType == DERMAL_MYOMER_ARM_ARMOR || injuries == DERMAL_MYOMER_LEG_ARMOR) {
+            if (injuryType == DERMAL_MYOMER_ARM_ARMOR || injuryType == DERMAL_MYOMER_LEG_ARMOR) {
                 dermalArmorCount++;
             }
 
-            if (injuryType == DERMAL_MYOMER_ARM_CAMO || injuries == DERMAL_MYOMER_LEG_CAMO) {
+            if (injuryType == DERMAL_MYOMER_ARM_CAMO || injuryType == DERMAL_MYOMER_LEG_CAMO) {
                 dermalCamoCount++;
             }
         }
@@ -272,7 +368,7 @@ public class AdvancedMedicalAlternateImplants {
         PersonnelOptions options = person.getOptions();
         int requiredLimbCount = 4;
         options.getOption(MD_DERMAL_ARMOR).setValue(dermalArmorCount >= requiredLimbCount);
-        options.getOption(MD_DERMAL_CAMO_ARMOR).setValue(dermalArmorCount >= requiredLimbCount);
+        options.getOption(MD_DERMAL_CAMO_ARMOR).setValue(dermalCamoCount >= requiredLimbCount);
     }
 
     /**

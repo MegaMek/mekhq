@@ -3089,11 +3089,8 @@ public class Campaign implements ITechManager {
 
     public List<Person> getPatients() {
         List<Person> patients = new ArrayList<>();
-        for (Person person : getPersonnel()) {
-            if (person.needsFixing() ||
-                      (getCampaignOptions().isUseAdvancedMedical() &&
-                             person.hasInjuries(true) &&
-                             person.getStatus().isActiveFlexible())) {
+        for (Person person : getActivePersonnel(true, true)) {
+            if (person.needsFixing()) {
                 patients.add(person);
             }
         }

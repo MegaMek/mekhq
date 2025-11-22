@@ -57,9 +57,6 @@ import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CATATONIA;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CHILDLIKE_REGRESSION;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.CRIPPLING_FLASHBACKS;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.getAllActiveInjuryEffects;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
@@ -132,6 +129,7 @@ import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.ranks.Rank;
@@ -3136,7 +3134,13 @@ public class Person {
             if (nTasks > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nTasks", nTasks);
             }
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doctorId", doctorId);
+
+            // Empty check is to self-correct instances where we didn't cleanly remove the doctor following injuries
+            // getting healed
+            if (!injuries.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doctorId", doctorId);
+            }
+
             if (getUnit() != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", getUnit().getId());
             }
@@ -5437,7 +5441,7 @@ public class Person {
     }
 
     public boolean needsFixing() {
-        return ((hits > 0) || needsAMFixing()) && getStatus().isActiveFlexible();
+        return (hits > 0) || needsAMFixing();
     }
 
     /**
@@ -7050,11 +7054,57 @@ public class Person {
         return injuries.stream().filter(i -> !i.getSubType().isProsthetic()).collect(Collectors.toList());
     }
 
-    public void clearInjuries() {
-        injuries.clear();
+    /**
+     * Removes all non-prosthetic injuries from this person.
+     *
+     * <p>Any injury whose subtype does <em>not</em> identify as a prosthetic is removed via
+     * {@link #removeInjury(Injury)}. Prosthetic injuries are left intact. If removal results in the person having no
+     * remaining injuries, the assigned {@code doctorId} is cleared.</p>
+     *
+     * <p>After modifications are complete, a {@link PersonChangedEvent} is fired to notify the campaign of the
+     * update.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public void clearInjuriesExcludingProsthetics() {
+        for (Injury injury : injuries) {
+            if (!injury.getSubType().isProsthetic()) {
+                removeInjury(injury);
+            }
+        }
 
-        // Clear the doctor if there is one
-        doctorId = null;
+        if (injuries.isEmpty()) {
+            doctorId = null;
+        }
+
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    /**
+     * Removes all prosthetic-related injuries from this person.
+     *
+     * <p>Any injury whose subtype identifies as a prosthetic is removed via {@link #removeInjury(Injury)}.
+     * Non-prosthetic injuries remain untouched. If removal results in the person having no remaining injuries, the
+     * assigned {@code doctorId} is cleared.</p>
+     *
+     * <p>After modifications are complete, a {@link PersonChangedEvent} is fired to notify the campaign of the
+     * update.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public void clearProstheticInjuries() {
+        for (Injury injury : injuries) {
+            if (injury.getSubType().isProsthetic()) {
+                removeInjury(injury);
+            }
+        }
+
+        if (injuries.isEmpty()) {
+            doctorId = null;
+        }
+
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
@@ -7595,12 +7645,15 @@ public class Person {
         final int DEATH_THRESHOLD = 5;
 
         if (hasCompulsionAddiction && failedWillpowerCheck) {
-            if (useAdvancedMedical || isUseAltAdvancedMedical) {
+            if (useAdvancedMedical) {
                 Injury injury;
-                if (useAdvancedMedical) {
-                    injury = InjuryTypes.DISCONTINUATION_SYNDROME.newInjury(campaign, this, INTERNAL, 1);
-                } else {
+                if (isUseAltAdvancedMedical &&
+                          // These injury types don't stack
+                          !AdvancedMedicalAlternate.hasInjuryOfType(injuries,
+                                AlternateInjuries.DISCONTINUATION_SYNDROME)) {
                     injury = AlternateInjuries.DISCONTINUATION_SYNDROME.newInjury(campaign, this, GENERIC, 1);
+                } else {
+                    injury = InjuryTypes.DISCONTINUATION_SYNDROME.newInjury(campaign, this, INTERNAL, 1);
                 }
 
                 if (injury != null) {
@@ -7633,22 +7686,31 @@ public class Person {
      * <p>If the number of injuries or hits exceeds a predefined threshold, the character's status is updated to
      * {@link PersonnelStatus#MEDICAL_COMPLICATIONS} (killed).</p>
      *
-     * @param campaign             The current campaign context.
-     * @param useAdvancedMedical   {@code true} if advanced medical care is available; {@code false} otherwise.
-     * @param hasFlashbacks        {@code true} if the personnel is suffering from flashbacks.
-     * @param failedWillpowerCheck {@code true} if the personnel failed their willpower check due to flashbacks.
+     * @param campaign                The current campaign context.
+     * @param useAdvancedMedical      {@code true} if advanced medical care is enabled
+     * @param isUseAltAdvancedMedical {@code true} if advanced medical's alt mode is enabled
+     * @param hasFlashbacks           {@code true} if the personnel is suffering from flashbacks.
+     * @param failedWillpowerCheck    {@code true} if the personnel failed their willpower check due to flashbacks.
      *
      * @author Illiani
      * @since 0.50.07
      */
     public void processCripplingFlashbacks(Campaign campaign, boolean useAdvancedMedical,
+          boolean isUseAltAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasFlashbacks, boolean failedWillpowerCheck) {
         final int DEATH_THRESHOLD = 5;
 
         if (hasFlashbacks && failedWillpowerCheck) {
             if (useAdvancedMedical) {
-                Injury injury = CRIPPLING_FLASHBACKS.newInjury(campaign, this, INTERNAL, 1);
+                Injury injury;
+                if (isUseAltAdvancedMedical &&
+                          // These injury types don't stack
+                          !AdvancedMedicalAlternate.hasInjuryOfType(injuries, AlternateInjuries.CRIPPLING_FLASHBACKS)) {
+                    injury = AlternateInjuries.CRIPPLING_FLASHBACKS.newInjury(campaign, this, GENERIC, 1);
+                } else {
+                    injury = InjuryTypes.CRIPPLING_FLASHBACKS.newInjury(campaign, this, INTERNAL, 1);
+                }
                 addInjury(injury);
             } else {
                 hits += 1;
@@ -7906,19 +7968,28 @@ public class Person {
      * of injuries or hits exceeds a defined threshold, the personnel status is changed to indicate medical
      * complications (killed).</p>
      *
-     * @param campaign             the {@link Campaign} context in which the effects are processed
-     * @param useAdvancedMedical   {@code true} to use advanced medical injury processing
-     * @param hasRegression        {@code true} if the character is affected by childlike regression
-     * @param failedWillpowerCheck {@code true} if the character failed their willpower check
+     * @param campaign                the {@link Campaign} context in which the effects are processed
+     * @param useAdvancedMedical      {@code true} to use advanced medical injury processing
+     * @param isUseAltAdvancedMedical {@code true} if advanced medical's alt mode is enabled
+     * @param hasRegression           {@code true} if the character is affected by childlike regression
+     * @param failedWillpowerCheck    {@code true} if the character failed their willpower check
      */
     public String processChildlikeRegression(Campaign campaign, boolean useAdvancedMedical,
+          boolean isUseAltAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasRegression, boolean failedWillpowerCheck) {
         final int DEATH_THRESHOLD = 5;
 
         if (hasRegression && failedWillpowerCheck) {
             if (useAdvancedMedical) {
-                Injury injury = CHILDLIKE_REGRESSION.newInjury(campaign, this, INTERNAL, 1);
+                Injury injury;
+                if (isUseAltAdvancedMedical &&
+                          // These injury types don't stack
+                          !AdvancedMedicalAlternate.hasInjuryOfType(injuries, AlternateInjuries.CHILDLIKE_REGRESSION)) {
+                    injury = AlternateInjuries.CHILDLIKE_REGRESSION.newInjury(campaign, this, GENERIC, 1);
+                } else {
+                    injury = InjuryTypes.CHILDLIKE_REGRESSION.newInjury(campaign, this, INTERNAL, 1);
+                }
                 addInjury(injury);
             } else {
                 hits += 1;
@@ -7944,24 +8015,32 @@ public class Person {
      * either case, the method returns a formatted string describing the catatonia episode. If the conditions are not
      * met, it returns an empty string.</p>
      *
-     * @param campaign             the current campaign context
-     * @param useAdvancedMedical   {@code true} to use advanced medical rules, {@code false} otherwise
-     * @param hasCatatonia         {@code true} if the person is suffering from catatonia
-     * @param failedWillpowerCheck {@code true} if the person failed their willpower check
+     * @param campaign                the current campaign context
+     * @param useAdvancedMedical      {@code true} to use advanced medical rules, {@code false} otherwise
+     * @param isUseAltAdvancedMedical {@code true} to use alt advanced medical rules, {@code false} otherwise
+     * @param hasCatatonia            {@code true} if the person is suffering from catatonia
+     * @param failedWillpowerCheck    {@code true} if the person failed their willpower check
      *
      * @return description of the resulting catatonia episode, or an empty string if no episode occurred
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public String processCatatonia(Campaign campaign, boolean useAdvancedMedical,
+    public String processCatatonia(Campaign campaign, boolean useAdvancedMedical, boolean isUseAltAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasCatatonia, boolean failedWillpowerCheck) {
         final int DEATH_THRESHOLD = 5;
 
         if (hasCatatonia && failedWillpowerCheck) {
             if (useAdvancedMedical) {
-                Injury injury = CATATONIA.newInjury(campaign, this, INTERNAL, 1);
+                Injury injury;
+                if (isUseAltAdvancedMedical &&
+                          // These injury types don't stack
+                          !AdvancedMedicalAlternate.hasInjuryOfType(injuries, AlternateInjuries.CATATONIA)) {
+                    injury = AlternateInjuries.CATATONIA.newInjury(campaign, this, GENERIC, 1);
+                } else {
+                    injury = InjuryTypes.CATATONIA.newInjury(campaign, this, INTERNAL, 1);
+                }
                 addInjury(injury);
             } else {
                 hits += 1;
@@ -7981,7 +8060,7 @@ public class Person {
     /**
      * Processes the effects of "confusion" for a personnel based on their mental state.
      *
-     * <p>If the personnel has both "madness confusion", and has failed a willpower check, applies random damage
+     * <p>If the personnel has both "madness confusion" and has failed a willpower check, applies random damage
      * (injury or hit points depending on the medical system in use), and changes their status to medical complications
      * if the number of injuries or hits exceeds a set threshold.</p>
      *
@@ -8053,6 +8132,11 @@ public class Person {
         final int DEATH_THRESHOLD = 5;
 
         if (hasBerserker && failedWillpowerCheck) {
+            if (randomInt(4) != 0) { // the character was restrained before they could do harm
+                return String.format(resources.getString("compulsion.berserker.restrained"), getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
+            }
+
             LocalDate today = campaign.getLocalDate();
             Set<Person> victims = new HashSet<>();
             List<Person> allActivePersonnel = campaign.getActivePersonnel(true, true);
@@ -8082,7 +8166,7 @@ public class Person {
                 }
             }
 
-            return String.format(resources.getString("compulsion.berserker"), getHyperlinkedFullTitle(),
+            return String.format(resources.getString("compulsion.berserker.normal"), getHyperlinkedFullTitle(),
                   spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
         }
 
