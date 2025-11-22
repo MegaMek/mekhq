@@ -89,6 +89,7 @@ class SkillCheckUtilityTest {
     @Test
     void testIsPersonNull_EdgeDisallowed() {
         SkillCheckUtility checkUtility = new SkillCheckUtility(null,
+              null,
               S_GUN_MEK,
               null,
               0,
@@ -115,6 +116,7 @@ class SkillCheckUtilityTest {
     @Test
     void testIsPersonNull_EdgeAllowed() {
         SkillCheckUtility checkUtility = new SkillCheckUtility(null,
+              null,
               S_GUN_MEK,
               null,
               0,
