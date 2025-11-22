@@ -263,7 +263,6 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         setTechnicalLogPanel(new DailyReportLogPanel(getGUI()));
         getTechnicalLogPanel().refreshLog(gui.getCommandCenterTab().getTechnicalLog().getLogText());
 
-        int index = 0;
         EnhancedTabbedPane dailyReportTab = new EnhancedTabbedPane();
         dailyReportTab.addTab(GENERAL.getIconString(), getDailyLogPanel());
         dailyReportTab.setToolTipTextAt(GENERAL.getTabIndex(), GENERAL.getTooltip());

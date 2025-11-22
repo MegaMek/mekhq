@@ -530,7 +530,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         pnlTechnicalLog.setMinimumSize(size);
         pnlTechnicalLog.setPreferredSize(size);
 
-        int index = 0;
         tabLogs = new EnhancedTabbedPane();
         tabLogs.addTab(GENERAL.getIconString(), pnlGeneralLog);
         tabLogs.setToolTipTextAt(GENERAL.getTabIndex(), GENERAL.getTooltip());
