@@ -36,10 +36,13 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPan
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
@@ -51,6 +54,7 @@ import megamek.common.enums.SkillLevel;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -152,8 +156,8 @@ public class RulesetsTab {
     private CampaignOptionsHeaderPanel legacyHeader;
     // end Legacy Options
 
-    private JCheckBox chkUseStratCon;
-    private JCheckBox chkUseStratConMaplessMode;
+    private JLabel lblStratConPlayType;
+    private MMComboBox<StratConPlayType> comboStratConPlayType;
     private JCheckBox chkUseAdvancedScouting;
     private JCheckBox chkNoSeedForces;
     private JCheckBox chkUseGenericBattleValue;
@@ -697,8 +701,29 @@ public class RulesetsTab {
      * Initializes the StratCon (Strategic Context) section of the tab.
      */
     private void initializeStratConTab() {
-        chkUseStratCon = new JCheckBox();
-        chkUseStratConMaplessMode = new JCheckBox();
+        lblStratConPlayType = new JLabel("StratConPlayType");
+        comboStratConPlayType = new MMComboBox<>("StratConPlayType", StratConPlayType.values());
+        comboStratConPlayType.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(
+                  JList<?> list,
+                  Object value,
+                  int index,
+                  boolean isSelected,
+                  boolean cellHasFocus) {
+
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                      list, value, index, isSelected, cellHasFocus);
+
+                if (value instanceof StratConPlayType type) {
+                    // Whatever you want your tooltip to be
+                    label.setToolTipText(type.getTooltip());
+                }
+
+                return label;
+            }
+        });
+
         chkUseAdvancedScouting = new JCheckBox();
         chkNoSeedForces = new JCheckBox();
         chkUseGenericBattleValue = new JCheckBox();
@@ -779,10 +804,9 @@ public class RulesetsTab {
         chkAutoConfigMunitions.addMouseListener(createTipPanelUpdater(stratConHeader, "AutoConfigMunitions"));
 
         // Content
-        chkUseStratCon = new CampaignOptionsCheckBox("UseStratCon");
-        chkUseStratCon.addMouseListener(createTipPanelUpdater(stratConHeader, "UseStratCon"));
-        chkUseStratConMaplessMode = new CampaignOptionsCheckBox("UseStratConMaplessMode");
-        chkUseStratConMaplessMode.addMouseListener(createTipPanelUpdater(stratConHeader, "UseStratConMaplessMode"));
+        lblStratConPlayType = new CampaignOptionsLabel("StratConPlayType");
+        lblStratConPlayType.addMouseListener(createTipPanelUpdater(stratConHeader, "StratConPlayType"));
+        comboStratConPlayType.addMouseListener(createTipPanelUpdater(stratConHeader, "StratConPlayType"));
         chkUseAdvancedScouting = new CampaignOptionsCheckBox("UseAdvancedScouting");
         chkUseAdvancedScouting.addMouseListener(createTipPanelUpdater(stratConHeader, "UseAdvancedScouting"));
         chkNoSeedForces = new CampaignOptionsCheckBox("NoSeedForces");
@@ -803,13 +827,13 @@ public class RulesetsTab {
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(chkUseStratCon, layout);
+        panel.add(lblStratConPlayType, layout);
+        layout.gridx++;
+        panel.add(comboStratConPlayType, layout);
         layout.gridx++;
         panel.add(chkUseAdvancedScouting, layout);
         layout.gridx++;
         panel.add(chkNoSeedForces, layout);
-        layout.gridx++;
-        panel.add(chkUseStratConMaplessMode, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -928,8 +952,7 @@ public class RulesetsTab {
         options.setAutoResolveExperimentalPacarGuiEnabled(chkAutoResolveExperimentalPacarGuiEnabled.isSelected());
 
         // StratCon
-        options.setUseStratCon(chkUseStratCon.isSelected());
-        options.setUseStratConMaplessMode(chkUseStratConMaplessMode.isSelected());
+        options.setStratConPlayType(comboStratConPlayType.getSelectedItem());
         options.setUseAdvancedScouting(chkUseAdvancedScouting.isSelected());
         options.setNoSeedForces(chkNoSeedForces.isSelected());
         options.setUseGenericBattleValue(chkUseGenericBattleValue.isSelected());
@@ -992,8 +1015,7 @@ public class RulesetsTab {
         spnAutoResolveNumberOfScenarios.setValue(options.getAutoResolveNumberOfScenarios());
 
         // StratCon
-        chkUseStratCon.setSelected(options.isUseStratCon());
-        chkUseStratConMaplessMode.setSelected(options.isUseStratConMaplessMode());
+        comboStratConPlayType.setSelectedItem(options.getStratConPlayType());
         chkUseAdvancedScouting.setSelected(options.isUseAdvancedScouting());
         chkNoSeedForces.setSelected(options.isNoSeedForces());
         chkUseGenericBattleValue.setSelected(options.isUseGenericBattleValue());

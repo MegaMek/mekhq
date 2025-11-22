@@ -55,6 +55,7 @@ import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
+import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -843,8 +844,18 @@ public class CampaignOptionsUnmarshaller {
             case "useAtB" -> {
                 return true; // < 50.10 compatibility handler
             }
-            case "useStratCon" -> campaignOptions.setUseStratCon(parseBoolean(nodeContents));
-            case "useMaplessStratCon" -> campaignOptions.setUseStratConMaplessMode(parseBoolean(nodeContents));
+            case "stratConPlayType" ->
+                  campaignOptions.setStratConPlayType(StratConPlayType.fromLookupName(nodeContents));
+            case "useStratCon" -> { // < 50.10 compatibility handler
+                if (parseBoolean(nodeContents)) {
+                    campaignOptions.setStratConPlayType(StratConPlayType.NORMAL);
+                }
+            }
+            case "useMaplessStratCon" -> { // < 50.10 compatibility handler
+                if (parseBoolean(nodeContents)) {
+                    campaignOptions.setStratConPlayType(StratConPlayType.MAPLESS);
+                }
+            }
             case "useAdvancedScouting" -> campaignOptions.setUseAdvancedScouting(parseBoolean(nodeContents));
             case "noSeedForces" -> campaignOptions.setNoSeedForces(parseBoolean(nodeContents));
             case "useGenericBattleValue" -> campaignOptions.setUseGenericBattleValue(parseBoolean(nodeContents));

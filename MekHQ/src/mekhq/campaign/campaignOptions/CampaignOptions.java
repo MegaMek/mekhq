@@ -69,6 +69,7 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -624,7 +625,7 @@ public class CampaignOptions {
     // endregion Markets Tab
 
     // region Against the Bot Tab
-    private boolean useStratCon;
+    private StratConPlayType stratConPlayType;
     private boolean useMaplessStratCon;
     private boolean useAdvancedScouting;
     private boolean noSeedForces;
@@ -1282,7 +1283,7 @@ public class CampaignOptions {
         // endregion Markets Tab
 
         // region Against the Bot Tab
-        useStratCon = false;
+        stratConPlayType = StratConPlayType.DISABLED;
         useMaplessStratCon = false;
         useAdvancedScouting = false;
         noSeedForces = false;
@@ -4847,15 +4848,19 @@ public class CampaignOptions {
 
     @Deprecated(since = "0.50.10", forRemoval = false)
     public boolean isUseAtB() {
-        return useStratCon;
+        return isUseStratCon();
     }
 
     public boolean isUseStratCon() {
-        return useStratCon;
+        return getStratConPlayType() != StratConPlayType.DISABLED;
     }
 
-    public void setUseStratCon(final boolean useStratCon) {
-        this.useStratCon = useStratCon;
+    public StratConPlayType getStratConPlayType() {
+        return stratConPlayType;
+    }
+
+    public void setStratConPlayType(final StratConPlayType stratConPlayType) {
+        this.stratConPlayType = stratConPlayType;
     }
 
     public boolean isUseStratConMaplessMode() {
@@ -5087,7 +5092,7 @@ public class CampaignOptions {
      *                          {@code false}, this allows the method to ignore StratCon-enabled status.
      */
     public int getAtBBattleChance(CombatRole role, boolean useStratConBypass) {
-        if (useStratCon && useStratConBypass) {
+        if (isUseStratCon() && useStratConBypass) {
             return 0;
         }
 
