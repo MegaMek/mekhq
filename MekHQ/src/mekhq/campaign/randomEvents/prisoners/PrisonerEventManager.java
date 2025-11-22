@@ -486,7 +486,7 @@ public class PrisonerEventManager {
      *
      * <p>If at least one breach occurs, the selected contract’s morale level is improved by the number of breaches,
      * and a corresponding {@link ImmersiveDialogNotification} is displayed to the user. Contracts at
-     * {@link AtBMoraleLevel#OVERWHELMING} morale are excluded from selection as their morale cannot improve.</p>
+     * {@link AtBMoraleLevel#OVERWHELMING} or {@link AtBMoraleLevel#ROUTED} morale are excluded from selection.</p>
      *
      * @param campaign           the {@link Campaign} context in which the event occurs
      * @param freedPrisonerCount the total number of prisoners freed by the player
@@ -495,8 +495,13 @@ public class PrisonerEventManager {
      * @since 0.50.10
      */
     public static void checkForIntelBreachEvent(Campaign campaign, int freedPrisonerCount) {
+        if (!campaign.getCampaignOptions().getPrisonerCaptureStyle().isMekHQ()) {
+            return;
+        }
+
         List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
-        activeContracts.removeIf(contract -> contract.getMoraleLevel().isOverwhelming());
+        activeContracts.removeIf(contract -> contract.getMoraleLevel().isOverwhelming() ||
+                                                   contract.getMoraleLevel().isRouted());
         if (activeContracts.isEmpty()) {
             return; // No risk of event
         }
