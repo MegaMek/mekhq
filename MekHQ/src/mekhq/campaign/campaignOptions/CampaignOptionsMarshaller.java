@@ -211,6 +211,7 @@ public class CampaignOptionsMarshaller {
               "useRandomUnitQualities",
               campaignOptions.isUseRandomUnitQualities());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryModifiers", campaignOptions.isUsePlanetaryModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useNoTornadoes", campaignOptions.isUseNoTornadoes());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "useUnofficialMaintenance",
