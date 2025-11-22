@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.stratCon;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
@@ -207,8 +208,9 @@ public class StratConRulesManager {
      */
     public static void generateScenariosDatesForWeek(Campaign campaign, StratConCampaignState campaignState,
           AtBContract contract, StratConTrackState track) {
-        // maps scenarios to force IDs
-        int scenarioRolls = track.getRequiredLanceCount();
+        // We divide the number of scenario rolls by the number of tracks so that we're not unintentionally
+        // multiplying Intensity by tracks
+        int scenarioRolls = (int) ceil(track.getRequiredLanceCount() / (double) campaignState.getTrackCount());
         for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
             int targetNum = calculateScenarioOdds(track, contract, false);
             int roll = randomInt(100);
@@ -741,23 +743,21 @@ public class StratConRulesManager {
             return;
         }
 
-        if (!isCombatChallenge) {
-            ContractCommandRights commandRights = contract.getCommandRights();
-            switch (commandRights) {
-                case INTEGRATED -> {
+        ContractCommandRights commandRights = contract.getCommandRights();
+        switch (commandRights) {
+            case INTEGRATED -> {
+                scenario.setTurningPoint(true);
+                setAttachedUnitsModifier(scenario, contract);
+            }
+            case HOUSE, LIAISON -> {
+                if (randomInt(3) == 0) {
                     scenario.setTurningPoint(true);
                     setAttachedUnitsModifier(scenario, contract);
                 }
-                case HOUSE, LIAISON -> {
-                    if (randomInt(3) == 0 || isObjective) {
-                        scenario.setTurningPoint(true);
-                        setAttachedUnitsModifier(scenario, contract);
-                    }
-                }
-                case INDEPENDENT -> {
-                    if (randomInt(3) == 0 || isObjective) {
-                        scenario.setTurningPoint(true);
-                    }
+            }
+            case INDEPENDENT -> {
+                if (randomInt(3) == 0) {
+                    scenario.setTurningPoint(true);
                 }
             }
         }

@@ -2407,4 +2407,52 @@ public class AtBContract extends Contract {
     public @Nullable Money getRoutedPayout() {
         return routedPayout;
     }
+
+    /**
+     * Calculates the number of required Victory Points (VP) needed to achieve overall success for this StratCon
+     * contract.
+     *
+     * <p>The calculation is based on several averaged campaign parameters:
+     * <ul>
+     *     <li><b>Base requirement</b> — Required number of combat teams multiplied by the contract length.</li>
+     *     <li><b>Scenario odds</b> — The mean scenario-odds percentage across all StratCon tracks, converted to a
+     *     probability.</li>
+     *     <li><b>Turning point chance</b> — A scaling factor based on command rights: {@code INTEGRATED} contracts
+     *     assume a 100% chance, while all others use a one-third chance.</li>
+     * </ul>
+     *
+     * <p>The final result estimates the expected number of Turning Points the player must win for overall contract
+     * success. If the player loses a handful of Turning Points, they should still be able to win the contract by
+     * being proactive in the Area of Operations.</p>
+     *
+     * @return the required number of Victory Points, rounded up to the nearest integer
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public int getRequiredVictoryPoints() {
+        double baseRequirement = getRequiredCombatTeams();
+
+        int duration = getLength();
+        if (contractType.isGarrisonType()) {
+            duration = (int) ceil(duration * 0.75); // We assume around 25% of the contract will be peaceful
+        }
+
+        double trackCount = 0;
+        int totalScenarioOdds = 0;
+        for (StratConTrackState trackState : stratconCampaignState.getTracks()) {
+            trackCount++;
+            totalScenarioOdds += trackState.getScenarioOdds();
+        }
+
+        double meanScenarioOdds = totalScenarioOdds / trackCount;
+        double scenarioOdds = meanScenarioOdds / 100.0;
+        double turningPointChance = switch (getCommandRights()) {
+            case INTEGRATED -> 1.0;
+            default -> 0.33;
+        };
+
+        // This result gives us the average number of Turning Points expected for the contract
+        return (int) ceil(baseRequirement * duration * scenarioOdds * turningPointChance);
+    }
 }

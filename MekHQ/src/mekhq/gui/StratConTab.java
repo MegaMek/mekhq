@@ -499,7 +499,7 @@ public class StratConTab extends CampaignGuiTab {
             }
 
             sb.append(" Maintain Campaign Victory Point count above <b>")
-                  .append(contract.getRequiredCombatTeams() * contract.getLength())
+                  .append(contract.getRequiredVictoryPoints())
                   .append("</b> by completing Turning Point scenarios")
                   .append("</span><br/>");
         }
