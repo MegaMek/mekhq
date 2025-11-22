@@ -40,6 +40,7 @@ import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.ELITE;
@@ -57,6 +58,8 @@ import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
@@ -1450,6 +1453,40 @@ public class AtBContract extends Contract {
 
     public void setMoraleLevel(final AtBMoraleLevel moraleLevel) {
         this.moraleLevel = moraleLevel;
+    }
+
+    /**
+     * Adjusts the current {@link AtBMoraleLevel} by the specified delta and returns the resulting morale level.
+     *
+     * <p>The method computes a new integer morale value by adding the given {@code delta} to the unit's current
+     * morale level, then clamps the result to the valid range defined by {@code MINIMUM_MORALE_LEVEL} and
+     * {@code MAXIMUM_MORALE_LEVEL}. It then attempts to resolve the resulting value to a corresponding
+     * {@link AtBMoraleLevel}.</p>
+     *
+     * <p>If the resolved morale level is valid (i.e., non-{@code null}), the unit's internal morale state is updated.
+     * If no valid enum constant exists for the computed level, the method leaves the current morale unchanged and
+     * returns the existing level.</p>
+     *
+     * <p><b>Note:</b> a positive delta improves the enemy morale, a negative delta decreases enemy morale.</p>
+     *
+     * @param delta the amount to adjust the current morale level by; may be positive or negative
+     *
+     * @return the new {@link AtBMoraleLevel} after applying the delta; if no corresponding morale level exists for the
+     *       computed value, the current morale level is returned unchanged
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public AtBMoraleLevel changeMoraleLevel(final int delta) {
+        int currentLevel = moraleLevel.getLevel();
+        int newLevel = clamp(currentLevel + delta, MINIMUM_MORALE_LEVEL, MAXIMUM_MORALE_LEVEL);
+
+        AtBMoraleLevel newMoraleLevel = AtBMoraleLevel.parseFromLevel(newLevel);
+        if (newMoraleLevel != null) {
+            moraleLevel = newMoraleLevel;
+        }
+
+        return newMoraleLevel != null ? newMoraleLevel : moraleLevel;
     }
 
     public boolean isPeaceful() {
