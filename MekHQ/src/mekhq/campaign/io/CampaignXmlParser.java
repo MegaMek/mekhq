@@ -862,6 +862,111 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                             campaign.getSkillReport().add(wn2.getTextContent());
                         }
                     }
+                } else if (nodeName.equalsIgnoreCase("battleReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getBattleReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getBattleReport().add(wn2.getTextContent());
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("personnelReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getPersonnelReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getPersonnelReport().add(wn2.getTextContent());
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("medicalReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getMedicalReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getMedicalReport().add(wn2.getTextContent());
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("acquisitionsReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getAcquisitionsReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getAcquisitionsReport().add(wn2.getTextContent());
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("technicalReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getTechnicalReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getTechnicalReport().add(wn2.getTextContent());
+                        }
+                    }
                 } else if (nodeName.equalsIgnoreCase("faction")) {
                     Faction faction = Factions.getInstance().getFaction(childNode.getTextContent());
                     campaign.setFaction(faction);
@@ -966,6 +1071,74 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             newSkillReports.add(report);
         }
         campaign.setNewSkillReports(newSkillReports);
+
+        campaign.setBattleReportHTML(Utilities.combineString(campaign.getBattleReport(), Campaign.REPORT_LINEBREAK));
+        List<String> newBattleReports = new ArrayList<>(campaign.getBattleReport().size() * 2);
+        boolean firstBattleReport = true;
+        for (String report : campaign.getBattleReport()) {
+            if (firstBattleReport) {
+                firstBattleReport = false;
+            } else {
+                newBattleReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newBattleReports.add(report);
+        }
+        campaign.setNewBattleReports(newBattleReports);
+
+        campaign.setPersonnelReportHTML(Utilities.combineString(campaign.getPersonnelReport(),
+              Campaign.REPORT_LINEBREAK));
+        List<String> newPersonnelReports = new ArrayList<>(campaign.getPersonnelReport().size() * 2);
+        boolean firstPersonnelReport = true;
+        for (String report : campaign.getPersonnelReport()) {
+            if (firstPersonnelReport) {
+                firstPersonnelReport = false;
+            } else {
+                newPersonnelReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newPersonnelReports.add(report);
+        }
+        campaign.setNewPersonnelReports(newPersonnelReports);
+
+        campaign.setMedicalReportHTML(Utilities.combineString(campaign.getMedicalReport(), Campaign.REPORT_LINEBREAK));
+        List<String> newMedicalReports = new ArrayList<>(campaign.getMedicalReport().size() * 2);
+        boolean firstMedicalReport = true;
+        for (String report : campaign.getMedicalReport()) {
+            if (firstMedicalReport) {
+                firstMedicalReport = false;
+            } else {
+                newMedicalReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newMedicalReports.add(report);
+        }
+        campaign.setNewMedicalReports(newMedicalReports);
+
+        campaign.setAcquisitionsReportHTML(Utilities.combineString(campaign.getAcquisitionsReport(),
+              Campaign.REPORT_LINEBREAK));
+        List<String> newAcquisitionsReports = new ArrayList<>(campaign.getAcquisitionsReport().size() * 2);
+        boolean firstAcquisitionsReport = true;
+        for (String report : campaign.getAcquisitionsReport()) {
+            if (firstAcquisitionsReport) {
+                firstAcquisitionsReport = false;
+            } else {
+                newAcquisitionsReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newAcquisitionsReports.add(report);
+        }
+        campaign.setNewAcquisitionsReports(newAcquisitionsReports);
+
+        campaign.setTechnicalReportHTML(Utilities.combineString(campaign.getTechnicalReport(),
+              Campaign.REPORT_LINEBREAK));
+        List<String> newTechnicalReports = new ArrayList<>(campaign.getTechnicalReport().size() * 2);
+        boolean firstTechnicalReport = true;
+        for (String report : campaign.getTechnicalReport()) {
+            if (firstTechnicalReport) {
+                firstTechnicalReport = false;
+            } else {
+                newTechnicalReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newTechnicalReports.add(report);
+        }
+        campaign.setNewTechnicalReports(newTechnicalReports);
     }
 
     private static void processCombatTeamNodes(Campaign campaign, Node workingNode) {
