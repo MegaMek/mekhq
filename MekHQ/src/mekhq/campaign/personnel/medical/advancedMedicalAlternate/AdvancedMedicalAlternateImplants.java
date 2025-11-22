@@ -46,6 +46,7 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.Alternat
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_LEG_ARMOR;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_LEG_CAMO;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.ENHANCED_IMAGING_IMPLANT;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.DERMAL_MYOMER_ARM_ARMOR;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.ENHANCED_IMAGING;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.getProstheticTypeFromInjuryType;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -215,7 +216,7 @@ public class AdvancedMedicalAlternateImplants {
                 String key = "AlternateInjuries.report." +
                                    (isTooManyProsthetics ? "prosthetics" : "implant") +
                                    ".degradation";
-                
+
                 campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
                       key,
                       spanOpeningWithCustomColor(getNegativeColor()),
