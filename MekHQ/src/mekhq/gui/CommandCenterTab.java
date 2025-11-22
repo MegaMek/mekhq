@@ -33,8 +33,14 @@
 package mekhq.gui;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+import static mekhq.campaign.enums.DailyReportType.BATTLE;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.MEDICAL;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
-import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -524,14 +530,22 @@ public final class CommandCenterTab extends CampaignGuiTab {
         pnlTechnicalLog.setMinimumSize(size);
         pnlTechnicalLog.setPreferredSize(size);
 
+        int index = 0;
         tabLogs = new EnhancedTabbedPane();
-        tabLogs.addTab(getText("tabLogs.general"), pnlGeneralLog);
-        tabLogs.addTab(getText("tabLogs.battle"), pnlBattleLog);
-        tabLogs.addTab(getText("tabLogs.personnel"), pnlPersonnelLog);
-        tabLogs.addTab(getText("tabLogs.medical"), pnlMedicalLog);
-        tabLogs.addTab(getText("tabLogs.acquisitions"), pnlAcquisitionsLog);
-        tabLogs.addTab(getText("tabLogs.technical"), pnlTechnicalLog);
-        tabLogs.addTab(getText("tabLogs.skill"), pnlSkillLog);
+        tabLogs.addTab(GENERAL.getIconString(), pnlGeneralLog);
+        tabLogs.setToolTipTextAt(GENERAL.getTabIndex(), GENERAL.getTooltip());
+        tabLogs.addTab(BATTLE.getIconString(), pnlBattleLog);
+        tabLogs.setToolTipTextAt(BATTLE.getTabIndex(), BATTLE.getTooltip());
+        tabLogs.addTab(PERSONNEL.getIconString(), pnlPersonnelLog);
+        tabLogs.setToolTipTextAt(PERSONNEL.getTabIndex(), PERSONNEL.getTooltip());
+        tabLogs.addTab(MEDICAL.getIconString(), pnlMedicalLog);
+        tabLogs.setToolTipTextAt(MEDICAL.getTabIndex(), MEDICAL.getTooltip());
+        tabLogs.addTab(ACQUISITIONS.getIconString(), pnlAcquisitionsLog);
+        tabLogs.setToolTipTextAt(ACQUISITIONS.getTabIndex(), ACQUISITIONS.getTooltip());
+        tabLogs.addTab(TECHNICAL.getIconString(), pnlTechnicalLog);
+        tabLogs.setToolTipTextAt(TECHNICAL.getTabIndex(), TECHNICAL.getTooltip());
+        tabLogs.addTab(SKILL_CHECKS.getIconString(), pnlSkillLog);
+        tabLogs.setToolTipTextAt(SKILL_CHECKS.getTabIndex(), SKILL_CHECKS.getTooltip());
     }
 
     /**
