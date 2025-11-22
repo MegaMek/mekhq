@@ -202,8 +202,14 @@ public class AttributeCheckDialog {
         SkillAttribute firstAttribute = attributes.get(0);
         SkillAttribute secondAttribute = attributes.size() > 1 ? attributes.get(1) : null;
         boolean useEdge = choiceIndex == DIALOG_USE_EDGE_INDEX;
-        AttributeCheckUtility utility = new AttributeCheckUtility(character, firstAttribute, secondAttribute, null,
-              selectedModifier, useEdge, true);
+        AttributeCheckUtility utility = new AttributeCheckUtility(null,
+              character,
+              firstAttribute,
+              secondAttribute,
+              null,
+              selectedModifier,
+              useEdge,
+              true);
         isSuccess = utility.isSuccess();
 
         return utility.getResultsText();

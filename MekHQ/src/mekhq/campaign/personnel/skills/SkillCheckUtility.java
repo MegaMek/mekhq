@@ -40,6 +40,7 @@ import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfS
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessString;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -85,6 +86,7 @@ public class SkillCheckUtility {
      */
     protected static final int UNTRAINED_SKILL_MODIFIER = 4; // ATOW pg 43
 
+    private final String reason;
     private final Person person;
     private final String skillName;
     private int marginOfSuccess;
@@ -109,6 +111,7 @@ public class SkillCheckUtility {
      * <p><b>Usage:</b> This is a convenience constructor that excludes Reputation modifiers. Reputation modifiers
      * are only applied to Negotiation, Protocols/Any, and Streetwise/Any checks.</p>
      *
+     * @param reason                      the reason for the check; can be {@code null}
      * @param person                      the {@link Person} performing the skill check
      * @param skillName                   the name of the skill being used, corresponding to a {@link SkillType}
      * @param externalModifiers           an optional list of {@link TargetRollModifier}s that affect the target number
@@ -126,19 +129,19 @@ public class SkillCheckUtility {
      * @author Illiani
      * @since 0.50.05
      */
-    public SkillCheckUtility(final Person person, final String skillName,
+    public SkillCheckUtility(final @Nullable String reason, final Person person, final String skillName,
           @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier, final boolean useEdge,
           final boolean includeMarginsOfSuccessText) {
-        this.person = person;
-        this.skillName = skillName;
-        SkillCheckUtility proxy = new SkillCheckUtility(person, skillName, externalModifiers, miscModifier, useEdge,
+        this(reason,
+              person,
+              skillName,
+              externalModifiers,
+              miscModifier,
+              useEdge,
               includeMarginsOfSuccessText,
-              false, false, LocalDate.of(3151, 1, 1));
-        marginOfSuccess = proxy.getMarginOfSuccess();
-        resultsText = proxy.getResultsText();
-        targetNumber = proxy.getTargetNumber();
-        roll = proxy.getRoll();
-        usedEdge = proxy.isUsedEdge();
+              false,
+              false,
+              LocalDate.of(3151, 1, 1));
     }
 
     /**
@@ -158,6 +161,7 @@ public class SkillCheckUtility {
      * {@link #performQuickSkillCheck(Person, String, List, int, boolean, boolean, LocalDate)} method provides a more
      * streamlined approach.</p>
      *
+     * @param reason                      the reason for the check; can be {@code null}
      * @param person                      the {@link Person} performing the skill check
      * @param skillName                   the name of the skill being used, corresponding to a {@link SkillType}
      * @param externalModifiers           an optional list of {@link TargetRollModifier}s that affect the target number
@@ -178,10 +182,11 @@ public class SkillCheckUtility {
      * @author Illiani
      * @since 0.50.05
      */
-    public SkillCheckUtility(final Person person, final String skillName,
+    public SkillCheckUtility(final @Nullable String reason, final Person person, final String skillName,
           @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier, final boolean useEdge,
           final boolean includeMarginsOfSuccessText, boolean isUseAgingEffects, boolean isClanCampaign,
           LocalDate today) {
+        this.reason = reason;
         this.person = person;
         this.skillName = skillName;
 
@@ -251,7 +256,7 @@ public class SkillCheckUtility {
     public static boolean performQuickSkillCheck(final Person person, final String skillName,
           final @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier,
           boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
-        SkillCheckUtility skillCheck = new SkillCheckUtility(person, skillName, externalModifiers, miscModifier,
+        SkillCheckUtility skillCheck = new SkillCheckUtility(null, person, skillName, externalModifiers, miscModifier,
               false, false, isUseAgingEffects, isClanCampaign, today);
         return skillCheck.isSuccess();
     }
@@ -323,13 +328,12 @@ public class SkillCheckUtility {
      * @author Illiani
      * @since 0.50.05
      */
-    private String generateResultsText(boolean includeMarginsOfSuccessText) {
+    private String generateResultsText(boolean includeMarginsOfSuccessText, boolean hasNaturalAptitude) {
         if (skillName == null) {
             return getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.nullSkillName");
         }
 
         String fullTitle = person.getHyperlinkedFullTitle();
-        String firstName = person.getFirstName();
         String genderedReferenced = HIS_HER_THEIR.getDescriptor(person.getGender());
 
         String colorOpen;
@@ -341,10 +345,12 @@ public class SkillCheckUtility {
         } else {
             colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
         }
-        String status = getFormattedTextAt(RESOURCE_BUNDLE,
-              "skillCheck.results." + (isSuccess() ? "success" : "failure"));
-        String mainMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+
+        String status = getTextAt(RESOURCE_BUNDLE, "skillCheck.results." + (isSuccess() ? "success" : "failure"));
+
+        StringBuilder resultsText = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
               "skillCheck.results",
+              reason == null ? "" : "<b>" + reason + ":</b> ",
               fullTitle,
               colorOpen,
               status,
@@ -352,21 +358,23 @@ public class SkillCheckUtility {
               genderedReferenced,
               skillName,
               roll,
-              targetNumber.getValue());
+              targetNumber.getValue()));
 
-        String edgeUseText = !usedEdge ? "" : getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.rerolled", firstName);
+        if (hasNaturalAptitude) {
+            resultsText.append(" ").append(getTextAt(RESOURCE_BUNDLE, "skillCheck.naturalAptitude"));
+        }
 
-        if (!edgeUseText.isBlank()) {
-            mainMessage = mainMessage + "<p>" + edgeUseText + "</p>";
+        if (usedEdge) {
+            resultsText.append(" ").append(getTextAt(RESOURCE_BUNDLE, "skillCheck.rerolled"));
         }
 
         if (includeMarginsOfSuccessText) {
             MarginOfSuccess marginOfSuccessObject = getMarginOfSuccessObjectFromMarginValue(marginOfSuccess);
             String marginOfSuccessText = getMarginOfSuccessString(marginOfSuccessObject);
-            return mainMessage + "<p>" + marginOfSuccessText + "</p>";
-        } else {
-            return mainMessage;
+            resultsText.append(" ").append(marginOfSuccessText);
         }
+
+        return resultsText.toString();
     }
 
     /**
@@ -551,7 +559,7 @@ public class SkillCheckUtility {
      *                                    availability.
      * @param includeMarginsOfSuccessText whether to include detailed information about the margin of success in the
      *                                    final results text
-     * @param hasNaturalAptitude          whether the character has a Natural Aptitude ability in this skill
+     * @param hasNaturalAptitude          {@code true} if the character rolls 3d6 for this check, using the highest 2
      *
      * @author Illiani
      * @since 0.50.05
@@ -559,14 +567,14 @@ public class SkillCheckUtility {
     void performCheck(boolean useEdge, boolean hasNaturalAptitude, boolean includeMarginsOfSuccessText) {
         getRoll(hasNaturalAptitude);
 
-        if (performInitialRoll(useEdge, includeMarginsOfSuccessText)) {
+        if (performInitialRoll(useEdge, hasNaturalAptitude, includeMarginsOfSuccessText)) {
             return;
         }
 
         // Prevent us from burning Edge on impossible checks
         if (!targetNumber.cannotSucceed() || targetNumber.getValue() <= 12) {
             getRoll(hasNaturalAptitude);
-            rollWithEdge(includeMarginsOfSuccessText);
+            rollWithEdge(includeMarginsOfSuccessText, hasNaturalAptitude);
         }
     }
 
@@ -577,8 +585,7 @@ public class SkillCheckUtility {
      * for this skill, a third die is rolled. The final roll value is the sum of the highest two dice, determined using
      * {@link Compute#highestTwoIntegers(int...)}.</p>
      *
-     * @param hasNaturalAptitude {@code true} if the character receives an additional die for this roll, {@code false}
-     *                           otherwise
+     * @param hasNaturalAptitude {@code true} if the character rolls 3d6 for this check, using the highest 2
      *
      * @author Illiani
      * @since 0.50.10
@@ -611,6 +618,7 @@ public class SkillCheckUtility {
      * otherwise finalizes the results based on the initial roll.</p>
      *
      * @param useEdge                     whether to allow using edge points for a re-roll if the initial roll fails
+     * @param hasNaturalAptitude          {@code true} if the character rolls 3d6 for this check, using the highest 2
      * @param includeMarginsOfSuccessText whether to include detailed margin of success information in the results text
      *
      * @return {@code true} if the skill check is resolved using the initial roll (success or no edge re-roll possible);
@@ -619,7 +627,7 @@ public class SkillCheckUtility {
      * @author Illiani
      * @since 0.50.05
      */
-    boolean performInitialRoll(boolean useEdge, boolean includeMarginsOfSuccessText) {
+    boolean performInitialRoll(boolean useEdge, boolean hasNaturalAptitude, boolean includeMarginsOfSuccessText) {
         int availableEdge = person.getCurrentEdge();
         int targetNumberValue = targetNumber.getValue();
 
@@ -627,7 +635,7 @@ public class SkillCheckUtility {
             int difference = isCountUp ? targetNumberValue - roll : roll - targetNumberValue;
 
             marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(difference);
-            resultsText = generateResultsText(includeMarginsOfSuccessText);
+            resultsText = generateResultsText(includeMarginsOfSuccessText, hasNaturalAptitude);
             LOGGER.info(resultsText);
             return true;
         }
@@ -648,11 +656,12 @@ public class SkillCheckUtility {
      * depending on the value of the {@code includeMarginsOfSuccessText} parameter.</p>
      *
      * @param includeMarginsOfSuccessText whether to include detailed margin of success information in the results text
+     * @param hasNaturalAptitude          {@code true} if the character rolls 3d6 for this check, using the highest 2
      *
      * @author Illiani
      * @since 0.50.05
      */
-    private void rollWithEdge(boolean includeMarginsOfSuccessText) {
+    private void rollWithEdge(boolean includeMarginsOfSuccessText, boolean hasNaturalAptitude) {
         person.changeCurrentEdge(-1);
         MekHQ.triggerEvent(new PersonChangedEvent(person));
         usedEdge = true;
@@ -661,7 +670,7 @@ public class SkillCheckUtility {
 
         int difference = isCountUp ? targetNumberValue - roll : roll - targetNumberValue;
         marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(difference);
-        resultsText = generateResultsText(includeMarginsOfSuccessText);
+        resultsText = generateResultsText(includeMarginsOfSuccessText, hasNaturalAptitude);
     }
 
     /**
