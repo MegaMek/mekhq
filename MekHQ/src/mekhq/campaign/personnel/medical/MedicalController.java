@@ -140,7 +140,8 @@ public class MedicalController {
             if (isUseAdvancedMedical) {
                 if (isUseAltAdvancedMedical) {
                     AdvancedMedicalAlternateHealing.processNewDay(campaign.getLocalDate(),
-                          campaign.getCampaignOptions().isUseFatigue(), patient, doctor);
+                          campaign.getCampaignOptions().isUseFatigue(), campaign.getCampaignOptions().getFatigueRate(),
+                          patient, doctor);
                 } else {
                     InjuryUtil.resolveDailyHealing(campaign, patient);
                 }

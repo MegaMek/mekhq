@@ -2370,8 +2370,7 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblFatigue = null;
         int baseFatigue = person.getFatigue();
         int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.getPermanentFatigue(),
-              person.isClanPersonnel(),
-              person.getSkillLevel(campaign, false, true));
+              person.isClanPersonnel(), person.getSkillLevel(campaign, false, true));
         if (campaignOptions.isUseFatigue() && (baseFatigue != 0 || effectiveFatigue != 0)) {
             StringBuilder fatigueDisplay = new StringBuilder("<html>");
             int fatigueTurnoverModifier = MathUtility.clamp(((effectiveFatigue - 1) / 4) - 1, 0, 3);
@@ -2381,7 +2380,7 @@ public class PersonViewPanel extends JScrollablePanel {
                       .append("</font></s> ")
                       .append(effectiveFatigue);
             } else {
-                fatigueDisplay.append("<font color='gray'>").append(effectiveFatigue).append("</font>");
+                fatigueDisplay.append(effectiveFatigue);
             }
             if (fatigueTurnoverModifier > 0) {
                 fatigueDisplay.append(" (-").append(fatigueTurnoverModifier).append(')');
