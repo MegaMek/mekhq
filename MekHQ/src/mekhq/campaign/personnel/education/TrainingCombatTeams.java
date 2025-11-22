@@ -39,8 +39,6 @@ import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObject;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessString;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginValue;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;

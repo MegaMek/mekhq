@@ -581,7 +581,7 @@ public class SkillCheckUtility {
      *
      * <p>This method rolls two six-sided dice by default. If the character has the {@code Natural Aptitude} trait
      * for this skill, a third die is rolled. The final roll value is the sum of the highest two dice, determined using
-     * {@link Compute#highestTwoIntegers(int...)}.</p>
+     * {@link Compute#getHighestTwoIntegers(int...)}.</p>
      *
      * @param hasNaturalAptitude {@code true} if the character rolls 3d6 for this check, using the highest 2
      *
@@ -593,7 +593,7 @@ public class SkillCheckUtility {
         int roll2 = d6(1);
         int roll3 = hasNaturalAptitude ? d6(1) : 0;
 
-        roll = Compute.highestTwoIntegers(roll1, roll2, roll3);
+        roll = Compute.getHighestTwoIntegers(roll1, roll2, roll3);
     }
 
     /**
