@@ -319,9 +319,16 @@ public class AdvancedReplacementLimbDialog extends JDialog {
               "AdvancedReplacementLimbDialog.button.confirm"));
         confirmButton.addActionListener(this::onConfirm);
 
+        RoundedJButton gmButton = new RoundedJButton(getTextAt(
+              RESOURCE_BUNDLE,
+              "AdvancedReplacementLimbDialog.button.gm"));
+        gmButton.setEnabled(campaign.isGM());
+        gmButton.addActionListener(this::onGMConfirm);
+
         buttonPanel.add(cancelButton);
         buttonPanel.add(documentationButton);
         buttonPanel.add(confirmButton);
+        buttonPanel.add(gmButton);
 
         JPanel bottomContainer = new JPanel(new BorderLayout());
         bottomContainer.add(summaryPanel, BorderLayout.NORTH);
@@ -333,6 +340,16 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         updateSummary();
     }
 
+    /**
+     * Adds a label and prosthetic selection combo box row for each valid body location to the main panel, wiring the
+     * combo boxes into {@link #treatmentSelections}.
+     *
+     * @param gridBagConstraints the constraints template used when laying out components
+     * @param mainPanel          the panel that will host the surgery selection rows
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void addSurgeryComboBoxes(GridBagConstraints gridBagConstraints, JPanel mainPanel) {
         int i = 1;
         for (BodyLocation bodyLocation : VALID_BODY_LOCATIONS) {
@@ -684,6 +701,36 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     }
 
     /**
+     * Handles the GM confirm action by applying all planned surgeries without performing any rolls or charging the
+     * campaign. This is intended for manual GM adjudication.
+     *
+     * <p>For each planned surgery this method removes applicable injuries, records a marker injury, and grants any
+     * associated implants and abilities before notifying the campaign that the patient has been updated.</p>
+     *
+     * @param event the originating action event
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void onGMConfirm(ActionEvent event) {
+        if (!campaign.isGM()) {
+            return;
+        }
+        dispose();
+
+        for (PlannedSurgery surgery : getPlannedSurgeries()) {
+            BodyLocation location = surgery.location;
+            ProstheticType type = surgery.type;
+
+            processOldInjuryRemoval(type, location);
+            addMarkerInjury(type, location);
+            addImplantsAndAbilities(type);
+        }
+
+        campaign.personUpdated(patient);
+    }
+
+    /**
      * Debits the campaign finances for the total cost of all planned surgeries.
      *
      * @author Illiani
@@ -716,20 +763,10 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         if (successfulSurgeries.contains(surgery)) {
             // Remove injuries based on the surgery type
-            boolean isBurnRemovalOnly = type.isBurnRemoveOnly();
-            for (Injury injury : relevantInjuries.getOrDefault(location, new ArrayList<>())) {
-                if (injury != null && (injury.getSubType().isBurn() || !isBurnRemovalOnly)) {
-                    patient.removeInjury(injury);
-                }
-            }
+            processOldInjuryRemoval(type, location);
 
-            // Add the new surgery 'injury'. This is a semi-permanent record of
-            // the surgery on the character
-            InjuryType injuryType = type.getInjuryType();
-            Injury injury = injuryType.newInjury(campaign, patient, location,
-                  0);
-            adjustForKinderMode(useKinderMode, injury);
-            patient.addInjury(injury);
+            // Add the new surgery 'injury'. This is a semi-permanent record of the surgery on the character
+            addMarkerInjury(type, location);
 
             // Add recovery period injuries
             InjuryType recoveryInjuryType = getRecoveryInjuryType(surgery);
@@ -737,17 +774,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             adjustForKinderMode(useKinderMode, recoveryInjury);
             patient.addInjury(recoveryInjury);
 
-            if (campaign.getCampaignOptions().isUseImplants()) {
-                for (String implant : type.getAssociatedPilotOptions()) {
-                    patient.getOptions().acquireAbility(LVL3_ADVANTAGES, implant, true);
-                }
-            }
-
-            if (campaign.getCampaignOptions().isUseAbilities()) {
-                for (String option : type.getAssociatedPersonnelOptions()) {
-                    patient.getOptions().acquireAbility(LVL3_ADVANTAGES, option, true);
-                }
-            }
+            addImplantsAndAbilities(type);
         } else {
             // Add failed surgery injury
             Injury recoveryInjury =
@@ -758,6 +785,64 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
 
         campaign.personUpdated(patient);
+    }
+
+    /**
+     * Grants any pilot and personnel abilities associated with the given prosthetic type, honoring the campaign options
+     * that govern implants and SPAs.
+     *
+     * @param type the prosthetic type being applied to the patient
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void addImplantsAndAbilities(ProstheticType type) {
+        if (campaign.getCampaignOptions().isUseImplants()) {
+            for (String implant : type.getAssociatedPilotOptions()) {
+                patient.getOptions().acquireAbility(LVL3_ADVANTAGES, implant, true);
+            }
+        }
+
+        if (campaign.getCampaignOptions().isUseAbilities()) {
+            for (String option : type.getAssociatedPersonnelOptions()) {
+                patient.getOptions().acquireAbility(LVL3_ADVANTAGES, option, true);
+            }
+        }
+    }
+
+    /**
+     * Adds a zero-severity marker injury representing the installed prosthetic at the specified body location. This
+     * serves as a semi-permanent record of the surgery.
+     *
+     * @param type     the prosthetic type that was installed
+     * @param location the body location that was treated
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void addMarkerInjury(ProstheticType type, BodyLocation location) {
+        InjuryType injuryType = type.getInjuryType();
+        Injury injury = injuryType.newInjury(campaign, patient, location, 0);
+        patient.addInjury(injury);
+    }
+
+    /**
+     * Removes existing injuries at the given location that are resolved by the specified prosthetic type. Some
+     * prosthetics can only clear burn injuries, while others remove all mapped injuries at that location.
+     *
+     * @param type     the prosthetic type being applied
+     * @param location the body location being treated
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void processOldInjuryRemoval(ProstheticType type, BodyLocation location) {
+        boolean isBurnRemovalOnly = type.isBurnRemoveOnly();
+        for (Injury injury : relevantInjuries.getOrDefault(location, new ArrayList<>())) {
+            if (injury != null && (injury.getSubType().isBurn() || !isBurnRemovalOnly)) {
+                patient.removeInjury(injury);
+            }
+        }
     }
 
     /**
@@ -882,15 +967,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      */
     private List<PlannedSurgery> getPrioritizedSurgeries() {
         int gameYear = campaign.getGameYear();
-        Map<BodyLocation, ProstheticType> scheduledSurgeries =
-              getSelectedTreatments();
-
-        List<PlannedSurgery> prioritizedSurgeries = new ArrayList<>();
-        for (Map.Entry<BodyLocation, ProstheticType> entry :
-              scheduledSurgeries.entrySet()) {
-            prioritizedSurgeries.add(
-                  new PlannedSurgery(entry.getValue(), entry.getKey()));
-        }
+        List<PlannedSurgery> prioritizedSurgeries = getPlannedSurgeries();
 
         prioritizedSurgeries.sort(
               Comparator.<PlannedSurgery>comparingInt(
@@ -905,6 +982,26 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                     )
         );
 
+        return prioritizedSurgeries;
+    }
+
+    /**
+     * Builds the list of surgeries currently planned based on the selected treatments in the UI.
+     *
+     * @return a list of {@link PlannedSurgery} instances representing the current plan
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private List<PlannedSurgery> getPlannedSurgeries() {
+        Map<BodyLocation, ProstheticType> scheduledSurgeries = getSelectedTreatments();
+
+        List<PlannedSurgery> prioritizedSurgeries = new ArrayList<>();
+        for (Map.Entry<BodyLocation, ProstheticType> entry :
+              scheduledSurgeries.entrySet()) {
+            prioritizedSurgeries.add(
+                  new PlannedSurgery(entry.getValue(), entry.getKey()));
+        }
         return prioritizedSurgeries;
     }
 
