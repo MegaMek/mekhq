@@ -760,21 +760,15 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     }
 
     /**
-     * Determines whether accumulated injury hits after surgery result in the patient's death (medical complications)
+     * Determines whether accumulated injury hits after surgery results in the patient's death (medical complications)
      * and updates their status accordingly.
      *
      * @author Illiani
      * @since 0.50.10
      */
     private void checkForDeath() {
-        int deathThreshold = 5;
-        for (Injury injury : patient.getInjuries()) {
-            deathThreshold -= injury.getHits();
-        }
-
-        if (deathThreshold < 0) {
-            patient.changeStatus(campaign, campaign.getLocalDate(),
-                  PersonnelStatus.MEDICAL_COMPLICATIONS);
+        if (patient.getTotalInjurySeverity() > 5) {
+            patient.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
         }
     }
 

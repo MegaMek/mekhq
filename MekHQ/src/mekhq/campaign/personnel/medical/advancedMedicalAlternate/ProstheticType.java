@@ -34,15 +34,18 @@ package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
 import static java.lang.Math.max;
 import static java.lang.Math.round;
-import static megamek.common.options.OptionsConstants.MD_BOOST_COMM_IMPLANT;
-import static megamek.common.options.OptionsConstants.MD_COMM_IMPLANT;
-import static megamek.common.options.OptionsConstants.MD_CYBER_IMP_LASER;
-import static megamek.common.options.OptionsConstants.MD_CYBER_IMP_VISUAL;
-import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
+import static megamek.common.options.OptionsConstants.*;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ATTRACTIVE;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_PAINKILLER_ADDICTION;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_UNATTRACTIVE;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticComplexity.ADVANCED;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticComplexity.CLONE;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticComplexity.CRUDE;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticComplexity.ENHANCED;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticComplexity.SIMPLE;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticComplexity.STANDARD;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -83,7 +86,7 @@ import mekhq.campaign.universe.Planet;
  */
 public enum ProstheticType {
     WOODEN_ARM("WOODEN_ARM",
-          1,
+          CRUDE,
           2,
           AlternateInjuries.WOODEN_ARM,
           Money.of(75),
@@ -92,7 +95,7 @@ public enum ProstheticType {
           false,
           false),
     HOOK_HAND("HOOK_HAND",
-          1,
+          CRUDE,
           2,
           AlternateInjuries.HOOK_HAND,
           Money.of(75),
@@ -101,7 +104,7 @@ public enum ProstheticType {
           false,
           false),
     PEG_LEG("PEG_LEG",
-          1,
+          CRUDE,
           2,
           AlternateInjuries.PEG_LEG,
           Money.of(75),
@@ -110,7 +113,7 @@ public enum ProstheticType {
           false,
           false),
     WOODEN_FOOT("WOODEN_FOOT",
-          1,
+          CRUDE,
           2,
           AlternateInjuries.WOODEN_FOOT,
           Money.of(75),
@@ -119,7 +122,7 @@ public enum ProstheticType {
           false,
           false),
     SIMPLE_ARM("SIMPLE_ARM",
-          2,
+          SIMPLE,
           2,
           AlternateInjuries.SIMPLE_ARM,
           Money.of(750),
@@ -128,7 +131,7 @@ public enum ProstheticType {
           false,
           false),
     SIMPLE_CLAW_HAND("SIMPLE_CLAW_HAND",
-          2,
+          SIMPLE,
           2,
           AlternateInjuries.SIMPLE_CLAW_HAND,
           Money.of(750),
@@ -137,7 +140,7 @@ public enum ProstheticType {
           false,
           false),
     SIMPLE_LEG("SIMPLE_LEG",
-          2,
+          SIMPLE,
           2,
           AlternateInjuries.SIMPLE_LEG,
           Money.of(250),
@@ -146,7 +149,7 @@ public enum ProstheticType {
           false,
           false),
     SIMPLE_FOOT("SIMPLE_FOOT",
-          2,
+          SIMPLE,
           2,
           AlternateInjuries.SIMPLE_FOOT,
           Money.of(250),
@@ -155,7 +158,7 @@ public enum ProstheticType {
           false,
           false),
     PROSTHETIC_ARM("PROSTHETIC_ARM",
-          3,
+          STANDARD,
           5,
           AlternateInjuries.PROSTHETIC_ARM,
           Money.of(7500),
@@ -164,7 +167,7 @@ public enum ProstheticType {
           false,
           false),
     PROSTHETIC_HAND("PROSTHETIC_HAND",
-          3,
+          STANDARD,
           5,
           AlternateInjuries.PROSTHETIC_HAND,
           Money.of(7500),
@@ -173,7 +176,7 @@ public enum ProstheticType {
           false,
           false),
     PROSTHETIC_LEG("PROSTHETIC_LEG",
-          3,
+          STANDARD,
           5,
           AlternateInjuries.PROSTHETIC_LEG,
           Money.of(10000),
@@ -182,7 +185,7 @@ public enum ProstheticType {
           false,
           false),
     PROSTHETIC_FOOT("PROSTHETIC_FOOT",
-          3,
+          STANDARD,
           5,
           AlternateInjuries.PROSTHETIC_FOOT,
           Money.of(10000),
@@ -191,7 +194,7 @@ public enum ProstheticType {
           false,
           false),
     ADVANCED_PROSTHETIC_ARM("ADVANCED_PROSTHETIC_ARM",
-          4,
+          ADVANCED,
           5,
           AlternateInjuries.ADVANCED_PROSTHETIC_ARM,
           Money.of(25000),
@@ -200,7 +203,7 @@ public enum ProstheticType {
           false,
           false),
     ADVANCED_PROSTHETIC_HAND("ADVANCED_PROSTHETIC_HAND",
-          4,
+          ADVANCED,
           5,
           AlternateInjuries.ADVANCED_PROSTHETIC_HAND,
           Money.of(25000),
@@ -209,7 +212,7 @@ public enum ProstheticType {
           false,
           false),
     ADVANCED_PROSTHETIC_LEG("ADVANCED_PROSTHETIC_LEG",
-          4,
+          ADVANCED,
           5,
           AlternateInjuries.ADVANCED_PROSTHETIC_LEG,
           Money.of(17500),
@@ -218,7 +221,7 @@ public enum ProstheticType {
           false,
           false),
     ADVANCED_PROSTHETIC_FOOT("ADVANCED_PROSTHETIC_FOOT",
-          4,
+          ADVANCED,
           5,
           AlternateInjuries.ADVANCED_PROSTHETIC_FOOT,
           Money.of(17500),
@@ -227,7 +230,7 @@ public enum ProstheticType {
           false,
           false),
     MYOMER_ARM("MYOMER_ARM",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.MYOMER_ARM,
           Money.of(200000),
@@ -236,7 +239,7 @@ public enum ProstheticType {
           false,
           true),
     MYOMER_HAND("MYOMER_HAND",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.MYOMER_HAND,
           Money.of(100000),
@@ -245,7 +248,7 @@ public enum ProstheticType {
           false,
           true),
     MYOMER_LEG("MYOMER_LEG",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.MYOMER_LEG,
           Money.of(125000),
@@ -254,7 +257,7 @@ public enum ProstheticType {
           false,
           true),
     MYOMER_FOOT("MYOMER_FOOT",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.MYOMER_FOOT,
           Money.of(50000),
@@ -263,7 +266,7 @@ public enum ProstheticType {
           false,
           true),
     CLONED_ARM("CLONED_ARM",
-          6,
+          CLONE,
           5,
           AlternateInjuries.CLONED_ARM,
           Money.of(500000),
@@ -272,7 +275,7 @@ public enum ProstheticType {
           true,
           false),
     CLONED_HAND("CLONED_HAND",
-          6,
+          CLONE,
           5,
           AlternateInjuries.CLONED_HAND,
           Money.of(300000),
@@ -281,7 +284,7 @@ public enum ProstheticType {
           true,
           false),
     CLONED_LEG("CLONED_LEG",
-          6,
+          CLONE,
           5,
           AlternateInjuries.CLONED_LEG,
           Money.of(350000),
@@ -290,7 +293,7 @@ public enum ProstheticType {
           true,
           false),
     CLONED_FOOT("CLONED_FOOT",
-          6,
+          CLONE,
           5,
           AlternateInjuries.CLONED_FOOT,
           Money.of(50000),
@@ -299,7 +302,7 @@ public enum ProstheticType {
           true,
           false),
     EYE_IMPLANT("EYE_IMPLANT",
-          2,
+          SIMPLE,
           2,
           AlternateInjuries.EYE_IMPLANT,
           Money.of(350),
@@ -308,7 +311,7 @@ public enum ProstheticType {
           false,
           false),
     BIONIC_EAR("BIONIC_EAR",
-          3,
+          STANDARD,
           5,
           AlternateInjuries.BIONIC_EAR,
           Money.of(100000),
@@ -317,7 +320,7 @@ public enum ProstheticType {
           false,
           false),
     BIONIC_EYE("BIONIC_EYE",
-          4,
+          ADVANCED,
           5,
           AlternateInjuries.BIONIC_EYE,
           Money.of(220000),
@@ -326,7 +329,7 @@ public enum ProstheticType {
           false,
           false),
     BIONIC_HEART("BIONIC_HEART",
-          3,
+          STANDARD,
           5,
           AlternateInjuries.BIONIC_HEART,
           Money.of(500000),
@@ -335,7 +338,7 @@ public enum ProstheticType {
           false,
           false),
     BIONIC_LUNGS("BIONIC_LUNGS",
-          4,
+          ADVANCED,
           5,
           AlternateInjuries.BIONIC_LUNGS,
           Money.of(800000),
@@ -344,7 +347,7 @@ public enum ProstheticType {
           false,
           false),
     BIONIC_ORGAN_OTHER("BIONIC_ORGAN_OTHER",
-          4,
+          ADVANCED,
           5,
           AlternateInjuries.BIONIC_ORGAN_OTHER,
           Money.of(750000),
@@ -353,7 +356,7 @@ public enum ProstheticType {
           false,
           false),
     COSMETIC_SURGERY("COSMETIC_SURGERY",
-          2,
+          SIMPLE,
           2,
           AlternateInjuries.COSMETIC_SURGERY,
           Money.of(2500),
@@ -362,7 +365,7 @@ public enum ProstheticType {
           false,
           false),
     ELECTIVE_MYOMER_ARM("ELECTIVE_MYOMER_ARM",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.ELECTIVE_MYOMER_ARM,
           Money.of(300000),
@@ -373,7 +376,7 @@ public enum ProstheticType {
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     ELECTIVE_MYOMER_HAND("ELECTIVE_MYOMER_HAND",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.ELECTIVE_MYOMER_HAND,
           Money.of(150000),
@@ -384,7 +387,7 @@ public enum ProstheticType {
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     ELECTIVE_MYOMER_LEG("ELECTIVE_MYOMER_LEG",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.ELECTIVE_MYOMER_LEG,
           Money.of(375000),
@@ -395,7 +398,7 @@ public enum ProstheticType {
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     ENHANCED_IMAGING("ENHANCED_IMAGING",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.ENHANCED_IMAGING_IMPLANT,
           Money.of(1500000),
@@ -406,7 +409,7 @@ public enum ProstheticType {
           List.of(UNOFFICIAL_EI_IMPLANT),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     BONE_REINFORCEMENT("BONE_REINFORCEMENT",
-          4,
+          ADVANCED,
           5,
           AlternateInjuries.BONE_REINFORCEMENT,
           Money.of(10000),
@@ -417,7 +420,7 @@ public enum ProstheticType {
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     LIVER_FILTRATION_IMPLANT("LIVER_FILTRATION_IMPLANT",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.LIVER_FILTRATION_IMPLANT,
           Money.of(10000),
@@ -428,7 +431,7 @@ public enum ProstheticType {
           List.of(),
           List.of(ATOW_POISON_RESISTANCE, COMPULSION_PAINKILLER_ADDICTION)),
     BIONIC_LUNGS_WITH_TYPE_1_FILTER("BIONIC_LUNGS_WITH_TYPE_1_FILTER",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.BIONIC_LUNGS_WITH_TYPE_1_FILTER,
           Money.of(805000),
@@ -439,7 +442,7 @@ public enum ProstheticType {
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     BIONIC_LUNGS_WITH_TYPE_2_FILTER("BIONIC_LUNGS_WITH_TYPE_2_FILTER",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.BIONIC_LUNGS_WITH_TYPE_2_FILTER,
           Money.of(815000),
@@ -450,7 +453,7 @@ public enum ProstheticType {
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     BIONIC_LUNGS_WITH_TYPE_3_FILTER("BIONIC_LUNGS_WITH_TYPE_3_FILTER",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.BIONIC_LUNGS_WITH_TYPE_3_FILTER,
           Money.of(845000),
@@ -461,7 +464,7 @@ public enum ProstheticType {
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EYE_EM_IR("CYBERNETIC_EYE_EM_IR",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.CYBERNETIC_EYE_EM_IR,
           Money.of(650000),
@@ -472,7 +475,7 @@ public enum ProstheticType {
           List.of(MD_CYBER_IMP_VISUAL),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EYE_TELESCOPE("CYBERNETIC_EYE_TELESCOPE",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.CYBERNETIC_EYE_TELESCOPE,
           Money.of(450000),
@@ -483,7 +486,7 @@ public enum ProstheticType {
           List.of(MD_CYBER_IMP_LASER),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EYE_LASER("CYBERNETIC_EYE_LASER",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.CYBERNETIC_EYE_LASER,
           Money.of(600000),
@@ -494,7 +497,7 @@ public enum ProstheticType {
           List.of(MD_CYBER_IMP_LASER),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EYE_MULTI("CYBERNETIC_EYE_MULTI",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.CYBERNETIC_EYE_MULTI,
           Money.of(1050000),
@@ -505,7 +508,7 @@ public enum ProstheticType {
           List.of(MD_CYBER_IMP_LASER),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EYE_MULTI_ENHANCED("CYBERNETIC_EYE_MULTI_ENHANCED",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.CYBERNETIC_EYE_MULTI_ENHANCED,
           Money.of(17000000),
@@ -516,7 +519,7 @@ public enum ProstheticType {
           List.of(MD_CYBER_IMP_LASER, MD_CYBER_IMP_VISUAL),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EAR_SIGNAL("CYBERNETIC_EAR_SIGNAL",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.CYBERNETIC_EAR_SIGNAL,
           Money.of(400000),
@@ -527,7 +530,7 @@ public enum ProstheticType {
           List.of(MD_COMM_IMPLANT),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EAR_MULTI("CYBERNETIC_EAR_MULTI",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.CYBERNETIC_EAR_MULTI,
           Money.of(600000),
@@ -538,7 +541,7 @@ public enum ProstheticType {
           List.of(MD_BOOST_COMM_IMPLANT),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_SPEECH_IMPLANT("CYBERNETIC_SPEECH_IMPLANT",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.CYBERNETIC_SPEECH_IMPLANT,
           Money.of(200000),
@@ -549,7 +552,7 @@ public enum ProstheticType {
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     PHEROMONE_EFFUSER("PHEROMONE_EFFUSER",
-          5,
+          ENHANCED,
           5,
           AlternateInjuries.PHEROMONE_EFFUSER,
           Money.of(40000),
@@ -560,7 +563,7 @@ public enum ProstheticType {
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     COSMETIC_BEAUTY_ENHANCEMENT("COSMETIC_BEAUTY_ENHANCEMENT",
-          3,
+          STANDARD,
           5,
           AlternateInjuries.COSMETIC_BEAUTY_ENHANCEMENT,
           Money.of(15000),
@@ -571,7 +574,7 @@ public enum ProstheticType {
           List.of(),
           List.of(ATOW_ATTRACTIVE, COMPULSION_PAINKILLER_ADDICTION)),
     COSMETIC_HORROR_ENHANCEMENT("COSMETIC_HORROR_ENHANCEMENT",
-          3,
+          STANDARD,
           5,
           AlternateInjuries.COSMETIC_HORROR_ENHANCEMENT,
           Money.of(15000),
@@ -582,7 +585,7 @@ public enum ProstheticType {
           List.of(),
           List.of(FLAW_UNATTRACTIVE, COMPULSION_PAINKILLER_ADDICTION)),
     COSMETIC_TAIL_PROSTHETIC("COSMETIC_TAIL_PROSTHETIC",
-          3,
+          STANDARD,
           5,
           AlternateInjuries.COSMETIC_TAIL_PROSTHETIC,
           Money.of(60000),
@@ -593,7 +596,7 @@ public enum ProstheticType {
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     COSMETIC_ANIMAL_EAR_PROSTHETIC("COSMETIC_ANIMAL_EAR_PROSTHETIC",
-          3,
+          STANDARD,
           5,
           AlternateInjuries.COSMETIC_ANIMAL_EAR_PROSTHETIC,
           Money.of(60000),
@@ -604,7 +607,7 @@ public enum ProstheticType {
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     COSMETIC_ANIMAL_LEG_PROSTHETIC("COSMETIC_ANIMAL_LEG_PROSTHETIC",
-          3,
+          STANDARD,
           5,
           AlternateInjuries.COSMETIC_ANIMAL_LEG_PROSTHETIC,
           Money.of(60000),
@@ -613,10 +616,120 @@ public enum ProstheticType {
           false,
           false,
           List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
+    DERMAL_MYOMER_ARM_ARMOR("DERMAL_MYOMER_ARM_ARMOR",
+          ENHANCED,
+          5,
+          AlternateInjuries.DERMAL_MYOMER_ARM_ARMOR,
+          Money.of(450000),
+          TechRating.B,
+          AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.E,
+          false,
+          false,
+          List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE)),
+    DERMAL_MYOMER_ARM_CAMO("DERMAL_MYOMER_LEG_CAMO",
+          ENHANCED,
+          5,
+          AlternateInjuries.DERMAL_MYOMER_ARM_CAMO,
+          Money.of(330000),
+          TechRating.A,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
+          false,
+          List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, MISC_PAIN_RESISTANCE)),
+    DERMAL_MYOMER_ARM_TRIPLE("DERMAL_MYOMER_LEG_TRIPLE",
+          ENHANCED,
+          5,
+          AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE,
+          Money.of(750000),
+          TechRating.A,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          false,
+          false,
+          List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, ATOW_TOUGHNESS)),
+    DERMAL_MYOMER_LEG_ARMOR("DERMAL_MYOMER_LEG_ARMOR",
+          ENHANCED,
+          5,
+          AlternateInjuries.DERMAL_MYOMER_LEG_ARMOR,
+          Money.of(562500),
+          TechRating.B,
+          AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.E,
+          false,
+          false,
+          List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, MISC_PAIN_RESISTANCE)),
+    DERMAL_MYOMER_LEG_CAMO("DERMAL_MYOMER_LEG_CAMO",
+          ENHANCED,
+          5,
+          AlternateInjuries.DERMAL_MYOMER_LEG_CAMO,
+          Money.of(412500),
+          TechRating.A,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
+          false,
+          List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE)),
+    DERMAL_MYOMER_LEG_TRIPLE("DERMAL_MYOMER_LEG_TRIPLE",
+          ENHANCED,
+          5,
+          AlternateInjuries.DERMAL_MYOMER_LEG_TRIPLE,
+          Money.of(937500),
+          TechRating.A,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          false,
+          false,
+          List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, ATOW_TOUGHNESS)),
+    VDNI("VDNI",
+          ENHANCED,
+          5,
+          AlternateInjuries.VEHICULAR_DNI,
+          Money.of(1400000),
+          TechRating.A,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          false,
+          true,
+          List.of(MD_VDNI),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
+    BUFFERED_VDNI("BUFFERED_VDNI",
+          ENHANCED,
+          5,
+          AlternateInjuries.BUFFERED_VDNI,
+          Money.of(2000000),
+          TechRating.A,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          false,
+          true,
+          List.of(MD_BVDNI),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
+    BUFFERED_VDNI_TRIPLE_CORE("BUFFERED_VDNI_TRIPLE_CORE",
+          ENHANCED,
+          5,
+          AlternateInjuries.BUFFERED_VDNI_TRIPLE_CORE,
+          Money.of(5000000),
+          TechRating.B,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
+          true,
+          List.of(MD_BVDNI, MD_TRIPLE_CORE_PROCESSOR),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
+    PAIN_SHUNT("PAIN_SHUNT",
+          ENHANCED,
+          5,
+          AlternateInjuries.PAIN_SHUNT,
+          Money.of(50000),
+          TechRating.B,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
+          true,
+          List.of(MD_PAIN_SHUNT),
           List.of(COMPULSION_PAINKILLER_ADDICTION));
 
     private final String lookupName;
-    private final int prostheticType;
+    private final ProstheticComplexity prostheticType;
     private final int surgeryLevel;
     private final InjuryType injuryType;
     private final Money baseCost;
@@ -663,9 +776,10 @@ public enum ProstheticType {
      * @author Illiani
      * @since 0.50.10
      */
-    ProstheticType(String lookupName, int prostheticType, int surgeryLevel, InjuryType injuryType, Money baseCost,
-          TechRating technologyRating, AvailabilityValue availabilityEarly, AvailabilityValue availabilityMid,
-          AvailabilityValue availabilityLate, boolean isClanOnly, boolean isComStarOnly) {
+    ProstheticType(String lookupName, ProstheticComplexity prostheticType, int surgeryLevel, InjuryType injuryType,
+          Money baseCost, TechRating technologyRating, AvailabilityValue availabilityEarly,
+          AvailabilityValue availabilityMid, AvailabilityValue availabilityLate, boolean isClanOnly,
+          boolean isComStarOnly) {
         this.lookupName = lookupName;
         this.prostheticType = prostheticType;
         this.surgeryLevel = surgeryLevel;
@@ -702,10 +816,10 @@ public enum ProstheticType {
      * @author Illiani
      * @since 0.50.10
      */
-    ProstheticType(String lookupName, int prostheticType, int surgeryLevel, InjuryType injuryType, Money baseCost,
-          TechRating technologyRating, AvailabilityValue availabilityEarly, AvailabilityValue availabilityMid,
-          AvailabilityValue availabilityLate, boolean isClanOnly, boolean isComStarOnly,
-          List<String> associatedPilotOptions, List<String> associatedPersonnelOptions) {
+    ProstheticType(String lookupName, ProstheticComplexity prostheticType, int surgeryLevel, InjuryType injuryType,
+          Money baseCost, TechRating technologyRating, AvailabilityValue availabilityEarly,
+          AvailabilityValue availabilityMid, AvailabilityValue availabilityLate, boolean isClanOnly,
+          boolean isComStarOnly, List<String> associatedPilotOptions, List<String> associatedPersonnelOptions) {
         this.lookupName = lookupName;
         this.prostheticType = prostheticType;
         this.surgeryLevel = surgeryLevel;
@@ -723,7 +837,7 @@ public enum ProstheticType {
 
     /** @return the prosthetic classification. */
     public int getProstheticType() {
-        return prostheticType;
+        return prostheticType.getType();
     }
 
     /** @return the minimum surgical skill required. */
@@ -871,6 +985,34 @@ public enum ProstheticType {
     }
 
     /**
+     * Returns the {@link ProstheticType} associated with the given {@link InjuryType}, or {@code null} if no matching
+     * prosthetic type exists.
+     *
+     * <p>This method iterates over all defined {@link ProstheticType} values and compares their mapped injury types
+     * against the provided {@code injuryType}. If a match is found, the corresponding prosthetic type is returned
+     * immediately.</p>
+     *
+     * <p>Note that this method returns {@code null} when no association is defined, so callers should perform a null
+     * check or annotate accordingly when using the result.</p>
+     *
+     * @param injuryType the injury type to look up; must not be {@code null}
+     *
+     * @return the matching prosthetic type, or {@code null} if none exists
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public static @Nullable ProstheticType getProstheticTypeFromInjuryType(InjuryType injuryType) {
+        for (ProstheticType prostheticType : ProstheticType.values()) {
+            if (prostheticType.getInjuryType().equals(injuryType)) {
+                return prostheticType;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Returns the localized display name for this prosthetic type.
      *
      * @return the translated name string
@@ -900,29 +1042,34 @@ public enum ProstheticType {
         // 1) Surgery level required
         tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.skill", surgeryLevel));
 
-        // 2) Base cost
+        // 2) ATOW Type
+        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
+              "ProstheticType.tooltip.type",
+              prostheticType.toString()));
+
+        // 3) Base cost
         Money cost = getCost(gameYear);
         if (cost != null) {
             tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.cost",
                   cost.toAmountString()));
         }
 
-        // 3) Required planetary tech rating
+        // 4) Required planetary tech rating
         tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.techLevel",
               technologyRating.getName()));
 
-        // 4) Estimated recovery time
+        // 5) Estimated recovery time
         int recoveryTime = (int) round(injuryType.getBaseRecoveryTime() * (isUseKinderMode ? 0.5 : 1.0));
         tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.recovery", recoveryTime));
 
-        // 5) Misc
+        // 6) Misc
         InjuryEffect effect = injuryType.getInjuryEffect();
         int toughness = effect.getToughnessModifier();
         if (toughness != 0) {
             tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.toughness", toughness));
         }
 
-        // 6) Skills
+        // 7) Skills
         int gunnery = effect.getGunneryModifier();
         if (gunnery != 0) {
             tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.gunnery", gunnery));
@@ -965,7 +1112,7 @@ public enum ProstheticType {
             tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.acrobatics", acrobatics));
         }
 
-        // 7) Attribute modifiers
+        // 8) Attribute modifiers
         Map<SkillAttribute, Integer> attributeTotals = new EnumMap<>(SkillAttribute.class);
 
         addToMap(attributeTotals, SkillAttribute.STRENGTH, effect.getStrengthModifier());
@@ -984,7 +1131,7 @@ public enum ProstheticType {
             }
         }
 
-        // 8) Implants
+        // 9) Implants
         PersonnelOptions options = new PersonnelOptions();
         for (String lookupName : associatedPilotOptions) {
             IOption option = options.getOption(lookupName);
@@ -994,16 +1141,24 @@ public enum ProstheticType {
 
             // Special handlers
             switch (lookupName) {
-                case UNOFFICIAL_EI_IMPLANT -> {
-                    description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.ei");
-                }
+                case UNOFFICIAL_EI_IMPLANT ->
+                      description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.ei");
+                case MD_VDNI -> description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.vdni");
+                case MD_BVDNI -> description += ". " + getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.bvdni");
                 default -> {}
             }
 
             tooltipPortion.add("<b>" + label + ":</b> " + description);
         }
 
-        // 9) Abilities
+        switch (this) { // Covers special cases
+            case DERMAL_MYOMER_ARM_ARMOR, DERMAL_MYOMER_LEG_ARMOR ->
+                  tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.armor"));
+            case DERMAL_MYOMER_ARM_CAMO, DERMAL_MYOMER_LEG_CAMO ->
+                  tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.camo"));
+        }
+
+        // 10) Abilities
         for (String lookupName : associatedPersonnelOptions) {
             IOption ability = options.getOption(lookupName);
             String label = ability == null ? lookupName : ability.getDisplayableName();
