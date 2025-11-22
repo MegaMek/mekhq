@@ -145,6 +145,7 @@ public class MarketsTab {
     private JCheckBox chkUseTwoWayPay;
     private JCheckBox chkUseCamOpsSalvage;
     private JCheckBox chkUseRiskySalvage;
+    private JCheckBox chkEnableSalvageFlagByDefault;
     private JCheckBox chkUseDynamicDifficulty;
     private JCheckBox chkUseBolsterContractSkill;
     private JCheckBox chkContractMarketReportRefresh;
@@ -546,6 +547,7 @@ public class MarketsTab {
         chkUseTwoWayPay = new JCheckBox();
         chkUseCamOpsSalvage = new JCheckBox();
         chkUseRiskySalvage = new JCheckBox();
+        chkEnableSalvageFlagByDefault = new JCheckBox();
         chkUseDynamicDifficulty = new JCheckBox();
         chkUseBolsterContractSkill = new JCheckBox();
         chkContractMarketReportRefresh = new JCheckBox();
@@ -645,6 +647,10 @@ public class MarketsTab {
         chkUseRiskySalvage.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "UseRiskySalvage"));
 
+        chkEnableSalvageFlagByDefault = new CampaignOptionsCheckBox("EnableSalvageFlagByDefault");
+        chkEnableSalvageFlagByDefault.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "EnableSalvageFlagByDefault"));
+
         chkUseDynamicDifficulty = new CampaignOptionsCheckBox("UseDynamicDifficulty");
         chkUseDynamicDifficulty.addMouseListener(createTipPanelUpdater(contractMarketHeader, "UseDynamicDifficulty"));
 
@@ -700,6 +706,9 @@ public class MarketsTab {
 
         layout.gridy++;
         panel.add(chkUseRiskySalvage, layout);
+
+        layout.gridy++;
+        panel.add(chkEnableSalvageFlagByDefault, layout);
 
         layout.gridy++;
         panel.add(chkUseDynamicDifficulty, layout);
@@ -920,6 +929,7 @@ public class MarketsTab {
         chkUseTwoWayPay.setSelected(options.isUseTwoWayPay());
         chkUseCamOpsSalvage.setSelected(options.isUseCamOpsSalvage());
         chkUseRiskySalvage.setSelected(options.isUseRiskySalvage());
+        chkEnableSalvageFlagByDefault.setSelected(options.isEnableSalvageFlagByDefault());
         chkUseDynamicDifficulty.setSelected(options.isUseDynamicDifficulty());
         chkUseBolsterContractSkill.setSelected(options.isUseBolsterContractSkill());
         chkContractMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
@@ -991,6 +1001,7 @@ public class MarketsTab {
         options.setUseTwoWayPay(chkUseTwoWayPay.isSelected());
         options.setUseCamOpsSalvage(chkUseCamOpsSalvage.isSelected());
         options.setUseRiskySalvage(chkUseRiskySalvage.isSelected());
+        options.setEnableSalvageFlagByDefault(chkEnableSalvageFlagByDefault.isSelected());
         options.setUseDynamicDifficulty(chkUseDynamicDifficulty.isSelected());
         options.setUseBolsterContractSkill(chkUseBolsterContractSkill.isSelected());
         options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());

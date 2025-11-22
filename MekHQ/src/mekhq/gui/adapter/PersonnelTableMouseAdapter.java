@@ -3754,17 +3754,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // 7) Trying To Marry
         menu = new JMenu(resources.getString("specialFlagsMenu.text"));
 
-        if (Stream.of(selected).allMatch(p -> p.isClanPersonnel() == person.isClanPersonnel())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miClanPersonnel.text"));
-            cbMenuItem.setToolTipText(resources.getString("miClanPersonnel.toolTipText"));
-            cbMenuItem.setName("miClanPersonnel");
-            cbMenuItem.setSelected(person.isClanPersonnel());
-            cbMenuItem.addActionListener(evt -> {
-                final boolean clanPersonnel = !person.isClanPersonnel();
-                Stream.of(selected).forEach(p -> p.setClanPersonnel(clanPersonnel));
-            });
-            menu.add(cbMenuItem);
-        }
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miClanPersonnel.text"));
+        cbMenuItem.setToolTipText(resources.getString("miClanPersonnel.toolTipText"));
+        cbMenuItem.setName("miClanPersonnel");
+        cbMenuItem.setSelected(selected.length == 1 && person.isClanPersonnel());
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setClanPersonnel(!p.isClanPersonnel())));
+        menu.add(cbMenuItem);
 
         if (oneSelected) {
             final JCheckBoxMenuItem miCommander = new JCheckBoxMenuItem(resources.getString("miCommander.text"));
@@ -3788,108 +3783,78 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(miCommander);
         }
 
-        if ((getCampaignOptions().isUseManualDivorce() || !getCampaignOptions().getRandomDivorceMethod().isNone()) &&
-                  Stream.of(selected).allMatch(p -> p.getGenealogy().hasSpouse()) &&
-                  Stream.of(selected).allMatch(p -> p.isDivorceable() == person.isDivorceable())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miDivorceable.text"));
-            cbMenuItem.setToolTipText(resources.getString("miDivorceable.toolTipText"));
-            cbMenuItem.setName("miDivorceable");
-            cbMenuItem.setSelected(person.isDivorceable());
-            cbMenuItem.addActionListener(evt -> {
-                final boolean divorceable = !person.isDivorceable();
-                Stream.of(selected).forEach(p -> p.setDivorceable(divorceable));
-            });
-            menu.add(cbMenuItem);
-        }
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miDivorceable.text"));
+        cbMenuItem.setToolTipText(resources.getString("miDivorceable.toolTipText"));
+        cbMenuItem.setName("miDivorceable");
+        cbMenuItem.setSelected(selected.length == 1 && person.isDivorceable());
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setDivorceable(!p.isDivorceable())));
+        menu.add(cbMenuItem);
 
-        if (Stream.of(selected).allMatch(p -> p.isFounder() == person.isFounder())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miFounder.text"));
-            cbMenuItem.setToolTipText(resources.getString("miFounder.toolTipText"));
-            cbMenuItem.setName("miFounder");
-            cbMenuItem.setSelected(person.isFounder());
-            cbMenuItem.addActionListener(evt -> {
-                final boolean founder = !person.isFounder();
-                Stream.of(selected).forEach(p -> p.setFounder(founder));
-            });
-            menu.add(cbMenuItem);
-        }
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miFounder.text"));
+        cbMenuItem.setToolTipText(resources.getString("miFounder.toolTipText"));
+        cbMenuItem.setName("miFounder");
+        cbMenuItem.setSelected(selected.length == 1 && person.isFounder());
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setFounder(!p.isFounder())));
+        menu.add(cbMenuItem);
 
-        if (Stream.of(selected).noneMatch(p -> p.getStatus().isDead()) &&
-                  Stream.of(selected).allMatch(p -> p.isImmortal() == person.isImmortal())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miImmortal.text"));
-            cbMenuItem.setToolTipText(resources.getString("miImmortal.toolTipText"));
-            cbMenuItem.setName("miImmortal");
-            cbMenuItem.setSelected(person.isImmortal());
-            cbMenuItem.addActionListener(evt -> {
-                final boolean immortal = !person.isImmortal();
-                Stream.of(selected).forEach(p -> p.setImmortal(immortal));
-            });
-            menu.add(cbMenuItem);
-        }
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miImmortal.text"));
+        cbMenuItem.setToolTipText(resources.getString("miImmortal.toolTipText"));
+        cbMenuItem.setName("miImmortal");
+        cbMenuItem.setSelected(selected.length == 1 && person.isImmortal());
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setImmortal(!p.isImmortal())));
+        menu.add(cbMenuItem);
 
-        if (Stream.of(selected).allMatch(p -> p.isQuickTrainIgnore() == person.isQuickTrainIgnore())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miQuickTrainIgnore.text"));
-            cbMenuItem.setToolTipText(resources.getString("miQuickTrainIgnore.toolTipText"));
-            cbMenuItem.setName("miQuickTrainIgnore");
-            cbMenuItem.setSelected(person.isQuickTrainIgnore());
-            cbMenuItem.addActionListener(evt -> {
-                final boolean quickTrainIgnore = !person.isQuickTrainIgnore();
-                Stream.of(selected).forEach(p -> p.setQuickTrainIgnore(quickTrainIgnore));
-            });
-            menu.add(cbMenuItem);
-        }
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miQuickTrainIgnore.text"));
+        cbMenuItem.setToolTipText(resources.getString("miQuickTrainIgnore.toolTipText"));
+        cbMenuItem.setName("miQuickTrainIgnore");
+        cbMenuItem.setSelected(selected.length == 1 && person.isQuickTrainIgnore());
+        cbMenuItem.addActionListener(evt -> Stream.of(selected)
+                                                  .forEach(p -> p.setQuickTrainIgnore(!p.isQuickTrainIgnore())));
+        menu.add(cbMenuItem);
 
-        if (getCampaignOptions().isUseManualMarriages() || !getCampaignOptions().getRandomMarriageMethod().isNone()) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersMen.text"));
-            cbMenuItem.setToolTipText(wordWrap(resources.getString("miPrefersMen.toolTipText")));
-            cbMenuItem.setName("miPrefersMen");
-            cbMenuItem.setSelected(selected.length == 1 && person.isPrefersMen());
-            cbMenuItem.addActionListener(evt -> {
-                Stream.of(selected).forEach(p -> p.setPrefersMen(!p.isPrefersMen()));
-            });
-            menu.add(cbMenuItem);
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miSalvageSupervisor.text"));
+        cbMenuItem.setToolTipText(resources.getString("miSalvageSupervisor.toolTipText"));
+        cbMenuItem.setName("miSalvageSupervisor");
+        cbMenuItem.setSelected(selected.length == 1 && person.isSalvageSupervisor());
+        cbMenuItem.addActionListener(evt -> Stream.of(selected)
+                                                  .forEach(p -> p.setSalvageSupervisor(!p.isSalvageSupervisor())));
+        menu.add(cbMenuItem);
 
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersWomen.text"));
-            cbMenuItem.setToolTipText(wordWrap(resources.getString("miPrefersWomen.toolTipText")));
-            cbMenuItem.setName("miPrefersWomen");
-            cbMenuItem.setSelected(selected.length == 1 && person.isPrefersWomen());
-            cbMenuItem.addActionListener(evt -> {
-                Stream.of(selected).forEach(p -> p.setPrefersWomen(!p.isPrefersWomen()));
-            });
-            menu.add(cbMenuItem);
-        }
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersMen.text"));
+        cbMenuItem.setToolTipText(wordWrap(resources.getString("miPrefersMen.toolTipText")));
+        cbMenuItem.setName("miPrefersMen");
+        cbMenuItem.setSelected(selected.length == 1 && person.isPrefersMen());
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setPrefersMen(!p.isPrefersMen())));
+        menu.add(cbMenuItem);
 
-        if ((getCampaignOptions().isUseManualProcreation() ||
-                   !getCampaignOptions().getRandomProcreationMethod().isNone()) &&
-                  Stream.of(selected).allMatch(p -> p.getGender().isFemale()) &&
-                  Stream.of(selected).allMatch(p -> p.isTryingToConceive() == person.isTryingToConceive())) {
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersWomen.text"));
+        cbMenuItem.setToolTipText(wordWrap(resources.getString("miPrefersWomen.toolTipText")));
+        cbMenuItem.setName("miPrefersWomen");
+        cbMenuItem.setSelected(selected.length == 1 && person.isPrefersWomen());
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setPrefersWomen(!p.isPrefersWomen())));
+        menu.add(cbMenuItem);
+
+        if (Stream.of(selected).allMatch(p -> p.getGender().isFemale())) {
             cbMenuItem = new JCheckBoxMenuItem(resources.getString("miTryingToConceive.text"));
             cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("miTryingToConceive.toolTipText"),
                   100));
             cbMenuItem.setName("miTryingToConceive");
-            cbMenuItem.setSelected(person.isTryingToConceive());
-            cbMenuItem.addActionListener(evt -> {
-                final boolean tryingToConceive = !person.isTryingToConceive();
-                Stream.of(selected).forEach(p -> p.setTryingToConceive(tryingToConceive));
-            });
+            cbMenuItem.setSelected(selected.length == 1 && person.isTryingToConceive());
+            cbMenuItem.addActionListener(evt -> Stream.of(selected)
+                                                      .forEach(p -> p.setTryingToConceive(p.isTryingToConceive())));
             menu.add(cbMenuItem);
         }
 
-        if (getCampaignOptions().isUseRandomPersonalities()) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miHidePersonality.text"));
-            cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("miHidePersonality.toolTipText"),
-                  100));
-            cbMenuItem.setName("miHidePersonality");
-            cbMenuItem.setSelected(person.isHidePersonality());
-            cbMenuItem.addActionListener(evt -> {
-                final boolean hidePersonality = !person.isHidePersonality();
-                Stream.of(selected).forEach(selectedPerson -> {
-                    selectedPerson.setHidePersonality(hidePersonality);
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
-                });
-            });
-            menu.add(cbMenuItem);
-        }
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miHidePersonality.text"));
+        cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("miHidePersonality.toolTipText"),
+              100));
+        cbMenuItem.setName("miHidePersonality");
+        cbMenuItem.setSelected(selected.length == 1 && person.isHidePersonality());
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            selectedPerson.setHidePersonality(selectedPerson.isHidePersonality());
+            MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+        }));
+        menu.add(cbMenuItem);
 
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         // endregion Flags Menu
