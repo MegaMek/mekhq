@@ -178,6 +178,9 @@ public class StratConScenarioFactory {
             jointList.addAll(dynamicScenarioUnitTypeMap.get(generalUnitType));
         }
 
+        // We don't want facilities spawning mid-contract; this stops facility count getting out of control
+        jointList.removeIf(ScenarioTemplate::isFacilityScenario);
+
         return ObjectUtility.getRandomItem(jointList).clone();
     }
 
