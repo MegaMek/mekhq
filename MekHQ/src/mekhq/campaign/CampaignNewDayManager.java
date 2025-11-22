@@ -40,7 +40,6 @@ import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
-import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
@@ -83,7 +82,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
@@ -261,6 +259,26 @@ public class CampaignNewDayManager {
         campaign.getSkillReport().clear();
         campaign.setSkillReportHTML("");
         campaign.getNewSkillReports().clear();
+
+        campaign.getBattleReport().clear();
+        campaign.setBattleReportHTML("");
+        campaign.getNewBattleReports().clear();
+
+        campaign.getPersonnelReport().clear();
+        campaign.setPersonnelReportHTML("");
+        campaign.getNewPersonnelReports().clear();
+
+        campaign.getMedicalReport().clear();
+        campaign.setMedicalReportHTML("");
+        campaign.getNewMedicalReports().clear();
+
+        campaign.getAcquisitionsReport().clear();
+        campaign.setAcquisitionsReportHTML("");
+        campaign.getNewAcquisitionsReports().clear();
+
+        campaign.getTechnicalReport().clear();
+        campaign.setTechnicalReportHTML("");
+        campaign.getNewTechnicalReports().clear();
 
         campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(today) + "</b>");
 
@@ -567,6 +585,7 @@ public class CampaignNewDayManager {
         boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         boolean isUseAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
         boolean isUseFatigue = campaignOptions.isUseFatigue();
+        int fatigueRate = campaignOptions.getFatigueRate();
         boolean useBetterMonthlyIncome = campaignOptions.isUseBetterExtraIncome();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
@@ -623,7 +642,7 @@ public class CampaignNewDayManager {
                 }
 
                 processCompulsionsAndMadness(person, personnelOptions, isUseAdvancedMedical, isUseAltAdvancedMedical,
-                      isUseFatigue);
+                      isUseFatigue, fatigueRate);
             }
 
             // Monthly events
@@ -898,7 +917,7 @@ public class CampaignNewDayManager {
             if (campaignState != null && !contract.getEndingDate().equals(today)) {
                 boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
                 int victoryPoints = contract.getContractScore(isUseMaplessMode);
-                int requiredVictoryPoints = contract.getRequiredCombatTeams() * contract.getLength();
+                int requiredVictoryPoints = contract.getRequiredVictoryPoints();
 
                 if (campaignState.canEndContractEarly() && victoryPoints >= requiredVictoryPoints) {
                     new ImmersiveDialogNotification(campaign,
@@ -1416,12 +1435,13 @@ public class CampaignNewDayManager {
      * @param isUseAdvancedMedical    {@code true} if advanced medical rules are applied, {@code false} otherwise
      * @param isUseAltAdvancedMedical {@code true} if alt advanced medical rules are applied, {@code false} otherwise
      * @param isUseFatigue            {@code true} if fatigue rules are applied, {@code false} otherwise
+     * @param fatigueRate             the user-defined rate at which fatigue is gained
      *
      * @author Illiani
      * @since 0.50.07
      */
     private void processCompulsionsAndMadness(Person person, PersonnelOptions personnelOptions,
-          boolean isUseAdvancedMedical, boolean isUseAltAdvancedMedical, boolean isUseFatigue) {
+          boolean isUseAdvancedMedical, boolean isUseAltAdvancedMedical, boolean isUseFatigue, int fatigueRate) {
         String gamblingReport = person.gambleWealth();
         if (!gamblingReport.isBlank()) {
             campaign.addReport(gamblingReport);
@@ -1438,12 +1458,20 @@ public class CampaignNewDayManager {
             Money cost = Money.of(PersonnelOptions.PAINKILLER_COST * prostheticCount);
             if (!finances.debit(TransactionType.MEDICAL_EXPENSES, today, cost,
                   getFormattedTextAt(RESOURCE_BUNDLE, "painkillerAddiction.transaction", person.getFullTitle()))) {
-                checkForDiscontinuationSyndrome(person, isUseAdvancedMedical, isUseAltAdvancedMedical, isUseFatigue);
+                checkForDiscontinuationSyndrome(person,
+                      isUseAdvancedMedical,
+                      isUseAltAdvancedMedical,
+                      isUseFatigue,
+                      fatigueRate);
             }
         }
 
         if (personnelOptions.booleanOption(COMPULSION_ADDICTION)) {
-            checkForDiscontinuationSyndrome(person, isUseAdvancedMedical, isUseAltAdvancedMedical, isUseFatigue);
+            checkForDiscontinuationSyndrome(person,
+                  isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
+                  isUseFatigue,
+                  fatigueRate);
         }
 
         if (personnelOptions.booleanOption(MADNESS_FLASHBACKS)) {
@@ -1543,7 +1571,7 @@ public class CampaignNewDayManager {
     }
 
     private void checkForDiscontinuationSyndrome(Person person, boolean isUseAdvancedMedical,
-          boolean isUseAltAdvancedMedical, boolean isUseFatigue) {
+          boolean isUseAltAdvancedMedical, boolean isUseFatigue, int fatigueRate) {
         int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
         boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
               null, modifier);
@@ -1551,6 +1579,7 @@ public class CampaignNewDayManager {
               isUseAdvancedMedical,
               isUseAltAdvancedMedical,
               isUseFatigue,
+              fatigueRate,
               true,
               failedWillpowerCheck);
     }
@@ -1787,12 +1816,6 @@ public class CampaignNewDayManager {
                                              " requirements resulted in " +
                                              deficit +
                                              ((deficit == 1) ? " minor contract breach" : " minor contract breaches"));
-                }
-            }
-
-            if (Objects.equals(updatedLocation.getCurrentSystem(), contract.getSystem())) {
-                if (!campaign.getAutomatedMothballUnits().isEmpty()) {
-                    performAutomatedActivation(campaign);
                 }
             }
 

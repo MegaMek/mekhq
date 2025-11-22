@@ -120,6 +120,7 @@ public class RulesetsTab {
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
+    private JCheckBox chkUseNoTornadoes;
     private JLabel lblFixedMapChance;
     private JSpinner spnFixedMapChance;
 
@@ -235,6 +236,7 @@ public class RulesetsTab {
         chkUseWeatherConditions = new JCheckBox();
         chkUseLightConditions = new JCheckBox();
         chkUsePlanetaryConditions = new JCheckBox();
+        chkUseNoTornadoes = new JCheckBox();
         lblFixedMapChance = new JLabel();
         spnFixedMapChance = new JSpinner();
 
@@ -556,6 +558,7 @@ public class RulesetsTab {
         chkUseWeatherConditions = new CampaignOptionsCheckBox("UseWeatherConditions");
         chkUseLightConditions = new CampaignOptionsCheckBox("UseLightConditions");
         chkUsePlanetaryConditions = new CampaignOptionsCheckBox("UsePlanetaryConditions");
+        chkUseNoTornadoes = new CampaignOptionsCheckBox("UseNoTornadoes");
         lblFixedMapChance = new CampaignOptionsLabel("FixedMapChance");
         spnFixedMapChance = new CampaignOptionsSpinner("FixedMapChance",
               0, 0, 100, 1);
@@ -575,6 +578,9 @@ public class RulesetsTab {
 
         layout.gridy++;
         panel.add(chkUsePlanetaryConditions, layout);
+
+        layout.gridy++;
+        panel.add(chkUseNoTornadoes, layout);
 
         layout.gridy++;
         layout.gridwidth = 1;
@@ -746,6 +752,7 @@ public class RulesetsTab {
         chkUseWeatherConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UseWeatherConditions"));
         chkUseLightConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UseLightConditions"));
         chkUsePlanetaryConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UsePlanetaryConditions"));
+        chkUseNoTornadoes.addMouseListener(createTipPanelUpdater(stratConHeader, "UseNoTornadoes"));
         lblFixedMapChance.addMouseListener(createTipPanelUpdater(stratConHeader, "FixedMapChance"));
         spnFixedMapChance.addMouseListener(createTipPanelUpdater(stratConHeader, "FixedMapChance"));
         lblScenarioModMax.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModMax"));
@@ -907,6 +914,7 @@ public class RulesetsTab {
         options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
         options.setUseLightConditions(chkUseLightConditions.isSelected());
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
+        options.setUseNoTornadoes(chkUseNoTornadoes.isSelected());
         options.setFixedMapChance((int) spnFixedMapChance.getValue());
         options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
         options.setMoraleVictoryEffect((int) spnMoraleVictory.getValue());
@@ -970,6 +978,7 @@ public class RulesetsTab {
         chkUseWeatherConditions.setSelected(options.isUseWeatherConditions());
         chkUseLightConditions.setSelected(options.isUseLightConditions());
         chkUsePlanetaryConditions.setSelected(options.isUsePlanetaryConditions());
+        chkUseNoTornadoes.setSelected(options.isUseNoTornadoes());
         spnFixedMapChance.setValue(options.getFixedMapChance());
         chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
         spnMoraleVictory.setValue(options.getMoraleVictoryEffect());

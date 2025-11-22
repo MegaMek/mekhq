@@ -40,6 +40,7 @@ import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.ELITE;
@@ -57,6 +58,8 @@ import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
@@ -1452,6 +1455,40 @@ public class AtBContract extends Contract {
         this.moraleLevel = moraleLevel;
     }
 
+    /**
+     * Adjusts the current {@link AtBMoraleLevel} by the specified delta and returns the resulting morale level.
+     *
+     * <p>The method computes a new integer morale value by adding the given {@code delta} to the unit's current
+     * morale level, then clamps the result to the valid range defined by {@code MINIMUM_MORALE_LEVEL} and
+     * {@code MAXIMUM_MORALE_LEVEL}. It then attempts to resolve the resulting value to a corresponding
+     * {@link AtBMoraleLevel}.</p>
+     *
+     * <p>If the resolved morale level is valid (i.e., non-{@code null}), the unit's internal morale state is updated.
+     * If no valid enum constant exists for the computed level, the method leaves the current morale unchanged and
+     * returns the existing level.</p>
+     *
+     * <p><b>Note:</b> a positive delta improves the enemy morale, a negative delta decreases enemy morale.</p>
+     *
+     * @param delta the amount to adjust the current morale level by; may be positive or negative
+     *
+     * @return the new {@link AtBMoraleLevel} after applying the delta; if no corresponding morale level exists for the
+     *       computed value, the current morale level is returned unchanged
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public AtBMoraleLevel changeMoraleLevel(final int delta) {
+        int currentLevel = moraleLevel.getLevel();
+        int newLevel = clamp(currentLevel + delta, MINIMUM_MORALE_LEVEL, MAXIMUM_MORALE_LEVEL);
+
+        AtBMoraleLevel newMoraleLevel = AtBMoraleLevel.parseFromLevel(newLevel);
+        if (newMoraleLevel != null) {
+            moraleLevel = newMoraleLevel;
+        }
+
+        return newMoraleLevel != null ? newMoraleLevel : moraleLevel;
+    }
+
     public boolean isPeaceful() {
         return getContractType().isGarrisonType() && getMoraleLevel().isRouted();
     }
@@ -2406,5 +2443,53 @@ public class AtBContract extends Contract {
 
     public @Nullable Money getRoutedPayout() {
         return routedPayout;
+    }
+
+    /**
+     * Calculates the number of required Victory Points (VP) needed to achieve overall success for this StratCon
+     * contract.
+     *
+     * <p>The calculation is based on several averaged campaign parameters:
+     * <ul>
+     *     <li><b>Base requirement</b> — Required number of combat teams multiplied by the contract length.</li>
+     *     <li><b>Scenario odds</b> — The mean scenario-odds percentage across all StratCon tracks, converted to a
+     *     probability.</li>
+     *     <li><b>Turning point chance</b> — A scaling factor based on command rights: {@code INTEGRATED} contracts
+     *     assume a 100% chance, while all others use a one-third chance.</li>
+     * </ul>
+     *
+     * <p>The final result estimates the expected number of Turning Points the player must win for overall contract
+     * success. If the player loses a handful of Turning Points, they should still be able to win the contract by
+     * being proactive in the Area of Operations.</p>
+     *
+     * @return the required number of Victory Points, rounded up to the nearest integer
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public int getRequiredVictoryPoints() {
+        double baseRequirement = getRequiredCombatTeams();
+
+        int duration = getLength();
+        if (contractType.isGarrisonType()) {
+            duration = (int) ceil(duration * 0.75); // We assume around 25% of the contract will be peaceful
+        }
+
+        double trackCount = 0;
+        int totalScenarioOdds = 0;
+        for (StratConTrackState trackState : stratconCampaignState.getTracks()) {
+            trackCount++;
+            totalScenarioOdds += trackState.getScenarioOdds();
+        }
+
+        double meanScenarioOdds = totalScenarioOdds / trackCount;
+        double scenarioOdds = meanScenarioOdds / 100.0;
+        double turningPointChance = switch (getCommandRights()) {
+            case INTEGRATED -> 1.0;
+            default -> 0.33;
+        };
+
+        // This result gives us the average number of Turning Points expected for the contract
+        return (int) ceil(baseRequirement * duration * scenarioOdds * turningPointChance);
     }
 }

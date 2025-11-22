@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.stratCon;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
@@ -85,6 +86,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
@@ -209,8 +211,9 @@ public class StratConRulesManager {
      */
     public static void generateScenariosDatesForWeek(Campaign campaign, StratConCampaignState campaignState,
           AtBContract contract, StratConTrackState track) {
-        // maps scenarios to force IDs
-        int scenarioRolls = track.getRequiredLanceCount();
+        // We divide the number of scenario rolls by the number of tracks so that we're not unintentionally
+        // multiplying Intensity by tracks
+        int scenarioRolls = (int) ceil(track.getRequiredLanceCount() / (double) campaignState.getTrackCount());
         for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
             int targetNum = calculateScenarioOdds(track, contract, false);
             int roll = randomInt(100);
@@ -291,7 +294,7 @@ public class StratConRulesManager {
                       track);
                 // otherwise, pick a random force from the avail
             } else {
-                int randomForceID = getRandomItem(availableForceIDs);
+                Integer randomForceID = getRandomItem(availableForceIDs); // Can be null
 
                 // two scenarios on the same coordinates wind up increasing in size
                 if (track.getScenarios().containsKey(scenarioCoords)) {
@@ -657,7 +660,7 @@ public class StratConRulesManager {
 
         // Finally, finish scenario set up
         finalizeScenario(backingScenario, contract, campaign);
-        setScenarioParametersFromBiome(track, scenario);
+        setScenarioParametersFromBiome(track, scenario, campaign.getCampaignOptions().isUseNoTornadoes());
         swapInPlayerUnits(scenario, campaign, FORCE_NONE);
 
         if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
@@ -743,23 +746,21 @@ public class StratConRulesManager {
             return;
         }
 
-        if (!isCombatChallenge) {
-            ContractCommandRights commandRights = contract.getCommandRights();
-            switch (commandRights) {
-                case INTEGRATED -> {
+        ContractCommandRights commandRights = contract.getCommandRights();
+        switch (commandRights) {
+            case INTEGRATED -> {
+                scenario.setTurningPoint(true);
+                setAttachedUnitsModifier(scenario, contract);
+            }
+            case HOUSE, LIAISON -> {
+                if (randomInt(3) == 0) {
                     scenario.setTurningPoint(true);
                     setAttachedUnitsModifier(scenario, contract);
                 }
-                case HOUSE, LIAISON -> {
-                    if (randomInt(3) == 0 || isObjective) {
-                        scenario.setTurningPoint(true);
-                        setAttachedUnitsModifier(scenario, contract);
-                    }
-                }
-                case INDEPENDENT -> {
-                    if (randomInt(3) == 0 || isObjective) {
-                        scenario.setTurningPoint(true);
-                    }
+            }
+            case INDEPENDENT -> {
+                if (randomInt(3) == 0) {
+                    scenario.setTurningPoint(true);
                 }
             }
         }
@@ -805,7 +806,8 @@ public class StratConRulesManager {
      * Picks the scenario terrain based on the scenario coordinates' biome Note that "finalizeScenario" currently wipes
      * out temperature/map info so this method must be called afterward.
      */
-    public static void setScenarioParametersFromBiome(StratConTrackState track, StratConScenario scenario) {
+    public static void setScenarioParametersFromBiome(StratConTrackState track, StratConScenario scenario,
+          boolean isNoTornadoes) {
         StratConCoords coords = scenario.getCoords();
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
         StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
@@ -858,7 +860,7 @@ public class StratConRulesManager {
                 backingScenario.setMap(mapTypeList.get(randomInt(mapTypeList.size())));
             }
             backingScenario.setLightConditions();
-            backingScenario.setWeatherConditions();
+            backingScenario.setWeatherConditions(isNoTornadoes);
         }
     }
 
@@ -1154,7 +1156,9 @@ public class StratConRulesManager {
             commitPrimaryForces(campaign, revealedScenario, track);
             if (!revealedScenario.getBackingScenario().isFinalized()) {
                 finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
-                setScenarioParametersFromBiome(track, revealedScenario);
+                setScenarioParametersFromBiome(track,
+                      revealedScenario,
+                      campaign.getCampaignOptions().isUseNoTornadoes());
             }
             return;
         }
@@ -1300,8 +1304,8 @@ public class StratConRulesManager {
      *
      * @return The newly set up {@link StratConScenario}.
      */
-    public static @Nullable StratConScenario setupScenario(StratConCoords coords, int forceID, Campaign campaign,
-          AtBContract contract, StratConTrackState track) {
+    public static @Nullable StratConScenario setupScenario(StratConCoords coords, @Nullable Integer forceID,
+          Campaign campaign, AtBContract contract, StratConTrackState track) {
         return setupScenario(coords,
               forceID,
               campaign,
@@ -1334,9 +1338,9 @@ public class StratConRulesManager {
      *
      * @return The newly set up {@link StratConScenario}.
      */
-    public static @Nullable StratConScenario setupScenario(StratConCoords coords, int forceID, Campaign campaign,
-          AtBContract contract, StratConTrackState track, @Nullable ScenarioTemplate template, boolean ignoreFacilities,
-          @Nullable Integer daysTilDeployment) {
+    public static @Nullable StratConScenario setupScenario(StratConCoords coords, @Nullable Integer forceID,
+          Campaign campaign, AtBContract contract, StratConTrackState track, @Nullable ScenarioTemplate template,
+          boolean ignoreFacilities, @Nullable Integer daysTilDeployment) {
         StratConScenario scenario;
 
         if (track.getFacilities().containsKey(coords) && !ignoreFacilities) {
@@ -1808,12 +1812,14 @@ public class StratConRulesManager {
      * @param campaign the campaign
      */
     private static void increaseFatigue(int forceID, Campaign campaign) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseFatigue = campaignOptions.isUseFatigue();
+        int fatigueRate = campaignOptions.getFatigueRate();
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
-                int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
-                person.changeFatigue(fatigueChangeRate);
+                person.changeFatigue(fatigueRate);
 
-                if (campaign.getCampaignOptions().isUseFatigue()) {
+                if (isUseFatigue) {
                     Fatigue.processFatigueActions(campaign, person);
                 }
             }
@@ -2343,8 +2349,14 @@ public class StratConRulesManager {
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation fails
      */
     private static @Nullable StratConScenario generateScenario(Campaign campaign, AtBContract contract,
-          StratConTrackState track, int forceID, StratConCoords coords, @Nullable Integer daysTilDeployment) {
-        int unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
+          StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
+          @Nullable Integer daysTilDeployment) {
+        int unitType = MEK;
+        ;
+        if (forceID != null) {
+            unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
+        }
+
         ScenarioTemplate template = StratConScenarioFactory.getRandomScenario(unitType);
         // useful for debugging specific scenario types
         // template = StratConScenarioFactory.getSpecificScenario("Defend Grounded
@@ -2385,9 +2397,13 @@ public class StratConRulesManager {
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation failed
      */
     static @Nullable StratConScenario generateScenario(Campaign campaign, AtBContract contract,
-          StratConTrackState track, int forceID, StratConCoords coords, ScenarioTemplate template,
+          StratConTrackState track, @Nullable Integer forceID, StratConCoords coords, ScenarioTemplate template,
           @Nullable Integer daysTilDeployment) {
         StratConScenario scenario = new StratConScenario();
+
+        if (forceID == null) {
+            forceID = FORCE_NONE;
+        }
 
         if (template == null) {
             int unitType = MEK;

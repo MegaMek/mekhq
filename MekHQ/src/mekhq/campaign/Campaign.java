@@ -45,6 +45,7 @@ import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.force.ForceType.STANDARD;
+import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
@@ -201,6 +202,7 @@ import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -335,9 +337,29 @@ public class Campaign implements ITechManager {
     private transient String currentReportHTML;
     private transient List<String> newReports;
 
+    private final ArrayList<String> personnelReport;
+    private transient String personnelReportHTML;
+    private transient List<String> newPersonnelReports;
+
     private final ArrayList<String> skillReport;
     private transient String skillReportHTML;
     private transient List<String> newSkillReports;
+
+    private final ArrayList<String> technicalReport;
+    private transient String technicalReportHTML;
+    private transient List<String> newTechnicalReports;
+
+    private final ArrayList<String> acquisitionsReport;
+    private transient String acquisitionsReportHTML;
+    private transient List<String> newAcquisitionsReports;
+
+    private final ArrayList<String> medicalReport;
+    private transient String medicalReportHTML;
+    private transient List<String> newMedicalReports;
+
+    private final ArrayList<String> battleReport;
+    private transient String battleReportHTML;
+    private transient List<String> newBattleReports;
 
     private boolean fieldKitchenWithinCapacity;
     private int mashTheatreCapacity;
@@ -586,9 +608,29 @@ public class Campaign implements ITechManager {
         currentReportHTML = "";
         newReports = new ArrayList<>();
 
+        personnelReport = new ArrayList<>();
+        personnelReportHTML = "";
+        newPersonnelReports = new ArrayList<>();
+
         skillReport = new ArrayList<>();
         skillReportHTML = "";
         newSkillReports = new ArrayList<>();
+
+        technicalReport = new ArrayList<>();
+        technicalReportHTML = "";
+        newTechnicalReports = new ArrayList<>();
+
+        acquisitionsReport = new ArrayList<>();
+        acquisitionsReportHTML = "";
+        newAcquisitionsReports = new ArrayList<>();
+
+        medicalReport = new ArrayList<>();
+        medicalReportHTML = "";
+        newMedicalReports = new ArrayList<>();
+
+        battleReport = new ArrayList<>();
+        battleReportHTML = "";
+        newBattleReports = new ArrayList<>();
 
         // Secondary initialization from passed / derived values
         news = new News(getGameYear(), id.getLeastSignificantBits());
@@ -1368,6 +1410,14 @@ public class Campaign implements ITechManager {
             return;
         }
 
+        if (id == FORCE_NONE) {
+            Force currentForce = getForce(unit.getForceId());
+            unit.setForceId(FORCE_NONE);
+            unit.setScenarioId(NO_ASSIGNED_SCENARIO);
+            MekHQ.triggerEvent(new OrganizationChangedEvent(this, currentForce, unit));
+            return;
+        }
+
         Force force = forceIds.get(id);
         Force prevForce = forceIds.get(unit.getForceId());
         boolean useTransfers = false;
@@ -1726,13 +1776,31 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Moves immediately to a {@link PlanetarySystem}.
+     * Relocates the campaign immediately to the specified {@link PlanetarySystem}, updating the current location and
+     * firing any associated events or automated behaviors.
      *
-     * @param s The {@link PlanetarySystem} the campaign has been moved to.
+     * <p>This method performs the following actions:</p>
+     * <ul>
+     *     <li>Updates the campaign's {@link CurrentLocation} to the given planetary system.</li>
+     *     <li>Triggers a {@link LocationChangedEvent} to notify listeners of the move.</li>
+     *     <li>If there are no units in automated mothball mode, performs automated activation.</li>
+     *     <li>If enabled by campaign options, checks for possible inoculation prompts related to the Random Diseases
+     *     and Alternative Advanced Medical systems.</li>
+     * </ul>
+     *
+     * @param planetarySystem the destination {@link PlanetarySystem} to move the campaign to
      */
-    public void moveToPlanetarySystem(PlanetarySystem s) {
-        setLocation(new CurrentLocation(s, 0.0));
+    public void moveToPlanetarySystem(PlanetarySystem planetarySystem) {
+        setLocation(new CurrentLocation(planetarySystem, 0.0));
         MekHQ.triggerEvent(new LocationChangedEvent(getLocation(), false));
+
+        if (getAutomatedMothballUnits().isEmpty()) {
+            performAutomatedActivation(this);
+        }
+
+        if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+            Inoculations.triggerInoculationPrompt(this, false);
+        }
     }
 
     public CurrentLocation getLocation() {
@@ -3231,6 +3299,136 @@ public class Campaign implements ITechManager {
         List<String> oldSkillReports = newSkillReports;
         setNewSkillReports(new ArrayList<>());
         return oldSkillReports;
+    }
+
+    public List<String> getTechnicalReport() {
+        return technicalReport;
+    }
+
+    public void setTechnicalReportHTML(String html) {
+        technicalReportHTML = html;
+    }
+
+    public String getTechnicalReportHTML() {
+        return technicalReportHTML;
+    }
+
+    public List<String> getNewTechnicalReports() {
+        return newTechnicalReports;
+    }
+
+    public void setNewTechnicalReports(List<String> reports) {
+        newTechnicalReports = reports;
+    }
+
+    public List<String> fetchAndClearNewTechnicalReports() {
+        List<String> oldTechnicalReports = newTechnicalReports;
+        setNewTechnicalReports(new ArrayList<>());
+        return oldTechnicalReports;
+    }
+
+    public List<String> getAcquisitionsReport() {
+        return acquisitionsReport;
+    }
+
+    public void setAcquisitionsReportHTML(String html) {
+        acquisitionsReportHTML = html;
+    }
+
+    public String getAcquisitionsReportHTML() {
+        return acquisitionsReportHTML;
+    }
+
+    public List<String> getNewAcquisitionsReports() {
+        return newAcquisitionsReports;
+    }
+
+    public void setNewAcquisitionsReports(List<String> reports) {
+        newAcquisitionsReports = reports;
+    }
+
+    public List<String> fetchAndClearNewAcquisitionsReports() {
+        List<String> oldAcquisitionsReports = newAcquisitionsReports;
+        setNewAcquisitionsReports(new ArrayList<>());
+        return oldAcquisitionsReports;
+    }
+
+    public List<String> getMedicalReport() {
+        return medicalReport;
+    }
+
+    public void setMedicalReportHTML(String html) {
+        medicalReportHTML = html;
+    }
+
+    public String getMedicalReportHTML() {
+        return medicalReportHTML;
+    }
+
+    public List<String> getNewMedicalReports() {
+        return newMedicalReports;
+    }
+
+    public void setNewMedicalReports(List<String> reports) {
+        newMedicalReports = reports;
+    }
+
+    public List<String> fetchAndClearNewMedicalReports() {
+        List<String> oldMedicalReports = newMedicalReports;
+        setNewMedicalReports(new ArrayList<>());
+        return oldMedicalReports;
+    }
+
+    public List<String> getPersonnelReport() {
+        return personnelReport;
+    }
+
+    public void setPersonnelReportHTML(String html) {
+        personnelReportHTML = html;
+    }
+
+    public String getPersonnelReportHTML() {
+        return personnelReportHTML;
+    }
+
+    public List<String> getNewPersonnelReports() {
+        return newPersonnelReports;
+    }
+
+    public void setNewPersonnelReports(List<String> reports) {
+        newPersonnelReports = reports;
+    }
+
+    public List<String> fetchAndClearNewPersonnelReports() {
+        List<String> oldPersonnelReports = newPersonnelReports;
+        setNewPersonnelReports(new ArrayList<>());
+        return oldPersonnelReports;
+    }
+
+    public List<String> getBattleReport() {
+        return battleReport;
+    }
+
+    public void setBattleReportHTML(String html) {
+        battleReportHTML = html;
+    }
+
+    public String getBattleReportHTML() {
+        return battleReportHTML;
+    }
+
+    public List<String> getNewBattleReports() {
+        return newBattleReports;
+    }
+
+    public void setNewBattleReports(List<String> reports) {
+        newBattleReports = reports;
+    }
+
+    public List<String> fetchAndClearNewBattleReports() {
+        List<String> oldBattleReports = newBattleReports;
+        setNewBattleReports(new ArrayList<>());
+        return oldBattleReports;
     }
 
     /**
@@ -5747,7 +5945,7 @@ public class Campaign implements ITechManager {
 
                 newReports.add(report);
             }
-            case SKILL -> {
+            case SKILL_CHECKS -> {
                 skillReport.add(report);
                 if (!skillReportHTML.isEmpty()) {
                     skillReportHTML = skillReportHTML + REPORT_LINEBREAK + report;
@@ -5757,6 +5955,61 @@ public class Campaign implements ITechManager {
                 }
 
                 newSkillReports.add(report);
+            }
+            case TECHNICAL -> {
+                technicalReport.add(report);
+                if (!technicalReportHTML.isEmpty()) {
+                    technicalReportHTML = technicalReportHTML + REPORT_LINEBREAK + report;
+                    newTechnicalReports.add(REPORT_LINEBREAK);
+                } else {
+                    technicalReportHTML = report;
+                }
+
+                newTechnicalReports.add(report);
+            }
+            case ACQUISITIONS -> {
+                acquisitionsReport.add(report);
+                if (!acquisitionsReportHTML.isEmpty()) {
+                    acquisitionsReportHTML = acquisitionsReportHTML + REPORT_LINEBREAK + report;
+                    newAcquisitionsReports.add(REPORT_LINEBREAK);
+                } else {
+                    acquisitionsReportHTML = report;
+                }
+
+                newAcquisitionsReports.add(report);
+            }
+            case MEDICAL -> {
+                medicalReport.add(report);
+                if (!medicalReportHTML.isEmpty()) {
+                    medicalReportHTML = medicalReportHTML + REPORT_LINEBREAK + report;
+                    newMedicalReports.add(REPORT_LINEBREAK);
+                } else {
+                    medicalReportHTML = report;
+                }
+
+                newMedicalReports.add(report);
+            }
+            case PERSONNEL -> {
+                personnelReport.add(report);
+                if (!personnelReportHTML.isEmpty()) {
+                    personnelReportHTML = personnelReportHTML + REPORT_LINEBREAK + report;
+                    newPersonnelReports.add(REPORT_LINEBREAK);
+                } else {
+                    personnelReportHTML = report;
+                }
+
+                newPersonnelReports.add(report);
+            }
+            case BATTLE -> {
+                battleReport.add(report);
+                if (!battleReportHTML.isEmpty()) {
+                    battleReportHTML = battleReportHTML + REPORT_LINEBREAK + report;
+                    newBattleReports.add(REPORT_LINEBREAK);
+                } else {
+                    battleReportHTML = report;
+                }
+
+                newBattleReports.add(report);
             }
         }
         MekHQ.triggerEvent(new ReportEvent(this, report));
@@ -6012,6 +6265,41 @@ public class Campaign implements ITechManager {
             writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "skillReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "technicalReport");
+        for (String report : technicalReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "technicalReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "acquisitionsReport");
+        for (String report : acquisitionsReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "acquisitionsReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "medicalReport");
+        for (String report : medicalReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "medicalReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "personnelReport");
+        for (String report : personnelReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "personnelReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "battleReport");
+        for (String report : battleReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "battleReport");
 
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "info");
         // endregion Basic Campaign Info
@@ -6326,11 +6614,10 @@ public class Campaign implements ITechManager {
 
         List<AtBContract> activeAtBContracts = getActiveAtBContracts();
 
-        if (!skipAccessCheck
-                  && campaignOptions.isUseFactionStandingOutlawedSafe()) {
-            FactionHints factionHints = FactionHints.getInstance();
+        FactionHints factionHints = FactionHints.getInstance();
+        if (!skipAccessCheck && campaignOptions.isUseFactionStandingOutlawedSafe()) {
             boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
-                  getCurrentSystem(), end, currentDay, activeAtBContracts, factionHints);
+                  start, end, currentDay, activeAtBContracts, factionHints);
             if (!canAccessSystem) {
                 new ImmersiveDialogSimple(this, getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT), null,
                       String.format(resources.getString("unableToEnterSystem.outlawed.ic"), getCommanderAddress()),
@@ -6363,7 +6650,11 @@ public class Campaign implements ITechManager {
         scoreG.put(current, 0.0);
         closed.add(current);
 
-        FactionHints factionHints = FactionHints.getInstance();
+        // We need this additional check as later we're going to be comparing neighbors, rather than start point.
+        // Which means that if we're passing through more than one Outlawed system en route to our escape our
+        // progress will be blocked.
+        boolean isEscapingOutlawing = !FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
+              null, start, currentDay, activeAtBContracts, factionHints);
 
         // A* search
         final int MAX_JUMPS = 10000;
@@ -6392,10 +6683,11 @@ public class Campaign implements ITechManager {
                 }
 
                 // Skip systems where the campaign is outlawed
-                if (!skipAccessCheck
-                          && campaignOptions.isUseFactionStandingOutlawedSafe()) {
+                if (!skipAccessCheck &&
+                          !isEscapingOutlawing &&
+                          campaignOptions.isUseFactionStandingOutlawedSafe()) {
                     boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
-                          getCurrentSystem(), neighborSystem, currentDay, activeAtBContracts, factionHints);
+                          currentSystem, neighborSystem, currentDay, activeAtBContracts, factionHints);
                     if (!canAccessSystem) {
                         return;
                     }
@@ -7704,8 +7996,12 @@ public class Campaign implements ITechManager {
      * @param person The {@link Person} who should receive a randomized portrait.
      */
     public void assignRandomPortraitFor(final Person person) {
-        final Boolean allowDuplicatePortraits = getCampaignOptions().isAllowDuplicatePortraits();
-        final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(), person, allowDuplicatePortraits);
+        final boolean allowDuplicatePortraits = campaignOptions.isAllowDuplicatePortraits();
+        final boolean genderedPortraitsOnly = campaignOptions.isUseGenderedPortraitsOnly();
+        final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(),
+              person,
+              allowDuplicatePortraits,
+              genderedPortraitsOnly);
         if (!portrait.isDefault()) {
             person.setPortrait(portrait);
         }

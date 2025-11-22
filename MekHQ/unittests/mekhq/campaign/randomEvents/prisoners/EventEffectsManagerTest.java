@@ -543,6 +543,7 @@ class EventEffectsManagerTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isUseFatigue()).thenReturn(true);
+        when(mockCampaignOptions.getFatigueRate()).thenReturn(1);
 
         EventResult eventResult = new EventResult(FATIGUE_ONE, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
@@ -578,6 +579,7 @@ class EventEffectsManagerTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isUseFatigue()).thenReturn(true);
+        when(mockCampaignOptions.getFatigueRate()).thenReturn(1);
 
         EventResult eventResult = new EventResult(FATIGUE_ALL, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
@@ -779,6 +781,7 @@ class EventEffectsManagerTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isUseFatigue()).thenReturn(true);
+        when(mockCampaignOptions.getFatigueRate()).thenReturn(1);
 
         EventResult eventResult = new EventResult(UNIQUE, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,

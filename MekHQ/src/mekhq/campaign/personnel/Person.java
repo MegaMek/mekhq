@@ -92,6 +92,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.HandheldWeapon;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -2208,7 +2209,7 @@ public class Person {
             delta = (int) floor(delta * getFatigueMultiplier());
         }
 
-        this.fatigue = this.fatigue + delta;
+        this.fatigue = this.fatigue + MathUtility.roundAwayFromZero(delta);
     }
 
     public boolean getIsRecoveringFromFatigue() {
@@ -5779,8 +5780,8 @@ public class Person {
     /**
      * Determines if the user holds the necessary technical skills to service or repair the specified entity.
      *
-     * <p>The method inspects the entity type and checks for the corresponding technical skills required to perform
-     * maintenance or repairs. Supported types include Mek, ProtoMek, dropship, jumpship, aerospace unit, battle armor,
+     * <p>The method inspects the entity type and checks for the corresponding technical profession required to perform
+     * maintenance or repairs. Supported types include Mek, ProtoMek, DropShip, JumpShip, aerospace unit, battle armor,
      * and tank.</p>
      *
      * @param entity the entity to assess for technical capability. If {@code null}, returns {@code false}.
@@ -5792,16 +5793,16 @@ public class Person {
             return false;
         }
 
-        if ((entity instanceof Mek) || (entity instanceof ProtoMek)) {
-            return hasSkill(S_TECH_MEK) && isTechMek();
+        if ((entity instanceof Mek) || (entity instanceof ProtoMek) || (entity instanceof HandheldWeapon)) {
+            return isTechMek();
         } else if (entity instanceof Dropship || entity instanceof Jumpship) {
-            return hasSkill(S_TECH_VESSEL) && isTechLargeVessel();
+            return isTechLargeVessel();
         } else if (entity instanceof Aero) {
-            return hasSkill(S_TECH_AERO) && isTechAero();
+            return isTechAero();
         } else if (entity instanceof BattleArmor) {
-            return hasSkill(S_TECH_BA) && isTechBA();
+            return isTechBA();
         } else if (entity instanceof Tank) {
-            return hasSkill(S_TECH_MECHANIC) && isTechMechanic();
+            return isTechMechanic();
         } else {
             return false;
         }
@@ -6360,8 +6361,9 @@ public class Person {
     public @Nullable Skill getSkillForWorkingOn(final @Nullable Unit unit) {
         if (unit == null) {
             return null;
-        } else if (((unit.getEntity() instanceof Mek) || (unit.getEntity() instanceof ProtoMek)) &&
-                         hasSkill(S_TECH_MEK)) {
+        } else if (((unit.getEntity() instanceof Mek) ||
+                          (unit.getEntity() instanceof ProtoMek) ||
+                          (unit.getEntity() instanceof HandheldWeapon)) && hasSkill(S_TECH_MEK)) {
             return getSkill(S_TECH_MEK);
         } else if ((unit.getEntity() instanceof BattleArmor) && hasSkill(S_TECH_BA)) {
             return getSkill(S_TECH_BA);
@@ -7630,6 +7632,7 @@ public class Person {
      * @param useAdvancedMedical      {@code true} if Advanced Medical is enabled
      * @param isUseAltAdvancedMedical {@code true} if Alt Advanced Medical is enabled
      * @param useFatigue              {@code true} if Fatigue should be increased
+     * @param fatigueRate             the user-defined rate at which fatigue is gained
      * @param hasCompulsionAddiction  specifies if the character has the {@link PersonnelOptions#COMPULSION_ADDICTION}
      *                                Flaw.
      * @param failedWillpowerCheck    {@code true} if the character failed the check to resist their compulsion
@@ -7638,7 +7641,7 @@ public class Person {
      * @since 0.50.07
      */
     public void processDiscontinuationSyndrome(Campaign campaign, boolean useAdvancedMedical,
-          boolean isUseAltAdvancedMedical, boolean useFatigue,
+          boolean isUseAltAdvancedMedical, boolean useFatigue, int fatigueRate,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasCompulsionAddiction, boolean failedWillpowerCheck) {
         final int FATIGUE_INCREASE = 2;
@@ -7664,7 +7667,7 @@ public class Person {
             }
 
             if (useFatigue) {
-                changeFatigue(FATIGUE_INCREASE);
+                changeFatigue(FATIGUE_INCREASE * fatigueRate);
             }
 
             int severity = getTotalInjurySeverity();

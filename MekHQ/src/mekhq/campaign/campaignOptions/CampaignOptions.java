@@ -581,6 +581,7 @@ public class CampaignOptions {
     private final boolean[] usePortraitForRole;
     private boolean assignPortraitOnRoleChange;
     private boolean allowDuplicatePortraits;
+    private boolean useGenderedPortraitsOnly;
     // endregion Name and Portrait Generation
 
     // region Markets Tab
@@ -652,6 +653,7 @@ public class CampaignOptions {
     private boolean useWeatherConditions;
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
+    private boolean useNoTornadoes;
     private int fixedMapChance;
     private int spaUpgradeIntensity;
     private int scenarioModMax;
@@ -718,6 +720,7 @@ public class CampaignOptions {
         reverseQualityNames = false;
         setUseRandomUnitQualities(true);
         setUsePlanetaryModifiers(true);
+        useNoTornadoes = false;
         useUnofficialMaintenance = false;
         logMaintenance = false;
         defaultMaintenanceTime = 4;
@@ -1235,6 +1238,7 @@ public class CampaignOptions {
         usePortraitForRole[PersonnelRole.MEKWARRIOR.ordinal()] = true;
         assignPortraitOnRoleChange = false;
         allowDuplicatePortraits = true;
+        useGenderedPortraitsOnly = false;
         // endregion Name and Portrait Generation Tab
 
         // region Markets Tab
@@ -4366,6 +4370,14 @@ public class CampaignOptions {
         this.allowDuplicatePortraits = allowDuplicatePortraits;
     }
 
+    public boolean isUseGenderedPortraitsOnly() {
+        return useGenderedPortraitsOnly;
+    }
+
+    public void setUseGenderedPortraitsOnly(final boolean useGenderedPortraitsOnly) {
+        this.useGenderedPortraitsOnly = useGenderedPortraitsOnly;
+    }
+
     public int getVocationalXP() {
         return vocationalXP;
     }
@@ -5128,6 +5140,14 @@ public class CampaignOptions {
 
     public void setUsePlanetaryConditions(final boolean usePlanetaryConditions) {
         this.usePlanetaryConditions = usePlanetaryConditions;
+    }
+
+    public boolean isUseNoTornadoes() {
+        return useNoTornadoes;
+    }
+
+    public void setUseNoTornadoes(final boolean useNoTornadoes) {
+        this.useNoTornadoes = useNoTornadoes;
     }
 
     /**

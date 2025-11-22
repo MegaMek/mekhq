@@ -211,6 +211,7 @@ public class CampaignOptionsMarshaller {
               "useRandomUnitQualities",
               campaignOptions.isUseRandomUnitQualities());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryModifiers", campaignOptions.isUsePlanetaryModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useNoTornadoes", campaignOptions.isUseNoTornadoes());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "useUnofficialMaintenance",
@@ -1114,6 +1115,8 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isAssignPortraitOnRoleChange());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowDuplicatePortraits",
               campaignOptions.isAllowDuplicatePortraits());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useGenderedPortraitsOnly",
+              campaignOptions.isUseGenderedPortraitsOnly());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fixedMapChance", campaignOptions.getFixedMapChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaUpgradeIntensity", campaignOptions.getSpaUpgradeIntensity());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModMax", campaignOptions.getScenarioModMax());

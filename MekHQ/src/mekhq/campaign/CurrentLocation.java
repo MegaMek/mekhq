@@ -36,6 +36,7 @@ package mekhq.campaign;
 import static java.lang.Math.ceil;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_TRANSIT_DISORIENTATION_SYNDROME;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
@@ -372,11 +373,18 @@ public class CurrentLocation {
         }
 
         // If we were previously traveling and now aren't, we should check to see if we have arrived at a contract
-        // system earlier than necessary. And, if appropriate, trigger innoculation prompts
+        // system earlier than necessary. And, if appropriate, trigger inoculation prompts and activate mothballed
+        // units
         if (wasTraveling && isOnPlanet()) {
+            // This should be before inoculations so that we can correctly read the TO&E
+            if (!campaign.getAutomatedMothballUnits().isEmpty()) {
+                performAutomatedActivation(campaign);
+            }
+
             if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
                 Inoculations.triggerInoculationPrompt(campaign, false);
             }
+            
             testForEarlyArrival(campaign);
         }
     }
