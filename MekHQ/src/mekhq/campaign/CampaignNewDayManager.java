@@ -260,6 +260,26 @@ public class CampaignNewDayManager {
         campaign.setSkillReportHTML("");
         campaign.getNewSkillReports().clear();
 
+        campaign.getBattleReport().clear();
+        campaign.setBattleReportHTML("");
+        campaign.getNewBattleReports().clear();
+
+        campaign.getPersonnelReport().clear();
+        campaign.setPersonnelReportHTML("");
+        campaign.getNewPersonnelReports().clear();
+
+        campaign.getMedicalReport().clear();
+        campaign.setMedicalReportHTML("");
+        campaign.getNewMedicalReports().clear();
+
+        campaign.getAcquisitionsReport().clear();
+        campaign.setAcquisitionsReportHTML("");
+        campaign.getNewAcquisitionsReports().clear();
+
+        campaign.getTechnicalReport().clear();
+        campaign.setTechnicalReportHTML("");
+        campaign.getNewTechnicalReports().clear();
+
         campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(today) + "</b>");
 
         campaign.getPersonnelWhoAdvancedInXP().clear();
