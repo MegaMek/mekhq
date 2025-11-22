@@ -84,6 +84,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
@@ -1808,12 +1809,14 @@ public class StratConRulesManager {
      * @param campaign the campaign
      */
     private static void increaseFatigue(int forceID, Campaign campaign) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseFatigue = campaignOptions.isUseFatigue();
+        int fatigueRate = campaignOptions.getFatigueRate();
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
-                int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
-                person.changeFatigue(fatigueChangeRate);
+                person.changeFatigue(fatigueRate);
 
-                if (campaign.getCampaignOptions().isUseFatigue()) {
+                if (isUseFatigue) {
                     Fatigue.processFatigueActions(campaign, person);
                 }
             }

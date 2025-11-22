@@ -82,13 +82,15 @@ public class AdvancedMedicalAlternateHealing {
      *
      * @param today        the current in-game date
      * @param isUseFatigue {@code true} if fatigue effects from healing should be applied; {@code false} otherwise
+     * @param fatigueRate  the user-defined rate fatigue is gained
      * @param patient      the person undergoing healing
      * @param doctor       the doctor providing treatment, or {@code null} if the patient is healing naturally
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static void processNewDay(LocalDate today, boolean isUseFatigue, Person patient, @Nullable Person doctor) {
+    public static void processNewDay(LocalDate today, boolean isUseFatigue, int fatigueRate, Person patient,
+          @Nullable Person doctor) {
         // Modifiers
         List<TargetRollModifier> modifiers = getSPAModifiers(patient);
         Set<BodyLocation> prostheticPenalties = getProstheticPenalties(patient);
@@ -96,12 +98,12 @@ public class AdvancedMedicalAlternateHealing {
         // Healing
         if (doctor == null) {
             boolean patientUsesEdge = patient.getOptions().booleanOption(EDGE_MEDICAL);
-            performUnassistedHealingCheck(today, isUseFatigue, patient, modifiers, prostheticPenalties,
+            performUnassistedHealingCheck(today, isUseFatigue, fatigueRate, patient, modifiers, prostheticPenalties,
                   patientUsesEdge);
         } else {
             boolean doctorUsesEdge = doctor.getOptions().booleanOption(EDGE_MEDICAL);
-            performAssistedHealingCheck(today, isUseFatigue, patient, doctor, modifiers, prostheticPenalties,
-                  doctorUsesEdge);
+            performAssistedHealingCheck(today, isUseFatigue, fatigueRate, patient, doctor, modifiers,
+                  prostheticPenalties, doctorUsesEdge);
         }
     }
 
@@ -174,6 +176,7 @@ public class AdvancedMedicalAlternateHealing {
      * @param today               the current in-game date
      * @param isUseFatigue        {@code true} if fatigue effects from healing should be applied; {@code false}
      *                            otherwise
+     * @param fatigueRate         the user-defined rate fatigue is gained
      * @param patient             the person attempting to heal naturally
      * @param modifiers           the list of SPA-based and other modifiers applied to the natural healing roll
      * @param prostheticPenalties the set of body locations that should incur a prosthetic penalty
@@ -183,8 +186,8 @@ public class AdvancedMedicalAlternateHealing {
      * @author Illiani
      * @since 0.50.10
      */
-    public static void performUnassistedHealingCheck(LocalDate today, boolean isUseFatigue, Person patient,
-          List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties, boolean useEdge) {
+    public static void performUnassistedHealingCheck(LocalDate today, boolean isUseFatigue, int fatigueRate,
+          Person patient, List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties, boolean useEdge) {
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
             if (!injury.isPermanent()) {
@@ -196,7 +199,7 @@ public class AdvancedMedicalAlternateHealing {
                 int marginOfSuccess = getMarginOfSuccessForUnassistedHealing(patient, modifiers, miscPenalty, useEdge);
 
                 if (injury.getTime() <= 0) { // Time to try and fully heal the injury
-                    processHealingEffects(isUseFatigue, patient, injury, marginOfSuccess);
+                    processHealingEffects(isUseFatigue, fatigueRate, patient, injury, marginOfSuccess);
                     processTaskAwardsAndPersonnelLogUpdates(today, patient, null, injury, marginOfSuccess);
                 } else if (marginOfSuccess <= -6) { // The injury became permanent
                     injury.setPermanent(true);
@@ -284,6 +287,7 @@ public class AdvancedMedicalAlternateHealing {
      * @param today               the current in-game date
      * @param isUseFatigue        {@code true} if fatigue effects from healing should be applied; {@code false}
      *                            otherwise
+     * @param fatigueRate         the user-defined rate fatigue is gained
      * @param patient             the person being treated
      * @param doctor              the doctor performing the assisted healing
      * @param modifiers           the list of modifiers applied to the surgery check
@@ -294,8 +298,9 @@ public class AdvancedMedicalAlternateHealing {
      * @author Illiani
      * @since 0.50.10
      */
-    public static void performAssistedHealingCheck(LocalDate today, boolean isUseFatigue, Person patient, Person doctor,
-          List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties, boolean useEdge) {
+    public static void performAssistedHealingCheck(LocalDate today, boolean isUseFatigue, int fatigueRate,
+          Person patient, Person doctor, List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties,
+          boolean useEdge) {
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
             if (!injury.isPermanent()) {
@@ -308,7 +313,7 @@ public class AdvancedMedicalAlternateHealing {
                     int miscPenalty = getMiscPenalty(injuryPenalty, prostheticPenalties, injury.getLocation());
                     int marginOfSuccess = getMarginOfSuccessForAssistedHealing(doctor, modifiers, miscPenalty, useEdge);
 
-                    processHealingEffects(isUseFatigue, patient, injury, marginOfSuccess);
+                    processHealingEffects(isUseFatigue, fatigueRate, patient, injury, marginOfSuccess);
                     processTaskAwardsAndPersonnelLogUpdates(today, patient, doctor, injury, marginOfSuccess);
                 }
             }
@@ -397,6 +402,7 @@ public class AdvancedMedicalAlternateHealing {
      * the injury is marked permanent. Otherwise, the configured delay adjusts the injury's remaining healing time.</p>
      *
      * @param isUseFatigue    {@code true} if fatigue effects from healing should be applied; {@code false} otherwise
+     * @param fatigueRate     the user-defined rate fatigue is gained
      * @param patient         the person undergoing healing
      * @param injury          the injury being updated
      * @param marginOfSuccess the final margin of success for the healing attempt
@@ -404,11 +410,11 @@ public class AdvancedMedicalAlternateHealing {
      * @author Illiani
      * @since 0.50.10
      */
-    private static void processHealingEffects(boolean isUseFatigue, Person patient, Injury injury,
+    private static void processHealingEffects(boolean isUseFatigue, int fatigueRate, Person patient, Injury injury,
           int marginOfSuccess) {
         HealingMarginOfSuccessEffects healingEffect = getEffectFromHealingAttempt(marginOfSuccess);
         if (isUseFatigue) {
-            patient.changeFatigue(healingEffect.getFatigueDamage());
+            patient.changeFatigue(healingEffect.getFatigueDamage() * fatigueRate);
         }
 
         if (healingEffect.isHealed()) {

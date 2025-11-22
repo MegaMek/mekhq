@@ -33,6 +33,8 @@
 package mekhq.campaign.personnel.education;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.ceil;
+import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
@@ -56,6 +58,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
@@ -111,19 +114,20 @@ public class TrainingCombatTeams {
         final LocalDate today = campaign.getLocalDate();
         final List<CombatTeam> combatTeams = campaign.getCombatTeamsAsList();
 
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUsingStratCon = campaignOptions.isUseStratCon();
+        boolean isUsingMaplessMode = campaignOptions.isUseStratConMaplessMode();
+
         for (CombatTeam combatTeam : combatTeams) {
             if (!combatTeam.getRole().isTraining()) {
                 continue;
             }
 
             AtBContract contract = combatTeam.getContract(campaign);
-            if (contract == null || !contract.isActiveOn(today, true)) {
+            if (contract == null || !contract.isActiveOn(today, false)) {
                 continue;
             }
 
-            CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            boolean isUsingStratCon = campaignOptions.isUseStratCon();
-            boolean isUsingMaplessMode = campaignOptions.isUseStratConMaplessMode();
             StratConCampaignState campaignState = contract.getStratconCampaignState();
             boolean isForceDeployed = campaignState != null &&
                                             campaignState.isForceDeployedHere(combatTeam.getForceId());
@@ -215,9 +219,13 @@ public class TrainingCombatTeams {
      */
     private static void performTraining(Campaign campaign, Force force, Person commander,
           Map<String, Integer> educatorSkills, int marginOfSuccess) {
-        boolean useReasoningXPChanges = campaign.getCampaignOptions().isUseReasoningXpMultiplier();
-        double xpCostMultiplier = campaign.getCampaignOptions().getXpCostMultiplier();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean useReasoningXPChanges = campaignOptions.isUseReasoningXpMultiplier();
+        boolean isUseFatigue = campaignOptions.isUseFatigue();
+        int fatigueRate = campaignOptions.getFatigueRate();
+        double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
 
+        List<Person> educatorCrew = commander.getUnit().getActiveCrew();
         for (UUID unitId : force.getUnits()) {
             Unit unit = campaign.getUnit(unitId);
 
@@ -226,23 +234,13 @@ public class TrainingCombatTeams {
             }
 
             for (Person trainee : unit.getActiveCrew()) {
-                if (campaign.getCampaignOptions().isUseFatigue()) {
-                    int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
-
-                    boolean hasGlassJaw = trainee.getOptions().booleanOption(FLAW_GLASS_JAW);
-                    boolean hasToughness = trainee.getOptions().booleanOption(ATOW_TOUGHNESS);
-                    boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
-
-                    if (hasGlassJaw && !hasGlassJawAndToughness) {
-                        fatigueChangeRate = fatigueChangeRate * 2;
-                    } else if (hasToughness && !hasGlassJawAndToughness) {
-                        fatigueChangeRate = (int) round(fatigueChangeRate * 0.5);
-                    }
-
+                if (isUseFatigue) {
+                    LOGGER.info("adding fatigue to {}", trainee.getFullTitle());
+                    int fatigueChangeRate = getFatigueChangeRate(trainee, fatigueRate);
                     trainee.changeFatigue(fatigueChangeRate);
                 }
 
-                if (commander.getUnit().getActiveCrew().contains(trainee)) {
+                if (educatorCrew.contains(trainee)) {
                     continue;
                 }
 
@@ -283,6 +281,22 @@ public class TrainingCombatTeams {
                 }
             }
         }
+    }
+
+    private static int getFatigueChangeRate(Person trainee, int fatigueRate) {
+        PersonnelOptions options = trainee.getOptions();
+        boolean hasGlassJaw = options.booleanOption(FLAW_GLASS_JAW);
+        boolean hasToughness = options.booleanOption(ATOW_TOUGHNESS);
+        boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
+
+        int fatigueChangeRate = fatigueRate;
+        if (hasGlassJaw && !hasGlassJawAndToughness) {
+            fatigueChangeRate *= 2;
+        } else if (hasToughness && !hasGlassJawAndToughness) {
+            fatigueChangeRate = max(1, (int) ceil(fatigueChangeRate * 0.5));
+        }
+
+        return fatigueChangeRate;
     }
 
     /**

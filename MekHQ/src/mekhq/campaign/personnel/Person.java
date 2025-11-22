@@ -2209,7 +2209,7 @@ public class Person {
             delta = (int) floor(delta * getFatigueMultiplier());
         }
 
-        this.fatigue = this.fatigue + delta;
+        this.fatigue = this.fatigue + MathUtility.roundAwayFromZero(delta);
     }
 
     public boolean getIsRecoveringFromFatigue() {
@@ -7632,6 +7632,7 @@ public class Person {
      * @param useAdvancedMedical      {@code true} if Advanced Medical is enabled
      * @param isUseAltAdvancedMedical {@code true} if Alt Advanced Medical is enabled
      * @param useFatigue              {@code true} if Fatigue should be increased
+     * @param fatigueRate             the user-defined rate at which fatigue is gained
      * @param hasCompulsionAddiction  specifies if the character has the {@link PersonnelOptions#COMPULSION_ADDICTION}
      *                                Flaw.
      * @param failedWillpowerCheck    {@code true} if the character failed the check to resist their compulsion
@@ -7640,7 +7641,7 @@ public class Person {
      * @since 0.50.07
      */
     public void processDiscontinuationSyndrome(Campaign campaign, boolean useAdvancedMedical,
-          boolean isUseAltAdvancedMedical, boolean useFatigue,
+          boolean isUseAltAdvancedMedical, boolean useFatigue, int fatigueRate,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasCompulsionAddiction, boolean failedWillpowerCheck) {
         final int FATIGUE_INCREASE = 2;
@@ -7666,7 +7667,7 @@ public class Person {
             }
 
             if (useFatigue) {
-                changeFatigue(FATIGUE_INCREASE);
+                changeFatigue(FATIGUE_INCREASE * fatigueRate);
             }
 
             int severity = getTotalInjurySeverity();
