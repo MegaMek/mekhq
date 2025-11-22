@@ -43,7 +43,6 @@ import static mekhq.campaign.personnel.skills.SkillCheckUtility.getTotalAttribut
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.performQuickSkillCheck;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_MEK;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginValue;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
@@ -99,7 +98,7 @@ class SkillCheckUtilityTest {
               false,
               CURRENT_DATE);
 
-        int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
+        int expectedMarginOfSuccess = DISASTROUS.getValue();
         assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
 
         String RESOURCE_BUNDLE = "mekhq.resources.SkillCheckUtility";
@@ -125,7 +124,7 @@ class SkillCheckUtilityTest {
               false,
               CURRENT_DATE);
 
-        int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
+        int expectedMarginOfSuccess = DISASTROUS.getValue();
         assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
 
         String RESOURCE_BUNDLE = "mekhq.resources.SkillCheckUtility";

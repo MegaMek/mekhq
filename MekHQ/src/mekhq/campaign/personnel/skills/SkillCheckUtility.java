@@ -37,8 +37,6 @@ import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessString;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -272,7 +270,7 @@ public class SkillCheckUtility {
             LOGGER.debug("Null person passed into SkillCheckUtility." +
                                " Auto-failing check with bogus results so the bug stands out.");
 
-            marginOfSuccess = getMarginValue(DISASTROUS);
+            marginOfSuccess = DISASTROUS.getValue();
             resultsText = getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.nullPerson");
             targetNumber = new TargetRoll(Integer.MAX_VALUE, "ERROR");
             roll = Integer.MIN_VALUE;
@@ -331,7 +329,7 @@ public class SkillCheckUtility {
         String genderedReferenced = HIS_HER_THEIR.getDescriptor(person.getGender());
 
         String colorOpen;
-        int neutralMarginValue = getMarginValue(BARELY_MADE_IT);
+        int neutralMarginValue = BARELY_MADE_IT.getValue();
         if (marginOfSuccess == neutralMarginValue) {
             colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
         } else if (marginOfSuccess < neutralMarginValue) {
@@ -360,7 +358,7 @@ public class SkillCheckUtility {
 
         if (includeMarginsOfSuccessText) {
             MarginOfSuccess marginOfSuccessObject = getMarginOfSuccessObjectFromMarginValue(marginOfSuccess);
-            String marginOfSuccessText = getMarginOfSuccessString(marginOfSuccessObject);
+            String marginOfSuccessText = marginOfSuccessObject.getLabel();
             return mainMessage + "<p>" + marginOfSuccessText + "</p>";
         } else {
             return mainMessage;
@@ -400,7 +398,7 @@ public class SkillCheckUtility {
      * @since 0.50.05
      */
     public boolean isSuccess() {
-        return marginOfSuccess >= getMarginValue(BARELY_MADE_IT);
+        return marginOfSuccess >= BARELY_MADE_IT.getValue();
     }
 
     /**
