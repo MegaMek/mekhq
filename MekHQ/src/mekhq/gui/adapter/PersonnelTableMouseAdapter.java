@@ -62,6 +62,7 @@ import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.checkForIntelBreachEvent;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
@@ -1979,31 +1980,35 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             label = String.format(resources.getString("numPrisoners.text"), prisoners.length);
         }
 
-        if (0 ==
-                  JOptionPane.showConfirmDialog(null,
-                        String.format(resources.getString(message), label),
-                        resources.getString(title),
-                        JOptionPane.YES_NO_OPTION)) {
+        if (0 == JOptionPane.showConfirmDialog(null,
+              String.format(resources.getString(message), label),
+              resources.getString(title),
+              JOptionPane.YES_NO_OPTION)) {
+
+            if (isExecution) {
+                if (getCampaign().getCampaignOptions().isTrackFactionStanding()) {
+                    FactionStandings factionStandings = getCampaign().getFactionStandings();
+
+                    List<Person> listOfPrisoners = Arrays.asList(prisoners);
+                    List<String> reports =
+                          factionStandings.executePrisonersOfWar(getCampaign().getFaction().getShortName(),
+                                listOfPrisoners,
+                                getCampaign().getGameYear(),
+                                getCampaign().getCampaignOptions().getRegardMultiplier());
+
+                    for (String report : reports) {
+                        getCampaign().addReport(report);
+                    }
+                }
+
+                processAdHocExecution(getCampaign(), prisoners.length);
+            } else {
+                checkForIntelBreachEvent(getCampaign(), prisoners.length);
+            }
+
             for (Person prisoner : prisoners) {
                 getCampaign().removePerson(prisoner);
             }
-        }
-
-        if (isExecution) {
-            if (getCampaign().getCampaignOptions().isTrackFactionStanding()) {
-                FactionStandings factionStandings = getCampaign().getFactionStandings();
-
-                List<Person> listOfPrisoners = Arrays.asList(prisoners);
-                List<String> reports =
-                      factionStandings.executePrisonersOfWar(getCampaign().getFaction().getShortName(), listOfPrisoners,
-                            getCampaign().getGameYear(), getCampaign().getCampaignOptions().getRegardMultiplier());
-
-                for (String report : reports) {
-                    getCampaign().addReport(report);
-                }
-            }
-
-            processAdHocExecution(getCampaign(), prisoners.length);
         }
     }
 

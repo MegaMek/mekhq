@@ -34,6 +34,7 @@ package mekhq.campaign.mission.enums;
 
 import java.util.ResourceBundle;
 
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 
@@ -49,6 +50,9 @@ public enum AtBMoraleLevel {
     ADVANCING(1, 3, "AtBMoraleLevel.ADVANCING.text", "AtBMoraleLevel.ADVANCING.toolTipText"),
     DOMINATING(2, 2, "AtBMoraleLevel.DOMINATING.text", "AtBMoraleLevel.DOMINATING.toolTipText"),
     OVERWHELMING(3, 1, "AtBMoraleLevel.OVERWHELMING.text", "AtBMoraleLevel.OVERWHELMING.toolTipText");
+
+    public final static int MINIMUM_MORALE_LEVEL = ROUTED.getLevel();
+    public final static int MAXIMUM_MORALE_LEVEL = OVERWHELMING.getLevel();
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -162,6 +166,31 @@ public enum AtBMoraleLevel {
         return this == OVERWHELMING;
     }
     // endregion Boolean Comparison Methods
+
+    /**
+     * Returns the {@link AtBMoraleLevel} that corresponds to the specified integer level.
+     *
+     * <p>This method iterates over all defined {@link AtBMoraleLevel} values and returns the one whose
+     * {@link #getLevel()} value matches the provided {@code level}. If no matching morale level exists, {@code null} is
+     * returned.</p>
+     *
+     * @param level the integer morale level to parse
+     *
+     * @return the matching {@link AtBMoraleLevel}, or {@code null} if no defined morale level corresponds to the given
+     *       value
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public static @Nullable AtBMoraleLevel parseFromLevel(final int level) {
+        for (AtBMoraleLevel atBMoraleLevel : AtBMoraleLevel.values()) {
+            if (atBMoraleLevel.getLevel() == level) {
+                return atBMoraleLevel;
+            }
+        }
+
+        return null;
+    }
 
     /**
      * Parses a string representation of a morale level and returns the corresponding {@link AtBMoraleLevel} enum
