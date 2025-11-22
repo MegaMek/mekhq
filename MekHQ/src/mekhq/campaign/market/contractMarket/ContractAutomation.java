@@ -65,7 +65,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * units when arriving in the system.</p>
  */
 public class ContractAutomation {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + ContractAutomation.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractAutomation";
     private static final MMLogger logger = MMLogger.create(ContractAutomation.class);
 
     private static final int DIALOG_CONFIRM_OPTION = 0;
@@ -168,7 +168,7 @@ public class ContractAutomation {
      *
      * @return A list of all newly mothballed units.
      */
-    private static List<UUID> performAutomatedMothballing(Campaign campaign) {
+    public static List<UUID> performAutomatedMothballing(Campaign campaign) {
         List<UUID> mothballTargets = new ArrayList<>();
         MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
 
@@ -241,5 +241,33 @@ public class ContractAutomation {
 
         // We still want to clear out any units
         campaign.setAutomatedMothballUnits(new ArrayList<>());
+    }
+
+    public static void outOfContractMothballAutomation(Campaign campaign) {
+        final List<String> buttonLabels = List.of(getTextAt(RESOURCE_BUNDLE, "generalConfirm.text"),
+              getTextAt(RESOURCE_BUNDLE, "generalDecline.text"));
+
+        final Person speaker = campaign.getSeniorAdminPerson(TRANSPORT);
+
+        final String commanderAddress = campaign.getCommanderAddress();
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+              "mothballDescription.text.noContract",
+              commanderAddress);
+
+        String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+              "mothballDescription.addendum.noContract");
+
+        ImmersiveDialogSimple mothballDialog = new ImmersiveDialogSimple(campaign,
+              speaker,
+              null,
+              inCharacterMessage,
+              buttonLabels,
+              outOfCharacterMessage,
+              null,
+              false);
+
+        if (mothballDialog.getDialogChoice() == DIALOG_CONFIRM_OPTION) {
+            campaign.setAutomatedMothballUnits(performAutomatedMothballing(campaign));
+        }
     }
 }
