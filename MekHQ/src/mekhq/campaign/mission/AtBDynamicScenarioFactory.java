@@ -3406,11 +3406,14 @@ public class AtBDynamicScenarioFactory {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isGenericBattleValue = campaignOptions.isUseGenericBattleValue() && !forceStandardBattleValue;
         boolean isUseNoSeedForce = campaignOptions.isNoSeedForces();
+        boolean isStratConSingles = campaignOptions.isUseStratConSinglesMode();
 
         String generationMethod = isGenericBattleValue ? "Generic BV" : "BV2";
 
         // average player forces
-        if (isUseNoSeedForce) {
+        if (isStratConSingles) {
+            bvBudget = getBVBudgetForStratConSingles(campaign, forceStandardBattleValue);
+        } else if (isUseNoSeedForce) {
             bvBudget = getBVBudgetWithoutUsingASeedForce(campaign, forceStandardBattleValue);
         } else {
             // deployed player forces
@@ -3476,6 +3479,62 @@ public class AtBDynamicScenarioFactory {
               bvBudget);
 
         return bvBudget;
+    }
+
+    /**
+     * Calculates the total Battle Value (BV) budget to use when generating a StratCon Singles scenario.
+     *
+     * <p>This method examines the player's available {@link CombatTeam}s and aggregates the Battle Value of all
+     * forces whose roles are considered valid for StratCon Singles generation. Valid roles are:
+     * {@link CombatRole#FRONTLINE}, {@link CombatRole#MANEUVER}, {@link CombatRole#CADRE}, and
+     * {@link CombatRole#PATROL}.</p>
+     *
+     * <p>Only Combat Teams with a non-null {@link Force} and a positive BV are counted. If at least one valid force
+     * is found, the BV budget returned is the sum of the BVs of all qualifying forces.</p>
+     *
+     * <p>If the player has no qualifying forces, a default budget of {@code 10,000} BV is returned. This helps
+     * ensure StratCon Singles generation can still proceed even when the player lacks suitable forces.</p>
+     *
+     * @param campaign                 the {@link Campaign} containing the Combat Teams used to determine the BV budget
+     * @param forceStandardBattleValue whether BV should be computed using standard Battle Value rules
+     *
+     * @return the total BV budget for StratCon Singles generation, or the default value if no valid forces are
+     *       available
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static int getBVBudgetForStratConSingles(Campaign campaign, boolean forceStandardBattleValue) {
+        int defaultBVBudget = 10000; // We use this value if the player has no valid forces
+
+        int totalForces = 0;
+        int totalBattleValue = 0;
+        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+            CombatRole role = combatTeam.getRole();
+            if (!validRoles.contains(role)) {
+                continue;
+            }
+
+            Force force = combatTeam.getForce(campaign);
+            if (force != null) {
+                int battleValue = force.getTotalBV(campaign, forceStandardBattleValue);
+                if (battleValue > 0) {
+                    totalForces++;
+                    totalBattleValue += battleValue;
+                }
+            }
+        }
+
+        if (totalForces == 0) {
+            LOGGER.info("Found no player forces with BV for StratCon Singles. Returning default budget {}.",
+                  defaultBVBudget);
+            return defaultBVBudget;
+        } else {
+            LOGGER.info("Using StratCon Singles: BV budget of all Combat Teams {} from {} forces",
+                  totalBattleValue, totalForces);
+            return totalBattleValue;
+        }
     }
 
     /**
@@ -3552,8 +3611,11 @@ public class AtBDynamicScenarioFactory {
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseNoSeedForce = campaignOptions.isNoSeedForces();
+        boolean isStratConSingles = campaignOptions.isUseStratConSinglesMode();
 
-        if (isUseNoSeedForce) {
+        if (isStratConSingles) {
+            unitCount = getUnitCountForStratConSingles(campaign);
+        } else if (isUseNoSeedForce) {
             unitCount = getUnitCountWithoutUsingASeedForce(campaign);
         } else {
             // deployed player forces:
@@ -3586,6 +3648,60 @@ public class AtBDynamicScenarioFactory {
         }
 
         return unitCount;
+    }
+
+    /**
+     * Determines the total number of units to use when generating a StratCon Singles scenario.
+     *
+     * <p>This method inspects all player {@link CombatTeam}s and sums the number of units contained within forces
+     * whose roles are considered valid for StratCon Singles generation. Valid roles are: {@link CombatRole#FRONTLINE},
+     * {@link CombatRole#MANEUVER}, {@link CombatRole#CADRE}, and {@link CombatRole#PATROL}.</p>
+     *
+     * <p>For each qualifying Combat Team, the force is retrieved and counted if it contains at least one unit. The
+     * total number of units across all valid forces is then returned.</p>
+     *
+     * <p>If the player has no qualifying forces (i.e., no forces with units in the valid role categories), the
+     * method falls back to the faction’s standard default force size as determined by
+     * {@link CombatTeam#getStandardForceSize(Faction)}.</p>
+     *
+     * @param campaign the {@link Campaign} from which Combat Teams and forces are obtained
+     *
+     * @return the total number of units across all valid forces, or the faction’s standard default force size if no
+     *       valid forces contain units
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static int getUnitCountForStratConSingles(Campaign campaign) {
+        int defaultUnitCount = CombatTeam.getStandardForceSize(campaign.getFaction());
+
+        int forceCount = 0;
+        int unitCount = 0;
+        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+            CombatRole role = combatTeam.getRole();
+            if (!validRoles.contains(role)) {
+                continue;
+            }
+
+            Force force = combatTeam.getForce(campaign);
+            if (force != null) {
+                int unitsInForce = force.getAllUnits(false).size();
+                if (unitsInForce != 0) {
+                    forceCount++;
+                    unitCount += unitsInForce;
+                }
+            }
+        }
+
+        if (forceCount == 0) {
+            LOGGER.info("Found no player forces with units for StratCon Singles. Returning default budget {}.",
+                  defaultUnitCount);
+            return defaultUnitCount;
+        } else {
+            LOGGER.info("Using StratCon Singles: total unit count {} from {} forces", unitCount, forceCount);
+            return unitCount;
+        }
     }
 
     /**
