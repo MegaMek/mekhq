@@ -4862,7 +4862,9 @@ public class CampaignOptions {
     }
 
     public boolean isUseStratConMaplessMode() {
-        return getStratConPlayType() == StratConPlayType.MAPLESS;
+        return getStratConPlayType() == StratConPlayType.MAPLESS ||
+                     // Singles is a type of mapless mode, so all rules that apply to Mapless also apply to Singles
+                     getStratConPlayType() == StratConPlayType.SINGLES;
     }
 
     public boolean isUseStratConSinglesMode() {
