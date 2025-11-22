@@ -527,7 +527,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processDiscontinuationSyndrome(mockCampaign, false, false, true, false, false);
+        person.processDiscontinuationSyndrome(mockCampaign, false, false, true, 1, false, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(0, person.getFatigue());
@@ -542,7 +542,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processDiscontinuationSyndrome(mockCampaign, false, false, true, true, false);
+        person.processDiscontinuationSyndrome(mockCampaign, false, false, true, 1, true, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(0, person.getFatigue());
@@ -561,7 +561,7 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
-        person.processDiscontinuationSyndrome(mockCampaign, false, false, true, true, true);
+        person.processDiscontinuationSyndrome(mockCampaign, false, false, true, 1, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(1, person.getHits());
         assertEquals(2, person.getFatigue());
@@ -580,7 +580,7 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
-        person.processDiscontinuationSyndrome(mockCampaign, true, false, true, true, true);
+        person.processDiscontinuationSyndrome(mockCampaign, true, false, true, 1, true, true);
         assertEquals(1, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(2, person.getFatigue());
@@ -595,7 +595,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processDiscontinuationSyndrome(mockCampaign, false, false, false, true, true);
+        person.processDiscontinuationSyndrome(mockCampaign, false, false, false, 1, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(1, person.getHits());
         assertEquals(0, person.getFatigue());
@@ -614,7 +614,7 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
-        person.processDiscontinuationSyndrome(mockCampaign, true, false, false, true, true);
+        person.processDiscontinuationSyndrome(mockCampaign, true, false, false, 1, true, true);
         assertEquals(1, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(0, person.getFatigue());
@@ -639,7 +639,7 @@ public class PersonTest {
         Person person = new Person(mockCampaign);
         person.setHits(5);
 
-        person.processDiscontinuationSyndrome(mockCampaign, false, false, false, true, true);
+        person.processDiscontinuationSyndrome(mockCampaign, false, false, false, 1, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(6, person.getHits());
         assertEquals(0, person.getFatigue());
@@ -666,7 +666,7 @@ public class PersonTest {
             person.addInjury(new Injury());
         }
 
-        person.processDiscontinuationSyndrome(mockCampaign, true, false, false, true, true);
+        person.processDiscontinuationSyndrome(mockCampaign, true, false, false, 1, true, true);
         assertEquals(6, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(0, person.getFatigue());
