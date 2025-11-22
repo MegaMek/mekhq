@@ -33,10 +33,18 @@
 package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
+import static megamek.common.options.OptionsConstants.MD_BVDNI;
+import static megamek.common.options.OptionsConstants.MD_DERMAL_ARMOR;
+import static megamek.common.options.OptionsConstants.MD_DERMAL_CAMO_ARMOR;
+import static megamek.common.options.OptionsConstants.MD_VDNI;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
-import static mekhq.campaign.personnel.medical.BodyLocation.HEAD;
+import static mekhq.campaign.personnel.medical.BodyLocation.BRAIN;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_ARM_ARMOR;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_ARM_CAMO;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_LEG_ARMOR;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_LEG_CAMO;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.ENHANCED_IMAGING_IMPLANT;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.ENHANCED_IMAGING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -52,6 +60,7 @@ import megamek.codeUtilities.ObjectUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -147,7 +156,12 @@ public class AdvancedMedicalAlternateImplants {
      * @param person   the {@link Person} to evaluate; must not be {@code null}
      */
     public static void performEnhancedImagingDegradationCheck(Campaign campaign, Person person) {
-        if (!person.getOptions().booleanOption(UNOFFICIAL_EI_IMPLANT)) {
+        PersonnelOptions options = person.getOptions();
+        boolean hasEnhancedImaging = options.booleanOption(UNOFFICIAL_EI_IMPLANT);
+        boolean hasVDNI = options.booleanOption(MD_VDNI);
+        boolean hasBufferedVDNI = options.booleanOption(MD_BVDNI);
+
+        if (!hasEnhancedImaging && !hasVDNI && !hasBufferedVDNI) {
             return;
         }
 
@@ -161,15 +175,24 @@ public class AdvancedMedicalAlternateImplants {
 
         int gameYear = campaign.getGameYear();
 
-        // Occurs every year for most phenotypes, but every 3rd year for the Aerospace phenotype (ATOW pg 317). ATOW
+        // Occurs every year for most characters, but every 3rd year for the Aerospace phenotype (ATOW pg 317). ATOW
         // states that this occurs every 3rd full year, but I didn't want to add even more tracking to Person for
         // such a niche thing, so instead it hits every 3rd canonical year.
-        boolean incrementPermanentFatigueDamage = !person.getPhenotype().isAerospace() || gameYear % 3 == 0;
+        int frequency = 1;
+        if (person.getPhenotype().isAerospace() || hasBufferedVDNI) {
+            frequency = 3;
+        }
+
+        if (hasVDNI) {
+            frequency = 2;
+        }
+
+        boolean incrementPermanentFatigueDamage = !person.getPhenotype().isAerospace() || gameYear % frequency == 0;
         if (incrementPermanentFatigueDamage) {
             if (useFatigue) {
                 person.changePermanentFatigue(1);
                 campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "AlternateInjuries.report.ei.fatigue",
+                      "AlternateInjuries.report.implant.fatigue",
                       spanOpeningWithCustomColor(getWarningColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle()));
@@ -184,7 +207,7 @@ public class AdvancedMedicalAlternateImplants {
                 String flaw = getAndApplyEIDegradationFlaw(person);
                 if (!flaw.isBlank()) {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                          "AlternateInjuries.report.ei.degradation",
+                          "AlternateInjuries.report.implant.degradation",
                           spanOpeningWithCustomColor(getNegativeColor()),
                           CLOSING_SPAN_TAG,
                           person.getHyperlinkedFullTitle(), flaw));
@@ -210,7 +233,6 @@ public class AdvancedMedicalAlternateImplants {
      *       selected Flaw
      */
     public static String getAndApplyEIDegradationFlaw(Person person) {
-
         String flaw = ObjectUtility.getRandomItem(POSSIBLE_FLAWS);
         if (flaw.equals(COMPULSION_PLACEHOLDER)) {
             flaw = ObjectUtility.getRandomItem(POSSIBLE_COMPULSIONS);
@@ -231,6 +253,28 @@ public class AdvancedMedicalAlternateImplants {
         }
     }
 
+    public static void checkForDermalEligibility(Person person) {
+        List<Injury> injuries = person.getInjuries();
+
+        int dermalArmorCount = 0;
+        int dermalCamoCount = 0;
+        for (Injury injury : injuries) {
+            InjuryType injuryType = injury.getType();
+            if (injuryType == DERMAL_MYOMER_ARM_ARMOR || injuries == DERMAL_MYOMER_LEG_ARMOR) {
+                dermalArmorCount++;
+            }
+
+            if (injuryType == DERMAL_MYOMER_ARM_CAMO || injuries == DERMAL_MYOMER_LEG_CAMO) {
+                dermalCamoCount++;
+            }
+        }
+
+        PersonnelOptions options = person.getOptions();
+        int requiredLimbCount = 4;
+        options.getOption(MD_DERMAL_ARMOR).setValue(dermalArmorCount >= requiredLimbCount);
+        options.getOption(MD_DERMAL_CAMO_ARMOR).setValue(dermalArmorCount >= requiredLimbCount);
+    }
+
     /**
      * Applies the Enhanced Imaging (EI) implant to the specified person.
      *
@@ -242,7 +286,7 @@ public class AdvancedMedicalAlternateImplants {
      * @param person   the {@link Person} receiving the Enhanced Imaging implant
      */
     public static void giveEIImplant(Campaign campaign, Person person) {
-        Injury injury = ENHANCED_IMAGING_IMPLANT.newInjury(campaign, person, HEAD, 0);
+        Injury injury = ENHANCED_IMAGING_IMPLANT.newInjury(campaign, person, BRAIN, 0);
         person.addInjury(injury);
 
         if (campaign.getCampaignOptions().isUseImplants()) {

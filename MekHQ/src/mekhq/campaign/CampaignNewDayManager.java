@@ -605,6 +605,8 @@ public class CampaignNewDayManager {
 
             person.checkForIlliterateRemoval();
 
+            AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+
             // Weekly events
             if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
                 if (!campaign.getRandomDeath().processNewWeek(campaign, today, person)) {
