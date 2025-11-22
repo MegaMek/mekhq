@@ -38,9 +38,11 @@ import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.enums.ScenarioStatus.DRAW;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
+import static mekhq.campaign.stratCon.StratConRulesManager.generateDailyScenariosForTrack;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getText;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -107,7 +109,6 @@ import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.camOpsSalvage.SalvageForceData;
 import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
@@ -155,6 +156,9 @@ import mekhq.gui.view.ScenarioViewPanel;
  * Displays Mission/Contract and Scenario details.
  */
 public final class BriefingTab extends CampaignGuiTab {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
+
+    @Deprecated(since = "0.50.10", forRemoval = false)
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
           MekHQ.getMHQOptions().getLocale());
 
@@ -262,7 +266,7 @@ public final class BriefingTab extends CampaignGuiTab {
         btnDeleteMission.addActionListener(ev -> deleteMission());
         panMissionButtons.add(btnDeleteMission);
 
-        btnGMGenerateScenarios = new RoundedJButton(resourceMap.getString("btnGMGenerateScenarios.text"));
+        btnGMGenerateScenarios = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "btnGMGenerateScenarios.text"));
         btnGMGenerateScenarios.setToolTipText(resourceMap.getString("btnGMGenerateScenarios.toolTipText"));
         btnGMGenerateScenarios.setName("btnGMGenerateScenarios");
         btnGMGenerateScenarios.addActionListener(ev -> gmGenerateScenarios());
@@ -378,7 +382,7 @@ public final class BriefingTab extends CampaignGuiTab {
         paneLanceDeployment.setBorder(null);
         paneLanceDeployment.setMinimumSize(new Dimension(200, 300));
         paneLanceDeployment.setPreferredSize(new Dimension(200, 300));
-        paneLanceDeployment.setVisible(getCampaign().getCampaignOptions().isUseAtB());
+        paneLanceDeployment.setVisible(getCampaignOptions().isUseAtB());
         splitScenario = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panScenario, paneLanceDeployment);
         splitScenario.setOneTouchExpandable(true);
         splitScenario.setResizeWeight(1.0);
@@ -418,7 +422,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
+        if (getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             CustomizeAtBContractDialog cmd = new CustomizeAtBContractDialog(getFrame(),
                   true,
                   (AtBContract) mission,
@@ -440,7 +444,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        CampaignOptions campaignOptions = getCampaignOptions();
 
         getCampaign().getApp().getAutosaveService().requestBeforeMissionEndAutosave(getCampaign());
 
@@ -624,7 +628,7 @@ public final class BriefingTab extends CampaignGuiTab {
             scenario.setStatus(DRAW);
         }
 
-        if (getCampaign().getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
+        if (getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
             if (mission instanceof AtBContract contract) {
                 if (contract.getEmployerCode().equals(PIRATE_FACTION_CODE)) {
                     // CamOps 'other crimes' value
@@ -701,19 +705,19 @@ public final class BriefingTab extends CampaignGuiTab {
      */
     private int getMissionXpAward(MissionStatus missionStatus, Mission mission) {
         return switch (missionStatus) {
-            case FAILED, BREACH -> getCampaign().getCampaignOptions().getMissionXpFail();
+            case FAILED, BREACH -> getCampaignOptions().getMissionXpFail();
             case SUCCESS, PARTIAL -> {
-                if ((getCampaign().getCampaignOptions().isUseStratCon()) &&
+                if ((getCampaignOptions().isUseStratCon()) &&
                           (mission instanceof AtBContract)) {
                     StratConCampaignState stratConCampaignState = ((AtBContract) mission).getStratconCampaignState();
 
                     if (stratConCampaignState == null || stratConCampaignState.getVictoryPoints() < 3) {
-                        yield getCampaign().getCampaignOptions().getMissionXpSuccess();
+                        yield getCampaignOptions().getMissionXpSuccess();
                     } else {
-                        yield getCampaign().getCampaignOptions().getMissionXpOutstandingSuccess();
+                        yield getCampaignOptions().getMissionXpOutstandingSuccess();
                     }
                 } else {
-                    yield getCampaign().getCampaignOptions().getMissionXpSuccess();
+                    yield getCampaignOptions().getMissionXpSuccess();
                 }
             }
             case ACTIVE -> 0;
@@ -752,19 +756,34 @@ public final class BriefingTab extends CampaignGuiTab {
 
     private void gmGenerateScenarios() {
         if (!getCampaign().isGM()) {
-            JOptionPane.showMessageDialog(this, "Only allowed for GM players", "Not GM", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                  getTextAt(RESOURCE_BUNDLE, "btnGMGenerateScenarios.error.notGM.message"),
+                  getTextAt(RESOURCE_BUNDLE, "btnGMGenerateScenarios.error.notGM.title"),
+                  JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        if (0 !=
-                  JOptionPane.showConfirmDialog(null,
-                        "Are you sure you want to generate a new set of scenarios?",
-                        "Generate scenarios?",
-                        JOptionPane.YES_NO_OPTION)) {
+        if (!getCampaignOptions().isUseStratCon()) {
+            JOptionPane.showMessageDialog(this,
+                  getTextAt(RESOURCE_BUNDLE, "btnGMGenerateScenarios.error.notUsingStratCon.message"),
+                  getTextAt(RESOURCE_BUNDLE, "btnGMGenerateScenarios.error.notUsingStratCon.title"),
+                  JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        AtBScenarioFactory.createScenariosForNewWeek(getCampaign());
+        if (comboMission.getSelectedItem() instanceof AtBContract contract) {
+            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            if (campaignState != null) {
+                generateDailyScenariosForTrack(getCampaign(), campaignState, contract, 1);
+                this.refreshAll(); // We need to refresh otherwise the scenario won't show up in the GUI
+                return;
+            }
+        }
+
+        JOptionPane.showMessageDialog(this,
+              getTextAt(RESOURCE_BUNDLE, "btnGMGenerateScenarios.error.notStratConContract.message"),
+              getTextAt(RESOURCE_BUNDLE, "btnGMGenerateScenarios.error.notStratConContract.title"),
+              JOptionPane.ERROR_MESSAGE);
     }
 
     private void addScenario() {
@@ -946,7 +965,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private boolean displaySalvageForcePicker(Scenario scenario) {
-        if (!getCampaign().getCampaignOptions().isUseCamOpsSalvage()) {
+        if (!getCampaignOptions().isUseCamOpsSalvage()) {
             return true;
         }
 
@@ -985,7 +1004,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 }
             }
 
-            if (getCampaign().getCampaignOptions().isUseStratCon()) {
+            if (getCampaignOptions().isUseStratCon()) {
                 CamOpsSalvageUtilities.deploySalvageTeams(getCampaign(), scenario);
             }
         }
@@ -1008,7 +1027,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private boolean displaySalvageTechPicker(Scenario scenario) {
-        if (!getCampaign().getCampaignOptions().isUseCamOpsSalvage()) {
+        if (!getCampaignOptions().isUseCamOpsSalvage()) {
             return true;
         }
 
@@ -1542,12 +1561,12 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario atBScenario)) {
+        if (getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario atBScenario)) {
             atBScenario.refresh(getCampaign());
 
             // Autoconfigure munitions for all non-player forces once more, using finalized
             // forces
-            if (getCampaign().getCampaignOptions().isAutoConfigMunitions()) {
+            if (getCampaignOptions().isAutoConfigMunitions()) {
                 autoconfigureBotMunitions(atBScenario, chosen);
             }
             configureBotAi(atBScenario);
@@ -1863,7 +1882,7 @@ public final class BriefingTab extends CampaignGuiTab {
      */
     private int calculateGenericBattleValue(ArrayList<Entity> chosen) {
         int genericBattleValue = 0;
-        if (getCampaign().getCampaignOptions().isUseGenericBattleValue()) {
+        if (getCampaignOptions().isUseGenericBattleValue()) {
             genericBattleValue = chosen.stream().mapToInt(Entity::getGenericBattleValue).sum();
         }
         return genericBattleValue;
@@ -1900,7 +1919,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         changeMission();
-        if (getCampaign().getCampaignOptions().isUseAtB()) {
+        if (getCampaignOptions().isUseAtB()) {
             refreshLanceAssignments();
         }
     }
@@ -1925,7 +1944,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         selectedScenario = scenario.getId();
-        if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
+        if (getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
             scrollScenarioView.setViewportView(new AtBScenarioViewPanel((AtBScenario) scenario,
                   getCampaign(),
                   getFrame()));
@@ -1990,7 +2009,9 @@ public final class BriefingTab extends CampaignGuiTab {
             btnCompleteMission.setEnabled(mission.getStatus().isActive());
             btnDeleteMission.setEnabled(true);
             btnAddScenario.setEnabled(mission.isActiveOn(getCampaign().getLocalDate()));
-            btnGMGenerateScenarios.setEnabled(mission.isActiveOn(getCampaign().getLocalDate()) && getCampaign().isGM());
+            btnGMGenerateScenarios.setEnabled(mission.isActiveOn(getCampaign().getLocalDate()) &&
+                                                    getCampaign().isGM() &&
+                                                    getCampaignOptions().isUseStratCon());
         }
         refreshScenarioTableData();
     }
