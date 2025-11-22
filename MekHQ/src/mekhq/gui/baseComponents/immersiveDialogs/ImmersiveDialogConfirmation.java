@@ -33,9 +33,14 @@
 package mekhq.gui.baseComponents.immersiveDialogs;
 
 import static mekhq.utilities.MHQInternationalization.getText;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.GridBagLayout;
 import java.util.List;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 
 /**
@@ -48,6 +53,8 @@ import mekhq.campaign.Campaign;
  * @since 0.50.07
  */
 public class ImmersiveDialogConfirmation extends ImmersiveDialogCore {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ImmersiveDialogConfirmation";
+
     /** The index position in the dialog button list that corresponds to user confirmation ("Yes"). */
     private static final int DIALOG_CHOICE_INDEX_CONFIRM = 1;
 
@@ -73,24 +80,118 @@ public class ImmersiveDialogConfirmation extends ImmersiveDialogCore {
      * <p>After construction, the result of the user's choice may be queried via {@link #wasConfirmed()}.</p>
      *
      * @param campaign the current {@link Campaign} context this dialog is associated with
+     * @param nagKey   the nag identifier used to look up additional text and to track whether this confirmation should
+     *                 be ignored in the future
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public ImmersiveDialogConfirmation(Campaign campaign) {
+    public ImmersiveDialogConfirmation(Campaign campaign, String nagKey) {
         super(campaign,
               null,
               null,
-              getText("AreYouSure.text"),
-              List.of(new ButtonLabelTooltipPair(getText("No.text"), null),
-                    new ButtonLabelTooltipPair(getText("Yes.text"), null)),
-              null,
+              getPrimaryText(nagKey),
+              List.of(new ButtonLabelTooltipPair(getNoText(), null),
+                    new ButtonLabelTooltipPair(getYesText(), null)),
+              getSecondaryText(),
               ImmersiveDialogWidth.SMALL.getWidth(),
               false,
-              null,
+              getSupplementalPanel(nagKey),
               null,
               true);
 
         wasConfirmed = getDialogChoice() == DIALOG_CHOICE_INDEX_CONFIRM;
+    }
+
+    /**
+     * Builds the primary message text for the confirmation dialog.
+     *
+     * <p>This combines a generic "Are you sure?" prompt with an optional, nag-specific follow-up text, if one is
+     * defined for the given {@code nagKey}.</p>
+     *
+     * @param nagKey the nag identifier used to resolve additional primary text; if blank, only the generic message is
+     *               returned
+     *
+     * @return the localized primary confirmation message
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static String getPrimaryText(String nagKey) {
+        String initial = getText("AreYouSure.text");
+        String followUp = nagKey.isBlank()
+                                ? ""
+                                : "<p>" + getTextAt(RESOURCE_BUNDLE,
+              "ImmersiveDialogConfirmation." + nagKey + ".text.primary") + "</p>";
+
+        return initial + followUp;
+    }
+
+    /**
+     * Returns the secondary explanatory text displayed beneath the primary confirmation message.
+     *
+     * @return the localized secondary confirmation text
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static String getSecondaryText() {
+        return getTextAt(RESOURCE_BUNDLE, "ImmersiveDialogConfirmation.text.secondary");
+    }
+
+    /**
+     * Returns the label text for the "No" button.
+     *
+     * <p>The {@code nagKey} parameter is accepted for consistency with other helper methods and to allow future
+     * customization, but is not currently used.</p>
+     *
+     * @return the localized label for the "No" button
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static String getNoText() {
+        return getTextAt(RESOURCE_BUNDLE, "ImmersiveDialogConfirmation.button.no");
+    }
+
+    /**
+     * Returns the label text for the "Yes" button.
+     *
+     * <p>The {@code nagKey} parameter is accepted for consistency with other helper methods and to allow future
+     * customization, but is not currently used.</p>
+     *
+     * @return the localized label for the "Yes" button
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static String getYesText() {
+        return getTextAt(RESOURCE_BUNDLE, "ImmersiveDialogConfirmation.button.yes");
+    }
+
+    /**
+     * Creates the supplemental panel for this dialog, containing a checkbox that allows the user to ignore this nag in
+     * the future.
+     *
+     * <p>When the checkbox state changes, the associated option on {@link MekHQ#getMHQOptions()} is updated using
+     * the provided {@code nagKey}.</p>
+     *
+     * @param nagKey the nag identifier used to persist the "ignore" choice
+     *
+     * @return a panel containing the "ignore this nag" checkbox
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static JPanel getSupplementalPanel(String nagKey) {
+        JPanel panel = new JPanel(new GridBagLayout());
+
+        JCheckBox checkBox = new JCheckBox(getText("chkIgnore.text"));
+        checkBox.addActionListener(
+              e -> MekHQ.getMHQOptions()
+                         .setNagDialogIgnore(nagKey, checkBox.isSelected()));
+        panel.add(checkBox);
+
+        return panel;
     }
 }

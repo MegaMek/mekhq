@@ -62,21 +62,10 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 public class ContractStartRentalDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FacilityRentals";
 
-    private static final int DIALOG_CONFIRM_OPTION = 1;
-
     private static JSpinner spnHospitals;
     private static JSpinner spnKitchens;
     private static JSpinner spnSecurity;
     private static JLabel lblRentalCost;
-
-    /**
-     * Checks if the user confirmed the rental.
-     *
-     * @return {@code true} if the user chose to confirm the rental
-     */
-    public boolean wasConfirmed() {
-        return this.getDialogChoice() == DIALOG_CONFIRM_OPTION;
-    }
 
     /**
      * Gets the current hospital beds spinner value.
@@ -140,7 +129,6 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
      */
     private static List<ButtonLabelTooltipPair> getButtons() {
         return List.of(
-              new ButtonLabelTooltipPair(getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.button.cancel"), null),
               new ButtonLabelTooltipPair(getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.button.confirm"), null)
         );
     }
