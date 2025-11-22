@@ -625,6 +625,8 @@ public class CampaignOptions {
     // endregion Markets Tab
 
     // region Against the Bot Tab
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    private boolean hadAtBEnabledMarker;
     private StratConPlayType stratConPlayType;
     private boolean useAdvancedScouting;
     private boolean noSeedForces;
@@ -1282,6 +1284,7 @@ public class CampaignOptions {
         // endregion Markets Tab
 
         // region Against the Bot Tab
+        hadAtBEnabledMarker = false;
         stratConPlayType = StratConPlayType.DISABLED;
         useAdvancedScouting = false;
         noSeedForces = false;
@@ -4859,6 +4862,14 @@ public class CampaignOptions {
 
     public void setStratConPlayType(final StratConPlayType stratConPlayType) {
         this.stratConPlayType = stratConPlayType;
+    }
+
+    public boolean isHadAtBEnabledMarker() {
+        return hadAtBEnabledMarker;
+    }
+
+    public void setHadAtBEnabledMarker(boolean hadAtBEnabledMarker) {
+        this.hadAtBEnabledMarker = hadAtBEnabledMarker;
     }
 
     public boolean isUseStratConMaplessMode() {

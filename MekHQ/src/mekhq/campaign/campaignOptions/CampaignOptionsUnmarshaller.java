@@ -64,6 +64,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class CampaignOptionsUnmarshaller {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsUnmarshaller";
     private static final MMLogger LOGGER = MMLogger.create(CampaignOptionsUnmarshaller.class);
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node parentNod, Version version) {
@@ -73,7 +74,6 @@ public class CampaignOptionsUnmarshaller {
         CampaignOptions campaignOptions = new CampaignOptions();
         NodeList childNodes = parentNod.getChildNodes();
 
-        boolean wasUsingAtB = false;
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node childNode = childNodes.item(i);
 
@@ -90,18 +90,10 @@ public class CampaignOptionsUnmarshaller {
             }
 
             try {
-                if (parseNodeName(version, nodeName, campaignOptions, nodeContents, childNode)) {
-                    wasUsingAtB = true;
-                }
+                parseNodeName(version, nodeName, campaignOptions, nodeContents, childNode);
             } catch (Exception ex) {
                 LOGGER.error(ex, "Exception parsing campaign option node: {}", nodeName);
             }
-        }
-
-        //  < 50.10 compatibility handler
-        if (wasUsingAtB && !campaignOptions.isUseStratCon()) {
-            // Mapless StratCon replaced AtB in 50.10
-            campaignOptions.setStratConPlayType(StratConPlayType.MAPLESS);
         }
 
         LOGGER.debug("Load Campaign Options Complete!");
@@ -841,9 +833,7 @@ public class CampaignOptionsUnmarshaller {
                     campaignOptions.setPhenotypeProbability(i, parseInt(values[i]));
                 }
             }
-            case "useAtB" -> {
-                return true; // < 50.10 compatibility handler
-            }
+            case "useAtB" -> campaignOptions.setHadAtBEnabledMarker(true);
             case "stratConPlayType" ->
                   campaignOptions.setStratConPlayType(StratConPlayType.fromLookupName(nodeContents));
             case "useStratCon" -> { // < 50.10 compatibility handler

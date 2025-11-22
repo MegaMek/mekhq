@@ -75,15 +75,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
-import mekhq.gui.campaignOptions.optionChangeDialogs.AdvancedScoutingCampaignOptionsChangedConfirmationDialog;
-import mekhq.gui.campaignOptions.optionChangeDialogs.AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog;
-import mekhq.gui.campaignOptions.optionChangeDialogs.FactionStandingCampaignOptionsChangedConfirmationDialog;
-import mekhq.gui.campaignOptions.optionChangeDialogs.FatigueTrackingCampaignOptionsChangedConfirmationDialog;
-import mekhq.gui.campaignOptions.optionChangeDialogs.MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog;
-import mekhq.gui.campaignOptions.optionChangeDialogs.PrisonerTrackingCampaignOptionsChangedConfirmationDialog;
-import mekhq.gui.campaignOptions.optionChangeDialogs.SalvageCampaignOptionsChangedConfirmationDialog;
-import mekhq.gui.campaignOptions.optionChangeDialogs.StratConConvoyCampaignOptionsChangedConfirmationDialog;
-import mekhq.gui.campaignOptions.optionChangeDialogs.VeterancyAwardsCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.campaignOptions.optionChangeDialogs.*;
 
 /**
  * The {@code CampaignOptionsPane} class represents a tabbed pane used for displaying and managing various campaign
@@ -527,6 +519,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         boolean oldIsUseFatigue = options.isUseFatigue();
         boolean oldIsUseAdvancedSalvage = options.isUseCamOpsSalvage();
         boolean oldIsUseStratCon = options.isUseStratCon();
+        boolean oldIsUseMapless = options.isUseStratConMaplessMode();
         boolean oldIsUseAdvancedScouting = options.isUseAdvancedScouting() && oldIsUseStratCon;
         boolean oldIsUseAltAdvancedMedical = options.isUseAlternativeAdvancedMedical();
         boolean oldIsUseDiseases = oldIsUseAltAdvancedMedical && options.isUseRandomDiseases();
@@ -616,6 +609,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         boolean newIsUseStratCon = options.isUseStratCon();
         if (!isStartUp && newIsUseStratCon && !oldIsUseStratCon) { // Has tracking changed?
             new StratConConvoyCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseMapless = options.isUseStratConMaplessMode();
+        if (!isStartUp && newIsUseMapless && !oldIsUseMapless) { // Has tracking changed?
+            new StratConMaplessCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
         boolean newIsUseAdvancedScouting = options.isUseAdvancedScouting() && newIsUseStratCon;
