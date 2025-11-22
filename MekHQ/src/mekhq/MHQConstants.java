@@ -220,6 +220,12 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT = "nagUnableToAffordLoanPayment";
     public static final String NAG_UNABLE_TO_AFFORD_JUMP = "nagUnableToAffordJump";
     public static final String NAG_UNABLE_TO_AFFORD_SHOPPING_LIST = "nagUnableToAffordShoppingList";
+
+    public static final String CONFIRMATION_CONTRACT_RENTAL = "confirmationContractRental";
+    public static final String CONFIRMATION_FACTION_STANDINGS_ULTIMATUM = "confirmationFactionStandingsUltimatum";
+    public static final String CONFIRMATION_BEGIN_TRANSIT = "confirmationBeginTransit";
+    public static final String CONFIRMATION_STRATCON_BATCHALL_BREACH = "confirmationStratConBatchallBreach";
+    public static final String CONFIRMATION_STRATCON_DEPLOY = "confirmationStratConDeploy";
     // endregion Nag Tab
 
     // region Miscellaneous Options

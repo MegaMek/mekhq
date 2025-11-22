@@ -217,6 +217,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionUnableToAffordJumpNag;
     private JCheckBox optionUnableToAffordShoppingListNag;
 
+    private JCheckBox optionContractRentalConfirmation;
+    private JCheckBox optionFactionStandingsUltimatumConfirmation;
+    private JCheckBox optionBeginTransitConfirmation;
+    private JCheckBox optionStratConBatchallBreachConfirmation;
+    private JCheckBox optionStratConDeployConfirmation;
+
     // endregion Nag Tab
 
     // region Miscellaneous
@@ -1148,11 +1154,41 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionUnableToAffordJumpNag.setToolTipText(resources.getString("optionUnableToAffordJumpNag.toolTipText"));
         optionUnableToAffordJumpNag.setName("optionUnableToAffordJumpNag");
 
-        optionUnableToAffordShoppingListNag = new JCheckBox(resources.getString("optionUnableToAffordShoppingListNag" +
-                                                                                      ".text"));
-        optionUnableToAffordShoppingListNag.setToolTipText(resources.getString("optionUnableToAffordShoppingListNag" +
-                                                                                     ".toolTipText"));
+        optionUnableToAffordShoppingListNag = new JCheckBox(resources.getString(
+              "optionUnableToAffordShoppingListNag.text"));
+        optionUnableToAffordShoppingListNag.setToolTipText(resources.getString(
+              "optionUnableToAffordShoppingListNag.toolTipText"));
         optionUnableToAffordShoppingListNag.setName("optionUnableToAffordShoppingListNag");
+
+        optionContractRentalConfirmation = new JCheckBox(resources.getString(
+              "optionContractRentalConfirmation.text"));
+        optionContractRentalConfirmation.setToolTipText(resources.getString(
+              "optionContractRentalConfirmation.toolTipText"));
+        optionContractRentalConfirmation.setName("optionContractRentalConfirmation");
+
+        optionFactionStandingsUltimatumConfirmation = new JCheckBox(resources.getString(
+              "optionFactionStandingsUltimatumConfirmation.text"));
+        optionFactionStandingsUltimatumConfirmation.setToolTipText(resources.getString(
+              "optionFactionStandingsUltimatumConfirmation.toolTipText"));
+        optionFactionStandingsUltimatumConfirmation.setName("optionFactionStandingsUltimatumConfirmation");
+
+        optionBeginTransitConfirmation = new JCheckBox(resources.getString(
+              "optionBeginTransitConfirmation.text"));
+        optionBeginTransitConfirmation.setToolTipText(resources.getString(
+              "optionBeginTransitConfirmation.toolTipText"));
+        optionBeginTransitConfirmation.setName("optionBeginTransitConfirmation");
+
+        optionStratConBatchallBreachConfirmation = new JCheckBox(resources.getString(
+              "optionStratConBatchallBreachConfirmation.text"));
+        optionStratConBatchallBreachConfirmation.setToolTipText(resources.getString(
+              "optionStratConBatchallBreachConfirmation.toolTipText"));
+        optionStratConBatchallBreachConfirmation.setName("optionStratConBatchallBreachConfirmation");
+
+        optionStratConDeployConfirmation = new JCheckBox(resources.getString(
+              "optionStratConDeployConfirmation.text"));
+        optionStratConDeployConfirmation.setToolTipText(resources.getString(
+              "optionStratConDeployConfirmation.toolTipText"));
+        optionStratConDeployConfirmation.setName("optionStratConDeployConfirmation");
 
 
         // Layout the UI
@@ -1183,7 +1219,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(optionUnableToAffordRentNag)
                                       .addComponent(optionUnableToAffordLoanPaymentNag)
                                       .addComponent(optionUnableToAffordJumpNag)
-                                      .addComponent(optionUnableToAffordShoppingListNag));
+                                      .addComponent(optionUnableToAffordShoppingListNag)
+                                      .addComponent(optionContractRentalConfirmation)
+                                      .addComponent(optionFactionStandingsUltimatumConfirmation)
+                                      .addComponent(optionBeginTransitConfirmation)
+                                      .addComponent(optionStratConBatchallBreachConfirmation)
+                                      .addComponent(optionStratConDeployConfirmation));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
                                         .addComponent(optionUnmaintainedUnitsNag)
@@ -1205,7 +1246,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(optionUnableToAffordRentNag)
                                         .addComponent(optionUnableToAffordLoanPaymentNag)
                                         .addComponent(optionUnableToAffordJumpNag)
-                                        .addComponent(optionUnableToAffordShoppingListNag));
+                                        .addComponent(optionUnableToAffordShoppingListNag)
+                                        .addComponent(optionContractRentalConfirmation)
+                                        .addComponent(optionFactionStandingsUltimatumConfirmation)
+                                        .addComponent(optionBeginTransitConfirmation)
+                                        .addComponent(optionStratConBatchallBreachConfirmation)
+                                        .addComponent(optionStratConDeployConfirmation));
 
         return panel;
     }
@@ -1536,6 +1582,21 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_SHOPPING_LIST,
                     optionUnableToAffordShoppingListNag.isSelected());
+        MekHQ.getMHQOptions()
+              .setNagDialogIgnore(MHQConstants.CONFIRMATION_CONTRACT_RENTAL,
+                    optionContractRentalConfirmation.isSelected());
+        MekHQ.getMHQOptions()
+              .setNagDialogIgnore(MHQConstants.CONFIRMATION_FACTION_STANDINGS_ULTIMATUM,
+                    optionFactionStandingsUltimatumConfirmation.isSelected());
+        MekHQ.getMHQOptions()
+              .setNagDialogIgnore(MHQConstants.CONFIRMATION_BEGIN_TRANSIT,
+                    optionBeginTransitConfirmation.isSelected());
+        MekHQ.getMHQOptions()
+              .setNagDialogIgnore(MHQConstants.CONFIRMATION_STRATCON_BATCHALL_BREACH,
+                    optionStratConBatchallBreachConfirmation.isSelected());
+        MekHQ.getMHQOptions()
+              .setNagDialogIgnore(MHQConstants.CONFIRMATION_STRATCON_DEPLOY,
+                    optionStratConDeployConfirmation.isSelected());
 
         PreferenceManager.getClientPreferences().setUserDir(txtUserDir.getText());
         PreferenceManager.getInstance().save();
@@ -1701,6 +1762,21 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                       .getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP));
         optionUnableToAffordShoppingListNag.setSelected(MekHQ.getMHQOptions()
                                                               .getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_SHOPPING_LIST));
+
+        optionContractRentalConfirmation.setSelected(MekHQ.getMHQOptions()
+                                                           .getNagDialogIgnore(MHQConstants.CONFIRMATION_CONTRACT_RENTAL));
+
+        optionFactionStandingsUltimatumConfirmation.setSelected(MekHQ.getMHQOptions()
+                                                                      .getNagDialogIgnore(MHQConstants.CONFIRMATION_FACTION_STANDINGS_ULTIMATUM));
+
+        optionBeginTransitConfirmation.setSelected(MekHQ.getMHQOptions()
+                                                         .getNagDialogIgnore(MHQConstants.CONFIRMATION_BEGIN_TRANSIT));
+
+        optionStratConBatchallBreachConfirmation.setSelected(MekHQ.getMHQOptions()
+                                                                   .getNagDialogIgnore(MHQConstants.CONFIRMATION_STRATCON_BATCHALL_BREACH));
+
+        optionStratConDeployConfirmation.setSelected(MekHQ.getMHQOptions()
+                                                           .getNagDialogIgnore(MHQConstants.CONFIRMATION_STRATCON_DEPLOY));
         txtUserDir.setText(PreferenceManager.getClientPreferences().getUserDir());
         spnStartGameDelay.setValue(MekHQ.getMHQOptions().getStartGameDelay());
         spnStartGameClientDelay.setValue(MekHQ.getMHQOptions().getStartGameClientDelay());

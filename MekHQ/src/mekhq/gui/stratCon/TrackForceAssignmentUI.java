@@ -33,6 +33,8 @@
 
 package mekhq.gui.stratCon;
 
+import static mekhq.MHQConstants.CONFIRMATION_STRATCON_DEPLOY;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -44,6 +46,7 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -151,10 +154,13 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
 
             // This dialog marks a point of no return, so we ask the player to confirm their decision before moving
             // forward
-            ImmersiveDialogConfirmation dialog = new ImmersiveDialogConfirmation(campaign);
-            if (!dialog.wasConfirmed()) {
-                btnConfirm.setEnabled(true);
-                return;
+            if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_STRATCON_DEPLOY)) {
+                ImmersiveDialogConfirmation dialog = new ImmersiveDialogConfirmation(campaign,
+                      CONFIRMATION_STRATCON_DEPLOY);
+                if (!dialog.wasConfirmed()) {
+                    btnConfirm.setEnabled(true);
+                    return;
+                }
             }
 
             for (Force force : availableForceList.getSelectedValuesList()) {

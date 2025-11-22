@@ -40,6 +40,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.rentals.FacilityRentals;
@@ -99,6 +100,7 @@ public class UnableToAffordRentNagDialog extends ImmersiveDialogNag {
             rent = rent.plus(campaign.getTotalRentFeesExcludingBays());
         }
 
-        return unableToAffordRent(campaign.getFunds(), rent);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNABLE_TO_AFFORD_RENT) &&
+                     unableToAffordRent(campaign.getFunds(), rent);
     }
 }
