@@ -198,6 +198,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_REMOVE_INJURY = "REMOVE_INJURY";
     private static final String CMD_REPLACE_MISSING_LIMB = "REPLACE_MISSING_LIMB";
     private static final String CMD_CLEAR_INJURIES = "CLEAR_INJURIES";
+    private static final String CMD_CLEAR_PROSTHETICS = "CMD_CLEAR_PROSTHETICS";
     private static final String CMD_CALLSIGN = "CALLSIGN";
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG";
     private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE";
@@ -1545,10 +1546,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_CLEAR_INJURIES: {
                 for (Person person : people) {
-                    person.clearInjuries();
-                    Unit u = person.getUnit();
-                    if (null != u) {
-                        u.resetPilotAndEntity();
+                    person.clearInjuriesExcludingProsthetics();
+                    Unit unit = person.getUnit();
+                    if (null != unit) {
+                        unit.resetPilotAndEntity();
+                    }
+                }
+                break;
+            }
+            case CMD_CLEAR_PROSTHETICS: {
+                for (Person person : people) {
+                    person.clearProstheticInjuries();
+                    Unit unit = person.getUnit();
+                    if (null != unit) {
+                        unit.resetPilotAndEntity();
                     }
                 }
                 break;
@@ -4039,6 +4050,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if (getCampaignOptions().isUseAdvancedMedical()) {
                 menuItem = new JMenuItem(resources.getString("removeAllInjuries.text"));
                 menuItem.setActionCommand(CMD_CLEAR_INJURIES);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+
+                menuItem = new JMenuItem(resources.getString("removeAllProsthetics.text"));
+                menuItem.setActionCommand(CMD_CLEAR_PROSTHETICS);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
 
