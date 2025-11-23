@@ -798,7 +798,9 @@ public class MekLocation extends Part {
             }
 
             if (slot.getType() == CriticalSlot.TYPE_EQUIPMENT) {
-                if ((slot.getMount() != null) && !slot.getMount().isDestroyed()) {
+                if ((slot.getMount() != null) &&
+                          (!slot.getMount().isDestroyed()) &&
+                          (slot.getMount().getType() instanceof EquipmentType)) {
                     EquipmentType equipmentType = slot.getMount().getType();
                     if (equipmentType.hasFlag(MiscType.F_NULL_SIG)) {
                         partsToSalvageOrScrap.add("Null-Signature System");
