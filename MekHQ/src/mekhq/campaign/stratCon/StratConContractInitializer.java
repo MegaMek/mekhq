@@ -47,6 +47,7 @@ import megamek.common.compute.Compute;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -97,9 +98,11 @@ public class StratConContractInitializer {
         int maximumTrackIndex = max(0, contract.getRequiredCombatTeams() / NUM_LANCES_PER_TRACK);
         int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
 
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
         for (int x = 0; x < maximumTrackIndex; x++) {
             int scenarioOdds = getScenarioOdds(contractDefinition);
-            int deploymentTime = getDeploymentTime(contractDefinition);
+            int deploymentTime = isUseMaplessMode ? 0 : getDeploymentTime(contractDefinition);
 
             StratConTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK,
                   scenarioOdds,
@@ -115,7 +118,7 @@ public class StratConContractInitializer {
         int oddLanceCount = contract.getRequiredCombatTeams() % NUM_LANCES_PER_TRACK;
         if (oddLanceCount > 0) {
             int scenarioOdds = getScenarioOdds(contractDefinition);
-            int deploymentTime = getDeploymentTime(contractDefinition);
+            int deploymentTime = isUseMaplessMode ? 0 : getDeploymentTime(contractDefinition);
 
             StratConTrackState track = initializeTrackState(oddLanceCount,
                   scenarioOdds,
@@ -128,7 +131,7 @@ public class StratConContractInitializer {
         // Last chance generation, to ensure we never generate a StratCon map with 0 tracks
         if (campaignState.getTrackCount() == 0) {
             int scenarioOdds = getScenarioOdds(contractDefinition);
-            int deploymentTime = getDeploymentTime(contractDefinition);
+            int deploymentTime = isUseMaplessMode ? 0 : getDeploymentTime(contractDefinition);
 
             StratConTrackState track = initializeTrackState(1, scenarioOdds, deploymentTime, planetaryTemperature);
             track.setDisplayableName(String.format("Sector %d", campaignState.getTrackCount()));
@@ -136,8 +139,7 @@ public class StratConContractInitializer {
         }
 
         // now seed the tracks with objectives and facilities
-        boolean isNotUsingMaplessMode = !campaign.getCampaignOptions().isUseStratConMaplessMode();
-        if (isNotUsingMaplessMode) {
+        if (!isUseMaplessMode) {
             for (ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
                 int objectiveCount = objectiveParams.objectiveCount > 0 ?
                                            (int) objectiveParams.objectiveCount :
@@ -208,7 +210,7 @@ public class StratConContractInitializer {
         }
 
         // non-objective allied facilities
-        if (isNotUsingMaplessMode) {
+        if (!isUseMaplessMode) {
             int facilityCount = contractDefinition.getAlliedFacilityCount() > 0 ?
                                       (int) contractDefinition.getAlliedFacilityCount() :
                                       (int) (-contractDefinition.getAlliedFacilityCount() *
