@@ -39,6 +39,7 @@ import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.enums.ScenarioStatus.DRAW;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.stratCon.StratConRulesManager.generateDailyScenariosForTrack;
+import static mekhq.campaign.stratCon.StratConRulesManager.isForceDeployedToStratCon;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getText;
@@ -120,7 +121,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -1146,6 +1146,7 @@ public final class BriefingTab extends CampaignGuiTab {
         List<SalvageForceData> salvageForceOptions = new ArrayList<>();
 
         // Collect eligible salvage forces (We want salvage forces first)
+        List<AtBContract> activeContracts = getCampaign().getActiveAtBContracts();
         Hangar hangar = campaign.getHangar();
         List<Force> eligibleSalvageForces = new ArrayList<>();
         for (Force force : getCampaign().getAllForces()) {
@@ -1154,7 +1155,16 @@ public final class BriefingTab extends CampaignGuiTab {
                 continue;
             }
 
-            if (force.getForceType().isSalvage() && force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
+            boolean isDeployedToScenario = force.isDeployed();
+            boolean isDeployedToStratCon = isForceDeployedToStratCon(activeContracts,
+                  force.getId());
+            boolean isSalvageForce = force.getForceType().isSalvage();
+            boolean hasAtLeastOneSalvageUnit = force.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
+
+            if (!isDeployedToScenario &&
+                      !isDeployedToStratCon &&
+                      isSalvageForce &&
+                      hasAtLeastOneSalvageUnit) {
                 eligibleSalvageForces.add(force);
             }
         }
@@ -1167,7 +1177,6 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Collect eligible Combat Teams
         List<Force> eligibleCombatTeams = new ArrayList<>();
-        List<AtBContract> activeContracts = getCampaign().getActiveAtBContracts();
         for (CombatTeam combatTeam : getCampaign().getCombatTeamsAsList()) {
             int forceId = combatTeam.getForceId();
             Force force = getCampaign().getForce(forceId);
@@ -1175,21 +1184,14 @@ public final class BriefingTab extends CampaignGuiTab {
                 continue;
             }
 
-            boolean isDeployedToStratCon = StratConRulesManager.isForceDeployedToStratCon(activeContracts, forceId);
-            if (!force.isDeployed() &&
-                      !isDeployedToStratCon &&
-                      force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
-                boolean hasDeployedUnit = false;
-                for (Unit unit : force.getAllUnitsAsUnits(getCampaign().getHangar(), false)) {
-                    if (StratConRulesManager.isUnitDeployedToStratCon(unit)) {
-                        hasDeployedUnit = true;
-                        break;
-                    }
-                }
+            boolean isDeployedToScenario = force.isDeployed();
+            boolean isDeployedToStratCon = isForceDeployedToStratCon(activeContracts, force.getId());
+            boolean hasAtLeastOneSalvageUnit = force.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
 
-                if (!hasDeployedUnit) {
-                    eligibleCombatTeams.add(force);
-                }
+            if (!isDeployedToScenario &&
+                      !isDeployedToStratCon &&
+                      hasAtLeastOneSalvageUnit) {
+                eligibleCombatTeams.add(force);
             }
         }
 
