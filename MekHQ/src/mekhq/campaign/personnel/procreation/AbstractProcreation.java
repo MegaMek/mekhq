@@ -434,6 +434,7 @@ public abstract class AbstractProcreation {
             baby.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.DEPENDENT); // babies can't have jobs
             baby.setOptions(new PersonnelOptions()); // Stop babies being born with SPAs
             baby.setPreNominal(""); // Stop babies being born with doctorates
+            baby.setPostNominal(""); // Stop babies being born with post-nominal titles
 
             baby.setBloodGroup(getInheritedBloodGroup(mother.getBloodGroup(),
                   father == null ? getRandomBloodGroup() : father.getBloodGroup()));
