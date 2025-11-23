@@ -7070,7 +7070,7 @@ public class Person {
      * @since 0.50.10
      */
     public void clearInjuriesExcludingProsthetics() {
-        for (Injury injury : injuries) {
+        for (Injury injury : new ArrayList<>(injuries)) {
             if (!injury.getSubType().isProsthetic()) {
                 removeInjury(injury);
             }
@@ -7097,7 +7097,7 @@ public class Person {
      * @since 0.50.10
      */
     public void clearProstheticInjuries() {
-        for (Injury injury : injuries) {
+        for (Injury injury : new ArrayList<>(injuries)) {
             if (injury.getSubType().isProsthetic()) {
                 removeInjury(injury);
             }
