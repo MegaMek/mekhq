@@ -5193,144 +5193,78 @@ public class Unit implements ITechnology {
         entity.getCrew().setMissing(false, slot);
     }
 
+    /**
+     * Resets the engineer assignment for this unit based on its current crew.
+     *
+     * <p>This method recalculates which {@link Person} should be considered the unit's engineer. The logic depends
+     * on unit type:</p>
+     * <ul>
+     *     <li>If the unit is not self-crewed, the method exits with no changes.</li>
+     *     <li>If the unit is infantry:
+     *         <ul>
+     *             <li>Unmanned infantry has no engineer.</li>
+     *             <li>Otherwise, the engineer is chosen from active crew using
+     *             {@link Person#outRanksUsingSkillTiebreaker} to pick the most qualified.</li>
+     *         </ul>
+     *     </li>
+     *     <li>For all other entities:
+     *         <ul>
+     *             <li>If the vessel crew is empty, there is no engineer.</li>
+     *             <li>Otherwise, the engineer is chosen from the vessel crew using the same ranking logic.</li>
+     *         </ul>
+     *     </li>
+     * </ul>
+     *
+     * <p>After selecting the engineer (or determining that none exists), the method updates all scheduled
+     * maintenance tasks:</p>
+     *
+     * <ul>
+     *     <li>If an engineer is present, all ongoing part tasks are reassigned to that engineer.</li>
+     *     <li>If no engineer exists:
+     *         <ul>
+     *             <li>Any active mothballing is cancelled.</li>
+     *             <li>All ongoing part tasks are cancelled.</li>
+     *         </ul>
+     *     </li>
+     * </ul>
+     *
+     * <p>This ensures that engineering workloads always match the current crew state and avoids leaving tasks
+     * assigned to invalid or nonexistent personnel.</p>
+     */
     public void resetEngineer() {
         if (!isSelfCrewed()) {
             return;
         }
-        int minutesLeft = TECH_WORK_DAY;
-        int overtimeLeft = TECH_WORK_DAY / 2;
-        boolean breakPartReRoll = true;
-        boolean failRefitReRoll = true;
-        if (null != engineer) {
-            minutesLeft = engineer.getMinutesLeft();
-            overtimeLeft = engineer.getOvertimeLeft();
-        } else {
-            // then get the number based on the least amount available to crew members
-            // in the case of Edge, everyone must have the same triggers set for Edge to
-            // work
-            for (Person person : getActiveCrew()) {
-                if (person.getMinutesLeft() < minutesLeft) {
-                    minutesLeft = person.getMinutesLeft();
-                }
 
-                if (person.getOvertimeLeft() < overtimeLeft) {
-                    overtimeLeft = person.getOvertimeLeft();
-                }
-            }
-        }
+        engineer = null; // Unassign engineer
 
         if (getEntity() instanceof Infantry) {
-            if (!isUnmanned()) {
-                engineer = new Person(getCommander().getGivenName(), getCommander().getSurname(), getCampaign());
-                engineer.setEngineer(true);
-                engineer.setClanPersonnel(getCommander().isClanPersonnel());
-                engineer.setMinutesLeft(minutesLeft);
-                engineer.setOvertimeLeft(overtimeLeft);
-                engineer.setId(getCommander().getId());
-                engineer.setPrimaryRoleDirect(PersonnelRole.MECHANIC);
-                engineer.setRank(getCommander().getRankNumeric());
-                // will only be reloading ammo, so doesn't really matter what skill level we
-                // give them - set to regular
-                engineer.addSkill(SkillType.S_TECH_MECHANIC,
-                      SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(),
-                      0);
-                engineer.addSkill(SkillType.S_ADMIN,
-                      SkillType.getType(SkillType.S_ADMIN).getRegularLevel(),
-                      0);
-            } else {
+            if (isUnmanned()) {
                 engineer = null;
+            } else {
+                for (Person person : getActiveCrew()) {
+                    if (engineer == null || person.outRanksUsingSkillTiebreaker(campaign, engineer)) {
+                        engineer = person;
+                    }
+                }
             }
         } else {
-            if (!vesselCrew.isEmpty()) {
-                int nCrew = 0;
-                int sumTechSkill = 0;
-                int sumTechBonus = 0;
-                int sumAdminSkill = -1; // Unskilled
-                int sumAdminBonus = 0;
-                int sumEdge = 0;
-                int sumEdgeUsed = 0;
-                String engineerGivenName = "Nobody";
-                String engineerSurname = "Nobody";
-                int bestRank = Integer.MIN_VALUE;
-                for (Person person : vesselCrew) {
-                    if (engineer != null) {
-                        // If the engineer used edge points, remove some from vessel crewmembers until
-                        // all is paid for
-                        if (engineer.getEdgeUsed() > 0) {
-                            // Don't subtract an Edge if the individual has none left
-                            if (person.getCurrentEdge() > 0) {
-                                person.changeCurrentEdge(-1);
-                                engineer.setEdgeUsed(engineer.getEdgeUsed() - 1);
-                            }
-                        }
-                        // If the engineer gained XP, add it for each crewman
-                        person.awardXP(getCampaign(), engineer.getXP());
-
-                        // Update each crewman's successful task count too
-                        person.setNTasks(person.getNTasks() + engineer.getNTasks());
-                        if (person.getNTasks() >= getCampaign().getCampaignOptions().getNTasksXP()) {
-                            person.awardXP(getCampaign(), getCampaign().getCampaignOptions().getTaskXP());
-                            person.setNTasks(0);
-                        }
-                        sumEdgeUsed = engineer.getEdgeUsed();
-                    }
-                    sumEdge += person.getAdjustedEdge();
-
-                    if (person.hasSkill(SkillType.S_TECH_VESSEL)) {
-                        sumTechSkill += person.getSkill(SkillType.S_TECH_VESSEL).getLevel();
-                        sumTechBonus += person.getSkill(SkillType.S_TECH_VESSEL).getBonus();
-                        nCrew++;
-                    }
-
-                    if (person.hasSkill(SkillType.S_ADMIN)) {
-                        sumAdminSkill += person.getSkill(SkillType.S_ADMIN).getLevel();
-                        sumAdminBonus += person.getSkill(SkillType.S_ADMIN).getBonus();
-                    }
-                    if (!(person.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART))) {
-                        breakPartReRoll = false;
-                    }
-                    if (!(person.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT))) {
-                        failRefitReRoll = false;
-                    }
-                    if (person.getRankNumeric() > bestRank) {
-                        engineerGivenName = person.getGivenName();
-                        engineerSurname = person.getSurname();
-                        bestRank = person.getRankNumeric();
-                    }
-                }
-                if (nCrew > 0) {
-                    engineer = new Person(engineerGivenName, engineerSurname, getCampaign());
-                    engineer.setEngineer(true);
-                    engineer.setClanPersonnel(getCommander().isClanPersonnel());
-                    engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_BREAK_PART, breakPartReRoll);
-                    engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT, failRefitReRoll);
-                    engineer.setMinutesLeft(minutesLeft);
-                    engineer.setOvertimeLeft(overtimeLeft);
-                    engineer.setId(getCommander().getId());
-                    engineer.setPrimaryRoleDirect(PersonnelRole.VESSEL_CREW);
-                    if (bestRank > -1) {
-                        engineer.setRank(bestRank);
-                    }
-                    engineer.addSkill(SkillType.S_TECH_VESSEL, sumTechSkill / nCrew, sumTechBonus / nCrew);
-                    if (sumAdminSkill > -1) {
-                        engineer.addSkill(SkillType.S_ADMIN, sumAdminSkill / nCrew, sumAdminBonus / nCrew);
-                    }
-                    engineer.setEdgeUsed(sumEdgeUsed);
-                    engineer.setCurrentEdge(max(0, (sumEdge - sumEdgeUsed) / nCrew));
-                    engineer.setUnit(this);
-                } else {
-                    engineer = null;
-                }
-            } else {
-                // Needed to fix bug where removed crew doesn't remove engineer
+            if (vesselCrew.isEmpty()) {
                 engineer = null;
+            } else {
+                for (Person person : getVesselCrew()) {
+                    if (engineer == null || person.outRanksUsingSkillTiebreaker(campaign, engineer)) {
+                        engineer = person;
+                    }
+                }
             }
         }
-        if (null != engineer) {
+
+        if (engineer != null) {
             // change reference for any scheduled tasks
-            for (Part p : getParts()) {
-                if (p.isBeingWorkedOn()) {
-                    p.setTech(engineer);
+            for (Part part : getParts()) {
+                if (part.isBeingWorkedOn()) {
+                    part.setTech(engineer);
                 }
             }
         } else {
@@ -5339,9 +5273,9 @@ public class Unit implements ITechnology {
                 mothballTime = 0;
             }
             // cancel any scheduled tasks
-            for (Part p : getParts()) {
-                if (p.isBeingWorkedOn()) {
-                    p.cancelAssignment(true);
+            for (Part part : getParts()) {
+                if (part.isBeingWorkedOn()) {
+                    part.cancelAssignment(true);
                 }
             }
         }
