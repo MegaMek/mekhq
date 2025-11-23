@@ -39,6 +39,7 @@ import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.enums.ScenarioStatus.DRAW;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.stratCon.StratConRulesManager.generateDailyScenariosForTrack;
+import static mekhq.campaign.stratCon.StratConRulesManager.isForceDeployedToStratCon;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getText;
@@ -120,7 +121,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -1156,7 +1156,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
 
             boolean isDeployedToScenario = force.isDeployed();
-            boolean isDeployedToStratCon = StratConRulesManager.isForceDeployedToStratCon(activeContracts,
+            boolean isDeployedToStratCon = isForceDeployedToStratCon(activeContracts,
                   force.getId());
             boolean isSalvageForce = force.getForceType().isSalvage();
             boolean hasAtLeastOneSalvageUnit = force.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
@@ -1165,16 +1165,7 @@ public final class BriefingTab extends CampaignGuiTab {
                       !isDeployedToStratCon &&
                       isSalvageForce &&
                       hasAtLeastOneSalvageUnit) {
-                for (Unit unit : force.getAllUnitsAsUnits(getCampaign().getHangar(), false)) {
-                    if (StratConRulesManager.isUnitDeployedToStratCon(unit)) {
-                        isDeployedToStratCon = true;
-                        break;
-                    }
-                }
-
-                if (!isDeployedToStratCon) {
-                    eligibleSalvageForces.add(force);
-                }
+                eligibleSalvageForces.add(force);
             }
         }
 
@@ -1194,23 +1185,13 @@ public final class BriefingTab extends CampaignGuiTab {
             }
 
             boolean isDeployedToScenario = force.isDeployed();
-            boolean isDeployedToStratCon = StratConRulesManager.isForceDeployedToStratCon(activeContracts,
-                  force.getId());
+            boolean isDeployedToStratCon = isForceDeployedToStratCon(activeContracts, force.getId());
             boolean hasAtLeastOneSalvageUnit = force.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
 
             if (!isDeployedToScenario &&
                       !isDeployedToStratCon &&
                       hasAtLeastOneSalvageUnit) {
-                for (Unit unit : force.getAllUnitsAsUnits(getCampaign().getHangar(), false)) {
-                    if (StratConRulesManager.isUnitDeployedToStratCon(unit)) {
-                        isDeployedToScenario = true;
-                        break;
-                    }
-                }
-
-                if (!isDeployedToScenario) {
-                    eligibleCombatTeams.add(force);
-                }
+                eligibleCombatTeams.add(force);
             }
         }
 
