@@ -71,7 +71,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
@@ -2717,15 +2716,18 @@ public class StratConRulesManager {
           StratConCampaignState campaignState, boolean isCombatChallenge) {
         List<Integer> retVal = new ArrayList<>();
 
-        // assemble a set of all force IDs that are currently assigned to tracks that are not this one
-        Set<Integer> forcesInTracks = campaign.getActiveAtBContracts()
-                                            .stream()
-                                            .flatMap(contract -> contract.getStratconCampaignState()
-                                                                       .getTracks()
-                                                                       .stream())
-                                            .filter(track -> (!Objects.equals(track, currentTrack)) || !reinforcements)
-                                            .flatMap(track -> track.getAssignedForceCoords().keySet().stream())
-                                            .collect(Collectors.toSet());
+        // assemble a set of all force IDs that are currently assigned to tracks
+        Set<Integer> forcesInTracks = new HashSet<>();
+        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+            StratConCampaignState state = contract.getStratconCampaignState();
+            if (state == null) {
+                continue;
+            }
+
+            for (StratConTrackState track : state.getTracks()) {
+                forcesInTracks.addAll(track.getAssignedForceCoords().keySet());
+            }
+        }
 
         // if there's an existing scenario, and we're doing reinforcements,
         // prevent forces that failed to deploy from trying to deploy again
