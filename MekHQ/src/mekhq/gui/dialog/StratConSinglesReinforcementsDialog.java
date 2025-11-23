@@ -66,7 +66,6 @@ public class StratConSinglesReinforcementsDialog {
      *   <li>{@code CANCEL} – user chose to abort</li>
      *   <li>{@code REINFORCE_GM_INSTANTLY} – user confirmed deployment</li>
      * </ul>
-     * </p>
      *
      * @return the chosen {@link StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType}
      *
