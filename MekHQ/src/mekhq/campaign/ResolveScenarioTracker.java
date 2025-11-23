@@ -706,7 +706,7 @@ public class ResolveScenarioTracker {
                     }
                 }
                 // try to find the crew in our pilot and mia vectors
-                Crew pilot = pilots.get(u.getCommander().getId());
+                Crew pilot = u.getCommander() == null ? null : pilots.get(u.getCommander().getId());
                 boolean missingCrew = false;
                 // For multi-crew cockpits, the crew id is the first slot, which is not
                 // necessarily the commander
