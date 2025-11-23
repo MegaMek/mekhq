@@ -1666,16 +1666,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 // pay person & add expense
                 Money individualPayment = Money.of(payment);
                 Money totalPayment = individualPayment.multipliedBy(people.length);
-                Map<Person, Money> personMoneyMap = new HashMap<>();
                 for (Person person : people) {
                     person.payPerson(individualPayment);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
 
-                getCampaign().payPersonnel(TransactionType.MISCELLANEOUS,
+                getCampaign().getFinances().debit(TransactionType.MISCELLANEOUS,
+                      getCampaign().getLocalDate(),
                       totalPayment,
-                      resources.getString("givePayment.format"),
-                      personMoneyMap);
+                      resources.getString("givePayment.format"));
 
                 break;
             }
