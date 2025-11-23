@@ -204,21 +204,23 @@ public class StratConRulesManager {
      * For each scenario, a scenario odds target number is calculated, and a roll is made against this target. If the
      * roll is less than the target number, a new weekly scenario is created with a random date within the week.
      *
-     * @param campaign      The campaign.
-     * @param campaignState The state of the StratCon campaign.
-     * @param contract      The AtBContract for the campaign.
-     * @param track         The StratCon campaign track.
+     * @param campaign             The campaign.
+     * @param campaignState        The state of the StratCon campaign.
+     * @param contract             The AtBContract for the campaign.
+     * @param track                The StratCon campaign track.
+     * @param isUseStratConSingles If {@code true} only a single scenario will be generated
      */
     public static void generateScenariosDatesForWeek(Campaign campaign, StratConCampaignState campaignState,
-          AtBContract contract, StratConTrackState track) {
-        // We divide the number of scenario rolls by the number of tracks so that we're not unintentionally
-        // multiplying Intensity by tracks
-        int scenarioRolls = (int) ceil(track.getRequiredLanceCount() / (double) campaignState.getTrackCount());
+          AtBContract contract, StratConTrackState track, boolean isUseStratConSingles) {
+        int scenarioRolls = isUseStratConSingles ? 1 :
+                                  // We divide the number of scenario rolls by the number of tracks so that we're not
+                                  // unintentionally multiplying Intensity by tracks
+                                  (int) ceil(track.getRequiredLanceCount() / (double) campaignState.getTrackCount());
         for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
             int targetNum = calculateScenarioOdds(track, contract, false);
             int roll = randomInt(100);
 
-            if (roll < targetNum) {
+            if (isUseStratConSingles || roll < targetNum) {
                 LocalDate scenarioDate = campaign.getLocalDate().plusDays(randomInt(7));
                 campaignState.addWeeklyScenario(scenarioDate);
                 LOGGER.info("StratCon Weekly Scenario Roll: {} vs. {} ({})",
@@ -3547,21 +3549,26 @@ public class StratConRulesManager {
         Campaign campaign = ev.getCampaign();
 
         // don't do any of this if StratCon isn't turned on
-        if (!campaign.getCampaignOptions().isUseStratCon()) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (!campaignOptions.isUseStratCon()) {
             return;
         }
+
+        boolean isUseStratConSingles = campaignOptions.isUseStratConSinglesMode();
+        boolean isUseStratConMapless = campaignOptions.isUseStratConMaplessMode();
 
         LocalDate today = campaign.getLocalDate();
         boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
         boolean isStartOfMonth = today.getDayOfMonth() == 1;
 
-        // run scenario generation routine for every track attached to an active
-        // contract
+        // run scenario generation routine for every track attached to an active contract
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
             StratConCampaignState campaignState = contract.getStratconCampaignState();
 
             if (campaignState != null) {
-                for (StratConTrackState track : campaignState.getTracks()) {
+                List<StratConTrackState> tracks = campaignState.getTracks();
+                boolean hasAssignedSingleDropScenario = false;
+                for (StratConTrackState track : tracks) {
                     cleanupPhantomScenarios(track);
 
                     // check if some of the forces have finished deployment
@@ -3570,7 +3577,7 @@ public class StratConRulesManager {
                     // 0-deployment-length tracks
                     processTrackForceReturnDates(track, campaign);
 
-                    if (!campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+                    if (!isUseStratConMapless) {
                         processFacilityEffects(track, campaignState, isStartOfMonth);
                     }
 
@@ -3585,8 +3592,13 @@ public class StratConRulesManager {
                     }
 
                     // on monday, generate new scenario dates
-                    if (isMonday) {
-                        generateScenariosDatesForWeek(campaign, campaignState, contract, track);
+                    if (isMonday && !hasAssignedSingleDropScenario) {
+                        generateScenariosDatesForWeek(campaign, campaignState, contract, track, isUseStratConSingles);
+                    }
+
+                    // Only one scenario/week for Single Drop
+                    if (isUseStratConSingles) {
+                        hasAssignedSingleDropScenario = true;
                     }
                 }
 

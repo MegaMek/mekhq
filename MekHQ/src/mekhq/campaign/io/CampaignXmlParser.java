@@ -141,12 +141,14 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyArc.StoryArc;
+import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.gui.campaignOptions.optionChangeDialogs.StratConMaplessCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.dialog.MilestoneUpgradePathDialog;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
@@ -248,6 +250,14 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (xn.equalsIgnoreCase("campaignOptions")) {
                     campaign.setCampaignOptions(CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(wn,
                           version));
+
+                    //  < 50.10 compatibility handler
+                    CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                    if (campaignOptions.isHadAtBEnabledMarker() && !campaignOptions.isUseStratCon()) {
+                        // Mapless StratCon replaced AtB in 50.10
+                        campaignOptions.setStratConPlayType(StratConPlayType.MAPLESS);
+                        new StratConMaplessCampaignOptionsChangedConfirmationDialog(campaign);
+                    }
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     campaign.getGameOptions().fillFromXML(wn.getChildNodes());
                 }

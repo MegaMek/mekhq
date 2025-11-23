@@ -55,6 +55,7 @@ import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
+import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -63,6 +64,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class CampaignOptionsUnmarshaller {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsUnmarshaller";
     private static final MMLogger LOGGER = MMLogger.create(CampaignOptionsUnmarshaller.class);
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node parentNod, Version version) {
@@ -72,7 +74,6 @@ public class CampaignOptionsUnmarshaller {
         CampaignOptions campaignOptions = new CampaignOptions();
         NodeList childNodes = parentNod.getChildNodes();
 
-        boolean wasUsingAtB = false;
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node childNode = childNodes.item(i);
 
@@ -89,18 +90,10 @@ public class CampaignOptionsUnmarshaller {
             }
 
             try {
-                if (parseNodeName(version, nodeName, campaignOptions, nodeContents, childNode)) {
-                    wasUsingAtB = true;
-                }
+                parseNodeName(version, nodeName, campaignOptions, nodeContents, childNode);
             } catch (Exception ex) {
                 LOGGER.error(ex, "Exception parsing campaign option node: {}", nodeName);
             }
-        }
-
-        //  < 50.10 compatibility handler
-        if (wasUsingAtB && !campaignOptions.isUseStratCon()) {
-            // Mapless StratCon replaced AtB in 50.10
-            campaignOptions.setUseStratConMaplessMode(true);
         }
 
         LOGGER.debug("Load Campaign Options Complete!");
@@ -840,11 +833,23 @@ public class CampaignOptionsUnmarshaller {
                     campaignOptions.setPhenotypeProbability(i, parseInt(values[i]));
                 }
             }
-            case "useAtB" -> {
-                return true; // < 50.10 compatibility handler
+            case "useAtB" -> campaignOptions.setHadAtBEnabledMarker(true);
+            case "stratConPlayType" ->
+                  campaignOptions.setStratConPlayType(StratConPlayType.fromLookupName(nodeContents));
+            case "useStratCon" -> { // < 50.10 compatibility handler
+                if (parseBoolean(nodeContents)) {
+                    // We want to be able to overwrite this with 'useMaplessStratCon' if that clause is hit before
+                    // this one.
+                    if (campaignOptions.getStratConPlayType() == StratConPlayType.DISABLED) {
+                        campaignOptions.setStratConPlayType(StratConPlayType.NORMAL);
+                    }
+                }
             }
-            case "useStratCon" -> campaignOptions.setUseStratCon(parseBoolean(nodeContents));
-            case "useMaplessStratCon" -> campaignOptions.setUseStratConMaplessMode(parseBoolean(nodeContents));
+            case "useMaplessStratCon" -> { // < 50.10 compatibility handler
+                if (parseBoolean(nodeContents)) {
+                    campaignOptions.setStratConPlayType(StratConPlayType.MAPLESS);
+                }
+            }
             case "useAdvancedScouting" -> campaignOptions.setUseAdvancedScouting(parseBoolean(nodeContents));
             case "noSeedForces" -> campaignOptions.setNoSeedForces(parseBoolean(nodeContents));
             case "useGenericBattleValue" -> campaignOptions.setUseGenericBattleValue(parseBoolean(nodeContents));

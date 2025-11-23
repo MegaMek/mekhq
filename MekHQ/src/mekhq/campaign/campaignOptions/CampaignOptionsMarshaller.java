@@ -1074,8 +1074,10 @@ public class CampaignOptionsMarshaller {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities",
               campaignOptions.getPhenotypeProbabilities());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStratCon", campaignOptions.isUseStratCon());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMaplessStratCon", campaignOptions.isUseStratConMaplessMode());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "stratConPlayType",
+              campaignOptions.getStratConPlayType().getLookupName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedScouting", campaignOptions.isUseAdvancedScouting());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noSeedForces", campaignOptions.isNoSeedForces());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useGenericBattleValue", campaignOptions.isUseGenericBattleValue());

@@ -91,6 +91,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.StratConReinforcementsConfirmationDialog;
+import mekhq.gui.dialog.StratConSinglesReinforcementsDialog;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.ArrayUtils;
@@ -758,28 +759,81 @@ public class StratConScenarioWizard extends JDialog {
     }
 
     /**
-     * Creates and displays the "Reinforcement Confirmation" dialog, allowing the user to review, adjust, and commit
-     * reinforcements to a scenario. The dialog provides information about the current target roll modifiers, the
-     * ability to adjust Support Points, and handles calculation and changes to the reinforcement target number
-     * dynamically.
+     * Handles the reinforcement confirmation flow for the current StratCon scenario.
      *
-     * <p>The dialog includes the following components:</p>
+     * <p>The method selects the appropriate reinforcement workflow based on the campaign's StratCon mode:</p>
      * <ul>
-     *   <li><b>Left Panel:</b> Contains details about the speaker, including an icon (if available)
-     *       and a description of their role in the campaign.</li>
-     *   <li><b>Right Panel:</b> Shows a breakdown of the current target roll modifiers and target number.</li>
-     *   <li><b>Support Point Selector:</b> A spinner that allows the user to adjust the number of
-     *       Support Points they wish to spend to modify the target number. The maximum available
-     *       Support Points are based on the current campaign state.</li>
-     *   <li><b>Check/Confirm Buttons:</b> Includes two confirm buttons (standard and GM-specific)
-     *       that allow the user to commit reinforcements or additional actions, along with a cancel button
-     *       to close the dialog without making any changes.</li>
-     *   <li><b>Info Panel:</b> A supplemental label with additional guidance or information displayed
-     *       below the buttons, which can help inform the user about the reinforcement process or provide
-     *       clarification about decisions made.</li>
+     *     <li>If StratCon Singles Mode is enabled, reinforcement selection is handled through the single-drop
+     *     reinforcement dialog.</li>
+     *     <li>Otherwise, the standard reinforcement confirmation dialog is used.</li>
      * </ul>
      */
     private void reinforcementConfirmDialog() {
+        if (campaign.getCampaignOptions().isUseStratConSinglesMode()) {
+            processSingleDropReinforcements();
+        } else {
+            processNormalReinforcements();
+        }
+    }
+
+    /**
+     * Processes reinforcements when the campaign is operating in StratCon Singles Mode.
+     *
+     * <p>This method opens the {@link StratConSinglesReinforcementsDialog} and reacts to the player's selected
+     * reinforcement option. Depending on the response, the method either re-shows the previous dialog or commits
+     * reinforcements immediately (optionally under GM control).</p>
+     *
+     * <p>Only two responses are valid in Singles Mode:</p>
+     * <ul>
+     *     <li>{@code CANCEL} — The previous dialog is restored.</li>
+     *     <li>{@code REINFORCE_GM_INSTANTLY} — Reinforcements are committed immediately with GM override.</li>
+     * </ul>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void processSingleDropReinforcements() {
+        StratConSinglesReinforcementsDialog dialog = new StratConSinglesReinforcementsDialog(campaign);
+        StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType responseType =
+              dialog.getResponseType();
+        switch (responseType) {
+            case CANCEL -> setVisible(true);
+            case REINFORCE_GM_INSTANTLY -> btnCommitClicked(0, true, true);
+        }
+    }
+
+    /**
+     * Processes reinforcements for standard StratCon scenarios (non-Singles Mode).
+     *
+     * <p>The existing dialog is temporarily hidden while the reinforcement confirmation flow executes. The method
+     * performs the following:</p>
+     *
+     * <ol>
+     *     <li>Checks for special-case restrictions, such as official challenges that prohibit reinforcements.</li>
+     *     <li>Determines the reinforcement Target Number based on command personnel, contract factors, and support
+     *     point availability.</li>
+     *     <li>Handles Clan batchall constraints, including warnings and potential breach tracking.</li>
+     *     <li>Calculates reinforcement cost multipliers and presents the
+     *     {@link StratConReinforcementsConfirmationDialog} to the user.</li>
+     *     <li>Processes the user's selected reinforcement option, applying support point costs, adjusting the Target
+     *     Number, and committing forces accordingly.</li>
+     * </ol>
+     *
+     * <p>Several reinforcement pathways are supported:</p>
+     * <ul>
+     *     <li><b>CANCEL</b> — The previous dialog is restored.</li>
+     *     <li><b>REINFORCE</b> — Reinforcements arrive normally, with support point cost and Target Number
+     *     adjustments applied.</li>
+     *     <li><b>REINFORCE_INSTANTLY</b> — Reinforcements arrive immediately at double support point cost.</li>
+     *     <li><b>GM reinforcement options</b> — Reinforcements are forced with GM override, bypassing support point
+     *     costs.</li>
+     * </ul>
+     *
+     * <p>If reinforcements violate accepted batchall terms, a batchall breach is recorded and processed.</p>
+     *
+     * @since 0.50.10
+     */
+    private void processNormalReinforcements() {
         // Hide the old dialog until we're done.
         // The dialog will be 'disposed' if the confirmation dialog is confirmed and re-shown if the dialog is canceled
         setVisible(false);
