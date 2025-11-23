@@ -2285,6 +2285,18 @@ public class Campaign implements ITechManager {
         return baseCapacity + rentedCapacity;
     }
 
+    /**
+     * Returns the cached MASH theater capacity value for the campaign.
+     * <p>
+     * This value is updated at the start of each new day via {@link #updateMASHTheatreCapacity()}.
+     * It includes capacity from both owned and rented facilities.
+     * <p>
+     * This method differs from {@link #calculateMASHTheaterCapacity()} in that it returns the last cached value,
+     * which is suitable for use in GUI components to avoid unnecessary recalculation.
+     * For mechanical operations or when accuracy is critical, use {@code calculateMASHTheaterCapacity()} to get the current value.
+     *
+     * @return the cached MASH theater capacity value, including rented facilities
+     */
     public int getCachedMashTheaterCapacity() {
         return mashTheatreCapacity;
     }
