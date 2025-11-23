@@ -426,16 +426,15 @@ public abstract class AbstractProcreation {
                   campaign.getLocation().getPlanet());
             baby.setSurname(campaignOptions.getBabySurnameStyle()
                                   .generateBabySurname(mother, father, baby.getGender()));
-            baby.setDateOfBirth(today);
-            baby.removeAllSkills(); // Limit skills by age for children and adolescents
-            baby.setPrimaryRole(campaign, PersonnelRole.DEPENDENT);
 
-            // re-roll SPAs to include in any age and skill adjustments
-            Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
-
-            for (IOption option : Collections.list(options)) {
-                baby.getOptions().getOption(option.getName()).clearValue();
-            }
+            // Every one of these lines fixes a bug we've had with babies. Who knew children were so good at
+            // breaking things?
+            baby.setDateOfBirth(today); // Make sure we don't have any past or future babies
+            baby.removeAllSkills(); // Babies don't have skills beyond making a mess and screaming
+            baby.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.DEPENDENT); // babies can't have jobs
+            baby.setOptions(new PersonnelOptions()); // Stop babies being born with SPAs
+            baby.setPreNominal(""); // Stop babies being born with doctorates
+            baby.setPostNominal(""); // Stop babies being born with post-nominal titles
 
             baby.setBloodGroup(getInheritedBloodGroup(mother.getBloodGroup(),
                   father == null ? getRandomBloodGroup() : father.getBloodGroup()));
