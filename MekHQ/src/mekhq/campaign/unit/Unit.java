@@ -1222,7 +1222,7 @@ public class Unit implements ITechnology {
         if (!isFunctional()) {
             return "unit is not functional";
         }
-        if (isUnmanned() && isNotCrewedEntityType()) {
+        if (isUnmanned() && !isNotCrewedEntityType()) {
             return "unit has no pilot";
         }
         if (isRefitting()) {
