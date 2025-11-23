@@ -1146,6 +1146,7 @@ public final class BriefingTab extends CampaignGuiTab {
         List<SalvageForceData> salvageForceOptions = new ArrayList<>();
 
         // Collect eligible salvage forces (We want salvage forces first)
+        List<AtBContract> activeContracts = getCampaign().getActiveAtBContracts();
         Hangar hangar = campaign.getHangar();
         List<Force> eligibleSalvageForces = new ArrayList<>();
         for (Force force : getCampaign().getAllForces()) {
@@ -1154,8 +1155,26 @@ public final class BriefingTab extends CampaignGuiTab {
                 continue;
             }
 
-            if (force.getForceType().isSalvage() && force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
-                eligibleSalvageForces.add(force);
+            boolean isDeployedToScenario = force.isDeployed();
+            boolean isDeployedToStratCon = StratConRulesManager.isForceDeployedToStratCon(activeContracts,
+                  force.getId());
+            boolean isSalvageForce = force.getForceType().isSalvage();
+            boolean hasAtLeastOneSalvageUnit = force.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
+
+            if (!isDeployedToScenario &&
+                      !isDeployedToStratCon &&
+                      isSalvageForce &&
+                      hasAtLeastOneSalvageUnit) {
+                for (Unit unit : force.getAllUnitsAsUnits(getCampaign().getHangar(), false)) {
+                    if (StratConRulesManager.isUnitDeployedToStratCon(unit)) {
+                        isDeployedToStratCon = true;
+                        break;
+                    }
+                }
+
+                if (!isDeployedToStratCon) {
+                    eligibleSalvageForces.add(force);
+                }
             }
         }
 
@@ -1167,7 +1186,6 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Collect eligible Combat Teams
         List<Force> eligibleCombatTeams = new ArrayList<>();
-        List<AtBContract> activeContracts = getCampaign().getActiveAtBContracts();
         for (CombatTeam combatTeam : getCampaign().getCombatTeamsAsList()) {
             int forceId = combatTeam.getForceId();
             Force force = getCampaign().getForce(forceId);
@@ -1175,19 +1193,22 @@ public final class BriefingTab extends CampaignGuiTab {
                 continue;
             }
 
-            boolean isDeployedToStratCon = StratConRulesManager.isForceDeployedToStratCon(activeContracts, forceId);
-            if (!force.isDeployed() &&
+            boolean isDeployedToScenario = force.isDeployed();
+            boolean isDeployedToStratCon = StratConRulesManager.isForceDeployedToStratCon(activeContracts,
+                  force.getId());
+            boolean hasAtLeastOneSalvageUnit = force.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
+
+            if (!isDeployedToScenario &&
                       !isDeployedToStratCon &&
-                      force.getSalvageUnitCount(hangar, isSpaceScenario) > 0) {
-                boolean hasDeployedUnit = false;
+                      hasAtLeastOneSalvageUnit) {
                 for (Unit unit : force.getAllUnitsAsUnits(getCampaign().getHangar(), false)) {
                     if (StratConRulesManager.isUnitDeployedToStratCon(unit)) {
-                        hasDeployedUnit = true;
+                        isDeployedToScenario = true;
                         break;
                     }
                 }
 
-                if (!hasDeployedUnit) {
+                if (!isDeployedToScenario) {
                     eligibleCombatTeams.add(force);
                 }
             }
