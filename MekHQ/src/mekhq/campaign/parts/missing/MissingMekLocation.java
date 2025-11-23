@@ -276,7 +276,7 @@ public class MissingMekLocation extends MissingPart {
             } else if (slot.getType() == CriticalSlot.TYPE_EQUIPMENT) {
                 if ((slot.getMount() != null) &&
                           (!slot.getMount().isDestroyed()) &&
-                          (slot.getMount().getType() instanceof EquipmentType)) {
+                          (slot.getMount().getType() instanceof MiscType)) {
                     EquipmentType equipmentType = slot.getMount().getType();
                     if (equipmentType.hasFlag(MiscType.F_NULL_SIG)) {
                         partsToSalvageOrScrap.add("Null-Signature System");
