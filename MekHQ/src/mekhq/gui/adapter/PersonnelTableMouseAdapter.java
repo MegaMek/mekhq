@@ -1664,14 +1664,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 // pay person & add expense
+                Money individualPayment = Money.of(payment);
+                Money totalPayment = individualPayment.multipliedBy(people.length);
                 Map<Person, Money> personMoneyMap = new HashMap<>();
-                personMoneyMap.put(selectedPerson, Money.of(payment));
-                getCampaign().payPersonnel(TransactionType.MISCELLANEOUS,
-                      Money.of(payment),
-                      String.format(resources.getString("givePayment.format"), selectedPerson.getFullName()),
-                      personMoneyMap);
-                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                for (Person person : people) {
+                    person.payPerson(individualPayment);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
 
+                getCampaign().payPersonnel(TransactionType.MISCELLANEOUS,
+                      totalPayment,
+                      resources.getString("givePayment.format"),
+                      personMoneyMap);
 
                 break;
             }
@@ -2363,12 +2367,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         // give C-Bill payment
-        if (oneSelected && person.getStatus().isActiveFlexible()) {
-            menuItem = new JMenuItem(resources.getString("givePayment.text"));
-            menuItem.setActionCommand(CMD_GIVE_PAYMENT);
-            menuItem.addActionListener(this);
-            popup.add(menuItem);
-        }
+        menuItem = new JMenuItem(resources.getString("givePayment.text"));
+        menuItem.setActionCommand(CMD_GIVE_PAYMENT);
+        menuItem.addActionListener(this);
+        popup.add(menuItem);
 
         boolean isUseAltAdvancedMedical = getCampaignOptions().isUseAlternativeAdvancedMedical();
         if (oneSelected && getCampaignOptions().isUseAdvancedMedical()) {
