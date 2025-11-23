@@ -2280,7 +2280,9 @@ public class Campaign implements ITechManager {
 
     public int calculateMASHTheaterCapacity() {
         List<Unit> unitsInTOE = getForce(FORCE_ORIGIN).getAllUnitsAsUnits(units, false);
-        return MASHCapacity.checkMASHCapacity(unitsInTOE, campaignOptions.getMASHTheatreCapacity());
+        int baseCapacity = MASHCapacity.checkMASHCapacity(unitsInTOE, campaignOptions.getMASHTheatreCapacity());
+        int rentedCapacity = FacilityRentals.getCapacityIncreaseFromRentals(this, ContractRentalType.HOSPITAL_BED);
+        return baseCapacity + rentedCapacity;
     }
 
     public int getCachedMashTheaterCapacity() {
