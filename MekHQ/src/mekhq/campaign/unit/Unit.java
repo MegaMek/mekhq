@@ -5236,6 +5236,8 @@ public class Unit implements ITechnology {
             return;
         }
 
+        engineer = null; // Unassign engineer
+
         if (getEntity() instanceof Infantry) {
             if (isUnmanned()) {
                 engineer = null;
