@@ -9319,12 +9319,15 @@ public class Campaign implements ITechManager {
      */
     public List<Entity> getAllCombatEntities() {
         List<Entity> units = new ArrayList<>();
-        for (Force force : getAllForces()) {
-            if (!force.isForceType(ForceType.STANDARD)) {
-                continue;
-            }
-            for (UUID unitID : force.getUnits()) {
-                units.add(getUnit(unitID).getEntity());
+        for (CombatTeam combatTeam : getCombatTeamsAsList()) {
+            Force force = getForce(combatTeam.getForceId());
+            if (force != null) {
+                for (Unit unit : force.getAllUnitsAsUnits(getHangar(), true)) {
+                    Entity entity = unit.getEntity();
+                    if (entity != null) {
+                        units.add(entity);
+                    }
+                }
             }
         }
         return units;
