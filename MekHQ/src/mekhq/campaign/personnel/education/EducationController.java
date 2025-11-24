@@ -1637,8 +1637,7 @@ public class EducationController {
      *     <li>{@code COMPULSION_PIRATE_HATE}: blocks change if the campaign faction is Pirate.</li>
      * </ul>
      *
-     * <p>If any of the above conditions apply, the method returns {@code true}; otherwise, it returns {@code false}
-     * .</p>
+     * <p>If any of the above conditions apply, the method returns {@code true}; otherwise, it returns {@code false}.</p>
      *
      * @param person          the {@link Person} whose faction-change eligibility is being evaluated
      * @param campaignFaction the destination {@link Faction} for which eligibility is being checked
