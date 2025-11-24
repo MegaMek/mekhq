@@ -2124,46 +2124,35 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Calculates the difficulty of a contract based on the relative power of enemy forces, player forces, and any
-     * allied forces involved in the campaign.
+     * Calculates the difficulty rating of a contract by comparing the estimated combat strength of the opposing
+     * force to the combat strength of the player's participating units.
      *
-     * <p>
-     * The method evaluates the enemy's estimated power against the player's strengths and considers allied
-     * contributions depending on the assigned command rights. The result is a difficulty level mapped between 1 and 10,
-     * where higher values represent more challenging contracts.
-     * </p>
+     * <p>The method performs the following steps:</p>
+     * <ol>
+     *     <li>Determines the opposing force's effective skill level by applying any faction-based adjustments to
+     *     their base {@link SkillLevel}.</li>
+     *     <li>Computes a skill multiplier and applies it to the estimated enemy force power, derived from the game
+     *     year, force quality, and whether generic BV values are used.</li>
+     *     <li>Estimates the total combat power of the player's units based on their BV values and optionally using
+     *     generic BV rules.</li>
+     *     <li>Computes the percentage difference between enemy and player power.</li>
+     *     <li>Maps that percentage difference into a difficulty scale ranging from {@code 1} (easiest) to {@code 10}
+     *     (hardest), centered around {@code 5} as an even match.</li>
+     * </ol>
      *
-     * @param gameYear          The current year in the campaign (e.g., from {@link Campaign#getGameYear()})
-     * @param useGenericBV      Whether "Use Generic BV" is enabled in the Campaign Options
-     * @param playerCombatUnits List of Entities representing all combat units for the player. This can be obtained via
-     *                          {@link Campaign#getAllCombatEntities()}.
+     * <p>A negative percentage difference indicates that the player is stronger than the opposing force; a positive
+     * difference indicates the enemy is stronger. Each 20% shift away from parity increases (or decreases)
+     * difficulty by one step.</p>
      *
-     * @return An integer representing the difficulty of the contract:
-     *       <ul>
-     *       <li>1 = very easy</li>
-     *       <li>10 = extremely difficult</li>
-     *       </ul>
-     *       <p>
-     *       <b>WARNING: </b>Returns `-99` (defined as `ERROR`) if the enemy's
-     *       power cannot be calculated.
-     *       </p>
-     *       <p>
-     *       <b>Mapped Result Explanation:</b>
-     *       </p>
-     *       The method divides the absolute percentage difference between enemy
-     *       and player forces by 20
-     *       (rounding up), then adjusts the difficulty accordingly:
-     *       <ul>
-     *       <li>If the player's forces are stronger, the difficulty is adjusted
-     *       downward from a baseline of 5.</li>
-     *       <li>If the enemy's forces are stronger, the difficulty is adjusted
-     *       upward from a baseline of 5.</li>
-     *       <li>If an error is encountered, the difficulty is returned as
-     *       -99</li>
-     *       </ul>
-     *       The result is clamped to fit between the valid range of 1 and 10. Or
-     *       -99 if an error is encountered.
-     **/
+     * <p>If enemy combat strength cannot be computed, the method returns {@code -99} to signal an error.</p>
+     *
+     * @param gameYear          the current in-game year used for estimating enemy technology and BV baselines
+     * @param useGenericBV      whether generic BV values should be used instead of unit-specific BV calculations
+     * @param playerCombatUnits the list of player {@link Entity} objects expected to participate in the contract
+     *
+     * @return a difficulty rating from {@code 1} to {@code 10}, where {@code 5} represents roughly even forces; or
+     * {@code -99} if the enemy power estimation fails
+     */
     public int calculateContractDifficulty(int gameYear, boolean useGenericBV, List<Entity> playerCombatUnits) {
         final int ERROR = -99;
 
