@@ -35,6 +35,7 @@ package mekhq.campaign.market.contractMarket;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.HEROIC;
@@ -563,10 +564,10 @@ public abstract class AbstractContractMarket {
                                               contract.getContractType().isGarrisonType());
             Faction enemyFaction = Factions.getInstance().getFaction(enemyFactionCode);
 
-            // If the OpFor isn't Clan, there is a 1-in-4 chance they've hired mercenaries to do their dirty work. So
+            // If the OpFor isn't Clan, there is a 1-in-5 chance they've hired mercenaries to do their dirty work. So
             // the original enemy faction is set as the mercenary's employer, while the enemy faction is set to
             // Mercenaries.
-            if (!enemyFaction.isClan() && !enemyFaction.isAggregate() && d6(1) == 1) {
+            if (!enemyFaction.isClan() && !enemyFaction.isAggregate() && randomInt(5) == 0) {
                 contract.setEnemyMercenaryEmployerCode(enemyFactionCode);
                 contract.setEnemyCode(MERCENARY_FACTION_CODE);
             } else {
