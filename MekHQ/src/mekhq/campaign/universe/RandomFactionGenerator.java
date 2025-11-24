@@ -62,8 +62,8 @@ import mekhq.campaign.universe.factionHints.FactionHints;
  *       <p>
  *       Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also
  *       finds a suitable planet for the action.
- *                                                                               TODO : Account for the de facto alliance of the invading Clans and the
- *                                                                               TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
+ *                                                                                     TODO : Account for the de facto alliance of the invading Clans and the
+ *                                                                                     TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
     private static final MMLogger LOGGER = MMLogger.create(RandomFactionGenerator.class);
@@ -636,8 +636,9 @@ public class RandomFactionGenerator {
 
         // Main border calculation
         Set<PlanetarySystem> planetSet = new HashSet<>(borderTracker.getBorderSystems(attacker, defender));
-        // Border systems in the case of pirates/mercenaries/ComStar with no planetary regions
-        if ((defenderIsPirate || defenderIsMerc || defenderIsComStar) && defenderHasNoPlanets) {
+        // For mercenaries, we don't care if they own planets, as generally they're a proxy force. For pirates and
+        // ComStar if they own any planets, we want to target those planets.
+        if (defenderIsMerc || ((defenderIsPirate || defenderIsComStar) && defenderHasNoPlanets)) {
             for (Faction regionalFaction : borderTracker.getFactionsInRegion()) {
                 planetSet.addAll(borderTracker.getBorderSystems(regionalFaction, attacker));
                 planetSet.addAll(borderTracker.getBorderSystems(attacker, regionalFaction));

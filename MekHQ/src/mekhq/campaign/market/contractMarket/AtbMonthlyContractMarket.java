@@ -384,6 +384,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (isDuringJihad
                   && wordOfBlake.validIn(today)
                   && !Objects.equals("WOB", employerCode)
+                  && !Objects.equals("WOB", contract.getEnemyCode())
                   && Compute.randomInt(WOB_CO_OPT_CHANCE) == 0) {
             contract.setEmployerCode("WOB", today.getYear());
         }
