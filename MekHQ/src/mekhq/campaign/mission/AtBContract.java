@@ -2182,32 +2182,7 @@ public class AtBContract extends Contract {
         // Estimate player power
         double playerPower = estimatePlayerPower(playerCombatUnits, useGenericBV);
 
-        // Estimate the power of allied forces
-        // TODO pull these directly from Force Generation instead of using magic numbers
-        // TODO estimate the LIAISON ratio by going through each combat lance and
-        // getting the actual average (G)BV for an allied heavy/assault mek.
-        double allyRatio = switch (getCommandRights()) {
-            case INDEPENDENT -> 0; // no allies
-            case LIAISON -> 0.4; // single allied heavy/assault mek, pure guess for now
-            case HOUSE -> 0.25; // allies with 25% the player's (G)BV budget
-            case INTEGRATED -> 0.5; // allies with 50% the player's (G)BV budget
-        };
-
-        if (allyRatio > 0) {
-            SkillLevel alliedSkill = modifySkillLevelBasedOnFaction(employerCode, allySkill);
-            double allySkillMultiplier = getSkillMultiplier(alliedSkill);
-            double allyPower = estimateMekStrength(gameYear, useGenericBV, employerCode, allyQuality);
-            allyPower = allyPower * allySkillMultiplier;
-            // If we cannot calculate ally's power, use player power as a fallback.
-            if (allyPower == 0) {
-                allyPower = playerPower;
-            }
-            playerPower += allyRatio * allyPower;
-            enemyPower += allyRatio * enemyPower;
-        }
-
-        // Calculate difficulty based on the percentage difference between the two
-        // forces.
+        // Calculate difficulty based on the percentage difference between the two forces.
         double difference = enemyPower - playerPower;
         double percentDifference = (difference / playerPower) * 100;
 
