@@ -32,7 +32,12 @@
  */
 package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
+import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_POOR_IMMUNE_SYSTEM;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_SUPER_SPREADER;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_VACCINE_DODGER;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_ADAPTIVE_IMMUNITY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -116,14 +121,13 @@ public class Inoculations {
         String planetName = currentPlanet.getName(today);
 
         // Determine who, if anyone, needs inoculations
-        Collection<Person> allPersonnel = campaign.getPersonnel();
+        Collection<Person> allPersonnel = campaign.getPersonnelFilteringOutDepartedAndAbsent();
         List<Person> militaryPersonnel = new ArrayList<>();
         List<Person> civilianPersonnel = new ArrayList<>();
         gatherPersonnelInNeedOfInoculations(allPersonnel, currentPlanet.getId(), civilianPersonnel, militaryPersonnel);
 
         if (militaryPersonnel.isEmpty() && civilianPersonnel.isEmpty()) { // Nobody needs treatment
-            new ImmersiveDialogNotification(campaign,
-                  getFormattedTextAt(RESOURCE_BUNDLE, "Inoculations.fullVaccinated", planetName), true);
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "Inoculations.fullVaccinated", planetName));
             return;
         }
 
@@ -171,8 +175,7 @@ public class Inoculations {
     private static void gatherPersonnelInNeedOfInoculations(Collection<Person> allPersonnel, String planetId,
           List<Person> civilianPersonnel, List<Person> militaryPersonnel) {
         for (Person person : allPersonnel) {
-            PersonnelStatus status = person.getStatus();
-            if (status.isDepartedUnit() || status.isAbsent()) {
+            if (person.getOptions().booleanOption(FLAW_VACCINE_DODGER)) {
                 continue;
             }
 
@@ -394,11 +397,15 @@ public class Inoculations {
         CurrentLocation location = campaign.getLocation();
         String planetCode = location.isOnPlanet() ? location.getPlanet().getId() : null;
 
-        Collection<Person> allPersonnel = campaign.getPersonnelFilteringOutDepartedAndAbsent();
+        List<Person> allPersonnel = campaign.getPersonnelFilteringOutDepartedAndAbsent();
 
         // Gather the active diseases in the players' campaign
-        Set<InjuryType> activeDiseases = getActiveDiseases(allPersonnel);
-        int diseaseChance = activeDiseases.isEmpty() ? MONTHLY_NEW_DISEASE_CHANCE : MONTHLY_DISEASE_SPREAD_CHANCE;
+        DiseaseScanResult diseaseScanResult = getActiveDiseases(allPersonnel);
+        Set<InjuryType> activeDiseases = diseaseScanResult.activeDiseases;
+        boolean hasSuperSpreader = diseaseScanResult.hasSuperSpreader;
+        int diseaseChance = activeDiseases.isEmpty() ?
+                                  MONTHLY_NEW_DISEASE_CHANCE : // Super Spreader doesn't affect new disease chance
+                                  hasSuperSpreader ? MONTHLY_DISEASE_SPREAD_CHANCE / 3 : MONTHLY_DISEASE_SPREAD_CHANCE;
 
         if (activeDiseases.isEmpty()) {
             if (planetCode != null) {
@@ -410,7 +417,7 @@ public class Inoculations {
             }
         }
 
-        // Now roll for the spread of disease among vaccine dodgers
+        // Now roll for the spread of disease among unvaccinated characters
         Set<String> spreadingDiseases = getSpreadingDiseases(campaign,
               allPersonnel,
               planetCode,
@@ -455,8 +462,15 @@ public class Inoculations {
                 continue;
             }
 
+            if (person.getOptions().booleanOption(UNOFFICIAL_ADAPTIVE_IMMUNITY)) {
+                continue;
+            }
+
+            double spreadMultiplier = person.getOptions().booleanOption(FLAW_POOR_IMMUNE_SYSTEM) ? 3.0 : 1.0;
+            int personalInfectionChance = (int) round(diseaseChance / spreadMultiplier);
+
             for (InjuryType disease : activeDiseases) {
-                if (randomInt(diseaseChance) == 0) {
+                if (personalInfectionChance == 0 || randomInt(personalInfectionChance) == 0) {
                     applyDisease(campaign, person, disease);
                     spreadingDiseases.add(disease.getSimpleName());
                 }
@@ -465,26 +479,40 @@ public class Inoculations {
         return spreadingDiseases;
     }
 
+    public record DiseaseScanResult(boolean hasSuperSpreader, Set<InjuryType> activeDiseases) {}
+
     /**
-     * Collects all active diseases currently present in the personnel.
+     * Scans all personnel for disease-related injuries and the presence of any Super Spreader flaw. Returns both the
+     * collected set of active diseases and whether at least one Super Spreader is present.
      *
-     * @param allPersonnel all active personnel
-     *
-     * @return a set of injury types representing active diseases
+     * @param allPersonnel the collection of personnel to evaluate
+     * @return a {@link DiseaseScanResult} containing:
+     *         <ul>
+     *           <li>{@code hasSuperSpreader} — {@code true} if any person has the Super Spreader flaw</li>
+     *           <li>{@code activeDiseases} — the set of all disease-type injuries present across the personnel</li>
+     *         </ul>
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static Set<InjuryType> getActiveDiseases(Collection<Person> allPersonnel) {
+    private static DiseaseScanResult getActiveDiseases(List<Person> allPersonnel) {
+        boolean hasSuperSpreader = false;
         Set<InjuryType> activeDiseases = new HashSet<>();
+
         for (Person person : allPersonnel) {
+            // Super Spreader is a one-time flag; no stacking
+            if (!hasSuperSpreader && person.getOptions().booleanOption(FLAW_SUPER_SPREADER)) {
+                hasSuperSpreader = true;
+            }
+
             for (Injury injury : person.getInjuries()) {
                 if (injury.getSubType().isDisease()) {
                     activeDiseases.add(injury.getType());
                 }
             }
         }
-        return activeDiseases;
+
+        return new DiseaseScanResult(hasSuperSpreader, activeDiseases);
     }
 
     /**
