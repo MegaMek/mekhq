@@ -91,6 +91,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String FLAW_POOR_VISION = "flaw_poor_vision";
     public static final String ATOW_GOOD_VISION = "atow_good_vision";
     public static final String FLAW_INTROVERT = "flaw_introvert";
+    public static final String FLAW_IN_FOR_LIFE = "flaw_in_for_life";
     public static final String ATOW_GREGARIOUS = "atow_gregarious";
     public static final String FLAW_IMPATIENT = "flaw_impatient";
     public static final String ATOW_PATIENT = "atow_patient";
@@ -157,6 +158,14 @@ public class PersonnelOptions extends PilotOptions {
     public static final String COMPULSION_PAINKILLER_ADDICTION = "compulsion_addiction_painkillers";
     public static final String COMPULSION_BIONIC_HATE = "compulsion_bionic_hate";
     public static final String COMPULSION_BODY_MOD_ADDICTION = "compulsion_body_mod_addiction";
+    public static final String COMPULSION_OTHER_FACTION_DISLIKE = "compulsion_other_faction_dislike";
+    public static final String COMPULSION_PARENT_FACTION_DISLIKE = "compulsion_parent_faction_dislike";
+    public static final String COMPULSION_INNER_SPHERE_HATE = "compulsion_inner_sphere_hate";
+    public static final String COMPULSION_CLAN_HATE = "compulsion_clan_hate";
+    public static final String COMPULSION_OTHER_FACTION_HATE = "compulsion_other_faction_hate";
+    public static final String COMPULSION_PARENT_FACTION_HATE = "compulsion_parent_faction_hate";
+    public static final String COMPULSION_MERCENARY_HATE = "compulsion_merc_hate";
+    public static final String COMPULSION_PIRATE_HATE = "compulsion_pirate_hate";
 
     public static final String MADNESS_FLASHBACKS = "madness_flashbacks";
     public static final String MADNESS_CONFUSION = "madness_confusion";
@@ -249,6 +258,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, FLAW_POOR_VISION, false);
         addOption(l3a, ATOW_GOOD_VISION, false);
         addOption(l3a, FLAW_INTROVERT, false);
+        addOption(l3a, FLAW_IN_FOR_LIFE, false);
         addOption(l3a, ATOW_GREGARIOUS, false);
         addOption(l3a, FLAW_IMPATIENT, false);
         addOption(l3a, ATOW_PATIENT, false);
@@ -315,6 +325,14 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, COMPULSION_PAINKILLER_ADDICTION, false);
         addOption(l3a, COMPULSION_BIONIC_HATE, false);
         addOption(l3a, COMPULSION_BODY_MOD_ADDICTION, false);
+        addOption(l3a, COMPULSION_OTHER_FACTION_DISLIKE, false);
+        addOption(l3a, COMPULSION_PARENT_FACTION_DISLIKE, false);
+        addOption(l3a, COMPULSION_INNER_SPHERE_HATE, false);
+        addOption(l3a, COMPULSION_CLAN_HATE, false);
+        addOption(l3a, COMPULSION_OTHER_FACTION_HATE, false);
+        addOption(l3a, COMPULSION_PARENT_FACTION_HATE, false);
+        addOption(l3a, COMPULSION_MERCENARY_HATE, false);
+        addOption(l3a, COMPULSION_PIRATE_HATE, false);
 
         addOption(l3a, MADNESS_FLASHBACKS, false);
         addOption(l3a, MADNESS_CONFUSION, false);

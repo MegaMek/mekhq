@@ -34,9 +34,20 @@ package mekhq.campaign.personnel.education;
 
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_CLAN_HATE;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_FACTION_LOYALTY;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_FACTION_PRIDE;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_INNER_SPHERE_HATE;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_MERCENARY_HATE;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_OTHER_FACTION_DISLIKE;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_OTHER_FACTION_HATE;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_PIRATE_HATE;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_IN_FOR_LIFE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.DayOfWeek;
@@ -60,12 +71,14 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
+import mekhq.campaign.universe.Faction;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -1562,8 +1575,24 @@ public class EducationController {
         }
 
         if (academy.isReeducationCamp()) {
-            if (campaign.getCampaignOptions().isUseReeducationCamps()) {
-                person.setOriginFaction(campaign.getFaction());
+            Faction campaignFaction = campaign.getFaction();
+            boolean isUseReeducationChangesFaction = campaign.getCampaignOptions().isUseReeducationCamps();
+
+            if (isUseReeducationChangesFaction) {
+                boolean factionChangeBlocked = isFactionChangeBlocked(person, campaignFaction);
+                if (factionChangeBlocked) {
+                    campaign.addReport(getFormattedTextAt(BUNDLE_NAME,
+                          "inForLife.text",
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(getWarningColor()),
+                          CLOSING_SPAN_TAG));
+                    person.changeLoyalty(-1);
+
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    return;
+                } else {
+                    person.setOriginFaction(campaignFaction);
+                }
             }
 
             // brainwashed personnel should have higher than average loyalty, so they roll
@@ -1577,6 +1606,8 @@ public class EducationController {
             Collections.sort(rolls);
 
             person.setLoyalty(rolls.get(1) + rolls.get(2) + rolls.get(3));
+
+            MekHQ.triggerEvent(new PersonChangedEvent(person));
         } else {
             adjustLoyalty(person);
         }
@@ -1584,6 +1615,68 @@ public class EducationController {
         if (!academy.isMilitary()) {
             reportMastersOrDoctorateGain(campaign, person, academy, educationLevel, resources);
         }
+    }
+
+    /**
+     * Determines whether the given {@link Person} is prevented from changing factions based on their psychological
+     * traits, flaws, and faction-specific compulsions.
+     *
+     * <p>The method evaluates two categories of restrictions:</p>
+     * <p><b>1. General faction-change blockers:</b> These are traits and flaws that always prohibit a faction change,
+     * regardless of the target faction. Examples include lifelong loyalty, faction pride, or compulsive hatred/dislike
+     * of other factions. If the person possesses any of these options, faction change is immediately considered
+     * blocked.</p>
+     *
+     * <p><b>2. Target-faction-specific blockers:</b> Additional compulsions prevent a faction change only when the
+     * destination faction matches certain categories:</p>
+     * <ul>
+     *     <li>{@code COMPULSION_INNER_SPHERE_HATE}: blocks change if the campaign faction is Inner Sphere (i.e., not
+     *     Clan).</li>
+     *     <li>{@code COMPULSION_CLAN_HATE}: blocks change if the campaign faction is Clan.</li>
+     *     <li>{@code COMPULSION_MERCENARY_HATE}: blocks change if the campaign faction is Mercenary.</li>
+     *     <li>{@code COMPULSION_PIRATE_HATE}: blocks change if the campaign faction is Pirate.</li>
+     * </ul>
+     *
+     * <p>If any of the above conditions apply, the method returns {@code true}; otherwise, it returns {@code false}.</p>
+     *
+     * @param person          the {@link Person} whose faction-change eligibility is being evaluated
+     * @param campaignFaction the destination {@link Faction} for which eligibility is being checked
+     *
+     * @return {@code true} if the person is blocked from changing to the specified faction; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static boolean isFactionChangeBlocked(Person person, Faction campaignFaction) {
+        List<String> generalFactionChangeBlockers = List.of(FLAW_IN_FOR_LIFE,
+              COMPULSION_FACTION_PRIDE,
+              COMPULSION_OTHER_FACTION_DISLIKE,
+              COMPULSION_FACTION_LOYALTY,
+              COMPULSION_OTHER_FACTION_HATE);
+        PersonnelOptions options = person.getOptions();
+        for (String factionChangeBlocker : generalFactionChangeBlockers) {
+            if (options.booleanOption(factionChangeBlocker)) {
+                return true;
+            }
+        }
+
+        if (options.booleanOption(COMPULSION_INNER_SPHERE_HATE) && !campaignFaction.isClan()) {
+            return true;
+        }
+
+        if (options.booleanOption(COMPULSION_CLAN_HATE) && campaignFaction.isClan()) {
+            return true;
+        }
+
+        if (options.booleanOption(COMPULSION_MERCENARY_HATE) && campaignFaction.isMercenary()) {
+            return true;
+        }
+
+        if (options.booleanOption(COMPULSION_PIRATE_HATE) && campaignFaction.isPirate()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
