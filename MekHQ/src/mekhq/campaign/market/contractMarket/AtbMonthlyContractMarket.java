@@ -309,10 +309,11 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
      * calculated after the indicated number of retries, this will return null.
      */
     private @Nullable AtBContract generateAtBContract(Campaign campaign, int unitRatingMod) {
+        AtBContract contract = null;
+
         if (campaign.getFaction().isMercenary()) {
             if (null == campaign.getRetainerEmployerCode()) {
                 int retries = MAXIMUM_GENERATION_RETRIES;
-                AtBContract contract = null;
                 while ((retries > 0) && (contract == null)) {
                     Faction employer = RandomFactionGenerator.getInstance().getEmployerFaction();
                     if (employer == null) {
@@ -323,33 +324,35 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                     String employerCode = employer.getShortName();
                     // Send only 1 retry down because we're handling retries in our loop
                     contract = generateAtBContract(campaign, employerCode, unitRatingMod, 1);
-
-                    // This try-catch is specifically implemented to make testing easier. Otherwise, we would need to
-                    // define the player's TO&E, their Ally's unit availability, and their Enemy's unit availability,
-                    // a RAT generator instance and a whole other pile of stuff. So instead, we let it fail, and if we
-                    // need to specifically define difficulty in a unit test, we can do so by using
-                    // contract.setDifficulty().
-                    try {
-                        if (contract != null) {
-                            checkForEmployerOverride(campaign.getLocalDate(), contract, employerCode);
-                            contract.setDifficulty(contract.calculateContractDifficulty(
-                                  contract.getStartDate().getYear(),
-                                  true,
-                                  campaign.getAllCombatEntities()));
-                        }
-                    } catch (Exception e) {
-                        contract.setDifficulty(5);
-                        logger.error(e, "Unable to calculate difficulty for AtB contract {}", contract);
-                    }
                     retries--;
                 }
-                return contract;
             } else {
-                return generateAtBContract(campaign, campaign.getRetainerEmployerCode(), unitRatingMod);
+                contract = generateAtBContract(campaign, campaign.getRetainerEmployerCode(), unitRatingMod);
             }
         } else {
-            return generateAtBContract(campaign, campaign.getFaction().getShortName(), unitRatingMod);
+            contract = generateAtBContract(campaign, campaign.getFaction().getShortName(), unitRatingMod);
         }
+
+        // This try-catch is specifically implemented to make testing easier. Otherwise, we would need to
+        // define the player's TO&E, their Ally's unit availability, and their Enemy's unit availability,
+        // a RAT generator instance and a whole other pile of stuff. So instead, we let it fail, and if we
+        // need to specifically define difficulty in a unit test, we can do so by using
+        // contract.setDifficulty().
+        try {
+            if (contract != null) {
+                checkForEmployerOverride(campaign.getLocalDate(), contract, contract.getEmployerCode());
+
+                contract.setDifficulty(contract.calculateContractDifficulty(
+                      contract.getStartDate().getYear(),
+                      true,
+                      campaign.getAllCombatEntities()));
+            }
+        } catch (Exception e) {
+            contract.setDifficulty(5);
+            logger.error(e, "Unable to calculate difficulty for AtB contract {}", contract);
+        }
+
+        return contract;
     }
 
     /**
