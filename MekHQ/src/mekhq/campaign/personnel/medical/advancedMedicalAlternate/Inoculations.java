@@ -37,6 +37,7 @@ import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_POOR_IMMUNE_SYSTEM;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_SUPER_SPREADER;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_VACCINE_DODGER;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_ADAPTIVE_IMMUNITY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -458,6 +459,10 @@ public class Inoculations {
             // If planetCode is null, the campaign is in transit. If they have an active disease while in transit, the
             // close confines remove any benefit from vaccinations
             if (planetCode != null && person.hasPlanetaryInoculation(planetCode)) {
+                continue;
+            }
+
+            if (person.getOptions().booleanOption(UNOFFICIAL_ADAPTIVE_IMMUNITY)) {
                 continue;
             }
 
