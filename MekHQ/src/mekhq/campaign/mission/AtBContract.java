@@ -1101,7 +1101,7 @@ public class AtBContract extends Contract {
                     employerCode = item.getTextContent();
                 } else if (item.getNodeName().equalsIgnoreCase("enemyCode")) {
                     enemyCode = item.getTextContent();
-                } else if (item.getNodeName().equalsIgnoreCase("mercenaryEnemyCode")) {
+                } else if (item.getNodeName().equalsIgnoreCase("enemyMercenaryEmployerCode")) {
                     enemyMercenaryEmployerCode = item.getTextContent();
                 } else if (item.getNodeName().equalsIgnoreCase("contractType")) {
                     setContractType(AtBContractType.parseFromString(item.getTextContent().trim()));
