@@ -864,34 +864,38 @@ public class StratConScenarioWizard extends JDialog {
             brokeBatchallTerms = true;
         }
 
-        int costMultiplier = 0;
+        int selectedForceCount = 0;
         for (String templateID : availableForceLists.keySet()) {
-            costMultiplier += availableForceLists.get(templateID).getSelectedValuesList().size();
+            selectedForceCount += availableForceLists.get(templateID).getSelectedValuesList().size();
         }
 
         StratConReinforcementsConfirmationDialog dialog = new StratConReinforcementsConfirmationDialog(campaign,
-              targetNumber, availableSupportPoints, costMultiplier);
+              targetNumber, availableSupportPoints, selectedForceCount);
         StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType responseType =
               dialog.getResponseType();
         switch (responseType) {
             case CANCEL -> setVisible(true);
             case REINFORCE -> {
-                // The costMultiplier addition here is to cover the base cost
-                int supportPointsSpent = dialog.getSupportPoints() + costMultiplier;
-                int supportPointModifier = (supportPointsSpent / costMultiplier) * SUPPORT_POINTS_MODIFIER;
+                // The addition here is to cover the base cost
+                int supportPointsSpent = dialog.getSupportPoints() + 1;
+                currentCampaignState.changeSupportPoints(-(supportPointsSpent * selectedForceCount));
+
+                int supportPointModifier = dialog.getSupportPoints() * SUPPORT_POINTS_MODIFIER;
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
-                currentCampaignState.changeSupportPoints(-supportPointsSpent);
+
                 btnCommitClicked(finalTargetNumber, false, false);
                 if (brokeBatchallTerms) {
                     processBatchallBreach(contract, enemy.getShortName());
                 }
             }
             case REINFORCE_INSTANTLY -> {
-                // The costMultiplier addition here is to cover the base cost. Instant reinforcing doubles the cost.
-                int supportPointsSpent = (dialog.getSupportPoints() + costMultiplier) * 2;
-                int supportPointModifier = (supportPointsSpent / costMultiplier) * SUPPORT_POINTS_MODIFIER;
+                // The addition here is to cover the base cost
+                int supportPointsSpent = dialog.getSupportPoints() + 2;
+                currentCampaignState.changeSupportPoints(-(supportPointsSpent * selectedForceCount));
+
+                int supportPointModifier = (dialog.getSupportPoints() / selectedForceCount) * SUPPORT_POINTS_MODIFIER;
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
-                currentCampaignState.changeSupportPoints(-supportPointsSpent);
+
                 btnCommitClicked(finalTargetNumber, false, true);
                 if (brokeBatchallTerms) {
                     processBatchallBreach(contract, enemy.getShortName());
