@@ -1652,8 +1652,7 @@ public class EducationController {
               COMPULSION_FACTION_PRIDE,
               COMPULSION_OTHER_FACTION_DISLIKE,
               COMPULSION_FACTION_LOYALTY,
-              COMPULSION_OTHER_FACTION_HATE,
-              COMPULSION_PIRATE_HATE);
+              COMPULSION_OTHER_FACTION_HATE);
         PersonnelOptions options = person.getOptions();
         for (String factionChangeBlocker : generalFactionChangeBlockers) {
             if (options.booleanOption(factionChangeBlocker)) {
