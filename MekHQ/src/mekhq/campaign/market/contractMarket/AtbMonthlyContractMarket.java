@@ -427,26 +427,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         getContractType(campaign, contract);
 
         setEnemyCode(contract);
-
-        /*
-         * Addition to AtB rules: factions which are generally neutral
-         * (ComStar, Mercs not under contract) are more likely to have garrison-type
-         * contracts and less likely to have battle-type contracts unless at war.
-         */
-        if (RandomFactionGenerator.getInstance()
-                  .getFactionHints()
-                  .isNeutral(Factions.getInstance().getFaction(employer)) &&
-                  !RandomFactionGenerator.getInstance()
-                         .getFactionHints()
-                         .isAtWarWith(Factions.getInstance().getFaction(employer),
-                               Factions.getInstance().getFaction(contract.getEnemyCode()),
-                               campaign.getLocalDate())) {
-            if (contract.getContractType().isPlanetaryAssault()) {
-                contract.setContractType(AtBContractType.GARRISON_DUTY);
-            } else if (contract.getContractType().isReliefDuty()) {
-                contract.setContractType(AtBContractType.SECURITY_DUTY);
-            }
-        }
         setAttacker(contract);
         try {
             setSystemId(contract);
