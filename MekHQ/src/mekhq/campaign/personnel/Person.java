@@ -5563,15 +5563,17 @@ public class Person {
     /**
      * Retrieves the adjusted edge value for the current person.
      *
-     * <p>The adjusted Edge value is calculated by subtracting the person's level of bad luck (unlucky)
-     * from their base Edge value.</p>
+     * <p>The adjusted Edge value is calculated by subtracting the person's level of bad luck (unlucky) and any
+     * relevant SPAs from their base Edge value.</p>
      *
-     * @return The adjusted edge value after accounting for the person's level of bad luck.
+     * @return The adjusted edge value after accounting for the person's level of bad luck and SPAs.
      */
     public int getAdjustedEdge() {
         boolean hasTraumaticPast = options.booleanOption(COMPULSION_TRAUMATIC_PAST);
-        int modifier = hasTraumaticPast ? -1 : 0;
-        return getEdge() - unlucky + modifier;
+        boolean hasInForLife = options.booleanOption(FLAW_IN_FOR_LIFE);
+        int traumaticPastModifier = hasTraumaticPast ? -1 : 0;
+        int inForLifeModifier = hasInForLife ? -1 : 0;
+        return getEdge() - unlucky + traumaticPastModifier + inForLifeModifier;
     }
 
     public void setEdge(final int edge) {
@@ -6553,6 +6555,9 @@ public class Person {
 
         boolean hasMildParanoia = options.booleanOption(COMPULSION_MILD_PARANOIA);
         modifiers += (hasMildParanoia ? -1 : 0);
+
+        boolean hasInForLife = options.booleanOption(FLAW_IN_FOR_LIFE);
+        modifiers += (hasInForLife ? -1 : 0);
 
         modifiers += getDarkSecretModifier(false);
 

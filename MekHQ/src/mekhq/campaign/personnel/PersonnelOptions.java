@@ -91,6 +91,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String FLAW_POOR_VISION = "flaw_poor_vision";
     public static final String ATOW_GOOD_VISION = "atow_good_vision";
     public static final String FLAW_INTROVERT = "flaw_introvert";
+    public static final String FLAW_IN_FOR_LIFE = "flaw_in_for_life";
     public static final String ATOW_GREGARIOUS = "atow_gregarious";
     public static final String FLAW_IMPATIENT = "flaw_impatient";
     public static final String ATOW_PATIENT = "atow_patient";
@@ -245,6 +246,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, FLAW_POOR_VISION, false);
         addOption(l3a, ATOW_GOOD_VISION, false);
         addOption(l3a, FLAW_INTROVERT, false);
+        addOption(l3a, FLAW_IN_FOR_LIFE, false);
         addOption(l3a, ATOW_GREGARIOUS, false);
         addOption(l3a, FLAW_IMPATIENT, false);
         addOption(l3a, ATOW_PATIENT, false);

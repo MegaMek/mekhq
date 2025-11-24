@@ -34,9 +34,12 @@ package mekhq.campaign.personnel.education;
 
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_IN_FOR_LIFE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.DayOfWeek;
@@ -1562,6 +1565,15 @@ public class EducationController {
         }
 
         if (academy.isReeducationCamp()) {
+            if (person.getOptions().booleanOption(FLAW_IN_FOR_LIFE)) {
+                campaign.addReport(getFormattedTextAt(BUNDLE_NAME, "inForLife.text", person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
+                person.changeLoyalty(-1);
+
+                MekHQ.triggerEvent(new PersonChangedEvent(person));
+                return;
+            }
+
             if (campaign.getCampaignOptions().isUseReeducationCamps()) {
                 person.setOriginFaction(campaign.getFaction());
             }
@@ -1577,6 +1589,8 @@ public class EducationController {
             Collections.sort(rolls);
 
             person.setLoyalty(rolls.get(1) + rolls.get(2) + rolls.get(3));
+
+            MekHQ.triggerEvent(new PersonChangedEvent(person));
         } else {
             adjustLoyalty(person);
         }
