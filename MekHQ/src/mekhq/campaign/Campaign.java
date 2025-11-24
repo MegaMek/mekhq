@@ -9324,7 +9324,7 @@ public class Campaign implements ITechManager {
             if (force != null) {
                 for (Unit unit : force.getAllUnitsAsUnits(getHangar(), true)) {
                     Entity entity = unit.getEntity();
-                    if (unit.getEntity() != null) {
+                    if (entity != null) {
                         units.add(entity);
                     }
                 }
