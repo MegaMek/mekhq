@@ -61,6 +61,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.enums.MHQTabType;
@@ -221,15 +222,24 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtEmployer, gridBagConstraintsText);
 
-        if (contract instanceof AtBContract) {
+        if (contract instanceof AtBContract atBContract) {
             JLabel lblEnemy = new JLabel(resourceMap.getString("lblEnemy.text"));
             lblEnemy.setName("lblEnemy");
             gridBagConstraintsLabels.gridy = ++y;
             mainPanel.add(lblEnemy, gridBagConstraintsLabels);
 
-            boolean enemyIsMerc = ((AtBContract) contract).getEnemy().isMercenary();
-            String mercenaryString = enemyIsMerc ? " (" + resourceMap.getString("lblEnemy.mercenary") + ')' : "";
-            String enemyLabel = ((AtBContract) contract).getEnemyBotName() + mercenaryString;
+            String mercenaryString = "";
+            boolean enemyIsMerc = atBContract.getEnemy().isMercenary();
+            if (enemyIsMerc) {
+                mercenaryString = " (" + resourceMap.getString("lblEnemy.mercenary");
+                Faction enemyMercenaryEmployer = atBContract.getEnemyMercenaryEmployer();
+                if (enemyMercenaryEmployer != null) {
+                    String enemyEmployerName = enemyMercenaryEmployer.getFullName(campaign.getGameYear());
+                    mercenaryString += ", " + enemyEmployerName;
+                }
+                mercenaryString += ")";
+            }
+            String enemyLabel = atBContract.getEnemyBotName() + mercenaryString;
             JLabel txtEnemy = new JLabel(enemyLabel);
             txtEnemy.setName("txtEnemy");
             gridBagConstraintsText.gridy = y;
