@@ -207,11 +207,6 @@ public class AtBContractTest {
         assertEquals(50, contract.getSharesPercent());
     }
 
-    /*
-     *  TODO: The following tests prefixed with old_* should be removed along with the deprecated methods they're
-     *   testing when deemed safe to do so (roughly 0.50.4 or 0.50.5).
-     */
-
     private static Stream<Arguments> provideContractDifficultyParameters() {
         return Stream.of(Arguments.of(500.0, 0.0, true, 10),
               Arguments.of(500.0, 0.0, false, 10),
@@ -219,8 +214,8 @@ public class AtBContractTest {
               Arguments.of(500.0, 500.0, false, 5),
               Arguments.of(500.0, 2000.0, true, 1),
               Arguments.of(500.0, 2000.0, false, 1),
-              Arguments.of(500.0, 525.0, true, 4),
-              Arguments.of(500.0, 525.0, false, 4),
+              Arguments.of(500.0, 525.0, true, 5),
+              Arguments.of(500.0, 525.0, false, 5),
               Arguments.of(500.0, 350.0, true, 7),
               Arguments.of(500.0, 350.0, false, 7),
               Arguments.of(0.0, 0.0, true, -99),
@@ -229,22 +224,7 @@ public class AtBContractTest {
 
     @ParameterizedTest
     @MethodSource("provideContractDifficultyParameters")
-    public void old_calculateContractDifficultySameSkillMatchesExpectedRating(double enemyBV, double playerBV,
-          boolean useGenericBattleValue, int expectedResult) {
-        contract = spy(contract);
-        doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
-        doReturn(enemyBV).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
-        doReturn(playerBV).when(contract).estimatePlayerPower(any(Campaign.class));
-        when(campaign.getGameYear()).thenReturn(3025);
-        when(options.isUseGenericBattleValue()).thenReturn(useGenericBattleValue);
-
-        int difficulty = contract.calculateContractDifficulty(campaign);
-        assertEquals(expectedResult, difficulty);
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideContractDifficultyParameters")
-    public void new_calculateContractDifficultySameSkillMatchesExpectedRating(double enemyBV, double playerBV,
+    public void calculateContractDifficultySameSkillMatchesExpectedRating(double enemyBV, double playerBV,
           boolean useGenericBattleValue, int expectedResult) {
         contract = spy(contract);
         doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));

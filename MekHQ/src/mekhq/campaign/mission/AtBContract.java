@@ -53,7 +53,6 @@ import static megamek.common.units.UnitType.TANK;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
-import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
@@ -87,7 +86,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.ResourceBundle;
-import java.util.UUID;
 import java.util.stream.Stream;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -115,7 +113,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
@@ -2023,107 +2020,6 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Calculates the difficulty of a contract based on the relative power of enemy forces, player forces, and any
-     * allied forces involved in the campaign.
-     *
-     * <p>
-     * The method evaluates the enemy's estimated power against the player's strengths and considers allied
-     * contributions depending on the assigned command rights. The result is a difficulty level mapped between 1 and 10,
-     * where higher values represent more challenging contracts.
-     * </p>
-     *
-     * @param campaign The {@link Campaign} object representing the current game state. Used to extract information
-     *                 about the player's forces, enemy forces, and allied forces.
-     *
-     * @return An integer representing the difficulty of the contract:
-     *       <ul>
-     *       <li>1 = very easy</li>
-     *       <li>10 = extremely difficult</li>
-     *       </ul>
-     *       <p>
-     *       <b>WARNING: </b>Returns `-99` (defined as `ERROR`) if the enemy's
-     *       power cannot be calculated.
-     *       </p>
-     *       <p>
-     *       <b>Mapped Result Explanation:</b>
-     *       </p>
-     *       The method divides the absolute percentage difference between enemy
-     *       and player forces by 20
-     *       (rounding up), then adjusts the difficulty accordingly:
-     *       <ul>
-     *       <li>If the player's forces are stronger, the difficulty is adjusted
-     *       downward from a baseline of 5.</li>
-     *       <li>If the enemy's forces are stronger, the difficulty is adjusted
-     *       upward from a baseline of 5.</li>
-     *       <li>If an error is encountered, the difficulty is returned as
-     *       -99</li>
-     *       </ul>
-     *       The result is clamped to fit between the valid range of 1 and 10. Or
-     *       -99 if an error is encountered.
-     *
-     * @since 0.50.04
-     * @deprecated use {@link #calculateContractDifficulty(int, boolean, List)} instead
-     */
-    @Deprecated(since = "0.50.04")
-    public int calculateContractDifficulty(Campaign campaign) {
-        final int ERROR = -99;
-
-        // Estimate the power of the enemy forces
-        SkillLevel opposingSkill = modifySkillLevelBasedOnFaction(enemyCode, enemySkill);
-        double enemySkillMultiplier = getSkillMultiplier(opposingSkill);
-        int gameYear = campaign.getGameYear();
-        boolean useGenericBV = campaign.getCampaignOptions().isUseGenericBattleValue();
-        double enemyPower = estimateMekStrength(gameYear, useGenericBV, enemyCode, enemyQuality);
-
-        // If we cannot calculate enemy power, abort.
-        if (enemyPower == 0) {
-            return ERROR;
-        }
-
-        enemyPower = (int) round(enemyPower * enemySkillMultiplier);
-
-        // Estimate player power
-        double playerPower = estimatePlayerPower(campaign);
-
-        // Estimate the power of allied forces
-        // TODO pull these directly from Force Generation instead of using magic numbers
-        // TODO estimate the LIAISON ratio by going through each combat lance and
-        // getting the actual average (G)BV for an allied heavy/assault mek.
-        double allyRatio = switch (getCommandRights()) {
-            case INDEPENDENT -> 0; // no allies
-            case LIAISON -> 0.4; // single allied heavy/assault mek, pure guess for now
-            case HOUSE -> 0.25; // allies with 25% the player's (G)BV budget
-            case INTEGRATED -> 0.5; // allies with 50% the player's (G)BV budget
-        };
-
-        if (allyRatio > 0) {
-            SkillLevel alliedSkill = modifySkillLevelBasedOnFaction(employerCode, allySkill);
-            double allySkillMultiplier = getSkillMultiplier(alliedSkill);
-            double allyPower = estimateMekStrength(gameYear, useGenericBV, employerCode, allyQuality);
-            allyPower = allyPower * allySkillMultiplier;
-            // If we cannot calculate ally's power, use player power as a fallback.
-            if (allyPower == 0) {
-                allyPower = playerPower;
-            }
-            playerPower += allyRatio * allyPower;
-            enemyPower += allyRatio * enemyPower;
-        }
-
-        // Calculate difficulty based on the percentage difference between the two forces.
-        double difference = enemyPower - playerPower;
-        double percentDifference = (difference / playerPower) * 100;
-
-        int mappedValue = (int) ceil(Math.abs(percentDifference) / 20);
-        if (percentDifference < 0) {
-            mappedValue = 5 - mappedValue;
-        } else {
-            mappedValue = 5 + mappedValue;
-        }
-
-        return min(max(mappedValue, 1), 10);
-    }
-
-    /**
      * Calculates the difficulty rating of a contract by comparing the estimated combat strength of the opposing
      * force to the combat strength of the player's participating units.
      *
@@ -2173,9 +2069,10 @@ public class AtBContract extends Contract {
 
         // Calculate difficulty based on the percentage difference between the two forces.
         double difference = enemyPower - playerPower;
-        double percentDifference = (difference / playerPower) * 100;
+        // Divide by 0 protection
+        double percentDifference = (playerPower != 0 ? (difference / playerPower) : difference) * 100;
 
-        int mappedValue = (int) ceil(Math.abs(percentDifference) / 20);
+        int mappedValue = (int) round(Math.abs(percentDifference) / 20);
         if (percentDifference < 0) {
             mappedValue = 5 - mappedValue;
         } else {
@@ -2203,41 +2100,6 @@ public class AtBContract extends Contract {
         }
 
         return skillLevel;
-    }
-
-    /**
-     * Estimates the power of the player in a campaign based on the battle values of their units.
-     *
-     * @param campaign the object containing the forces and units of the player
-     *
-     * @return average battle value per player unit OR total BV2 divided by total GBV
-     *
-     * @since 0.50.04
-     * @deprecated use {@link #estimatePlayerPower(List, boolean)} instead
-     */
-    @Deprecated(since = "0.50.04")
-    double estimatePlayerPower(Campaign campaign) {
-        int playerPower = 0;
-        int playerGBV = 0;
-        int playerUnitCount = 0;
-        for (Force force : campaign.getAllForces()) {
-            if (!force.isForceType(STANDARD)) {
-                continue;
-            }
-
-            for (UUID unitID : force.getUnits()) {
-                Entity entity = campaign.getUnit(unitID).getEntity();
-                playerPower += entity.calculateBattleValue();
-                playerGBV += entity.getGenericBattleValue();
-                playerUnitCount++;
-            }
-        }
-
-        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
-            return ((double) playerPower) / playerGBV;
-        } else {
-            return ((double) playerPower) / playerUnitCount;
-        }
     }
 
     double estimatePlayerPower(List<Entity> units, boolean useGenericBV) {
