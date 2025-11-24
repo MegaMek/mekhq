@@ -106,6 +106,9 @@ public class PersonnelOptions extends PilotOptions {
     public static final String UNOFFICIAL_PICK_POCKET = "unofficial_pick_pocket";
     public static final String UNOFFICIAL_NATURAL_THESPIAN = "unofficial_natural_thespian";
     public static final String UNOFFICIAL_BIOLOGICAL_MACHINIST = "unofficial_biological_machinist";
+    public static final String FLAW_VACCINE_DODGER = "flaw_vaccine_dodger";
+    public static final String FLAW_SUPER_SPREADER = "flaw_typhoid_mary";
+    public static final String FLAW_POOR_IMMUNE_SYSTEM = "flaw_poor_immune_system";
 
     public static final String DARK_SECRET_TRIVIAL = "dark_secret_trivial";
     public static final String DARK_SECRET_SIGNIFICANT = "dark_secret_significant";
@@ -260,6 +263,9 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, UNOFFICIAL_NATURAL_THESPIAN, false);
         addOption(l3a, UNOFFICIAL_BIOLOGICAL_MACHINIST, false);
         addOption(l3a, UNOFFICIAL_PICK_POCKET, false);
+        addOption(l3a, FLAW_VACCINE_DODGER, false);
+        addOption(l3a, FLAW_SUPER_SPREADER, false);
+        addOption(l3a, FLAW_POOR_IMMUNE_SYSTEM, false);
 
         addOption(l3a, DARK_SECRET_TRIVIAL, false);
         addOption(l3a, DARK_SECRET_SIGNIFICANT, false);
