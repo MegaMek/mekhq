@@ -427,7 +427,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         getContractType(campaign, contract);
 
         setEnemyCode(contract);
-        setIsRiotDuty(contract);
 
         /*
          * Addition to AtB rules: factions which are generally neutral

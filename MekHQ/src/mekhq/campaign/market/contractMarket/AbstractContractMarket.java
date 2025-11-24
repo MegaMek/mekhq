@@ -600,12 +600,6 @@ public abstract class AbstractContractMarket {
         }
     }
 
-    protected void setIsRiotDuty(AtBContract contract) {
-        if (contract.getContractType().isGarrisonDuty() && contract.getEnemy().isRebel()) {
-            contract.setContractType(AtBContractType.RIOT_DUTY);
-        }
-    }
-
     /**
      * Calculates and sets the ally skill and quality ratings for the given contract.
      *
