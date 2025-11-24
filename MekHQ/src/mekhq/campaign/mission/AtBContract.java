@@ -2468,6 +2468,10 @@ public class AtBContract extends Contract {
      * @since 0.50.10
      */
     public int getRequiredVictoryPoints() {
+        if (stratconCampaignState == null) {
+            return 0;
+        }
+
         double baseRequirement = getRequiredCombatTeams();
 
         int duration = getLength();
