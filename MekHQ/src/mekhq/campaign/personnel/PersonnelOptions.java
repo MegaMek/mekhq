@@ -267,6 +267,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, FLAW_VACCINE_DODGER, false);
         addOption(l3a, FLAW_SUPER_SPREADER, false);
         addOption(l3a, FLAW_POOR_IMMUNE_SYSTEM, false);
+        addOption(l3a, UNOFFICIAL_ADAPTIVE_IMMUNITY, false);
 
         addOption(l3a, DARK_SECRET_TRIVIAL, false);
         addOption(l3a, DARK_SECRET_SIGNIFICANT, false);
