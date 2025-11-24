@@ -2100,6 +2100,9 @@ public class Person {
         final int LOYALTY_PENALTY_FOR_ANARCHIST = -2;
 
         boolean campaignFactionMatchesOriginFaction = originFaction.equals(campaignFaction);
+        boolean isClanFaction = campaignFaction.isClan();
+        boolean isMercenaryFaction = campaignFaction.isMercenary();
+        boolean isPirateFaction = campaignFaction.isPirate();
 
         int modifier = 0;
         boolean hasHatredForAuthority = options.booleanOption(COMPULSION_ANARCHIST);
@@ -2115,6 +2118,46 @@ public class Person {
         boolean hasFactionLoyalty = options.booleanOption(COMPULSION_FACTION_LOYALTY);
         if (hasFactionLoyalty) {
             modifier += campaignFactionMatchesOriginFaction ? 1 : -4;
+        }
+
+        boolean hasOtherFactionDislike = options.booleanOption(COMPULSION_OTHER_FACTION_DISLIKE);
+        if (hasOtherFactionDislike) {
+            modifier += !campaignFactionMatchesOriginFaction ? -1 : 0;
+        }
+
+        boolean hasParentFactionDislike = options.booleanOption(COMPULSION_PARENT_FACTION_DISLIKE);
+        if (hasParentFactionDislike) {
+            modifier += campaignFactionMatchesOriginFaction ? -1 : 0;
+        }
+
+        boolean hasInnerSphereHate = options.booleanOption(COMPULSION_INNER_SPHERE_HATE);
+        if (hasInnerSphereHate) {
+            modifier += !isClanFaction ? -2 : 0;
+        }
+
+        boolean hasClanHate = options.booleanOption(COMPULSION_CLAN_HATE);
+        if (hasClanHate) {
+            modifier += isClanFaction ? -2 : 0;
+        }
+
+        boolean hasOtherFactionHate = options.booleanOption(COMPULSION_OTHER_FACTION_HATE);
+        if (hasOtherFactionHate) {
+            modifier += !campaignFactionMatchesOriginFaction ? -2 : 0;
+        }
+
+        boolean hasParentFactionHate = options.booleanOption(COMPULSION_PARENT_FACTION_HATE);
+        if (hasParentFactionHate) {
+            modifier += campaignFactionMatchesOriginFaction ? -2 : 0;
+        }
+
+        boolean hasMercenaryHate = options.booleanOption(COMPULSION_MERCENARY_HATE);
+        if (hasMercenaryHate) {
+            modifier += isMercenaryFaction ? -2 : 0;
+        }
+
+        boolean hasPirateHate = options.booleanOption(COMPULSION_PIRATE_HATE);
+        if (hasPirateHate) {
+            modifier += isPirateFaction ? -2 : 0;
         }
 
         boolean hasBodyModAddiction = options.booleanOption(COMPULSION_BODY_MOD_ADDICTION);

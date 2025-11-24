@@ -154,6 +154,14 @@ public class PersonnelOptions extends PilotOptions {
     public static final String COMPULSION_PAINKILLER_ADDICTION = "compulsion_addiction_painkillers";
     public static final String COMPULSION_BIONIC_HATE = "compulsion_bionic_hate";
     public static final String COMPULSION_BODY_MOD_ADDICTION = "compulsion_body_mod_addiction";
+    public static final String COMPULSION_OTHER_FACTION_DISLIKE = "compulsion_other_faction_dislike";
+    public static final String COMPULSION_PARENT_FACTION_DISLIKE = "compulsion_parent_faction_dislike";
+    public static final String COMPULSION_INNER_SPHERE_HATE = "compulsion_inner_sphere_hate";
+    public static final String COMPULSION_CLAN_HATE = "compulsion_clan_hate";
+    public static final String COMPULSION_OTHER_FACTION_HATE = "compulsion_other_faction_hate";
+    public static final String COMPULSION_PARENT_FACTION_HATE = "compulsion_parent_faction_hate";
+    public static final String COMPULSION_MERCENARY_HATE = "compulsion_merc_hate";
+    public static final String COMPULSION_PIRATE_HATE = "compulsion_pirate_hate";
 
     public static final String MADNESS_FLASHBACKS = "madness_flashbacks";
     public static final String MADNESS_CONFUSION = "madness_confusion";
@@ -309,6 +317,14 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, COMPULSION_PAINKILLER_ADDICTION, false);
         addOption(l3a, COMPULSION_BIONIC_HATE, false);
         addOption(l3a, COMPULSION_BODY_MOD_ADDICTION, false);
+        addOption(l3a, COMPULSION_OTHER_FACTION_DISLIKE, false);
+        addOption(l3a, COMPULSION_PARENT_FACTION_DISLIKE, false);
+        addOption(l3a, COMPULSION_INNER_SPHERE_HATE, false);
+        addOption(l3a, COMPULSION_CLAN_HATE, false);
+        addOption(l3a, COMPULSION_OTHER_FACTION_HATE, false);
+        addOption(l3a, COMPULSION_PARENT_FACTION_HATE, false);
+        addOption(l3a, COMPULSION_MERCENARY_HATE, false);
+        addOption(l3a, COMPULSION_PIRATE_HATE, false);
 
         addOption(l3a, MADNESS_FLASHBACKS, false);
         addOption(l3a, MADNESS_CONFUSION, false);
