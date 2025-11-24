@@ -405,7 +405,7 @@ public class Inoculations {
         boolean hasSuperSpreader = diseaseScanResult.hasSuperSpreader;
         int diseaseChance = activeDiseases.isEmpty() ?
                                   MONTHLY_NEW_DISEASE_CHANCE : // Super Spreader doesn't affect new disease chance
-                                  hasSuperSpreader ? MONTHLY_DISEASE_SPREAD_CHANCE * 3 : MONTHLY_DISEASE_SPREAD_CHANCE;
+                                  hasSuperSpreader ? MONTHLY_DISEASE_SPREAD_CHANCE / 3 : MONTHLY_DISEASE_SPREAD_CHANCE;
 
         if (activeDiseases.isEmpty()) {
             if (planetCode != null) {
