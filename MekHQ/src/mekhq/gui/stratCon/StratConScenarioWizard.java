@@ -880,7 +880,7 @@ public class StratConScenarioWizard extends JDialog {
                 int supportPointsSpent = dialog.getSupportPoints() + 1;
                 currentCampaignState.changeSupportPoints(-(supportPointsSpent * selectedForceCount));
 
-                int supportPointModifier = dialog.getSupportPoints() * SUPPORT_POINTS_MODIFIER;
+                int supportPointModifier = (dialog.getSupportPoints() * SUPPORT_POINTS_MODIFIER) / selectedForceCount;
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
 
                 btnCommitClicked(finalTargetNumber, false, false);
