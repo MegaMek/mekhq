@@ -1722,8 +1722,16 @@ public class FactionStandings {
 
                 if (mission instanceof AtBContract atbContract) {
                     int contractLength = atbContract.getLength();
+
+                    // First try and fetch the enemy mercenary employer if none exists (because the enemy faction
+                    // isn't an employed mercenary), then fetch the actual enemy
+                    Faction enemyFaction = atbContract.getEnemyMercenaryEmployer();
+                    if (enemyFaction == null) {
+                        enemyFaction = atbContract.getEnemy();
+                    }
+
                     String report = processContractAccept(campaignFactionCode,
-                          atbContract.getEnemy(),
+                          enemyFaction,
                           today,
                           regardMultiplier,
                           contractLength);

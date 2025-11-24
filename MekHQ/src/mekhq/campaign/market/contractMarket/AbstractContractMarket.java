@@ -40,6 +40,7 @@ import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.HEROIC;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.io.PrintWriter;
@@ -557,9 +558,20 @@ public abstract class AbstractContractMarket {
             String enemyCode = ObjectUtility.getRandomItem(localFactions);
             contract.setEnemyCode(enemyCode);
         } else {
-            contract.setEnemyCode(RandomFactionGenerator.getInstance()
+            String enemyFactionCode = RandomFactionGenerator.getInstance()
                                         .getEnemy(contract.getEmployerCode(),
-                                              contract.getContractType().isGarrisonType()));
+                                              contract.getContractType().isGarrisonType());
+            Faction enemyFaction = Factions.getInstance().getFaction(enemyFactionCode);
+
+            // If the OpFor isn't Clan, there is a 1-in-4 chance they've hired mercenaries to do their dirty work. So
+            // the original enemy faction is set as the mercenary's employer, while the enemy faction is set to
+            // Mercenaries.
+            if (!enemyFaction.isClan() && !enemyFaction.isAggregate() && d6(1) == 1) {
+                contract.setEnemyMercenaryEmployerCode(enemyFactionCode);
+                contract.setEnemyCode(MERCENARY_FACTION_CODE);
+            } else {
+                contract.setEnemyCode(enemyFactionCode);
+            }
         }
     }
 

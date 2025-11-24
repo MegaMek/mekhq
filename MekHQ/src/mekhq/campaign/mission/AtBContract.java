@@ -168,6 +168,7 @@ public class AtBContract extends Contract {
     protected Person clanOpponent;
     protected String employerCode;
     protected String enemyCode;
+    protected String enemyMercenaryEmployerCode;
     protected String enemyName;
 
     protected int difficulty;
@@ -244,6 +245,7 @@ public class AtBContract extends Contract {
         clanOpponent = null;
         employerCode = "IND";
         enemyCode = "IND";
+        enemyMercenaryEmployerCode = null;
         enemyName = "Independent";
 
         difficulty = Integer.MIN_VALUE;
@@ -999,6 +1001,10 @@ public class AtBContract extends Contract {
         indent = super.writeToXMLBegin(campaign, pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerCode", getEmployerCode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyCode", getEnemyCode());
+
+        if (enemyMercenaryEmployerCode != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyMercenaryEmployerCode", enemyMercenaryEmployerCode);
+        }
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractType", getContractType().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allySkill", getAllySkill().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyQuality", getAllyQuality());
@@ -1095,6 +1101,8 @@ public class AtBContract extends Contract {
                     employerCode = item.getTextContent();
                 } else if (item.getNodeName().equalsIgnoreCase("enemyCode")) {
                     enemyCode = item.getTextContent();
+                } else if (item.getNodeName().equalsIgnoreCase("mercenaryEnemyCode")) {
+                    enemyMercenaryEmployerCode = item.getTextContent();
                 } else if (item.getNodeName().equalsIgnoreCase("contractType")) {
                     setContractType(AtBContractType.parseFromString(item.getTextContent().trim()));
                 } else if (item.getNodeName().equalsIgnoreCase("allySkill")) {
@@ -1301,6 +1309,10 @@ public class AtBContract extends Contract {
         return enemyCode;
     }
 
+    public void setEnemyCode(String enemyCode) {
+        this.enemyCode = enemyCode;
+    }
+
     /**
      * Retrieves the name of the enemy for this contract.
      *
@@ -1322,8 +1334,25 @@ public class AtBContract extends Contract {
         }
     }
 
-    public void setEnemyCode(String enemyCode) {
-        this.enemyCode = enemyCode;
+    public @Nullable String getEnemyMercenaryEmployerCode() {
+        return enemyMercenaryEmployerCode;
+    }
+
+    public @Nullable Faction getEnemyMercenaryEmployer() {
+        return enemyMercenaryEmployerCode == null ? null :
+                     Factions.getInstance().getFaction(enemyMercenaryEmployerCode);
+    }
+
+    /**
+     * Sets the faction code representing the employer of the enemy mercenary forces.
+     *
+     * @param enemyMercenaryEmployerCode the faction code to assign as the employer of opposing mercenary units
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public void setEnemyMercenaryEmployerCode(String enemyMercenaryEmployerCode) {
+        this.enemyMercenaryEmployerCode = enemyMercenaryEmployerCode;
     }
 
     public int getDifficulty() {

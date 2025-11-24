@@ -171,33 +171,36 @@ public class RandomFactionGenerator {
      * @return Map used to select employer
      */
     protected WeightedIntMap<Faction> buildEmployerMap() {
-        WeightedIntMap<Faction> retVal = new WeightedIntMap<>();
-        for (Faction f : borderTracker.getFactionsInRegion()) {
-
-            if (f.isClan() || FactionHints.isEmptyFaction(f)) {
+        WeightedIntMap<Faction> employerMap = new WeightedIntMap<>();
+        for (Faction faction : borderTracker.getFactionsInRegion()) {
+            if (faction.isClan() || FactionHints.isEmptyFaction(faction)) {
                 continue;
             }
-            if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
+            if (faction.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
+                continue;
+            }
+            if (faction.getShortName().equals(MERCENARY_FACTION_CODE)) {
                 continue;
             }
 
-            int weight = borderTracker.getBorders(f).getSystems().size();
-            retVal.add(weight, f);
+            int weight = borderTracker.getBorders(faction).getSystems().size();
+            employerMap.add(weight, faction);
 
             /* Add factions which do not control any planets to the employer list */
-            for (Faction cfaction : factionHints.getContainedFactions(f, getCurrentDate())) {
-                if (null != cfaction) {
-                    if (!cfaction.isClan()) {
-                        weight = (int) Math.floor((borderTracker.getBorders(f).getSystems().size() *
-                                                         factionHints.getAltLocationFraction(f,
-                                                               cfaction,
+            for (Faction containedFaction : factionHints.getContainedFactions(faction, getCurrentDate())) {
+                if (null != containedFaction) {
+                    if (!containedFaction.isClan()) {
+                        weight = (int) Math.floor((borderTracker.getBorders(faction).getSystems().size() *
+                                                         factionHints.getAltLocationFraction(faction,
+                                                               containedFaction,
                                                                getCurrentDate())) + 0.5);
-                        retVal.add(weight, f);
+                        employerMap.add(weight, faction);
                     }
                 }
             }
         }
-        return retVal;
+
+        return employerMap;
     }
 
     /**
@@ -248,7 +251,7 @@ public class RandomFactionGenerator {
      * Pick an enemy faction, possibly rebels or mercenaries, given an employer.
      */
     public String getEnemy(Faction employer, boolean useRebels) {
-        return getEnemy(employer, useRebels, true);
+        return getEnemy(employer, useRebels, false);
     }
 
     /**
