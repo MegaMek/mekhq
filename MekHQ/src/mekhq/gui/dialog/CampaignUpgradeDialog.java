@@ -32,17 +32,21 @@
  */
 package mekhq.gui.dialog;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.CAMPAIGN_UPGRADE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Frame;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -261,7 +265,29 @@ public class CampaignUpgradeDialog {
         }
 
         JLabel lblPresetName = new JLabel(getTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.label.presetPicker"));
-        MMComboBox<String> comboBox = new MMComboBox<>("cboPresets", convertPresetListModelToComboBoxModel());
+        MMComboBox<CampaignPreset> comboBox = new MMComboBox<>("cboPresets", presets);
+        comboBox.setSelectedIndex(0);
+        comboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list,
+                  Object value,
+                  int index,
+                  boolean isSelected,
+                  boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                if (value instanceof CampaignPreset preset) {
+                    setText(preset.getTitle());
+                    String tooltipText = preset.getDescription();
+                    setToolTipText(wordWrap(tooltipText));
+                } else {
+                    setText("-");
+                    setToolTipText(null);
+                }
+
+                return this;
+            }
+        });
 
         JPanel panel = new JPanel();
         panel.add(lblPresetName, BorderLayout.WEST);

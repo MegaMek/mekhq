@@ -400,13 +400,13 @@ public class RelationshipsTab {
               10, 0, 100, 1);
         spnRandomMarriageAgeRange.addMouseListener(createTipPanelUpdater(marriageHeader, "RandomMarriageAgeRange"));
 
-        lblRandomMarriageDiceSize = new CampaignOptionsLabel("RandomMarriageOppositeSexDiceSize");
+        lblRandomMarriageDiceSize = new CampaignOptionsLabel("RandomMarriageDiceSize");
         lblRandomMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
-              "RandomMarriageOppositeSexDiceSize"));
-        spnRandomMarriageDiceSize = new CampaignOptionsSpinner("RandomMarriageOppositeSexDiceSize",
+              "RandomMarriageDiceSize"));
+        spnRandomMarriageDiceSize = new CampaignOptionsSpinner("RandomMarriageDiceSize",
               5000, 0, 100000, 1);
         spnRandomMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
-              "RandomMarriageOppositeSexDiceSize"));
+              "RandomMarriageDiceSize"));
 
         lblRandomNewDependentMarriage = new CampaignOptionsLabel("RandomNewDependentMarriage");
         lblRandomNewDependentMarriage.addMouseListener(createTipPanelUpdater(marriageHeader,
