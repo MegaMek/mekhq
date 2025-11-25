@@ -494,24 +494,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          * @since 0.50.07
          */
         private static void handleCampaignUpgrading(Campaign campaign) {
-            // As we're upgrading the campaign, we purposefully block load progress until after the upgrade
-            // has completed. This removes any risk of gui interaction with a mid-upgrade campaign object.
-            // During testing this was found to result in a bundle of inconsistent and seemingly random
-            // errors.
-
-            CountDownLatch latch = new CountDownLatch(1);
-
-            CampaignUpgradeDialog.campaignUpgradeDialog(campaign, () -> {
-                MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
-                latch.countDown();
-            });
-
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                LOGGER.warn("Thread was interrupted during campaign upgrade", e);
-            }
+            CampaignUpgradeDialog.campaignUpgradeDialog(campaign,
+                  () -> MekHQ.triggerEvent(new OptionsChangedEvent(campaign)));
         }
 
         /**
