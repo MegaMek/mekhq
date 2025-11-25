@@ -132,8 +132,11 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                           "AtbMonthlyContractMarket.connectionsReport.normal",
                           campaignCommander.getHyperlinkedFullTitle()));
                 } else {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                          "AtbMonthlyContractMarket.connectionsReport.none",
+                    String key = "AtbMonthlyContractMarket.connectionsReport.none";
+                    if (campaignCommander.getBurnedConnectionsEndDate() != null) {
+                        key = "AtbMonthlyContractMarket.connectionsReport.burned";
+                    }
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, key,
                           campaignCommander.getHyperlinkedFullTitle()));
                 }
             }
