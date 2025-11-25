@@ -5441,6 +5441,7 @@ public class Campaign implements ITechManager {
         if (unit != null) {
             unit.remove(person, true);
         }
+        person.setDoctorId(null, 0);
         removeAllPatientsFor(person);
         person.removeAllTechJobs(this);
         removeKillsFor(person.getId());
