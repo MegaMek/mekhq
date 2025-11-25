@@ -97,7 +97,6 @@ public class SelectPresetDialog extends JDialog {
      */
     public SelectPresetDialog(JFrame frame, boolean includePresetSelectOption, boolean includeCustomizePresetOption) {
         super(frame, getTextAt(getCampaignOptionsResourceBundle(), "presetDialog.title"), true);
-        final int MAXIMUM_HEIGHT = 300; // Stops it expanding behind the task bar on Windows
         final int DIALOG_WIDTH = UIUtil.scaleForGUI(400);
         final int INSERT_SIZE = UIUtil.scaleForGUI(10);
         returnState = PRESET_SELECTION_CANCELLED;
