@@ -39,9 +39,11 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -95,6 +97,7 @@ public class SelectPresetDialog extends JDialog {
      */
     public SelectPresetDialog(JFrame frame, boolean includePresetSelectOption, boolean includeCustomizePresetOption) {
         super(frame, getTextAt(getCampaignOptionsResourceBundle(), "presetDialog.title"), true);
+        final int MAXIMUM_HEIGHT = 300; // Stops it expanding behind the task bar on Windows
         final int DIALOG_WIDTH = UIUtil.scaleForGUI(400);
         final int INSERT_SIZE = UIUtil.scaleForGUI(10);
         returnState = PRESET_SELECTION_CANCELLED;
@@ -206,7 +209,18 @@ public class SelectPresetDialog extends JDialog {
 
         add(buttonPanel, BorderLayout.PAGE_END);
 
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Dimension screen = toolkit.getScreenSize();
+        Insets insets = getToolkit().getScreenInsets(getGraphicsConfiguration());
+
+        int maxHeight = screen.height - insets.top - insets.bottom;
+
         pack();
+        Dimension size = getSize();
+        if (size.height > maxHeight) {
+            setSize(new Dimension(size.width, maxHeight));
+        }
+
         setAlwaysOnTop(true);
         setResizable(false);
         setLocationRelativeTo(null);
