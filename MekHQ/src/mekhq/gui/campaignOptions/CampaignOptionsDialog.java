@@ -81,7 +81,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private boolean wasCanceled = true;
 
     public enum CampaignOptionsDialogMode {
-        NORMAL, STARTUP, STARTUP_ABRIDGED, ABRIDGED
+        NORMAL, STARTUP, STARTUP_ABRIDGED, CAMPAIGN_UPGRADE
     }
 
     /**
@@ -199,7 +199,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         pnlButtons.add(btnApplySettings);
 
         // Save Preset
-        if (mode != CampaignOptionsDialogMode.ABRIDGED && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
+        if (mode != CampaignOptionsDialogMode.CAMPAIGN_UPGRADE && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
             JButton btnSavePreset = new CampaignOptionsButton("SavePreset");
             btnSavePreset.addActionListener(evt -> btnSaveActionPerformed());
             pnlButtons.add(btnSavePreset);
@@ -234,12 +234,10 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      */
     public void processApplyAction() {
         wasCanceled = false;
-        boolean isStartup = mode == CampaignOptionsDialogMode.STARTUP ||
-                                  mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED;
-        campaignOptionsPane.applyCampaignOptionsToCampaign(null, isStartup, false);
+        campaignOptionsPane.applyCampaignOptionsToCampaign(null, mode, false);
         dispose();
 
-        if (isStartup) {
+        if (mode == CampaignOptionsDialogMode.STARTUP || mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
             final CampaignOptions campaignOptions = campaign.getCampaignOptions();
             if (campaignOptions.isUseStratCon()) {
                 showStratConNotice();
@@ -263,9 +261,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             return;
         }
 
-        campaignOptionsPane.applyCampaignOptionsToCampaign(preset,
-              mode == CampaignOptionsDialogMode.STARTUP || mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED,
-              true);
+        campaignOptionsPane.applyCampaignOptionsToCampaign(preset, mode, true);
 
         preset.writeToFile(null, FileDialogs.saveCampaignPreset(null, preset).orElse(null));
     }

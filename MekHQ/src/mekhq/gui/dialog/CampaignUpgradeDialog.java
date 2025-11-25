@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.CAMPAIGN_UPGRADE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -204,7 +205,8 @@ public class CampaignUpgradeDialog {
             SwingWorker<Void, Void> worker = new SwingWorker<>() {
                 @Override
                 protected Void doInBackground() {
-                    CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(campaign, chosenPreset);
+                    CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(null, campaign, chosenPreset,
+                          CAMPAIGN_UPGRADE);
                     optionsDialog.processApplyAction();
                     return null;
                 }

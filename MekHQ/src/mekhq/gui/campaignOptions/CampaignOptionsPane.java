@@ -39,7 +39,8 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.UTILITY;
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.CAMPAIGN_UPGRADE;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -191,7 +192,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         } catch (Exception ignored) {
         }
 
-        if (mode != ABRIDGED && mode != STARTUP_ABRIDGED) {
+        if (mode != CAMPAIGN_UPGRADE && mode != STARTUP_ABRIDGED) {
             addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
                   round(HEADER_FONT_SIZE * uiScale),
                   getTextAt(getCampaignOptionsResourceBundle(), resourceName + ".title")), tabScrollPane);
@@ -496,11 +497,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * categories).
      *
      * @param preset       an optional {@link CampaignPreset} used to override campaign options
-     * @param isStartUp    specifies whether this is run as part of a startup initialization
+     * @param mode     the mode in which the application process was triggered
      * @param isSaveAction determines if this action is saving options to a preset
      */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, boolean isStartUp,
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, CampaignOptionsDialogMode mode,
           boolean isSaveAction) {
+        boolean isStartUp = mode == STARTUP || mode == STARTUP_ABRIDGED;
+        boolean isCampaignUpgrade = mode == CAMPAIGN_UPGRADE;
+
         CampaignOptions options = this.campaignOptions;
         RandomSkillPreferences presetRandomSkillPreferences = null;
         Map<String, SkillType> presetSkills = null;
@@ -532,7 +536,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Human Resources
         personnelTab.applyCampaignOptionsToCampaign(campaign, options);
-        biographyTab.applyCampaignOptionsToCampaign(options);
+        biographyTab.applyCampaignOptionsToCampaign(isCampaignUpgrade, options);
         relationshipsTab.applyCampaignOptionsToCampaign(options);
         salariesTab.applyCampaignOptionsToCampaign(options);
         turnoverAndRetentionTab.applyCampaignOptionsToCampaign(options);
@@ -682,9 +686,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * factions, and skills.
      *
      * @param campaignPreset the {@link CampaignPreset} containing the preset options to apply
-     * @param isStartUp      {@code true} if the preset is being loaded during new campaign startup
+     * @param isStartup      {@code true} if the preset is being loaded during new campaign startup
      */
-    public void applyPreset(@Nullable CampaignPreset campaignPreset, boolean isStartUp) {
+    public void applyPreset(@Nullable CampaignPreset campaignPreset, boolean isStartup) {
         if (campaignPreset == null) {
             return;
         }
@@ -693,7 +697,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         LocalDate presetDate = campaign.getLocalDate();
         Faction presetFaction = campaign.getFaction();
-        if (isStartUp) {
+        if (isStartup) {
             presetDate = campaignPreset.getDate();
             presetFaction = campaignPreset.getFaction();
         }

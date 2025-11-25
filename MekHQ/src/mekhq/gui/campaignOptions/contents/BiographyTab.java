@@ -1619,10 +1619,12 @@ public class BiographyTab {
      * If a preset options object is provided, the changes are applied there. Otherwise, they are applied to the current
      * campaign's options.
      *
+     * @param isCampaignUpgrade Is triggered as part of the campaign upgrade process
      * @param presetCampaignOptions A {@link CampaignOptions} object to update with the current UI settings, or
      *                              {@code null} to apply changes to the campaign's options directly.
      */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(boolean isCampaignUpgrade,
+          @Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         RandomOriginOptions originOptions;
         if (presetCampaignOptions == null) {
@@ -1721,6 +1723,10 @@ public class BiographyTab {
         }
 
         // Ranks
-        rankSystemsPane.applyToCampaign();
+        if (!isCampaignUpgrade) {
+            // We don't change rank when upgrade the campaign across versions, otherwise the players' rank system
+            // will be changed if the campaign rank system and the one in the preset don't match.`
+            rankSystemsPane.applyToCampaign();
+        }
     }
 }
