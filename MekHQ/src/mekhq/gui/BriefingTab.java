@@ -970,7 +970,9 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         boolean isSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
-        List<SalvageForceData> salvageForceOptions = getSalvageForces(getCampaign(), isSpace);
+        List<SalvageForceData> salvageForceOptions = getSalvageForces(getCampaign(),
+              isSpace,
+              scenario.getSalvageForces());
 
         SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), salvageForceOptions, isSpace,
               scenario.getSalvageForces());
@@ -1136,13 +1138,15 @@ public final class BriefingTab extends CampaignGuiTab {
      *
      * @param campaign        the current campaign state
      * @param isSpaceScenario {@code true} if checking for space salvage capabilities, {@code false} for ground
+     * @param alreadyAssignedForces a list of salvage forces that have already been assigned to the scenario
      *
      * @return a sorted list of forces capable of salvage operations
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private List<SalvageForceData> getSalvageForces(Campaign campaign, boolean isSpaceScenario) {
+    private List<SalvageForceData> getSalvageForces(Campaign campaign, boolean isSpaceScenario,
+          List<Integer> alreadyAssignedForces) {
         List<SalvageForceData> salvageForceOptions = new ArrayList<>();
 
         // Collect eligible salvage forces (We want salvage forces first)
@@ -1156,8 +1160,11 @@ public final class BriefingTab extends CampaignGuiTab {
             }
 
             boolean isDeployedToScenario = force.isDeployed();
-            boolean isDeployedToStratCon = isForceDeployedToStratCon(activeContracts,
-                  force.getId());
+            // If the force is already assigned to this scenario, then we bypass the 'is deployed to StratCon' check.
+            // Otherwise, if the player assigns a force and then cancels at the last minute, the already assigned
+            // forces will no longer be available for the salvage operations they were assigned to perform.
+            boolean isDeployedToStratCon = !alreadyAssignedForces.contains(force.getId()) &&
+                                                 isForceDeployedToStratCon(activeContracts, force.getId());
             boolean isSalvageForce = force.getForceType().isSalvage();
             boolean hasAtLeastOneSalvageUnit = force.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
 
@@ -1185,7 +1192,11 @@ public final class BriefingTab extends CampaignGuiTab {
             }
 
             boolean isDeployedToScenario = force.isDeployed();
-            boolean isDeployedToStratCon = isForceDeployedToStratCon(activeContracts, force.getId());
+            // If the force is already assigned to this scenario, then we bypass the 'is deployed to StratCon' check.
+            // Otherwise, if the player assigns a force and then cancels at the last minute, the already assigned
+            // forces will no longer be available for the salvage operations they were assigned to perform.
+            boolean isDeployedToStratCon = !alreadyAssignedForces.contains(force.getId()) &&
+                                                 isForceDeployedToStratCon(activeContracts, force.getId());
             boolean hasAtLeastOneSalvageUnit = force.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
 
             if (!isDeployedToScenario &&
