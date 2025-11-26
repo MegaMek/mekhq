@@ -547,15 +547,16 @@ public class MHQMorale {
      * end early and whether it is a garrison type:</p>
      *
      * <ul>
-     *     <li><b>Garrison or non-early finish contracts</b>:</li>
+     *     <li><b>Garrison or non-early finish contracts</b>:
      *     <ul>
      *         <li>Sets a {@code routEnd} date a short time in the future, based on a random {@code d6} roll,
      *         resulting in a delay of roughly one to three months from the current in-game date.</li>
      *         <li>Processes friendly and enemy prisoners via {@link PrisonerMissionEndEvent}, if any are present.</li>
      *         <li>Resets the temporary prisoner capacity to {@link PrisonerEventManager#DEFAULT_TEMPORARY_CAPACITY}.</li>
      *     </ul>
+     *     </li>
      *
-     *     <li><b>Non-garrison contracts that can end early</b>:</li>
+     *     <li><b>Non-garrison contracts that can end early</b>:
      *     <ul>
      *         <li>Displays an immersive notification indicating that the contract is ending early due to routed
      *         morale.</li>
@@ -564,6 +565,7 @@ public class MHQMorale {
      *         routed payout.</li>
      *         <li>Sets the contract end date to the next in-game day.</li>
      *     </ul>
+     *     </li>
      * </ul>
      *
      * <p>This method should be called only after {@link AtBContract#getMoraleLevel()} has been updated to a routed
