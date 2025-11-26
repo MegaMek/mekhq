@@ -4906,9 +4906,7 @@ public class Unit implements ITechnology {
         int nCrew = 0;
 
         boolean entityIsConventionalInfantry = entity.isConventionalInfantry();
-        LOGGER.info("entityIsConventionalInfantry: {}", entityIsConventionalInfantry);
         boolean isTank = entity instanceof Tank; // Includes Wet Naval and VTOLs
-        LOGGER.info("isTank: {}", isTank);
 
         // For certain entities both drivers and gunners contribute to gunnery & piloting
         List<Person> relevantCrew = getCompositeCrew(isTank || entityIsConventionalInfantry, true);
@@ -5101,7 +5099,8 @@ public class Unit implements ITechnology {
             // if the unit is not always single crew, but in this instance is, the gunners list will be empty. In
             // such cases we instead want to return the drivers. Otherwise, we return the gunners (converted into an
             // ArrayList because they're currently stored as a Set).
-            return isDrivers ? drivers : (gunners.isEmpty() ? drivers : new ArrayList<>(gunners));
+            boolean isSingleCrewInThisInstance = getFullCrewSize() == 1;
+            return isDrivers || isSingleCrewInThisInstance ? drivers : new ArrayList<>(gunners);
         }
     }
 
