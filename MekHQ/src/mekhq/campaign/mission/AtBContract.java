@@ -453,7 +453,7 @@ public class AtBContract extends Contract {
                 moraleLevel = newMoraleLevel;
                 routEnd = null;
 
-                if (contractType.isGarrisonType() || contractType.isRetainer()) {
+                if (contractType.isGarrisonDuty() || contractType.isRetainer()) {
                     updateEnemy(campaign, today); // mix it up a little
                 }
             }
