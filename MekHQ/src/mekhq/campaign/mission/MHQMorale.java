@@ -56,6 +56,7 @@ import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
+import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 
@@ -540,38 +541,50 @@ public class MHQMorale {
     /**
      * Applies follow-up effects when a contract's morale has reached a routed state.
      *
-     * <p>The behavior depends on the contract type:</p>
+     * <p>If the contract is not in a routed morale state, this method performs no action.</p>
+     *
+     * <p>When the contract <b>is</b> routed, one of two behaviors is applied, depending on whether the contract can
+     * end early and whether it is a garrison type:</p>
+     *
      * <ul>
-     *     <li><b>Garrison contracts:</b>
+     *     <li><b>Garrison or non-early finish contracts</b>:</li>
      *     <ul>
-     *         <li>Sets a {@code routEnd} date a short time in the future based on a random d6 roll.</li>
-     *         <li>Processes friendly and enemy prisoners via {@link PrisonerMissionEndEvent}.</li>
-     *         <li>Resets the temporary prisoner capacity to
-     *         {@link PrisonerEventManager#DEFAULT_TEMPORARY_CAPACITY}.</li>
+     *         <li>Sets a {@code routEnd} date a short time in the future, based on a random {@code d6} roll,
+     *         resulting in a delay of roughly one to three months from the current in-game date.</li>
+     *         <li>Processes friendly and enemy prisoners via {@link PrisonerMissionEndEvent}, if any are present.</li>
+     *         <li>Resets the temporary prisoner capacity to {@link PrisonerEventManager#DEFAULT_TEMPORARY_CAPACITY}.</li>
      *     </ul>
-     *     </li>
-     *     <li><b>Non-garrison contracts:</b>
+     *
+     *     <li><b>Non-garrison contracts that can end early</b>:</li>
      *     <ul>
-     *         <li>Displays an immersive notification indicating an early contract end.</li>
-     *         <li>Calculates the remaining payout for the routed contract and stores it on the contract.</li>
+     *         <li>Displays an immersive notification indicating that the contract is ending early due to routed
+     *         morale.</li>
+     *         <li>Calculates the remaining payout for the routed contract by multiplying the monthly payout by the
+     *         number of months remaining after the next in-game day and stores the result on the contract as the
+     *         routed payout.</li>
      *         <li>Sets the contract end date to the next in-game day.</li>
      *     </ul>
-     *     </li>
      * </ul>
      *
-     * <p>This method should only be called when {@link AtBContract#getMoraleLevel()} is already in a routed state.</p>
+     * <p>This method should be called only after {@link AtBContract#getMoraleLevel()} has been updated to a routed
+     * state, and it assumes that the supplied {@link Campaign} and {@link AtBContract} are consistent with that
+     * state.</p>
      *
-     * @param campaign the campaign containing time, contract, and prisoner state
+     * @param campaign the campaign providing time, contract, and prisoner state
      * @param contract the routed contract whose end behavior and prisoner state are being updated
      *
      * @author Illiani
      * @since 0.50.10
      */
     public static void routedMoraleUpdate(Campaign campaign, AtBContract contract) {
-        LocalDate today = campaign.getLocalDate();
         if (contract.getMoraleLevel().isRouted()) {
-            // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
-            if (contract.getContractType().isGarrisonType()) {
+            LocalDate today = campaign.getLocalDate();
+            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            boolean canEarlyFinish = campaignState == null || campaignState.canEndContractEarly();
+
+            // Additional morale updates if morale level is set to 'Routed' and the contract type is either a garrison
+            // type or doesn't allow early contract completion
+            if (!canEarlyFinish || contract.getContractType().isGarrisonType()) {
                 contract.setRoutEnd(today.plusMonths(max(1, d6() - 3)).minusDays(1));
 
                 PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(campaign, contract);
