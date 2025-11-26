@@ -4629,6 +4629,7 @@ public class Unit implements ITechnology {
                 }
             }
         } else {
+            LOGGER.info("HIT_^&");
             if ((entity.getEntityType() & Entity.ETYPE_LAND_AIR_MEK) == 0) {
                 calcCompositeCrew(isOnlyCommandersMatter);
             } else {
@@ -4904,9 +4905,10 @@ public class Unit implements ITechnology {
         int nGunners = 0;
         int nCrew = 0;
 
-        boolean entityIsConventionalInfantry = entity.hasETypeFlag(Entity.ETYPE_INFANTRY) &&
-                                                     !entity.hasETypeFlag(Entity.ETYPE_BATTLEARMOR);
+        boolean entityIsConventionalInfantry = entity.isConventionalInfantry();
+        LOGGER.info("entityIsConventionalInfantry: {}", entityIsConventionalInfantry);
         boolean isTank = entity instanceof Tank; // Includes Wet Naval and VTOLs
+        LOGGER.info("isTank: {}", isTank);
 
         // For certain entities both drivers and gunners contribute to gunnery & piloting
         List<Person> relevantCrew = getCompositeCrew(isTank || entityIsConventionalInfantry, true);
@@ -5090,13 +5092,16 @@ public class Unit implements ITechnology {
      *                         {@code isTankOrInfantry} is {@code true})
      *
      * @return a list of personnel; for tanks or infantry returns the full crew, for other entities returns either
-     *       drivers or a copy of the gunners list
+     *       drivers or a copy of the gunner list
      */
     private List<Person> getCompositeCrew(boolean isTankOrInfantry, boolean isDrivers) {
         if (isTankOrInfantry) {
             return getCrew();
         } else {
-            return isDrivers ? drivers : new ArrayList<>(gunners);
+            // if the unit is not always single crew, but in this instance is, the gunners list will be empty. In
+            // such cases we instead want to return the drivers. Otherwise, we return the gunners (converted into an
+            // ArrayList because they're currently stored as a Set).
+            return isDrivers ? drivers : (gunners.isEmpty() ? drivers : new ArrayList<>(gunners));
         }
     }
 
