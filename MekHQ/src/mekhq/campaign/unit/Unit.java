@@ -5080,17 +5080,28 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Returns the appropriate list of personnel based on entity type and role.
+     * Returns the appropriate list of personnel based on the entity type and the requested crew role.
      *
-     * <p>For tank entities, this method returns the entire crew regardless of the role specified. For non-tank,
-     * non-infantry entities, it returns either the drivers or gunners list based on the {@code isDrivers} parameter.
+     * <p>If the entity is a tank or infantry unit, this method always returns the full crew, since those unit types
+     * do not distinguish between driver and gunner roles.</p>
      *
-     * @param isTankOrInfantry {@code true} if the entity is a tank or infantry, {@code false} otherwise
-     * @param isDrivers        {@code true} to return drivers, {@code false} to return gunners (ignored if
-     *                         {@code isTankOrInfantry} is {@code true})
+     * <p>For all other entity types, the returned list depends on the {@code isDrivers} flag and the unit’s crew
+     * configuration:</p>
+     * <ul>
+     *     <li>If {@code isDrivers} is {@code true}, the drivers list is returned.</li>
+     *     <li>If the unit is effectively single-crew for this instance (i.e., {@link #getFullCrewSize()} returns
+     *     {@code 1}), the drivers list is returned even if {@code isDrivers} is {@code false}. This avoids returning
+     *     an empty gunner list for units that normally support multiple crew.</li>
+     *     <li>Otherwise, the gunners list is returned as a new {@link ArrayList}, since gunners are stored
+     *     internally as a {@link Set}.</li>
+     * </ul>
      *
-     * @return a list of personnel; for tanks or infantry returns the full crew, for other entities returns either
-     *       drivers or a copy of the gunner list
+     * @param isTankOrInfantry {@code true} if the entity is a tank or infantry unit; when {@code true}, the {@code
+     * isDrivers} flag is ignored
+     * @param isDrivers        {@code true} to request the drivers list, {@code false} to request the gunners list
+     *                                     (unless overridden by single-crew behavior)
+     *
+     * @return a list of personnel appropriate to the entity type and requested role (never {@code null})
      */
     private List<Person> getCompositeCrew(boolean isTankOrInfantry, boolean isDrivers) {
         if (isTankOrInfantry) {
