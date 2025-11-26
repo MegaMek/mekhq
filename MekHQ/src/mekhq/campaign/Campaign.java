@@ -3608,7 +3608,7 @@ public class Campaign implements ITechManager {
         }
 
         // sort based on available minutes (highest -> lowest)
-        techs.sort(Comparator.comparingInt(person -> -person.getDailyAvailableTechTime(campaignOptions.isTechsUseAdministration())));
+        techs.sort(Comparator.comparingInt(person -> -person.getDailyAvailableTechTime(getCampaignOptions().isTechsUseAdministration())));
 
         // finally, sort based on rank (lowest -> highest)
         techs.sort((person1, person2) -> {
