@@ -5857,24 +5857,13 @@ public class Person {
      * Calculates the total available tech time per day for this person, including adjustments for skill level and
      * administrative support.
      *
-     * <p>Primary role techs (with no secondary role) receive full base time, while secondary role or expanded tech
-     * roles receive reduced base time. Personnel without any tech role receive no tech time. The base time is then
-     * multiplied by factors based on the tech's skill level and whether administrative support is available.</p>
-     *
      * @param isTechsUseAdministration whether techs benefit from administrative support personnel, which increases
      *                                 their available working time
      *
-     * @return the total available tech time in minutes per day, rounded to the nearest minute, or 0 if the person has
-     *       no tech role
+     * @return the total available tech time in minutes per day, rounded to the nearest minute
      */
     public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
-        int baseTime = 0;
-
-        if (isTechExpanded()) {
-            baseTime = PRIMARY_ROLE_SUPPORT_TIME;
-        }
-
-        return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration));
+        return (int) round(PRIMARY_ROLE_SUPPORT_TIME * calculateTechTimeMultiplier(isTechsUseAdministration));
     }
 
     public int getMaintenanceTimeUsing() {
@@ -6061,25 +6050,15 @@ public class Person {
      * Resets the available working time (minutes and overtime) for this person based on their role and administrative
      * support.
      *
-     * <p>Doctors receive standard support time, while techs receive time adjusted by skill and administration
-     * multipliers.</p>
-     *
      * @param isTechsUseAdministration whether techs benefit from administrative support personnel, which increases
      *                                 their available working time
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
-        // Personnel without tech or doctor roles have no available time
-        if (!isTechExpanded() && !isDoctor()) {
-            this.minutesLeft = 0;
-            this.overtimeLeft = 0;
-            return;
-        } else {
             this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
             this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-        }
 
         // Techs get support time adjusted by skill and administration multipliers
-        if (isTech() && isTechsUseAdministration) {
+        if (isTechExpanded() && isTechsUseAdministration) {
             double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
             this.minutesLeft = (int) Math.round(minutesLeft * multiplier);
             this.overtimeLeft = (int) Math.round(overtimeLeft * multiplier);
@@ -6218,7 +6197,6 @@ public class Person {
      *
      * @return the calculated time multiplier, where:
      *       <ul>
-     *         <li>0.0 indicates the person is not a technician.</li>
      *         <li>1.0 indicates no adjustment is applied.</li>
      *         <li>Values greater or less than 1.0 adjust task times accordingly.</li>
      *       </ul>
@@ -6228,7 +6206,7 @@ public class Person {
         final int REGULAR_EXPERIENCE_LEVEL = REGULAR.getExperienceLevel();
 
         if (!isTechExpanded()) {
-            return 0;
+            return 1;
         }
 
         if (!isTechsUseAdministration) {
@@ -6321,6 +6299,14 @@ public class Person {
 
     public @Nullable Skill getSkillForWorkingOn(final IPartWork part) {
         final Unit unit = part.getUnit();
+
+        // Infantry don't need techs to reload or swap out their ammo
+        boolean isForConventionalInfantry = unit.isConventionalInfantry();
+        if (isForConventionalInfantry) {
+            SkillType mechanicSkillType = SkillType.getType(S_TECH_MECHANIC);
+            return new Skill(S_TECH_MECHANIC, mechanicSkillType.getRegularLevel());
+        }
+
         Skill skill = getSkillForWorkingOn(unit);
         if (skill != null) {
             return skill;
