@@ -196,7 +196,7 @@ public class CampaignTest {
         when(testCampaign.getTechs(anyBoolean(), anyBoolean())).thenCallRealMethod();
         when(testCampaign.getTechsExpanded(anyBoolean(), anyBoolean(), anyBoolean())).thenCallRealMethod();
 
-        CampaignOptions campaignOptions = new CampaignOptions();
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(testCampaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(campaignOptions.isTechsUseAdministration()).thenReturn(false);
 
