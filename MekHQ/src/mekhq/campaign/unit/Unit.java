@@ -4629,6 +4629,7 @@ public class Unit implements ITechnology {
                 }
             }
         } else {
+            LOGGER.info("HIT_^&");
             if ((entity.getEntityType() & Entity.ETYPE_LAND_AIR_MEK) == 0) {
                 calcCompositeCrew(isOnlyCommandersMatter);
             } else {
@@ -4904,8 +4905,7 @@ public class Unit implements ITechnology {
         int nGunners = 0;
         int nCrew = 0;
 
-        boolean entityIsConventionalInfantry = entity.hasETypeFlag(Entity.ETYPE_INFANTRY) &&
-                                                     !entity.hasETypeFlag(Entity.ETYPE_BATTLEARMOR);
+        boolean entityIsConventionalInfantry = entity.isConventionalInfantry();
         boolean isTank = entity instanceof Tank; // Includes Wet Naval and VTOLs
 
         // For certain entities both drivers and gunners contribute to gunnery & piloting
@@ -5080,23 +5080,38 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Returns the appropriate list of personnel based on entity type and role.
+     * Returns the appropriate list of personnel based on the entity type and the requested crew role.
      *
-     * <p>For tank entities, this method returns the entire crew regardless of the role specified. For non-tank,
-     * non-infantry entities, it returns either the drivers or gunners list based on the {@code isDrivers} parameter.
+     * <p>If the entity is a tank or infantry unit, this method always returns the full crew, since those unit types
+     * do not distinguish between driver and gunner roles.</p>
      *
-     * @param isTankOrInfantry {@code true} if the entity is a tank or infantry, {@code false} otherwise
-     * @param isDrivers        {@code true} to return drivers, {@code false} to return gunners (ignored if
-     *                         {@code isTankOrInfantry} is {@code true})
+     * <p>For all other entity types, the returned list depends on the {@code isDrivers} flag and the unit’s crew
+     * configuration:</p>
+     * <ul>
+     *     <li>If {@code isDrivers} is {@code true}, the drivers list is returned.</li>
+     *     <li>If the unit is effectively single-crew for this instance (i.e., {@link #getFullCrewSize()} returns
+     *     {@code 1}), the drivers list is returned even if {@code isDrivers} is {@code false}. This avoids returning
+     *     an empty gunner list for units that normally support multiple crew.</li>
+     *     <li>Otherwise, the gunners list is returned as a new {@link ArrayList}, since gunners are stored
+     *     internally as a {@link Set}.</li>
+     * </ul>
      *
-     * @return a list of personnel; for tanks or infantry returns the full crew, for other entities returns either
-     *       drivers or a copy of the gunners list
+     * @param isTankOrInfantry {@code true} if the entity is a tank or infantry unit; when {@code true}, the {@code
+     * isDrivers} flag is ignored
+     * @param isDrivers        {@code true} to request the drivers list, {@code false} to request the gunners list
+     *                                     (unless overridden by single-crew behavior)
+     *
+     * @return a list of personnel appropriate to the entity type and requested role (never {@code null})
      */
     private List<Person> getCompositeCrew(boolean isTankOrInfantry, boolean isDrivers) {
         if (isTankOrInfantry) {
             return getCrew();
         } else {
-            return isDrivers ? drivers : new ArrayList<>(gunners);
+            // if the unit is not always single crew, but in this instance is, the gunners list will be empty. In
+            // such cases we instead want to return the drivers. Otherwise, we return the gunners (converted into an
+            // ArrayList because they're currently stored as a Set).
+            boolean isSingleCrewInThisInstance = getFullCrewSize() == 1;
+            return isDrivers || isSingleCrewInThisInstance ? drivers : new ArrayList<>(gunners);
         }
     }
 
