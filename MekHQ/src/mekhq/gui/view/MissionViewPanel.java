@@ -1063,8 +1063,8 @@ public class MissionViewPanel extends JScrollablePanel {
             int neededScore = contract.getRequiredVictoryPoints();
             String earlyContractEnd = "";
             if (contract.getStratconCampaignState() != null &&
-                      !contract.getStratconCampaignState().canEndContractEarly()) {
-                earlyContractEnd = resourceMap.getString("lblNoEarlyEnd.text");
+                      !contract.getStratconCampaignState().allowEarlyVictory()) {
+                earlyContractEnd = " " + resourceMap.getString("lblNoEarlyEnd.text");
             }
             txtScore.setText(currentScore + " / " + neededScore + earlyContractEnd);
             gridBagConstraints = new GridBagConstraints();
