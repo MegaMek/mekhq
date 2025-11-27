@@ -6436,29 +6436,45 @@ public class Person {
         }
     }
 
+    /**
+     * Returns the highest effective tech skill level the person possesses.
+     *
+     * <p>This method considers the four primary tech skills:</p>
+     * <ul>
+     *   <li>{@link SkillType#S_TECH_MEK}</li>
+     *   <li>{@link SkillType#S_TECH_MECHANIC}</li>
+     *   <li>{@link SkillType#S_TECH_BA}</li>
+     *   <li>{@link SkillType#S_TECH_AERO}</li>
+     * </ul>
+     *
+     * <p>For each skill the person has, the method computes its total effective level using the active
+     * {@link SkillModifierData} and returns the maximum among them. If none of the skills are present,
+     * {@link SkillType#EXP_NONE} is returned.</p>
+     *
+     * @return the highest total tech skill level across all tech skills, or {@link SkillType#EXP_NONE} if the person
+     *       has none of them.
+     */
     public int getBestTechLevel() {
-        int level = EXP_NONE;
-        final Skill mekSkill = getSkill(S_TECH_MEK);
-        final Skill mechanicSkill = getSkill(S_TECH_MECHANIC);
-        final Skill baSkill = getSkill(S_TECH_BA);
-        final Skill aeroSkill = getSkill(S_TECH_AERO);
-        if ((mekSkill != null) && (mekSkill.getLevel() > level)) {
-            level = mekSkill.getLevel();
+        SkillModifierData modifierData = getSkillModifierData();
+        int bestLevel = EXP_NONE;
+
+        Skill[] skills = {
+              getSkill(S_TECH_MEK),
+              getSkill(S_TECH_MECHANIC),
+              getSkill(S_TECH_BA),
+              getSkill(S_TECH_AERO)
+        };
+
+        for (Skill skill : skills) {
+            if (skill != null) {
+                int level = skill.getTotalSkillLevel(modifierData);
+                if (level > bestLevel) {
+                    bestLevel = level;
+                }
+            }
         }
 
-        if ((mechanicSkill != null) && (mechanicSkill.getLevel() > level)) {
-            level = mechanicSkill.getLevel();
-        }
-
-        if ((baSkill != null) && (baSkill.getLevel() > level)) {
-            level = baSkill.getLevel();
-        }
-
-        if ((aeroSkill != null) && (aeroSkill.getLevel() > level)) {
-            level = aeroSkill.getLevel();
-        }
-
-        return level;
+        return bestLevel;
     }
 
     public boolean isRightTechTypeFor(final IPartWork part) {
