@@ -4629,7 +4629,6 @@ public class Unit implements ITechnology {
                 }
             }
         } else {
-            LOGGER.info("HIT_^&");
             if ((entity.getEntityType() & Entity.ETYPE_LAND_AIR_MEK) == 0) {
                 calcCompositeCrew(isOnlyCommandersMatter);
             } else {
