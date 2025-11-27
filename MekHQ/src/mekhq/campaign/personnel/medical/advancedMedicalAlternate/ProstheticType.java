@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
-import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.common.options.OptionsConstants.*;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ATTRACTIVE;
@@ -903,18 +902,21 @@ public enum ProstheticType {
      * @since 0.50.10
      */
     public boolean isAvailableInCurrentLocation(CurrentLocation currentLocation, LocalDate today) {
-        int minimumTechRating = TechRating.E.getIndex();
-        int prostheticTechLevel = technologyRating.getIndex();
+        TechRating minimumTechRating = TechRating.E;
+        TechRating prostheticTechLevel = technologyRating;
 
+        // In transit: availability limited to rating E or lower
         if (!currentLocation.isOnPlanet()) {
-            // In transit: availability limited to rating E or lower
-            return minimumTechRating >= prostheticTechLevel;
+            return minimumTechRating.isPlanetaryTechLevelBetterOrEqualThan(prostheticTechLevel);
         }
 
         Planet planet = currentLocation.getPlanet();
-        int planetTechRating = max(minimumTechRating, planet.getTechRating(today).getIndex());
+        TechRating planetTechRating = planet.getTechRating(today);
+        if (planetTechRating == null || !planetTechRating.isPlanetaryTechLevelBetterOrEqualThan(minimumTechRating)) {
+            planetTechRating = minimumTechRating;
+        }
 
-        return planetTechRating >= prostheticTechLevel;
+        return planetTechRating.isPlanetaryTechLevelBetterOrEqualThan(prostheticTechLevel);
     }
 
     /**
