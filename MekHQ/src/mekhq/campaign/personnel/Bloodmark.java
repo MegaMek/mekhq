@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.personnel;
 
-import static java.lang.Math.ceil;
 import static java.lang.Math.min;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
@@ -53,6 +52,8 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.persons.PersonChangedEvent;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
@@ -219,6 +220,20 @@ public class Bloodmark {
         if (bloodmark == BLOODMARK_ZERO) {
             LOGGER.info("An assassination attempt was made on a character with no bloodmark. Skipping the hunt.");
             return;
+        }
+
+        if (person.isUnderProtection()) {
+            Money cost = bloodmark.getBounty().multipliedBy(2.0);
+            boolean paymentSuccessful = campaign.getFinances()
+                                              .debit(TransactionType.MISCELLANEOUS,
+                                                    campaign.getLocalDate(),
+                                                    cost,
+                                                    getFormattedTextAt(RESOURCE_BUNDLE,
+                                                          "Bloodmark.assassinationAttempt.paidOff",
+                                                          person.getFullTitle()));
+            if (paymentSuccessful) {
+                return;
+            }
         }
 
         // Generate the bounty hunter
