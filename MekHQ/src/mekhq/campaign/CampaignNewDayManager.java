@@ -182,7 +182,7 @@ import mekhq.utilities.ReportingUtilities;
  */
 public class CampaignNewDayManager {
     private static final MMLogger LOGGER = MMLogger.create(CampaignNewDayManager.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignNewDayManager";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
 
     // Deprecated since 0.50.10, for removal false
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
