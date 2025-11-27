@@ -1829,14 +1829,14 @@ public class AlternateInjuries {
     public static final class DermalMyomerArmorLeg extends Prosthetic {
         DermalMyomerArmorLeg() {
             super();
-            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_LEGOR.simpleName");
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_ARMOR.simpleName");
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
             this.injuryEffect = MYOMER_IMPLANT_LEG;
         }
 
         @Override
         public String getName(BodyLocation loc, int severity) {
-            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_LEGOR.simpleName",
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_ARMOR.simpleName",
                   Utilities.capitalize(loc.locationName()));
         }
     }
