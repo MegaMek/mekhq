@@ -186,18 +186,29 @@ public class TaskTableModel extends DataTableModel<IPartWork> {
 
                         if (null != tech) {
                             Skill partSkill = tech.getSkillForWorkingOn(part);
-                            String skillName = partSkill.getType().getName();
 
-                            //Find a tech in our placeholder cache
-                            tech = techCache.get(skillName);
+                            // If the tech has no applicable skill, skip dummy-tech creation and let getTargetFor()
+                            // handle the "cannot repair" case.
+                            if (partSkill != null) {
+                                String skillName = partSkill.getType().getName();
 
-                            if (null == tech) {
-                                //Create a dummy elite tech with the proper skill and 1 minute and put it in our cache for later use
-                                tech = new Person("Temp", String.format("Tech (%s)", skillName), gui.getCampaign());
-                                tech.addSkill(skillName, partSkill.getType().getEliteLevel(), 1);
-                                tech.setMinutesLeft(1);
+                                // Find a tech in our placeholder cache
+                                Person cachedTech = techCache.get(skillName);
 
-                                techCache.put(skillName, tech);
+                                if (cachedTech == null) {
+                                    // Create a dummy elite tech with the proper skill and 1 minute
+                                    // and put it in our cache for later use
+                                    cachedTech = new Person("Temp",
+                                          String.format("Tech (%s)", skillName),
+                                          gui.getCampaign());
+                                    cachedTech.addSkill(skillName,
+                                          partSkill.getType().getEliteLevel(), 1);
+                                    cachedTech.setMinutesLeft(1);
+
+                                    techCache.put(skillName, cachedTech);
+                                }
+
+                                tech = cachedTech;
                             }
                         }
                     }
