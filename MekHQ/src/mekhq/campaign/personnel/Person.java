@@ -6314,7 +6314,7 @@ public class Person {
         final Unit unit = part.getUnit();
 
         // Infantry don't need techs to reload or swap out their ammo
-        boolean isForConventionalInfantry = unit.isConventionalInfantry();
+        boolean isForConventionalInfantry = unit != null && unit.isConventionalInfantry();
         if (isForConventionalInfantry) {
             SkillType mechanicSkillType = SkillType.getType(S_TECH_MECHANIC);
             return new Skill(S_TECH_MECHANIC, mechanicSkillType.getRegularLevel());
