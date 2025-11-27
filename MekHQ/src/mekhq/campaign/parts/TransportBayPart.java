@@ -81,7 +81,7 @@ public class TransportBayPart extends Part {
     @Override
     public String getName() {
         if (null != getBay()) {
-            return getBay().getTransporterType() + " Bay #" + bayNumber;
+            return getBay().getType() + " Bay #" + bayNumber;
         }
         return super.getName();
     }
