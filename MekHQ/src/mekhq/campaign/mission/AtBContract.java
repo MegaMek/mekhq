@@ -68,6 +68,7 @@ import static mekhq.campaign.stratCon.StratConContractDefinition.getContractDefi
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.factionStanding.BatchallFactions.BATCHALL_FACTIONS;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -142,6 +143,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -215,6 +217,9 @@ public class AtBContract extends Contract {
     private StratConCampaignState stratconCampaignState;
     private boolean isAttacker;
 
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBContract";
+    @Deprecated(since = "0.50.10")
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBContract",
           MekHQ.getMHQOptions().getLocale());
 
@@ -414,12 +419,12 @@ public class AtBContract extends Contract {
      * @param today The current date in the context.
      */
     public void checkMorale(Campaign campaign, LocalDate today) {
-        // Check whether enemy forces have been reinforced, and whether any current rout continues beyond its
-        // expected date
-        boolean routContinue = randomInt(4) == 0;
 
         // If there is a rout end date, and it's past today, update morale and enemy state accordingly
         if (routEnd != null) {
+            // Check whether any current rout continues beyond its expected date. This is only applicable for
+            // Garrison Type contracts. For all other types we reinforce immediately
+            boolean routContinue = contractType.isGarrisonType() && randomInt(4) == 0;
             if (routContinue) {
                 return;
             }
@@ -428,7 +433,7 @@ public class AtBContract extends Contract {
                 int roll = randomInt(8);
 
                 // We use variable morale levels to spike morale up to a value above Stalemate. This works with the
-                // regenerated Scenario Odds to crease very high intensity spikes in otherwise low-key Garrison-type
+                // regenerated Scenario Odds to create very high intensity spikes in otherwise low-key Garrison-type
                 // contracts.
                 AtBMoraleLevel newMoraleLevel = switch (roll) {
                     case 2, 3, 4, 5 -> ADVANCING;
@@ -453,9 +458,23 @@ public class AtBContract extends Contract {
                 moraleLevel = newMoraleLevel;
                 routEnd = null;
 
+                String key = "routEnded.normal";
                 if (contractType.isGarrisonDuty() || contractType.isRetainer()) {
                     updateEnemy(campaign, today); // mix it up a little
+                    key = "routEnded.aNewChallenger";
                 }
+
+                new ImmersiveDialogSimple(campaign,
+                      getEmployerLiaison(),
+                      null,
+                      getFormattedTextAt(RESOURCE_BUNDLE,
+                            key,
+                            campaign.getCommanderAddress(),
+                            FactionStandingUtilities.getFactionName(getEnemy(), today.getYear())),
+                      null,
+                      null,
+                      null,
+                      false);
             }
 
             return;
