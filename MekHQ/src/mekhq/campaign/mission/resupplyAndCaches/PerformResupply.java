@@ -197,7 +197,7 @@ public class PerformResupply {
         }
 
         // With the focus chosen, we determine the contents of the convoy
-        boolean isUsePlayerConvoy = resupply.getUsePlayerConvoy();
+        boolean isUsePlayerConvoy = !resupplyType.equals(RESUPPLY_LOOT) && resupply.getUsePlayerConvoy();
         for (int i = 0; i < dropCount; i++) {
             getResupplyContents(resupply, DROP_TYPE_ARMOR, isUsePlayerConvoy);
             getResupplyContents(resupply, DROP_TYPE_AMMO, isUsePlayerConvoy);
