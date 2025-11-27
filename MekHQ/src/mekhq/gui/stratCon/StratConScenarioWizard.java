@@ -869,6 +869,10 @@ public class StratConScenarioWizard extends JDialog {
             selectedForceCount += availableForceLists.get(templateID).getSelectedValuesList().size();
         }
 
+        if (selectedForceCount == 0) {
+            return;
+        }
+
         StratConReinforcementsConfirmationDialog dialog = new StratConReinforcementsConfirmationDialog(campaign,
               targetNumber, availableSupportPoints, selectedForceCount);
         StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType responseType =
