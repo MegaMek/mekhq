@@ -582,7 +582,7 @@ public class MHQMorale {
         if (contract.getMoraleLevel().isRouted()) {
             LocalDate today = campaign.getLocalDate();
             StratConCampaignState campaignState = contract.getStratconCampaignState();
-            boolean canEarlyFinish = campaignState == null || campaignState.canEndContractEarly();
+            boolean canEarlyFinish = campaignState == null || campaignState.allowEarlyVictory();
 
             // Additional morale updates if morale level is set to 'Routed' and the contract type is either a garrison
             // type or doesn't allow early contract completion
