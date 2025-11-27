@@ -362,7 +362,7 @@ public class StratConReinforcementsConfirmationDialog {
             breakdown.append("<br><b>").append(modifier.getDesc()).append(":</b> ").append(modifier.value());
         }
 
-        int modifier = costMultiplier == 0 ? 0 : (supportPoints * SUPPORT_POINTS_MODIFIER) / costMultiplier;
+        int modifier = (supportPoints * SUPPORT_POINTS_MODIFIER) / costMultiplier;
 
         breakdown.append("<br><b>")
               .append(getTextAt(RESOURCE_BUNDLE,
