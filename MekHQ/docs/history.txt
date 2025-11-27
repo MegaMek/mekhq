@@ -1,6 +1,8 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.10 (2025-10- 2030 UTC)
+0.50.11
+
+0.50.10 (2025-10-12 2030 UTC)
 * Improvement: Made Profession Skills More Visible in Character Sheet Panel & When Spending XP by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7714
 * Fix #7717: Stopped Reinforcements Checks from Auto-Succeeding if GM Mode is Disabled by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7718
 * Fix #7715: Stopped Non-Vehicle Crew Appearing in Vehicle Crews Personnel Filter by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7716
