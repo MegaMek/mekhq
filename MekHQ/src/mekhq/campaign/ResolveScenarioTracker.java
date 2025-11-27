@@ -90,6 +90,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.FileDialogs;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.dialog.camOpsSalvage.SalvagePostScenarioPicker;
 import mekhq.utilities.ReportingUtilities;
 
@@ -1682,7 +1683,8 @@ public class ResolveScenarioTracker {
         }
 
         if (scenario.getStratConScenarioType().isHostileFacility() && control) {
-            campaign.addReport(getTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.civilianCaptives"));
+            new ImmersiveDialogNotification(campaign,
+                  getTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.civilianCaptives"), true);
 
             Hashtable<UUID, OppositionPersonnelStatus> civilianPersonnel = getCivilianCaptives(campaign, mission);
             for (UUID pid : civilianPersonnel.keySet()) {
