@@ -912,7 +912,7 @@ public enum ProstheticType {
 
         Planet planet = currentLocation.getPlanet();
         TechRating planetTechRating = planet.getTechRating(today);
-        if (planetTechRating == null || !planetTechRating.isPlanetaryTechLevelBetterOrEqualThan(minimumTechRating)) {
+        if (planetTechRating == null || minimumTechRating.isPlanetaryTechLevelBetterThan(planetTechRating)) {
             planetTechRating = minimumTechRating;
         }
 
