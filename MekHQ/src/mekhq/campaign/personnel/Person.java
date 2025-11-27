@@ -6300,11 +6300,13 @@ public class Person {
     public @Nullable Skill getSkillForWorkingOn(final IPartWork part) {
         final Unit unit = part.getUnit();
 
-        // Infantry don't need techs to reload or swap out their ammo
-        boolean isForConventionalInfantry = unit.isConventionalInfantry();
-        if (isForConventionalInfantry) {
-            SkillType mechanicSkillType = SkillType.getType(S_TECH_MECHANIC);
-            return new Skill(S_TECH_MECHANIC, mechanicSkillType.getRegularLevel());
+        if (unit != null) {
+            // Infantry don't need techs to reload or swap out their ammo
+            boolean isForConventionalInfantry = unit.isConventionalInfantry();
+            if (isForConventionalInfantry) {
+                SkillType mechanicSkillType = SkillType.getType(S_TECH_MECHANIC);
+                return new Skill(S_TECH_MECHANIC, mechanicSkillType.getRegularLevel());
+            }
         }
 
         Skill skill = getSkillForWorkingOn(unit);
