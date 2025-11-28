@@ -824,7 +824,7 @@ public class PersonnelTableModelColumnTest {
             switch (personnelTableModelColumn) {
                 case RANK -> assertInstanceOf(PersonRankStringSorter.class,
                       personnelTableModelColumn.getComparator(mockCampaign));
-                case EDUCATION -> assertInstanceOf(EducationLevelSorter.class,
+                case HIGHEST_EDUCATION, CURRENT_EDUCATION -> assertInstanceOf(EducationLevelSorter.class,
                       personnelTableModelColumn.getComparator(mockCampaign));
                 case AGE, BIRTHDAY, RECRUITMENT_DATE, LAST_RANK_CHANGE_DATE, DUE_DATE, RETIREMENT_DATE, DEATH_DATE ->
                       assertInstanceOf(DateStringComparator.class,
