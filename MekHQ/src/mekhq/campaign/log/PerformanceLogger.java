@@ -86,6 +86,14 @@ public class PerformanceLogger {
         }
     }
 
+    public static void paidOffFlaw(final Campaign campaign, final Person person, final LocalDate date,
+          final String spa) {
+        if (campaign.getCampaignOptions().isPersonnelLogAbilityGain()) {
+            person.addPerformanceLogEntry(new PerformanceLogEntry(date,
+                  MessageFormat.format(resources.getString("removed.text"), spa)));
+        }
+    }
+
     public static void gainedEdge(final Campaign campaign, final Person person, final LocalDate date) {
         if (campaign.getCampaignOptions().isPersonnelLogEdgeGain()) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,
