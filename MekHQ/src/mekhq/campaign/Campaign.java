@@ -37,8 +37,6 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.campaignOptions.CampaignOptions.S_AUTO;
-import static mekhq.campaign.campaignOptions.CampaignOptions.S_TECH;
 import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_MONTH;
 import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_WEEK;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
@@ -54,9 +52,12 @@ import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOT
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_ASTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
+import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
+import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
@@ -122,6 +123,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Quartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -3685,7 +3687,21 @@ public class Campaign implements ITechManager {
      *       found.
      */
     public @Nullable Person getLogisticsPerson() {
-        final String skillName = campaignOptions.getAcquisitionSkill();
+        final AcquisitionsType acquisitionsType = campaignOptions.getAcquisitionType();
+        String fixedSkillName = "";
+        boolean isAnyTech = false;
+
+        switch (acquisitionsType) {
+            case ADMINISTRATION -> fixedSkillName = S_ADMIN;
+            case ANY_TECH -> {
+                isAnyTech = true;
+            }
+            case AUTOMATIC -> {
+                return null;
+            }
+            case NEGOTIATION -> fixedSkillName = S_NEGOTIATION;
+        }
+
         final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
         final int defaultMaxAcquisitions = campaignOptions.getMaxAcquisitions();
 
@@ -3694,9 +3710,7 @@ public class Campaign implements ITechManager {
 
         int bestSkill = -1;
         Person procurementCharacter = null;
-        if (skillName.equals(S_AUTO)) {
-            return null;
-        } else if (skillName.equals(S_TECH)) {
+        if (isAnyTech) {
             for (Person person : getActivePersonnel(false, false)) {
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
@@ -3708,7 +3722,7 @@ public class Campaign implements ITechManager {
 
                 SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
                       currentDay);
-                Skill skill = person.getSkill(skillName);
+                Skill skill = person.getBestTechSkill();
 
                 int totalSkillLevel = Integer.MIN_VALUE;
                 if (skill != null) {
@@ -3733,7 +3747,7 @@ public class Campaign implements ITechManager {
                 SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
                       currentDay);
 
-                Skill skill = person.getSkill(skillName);
+                Skill skill = person.getSkill(fixedSkillName);
 
                 int totalSkillLevel = Integer.MIN_VALUE;
                 if (skill != null) {
@@ -3932,85 +3946,97 @@ public class Campaign implements ITechManager {
      *       empty list if acquisitions automatically succeed.
      */
     public List<Person> getLogisticsPersonnel() {
-        final String skillName = getCampaignOptions().getAcquisitionSkill();
+        final AcquisitionsType acquisitionsType = getCampaignOptions().getAcquisitionType();
 
-        if (skillName.equals(S_AUTO)) {
-            return Collections.emptyList();
-        } else {
-            final int maxAcquisitions = campaignOptions.getMaxAcquisitions();
-            final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
-            List<Person> logisticsPersonnel = new ArrayList<>();
+        String fixedSkillName = "";
+        boolean isAnyTech = false;
 
-            for (Person person : getActivePersonnel(false, false)) {
-                if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
-                    continue;
-                }
+        switch (acquisitionsType) {
+            case ADMINISTRATION -> fixedSkillName = S_ADMIN;
+            case ANY_TECH -> {
+                isAnyTech = true;
+            }
+            case AUTOMATIC -> {
+                return Collections.emptyList();
+            }
+            case NEGOTIATION -> fixedSkillName = S_NEGOTIATION;
+        }
 
-                if ((maxAcquisitions > 0) && (person.getAcquisitions() >= maxAcquisitions)) {
-                    continue;
-                }
-                if (skillName.equals(S_TECH)) {
-                    if (null != person.getBestTechSkill()) {
-                        logisticsPersonnel.add(person);
-                    }
-                } else if (person.hasSkill(skillName)) {
-                    logisticsPersonnel.add(person);
-                }
+        final int maxAcquisitions = campaignOptions.getMaxAcquisitions();
+        final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
+        List<Person> logisticsPersonnel = new ArrayList<>();
+
+        for (Person person : getActivePersonnel(false, false)) {
+            if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
+                continue;
             }
 
-            // Sort by their skill level, descending.
-            boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
-            boolean isClanCampaign = isClanCampaign();
-            logisticsPersonnel.sort((person1, person2) -> {
-                if (skillName.equals(S_TECH)) {
-                    // Person 1
-                    Skill skill = person1.getBestTechSkill();
-
-                    int person1SkillLevel = Integer.MIN_VALUE;
-                    if (skill != null) {
-                        SkillModifierData skillModifierData = person1.getSkillModifierData(isUseAgingEffects,
-                              isClanCampaign, currentDay);
-                        person1SkillLevel = skill.getTotalSkillLevel(skillModifierData);
-                    }
-
-                    // Person 2
-                    skill = person2.getBestTechSkill();
-
-                    int person2SkillLevel = Integer.MIN_VALUE;
-                    if (skill != null) {
-                        SkillModifierData skillModifierData = person2.getSkillModifierData(isUseAgingEffects,
-                              isClanCampaign, currentDay);
-                        person2SkillLevel = skill.getTotalSkillLevel(skillModifierData);
-                    }
-
-                    return Integer.compare(person1SkillLevel, person2SkillLevel);
-                } else {
-                    // Person 1
-                    Skill skill = person1.getSkill(S_TECH);
-
-                    int person1SkillLevel = Integer.MIN_VALUE;
-                    if (skill != null) {
-                        SkillModifierData skillModifierData = person1.getSkillModifierData(isUseAgingEffects,
-                              isClanCampaign, currentDay);
-                        person1SkillLevel = skill.getTotalSkillLevel(skillModifierData);
-                    }
-
-                    // Person 2
-                    skill = person2.getSkill(S_TECH);
-
-                    int person2SkillLevel = Integer.MIN_VALUE;
-                    if (skill != null) {
-                        SkillModifierData skillModifierData = person2.getSkillModifierData(isUseAgingEffects,
-                              isClanCampaign, currentDay);
-                        person2SkillLevel = skill.getTotalSkillLevel(skillModifierData);
-                    }
-
-                    return Integer.compare(person1SkillLevel, person2SkillLevel);
+            if ((maxAcquisitions > 0) && (person.getAcquisitions() >= maxAcquisitions)) {
+                continue;
+            }
+            if (isAnyTech) {
+                if (null != person.getBestTechSkill()) {
+                    logisticsPersonnel.add(person);
                 }
-            });
-
-            return logisticsPersonnel;
+            } else if (person.hasSkill(fixedSkillName)) {
+                logisticsPersonnel.add(person);
+            }
         }
+
+        // Sort by their skill level, descending.
+        boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
+        boolean isClanCampaign = isClanCampaign();
+        boolean finalIsAnyTech = isAnyTech; // Needed for lamba
+        String finalFixedSkillName = fixedSkillName; // Also needed for lamba
+        logisticsPersonnel.sort((person1, person2) -> {
+            if (finalIsAnyTech) {
+                // Person 1
+                Skill skill = person1.getBestTechSkill();
+
+                int person1SkillLevel = Integer.MIN_VALUE;
+                if (skill != null) {
+                    SkillModifierData skillModifierData = person1.getSkillModifierData(isUseAgingEffects,
+                          isClanCampaign, currentDay);
+                    person1SkillLevel = skill.getTotalSkillLevel(skillModifierData);
+                }
+
+                // Person 2
+                skill = person2.getBestTechSkill();
+
+                int person2SkillLevel = Integer.MIN_VALUE;
+                if (skill != null) {
+                    SkillModifierData skillModifierData = person2.getSkillModifierData(isUseAgingEffects,
+                          isClanCampaign, currentDay);
+                    person2SkillLevel = skill.getTotalSkillLevel(skillModifierData);
+                }
+
+                return Integer.compare(person1SkillLevel, person2SkillLevel);
+            } else {
+                // Person 1
+                Skill skill = person1.getSkill(finalFixedSkillName);
+
+                int person1SkillLevel = Integer.MIN_VALUE;
+                if (skill != null) {
+                    SkillModifierData skillModifierData = person1.getSkillModifierData(isUseAgingEffects,
+                          isClanCampaign, currentDay);
+                    person1SkillLevel = skill.getTotalSkillLevel(skillModifierData);
+                }
+
+                // Person 2
+                skill = person2.getSkill(finalFixedSkillName);
+
+                int person2SkillLevel = Integer.MIN_VALUE;
+                if (skill != null) {
+                    SkillModifierData skillModifierData = person2.getSkillModifierData(isUseAgingEffects,
+                          isClanCampaign, currentDay);
+                    person2SkillLevel = skill.getTotalSkillLevel(skillModifierData);
+                }
+
+                return Integer.compare(person1SkillLevel, person2SkillLevel);
+            }
+        });
+
+        return logisticsPersonnel;
     }
 
     /***
@@ -4029,7 +4055,7 @@ public class Campaign implements ITechManager {
             shoppingItem.decrementDaysToWait();
         }
 
-        if (getCampaignOptions().getAcquisitionSkill().equals(S_AUTO)) {
+        if (getCampaignOptions().getAcquisitionType() == AcquisitionsType.AUTOMATIC) {
             return goShoppingAutomatically(sList);
         } else if (!getCampaignOptions().isUsePlanetaryAcquisition()) {
             return goShoppingStandard(sList);
@@ -7369,17 +7395,30 @@ public class Campaign implements ITechManager {
      */
     public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, @Nullable Person person,
           final boolean checkDaysToWait, final boolean ignoreAcquisitionsPersonnel) {
-        if (getCampaignOptions().getAcquisitionSkill().equals(S_AUTO)) {
+        if (getCampaignOptions().getAcquisitionType() == AcquisitionsType.AUTOMATIC) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
         }
 
-        String acquisitionsSkill = getCampaignOptions().getAcquisitionSkill();
+        final AcquisitionsType acquisitionsType = campaignOptions.getAcquisitionType();
+        String fixedSkillName = "";
+        boolean isAnyTech = false;
+
+        switch (acquisitionsType) {
+            case ADMINISTRATION -> fixedSkillName = S_ADMIN;
+            case ANY_TECH -> isAnyTech = true;
+            case AUTOMATIC -> {
+                return null;
+            }
+            case NEGOTIATION -> fixedSkillName = S_NEGOTIATION;
+        }
+
         if (ignoreAcquisitionsPersonnel) {
             person = new Person(this);
-            SkillType skillType = SkillType.getType(acquisitionsSkill);
+            fixedSkillName = acquisitionsType == AcquisitionsType.ANY_TECH ? S_TECH_MECHANIC : fixedSkillName;
+            SkillType skillType = getType(fixedSkillName);
             if (skillType != null) {
                 int regularLevel = skillType.getRegularLevel();
-                person.addSkill(acquisitionsSkill, regularLevel, 0);
+                person.addSkill(fixedSkillName, regularLevel, 0);
             }
         }
 
@@ -7388,7 +7427,10 @@ public class Campaign implements ITechManager {
                   "Your procurement personnel have used up all their acquisition attempts for this period");
         }
 
-        final Skill skill = person.getSkillForWorkingOn(acquisitionsSkill);
+        final Skill skill = isAnyTech ? person.getBestTechSkill() : person.getSkillForWorkingOn(fixedSkillName);
+        if (skill == null) {
+            return new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "No skill");
+        }
         if (null != getShoppingList().getShoppingItem(acquisition.getNewEquipment()) && checkDaysToWait) {
             return new TargetRoll(TargetRoll.AUTOMATIC_FAIL,
                   "You must wait until the new cycle to check for this part. Further" +

@@ -95,9 +95,6 @@ public class CampaignOptions {
     public static final int TRANSIT_UNIT_WEEK = 1;
     public static final int TRANSIT_UNIT_MONTH = 2;
 
-    public static final String S_TECH = "Tech";
-    public static final String S_AUTO = "Automatic Success";
-
     public static final double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
     public static final double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
@@ -167,7 +164,7 @@ public class CampaignOptions {
     // region Supplies and Acquisition Tab
     // Acquisition
     private int waitingPeriod;
-    private String acquisitionSkill;
+    private AcquisitionsType acquisitionsType;
     private boolean useFunctionalAppraisal;
     private ProcurementPersonnelPick acquisitionPersonnelCategory;
     private int clanAcquisitionPenalty;
@@ -746,7 +743,6 @@ public class CampaignOptions {
         // region Supplies and Acquisitions Tab
         // Acquisition
         waitingPeriod = 7;
-        acquisitionSkill = S_TECH;
         useFunctionalAppraisal = false;
         acquisitionPersonnelCategory = SUPPORT;
         clanAcquisitionPenalty = 0;
@@ -4476,12 +4472,12 @@ public class CampaignOptions {
         this.waitingPeriod = acquisitionSkill;
     }
 
-    public String getAcquisitionSkill() {
-        return acquisitionSkill;
+    public AcquisitionsType getAcquisitionType() {
+        return acquisitionsType;
     }
 
-    public void setAcquisitionSkill(final String acquisitionSkill) {
-        this.acquisitionSkill = acquisitionSkill;
+    public void setAcquisitionType(final AcquisitionsType acquisitionsType) {
+        this.acquisitionsType = acquisitionsType;
     }
 
     public boolean isUseFunctionalAppraisal() {
