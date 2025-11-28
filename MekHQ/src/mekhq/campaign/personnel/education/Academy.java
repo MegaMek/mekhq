@@ -1077,7 +1077,7 @@ public class Academy implements Comparable<Academy> {
         if (result == null) {
             JOptionPane.showMessageDialog(
                   null,
-                  "Unrecognized skill: " + skill,
+                  "Unrecognized skill: " + skill + ". If you are using a custom academy, please remove this skill.",
                   "Unknown Skill",
                   JOptionPane.WARNING_MESSAGE
             );
