@@ -458,7 +458,7 @@ public class AtBContract extends Contract {
                 moraleLevel = newMoraleLevel;
                 routEnd = null;
 
-                String key = "routEnded.normal";
+                String key = "routEnded.reinforcements";
                 if (contractType.isGarrisonDuty() || contractType.isRetainer()) {
                     updateEnemy(campaign, today); // mix it up a little
                     key = "routEnded.aNewChallenger";
