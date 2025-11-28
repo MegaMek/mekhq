@@ -4759,7 +4759,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             menuItem.setEnabled(available);
 
-            AbilityCategory category = getSpaCategory(flaw);
             alreadyPurchasedFlawMenu.add(menuItem);
         }
     }
