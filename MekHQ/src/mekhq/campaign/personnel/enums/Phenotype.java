@@ -135,7 +135,7 @@ public enum Phenotype {
      * @since 0.50.05
      */
     public int getAttributeCap(SkillAttribute attribute) {
-        return attributeCaps.getAttributeScore(attribute);
+        return attributeCaps.getBaseAttributeScore(attribute);
     }
 
     /**
