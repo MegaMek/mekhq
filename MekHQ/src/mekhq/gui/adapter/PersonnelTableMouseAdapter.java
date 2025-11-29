@@ -3866,7 +3866,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.setName("miTryingToConceive");
             cbMenuItem.setSelected(selected.length == 1 && person.isTryingToConceive());
             cbMenuItem.addActionListener(evt -> Stream.of(selected)
-                                                      .forEach(p -> p.setTryingToConceive(p.isTryingToConceive())));
+                                                      .forEach(p -> p.setTryingToConceive(!p.isTryingToConceive())));
             menu.add(cbMenuItem);
         }
 
@@ -3876,7 +3876,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         cbMenuItem.setName("miHidePersonality");
         cbMenuItem.setSelected(selected.length == 1 && person.isHidePersonality());
         cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
-            selectedPerson.setHidePersonality(selectedPerson.isHidePersonality());
+            selectedPerson.setHidePersonality(!selectedPerson.isHidePersonality());
             MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
         }));
         menu.add(cbMenuItem);
