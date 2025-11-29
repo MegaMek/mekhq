@@ -39,6 +39,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,7 @@ import javax.swing.table.TableRowSorter;
 
 import mekhq.MHQConstants;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionHints.FactionHint;
 import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -99,6 +101,7 @@ public class DiplomacyReport extends JDialog {
     private final LocalDate today;
     private final boolean isClanCampaign;
     private final boolean isBeforeClanInvasionFirstWave;
+    private final Collection<Faction> activeFactions;
 
     /**
      * Constructs the {@link DiplomacyReport} dialog.
@@ -115,6 +118,7 @@ public class DiplomacyReport extends JDialog {
         this.today = today;
 
         isBeforeClanInvasionFirstWave = today.isBefore(MHQConstants.CLAN_INVASION_FIRST_WAVE_BEGINS);
+        activeFactions = Factions.getInstance().getActiveFactions(today);
 
         setLayout(new BorderLayout());
 
@@ -199,10 +203,6 @@ public class DiplomacyReport extends JDialog {
         Faction primaryFaction = outerEntry.getKey();
         String primaryFactionName = primaryFaction.getFullName(currentYear);
 
-        if (shouldHideFaction(primaryFaction)) {
-            return;
-        }
-
         Map<Faction, List<FactionHint>> innerMap = outerEntry.getValue();
         for (Map.Entry<Faction, List<FactionHint>> innerEntry : innerMap.entrySet()) {
             Faction otherFaction = innerEntry.getKey();
@@ -211,6 +211,11 @@ public class DiplomacyReport extends JDialog {
             String key = primaryFactionName + relationType + otherFactionName;
             if (seenPairs.contains(key)) {
                 continue; // Avoid duplicates due to symmetry
+            }
+
+            // We're filtering down here so that we can ensure the pair is still added to the 'seenPairs' Set
+            if (shouldHideFaction(primaryFaction, otherFaction)) {
+                return;
             }
 
             List<FactionHint> factionHints = innerEntry.getValue();
@@ -232,6 +237,10 @@ public class DiplomacyReport extends JDialog {
      * <p>If the current date is before the Clan Invasion first wave, this method will hide non-Clan factions in
      * Clan campaigns and Clan factions in non-Clan campaigns. Otherwise, no factions are hidden.</p>
      *
+     * <p>If either faction isn't active yet, we will also hide them. The way our faction relationship data is set
+     * up, there are several instances where we don't define the start/end date. That causes the relationship to be
+     * incorrectly picked up by the diplomacy report.</p>
+     *
      * @param primaryFaction the faction to test for hiding
      *
      * @return {@code true} if the faction should be hidden
@@ -239,10 +248,17 @@ public class DiplomacyReport extends JDialog {
      * @author Illiani
      * @since 0.50.10
      */
-    private boolean shouldHideFaction(Faction primaryFaction) {
+    private boolean shouldHideFaction(Faction primaryFaction, Faction secondaryFaction) {
+        // If it's before the Clan Invasion first wave hide Inner Sphere relationships from Clan factions and Clan
+        // relations from Inner Sphere factions.
         if (isBeforeClanInvasionFirstWave) {
-            return isClanCampaign != primaryFaction.isClan();
+            if (isClanCampaign != primaryFaction.isClan()) {
+                return true;
+            }
         }
-        return false;
+
+        // If either faction is not currently active, hide the relationship. This is because we have a number of
+        // relationships with no defined start or end date.
+        return !activeFactions.contains(primaryFaction) || !activeFactions.contains(secondaryFaction);
     }
 }
