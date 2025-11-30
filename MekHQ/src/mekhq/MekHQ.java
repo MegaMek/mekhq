@@ -34,6 +34,7 @@
 package mekhq;
 
 import static megamek.MMConstants.LOCALHOST_IP;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.FileDialog;
 import java.awt.event.InputEvent;
@@ -113,6 +114,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.panels.StartupScreenPanel;
@@ -120,7 +122,6 @@ import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
-import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ScenarioUtils;
 
 /**
@@ -627,23 +628,7 @@ public class MekHQ implements GameListener {
             return;
         }
         try {
-            String victoryMessage = MHQInternationalization.getText("ResolveDialog.control.message");
-
-            if (currentScenario instanceof AtBDynamicScenario) {
-                ScenarioTemplate template = ((AtBDynamicScenario) currentScenario).getTemplate();
-
-                if (template != null) {
-                    BattlefieldControlType battlefieldControl = template.getBattlefieldControl();
-
-                    String controlMessage = MHQInternationalization.getText("ResolveDialog.control." +
-                                                                                  battlefieldControl.name());
-
-                    victoryMessage = String.format("%s\n\n%s", controlMessage, victoryMessage);
-                }
-            }
-
-            boolean control = yourSideControlsTheBattlefieldDialogAsk(victoryMessage,
-                  MHQInternationalization.getText("ResolveDialog.control.title"));
+            boolean control = playerHasFieldControl(currentScenario, null);
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
             tracker.setClient(gameThread.getClient());
             tracker.setEvent(gve);
@@ -675,24 +660,7 @@ public class MekHQ implements GameListener {
             return;
         }
 
-        String victoryMessage = MHQInternationalization.getText("ResolveDialog.control.message");
-
-        if (selectedScenario instanceof AtBDynamicScenario) {
-            ScenarioTemplate template = ((AtBDynamicScenario) selectedScenario).getTemplate();
-
-            if (template != null) {
-                BattlefieldControlType battlefieldControl = template.getBattlefieldControl();
-
-                String controlMessage = MHQInternationalization.getText("ResolveDialog.control." +
-                                                                              battlefieldControl.name());
-
-                victoryMessage = String.format("%s\n\n%s", controlMessage, victoryMessage);
-            }
-        }
-
-        boolean control = yourSideControlsTheBattlefieldDialogAsk(victoryMessage,
-              MHQInternationalization.getText("ResolveDialog.control.title"));
-
+        boolean control = playerHasFieldControl(selectedScenario, null);
         ResolveScenarioTracker tracker = new ResolveScenarioTracker(selectedScenario, getCampaign(), control);
 
         ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(campaignGUI.getFrame(), true, tracker);
@@ -714,12 +682,70 @@ public class MekHQ implements GameListener {
         PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), selectedScenario, tracker);
     }
 
-    private boolean yourSideControlsTheBattlefieldDialogAsk(String message, String title) {
-        return JOptionPane.showConfirmDialog(campaignGUI.getFrame(),
-              message,
-              title,
-              JOptionPane.YES_NO_OPTION,
-              JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
+    /**
+     * Determines whether the player chooses to assert field control for the specified {@link Scenario} by presenting a
+     * confirmation dialog to the user.
+     *
+     * <p>If the scenario is an instance of {@link AtBDynamicScenario}, the method attempts to retrieve the
+     * associated {@link ScenarioTemplate}. When available, the template’s {@link BattlefieldControlType} is used to
+     * append an additional descriptive message to the dialog, informing the player of the battlefield control
+     * context.</p>
+     *
+     * <p>The constructed message is then shown in an {@link ImmersiveDialogSimple}, offering the player two
+     * choices:</p>
+     * <ul>
+     *   <li><b>Control</b> – the player claims field control;</li>
+     *   <li><b>Yield</b> – the player relinquishes field control.</li>
+     * </ul>
+     * <p>The method returns {@code true} only if the player selects the first option.</p>
+     *
+     * @param selectedScenario              the scenario for which field control is being evaluated; may be an
+     *                                      {@link AtBDynamicScenario} or a standard scenario
+     * @param playerWonAutoResolvedScenario {@code true} if the scenario was resolved via auto-resolve and the players'
+     *                                      forces won. Otherwise {@code false}. If the scenario was not resolved via
+     *                                      auto-resolve should equal {@code null}.
+     *
+     * @return {@code true} if the player elects to claim field control, {@code false} if they choose to yield
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private boolean playerHasFieldControl(Scenario selectedScenario, @Nullable Boolean playerWonAutoResolvedScenario) {
+        String resolveMessage = "";
+
+        if (playerWonAutoResolvedScenario != null) {
+            resolveMessage = playerWonAutoResolvedScenario ? getText("AutoResolveDialog.message.victory") : getText(
+                  "AutoResolveDialog.message.defeat");
+        }
+
+        if (resolveMessage.isBlank()) {
+            resolveMessage = getText("ResolveDialog.control.message");
+        } else {
+            resolveMessage = "<p>" + getText("ResolveDialog.control.message") + "</p>";
+        }
+
+        if (selectedScenario instanceof AtBDynamicScenario) {
+            ScenarioTemplate template = ((AtBDynamicScenario) selectedScenario).getTemplate();
+
+            if (template != null) {
+                BattlefieldControlType battlefieldControl = template.getBattlefieldControl();
+
+                String controlMessage = getText("ResolveDialog.control." +
+                                                      battlefieldControl.name());
+
+                resolveMessage = resolveMessage + "<p>" + controlMessage + "</p>";
+            }
+        }
+
+        ImmersiveDialogSimple dialogSimple = new ImmersiveDialogSimple(getCampaign(),
+              null,
+              null,
+              resolveMessage,
+              List.of(getText("AutoResolveDialog.control.control"), getText("AutoResolveDialog.control.yield")),
+              null,
+              null,
+              true);
+        return dialogSimple.getDialogChoice() == 0;
     }
 
     // region Event Handling Methods that are not implemented
@@ -814,30 +840,7 @@ public class MekHQ implements GameListener {
      */
     public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent, Scenario scenario) {
         try {
-            String victoryMessage = autoResolveConcludedEvent.controlledScenario() ?
-                                          MHQInternationalization.getText("AutoResolveDialog.message.victory") :
-                                          MHQInternationalization.getText("AutoResolveDialog.message.defeat");
-
-            String decisionMessage = MHQInternationalization.getText("ResolveDialog.control.message");
-
-            if (scenario instanceof AtBDynamicScenario atBDynamicScenario) {
-                ScenarioTemplate template = atBDynamicScenario.getTemplate();
-
-                if (template != null) {
-                    BattlefieldControlType battlefieldControl = template.getBattlefieldControl();
-
-                    String controlMessage = MHQInternationalization.getText("ResolveDialog.control." +
-                                                                                  battlefieldControl.name());
-
-                    victoryMessage = String.format("%s\n\n%s\n\n%s", controlMessage, victoryMessage, decisionMessage);
-                }
-            }
-
-            String title = autoResolveConcludedEvent.controlledScenario() ?
-                                 MHQInternationalization.getText("AutoResolveDialog.victory") :
-                                 MHQInternationalization.getText("AutoResolveDialog.defeat");
-            boolean control = yourSideControlsTheBattlefieldDialogAsk(victoryMessage, title);
-
+            boolean control = playerHasFieldControl(currentScenario, autoResolveConcludedEvent.controlledScenario());
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign(), control);
             tracker.setClient(new SimulatedClient(autoResolveConcludedEvent.getGame()));
             tracker.setEvent(autoResolveConcludedEvent);
