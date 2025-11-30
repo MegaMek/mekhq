@@ -6067,8 +6067,8 @@ public class Person {
      *                                 their available working time
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
-            this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
-            this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
+        this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
+        this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
 
         // Techs get support time adjusted by skill and administration multipliers
         if (isTechExpanded() && isTechsUseAdministration) {
@@ -6427,9 +6427,7 @@ public class Person {
     }
 
     public @Nullable Skill getSkillForWorkingOn(final @Nullable String skillName) {
-        if (CampaignOptions.S_TECH.equals(skillName)) {
-            return getBestTechSkill();
-        } else if (hasSkill(skillName)) {
+        if (hasSkill(skillName)) {
             return getSkill(skillName);
         } else {
             return null;
