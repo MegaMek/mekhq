@@ -604,8 +604,19 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
 
         if (!selected.isAvailableToFaction(campaign.getFaction())) {
-            tooltip += getTextAt(RESOURCE_BUNDLE,
-                  "AdvancedReplacementLimbDialog.exclusions.faction");
+            if (selected.isClanOnly()) {
+                tooltip += getTextAt(RESOURCE_BUNDLE,
+                      "AdvancedReplacementLimbDialog.exclusions.faction.clan");
+            } else if (selected.isComStarOnly()) {
+                tooltip += getTextAt(RESOURCE_BUNDLE,
+                      "AdvancedReplacementLimbDialog.exclusions.faction.comstar");
+            } else if (selected.isWordOfBlakeOnly()) {
+                tooltip += getTextAt(RESOURCE_BUNDLE,
+                      "AdvancedReplacementLimbDialog.exclusions.faction.wob");
+            } else {
+                tooltip += getTextAt(RESOURCE_BUNDLE,
+                      "AdvancedReplacementLimbDialog.exclusions.faction.generic");
+            }
         }
 
         if (!selected.isAvailableInCurrentLocation(campaign.getLocation(),
