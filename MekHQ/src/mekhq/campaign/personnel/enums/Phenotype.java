@@ -96,9 +96,6 @@ public enum Phenotype {
 
     Phenotype(final boolean isTrueborn, final boolean external, final int strength, final int body, final int reflexes,
           final int dexterity, final Attributes attributeCaps, final List<String> bonusTraits) {
-        this.shortName = generateShortName();
-        this.label = generateLabel();
-        this.tooltip = generateTooltip();
         this.isTrueborn = isTrueborn;
         this.external = external;
         this.strength = strength;
@@ -107,6 +104,9 @@ public enum Phenotype {
         this.dexterity = dexterity;
         this.attributeCaps = attributeCaps;
         this.bonusTraits = bonusTraits;
+        this.shortName = generateShortName();
+        this.label = generateLabel();
+        this.tooltip = generateTooltip();
     }
     // endregion Constructors
 
@@ -135,7 +135,7 @@ public enum Phenotype {
      * @since 0.50.05
      */
     public int getAttributeCap(SkillAttribute attribute) {
-        return attributeCaps.getAttributeScore(attribute);
+        return attributeCaps.getBaseAttributeScore(attribute);
     }
 
     /**

@@ -236,6 +236,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_ACQUIRE_HUMAN_TRO = "HUMAN_TRO";
     private static final String CMD_ACQUIRE_ABILITY = "ABILITY";
     private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE";
+    private static final String CMD_BUY_OFF_FLAW = "BUY_OFF_FLAW";
     private static final String CMD_REFUND_SKILL = "REFUND_SKILL";
     private static final String CMD_IMPROVE = "IMPROVE";
     private static final String CMD_BUY_TRAIT = "BUY_TRAIT";
@@ -776,6 +777,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     getCampaign().personUpdated(person);
                 }
 
+                break;
+            }
+            case CMD_BUY_OFF_FLAW: {
+                String selected = data[1];
+                int cost = MathUtility.parseInt(data[2]);
+                IOption option = selectedPerson.getOptions().getOption(selected);
+                option.setValue(option.getDefault());
+                selectedPerson.spendXP(cost);
+                final String displayName = SpecialAbility.getDisplayName(selected);
+                PerformanceLogger.paidOffFlaw(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
+                getCampaign().addReport(String.format(resources.getString("removed.format"),
+                      selectedPerson.getHyperlinkedName(),
+                      displayName));
+                getCampaign().personUpdated(selectedPerson);
                 break;
             }
             case CMD_ACQUIRE_ABILITY: {
@@ -2401,7 +2416,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem = new JMenuItem(resources.getString("performAdvancedSurgery.text"));
             menuItem.addActionListener(ev -> {
                 for (Person selectedPerson : getSelectedPeople()) {
-                    new AdvancedReplacementLimbDialog(getCampaign(), selectedPerson);
+                    new AdvancedReplacementLimbDialog(getCampaign(), selectedPerson, false);
                 }
             });
             popup.add(menuItem);
@@ -2827,29 +2842,35 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             final double xpCostMultiplier = getCampaignOptions().getXpCostMultiplier();
 
             menu = new JMenu(resources.getString("spendXP.text"));
+            submenu = new JMenu(resources.getString("abilities.text"));
+            menu.add(submenu);
             if (getCampaignOptions().isUseAbilities()) {
                 JMenu combatAbilityMenu = new JMenu(resources.getString("combatAbilityMenu.text"));
-                menu.add(combatAbilityMenu);
+                submenu.add(combatAbilityMenu);
 
                 JMenu maneuveringAbilityMenu = new JMenu(resources.getString("maneuveringAbilityMenu.text"));
-                menu.add(maneuveringAbilityMenu);
+                submenu.add(maneuveringAbilityMenu);
 
                 JMenu utilityAbilityMenu = new JMenu(resources.getString("utilityAbilityMenu.text"));
-                menu.add(utilityAbilityMenu);
-
-                JMenu characterFlawMenu = new JMenu(resources.getString("characterFlawMenu.text"));
-                menu.add(characterFlawMenu);
+                submenu.add(utilityAbilityMenu);
 
                 JMenu characterOriginMenu = new JMenu(resources.getString("characterOriginMenu.text"));
-                menu.add(characterOriginMenu);
+                if (getCampaign().isGM()) {
+                    submenu.add(characterOriginMenu);
+                }
 
-                int cost;
+                JMenu characterFlawMenu = new JMenu(resources.getString("characterFlawMenu.text"));
+                submenu.add(characterFlawMenu);
+
+                JMenu characterBuyOffFlawMenu = new JMenu(resources.getString("characterBuyOffFlawMenu.text"));
+                submenu.add(characterBuyOffFlawMenu);
 
                 List<SpecialAbility> specialAbilities = new ArrayList<>(SpecialAbility.getSpecialAbilities().values());
                 specialAbilities.sort(Comparator.comparing(SpecialAbility::getName));
 
                 List<SpecialAbility> eligibleAbilities = new ArrayList<>();
                 List<SpecialAbility> notEligibleAbilities = new ArrayList<>();
+                List<SpecialAbility> alreadyPurchasedFlaws = new ArrayList<>();
                 for (SpecialAbility spa : specialAbilities) {
                     if (null == spa) {
                         continue;
@@ -2858,6 +2879,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         eligibleAbilities.add(spa);
                     } else {
                         notEligibleAbilities.add(spa);
+                    }
+
+                    if (spa.getCost() < 0 && person.getOptions().booleanOption(spa.getName())) {
+                        alreadyPurchasedFlaws.add(spa);
                     }
                 }
 
@@ -2894,6 +2919,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                           characterOriginMenu,
                           false);
                 }
+
+                for (SpecialAbility flaw : alreadyPurchasedFlaws) {
+                    addAlreadyPurchasedFlawToMenu(flaw,
+                          xpCostMultiplier,
+                          person,
+                          characterBuyOffFlawMenu);
+                }
             }
 
             JMenu currentMenu = new JMenu(resources.getString("spendOnCurrentSkills.text"));
@@ -2915,11 +2947,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             JMenu roleplaySkillsArtNew = new JMenu(resources.getString("roleplaySkills.art"));
             JMenu roleplaySkillsInterestNew = new JMenu(resources.getString("roleplaySkills.interest"));
             JMenu roleplaySkillsScienceNew = new JMenu(resources.getString("roleplaySkills.science"));
-
-            int adjustedReputation = person.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
-                  getCampaign().isClanCampaign(),
-                  getCampaign().getLocalDate(),
-                  person.getRankNumeric());
 
             boolean adminsHaveNegotiation = getCampaignOptions().isAdminsHaveNegotiation();
             boolean doctorsUseAdmin = getCampaignOptions().isDoctorsUseAdministration();
@@ -3866,7 +3893,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.setName("miTryingToConceive");
             cbMenuItem.setSelected(selected.length == 1 && person.isTryingToConceive());
             cbMenuItem.addActionListener(evt -> Stream.of(selected)
-                                                      .forEach(p -> p.setTryingToConceive(p.isTryingToConceive())));
+                                                      .forEach(p -> p.setTryingToConceive(!p.isTryingToConceive())));
             menu.add(cbMenuItem);
         }
 
@@ -3876,7 +3903,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         cbMenuItem.setName("miHidePersonality");
         cbMenuItem.setSelected(selected.length == 1 && person.isHidePersonality());
         cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
-            selectedPerson.setHidePersonality(selectedPerson.isHidePersonality());
+            selectedPerson.setHidePersonality(!selectedPerson.isHidePersonality());
             MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
         }));
         menu.add(cbMenuItem);
@@ -4705,6 +4732,34 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 case CHARACTER_CREATION_ONLY -> {
                 }
             }
+        }
+    }
+
+    private void addAlreadyPurchasedFlawToMenu(SpecialAbility flaw, double xpCostMultiplier, Person person,
+          JMenu alreadyPurchasedFlawMenu) {
+        JMenuItem menuItem;
+        int cost;
+        // Reasoning cost changes should always take place before global changes
+        int baseCost = flaw.getCost();
+        cost = (int) round(baseCost * xpCostMultiplier);
+        cost = -cost; // Reverse the polarity as we're paying the Flaw off
+
+        String costDesc = String.format(resources.getString("costValue.format"), cost);
+        boolean available = person.getXP() >= cost;
+
+        if (person.getOptions().booleanOption(flaw.getName())) { // Insurance check
+            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"),
+                  flaw.getDisplayName(),
+                  costDesc));
+            menuItem.setToolTipText(wordWrap(flaw.getDescription() + "<br><br>" + flaw.getAllPrereqDesc()));
+
+            menuItem.setActionCommand(makeCommand(CMD_BUY_OFF_FLAW,
+                  flaw.getName(),
+                  String.valueOf(cost)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(available);
+
+            alreadyPurchasedFlawMenu.add(menuItem);
         }
     }
 

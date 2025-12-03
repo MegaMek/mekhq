@@ -1787,7 +1787,7 @@ public enum InjuryEffect {
             int modifier = attributeTotals.getOrDefault(attribute, 0);
             if (modifier != 0) {
                 tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "InjuryEffect.tooltip.attribute", modifier, attribute));
+                      "InjuryEffect.tooltip.attribute", modifier, attribute.getLabel()));
             }
         }
 

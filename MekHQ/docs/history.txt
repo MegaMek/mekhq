@@ -1,6 +1,435 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.08
+0.50.11
+
+0.50.10 (2025-10-12 2030 UTC)
+* Improvement: Made Profession Skills More Visible in Character Sheet Panel & When Spending XP by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7714
+* Fix #7717: Stopped Reinforcements Checks from Auto-Succeeding if GM Mode is Disabled by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7718
+* Fix #7715: Stopped Non-Vehicle Crew Appearing in Vehicle Crews Personnel Filter by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7716
+* Fix: Fixed Advanced Scouting Movement Modifiers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7713
+* Fix: Updated Tooltips for Astech and MedTech/Any Skills by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7712
+* Fix #7702: Fixed Personnel Being Incorrectly Marked as Camp Followers If Edited in Hire (GM) Dialog Prior to Hiring by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7708
+* Fix #7704: Fixed Patrol Forces Deploying Scenarios to Unexplored Hexes in StratCon by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7706
+* Fix #7696: Corrected Prisoner Capacity Math by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7698
+* Fix: Fixed Battle Armor Skill Use by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7699
+* Fix #7697: Fixed New Day Advance when Character is Illiterate But Has No Languages/Any Skill by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7701
+* Fix #7720: Ensured Low Reputation (or Pirate) Campaigns Can Access New Recruits by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7721
+* Fix #7723: Stopped POWs Appearing as Camp Followers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7724
+* Fix #7722: Ensured Injury Panel Remains Visible When All Injuries Have Been Treated But Some Are Permanent by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7725
+* Improvement: Added Support for New Skills to Education Module by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7728
+* Improvement: Rebranded 'Reasoning' as 'Talent' Based on Player Feedback by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7730
+* Improvement: Added Support Vehicles, DropShips, JumpShips, Infantry, and Battle Armor to the Unit Market by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7734
+* Improvement: Disabled & Deprecated AtB Ship Search by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7735
+* Improvement #7710: Separated Ex-RP Only Skills into Their Own Skill Group Category by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7732
+* Fix #3846, #4206, #4383, #4540, #6196, #7160, #7507: Corrected Additional Crew Requirements when Unit is Equipped with Communications Equipment, Field Kitchen, Mobile Field Base,  MASH Theaters, or Has 'Extra Seats'; Fixed Personnel Assignment to Conventional Fighters by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7738
+* Improvement: Added 'Vehicle Crews' Glossary Entry; Expanded Vehicle Crew Eligibility to Include Soldier & Administrator Professions by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7739
+* Fix #7740: Fixed Sale of Items Increasing Warehouse Item Count by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7741
+* Improvement: Added Additional Toggle Buttons to the Abilities Tabs in Campaign Options by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7737
+* Fix #7743: Fixed Parts in Use Order Display Error by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7744
+* Fix: Fixed Atmosphere Loading for Custom Planetary Systems by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7753
+* Fix: Fixed Hammer Traveling Back in Time to Release MegaMek Before MegaMek Was Invented, Thus Creating an Time Paradox That Breaches the Temporal Prime Directive by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7757
+* Improvement: Added a Compatibility Handler to Resolve Issues With Academy Name Changes Between Versions by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7755
+* Task: Updated Campaign Options Iconography for 50.10 by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7773
+* Sentry: Fixed Error When Faction Standing Simulates a Mission with a Missing Start Date by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7768
+* Issue #7754: If a part's location is -1, display that as the reason instead of throwing an exception by @psikomonkie in https://github.com/MegaMek/mekhq/pull/7758
+* Fix: Added Additional Cache Exclusions from Build Scripts by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7786
+* Issue MML#2059 by @SJuliez in https://github.com/MegaMek/mekhq/pull/7810
+* Improvement #7449: Technology Cost Modifiers Applied to Unit Market by @Dark-Hobbit in https://github.com/MegaMek/mekhq/pull/7802
+* Fix #7688: Stopped Parts in Use Counting Reserved Parts as In Stock by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7795
+* Fix #6995: Fixed Parts Costs Being Reduced by Around 50% by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7793
+* Fix #7771: Fixed Ordering from Parts in Use & autoLogistics when Two Identical Items of Differing Tech Bases Exist in Use by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7792
+* Improvement: Allowed Conventional Infantry Units to be Refit by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7791
+* Fix #7778: Removed Colon from Display of Profession Skills by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7781
+* Fix #7779: Removed Unnecessary Recommendation & Warning from Scenario XP Campaign Option by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7780
+* Feature: Implemented Quick Train Quality of Life System by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7775
+* Task: Removed FM:MR Unit Reputation Campaign Option by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7762
+* Sentry: Fixed Error Caused by Missing Scenario Information in Personnel Table by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7761
+* Fix #7774: Corrected Glossary Entry Reference for HR Strain by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7787
+* Improvement: Brought Back Veterancy Awards Due To Popular Demand by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7772
+* Fix #7783: Corrected Large Vessel Ammo Reloading by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7788
+* Fix #7063, #7726, #7777: Added Crew Validation for Units On Load & On Refit by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7790
+* Improvement #6021, #7181: Acquisitions Table in Command Center Will No Longer Factor Acquisitions Personnel into Target Column by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7794
+* Improvement: Allowed Players to Access MegaMek Client Settings from Within MekHQ by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7798
+* Improvement #7694: Escalated Conflict Between WoB & Other Factions During Jihad by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7801
+* Issue #7080: Bottom-Up TO&E by @psikomonkie in https://github.com/MegaMek/mekhq/pull/7813
+* Improvement #7745: Added Crew Needs to Unit Display in Hangar by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7806
+* Improvement: Added Client Option to Hide Unit Fluff Images from Certain Views in MegaMek & MekHQ by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7797
+* Improvement #7820: Added a Daily Report Message When Selling DropShip Salvage Coordinates by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7822
+* Improvement #7749: Added Campaign Option to Handle to Automatic Undeployment of Fatigued Forces from StratCon by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7803
+* Fix: Fixed Quick Train Failing on Unknown Skills by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7817
+* Improvement: Refactored `resetMinutesLeft` to Clean Up Code by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7818
+* Improvement: Added Newness Iconography to Glossary to More Easily Show When an Entry or Document Has Been Added or Updated by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7823
+* Fix #7825: Capped Turnover Desirability Modifier to Elite by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7827
+* Fix #7824: Fixed Battle Armor Pilot Starting Charisma by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7828
+* Fix #7842: Corrected Advanced Scouting Not Correctly Excluding Already Revealed Hexes by @Beornwulf in https://github.com/MegaMek/mekhq/pull/7841
+* Fix #7831: Fixed Parts in Use Not Detecting Units; Refactored Parts in Use Out of Campaign.java by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7832
+* Feature: Implemented 'Extra-Income' A Time of War Trait by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7517
+* Improvement #1570, #6566: Added GM Options to Personnel Menu Allowing Users to Add/Remove Parents and Add/Remove Children by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7830
+* Improvement: Updated CodeQL to (Hopefully) Analyze Using the Right Version of Java by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7846
+* Improvement #1276, #7763: Introduced 'Only Commanders Matter' Option for Most Multi-Crewed Units by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7776
+* Improvement: Added Announcements for Diplomatic State Changes Affecting the Campaign Faction by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7782
+* Improvement: Added Optional Tracking of MASH Theatres by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7807
+* Improvement: Rewrote Morale System Based on Player Feedback by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7816
+* Fix #7719: Fixed Inability to Maintain DropShips by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7819
+* Feature #1569: Added the Ability to View a Character's Family Tree by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7826
+* Fix: Purged Ship Search from GUI Triggers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7829
+* Fix: Profession Skills for Mechanics Not Including Admin; Vehicle Crew Incorrectly Including Gunnery by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7835
+* Improvement: Added More Robust Notifications for When Contracts Can Be Ended Early by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7837
+* Fix #7746: Overhauled Transportation Costs to Bring Them in Line With CamOps by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7750
+* Improvement: Converted Faction Hints into a Singleton by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7799
+* Improvement: Rebranded 'Vehicle Crewmember' Profession as 'Combat Technician'; Combat Technicians Can Repair Units by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7839
+* Improvement: Added Diplomacy Report to Command Center Tab by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7800
+* Feature: Added Facility Renting Mechanics by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7815
+* Improvement #7747: Implemented an Option to Restrict Soldiers to Small Arms Only by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7821
+* Improvement: Updated Random Marriage System to Better Reflect Character Sexualities Rather Than Treating All Characters As Either Asexual or Bisexual by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7840
+* Improvement: Updated Procreation Within Relationship Dice Size to Offer Better Distribution by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7843
+* Improvement: Improved Randomization of Traits & Attribute Scores by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7844
+* Improvement: Refactored New Day Code Out of Campaign.java by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7845
+* Improvement: Relocated BodyLocation Enum into Medical Package by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7851
+* Bump actions/upload-artifact from 4 to 5 by @dependabot[bot] in https://github.com/MegaMek/mekhq/pull/7854
+* Fix #7853: Fixed Diplomacy Report Triggering Daily by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7859
+* Fix #7855: Stopped Veterancy Awards Generating Effectively Infinite Awards by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7861
+* Fix #7856: Fixed New Day Error; Renamed Methods to Reduce Room for Confusion by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7869
+* Fix #7864: Fixed Scenario Resolution Error by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7870
+* Fix: Restored Missing Clause from Availability by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7871
+* Improvement: Updated AtB Contract Score Calculations by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7872
+* Improvement: Restored Ability to Deploy from TO&E; Added Ability to Deploy to StratCon from Briefing Room by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7874
+* Improvement: Added the Ability to Change Combat Roles in the TO&E; Forces Will Now Remember Their Last Assigned Combat Role; Contract Finances Updated to Better Account for Combat Roles by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7877
+* Improvement: Updated StratCon Scenario Generation Tempo; Introduced Morale-Based Crisis Scenarios by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7879
+* Improvement #7862: Replaced Several Vehicle Professions. Updated Vehicle Commander Picking by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7866
+* Fix: Prevented Some SPAs from Spawning Via Veterancy Awards; Fixed XP Cost of Natural Aptitude SPAs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7867
+* Improvement: Updated SPA Loading to Improve Cross-Version Compatibility by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7868
+* Improvement: Added Optional 'AtB Style' Mapless Mode to StratCon by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7876
+* Improvement: Added 'Cadre' Combat Role to Distinguish Between Forces Assigned to Train Allied Forces & Those Assigned to Train Player Forces by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7878
+* Fix: Fixed Inability to Deploy to Scenarios by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7882
+* Task: Refactored Skill Level Fetching to Improve Useability by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7858
+* Feature: Added CamOps Salvage Rules by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7883
+* Improvement: Adjusted Scenario Hex Bias by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7884
+* Fix: Fixed Contracts Sending You Halfway Around the Inner Sphere Because Your Jump Captain is Scared of Empty Systems by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7885
+* Task: Migrated Maintenance Code Out of Campaign & Into Its Own Class by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7886
+* Fix #6781, #6789, #6876: Removed Restrictions on Maintenance Assignments by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7888
+* Task: De-escalates Log Level in Medical Controller to Debug by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7892
+* Task: Removed Campaign Archive from Build by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7895
+* Improvement: Added Automated System to Self-Correct Maintenance Schedules by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7887
+* Improvement: Expanded Advanced Medical with New Alternative Advanced Medical by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7894
+* Fix #7897: Fixed Legendary MekWarriors Not Counting Towards CamOps Reputation by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7898
+* Fix #7896: Fixed Copy-Paste Error Breaking Artillery Skill Enabled Campaigns by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7899
+* Fix #7451, #7863, #7891: Fixed Edit Mission Incorrectly Reassigning Combat Teams Value by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7900
+* Improvement: Reduced User Confusion by Removing Combat Teams Line from Contract Summary by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7901
+* Fix #4996: Fixed Mek Front Right Legs Being Incorrectly Called Mek Front Left Legs Causing the Wrong Part to Be Ordered by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7905
+* Fix #7811: Fixed null GUI Being Passed Into Custom Scenario Loot Picker by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7906
+* Fix: Allowed Training Forces to Function When Using Mapless Mode by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7916
+* Fix #7915: Fixed Doctor & MASH Capacity Warnings Not Displaying; Updated Glossary Entry by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7917
+* Fix #7907: Fixed Race Condition When Loading Campaign by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7921
+* Improvement: Changed 'Combat Technician' Profession to 'Support' by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7923
+* Issue #7751: Match Destroyed Ammo Bins by @psikomonkie in https://github.com/MegaMek/mekhq/pull/7935
+* PR: Adjust Intensity Based on Variance by @psikomonkie in https://github.com/MegaMek/mekhq/pull/7933
+* Fix #7865: Fixed Unit History Appearing Over Other Panels in Unit View by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7902
+* Fix #6048, #7836: Fixed Parts in Use & Warehouse & Shopping List All Using Invalid Data When Campaign Includes Biped & Quadruped (and Possibly Tripod) 'Meks of the Same Weight by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7904
+* Improvement #7808: Added Hiring Fee, SPA, Flaw, and Performance Exam Columns to New Personnel Market by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7908
+* Improvement: Posted Advanced Scouting Results Text to Daily Reports by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7909
+* Improvement #7766: Added Ability to Customize XP Cost of Attribute Scores by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7910
+* Improvement: Added 'Riot' Special Scenarios to Riot Duty Contracts by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7913
+* Improvement: Adjusted Healing Times on New Injuries to Make Them Less Oppressive by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7914
+* Fix: Removed Typo from Neutrality Pact Notification by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7918
+* Improvement: Increased Scroll Speed in Edit Person Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7919
+* Fix: Fixed Small Conventional Fighters Being Incorrectly Detected as Overcrewed by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7922
+* Improvement #7924: MASH Theater & Field Kitchen Capacities Are Now Bypassed if Campaign is Not Planetside While On Contract by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7926
+* Fix #7920: Fixed Large Vessels Incorrectly Spawning with a Maintenance Multiplier Higher Than x1 by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7927
+* Fix: Fixed Missing Resource for 'Unable to Perform Maintenance' by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7928
+* Improvement: Updated Scroll Behavior of Immersive Dialogs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7929
+* Improvement: Stopped Personnel Role Profession Skills Fetcher from Returning Immutable List by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7932
+* Improvement: Rewrote Tech Picker During Salvage Operations by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7936
+* Improvement: Salvage Picker Dialog Fixes by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7937
+* Fix: Fixed 'Recoverable' Toggle Always Being Disabled on Exchange Contracts by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7939
+* Improvement: Salvage Financials Now Always Display by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7940
+* Fix #7942: Fixed Inability to Assign Vehicle Gunners from Personnel Tab by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7943
+* Improvement #7941: Added Bonus to Reinforcement Speeds for LAM Units by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7950
+* Improvement: Training Forces Always Deploy to StratCon 'Sticky' by Default by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7953
+* Fix #7944: Fixed Replacement Limb Surgeon Picker Using Incorrect Method to Determine In-House Surgeon Eligibility by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7951
+* Improvement: Rewrote Salvage Force Picker by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7934
+* Improvement: Adjusted Edge to Bring it More in Line With Official Rules by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7925
+* Improvement: Decreased Odds a Veterancy Award Will Be Negative, From 12.5% to 2%. by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7949
+* Fix #7931: Fixed Salvage & Exchange Values Not Being Properly Recorded by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7938
+* RFE: Simple Cargo (Lift Hoists) by @psikomonkie in https://github.com/MegaMek/mekhq/pull/7903
+* Fix #7954: Prevented Children From Being Targeted By Berserker Mental Breaks by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7956
+* Improvement: Migrated The Various 'Option Changed' Dialog Prompts into a Dedicated Directory by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7958
+* Improvement: Delayed Return of Salvaged Units Based on Deployment Time of Track by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7959
+* Fix: Fixed Missing Table When No Techs or Salvage Forces Available by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7960
+* Fix: Added Missing Dialog Size Memory for Salvage Pickers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7961
+* Fix: Corrected Formatting in New Transport Cost Report by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7962
+* Fix: Fixed CamOps Reputation Including Bay Personnel in Passenger Capacity by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7965
+* Fix #7946: Fixed 'Fleet in Being' Status Not Correctly Applying to Scenarios by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7964
+* Fix #7947: Corrected Transport Costs Not Factoring in Player Passenger Capacity by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7963
+* Fix #6312, #7952: Added 'Point of No Return' to StratCon Deployment Dialogs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7966
+* Improvement: Adjusted Deployment Date to Equal Battle Date to Improve User Experience by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7968
+* Fix: Fixed Hidden Scenarios Appearing in the TO&E Deployment Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7967
+* Improvement: Updated Contract Duration Variance to Remove Manual Definitions by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7969
+* Improvement: Added Free MASH Truck Option for Existing Campaigns Enabling MASH Tracking for The First Time by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7957
+* Support for Handheld Weapons in MHQ by @psikomonkie in https://github.com/MegaMek/mekhq/pull/7978
+* Improvement: Added Seven New Contract Types; Updated Contract Type Generation by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7970
+* Fix #7979: Fixed Skill Levels in Salvage Tech Picker Using Incorrect Sorter by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7980
+* Fix #7977: Stopped All Followup Contracts Being Identically Named by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7981
+* Fix #7976: Restored Ability to Cancel Out of Reinforcement Force Picker by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7982
+* Fix #7974: Fixed Vessel Crewmembers Being Generated For Non-Support Vehicles With Extra Crew Needs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7983
+* Fix #8014: Fixed Error When Sorting Certain Columns in Personnel Market by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7984
+* Task: Updated Portrait Guide to Include Recent Changes by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7986
+* Fix #7973: Fixed Inability to Assign Personnel to Vehicle Extra Crew Seats by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7987
+* Fix: Fixed Loading of CamOps Reputation When Campaign is Rated as Ultra-Green by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7988
+* Improvement: Made Contract-Required Scenarios More Obvious in Briefing Room; Adjusted Turning Point Status for Strategic Objectives by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7989
+* Improvement: Made Professions a Character is Ineligible For Visible in Change Role Sub-Menu by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7991
+* Fix: Fixed Display of Required Combat Elements in Briefing Room by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7993
+* Fix: Stopped Techs & Doctors Having Their Work Time Replenished While Deployed by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7994
+* Improvement: Added Out-of-Character Notice to Disband Events by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8018
+* Fix: Stopped Claiming Bounties on Prisoners of War Negatively Affecting Personnel Loyalty by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8026
+* Improvement: Adjusted Date Range for Random Start Year Button to Remove Pre-Star League Bias by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7990
+* Fix: Fixed Edge Not Passing to MegaMek From MekHQ by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7997
+* Fix: Fixed Edge Not Being Settable from Personnel Tab Right-Click Menu by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7998
+* Fix: Fixed Campaign Upgrader Occasionally Hanging During Upgrade Process by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7999
+* Fix #7930: Removed Several (Mostly Legacy) Unit Type Allowance Options Affecting Non-Legacy Campaigns by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8001
+* Improvement: Reduced StratCon Scenario Tempo When Using Alt Advanced Medical by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8004
+* Improvement: Increased Recruitment Opportunities for Campaigns with Alternate Advanced Medical Enabled by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8005
+* Fix #8002, #8020: Fixed Crew Fetching for Non-Tanks With Composite Crews by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8007
+* Improvement: Added Support Vehicle Generation to Quickstart Company Generator; Added Additional Option Change 'Cathers' to Campaign Options by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8006
+* Fix: Updated Skill Modifier Data to Exclude Injury Effects in Certain Circumstances by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8008
+* Improvement: Updated Alternative Advanced Medical Based on Player Feedback by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8009
+* Improvement: Removed Silent Nature of First Two Faction Standing Accolade Levels by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8019
+* Fix #8015, #8021, #8022: Fixed Multiple Bugs With Jump Cost Calculations & Report; Fixed Transportation Rating Incorrectly Calculating Passenger Needs & Capacity by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8023
+* Improvement: Added a Campaign Option to Obstruct Delivery of Parts and Units While in Transit by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8024
+* Fix #8012: Removed Unused Placeholder from Convoy Intercept Messages by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8028
+* Fix #8010: Fixed Salvaged Units Using Default Repair Site by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8029
+* Fix: Fixed MASH & Field Kitchen Capacity Still Not Being Bypassed While in Transit by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8030
+* Fix #8011: Fixed Polarity of Victory/Defeat Modifiers for Morale Checks by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8027
+* Improvement: Made SPAs a Character is Ineligible For Visible in Purchase SPA Sub-Menu by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7992
+* Improvement: Expanded Alt Advanced Medical to Include Random Diseases & Inoculation System by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8016
+* Fix: Fixed Engineers Being Able to Be Assigned to Salvage Operations by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8031
+* Fix: Fixed Salvage Operations Being Successful if Exactly 0 Minutes Available by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8032
+* Fix #8036: Stopped Transportation Cost Calculator Trying to Put Handheld Weapons, Space Stations, JumpShips, and WarShips into Transport Bays by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8037
+* Fix #8035: Added Clamping to Contract Type Table Rolls by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8039
+* Fix #8041: Fixed Missing Belligerents in Edit Mission Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8042
+* Fix #8034: Fixed Visual Bug Causing Morale Victory Status to Be Reversed by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8043
+* Fix: Fixed Bug in Vehicle Profession Compatibility Handler by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8044
+* Fix #8038: Fixed Dark Secret Inexplicably Applying a -1 Penalty Even When Not Revealed by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8045
+* Fix #8048: Fixed Impatient & Patient Traits Not Applying Modifiers to All Relevant Skills by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8049
+* Fix: Fixed Filename Errors in Two Resource Bundles by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8050
+* Fix #8047: Fixed autoLogistics Stock Key Using Wrong Format in Parts in Use Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8051
+* Fix: Fixed Tech Time Calculations by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8053
+* Fix #8046: Fixed Error When Ordering from Parts in Use Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8054
+* Improvement: Expanded Salvage Tech AutoAssignment to Include Techs Assigned to Vehicles Participating in Salvage Operation by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8052
+* Improvement: Expanded Training Combat Teams to Include Scouting Skills in Training Regime by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8055
+* Fix #8059: Fixed a Number of Instances Where Technician Skills Were Being Unintentionally Excluded; Fixed NPE When Applying Campaign Options by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8060
+* Improvement: Updated Tech Assignment Menus to Include Display of Maintenance Time Available & Required to Reduce Manual Menu Cross-Referencing by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8061
+* Fix: Removed Unit Coloring from Personnel & Hangar Context Menus by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8062
+* Improvement #8057: Excluded Civilian Roleplay Professions from Tech Time Calculations by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8063
+* Fix: Fixed 'Minefield Planner' Civilian Profession Displaying as 'Minefield' Only by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8068
+* Improvement: Improved 'Crew Needs' Display in Hangar In Attempt To Reduce Player Confusion by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8067
+* Improvement: Improved Compatibility Handling of Vehicle Crewmember -> Combat Technician Role Change to Reduce Player Confusion by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8066
+* Fix #8056: Fixed Inability to Conclude Salvage Operations When No Techs Assigned by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8064
+* Improvement: Reworked Advanced Scouting Based on Player Feedback by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8069
+* Task: Disabled AtB by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8003
+* Issue #8088: Fix Teams Formation Size Override by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8094
+* Fix: Fixed Location of Vehicle Profession Skill Change Message by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8065
+* Sentry: Fixed Error in Briefing Room Display by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8072
+* Improvement: Utilized New Alternate Advanced Medical to Expand Prosthetic & Surgery Options by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8077
+* Improvement: Removed Scenario Odds Reduction when Alt-Advanced Medical is Enabled by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8078
+* Fix: Added Missing 'getName' Call in Campaign Option Changed Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8079
+* Improvement: Improved 'Campaign Options Changed' Dialog Text by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8080
+* Improvement: Improved Salvage Tech Picker Based on Player Feedback by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8081
+* Fix: Fixed Morale Yet Again By Undoing the Previous Fix; Improved Transparency of Morale Checks by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8082
+* Fix #8084: Fixed Placeholder Appearing in Maintenance Report Text by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8087
+* Improvement #8089: Improved Visibility of Burned Connections by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8090
+* Fix #8075: Fixed Personnel Tab Context Menu Showing Wrong XP Cost for Attribute Score (inc. Edge) Purchases by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8092
+* Improvement: Added 'Bolster Contract Skill' Option to Optionally Increase OpFor & Ally Skills by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8093
+* Improvement: Updated Company Generator to Include Infantry for Prisoner Management; Added Campaign Options Changed Trigger for Prisoner Capacity to Give Players Free Infantry Unit by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8096
+* Improvement: Guerrilla-Type Contracts Will Always Have Independent Command Rights by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8099
+* Fix #8100: Cleaned Up & Corrected CamOps Experience Rating by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8101
+* Sentry: Fixed Out of Index Error in MRMS by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8102
+* Improvement: Added Combat Challenge Scenario Inspired by AtB's 'Officer Dual' Scenario by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8083
+* Fix #8085: Fixed Salvage Techs Sometimes Being Unpickable; Added More Information to Salvage Force Picker by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8086
+* Fix #8076: Fixed Contract Market Incorrectly Using Wrong Method to Fetch Connections Trait by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8091
+* Fix: Fixed HR Strain Penalizing Complete Usage by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8103
+* Fix for breaking error on right click of personnel, in Academy skills list by @trent1098s in https://github.com/MegaMek/mekhq/pull/8116
+* Fix to HRStrainModifier calculation by @trent1098s in https://github.com/MegaMek/mekhq/pull/8113
+* Improvement: Optionally Hide Mothballed Units in Hangar by @ActuallyTrent in https://github.com/MegaMek/mekhq/pull/8108
+* Improvement: Adjusted Starting Attribute Scores for All Professions Based on Player Feedback (by SirChaos) by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8109
+* Fix: Fixed Employment of Camp Followers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8111
+* Fix #8119: Fixed Reference Entry for Maximum Patients Campaign Option by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8112
+* Improvement: Added 19 Additional Elective Prosthetic Surgeries by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8124
+* Fix #8125: Fixed Campaign Options Tooltip for Commanders Only Vehicle Edition by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8126
+* Fix #8118: Stopped Passengers Rudely Backseat Driving Tanks by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8127
+* Fix #8117: Fixed Order of Operations Creating Weird TO&E Skill Levels by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8128
+* Fix #8122: Fixed MASH Theater Capacity Using MASH Equipment Count Instead of MASH Theater Count by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8129
+* Improvement: Added Current Minutes to Personnel Table by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8130
+* Fix: Fixed AdScout Rules Applying When AdScout is Disabled by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8132
+* Task: Removed Excess Skill Clause in Academy Skill Parser by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8133
+* Fix: Fixed Combat Technicians Not Counting Towards CamOps Rating by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8134
+* Improvement #8137: Updated Illiterate State Removal Based on Player Expectations; Updated Skill Display to More Clearly Display Base & Modified Skill Level by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8138
+* Improvement #8115: Added Edge Trigger to Avoid Death During Salvage Accidents by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8131
+* Removed logic to zero minutes out on techs assigned to vehicles deployed for salvage operations by @trent1098s in https://github.com/MegaMek/mekhq/pull/8139
+* Fix: Fixed Free Field Kitchen Actually Trying (and Failing) to Gift the Player a Unit That Doesn't Exist by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8141
+* Fix: Fixed Campaign Options Failing to Initialize Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8144
+* Useful Permanent Astech Tweak Fixes issue #8135 by @wildfire142 in https://github.com/MegaMek/mekhq/pull/8155
+* Fix #8153: Fixed Incorrect Use of getCrewState in MASH & Field Kitchen Capacity Calculations by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8156
+* Fix #8151: Fixed 'hasInjuries' Check Incorrectly Counting Permanent Injuries With 'Healing Time' Remaining as Non-Permanent by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8157
+* Fix #8150: Fixed Edit Person & Create Person Panels Incorrectly Using Wrong Method to Fetch Skill Target Number; Fixed the Same Panels Also Presenting Incorrect Skill Information Once Skill Level is Edited by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8159
+* Fix #8158: Fixed Spacing for C3 Networks by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8160
+* Fix: Fixed Personnel Generation Generating Personnel at Wrong Experience Level by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8163
+* Fix #8149: Fixed Stacking Modifiers Causing Personnel to Generate 1-2 Experience Levels Higher Than Intended by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8164
+* Fix: Fixed Personnel Generation Failing to Properly Reconsider the Experience Level of Young Personnel by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8165
+* Improvement: Updated Character Starting Age Calculations by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8166
+* Fix: Fixed Order of Operations Causing All Female Personnel to Generate with a Same-Sex Preference by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8167
+* Fix: Fixed Player Expectation Conflict When Assigning Camp Followers to Education by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8168
+* Fix #8152: Simplified Personnel Filtering in Hangar Assignment menu by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8171
+* Fix #8147: Added Missing Parenthesis to Gyro Weight Text by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8175
+* Improvement: Removed Available Minutes Profession Type Distinction by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8146
+* Fix #8148: Fixed Duplicate Selections in Salvage Resolution Screen; Fixed Prior Selected Salvage Forces & Techs Not Appearing Pre-selected in Salvage Force & Salvage Tech Picker by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8161
+* Fix #8162: Fixed Visibility of Transit & On Order Stock in Repair Bay by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8172
+* Fix: Fixed Cadre Forces Incorrectly Being Excluded from Seed Force Consideration by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8173
+* Fix #8179: Reduced Impact of Contract Breaches on Faction Standing; Added Falloff to Regard Changes from Contract Length by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8181
+* Fix: Fixed Broken 'Reset all Faction Standings' Option by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8182
+* Fix #8180: Fixed Several Injury Locations by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8183
+* Improvement: Solved 'Combat Technician' Identity Crisis; Improved Combat Technician Compatibility Handler; Updated Generic Crew Profession by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8169
+* Fix #8177: Prevent Hard Lock When Over Salvage % in Salvage Picker by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8178
+* Improvement: Migrated Implant-Related Code out of Main Alt Advanced Medical Class into Own Class by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8192
+* Improvement: Fixed Width of Selection Boxes in CamOps Salvage Picker by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8191
+* Improvement: Added Ability to Deploy Multiple Forces as Reinforcements at Same Time by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8189
+* Improvement #8140: Added Ability to View Support Points in Briefing Room by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8187
+* Improvement: Updated Person Medical View to Handle New Locations from Alt Advanced Medical by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8185
+* Improvement: Added Ability to See Current Salvage % to CamOps Salvage Picker by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8184
+* Fix #8136: Leadership & Frontline Units Now Arrive Instantly by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8188
+* Fix #8200: Fixed Crew Tooltip for Fixed-Wing Support Vehicles by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8201
+* Fix #8196: Improved Academy Compatibility Handler with Added Robustness & Additional Clauses by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8202
+* Fix #8195: Decreased Mechanical Complexity of Training Combat Teams; Added Glossary Entry by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8203
+* Improvement: Added GUI Indicator of Skill Experience Level by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8204
+* Improvement #4969: Added Tabbed Daily Report Functionality by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8206
+* Fix #8205: Fixed Prosthetics Being Unable to Inflict Recovery Injuries by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8208
+* Task: Tabbed Daily Report Corrections by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8211
+* Improvement: Added Campaign Option to Disable the Use of Seed Forces in StratCon by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8174
+* Fix: Fixed CamOps Reputation Treating Empty Campaigns as Legendary by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8176
+* Fix: Added Sanity Checks for Trailers During Salvage Operations to Stop Self-Propelled Trailers Mysteriously Carting Off Salvage All By Themselves; Fixed Salvage Teams Multiple Assignment Exploit; Fixed Uncrewed Salvage Unit Bug by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8209
+* Improvement: Optimized Name Fetching by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8210
+* Fix: Fixed Transportation Costs Displaying Incorrectly in Contract Market by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8104
+* Improvement: Updated Alt Advanced Medical with New Healing Process; Fixed Glossary Entry Text Being Off-Screen by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8197
+* Improvement #8194: Adjusted Required Victory Points for Early Contract End by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8198
+* Task: Added Missing Legal Statement to ContractTypePicker.java by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8213
+* Task: Added Missing JavaDocs to InjuryLocationService.java by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8214
+* Fix: Added Missing 'Standard' Force Resource Bundle Entry by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8229
+* Fix #8227: Fixed Talent Label Showing Unformatted Value by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8228
+* Improvement: Removed the Combat Technician/Engineer Profession by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8225
+* Fix #8218: Fixed Error When Attempting to Fetch the Prosthetics Healing Penalty for a Location That Cannot Have Prosthetics by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8224
+* Fix #8221: Fixed autoInfirmary Mistakenly Unassigning Patients by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8223
+* Fix #8220: Fixed Facilities Incorrectly Not Being Always Considered Within Capacity While In Transit or Off Contract by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8222
+* Fix: Fixed autoInfirmary Mangling Patient Counts by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8239
+* Improvement: Adjusted Some Prosthetic & Cybernetics to Make Better Use of Existing Implant Options by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8241
+* Fix: Improved Advanced Medical Tooltip Visuals; Added Missing Modifiers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8242
+* Improvement: Removed Old StratCon Data at Contract Conclusion by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8243
+* Fix #8244: Fixed Docking Collar Requirements Incorrectly Using Count of Additional DropShips Needed by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8245
+* Fix #8246: Fixed Incorrect Use of `Equals` Instead of `Compare` in Salvage Picker Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8248
+* Bump actions/checkout from 5 to 6 by @dependabot[bot] in https://github.com/MegaMek/mekhq/pull/8261
+* Fix #8226: Prevent HHWs from being crewed by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8270
+* Fix #8216: Stopped Astech Being Combined with Other Tech Professions by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8230
+* Fix #8231: Added Vehicle Crew/x to List of Eligible Roles for Vehicle Crew (Other) Seats; Updated Glossary by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8234
+* Improvement: Added White Space Between Skill Level & Veterancy Grade by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8236
+* Fix: Fixed Units Getting Stuck in Scenarios at Contract Conclusion by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8238
+* Fix #8247: Removed HTML Formatting from Profession Column in Personnel Tab (Fixing Line Wrap Issue) by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8249
+* Improvement #8219: Adjusted Default Support Personnel Counts for Quick Start Company Generator by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8251
+* Improvement: Toughness Now Reduces Injury Modifier to Healing in Alt Advanced Medical; Updated Glossary by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8253
+* Fix: Corrected Resource Bundle Entry for Reinforced Bones Injury Effect by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8273
+* Improvement: Separated Injuries & Prosthetics in Person View by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8274
+* Fix #8260: Fixed Morale Yet Again; Updated Glossary; Added Even More Tests by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8262
+* Fix #8232: Hopefully Fix Text Cut Off in Glossary by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8233
+* Task: Removed Final References to Combat Technicians/Engineers by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8235
+* Fix: Corrected Margin of Success Label Retrieval by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8237
+* Improvement: Added the Ability to Stop Individual Techs from Appearing in the Salvage Op Tech Picker by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8250
+* Improvement: Added Final Batch of Elective Surgeries to Alt Advanced Medical by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8252
+* Fix: Stopped Alt Advanced Medical Injuries From Counting as More Than 1 'Hit' Per by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8254
+* Improvement: Added Degrading Mental & Physical Health for Too Many Advanced Prosthetics/Implants; Updated Glossary by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8255
+* Improvement: Added Alt Advanced Medical Version of the Various 'Special' Injuries; Reduced Impact of Mental Breaks by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8256
+* Improvement: Increased Size of Information Display in Campaign Options; Stopped Panels 'Wiggling' When Displaying Lots of Information; Updated Skill Randomization Panel for Usability; Fixed Minor Bugs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8264
+* Improvement: Added Ability to Suppress Confirmation Dialogs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8266
+* Fix #8268: Alt Advanced Medical Will Now Unassign Medical Assignments When Fully Healing a Character; Delayed Recovery Time Now Cannot Exceed Original Length of Recovery; Fixed Fetching of Patients by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8269
+* Fix #8265: Added Skip Surgery Option for GMs in Advanced Surgery Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8272
+* Improvement #307, #2377, #5497, #7542, #8263: Added Ability to Manage TO&E Assignments from Within Hangar (Including Uncrewed Units) by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8275
+* Fix #8271: Added Ability to Assign Tech to Maintain Handheld Weapons by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8276
+* Improvement #3694: Replaced Old AtB 'Generate Scenarios' Button with 'Add a StratCon Scenario' Functionality by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8277
+* Improvement #6433: Added Base Personnel Prisoners Following Hostile Facility Scenario by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8278
+* Improvement: Pyrrhic Victories Now Count as Both Defeat & Victory for Morale; Updated Glossary by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8279
+* Improvement #2321: Added Campaign Option to Prevent Tornadoes From Spawning in Scenarios by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8282
+* Improvement #2564, #6183: Added AutoMothball Prompt When Beginning Transit - Even if Off Contract by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8284
+* Improvement #3180, #4815: Added Campaign Option to Ignore Roles in Portrait Assignment; Fixed Last Resort Portrait Generation by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8285
+* Fix #8286: Stopped Fatigue Undeployment Notice Appearing if A Training Force is Not Deployed; Fixed Fatigue Gain from Training Forces After Contract Has Ended by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8287
+* Fix #8281: Stopped Campaigns from Getting Stranded if They Are Deep in Outlawed Territory by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8288
+* Improvement: Updated Required Victory Points Calculations; Added Indicator Whether Contract Can End Early to Briefing Room by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8292
+* Improvement: Added Intel Breach Events When Freeing Prisoners by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8293
+* Improvement: Added Remaining Daily Log Category Tabs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8295
+* Improvement: Stopped New StratCon Facilities Spawning Mid-Contract by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8296
+* Improvement: Updated & Optimized Scenario Placement in StratCon AO by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8297
+* Fix #8258: Fixed Double Display of Armor Stocks in Repair Bay by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8298
+* Improvement: Added Code Support for Skill-Specific Natural Aptitude Traits; Fixed Skill/Ability Check Utilities Burning Edge on Impossible Checks; Added 'Reason' to Skill Checks by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8291
+* Improvement: Added New Alternative Way to Play StratCon Aimed at Multiplayer Campaigns - Single Drop; Improved AtB Transferral Handler by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8300
+* Fix: Fixed Wording of Deployment Confirmation Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8305
+* Fix: Fixed Potential Null Error in Scenario Resolution by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8306
+* Fix #4371, #8289: Replaced Large Vessel 'Composite Crew' Mechanics With Less Bug Prone Personnel Assignment by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8307
+* Fix: Stopped Babies Being Born With Doctorates... Again by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8309
+* Fix: Concurrent Modification in Injury Removal by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8310
+* Fix #8304, #8308: Fixed Medical Assignment When MASH Theater Tracking Enabled by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8311
+* Fix: Fixed Alt Advanced Medical Options Changed Dialog Incorrectly Referencing Advanced Scouting by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8312
+* Fix #8303: Removed Ability to Use Currently Deployed Forces as Reinforcements by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8313
+* Fix: Changed StratCon Deployment Time to 0 for Mapless Mode by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8314
+* Fix #8290: Removed Restrictions from 'Give Payment' Personnel Option by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8315
+* Fix: Fixed Ability to Deploy Salvage Forces Multiple Times by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8316
+* Fix #8258: Fix oversized logs from incorrect flag comparison by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8319
+* Fix #8283: Fix unable to deploy crewless trailers or HHW  by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8320
+* Fix #8317: Fixed Error When Loading Campaign With Non-StratCon Contracts While StratCon is Enabled by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8325
+* Fix #8321: Stopped MekHQ's Contract Generation from Having a Vendetta Against Outreach, Galatea, and Northwind by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8326
+* Fix #8323: Fixed Missing Button Label in Maintenance Bay Hiring Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8327
+* Fix: Stopped the Word of Blake From Declaring War on the Word of Blake by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8328
+* Improvement: Extended Bay Rentals to Include Large Craft by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8330
+* Improvement: Added MASH Theater Capacities from Large Craft (inc. Space Stations) by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8331
+* Improvement: Added Three New Flaws & One SPA Related to the New Disease Mechanics by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8338
+* Implemented: Added a Handful of New Flaws by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8337
+* Fix #8318: Fixed Reinforcements Cost & Difficulty Calculations by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8335
+* Fix #8324: Fixed Contract Challenge Estimates Not Appearing for Campaigns Other Than Mercenary Campaigns Without a Retainer by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8334
+* Improvement: Optimized `getAllCombatEntities` by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8333
+* Improvement: Removed Allied Contribution Calculation from Contract Difficulty Estimation by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8332
+* Improvement: Improved Mercenary Enemy Handling to Prevent Weirdness & Better Integrate With Faction Standings by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8329
+* Fix #8340: Explicitly Remove Personnel From Doctor Assignment When Removing from Campaign by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8341
+* Fix: Fixed Typo in Mass Repair, Mass Salvage Reporting by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8342
+* Fix: Fixed Incorrect Reference in Campaign Options for Marriage Chance by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8343
+* Fix: Stopped Preset Picker Extending Beyond Visible Screen Limits on Windows Systems With Tiny Screens by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8344
+* Task: Updated 'Learning Ropes' Tutorial Campaign to 50.10 by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8347
+* Improvement: Campaign Upgrader Preset Picker Now Has Tooltips Describing Each Option by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8348
+* Improvement: Improved Speed of Campaign Upgrader And Resolved Issue Slow-Down Was Previously Implemented to Address by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8349
+* Fix #8346: Stopped Already Assigned Salvage Forces Being Marked as Ineligible For Salvage Operations If Player Exits & Reenters Scenario by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8351
+* Fix #8322: Connections Usage for Contract Type Will Now Change Based on Whether Campaign Commander Has No Connections, Or Connections Are Burned by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8345
+* Improvement: Stopped Campaign Upgrader Process From Changing Rank System by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8350
+* Fix: Stopped Early Contract Finishes via Routing OpFor On Contracts That Don't Allow Early Contract Finishes by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8357
+* Fix #8353: Fixed Crew Skill Fetching for Units That Are Not Always Single Crew But in This Case Are by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8360
+* Fix #8339: Fixed Infantry Being Unable to Perform Repair Tasks by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8361
+* Fix #8355, #8356: Stopped Parts in Use Table Resetting to Prior State When Ordering Parts by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8358
+* Fix: Fixed Availability of Prosthetics Based on Planetary Tech Level by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8362
+* Improvement #8359: Added Dialog to Alert of Rout End/New Opponent Arrival by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8363
+* Sentry: Fixed Missing Resource by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8364
+* Fix: Fixed Divide By Zero Error in Reinforcement Dialog by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8369
+* Fix: Fixed Early Contract End Check by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8365
+* Fix: Fixed Label for Dermal Armor by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8366
+* Fix: Remove Trouble Shoot Log Call by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8367
+* Fix: Corrected Oversights in Learning Ropes Campaign by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8368
+* Improvement: Added Ability to Pay Off Bounty Hunters by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8370
+* Improvement: Made Base Personnel Round Up More Obvious by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8371
+* Sentry: Fixed Error When Accessing Repair Skill for Part That Has No Attached Unit by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8372
+* Sentry: Fixed Error When Trying to Repair Part With Tech That Lacks Skill by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8375
+* Fix #8376: Fixed Convoy Raid on Independent Command Rights Not Generating Loot if Player Has No Convoys by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8377
+* PR: Refactor `Transporter.getType()` and `InfantryTransporter.getType()` to prevent conflicts in classes that implement both `IBuilding` and `Transporter` by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8378
+* Revert "PR: Refactor `Transporter.getType()` and `InfantryTransporter.getType()` to prevent conflicts in classes that implement both `IBuilding` and `Transporter`" by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8379
+* Fix #8373: Fixed Sorting of Techs by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8383
+
+## New Contributors
+* @Beornwulf made their first contribution in https://github.com/MegaMek/mekhq/pull/7841
+* @trent1098s made their first contribution in https://github.com/MegaMek/mekhq/pull/8116
+* @ActuallyTrent made their first contribution in https://github.com/MegaMek/mekhq/pull/8108
+
+================PLEASE NOTE VERSION JUMP IS DUE TO GRADLE PACKAGING BUG THE WON'T ALLOW FOR VERSIONS LIKE 0.50.08 or 0.50.09================
 
 0.50.07 (2025-10- 2130 UTC)
 * Improvement: Added Support for Command Lances in TO&E by @IllianiBird in https://github.com/MegaMek/mekhq/pull/7001
