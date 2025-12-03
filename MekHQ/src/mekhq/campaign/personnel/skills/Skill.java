@@ -545,7 +545,7 @@ public class Skill {
      * @since 0.50.05
      */
     public static int getTotalAttributeModifier(TargetRoll targetNumber, final Attributes characterAttributes,
-          final SkillType skillType) {
+          final SkillType skillType, final List<InjuryEffect> injuryEffects, final PersonnelOptions options) {
         if (targetNumber == null || characterAttributes == null || skillType == null) {
             return 0;
         }
@@ -558,7 +558,7 @@ public class Skill {
                 continue;
             }
 
-            int attributeScore = characterAttributes.getAttribute(attribute);
+            int attributeScore = characterAttributes.getAdjustedAttributeScore(attribute, injuryEffects, options);
             int attributeModifier = getIndividualAttributeModifier(attributeScore);
             totalModifier += attributeModifier;
             targetNumber.addModifier(-attributeModifier, attribute.getLabel());
@@ -666,7 +666,8 @@ public class Skill {
     private int getModifiers(SkillModifierData skillModifierData) {
         int spaModifiers = getSPAModifiers(skillModifierData.characterOptions(),
               skillModifierData.adjustedReputation());
-        int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), skillModifierData.attributes(), type);
+        int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), skillModifierData.attributes(), type,
+              skillModifierData.injuryEffects(), skillModifierData.characterOptions());
         int totalInjuryModifier = getTotalInjuryModifier(skillModifierData, type);
 
         return spaModifiers + attributeModifiers + totalInjuryModifier;
@@ -675,8 +676,6 @@ public class Skill {
     public static int getTotalInjuryModifier(SkillModifierData skillModifierData, SkillType type) {
         int totalInjuryModifier = 0;
         for (InjuryEffect injuryEffect : skillModifierData.injuryEffects()) {
-            int firstAttributeModifier = getAttributeModifierFromInjuryEffect(injuryEffect, type.getFirstAttribute());
-            int secondAttributeModifier = getAttributeModifierFromInjuryEffect(injuryEffect, type.getSecondAttribute());
             int perceptionModifier = type.getName().equals(S_PERCEPTION) ? injuryEffect.getPerceptionModifier() : 0;
             int survivalModifier = type.getName().equals(S_SURVIVAL) ? injuryEffect.getSurvivalModifier() : 0;
             int actingModifier = type.getName().equals(S_ACTING) ? injuryEffect.getActingModifier() : 0;
@@ -687,9 +686,7 @@ public class Skill {
                                               0;
             int acrobaticsModifier = type.getName().equals(S_ACROBATICS) ? injuryEffect.getInterrogationModifier() : 0;
 
-            totalInjuryModifier += firstAttributeModifier +
-                                         secondAttributeModifier +
-                                         perceptionModifier +
+            totalInjuryModifier += perceptionModifier +
                                          survivalModifier +
                                          actingModifier +
                                          negotiationModifier +
@@ -698,19 +695,6 @@ public class Skill {
                                          acrobaticsModifier;
         }
         return totalInjuryModifier;
-    }
-
-    private static int getAttributeModifierFromInjuryEffect(InjuryEffect injuryEffect, SkillAttribute skillAttribute) {
-        return switch (skillAttribute) {
-            case NONE, EDGE -> 0;
-            case STRENGTH -> injuryEffect.getStrengthModifier();
-            case BODY -> injuryEffect.getBodyModifier();
-            case DEXTERITY -> injuryEffect.getDexterityModifier();
-            case REFLEXES -> injuryEffect.getReflexesModifier();
-            case INTELLIGENCE -> injuryEffect.getIntelligenceModifier();
-            case WILLPOWER -> injuryEffect.getWillpowerModifier();
-            case CHARISMA -> injuryEffect.getCharismaModifier();
-        };
     }
 
     public void improve() {
@@ -890,8 +874,13 @@ public class Skill {
                   (injuryModifier > 0 ? "+" : "") + injuryModifier));
         }
 
+        Attributes attributes = skillModifierData.attributes();
+        List<InjuryEffect> activeInjuryEffects = skillModifierData.injuryEffects();
         SkillAttribute firstLinkedAttribute = type.getFirstAttribute();
-        int firstLinkedAttributeModifier = skillModifierData.attributes().getAttributeModifier(firstLinkedAttribute);
+        PersonnelOptions options = skillModifierData.characterOptions();
+        int firstLinkedAttributeModifier = attributes.getAttributeModifier(firstLinkedAttribute,
+              activeInjuryEffects,
+              options);
         String additionSymbol = getTextAt(RESOURCE_BUNDLE, "tooltip.format.addition");
         tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "tooltip.format.linkedAttribute",
@@ -900,8 +889,8 @@ public class Skill {
 
         SkillAttribute secondLinkedAttribute = type.getSecondAttribute();
         if (secondLinkedAttribute != SkillAttribute.NONE) {
-            int secondLinkedAttributeModifier = skillModifierData.attributes()
-                                                      .getAttributeModifier(secondLinkedAttribute);
+            int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute,
+                  activeInjuryEffects, options);
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "tooltip.format.linkedAttribute",
                   secondLinkedAttribute.getLabel(),

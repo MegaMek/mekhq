@@ -1229,7 +1229,7 @@ public enum ProstheticType {
             int modifier = attributeTotals.getOrDefault(attribute, 0);
             if (modifier != 0) {
                 tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "ProstheticType.tooltip.attribute", modifier, attribute));
+                      "ProstheticType.tooltip.attribute", modifier, attribute.getLabel()));
             }
         }
 

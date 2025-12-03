@@ -36,7 +36,6 @@ package mekhq.campaign.personnel;
 import static java.lang.Math.abs;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
-import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.StringUtility.isNullOrBlank;
@@ -59,9 +58,7 @@ import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.getAllActiveInjuryEffects;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
-import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
-import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
@@ -6884,49 +6881,8 @@ public class Person {
      * @since 0.50.5
      */
     public int getAttributeScore(final SkillAttribute attribute) {
-        if (attribute == null || attribute.isNone()) {
-            LOGGER.error("(getAttributeScore) SkillAttribute is null or NONE.");
-            return DEFAULT_ATTRIBUTE_SCORE;
-        }
-
-        boolean hasFreakishStrength = options.booleanOption(MUTATION_FREAKISH_STRENGTH);
-        boolean hasExoticAppearance = options.booleanOption(MUTATION_EXOTIC_APPEARANCE);
-        boolean hasFacialHair = options.booleanOption(MUTATION_FACIAL_HAIR);
-        boolean hasSeriousDisfigurement = options.booleanOption(MUTATION_SERIOUS_DISFIGUREMENT);
-        boolean isCatGirl = options.booleanOption(MUTATION_CAT_GIRL);
-        boolean isCatGirlUnofficial = options.booleanOption(MUTATION_CAT_GIRL_UNOFFICIAL);
-
-        return switch (attribute) {
-            case NONE -> 0;
-            case STRENGTH -> {
-                int attributeScore = atowAttributes.getAttributeScore(attribute);
-                if (hasFreakishStrength) {
-                    attributeScore += 2;
-                }
-                yield min(attributeScore, MAXIMUM_ATTRIBUTE_SCORE);
-            }
-            case BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, EDGE ->
-                  atowAttributes.getAttributeScore(attribute);
-            case CHARISMA -> {
-                int attributeScore = atowAttributes.getAttributeScore(attribute);
-                if (hasExoticAppearance) {
-                    attributeScore++;
-                }
-                if (hasFacialHair) {
-                    attributeScore--;
-                }
-                if (hasSeriousDisfigurement) {
-                    attributeScore -= 3;
-                }
-                if (isCatGirl) {
-                    attributeScore -= 3;
-                }
-                if (isCatGirlUnofficial) {
-                    attributeScore++;
-                }
-                yield clamp(attributeScore, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-            }
-        };
+        int maximum = getAttributeCap(attribute);
+        return atowAttributes.getAdjustedAttributeScore(attribute, getActiveInjuryEffects(), options);
     }
 
     /**
@@ -6994,7 +6950,7 @@ public class Person {
             return;
         }
 
-        int current = atowAttributes.getAttributeScore(attribute);
+        int current = atowAttributes.getBaseAttributeScore(attribute);
         int newScore = current + delta;
 
         setAttributeScore(attribute, newScore);
@@ -7094,6 +7050,11 @@ public class Person {
 
     public List<Injury> getInjuries() {
         return new ArrayList<>(injuries);
+    }
+
+    public List<InjuryEffect> getActiveInjuryEffects() {
+        boolean isAmbidextrous = options.booleanOption(ATOW_AMBIDEXTROUS);
+        return AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous, injuries);
     }
 
     public int getTotalInjurySeverity() {
