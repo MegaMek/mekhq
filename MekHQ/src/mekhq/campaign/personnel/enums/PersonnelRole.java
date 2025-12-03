@@ -767,7 +767,7 @@ public enum PersonnelRole {
             case MUNITIONS_FACTORY_WORKER -> List.of(SkillType.S_DEMOLITIONS, SkillType.S_ASTECH);
             case MUSICIAN -> List.of(SkillType.S_ART_INSTRUMENT, SkillType.S_INTEREST_MUSIC);
             case ORBITAL_DEFENSE_GUNNER -> List.of(SkillType.S_GUN_VEE, SkillType.S_TECH_MECHANIC);
-            case ORBITAL_SHUTTLE_PILOT -> List.of(SkillType.S_PILOT_AERO, SkillType.S_PROTOCOLS);
+            case ORBITAL_SHUTTLE_PILOT -> List.of(SkillType.S_PILOT_SPACE, SkillType.S_PROTOCOLS);
             case PARAMEDIC -> List.of(SkillType.S_MEDTECH, SkillType.S_PILOT_GVEE);
             case PAINTER -> List.of(SkillType.S_ART_PAINTING, SkillType.S_INTEREST_MYTHOLOGY);
             case PATHFINDER -> List.of(SkillType.S_TRACKING, SkillType.S_SURVIVAL);
