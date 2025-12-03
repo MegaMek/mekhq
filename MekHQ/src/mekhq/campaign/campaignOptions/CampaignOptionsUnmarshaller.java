@@ -156,7 +156,17 @@ public class CampaignOptionsUnmarshaller {
             case "edgeCost" -> campaignOptions.setEdgeCost(parseInt(nodeContents));
             case "attributeCost" -> campaignOptions.setAttributeCost(parseInt(nodeContents));
             case "waitingPeriod" -> campaignOptions.setWaitingPeriod(parseInt(nodeContents));
-            case "acquisitionSkill" -> campaignOptions.setAcquisitionSkill(nodeContents);
+            case "acquisitionSkill" -> {
+                AcquisitionsType newType = switch (nodeContents) {
+                    case "Administration" -> AcquisitionsType.ADMINISTRATION;
+                    case "Negotiation" -> AcquisitionsType.NEGOTIATION;
+                    case "Automatic Success" -> AcquisitionsType.AUTOMATIC;
+                    default -> AcquisitionsType.ANY_TECH;
+                };
+                campaignOptions.setAcquisitionType(newType);
+            }
+            case "acquisitionsType" ->
+                  campaignOptions.setAcquisitionType(AcquisitionsType.parseFromLookupName(nodeContents));
             case "useFunctionalAppraisal" -> campaignOptions.setUseFunctionalAppraisal(parseBoolean(nodeContents));
             case "unitTransitTime" -> campaignOptions.setUnitTransitTime(parseInt(nodeContents));
             case "noDeliveriesInTransit" -> campaignOptions.setNoDeliveriesInTransit(parseBoolean(nodeContents));

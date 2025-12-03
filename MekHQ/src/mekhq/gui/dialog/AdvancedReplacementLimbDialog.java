@@ -151,6 +151,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
     private final Campaign campaign;
     private final Person patient;
+    private final boolean isGMMode;
     private Person surgeon; // can be null
     private int surgeryLevelNeeded = 0;
     private boolean isUseLocalSurgeon;
@@ -203,14 +204,15 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      *
      * @param campaign the active campaign context
      * @param patient  the patient undergoing treatment, or {@code null}
+     * @param isGMMode whether the dialog has been launched in GM Mode (bypassing all restrictions)
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public AdvancedReplacementLimbDialog(Campaign campaign,
-          @Nullable Person patient) {
+    public AdvancedReplacementLimbDialog(Campaign campaign, @Nullable Person patient, boolean isGMMode) {
         this.patient = patient;
         this.campaign = campaign;
+        this.isGMMode = isGMMode;
         surgeon = getSurgeon(campaign.getDoctors()); // can return null
 
         if (patient == null) {
@@ -329,6 +331,27 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         buttonPanel.add(documentationButton);
         buttonPanel.add(confirmButton);
         buttonPanel.add(gmButton);
+
+        if (isGMMode) {
+            RoundedJButton normalModeButton = new RoundedJButton(getTextAt(
+                  RESOURCE_BUNDLE,
+                  "AdvancedReplacementLimbDialog.button.normalMode"));
+            normalModeButton.addActionListener(evt -> {
+                dispose();
+                new AdvancedReplacementLimbDialog(campaign, patient, false);
+            });
+            buttonPanel.add(normalModeButton);
+        } else {
+            RoundedJButton gmModeButton = new RoundedJButton(getTextAt(
+                  RESOURCE_BUNDLE,
+                  "AdvancedReplacementLimbDialog.button.gmMode"));
+            gmModeButton.setEnabled(campaign.isGM());
+            gmModeButton.addActionListener(evt -> {
+                dispose();
+                new AdvancedReplacementLimbDialog(campaign, patient, true);
+            });
+            buttonPanel.add(gmModeButton);
+        }
 
         JPanel bottomContainer = new JPanel(new BorderLayout());
         bottomContainer.add(summaryPanel, BorderLayout.NORTH);
@@ -589,7 +612,12 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * @since 0.50.10
      */
     private String getExclusions(boolean isOnPlanet, ProstheticType selected, int gameYear) {
+        if (isGMMode) {
+            return "";
+        }
+
         String tooltip = "";
+
         // Check if selection should be disabled
         int atowProstheticType = selected.getProstheticType();
         boolean hasHatredOfBionics = patient.getOptions().booleanOption(COMPULSION_BIONIC_HATE);
@@ -604,8 +632,19 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
 
         if (!selected.isAvailableToFaction(campaign.getFaction())) {
-            tooltip += getTextAt(RESOURCE_BUNDLE,
-                  "AdvancedReplacementLimbDialog.exclusions.faction");
+            if (selected.isClanOnly()) {
+                tooltip += getTextAt(RESOURCE_BUNDLE,
+                      "AdvancedReplacementLimbDialog.exclusions.faction.clan");
+            } else if (selected.isComStarOnly()) {
+                tooltip += getTextAt(RESOURCE_BUNDLE,
+                      "AdvancedReplacementLimbDialog.exclusions.faction.comstar");
+            } else if (selected.isWordOfBlakeOnly()) {
+                tooltip += getTextAt(RESOURCE_BUNDLE,
+                      "AdvancedReplacementLimbDialog.exclusions.faction.wob");
+            } else {
+                tooltip += getTextAt(RESOURCE_BUNDLE,
+                      "AdvancedReplacementLimbDialog.exclusions.faction.generic");
+            }
         }
 
         if (!selected.isAvailableInCurrentLocation(campaign.getLocation(),

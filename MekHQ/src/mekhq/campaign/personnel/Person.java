@@ -36,7 +36,6 @@ package mekhq.campaign.personnel;
 import static java.lang.Math.abs;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
-import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.StringUtility.isNullOrBlank;
@@ -59,9 +58,7 @@ import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.getAllActiveInjuryEffects;
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
-import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
-import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
@@ -6067,8 +6064,8 @@ public class Person {
      *                                 their available working time
      */
     public void resetMinutesLeft(boolean isTechsUseAdministration) {
-            this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
-            this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
+        this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
+        this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
 
         // Techs get support time adjusted by skill and administration multipliers
         if (isTechExpanded() && isTechsUseAdministration) {
@@ -6427,38 +6424,52 @@ public class Person {
     }
 
     public @Nullable Skill getSkillForWorkingOn(final @Nullable String skillName) {
-        if (CampaignOptions.S_TECH.equals(skillName)) {
-            return getBestTechSkill();
-        } else if (hasSkill(skillName)) {
+        if (hasSkill(skillName)) {
             return getSkill(skillName);
         } else {
             return null;
         }
     }
 
+    /**
+     * Returns the highest effective tech skill level the person possesses.
+     *
+     * <p>This method considers the four primary tech skills:</p>
+     * <ul>
+     *   <li>{@link SkillType#S_TECH_MEK}</li>
+     *   <li>{@link SkillType#S_TECH_MECHANIC}</li>
+     *   <li>{@link SkillType#S_TECH_BA}</li>
+     *   <li>{@link SkillType#S_TECH_AERO}</li>
+     * </ul>
+     *
+     * <p>For each skill the person has, the method computes its total effective level using the active
+     * {@link SkillModifierData} and returns the maximum among them. If none of the skills are present,
+     * {@link SkillType#EXP_NONE} is returned.</p>
+     *
+     * @return the highest total tech skill level across all tech skills, or {@link SkillType#EXP_NONE} if the person
+     *       has none of them.
+     */
     public int getBestTechLevel() {
-        int level = EXP_NONE;
-        final Skill mekSkill = getSkill(S_TECH_MEK);
-        final Skill mechanicSkill = getSkill(S_TECH_MECHANIC);
-        final Skill baSkill = getSkill(S_TECH_BA);
-        final Skill aeroSkill = getSkill(S_TECH_AERO);
-        if ((mekSkill != null) && (mekSkill.getLevel() > level)) {
-            level = mekSkill.getLevel();
+        SkillModifierData modifierData = getSkillModifierData();
+        int bestLevel = EXP_NONE;
+
+        Skill[] skills = {
+              getSkill(S_TECH_MEK),
+              getSkill(S_TECH_MECHANIC),
+              getSkill(S_TECH_BA),
+              getSkill(S_TECH_AERO)
+        };
+
+        for (Skill skill : skills) {
+            if (skill != null) {
+                int level = skill.getTotalSkillLevel(modifierData);
+                if (level > bestLevel) {
+                    bestLevel = level;
+                }
+            }
         }
 
-        if ((mechanicSkill != null) && (mechanicSkill.getLevel() > level)) {
-            level = mechanicSkill.getLevel();
-        }
-
-        if ((baSkill != null) && (baSkill.getLevel() > level)) {
-            level = baSkill.getLevel();
-        }
-
-        if ((aeroSkill != null) && (aeroSkill.getLevel() > level)) {
-            level = aeroSkill.getLevel();
-        }
-
-        return level;
+        return bestLevel;
     }
 
     public boolean isRightTechTypeFor(final IPartWork part) {
@@ -6870,49 +6881,8 @@ public class Person {
      * @since 0.50.5
      */
     public int getAttributeScore(final SkillAttribute attribute) {
-        if (attribute == null || attribute.isNone()) {
-            LOGGER.error("(getAttributeScore) SkillAttribute is null or NONE.");
-            return DEFAULT_ATTRIBUTE_SCORE;
-        }
-
-        boolean hasFreakishStrength = options.booleanOption(MUTATION_FREAKISH_STRENGTH);
-        boolean hasExoticAppearance = options.booleanOption(MUTATION_EXOTIC_APPEARANCE);
-        boolean hasFacialHair = options.booleanOption(MUTATION_FACIAL_HAIR);
-        boolean hasSeriousDisfigurement = options.booleanOption(MUTATION_SERIOUS_DISFIGUREMENT);
-        boolean isCatGirl = options.booleanOption(MUTATION_CAT_GIRL);
-        boolean isCatGirlUnofficial = options.booleanOption(MUTATION_CAT_GIRL_UNOFFICIAL);
-
-        return switch (attribute) {
-            case NONE -> 0;
-            case STRENGTH -> {
-                int attributeScore = atowAttributes.getAttributeScore(attribute);
-                if (hasFreakishStrength) {
-                    attributeScore += 2;
-                }
-                yield min(attributeScore, MAXIMUM_ATTRIBUTE_SCORE);
-            }
-            case BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, EDGE ->
-                  atowAttributes.getAttributeScore(attribute);
-            case CHARISMA -> {
-                int attributeScore = atowAttributes.getAttributeScore(attribute);
-                if (hasExoticAppearance) {
-                    attributeScore++;
-                }
-                if (hasFacialHair) {
-                    attributeScore--;
-                }
-                if (hasSeriousDisfigurement) {
-                    attributeScore -= 3;
-                }
-                if (isCatGirl) {
-                    attributeScore -= 3;
-                }
-                if (isCatGirlUnofficial) {
-                    attributeScore++;
-                }
-                yield clamp(attributeScore, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-            }
-        };
+        int maximum = getAttributeCap(attribute);
+        return atowAttributes.getAdjustedAttributeScore(attribute, getActiveInjuryEffects(), options);
     }
 
     /**
@@ -6980,7 +6950,7 @@ public class Person {
             return;
         }
 
-        int current = atowAttributes.getAttributeScore(attribute);
+        int current = atowAttributes.getBaseAttributeScore(attribute);
         int newScore = current + delta;
 
         setAttributeScore(attribute, newScore);
@@ -7080,6 +7050,11 @@ public class Person {
 
     public List<Injury> getInjuries() {
         return new ArrayList<>(injuries);
+    }
+
+    public List<InjuryEffect> getActiveInjuryEffects() {
+        boolean isAmbidextrous = options.booleanOption(ATOW_AMBIDEXTROUS);
+        return AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous, injuries);
     }
 
     public int getTotalInjurySeverity() {

@@ -51,6 +51,8 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.utilities.ReportingUtilities;
@@ -74,12 +76,12 @@ public class AttributeCheckUtility {
     /**
      * The target number for an attribute check with one attribute.
      */
-    protected static final int TARGET_NUMBER_ONE_LINKED_ATTRIBUTE = 12; // ATOW pg 43
+    protected static final int TARGET_NUMBER_ONE_LINKED_ATTRIBUTE = 12; // ATOW pg 39-41
 
     /**
      * The target number for an attribute check with two attributes.
      */
-    protected static final int TARGET_NUMBER_TWO_LINKED_ATTRIBUTES = 18; // ATOW pg 43
+    protected static final int TARGET_NUMBER_TWO_LINKED_ATTRIBUTES = 18; // ATOW pg 39-41
 
     private final String reason;
     private final Person person;
@@ -429,7 +431,8 @@ public class AttributeCheckUtility {
         TargetRoll targetNumber = new TargetRoll();
 
         getBaseTargetNumber(targetNumber, secondSkillAttribute != null);
-        getAttributeModifiers(firstSkillAttribute, secondSkillAttribute, characterAttributes, targetNumber);
+        getAttributeModifiers(firstSkillAttribute, secondSkillAttribute, characterAttributes, targetNumber,
+              person.getActiveInjuryEffects(), person.getOptions());
 
         targetNumber.addModifier(miscModifier, getFormattedTextAt(RESOURCE_BUNDLE, "AttributeCheck.miscModifier"));
 
@@ -449,12 +452,16 @@ public class AttributeCheckUtility {
      * @since 0.50.07
      */
     private static void getAttributeModifiers(SkillAttribute firstSkillAttribute, SkillAttribute secondSkillAttribute,
-          Attributes characterAttributes, TargetRoll targetNumber) {
-        int firstAttributeModifier = -characterAttributes.getAttributeScore(firstSkillAttribute);
+          Attributes characterAttributes, TargetRoll targetNumber, List<InjuryEffect> injuryEffects,
+          PersonnelOptions options) {
+        // Because we're adjusting the target number, positive is bad, negative is good
+        int firstAttributeModifier = -characterAttributes.getAdjustedAttributeScore(firstSkillAttribute, injuryEffects,
+              options);
         targetNumber.addModifier(firstAttributeModifier, firstSkillAttribute.getLabel());
 
         if (secondSkillAttribute != null) {
-            int secondAttributeModifier = -characterAttributes.getAttributeScore(secondSkillAttribute);
+            int secondAttributeModifier = -characterAttributes.getAdjustedAttributeScore(secondSkillAttribute,
+                  injuryEffects, options);
             targetNumber.addModifier(secondAttributeModifier, secondSkillAttribute.getLabel());
         }
     }

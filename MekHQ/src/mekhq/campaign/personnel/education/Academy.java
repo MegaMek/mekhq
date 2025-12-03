@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
+import javax.swing.JOptionPane;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -959,7 +960,8 @@ public class Academy implements Comparable<Academy> {
      * @throws IllegalStateException if the skill string is unexpected or invalid
      */
     public static String skillParser(String skill) {
-        return switch (skill.toLowerCase().trim()) {
+        String normalized = skill.toLowerCase().trim();
+        String result = switch (normalized) {
             case "piloting/mek" -> SkillType.S_PILOT_MEK;
             case "gunnery/mek" -> SkillType.S_GUN_MEK;
             case "piloting/aerospace" -> SkillType.S_PILOT_AERO;
@@ -1069,7 +1071,18 @@ public class Academy implements Comparable<Academy> {
             case "career/any" -> SkillType.S_CAREER_ANY;
             case "running" -> SkillType.S_RUNNING;
             case "swimming" -> SkillType.S_SWIMMING;
-            default -> throw new IllegalStateException("Unexpected skill in skillParser(): " + skill);
+            default -> null;
         };
+
+        if (result == null) {
+            JOptionPane.showMessageDialog(
+                  null,
+                  "Unrecognized skill: " + skill + ". If you are using a custom academy, please remove this skill.",
+                  "Unknown Skill",
+                  JOptionPane.WARNING_MESSAGE
+            );
+        }
+
+        return result;
     }
 }
