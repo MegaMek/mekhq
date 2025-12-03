@@ -2416,7 +2416,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem = new JMenuItem(resources.getString("performAdvancedSurgery.text"));
             menuItem.addActionListener(ev -> {
                 for (Person selectedPerson : getSelectedPeople()) {
-                    new AdvancedReplacementLimbDialog(getCampaign(), selectedPerson);
+                    new AdvancedReplacementLimbDialog(getCampaign(), selectedPerson, false);
                 }
             });
             popup.add(menuItem);
