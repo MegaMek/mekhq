@@ -161,7 +161,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         btnAdvancedSurgery.setEnabled(false);
         btnAdvancedSurgery.addActionListener(ev -> {
             for (Person person : getAllSelectedPatients()) {
-                new AdvancedReplacementLimbDialog(getCampaign(), person);
+                new AdvancedReplacementLimbDialog(getCampaign(), person, false);
             }
         });
 

@@ -145,7 +145,10 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "factionIntroDate", campaignOptions.isFactionIntroDate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAmmoByType", campaignOptions.isUseAmmoByType());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "waitingPeriod", campaignOptions.getWaitingPeriod());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionSkill", campaignOptions.getAcquisitionSkill());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "acquisitionsType",
+              campaignOptions.getAcquisitionType().getLookupName());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "useFunctionalAppraisal",

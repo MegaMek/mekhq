@@ -33,18 +33,15 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.CAMPAIGN_UPGRADE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Frame;
 import java.util.List;
-import javax.swing.DefaultComboBoxModel;
+import java.util.Map;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -58,9 +55,11 @@ import mekhq.CampaignPreset;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 
 /**
@@ -157,9 +156,45 @@ public class CampaignUpgradeDialog {
                 }
 
                 CampaignPreset chosenPreset = presets.get(comboChoiceIndex);
-                LOGGER.info("Applying {} during upgrade process", chosenPreset.getTitle());
+                campaign.setGameOptions(chosenPreset.getGameOptions());
+                campaign.setRandomSkillPreferences(chosenPreset.getRandomSkillPreferences());
+                Map<String, SkillType> presetSkills = chosenPreset.getSkills();
+                for (final String skillName : SkillType.getSkillList()) {
+                    SkillType storedType = SkillType.getType(skillName);
+                    SkillType presetType = presetSkills.get(skillName);
 
-                triggerLoadingDialog(campaign, chosenPreset, runnable);
+                    if (storedType == null || presetType == null) {
+                        LOGGER.info("Skipping outdated or missing skill: {}", skillName);
+                        continue;
+                    }
+
+                    // Update Target Number
+                    storedType.setTarget(presetType.getTarget());
+
+                    // Update Skill Costs
+                    int size = storedType.getCosts().length;
+                    Integer[] presetCosts = presetType.getCosts();
+                    for (int level = 0; level < size; level++) {
+                        try {
+                            int cost = presetCosts[level];
+                            SkillType.setCost(skillName, cost, level);
+                        } catch (IllegalArgumentException e) {
+                            LOGGER.info("Skipping outdated or missing skill level: {}", skillName);
+                        }
+                    }
+
+                    // Update Skill Milestones
+                    storedType.setGreenLevel(presetType.getGreenLevel());
+                    storedType.setRegularLevel(presetType.getRegularLevel());
+                    storedType.setVeteranLevel(presetType.getVeteranLevel());
+                    storedType.setEliteLevel(presetType.getEliteLevel());
+                    storedType.setHeroicLevel(presetType.getHeroicLevel());
+                    storedType.setLegendaryLevel(presetType.getLegendaryLevel());
+                }
+
+                SpecialAbility.replaceSpecialAbilities(chosenPreset.getSpecialAbilities());
+
+                LOGGER.info("Applying {} during upgrade process", chosenPreset.getTitle());
             }
             case PRESET_SELECTION_CUSTOMIZE -> {
                 CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(null, campaign);
@@ -170,62 +205,10 @@ public class CampaignUpgradeDialog {
                 SwingUtilities.invokeLater(runnable);
             }
         }
-    }
 
-    /**
-     * Triggers a loading dialog while the provided campaign is upgraded using the chosen preset.
-     *
-     * <p>This method performs the upgrade operation on a background thread, displaying a modal overlay to the user.
-     * Upon completion, the dialog is closed and, if specified, a {@link Runnable} completion task is executed.</p>
-     *
-     * @param campaign          The campaign being upgraded.
-     * @param chosenPreset      The campaign preset to apply during the upgrade.
-     * @param onUpgradeComplete A task to execute once the upgrade is complete.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    /**
-     * Triggers a loading dialog while upgrading campaign options. This method can be called from any thread and will
-     * ensure all Swing operations occur on the Event Dispatch Thread.
-     *
-     * @param campaign          the campaign to upgrade
-     * @param chosenPreset      the preset to apply
-     * @param onUpgradeComplete callback to run after upgrade completes
-     */
-    private static void triggerLoadingDialog(Campaign campaign, CampaignPreset chosenPreset,
-          Runnable onUpgradeComplete) {
-        SwingUtilities.invokeLater(() -> {
-            JDialog loadingDialog = new JDialog((Frame) null, true);
-            loadingDialog.setUndecorated(true);
-
-            JLabel loadingLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.upgrading",
-                  MHQConstants.VERSION.toString()));
-            loadingLabel.setBorder(RoundedLineBorder.createRoundedLineBorder());
-            loadingDialog.add(loadingLabel);
-            loadingDialog.pack();
-            loadingDialog.setLocationRelativeTo(null);
-
-            SwingWorker<Void, Void> worker = new SwingWorker<>() {
-                @Override
-                protected Void doInBackground() {
-                    CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(null, campaign, chosenPreset,
-                          CAMPAIGN_UPGRADE);
-                    optionsDialog.processApplyAction();
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    loadingDialog.setVisible(false);
-                    loadingDialog.dispose();
-                    onUpgradeComplete.run();
-                }
-            };
-
-            worker.execute();
-            loadingDialog.setVisible(true); // Blocks EDT until worker.done() closes dialog
-        });
+        new ImmersiveDialogNotification(campaign,
+              getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.upgrading", MHQConstants.VERSION.toString()),
+              true);
     }
 
     /**
@@ -294,24 +277,5 @@ public class CampaignUpgradeDialog {
         panel.add(comboBox, BorderLayout.CENTER);
 
         return panel;
-    }
-
-
-    /**
-     * Converts a list of {@link CampaignPreset} objects into a combo box model of their display names.
-     *
-     * @return a {@link DefaultComboBoxModel} holding the titles of available campaign presets.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private static DefaultComboBoxModel<String> convertPresetListModelToComboBoxModel() {
-        DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<>();
-
-        for (CampaignPreset preset : presets) {
-            comboBoxModel.addElement(preset.getTitle());
-        }
-
-        return comboBoxModel;
     }
 }
