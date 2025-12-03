@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -82,6 +83,7 @@ public class QuickTrain {
         boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
         boolean isTechsUseAdministration = campaignOptions.isTechsUseAdministration();
         boolean isUseArtillery = campaignOptions.isUseArtillery();
+        boolean isUseSmallArmsOnly = campaignOptions.isUseSmallArmsOnly();
         boolean isUseReasoningMultiplier = campaignOptions.isUseReasoningXpMultiplier();
         double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
         boolean isLogSkillGain = campaignOptions.isPersonnelLogSkillGain();
@@ -105,7 +107,7 @@ public class QuickTrain {
             SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
                   today, true);
             processSkills(person, isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration,
-                  isUseArtillery, targetSkills, skillModifierData);
+                  isUseArtillery, isUseSmallArmsOnly, targetSkills, skillModifierData);
 
             if (targetSkills.isEmpty()) {
                 continue;
@@ -214,23 +216,31 @@ public class QuickTrain {
      * @param isDoctorsUseAdministration campaign option: doctors substitute administration
      * @param isTechsUseAdministration   campaign option: techs substitute administration
      * @param isUseArtillery             campaign option: include artillery skills
-     * @param targetSkills               (output) list of skill names eligible for training, will be filled and sorted
+     * @param isUseSmallArmsOnly         campaign options: infantry uses Small Arms only
+     * @param targetSkills               (output) list of skill names eligible for training will be filled and sorted
      *
      * @author Illiani
      * @since 0.50.10
      */
     private static void processSkills(Person person, boolean isAdminsHaveNegotiation,
           boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isUseArtillery,
-          List<String> targetSkills, SkillModifierData skillModifierData) {
+          boolean isUseSmallArmsOnly, List<String> targetSkills, SkillModifierData skillModifierData) {
         fetchSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
-              isTechsUseAdministration, isUseArtillery, person, targetSkills,
+              isTechsUseAdministration, isUseArtillery, isUseSmallArmsOnly, person, targetSkills,
               person.getPrimaryRole(), skillModifierData);
         fetchSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
-              isTechsUseAdministration, isUseArtillery, person, targetSkills,
+              isTechsUseAdministration, isUseArtillery, isUseSmallArmsOnly, person, targetSkills,
               person.getSecondaryRole(), skillModifierData);
 
         if (!person.hasSkill(SkillType.S_ARTILLERY)) {
             targetSkills.remove(SkillType.S_ARTILLERY);
+        }
+
+        for (SkillType skillType : SkillType.getUtilitySkills()) {
+            String skillName = skillType.getName();
+            if (!targetSkills.contains(skillName) && person.hasSkill(skillName)) {
+                targetSkills.add(skillName);
+            }
         }
 
         // Sort the skills by their total skill level (lowest -> highest)
@@ -252,6 +262,7 @@ public class QuickTrain {
      * @param isDoctorsUseAdministration campaign option: doctors substitute administration
      * @param isTechsUseAdministration   campaign option: techs substitute administration
      * @param isUseArtillery             campaign option: include artillery skills
+     * @param isUseSmallArmsOnly         campaign option: infantry uses Small Arms only
      * @param person                     the person whose skills are being evaluated
      * @param targetSkills               (output) list to add eligible skill names to
      * @param profession                 the personnel role/profession to check
@@ -260,16 +271,18 @@ public class QuickTrain {
      * @since 0.50.10
      */
     private static void fetchSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
-          boolean isTechsUseAdministration, boolean isUseArtillery, Person person, List<String> targetSkills,
-          PersonnelRole profession, SkillModifierData skillModifierData) {
+          boolean isTechsUseAdministration, boolean isUseArtillery, boolean isUseSmallArmsOnly, Person person,
+          List<String> targetSkills, PersonnelRole profession, SkillModifierData skillModifierData) {
         if (profession.isNone() || profession.isDependent()) {
             return;
         }
 
         switch (profession) {
             case SOLDIER -> {
-                String highestSkillName = getHighestSkill(InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS,
-                      person, skillModifierData);
+                String highestSkillName = isUseSmallArmsOnly ?
+                                                S_SMALL_ARMS :
+                                                getHighestSkill(InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS,
+                                                      person, skillModifierData);
                 if (person.hasSkill(SkillType.S_ANTI_MEK)) {
                     targetSkills.add(SkillType.S_ANTI_MEK);
                 }
