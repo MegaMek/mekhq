@@ -620,7 +620,7 @@ public class Skill {
                   new Attributes(),
                   0,
                   new ArrayList<>(),
-                  skillModifierData.age());
+                  IGNORE_AGE);
         }
 
         int baseValue = level + bonus;
