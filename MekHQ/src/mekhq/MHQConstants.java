@@ -364,6 +364,8 @@ public final class MHQConstants extends SuiteConstants {
     // startregion Important Dates
     public static final LocalDate CLAN_INVASION_FIRST_WAVE_BEGINS = LocalDate.of(3050, 3, 7);
     public static final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
+    public static final LocalDate COMSTAR_SCHISM = LocalDate.of(3052, 9, 21);
+    public static final LocalDate OPERATION_SCOUR_ENDS = LocalDate.of(3078, 1, 1);
     /**
      * The invasion of Luthien kicks off the Jihad
      */
