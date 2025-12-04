@@ -212,6 +212,6 @@ public class PersonUtility {
             bonus = person.getSkill(skill).getBonus();
         }
 
-        addSkill(person, skill, skillLevel.getExperienceLevel(), bonus);
+        addSkill(person, skill, skillLevel.getAdjustedValue(), bonus);
     }
 }

@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static java.lang.Math.max;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -65,14 +64,15 @@ import javax.swing.ImageIcon;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -198,7 +198,7 @@ public class FactionStandings {
     /**
      * Regard penalty for breaching a contract (employer).
      */
-    static final double REGARD_DELTA_CONTRACT_BREACH_EMPLOYER = -(REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER * 3);
+    static final double REGARD_DELTA_CONTRACT_BREACH_EMPLOYER = -(REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER * 2.75);
 
     /**
      * Regard penalty for breaching a contract (employer's allies).
@@ -250,7 +250,7 @@ public class FactionStandings {
     /**
      * How much we should divide contract duration by when determining Duration Multiplier
      */
-    static final int CONTRACT_DURATION_LENGTH_DIVISOR = 6;
+    static final double CONTRACT_DURATION_LENGTH_DIVISOR = 6.0;
 
     /**
      * A mapping of faction names to their respective standing levels.
@@ -287,7 +287,7 @@ public class FactionStandings {
      * separately.</p>
      *
      * <p>If we're starting a new campaign, we should follow up object construction with a call to
-     * {@link #updateClimateRegard(Faction, LocalDate, double)}</p>
+     * {@link #updateClimateRegard(Faction, LocalDate, double, boolean)}</p>
      *
      * @author Illiani
      * @since 0.50.07
@@ -360,7 +360,7 @@ public class FactionStandings {
         int gameYear = today.getYear();
 
         Collection<Faction> allFactions = Factions.getInstance().getFactions();
-        FactionHints factionHints = FactionHints.defaultFactionHints(false);
+        FactionHints factionHints = FactionHints.getInstance();
 
         boolean isMercenary = campaignFaction.isMercenaryOrganization();
         boolean isPirate = campaignFaction.isPirate();
@@ -804,10 +804,10 @@ public class FactionStandings {
         return null;
     }
 
-    /** Use {@link #updateClimateRegard(Faction, LocalDate, double)} instead */
+    /** Use {@link #updateClimateRegard(Faction, LocalDate, double, boolean)} instead */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public String updateClimateRegard(final Faction campaignFaction, final LocalDate today) {
-        return updateClimateRegard(campaignFaction, today, 1.0);
+        return updateClimateRegard(campaignFaction, today, 1.0, false);
     }
 
     /**
@@ -822,9 +822,11 @@ public class FactionStandings {
      * <p>After updating, this method generates and returns an HTML-formatted report summarizing the new climate
      * regard standings for all relevant factions.</p>
      *
-     * @param campaignFaction  the {@link Faction} representing the campaign's primary faction
-     * @param today            the {@link LocalDate} to use for validating factions and determining relationships
-     * @param regardMultiplier the regard multiplier set in campaign options
+     * @param campaignFaction            the {@link Faction} representing the campaign's primary faction
+     * @param today                      the {@link LocalDate} to use for validating factions and determining
+     *                                   relationships
+     * @param regardMultiplier           the regard multiplier set in campaign options
+     * @param enableVerboseClimateRegard {@code true} if the verbose climate regard campaign option is enabled
      *
      * @return an HTML-formatted {@link String} report of faction climate regard changes
      *
@@ -832,8 +834,8 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public String updateClimateRegard(final Faction campaignFaction, final LocalDate today,
-          final double regardMultiplier) {
-        return updateClimateRegard(campaignFaction, today, regardMultiplier, false);
+          final double regardMultiplier, final boolean enableVerboseClimateRegard) {
+        return updateClimateRegard(campaignFaction, today, regardMultiplier, enableVerboseClimateRegard, false);
     }
 
     /**
@@ -848,10 +850,12 @@ public class FactionStandings {
      * <p>After updating, this method generates and returns an HTML-formatted report summarizing the new climate
      * regard standings for all relevant factions.</p>
      *
-     * @param campaignFaction  the {@link Faction} representing the campaign's primary faction
-     * @param today            the {@link LocalDate} to use for validating factions and determining relationships
-     * @param regardMultiplier the regard multiplier set in campaign options
-     * @param useTestDirectory {@code true} if called from within a Unit Test
+     * @param campaignFaction            the {@link Faction} representing the campaign's primary faction
+     * @param today                      the {@link LocalDate} to use for validating factions and determining
+     *                                   relationships
+     * @param regardMultiplier           the regard multiplier set in campaign options
+     * @param enableVerboseClimateRegard {@code true} if the verbose climate regard campaign option is enabled
+     * @param useTestDirectory           {@code true} if called from within a Unit Test
      *
      * @return an HTML-formatted {@link String} report of faction climate regard changes
      *
@@ -859,9 +863,11 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public String updateClimateRegard(final Faction campaignFaction, final LocalDate today,
-          final double regardMultiplier, boolean useTestDirectory) {
+          final double regardMultiplier, boolean enableVerboseClimateRegard, boolean useTestDirectory) {
         Collection<Faction> allFactions = Factions.getInstance().getActiveFactions(today);
-        FactionHints factionHints = FactionHints.defaultFactionHints(useTestDirectory);
+        FactionHints factionHints = useTestDirectory ?
+                                          FactionHints.initializeTestInstance() :
+                                          FactionHints.getInstance();
         boolean isPirate = campaignFaction.isPirate();
 
         // Clear any existing climate regard entries
@@ -925,11 +931,11 @@ public class FactionStandings {
         }
 
         // If we're not handling any climate modifiers, return an empty string
-        if (climateRegard.isEmpty()) {
+        if (climateRegard.isEmpty() || !enableVerboseClimateRegard) {
             return "";
         }
 
-        return buildClimateReport(campaignFaction.isPirate(), today).toString();
+        return buildClimateReport(campaignFaction.isPirate(), campaignFaction.isClan(), today).toString();
     }
 
     /**
@@ -941,7 +947,8 @@ public class FactionStandings {
      *
      * <p>If any entries exist, an introductory line is inserted at the beginning.</p>
      *
-     * @param campaignIsPirate whether the faction is a pirate faction
+     * @param campaignIsPirate whether the campaign faction is a pirate faction
+     * @param campaignIsClan   whether the campaign faction is a Clan faction
      * @param today            the {@link LocalDate} used for retrieving year-specific faction names
      *
      * @return a {@link StringBuilder} containing the formatted climate regard report
@@ -949,7 +956,10 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    private StringBuilder buildClimateReport(boolean campaignIsPirate, LocalDate today) {
+    private StringBuilder buildClimateReport(boolean campaignIsPirate, boolean campaignIsClan, LocalDate today) {
+        // We minus a day as otherwise this will return false if today is the first day of the First Wave
+        boolean clanInvasionHasBegun = MHQConstants.CLAN_INVASION_FIRST_WAVE_BEGINS.minusDays(1).isBefore(today);
+
         StringBuilder report = new StringBuilder();
         String factionName;
         double regard;
@@ -970,6 +980,11 @@ public class FactionStandings {
             if (faction == null) {
                 LOGGER.warn("Faction {} is missing from the Factions collection. Skipping.",
                       climateRegard.get(factionCode));
+                continue;
+            }
+
+            // If the Clan Invasion First Wave hasn't occurred
+            if (!clanInvasionHasBegun && (campaignIsClan != faction.isClan())) {
                 continue;
             }
 
@@ -1225,7 +1240,8 @@ public class FactionStandings {
             regardDelta = REGARD_DELTA_CONTRACT_ACCEPT_ENEMY_NORMAL;
         }
 
-        double durationMultiplier = max((double) contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1.0);
+        double modifiedContractDuration = contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR;
+        double durationMultiplier = 1.0 + Math.log1p(Math.sqrt(modifiedContractDuration));
         regardDelta *= durationMultiplier;
 
         return changeRegardForFaction(campaignFactionCode, enemyFaction.getShortName(), regardDelta, gameYear,
@@ -1322,7 +1338,8 @@ public class FactionStandings {
             default -> throw new IllegalStateException("Unexpected value: " + missionStatus);
         };
 
-        double durationMultiplier = max(contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR, 1.0);
+        double modifiedContractDuration = contractDuration / CONTRACT_DURATION_LENGTH_DIVISOR;
+        double durationMultiplier = 1.0 + Math.log1p(Math.sqrt(modifiedContractDuration));
         regardDeltaEmployer *= durationMultiplier;
         return regardDeltaEmployer;
     }
@@ -1705,8 +1722,16 @@ public class FactionStandings {
 
                 if (mission instanceof AtBContract atbContract) {
                     int contractLength = atbContract.getLength();
+
+                    // First try and fetch the enemy mercenary employer if none exists (because the enemy faction
+                    // isn't an employed mercenary), then fetch the actual enemy
+                    Faction enemyFaction = atbContract.getEnemyMercenaryEmployer();
+                    if (enemyFaction == null) {
+                        enemyFaction = atbContract.getEnemy();
+                    }
+
                     String report = processContractAccept(campaignFactionCode,
-                          atbContract.getEnemy(),
+                          enemyFaction,
                           today,
                           regardMultiplier,
                           contractLength);

@@ -110,6 +110,16 @@ public class FinancesTab {
     private JPanel pnlShares;
     private JCheckBox chkUseShareSystem;
     private JCheckBox chkSharesForAll;
+
+    private JPanel pnlRentedFacilities;
+    private JLabel lblRentedFacilitiesCostHospitalBeds;
+    private JSpinner spnRentedFacilitiesCostHospitalBeds;
+    private JLabel lblRentedFacilitiesCostKitchens;
+    private JSpinner spnRentedFacilitiesCostKitchens;
+    private JLabel lblRentedFacilitiesCostHoldingCells;
+    private JSpinner spnRentedFacilitiesCostHoldingCells;
+    private JLabel lblRentedFacilitiesCostRepairBays;
+    private JSpinner spnRentedFacilitiesCostRepairBays;
     //end General Options
 
     //start Price Multipliers
@@ -220,6 +230,17 @@ public class FinancesTab {
         pnlShares = new JPanel();
         chkUseShareSystem = new JCheckBox();
         chkSharesForAll = new JCheckBox();
+
+        // Rented Facilities
+        pnlRentedFacilities = new JPanel();
+        lblRentedFacilitiesCostHospitalBeds = new JLabel();
+        spnRentedFacilitiesCostHospitalBeds = new JSpinner();
+        lblRentedFacilitiesCostKitchens = new JLabel();
+        spnRentedFacilitiesCostKitchens = new JSpinner();
+        lblRentedFacilitiesCostHoldingCells = new JLabel();
+        spnRentedFacilitiesCostHoldingCells = new JSpinner();
+        lblRentedFacilitiesCostRepairBays = new JLabel();
+        spnRentedFacilitiesCostRepairBays = new JSpinner();
     }
 
     /**
@@ -232,7 +253,7 @@ public class FinancesTab {
     public JPanel createFinancesGeneralOptionsTab() {
         // Header
         financesGeneralOptions = new CampaignOptionsHeaderPanel("FinancesGeneralTab",
-              getImageDirectory() + "logo_star_league.png", 10);
+              getImageDirectory() + "logo_star_league.png", 8);
 
         // Contents
         pnlGeneralOptions = createGeneralOptionsPanel();
@@ -301,9 +322,9 @@ public class FinancesTab {
         payForRecruitmentBox = new CampaignOptionsCheckBox("PayForRecruitmentBox");
         payForRecruitmentBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForRecruitmentBox"));
         payForFoodBox = new CampaignOptionsCheckBox("PayForFoodBox");
-        payForRecruitmentBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForFoodBox"));
+        payForFoodBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForFoodBox"));
         payForHousingBox = new CampaignOptionsCheckBox("PayForHousingBox");
-        payForRecruitmentBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForHousingBox"));
+        payForHousingBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForHousingBox"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PaymentsPanel", true, "PaymentsPanel");
@@ -315,15 +336,13 @@ public class FinancesTab {
         panel.add(payForPartsBox, layout);
         layout.gridx++;
         panel.add(payForRepairsBox, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(payForUnitsBox, layout);
         layout.gridx++;
-        panel.add(payForSalariesBox, layout);
+        panel.add(payForUnitsBox, layout);
 
         layout.gridx = 0;
         layout.gridy++;
+        panel.add(payForSalariesBox, layout);
+        layout.gridx++;
         panel.add(payForOverheadBox, layout);
         layout.gridx++;
         panel.add(payForMaintainBox, layout);
@@ -333,11 +352,11 @@ public class FinancesTab {
         panel.add(payForTransportBox, layout);
         layout.gridx++;
         panel.add(payForRecruitmentBox, layout);
+        layout.gridx++;
+        panel.add(payForFoodBox, layout);
 
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(payForFoodBox, layout);
-        layout.gridx++;
         panel.add(payForHousingBox, layout);
 
         return panel;
@@ -354,6 +373,7 @@ public class FinancesTab {
         // Contents
         pnlTaxes = createTaxesPanel();
         pnlShares = createSharesPanel();
+        pnlRentedFacilities = createRentedFacilitiesPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("OtherSystemsPanel");
@@ -366,6 +386,9 @@ public class FinancesTab {
 
         layout.gridy++;
         panel.add(pnlShares, layout);
+
+        layout.gridy++;
+        panel.add(pnlRentedFacilities, layout);
 
         return panel;
     }
@@ -536,6 +559,72 @@ public class FinancesTab {
         return panel;
     }
 
+    private JPanel createRentedFacilitiesPanel() {
+        // Contents
+        lblRentedFacilitiesCostHospitalBeds = new CampaignOptionsLabel("RentedFacilitiesCostHospitalBeds");
+        lblRentedFacilitiesCostHospitalBeds.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
+              "RentedFacilitiesCostHospitalBeds"));
+        spnRentedFacilitiesCostHospitalBeds = new CampaignOptionsSpinner("RentedFacilitiesCostHospitalBeds",
+              4100, 0, 1000000, 1);
+        spnRentedFacilitiesCostHospitalBeds.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
+              "RentedFacilitiesCostHospitalBeds"));
+
+        lblRentedFacilitiesCostKitchens = new CampaignOptionsLabel("RentedFacilitiesCostKitchens");
+        lblRentedFacilitiesCostKitchens.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
+              "RentedFacilitiesCostKitchens"));
+        spnRentedFacilitiesCostKitchens = new CampaignOptionsSpinner("RentedFacilitiesCostKitchens",
+              3700, 0, 1000000, 1);
+        spnRentedFacilitiesCostKitchens.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
+              "RentedFacilitiesCostKitchens"));
+
+        lblRentedFacilitiesCostHoldingCells = new CampaignOptionsLabel("RentedFacilitiesCostHoldingCells");
+        lblRentedFacilitiesCostHoldingCells.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
+              "RentedFacilitiesCostHoldingCells"));
+        spnRentedFacilitiesCostHoldingCells = new CampaignOptionsSpinner("RentedFacilitiesCostHoldingCells",
+              6400, 0, 1000000, 1);
+        spnRentedFacilitiesCostHoldingCells.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
+              "RentedFacilitiesCostHoldingCells"));
+
+        lblRentedFacilitiesCostRepairBays = new CampaignOptionsLabel("RentedFacilitiesCostRepairBays");
+        lblRentedFacilitiesCostRepairBays.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
+              "RentedFacilitiesCostRepairBays"));
+        spnRentedFacilitiesCostRepairBays = new CampaignOptionsSpinner("RentedFacilitiesCostRepairBays",
+              25000, 0, 1000000, 1);
+        spnRentedFacilitiesCostRepairBays.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
+              "RentedFacilitiesCostRepairBays"));
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("RentedFacilitiesPanel", true, "RentedFacilitiesPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(lblRentedFacilitiesCostHospitalBeds, layout);
+        layout.gridx++;
+        panel.add(spnRentedFacilitiesCostHospitalBeds, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblRentedFacilitiesCostKitchens, layout);
+        layout.gridx++;
+        panel.add(spnRentedFacilitiesCostKitchens, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblRentedFacilitiesCostHoldingCells, layout);
+        layout.gridx++;
+        panel.add(spnRentedFacilitiesCostHoldingCells, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblRentedFacilitiesCostRepairBays, layout);
+        layout.gridx++;
+        panel.add(spnRentedFacilitiesCostRepairBays, layout);
+
+        return panel;
+    }
+
     /**
      * Initializes the components and layout for the price multipliers tab. This tab includes controls for setting
      * various price multipliers such as - General multipliers for unit and part prices. - Multipliers for used parts. -
@@ -582,7 +671,7 @@ public class FinancesTab {
     public JPanel createPriceMultipliersTab() {
         // Header
         priceMultipliersHeader = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
-              getImageDirectory() + "logo_clan_stone_lion.png", true, true, 2);
+              getImageDirectory() + "logo_clan_stone_lion.png", true, true, 1);
 
         // Contents
         pnlGeneralMultipliers = createGeneralMultipliersPanel();
@@ -870,6 +959,10 @@ public class FinancesTab {
         options.setTaxesPercentage((int) spnTaxesPercentage.getValue());
         options.setUseShareSystem(chkUseShareSystem.isSelected());
         options.setSharesForAll(chkSharesForAll.isSelected());
+        options.setRentedFacilitiesCostHospitalBeds((int) spnRentedFacilitiesCostHospitalBeds.getValue());
+        options.setRentedFacilitiesCostKitchens((int) spnRentedFacilitiesCostKitchens.getValue());
+        options.setRentedFacilitiesCostHoldingCells((int) spnRentedFacilitiesCostHoldingCells.getValue());
+        options.setRentedFacilitiesCostRepairBays((int) spnRentedFacilitiesCostRepairBays.getValue());
 
         // Price Multipliers
         options.setCommonPartPriceMultiplier((double) spnCommonPartPriceMultiplier.getValue());
@@ -937,6 +1030,10 @@ public class FinancesTab {
         spnTaxesPercentage.setValue(options.getTaxesPercentage());
         chkUseShareSystem.setSelected(options.isUseShareSystem());
         chkSharesForAll.setSelected(options.isSharesForAll());
+        spnRentedFacilitiesCostHospitalBeds.setValue(options.getRentedFacilitiesCostHospitalBeds());
+        spnRentedFacilitiesCostKitchens.setValue(options.getRentedFacilitiesCostKitchens());
+        spnRentedFacilitiesCostHoldingCells.setValue(options.getRentedFacilitiesCostHoldingCells());
+        spnRentedFacilitiesCostRepairBays.setValue(options.getRentedFacilitiesCostRepairBays());
 
         // Price Multipliers
         spnCommonPartPriceMultiplier.setValue(options.getCommonPartPriceMultiplier());

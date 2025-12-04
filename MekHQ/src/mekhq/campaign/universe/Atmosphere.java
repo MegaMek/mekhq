@@ -40,7 +40,20 @@ public enum Atmosphere {
     TOXIC_POISON("Toxic (Poisonous)"),
     TOXIC_CAUSTIC("Toxic (Caustic)"),
     TOXIC_FLAME("Toxic (Flammable)"),
-    BREATHABLE("Breathable");
+    BREATHABLE("Breathable"),
+    // Pre <50.07 enums. Removing these will break player customized systems
+    @Deprecated(since = "50.07", forRemoval = false)
+    TAINTEDPOISON("Tainted (Poisonous)"),
+    @Deprecated(since = "50.07", forRemoval = false)
+    TAINTEDCAUSTIC("Tainted (Caustic)"),
+    @Deprecated(since = "50.07", forRemoval = false)
+    TAINTEDFLAME("Tainted (Flammable)"),
+    @Deprecated(since = "50.07", forRemoval = false)
+    TOXICPOISON("Toxic (Poisonous)"),
+    @Deprecated(since = "50.07", forRemoval = false)
+    TOXICCAUSTIC("Toxic (Caustic)"),
+    @Deprecated(since = "50.07", forRemoval = false)
+    TOXICFLAME("Toxic (Flammable)");
 
     public final String name;
 
@@ -56,27 +69,27 @@ public enum Atmosphere {
     }
 
     public boolean isTaintedPoison() {
-        return this == TAINTED_POISON;
+        return this == TAINTED_POISON || this == TAINTEDPOISON;
     }
 
     public boolean isTaintedCaustic() {
-        return this == TAINTED_CAUSTIC;
+        return this == TAINTED_CAUSTIC || this == TAINTEDCAUSTIC;
     }
 
     public boolean isTaintedFlame() {
-        return this == TAINTED_FLAME;
+        return this == TAINTED_FLAME || this == TAINTEDFLAME;
     }
 
     public boolean isToxicPoison() {
-        return this == TOXIC_POISON;
+        return this == TOXIC_POISON || this == TOXICPOISON;
     }
 
     public boolean isToxicCaustic() {
-        return this == TOXIC_CAUSTIC;
+        return this == TOXIC_CAUSTIC || this == TOXICCAUSTIC;
     }
 
     public boolean isToxicFlame() {
-        return this == TOXIC_FLAME;
+        return this == TOXIC_FLAME || this == TOXICFLAME;
     }
 
     public boolean isBreathable() {

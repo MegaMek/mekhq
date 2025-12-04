@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.KeyEvent;
@@ -54,104 +54,39 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
  */
 public enum PersonnelRole {
     // region Enum Declarations
-    /**
-     * Individual roles with corresponding name texts and mnemonics.
-     */
-    // I used an average of the modifiers from the MekWarrior, Hot Shot, and Grizzled Veteran ATOW Archetypes
-    MEKWARRIOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_M, 4, 5, 6, 6, 4, 4, 4),
-
-    // I used an average of the modifiers from the MekWarrior, and Aerospace Pilot ATOW Archetypes
-    LAM_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 3, 4, 6, 6, 4, 4, 5),
-
-    // ATOW: Tanker Archetype
-    GROUND_VEHICLE_DRIVER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_V, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Tanker Archetype
-    NAVAL_VEHICLE_DRIVER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_N, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Companion Chopper Pilot Archetype
-    VTOL_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
-
-    // ATOW: Tanker Archetype
-    VEHICLE_GUNNER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_G, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    VEHICLE_CREW(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Aerospace Pilot Archetype
-    AEROSPACE_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_A, 2, 3, 5, 5, 4, 4, 5),
-
-    // ATOW: Aerospace Pilot Archetype
-    CONVENTIONAL_AIRCRAFT_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_C, 2, 3, 5, 5, 4, 4, 5),
-
-    // ATOW: Aerospace Pilot Archetype (most ProtoMek pilots are Aerospace Sibkbo washouts, so this made the most sense)
-    PROTOMEK_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_P, 2, 3, 5, 5, 4, 4, 5),
-
-    // ATOW: Elemental Archetype
-    BATTLE_ARMOUR(PersonnelRoleSubType.COMBAT, true, KeyEvent.VK_B, 7, 6, 4, 5, 3, 4, 3),
-
-    // ATOW: Renegade Warrior Archetype
-    SOLDIER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_S, 5, 5, 4, 5, 4, 6, 3),
-
-    // ATOW: Tanker Archetype
-    VESSEL_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_I, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Tanker Archetype
-    VESSEL_GUNNER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_U, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    VESSEL_CREW(PersonnelRoleSubType.COMBAT, KeyEvent.VK_W, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype
-    VESSEL_NAVIGATOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_Y, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    MEK_TECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_T, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    MECHANIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_E, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    AERO_TEK(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_O, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    BA_TECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    ASTECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Communications Specialist Archetype (this might seem like an odd choice, but the Attributes for this Archetype
-    // work really well for this profession). However, we have switched Dexterity and Reflexes.
-    DOCTOR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_D, 3, 4, 5, 4, 6, 4, 4),
-
-    // ATOW: Communications Specialist Archetype (this might seem like an odd choice, but the Attributes for this Archetype
-    // work really well for this profession
-    MEDIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 4, 5, 6, 4, 4),
-
-    // ATOW: Faceman Archetype
-    ADMINISTRATOR_COMMAND(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 3, 3, 4, 6, 3, 5),
-
-    // ATOW: Faceman Archetype
-    ADMINISTRATOR_LOGISTICS(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_L, 3, 3, 3, 4, 6, 3, 5),
-
-    // ATOW: Faceman Archetype
-    ADMINISTRATOR_TRANSPORT(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_R, 3, 3, 3, 4, 6, 3, 5),
-
-    // ATOW: Faceman Archetype
-    ADMINISTRATOR_HR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_H, 3, 3, 3, 4, 6, 3, 5),
+    MEKWARRIOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_M, 4, 4, 5, 5, 4, 4, 4),
+    LAM_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
+    VEHICLE_CREW_GROUND(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
+    VEHICLE_CREW_NAVAL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
+    VEHICLE_CREW_VTOL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
+    AEROSPACE_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_A, 4, 4, 5, 5, 4, 4, 4),
+    CONVENTIONAL_AIRCRAFT_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_C, 4, 4, 5, 5, 4, 4, 4),
+    PROTOMEK_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_P, 4, 4, 5, 5, 4, 4, 4),
+    BATTLE_ARMOUR(PersonnelRoleSubType.COMBAT, true, KeyEvent.VK_B, 4, 4, 5, 5, 4, 4, 4),
+    SOLDIER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_S, 4, 5, 5, 4, 4, 4, 4),
+    VESSEL_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_I, 4, 4, 5, 5, 4, 4, 4),
+    VESSEL_GUNNER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_U, 4, 4, 5, 5, 4, 4, 4),
+    VESSEL_CREW(PersonnelRoleSubType.COMBAT, KeyEvent.VK_W, 3, 4, 5, 4, 5, 5, 4),
+    VESSEL_NAVIGATOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_Y, 4, 4, 4, 4, 6, 4, 4),
+    MEK_TECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_T, 4, 4, 5, 3, 5, 5, 4),
+    MECHANIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_E, 4, 4, 5, 3, 5, 5, 4),
+    AERO_TEK(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_O, 4, 4, 5, 3, 5, 5, 4),
+    BA_TECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 3, 5, 5, 4),
+    ASTECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 3, 5, 5, 4),
+    DOCTOR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_D, 3, 4, 5, 4, 5, 5, 4),
+    MEDIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 5, 4, 5, 5, 4),
+    ADMINISTRATOR_COMMAND(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 4, 4, 5, 5, 5),
+    ADMINISTRATOR_LOGISTICS(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_L, 3, 4, 4, 4, 5, 5, 5),
+    ADMINISTRATOR_TRANSPORT(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_R, 3, 4, 4, 4, 5, 5, 5),
+    ADMINISTRATOR_HR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_H, 3, 4, 4, 4, 5, 5, 5),
 
     // If we're generating a character without a Profession, we're just going to leave them with middle of the road
-    // Attribute scores (5 in everything)
-    NONE(PersonnelRoleSubType.CIVILIAN, false, KeyEvent.VK_UNDEFINED, 5, 5, 5, 5, 5, 5, 5),
+    // Attribute scores (4 in everything)
+    NONE(PersonnelRoleSubType.CIVILIAN, false, KeyEvent.VK_UNDEFINED, 4, 4, 4, 4, 4, 4, 4),
 
-    // No archetype, but ATOW pg 35 states that the Attribute scores for an average person are 4
+    // No archetype, but ATOW pg 35 states that the Attribute scores for an average person are 4. We've gone with 5
+    // because otherwise it takes +2 levels to get a modifier, but only -1 to get a penalty and players didn't like
+    // that.
     DEPENDENT(KeyEvent.VK_UNDEFINED),
     ADULT_ENTERTAINER(KeyEvent.VK_UNDEFINED),
     ANTIQUARIAN(KeyEvent.VK_UNDEFINED),
@@ -408,12 +343,29 @@ public enum PersonnelRole {
     LOCAL_WARLORD(KeyEvent.VK_UNDEFINED),
     MISCELLANEOUS_JOB(KeyEvent.VK_UNDEFINED),
     NOBLE(KeyEvent.VK_UNDEFINED),
-    COMMON_CRIMINAL(KeyEvent.VK_UNDEFINED);
+    COMMON_CRIMINAL(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    GROUND_VEHICLE_DRIVER(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    NAVAL_VEHICLE_DRIVER(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    VTOL_PILOT(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    VEHICLE_GUNNER(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    VEHICLE_CREW(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    COMBAT_TECHNICIAN(KeyEvent.VK_UNDEFINED);
     // endregion Enum Declarations
 
     // region Variable Declarations
     private static final MMLogger logger = MMLogger.create(PersonnelRole.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelRole";
+
+    public static final List<PersonnelRole> VEHICLE_CREW_EXTENDED_ROLES = List.of(MEK_TECH, AERO_TEK, MECHANIC,
+          BA_TECH, ASTECH, DOCTOR, MEDIC, COMMS_OPERATOR, TECH_COMMUNICATIONS, SENSOR_TECHNICIAN, SOLDIER,
+          ADMINISTRATOR_COMMAND, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_HR, CHEF,
+          VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL);
 
     private final PersonnelRoleSubType subType;
     private final boolean hasClanName;
@@ -429,7 +381,7 @@ public enum PersonnelRole {
 
     // region Constructors
     PersonnelRole(final int mnemonic) {
-        this(PersonnelRoleSubType.CIVILIAN, false, mnemonic, 4, 4, 4, 4, 4, 4, 4);
+        this(PersonnelRoleSubType.CIVILIAN, false, mnemonic, 5, 5, 5, 5, 5, 5, 5);
     }
 
     PersonnelRole(final PersonnelRoleSubType subType, final int mnemonic, final int strength, final int body,
@@ -473,7 +425,7 @@ public enum PersonnelRole {
      */
     public String getLabel(final boolean isClan) {
         final boolean useClan = isClan && hasClanName;
-        return getFormattedTextAt(RESOURCE_BUNDLE, name() + ".label" + (useClan ? ".clan" : ""));
+        return getTextAt(RESOURCE_BUNDLE, name() + ".label" + (useClan ? ".clan" : ""));
     }
 
     /**
@@ -522,20 +474,8 @@ public enum PersonnelRole {
         StringBuilder tooltip = new StringBuilder(getDescription(isClan)).append("<br>");
 
         List<String> skills = new ArrayList<>();
-        if (this == VEHICLE_CREW) {
-            // Vehicle Crew is a bit of a special case as any of these skills makes a character eligible for
-            // experience level improvements.
-            List<String> relevantSkills = List.of(SkillType.S_TECH_MEK,
-                  SkillType.S_TECH_AERO,
-                  SkillType.S_TECH_MECHANIC,
-                  SkillType.S_TECH_BA,
-                  SkillType.S_SURGERY,
-                  SkillType.S_MEDTECH,
-                  SkillType.S_ASTECH,
-                  SkillType.S_COMMUNICATIONS,
-                  SkillType.S_ART_COOKING,
-                  SkillType.S_SENSOR_OPERATIONS);
-            skills.addAll(relevantSkills);
+        if (this == SOLDIER) {
+            skills.addAll(INFANTRY_GUNNERY_SKILLS);
         } else {
             skills.addAll(getSkillsForProfession());
         }
@@ -598,7 +538,7 @@ public enum PersonnelRole {
         }
 
         return switch (attribute) {
-            case NONE -> 0;
+            case NONE, EDGE -> 0;
             case STRENGTH -> strength;
             case BODY -> body;
             case REFLEXES -> reflexes;
@@ -615,9 +555,8 @@ public enum PersonnelRole {
      * @see #getSkillsForProfession(boolean, boolean, boolean, boolean)
      */
     public List<String> getSkillsForProfession() {
-        return getSkillsForProfession(false, false, false, false);
+        return getSkillsForProfession(false, false, false, false, false);
     }
-
 
     /**
      * Retrieves the list of skill names relevant to this profession, tailored according to provided campaign or
@@ -639,7 +578,34 @@ public enum PersonnelRole {
      */
     public List<String> getSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
           boolean isTechsUseAdministration, boolean isUseArtillery) {
-        return switch (this) {
+        return getSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration,
+              isUseArtillery, false);
+    }
+
+
+    /**
+     * Retrieves the list of skill names relevant to this profession, tailored according to provided campaign or
+     * generation options.
+     *
+     * <p>The set of returned skills may vary depending on input flags that define whether certain support or
+     * specialty skills (such as Negotiation, Administration, or Artillery) should be included for appropriate
+     * roles.</p>
+     *
+     * <p>This method is typically used during personnel creation or skill assignment to ensure each role receives a
+     * fitting skill set based on campaign rules and user preferences.</p>
+     *
+     * @param isAdminsHaveNegotiation    if {@code true}, includes Negotiation skill for administrators
+     * @param isDoctorsUseAdministration if {@code true}, includes Administration skill for medical roles
+     * @param isTechsUseAdministration   if {@code true}, includes Administration skill for technical roles
+     * @param isUseArtillery             if {@code true}, includes Artillery skills where applicable
+     * @param includeExpandedSkills      if {@code true}, includes expanded skills for conventional infantry and vehicle
+     *                                   crewmember roles
+     *
+     * @return a list of skill names representing the profession-appropriate skills
+     */
+    public List<String> getSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
+          boolean isTechsUseAdministration, boolean isUseArtillery, boolean includeExpandedSkills) {
+        List<String> skills = switch (this) {
             case MEKWARRIOR -> {
                 if (isUseArtillery) {
                     yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_ARTILLERY);
@@ -649,22 +615,45 @@ public enum PersonnelRole {
             }
             case LAM_PILOT ->
                   List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
-            case GROUND_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_GVEE);
-            case NAVAL_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_NVEE);
-            case VTOL_PILOT -> List.of(SkillType.S_PILOT_VTOL);
-            case VEHICLE_GUNNER -> {
+            case VEHICLE_CREW_GROUND -> {
                 if (isUseArtillery) {
-                    yield List.of(SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
+                    yield List.of(SkillType.S_PILOT_GVEE, SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
                 } else {
-                    yield List.of(SkillType.S_GUN_VEE);
+                    yield List.of(SkillType.S_PILOT_GVEE, SkillType.S_GUN_VEE);
                 }
             }
-            case VEHICLE_CREW, MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
+            case VEHICLE_CREW_NAVAL -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_PILOT_NVEE, SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_PILOT_NVEE, SkillType.S_GUN_VEE);
+                }
+            }
+            case VEHICLE_CREW_VTOL -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_PILOT_VTOL, SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_PILOT_VTOL, SkillType.S_GUN_VEE);
+                }
+            }
+            case MECHANIC -> {
+                if (isTechsUseAdministration) {
+                    yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_ADMIN);
+                } else {
+                    yield List.of(SkillType.S_TECH_MECHANIC);
+                }
+            }
             case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
             case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO);
             case BATTLE_ARMOUR -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
-            case SOLDIER -> List.of(SkillType.S_SMALL_ARMS);
+            case SOLDIER -> {
+                if (includeExpandedSkills) {
+                    yield INFANTRY_GUNNERY_SKILLS;
+                } else {
+                    yield List.of(SkillType.S_SMALL_ARMS);
+                }
+            }
             case VESSEL_PILOT -> List.of(SkillType.S_PILOT_SPACE);
             case VESSEL_GUNNER -> List.of(SkillType.S_GUN_SPACE);
             case VESSEL_CREW -> {
@@ -973,7 +962,10 @@ public enum PersonnelRole {
             case LOCAL_WARLORD -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_LEADER);
             case NOBLE -> List.of(SkillType.S_PROTOCOLS, SkillType.S_INTEREST_POLITICS);
             case COMMON_CRIMINAL -> List.of(SkillType.S_STREETWISE, SkillType.S_INTEREST_GAMBLING);
+            default -> List.of();
         };
+
+        return new ArrayList<>(skills);
     }
     // endregion Getters
 
@@ -996,36 +988,22 @@ public enum PersonnelRole {
     /**
      * @return {@code true} if the personnel has the Ground Vehicle Driver role, {@code false} otherwise.
      */
-    public boolean isGroundVehicleDriver() {
-        return this == GROUND_VEHICLE_DRIVER;
+    public boolean isVehicleCrewGround() {
+        return this == VEHICLE_CREW_GROUND;
     }
 
     /**
      * @return {@code true} if the personnel has the Naval Vehicle Driver role, {@code false} otherwise.
      */
-    public boolean isNavalVehicleDriver() {
-        return this == NAVAL_VEHICLE_DRIVER;
+    public boolean isVehicleCrewNaval() {
+        return this == VEHICLE_CREW_NAVAL;
     }
 
     /**
      * @return {@code true} if the personnel has the VTOL Pilot role, {@code false} otherwise.
      */
-    public boolean isVTOLPilot() {
-        return this == VTOL_PILOT;
-    }
-
-    /**
-     * @return {@code true} if the personnel has the Vehicle Gunner role, {@code false} otherwise.
-     */
-    public boolean isVehicleGunner() {
-        return this == VEHICLE_GUNNER;
-    }
-
-    /**
-     * @return {@code true} if the personnel has the Vehicle Crew role, {@code false} otherwise.
-     */
-    public boolean isVehicleCrew() {
-        return this == VEHICLE_CREW;
+    public boolean isVehicleCrewVTOL() {
+        return this == VEHICLE_CREW_VTOL;
     }
 
     /**
@@ -1035,18 +1013,7 @@ public enum PersonnelRole {
      * @since 0.50.07
      */
     public boolean isVehicleCrewExtended() {
-        return this == VEHICLE_CREW ||
-                     this == MEK_TECH ||
-                     this == AERO_TEK ||
-                     this == MECHANIC ||
-                     this == BA_TECH ||
-                     this == ASTECH ||
-                     this == DOCTOR ||
-                     this == MEDIC ||
-                     this == COMMS_OPERATOR ||
-                     this == TECH_COMMUNICATIONS ||
-                     this == SENSOR_TECHNICIAN ||
-                     this == CHEF;
+        return VEHICLE_CREW_EXTENDED_ROLES.contains(this);
     }
 
 
@@ -1240,35 +1207,31 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Ground Vehicle Driver, Vehicle Gunner, or the Vehicle
-     *       Crew role, {@code false} otherwise.
+     * @return {@code true} if the character is assigned to Vehicle Crew/Ground
      */
     public boolean isGroundVehicleCrew() {
-        return isGroundVehicleDriver() || isVehicleGunner() || isVehicleCrewExtended();
+        return isVehicleCrewGround();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Naval Vehicle Driver, Vehicle Gunner, or the Vehicle
-     *       Crew role, {@code false} otherwise.
+     * @return {@code true} if the character is assigned to Vehicle Crew/Naval
      */
     public boolean isNavalVehicleCrew() {
-        return isNavalVehicleDriver() || isVehicleGunner() || isVehicleCrewExtended();
+        return isVehicleCrewNaval();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the VTOL Pilot, Vehicle Gunner, or the Vehicle Crew role,
-     *       {@code false} otherwise.
+     * @return {@code true} if the character is assigned to Vehicle Crew/VTOL
      */
     public boolean isVTOLCrew() {
-        return isVTOLPilot() || isVehicleGunner() || isVehicleCrewExtended();
+        return isVehicleCrewVTOL();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Ground Vehicle Crew, Naval Vehicle Crew, or the VTOL
-     *       Pilot role, {@code false} otherwise.
+     * @return {@code true} if the character is assigned to the Vehicle Crew/x role
      */
     public boolean isVehicleCrewMember() {
-        return isGroundVehicleCrew() || isNavalVehicleDriver() || isVTOLPilot();
+        return isGroundVehicleCrew() || isNavalVehicleCrew() || isVTOLCrew();
     }
 
     /**

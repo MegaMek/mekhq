@@ -10,25 +10,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Data Repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: megamek/mm-data
           path: mm-data
 
       - name: "Check out MekHQ"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: MekHQ
 
       - name: "Check out MegaMekLab"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: MegaMek/megameklab
           ref: main
           path: megameklab
 
       - name: Checkout MegaMek
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: MegaMek/megamek
           ref: main
@@ -41,7 +41,7 @@ jobs:
           java-version: 17
 
       - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@v4
+        uses: gradle/actions/dependency-submission@v5
         with:
           build-scan-publish: true
           build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"

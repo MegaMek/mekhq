@@ -82,9 +82,9 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
                 person = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT);
             } else if (unit.getEntity() instanceof Tank) {
                 person = switch (unit.getEntity().getMovementMode()) {
-                    case VTOL -> campaign.newPerson(PersonnelRole.VTOL_PILOT);
-                    case NAVAL, HYDROFOIL, SUBMARINE -> campaign.newPerson(PersonnelRole.NAVAL_VEHICLE_DRIVER);
-                    default -> campaign.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER);
+                    case VTOL -> campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL);
+                    case NAVAL, HYDROFOIL, SUBMARINE -> campaign.newPerson(PersonnelRole.VEHICLE_CREW_NAVAL);
+                    default -> campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
                 };
             } else if (unit.getEntity() instanceof ProtoMek) {
                 person = campaign.newPerson(PersonnelRole.PROTOMEK_PILOT);
@@ -111,13 +111,22 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
         while (unit.canTakeMoreGunners()) {
             Person person = null;
             if (unit.getEntity() instanceof Tank) {
-                person = campaign.newPerson(PersonnelRole.VEHICLE_GUNNER);
+                if (unit.getEntity().getMovementMode().isMarine()) {
+                    person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_NAVAL);
+                } else if (unit.getEntity().getMovementMode().isVTOL()) {
+                    person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL);
+                } else {
+                    person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
+                }
             } else if (unit.getEntity() instanceof SmallCraft
                              || unit.getEntity() instanceof Jumpship) {
                 person = campaign.newPerson(PersonnelRole.VESSEL_GUNNER);
             } else if (unit.getEntity() instanceof Mek) {
                 person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+            } else if (unit.getEntity() instanceof ConvFighter) {
+                person = campaign.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
             }
+
             if (person == null) {
                 break;
             }
@@ -128,8 +137,24 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
         }
 
         while (unit.canTakeMoreVesselCrew()) {
-            Person person = campaign.newPerson(unit.getEntity().isSupportVehicle()
-                                                     ? PersonnelRole.VEHICLE_CREW : PersonnelRole.VESSEL_CREW);
+            PersonnelRole role;
+            if (unit.getEntity().isLargeCraft()) {
+                role = PersonnelRole.VESSEL_CREW;
+            } else if (unit.getEntity() instanceof Tank) {
+                if (unit.getEntity().getMovementMode().isMarine()) {
+                    role = PersonnelRole.VEHICLE_CREW_NAVAL;
+                } else if (unit.getEntity().getMovementMode().isVTOL()) {
+                    role = PersonnelRole.VEHICLE_CREW_VTOL;
+                } else {
+                    role = PersonnelRole.VEHICLE_CREW_GROUND;
+                }
+            } else if (unit.getEntity().isConventionalFighter()) {
+                role = PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
+            } else {
+                role = PersonnelRole.ASTECH;
+            }
+
+            Person person = campaign.newPerson(role);
             if (person == null) {
                 break;
             }
@@ -151,7 +176,13 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
             Person person;
             //For vehicle command console we will default to gunner
             if (unit.getEntity() instanceof Tank) {
-                person = campaign.newPerson(PersonnelRole.VEHICLE_GUNNER);
+                if (unit.getEntity().getMovementMode().isMarine()) {
+                    person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_NAVAL);
+                } else if (unit.getEntity().getMovementMode().isVTOL()) {
+                    person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL);
+                } else {
+                    person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
+                }
             } else {
                 person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
             }

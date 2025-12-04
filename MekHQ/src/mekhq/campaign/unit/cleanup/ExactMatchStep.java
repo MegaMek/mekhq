@@ -32,8 +32,11 @@
  */
 package mekhq.campaign.unit.cleanup;
 
+import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Mounted;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 
 public class ExactMatchStep extends UnscrambleStep {
@@ -48,8 +51,16 @@ public class ExactMatchStep extends UnscrambleStep {
     @Override
     public void visit(final EquipmentProposal proposal, final MissingEquipmentPart part) {
         final Mounted<?> mount = proposal.getEquipment(part.getEquipmentNum());
-        if ((mount != null) && part.getType().equals(mount.getType())) {
+        if (mount == null) {
+            return;
+        }
+        if (part.getType().equals(mount.getType())) {
             proposal.proposeMapping(part, part.getEquipmentNum());
+        }
+
+        if (part instanceof MissingAmmoBin missingAmmoBin &&
+                  ((AmmoBin) missingAmmoBin.getReplacementPart()).canChangeMunitions((AmmoType) mount.getType())) {
+            proposal.proposeMapping(missingAmmoBin, part.getEquipmentNum());
         }
     }
 }

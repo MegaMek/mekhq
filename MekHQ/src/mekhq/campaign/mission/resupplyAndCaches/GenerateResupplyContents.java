@@ -42,8 +42,8 @@ import java.util.Collections;
 import java.util.List;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.compute.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -113,6 +113,7 @@ public class GenerateResupplyContents {
         };
 
         if (availableSpace == 0) {
+            logger.info("availableSpace is 0, no resupply possible");
             return;
         }
 

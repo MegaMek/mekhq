@@ -33,22 +33,18 @@
 package mekhq.campaign.personnel.skills;
 
 import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_BODY;
-import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_CHARISMA;
-import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_DEXTERITY;
-import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE;
-import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_REFLEXES;
-import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_STRENGTH;
-import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_WILLPOWER;
-import static mekhq.campaign.personnel.PersonnelOptions.MUTATION_FREAKISH_STRENGTH;
+import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.io.PrintWriter;
+import java.util.List;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -77,6 +73,7 @@ import org.w3c.dom.NodeList;
  * @since 0.50.5
  */
 public class Attributes {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Skill";
     private static final MMLogger LOGGER = MMLogger.create(Attributes.class);
 
     private int strength;
@@ -86,9 +83,8 @@ public class Attributes {
     private int intelligence;
     private int willpower;
     private int charisma;
-
-    // We store illiteracy here as it ensures that state is always accessible to skill checks
-    private boolean isIlliterate;
+    private int edge;
+    private int currentEdge;
 
     /**
      * The default score assigned to all attributes during initialization.
@@ -96,15 +92,7 @@ public class Attributes {
     public static int DEFAULT_ATTRIBUTE_SCORE = 5;
 
     /**
-     * The minimum allowable score for the Edge attribute.
-     *
-     * <p>The Edge attribute can be set to zero. his is distinct from other attributes, whose minimums are set by
-     * {@link #MINIMUM_ATTRIBUTE_SCORE}.</p>
-     */
-    public static int MINIMUM_EDGE_SCORE = 0;
-
-    /**
-     * The minimum allowable score for any attribute other than Edge.
+     * The minimum allowable score for any attribute (other than Edge).
      *
      * <p>Attribute values cannot be set below this limit, and any attempts to do so will result in clamping to this
      * value.</p>
@@ -115,17 +103,20 @@ public class Attributes {
     public static int MINIMUM_ATTRIBUTE_SCORE = 1;
 
     /**
+     * The minimum allowable score for the Edge attribute.
+     *
+     * <p>Edge values cannot be set below this limit, and any attempts to do so will result in clamping to this
+     * value.</p>
+     */
+    public static int MINIMUM_EDGE_SCORE = 0;
+
+    /**
      * The maximum allowable score for any attribute.
      *
      * <p>Attribute values cannot be set above this limit, and any attempts to do so will result in clamping to this
      * value.</p>
      */
     public static int MAXIMUM_ATTRIBUTE_SCORE = 10;
-
-    /**
-     * Represents the cost required to improve an attribute. This is taken from ATOW pg 333.
-     */
-    public static int ATTRIBUTE_IMPROVEMENT_COST = 100;
 
     // Constructor
 
@@ -143,6 +134,8 @@ public class Attributes {
         intelligence = DEFAULT_ATTRIBUTE_SCORE;
         willpower = DEFAULT_ATTRIBUTE_SCORE;
         charisma = DEFAULT_ATTRIBUTE_SCORE;
+        edge = 0;
+        currentEdge = 0;
     }
 
 
@@ -156,12 +149,13 @@ public class Attributes {
      * @param intelligence The initial value for the intelligence {@link SkillAttribute}.
      * @param willpower    The initial value for the willpower {@link SkillAttribute}.
      * @param charisma     The initial value for the charisma {@link SkillAttribute}.
+     * @param edge         The initial value for the edge {@link SkillAttribute}.
      *
      * @author Illiani
      * @since 0.50.05
      */
     public Attributes(int strength, int body, int reflexes, int dexterity, int intelligence, int willpower,
-          int charisma) {
+          int charisma, int edge, int currentEdge) {
         this.strength = strength;
         this.body = body;
         this.reflexes = reflexes;
@@ -169,7 +163,8 @@ public class Attributes {
         this.intelligence = intelligence;
         this.willpower = willpower;
         this.charisma = charisma;
-        isIlliterate = false;
+        this.edge = edge;
+        this.currentEdge = currentEdge;
     }
 
     /**
@@ -179,7 +174,7 @@ public class Attributes {
      * to the same value with a single argument.</p>
      *
      * @param singleValue The value to be assigned to all attribute fields, such as strength, body, reflexes, dexterity,
-     *                    intelligence, willpower, and charisma.
+     *                    intelligence, willpower, charisma, and edge.
      *
      * @author Illiani
      * @since 0.50.05
@@ -192,7 +187,8 @@ public class Attributes {
         this.intelligence = singleValue;
         this.willpower = singleValue;
         this.charisma = singleValue;
-        isIlliterate = false;
+        this.edge = singleValue;
+        this.currentEdge = singleValue;
     }
 
     // Getters and Setters
@@ -219,6 +215,7 @@ public class Attributes {
             case INTELLIGENCE -> clamp(intelligence, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
             case WILLPOWER -> clamp(willpower, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
             case CHARISMA -> clamp(charisma, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case EDGE -> clamp(edge, MINIMUM_EDGE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
             default -> 0;
         };
     }
@@ -237,9 +234,60 @@ public class Attributes {
      * @author Illiani
      * @since 0.50.06
      */
-    public int getAttributeModifier(SkillAttribute attribute) {
-        int attributeScore = getAttribute(attribute);
+    public int getAttributeModifier(SkillAttribute attribute, List<InjuryEffect> injuryEffects,
+          PersonnelOptions options) {
+        int attributeScore = getAdjustedAttributeScore(attribute, injuryEffects, options);
         return getIndividualAttributeModifier(attributeScore);
+    }
+
+    public int getAdjustedAttributeScore(SkillAttribute attribute, List<InjuryEffect> injuryEffects,
+          PersonnelOptions options) {
+        int attributeScore = getAttribute(attribute);
+        int injuryModifier = getAttributeScoreInjuryModifier(attribute, injuryEffects);
+        int abilityModifier = getAbilityAdjustment(attribute, options);
+
+        int total = attributeScore + injuryModifier + abilityModifier;
+        return clamp(total, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+    }
+
+    public int getAbilityAdjustment(SkillAttribute attribute, PersonnelOptions options) {
+        boolean hasFreakishStrength = options.booleanOption(MUTATION_FREAKISH_STRENGTH);
+        boolean hasExoticAppearance = options.booleanOption(MUTATION_EXOTIC_APPEARANCE);
+        boolean hasFacialHair = options.booleanOption(MUTATION_FACIAL_HAIR);
+        boolean hasSeriousDisfigurement = options.booleanOption(MUTATION_SERIOUS_DISFIGUREMENT);
+        boolean isCatGirl = options.booleanOption(MUTATION_CAT_GIRL);
+        boolean isCatGirlUnofficial = options.booleanOption(MUTATION_CAT_GIRL_UNOFFICIAL);
+
+        int attributeScore = 0;
+        return switch (attribute) {
+            case NONE, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, EDGE -> 0;
+            case STRENGTH -> {
+                if (hasFreakishStrength) {
+                    attributeScore += 2;
+                }
+
+                yield attributeScore;
+            }
+            case CHARISMA -> {
+                if (hasExoticAppearance) {
+                    attributeScore++;
+                }
+                if (hasFacialHair) {
+                    attributeScore--;
+                }
+                if (hasSeriousDisfigurement) {
+                    attributeScore -= 3;
+                }
+                if (isCatGirl) {
+                    attributeScore -= 3;
+                }
+                if (isCatGirlUnofficial) {
+                    attributeScore++;
+                }
+
+                yield attributeScore;
+            }
+        };
     }
 
     /**
@@ -256,7 +304,7 @@ public class Attributes {
      * @author Illiani
      * @since 0.50.05
      */
-    public int getAttributeScore(SkillAttribute attribute) {
+    public int getBaseAttributeScore(SkillAttribute attribute) {
         if (attribute == null || attribute.isNone()) {
             LOGGER.warn("(getAttributeScore) attribute is null or NONE.");
             return DEFAULT_ATTRIBUTE_SCORE;
@@ -270,11 +318,53 @@ public class Attributes {
             case INTELLIGENCE -> intelligence;
             case WILLPOWER -> willpower;
             case CHARISMA -> charisma;
+            case EDGE -> edge;
             default -> {
                 LOGGER.error("(getAttributeScore) Invalid attribute requested: {}", attribute);
                 yield DEFAULT_ATTRIBUTE_SCORE;
             }
         };
+    }
+
+    /**
+     * Calculates the cumulative attribute score modifier from a list of injury effects for a given
+     * {@link SkillAttribute}.
+     *
+     * <p>The method iterates through all provided {@link InjuryEffect InjuryEffects} and sums the relevant modifier
+     * based on the requested {@code attribute}. Each injury effect contributes only to the attribute it is associated
+     * with. While {@link SkillAttribute#EDGE} is unaffected by injuries and thus contributes {@code 0}.</p>
+     *
+     * <p>If an unsupported or unexpected attribute is supplied, an error is logged and {@code 0} is used for that
+     * effect.</p>
+     *
+     * @param attribute     the attribute for which the modifier is being calculated
+     * @param injuryEffects the list of injury effects to evaluate; may be empty but must not be {@code null}
+     *
+     * @return the sum of all modifiers relevant to the specified attribute
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public int getAttributeScoreInjuryModifier(SkillAttribute attribute, List<InjuryEffect> injuryEffects) {
+        int totalModifier = 0;
+        for (InjuryEffect effect : injuryEffects) {
+            totalModifier += switch (attribute) {
+                case STRENGTH -> effect.getStrengthModifier();
+                case BODY -> effect.getBodyModifier();
+                case REFLEXES -> effect.getReflexesModifier();
+                case DEXTERITY -> effect.getDexterityModifier();
+                case INTELLIGENCE -> effect.getIntelligenceModifier();
+                case WILLPOWER -> effect.getWillpowerModifier();
+                case CHARISMA -> effect.getCharismaModifier();
+                case EDGE -> 0; // There are no Edge modifying injury effects
+                default -> {
+                    LOGGER.error("(getAttributeScoreModifier) Invalid attribute requested: {}", attribute);
+                    yield 0;
+                }
+            };
+        }
+
+        return totalModifier;
     }
 
     /**
@@ -320,6 +410,7 @@ public class Attributes {
             case INTELLIGENCE -> intelligence = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
             case WILLPOWER -> willpower = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
             case CHARISMA -> charisma = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case EDGE -> edge = clamp(score, MINIMUM_EDGE_SCORE, cap);
             default -> LOGGER.error("(setAttributeScore) Invalid attribute requested: {}", attribute);
         }
     }
@@ -360,6 +451,7 @@ public class Attributes {
         boolean hasExceptionalIntelligence = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE);
         boolean hasExceptionalWillpower = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_WILLPOWER);
         boolean hasExceptionalCharisma = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_CHARISMA);
+        boolean hasExceptionalEdge = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_EDGE);
 
         cap += switch (attribute) {
             case STRENGTH -> {
@@ -373,132 +465,13 @@ public class Attributes {
             case INTELLIGENCE -> hasExceptionalIntelligence ? 1 : 0;
             case WILLPOWER -> hasExceptionalWillpower ? 1 : 0;
             case CHARISMA -> hasExceptionalCharisma ? 1 : 0;
+            case EDGE -> hasExceptionalEdge ? 1 : 0;
             default -> {
                 LOGGER.error("(setAttributeScore) Invalid attribute requested for cap modifier: {}", attribute);
                 yield 0;
             }
         };
         return cap;
-    }
-
-    public boolean isIlliterate() {
-        return isIlliterate;
-    }
-
-    public void setIlliterate(boolean isIlliterate) {
-        this.isIlliterate = isIlliterate;
-    }
-
-    /**
-     * @deprecated use {@link #getAttributeScore(SkillAttribute)}  instead
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public int getStrength() {
-        return strength;
-    }
-
-    /**
-     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public void setStrength(int strength) {
-        this.strength = clamp(strength, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-    }
-
-    /**
-     * @deprecated use {@link #getAttributeScore(SkillAttribute)}  instead
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public int getBody() {
-        return body;
-    }
-
-    /**
-     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public void setBody(int body) {
-        this.body = clamp(body, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-    }
-
-    /**
-     * @deprecated use {@link #getAttributeScore(SkillAttribute)}  instead
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public int getReflexes() {
-        return reflexes;
-    }
-
-    /**
-     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public void setReflexes(int reflexes) {
-        this.reflexes = clamp(reflexes, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-    }
-
-    /**
-     * @deprecated use {@link #getAttributeScore(SkillAttribute)}  instead
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public int getDexterity() {
-        return dexterity;
-    }
-
-    /**
-     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public void setDexterity(int dexterity) {
-        this.dexterity = clamp(dexterity, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-    }
-
-    /**
-     * @deprecated use {@link #getAttributeScore(SkillAttribute)}  instead
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public int getIntelligence() {
-        return intelligence;
-    }
-
-    /**
-     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public void setIntelligence(int intelligence) {
-        this.intelligence = clamp(intelligence, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-    }
-
-    /**
-     * @deprecated use {@link #getAttributeScore(SkillAttribute)}  instead
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public int getWillpower() {
-        return willpower;
-    }
-
-    /**
-     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public void setWillpower(int willpower) {
-        this.willpower = clamp(willpower, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-    }
-
-    /**
-     * @deprecated use {@link #getAttributeScore(SkillAttribute)}  instead
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public int getCharisma() {
-        return charisma;
-    }
-
-    /**
-     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public void setCharisma(int charisma) {
-        this.charisma = clamp(charisma, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     // Utility Methods
@@ -576,122 +549,65 @@ public class Attributes {
             return;
         }
 
-        int currentScore = getAttributeScore(attribute);
+        int currentScore = getBaseAttributeScore(attribute);
         // We defer ensuring this falls within permissible values to setAttributeScore
         int newScore = currentScore + delta;
         setAttributeScore(phenotype, options, attribute, newScore);
     }
 
     /**
-     * Changes the strength attribute by a delta.
+     * Changes the edge attribute by a delta.
      *
-     * <p>The result is clamped between {@link #MINIMUM_ATTRIBUTE_SCORE} and {@link #MAXIMUM_ATTRIBUTE_SCORE}.</p>
+     * <p>The result is clamped between {@code 0} and {@link #MAXIMUM_ATTRIBUTE_SCORE}.</p>
      *
-     * @param delta the value to add to the current strength. A positive delta will increase the attribute score, while
-     *              a negative delta will decrease it.
-     *
-     * @since 0.50.5
-     */
-    @Deprecated(since = "0.50.5", forRemoval = true)
-    public void changeStrength(int delta) {
-        strength += delta;
-        strength = clamp(strength, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-    }
-
-
-    /**
-     * Changes the body attribute by a delta.
-     *
-     * <p>The result is clamped between {@link #MINIMUM_ATTRIBUTE_SCORE} and {@link #MAXIMUM_ATTRIBUTE_SCORE}.</p>
-     *
-     * @param delta the value to add to the current body. A positive delta will increase the attribute score, while a
+     * @param delta the value to add to the current edge. A positive delta will increase the attribute score, while a
      *              negative delta will decrease it.
      *
      * @since 0.50.5
      */
-    public void changeBody(int delta) {
-        body += delta;
-        body = clamp(body, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+    public void changeEdge(int delta) {
+        edge += delta;
+        edge = clamp(edge, MINIMUM_EDGE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
-
-    /**
-     * Changes the reflexes attribute by a delta.
-     *
-     * <p>The result is clamped between {@link #MINIMUM_ATTRIBUTE_SCORE} and {@link #MAXIMUM_ATTRIBUTE_SCORE}.</p>
-     *
-     * @param delta the value to add to the current reflexes. A positive delta will increase the attribute score, while
-     *              a negative delta will decrease it.
-     *
-     * @since 0.50.5
-     */
-    public void changeReflexes(int delta) {
-        reflexes += delta;
-        reflexes = clamp(reflexes, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+    public int getCurrentEdge() {
+        return currentEdge;
     }
 
-
-    /**
-     * Changes the dexterity attribute by a delta.
-     *
-     * <p>The result is clamped between {@link #MINIMUM_ATTRIBUTE_SCORE} and {@link #MAXIMUM_ATTRIBUTE_SCORE}.</p>
-     *
-     * @param delta the value to add to the current dexterity. A positive delta will increase the attribute score, while
-     *              a negative delta will decrease it.
-     *
-     * @since 0.50.5
-     */
-    public void changeDexterity(int delta) {
-        dexterity += delta;
-        dexterity = clamp(dexterity, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+    public void changeCurrentEdge(int delta) {
+        currentEdge += delta;
+        currentEdge = clamp(currentEdge, MINIMUM_EDGE_SCORE, edge);
     }
 
-
-    /**
-     * Changes the intelligence attribute by a delta.
-     *
-     * <p>The result is clamped between {@link #MINIMUM_ATTRIBUTE_SCORE} and {@link #MAXIMUM_ATTRIBUTE_SCORE}.</p>
-     *
-     * @param delta the value to add to the current intelligence. A positive delta will increase the attribute score,
-     *              while a negative delta will decrease it.
-     *
-     * @since 0.50.5
-     */
-    public void changeIntelligence(int delta) {
-        intelligence += delta;
-        intelligence = clamp(intelligence, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+    public void setCurrentEdge(final int currentEdge) {
+        this.currentEdge = currentEdge;
     }
 
+    public String getTooltip(SkillAttribute attribute, List<InjuryEffect> injuryEffects, PersonnelOptions options) {
+        StringBuilder tooltip = new StringBuilder();
 
-    /**
-     * Changes the willpower attribute by a delta.
-     *
-     * <p>The result is clamped between {@link #MINIMUM_ATTRIBUTE_SCORE} and {@link #MAXIMUM_ATTRIBUTE_SCORE}.</p>
-     *
-     * @param delta the value to add to the current willpower. A positive delta will increase the attribute score, while
-     *              a negative delta will decrease it.
-     *
-     * @since 0.50.5
-     */
-    public void changeWillpower(int delta) {
-        willpower += delta;
-        willpower = clamp(willpower, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-    }
+        String flavorText = attribute.getDescription();
+        if (!flavorText.isBlank()) {
+            tooltip.append(flavorText).append("<br><br>");
+        }
 
+        // TODO aging modifiers
 
-    /**
-     * Changes the charisma attribute by a delta.
-     *
-     * <p>The result is clamped between {@link #MINIMUM_ATTRIBUTE_SCORE} and {@link #MAXIMUM_ATTRIBUTE_SCORE}.</p>
-     *
-     * @param delta the value to add to the current charisma. A positive delta will increase the attribute score, while
-     *              a negative delta will decrease it.
-     *
-     * @since 0.50.5
-     */
-    public void changeCharisma(int delta) {
-        charisma += delta;
-        charisma = clamp(charisma, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+        int abilityModifier = getAbilityAdjustment(attribute, options);
+        if (abilityModifier != 0) {
+            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "tooltip.format.spa",
+                  (abilityModifier > 0 ? "+" : "") + abilityModifier));
+        }
+
+        int injuryModifier = getAttributeScoreInjuryModifier(attribute, injuryEffects);
+        if (injuryModifier != 0) {
+            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "tooltip.format.injury",
+                  (injuryModifier > 0 ? "+" : "") + injuryModifier));
+        }
+
+        return tooltip.toString();
     }
 
     // Reading and Writing
@@ -724,6 +640,8 @@ public class Attributes {
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "intelligence", intelligence);
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "willpower", willpower);
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "charisma", charisma);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "edge", edge);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "currentEdge", currentEdge);
     }
 
     /**
@@ -760,6 +678,10 @@ public class Attributes {
                     this.willpower = MathUtility.parseInt(workingNode2.getTextContent(), DEFAULT_ATTRIBUTE_SCORE);
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("charisma")) {
                     this.charisma = MathUtility.parseInt(workingNode2.getTextContent(), DEFAULT_ATTRIBUTE_SCORE);
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("edge")) {
+                    this.edge = MathUtility.parseInt(workingNode2.getTextContent());
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("currentEdge")) {
+                    this.currentEdge = MathUtility.parseInt(workingNode2.getTextContent());
                 }
             }
         } catch (Exception ex) {

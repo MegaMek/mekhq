@@ -34,9 +34,7 @@ package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.GridBagConstraints;
 import javax.swing.JCheckBox;
@@ -44,12 +42,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
-import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -76,7 +72,6 @@ public class SystemsTab {
     // Reputation Tab
     private CampaignOptionsHeaderPanel reputationHeader;
 
-    private MMComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JCheckBox chkResetCriminalRecord;
 
     private JSpinner manualUnitRatingModifier;
@@ -87,6 +82,7 @@ public class SystemsTab {
     // Faction Standing Tab
     private CampaignOptionsHeaderPanel factionStandingHeader;
     private JCheckBox chkTrackFactionStanding;
+    private JCheckBox chkTrackClimateRegardChanges;
     private JSpinner spnRegardMultiplier;
 
     private JCheckBox chkUseFactionStandingNegotiation;
@@ -105,9 +101,12 @@ public class SystemsTab {
 
     private JCheckBox chkUseAttributes;
     private JCheckBox chkRandomizeAttributes;
+    private JCheckBox chkDisplayAllAttributes;
     private JCheckBox chkRandomizeTraits;
     private JCheckBox chkAllowMonthlyReinvestment;
     private JCheckBox chkAllowMonthlyConnections;
+    private JCheckBox chkUseBetterExtraIncome;
+    private JCheckBox chkUseSmallArmsOnly;
 
     /**
      * Constructs a new {@code SystemsTab} for the specified campaign.
@@ -135,7 +134,7 @@ public class SystemsTab {
         // Header
         reputationHeader = new CampaignOptionsHeaderPanel("ReputationTab",
               getImageDirectory() + "logo_morgrains_valkyrate.png",
-              10);
+              8);
 
         // Contents
         JPanel pnlReputationGeneralOptions = createReputationGeneralPanel();
@@ -172,13 +171,6 @@ public class SystemsTab {
      */
     private JPanel createReputationGeneralPanel() {
         // Contents
-        JLabel lblReputation = new CampaignOptionsLabel("Reputation");
-        lblReputation.addMouseListener(createTipPanelUpdater(reputationHeader, "Reputation"));
-        unitRatingMethodCombo = new MMComboBox<>("unitRatingMethodCombo", UnitRatingMethod.values());
-        unitRatingMethodCombo.setToolTipText(String.format("<html>%s</html>",
-              getTextAt(getCampaignOptionsResourceBundle(), "lblReputation.tooltip")));
-        unitRatingMethodCombo.addMouseListener(createTipPanelUpdater(reputationHeader, "Reputation"));
-
         JLabel lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
         lblManualUnitRatingModifier.addMouseListener(createTipPanelUpdater(reputationHeader,
               "ManualUnitRatingModifier"));
@@ -195,12 +187,6 @@ public class SystemsTab {
         layout.gridy = 0;
         layout.gridx = 0;
         layout.gridwidth = 1;
-        panel.add(lblReputation, layout);
-        layout.gridx++;
-        panel.add(unitRatingMethodCombo, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
         panel.add(lblManualUnitRatingModifier, layout);
         layout.gridx++;
         panel.add(manualUnitRatingModifier, layout);
@@ -266,11 +252,15 @@ public class SystemsTab {
         // Header
         factionStandingHeader = new CampaignOptionsHeaderPanel("FactionStandingTab",
               getImageDirectory() + "logo_morgrains_valkyrate.png",
-              4);
+              3);
 
         // Contents
         chkTrackFactionStanding = new CampaignOptionsCheckBox("TrackFactionStanding");
         chkTrackFactionStanding.addMouseListener(createTipPanelUpdater(factionStandingHeader, "TrackFactionStanding"));
+
+        chkTrackClimateRegardChanges = new CampaignOptionsCheckBox("TrackClimateRegardChanges");
+        chkTrackClimateRegardChanges.addMouseListener(createTipPanelUpdater(factionStandingHeader,
+              "TrackClimateRegardChanges"));
 
         JLabel lblRegardMultiplier = new CampaignOptionsLabel("RegardMultiplier");
         lblRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
@@ -291,7 +281,10 @@ public class SystemsTab {
         layoutParent.gridy++;
         layoutParent.gridwidth = 1;
         panel.add(chkTrackFactionStanding, layoutParent);
+        layoutParent.gridx++;
+        panel.add(chkTrackClimateRegardChanges, layoutParent);
 
+        layoutParent.gridx = 0;
         layoutParent.gridy++;
         panel.add(lblRegardMultiplier, layoutParent);
         layoutParent.gridx++;
@@ -407,7 +400,7 @@ public class SystemsTab {
         // Header
         atowHeader = new CampaignOptionsHeaderPanel("ATimeOfWarTab",
               getImageDirectory() + "logo_elysian_fields.png",
-              9);
+              8);
 
         // Contents
         JPanel pnlATOWAttributes = createATOWAttributesPanel();
@@ -441,6 +434,8 @@ public class SystemsTab {
         chkUseAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "UseAttributes"));
         chkRandomizeAttributes = new CampaignOptionsCheckBox("RandomizeAttributes");
         chkRandomizeAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeAttributes"));
+        chkDisplayAllAttributes = new CampaignOptionsCheckBox("DisplayAllAttributes");
+        chkDisplayAllAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "DisplayAllAttributes"));
         chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
         chkRandomizeTraits.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeTraits"));
         chkAllowMonthlyReinvestment = new CampaignOptionsCheckBox("AllowMonthlyReinvestment");
@@ -449,6 +444,12 @@ public class SystemsTab {
         chkAllowMonthlyConnections = new CampaignOptionsCheckBox("AllowMonthlyConnections");
         chkAllowMonthlyConnections.addMouseListener(createTipPanelUpdater(atowHeader,
               "AllowMonthlyConnections"));
+        chkUseBetterExtraIncome = new CampaignOptionsCheckBox("UseBetterExtraIncome");
+        chkUseBetterExtraIncome.addMouseListener(createTipPanelUpdater(atowHeader,
+              "UseBetterExtraIncome"));
+        chkUseSmallArmsOnly = new CampaignOptionsCheckBox("UseSmallArmsOnly");
+        chkUseSmallArmsOnly.addMouseListener(createTipPanelUpdater(atowHeader,
+              "UseSmallArmsOnly"));
 
         final JPanel panel = new CampaignOptionsStandardPanel("ATOWAttributesPanel", true, "ATOWAttributesPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -461,6 +462,8 @@ public class SystemsTab {
         layout.gridx++;
         panel.add(chkRandomizeAttributes, layout);
         layout.gridx++;
+        panel.add(chkDisplayAllAttributes, layout);
+        layout.gridx++;
         panel.add(chkRandomizeTraits, layout);
 
         layout.gridx = 0;
@@ -468,6 +471,10 @@ public class SystemsTab {
         panel.add(chkAllowMonthlyReinvestment, layout);
         layout.gridx++;
         panel.add(chkAllowMonthlyConnections, layout);
+        layout.gridx++;
+        panel.add(chkUseBetterExtraIncome, layout);
+        layout.gridx++;
+        panel.add(chkUseSmallArmsOnly, layout);
 
         return panel;
     }
@@ -508,7 +515,6 @@ public class SystemsTab {
         }
 
         // Reputation
-        unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod());
         manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
 
         chkClampReputationPayMultiplier.setSelected(options.isClampReputationPayMultiplier());
@@ -517,6 +523,7 @@ public class SystemsTab {
 
         // Faction Standing
         chkTrackFactionStanding.setSelected(options.isTrackFactionStanding());
+        chkTrackClimateRegardChanges.setSelected(options.isTrackClimateRegardChanges());
         spnRegardMultiplier.setValue(options.getRegardMultiplier());
         chkUseFactionStandingNegotiation.setSelected(options.isUseFactionStandingNegotiation());
         chkUseFactionStandingResupply.setSelected(options.isUseFactionStandingResupply());
@@ -532,9 +539,12 @@ public class SystemsTab {
         // A Time of War
         chkUseAttributes.setSelected(skillPreferences.isUseAttributes());
         chkRandomizeAttributes.setSelected(skillPreferences.isRandomizeAttributes());
+        chkDisplayAllAttributes.setSelected(options.isDisplayAllAttributes());
         chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
         chkAllowMonthlyReinvestment.setSelected(options.isAllowMonthlyReinvestment());
         chkAllowMonthlyConnections.setSelected(options.isAllowMonthlyConnections());
+        chkUseBetterExtraIncome.setSelected(options.isUseBetterExtraIncome());
+        chkUseSmallArmsOnly.setSelected(options.isUseSmallArmsOnly());
     }
 
     /**
@@ -562,7 +572,6 @@ public class SystemsTab {
         }
 
         // Reputation
-        options.setUnitRatingMethod(unitRatingMethodCombo.getSelectedItem());
         options.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());
 
         if (chkResetCriminalRecord.isSelected()) {
@@ -577,6 +586,7 @@ public class SystemsTab {
 
         // Faction Standing
         options.setTrackFactionStanding(chkTrackFactionStanding.isSelected());
+        options.setTrackClimateRegardChanges(chkTrackClimateRegardChanges.isSelected());
         options.setRegardMultiplier((double) spnRegardMultiplier.getValue());
         options.setUseFactionStandingNegotiation(chkUseFactionStandingNegotiation.isSelected());
         options.setUseFactionStandingResupply(chkUseFactionStandingResupply.isSelected());
@@ -592,8 +602,11 @@ public class SystemsTab {
         // A Time of War
         skillPreferences.setUseAttributes(chkUseAttributes.isSelected());
         skillPreferences.setRandomizeAttributes(chkRandomizeAttributes.isSelected());
+        options.setDisplayAllAttributes(chkDisplayAllAttributes.isSelected());
         skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
         options.setAllowMonthlyReinvestment(chkAllowMonthlyReinvestment.isSelected());
         options.setAllowMonthlyConnections(chkAllowMonthlyConnections.isSelected());
+        options.setUseBetterExtraIncome(chkUseBetterExtraIncome.isSelected());
+        options.setUseSmallArmsOnly(chkUseSmallArmsOnly.isSelected());
     }
 }

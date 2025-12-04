@@ -36,32 +36,31 @@ package mekhq.campaign.personnel.skills;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static megamek.common.options.OptionsConstants.UNOFFICIAL_SENSOR_GEEK;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
-import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_SKILL_MODIFIER;
-import static mekhq.campaign.personnel.skills.SkillType.S_ACTING;
-import static mekhq.campaign.personnel.skills.SkillType.S_ANIMAL_HANDLING;
-import static mekhq.campaign.personnel.skills.SkillType.S_INTEREST_THEOLOGY;
-import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
-import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
-import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
-import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
+import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import megamek.codeUtilities.MathUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -107,6 +106,7 @@ public class Skill {
     private int level;
     private int bonus;
     private int agingModifier;
+    private boolean hasNaturalAptitude;
 
     protected Skill() {
 
@@ -114,28 +114,47 @@ public class Skill {
 
     public Skill(String type) {
         this.type = SkillType.getType(type);
-        this.level = this.type.getLevelFromExperience(SkillType.EXP_REGULAR);
+        this.level = this.type.getLevelFromExperience(EXP_REGULAR);
+    }
+
+    public Skill(String type, int level) {
+        this(SkillType.getType(type), level, 0, 0, false);
     }
 
     public Skill(String type, int level, int bonus) {
-        this(SkillType.getType(type), level, bonus);
+        this(SkillType.getType(type), level, bonus, 0, false);
+    }
+
+    public Skill(String type, int level, int bonus, boolean hasNaturalAptitude) {
+        this(SkillType.getType(type), level, bonus, 0, hasNaturalAptitude);
     }
 
     public Skill(String type, int level, int bonus, int agingModifier) {
-        this(SkillType.getType(type), level, bonus, agingModifier);
+        this(SkillType.getType(type), level, bonus, agingModifier, false);
+    }
+
+    public Skill(String type, int level, int bonus, int agingModifier, boolean hasNaturalAptitude) {
+        this(SkillType.getType(type), level, bonus, agingModifier, hasNaturalAptitude);
     }
 
     public Skill(SkillType type, int level, int bonus) {
-        this.type = type;
-        this.level = level;
-        this.bonus = bonus;
+        this(type, level, bonus, 0, false);
+    }
+
+    public Skill(SkillType type, int level, int bonus, boolean hasNaturalAptitude) {
+        this(type, level, bonus, 0, hasNaturalAptitude);
     }
 
     public Skill(SkillType type, int level, int bonus, int agingModifier) {
+        this(type, level, bonus, agingModifier, false);
+    }
+
+    public Skill(SkillType type, int level, int bonus, int agingModifier, boolean hasNaturalAptitude) {
         this.type = type;
         this.level = level;
         this.bonus = bonus;
         this.agingModifier = agingModifier;
+        this.hasNaturalAptitude = hasNaturalAptitude;
     }
 
     /**
@@ -242,42 +261,16 @@ public class Skill {
         this.agingModifier = agingModifier;
     }
 
+    public boolean getHasNaturalAptitude() {
+        return hasNaturalAptitude;
+    }
+
+    public void setHasNaturalAptitude(boolean hasNaturalAptitude) {
+        this.hasNaturalAptitude = hasNaturalAptitude;
+    }
+
     public SkillType getType() {
         return type;
-    }
-
-    /**
-     * @deprecated use {@link #getFinalSkillValue(PersonnelOptions, Attributes)} instead.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public int getFinalSkillValue(PersonnelOptions characterOptions) {
-        return getFinalSkillValue(characterOptions, new Attributes(), 0);
-    }
-
-    /**
-     * Calculates the final skill value for the character based on the default reputation modifier (zero).
-     *
-     * <p>This is a convenience method that delegates to {@link #getFinalSkillValue(PersonnelOptions, Attributes, int)}
-     * with a default reputation value of {@code 0}.</p>
-     *
-     * <p><b>Usage:</b> This method is for when we know, 100%, that the targeted {@link Skill} is not affected by
-     * the character's Reputation. If unsure, use {@link #getFinalSkillValue(PersonnelOptions, Attributes, int)}
-     * instead.</p>
-     *
-     * @param characterOptions The {@link PersonnelOptions} to consider for determining skill value modifiers.
-     *
-     * @return The final skill value after applying progression rules and using a default reputation of zero.
-     */
-    public int getFinalSkillValue(PersonnelOptions characterOptions, Attributes attributes) {
-        return getFinalSkillValue(characterOptions, attributes, 0);
-    }
-
-    /**
-     * @deprecated use {@link #getFinalSkillValue(PersonnelOptions, Attributes, int)} instead.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public int getFinalSkillValue(PersonnelOptions characterOptions, int reputation) {
-        return getFinalSkillValue(characterOptions, new Attributes(), reputation);
     }
 
     /**
@@ -294,14 +287,14 @@ public class Skill {
      *
      * <p>The reputation value is included as part of the modifiers to the skill value.</p>
      *
-     * @param characterOptions the {@link PersonnelOptions} that define modifiers and SPA specifics for the character
-     * @param attributes       the {@link Attributes} object providing attribute values for the character
-     * @param reputation       a numeric value influencing the skill, positive to improve or negative to penalize it
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return the calculated final skill value, after applying all modifiers and bounds
      */
-    public int getFinalSkillValue(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
-        int modifiers = getModifiers(characterOptions, attributes, reputation);
+    public int getFinalSkillValue(SkillModifierData skillModifierData) {
+        int modifiers = getModifiers(skillModifierData);
 
         if (isCountUp()) {
             return min(COUNT_UP_MAX_VALUE, getSkillValue() + modifiers);
@@ -312,6 +305,8 @@ public class Skill {
 
     /**
      * Calculates the skill modifiers for the current skill type based on the character's SPAs.
+     *
+     * <p><b>Usage:</b> Positive modifiers make the skill check easier, negative make it harder.</p>
      *
      * @param characterOptions The {@link PersonnelOptions} with the character's attributes and options.
      * @param reputation       The character's reputation
@@ -351,6 +346,41 @@ public class Skill {
             }
         }
 
+        // Houdini
+        if (Objects.equals(name, S_ESCAPE_ARTIST)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_HOUDINI)) {
+                modifier += 2;
+            }
+        }
+
+        // Master Impersonator
+        if (Objects.equals(name, S_DISGUISE)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_MASTER_IMPERSONATOR)) {
+                modifier += 2;
+            }
+        }
+
+        // Counterfeiter
+        if (Objects.equals(name, S_FORGERY)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_COUNTERFEITER)) {
+                modifier += 2;
+            }
+        }
+
+        // Natural Thespian
+        if (Objects.equals(name, S_ACTING)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_NATURAL_THESPIAN)) {
+                modifier += 2;
+            }
+        }
+
+        // Pick Pocket
+        if (Objects.equals(name, S_SLEIGHT_OF_HAND)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_PICK_POCKET)) {
+                modifier += 2;
+            }
+        }
+
         // Attractive, Unattractive, Freakish Strength, some compulsions
         if (type.hasAttribute(CHARISMA)) {
             if (characterOptions.booleanOption(FLAW_UNATTRACTIVE)) {
@@ -369,12 +399,15 @@ public class Skill {
                 modifier -= 1;
             }
 
-            if (hasReligiousFanaticism) {
-                modifier -= 1;
-            }
-
             if (characterOptions.booleanOption(ATOW_ATTRACTIVE)) {
                 modifier += 2;
+            }
+        }
+
+        // Illiterate
+        if (type.hasAttribute(INTELLIGENCE)) {
+            if (characterOptions.booleanOption(FLAW_ILLITERATE)) {
+                modifier -= 4;
             }
         }
 
@@ -449,6 +482,31 @@ public class Skill {
             }
         }
 
+        // Sensor Geek
+        if (Objects.equals(S_SENSOR_OPERATIONS, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_SENSOR_GEEK)) {
+                modifier += 2;
+            }
+        }
+
+        // Ranger
+        if (Objects.equals(S_TRACKING, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_RANGER)) {
+                modifier += 1;
+            }
+        }
+
+        // Ranger
+        if (Objects.equals(S_STEALTH, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_GHOST)) {
+                modifier += 1;
+            }
+
+            if (characterOptions.booleanOption(UNOFFICIAL_LOUD_MOUTH)) {
+                modifier -= 1;
+            }
+        }
+
         return modifier;
     }
 
@@ -487,7 +545,7 @@ public class Skill {
      * @since 0.50.05
      */
     public static int getTotalAttributeModifier(TargetRoll targetNumber, final Attributes characterAttributes,
-          final SkillType skillType) {
+          final SkillType skillType, final List<InjuryEffect> injuryEffects, final PersonnelOptions options) {
         if (targetNumber == null || characterAttributes == null || skillType == null) {
             return 0;
         }
@@ -500,7 +558,7 @@ public class Skill {
                 continue;
             }
 
-            int attributeScore = characterAttributes.getAttribute(attribute);
+            int attributeScore = characterAttributes.getAdjustedAttributeScore(attribute, injuryEffects, options);
             int attributeModifier = getIndividualAttributeModifier(attributeScore);
             totalModifier += attributeModifier;
             targetNumber.addModifier(-attributeModifier, attribute.getLabel());
@@ -558,14 +616,6 @@ public class Skill {
     }
 
     /**
-     * @deprecated use {@link #getTotalSkillLevel(PersonnelOptions, Attributes, int)} instead.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public int getTotalSkillLevel() {
-        return level + bonus + agingModifier;
-    }
-
-    /**
      * Calculates the total skill level for a character, factoring in the level, bonuses, aging modifiers, SPA
      * modifiers, and attribute modifiers.
      *
@@ -576,19 +626,26 @@ public class Skill {
      *   <li>Attribute-based modifiers relevant to the skill type derived from the character's attributes.</li>
      * </ul>
      *
-     * @param characterOptions the {@link PersonnelOptions} defining character-specific modifiers, including SPAs
-     * @param attributes       the {@link Attributes} representing the character's current attribute values
-     * @param reputation       a numerical modifier for reputation affecting skill level (positive or negative)
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return the complete skill level after all relevant modifiers have been applied
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public int getTotalSkillLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
+    public int getTotalSkillLevel(@Nullable SkillModifierData skillModifierData) {
+        if (skillModifierData == null) {
+            skillModifierData = new SkillModifierData(new PersonnelOptions(),
+                  new Attributes(),
+                  0,
+                  new ArrayList<>());
+        }
+
         int baseValue = level + bonus + agingModifier;
 
-        int modifiers = getModifiers(characterOptions, attributes, reputation);
+        int modifiers = getModifiers(skillModifierData);
 
         return baseValue + modifiers;
     }
@@ -597,49 +654,51 @@ public class Skill {
      * Calculates the total modifiers for a character based on their SPA (Special Pilot Abilities), attributes, possible
      * illiteracy penalty, and reputation.
      *
-     * @param characterOptions the {@link PersonnelOptions} containing the character's options and SPAs
-     * @param attributes       the {@link Attributes} object representing the character's attributes
-     * @param reputation       the character's reputation value
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return the sum of SPA modifiers, attribute-based modifiers, and any additional penalty (such as for illiteracy)
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private int getModifiers(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
-        int spaModifiers = getSPAModifiers(characterOptions, reputation);
-        int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), attributes, type);
+    private int getModifiers(SkillModifierData skillModifierData) {
+        int spaModifiers = getSPAModifiers(skillModifierData.characterOptions(),
+              skillModifierData.adjustedReputation());
+        int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), skillModifierData.attributes(), type,
+              skillModifierData.injuryEffects(), skillModifierData.characterOptions());
+        int totalInjuryModifier = getTotalInjuryModifier(skillModifierData, type);
 
-        boolean isIntelligenceBased = INTELLIGENCE.equals(type.getFirstAttribute())
-                                            || INTELLIGENCE.equals(type.getSecondAttribute());
-        int literacyModifier = isIntelligenceBased && attributes.isIlliterate()
-                                     ? UNTRAINED_SKILL_MODIFIER : 0;
-
-        return spaModifiers + attributeModifiers + literacyModifier;
+        return spaModifiers + attributeModifiers + totalInjuryModifier;
     }
 
-    /**
-     * Calculates the total skill level for a character using the base level, bonuses, aging modifiers, SPA modifiers,
-     * and attribute modifiers. In this version, reputation is not considered.
-     *
-     * <p>The computation sums:</p>
-     * <ul>
-     *   <li>The base skill level, any additional bonuses, and modifiers due to aging.</li>
-     *   <li>SPA modifiers, determined from the given character options (with a reputation value of zero).</li>
-     *   <li>Attribute-based modifiers for the skill type, derived from the provided attributes.</li>
-     * </ul>
-     *
-     * @param characterOptions the {@link PersonnelOptions} defining character-specific modifiers, including SPAs
-     * @param attributes       the {@link Attributes} representing the character's current attribute values
-     *
-     * @return the complete skill level after all relevant modifiers (excluding reputation) have been applied
-     */
-    public int getTotalSkillLevel(PersonnelOptions characterOptions, Attributes attributes) {
-        return getTotalSkillLevel(characterOptions, attributes, 0);
+    public static int getTotalInjuryModifier(SkillModifierData skillModifierData, SkillType type) {
+        int totalInjuryModifier = 0;
+        for (InjuryEffect injuryEffect : skillModifierData.injuryEffects()) {
+            int perceptionModifier = type.getName().equals(S_PERCEPTION) ? injuryEffect.getPerceptionModifier() : 0;
+            int survivalModifier = type.getName().equals(S_SURVIVAL) ? injuryEffect.getSurvivalModifier() : 0;
+            int actingModifier = type.getName().equals(S_ACTING) ? injuryEffect.getActingModifier() : 0;
+            int negotiationModifier = type.getName().equals(S_NEGOTIATION) ? injuryEffect.getNegotiationModifier() : 0;
+            int leadershipModifier = type.getName().equals(S_LEADER) ? injuryEffect.getLeadershipModifier() : 0;
+            int interrogationModifier = type.getName().equals(S_INTERROGATION) ?
+                                              injuryEffect.getInterrogationModifier() :
+                                              0;
+            int acrobaticsModifier = type.getName().equals(S_ACROBATICS) ? injuryEffect.getInterrogationModifier() : 0;
+
+            totalInjuryModifier += perceptionModifier +
+                                         survivalModifier +
+                                         actingModifier +
+                                         negotiationModifier +
+                                         leadershipModifier +
+                                         interrogationModifier +
+                                         acrobaticsModifier;
+        }
+        return totalInjuryModifier;
     }
 
     public void improve() {
-        if (level >= SkillType.NUM_LEVELS - 1) {
+        if (level >= NUM_LEVELS - 1) {
             // Can't improve past the max
             return;
         }
@@ -658,26 +717,18 @@ public class Skill {
      * the cost for the next valid level if it exists.</p>
      *
      * <p><b>Usage:</b> For most use cases you probably want to call {@code getCostToImprove(String)} from a
-     * {@link Person} object.</p>
+     * {@link Person} object, as that will factor in things like {@link Reasoning}.</p>
      *
      * @return the cost to improve the skill, or 0 if no valid level with a positive cost is found.
      */
     public int getCostToImprove() {
         int cost = 0;
         int i = 1;
-        while (cost <= 0 && (level + i) < SkillType.NUM_LEVELS) {
+        while (cost <= 0 && (level + i) < NUM_LEVELS) {
             cost = type.getCost(level + i);
             ++i;
         }
         return cost;
-    }
-
-    /**
-     * @deprecated use {@link #getSkillLevel(PersonnelOptions, Attributes, int)} instead.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public SkillLevel getSkillLevel() {
-        return getSkillLevel(new PersonnelOptions(), new Attributes(), 0);
     }
 
     /**
@@ -688,41 +739,15 @@ public class Skill {
      * {@link Skills#SKILL_LEVELS} array. The returned value represents the skill proficiency tier for the given
      * parameters.</p>
      *
-     * @param characterOptions the SPAs specific to the character
-     * @param attributes       the character's attributes used in skill evaluation
-     * @param reputation       the reputation value influencing skill evaluation
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return the corresponding {@link SkillLevel} for the evaluated experience level
      */
-    public SkillLevel getSkillLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
+    public SkillLevel getSkillLevel(SkillModifierData skillModifierData) {
         // Returns the SkillLevel Enum value equivalent to the Experience Level Magic Number
-        return Skills.SKILL_LEVELS[getExperienceLevel(characterOptions, attributes, reputation) + 1];
-    }
-
-    /**
-     * Determines the {@link SkillLevel} of a character based on their options and attributes.
-     *
-     * <p>This method calculates the experience level index using the provided {@code characterOptions} and
-     * {@code attributes}, and returns the corresponding {@link SkillLevel} from the {@code Skills.SKILL_LEVELS} array.
-     * The returned value represents the skill proficiency tier for the given parameters.</p>
-     *
-     * @param characterOptions the SPAs specific to the character
-     * @param attributes       the character's attributes used in skill evaluation
-     *
-     * @return the corresponding {@link SkillLevel} for the evaluated experience level
-     */
-    public SkillLevel getSkillLevel(PersonnelOptions characterOptions, Attributes attributes) {
-        // Returns the SkillLevel Enum value equivalent to the Experience Level Magic Number
-        return getSkillLevel(characterOptions, attributes, 0);
-    }
-
-    /**
-     * @deprecated use {@link #getExperienceLevel(PersonnelOptions, Attributes, int)} or
-     *       {@link #getExperienceLevel(PersonnelOptions, Attributes)} instead.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public int getExperienceLevel() {
-        return type.getExperienceLevel(getTotalSkillLevel(new PersonnelOptions(), new Attributes(), 0));
+        return Skills.SKILL_LEVELS[getExperienceLevel(skillModifierData) + 1];
     }
 
     /**
@@ -733,44 +758,24 @@ public class Skill {
      * determine the total skill level and then delegates to the skill type to derive the corresponding experience
      * level.</p>
      *
-     * @param characterOptions the {@link PersonnelOptions} representing character-specific options
-     * @param attributes       the {@link Attributes} possessed by the character
-     * @param reputation       the reputation value to factor into the skill calculation
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return the computed experience level as determined by the underlying skill type
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public int getExperienceLevel(PersonnelOptions characterOptions, Attributes attributes, int reputation) {
-        int totalSkillLevel = getTotalSkillLevel(characterOptions, attributes, reputation);
-        return type.getExperienceLevel(totalSkillLevel);
-    }
-
-    /**
-     * Calculates and returns the experience level for this skill based on the given personnel options and attributes,
-     * ignoring reputation.
-     *
-     * <p><b>Usage:</b> This is a convenience method that assumes a reputation value of zero. It should only be used
-     * in situations where we are 100% sure Reputation has no impact on the skill level.</p>
-     *
-     * @param characterOptions the {@link PersonnelOptions} representing character-specific options
-     * @param attributes       the {@link Attributes} possessed by the character
-     *
-     * @return the computed experience level as determined by the underlying skill type
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    public int getExperienceLevel(PersonnelOptions characterOptions, Attributes attributes) {
-        int totalSkillLevel = getTotalSkillLevel(characterOptions, attributes);
+    public int getExperienceLevel(SkillModifierData skillModifierData) {
+        int totalSkillLevel = getTotalSkillLevel(skillModifierData);
         return type.getExperienceLevel(totalSkillLevel);
     }
 
     /**
      * Returns a string representation of the object using default parameters.
      *
-     * <p>This method calls {@link #toString(PersonnelOptions, Attributes, int)} with a default
+     * <p>This method calls {@link #toString(SkillModifierData)} with a default
      * {@link PersonnelOptions} instance and a reputation value of {@code 0}.</p>
      *
      * <p><b>Usage:</b> Generally you want to use the above-cited method, and pass in the character's SPAs and
@@ -781,7 +786,9 @@ public class Skill {
      */
     @Override
     public String toString() {
-        return toString(new PersonnelOptions(), new Attributes(), 0);
+        SkillModifierData skillModifierData = new SkillModifierData(new PersonnelOptions(), new Attributes(),
+              0, new ArrayList<>());
+        return toString(skillModifierData);
     }
 
     /**
@@ -792,33 +799,37 @@ public class Skill {
      *   <li>Otherwise, the final skill value is suffixed with a plus sign (<code>+</code>).</li>
      * </ul>
      *
-     * @param options    The {@link PersonnelOptions} to use for calculating the final skill value.
-     * @param reputation The reputation value used in the calculation.
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return A string representation of the calculated final skill value, formatted depending on the state of
      *       {@link #isCountUp()}.
      *
      * @see #isCountUp()
-     * @see #getFinalSkillValue(PersonnelOptions, Attributes, int)
+     * @see #getFinalSkillValue(SkillModifierData)
      */
-    public String toString(PersonnelOptions options, Attributes attributes, int reputation) {
-        if (isCountUp()) {
-            return "+" + getFinalSkillValue(options, attributes, reputation);
-        } else {
-            return getFinalSkillValue(options, attributes, reputation) + "+";
-        }
-    }
+    public String toString(SkillModifierData skillModifierData) {
+        String display;
 
-    /**
-     * * @deprecated use {@link #toString(PersonnelOptions, Attributes, int)} instead
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public String toString(PersonnelOptions options, int reputation) {
         if (isCountUp()) {
-            return "+" + getFinalSkillValue(options, new Attributes(), reputation);
+            display = "+" + getFinalSkillValue(skillModifierData);
         } else {
-            return getFinalSkillValue(options, new Attributes(), reputation) + "+";
+            display = getFinalSkillValue(skillModifierData) + "+";
         }
+
+        int baseSkillLevel = level;
+        int totalSkillLevel = getTotalSkillLevel(skillModifierData);
+        SkillLevel skillLevel = getSkillLevel(skillModifierData);
+        String skillLevelLabel = skillLevel.getShortName();
+        if (baseSkillLevel != totalSkillLevel) {
+            display += String.format(" (<s><font color='gray'>%d</font></s> %d %s)",
+                  baseSkillLevel, totalSkillLevel, skillLevelLabel);
+        } else {
+            display += String.format(" (%d %s)", baseSkillLevel, skillLevelLabel);
+        }
+
+        return display;
     }
 
     /**
@@ -826,16 +837,16 @@ public class Skill {
      * modifiers, and linked attribute modifiers. The content is constructed using resource bundle formatting and the
      * provided personnel options, attribute values, and reputation adjustment.
      *
-     * @param options            the personnel options affecting SPA calculation
-     * @param attributes         the set of attributes used to determine modifier values
-     * @param adjustedReputation the reputation value impacting the tooltip details
+     * @param skillModifierData the {@link SkillModifierData} containing information about modifiers that affect this
+     *                          skill. Obtained using {@link Person#getSkillModifierData(boolean, boolean, LocalDate)}
+     *                          or {@link Person#getSkillModifierData()}
      *
      * @return an HTML-formatted string representing the generated skill tooltip
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public String getTooltip(PersonnelOptions options, Attributes attributes, int adjustedReputation) {
+    public String getTooltip(SkillModifierData skillModifierData) {
         StringBuilder tooltip = new StringBuilder();
 
         String flavorText = getType().getFlavorText(false, false);
@@ -849,15 +860,27 @@ public class Skill {
                   (agingModifier > 0 ? "+" : "") + agingModifier));
         }
 
-        int spaModifier = getSPAModifiers(options, adjustedReputation);
+        int spaModifier = getSPAModifiers(skillModifierData.characterOptions(), skillModifierData.adjustedReputation());
         if (spaModifier != 0) {
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "tooltip.format.spa",
                   (spaModifier > 0 ? "+" : "") + spaModifier));
         }
 
+        int injuryModifier = getTotalInjuryModifier(skillModifierData, type);
+        if (injuryModifier != 0) {
+            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "tooltip.format.injury",
+                  (injuryModifier > 0 ? "+" : "") + injuryModifier));
+        }
+
+        Attributes attributes = skillModifierData.attributes();
+        List<InjuryEffect> activeInjuryEffects = skillModifierData.injuryEffects();
         SkillAttribute firstLinkedAttribute = type.getFirstAttribute();
-        int firstLinkedAttributeModifier = attributes.getAttributeModifier(firstLinkedAttribute);
+        PersonnelOptions options = skillModifierData.characterOptions();
+        int firstLinkedAttributeModifier = attributes.getAttributeModifier(firstLinkedAttribute,
+              activeInjuryEffects,
+              options);
         String additionSymbol = getTextAt(RESOURCE_BUNDLE, "tooltip.format.addition");
         tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "tooltip.format.linkedAttribute",
@@ -866,7 +889,8 @@ public class Skill {
 
         SkillAttribute secondLinkedAttribute = type.getSecondAttribute();
         if (secondLinkedAttribute != SkillAttribute.NONE) {
-            int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute);
+            int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute,
+                  activeInjuryEffects, options);
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "tooltip.format.linkedAttribute",
                   secondLinkedAttribute.getLabel(),

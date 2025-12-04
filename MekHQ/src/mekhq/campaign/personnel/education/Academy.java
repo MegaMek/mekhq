@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.education;
 
+import static java.lang.Math.min;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -39,6 +41,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
+import javax.swing.JOptionPane;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -54,10 +57,10 @@ import mekhq.campaign.personnel.enums.education.EducationLevel.Adapter;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.factionHints.FactionHints;
 
 /**
  * The Academy class represents an academy with various properties and methods.
@@ -498,6 +501,34 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
+     * Returns a clamped course index based on the size of the qualification list.
+     *
+     * <p>This method ensures the returned index is always within the valid range of the underlying {@code
+     * qualifications} list. If the provided {@code index} is greater than the last valid position, the maximum
+     * allowable index is returned instead.</p>
+     *
+     * <p><b>Usage:</b> This method was introduced due to the manner in which courses are stored in the
+     * {@link Person} object. The course a character is enrolled is stored as an integer which matches the index of the
+     * course in the {@link Academy}. If the number of courses is reduced in the source XML any characters with a course
+     * index larger than the new array length will prompt a series of {@link IndexOutOfBoundsException} errors. To avoid
+     * that, we instead shunt the character into the last possible course.</p>
+     *
+     * @param index the requested course index
+     *
+     * @return the provided index if within bounds, otherwise the highest valid index
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public int getAdjustedCourseIndex(int index) {
+        if (qualifications.isEmpty()) {
+            return 0;
+        }
+        int maximumIndex = qualifications.size() - 1;
+        return min(index, maximumIndex);
+    }
+
+    /**
      * Retrieves the skills improved by this academy.
      *
      * @return The skills improved by this academy as a String.
@@ -929,7 +960,8 @@ public class Academy implements Comparable<Academy> {
      * @throws IllegalStateException if the skill string is unexpected or invalid
      */
     public static String skillParser(String skill) {
-        return switch (skill.toLowerCase().trim()) {
+        String normalized = skill.toLowerCase().trim();
+        String result = switch (normalized) {
             case "piloting/mek" -> SkillType.S_PILOT_MEK;
             case "gunnery/mek" -> SkillType.S_GUN_MEK;
             case "piloting/aerospace" -> SkillType.S_PILOT_AERO;
@@ -946,14 +978,14 @@ public class Academy implements Comparable<Academy> {
             case "gunnery/battlearmor" -> SkillType.S_GUN_BA;
             case "gunnery/protomek" -> SkillType.S_GUN_PROTO;
             case "small arms" -> SkillType.S_SMALL_ARMS;
-            case "anti-mek" -> SkillType.S_ANTI_MEK;
+            case "anti-mek", "climbing" -> SkillType.S_ANTI_MEK;
             case "tech/mek" -> SkillType.S_TECH_MEK;
             case "tech/mechanic" -> SkillType.S_TECH_MECHANIC;
             case "tech/aero" -> SkillType.S_TECH_AERO;
             case "tech/battlearmor" -> SkillType.S_TECH_BA;
             case "tech/vessel" -> SkillType.S_TECH_VESSEL;
             case "astech" -> SkillType.S_ASTECH;
-            case "doctor" -> SkillType.S_SURGERY;
+            case "doctor", "surgery/any" -> SkillType.S_SURGERY;
             case "medtech" -> SkillType.S_MEDTECH;
             case "hyperspace navigation" -> SkillType.S_NAVIGATION;
             case "administration" -> SkillType.S_ADMIN;
@@ -961,7 +993,96 @@ public class Academy implements Comparable<Academy> {
             case "strategy" -> SkillType.S_STRATEGY;
             case "negotiation" -> SkillType.S_NEGOTIATION;
             case "leadership" -> SkillType.S_LEADER;
-            default -> throw new IllegalStateException("Unexpected skill in skillParser(): " + skill);
+            case "archery" -> SkillType.S_ARCHERY;
+            case "demolitions" -> SkillType.S_DEMOLITIONS;
+            case "martial arts" -> SkillType.S_MARTIAL_ARTS;
+            case "melee weapons" -> SkillType.S_MELEE_WEAPONS;
+            case "thrown weapons" -> SkillType.S_THROWN_WEAPONS;
+            case "support weapons" -> SkillType.S_SUPPORT_WEAPONS;
+            case "training" -> SkillType.S_TRAINING;
+            case "zero-g operations" -> SkillType.S_ZERO_G_OPERATIONS;
+            case "escape artist" -> SkillType.S_ESCAPE_ARTIST;
+            case "disguise" -> SkillType.S_DISGUISE;
+            case "forgery" -> SkillType.S_FORGERY;
+            case "acting" -> SkillType.S_ACTING;
+            case "appraisal" -> SkillType.S_APPRAISAL;
+            case "communications/any" -> SkillType.S_COMMUNICATIONS;
+            case "perception" -> SkillType.S_PERCEPTION;
+            case "sensor operations" -> SkillType.S_SENSOR_OPERATIONS;
+            case "stealth" -> SkillType.S_STEALTH;
+            case "tracking" -> SkillType.S_TRACKING;
+            case "sleight of hand" -> SkillType.S_SLEIGHT_OF_HAND;
+            case "acrobatics" -> SkillType.S_ACROBATICS;
+            case "animal handling" -> SkillType.S_ANIMAL_HANDLING;
+            case "art/dancing" -> SkillType.S_ART_DANCING;
+            case "art/drawing" -> SkillType.S_ART_DRAWING;
+            case "art/painting" -> SkillType.S_ART_PAINTING;
+            case "art/writing" -> SkillType.S_ART_WRITING;
+            case "art/cooking" -> SkillType.S_ART_COOKING;
+            case "art/poetry" -> SkillType.S_ART_POETRY;
+            case "art/sculpture" -> SkillType.S_ART_SCULPTURE;
+            case "art/instrument" -> SkillType.S_ART_INSTRUMENT;
+            case "art/singing" -> SkillType.S_ART_SINGING;
+            case "art/other" -> SkillType.S_ART_OTHER;
+            case "computers" -> SkillType.S_COMPUTERS;
+            case "cryptography" -> SkillType.S_CRYPTOGRAPHY;
+            case "interest/history" -> SkillType.S_INTEREST_HISTORY;
+            case "interest/literature" -> SkillType.S_INTEREST_LITERATURE;
+            case "interest/holo-games" -> SkillType.S_INTEREST_HOLO_GAMES;
+            case "interest/sports" -> SkillType.S_INTEREST_SPORTS;
+            case "interest/fashion" -> SkillType.S_INTEREST_FASHION;
+            case "interest/music" -> SkillType.S_INTEREST_MUSIC;
+            case "interest/military" -> SkillType.S_INTEREST_MILITARY;
+            case "interest/antiques" -> SkillType.S_INTEREST_ANTIQUES;
+            case "interest/theology" -> SkillType.S_INTEREST_THEOLOGY;
+            case "interest/gambling" -> SkillType.S_INTEREST_GAMBLING;
+            case "interest/politics" -> SkillType.S_INTEREST_POLITICS;
+            case "interest/philosophy" -> SkillType.S_INTEREST_PHILOSOPHY;
+            case "interest/economics" -> SkillType.S_INTEREST_ECONOMICS;
+            case "interest/pop-culture" -> SkillType.S_INTEREST_POP_CULTURE;
+            case "interest/astrology" -> SkillType.S_INTEREST_ASTROLOGY;
+            case "interest/fishing" -> SkillType.S_INTEREST_FISHING;
+            case "interest/mythology" -> SkillType.S_INTEREST_MYTHOLOGY;
+            case "interest/cartography" -> SkillType.S_INTEREST_CARTOGRAPHY;
+            case "interest/archeology" -> SkillType.S_INTEREST_ARCHEOLOGY;
+            case "interest/holo-cinema" -> SkillType.S_INTEREST_HOLO_CINEMA;
+            case "interest/exotic animals" -> SkillType.S_INTEREST_EXOTIC_ANIMALS;
+            case "interest/law" -> SkillType.S_INTEREST_LAW;
+            case "interest/other" -> SkillType.S_INTEREST_OTHER;
+            case "interrogation" -> SkillType.S_INTERROGATION;
+            case "investigation" -> SkillType.S_INVESTIGATION;
+            case "language/any" -> SkillType.S_LANGUAGES;
+            case "protocols/any" -> SkillType.S_PROTOCOLS;
+            case "science/biology" -> SkillType.S_SCIENCE_BIOLOGY;
+            case "science/chemistry" -> SkillType.S_SCIENCE_CHEMISTRY;
+            case "science/mathematics" -> SkillType.S_SCIENCE_MATHEMATICS;
+            case "science/physics" -> SkillType.S_SCIENCE_PHYSICS;
+            case "science/military" -> SkillType.S_SCIENCE_MILITARY;
+            case "science/geology" -> SkillType.S_SCIENCE_GEOLOGY;
+            case "science/xenobiology" -> SkillType.S_SCIENCE_XENOBIOLOGY;
+            case "science/pharmacology" -> SkillType.S_SCIENCE_PHARMACOLOGY;
+            case "science/genetics" -> SkillType.S_SCIENCE_GENETICS;
+            case "science/psychology" -> SkillType.S_SCIENCE_PSYCHOLOGY;
+            case "science/other" -> SkillType.S_SCIENCE_OTHER;
+            case "security systems/electronic" -> SkillType.S_SECURITY_SYSTEMS_ELECTRONIC;
+            case "security systems/mechanical" -> SkillType.S_SECURITY_SYSTEMS_MECHANICAL;
+            case "streetwise/any" -> SkillType.S_STREETWISE;
+            case "survival/any" -> SkillType.S_SURVIVAL;
+            case "career/any" -> SkillType.S_CAREER_ANY;
+            case "running" -> SkillType.S_RUNNING;
+            case "swimming" -> SkillType.S_SWIMMING;
+            default -> null;
         };
+
+        if (result == null) {
+            JOptionPane.showMessageDialog(
+                  null,
+                  "Unrecognized skill: " + skill + ". If you are using a custom academy, please remove this skill.",
+                  "Unknown Skill",
+                  JOptionPane.WARNING_MESSAGE
+            );
+        }
+
+        return result;
     }
 }

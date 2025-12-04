@@ -32,6 +32,8 @@
  */
 package mekhq.gui.menus;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
+
 import java.util.stream.Stream;
 import javax.swing.JMenuItem;
 
@@ -39,6 +41,7 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
 
@@ -68,14 +71,15 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
             return;
         }
 
+        boolean techsUseAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
+
         // Initialize Menu
         setText(resources.getString("AssignUnitToTechMenu.title"));
 
         // Initial Parsing Values
         final int maintenanceTime = Stream.of(units).mapToInt(Unit::getMaintenanceTime).sum();
         final String skillName = units[0].determineUnitTechSkillType();
-        final boolean assign = (maintenanceTime < Person.PRIMARY_ROLE_SUPPORT_TIME) &&
-                                     !StringUtility.isNullOrBlank(skillName) &&
+        final boolean assign = !StringUtility.isNullOrBlank(skillName) &&
                                      Stream.of(units)
                                            .allMatch(unit -> skillName.equalsIgnoreCase(unit.determineUnitTechSkillType()));
 
@@ -101,13 +105,13 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
                     continue;
                 }
 
-                if (tech.hasSkill(skillName) &&
-                          ((tech.getMaintenanceTimeUsing() + maintenanceTime) <= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
+                if (tech.hasSkill(skillName)) {
+                    SkillModifierData skillModifierData = tech.getSkillModifierData(true);
+
                     final SkillLevel skillLevel = (tech.getSkillForWorkingOn(units[0]) == null) ?
                                                         SkillLevel.NONE :
                                                         tech.getSkillForWorkingOn(units[0])
-                                                              .getSkillLevel(tech.getOptions(),
-                                                                    tech.getATOWAttributes());
+                                                              .getSkillLevel(skillModifierData);
 
                     final JScrollableMenu subMenu = switch (skillLevel) {
                         case LEGENDARY -> legendaryMenu;
@@ -121,13 +125,9 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
                     };
 
                     if (subMenu != null) {
-                        int dailyTime = tech.getDailyAvailableTechTime(campaign.getCampaignOptions()
-                                                                             .isTechsUseAdministration());
-                        int dailyTimeUsing = tech.getMaintenanceTimeUsing();
-                        int available = dailyTime - dailyTimeUsing;
-
-                        final JMenuItem miAssignTech = new JMenuItem(String.format(resources.getString(
-                              "miAssignTech.text"), tech.getFullTitle(), available));
+                        String display = getFormattedText("AssignTechToUnitMenu.display", tech.getFullTitle(),
+                              maintenanceTime, tech.getDailyAvailableTechTime(techsUseAdmin));
+                        final JMenuItem miAssignTech = new JMenuItem(display);
                         miAssignTech.setName("miAssignTech");
                         miAssignTech.addActionListener(evt -> {
                             for (final Unit unit : units) {

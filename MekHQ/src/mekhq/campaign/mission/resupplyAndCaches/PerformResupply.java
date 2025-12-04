@@ -45,7 +45,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TO
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
-import static mekhq.campaign.personnel.enums.PersonnelRole.GROUND_VEHICLE_DRIVER;
+import static mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_GROUND;
 import static mekhq.campaign.stratCon.StratConContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratCon.StratConRulesManager.generateExternalScenario;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -161,7 +161,7 @@ public class PerformResupply {
         }
 
         final boolean isIndependent = contract.getCommandRights().isIndependent();
-        final boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
+        final boolean isGuerrilla = contract.getContractType().isGuerrillaType();
         final boolean isPirate = PIRATE_FACTION_CODE.equals(contract.getEmployerCode());
         final ResupplyType resupplyType = resupply.getResupplyType();
 
@@ -197,7 +197,7 @@ public class PerformResupply {
         }
 
         // With the focus chosen, we determine the contents of the convoy
-        boolean isUsePlayerConvoy = resupply.getUsePlayerConvoy();
+        boolean isUsePlayerConvoy = !resupplyType.equals(RESUPPLY_LOOT) && resupply.getUsePlayerConvoy();
         for (int i = 0; i < dropCount; i++) {
             getResupplyContents(resupply, DROP_TYPE_ARMOR, isUsePlayerConvoy);
             getResupplyContents(resupply, DROP_TYPE_AMMO, isUsePlayerConvoy);
@@ -653,7 +653,7 @@ public class PerformResupply {
             }
         } else {
             // We invent an NPC driver for NPC convoys
-            speaker = campaign.newPerson(GROUND_VEHICLE_DRIVER, contract.getEmployerCode(), Gender.RANDOMIZE);
+            speaker = campaign.newPerson(VEHICLE_CREW_GROUND, contract.getEmployerCode(), Gender.RANDOMIZE);
         }
 
         if (inCharacterMessage.isBlank()) {

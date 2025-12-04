@@ -521,11 +521,14 @@ public class BotForceRandomizer {
             }
 
             if (!phenotype.isNone()) {
-                String bloodName = Bloodname.randomBloodname(faction.getShortName(), phenotype,
-                      campaign.getGameYear()).getName();
-                crewName += ' ' + bloodName;
-                innerMap.put(Crew.MAP_BLOOD_NAME, bloodName);
-                innerMap.put(Crew.MAP_PHENOTYPE, phenotype.name());
+                Bloodname bloodName = Bloodname.randomBloodname(faction.getShortName(), phenotype,
+                      campaign.getGameYear());
+                if (bloodName != null) {
+                    String bloodNameName = bloodName.getName();
+                    crewName += ' ' + bloodNameName;
+                    innerMap.put(Crew.MAP_BLOOD_NAME, bloodNameName);
+                    innerMap.put(Crew.MAP_PHENOTYPE, phenotype.name());
+                }
             }
         }
 

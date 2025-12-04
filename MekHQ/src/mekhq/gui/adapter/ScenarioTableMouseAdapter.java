@@ -41,10 +41,14 @@ import javax.swing.JTable;
 
 import mekhq.MekHQ;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.stratCon.MaplessStratCon;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.StratConTab;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 
 public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
@@ -79,6 +83,15 @@ public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
         JMenu menu;
 
         // let's fill the pop-up menu
+        if (gui.getTab(MHQTabType.STRAT_CON) instanceof StratConTab stratConTab
+                  && scenario instanceof AtBDynamicScenario) {
+            menuItem = new JMenuItem("Deploy...");
+            menuItem.addActionListener(evt -> MaplessStratCon.deployWithoutMap(stratConTab.getStratconPanel(),
+                  gui.getCampaign(),
+                  scenario));
+            popup.add(menuItem);
+        }
+
         menuItem = new JMenuItem("Edit...");
         menuItem.addActionListener(evt -> editScenario(scenario));
         popup.add(menuItem);
@@ -103,7 +116,7 @@ public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
         Mission mission = gui.getCampaign().getMission(scenario.getMissionId());
         if (mission != null) {
             CustomizeScenarioDialog csd = new CustomizeScenarioDialog(gui.getFrame(), true,
-                  scenario, mission, gui.getCampaign());
+                  scenario, mission, gui);
             csd.setVisible(true);
             MekHQ.triggerEvent(new ScenarioChangedEvent(scenario));
         }

@@ -47,24 +47,26 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.util.UIUtil;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
+import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * A dialog to show parts in use, ordered, in transit with actionable buttons for buying or adding more taken from the
@@ -73,12 +75,13 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class PartsReportDialog extends JDialog {
 
     private JCheckBox ignoreMothballedCheck, topUpWeeklyCheck;
-    private JButton topUpGMButton;
+    private RoundedJButton topUpGMButton;
     private JComboBox<String> ignoreSparesUnderQualityCB;
     private JTable overviewPartsInUseTable;
     private PartsInUseTableModel overviewPartsModel;
 
     private final Campaign campaign;
+    private final PartsInUseManager partsInUseManager;
     private final CampaignGUI gui;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
@@ -88,6 +91,7 @@ public class PartsReportDialog extends JDialog {
         super(gui.getFrame(), modal);
         this.gui = gui;
         this.campaign = gui.getCampaign();
+        this.partsInUseManager = new PartsInUseManager(campaign);
         initComponents();
         updateOverviewPartsInUse();
         pack();
@@ -96,7 +100,8 @@ public class PartsReportDialog extends JDialog {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                onClose(); // Call a custom method
+                dispose();
+                storePartInUseRequestedStockMap();
             }
         });
     }
@@ -278,42 +283,32 @@ public class PartsReportDialog extends JDialog {
               PartsInUseTableModel.COL_BUTTON_GM_ADD_BULK);
 
 
-        JScrollPane tableScroll = new JScrollPaneWithSpeed(overviewPartsInUseTable);
+        JScrollPane tableScroll = new FastJScrollPane(overviewPartsInUseTable);
+        tableScroll.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         ignoreMothballedCheck = new JCheckBox(resourceMap.getString("chkIgnoreMothballed.text"));
         ignoreMothballedCheck.addActionListener(evt -> refreshOverviewPartsInUse());
         ignoreMothballedCheck.setSelected(campaign.getIgnoreMothballed());
 
-
         topUpWeeklyCheck = new JCheckBox(resourceMap.getString("chkTopUpWeekly.text"));
         topUpWeeklyCheck.addActionListener(evt -> refreshOverviewPartsInUse());
         topUpWeeklyCheck.setSelected(campaign.getTopUpWeekly());
 
-
-        JButton topUpButton = new JButton();
+        RoundedJButton topUpButton = new RoundedJButton();
         topUpButton.setText(resourceMap.getString("topUpBtn.text"));
-        topUpButton.setIcon(null);
         topUpButton.setFocusPainted(false);
-        topUpButton.setEnabled(true);
-        topUpButton.setBorder(null);
         topUpButton.setMargin(new Insets(10, 20, 10, 20));
         topUpButton.addActionListener(evt -> topUp());
 
-        topUpGMButton = new JButton();
+        topUpGMButton = new RoundedJButton();
         topUpGMButton.setText(resourceMap.getString("topUpGMBtn.text"));
-        topUpGMButton.setIcon(null);
         topUpGMButton.setFocusPainted(false);
-        topUpGMButton.setEnabled(true);
-        topUpGMButton.setBorder(null);
         topUpGMButton.setMargin(new Insets(10, 20, 10, 20));
         topUpGMButton.addActionListener(evt -> topUpGM());
 
-        JButton resetRequestedStockButton = new JButton();
+        RoundedJButton resetRequestedStockButton = new RoundedJButton();
         resetRequestedStockButton.setText(resourceMap.getString("resetRequestedStockBtn.text"));
-        resetRequestedStockButton.setIcon(null);
         resetRequestedStockButton.setFocusPainted(false);
-        resetRequestedStockButton.setEnabled(true);
-        resetRequestedStockButton.setBorder(null);
         resetRequestedStockButton.setMargin(new Insets(10, 20, 10, 20));
         resetRequestedStockButton.addActionListener(evt -> resetRequestedStock());
 
@@ -338,45 +333,55 @@ public class PartsReportDialog extends JDialog {
         }
 
 
-        JButton btnClose = new JButton("Close");
+        RoundedJButton btnClose = new RoundedJButton("Close");
         btnClose.addActionListener(evt -> {
-            setVisible(false);
-            onClose();
+            dispose();
+            storePartInUseRequestedStockMap();
         });
 
-        layout.setHorizontalGroup(layout.createParallelGroup()
-                                        .addComponent(tableScroll)
-                                        .addGroup(layout.createSequentialGroup()
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
-                                                                              GroupLayout.DEFAULT_SIZE,
-                                                                              Short.MAX_VALUE)
-                                                                        .addComponent(ignorePartsUnderLabel)
-                                                                        .addComponent(ignoreSparesUnderQualityCB)
-                                                                        .addComponent(ignoreMothballedCheck)
-                                                                        .addComponent(topUpWeeklyCheck)
-                                                                        .addComponent(topUpButton)
-                                                                        .addComponent(topUpGMButton)
-                                                                        .addComponent(resetRequestedStockButton)
-                                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
-                                                                              GroupLayout.DEFAULT_SIZE,
-                                                                              Short.MAX_VALUE)
-                                                                        .addComponent(btnClose))));
+        layout.setHorizontalGroup(
+              layout.createParallelGroup()
+                    .addComponent(tableScroll)
+                    .addGroup(layout.createSequentialGroup()
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                                          GroupLayout.DEFAULT_SIZE,
+                                          Short.MAX_VALUE)
+                                    .addComponent(ignorePartsUnderLabel)
+                                    .addComponent(ignoreSparesUnderQualityCB)
+                                    .addComponent(ignoreMothballedCheck)
+                                    .addComponent(topUpWeeklyCheck)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                                          GroupLayout.DEFAULT_SIZE,
+                                          Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                                          GroupLayout.DEFAULT_SIZE,
+                                          Short.MAX_VALUE)
+                                    .addComponent(topUpButton)
+                                    .addComponent(topUpGMButton)
+                                    .addComponent(resetRequestedStockButton)
+                                    .addComponent(btnClose)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                                          GroupLayout.DEFAULT_SIZE,
+                                          Short.MAX_VALUE))
+        );
 
-        layout.setVerticalGroup(layout.createSequentialGroup()
-                                      .addComponent(tableScroll)
-                                      .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                                      .addComponent(ignoreMothballedCheck)
-                                                      .addComponent(ignorePartsUnderLabel)
-                                                      .addComponent(ignoreSparesUnderQualityCB)
-                                                      .addComponent(topUpWeeklyCheck)
-                                                      .addComponent(topUpButton)
-                                                      .addComponent(topUpGMButton)
-                                                      .addComponent(resetRequestedStockButton)
-                                                      .addComponent(btnClose)));
+        layout.setVerticalGroup(
+              layout.createSequentialGroup()
+                    .addComponent(tableScroll)
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(ignoreMothballedCheck)
+                                    .addComponent(ignorePartsUnderLabel)
+                                    .addComponent(ignoreSparesUnderQualityCB)
+                                    .addComponent(topUpWeeklyCheck))
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(topUpButton)
+                                    .addComponent(topUpGMButton)
+                                    .addComponent(resetRequestedStockButton)
+                                    .addComponent(btnClose))
+        );
 
         setPreferredSize(UIUtil.scaleForGUI(1400, 1000));
-
     }
 
 
@@ -399,9 +404,9 @@ public class PartsReportDialog extends JDialog {
 
     private void refreshOverviewSpecificPart(int row, PartInUse partInUse, IAcquisitionWork newPart) {
         storePartInUseRequestedStock(partInUse);
-        if (partInUse.equals(new PartInUse((Part) newPart))) {
+        if (partInUse.equals(new PartInUse(newPart.getAcquisitionPart()))) {
             // Simple update
-            campaign.updatePartInUse(partInUse, ignoreMothballedCheck.isSelected(),
+            partsInUseManager.updatePartInUse(partInUse, ignoreMothballedCheck.isSelected(),
                   getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem()));
             overviewPartsModel.fireTableRowsUpdated(row, row);
         } else {
@@ -411,8 +416,13 @@ public class PartsReportDialog extends JDialog {
     }
 
     private void updateOverviewPartsInUse() {
-        overviewPartsModel.setData(campaign.getPartsInUse(ignoreMothballedCheck.isSelected(),
-              false, getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem())));
+        overviewPartsModel.setData(
+              partsInUseManager.getPartsInUse(
+                    ignoreMothballedCheck.isSelected(),
+                    false,
+                    getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem())
+              )
+        );
         TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
         PartsInUseTableModel.ButtonColumn column = (PartsInUseTableModel.ButtonColumn) tcm
                                                                                              .getColumn(
@@ -439,45 +449,56 @@ public class PartsReportDialog extends JDialog {
     }
 
     private void topUp() {
-        campaign.stockUpPartsInUse(getPartsInUseFromTable());
-        storePartInUseRequestedStockMap(); // This is necessary to prevent request stock values from resetting when topping up
-        refreshOverviewPartsInUse();
+        // These are necessary to prevent request stock values from resetting when topping up
+        commitTableEdits();
+        storePartInUseRequestedStockMap();
+
+        partsInUseManager.stockUpPartsInUse(getPartsInUseFromTable());
+        updateOverviewPartsInUse();
     }
 
     private void topUpGM() {
-        campaign.stockUpPartsInUseGM(getPartsInUseFromTable());
-        storePartInUseRequestedStockMap(); // This is necessary to prevent request stock values from resetting when topping up
-        refreshOverviewPartsInUse();
+        // These are necessary to prevent request stock values from resetting when topping up
+        commitTableEdits();
+        storePartInUseRequestedStockMap();
+
+        partsInUseManager.stockUpPartsInUseGM(getPartsInUseFromTable());
+        updateOverviewPartsInUse();
     }
 
     public void storePartInUseRequestedStockMap() {
+        if (overviewPartsInUseTable.isEditing()) {
+            overviewPartsInUseTable.getCellEditor().stopCellEditing();
+        }
+
         campaign.setIgnoreMothballed(ignoreMothballedCheck.isSelected());
         campaign.setTopUpWeekly(topUpWeeklyCheck.isSelected());
         if (ignoreSparesUnderQualityCB == null) {
             campaign.setIgnoreSparesUnderQuality(getMinimumQuality(" "));
         } else {
             Object object = ignoreSparesUnderQualityCB.getSelectedItem();
-
             if (object instanceof String string) {
                 campaign.setIgnoreSparesUnderQuality(getMinimumQuality(string));
             }
         }
 
-        Map<String, Double> stockMap = new LinkedHashMap<>();
+        Map<String, Double> stockMap = campaign.getPartsInUseRequestedStockMap();
+        if (stockMap == null) {
+            stockMap = new LinkedHashMap<>();
+            campaign.setPartsInUseRequestedStockMap(stockMap);
+        } else {
+            stockMap.clear();
+        }
+
         for (int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
             PartInUse partInUse = overviewPartsModel.getPartInUse(row);
-            stockMap.put(partInUse.getDescription(), partInUse.getRequestedStock());
+            stockMap.put(PartsInUseManager.getStockKey(partInUse), partInUse.getRequestedStock());
         }
-        campaign.setPartsInUseRequestedStockMap(stockMap);
     }
 
     private void storePartInUseRequestedStock(PartInUse partInUse) {
         Map<String, Double> stockMap = campaign.getPartsInUseRequestedStockMap();
-        stockMap.put(partInUse.getDescription(), partInUse.getRequestedStock());
-    }
-
-    private void onClose() {
-        storePartInUseRequestedStockMap();
+        stockMap.put(PartsInUseManager.getStockKey(partInUse), partInUse.getRequestedStock());
     }
 
     /**
@@ -486,5 +507,11 @@ public class PartsReportDialog extends JDialog {
     private void resetRequestedStock() {
         campaign.wipePartsInUseMap();
         updateOverviewPartsInUse();
+    }
+
+    private void commitTableEdits() {
+        if (overviewPartsInUseTable.isEditing()) {
+            overviewPartsInUseTable.getCellEditor().stopCellEditing();
+        }
     }
 }

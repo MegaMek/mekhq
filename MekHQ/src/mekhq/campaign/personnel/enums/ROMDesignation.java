@@ -157,55 +157,32 @@ public enum ROMDesignation {
 
     private static String determineDesignationFromRole(final PersonnelRole role,
           final Person person) {
-        switch (role) {
-            case MEKWARRIOR:
-            case LAM_PILOT:
-                return EPSILON.toString();
-            case GROUND_VEHICLE_DRIVER:
-            case NAVAL_VEHICLE_DRIVER:
-            case VTOL_PILOT:
-            case VEHICLE_GUNNER:
-            case VEHICLE_CREW:
-            case CONVENTIONAL_AIRCRAFT_PILOT:
-                return LAMBDA.toString();
-            case AEROSPACE_PILOT:
-                return PI.toString();
-            case BATTLE_ARMOUR:
-            case SOLDIER:
-                return IOTA.toString();
-            case VESSEL_PILOT:
-            case VESSEL_GUNNER:
-            case VESSEL_CREW:
-            case VESSEL_NAVIGATOR:
-                final Unit unit = person.getUnit();
+        return switch (role) {
+            case MEKWARRIOR, LAM_PILOT -> EPSILON.toString();
+            case VEHICLE_CREW_GROUND,
+                 VEHICLE_CREW_NAVAL,
+                 VEHICLE_CREW_VTOL,
+                 CONVENTIONAL_AIRCRAFT_PILOT -> LAMBDA.toString();
+            case AEROSPACE_PILOT -> PI.toString();
+            case BATTLE_ARMOUR, SOLDIER -> IOTA.toString();
+            case VESSEL_PILOT, VESSEL_GUNNER, VESSEL_CREW, VESSEL_NAVIGATOR -> {
+                Unit unit = person.getUnit();
                 if (unit != null) {
-                    final Entity entity = unit.getEntity();
+                    Entity entity = unit.getEntity();
                     if (entity instanceof Dropship) {
-                        return XI.toString();
+                        yield XI.toString();
                     } else if (entity instanceof Jumpship) {
-                        return THETA.toString();
+                        yield THETA.toString();
                     }
                 }
-                break;
-            case MEK_TECH:
-            case MECHANIC:
-            case AERO_TEK:
-            case BA_TECH:
-            case ASTECH:
-                return ZETA.toString();
-            case DOCTOR:
-            case MEDIC:
-                return KAPPA.toString();
-            case ADMINISTRATOR_COMMAND:
-            case ADMINISTRATOR_LOGISTICS:
-            case ADMINISTRATOR_TRANSPORT:
-            case ADMINISTRATOR_HR:
-                return CHI.toString();
-            default:
-                break;
-        }
-
-        return "";
+                yield "";
+            }
+            case MEK_TECH, MECHANIC, AERO_TEK, BA_TECH, ASTECH -> ZETA.toString();
+            case DOCTOR, MEDIC -> KAPPA.toString();
+            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS,
+                 ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> CHI.toString();
+            default -> "";
+        };
     }
 
     // region File I/O

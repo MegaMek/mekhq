@@ -33,9 +33,21 @@
 package mekhq.campaign.personnel.education;
 
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_CLAN_HATE;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_FACTION_LOYALTY;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_FACTION_PRIDE;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_INNER_SPHERE_HATE;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_MERCENARY_HATE;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_OTHER_FACTION_DISLIKE;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_OTHER_FACTION_HATE;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_PIRATE_HATE;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_IN_FOR_LIFE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.DayOfWeek;
@@ -49,7 +61,6 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -60,11 +71,14 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
+import mekhq.campaign.universe.Faction;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -153,7 +167,11 @@ public class EducationController {
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
+        // Calculate the roll based on Reasoning if necessary
         int roll = d6(2);
+        if (campaignOptions.isUseRandomPersonalities()) {
+            roll += (person.getReasoning().getReasoningScore() / 4);
+        }
         // Calculate the target number based on base target number and faculty skill
         int targetNumber = campaignOptions.getEntranceExamBaseTargetNumber() - academy.getFacultySkill();
 
@@ -313,17 +331,17 @@ public class EducationController {
 
         boolean hasActiveParent = false;
         if (spouse != null) {
-            if (spouse.getStatus().isActive() && (spouse.isDependent() || !spouse.isEmployed())) {
+            if (spouse.getStatus().isActiveFlexible() && (spouse.isDependent() || !spouse.isEmployed())) {
                 person.addEduTagAlong(spouse.getId());
                 spouse.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
             }
 
-            hasActiveParent = spouse.getStatus().isActive();
+            hasActiveParent = spouse.getStatus().isActiveFlexible();
         }
 
         if (!hasActiveParent) {
             for (Person child : children) {
-                if (child.getStatus().isActive()) {
+                if (child.getStatus().isActiveFlexible()) {
                     if (child.isChild(campaign.getLocalDate())) {
                         person.addEduTagAlong(child.getId());
                         child.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
@@ -845,10 +863,10 @@ public class EducationController {
             int roll;
 
             if (militaryDiceSize > 1) {
-                roll = Compute.randomInt(militaryDiceSize);
+                roll = randomInt(militaryDiceSize);
 
                 if (academy.isHomeSchool()) {
-                    int secondRoll = Compute.randomInt(militaryDiceSize);
+                    int secondRoll = randomInt(militaryDiceSize);
 
                     if (secondRoll < roll) {
                         roll = secondRoll;
@@ -932,7 +950,7 @@ public class EducationController {
         // characters, so we treat them as children - even though at 16 they can take Roles.
         if (person.isChild(campaign.getLocalDate(), true)) {
             if (childDiceSize > 1) {
-                roll = Compute.randomInt(childDiceSize);
+                roll = randomInt(childDiceSize);
             } else {
                 roll = -1;
             }
@@ -940,7 +958,7 @@ public class EducationController {
             diceSize = childDiceSize;
         } else {
             if (adultDiceSize > 1) {
-                roll = Compute.randomInt(adultDiceSize);
+                roll = randomInt(adultDiceSize);
             } else {
                 roll = -1;
             }
@@ -1153,11 +1171,11 @@ public class EducationController {
      * @return true if the person completed their education, false otherwise
      */
     private static boolean graduateAdult(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        int graduationRoll = Compute.randomInt(100);
+        int graduationRoll = randomInt(100);
         int roll;
 
         if (academy.isHomeSchool()) {
-            int secondRoll = Compute.randomInt(100);
+            int secondRoll = randomInt(100);
 
             if (secondRoll < graduationRoll) {
                 graduationRoll = secondRoll;
@@ -1166,6 +1184,10 @@ public class EducationController {
             if (graduationRoll >= 90) {
                 graduationRoll = 89;
             }
+        }
+
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            graduationRoll += person.getReasoning().getReasoningScore();
         }
 
         // qualification failed
@@ -1450,14 +1472,18 @@ public class EducationController {
      * @param academy  the Prep School from which the person is being graduated
      */
     private static void graduateChild(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        int graduationRoll = Compute.randomInt(100);
+        int graduationRoll = randomInt(100);
 
         if (academy.isHomeSchool()) {
-            int secondRoll = Compute.randomInt(100);
+            int secondRoll = randomInt(100);
 
             if (secondRoll < graduationRoll) {
                 graduationRoll = secondRoll;
             }
+        }
+
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            graduationRoll += person.getReasoning().ordinal() - 12;
         }
 
         // We don't process the granularity of graduation events for very young children.
@@ -1549,8 +1575,24 @@ public class EducationController {
         }
 
         if (academy.isReeducationCamp()) {
-            if (campaign.getCampaignOptions().isUseReeducationCamps()) {
-                person.setOriginFaction(campaign.getFaction());
+            Faction campaignFaction = campaign.getFaction();
+            boolean isUseReeducationChangesFaction = campaign.getCampaignOptions().isUseReeducationCamps();
+
+            if (isUseReeducationChangesFaction) {
+                boolean factionChangeBlocked = isFactionChangeBlocked(person, campaignFaction);
+                if (factionChangeBlocked) {
+                    campaign.addReport(getFormattedTextAt(BUNDLE_NAME,
+                          "inForLife.text",
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(getWarningColor()),
+                          CLOSING_SPAN_TAG));
+                    person.changeLoyalty(-1);
+
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    return;
+                } else {
+                    person.setOriginFaction(campaignFaction);
+                }
             }
 
             // brainwashed personnel should have higher than average loyalty, so they roll
@@ -1564,6 +1606,8 @@ public class EducationController {
             Collections.sort(rolls);
 
             person.setLoyalty(rolls.get(1) + rolls.get(2) + rolls.get(3));
+
+            MekHQ.triggerEvent(new PersonChangedEvent(person));
         } else {
             adjustLoyalty(person);
         }
@@ -1571,6 +1615,68 @@ public class EducationController {
         if (!academy.isMilitary()) {
             reportMastersOrDoctorateGain(campaign, person, academy, educationLevel, resources);
         }
+    }
+
+    /**
+     * Determines whether the given {@link Person} is prevented from changing factions based on their psychological
+     * traits, flaws, and faction-specific compulsions.
+     *
+     * <p>The method evaluates two categories of restrictions:</p>
+     * <p><b>1. General faction-change blockers:</b> These are traits and flaws that always prohibit a faction change,
+     * regardless of the target faction. Examples include lifelong loyalty, faction pride, or compulsive hatred/dislike
+     * of other factions. If the person possesses any of these options, faction change is immediately considered
+     * blocked.</p>
+     *
+     * <p><b>2. Target-faction-specific blockers:</b> Additional compulsions prevent a faction change only when the
+     * destination faction matches certain categories:</p>
+     * <ul>
+     *     <li>{@code COMPULSION_INNER_SPHERE_HATE}: blocks change if the campaign faction is Inner Sphere (i.e., not
+     *     Clan).</li>
+     *     <li>{@code COMPULSION_CLAN_HATE}: blocks change if the campaign faction is Clan.</li>
+     *     <li>{@code COMPULSION_MERCENARY_HATE}: blocks change if the campaign faction is Mercenary.</li>
+     *     <li>{@code COMPULSION_PIRATE_HATE}: blocks change if the campaign faction is Pirate.</li>
+     * </ul>
+     *
+     * <p>If any of the above conditions apply, the method returns {@code true}; otherwise, it returns {@code false}.</p>
+     *
+     * @param person          the {@link Person} whose faction-change eligibility is being evaluated
+     * @param campaignFaction the destination {@link Faction} for which eligibility is being checked
+     *
+     * @return {@code true} if the person is blocked from changing to the specified faction; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static boolean isFactionChangeBlocked(Person person, Faction campaignFaction) {
+        List<String> generalFactionChangeBlockers = List.of(FLAW_IN_FOR_LIFE,
+              COMPULSION_FACTION_PRIDE,
+              COMPULSION_OTHER_FACTION_DISLIKE,
+              COMPULSION_FACTION_LOYALTY,
+              COMPULSION_OTHER_FACTION_HATE);
+        PersonnelOptions options = person.getOptions();
+        for (String factionChangeBlocker : generalFactionChangeBlockers) {
+            if (options.booleanOption(factionChangeBlocker)) {
+                return true;
+            }
+        }
+
+        if (options.booleanOption(COMPULSION_INNER_SPHERE_HATE) && !campaignFaction.isClan()) {
+            return true;
+        }
+
+        if (options.booleanOption(COMPULSION_CLAN_HATE) && campaignFaction.isClan()) {
+            return true;
+        }
+
+        if (options.booleanOption(COMPULSION_MERCENARY_HATE) && campaignFaction.isMercenary()) {
+            return true;
+        }
+
+        if (options.booleanOption(COMPULSION_PIRATE_HATE) && campaignFaction.isPirate()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -1714,7 +1820,7 @@ public class EducationController {
         curriculum = curriculum.stream().map(String::trim).toList();
 
         for (int i = 0; i < bonusCount; i++) {
-            int roll = Compute.randomInt(curriculum.size());
+            int roll = randomInt(curriculum.size());
 
             try {
                 String skillParsed = Academy.skillParser(curriculum.get(roll));
@@ -1756,7 +1862,7 @@ public class EducationController {
         List<String> graduationEventTable = graduationEventTable();
         Collections.shuffle(graduationEventTable);
 
-        return graduationEventTable.get(Compute.randomInt(graduationEventTable.size()));
+        return graduationEventTable.get(randomInt(graduationEventTable.size()));
     }
 
     /**
@@ -2024,13 +2130,17 @@ public class EducationController {
         }
 
         // Get the person's experience level and role (combat or non-combat)
-        final int experienceLevel = person.getExperienceLevel(campaign, false);
+        final int experienceLevel = person.getExperienceLevel(campaign, false, true);
         final boolean isCombatRole = person.getPrimaryRole().isCombat();
 
         // We base passRate on US averages
-        int passRate = 60;
+        int passRate = 60 - (Reasoning.values().length / 2);
+        final int reasoningModifier = campaign.getCampaignOptions().isUseRandomPersonalities() ?
+                                            person.getReasoning().getReasoningScore() :
+                                            Reasoning.values().length / 2;
+        passRate += reasoningModifier;
 
-        final boolean flunked = Compute.randomInt(100) <= passRate;
+        final boolean flunked = randomInt(100) <= passRate;
 
         EducationLevel educationLevel;
         if (isCombatRole) {
@@ -2075,7 +2185,7 @@ public class EducationController {
         if (experienceLevel < EXP_REGULAR) {
             // Second-chance roll for High School
             if (flunked) {
-                flunked = Compute.randomInt(100) < passRate;
+                flunked = randomInt(100) < passRate;
             }
 
             return flunked ? EducationLevel.EARLY_CHILDHOOD : EducationLevel.HIGH_SCHOOL;
@@ -2114,7 +2224,7 @@ public class EducationController {
         if (experienceLevel < EXP_REGULAR) {
             // Second-chance roll for High School
             if (flunked) {
-                flunked = Compute.randomInt(100) < passRate;
+                flunked = randomInt(100) < passRate;
             }
 
             return flunked ? EducationLevel.EARLY_CHILDHOOD : EducationLevel.HIGH_SCHOOL;

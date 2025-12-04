@@ -33,6 +33,12 @@
  */
 package mekhq.campaign.parts.missing;
 
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 
@@ -108,7 +114,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             toReturn.append(" (").append(getUnitTonnage()).append(" ton)");
         }
         toReturn.append(" - ")
-              .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(getSkillMin()),
+              .append(messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(getSkillMin()),
                     SkillType.getExperienceLevelName(getSkillMin()) + "+"))
               .append("</b><br/>")
               .append(getDetails())
@@ -132,7 +138,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public String succeed() {
         fix();
-        return ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getPositiveColor(),
+        return messageSurroundedBySpanWithColor(ReportingUtilities.getPositiveColor(),
               " <b>replaced</b>.");
     }
 
@@ -240,15 +246,16 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             if (isReplacementAvailable()) {
                 toReturn.append(inventories.getSupply()).append(" in stock");
             } else {
-                toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                      ReportingUtilities.getNegativeColor(), "None in stock"));
+                toReturn.append(messageSurroundedBySpanWithColor(getNegativeColor(), "None in stock"));
             }
 
-            String incoming = inventories.getTransitOrderedDetails();
-            if (!incoming.isEmpty()) {
-
-                toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                      ReportingUtilities.getWarningColor(), " (" + incoming + ")"));
+            String orderTransitString = inventories.getTransitOrderedDetails();
+            if (!orderTransitString.isEmpty()) {
+                toReturn.append(spanOpeningWithCustomColor(getWarningColor()))
+                      .append(" (")
+                      .append(orderTransitString)
+                      .append(")")
+                      .append(CLOSING_SPAN_TAG);
             }
         }
         return toReturn.toString();
@@ -285,12 +292,12 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
                 part.changeQuantity(-1);
                 skillMin = SkillType.EXP_GREEN;
             }
-            return ReportingUtilities.messageSurroundedBySpanWithColor(
-                  ReportingUtilities.getNegativeColor(),
+            return messageSurroundedBySpanWithColor(
+                  getNegativeColor(),
                   "<b> failed and part destroyed</b>") + '.';
         } else {
-            return ReportingUtilities.messageSurroundedBySpanWithColor(
-                  ReportingUtilities.getNegativeColor(),
+            return messageSurroundedBySpanWithColor(
+                  getNegativeColor(),
                   "<b> failed</b>") + '.';
         }
     }
@@ -380,22 +387,22 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public String find(int transitDays) {
+    public String find(int transitDays, double valueMultiplier) {
         // TODO: Move me to live with procurement functions?
         // Which shopping method is this used for?
         Part newPart = getNewPart();
         newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
         StringBuilder toReturn = new StringBuilder();
-        if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
-            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+        if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays)) {
+            toReturn.append(messageSurroundedBySpanWithColor(
                         ReportingUtilities.getPositiveColor(), "<b> part found</b>"))
                   .append(". It will be delivered in ")
                   .append(transitDays)
                   .append(" days.");
         } else {
-            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                  ReportingUtilities.getNegativeColor(),
+            toReturn.append(messageSurroundedBySpanWithColor(
+                  getNegativeColor(),
                   "<b> You cannot afford this part. Transaction cancelled</b>"));
         }
         return toReturn.toString();
@@ -411,8 +418,8 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public String failToFind() {
         // TODO: Move me to live with procurement functions?
-        return ReportingUtilities.messageSurroundedBySpanWithColor(
-              ReportingUtilities.getNegativeColor(), "<b> part not found</b>") + ".";
+        return messageSurroundedBySpanWithColor(
+              getNegativeColor(), "<b> part not found</b>") + ".";
     }
 
     @Override

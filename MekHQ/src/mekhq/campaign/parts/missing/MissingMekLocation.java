@@ -115,7 +115,7 @@ public class MissingMekLocation extends MissingPart {
                 this.name = forQuad ? "Mek Front Left Leg" : "Mek Left Arm";
                 break;
             case Mek.LOC_RIGHT_ARM:
-                this.name = forQuad ? "Mek Front Left Leg" : "Mek Right Arm";
+                this.name = forQuad ? "Mek Front Right Leg" : "Mek Right Arm";
                 break;
             case Mek.LOC_LEFT_LEG:
                 this.name = forQuad ? "Mek Rear Left Leg" : "Mek Left Leg";
@@ -274,7 +274,9 @@ public class MissingMekLocation extends MissingPart {
                     }
                 }
             } else if (slot.getType() == CriticalSlot.TYPE_EQUIPMENT) {
-                if ((slot.getMount() != null) && !slot.getMount().isDestroyed()) {
+                if ((slot.getMount() != null) &&
+                          (!slot.getMount().isDestroyed()) &&
+                          (slot.getMount().getType() instanceof MiscType)) {
                     EquipmentType equipmentType = slot.getMount().getType();
                     if (equipmentType.hasFlag(MiscType.F_NULL_SIG)) {
                         partsToSalvageOrScrap.add("Null-Signature System");

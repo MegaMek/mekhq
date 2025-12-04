@@ -60,6 +60,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
@@ -360,7 +361,8 @@ public class AtBConfiguration {
         int experienceLevel = EXP_ULTRA_GREEN;
         if (logisticsAdmin != null && logisticsAdmin.hasSkill(S_ADMIN)) {
             Skill skill = logisticsAdmin.getSkill(S_ADMIN);
-            experienceLevel = skill.getExperienceLevel(logisticsAdmin.getOptions(), logisticsAdmin.getATOWAttributes());
+            SkillModifierData skillModifierData = logisticsAdmin.getSkillModifierData();
+            experienceLevel = skill.getExperienceLevel(skillModifierData);
         }
 
         target.addModifier(SkillType.EXP_REGULAR - experienceLevel, "Admin/Logistics");

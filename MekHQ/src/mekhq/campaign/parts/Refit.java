@@ -1495,14 +1495,6 @@ public class Refit extends Part implements IAcquisitionWork {
         boolean aClan = false;
         oldUnit.setRefit(null);
         Entity oldEntity = oldUnit.getEntity();
-        List<Person> soldiers = new ArrayList<>();
-        // unload any soldiers to reload later, because troop size may have changed
-        if (oldEntity instanceof Infantry) {
-            soldiers = oldUnit.getCrew();
-            for (Person soldier : soldiers) {
-                oldUnit.remove(soldier, true);
-            }
-        }
         // add old parts to the warehouse
         for (Part part : oldUnitParts) {
             part.setUnit(null);
@@ -1711,12 +1703,10 @@ public class Refit extends Part implements IAcquisitionWork {
         oldUnit.initializeAllTransportSpace();
         campaign.updateTransportInTransports(oldUnit);
 
-        // reload any soldiers
-        for (Person soldier : soldiers) {
-            if (!oldUnit.canTakeMoreGunners()) {
-                break;
-            }
-            oldUnit.addPilotOrSoldier(soldier);
+        // Validate crew
+        List<String> reports = oldUnit.checkForOverCrewing();
+        for (String report : reports) {
+            campaign.addReport(report);
         }
         oldUnit.resetPilotAndEntity();
 
@@ -2639,8 +2629,8 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return string for report explaining how it went
      */
     @Override
-    public String find(int transitDays) {
-        if (campaign.getQuartermaster().buyPart(this, transitDays)) {
+    public String find(int transitDays, double valueMultiplier) {
+        if (campaign.getQuartermaster().buyPart(this, valueMultiplier, transitDays)) {
             return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
                                                                              .getFontColorPositiveHexColor(),
                   "<b> refit kit found.</b> Kit will arrive in " + transitDays + " days.");

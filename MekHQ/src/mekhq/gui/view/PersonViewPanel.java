@@ -45,18 +45,14 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
 import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_ART;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_INTEREST;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENCE;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import static org.jfree.chart.ChartColor.DARK_BLUE;
 import static org.jfree.chart.ChartColor.DARK_RED;
@@ -73,6 +69,7 @@ import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -118,12 +115,15 @@ import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
@@ -198,9 +198,33 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY = applyAndDisplayAwards(awardController, pnlPortrait, gridY);
         }
 
-        List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING));
+        JPanel pnlAttributes = null;
+        if (campaignOptions.isDisplayAllAttributes()) {
+            pnlAttributes = fillAttributeScores();
+        } else {
+            Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
+            if (!relevantAttributes.isEmpty()) {
+                pnlAttributes = fillAttributeModifiers(relevantAttributes, person.getActiveInjuryEffects());
+            }
+        }
+
+        if (pnlAttributes != null) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlAttributes, gridBagConstraints);
+            gridY++;
+        }
+
+        List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING,
+              SUPPORT, SUPPORT_TECHNICIAN));
         if (!relevantSkills.isEmpty()) {
-            JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.combat");
+            JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.profession");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -213,9 +237,9 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
-        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(SUPPORT, SUPPORT_COMMAND));
+        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(UTILITY, UTILITY_COMMAND));
         if (!relevantSkills.isEmpty()) {
-            JPanel pnlSupportSkills = fillSkills(relevantSkills, "pnlSkills.support");
+            JPanel pnlSupportSkills = fillSkills(relevantSkills, "pnlSkills.utility");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -247,21 +271,6 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
-        Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
-        if (!relevantAttributes.isEmpty()) {
-            JPanel pnlAttributes = fillAttributeModifiers(relevantAttributes);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlAttributes, gridBagConstraints);
-            gridY++;
-        }
-
         Map<IOption, String> relevantAbilities = getRelevantAbilities();
         if (!relevantAbilities.isEmpty()) {
             JPanel pnlAbilities = fillAbilitiesAndImplants(relevantAbilities);
@@ -289,8 +298,9 @@ public class PersonViewPanel extends JScrollablePanel {
         add(pnlOther, gridBagConstraints);
         gridY++;
 
-        if (campaignOptions.isUseAdvancedMedical() && person.needsFixing()) {
-            JPanel pnlInjuries = fillInjuries();
+        List<Injury> injuries = person.getNonProstheticInjuries();
+        if (!injuries.isEmpty()) {
+            JPanel pnlInjuries = fillInjuries(injuries, false);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -299,6 +309,20 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlInjuries, gridBagConstraints);
+            gridY++;
+        }
+
+        List<Injury> prosthetics = person.getProstheticInjuries();
+        if (!prosthetics.isEmpty()) {
+            JPanel pnlProsthetics = fillInjuries(prosthetics, true);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlProsthetics, gridBagConstraints);
             gridY++;
         }
 
@@ -429,6 +453,34 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlMedicalLogHeader, gridBagConstraints);
             add(pnlMedicalLog, gridBagConstraints);
+            gridY++;
+        }
+
+        if (!person.getPatientLog().isEmpty()) {
+            JPanel pnlPatientLogHeader = new JPanel();
+            pnlPatientLogHeader.setName("pnlPatientLogHeader");
+            pnlPatientLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+                  "pnlPatientLogHeader.title")));
+            pnlPatientLogHeader.setVisible(!campaignOptions.isDisplayPatientRecord());
+
+            JPanel pnlPatientLog = fillPatientLog();
+            pnlPatientLog.setName("pnlPatientLog");
+            pnlPatientLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+                  "pnlPatientLog.title")));
+            pnlPatientLog.setVisible(campaignOptions.isDisplayPatientRecord());
+
+            pnlPatientLogHeader.addMouseListener(getSwitchListener(pnlPatientLogHeader, pnlPatientLog));
+            pnlPatientLog.addMouseListener(getSwitchListener(pnlPatientLog, pnlPatientLogHeader));
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlPatientLogHeader, gridBagConstraints);
+            add(pnlPatientLog, gridBagConstraints);
             gridY++;
         }
 
@@ -668,12 +720,22 @@ public class PersonViewPanel extends JScrollablePanel {
                 continue;
             }
 
+            if (attribute == SkillAttribute.EDGE) {
+                relevantAttributes.put(attribute, 0); // modifier is irrelevant for Edge
+                continue;
+            }
+
             int attributeScore = person.getAttributeScore(attribute);
             int modifier = getIndividualAttributeModifier(attributeScore);
             if (modifier != 0) {
                 relevantAttributes.put(attribute, modifier);
             }
         }
+
+        if (!campaignOptions.isUseEdge()) {
+            relevantAttributes.remove(SkillAttribute.EDGE);
+        }
+
         return relevantAttributes;
     }
 
@@ -1015,8 +1077,11 @@ public class PersonViewPanel extends JScrollablePanel {
 
         GridBagConstraints gridBagConstraints;
 
+        LocalDate today = campaign.getLocalDate();
+
         int bloodmarkLevel = person.getBloodmark();
-        if (bloodmarkLevel > BloodmarkLevel.BLOODMARK_ZERO.getLevel()) {
+        boolean isChild = person.isChild(today, true);
+        if (!isChild && (bloodmarkLevel > BloodmarkLevel.BLOODMARK_ZERO.getLevel())) {
             BloodmarkLevel bloodmark = BloodmarkLevel.parseBloodmarkLevelFromInt(bloodmarkLevel);
             Money bounty = bloodmark.getBounty();
             String bountyText = String.format(resourceMap.getString("lblBounty.text"),
@@ -1103,7 +1168,7 @@ public class PersonViewPanel extends JScrollablePanel {
             lblOrigin1.setLabelFor(lblOrigin2);
             String factionName = person.getOriginFaction().getFullName(campaign.getGameYear());
             if (person.getOriginPlanet() != null) {
-                String planetName = person.getOriginPlanet().getName(campaign.getLocalDate());
+                String planetName = person.getOriginPlanet().getName(today);
                 lblOrigin2.setText(String.format("<html><a href='#'>%s</a> (%s)</html>", planetName, factionName));
                 lblOrigin2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblOrigin2.addMouseListener(new MouseAdapter() {
@@ -1170,7 +1235,7 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlInfo.add(lblAge1, gridBagConstraints);
 
         lblAge2.setName("lblAge2");
-        lblAge2.setText(Integer.toString(person.getAge(campaign.getLocalDate())));
+        lblAge2.setText(Integer.toString(person.getAge(today)));
         lblAge1.setLabelFor(lblAge2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -1875,10 +1940,26 @@ public class PersonViewPanel extends JScrollablePanel {
               campaign.getLocalDate(),
               person.getRankNumeric());
 
+        boolean adminsHaveNegotiation = campaignOptions.isAdminsHaveNegotiation();
+        boolean doctorsUseAdmin = campaignOptions.isDoctorsUseAdministration();
+        boolean techsUseAdmin = campaignOptions.isTechsUseAdministration();
+        boolean isUseArtillery = campaignOptions.isUseArtillery();
+        PersonnelRole primaryProfession = person.getPrimaryRole();
+        List<String> primaryProfessionSkills = primaryProfession.getSkillsForProfession(adminsHaveNegotiation,
+              doctorsUseAdmin,
+              techsUseAdmin,
+              isUseArtillery);
+
+        PersonnelRole secondaryProfession = person.getSecondaryRole();
+        List<String> secondaryProfessionSkills = new ArrayList<>(secondaryProfession.getSkillsForProfession(
+              adminsHaveNegotiation,
+              doctorsUseAdmin,
+              techsUseAdmin,
+              isUseArtillery));
+
         // Calculate how many rows per column for even distribution
         double numColumns = 3.0;
         int skillsPerColumn = (int) ceil(relevantSkills.size() / numColumns);
-
         for (int i = 0; i < relevantSkills.size(); i++) {
             int column = i / skillsPerColumn; // 0, 1, 2
             int row = i % skillsPerColumn;
@@ -1886,19 +1967,38 @@ public class PersonViewPanel extends JScrollablePanel {
 
             String skillName = relevantSkills.get(i);
             Skill skill = person.getSkill(skillName);
+            String formattedSkillName = skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "");
 
-            JLabel lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"),
-                  skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "")));
-
-            int attributeModifier = getTotalAttributeModifier(new TargetRoll(), attributes, skill.getType());
+            String label;
+            if (primaryProfessionSkills.contains(skillName)) {
+                label = String.format(resourceMap.getString("format.itemHeader.profession"),
+                      ReportingUtilities.spanOpeningWithCustomColor(getAmazingColor()), CLOSING_SPAN_TAG,
+                      formattedSkillName);
+            } else if (secondaryProfessionSkills.contains(skillName)) {
+                label = String.format(resourceMap.getString("format.itemHeader.profession"),
+                      ReportingUtilities.spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG,
+                      formattedSkillName);
+            } else {
+                label = formattedSkillName;
+            }
+            JLabel lblName = new JLabel(label);
+            List<InjuryEffect> injuryEffects = person.getActiveInjuryEffects();
+            SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
+                  injuryEffects);
+            int attributeModifier = getTotalAttributeModifier(new TargetRoll(),
+                  attributes,
+                  skill.getType(),
+                  injuryEffects,
+                  skillModifierData.characterOptions());
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
-            String adjustment = getAdjustment(skill, attributeModifier, spaModifier);
+            int injuryModifier = Skill.getTotalInjuryModifier(skillModifierData, skill.getType());
+            String adjustment = getSkillAdjustment(skill, attributeModifier, spaModifier, injuryModifier);
 
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
-                  skill.toString(options, attributes, adjustedReputation),
+                  skill.toString(skillModifierData),
                   adjustment));
             lblName.setLabelFor(lblValue);
-            String tooltip = wordWrap(skill.getTooltip(options, attributes, adjustedReputation));
+            String tooltip = wordWrap(skill.getTooltip(skillModifierData));
             lblName.setToolTipText(tooltip);
             lblValue.setToolTipText(tooltip);
 
@@ -1923,9 +2023,9 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlSkills;
     }
 
-    private static String getAdjustment(Skill skill, int attributeModifier, int spaModifier) {
+    private static String getSkillAdjustment(Skill skill, int attributeModifier, int spaModifier, int injuryModifier) {
         int ageModifier = skill.getAgingModifier();
-        int totalModifier = attributeModifier + spaModifier + ageModifier;
+        int totalModifier = attributeModifier + spaModifier + ageModifier + injuryModifier;
 
         String color = "";
         String icon = "";
@@ -1934,6 +2034,23 @@ public class PersonViewPanel extends JScrollablePanel {
                           ReportingUtilities.getNegativeColor() :
                           ReportingUtilities.getPositiveColor();
             icon = totalModifier < 0 ? "&#x25BC" : "&#x25B2";
+        }
+
+        String adjustment = "";
+        if (!color.isBlank()) {
+            adjustment = String.format(" %s%s%s", spanOpeningWithCustomColor(color), icon, CLOSING_SPAN_TAG);
+        }
+        return adjustment;
+    }
+
+    private static String getAttributeAdjustment(int injuryModifier) {
+        String color = "";
+        String icon = "";
+        if (injuryModifier != 0) {
+            color = injuryModifier < 0 ?
+                          ReportingUtilities.getNegativeColor() :
+                          ReportingUtilities.getPositiveColor();
+            icon = injuryModifier < 0 ? "&#x25BC" : "&#x25B2";
         }
 
         String adjustment = "";
@@ -1953,30 +2070,162 @@ public class PersonViewPanel extends JScrollablePanel {
      *
      * @return a {@link JPanel} containing the attribute names and values in a grid layout
      */
-    private JPanel fillAttributeModifiers(Map<SkillAttribute, Integer> relevantAttributes) {
+    private JPanel fillAttributeModifiers(Map<SkillAttribute, Integer> relevantAttributes,
+          List<InjuryEffect> injuryEffects) {
         JPanel pnlAttributes = new JPanel(new GridBagLayout());
-        pnlAttributes.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlSkills.attributes")));
+        pnlAttributes.setBorder(RoundedLineBorder.createRoundedLineBorder(
+              resourceMap.getString("pnlSkills.attributes.modifiers")));
 
         // Calculate how many rows per column for even distribution
         double numColumns = 3.0;
         int skillsPerColumn = (int) ceil(relevantAttributes.size() / numColumns);
 
         int i = 0;
-        for (SkillAttribute attribute : relevantAttributes.keySet()) {
+        for (SkillAttribute attribute : SkillAttribute.values()) {
+            if (!relevantAttributes.containsKey(attribute)) {
+                continue;
+            }
+
             int column = i / skillsPerColumn; // 0, 1, 2
             int row = i % skillsPerColumn;
             int gridX = column * 2; // Each column takes 2 grid positions: name + value
 
+            int baseEdge = person.getEdge();
+            int adjustedEdge = person.getAdjustedEdge();
+            int currentEdge = person.getCurrentEdge();
+
+            JLabel lblName = new JLabel();
+            JLabel lblValue = new JLabel();
             String attributeName = attribute.getLabel();
-            int attributeModifier = relevantAttributes.get(attribute);
+            String addendum = getAttributeAdjustment(person.getATOWAttributes()
+                                                           .getAttributeScoreInjuryModifier(attribute,
+                                                                 injuryEffects));
+            if (attribute != SkillAttribute.EDGE) {
+                int attributeModifier = relevantAttributes.get(attribute);
 
-            JLabel lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), attributeName));
-            JLabel lblValue = new JLabel((attributeModifier > 0 ? "+" : "") + attributeModifier);
-            lblName.setLabelFor(lblValue);
+                lblName.setText(attributeName);
+                lblValue.setText("<html>" +
+                                       (attributeModifier > 0 ? "+" : "") +
+                                       attributeModifier +
+                                       addendum +
+                                       "</html>");
+                lblName.setLabelFor(lblValue);
+            } else {
+                String adjustment = getTraitAdjustmentIcon(baseEdge, adjustedEdge);
+                String value = "<html>" + currentEdge + "/" + adjustedEdge + adjustment + "</html>";
 
-            String tooltip = wordWrap(attribute.getDescription());
+                lblName.setText(attributeName);
+                lblValue.setText(value + addendum);
+            }
+
+            String tooltip = wordWrap(person.getATOWAttributes()
+                                            .getTooltip(attribute, injuryEffects, person.getOptions()));
             lblName.setToolTipText(tooltip);
             lblValue.setToolTipText(tooltip);
+
+            // Name label constraints
+            GridBagConstraints nameConstraints = new GridBagConstraints();
+            nameConstraints.gridx = gridX;
+            nameConstraints.gridy = row;
+            nameConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+            // Value label constraints
+            GridBagConstraints valueConstraints = new GridBagConstraints();
+            valueConstraints.gridx = gridX + 1;
+            valueConstraints.gridy = row;
+            valueConstraints.anchor = GridBagConstraints.NORTHWEST;
+            valueConstraints.insets = new Insets(0, 5, 0, 10);
+            valueConstraints.weightx = 1;
+
+            pnlAttributes.add(lblName, nameConstraints);
+            pnlAttributes.add(lblValue, valueConstraints);
+
+            i++;
+        }
+
+        return pnlAttributes;
+    }
+
+    /**
+     * Constructs and returns a JPanel displaying the attribute scores and modifiers for a {@link Person}'s ATOW (A Time
+     * of War) attributes.
+     *
+     * <p>The attributes are displayed in three columns for even distribution, with each attribute's label and
+     * corresponding score (including modifier, if applicable). Tooltips are added to each label and value to provide
+     * attribute descriptions.</p>
+     *
+     * @return a {@link JPanel} arranged in a GridBagLayout, showing each attribute's name and value (with modifier, if
+     *       any), each with appropriate tooltips.
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private JPanel fillAttributeScores() {
+        JPanel pnlAttributes = new JPanel(new GridBagLayout());
+        pnlAttributes.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+              "pnlSkills.attributes.scores")));
+
+        Attributes attributes = person.getATOWAttributes();
+
+        // Calculate how many rows per column for even distribution
+        double numColumns = 3.0;
+        SkillAttribute[] allAttributes = SkillAttribute.values();
+        int numAttributes = allAttributes.length - 1; // -1 to exclude NONE
+        int skillsPerColumn = (int) ceil(numAttributes / numColumns);
+
+        int i = 0;
+        for (SkillAttribute attribute : allAttributes) {
+            if (attribute == SkillAttribute.NONE) {
+                continue;
+            }
+
+            int column = i / skillsPerColumn; // 0, 1, 2
+            int row = i % skillsPerColumn;
+            int gridX = column * 2; // Each column takes 2 grid positions: name + value
+
+            int baseEdge = person.getEdge();
+            int adjustedEdge = person.getAdjustedEdge();
+            int currentEdge = person.getCurrentEdge();
+
+            List<InjuryEffect> activeInjuryEffects = person.getActiveInjuryEffects();
+            PersonnelOptions options = person.getOptions();
+            String addendum = getAttributeAdjustment(person.getATOWAttributes()
+                                                           .getAttributeScoreInjuryModifier(attribute,
+                                                                 person.getActiveInjuryEffects()));
+
+            JLabel lblName = new JLabel();
+            JLabel lblValue = new JLabel();
+            if (attribute != SkillAttribute.EDGE) {
+                String attributeName = attribute.getLabel();
+                int attributeScore = attributes.getAdjustedAttributeScore(attribute, activeInjuryEffects, options);
+                int attributeModifier = attributes.getAttributeModifier(attribute, activeInjuryEffects, options);
+
+                lblName.setText(attributeName);
+                String value = "<html>" + attributeScore;
+                if (attributeModifier != 0) {
+                    value += " (" + (attributeModifier > 0 ? "+" : "") + attributeModifier + ")" + addendum + "</html>";
+                }
+
+                lblValue.setText(value);
+                lblName.setLabelFor(lblValue);
+
+                String tooltip = wordWrap(person.getATOWAttributes()
+                                                .getTooltip(attribute, activeInjuryEffects, options));
+                lblName.setToolTipText(tooltip);
+                lblValue.setToolTipText(tooltip);
+            } else if (campaignOptions.isUseEdge() && (baseEdge != 0 || adjustedEdge != 0)) {
+                String attributeName = attribute.getLabel();
+                String adjustment = getTraitAdjustmentIcon(baseEdge, adjustedEdge);
+                String value = "<html>" + currentEdge + "/" + adjustedEdge + adjustment + addendum + "</html>";
+
+                lblName.setText(attributeName);
+                lblValue.setText(value);
+
+                String tooltip = wordWrap(person.getATOWAttributes()
+                                                .getTooltip(attribute, activeInjuryEffects, options));
+                lblName.setToolTipText(tooltip);
+                lblValue.setToolTipText(tooltip);
+            }
 
             // Name label constraints
             GridBagConstraints nameConstraints = new GridBagConstraints();
@@ -2076,11 +2325,16 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlOther.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlSkills.traits")));
 
         JLabel lblConnections = null;
-        int connections = person.getAdjustedConnections();
+        int connections = person.getAdjustedConnections(true);
         if (connections != 0) {
+            String connectionsDisplayValue = Integer.toString(connections);
+            if (person.getBurnedConnectionsEndDate() != null) {
+                connectionsDisplayValue = "<html><b><font color='gray'>" + connections + "</font></b></html>";
+            }
+
             String connectionsLabel = String.format(resourceMap.getString("format.traitValue"),
                   resourceMap.getString("lblConnections.text"),
-                  connections,
+                  connectionsDisplayValue,
                   "");
             lblConnections = new JLabel(connectionsLabel);
             lblConnections.setToolTipText(wordWrap(resourceMap.getString("lblConnections.tooltip")));
@@ -2116,7 +2370,7 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         JLabel lblToughness = null;
-        int totalToughness = person.getToughness();
+        int totalToughness = person.getAdjustedToughness();
         if ((campaignOptions.isUseToughness()) && (totalToughness != 0)) {
             String toughnessLabel = String.format(resourceMap.getString("format.traitValue"),
                   resourceMap.getString("lblToughness.text"),
@@ -2126,22 +2380,9 @@ public class PersonViewPanel extends JScrollablePanel {
             lblToughness.setToolTipText(wordWrap(resourceMap.getString("lblToughness.tooltip")));
         }
 
-        JLabel lblEdge = null;
-        int baseEdge = person.getEdge();
-        int adjustedEdge = person.getAdjustedEdge();
-        int currentEdge = person.getCurrentEdge();
-        if (campaignOptions.isUseEdge() && (baseEdge != 0 || adjustedEdge != 0)) {
-            String adjustment = getTraitAdjustmentIcon(baseEdge, adjustedEdge);
-            String edgeLabel = String.format(resourceMap.getString("format.traitValue"),
-                  resourceMap.getString("lblEdge.text"),
-                  currentEdge + "/" + adjustedEdge,
-                  adjustment);
-            lblEdge = new JLabel(edgeLabel);
-            lblEdge.setToolTipText(wordWrap(resourceMap.getString("lblEdge.tooltip")));
-        }
-
         JLabel lblLoyalty = null;
-        int loyaltyModifier = person.getLoyaltyModifier(person.getAdjustedLoyalty(campaign.getFaction()));
+        int loyaltyModifier = person.getLoyaltyModifier(person.getAdjustedLoyalty(campaign.getFaction(),
+              campaignOptions.isUseAlternativeAdvancedMedical()));
         if ((campaignOptions.isUseLoyaltyModifiers()) &&
                   (!campaignOptions.isUseHideLoyalty()) &&
                   (loyaltyModifier != 0)) {
@@ -2155,9 +2396,8 @@ public class PersonViewPanel extends JScrollablePanel {
 
         JLabel lblFatigue = null;
         int baseFatigue = person.getFatigue();
-        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(),
-              person.isClanPersonnel(),
-              person.getSkillLevel(campaign, false));
+        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.getPermanentFatigue(),
+              person.isClanPersonnel(), person.getSkillLevel(campaign, false, true));
         if (campaignOptions.isUseFatigue() && (baseFatigue != 0 || effectiveFatigue != 0)) {
             StringBuilder fatigueDisplay = new StringBuilder("<html>");
             int fatigueTurnoverModifier = MathUtility.clamp(((effectiveFatigue - 1) / 4) - 1, 0, 3);
@@ -2167,7 +2407,7 @@ public class PersonViewPanel extends JScrollablePanel {
                       .append("</font></s> ")
                       .append(effectiveFatigue);
             } else {
-                fatigueDisplay.append("<font color='gray'>").append(effectiveFatigue).append("</font>");
+                fatigueDisplay.append(effectiveFatigue);
             }
             if (fatigueTurnoverModifier > 0) {
                 fatigueDisplay.append(" (-").append(fatigueTurnoverModifier).append(')');
@@ -2258,9 +2498,6 @@ public class PersonViewPanel extends JScrollablePanel {
         }
         if (lblToughness != null) {
             components.add(lblToughness);
-        }
-        if (lblEdge != null) {
-            components.add(lblEdge);
         }
         if (lblLoyalty != null) {
             components.add(lblLoyalty);
@@ -2381,6 +2618,13 @@ public class PersonViewPanel extends JScrollablePanel {
         return getLogPanel(logs, "Medical log for ", person.getFullName());
     }
 
+    private JPanel fillPatientLog() {
+        List<LogEntry> logs = person.getPatientLog();
+        Collections.reverse(logs);
+
+        return getLogPanel(logs, "Patient log for ", person.getFullName());
+    }
+
     private JPanel fillAssignmentLog() {
         List<LogEntry> logs = person.getAssignmentLog();
         Collections.reverse(logs);
@@ -2436,9 +2680,17 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlScenariosLog;
     }
 
-    private JPanel fillInjuries() {
+    private JPanel fillInjuries(List<Injury> injuries, boolean isProstheticReport) {
         JPanel pnlInjuries = new JPanel(new BorderLayout());
-        pnlInjuries.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlInjuries.title")));
+
+        String title;
+        if (isProstheticReport) {
+            title = resourceMap.getString("pnlProsthetics.title");
+        } else {
+            title = resourceMap.getString("pnlInjuries.title");
+        }
+
+        pnlInjuries.setBorder(RoundedLineBorder.createRoundedLineBorder(title));
 
         JPanel pnlInjuryDetails = new JPanel(new GridBagLayout());
         pnlInjuryDetails.getAccessibleContext().setAccessibleName("Injury Details for " + person.getFullName());
@@ -2447,65 +2699,63 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblAdvancedMedical1 = new JLabel();
         JLabel lblAdvancedMedical2 = new JLabel();
 
-        lblAdvancedMedical1.setName("lblAdvancedMedical1");
-        lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text"));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlInjuryDetails.add(lblAdvancedMedical1, gridBagConstraints);
 
         double vWeight = 1.0;
-        if (person.hasInjuries(false)) {
+        if (person.hasInjuries(true)) {
             vWeight = 0.0;
         }
 
-        lblAdvancedMedical2.setName("lblAdvancedMedical2");
-        lblAdvancedMedical2.setText(getAdvancedMedalEffectString(person));
-        lblAdvancedMedical1.setLabelFor(lblAdvancedMedical2);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+            getAlternativeAdvancedMedicalDisplay(lblAdvancedMedical2,
+                  lblAdvancedMedical1,
+                  gridBagConstraints,
+                  vWeight,
+                  pnlInjuryDetails);
+        } else {
+            getAdvancedMedicalDisplay(lblAdvancedMedical1,
+                  pnlInjuryDetails,
+                  gridBagConstraints,
+                  lblAdvancedMedical2,
+                  vWeight);
+        }
+
+        // This adds a dummy/invisible label to column 2, row 0 to prevent column 3 from being pushed away
+        JLabel dummy = new JLabel();
+        dummy.setPreferredSize(new Dimension(0, 0));
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = vWeight;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlInjuryDetails.add(lblAdvancedMedical2, gridBagConstraints);
+        pnlInjuryDetails.add(dummy, gridBagConstraints);
 
         JLabel lblInjury;
-        JLabel txtInjury;
-        int row = 1;
-        List<Injury> injuries = person.getInjuries();
-        for (Injury injury : injuries) {
-            lblInjury = new JLabel(injury.getFluff());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = row;
-            gridBagConstraints.weightx = 0.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlInjuryDetails.add(lblInjury, gridBagConstraints);
+        int columns = 3;
+        int rowsPerColumn = (int) Math.ceil((double) injuries.size() / columns);
+        for (int i = 0; i < injuries.size(); ++i) {
+            Injury injury = injuries.get(i);
 
-            String text = (injury.isPermanent() && injury.getTime() < 1) ?
-                                resourceMap.getString("lblPermanentInjury.text") :
-                                String.format(resourceMap.getString("format.injuryTime"), injury.getTime());
-            txtInjury = new JLabel("<html>" + text + "</html>");
-            lblInjury.setLabelFor(txtInjury);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = row;
+            int col = i / rowsPerColumn;
+            int displayRow = (i % rowsPerColumn) + 1; // Start rows at 1 as we have a header
+
+            lblInjury = new JLabel(getInjuryLabel(injury));
+            gridBagConstraints.gridx = col;
+            gridBagConstraints.gridy = displayRow;
             gridBagConstraints.weightx = 1.0;
-            if (row == (injuries.size() - 1)) {
-                gridBagConstraints.weighty = 1.0;
-            }
-            gridBagConstraints.insets = new Insets(0, 20, 0, 0);
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlInjuryDetails.add(txtInjury, gridBagConstraints);
-            row++;
+            pnlInjuryDetails.add(lblInjury, gridBagConstraints);
         }
 
         pnlInjuries.add(pnlInjuryDetails, BorderLayout.CENTER);
@@ -2514,30 +2764,111 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     /**
+     * Builds a formatted label for the given injury, including its name and a visual indication of duration or
+     * permanence.
+     *
+     * <p>Permanent injuries are rendered with a warning symbol (⚠) and use the negative color, while non-permanent
+     * injuries display their remaining time and use the warning color. Prosthetic injuries use a specialized format
+     * that omits duration.</p>
+     *
+     * @param injury the injury to describe
+     *
+     * @return a localized, HTML-formatted label string for the injury
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private String getInjuryLabel(Injury injury) {
+        String durationValue = injury.isPermanent() ? "\u26A0" : String.valueOf(injury.getTime());
+        String durationColor = injury.isPermanent() ? getNegativeColor() : getWarningColor();
+        String durationText = messageSurroundedBySpanWithColor(durationColor, durationValue);
+
+        String label;
+        if (injury.getSubType().isProsthetic()) {
+            label = String.format(resourceMap.getString("format.injuryLabel.prosthetic"), injury.getName());
+        } else if (injury.isPermanent()) {
+            label = String.format(resourceMap.getString("format.injuryLabel.permanent"), injury.getName(),
+                  durationText);
+        } else {
+            label = String.format(resourceMap.getString("format.injuryLabel.injury"), injury.getName(),
+                  durationText);
+        }
+
+        return label;
+    }
+
+    private void getAlternativeAdvancedMedicalDisplay(JLabel lblAdvancedMedical2, JLabel lblAdvancedMedical1,
+          GridBagConstraints gridBagConstraints, double vWeight, JPanel pnlInjuryDetails) {
+        lblAdvancedMedical2.setName("lblAdvancedMedical2");
+        List<InjuryEffect> injuryEffects = person.getActiveInjuryEffects();
+        lblAdvancedMedical2.setText(InjuryEffect.getEffectsLabel(injuryEffects));
+        String injuryEffectTooltip = wordWrap(InjuryEffect.getTooltip(injuryEffects));
+        lblAdvancedMedical2.setToolTipText(injuryEffectTooltip);
+        lblAdvancedMedical1.setLabelFor(lblAdvancedMedical2);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = vWeight;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlInjuryDetails.add(lblAdvancedMedical2, gridBagConstraints);
+    }
+
+    private void getAdvancedMedicalDisplay(JLabel lblAdvancedMedical1, JPanel pnlInjuryDetails,
+          GridBagConstraints gridBagConstraints,
+          JLabel lblAdvancedMedical2, double vWeight) {
+        lblAdvancedMedical1.setName("lblAdvancedMedical1");
+        lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text"));
+        pnlInjuryDetails.add(lblAdvancedMedical1, gridBagConstraints);
+
+        lblAdvancedMedical2.setName("lblAdvancedMedical2");
+        lblAdvancedMedical2.setText(getAdvancedMedalEffectString(person));
+        lblAdvancedMedical1.setLabelFor(lblAdvancedMedical2);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = vWeight;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlInjuryDetails.add(lblAdvancedMedical2, gridBagConstraints);
+    }
+
+    /**
      * Gets the advanced medical effects active for the person.
      *
      * @return an HTML encoded string of effects
      */
     private String getAdvancedMedalEffectString(Person person) {
-        StringBuilder medicalEffects = new StringBuilder("<html>");
+        StringBuilder medicalEffects = new StringBuilder();
         final int pilotingMod = person.getInjuryModifiers(true);
         final int gunneryMod = person.getInjuryModifiers(false);
+        boolean hadEffect = false;
+
         if ((pilotingMod != 0) && (pilotingMod < Integer.MAX_VALUE)) {
-            medicalEffects.append(String.format("  Piloting %+d <br>", pilotingMod));
+            medicalEffects.append(String.format("Piloting %+d", pilotingMod));
+            hadEffect = true;
         } else if (pilotingMod == Integer.MAX_VALUE) {
-            medicalEffects.append("  Piloting: <i>Impossible</i>  <br>");
+            medicalEffects.append("Piloting: Impossible");
+            hadEffect = true;
         }
 
         if ((gunneryMod != 0) && (gunneryMod < Integer.MAX_VALUE)) {
-            medicalEffects.append(String.format("  Gunnery: %+d <br>", gunneryMod));
+            if (hadEffect) {medicalEffects.append(", ");}
+            medicalEffects.append(String.format("Gunnery %+d", gunneryMod));
+            hadEffect = true;
         } else if (gunneryMod == Integer.MAX_VALUE) {
-            medicalEffects.append("  Gunnery: <i>Impossible</i>  <br>");
+            if (hadEffect) {medicalEffects.append(", ");}
+            medicalEffects.append("Gunnery: Impossible");
+            hadEffect = true;
         }
 
-        if ((gunneryMod == 0) && (pilotingMod == 0)) {
+        if (!hadEffect) {
             medicalEffects.append("None");
         }
-        return medicalEffects.append("</html>").toString();
+        return medicalEffects.toString();
     }
 
     private JPanel fillKillRecord() {

@@ -27,17 +27,17 @@ Gendered Folders: Note that all of the below MUST be added to one of the two gen
 Male Portraits:					/Male
 Female Portraits:				/Female
 
-Primary Role Folders:
-MekWarrior:					/MekWarrior
+Primary Role Folders:           Current:                            Pre-0.50.10 (see compatibility section below)
+MekWarrior:					    /MekWarrior
 LAM Pilot:						/LAM Pilot
-Ground Vehicle Driver:			/Vehicle Driver
-Naval Vehicle Driver:			/Naval Driver
-VTOL Pilot:						/VTOL Pilot
-Vehicle Gunner:					/Vehicle Gunner
-Vehicle Crew:					/Vehicle Crewmember
+Vehicle Crew/Ground:			/Vehicle Crew/Ground                /Vehicle Driver
+Vehicle Crew/Naval:             /Vehicle Crew/Naval                 /Naval Driver
+Vehicle Crew/VTOL:              /Vehicle Crew/VTOL                  /VTOL Pilot
+Vehicle Gunner:					MOVED TO /Vehicle Crew/Ground       /Vehicle Gunner
+None            			    /Vehicle Crew/Generic               /Vehicle Crewmember
 Aerospace Pilot:				/Aerospace Pilot
-Conventional Aircraft Pilot:	/Conventional Aircraft Pilot
-ProtoMek Pilot:				/ProtoMek Pilot
+Conventional Aircraft Pilot:	/Conventional Aircraft Crew         /Conventional Aircraft Pilot
+ProtoMek Pilot:				    /ProtoMek Pilot
 Battle Armour:					/Battle Armor Pilot
 Battle Armour (Clan):			/Elemental
 Soldier:						/Soldier
@@ -76,3 +76,11 @@ Administrators: Admin/Command, Admin/HR, Admin/Logistical, Admin/Transport
 Techs: Mek Tech, Mechanic, Aerospace Tech, Battle Armour Tech
 Medical Staff: Doctor, Medic
 Vessel Crewmembers: Vessel Pilot, Vessel Gunner, Vessel Crewmember, Hyperspace Navigator
+
+
+Post-0.50.10 Compatibility:
+Following the vehicle crew update in 0.50.10 some portrait folders changed, and the Vehicle Gunner folder was removed.
+
+For your existing campaigns you will need to rename your folders to match the new format. For Vehicle Gunners, all
+portraits have been moved to the Vehicle Crew Ground folder. MekHQ will automatically know to look there, so you should
+do the same.

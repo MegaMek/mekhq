@@ -56,6 +56,7 @@ import megamek.common.enums.Gender;
 import mekhq.MekHQ;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.mission.AtBContract;
@@ -63,10 +64,10 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.HiringHallLevel;
+import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
@@ -90,6 +91,8 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * @since 0.50.06
  */
 public class PersonnelMarketMekHQ extends NewPersonnelMarket {
+    public static final int ALTERNATE_ADVANCED_MEDICAL_RECRUITMENT_MULTIPLIER = 2;
+
     /**
      * Constructs a personnel market using the MekHQ classic ruleset.
      *
@@ -156,7 +159,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
                 }
             }
 
-            if (FactionHints.defaultFactionHints().isAtWarWith(getCampaignFaction(), faction, getToday())) {
+            if (FactionHints.getInstance().isAtWarWith(getCampaignFaction(), faction, getToday())) {
                 continue;
             }
 
@@ -168,7 +171,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
             // Allies are three times as likely to join the campaign as non-allies
             if (getCampaignFaction().equals(faction)
-                      || FactionHints.defaultFactionHints().isAlliedWith(getCampaignFaction(), faction, getToday())) {
+                      || FactionHints.getInstance().isAlliedWith(getCampaignFaction(), faction, getToday())) {
                 factionStandingMultiplier *= 3;
             }
 
@@ -177,15 +180,11 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             }
         }
 
-        if (mercenaryFaction != null &&
-                  !interestedFactions.isEmpty() &&
-                  !interestedFactions.contains(mercenaryFaction)) {
+        if (mercenaryFaction != null && !interestedFactions.contains(mercenaryFaction)) {
             interestedFactions.add(mercenaryFaction);
         }
 
-        if (pirateFaction != null &&
-                  !interestedFactions.isEmpty() &&
-                  !interestedFactions.contains(pirateFaction)) {
+        if (pirateFaction != null && !interestedFactions.contains(pirateFaction)) {
             interestedFactions.add(pirateFaction);
         }
 
@@ -337,6 +336,13 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         getLogger().debug("Base rolls: {}", lengthOfMonth);
 
         int rolls = lengthOfMonth * getSystemStatusRecruitmentMultiplier();
+        if (getCampaign().getCampaignOptions().isUseAlternativeAdvancedMedical()) {
+            // Alt Advanced Medical increases the impact of injuries. Therefore, players need to maintain a larger
+            // roster of combat personnel. This multiplier doubles the number of recruits in the pool to account for
+            // this.
+            rolls *= ALTERNATE_ADVANCED_MEDICAL_RECRUITMENT_MULTIPLIER;
+        }
+
         getLogger().debug("Rolls modified for location: {}", rolls);
 
         rolls = clamp((int) round(rolls * getSystemPopulationRecruitmentMultiplier()), 1, rolls);
@@ -434,5 +440,15 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         getLogger().debug("Rolls including capital status: {}", rolls);
 
         return rolls;
+    }
+
+    @Override
+    public Money getHiringCost(Person applicant) {
+        // Personnel are hired without a rank, meaning they have a 0.5 salary multiplier. As a Golden Hello is
+        // 12 months' salary, we double the multiplier from 12 to 24. And a normal hiring cost is one month's salary
+        // we increase 1 to 2.
+        int hiringCostMultiplier = isWasOfferingGoldenHello() ? 24 : 2;
+        Money salary = applicant.getSalary(getCampaign());
+        return salary.multipliedBy(hiringCostMultiplier);
     }
 }

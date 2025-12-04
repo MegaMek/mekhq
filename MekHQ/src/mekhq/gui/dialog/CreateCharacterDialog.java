@@ -32,12 +32,12 @@
  */
 package mekhq.gui.dialog;
 
-import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.Person.*;
+import static mekhq.campaign.personnel.skills.Aging.getAgeModifier;
+import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
-import static mekhq.campaign.personnel.skills.Skill.getCountDownMaxValue;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -92,11 +92,13 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
 import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -147,6 +149,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private JTextField textReputation;
     private JTextField textUnlucky;
     private JTextField textBloodmark;
+    private JTextField textExtraIncome;
     private JComboBox<EducationLevel> textEducationLevel;
     private JTextField textLoyalty;
 
@@ -160,6 +163,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private JSpinner spnSocial;
     private MMComboBox<PersonalityQuirk> comboPersonalityQuirk;
     private JSpinner spnPersonalityQuirk;
+    private MMComboBox<Reasoning> comboReasoning;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -263,6 +267,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         JLabel lblUnlucky = new JLabel();
         textBloodmark = new JTextField();
         JLabel lblBloodmark = new JLabel();
+        textExtraIncome = new JTextField();
+        JLabel lblExtraIncome = new JLabel();
         textEducationLevel = new JComboBox<>();
         textLoyalty = new JTextField();
         JLabel lblLoyalty = new JLabel();
@@ -643,7 +649,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         lblToughness.setText(resourceMap.getString("lblToughness.text")); // NOI18N
         lblToughness.setName("lblToughness"); // NOI18N
 
-        textToughness.setText(Integer.toString(person.getToughness()));
+        textToughness.setText(Integer.toString(person.getDirectToughness()));
         textToughness.setName("textToughness"); // NOI18N
 
         if (campaign.getCampaignOptions().isUseToughness()) {
@@ -765,6 +771,27 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         demographicPanel.add(textBloodmark, gridBagConstraints);
+
+        y++;
+
+        lblExtraIncome.setText(resourceMap.getString("lblExtraIncome.text"));
+        lblExtraIncome.setName("lblExtraIncome");
+
+        textExtraIncome.setText(Integer.toString(person.getExtraIncomeTraitLevel()));
+        textExtraIncome.setName("textExtraIncome");
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        demographicPanel.add(lblExtraIncome, gridBagConstraints);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        demographicPanel.add(textExtraIncome, gridBagConstraints);
 
         y++;
 
@@ -969,6 +996,26 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demographicPanel.add(spnPersonalityQuirk, gridBagConstraints);
+
+            JLabel labelReasoning = new JLabel();
+            labelReasoning.setText("Talent:");
+            labelReasoning.setName("labelReasoning");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demographicPanel.add(labelReasoning, gridBagConstraints);
+
+            comboReasoning = new MMComboBox<>("comboReasoning", Reasoning.values());
+            comboReasoning.setSelectedItem(person.getReasoning());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demographicPanel.add(comboReasoning, gridBagConstraints);
         }
 
         y++;
@@ -1205,8 +1252,11 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         c.insets = new Insets(0, 10, 0, 0);
         c.gridx = 0;
 
-        List<String> sortedSkillNames = getSortedSkillNames();
+        List<String> sortedSkillNames = SkillType.getSortedSkillNames();
 
+        SkillModifierData skillModifierData = person.getSkillModifierData(
+              campaign.getCampaignOptions().isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate(),
+              true);
         SkillType skillType;
         for (int index = 0; index < sortedSkillNames.size(); index++) {
             c.gridy = index;
@@ -1223,10 +1273,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             lblName = new JLabel(type);
             lblValue = new JLabel();
             if (person.hasSkill(type)) {
-                lblValue.setText(person.getSkill(type)
-                                       .toString(person.getOptions(),
-                                             person.getATOWAttributes(),
-                                             person.getReputation()));
+                lblValue.setText(person.getSkill(type).getFinalSkillValue(skillModifierData) + "+");
             } else {
                 lblValue.setText("-");
             }
@@ -1281,57 +1328,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             c.weightx = 1.0;
             panSkills.add(spnBonus, c);
         }
-    }
-
-    /**
-     * Returns a list of skill names sorted by category.
-     *
-     * <p>The sorting order is:</p>
-     * <ol>
-     *     <li>Combat skills</li>
-     *     <li>Support skills</li>
-     *     <li>Roleplay skills</li>
-     * </ol>
-     *
-     * <p>Skill names are categorized by querying their {@code SkillType}. Any unknown skill types are ignored and a
-     * warning is logged.</p>
-     *
-     * @return a {@code List} of skill names sorted by skill category
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    private static List<String> getSortedSkillNames() {
-        String[] unsortedSkillNames = SkillType.getSkillList();
-        List<String> sortedSkillNames = new ArrayList<>();
-        List<String> combatSkills = new ArrayList<>();
-        List<String> supportSkills = new ArrayList<>();
-        List<String> roleplaySkills = new ArrayList<>();
-        for (String skillName : unsortedSkillNames) {
-            SkillType skillType = SkillType.getType(skillName);
-
-            if (skillType == null) {
-                LOGGER.warn("Unknown skill type: {}", skillName);
-                continue;
-            }
-
-            if (skillType.isRoleplaySkill()) {
-                roleplaySkills.add(skillName);
-                continue;
-            }
-
-            if (skillType.isSupportSkill()) {
-                supportSkills.add(skillName);
-                continue;
-            }
-
-            combatSkills.add(skillName);
-        }
-
-        sortedSkillNames.addAll(combatSkills);
-        sortedSkillNames.addAll(supportSkills);
-        sortedSkillNames.addAll(roleplaySkills);
-        return sortedSkillNames;
     }
 
     private void setSkills() {
@@ -1557,18 +1553,31 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             skillLvls.get(type).getModel().setValue(0);
             return;
         }
+
+        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        LocalDate today = campaign.getLocalDate();
+
         SkillType skillType = SkillType.getType(type);
 
         int level = (Integer) skillLvls.get(type).getModel().getValue();
         int bonus = (Integer) skillBonus.get(type).getModel().getValue();
 
-        if (skillType.isCountUp()) {
-            int target = min(getCountUpMaxValue(), skillType.getTarget() + level + bonus);
-            skillValues.get(type).setText("+" + target);
-        } else {
-            int target = max(getCountDownMaxValue(), skillType.getTarget() - level - bonus);
-            skillValues.get(type).setText(target + "+");
+        int ageModifier = 0;
+        if (isUseAgeEffects) {
+            ageModifier = getAgeModifier(getMilestone(person.getAge(today)),
+                  skillType.getFirstAttribute(), skillType.getSecondAttribute());
         }
+
+        Skill skill = new Skill(type);
+        skill.setLevel(level);
+        skill.setBonus(bonus);
+        skill.setAgingModifier(ageModifier);
+
+        SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgeEffects, isClanCampaign, today, true);
+
+        int target = min(getCountUpMaxValue(), skill.getFinalSkillValue(skillModifierData));
+        skillValues.get(type).setText(target + "+");
     }
 
     private void changeValueEnabled(String type) {
@@ -1718,7 +1727,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         person.setClanPersonnel(chkClan.isSelected());
 
         if (campaign.getCampaignOptions().isUseToughness()) {
-            person.setToughness(MathUtility.parseInt(textToughness.getText(), person.getToughness()));
+            person.setToughness(MathUtility.parseInt(textToughness.getText(), person.getDirectToughness()));
         }
 
         int newValue = MathUtility.parseInt(textConnections.getText(), person.getConnections());
@@ -1735,6 +1744,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         newValue = MathUtility.parseInt(textBloodmark.getText(), person.getBloodmark());
         person.setBloodmark(clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
+
+        newValue = MathUtility.parseInt(textExtraIncome.getText(), person.getExtraIncomeTraitLevel());
+        person.setExtraIncomeFromTraitLevel(clamp(newValue, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
 
         person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), person.getBaseLoyalty()));
 
@@ -1757,6 +1769,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
             person.setPersonalityQuirkDescriptionIndex((int) spnPersonalityQuirk.getValue());
+
+            person.setReasoning(comboReasoning.getSelectedItem());
 
             writePersonalityDescription(person);
             writeInterviewersNotes(person);

@@ -73,7 +73,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.HPGLink;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -81,6 +80,7 @@ import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
+import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
@@ -739,7 +739,7 @@ public class InterstellarMapPanel extends JPanel {
                 LocalDate today = campaign.getLocalDate();
                 List<AtBContract> activeAtBContracts = campaign.getActiveAtBContracts();
 
-                FactionHints factionHints = FactionHints.defaultFactionHints();
+                FactionHints factionHints = FactionHints.getInstance();
 
                 for (PlanetarySystem system : systems) {
                     if (isSystemVisible(system, false)) {

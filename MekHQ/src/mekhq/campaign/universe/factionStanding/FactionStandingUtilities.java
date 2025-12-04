@@ -50,8 +50,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.factionHints.FactionHints;
 
 
 public class FactionStandingUtilities {
@@ -623,6 +623,10 @@ public class FactionStandingUtilities {
      * @since 0.50.07
      */
     public static String getFactionName(Faction faction, int gameYear) {
+        if (faction == null) {
+            return getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.faction");
+        }
+
         final String CLAN = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.clan");
         final String THE = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.the");
 

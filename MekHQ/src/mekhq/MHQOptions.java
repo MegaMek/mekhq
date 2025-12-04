@@ -78,6 +78,14 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).put(MHQConstants.LONG_DISPLAY_DATE_FORMAT, value);
     }
 
+    public boolean getHideUnitFluff() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.HIDE_UNIT_FLUFF, false);
+    }
+
+    public void setHideUnitFluff(boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.HIDE_UNIT_FLUFF, value);
+    }
+
     public boolean getHistoricalDailyLog() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.HISTORICAL_DAILY_LOG, false);
     }
@@ -728,7 +736,7 @@ public final class MHQOptions extends SuiteOptions {
      *
      * @return the hexadecimal color representation of the font color
      */
-    public String convertFontColorToHexColor(Color color) {
+    public static String convertFontColorToHexColor(Color color) {
         int red = color.getRed();
         int green = color.getGreen();
         int blue = color.getBlue();
@@ -849,6 +857,26 @@ public final class MHQOptions extends SuiteOptions {
     public void setNewDayOptimizeMedicalAssignments(final boolean value) {
         userPreferences.node(MHQConstants.NEW_DAY_NODE)
               .putBoolean(MHQConstants.NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS, value);
+    }
+
+    public boolean getNewMonthQuickTrain() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN, false);
+    }
+
+    public void setNewMonthQuickTrain(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN, value);
+    }
+
+    public boolean getSelfCorrectMaintenance() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.SELF_CORRECT_MAINTENANCE, true);
+    }
+
+    public void setSelfCorrectMaintenance(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.SELF_CORRECT_MAINTENANCE, value);
     }
 
     public boolean getNewDayForceIconOperationalStatus() {

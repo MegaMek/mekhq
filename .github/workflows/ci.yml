@@ -21,18 +21,18 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         java-distribution: [ temurin ]
-        java-version: [ 17, 21 ]
+        java-version: [ 17, 21, 25 ]
       fail-fast: false
 
     steps:
       - name: Checkout Data Repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: megamek/mm-data
           path: mm-data
 
       - name: Checkout out MekHQ
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: mekhq
 
@@ -52,7 +52,7 @@ jobs:
           exit 0
 
       - name: Checkout MegaMek
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: ${{ steps.find_mm.outputs.mmRepo }}
           ref: ${{ steps.find_mm.outputs.mmBranch }}
@@ -80,7 +80,7 @@ jobs:
           exit 0
 
       - name: Checkout MegaMekLab
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: ${{ steps.find_mml.outputs.mmlRepo }}
           ref: ${{ steps.find_mml.outputs.mmlBranch }}
@@ -99,7 +99,7 @@ jobs:
           java-version: ${{ matrix.java-version }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           build-scan-publish: true
           build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
@@ -128,7 +128,7 @@ jobs:
           mm.profile: dev
 
       - name: Upload Test Logs on Failure
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: cd-failure-logs
@@ -147,7 +147,7 @@ jobs:
           verbose: true
 
       - name: Upload Tar GZ Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: mhq-release-tgz-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
           path: mekhq/MekHQ/build/distributions/*.tar.gz

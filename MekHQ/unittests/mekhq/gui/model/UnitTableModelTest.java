@@ -96,7 +96,7 @@
          when(unit.getGunners()).thenReturn(gunners);
          when(unit.getTotalGunnerNeeds()).thenReturn(totalGunnerNeeds);
 
-         when(unit.getCrew()).thenReturn(crew);
+         when(unit.getActiveCrew()).thenReturn(crew);
          when(unit.getTotalCrewNeeds()).thenReturn(totalCrewNeeds);
 
          when(unit.getEntity()).thenReturn(entity);
@@ -116,42 +116,58 @@
                0, 0,
                0, 0,
                true, mock(SpaceStation.class),
-               "<html></html>");
+               "<html>None</html>");
      }
 
      @Test
      public void fullyCrewed() {
-         setCrew(1, 1,
-               2, 2,
-               3, 3,
-               true, mock(Jumpship.class),
-               "<html><b>Drivers: </b>1/1<br><b>Gunners: </b>2/2<br><b>Crew: </b>3/3<br><b>Navigator: </b>1/1</html>");
+         setCrew(1,
+               1,
+               2,
+               2,
+               3,
+               3,
+               true,
+               mock(Jumpship.class),
+               "<html><b>Drivers (Unknown): </b>1/1<br><b>Gunners (Unknown): </b>2/2<br><b>Other (see Glossary): </b>3/3<br><b>Navigator: </b>1/1</html>");
      }
 
      @Test
      public void partiallyCrewed() {
-         setCrew(0, 1,
-               1, 2,
-               2, 3,
-               false, mock(Jumpship.class),
-               "<html><b>Drivers: </b>0/1<br><b>Gunners: </b>1/2<br><b>Crew: </b>2/3<br><b>Navigator: </b>0/1</html>");
+         setCrew(0,
+               1,
+               1,
+               2,
+               2,
+               3,
+               false,
+               mock(Jumpship.class),
+               "<html><b>Drivers (Unknown): </b>0/1<br><b>Gunners (Unknown): </b>1/2<br><b>Other (see Glossary): </b>2/3<br><b>Navigator: </b>0/1</html>");
      }
 
      @Test
      public void excessCrew() {
-         setCrew(2, 1,
-               4, 2,
-               6, 5,
-               true, mock(SpaceStation.class),
-               "<html><b>Drivers: </b>2/1<br><b>Gunners: </b>4/2<br><b>Crew: </b>6/5</html>");
+         setCrew(2,
+               1,
+               4,
+               2,
+               6,
+               5,
+               true,
+               mock(SpaceStation.class),
+               "<html><b>Drivers (Unknown): </b>2/1<br><b>Gunners (Unknown): </b>4/2<br><b>Other (see Glossary): </b>6/5</html>");
      }
 
      @Test
      public void noAssignedCrew() {
-         setCrew(0, 1,
-               0, 1,
-               0, 1,
-               false, mock(Jumpship.class),
-               "<html><b>Drivers: </b>0/1<br><b>Gunners: </b>0/1<br><b>Crew: </b>0/1<br><b>Navigator: </b>0/1</html>");
+         setCrew(0,
+               1,
+               0,
+               1,
+               0,
+               1,
+               false,
+               mock(Jumpship.class),
+               "<html><b>Drivers (Unknown): </b>0/1<br><b>Gunners (Unknown): </b>0/1<br><b>Other (see Glossary): </b>0/1<br><b>Navigator: </b>0/1</html>");
      }
  }

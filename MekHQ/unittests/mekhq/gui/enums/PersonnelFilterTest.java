@@ -138,7 +138,7 @@ class PersonnelFilterTest {
     }
 
     @Test
-    void testIsVehicleCrewMember() {
+    void testIsCombatTechnicianMember() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.VEHICLE_CREWMEMBER) {
                 assertTrue(personnelFilter.isVehicleCrewMember());
@@ -151,7 +151,7 @@ class PersonnelFilterTest {
     @Test
     void testIsGroundVehicleDriver() {
         for (final PersonnelFilter personnelFilter : filters) {
-            if (personnelFilter == PersonnelFilter.GROUND_VEHICLE_DRIVER) {
+            if (personnelFilter == PersonnelFilter.VEHICLE_CREW_GROUND) {
                 assertTrue(personnelFilter.isGroundVehicleDriver());
             } else {
                 assertFalse(personnelFilter.isGroundVehicleDriver());
@@ -162,7 +162,7 @@ class PersonnelFilterTest {
     @Test
     void testIsNavalVehicleDriver() {
         for (final PersonnelFilter personnelFilter : filters) {
-            if (personnelFilter == PersonnelFilter.NAVAL_VEHICLE_DRIVER) {
+            if (personnelFilter == PersonnelFilter.VEHICLE_CREW_NAVAL) {
                 assertTrue(personnelFilter.isNavalVehicleDriver());
             } else {
                 assertFalse(personnelFilter.isNavalVehicleDriver());
@@ -173,32 +173,10 @@ class PersonnelFilterTest {
     @Test
     void testIsVTOLPilot() {
         for (final PersonnelFilter personnelFilter : filters) {
-            if (personnelFilter == PersonnelFilter.VTOL_PILOT) {
+            if (personnelFilter == PersonnelFilter.VEHICLE_CREW_VTOL) {
                 assertTrue(personnelFilter.isVTOLPilot());
             } else {
                 assertFalse(personnelFilter.isVTOLPilot());
-            }
-        }
-    }
-
-    @Test
-    void testIsVehicleGunner() {
-        for (final PersonnelFilter personnelFilter : filters) {
-            if (personnelFilter == PersonnelFilter.VEHICLE_GUNNER) {
-                assertTrue(personnelFilter.isVehicleGunner());
-            } else {
-                assertFalse(personnelFilter.isVehicleGunner());
-            }
-        }
-    }
-
-    @Test
-    void testIsVehicleCrew() {
-        for (final PersonnelFilter personnelFilter : filters) {
-            if (personnelFilter == PersonnelFilter.VEHICLE_CREW) {
-                assertTrue(personnelFilter.isVehicleCrew());
-            } else {
-                assertFalse(personnelFilter.isVehicleCrew());
             }
         }
     }

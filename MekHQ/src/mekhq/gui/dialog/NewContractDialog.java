@@ -340,7 +340,7 @@ public class NewContractDialog extends JDialog {
 
         cboNegotiator.setName("cboNegotiator");
         // Add negotiators
-        for (Person p : campaign.getActivePersonnel(true)) {
+        for (Person p : campaign.getActivePersonnel(false, false)) {
             if (p.hasSkill(SkillType.S_NEGOTIATION)) {
                 cboNegotiator.addItem(p);
             }
@@ -710,6 +710,11 @@ public class NewContractDialog extends JDialog {
                     campaign.getLocalDate(),
                     contract.getTotalAdvanceAmount(),
                     "Advance funds for " + contract.getName());
+        campaign.getFinances()
+              .credit(TransactionType.CONTRACT_PAYMENT,
+                    campaign.getLocalDate(),
+                    contract.getTransportAmount(),
+                    "Transport reimbursement for " + contract.getName());
 
         campaign.addMission(contract);
 

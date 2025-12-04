@@ -33,6 +33,9 @@
  */
 package mekhq.campaign.mission;
 
+import static java.lang.Math.ceil;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -88,6 +91,10 @@ public class Contract extends Mission {
     private int advancePct;
     private int signBonus;
 
+    private int hospitalBedsRented;
+    private int kitchensRented;
+    private int holdingCellsRented;
+
     // this is a transient variable meant to keep track of a single jump path while
     // the contract
     // runs through initial calculations, as the same jump path is referenced
@@ -130,6 +137,9 @@ public class Contract extends Mission {
         this.mrbcFee = true;
         this.advancePct = 25;
         this.signBonus = 0;
+        this.hospitalBedsRented = 0;
+        this.kitchensRented = 0;
+        this.holdingCellsRented = 0;
     }
 
     public static String getOverheadCompName(int i) {
@@ -307,6 +317,30 @@ public class Contract extends Mission {
 
     public void setSigningBonusPct(int s) {
         signBonus = s;
+    }
+
+    public int getHospitalBedsRented() {
+        return hospitalBedsRented;
+    }
+
+    public void setHospitalBedsRented(int count) {
+        hospitalBedsRented = count;
+    }
+
+    public int getKitchensRented() {
+        return kitchensRented;
+    }
+
+    public void setKitchensRented(int count) {
+        kitchensRented = count;
+    }
+
+    public int getHoldingCellsRented() {
+        return holdingCellsRented;
+    }
+
+    public void setHoldingCellsRented(int count) {
+        holdingCellsRented = count;
     }
 
     public int getAdvancePct() {
@@ -500,7 +534,7 @@ public class Contract extends Mission {
             double days = Math.round(jumpPath.getTotalTime(campaign.getLocalDate(),
                   campaign.getLocation().getTransitTime(), isUseCommandCircuit) * 100.0)
                                 / 100.0;
-            return (int) Math.round(days);
+            return (int) ceil(days);
         }
         return 0;
     }
@@ -511,7 +545,7 @@ public class Contract extends Mission {
      * @return the approximate number of months for a 2-way trip + deployment, rounded up
      */
     public int getLengthPlusTravel(Campaign c) {
-        int travelMonths = (int) Math.ceil(2 * getTravelDays(c) / 30.0);
+        int travelMonths = (int) ceil(2 * getTravelDays(c) / 30.0);
         return getLength() + travelMonths;
     }
 
@@ -557,19 +591,16 @@ public class Contract extends Mission {
     }
 
     /**
-     * @param c campaign loaded
+     * @param campaign campaign loaded
      *
      * @return the total (2-way) estimated transportation fee from the player's current location to this contract's
      *       planet
      */
-    public Money getTotalTransportationFees(Campaign c) {
-        if ((null != getSystem()) && c.getCampaignOptions().isPayForTransport()) {
-            JumpPath jumpPath = getJumpPath(c);
-
-            boolean campaignOps = c.getCampaignOptions().isEquipmentContractBase();
-
-            return c.calculateCostPerJump(campaignOps, campaignOps).multipliedBy(jumpPath.getJumps()).multipliedBy(2);
+    public Money getTotalTransportationFees(Campaign campaign) {
+        if ((null != getSystem()) && campaign.getCampaignOptions().isPayForTransport()) {
+            return getTransportCost(campaign, false);
         }
+
         return Money.zero();
     }
 
@@ -579,14 +610,14 @@ public class Contract extends Mission {
      * monthly expenses is the contract duration plus the travel time from the unit's current world to the contract
      * world and back.
      *
-     * @param c The campaign with which this contract is associated.
+     * @param campaign The campaign with which this contract is associated.
      *
      * @return The estimated profit in the current default currency.
      */
-    public Money getEstimatedTotalProfit(Campaign c) {
+    public Money getEstimatedTotalProfit(Campaign campaign) {
         return getTotalAdvanceAmount()
-                     .plus(getTotalMonthlyPayOut(c))
-                     .minus(getTotalTransportationFees(c));
+                     .plus(getTotalMonthlyPayOut(campaign))
+                     .minus(getTransportCost(campaign, false));
     }
 
     /**
@@ -661,18 +692,7 @@ public class Contract extends Mission {
 
         // calculate transportation costs
         if (null != getSystem() && campaign.getCampaignOptions().isPayForTransport()) {
-            JumpPath jumpPath = getJumpPath(campaign);
-
-            // FM:Mercs transport payments take into account owned transports and do not use
-            // CampaignOps DropShip costs.
-            // CampaignOps doesn't care about owned transports and does use its own DropShip
-            // costs.
-            boolean campaignOps = campaign.getCampaignOptions().isEquipmentContractBase();
-            transportAmount = campaign.calculateCostPerJump(campaignOps, campaignOps)
-                                    .multipliedBy(jumpPath.getJumps())
-                                    .multipliedBy(2)
-                                    .multipliedBy(transportComp)
-                                    .dividedBy(100);
+            transportAmount = getTransportCost(campaign, true);
         } else {
             transportAmount = Money.zero();
         }
@@ -681,8 +701,10 @@ public class Contract extends Mission {
         if (campaign.getCampaignOptions().isUsePeacetimeCost()
                   && campaign.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
             // contract base * transport period * reputation * employer modifier
+
+            boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
             transitAmount = accountant.getContractBase()
-                                  .multipliedBy(((getJumpPath(campaign).getJumps()) * 2.0) / 4.0)
+                                  .multipliedBy(((getJumpPath(campaign).getJumps()) * (useTwoWayPay ? 2.0 : 1.0)) / 4.0)
                                   .multipliedBy(campaign.getAtBUnitRatingMod() * 0.2 + 0.5)
                                   .multipliedBy(1.2);
         } else {
@@ -728,12 +750,55 @@ public class Contract extends Mission {
                         campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
                         campaign.getFactionStandings(), campaign.getFutureAtBContracts());
 
-            int days = (int) Math.ceil(getJumpPath(campaign).getTotalTime(campaign.getLocalDate(),
+            int days = (int) ceil(getJumpPath(campaign).getTotalTime(campaign.getLocalDate(),
                   campaign.getLocation().getTransitTime(), isUseCommandCircuit));
             startDate = startDate.plusDays(days);
         }
 
         setStartAndEndDate(startDate);
+    }
+
+    /**
+     * Calculates the total transport cost for this contract based on the campaign's transport settings and the
+     * contract's jump path.
+     *
+     * <p>The calculation considers the following factors:</p>
+     * <ul>
+     *   <li>The jump path duration, including any command circuit adjustments</li>
+     *   <li>The campaign's transport cost tables (using the Regular experience level)</li>
+     *   <li>Whether the employer pays for a round trip (two-way pay)</li>
+     *   <li>Whether transport compensation should be applied to reduce the final cost</li>
+     * </ul>
+     * <p>When {@code includeTransportCompensation} is true, the method calculates the employer's compensation
+     * percentage and subtracts it from the final transport cost.</p>
+     *
+     * @param campaign                     the current {@link Campaign} used for jump path, transport options, and cost
+     *                                     calculation
+     * @param includeTransportCompensation whether to apply the contract's transport compensation percentage to reduce
+     *                                     the cost
+     *
+     * @return the total {@link Money} required for transport, after applying all applicable modifiers
+     */
+    private Money getTransportCost(Campaign campaign, boolean includeTransportCompensation) {
+        JumpPath jumpPath = getJumpPath(campaign);
+
+        TransportCostCalculations transportCostCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
+        boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
+        boolean isUseCommandCircuits = campaign.isUseCommandCircuitForContract(this);
+        int duration = (int) ceil(jumpPath.getTotalTime(campaign.getLocalDate(),
+              campaign.getLocation().getTransitTime(), isUseCommandCircuits));
+        Money transportCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
+              jumpPath.getJumps());
+
+        // Is the employer paying for both ways?
+        transportCost = transportCost.multipliedBy(useTwoWayPay ? 2 : 1);
+
+        if (includeTransportCompensation) {
+            Money transportCompensation = transportCost.multipliedBy(transportComp / 100.0);
+            transportCost = transportCost.minus(transportCompensation);
+        }
+
+        return transportCost;
     }
 
     /**
@@ -764,6 +829,9 @@ public class Contract extends Mission {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrbcFee", mrbcFee);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advancePct", advancePct);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signBonus", signBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hospitalBedsRented", hospitalBedsRented);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "kitchensRented", kitchensRented);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "holdingCellsRented", holdingCellsRented);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advanceAmount", advanceAmount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signingAmount", signingAmount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportAmount", transportAmount);
@@ -814,6 +882,12 @@ public class Contract extends Mission {
                     advancePct = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("signBonus")) {
                     signBonus = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("hospitalBedsRented")) {
+                    hospitalBedsRented = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("kitchensRented")) {
+                    kitchensRented = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("holdingCellsRented")) {
+                    holdingCellsRented = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mrbcFee")) {
                     mrbcFee = wn2.getTextContent().trim().equals("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("advanceAmount")) {

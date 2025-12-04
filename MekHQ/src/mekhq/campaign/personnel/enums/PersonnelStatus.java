@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.enums;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -78,6 +79,7 @@ public enum PersonnelStatus {
     HOMICIDE(NotificationSeverity.NEGATIVE, true, true),
     WOUNDS(NotificationSeverity.NEGATIVE, true, true),
     DISEASE(NotificationSeverity.NEGATIVE, true, true),
+    CONTAGIOUS_DISEASE(NotificationSeverity.NEGATIVE, true, true),
     ACCIDENTAL(NotificationSeverity.NEGATIVE, true, true),
     NATURAL_CAUSES(NotificationSeverity.NEGATIVE, true, true),
     OLD_AGE(NotificationSeverity.NEGATIVE, true, true),
@@ -130,6 +132,9 @@ public enum PersonnelStatus {
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
     // region Variable Declarations
+    private final String label;
+    private final String tooltip;
+    private final String logText;
     private final NotificationSeverity severity;
     private final boolean isPrisonerSuitableStatus;
     private final boolean isCauseOfDeath;
@@ -149,11 +154,26 @@ public enum PersonnelStatus {
      */
     PersonnelStatus(final NotificationSeverity severity, final boolean isPrisonerSuitableStatus,
           final boolean isCauseOfDeath) {
+        this.label = generateLabel();
+        this.tooltip = generateTooltip();
+        this.logText = generateLogText();
         this.severity = severity;
         this.isPrisonerSuitableStatus = isPrisonerSuitableStatus;
         this.isCauseOfDeath = isCauseOfDeath;
     }
     // endregion Constructors
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getToolTipText() {
+        return tooltip;
+    }
+
+    public String getLogText() {
+        return logText;
+    }
 
     /**
      * Retrieves the severity level of this status.
@@ -194,10 +214,10 @@ public enum PersonnelStatus {
      *
      * @return the localized label text
      */
-    public String getLabel() {
+    private String generateLabel() {
         final String RESOURCE_KEY = name() + ".label";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**
@@ -208,10 +228,10 @@ public enum PersonnelStatus {
      *
      * @return the localized tooltip text
      */
-    public String getToolTipText() {
+    private String generateTooltip() {
         final String RESOURCE_KEY = name() + ".tooltip";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**
@@ -245,17 +265,30 @@ public enum PersonnelStatus {
      *
      * @return the localized log text
      */
-    public String getLogText() {
+    private String generateLogText() {
         final String RESOURCE_KEY = name() + ".log";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
     // endregion Getters
 
     // region Boolean Comparison Methods
 
     /**
+     * Checks if the character has either the {@link #ACTIVE} or {@link #CAMP_FOLLOWER} personnel status.
+     *
+     * @return {@code true} if the character has the {@link #ACTIVE} personnel status {@code false} otherwise.
+     */
+    public boolean isActiveFlexible() {
+        return this == ACTIVE || this == CAMP_FOLLOWER;
+    }
+
+    /**
      * Checks if the character has the {@link #ACTIVE} personnel status.
+     *
+     * <p><b>Usage:</b> In most cases we likely want to use {@link #isActiveFlexible()} as this will also return
+     * {@code true} for 'camp follower' characters. Those characters are also 'active', just not active employees of the
+     * player's campaign.</p>
      *
      * @return {@code true} if the character has the {@link #ACTIVE} personnel status {@code false} otherwise.
      */
@@ -415,6 +448,16 @@ public enum PersonnelStatus {
      */
     public boolean isDisease() {
         return this == DISEASE;
+    }
+
+    /**
+     * Checks if the character has the {@link #CONTAGIOUS_DISEASE} personnel status.
+     *
+     * @return {@code true} if the character has the {@link #CONTAGIOUS_DISEASE} personnel status {@code false}
+     *       otherwise.
+     */
+    public boolean isContagiousDisease() {
+        return this == CONTAGIOUS_DISEASE;
     }
 
     /**
@@ -598,6 +641,7 @@ public enum PersonnelStatus {
                      isHomicide() ||
                      isWounds() ||
                      isDisease() ||
+                     isContagiousDisease() ||
                      isAccidental() ||
                      isNaturalCauses() ||
                      isOldAge() ||

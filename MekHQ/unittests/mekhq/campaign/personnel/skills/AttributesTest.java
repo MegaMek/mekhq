@@ -36,6 +36,7 @@ import static java.lang.Math.min;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_EDGE_SCORE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
@@ -54,13 +55,13 @@ public class AttributesTest {
     @Test
     public void testDefaultConstructor() {
         Attributes attributes = new Attributes();
-        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getAttributeScore(STRENGTH));
-        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getAttributeScore(BODY));
-        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getAttributeScore(REFLEXES));
-        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getAttributeScore(DEXTERITY));
-        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getAttributeScore(INTELLIGENCE));
-        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getAttributeScore(WILLPOWER));
-        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getAttributeScore(CHARISMA));
+        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(STRENGTH));
+        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(BODY));
+        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(REFLEXES));
+        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(DEXTERITY));
+        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(INTELLIGENCE));
+        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(WILLPOWER));
+        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(CHARISMA));
     }
 
     @Test
@@ -72,15 +73,15 @@ public class AttributesTest {
         final int attributeCap = phenotype.getAttributeCap(STRENGTH);
 
         attributes.setAttributeScore(phenotype, options, STRENGTH, MAXIMUM_ATTRIBUTE_SCORE + 1);
-        assertEquals(attributeCap, attributes.getAttributeScore(STRENGTH));
+        assertEquals(attributeCap, attributes.getBaseAttributeScore(STRENGTH));
 
         attributes.setAttributeScore(phenotype, options, STRENGTH, MINIMUM_ATTRIBUTE_SCORE - 1);
-        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(STRENGTH));
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(STRENGTH));
 
         for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
             attributes.setAttributeScore(phenotype, options, STRENGTH, i);
             int expected = min(i, attributeCap);
-            assertEquals(expected, attributes.getAttributeScore(STRENGTH));
+            assertEquals(expected, attributes.getBaseAttributeScore(STRENGTH));
         }
     }
 
@@ -93,15 +94,15 @@ public class AttributesTest {
         final int attributeCap = phenotype.getAttributeCap(BODY);
 
         attributes.setAttributeScore(phenotype, options, BODY, MAXIMUM_ATTRIBUTE_SCORE + 1);
-        assertEquals(attributeCap, attributes.getAttributeScore(BODY));
+        assertEquals(attributeCap, attributes.getBaseAttributeScore(BODY));
 
         attributes.setAttributeScore(phenotype, options, BODY, MINIMUM_ATTRIBUTE_SCORE - 1);
-        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(BODY));
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(BODY));
 
         for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
             attributes.setAttributeScore(phenotype, options, BODY, i);
             int expected = min(i, attributeCap);
-            assertEquals(expected, attributes.getAttributeScore(BODY));
+            assertEquals(expected, attributes.getBaseAttributeScore(BODY));
         }
     }
 
@@ -114,15 +115,15 @@ public class AttributesTest {
         final int attributeCap = phenotype.getAttributeCap(REFLEXES);
 
         attributes.setAttributeScore(phenotype, options, REFLEXES, MAXIMUM_ATTRIBUTE_SCORE + 1);
-        assertEquals(attributeCap, attributes.getAttributeScore(REFLEXES));
+        assertEquals(attributeCap, attributes.getBaseAttributeScore(REFLEXES));
 
         attributes.setAttributeScore(phenotype, options, REFLEXES, MINIMUM_ATTRIBUTE_SCORE - 1);
-        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(REFLEXES));
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(REFLEXES));
 
         for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
             attributes.setAttributeScore(phenotype, options, REFLEXES, i);
             int expected = min(i, attributeCap);
-            assertEquals(expected, attributes.getAttributeScore(REFLEXES));
+            assertEquals(expected, attributes.getBaseAttributeScore(REFLEXES));
         }
     }
 
@@ -135,15 +136,15 @@ public class AttributesTest {
         final int attributeCap = phenotype.getAttributeCap(DEXTERITY);
 
         attributes.setAttributeScore(phenotype, options, DEXTERITY, MAXIMUM_ATTRIBUTE_SCORE + 1);
-        assertEquals(attributeCap, attributes.getAttributeScore(DEXTERITY));
+        assertEquals(attributeCap, attributes.getBaseAttributeScore(DEXTERITY));
 
         attributes.setAttributeScore(phenotype, options, DEXTERITY, MINIMUM_ATTRIBUTE_SCORE - 1);
-        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(DEXTERITY));
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(DEXTERITY));
 
         for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
             attributes.setAttributeScore(phenotype, options, DEXTERITY, i);
             int expected = min(i, attributeCap);
-            assertEquals(expected, attributes.getAttributeScore(DEXTERITY));
+            assertEquals(expected, attributes.getBaseAttributeScore(DEXTERITY));
         }
     }
 
@@ -156,15 +157,15 @@ public class AttributesTest {
         final int attributeCap = phenotype.getAttributeCap(INTELLIGENCE);
 
         attributes.setAttributeScore(phenotype, options, INTELLIGENCE, MAXIMUM_ATTRIBUTE_SCORE + 1);
-        assertEquals(attributeCap, attributes.getAttributeScore(INTELLIGENCE));
+        assertEquals(attributeCap, attributes.getBaseAttributeScore(INTELLIGENCE));
 
         attributes.setAttributeScore(phenotype, options, INTELLIGENCE, MINIMUM_ATTRIBUTE_SCORE - 1);
-        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(INTELLIGENCE));
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(INTELLIGENCE));
 
         for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
             attributes.setAttributeScore(phenotype, options, INTELLIGENCE, i);
             int expected = min(i, attributeCap);
-            assertEquals(expected, attributes.getAttributeScore(INTELLIGENCE));
+            assertEquals(expected, attributes.getBaseAttributeScore(INTELLIGENCE));
         }
     }
 
@@ -177,15 +178,15 @@ public class AttributesTest {
         final int attributeCap = phenotype.getAttributeCap(WILLPOWER);
 
         attributes.setAttributeScore(phenotype, options, WILLPOWER, MAXIMUM_ATTRIBUTE_SCORE + 1);
-        assertEquals(phenotype.getAttributeCap(WILLPOWER), attributes.getAttributeScore(WILLPOWER));
+        assertEquals(phenotype.getAttributeCap(WILLPOWER), attributes.getBaseAttributeScore(WILLPOWER));
 
         attributes.setAttributeScore(phenotype, options, WILLPOWER, MINIMUM_ATTRIBUTE_SCORE - 1);
-        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(WILLPOWER));
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(WILLPOWER));
 
         for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
             attributes.setAttributeScore(phenotype, options, WILLPOWER, i);
             int expected = min(i, attributeCap);
-            assertEquals(expected, attributes.getAttributeScore(WILLPOWER));
+            assertEquals(expected, attributes.getBaseAttributeScore(WILLPOWER));
         }
     }
 
@@ -196,14 +197,14 @@ public class AttributesTest {
         final PersonnelOptions options = new PersonnelOptions();
 
         attributes.setAttributeScore(phenotype, options, CHARISMA, MAXIMUM_ATTRIBUTE_SCORE + 1);
-        assertEquals(phenotype.getAttributeCap(CHARISMA), attributes.getAttributeScore(CHARISMA));
+        assertEquals(phenotype.getAttributeCap(CHARISMA), attributes.getBaseAttributeScore(CHARISMA));
 
         attributes.setAttributeScore(phenotype, options, CHARISMA, MINIMUM_ATTRIBUTE_SCORE - 1);
-        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(CHARISMA));
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(CHARISMA));
 
         for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
             attributes.setAttributeScore(phenotype, options, CHARISMA, i);
-            assertEquals(min(i, phenotype.getAttributeCap(CHARISMA)), attributes.getAttributeScore(CHARISMA));
+            assertEquals(min(i, phenotype.getAttributeCap(CHARISMA)), attributes.getBaseAttributeScore(CHARISMA));
         }
     }
 
@@ -220,7 +221,11 @@ public class AttributesTest {
                 continue;
             }
 
-            assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(attribute));
+            if (attribute != SkillAttribute.EDGE) {
+                assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getBaseAttributeScore(attribute));
+            } else {
+                assertEquals(MINIMUM_EDGE_SCORE, attributes.getBaseAttributeScore(attribute));
+            }
         }
     }
 
@@ -237,7 +242,7 @@ public class AttributesTest {
                 continue;
             }
 
-            assertEquals(phenotype.getAttributeCap(attribute), attributes.getAttributeScore(attribute));
+            assertEquals(phenotype.getAttributeCap(attribute), attributes.getBaseAttributeScore(attribute));
         }
     }
 
@@ -257,7 +262,7 @@ public class AttributesTest {
                     continue;
                 }
 
-                int newValue = attributes.getAttributeScore(attribute);
+                int newValue = attributes.getBaseAttributeScore(attribute);
                 int expected = MINIMUM_ATTRIBUTE_SCORE + i;
                 // Account for attribute caps
                 expected = min(expected, phenotype.getAttributeCap(attribute));

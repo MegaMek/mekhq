@@ -66,13 +66,14 @@ import megamek.client.ui.util.UIUtil;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.FactionHints;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.campaign.universe.factionStanding.FactionStandingLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -126,6 +127,9 @@ public class FactionStandingReport extends JDialog {
     private final boolean isFactionStandingEnabled;
     private final CampaignOptions campaignOptions;
 
+    private final boolean hideClanFactions;
+    private final boolean hideNonClanFactions;
+
     private final List<String> innerSphereFactions = new ArrayList<>();
     private final List<String> innerSphereMinorFactions = new ArrayList<>();
     private final List<String> clanFactions = new ArrayList<>();
@@ -156,6 +160,12 @@ public class FactionStandingReport extends JDialog {
         factions = Factions.getInstance();
         this.campaignOptions = campaign.getCampaignOptions();
         this.isFactionStandingEnabled = campaignOptions.isTrackFactionStanding();
+
+        // We minus a day as otherwise this will return false if today is the first day of the First Wave
+        boolean clanInvasionHasBegun = MHQConstants.CLAN_INVASION_FIRST_WAVE_BEGINS.minusDays(1).isBefore(today);
+        boolean campaignIsClan = campaignFaction.isClan();
+        hideClanFactions = !clanInvasionHasBegun && !campaignIsClan;
+        hideNonClanFactions = !clanInvasionHasBegun && campaignIsClan;
 
         sortFactions();
         createReportPanel();
@@ -227,11 +237,16 @@ public class FactionStandingReport extends JDialog {
                 continue;
             }
 
+            boolean factionIsClan = faction.isClan();
+            if ((factionIsClan && hideClanFactions) || (!factionIsClan && hideNonClanFactions)) {
+                continue;
+            }
+
             if (!faction.validIn(gameYear)) {
                 deadFactions.add(factionCode);
             } else if (faction.isMercenaryOrganization() || factionCode.equals(PIRACY_SUCCESS_INDEX_FACTION_CODE)) {
                 specialFactions.add(factionCode);
-            } else if (faction.isClan()) {
+            } else if (factionIsClan) {
                 clanFactions.add(factionCode);
             } else if (faction.isDeepPeriphery()) {
                 deepPeripheryFactions.add(factionCode);
@@ -273,13 +288,24 @@ public class FactionStandingReport extends JDialog {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
         if (isFactionStandingEnabled) {
-            tabbedPane.addTab(innerSphereTabTitle, createReportPanelForFactionGroup(innerSphereFactions));
-            tabbedPane.addTab(innerSphereMinorTabTitle, createReportPanelForFactionGroup(innerSphereMinorFactions));
-            tabbedPane.addTab(clanTabTitle, createReportPanelForFactionGroup(clanFactions));
-            tabbedPane.addTab(peripheryTabTitle, createReportPanelForFactionGroup(peripheryFactions));
-            tabbedPane.addTab(deepPeripheryTabTitle, createReportPanelForFactionGroup(deepPeripheryFactions));
-            tabbedPane.addTab(specialTabTitle, createReportPanelForFactionGroup(specialFactions));
-            tabbedPane.addTab(deadTabTitle, createReportPanelForFactionGroup(deadFactions));
+            Object[][] tabs = {
+                  { innerSphereTabTitle, innerSphereFactions },
+                  { innerSphereMinorTabTitle, innerSphereMinorFactions },
+                  { clanTabTitle, clanFactions },
+                  { peripheryTabTitle, peripheryFactions },
+                  { deepPeripheryTabTitle, deepPeripheryFactions },
+                  { specialTabTitle, specialFactions },
+                  { deadTabTitle, deadFactions }
+            };
+
+            for (Object[] tab : tabs) {
+                String title = (String) tab[0];
+                @SuppressWarnings("unchecked")
+                List<String> factions = (List<String>) tab[1];
+                if (!factions.isEmpty()) {
+                    tabbedPane.addTab(title, createReportPanelForFactionGroup(factions));
+                }
+            }
         } else {
             tabbedPane.addTab(disabledTitle, createFactionStandingDisabledTab());
         }
@@ -598,7 +624,7 @@ public class FactionStandingReport extends JDialog {
         String factionStandingLabel = factionStanding.getLabel(faction);
         String factionStandingDescription = factionStanding.getDescription(faction);
 
-        FactionHints factionHints = FactionHints.defaultFactionHints();
+        FactionHints factionHints = FactionHints.getInstance();
         LocalDate firstOfMonth = today.withDayOfMonth(1); // Climate states update on the 1st in Faction Standing
         boolean isAtWar = factionHints.isAtWarWith(campaignFaction, faction, firstOfMonth);
         boolean isAllied = factionHints.isAlliedWith(campaignFaction, faction, firstOfMonth);

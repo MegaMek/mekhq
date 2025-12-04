@@ -149,6 +149,14 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     private boolean commitForces = false;
 
+    public StratConScenarioWizard getStratConScenarioWizard() {
+        return scenarioWizard;
+    }
+
+    public TrackForceAssignmentUI getAssignmentUI() {
+        return assignmentUI;
+    }
+
     /**
      * Constructs a StratConPanel instance, given a parent campaign GUI and a pointer to an info area.
      */
@@ -886,8 +894,16 @@ public class StratConPanel extends JPanel implements ActionListener {
         return currentTrack;
     }
 
+    public void setCurrentTrack(StratConTrackState track) {
+        currentTrack = track;
+    }
+
     public StratConCoords getSelectedCoords() {
         return boardState.getSelectedCoords();
+    }
+
+    public void setSelectedCoords(StratConCoords coords) {
+        boardState.setSelectedCoords(coords);
     }
 
     /**
@@ -989,6 +1005,11 @@ public class StratConPanel extends JPanel implements ActionListener {
                 return new StratConCoords(selectedX, selectedY);
             }
         }
+
+        public void setSelectedCoords(StratConCoords coords) {
+            selectedX = coords.getX();
+            selectedY = coords.getY();
+        }
     }
 
     /**
@@ -1051,7 +1072,7 @@ public class StratConPanel extends JPanel implements ActionListener {
         switch (evt.getActionCommand()) {
             case RIGHT_CLICK_COMMAND_MANAGE_FORCES:
                 if (selectedScenario == null) {
-                    assignmentUI.display(campaign, campaignState, selectedCoords);
+                    assignmentUI.display(campaign, campaignState, selectedCoords, false);
                     assignmentUI.setVisible(true);
                     isPrimaryForce = true;
                 }
@@ -1060,7 +1081,11 @@ public class StratConPanel extends JPanel implements ActionListener {
                     ScenarioState currentState = selectedScenario.getCurrentState();
 
                     if (currentState.equals(UNRESOLVED)) {
-                        assignmentUI.display(campaign, campaignState, selectedCoords);
+                        AtBDynamicScenario backingScenario = selectedScenario.getBackingScenario();
+                        boolean restrictToSingleForce = backingScenario != null &&
+                                                              backingScenario.getStratConScenarioType()
+                                                                    .isOfficialChallenge();
+                        assignmentUI.display(campaign, campaignState, selectedCoords, restrictToSingleForce);
                         assignmentUI.setVisible(true);
                         isPrimaryForce = true;
                     }
@@ -1077,13 +1102,6 @@ public class StratConPanel extends JPanel implements ActionListener {
 
                     scenarioWizard.toFront();
                     scenarioWizard.setVisible(true);
-                }
-                if (selectedScenario != null && scenarioWizard.isWasCanceled()) {
-                    logger.info("Scenario wizard was cancelled. Resetting scenario to default state.");
-                    selectedScenario.resetScenario(campaign);
-
-                    // We currently retain the wizard in memory, so need to make sure we reset the canceled state
-                    scenarioWizard.setWasCanceled(false);
                 }
 
                 setCommitForces(false);

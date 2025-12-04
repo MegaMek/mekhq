@@ -51,9 +51,9 @@ import javax.swing.SwingConstants;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
@@ -87,7 +87,8 @@ public class EquipmentAndSuppliesTab {
     private CampaignOptionsHeaderPanel acquisitionHeader;
     private JPanel pnlAcquisitions;
     private JLabel lblChoiceAcquireSkill;
-    private MMComboBox<String> choiceAcquireSkill;
+    private MMComboBox<AcquisitionsType> choiceAcquireSkill;
+    private JCheckBox chkUseFunctionalAppraisal;
     private JLabel lblAcquireClanPenalty;
     private JLabel lblProcurementPersonnelPick;
     private MMComboBox<String> cboProcurementPersonnelPick;
@@ -133,6 +134,7 @@ public class EquipmentAndSuppliesTab {
     private static final int TRANSIT_UNIT_WEEK = 1;
     private static final int TRANSIT_UNIT_MONTH = 2;
     private static final int TRANSIT_UNIT_NUM = 3;
+    private JCheckBox chkNoDeliveriesInTransit;
     //end Delivery Tab
 
     //start Planetary Acquisition Tab
@@ -251,6 +253,7 @@ public class EquipmentAndSuppliesTab {
     private void initializeDelivery() {
         lblTransitTimeUnits = new JLabel();
         choiceTransitTimeUnits = new MMComboBox<>("choiceTransitTimeUnits", getTransitUnitOptions());
+        chkNoDeliveriesInTransit = new JCheckBox();
     }
 
     /**
@@ -261,7 +264,9 @@ public class EquipmentAndSuppliesTab {
     private void initializeAcquisitionTab() {
         pnlAcquisitions = new JPanel();
         lblChoiceAcquireSkill = new JLabel();
-        choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", buildAcquireSkillComboOptions());
+        choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", AcquisitionsType.values());
+
+        chkUseFunctionalAppraisal = new JCheckBox();
 
         lblProcurementPersonnelPick = new JLabel();
         cboProcurementPersonnelPick = new MMComboBox<>("procurementPersonnelPick",
@@ -339,7 +344,7 @@ public class EquipmentAndSuppliesTab {
         // Header
         acquisitionHeader = new CampaignOptionsHeaderPanel("AcquisitionTab",
               getImageDirectory() + "logo_clan_cloud_cobra.png",
-              4);
+              3);
 
         pnlAcquisitions = createAcquisitionPanel();
         pnlAutoLogistics = createAutoLogisticsPanel();
@@ -377,6 +382,9 @@ public class EquipmentAndSuppliesTab {
         lblChoiceAcquireSkill = new CampaignOptionsLabel("ChoiceAcquireSkill");
         lblChoiceAcquireSkill.addMouseListener(createTipPanelUpdater(acquisitionHeader, "ChoiceAcquireSkill"));
 
+        chkUseFunctionalAppraisal = new CampaignOptionsCheckBox("UseFunctionalAppraisal");
+        chkUseFunctionalAppraisal.addMouseListener(createTipPanelUpdater(acquisitionHeader, "UseFunctionalAppraisal"));
+
         lblProcurementPersonnelPick = new CampaignOptionsLabel("ProcurementPersonnelPick");
         lblProcurementPersonnelPick.addMouseListener(createTipPanelUpdater(acquisitionHeader,
               "ProcurementPersonnelPick"));
@@ -405,6 +413,9 @@ public class EquipmentAndSuppliesTab {
         lblTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
         choiceTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
 
+        chkNoDeliveriesInTransit = new CampaignOptionsCheckBox("NoDeliveriesInTransit");
+        chkNoDeliveriesInTransit.addMouseListener(createTipPanelUpdater(acquisitionHeader, "NoDeliveriesInTransit"));
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AcquisitionPanel", true, "AcquisitionPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -415,6 +426,10 @@ public class EquipmentAndSuppliesTab {
         panel.add(lblChoiceAcquireSkill, layout);
         layout.gridx++;
         panel.add(choiceAcquireSkill, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseFunctionalAppraisal, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -452,6 +467,10 @@ public class EquipmentAndSuppliesTab {
         panel.add(lblTransitTimeUnits, layout);
         layout.gridx++;
         panel.add(choiceTransitTimeUnits, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkNoDeliveriesInTransit, layout);
 
         return panel;
     }
@@ -572,7 +591,7 @@ public class EquipmentAndSuppliesTab {
         // Header
         planetaryAcquisitionHeader = new CampaignOptionsHeaderPanel("PlanetaryAcquisitionTab",
               getImageDirectory() + "logo_rim_worlds_republic.png",
-              14);
+              12);
 
         // Sub-Panels
         JPanel options = createOptionsPanel();
@@ -940,23 +959,6 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Builds a DefaultComboBoxModel containing a predefined set of skill options that can be acquired. The options
-     * include technical, administrative, negotiation, and auto skills.
-     *
-     * @return a DefaultComboBoxModel containing the skill options as string elements.
-     */
-    private static DefaultComboBoxModel<String> buildAcquireSkillComboOptions() {
-        DefaultComboBoxModel<String> acquireSkillModel = new DefaultComboBoxModel<>();
-
-        acquireSkillModel.addElement(CampaignOptions.S_TECH);
-        acquireSkillModel.addElement(SkillType.S_ADMIN);
-        acquireSkillModel.addElement(SkillType.S_NEGOTIATION);
-        acquireSkillModel.addElement(CampaignOptions.S_AUTO);
-
-        return acquireSkillModel;
-    }
-
-    /**
      * Builds a {@link DefaultComboBoxModel} containing options for all available {@link ProcurementPersonnelPick}
      * values.
      *
@@ -992,7 +994,7 @@ public class EquipmentAndSuppliesTab {
         //start Tech Limits Tab
         CampaignOptionsHeaderPanel techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsTab",
               getImageDirectory() + "logo_clan_ghost_bear.png",
-              3);
+              2);
 
         limitByYearBox = new CampaignOptionsCheckBox("LimitByYearBox");
         limitByYearBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "LimitByYearBox"));
@@ -1103,7 +1105,8 @@ public class EquipmentAndSuppliesTab {
         }
 
         // Acquisitions
-        options.setAcquisitionSkill(choiceAcquireSkill.getSelectedItem());
+        options.setAcquisitionType(choiceAcquireSkill.getSelectedItem());
+        options.setUseFunctionalAppraisal(chkUseFunctionalAppraisal.isSelected());
         options.setAcquisitionPersonnelCategory(ProcurementPersonnelPick.values()[cboProcurementPersonnelPick.getSelectedIndex()]);
         options.setClanAcquisitionPenalty((int) spnAcquireClanPenalty.getValue());
         options.setIsAcquisitionPenalty((int) spnAcquireIsPenalty.getValue());
@@ -1125,6 +1128,7 @@ public class EquipmentAndSuppliesTab {
 
         // Delivery
         options.setUnitTransitTime(choiceTransitTimeUnits.getSelectedIndex());
+        options.setNoDeliveriesInTransit(chkNoDeliveriesInTransit.isSelected());
 
         // Planetary Acquisitions
         options.setPlanetaryAcquisition(usePlanetaryAcquisitions.isSelected());
@@ -1184,7 +1188,8 @@ public class EquipmentAndSuppliesTab {
         }
 
         // Acquisitions
-        choiceAcquireSkill.setSelectedItem(options.getAcquisitionSkill());
+        choiceAcquireSkill.setSelectedItem(options.getAcquisitionType());
+        chkUseFunctionalAppraisal.setSelected(options.isUseFunctionalAppraisal());
         cboProcurementPersonnelPick.setSelectedItem(options.getAcquisitionPersonnelCategory().toString());
         spnAcquireClanPenalty.setValue(options.getClanAcquisitionPenalty());
         spnAcquireIsPenalty.setValue(options.getIsAcquisitionPenalty());
@@ -1206,6 +1211,7 @@ public class EquipmentAndSuppliesTab {
 
         // Delivery
         choiceTransitTimeUnits.setSelectedIndex(options.getUnitTransitTime());
+        chkNoDeliveriesInTransit.setSelected(options.isNoDeliveriesInTransit());
 
         // Planetary Acquisitions
         usePlanetaryAcquisitions.setSelected(options.isUsePlanetaryAcquisition());

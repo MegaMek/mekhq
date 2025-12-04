@@ -33,11 +33,13 @@
  */
 package mekhq.campaign;
 
+import static java.lang.Math.ceil;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
-import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
+import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_TRANSIT_DISORIENTATION_SYNDROME;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME;
+import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
+import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.io.PrintWriter;
@@ -52,17 +54,19 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.MHQXMLUtility;
-import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -161,14 +165,6 @@ public class CurrentLocation {
     }
 
     /**
-     * Use {@link #getReport(LocalDate, Money, boolean)} instead
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public String getReport(LocalDate date, Money jumpCost) {
-        return getReport(date, jumpCost, false);
-    }
-
-    /**
      * Generates a detailed status report for the current location and travel state.
      *
      * <p>The report includes:</p>
@@ -182,12 +178,12 @@ public class CurrentLocation {
      * <p>The report is formatted as HTML suitable for display in GUI components.</p>
      *
      * @param date                the current {@link LocalDate} for context-sensitive names and status
-     * @param jumpCost            the estimated jump cost as a {@link Money} value
      * @param isUseCommandCircuit whether the command circuit option is enabled
      *
      * @return a formatted HTML string representing the travel and location status report
      */
-    public String getReport(LocalDate date, Money jumpCost, boolean isUseCommandCircuit) {
+    public String getReport(LocalDate date, boolean isUseCommandCircuit,
+          TransportCostCalculations transportCostCalculations) {
         double currentRechargeTime = currentSystem.getRechargeTime(date, isUseCommandCircuit);
 
         StringBuilder report = new StringBuilder();
@@ -218,11 +214,19 @@ public class CurrentLocation {
         report.append("<br/>");
 
         // Second Line
+        boolean hasIncludedCost = false;
         if ((null != jumpPath) && !jumpPath.isEmpty()) {
             report.append("Traveling to ").append(jumpPath.getLastSystem().getPrintableName(date)).append(": ");
             if (jumpPath.getJumps() > 0) {
                 report.append(jumpPath.getJumps())
                       .append(jumpPath.getJumps() == 1 ? " jump remaining" : " jumps remaining");
+
+                int duration = (int) ceil(jumpPath.getTotalTime(date, getTransitTime(), isUseCommandCircuit));
+                Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
+                      jumpPath.getJumps());
+                report.append("<br>Estimated Jump Cost (Remaining): ").append(jumpCost.toAmountString()).append(" " +
+                                                                                                                      "C-Bills");
+                hasIncludedCost = true;
             } else {
                 report.append("In destination system");
             }
@@ -233,7 +237,14 @@ public class CurrentLocation {
         report.append("<br/>");
 
         // Third Line
-        report.append("Estimated Jump Cost: ").append(jumpCost.toAmountString()).append(" C-Bills<br><br>");
+        if (hasIncludedCost) {
+            report.append("<br><br>");
+        } else {
+            Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(7, 0);
+            report.append("Estimated Jump Cost (per week): ")
+                  .append(jumpCost.toAmountString())
+                  .append(" C-Bills<br><br>");
+        }
 
         report.append("</html>");
         return report.toString();
@@ -281,8 +292,9 @@ public class CurrentLocation {
     public void newDay(Campaign campaign) {
         final boolean wasTraveling = !isOnPlanet();
 
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
-              campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
+              campaign.isGM(), campaignOptions.isUseFactionStandingCommandCircuitSafe(),
               campaign.getFactionStandings(), campaign.getFutureAtBContracts());
 
         // recharge even if there is no jump path
@@ -318,37 +330,8 @@ public class CurrentLocation {
             }
             if (isAtJumpPoint() && (rechargeTime >= neededRechargeTime)) {
                 // jump
-                final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-                if (campaignOptions.isPayForTransport()) {
-                    if (!campaign.getFinances()
-                               .debit(TransactionType.TRANSPORTATION,
-                                     campaign.getLocalDate(),
-                                     campaign.calculateCostPerJump(true, campaignOptions.isEquipmentContractBase()),
-                                     "Jump from " +
-                                           currentSystem.getName(campaign.getLocalDate()) +
-                                           " to " +
-                                           jumpPath.get(1).getName(campaign.getLocalDate()))) {
-                        campaign.addReport("<font color='" +
-                                                 ReportingUtilities.getNegativeColor() +
-                                                 "'><b>You cannot afford to make the jump!</b></font>");
-                        return;
-                    }
-
-                    if (campaignOptions.isUseAbilities()) {
-                        for (Person person : campaign.getPersonnelFilteringOutDeparted()) {
-                            if (person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {
-                                Injury injury = TRANSIT_DISORIENTATION_SYNDROME.newInjury(campaign,
-                                      person,
-                                      INTERNAL,
-                                      1);
-                                person.addInjury(injury);
-
-                                if (campaignOptions.isUseFatigue()) {
-                                    person.changeFatigue(campaignOptions.getFatigueRate());
-                                }
-                            }
-                        }
-                    }
+                if (campaignOptions.isUseAbilities()) {
+                    checkForTransitDisorientationSyndrome(campaign, campaignOptions);
                 }
                 campaign.addReport("Jumping to " + jumpPath.get(1).getPrintableName(campaign.getLocalDate()));
                 currentSystem = jumpPath.get(1);
@@ -390,10 +373,101 @@ public class CurrentLocation {
         }
 
         // If we were previously traveling and now aren't, we should check to see if we have arrived at a contract
-        // system earlier than necessary.
+        // system earlier than necessary. And, if appropriate, trigger inoculation prompts and activate mothballed
+        // units
         if (wasTraveling && isOnPlanet()) {
+            // This should be before inoculations so that we can correctly read the TO&E
+            if (!campaign.getAutomatedMothballUnits().isEmpty()) {
+                performAutomatedActivation(campaign);
+            }
+
+            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+                Inoculations.triggerInoculationPrompt(campaign, false);
+            }
+            
             testForEarlyArrival(campaign);
         }
+    }
+
+    /**
+     * Applies Transit Disorientation Syndrome effects to all personnel who have the corresponding flaw.
+     *
+     * <p>This method iterates over all active personnel (excluding departed and absent individuals) and checks
+     * whether each person has the {@code FLAW_TRANSIT_DISORIENTATION_SYNDROME} flag enabled. If so, one of two effects
+     * occurs depending on campaign medical rules:</p>
+     *
+     * <ul>
+     *     <li><b>Advanced Medical enabled:</b>
+     *     <ul>
+     *         <li>An appropriate injury is created and added.</li>
+     *         <li>If the Alternative Advanced Medical system is active, the Alternate Injury version is used;
+     *         otherwise the standard injury is used.</li>
+     *     </ul>
+     *     </li>
+     *     <li><b>Advanced Medical disabled:</b>
+     *     <ul>
+     *         <li>The character simply gains +1 hit.</li>
+     *     </ul>
+     *     </li>
+     * </ul>
+     *
+     * <p>If the Fatigue subsystem is enabled, the character also gains fatigue equal to the configured campaign
+     * fatigue rate.</p>
+     *
+     * @param campaign        the current campaign, used for personnel state and injury construction
+     * @param campaignOptions the campaign's ruleset and configuration
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void checkForTransitDisorientationSyndrome(Campaign campaign, CampaignOptions campaignOptions) {
+        final boolean useAdvancedMedical = campaignOptions.isUseAdvancedMedical();
+        final boolean useAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
+        final boolean useFatigue = campaignOptions.isUseFatigue();
+        final int fatigueRate = campaignOptions.getFatigueRate();
+
+        for (Person person : campaign.getPersonnelFilteringOutDepartedAndAbsent()) {
+            if (!person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {
+                continue;
+            }
+
+            if (useAdvancedMedical) {
+                Injury injury = createTransitDisorientationInjury(campaign, person, useAltAdvancedMedical);
+                person.addInjury(injury);
+            } else {
+                person.setHits(person.getHits() + 1);
+            }
+
+            if (useFatigue) {
+                person.changeFatigue(fatigueRate);
+            }
+        }
+    }
+
+    /**
+     * Creates the appropriate Transit Disorientation Syndrome injury instance based on the currently active medical
+     * ruleset.
+     *
+     * <p>If the Alternative Advanced Medical system is active, this method uses the {@code AlternateInjuries}
+     * version of the injury definition using a generic location. Otherwise it uses the standard {@code InjuryTypes}
+     * version with an internal location.</p>
+     *
+     * @param campaign              the campaign context needed for injury construction
+     * @param person                the affected character
+     * @param useAltAdvancedMedical whether the Alternative Advanced Medical system is active
+     *
+     * @return an {@link Injury} instance representing Transit Disorientation Syndrome
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static Injury createTransitDisorientationInjury(Campaign campaign, Person person,
+          boolean useAltAdvancedMedical) {
+        return useAltAdvancedMedical
+                     ? AlternateInjuries.TRANSIT_DISORIENTATION_SYNDROME
+                             .newInjury(campaign, person, GENERIC, 1)
+                     : InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME
+                             .newInjury(campaign, person, INTERNAL, 1);
     }
 
     /**

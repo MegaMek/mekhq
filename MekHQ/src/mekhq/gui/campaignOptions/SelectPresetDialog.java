@@ -39,9 +39,11 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -206,7 +208,18 @@ public class SelectPresetDialog extends JDialog {
 
         add(buttonPanel, BorderLayout.PAGE_END);
 
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Dimension screen = toolkit.getScreenSize();
+        Insets insets = getToolkit().getScreenInsets(getGraphicsConfiguration());
+
+        int maxHeight = screen.height - insets.top - insets.bottom;
+
         pack();
+        Dimension size = getSize();
+        if (size.height > maxHeight) {
+            setSize(new Dimension(size.width, maxHeight));
+        }
+
         setAlwaysOnTop(true);
         setResizable(false);
         setLocationRelativeTo(null);

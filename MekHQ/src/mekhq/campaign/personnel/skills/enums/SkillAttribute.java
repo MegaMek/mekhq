@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel.skills.enums;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
@@ -59,13 +59,18 @@ public enum SkillAttribute {
     /** Represents mental willpower and determination. */
     WILLPOWER("WILLPOWER"),
     /** Represents social skills and personal magnetism. */
-    CHARISMA("CHARISMA");
+    CHARISMA("CHARISMA"),
+    /** Represents exceptional destiny or skill. */
+    EDGE("EDGE");
 
     public static final int NO_SKILL_ATTRIBUTE = -1;
 
     final private static String RESOURCE_BUNDLE = "mekhq.resources.SkillAttribute";
 
     private final String lookupName;
+    private final String label;
+    private final String shortName;
+    private final String description;
 
     /**
      * Constructs a {@link SkillAttribute} with the specified lookup name.
@@ -74,6 +79,9 @@ public enum SkillAttribute {
      */
     SkillAttribute(String lookupName) {
         this.lookupName = lookupName;
+        this.label = generateLabel();
+        this.shortName = generateShortName();
+        this.description = generateDescription();
     }
 
     /**
@@ -83,6 +91,18 @@ public enum SkillAttribute {
      */
     public String getLookupName() {
         return lookupName;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     /**
@@ -102,32 +122,12 @@ public enum SkillAttribute {
      *
      * @return The localized label for this {@link SkillAttribute}.
      *
-     * @see #getLabel(SkillAttribute)
      * @since 0.50.05
      */
-    public String getLabel() {
+    private String generateLabel() {
         final String RESOURCE_KEY = lookupName + ".label";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
-    }
-
-    /**
-     * Retrieves the label associated with the given {@link SkillAttribute}.
-     *
-     * <p>The label is determined by looking up a resource bundle key associated with the attribute's name in the
-     * format <code>{name}.label</code>.</p>
-     *
-     * @param attribute The {@link SkillAttribute} whose label is to be retrieved.
-     *
-     * @return The localized label for the provided {@link SkillAttribute}.
-     *
-     * @see #getLabel()
-     * @since 0.50.05
-     */
-    public static String getLabel(SkillAttribute attribute) {
-        final String RESOURCE_KEY = attribute.lookupName + ".label";
-
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**
@@ -138,32 +138,12 @@ public enum SkillAttribute {
      *
      * @return The localized short name for this {@link SkillAttribute}.
      *
-     * @see #getShortName(SkillAttribute)
      * @since 0.50.05
      */
-    public String getShortName() {
+    private String generateShortName() {
         final String RESOURCE_KEY = lookupName + ".shortName";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
-    }
-
-    /**
-     * Retrieves the short name associated with the given {@link SkillAttribute}.
-     *
-     * <p>The short name is determined by looking up a resource bundle key associated with the attribute's name in
-     * the format <code>{name}.shortName</code>.</p>
-     *
-     * @param attribute The {@link SkillAttribute} whose short name is to be retrieved.
-     *
-     * @return The localized short name for the provided {@link SkillAttribute}.
-     *
-     * @see #getShortName()
-     * @since 0.50.05
-     */
-    public static String getShortName(SkillAttribute attribute) {
-        final String RESOURCE_KEY = attribute.lookupName + ".shortName";
-
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**
@@ -174,32 +154,12 @@ public enum SkillAttribute {
      *
      * @return The localized description for this {@link SkillAttribute}.
      *
-     * @see #getDescription(SkillAttribute)
      * @since 0.50.05
      */
-    public String getDescription() {
+    private String generateDescription() {
         final String RESOURCE_KEY = lookupName + ".description";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
-    }
-
-    /**
-     * Retrieves the description associated with the given {@link SkillAttribute}.
-     *
-     * <p>The description is determined by looking up a resource bundle key associated with the attribute's name in
-     * the format <code>{name}.description</code>.</p>
-     *
-     * @param attribute The {@link SkillAttribute} whose description is to be retrieved.
-     *
-     * @return The localized description for the provided {@link SkillAttribute}.
-     *
-     * @see #getDescription()
-     * @since 0.50.05
-     */
-    public static String getDescription(SkillAttribute attribute) {
-        final String RESOURCE_KEY = attribute.lookupName + ".description";
-
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**

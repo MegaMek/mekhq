@@ -56,7 +56,10 @@ import mekhq.adapter.DateAdapter;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.personnel.enums.InjuryHiding;
 import mekhq.campaign.personnel.enums.InjuryLevel;
+import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import org.w3c.dom.Node;
 
 /**
@@ -67,7 +70,7 @@ import org.w3c.dom.Node;
 @XmlRootElement(name = "injury")
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class Injury {
-    private static final MMLogger logger = MMLogger.create(Injury.class);
+    private static final MMLogger LOGGER = MMLogger.create(Injury.class);
 
     public static final int VERSION = 1;
 
@@ -86,7 +89,7 @@ public class Injury {
             // unmarshaller.setEventHandler(new
             // javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch (JAXBException e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
     }
 
@@ -99,7 +102,7 @@ public class Injury {
         try {
             return unmarshaller.unmarshal(wn, Injury.class).getValue();
         } catch (Exception e) {
-            logger.error("", e);
+            LOGGER.error("", e);
         }
         return null;
     }
@@ -193,6 +196,10 @@ public class Injury {
         days = time;
     }
 
+    public void changeTime(int delta) {
+        days += delta;
+    }
+
     public int getOriginalTime() {
         return originalDays;
     }
@@ -219,8 +226,41 @@ public class Injury {
         location = loc;
     }
 
+    /**
+     * Returns the number of hits associated with this injury.
+     *
+     * <p>The returned value depends on both the injury's subtype and certain special rules used by the Alternate
+     * Advanced Medical system:</p>
+     *
+     * <ul>
+     *     <li><b>Prosthetic injuries</b> always count as zero hits.</li>
+     *     <li><b>Flaw injuries</b> always count as zero hits.</li>
+     *     <li>If the injury's type key contains {@code "alt:"}, then the injury always counts as one hit (unless it
+     *     is prosthetic), regardless of severity. This reflects the Alternate Advanced Medical rule that normalizes
+     *     hit values.</li>
+     * </ul>
+     *
+     * <p>A small {@code try/catch} is used to avoid initialization issues during unit testing. This prevents
+     * failures in situations where the full {@link InjuryType} registry has not been populated.</p>
+     *
+     * @return the number of hits this injury applies, taking prosthetics and Alternate Advanced Medical rules into
+     *       account
+     */
     public int getHits() {
-        return hits;
+        // This try-catch is to make testing easier. Otherwise, the entire InjuryType registry needs to be
+        // substantiated before we can test injuries.
+        try {
+            // Alt Advanced Medical always has an injury count as 1 hit regardless of severity
+            if (type.getKey().contains("alt:")) {
+                InjurySubType subType = getSubType();
+                // Prosthetic and Flaw injuries don't count towards a character's total
+                return subType.isProsthetic() || subType.isFlaw() ? 0 : 1;
+            }
+        } catch (Exception e) {
+            LOGGER.error("", e);
+        }
+
+        return getSubType().isProsthetic() ? 0 : hits;
     }
 
     public void setHits(int num) {
@@ -270,8 +310,16 @@ public class Injury {
         return type.getLevel(this);
     }
 
+    public InjurySubType getSubType() {
+        return type.getSubType();
+    }
+
     public Collection<Modifier> getModifiers() {
         return type.getModifiers(this);
+    }
+
+    public InjuryEffect getInjuryEffect() {
+        return type.getInjuryEffect();
     }
 
     public ExtraData getExtraData() {
@@ -318,7 +366,7 @@ public class Injury {
         try {
             marshaller.marshal(this, pw);
         } catch (JAXBException ex) {
-            logger.error("", ex);
+            LOGGER.error("", ex);
         }
     }
 

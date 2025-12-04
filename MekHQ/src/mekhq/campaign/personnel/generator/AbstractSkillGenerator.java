@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.generator;
 
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillType.getRoleplaySkills;
+import static mekhq.campaign.personnel.skills.SkillType.getUtilitySkills;
 
 import java.util.Objects;
 
@@ -89,7 +90,7 @@ public abstract class AbstractSkillGenerator {
      *
      * @param person The {@link Person} for whom attributes are to be generated.
      */
-    public abstract void generateAttributes(Person person);
+    public abstract void generateAttributes(Person person, boolean isUseEdge);
 
     /**
      * Generates the default skills for a {@link Person} based on their primary role.
@@ -138,6 +139,24 @@ public abstract class AbstractSkillGenerator {
         }
     }
 
+    public void generateUtilitySkills(final Person person, final int expLvl) {
+        for (SkillType skillType : getUtilitySkills()) {
+            if (DEPRECATED_SKILLS.contains(skillType)) {
+                continue;
+            }
+
+            // No double-dipping
+            if (person.hasSkill(skillType.getName())) {
+                continue;
+            }
+
+            int utilitySkillLevel = Utilities.generateExpLevel(randomSkillPreferences.getUtilitySkillsModifier(expLvl));
+            if (utilitySkillLevel > SkillType.EXP_ULTRA_GREEN) {
+                addSkill(person, skillType.getName(), utilitySkillLevel, randomSkillPreferences.randomizeSkill(), 0);
+            }
+        }
+    }
+
     public static void addSkill(Person person, String skillName, int level, int bonus) {
         person.addSkill(skillName, new Skill(skillName, level, bonus));
     }
@@ -168,48 +187,15 @@ public abstract class AbstractSkillGenerator {
             return 0;
         }
 
-        switch (person.getPrimaryRole()) {
-            case MEKWARRIOR:
-            case LAM_PILOT:
-                if (person.getPhenotype().isMekWarrior()) {
-                    return 1;
-                }
-                break;
-            case GROUND_VEHICLE_DRIVER:
-            case NAVAL_VEHICLE_DRIVER:
-            case VTOL_PILOT:
-            case VEHICLE_GUNNER:
-            case VEHICLE_CREW:
-                if (person.getPhenotype().isVehicle()) {
-                    return 1;
-                }
-                break;
-            case AEROSPACE_PILOT:
-            case CONVENTIONAL_AIRCRAFT_PILOT:
-                if (person.getPhenotype().isAerospace()) {
-                    return 1;
-                }
-                break;
-            case PROTOMEK_PILOT:
-                if (person.getPhenotype().isProtoMek()) {
-                    return 1;
-                }
-            case BATTLE_ARMOUR:
-                if (person.getPhenotype().isElemental()) {
-                    return 1;
-                }
-                break;
-            case VESSEL_PILOT:
-            case VESSEL_GUNNER:
-            case VESSEL_CREW:
-            case VESSEL_NAVIGATOR:
-                if (person.getPhenotype().isNaval()) {
-                    return 1;
-                }
-            default:
-                break;
-        }
-
-        return 0;
+        return switch (person.getPrimaryRole()) {
+            case MEKWARRIOR, LAM_PILOT -> person.getPhenotype().isMekWarrior() ? 1 : 0;
+            case VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL ->
+                  person.getPhenotype().isVehicle() ? 1 : 0;
+            case AEROSPACE_PILOT, CONVENTIONAL_AIRCRAFT_PILOT -> person.getPhenotype().isAerospace() ? 1 : 0;
+            case PROTOMEK_PILOT -> person.getPhenotype().isProtoMek() ? 1 : 0;
+            case BATTLE_ARMOUR -> person.getPhenotype().isElemental() ? 1 : 0;
+            case VESSEL_PILOT, VESSEL_GUNNER, VESSEL_CREW, VESSEL_NAVIGATOR -> person.getPhenotype().isNaval() ? 1 : 0;
+            default -> 0;
+        };
     }
 }

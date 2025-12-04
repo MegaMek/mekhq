@@ -37,16 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import megamek.common.bays.SuperHeavyVehicleBay;
-import megamek.common.bays.ASFBay;
-import megamek.common.bays.BattleArmorBay;
-import megamek.common.bays.Bay;
-import megamek.common.bays.HeavyVehicleBay;
-import megamek.common.bays.InfantryBay;
-import megamek.common.bays.LightVehicleBay;
-import megamek.common.bays.MekBay;
-import megamek.common.bays.ProtoMekBay;
-import megamek.common.bays.SmallCraftBay;
+import megamek.common.bays.*;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -329,6 +320,7 @@ public class TransportationRating {
             }
 
             passengerCapacity += entity.getNPassenger();
+            passengerCapacity += entity.getBayPersonnel();
         }
 
         // Map the capacity of each bay type
@@ -408,11 +400,7 @@ public class TransportationRating {
         }
 
         // Count the number of passengers by filtering the personnel list
-        int passengerCount = (int) campaign.getPersonnel().stream()
-                                         .filter(person -> !person.getStatus().isAbsent() &&
-                                                                 !person.getStatus().isDepartedUnit())
-                                         .filter(person -> person.getUnit() == null)
-                                         .count();
+        int passengerCount = (int) campaign.getPersonnelFilteringOutDepartedAndAbsent().size();
 
         // Map each unit count to its type
         Map<String, Integer> transportRequirements = new HashMap<>(Map.of(

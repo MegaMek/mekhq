@@ -37,6 +37,7 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.gui.enums.MHQTabType.COMMAND_CENTER;
@@ -72,12 +73,14 @@ import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
+import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
 import megamek.client.ui.dialogs.buttonDialogs.GameOptionsDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MULParser;
@@ -85,6 +88,7 @@ import megamek.common.loaders.MekSummaryCache;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
 import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
 import mekhq.IconPackage;
@@ -95,6 +99,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
+import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
 import mekhq.campaign.events.DayEndingEvent;
@@ -132,6 +137,7 @@ import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.RandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
@@ -194,7 +200,6 @@ public class CampaignGUI extends JPanel {
     /* For the menu bar */
     private JMenuBar menuBar;
     private JMenu menuThemes;
-    private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
     private JMenuItem miAwardEligibilityDialog;
     private JMenuItem miCompanyGenerator;
@@ -314,6 +319,13 @@ public class CampaignGUI extends JPanel {
         addStandardTab(MHQTabType.INFIRMARY);
         addStandardTab(MHQTabType.MEK_LAB);
         addStandardTab(MHQTabType.FINANCES);
+
+        boolean isMaplessMode = getCampaign().getCampaignOptions().isUseStratConMaplessMode();
+        int stratConTabIndex = tabMain.indexOfTab(MHQTabType.STRAT_CON.toString());
+
+        if (stratConTabIndex != -1) {
+            tabMain.setEnabledAt(stratConTabIndex, !isMaplessMode);
+        }
 
         // check to see if we just selected the command center tab
         // and if so change its color to standard
@@ -684,6 +696,14 @@ public class CampaignGUI extends JPanel {
         menuOptions.addActionListener(this::menuOptionsActionPerformed);
         menuFile.add(menuOptions);
 
+        final JMenuItem miMHQOptions = new JMenuItem(resourceMap.getString("miMHQOptions.text"));
+        miMHQOptions.setToolTipText(resourceMap.getString("miMHQOptions.toolTipText"));
+        miMHQOptions.setName("miMHQOptions");
+        miMHQOptions.setMnemonic(KeyEvent.VK_H);
+        miMHQOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
+        miMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
+        menuFile.add(miMHQOptions);
+
         final JMenuItem miGameOptions = new JMenuItem(resourceMap.getString("miGameOptions.text"));
         miGameOptions.setToolTipText(resourceMap.getString("miGameOptions.toolTipText"));
         miGameOptions.setName("miGameOptions");
@@ -699,13 +719,13 @@ public class CampaignGUI extends JPanel {
         });
         menuFile.add(miGameOptions);
 
-        final JMenuItem miMHQOptions = new JMenuItem(resourceMap.getString("miMHQOptions.text"));
-        miMHQOptions.setToolTipText(resourceMap.getString("miMHQOptions.toolTipText"));
-        miMHQOptions.setName("miMHQOptions");
-        miMHQOptions.setMnemonic(KeyEvent.VK_H);
-        miMHQOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
-        miMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
-        menuFile.add(miMHQOptions);
+        final JMenuItem miMMClientOptions = new JMenuItem(resourceMap.getString("miMMClientOptions.text"));
+        miMMClientOptions.setToolTipText(resourceMap.getString("miMMClientOptions.toolTipText"));
+        miMMClientOptions.setName("miMMClientOptions");
+        miMMClientOptions.setMnemonic(KeyEvent.VK_O);
+        miMMClientOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_DOWN_MASK));
+        miMMClientOptions.addActionListener(evt -> new CommonSettingsDialog(frame, null).setVisible(true));
+        menuFile.add(miMMClientOptions);
 
         menuThemes = new JMenu(resourceMap.getString("menuThemes.text"));
         menuThemes.setMnemonic(KeyEvent.VK_T);
@@ -747,13 +767,6 @@ public class CampaignGUI extends JPanel {
         miUnitMarket.addActionListener(evt -> showUnitMarket());
         miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         menuMarket.add(miUnitMarket);
-
-        miShipSearch = new JMenuItem(resourceMap.getString("miShipSearch.text"));
-        miShipSearch.setMnemonic(KeyEvent.VK_S);
-        miShipSearch.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK));
-        miShipSearch.addActionListener(evt -> new ShipSearchDialog(getFrame(), this).setVisible(true));
-        miShipSearch.setVisible(getCampaign().getCampaignOptions().isUseAtB());
-        menuMarket.add(miShipSearch);
 
         JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text"));
         miPurchaseUnit.setMnemonic(KeyEvent.VK_N);
@@ -862,7 +875,7 @@ public class CampaignGUI extends JPanel {
                   resourceMap.getString("popupFireAstechsNum.text"),
                   1,
                   0,
-                  getCampaign().getAsTechPool());
+                  getCampaign().getTemporaryAsTechPool());
             popupValueChoiceDialog.setVisible(true);
             if (popupValueChoiceDialog.getValue() >= 0) {
                 getCampaign().decreaseAsTechPool(popupValueChoiceDialog.getValue());
@@ -873,13 +886,13 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFullStrengthAsTechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
         miFullStrengthAsTechs.setMnemonic(KeyEvent.VK_B);
         miFullStrengthAsTechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.ALT_DOWN_MASK));
-        miFullStrengthAsTechs.addActionListener(evt -> getCampaign().fillAsTechPool());
+        miFullStrengthAsTechs.addActionListener(evt -> getCampaign().resetAsTechPool());
         menuAsTechPool.add(miFullStrengthAsTechs);
 
         JMenuItem miFireAllAsTechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
         miFireAllAsTechs.setMnemonic(KeyEvent.VK_R);
         miFireAllAsTechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
-        miFireAllAsTechs.addActionListener(evt -> getCampaign().decreaseAsTechPool(getCampaign().getAsTechPool()));
+        miFireAllAsTechs.addActionListener(evt -> getCampaign().emptyAsTechPool());
         menuAsTechPool.add(miFireAllAsTechs);
         menuMarket.add(menuAsTechPool);
         // endregion Astech Pool
@@ -916,7 +929,7 @@ public class CampaignGUI extends JPanel {
                   resourceMap.getString("popupFireMedicsNum.text"),
                   1,
                   0,
-                  getCampaign().getMedicPool());
+                  getCampaign().getTemporaryMedicPool());
             popupValueChoiceDialog.setVisible(true);
             if (popupValueChoiceDialog.getValue() >= 0) {
                 getCampaign().decreaseMedicPool(popupValueChoiceDialog.getValue());
@@ -927,13 +940,13 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
         miFullStrengthMedics.setMnemonic(KeyEvent.VK_B);
         miFullStrengthMedics.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.ALT_DOWN_MASK));
-        miFullStrengthMedics.addActionListener(evt -> getCampaign().fillMedicPool());
+        miFullStrengthMedics.addActionListener(evt -> getCampaign().resetMedicPool());
         menuMedicPool.add(miFullStrengthMedics);
 
         JMenuItem miFireAllMedics = new JMenuItem(resourceMap.getString("miFireAllMedics.text"));
         miFireAllMedics.setMnemonic(KeyEvent.VK_R);
         miFireAllMedics.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
-        miFireAllMedics.addActionListener(evt -> getCampaign().decreaseMedicPool(getCampaign().getMedicPool()));
+        miFireAllMedics.addActionListener(evt -> getCampaign().emptyMedicPool());
         menuMedicPool.add(miFireAllMedics);
         menuMarket.add(menuMedicPool);
         // endregion Medic Pool
@@ -1203,8 +1216,8 @@ public class CampaignGUI extends JPanel {
 
         lblLocation = new JLabel(getCampaign().getLocation()
                                        .getReport(getCampaign().getLocalDate(),
-                                             getCampaign().calculateCostPerJump(false, true),
-                                             isUseCommandCircuit));
+                                             isUseCommandCircuit,
+                                             getCampaign().getTransportCostCalculation(EXP_REGULAR)));
         lblLocation.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("currentLocation.title")));
 
         pnlTop = new JPanel(new GridBagLayout());
@@ -1949,7 +1962,6 @@ public class CampaignGUI extends JPanel {
                 // refresh lance assignment table
                 MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getForces()));
             }
-            miShipSearch.setVisible(newOptions.isUseAtB());
             if (newOptions.isUseAtB()) {
                 int loops = 0;
                 while (!RandomUnitGenerator.getInstance().isInitialized()) {
@@ -1977,7 +1989,9 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refitUnit(Refit r, boolean selectModelName) {
-        if (r.getOriginalEntity() instanceof Dropship || r.getOriginalEntity() instanceof Jumpship) {
+        if (r.getOriginalEntity() instanceof Infantry && !(r.getOriginalEntity() instanceof BattleArmor)) {
+            r.setTech(null);
+        } else if (r.getOriginalEntity() instanceof Dropship || r.getOriginalEntity() instanceof Jumpship) {
             Person engineer = r.getOriginalUnit().getEngineer();
             if (engineer == null) {
                 JOptionPane.showMessageDialog(frame,
@@ -1987,7 +2001,7 @@ public class CampaignGUI extends JPanel {
                 return;
             }
             r.setTech(engineer);
-        } else if (getCampaign().getActivePersonnel(true).stream().anyMatch(Person::isTech)) {
+        } else if (getCampaign().getActivePersonnel(false, false).stream().anyMatch(Person::isTech)) {
             String name;
             Map<String, Person> techHash = new HashMap<>();
             List<String> techList = new ArrayList<>();
@@ -2003,7 +2017,7 @@ public class CampaignGUI extends JPanel {
                 name = "<html>" +
                              tech.getFullName() +
                              ", <b>" +
-                             SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)) +
+                             SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false, true)) +
                              "</b> " +
                              tech.getPrimaryRoleDesc() +
                              " (" +
@@ -2145,11 +2159,11 @@ public class CampaignGUI extends JPanel {
                 if (!ignoreMaintenance) {
                     time -= Math.max(0, tech.getMaintenanceTimeUsing());
                 }
+                SkillModifierData skillModifierData = tech.getSkillModifierData(true);
                 name = tech.getFullTitle() +
                              ", " +
                              getExperienceLevelName(tech.getSkillForWorkingOn(unit)
-                                                          .getExperienceLevel(tech.getOptions(),
-                                                                tech.getATOWAttributes())) +
+                                                          .getExperienceLevel(skillModifierData)) +
                              " (" +
                              time +
                              "min)";
@@ -2426,7 +2440,7 @@ public class CampaignGUI extends JPanel {
             // Fix Spouse Id Information - This is required to fix spouse NPEs where one doesn't export both members
             // of the couple
             // TODO : make it so that exports will automatically include both spouses
-            for (Person p : getCampaign().getActivePersonnel(true)) {
+            for (Person p : getCampaign().getActivePersonnel(true, true)) {
                 if (p.getGenealogy().hasSpouse() &&
                           !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse())) {
                     // If this happens, we need to clear the spouse
@@ -2763,19 +2777,19 @@ public class CampaignGUI extends JPanel {
 
     private void refreshTempAsTechs() {
         // FIXME : Localize
-        String text = "<html><b>Temp AsTechs</b>: " + getCampaign().getAsTechPool() + "</html>";
+        String text = "<html><b>Temp AsTechs</b>: " + getCampaign().getTemporaryAsTechPool() + "</html>";
         lblTempAsTechs.setText(text);
     }
 
     private void refreshTempMedics() {
         // FIXME : Localize
-        String text = "<html><b>Temp Medics</b>: " + getCampaign().getMedicPool() + "</html>";
+        String text = "<html><b>Temp Medics</b>: " + getCampaign().getTemporaryMedicPool() + "</html>";
         lblTempMedics.setText(text);
     }
 
     private void refreshPartsAvailability() {
         if (!getCampaign().getCampaignOptions().isUseAtB() ||
-                  CampaignOptions.S_AUTO.equals(getCampaign().getCampaignOptions().getAcquisitionSkill())) {
+                  getCampaign().getCampaignOptions().getAcquisitionType() == AcquisitionsType.ANY_TECH) {
             lblPartsAvailabilityRating.setText("");
         } else {
             int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel();
@@ -2795,8 +2809,8 @@ public class CampaignGUI extends JPanel {
 
         lblLocation.setText(getCampaign().getLocation()
                                   .getReport(getCampaign().getLocalDate(),
-                                        getCampaign().calculateCostPerJump(false, true),
-                                        isUseCommandCircuit));
+                                        isUseCommandCircuit,
+                                        getCampaign().getTransportCostCalculation(EXP_REGULAR)));
     }
 
     public int getTabIndexByName(String tabTitle) {
@@ -3141,6 +3155,13 @@ public class CampaignGUI extends JPanel {
 
         miRetirementDefectionDialog.setVisible(optionsChangedEvent.getOptions().isUseRandomRetirement());
         miAwardEligibilityDialog.setVisible((optionsChangedEvent.getOptions().isEnableAutoAwards()));
+
+        boolean isMaplessMode = getCampaign().getCampaignOptions().isUseStratConMaplessMode();
+        int stratConTabIndex = tabMain.indexOfTab(MHQTabType.STRAT_CON.toString());
+
+        if (stratConTabIndex != -1) {
+            tabMain.setEnabledAt(stratConTabIndex, !isMaplessMode);
+        }
     }
 
     /**

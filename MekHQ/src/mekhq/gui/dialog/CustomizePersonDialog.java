@@ -32,14 +32,12 @@
  */
 package mekhq.gui.dialog;
 
-import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.Aging.getAgeModifier;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
-import static mekhq.campaign.personnel.skills.Skill.getCountDownMaxValue;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -78,6 +76,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Crew;
 import megamek.common.units.Entity;
 import megamek.common.universe.FactionTag;
@@ -91,12 +90,14 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
 import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -109,7 +110,6 @@ import mekhq.gui.control.EditKillLogControl;
 import mekhq.gui.control.EditLogControl;
 import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.control.EditScenarioLogControl;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 
 /**
@@ -149,6 +149,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JTextField textReputation;
     private JTextField textUnlucky;
     private JTextField textBloodmark;
+    private JTextField textExtraIncome;
     private JTextField textFatigue;
     private JComboBox<EducationLevel> textEducationLevel;
     private JTextField textLoyalty;
@@ -185,6 +186,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JSpinner spnSocial;
     private MMComboBox<PersonalityQuirk> comboPersonalityQuirk;
     private JSpinner spnPersonalityQuirk;
+    private MMComboBox<Reasoning> comboReasoning;
 
     // Other
     private JCheckBox chkDarkSecretRevealed;
@@ -257,14 +259,16 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         JLabel lblUnlucky = new JLabel();
         textBloodmark = new JTextField();
         JLabel lblBloodmark = new JLabel();
+        textExtraIncome = new JTextField();
+        JLabel lblExtraIncome = new JLabel();
         textFatigue = new JTextField();
         JLabel lblLoyalty = new JLabel();
         textLoyalty = new JTextField();
         JLabel lblToughness = new JLabel();
         textEducationLevel = new JComboBox<>();
         JLabel lblEducationLevel = new JLabel();
-        JScrollPane scrOptions = new JScrollPaneWithSpeed();
-        JScrollPane scrSkills = new JScrollPaneWithSpeed();
+        FastJScrollPane scrOptions = new FastJScrollPane();
+        FastJScrollPane scrSkills = new FastJScrollPane();
         JPanel panButtons = new JPanel();
         JButton btnOk = new JButton();
 
@@ -706,7 +710,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             lblToughness.setText(resourceMap.getString("lblToughness.text"));
             lblToughness.setName("lblToughness");
 
-            textToughness.setText(Integer.toString(person.getToughness()));
+            textToughness.setText(Integer.toString(person.getDirectToughness()));
             textToughness.setName("textToughness");
 
             gridBagConstraints = new GridBagConstraints();
@@ -827,6 +831,27 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         panDemographics.add(textBloodmark, gridBagConstraints);
+
+        y++;
+
+        lblExtraIncome.setText(resourceMap.getString("lblExtraIncome.text"));
+        lblExtraIncome.setName("lblExtraIncome");
+
+        textExtraIncome.setText(Integer.toString(person.getExtraIncomeTraitLevel()));
+        textExtraIncome.setName("textExtraIncome");
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        panDemographics.add(lblExtraIncome, gridBagConstraints);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        panDemographics.add(textExtraIncome, gridBagConstraints);
 
         y++;
 
@@ -1168,6 +1193,28 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             panDemographics.add(spnPersonalityQuirk, gridBagConstraints);
 
             y++;
+
+            JLabel labelReasoning = new JLabel();
+            labelReasoning.setText("Talent:");
+            labelReasoning.setName("labelReasoning");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemographics.add(labelReasoning, gridBagConstraints);
+
+            comboReasoning = new MMComboBox<>("comboReasoning", Reasoning.values());
+            comboReasoning.setSelectedItem(person.getReasoning());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemographics.add(comboReasoning, gridBagConstraints);
+
+            y++;
         }
 
         if (person.hasDarkSecret()) {
@@ -1199,7 +1246,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panDemographics.add(txtBio, gridBagConstraints);
 
-        JScrollPane scrollPane = new JScrollPane(panDemographics);
+        FastJScrollPane scrollPane = new FastJScrollPane(panDemographics);
         scrollPane.setMinimumSize(UIUtil.scaleForGUI(600, 500));
         scrollPane.setPreferredSize(UIUtil.scaleForGUI(600, 500));
 
@@ -1296,7 +1343,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             }
 
             // Add units to the combo box based on the person's capabilities
-            if (person.canDrive(entity)) {
+            if (person.canDrive(entity,
+                  campaign.getCampaignOptions().isUseAlternativeAdvancedMedical(),
+                  campaign.getCampaignOptions().isUseImplants())) {
                 choiceOriginalUnit.addItem(unit);
                 continue; // Skip further checks if already added
             }
@@ -1447,17 +1496,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         if (campaign.getCampaignOptions().isUseAgeEffects()) {
             updateAllSkillAgeModifiers(campaign.getLocalDate(), person);
         }
-        if (person.isEmployed()) {
-            LocalDate joinedDate = person.getJoinedCampaign();
-
-            if (recruitment != null) {
-                if (joinedDate == null || recruitment.isBefore(joinedDate)) {
-                    person.setJoinedCampaign(recruitment);
-                }
-            } else {
-                person.setRecruitment(null);
-            }
-        }
         person.setLastRankChangeDate(lastRankChangeDate);
         person.setRetirement(retirement);
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
@@ -1471,7 +1509,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setClanPersonnel(chkClan.isSelected());
 
         if (campaign.getCampaignOptions().isUseToughness()) {
-            int currentValue = person.getToughness();
+            int currentValue = person.getDirectToughness();
             person.setToughness(MathUtility.parseInt(textToughness.getText(), currentValue));
         }
 
@@ -1494,6 +1532,10 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         currentValue = person.getBloodmark();
         newValue = MathUtility.parseInt(textBloodmark.getText(), currentValue);
         person.setBloodmark(clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
+
+        currentValue = person.getExtraIncomeTraitLevel();
+        newValue = MathUtility.parseInt(textExtraIncome.getText(), currentValue);
+        person.setExtraIncomeFromTraitLevel(clamp(newValue, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
 
         if (campaign.getCampaignOptions().isUseEducationModule()) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
@@ -1532,6 +1574,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
             person.setPersonalityQuirkDescriptionIndex((int) spnPersonalityQuirk.getValue());
+
+            person.setReasoning(comboReasoning.getSelectedItem());
 
             writePersonalityDescription(person);
             writeInterviewersNotes(person);
@@ -1605,9 +1649,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         constraints.gridx = 0;
 
         AgingMilestone milestone = getMilestone(person.getAge(campaign.getLocalDate()));
+        SkillModifierData skillModifierData = person.getSkillModifierData(
+              campaign.getCampaignOptions().isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate(),
+              true);
 
-        List<String> sortedSkillNames = getSortedSkillNames();
-
+        List<String> sortedSkillNames = getSortedSkills();
         for (int index = 0; index < sortedSkillNames.size(); index++) {
             constraints.gridy = index;
             constraints.gridx = 0;
@@ -1622,10 +1668,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             lblName = new JLabel(type);
             lblValue = new JLabel();
             if (person.hasSkill(type)) {
-                lblValue.setText(person.getSkill(type)
-                                       .toString(person.getOptions(),
-                                             person.getATOWAttributes(),
-                                             person.getReputation()));
+                lblValue.setText(person.getSkill(type).getFinalSkillValue(skillModifierData) + "+");
             } else {
                 lblValue.setText("-");
             }
@@ -1699,54 +1742,33 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * Returns a list of skill names sorted by category.
+     * Returns a list of skill names where the person’s owned skills are listed first in alphabetical order, followed by
+     * any remaining skills, also in alphabetical order.
      *
-     * <p>The sorting order is:</p>
-     * <ol>
-     *     <li>Combat skills</li>
-     *     <li>Support skills</li>
-     *     <li>Roleplay skills</li>
-     * </ol>
+     * <p>This method sorts the owned skill names and places them at the beginning of the returned list. It then
+     * appends any skill names that are not owned by the person.</p>
      *
-     * <p>Skill names are categorized by querying their {@code SkillType}. Any unknown skill types are ignored and a
-     * warning is logged.</p>
-     *
-     * @return a {@code List} of skill names sorted by skill category
+     * @return a {@code List<String>} of skill names, with owned skills first and all others following
      *
      * @author Illiani
-     * @since 0.50.06
+     * @since 0.50.07
      */
-    private static List<String> getSortedSkillNames() {
-        String[] unsortedSkillNames = SkillType.getSkillList();
-        List<String> sortedSkillNames = new ArrayList<>();
-        List<String> combatSkills = new ArrayList<>();
-        List<String> supportSkills = new ArrayList<>();
-        List<String> roleplaySkills = new ArrayList<>();
-        for (String skillName : unsortedSkillNames) {
-            SkillType skillType = SkillType.getType(skillName);
+    private List<String> getSortedSkills() {
+        List<String> sortedSkillNames = SkillType.getSortedSkillNames();
 
-            if (skillType == null) {
-                LOGGER.warn("Unknown skill type: {}", skillName);
-                continue;
-            }
+        List<String> ownedSkills = person.getSkills().getSkills().stream()
+                                         .map(Skill::getType)
+                                         .filter(Objects::nonNull)
+                                         .map(SkillType::getName).distinct().sorted().toList();
 
-            if (skillType.isRoleplaySkill()) {
-                roleplaySkills.add(skillName);
-                continue;
-            }
+        List<String> remainingSkills = new ArrayList<>(sortedSkillNames);
+        remainingSkills.removeAll(ownedSkills);
 
-            if (skillType.isSupportSkill()) {
-                supportSkills.add(skillName);
-                continue;
-            }
+        List<String> allSkillsOrdered = new ArrayList<>();
+        allSkillsOrdered.addAll(ownedSkills);
+        allSkillsOrdered.addAll(remainingSkills);
 
-            combatSkills.add(skillName);
-        }
-
-        sortedSkillNames.addAll(combatSkills);
-        sortedSkillNames.addAll(supportSkills);
-        sortedSkillNames.addAll(roleplaySkills);
-        return sortedSkillNames;
+        return allSkillsOrdered;
     }
 
     private void setSkills() {
@@ -1908,24 +1930,31 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             skillValues.get(type).setText("-");
             return;
         }
+
+        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        LocalDate today = campaign.getLocalDate();
+
         SkillType skillType = SkillType.getType(type);
 
         int level = (Integer) skillLevels.get(type).getModel().getValue();
         int bonus = (Integer) skillBonus.get(type).getModel().getValue();
+
         int ageModifier = 0;
-        if (campaign.getCampaignOptions().isUseAgeEffects()) {
-            ageModifier = getAgeModifier(getMilestone(person.getAge(campaign.getLocalDate())),
-                  skillType.getFirstAttribute(),
-                  skillType.getSecondAttribute());
+        if (isUseAgeEffects) {
+            ageModifier = getAgeModifier(getMilestone(person.getAge(today)),
+                  skillType.getFirstAttribute(), skillType.getSecondAttribute());
         }
 
-        if (skillType.isCountUp()) {
-            int target = min(getCountUpMaxValue(), skillType.getTarget() + level + bonus + ageModifier);
-            skillValues.get(type).setText("+" + target);
-        } else {
-            int target = max(getCountDownMaxValue(), skillType.getTarget() - level - bonus - ageModifier);
-            skillValues.get(type).setText(target + "+");
-        }
+        Skill skill = new Skill(type);
+        skill.setLevel(level);
+        skill.setBonus(bonus);
+        skill.setAgingModifier(ageModifier);
+
+        SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgeEffects, isClanCampaign, today, true);
+
+        int target = min(getCountUpMaxValue(), skill.getFinalSkillValue(skillModifierData));
+        skillValues.get(type).setText(target + "+");
     }
 
     private void changeValueEnabled(String type) {

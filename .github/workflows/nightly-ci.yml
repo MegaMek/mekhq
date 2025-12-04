@@ -16,24 +16,24 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         java-distribution: [ temurin ]
-        java-version: [ 17, 21 ]
+        java-version: [ 17, 21, 25 ]
       fail-fast: false
 
     name: Nightly MekHQ CI ${{ matrix.os }} on ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
 
     steps:
       - name: Checkout Data Repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: megamek/mm-data
           path: mm-data
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: mekhq
 
       - name: Checkout MegaMek
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: MegaMek/megamek
           path: megamek
@@ -45,7 +45,7 @@ jobs:
           echo "$calculatedSha" >> megamek/docs/mm-revision.txt
 
       - name: Checkout MegaMekLab
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: MegaMek/megameklab
           path: megameklab
@@ -63,7 +63,7 @@ jobs:
           java-version: ${{ matrix.java-version }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           build-scan-publish: true
           build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
@@ -90,7 +90,7 @@ jobs:
         run: ./gradlew testAll
 
       - name: Upload Test Logs on Failure
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: cd-failure-logs
@@ -108,7 +108,7 @@ jobs:
           verbose: true
 
       - name: Upload Tar GZ Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: mhq-release-tgz-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
           path: mekhq/MekHQ/build/distributions/*.tar.gz

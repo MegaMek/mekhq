@@ -32,19 +32,29 @@
  */
 package mekhq.campaign.personnel.turnoverAndRetention;
 
+import static mekhq.campaign.stratCon.StratConRulesManager.isForceDeployedToStratCon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.Vector;
 
-import megamek.common.units.Entity;
-import megamek.common.equipment.MiscType;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.MiscMounted;
+import megamek.common.equipment.MiscType;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.stratCon.StratConRulesManager;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 
@@ -78,10 +88,9 @@ public class Fatigue {
         int fieldKitchenCount = 0;
 
         for (Unit unit : units) {
-            if ((unit.isDeployed())
-                      || (unit.isDamaged())
-                      || (unit.getCrewState().isUncrewed())
-                      || (unit.getCrewState().isPartiallyCrewed())) {
+            if (unit.isDeployed()
+                      || unit.isDamaged()
+                      || !unit.isFullyCrewed()) {
                 continue;
             }
 
@@ -112,7 +121,7 @@ public class Fatigue {
         int fieldKitchenUsage = 0;
 
         for (Person person : activePersonnel) {
-            if (person.isSupport() && isUseFieldKitchenIgnoreNonCombatants) {
+            if (!person.isCombat() && isUseFieldKitchenIgnoreNonCombatants) {
                 continue;
             }
 
@@ -158,16 +167,16 @@ public class Fatigue {
      * Processes fatigue-related actions for a given person in the campaign.
      *
      * <p>This method calculates the effective fatigue of the person, determines their fatigue
-     * state (e.g., tired, fatigued, exhausted, critical), generates reports based on their fatigue level, and
-     * updates their recovery status. If the fatigue exceeds the campaign's leave threshold, the person's status is
-     * updated to {@link PersonnelStatus#ON_LEAVE}.</p>
+     * state (e.g., tired, fatigued, exhausted, critical), generates reports based on their fatigue level, and updates
+     * their recovery status. If the fatigue exceeds the campaign's leave threshold, the person's status is updated to
+     * {@link PersonnelStatus#ON_LEAVE}.</p>
      *
      * @param campaign the campaign context in which the person operates.
      * @param person   the person whose fatigue actions are being processed.
      */
     public static void processFatigueActions(Campaign campaign, Person person) {
-        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
-              person.getSkillLevel(campaign, false));
+        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.getPermanentFatigue(),
+              person.isClanPersonnel(), person.getSkillLevel(campaign, false, true));
 
         if (!campaign.getCampaignOptions().isUseFatigue()) {
             return;
@@ -209,10 +218,85 @@ public class Fatigue {
         }
     }
 
+    /**
+     * Processes all combat teams in the campaign to evaluate deployment fatigue responses.
+     *
+     * <p>For each combat team, this method checks whether the fatigue and deployment rules are enabled in the
+     * campaign options. If enabled, it iterates through each unit and crew member of the team's force, calculating
+     * effective fatigue. If a unit's crew contains at least one individual with effective fatigue above the
+     * undeployment threshold, that unit is counted as fatigued.</p>
+     *
+     * <p>If at least half of the units in a force are fatigued above the threshold, a formatted warning message is
+     * created to indicate that the force has reached critical fatigue levels.</p>
+     *
+     * @param campaign the campaign containing the combat teams, options, and units to be checked
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public static void processDeploymentFatigueResponses(Campaign campaign) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (!campaignOptions.isUseStratCon() || !campaignOptions.isUseFatigue()) {
+            return;
+        }
+
+        int leaveThreshold = campaignOptions.getFatigueUndeploymentThreshold();
+        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+            Force force = combatTeam.getForce(campaign);
+            if (force == null || force.isDeployed()) {
+                // 'isDeployed' will only return true if the force is deployed to a scenario. In which cases we don't
+                // want to yank the unit back until the next Monday checkpoint.
+                continue;
+            }
+
+            if (!isForceDeployedToStratCon(activeContracts, force.getId())) {
+                continue;
+            }
+
+            Vector<UUID> unitsInForce = force.getAllUnits(false);
+            int fatiguedUnits = 0;
+            for (UUID unitId : unitsInForce) {
+                Unit unit = campaign.getUnit(unitId);
+                if (unit == null || !StratConRulesManager.isUnitDeployedToStratCon(unit)) {
+                    continue;
+                }
+
+                for (Person person : unit.getCrew()) {
+                    int fatigue = person.getFatigue();
+                    int permanentFatigue = person.getPermanentFatigue();
+                    boolean isClan = person.isClanPersonnel();
+                    SkillLevel experienceLevel = person.getSkillLevel(campaign, false, true);
+                    int effectiveFatigue = getEffectiveFatigue(fatigue, permanentFatigue, isClan, experienceLevel);
+
+                    if (effectiveFatigue >= leaveThreshold) {
+                        fatiguedUnits++;
+                        break;
+                    }
+                }
+            }
+
+            if (fatiguedUnits >= (unitsInForce.size() + 1) / 2) {
+                for (AtBContract contract : campaign.getActiveAtBContracts()) {
+                    if (contract.getStratconCampaignState() != null) {
+                        for (StratConTrackState track : contract.getStratconCampaignState().getTracks()) {
+                            track.unassignForce(force.getId());
+                        }
+                    }
+                }
+
+                String fatigueMessage = getFormattedTextAt(RESOURCE_BUNDLE, "fatigueUndeployed.text",
+                      spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, force.getName());
+                campaign.addReport(fatigueMessage);
+            }
+        }
+    }
+
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static int getEffectiveFatigue(int fatigue, boolean isClan, SkillLevel skillLevel,
           boolean areFieldKitchensWithinCapacity) {
-        return getEffectiveFatigue(fatigue, isClan, skillLevel);
+        return getEffectiveFatigue(fatigue, 0, isClan, skillLevel);
     }
 
 
@@ -226,13 +310,17 @@ public class Fatigue {
      *     <li>Whether field kitchens are operating within their required capacity.</li>
      * </ul>
      *
-     * @param fatigue                        the base fatigue level of the person.
-     * @param isClan                         flag indicating whether the person is Clan personnel.
-     * @param skillLevel                     the person's skill level.
+     * @param fatigue              the base fatigue level of the person.
+     * @param permanentFatigueLoss how many points of fatigue have been permanently applied to the character (usually
+     *                             from an EI Implant)
+     * @param isClan               flag indicating whether the person is Clan personnel.
+     * @param skillLevel           the person's skill level.
+     *
      * @return the calculated effective fatigue value.
      */
-    public static int getEffectiveFatigue(int fatigue, boolean isClan, SkillLevel skillLevel) {
-        int effectiveFatigue = fatigue;
+    public static int getEffectiveFatigue(int fatigue, int permanentFatigueLoss, boolean isClan,
+          SkillLevel skillLevel) {
+        int effectiveFatigue = fatigue + permanentFatigueLoss;
 
         if (isClan) {
             effectiveFatigue -= 2;
@@ -260,8 +348,8 @@ public class Fatigue {
      * zero or less, the person's recovery state is cleared, and their status may be updated to {@code ACTIVE} if they
      * were previously on leave.</p>
      *
-     * @param campaign the campaign context in which the fatigue recovery occurs.
-     * @param person   the person whose fatigue recovery is being handled.
+     * @param campaign                       the campaign context in which the fatigue recovery occurs.
+     * @param person                         the person whose fatigue recovery is being handled.
      * @param fieldKitchensAreWithinCapacity flag indicating if field kitchens are within capacity.
      */
     public static void processFatigueRecovery(Campaign campaign, Person person,

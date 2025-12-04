@@ -203,6 +203,7 @@ public abstract class AbstractUnitMarket {
                                                               (ms.isClan() ||
                                                                      campaign.getCampaignOptions()
                                                                            .isAllowISPurchases()));
+        LOGGER.debug("Adding unit to market: {} {} {}", unitType, mekSummary, percent);
         return (mekSummary == null) ? null : addSingleUnit(campaign, market, unitType, mekSummary, percent);
     }
 
@@ -227,7 +228,8 @@ public abstract class AbstractUnitMarket {
             }
         }
 
-        getOffers().add(new UnitMarketOffer(market, unitType, mekSummary, percent, generateTransitDuration(campaign)));
+        getOffers().add(new UnitMarketOffer(market, unitType, mekSummary, percent, generateTransitDuration(campaign),
+         campaign.getCampaignOptions()));
 
         return mekSummary.getName();
     }

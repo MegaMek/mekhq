@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,30 +52,33 @@ public enum Phenotype {
     /**
      * Individual external phenotypes.
      */
-    MEKWARRIOR(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9), new ArrayList<>()),
-    ELEMENTAL(true, true, 2, 1, -1, 0, new Attributes(9, 9, 8, 7, 8, 9, 8), List.of("atow_toughness")),
-    AEROSPACE(true, true, -1, -1, +2, +2, new Attributes(7, 7, 9, 9, 9, 8, 8), List.of("flaw_glass_jaw")),
+    MEKWARRIOR(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9, 8, 0), new ArrayList<>()),
+    ELEMENTAL(true, true, 2, 1, -1, 0, new Attributes(9, 9, 8, 7, 8, 9, 8, 8, 0), List.of("atow_toughness")),
+    AEROSPACE(true, true, -1, -1, +2, +2, new Attributes(7, 7, 9, 9, 9, 8, 8, 8, 0), List.of("flaw_glass_jaw")),
     // ATOW doesn't cover a vehicle phenotype, but as the linked attributes for vehicle skills are also reflexes and
     // dexterity, I copied the MekWarrior phenotype
-    VEHICLE(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9), new ArrayList<>()),
+    VEHICLE(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9, 8, 0), new ArrayList<>()),
     // According to my research, ProtoMek pilots are normally just Aerospace washouts, so I'm assuming they'd have the
     // same phenotype modifiers.
-    PROTOMEK(true, true, -1, -1, +2, +2, new Attributes(7, 7, 9, 9, 9, 8, 8), List.of("flaw_glass_jaw")),
+    PROTOMEK(true, true, -1, -1, +2, +2, new Attributes(7, 7, 9, 9, 9, 8, 8, 8, 0), List.of("flaw_glass_jaw")),
     // Copying the MekWarrior phenotype, same reasons as above.
-    NAVAL(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9), new ArrayList<>()),
+    NAVAL(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9, 8, 0), new ArrayList<>()),
 
     /**
      * Individual internal phenotypes.
      */
     // Internal Phenotypes
-    NONE(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9), new ArrayList<>()),
-    GENERAL(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9), new ArrayList<>());
+    NONE(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9, 8, 0), new ArrayList<>()),
+    GENERAL(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9, 8, 0), new ArrayList<>());
     // endregion Enum Declarations
 
     // region Variable Declarations
     private static final MMLogger logger = MMLogger.create(Phenotype.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Phenotype";
 
+    private final String shortName;
+    private final String label;
+    private final String tooltip;
     private final boolean isTrueborn;
     private final boolean external;
     private final int strength;
@@ -88,7 +91,7 @@ public enum Phenotype {
 
     // region Constructors
     Phenotype() {
-        this(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9), new ArrayList<>());
+        this(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9, 8, 0), new ArrayList<>());
     }
 
     Phenotype(final boolean isTrueborn, final boolean external, final int strength, final int body, final int reflexes,
@@ -101,10 +104,25 @@ public enum Phenotype {
         this.dexterity = dexterity;
         this.attributeCaps = attributeCaps;
         this.bonusTraits = bonusTraits;
+        this.shortName = generateShortName();
+        this.label = generateLabel();
+        this.tooltip = generateTooltip();
     }
     // endregion Constructors
 
     // region Getters
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getTooltip() {
+        return tooltip;
+    }
 
     /**
      * Retrieves the cap (maximum allowable score) for a specified {@link SkillAttribute}.
@@ -117,7 +135,7 @@ public enum Phenotype {
      * @since 0.50.05
      */
     public int getAttributeCap(SkillAttribute attribute) {
-        return attributeCaps.getAttributeScore(attribute);
+        return attributeCaps.getBaseAttributeScore(attribute);
     }
 
     /**
@@ -168,7 +186,7 @@ public enum Phenotype {
             case BODY -> body;
             case REFLEXES -> reflexes;
             case DEXTERITY -> dexterity;
-            case NONE, INTELLIGENCE, WILLPOWER, CHARISMA -> 0;
+            case NONE, INTELLIGENCE, WILLPOWER, CHARISMA, EDGE -> 0;
         };
     }
 
@@ -194,10 +212,10 @@ public enum Phenotype {
      * @author Illiani
      * @since 0.50.05
      */
-    public String getShortName() {
+    private String generateShortName() {
         String key = "shortName." + (isTrueborn ? "trueborn" : "freeborn");
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, key);
+        return getTextAt(RESOURCE_BUNDLE, key);
     }
 
     /**
@@ -213,8 +231,8 @@ public enum Phenotype {
      * @author Illiani
      * @since 0.50.05
      */
-    public String getLabel() {
-        return getFormattedTextAt(RESOURCE_BUNDLE, name() + ".label");
+    private String generateLabel() {
+        return getTextAt(RESOURCE_BUNDLE, name() + ".label");
     }
 
     /**
@@ -230,8 +248,8 @@ public enum Phenotype {
      * @author Illiani
      * @since 0.50.05
      */
-    public String getTooltip() {
-        return getFormattedTextAt(RESOURCE_BUNDLE, name() + ".tooltip");
+    private String generateTooltip() {
+        return getTextAt(RESOURCE_BUNDLE, name() + ".tooltip");
     }
     // endregion Getters
 

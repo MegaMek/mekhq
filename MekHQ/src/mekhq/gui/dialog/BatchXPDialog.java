@@ -258,7 +258,7 @@ public final class BatchXPDialog extends JDialog {
         choiceSkill.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceSkill.getPreferredSize().getHeight()));
         DefaultComboBoxModel<String> personSkillModel = new DefaultComboBoxModel<>();
         personSkillModel.addElement(choiceNoSkill);
-        for (String skill : SkillType.getSkillList()) {
+        for (String skill : SkillType.getSortedSkillNames()) {
             personSkillModel.addElement(skill);
         }
         choiceSkill.setModel(personSkillModel);
@@ -381,14 +381,14 @@ public final class BatchXPDialog extends JDialog {
 
                 Person person = personnelModel.getPerson(personnelTable.convertRowIndexToModel(i));
 
-                int cost = person.getCostToImprove(skillName);
+                int cost = person.getCostToImprove(skillName, campaignOptions.isUseReasoningXpMultiplier());
                 double costMultiplier = campaignOptions.getXpCostMultiplier();
 
                 cost = (int) round(cost * costMultiplier);
 
                 // Improve the skill and deduce the cost
                 person.improveSkill(skillName);
-                person.spendXP(cost);
+                person.spendXPOnSkills(campaign, cost);
 
                 Skill skill = person.getSkill(skillName);
                 PerformanceLogger.improvedSkill(campaignOptions.isPersonnelLogSkillGain(),
@@ -429,13 +429,13 @@ public final class BatchXPDialog extends JDialog {
         @Override
         public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
             Person person = entry.getModel().getPerson(entry.getIdentifier().intValue());
-            if (!person.getStatus().isActive()) {
+            if (!person.getStatus().isActiveFlexible()) {
                 return false;
             } else if (!prisoners && !person.getPrisonerStatus().isFree()) {
                 return false;
             } else if ((null != primaryRole) && (person.getPrimaryRole() != primaryRole)) {
                 return false;
-            } else if ((null != expLevel) && (person.getExperienceLevel(campaign, false) != expLevel)) {
+            } else if ((null != expLevel) && (person.getExperienceLevel(campaign, false, true) != expLevel)) {
                 return false;
             } else if (onlyOfficers && !person.getRank().isOfficer()) {
                 return false;
@@ -447,7 +447,7 @@ public final class BatchXPDialog extends JDialog {
                 final CampaignOptions campaignOptions = campaign.getCampaignOptions();
                 final double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
                 Skill skill = person.getSkill(skillName);
-                int cost = person.getCostToImprove(skillName);
+                int cost = person.getCostToImprove(skillName, campaignOptions.isUseReasoningXpMultiplier());
                 cost = (int) round(cost * xpCostMultiplier);
 
                 if (null == skill) {

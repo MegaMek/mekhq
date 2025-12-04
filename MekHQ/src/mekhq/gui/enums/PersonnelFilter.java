@@ -56,13 +56,14 @@ public enum PersonnelFilter {
     LAM_PILOT("PersonnelFilter.LAM_PILOT.text", "PersonnelFilter.LAM_PILOT.toolTipText", false, true),
     VEHICLE_CREWMEMBER("PersonnelFilter.VEHICLE_CREWMEMBER.text", "PersonnelFilter.VEHICLE_CREWMEMBER.toolTipText",
           true, false),
-    GROUND_VEHICLE_DRIVER("PersonnelFilter.GROUND_VEHICLE_DRIVER.text",
-          "PersonnelFilter.GROUND_VEHICLE_DRIVER.toolTipText", false, true),
-    NAVAL_VEHICLE_DRIVER("PersonnelFilter.NAVAL_VEHICLE_DRIVER.text",
-          "PersonnelFilter.NAVAL_VEHICLE_DRIVER.toolTipText", false, true),
-    VTOL_PILOT("PersonnelFilter.VTOL_PILOT.text", "PersonnelFilter.VTOL_PILOT.toolTipText", false, true),
-    VEHICLE_GUNNER("PersonnelFilter.VEHICLE_GUNNER.text", "PersonnelFilter.VEHICLE_GUNNER.toolTipText", false, true),
-    VEHICLE_CREW("PersonnelFilter.VEHICLE_CREW.text", "PersonnelFilter.VEHICLE_CREW.toolTipText", false, true),
+    VEHICLE_CREW_GROUND("PersonnelFilter.VEHICLE_CREW_GROUND.text",
+          "PersonnelFilter.VEHICLE_CREW_GROUND.toolTipText", false, true),
+    VEHICLE_CREW_NAVAL("PersonnelFilter.VEHICLE_CREW_NAVAL.text",
+          "PersonnelFilter.VEHICLE_CREW_NAVAL.toolTipText", false, true),
+    VEHICLE_CREW_VTOL("PersonnelFilter.VEHICLE_CREW_VTOL.text",
+          "PersonnelFilter.VEHICLE_CREW_VTOL.toolTipText",
+          false,
+          true),
     AEROSPACE_PILOT("PersonnelFilter.AEROSPACE_PILOT.text", "PersonnelFilter.AEROSPACE_PILOT.toolTipText"),
     CONVENTIONAL_AIRCRAFT_PILOT("PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT.text",
           "PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT.toolTipText"),
@@ -200,23 +201,15 @@ public enum PersonnelFilter {
     }
 
     public boolean isGroundVehicleDriver() {
-        return this == GROUND_VEHICLE_DRIVER;
+        return this == VEHICLE_CREW_GROUND;
     }
 
     public boolean isNavalVehicleDriver() {
-        return this == NAVAL_VEHICLE_DRIVER;
+        return this == VEHICLE_CREW_NAVAL;
     }
 
     public boolean isVTOLPilot() {
-        return this == VTOL_PILOT;
-    }
-
-    public boolean isVehicleGunner() {
-        return this == VEHICLE_GUNNER;
-    }
-
-    public boolean isVehicleCrew() {
-        return this == VEHICLE_CREW;
+        return this == VEHICLE_CREW_VTOL;
     }
 
     public boolean isAerospacePilot() {
@@ -396,7 +389,7 @@ public enum PersonnelFilter {
     }
 
     public boolean getFilteredInformation(final Person person, LocalDate currentDate) {
-        final boolean active = person.getStatus().isActive() && !person.getPrisonerStatus().isCurrentPrisoner();
+        final boolean active = person.getStatus().isActiveFlexible() && !person.getPrisonerStatus().isCurrentPrisoner();
         final boolean dead = person.getStatus().isDead();
 
         PersonnelStatus status = person.getStatus();
@@ -422,21 +415,15 @@ public enum PersonnelFilter {
                                                         person.getPrimaryRole().isVehicleCrewMember() :
                                                         (person.getPrimaryRole().isVehicleCrewMember() ||
                                                                person.getSecondaryRole().isVehicleCrewMember()));
-            case GROUND_VEHICLE_DRIVER -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                                           person.getPrimaryRole().isGroundVehicleDriver() :
-                                                           person.hasRole(PersonnelRole.GROUND_VEHICLE_DRIVER));
-            case NAVAL_VEHICLE_DRIVER -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                                          person.getPrimaryRole().isNavalVehicleDriver() :
-                                                          person.hasRole(PersonnelRole.NAVAL_VEHICLE_DRIVER));
-            case VEHICLE_GUNNER -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                                    person.getPrimaryRole().isVehicleGunner() :
-                                                    person.hasRole(PersonnelRole.VEHICLE_GUNNER));
-            case VEHICLE_CREW -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                                  person.getPrimaryRole().isVehicleCrew() :
-                                                  person.hasRole(PersonnelRole.VEHICLE_CREW));
-            case VTOL_PILOT -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                                person.getPrimaryRole().isVTOLPilot() :
-                                                person.hasRole(PersonnelRole.VTOL_PILOT));
+            case VEHICLE_CREW_GROUND -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
+                                                         person.getPrimaryRole().isVehicleCrewGround() :
+                                                         person.hasRole(PersonnelRole.VEHICLE_CREW_GROUND));
+            case VEHICLE_CREW_NAVAL -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
+                                                        person.getPrimaryRole().isVehicleCrewNaval() :
+                                                        person.hasRole(PersonnelRole.VEHICLE_CREW_NAVAL));
+            case VEHICLE_CREW_VTOL -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
+                                                       person.getPrimaryRole().isVehicleCrewVTOL() :
+                                                       person.hasRole(PersonnelRole.VEHICLE_CREW_VTOL));
             case AEROSPACE_PILOT -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                                      person.getPrimaryRole().isAerospacePilot() :
                                                      person.hasRole(PersonnelRole.AEROSPACE_PILOT));
@@ -469,7 +456,8 @@ public enum PersonnelFilter {
                                                       person.getPrimaryRole().isVesselNavigator() :
                                                       person.hasRole(PersonnelRole.VESSEL_NAVIGATOR));
             case TECH -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                          person.getPrimaryRole().isTech() : person.isTech());
+                                          (person.getPrimaryRole().isTech() || person.getPrimaryRole().isAstech()) :
+                                          (person.isTech() || person.isAstech()));
             case MEK_TECH -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                               person.getPrimaryRole().isMekTech() :
                                               person.hasRole(PersonnelRole.MEK_TECH));
@@ -515,7 +503,7 @@ public enum PersonnelFilter {
             case PRISONER -> ((!dead) &&
                                     ((person.getPrisonerStatus().isCurrentPrisoner()) ||
                                            (person.getPrisonerStatus().isBondsman())));
-            case INACTIVE -> ((!dead) && (!status.isActive()));
+            case INACTIVE -> ((!dead) && (!status.isActiveFlexible()));
             case ON_LEAVE -> status.isOnLeave() || status.isOnMaternityLeave();
             case MIA -> status.isMIA() || status.isPoW();
             case RETIRED -> status.isRetired();

@@ -125,8 +125,8 @@ public class MarketsTab {
     private JLabel lblUnitMarketMethod;
     private MMComboBox<UnitMarketMethod> comboUnitMarketMethod;
     private JCheckBox chkUnitMarketRegionalMekVariations;
-    private JLabel lblUnitMarketSpecialUnitChance;
-    private JSpinner spnUnitMarketSpecialUnitChance;
+    private JLabel lblUnitMarketArtilleryUnitChance;
+    private JSpinner spnUnitMarketArtilleryUnitChance;
     private JLabel lblUnitMarketRarityModifier;
     private JSpinner spnUnitMarketRarityModifier;
     private JCheckBox chkInstantUnitMarketDelivery;
@@ -142,7 +142,12 @@ public class MarketsTab {
     private JLabel lblContractSearchRadius;
     private JSpinner spnContractSearchRadius;
     private JCheckBox chkVariableContractLength;
+    private JCheckBox chkUseTwoWayPay;
+    private JCheckBox chkUseCamOpsSalvage;
+    private JCheckBox chkUseRiskySalvage;
+    private JCheckBox chkEnableSalvageFlagByDefault;
     private JCheckBox chkUseDynamicDifficulty;
+    private JCheckBox chkUseBolsterContractSkill;
     private JCheckBox chkContractMarketReportRefresh;
     private JLabel lblContractMaxSalvagePercentage;
     private JSpinner spnContractMaxSalvagePercentage;
@@ -244,7 +249,7 @@ public class MarketsTab {
     public JPanel createPersonnelMarketTab() {
         // Header
         personnelMarketHeader = new CampaignOptionsHeaderPanel("PersonnelMarketTab",
-              getImageDirectory() + "logo_st_ives_compact.png", 11);
+              getImageDirectory() + "logo_st_ives_compact.png", 9);
 
         // Contents
         pnlPersonnelMarketGeneralOptions = createPersonnelMarketGeneralOptionsPanel();
@@ -421,8 +426,8 @@ public class MarketsTab {
         lblUnitMarketMethod = new JLabel();
         comboUnitMarketMethod = new MMComboBox<>("comboUnitMarketMethod", UnitMarketMethod.values());
         chkUnitMarketRegionalMekVariations = new JCheckBox();
-        lblUnitMarketSpecialUnitChance = new JLabel();
-        spnUnitMarketSpecialUnitChance = new JSpinner();
+        lblUnitMarketArtilleryUnitChance = new JLabel();
+        spnUnitMarketArtilleryUnitChance = new JSpinner();
         lblUnitMarketRarityModifier = new JLabel();
         spnUnitMarketRarityModifier = new JSpinner();
         chkInstantUnitMarketDelivery = new JCheckBox();
@@ -442,7 +447,7 @@ public class MarketsTab {
         //start Unit Market
         CampaignOptionsHeaderPanel unitMarketHeader = new CampaignOptionsHeaderPanel("UnitMarketTab",
               getImageDirectory() + "logo_clan_ice_hellion.png",
-              5);
+              4);
 
         // Contents
         lblUnitMarketMethod = new CampaignOptionsLabel("UnitMarketMethod");
@@ -454,12 +459,12 @@ public class MarketsTab {
         chkUnitMarketRegionalMekVariations.addMouseListener(createTipPanelUpdater(unitMarketHeader,
               "UnitMarketRegionalMekVariations"));
 
-        lblUnitMarketSpecialUnitChance = new CampaignOptionsLabel("UnitMarketSpecialUnitChance");
-        lblUnitMarketSpecialUnitChance.addMouseListener(createTipPanelUpdater(unitMarketHeader,
-              "UnitMarketSpecialUnitChance"));
-        spnUnitMarketSpecialUnitChance = new CampaignOptionsSpinner("UnitMarketSpecialUnitChance", 30, 0, 100, 1);
-        spnUnitMarketSpecialUnitChance.addMouseListener(createTipPanelUpdater(unitMarketHeader,
-              "UnitMarketSpecialUnitChance"));
+        lblUnitMarketArtilleryUnitChance = new CampaignOptionsLabel("UnitMarketArtilleryUnitChance");
+        lblUnitMarketArtilleryUnitChance.addMouseListener(createTipPanelUpdater(unitMarketHeader,
+              "UnitMarketArtilleryUnitChance"));
+        spnUnitMarketArtilleryUnitChance = new CampaignOptionsSpinner("UnitMarketArtilleryUnitChance", 30, 0, 100, 1);
+        spnUnitMarketArtilleryUnitChance.addMouseListener(createTipPanelUpdater(unitMarketHeader,
+              "UnitMarketArtilleryUnitChance"));
 
         lblUnitMarketRarityModifier = new CampaignOptionsLabel("UnitMarketRarityModifier");
         lblUnitMarketRarityModifier.addMouseListener(createTipPanelUpdater(unitMarketHeader,
@@ -501,9 +506,9 @@ public class MarketsTab {
 
         layout.gridy++;
         layout.gridwidth = 1;
-        panel.add(lblUnitMarketSpecialUnitChance, layout);
+        panel.add(lblUnitMarketArtilleryUnitChance, layout);
         layout.gridx++;
-        panel.add(spnUnitMarketSpecialUnitChance, layout);
+        panel.add(spnUnitMarketArtilleryUnitChance, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -539,7 +544,12 @@ public class MarketsTab {
         lblContractSearchRadius = new JLabel();
         spnContractSearchRadius = new JSpinner();
         chkVariableContractLength = new JCheckBox();
+        chkUseTwoWayPay = new JCheckBox();
+        chkUseCamOpsSalvage = new JCheckBox();
+        chkUseRiskySalvage = new JCheckBox();
+        chkEnableSalvageFlagByDefault = new JCheckBox();
         chkUseDynamicDifficulty = new JCheckBox();
+        chkUseBolsterContractSkill = new JCheckBox();
         chkContractMarketReportRefresh = new JCheckBox();
         lblContractMaxSalvagePercentage = new JLabel();
         spnContractMaxSalvagePercentage = new JSpinner();
@@ -576,7 +586,7 @@ public class MarketsTab {
         // Header
         contractMarketHeader = new CampaignOptionsHeaderPanel("ContractMarketTab",
               getImageDirectory() + "logo_federated_suns.png",
-              5);
+              3);
         // Contents
         pnlContractMarketGeneralOptions = createContractMarketGeneralOptionsPanel();
         pnlContractPay = createContractPayPanel();
@@ -625,8 +635,28 @@ public class MarketsTab {
         chkVariableContractLength.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "VariableContractLength"));
 
+        chkUseTwoWayPay = new CampaignOptionsCheckBox("UseTwoWayPay");
+        chkUseTwoWayPay.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "UseTwoWayPay"));
+
+        chkUseCamOpsSalvage = new CampaignOptionsCheckBox("UseCamOpsSalvage");
+        chkUseCamOpsSalvage.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "UseCamOpsSalvage"));
+
+        chkUseRiskySalvage = new CampaignOptionsCheckBox("UseRiskySalvage");
+        chkUseRiskySalvage.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "UseRiskySalvage"));
+
+        chkEnableSalvageFlagByDefault = new CampaignOptionsCheckBox("EnableSalvageFlagByDefault");
+        chkEnableSalvageFlagByDefault.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "EnableSalvageFlagByDefault"));
+
         chkUseDynamicDifficulty = new CampaignOptionsCheckBox("UseDynamicDifficulty");
         chkUseDynamicDifficulty.addMouseListener(createTipPanelUpdater(contractMarketHeader, "UseDynamicDifficulty"));
+
+        chkUseBolsterContractSkill = new CampaignOptionsCheckBox("UseBolsterContractSkill");
+        chkUseBolsterContractSkill.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "UseBolsterContractSkill"));
 
         chkContractMarketReportRefresh = new CampaignOptionsCheckBox("ContractMarketReportRefresh");
         chkContractMarketReportRefresh.addMouseListener(createTipPanelUpdater(contractMarketHeader,
@@ -669,7 +699,22 @@ public class MarketsTab {
         panel.add(chkVariableContractLength, layout);
 
         layout.gridy++;
+        panel.add(chkUseTwoWayPay, layout);
+
+        layout.gridy++;
+        panel.add(chkUseCamOpsSalvage, layout);
+
+        layout.gridy++;
+        panel.add(chkUseRiskySalvage, layout);
+
+        layout.gridy++;
+        panel.add(chkEnableSalvageFlagByDefault, layout);
+
+        layout.gridy++;
         panel.add(chkUseDynamicDifficulty, layout);
+
+        layout.gridy++;
+        panel.add(chkUseBolsterContractSkill, layout);
 
         layout.gridy++;
         panel.add(chkContractMarketReportRefresh, layout);
@@ -871,7 +916,7 @@ public class MarketsTab {
         // Unit Market
         comboUnitMarketMethod.setSelectedItem(options.getUnitMarketMethod());
         chkUnitMarketRegionalMekVariations.setSelected(options.isRegionalMekVariations());
-        spnUnitMarketSpecialUnitChance.setValue(options.getUnitMarketSpecialUnitChance());
+        spnUnitMarketArtilleryUnitChance.setValue(options.getUnitMarketArtilleryUnitChance());
         spnUnitMarketRarityModifier.setValue(options.getUnitMarketRarityModifier());
         chkInstantUnitMarketDelivery.setSelected(options.isInstantUnitMarketDelivery());
         chkMothballUnitMarketDeliveries.setSelected(options.isMothballUnitMarketDeliveries());
@@ -881,7 +926,12 @@ public class MarketsTab {
         comboContractMarketMethod.setSelectedItem(options.getContractMarketMethod());
         spnContractSearchRadius.setValue(options.getContractSearchRadius());
         chkVariableContractLength.setSelected(options.isVariableContractLength());
+        chkUseTwoWayPay.setSelected(options.isUseTwoWayPay());
+        chkUseCamOpsSalvage.setSelected(options.isUseCamOpsSalvage());
+        chkUseRiskySalvage.setSelected(options.isUseRiskySalvage());
+        chkEnableSalvageFlagByDefault.setSelected(options.isEnableSalvageFlagByDefault());
         chkUseDynamicDifficulty.setSelected(options.isUseDynamicDifficulty());
+        chkUseBolsterContractSkill.setSelected(options.isUseBolsterContractSkill());
         chkContractMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
         spnContractMaxSalvagePercentage.setValue(options.getContractMaxSalvagePercentage());
         spnDropShipBonusPercentage.setValue(options.getDropShipBonusPercentage());
@@ -938,7 +988,7 @@ public class MarketsTab {
         // Unit Market
         options.setUnitMarketMethod(comboUnitMarketMethod.getSelectedItem());
         options.setUnitMarketRegionalMekVariations(chkUnitMarketRegionalMekVariations.isSelected());
-        options.setUnitMarketSpecialUnitChance((int) spnUnitMarketSpecialUnitChance.getValue());
+        options.setUnitMarketArtilleryUnitChance((int) spnUnitMarketArtilleryUnitChance.getValue());
         options.setUnitMarketRarityModifier((int) spnUnitMarketRarityModifier.getValue());
         options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
         options.setMothballUnitMarketDeliveries(chkMothballUnitMarketDeliveries.isSelected());
@@ -948,7 +998,12 @@ public class MarketsTab {
         options.setContractMarketMethod(comboContractMarketMethod.getSelectedItem());
         options.setContractSearchRadius((int) spnContractSearchRadius.getValue());
         options.setVariableContractLength(chkVariableContractLength.isSelected());
+        options.setUseTwoWayPay(chkUseTwoWayPay.isSelected());
+        options.setUseCamOpsSalvage(chkUseCamOpsSalvage.isSelected());
+        options.setUseRiskySalvage(chkUseRiskySalvage.isSelected());
+        options.setEnableSalvageFlagByDefault(chkEnableSalvageFlagByDefault.isSelected());
         options.setUseDynamicDifficulty(chkUseDynamicDifficulty.isSelected());
+        options.setUseBolsterContractSkill(chkUseBolsterContractSkill.isSelected());
         options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
         options.setContractMaxSalvagePercentage((int) spnContractMaxSalvagePercentage.getValue());
         options.setDropShipBonusPercentage((int) spnDropShipBonusPercentage.getValue());

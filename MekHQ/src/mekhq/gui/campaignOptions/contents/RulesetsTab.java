@@ -36,16 +36,15 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPan
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.comboBoxes.MMComboBox;
@@ -54,10 +53,8 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.skills.Skills;
-import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
+import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -106,9 +103,7 @@ public class RulesetsTab {
     private MMComboBox<SkillLevel> comboMinimumCallsignSkillLevel;
 
     private JCheckBox chkUseDropShips;
-    private JCheckBox chkOpForUsesVTOLs;
 
-    private JCheckBox chkClanVehicles;
     private JCheckBox chkRegionalMekVariations;
 
     private JCheckBox chkAttachedPlayerCamouflage;
@@ -129,8 +124,19 @@ public class RulesetsTab {
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
+    private JCheckBox chkUseNoTornadoes;
     private JLabel lblFixedMapChance;
     private JSpinner spnFixedMapChance;
+
+    private JPanel pnlMorale;
+    private JLabel lblMoraleVictory;
+    private JSpinner spnMoraleVictory;
+    private JLabel lblMoraleDecisiveVictory;
+    private JSpinner spnMoraleDecisiveVictory;
+    private JLabel lblMoraleDefeat;
+    private JSpinner spnMoraleDefeat;
+    private JLabel lblMoraleDecisiveDefeat;
+    private JSpinner spnMoraleDecisiveDefeat;
 
     private JPanel pnlPartsPanel;
     private JCheckBox chkRestrictPartsByMission;
@@ -146,32 +152,14 @@ public class RulesetsTab {
     private JSpinner spnAutoResolveNumberOfScenarios;
     //end Universal Options
 
-    //start Legacy AtB
+    //start Legacy Options
     private CampaignOptionsHeaderPanel legacyHeader;
-    private JCheckBox chkUseAtB;
+    // end Legacy Options
 
-    private JPanel pnlLegacyOpForGenerationPanel;
-    private JCheckBox chkUseVehicles;
-    private JCheckBox chkDoubleVehicles;
-    private JCheckBox chkOpForUsesAero;
-    private JLabel lblOpForAeroChance;
-    private JSpinner spnOpForAeroChance;
-    private JCheckBox chkOpForUsesLocalForces;
-    private JCheckBox chkAdjustPlayerVehicles;
-
-    private JPanel pnlLegacyScenarioGenerationPanel;
-    private JLabel lblIntensity;
-    private JSpinner spnAtBBattleIntensity;
-    private JLabel lblFightChance;
-    private JLabel lblDefendChance;
-    private JLabel lblScoutChance;
-    private JLabel lblTrainingChance;
-    private JSpinner[] spnAtBBattleChance;
-    private JButton btnIntensityUpdate;
-    private JCheckBox chkGenerateChases;
-    //end Legacy AtB
-
-    private JCheckBox chkUseStratCon;
+    private JLabel lblStratConPlayType;
+    private MMComboBox<StratConPlayType> comboStratConPlayType;
+    private JCheckBox chkUseAdvancedScouting;
+    private JCheckBox chkNoSeedForces;
     private JCheckBox chkUseGenericBattleValue;
     private JCheckBox chkUseVerboseBidding;
     //end StratCon
@@ -230,8 +218,6 @@ public class RulesetsTab {
         spnOpForLanceTypeVehicles = new JSpinner();
 
         chkUseDropShips = new JCheckBox();
-        chkOpForUsesVTOLs = new JCheckBox();
-        chkClanVehicles = new JCheckBox();
         chkRegionalMekVariations = new JCheckBox();
 
         chkAttachedPlayerCamouflage = new JCheckBox();
@@ -254,8 +240,20 @@ public class RulesetsTab {
         chkUseWeatherConditions = new JCheckBox();
         chkUseLightConditions = new JCheckBox();
         chkUsePlanetaryConditions = new JCheckBox();
+        chkUseNoTornadoes = new JCheckBox();
         lblFixedMapChance = new JLabel();
         spnFixedMapChance = new JSpinner();
+
+        // Morale
+        pnlMorale = new JPanel();
+        lblMoraleVictory = new JLabel();
+        spnMoraleVictory = new JSpinner();
+        lblMoraleDecisiveVictory = new JLabel();
+        spnMoraleDecisiveVictory = new JSpinner();
+        lblMoraleDefeat = new JLabel();
+        spnMoraleDefeat = new JSpinner();
+        lblMoraleDecisiveDefeat = new JLabel();
+        spnMoraleDecisiveDefeat = new JSpinner();
 
         // Parts
         pnlPartsPanel = new JPanel();
@@ -297,8 +295,6 @@ public class RulesetsTab {
         pnlUnitRatioPanel = createUniversalUnitRatioPanel();
 
         chkUseDropShips = new CampaignOptionsCheckBox("UseDropShips");
-        chkOpForUsesVTOLs = new CampaignOptionsCheckBox("OpForUsesVTOLs");
-        chkClanVehicles = new CampaignOptionsCheckBox("ClanVehicles");
         chkRegionalMekVariations = new CampaignOptionsCheckBox("RegionalMekVariations");
 
         chkAttachedPlayerCamouflage = new CampaignOptionsCheckBox("AttachedPlayerCamouflage");
@@ -312,6 +308,7 @@ public class RulesetsTab {
         pnlScenarioModifiers = createUniversalModifiersPanel();
         pnlMapGenerationPanel = createUniversalMapGenerationPanel();
         pnlPartsPanel = createUniversalPartsPanel();
+        pnlMorale = createUniversalMoralePanel();
 
         pnlScenarioGenerationPanel = createUniversalScenarioGenerationPanel();
         pnlCampaignOptions = createUniversalCampaignOptionsPanel();
@@ -359,12 +356,6 @@ public class RulesetsTab {
         layout.gridy++;
         layout.gridwidth = 2;
         panel.add(chkUseDropShips, layout);
-
-        layout.gridy++;
-        panel.add(chkOpForUsesVTOLs, layout);
-
-        layout.gridy++;
-        panel.add(chkClanVehicles, layout);
 
         layout.gridy++;
         panel.add(chkRegionalMekVariations, layout);
@@ -571,6 +562,7 @@ public class RulesetsTab {
         chkUseWeatherConditions = new CampaignOptionsCheckBox("UseWeatherConditions");
         chkUseLightConditions = new CampaignOptionsCheckBox("UseLightConditions");
         chkUsePlanetaryConditions = new CampaignOptionsCheckBox("UsePlanetaryConditions");
+        chkUseNoTornadoes = new CampaignOptionsCheckBox("UseNoTornadoes");
         lblFixedMapChance = new CampaignOptionsLabel("FixedMapChance");
         spnFixedMapChance = new CampaignOptionsSpinner("FixedMapChance",
               0, 0, 100, 1);
@@ -590,6 +582,9 @@ public class RulesetsTab {
 
         layout.gridy++;
         panel.add(chkUsePlanetaryConditions, layout);
+
+        layout.gridy++;
+        panel.add(chkUseNoTornadoes, layout);
 
         layout.gridy++;
         layout.gridwidth = 1;
@@ -617,9 +612,62 @@ public class RulesetsTab {
         layout.gridwidth = 2;
         layout.gridy = 0;
         layout.gridx = 0;
+        panel.add(pnlMorale, layout);
+        layout.gridy++;
         panel.add(pnlPartsPanel, layout);
         layout.gridy++;
         panel.add(pnlMapGenerationPanel, layout);
+
+        return panel;
+    }
+
+    private JPanel createUniversalMoralePanel() {
+        // Content
+        lblMoraleDecisiveVictory = new CampaignOptionsLabel("MoraleDecisiveVictory");
+        spnMoraleDecisiveVictory = new CampaignOptionsSpinner("MoraleDecisiveVictory",
+              4, 1, 10, 1);
+
+        lblMoraleVictory = new CampaignOptionsLabel("MoraleVictory");
+        spnMoraleVictory = new CampaignOptionsSpinner("MoraleVictory",
+              2, 1, 10, 1);
+
+        lblMoraleDefeat = new CampaignOptionsLabel("MoraleDefeat");
+        spnMoraleDefeat = new CampaignOptionsSpinner("MoraleDefeat",
+              -3, -10, -1, 1);
+
+        lblMoraleDecisiveDefeat = new CampaignOptionsLabel("MoraleDecisiveDefeat");
+        spnMoraleDecisiveDefeat = new CampaignOptionsSpinner("MoraleDecisiveDefeat",
+              -5, -10, -1, 1);
+
+        // Layout the panel
+        final JPanel panel = new CampaignOptionsStandardPanel("UniversalMoralePanel", true,
+              "UniversalMoralePanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(lblMoraleDecisiveVictory, layout);
+        layout.gridx++;
+        panel.add(spnMoraleDecisiveVictory, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblMoraleVictory, layout);
+        layout.gridx++;
+        panel.add(spnMoraleVictory, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblMoraleDefeat, layout);
+        layout.gridx++;
+        panel.add(spnMoraleDefeat, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblMoraleDecisiveDefeat, layout);
+        layout.gridx++;
+        panel.add(spnMoraleDecisiveDefeat, layout);
 
         return panel;
     }
@@ -653,7 +701,30 @@ public class RulesetsTab {
      * Initializes the StratCon (Strategic Context) section of the tab.
      */
     private void initializeStratConTab() {
-        chkUseStratCon = new JCheckBox();
+        lblStratConPlayType = new JLabel("StratConPlayType");
+        comboStratConPlayType = new MMComboBox<>("StratConPlayType", StratConPlayType.values());
+        comboStratConPlayType.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(
+                  JList<?> list,
+                  Object value,
+                  int index,
+                  boolean isSelected,
+                  boolean cellHasFocus) {
+
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                      list, value, index, isSelected, cellHasFocus);
+
+                if (value instanceof StratConPlayType type) {
+                    label.setToolTipText(type.getTooltip());
+                }
+
+                return label;
+            }
+        });
+
+        chkUseAdvancedScouting = new JCheckBox();
+        chkNoSeedForces = new JCheckBox();
         chkUseGenericBattleValue = new JCheckBox();
         chkUseVerboseBidding = new JCheckBox();
     }
@@ -674,7 +745,7 @@ public class RulesetsTab {
               getImageDirectory() + "logo_clan_wolf.png",
               false,
               true,
-              6);
+              4);
 
         // Universal Content
 
@@ -693,10 +764,19 @@ public class RulesetsTab {
               "AutoResolveVictoryChanceEnabled"));
         chkAutoResolveExperimentalPacarGuiEnabled.addMouseListener(createTipPanelUpdater(stratConHeader,
               "AutoResolveExperimentalPacarGuiEnabled"));
+        lblMoraleVictory.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleVictory"));
+        spnMoraleVictory.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleVictory"));
+        lblMoraleDecisiveVictory.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDecisiveVictory"));
+        spnMoraleDecisiveVictory.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDecisiveVictory"));
+        lblMoraleDefeat.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDefeat"));
+        spnMoraleDefeat.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDefeat"));
+        spnMoraleDecisiveDefeat.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDecisiveDefeat"));
+        spnMoraleDecisiveDefeat.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDecisiveDefeat"));
         chkRestrictPartsByMission.addMouseListener(createTipPanelUpdater(stratConHeader, "RestrictPartsByMission"));
         chkUseWeatherConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UseWeatherConditions"));
         chkUseLightConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UseLightConditions"));
         chkUsePlanetaryConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UsePlanetaryConditions"));
+        chkUseNoTornadoes.addMouseListener(createTipPanelUpdater(stratConHeader, "UseNoTornadoes"));
         lblFixedMapChance.addMouseListener(createTipPanelUpdater(stratConHeader, "FixedMapChance"));
         spnFixedMapChance.addMouseListener(createTipPanelUpdater(stratConHeader, "FixedMapChance"));
         lblScenarioModMax.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModMax"));
@@ -714,8 +794,6 @@ public class RulesetsTab {
         comboMinimumCallsignSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader,
               "MinimumCallsignSkillLevel"));
         chkUseDropShips.addMouseListener(createTipPanelUpdater(stratConHeader, "UseDropShips"));
-        chkOpForUsesVTOLs.addMouseListener(createTipPanelUpdater(stratConHeader, "OpForUsesVTOLs"));
-        chkClanVehicles.addMouseListener(createTipPanelUpdater(stratConHeader, "ClanVehicles"));
         chkRegionalMekVariations.addMouseListener(createTipPanelUpdater(stratConHeader, "RegionalMekVariations"));
         chkAttachedPlayerCamouflage.addMouseListener(createTipPanelUpdater(stratConHeader, "AttachedPlayerCamouflage"));
         chkPlayerControlsAttachedUnits.addMouseListener(createTipPanelUpdater(stratConHeader,
@@ -725,8 +803,13 @@ public class RulesetsTab {
         chkAutoConfigMunitions.addMouseListener(createTipPanelUpdater(stratConHeader, "AutoConfigMunitions"));
 
         // Content
-        chkUseStratCon = new CampaignOptionsCheckBox("UseStratCon");
-        chkUseStratCon.addMouseListener(createTipPanelUpdater(stratConHeader, "UseStratCon"));
+        lblStratConPlayType = new CampaignOptionsLabel("StratConPlayType");
+        lblStratConPlayType.addMouseListener(createTipPanelUpdater(stratConHeader, "StratConPlayType"));
+        comboStratConPlayType.addMouseListener(createTipPanelUpdater(stratConHeader, "StratConPlayType"));
+        chkUseAdvancedScouting = new CampaignOptionsCheckBox("UseAdvancedScouting");
+        chkUseAdvancedScouting.addMouseListener(createTipPanelUpdater(stratConHeader, "UseAdvancedScouting"));
+        chkNoSeedForces = new CampaignOptionsCheckBox("NoSeedForces");
+        chkNoSeedForces.addMouseListener(createTipPanelUpdater(stratConHeader, "NoSeedForces"));
         chkUseGenericBattleValue = new CampaignOptionsCheckBox("UseGenericBattleValue");
         chkUseGenericBattleValue.addMouseListener(createTipPanelUpdater(stratConHeader, "UseGenericBattleValue"));
         chkUseVerboseBidding = new CampaignOptionsCheckBox("UseVerboseBidding");
@@ -741,8 +824,15 @@ public class RulesetsTab {
         panel.add(stratConHeader, layout);
 
         layout.gridwidth = 1;
+        layout.gridx = 0;
         layout.gridy++;
-        panel.add(chkUseStratCon, layout);
+        panel.add(lblStratConPlayType, layout);
+        layout.gridx++;
+        panel.add(comboStratConPlayType, layout);
+        layout.gridx++;
+        panel.add(chkUseAdvancedScouting, layout);
+        layout.gridx++;
+        panel.add(chkNoSeedForces, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -754,17 +844,25 @@ public class RulesetsTab {
         layout.gridx++;
         panel.add(chkUseVerboseBidding, layout);
 
-        layout.gridwidth = 2;
+        layout.gridwidth = 3;
         layout.gridx = 0;
         layout.gridy++;
+        layout.anchor = GridBagConstraints.NORTHWEST;
+        layout.fill = GridBagConstraints.BOTH;
+        layout.gridheight = 2;
         panel.add(pnlScenarioGenerationPanel, layout);
 
-        layout.gridwidth = 2;
-        layout.gridx = 2;
+        layout.gridwidth = 1;
+        layout.gridheight = 1;
+        layout.gridx = 3;
         panel.add(pnlCampaignOptions, layout);
 
-        layout.gridwidth = 1;
+        layout.gridy++;
+        panel.add(pnlMorale, layout);
+
         layout.gridx = 4;
+        layout.gridy -= 1;
+        layout.gridheight = 2;
         panel.add(pnlAutoResolve, layout);
 
         // Create panel and return
@@ -772,34 +870,9 @@ public class RulesetsTab {
     }
 
     /**
-     * Initializes the Legacy AtB (Against the Bot) section of the tab.
+     * Initializes the Legacy Options section of the tab.
      */
-    private void initializeLegacyTab() {
-        // General
-        chkUseAtB = new JCheckBox();
-
-        // OpFor Generation
-        pnlLegacyOpForGenerationPanel = new JPanel();
-        chkUseVehicles = new JCheckBox();
-        chkDoubleVehicles = new JCheckBox();
-        chkOpForUsesAero = new JCheckBox();
-        lblOpForAeroChance = new JLabel();
-        spnOpForAeroChance = new JSpinner();
-        chkOpForUsesLocalForces = new JCheckBox();
-        chkAdjustPlayerVehicles = new JCheckBox();
-
-        // Scenarios
-        pnlLegacyScenarioGenerationPanel = new JPanel();
-        chkGenerateChases = new JCheckBox();
-        lblIntensity = new JLabel();
-        spnAtBBattleIntensity = new JSpinner();
-        lblFightChance = new JLabel();
-        lblDefendChance = new JLabel();
-        lblScoutChance = new JLabel();
-        lblTrainingChance = new JLabel();
-        spnAtBBattleChance = new JSpinner[CombatRole.values().length - 1];
-        btnIntensityUpdate = new JButton();
-    }
+    private void initializeLegacyTab() {}
 
     /**
      * Creates the UI panel for the Legacy AtB configuration.
@@ -816,11 +889,6 @@ public class RulesetsTab {
               getImageDirectory() + "logo_free_rasalhague_republic.png",
               true, true, 5);
 
-        chkUseAtB = new CampaignOptionsCheckBox("UseAtB");
-        chkUseAtB.addMouseListener(createTipPanelUpdater(legacyHeader, "UseAtB"));
-        pnlLegacyOpForGenerationPanel = createLegacyOpForGenerationPanel();
-        pnlLegacyScenarioGenerationPanel = createLegacyScenarioGenerationPanel();
-
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("LegacyTab", true);
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -830,251 +898,8 @@ public class RulesetsTab {
         layout.gridy = 0;
         panel.add(legacyHeader, layout);
 
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(chkUseAtB, layout);
-
-        layout.gridy++;
-        panel.add(pnlLegacyOpForGenerationPanel, layout);
-        layout.gridx++;
-        panel.add(pnlLegacyScenarioGenerationPanel, layout);
-
         // Create panel and return
         return createParentPanel(panel, "LegacyTab");
-    }
-
-    /**
-     * Creates the UI panel for configuring the Legacy AtB opponent force (OpFor) generation settings.
-     * <p>
-     * Options include enabling vehicle support, aero unit chances, local forces, and player vehicle adjustments. The
-     * panel provides various checkboxes and spinners for user interaction.
-     * </p>
-     *
-     * @return a {@link JPanel} containing controls to configure AtB opponent force generation options
-     */
-    private JPanel createLegacyOpForGenerationPanel() {
-        // Content
-        chkUseVehicles = new CampaignOptionsCheckBox("UseVehicles");
-        chkUseVehicles.addMouseListener(createTipPanelUpdater(legacyHeader, "UseVehicles"));
-        chkDoubleVehicles = new CampaignOptionsCheckBox("DoubleVehicles");
-        chkDoubleVehicles.addMouseListener(createTipPanelUpdater(legacyHeader, "DoubleVehicles"));
-        chkOpForUsesAero = new CampaignOptionsCheckBox("OpForUsesAero");
-        chkOpForUsesAero.addMouseListener(createTipPanelUpdater(legacyHeader, "OpForUsesAero"));
-        lblOpForAeroChance = new CampaignOptionsLabel("OpForAeroChance");
-        lblOpForAeroChance.addMouseListener(createTipPanelUpdater(legacyHeader, "OpForAeroChance"));
-        spnOpForAeroChance = new CampaignOptionsSpinner("OpForAeroChance",
-              0, 0, 6, 1);
-        spnOpForAeroChance.addMouseListener(createTipPanelUpdater(legacyHeader, "OpForAeroChance"));
-        chkOpForUsesLocalForces = new CampaignOptionsCheckBox("OpForUsesLocalForces");
-        chkOpForUsesLocalForces.addMouseListener(createTipPanelUpdater(legacyHeader, "OpForUsesLocalForces"));
-        chkAdjustPlayerVehicles = new CampaignOptionsCheckBox("AdjustPlayerVehicles");
-        chkAdjustPlayerVehicles.addMouseListener(createTipPanelUpdater(legacyHeader, "AdjustPlayerVehicles"));
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("LegacyOpForGenerationPanel", true,
-              "LegacyOpForGenerationPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 2;
-        panel.add(chkUseVehicles, layout);
-
-        layout.gridy++;
-        panel.add(chkDoubleVehicles, layout);
-
-        layout.gridy++;
-        panel.add(chkOpForUsesAero, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblOpForAeroChance, layout);
-        layout.gridx++;
-        panel.add(spnOpForAeroChance, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(chkOpForUsesLocalForces, layout);
-
-        layout.gridy++;
-        panel.add(chkAdjustPlayerVehicles, layout);
-
-        return panel;
-    }
-
-    /**
-     * Creates the UI panel for configuring the Legacy AtB (Against the Bot) scenario generation settings.
-     * <p>
-     * This panel includes settings for enabling chase generation, adjusting battle role chances (Fight, Defend, Scout,
-     * Training), and updating these values based on a calculated intensity.
-     * </p>
-     *
-     * @return a {@link JPanel} containing controls to configure AtB scenario generation options
-     */
-    private JPanel createLegacyScenarioGenerationPanel() {
-        // Content
-        chkGenerateChases = new CampaignOptionsCheckBox("GenerateChases");
-        chkGenerateChases.addMouseListener(createTipPanelUpdater(legacyHeader, "GenerateChases"));
-        lblIntensity = new CampaignOptionsLabel("AtBBattleIntensity");
-        lblIntensity.addMouseListener(createTipPanelUpdater(legacyHeader, "AtBBattleIntensity"));
-        spnAtBBattleIntensity = new CampaignOptionsSpinner("AtBBattleIntensity",
-              0.0, 0.0, 100.0, 0.1);
-        spnAtBBattleIntensity.addMouseListener(createTipPanelUpdater(legacyHeader, "AtBBattleIntensity"));
-
-        lblFightChance = new JLabel(CombatRole.MANEUVER.toString());
-        lblDefendChance = new JLabel(CombatRole.FRONTLINE.toString());
-        lblScoutChance = new JLabel(CombatRole.PATROL.toString());
-        lblTrainingChance = new JLabel(CombatRole.TRAINING.toString());
-        spnAtBBattleChance = new JSpinner[CombatRole.values().length - 1];
-
-        for (int i = 0; i < spnAtBBattleChance.length; i++) {
-            spnAtBBattleChance[i] = new JSpinner(
-                  new SpinnerNumberModel(0, 0, 100, 1));
-        }
-
-        btnIntensityUpdate = new CampaignOptionsButton("IntensityUpdate");
-        btnIntensityUpdate.addMouseListener(createTipPanelUpdater(legacyHeader, "IntensityUpdate"));
-        AtBBattleIntensityChangeListener atBBattleIntensityChangeListener = new AtBBattleIntensityChangeListener();
-        btnIntensityUpdate.addChangeListener(evt -> {
-            spnAtBBattleIntensity.removeChangeListener(atBBattleIntensityChangeListener);
-            spnAtBBattleIntensity.setValue(determineAtBBattleIntensity());
-            spnAtBBattleIntensity.addChangeListener(atBBattleIntensityChangeListener);
-        });
-
-        // Layout the Panel
-        final JPanel panelBattleChance = new CampaignOptionsStandardPanel("LegacyScenarioGenerationPanel");
-        final GridBagConstraints layoutBattleChance = new CampaignOptionsGridBagConstraints(panelBattleChance);
-
-        layoutBattleChance.gridx = 0;
-        layoutBattleChance.gridy = 0;
-        layoutBattleChance.gridwidth = 1;
-        panelBattleChance.add(lblFightChance, layoutBattleChance);
-        layoutBattleChance.gridx++;
-        panelBattleChance.add(spnAtBBattleChance[CombatRole.MANEUVER.ordinal()], layoutBattleChance);
-
-        layoutBattleChance.gridx = 0;
-        layoutBattleChance.gridy++;
-        panelBattleChance.add(lblDefendChance, layoutBattleChance);
-        layoutBattleChance.gridx++;
-        panelBattleChance.add(spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()], layoutBattleChance);
-
-        layoutBattleChance.gridx = 0;
-        layoutBattleChance.gridy++;
-        panelBattleChance.add(lblScoutChance, layoutBattleChance);
-        layoutBattleChance.gridx++;
-        panelBattleChance.add(spnAtBBattleChance[CombatRole.PATROL.ordinal()], layoutBattleChance);
-
-        layoutBattleChance.gridx = 0;
-        layoutBattleChance.gridy++;
-        panelBattleChance.add(lblTrainingChance, layoutBattleChance);
-        layoutBattleChance.gridx++;
-        panelBattleChance.add(spnAtBBattleChance[CombatRole.TRAINING.ordinal()], layoutBattleChance);
-
-        final JPanel panel = new CampaignOptionsStandardPanel("LegacyScenarioGenerationPanel", true,
-              "LegacyScenarioGenerationPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 2;
-        panel.add(chkGenerateChases, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblIntensity, layout);
-        layout.gridx++;
-        panel.add(spnAtBBattleIntensity, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(panelBattleChance, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(btnIntensityUpdate, layout);
-
-        return panel;
-    }
-
-    /**
-     * Determines the AtB (Against the Bot) battle intensity value based on the current settings of battle role chance
-     * spinners.
-     * <p>
-     * Each role (e.g., Maneuver, Frontline, Patrol, Training) contributes to the overall battle intensity value based
-     * on complex formulas. The result is normalized, capped at 100.0, and rounded to a single decimal place.
-     * </p>
-     *
-     * @return the calculated battle intensity value as a {@code double}
-     */
-    private double determineAtBBattleIntensity() {
-        double intensity = 0.0;
-
-        int x = (int) spnAtBBattleChance[CombatRole.MANEUVER.ordinal()].getValue();
-        intensity += ((-3.0 / 2.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
-
-        x = (int) spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].getValue();
-        intensity += ((-4.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
-
-        x = (int) spnAtBBattleChance[CombatRole.PATROL.ordinal()].getValue();
-        intensity += ((-2.0 / 3.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
-
-        x = (int) spnAtBBattleChance[CombatRole.TRAINING.ordinal()].getValue();
-        intensity += ((-9.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
-
-        intensity = intensity / 4.0;
-
-        if (intensity > 100.0) {
-            intensity = 100.0;
-        }
-
-        return Math.round(intensity * 10.0) / 10.0;
-    }
-
-    /**
-     * A listener to manage changes in the AtB (Against the Bot) battle intensity spinner value.
-     * <p>
-     * It listens for changes in the battle intensity spinner, recalculates the values for different battle roles (e.g.,
-     * Maneuver, Frontline, Patrol, Training), and updates the corresponding spinners for the player to see the effects
-     * of the intensity change.
-     * </p>
-     */
-    private class AtBBattleIntensityChangeListener implements ChangeListener {
-        /**
-         * Called when the state of the AtB battle intensity spinner changes.
-         * <p>
-         * Updates the battle role chance spinners based on the current value of the battle intensity spinner. If the
-         * intensity is below the minimum defined in {@link AtBContract#MINIMUM_INTENSITY}, all role chance spinners are
-         * set to zero.
-         * </p>
-         *
-         * @param e the {@link ChangeEvent} triggered when the spinner value changes
-         */
-        @Override
-        public void stateChanged(ChangeEvent e) {
-            double intensity = (double) spnAtBBattleIntensity.getValue();
-
-            if (intensity >= AtBContract.MINIMUM_INTENSITY) {
-                int value = (int) Math.min(
-                      Math.round(400.0 * intensity / (4.0 * intensity + 6.0) + 0.05), 100);
-                spnAtBBattleChance[CombatRole.MANEUVER.ordinal()].setValue(value);
-                value = (int) Math.min(Math.round(200.0 * intensity / (2.0 * intensity + 8.0) + 0.05),
-                      100);
-                spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].setValue(value);
-                value = (int) Math.min(Math.round(600.0 * intensity / (6.0 * intensity + 4.0) + 0.05),
-                      100);
-                spnAtBBattleChance[CombatRole.PATROL.ordinal()].setValue(value);
-                value = (int) Math.min(Math.round(100.0 * intensity / (intensity + 9.0) + 0.05), 100);
-                spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(value);
-            } else {
-                spnAtBBattleChance[CombatRole.MANEUVER.ordinal()].setValue(0);
-                spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].setValue(0);
-                spnAtBBattleChance[CombatRole.PATROL.ordinal()].setValue(0);
-                spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(0);
-            }
-        }
     }
 
     /**
@@ -1101,8 +926,6 @@ public class RulesetsTab {
         options.setAutoGenerateOpForCallSigns(chkAutoGenerateOpForCallSigns.isSelected());
         options.setMinimumCallsignSkillLevel(comboMinimumCallsignSkillLevel.getSelectedItem());
         options.setUseDropShips(chkUseDropShips.isSelected());
-        options.setOpForUsesVTOLs(chkOpForUsesVTOLs.isSelected());
-        options.setClanVehicles(chkClanVehicles.isSelected());
         options.setRegionalMekVariations(chkRegionalMekVariations.isSelected());
         options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
         options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
@@ -1114,8 +937,13 @@ public class RulesetsTab {
         options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
         options.setUseLightConditions(chkUseLightConditions.isSelected());
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
+        options.setUseNoTornadoes(chkUseNoTornadoes.isSelected());
         options.setFixedMapChance((int) spnFixedMapChance.getValue());
         options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
+        options.setMoraleVictoryEffect((int) spnMoraleVictory.getValue());
+        options.setMoraleDecisiveVictoryEffect((int) spnMoraleDecisiveVictory.getValue());
+        options.setMoraleDefeatEffect((int) spnMoraleDefeat.getValue());
+        options.setMoraleDecisiveDefeatEffect((int) spnMoraleDecisiveDefeat.getValue());
         options.setAutoResolveMethod(comboAutoResolveMethod.getSelectedItem());
         options.setStrategicViewTheme(minimapThemeSelector.getSelectedItem());
         options.setAutoResolveVictoryChanceEnabled(chkAutoResolveVictoryChanceEnabled.isSelected());
@@ -1123,23 +951,11 @@ public class RulesetsTab {
         options.setAutoResolveExperimentalPacarGuiEnabled(chkAutoResolveExperimentalPacarGuiEnabled.isSelected());
 
         // StratCon
-        options.setUseStratCon(chkUseStratCon.isSelected());
+        options.setStratConPlayType(comboStratConPlayType.getSelectedItem());
+        options.setUseAdvancedScouting(chkUseAdvancedScouting.isSelected());
+        options.setNoSeedForces(chkNoSeedForces.isSelected());
         options.setUseGenericBattleValue(chkUseGenericBattleValue.isSelected());
         options.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
-
-        // Legacy
-        options.setUseAtB(chkUseAtB.isSelected() && !chkUseStratCon.isSelected());
-        options.setUseVehicles(chkUseVehicles.isSelected());
-        options.setDoubleVehicles(chkDoubleVehicles.isSelected());
-        options.setUseAero(chkOpForUsesAero.isSelected());
-        options.setOpForAeroChance((int) spnOpForAeroChance.getValue());
-        options.setAllowOpForLocalUnits(chkOpForUsesLocalForces.isSelected());
-        options.setAdjustPlayerVehicles(chkAdjustPlayerVehicles.isSelected());
-        options.setGenerateChases(chkGenerateChases.isSelected());
-
-        for (int i = 0; i < spnAtBBattleChance.length; i++) {
-            options.setAtBBattleChance(i, (int) spnAtBBattleChance[i].getValue());
-        }
     }
 
     /**
@@ -1173,8 +989,6 @@ public class RulesetsTab {
         chkAutoGenerateOpForCallSigns.setSelected(options.isAutoGenerateOpForCallSigns());
         comboMinimumCallsignSkillLevel.setSelectedItem(options.getMinimumCallsignSkillLevel());
         chkUseDropShips.setSelected(options.isUseDropShips());
-        chkOpForUsesVTOLs.setSelected(options.isOpForUsesVTOLs());
-        chkClanVehicles.setSelected(options.isClanVehicles());
         chkRegionalMekVariations.setSelected(options.isRegionalMekVariations());
         chkAttachedPlayerCamouflage.setSelected(options.isAttachedPlayerCamouflage());
         chkPlayerControlsAttachedUnits.setSelected(options.isPlayerControlsAttachedUnits());
@@ -1186,8 +1000,13 @@ public class RulesetsTab {
         chkUseWeatherConditions.setSelected(options.isUseWeatherConditions());
         chkUseLightConditions.setSelected(options.isUseLightConditions());
         chkUsePlanetaryConditions.setSelected(options.isUsePlanetaryConditions());
+        chkUseNoTornadoes.setSelected(options.isUseNoTornadoes());
         spnFixedMapChance.setValue(options.getFixedMapChance());
         chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
+        spnMoraleVictory.setValue(options.getMoraleVictoryEffect());
+        spnMoraleDecisiveVictory.setValue(options.getMoraleDecisiveVictoryEffect());
+        spnMoraleDefeat.setValue(options.getMoraleDefeatEffect());
+        spnMoraleDecisiveDefeat.setValue(options.getMoraleDecisiveDefeatEffect());
         comboAutoResolveMethod.setSelectedItem(options.getAutoResolveMethod());
         minimapThemeSelector.setSelectedItem(options.getStrategicViewTheme().getName());
         chkAutoResolveVictoryChanceEnabled.setSelected(options.isAutoResolveVictoryChanceEnabled());
@@ -1195,23 +1014,10 @@ public class RulesetsTab {
         spnAutoResolveNumberOfScenarios.setValue(options.getAutoResolveNumberOfScenarios());
 
         // StratCon
-        chkUseStratCon.setSelected(options.isUseStratCon());
+        comboStratConPlayType.setSelectedItem(options.getStratConPlayType());
+        chkUseAdvancedScouting.setSelected(options.isUseAdvancedScouting());
+        chkNoSeedForces.setSelected(options.isNoSeedForces());
         chkUseGenericBattleValue.setSelected(options.isUseGenericBattleValue());
         chkUseVerboseBidding.setSelected(options.isUseVerboseBidding());
-
-        // Legacy
-        chkUseAtB.setSelected(options.isUseAtB() && !options.isUseStratCon());
-        chkUseVehicles.setSelected(options.isUseVehicles());
-        chkDoubleVehicles.setSelected(options.isDoubleVehicles());
-        chkOpForUsesAero.setSelected(options.isUseAero());
-        spnOpForAeroChance.setValue(options.getOpForAeroChance());
-        chkOpForUsesLocalForces.setSelected(options.isAllowOpForLocalUnits());
-        chkAdjustPlayerVehicles.setSelected(options.isAdjustPlayerVehicles());
-        chkGenerateChases.setSelected(options.isGenerateChases());
-        for (CombatRole role : CombatRole.values()) {
-            if (role.ordinal() <= CombatRole.TRAINING.ordinal()) {
-                spnAtBBattleChance[role.ordinal()].setValue(options.getAtBBattleChance(role));
-            }
-        }
     }
 }

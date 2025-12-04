@@ -40,7 +40,7 @@ import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.codeUtilities.ObjectUtility.getRandomItem;
+import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.ELITE;
@@ -53,22 +53,22 @@ import static megamek.common.units.UnitType.TANK;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
-import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
-import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_ASTAR;
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_B;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_C;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_F;
 import static mekhq.campaign.stratCon.StratConContractDefinition.getContractDefinition;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.factionStanding.BatchallFactions.BATCHALL_FACTIONS;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -87,7 +87,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.ResourceBundle;
-import java.util.UUID;
 import java.util.stream.Stream;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -108,7 +107,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
-import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -116,12 +114,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
@@ -134,7 +130,6 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.randomEvents.MercenaryAuction;
 import mekhq.campaign.randomEvents.RoninOffer;
-import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConContractDefinition;
 import mekhq.campaign.stratCon.StratConContractInitializer;
@@ -147,6 +142,8 @@ import mekhq.campaign.universe.factionStanding.BatchallFactions;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -170,6 +167,7 @@ public class AtBContract extends Contract {
     protected Person clanOpponent;
     protected String employerCode;
     protected String enemyCode;
+    protected String enemyMercenaryEmployerCode;
     protected String enemyName;
 
     protected int difficulty;
@@ -219,6 +217,9 @@ public class AtBContract extends Contract {
     private StratConCampaignState stratconCampaignState;
     private boolean isAttacker;
 
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBContract";
+    @Deprecated(since = "0.50.10")
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBContract",
           MekHQ.getMHQOptions().getLocale());
 
@@ -246,6 +247,7 @@ public class AtBContract extends Contract {
         clanOpponent = null;
         employerCode = "IND";
         enemyCode = "IND";
+        enemyMercenaryEmployerCode = null;
         enemyName = "Independent";
 
         difficulty = Integer.MIN_VALUE;
@@ -359,7 +361,7 @@ public class AtBContract extends Contract {
     }
 
     public void calculateLength(final boolean variable) {
-        setLength(getContractType().calculateLength(variable, this));
+        setLength(getContractType().calculateLength(variable));
     }
 
     /**
@@ -367,13 +369,13 @@ public class AtBContract extends Contract {
      *
      * @return The number of lances required.
      *
-     * @deprecated use {@link ContractUtilities#calculateBaseNumberOfRequiredLances(Campaign)}
+     * @deprecated use {@link ContractUtilities#calculateBaseNumberOfRequiredLances(Campaign, boolean, boolean, double)}
      *       <p>
      *       Calculates the number of lances required for this contract, based on [campaign].
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static int calculateBaseNumberOfRequiredLances(Campaign campaign) {
-        return ContractUtilities.calculateBaseNumberOfRequiredLances(campaign);
+        return ContractUtilities.calculateBaseNumberOfRequiredLances(campaign, false, true, 1.0);
     }
 
     /**
@@ -417,12 +419,12 @@ public class AtBContract extends Contract {
      * @param today The current date in the context.
      */
     public void checkMorale(Campaign campaign, LocalDate today) {
-        // Check whether enemy forces have been reinforced, and whether any current rout continues beyond its
-        // expected date
-        boolean routContinue = randomInt(4) == 0;
 
         // If there is a rout end date, and it's past today, update morale and enemy state accordingly
         if (routEnd != null) {
+            // Check whether any current rout continues beyond its expected date. This is only applicable for
+            // Garrison Type contracts. For all other types we reinforce immediately
+            boolean routContinue = contractType.isGarrisonType() && randomInt(4) == 0;
             if (routContinue) {
                 return;
             }
@@ -431,7 +433,7 @@ public class AtBContract extends Contract {
                 int roll = randomInt(8);
 
                 // We use variable morale levels to spike morale up to a value above Stalemate. This works with the
-                // regenerated Scenario Odds to crease very high intensity spikes in otherwise low-key Garrison-type
+                // regenerated Scenario Odds to create very high intensity spikes in otherwise low-key Garrison-type
                 // contracts.
                 AtBMoraleLevel newMoraleLevel = switch (roll) {
                     case 2, 3, 4, 5 -> ADVANCING;
@@ -445,14 +447,10 @@ public class AtBContract extends Contract {
                     StratConContractDefinition contractDefinition = getContractDefinition(getContractType());
 
                     if (contractDefinition != null) {
-                        List<Integer> definedScenarioOdds = contractDefinition.getScenarioOdds();
-
-                        int scenarioOddsMultiplier = randomInt(20) == 0 ? 2 : 1;
-
                         for (StratConTrackState trackState : stratconCampaignState.getTracks()) {
-                            int baseScenarioOdds = getRandomItem(definedScenarioOdds);
+                            int scenarioOdds = StratConContractInitializer.getScenarioOdds(contractDefinition);
 
-                            trackState.setScenarioOdds(baseScenarioOdds * scenarioOddsMultiplier);
+                            trackState.setScenarioOdds(scenarioOdds);
                         }
                     }
                 }
@@ -460,150 +458,43 @@ public class AtBContract extends Contract {
                 moraleLevel = newMoraleLevel;
                 routEnd = null;
 
-                if (contractType.isGarrisonDuty()) {
+                String key = "routEnded.reinforcements";
+                if (contractType.isGarrisonDuty() || contractType.isRetainer()) {
                     updateEnemy(campaign, today); // mix it up a little
+                    key = "routEnded.aNewChallenger";
                 }
+
+                new ImmersiveDialogSimple(campaign,
+                      getEmployerLiaison(),
+                      null,
+                      getFormattedTextAt(RESOURCE_BUNDLE,
+                            key,
+                            campaign.getCommanderAddress(),
+                            FactionStandingUtilities.getFactionName(getEnemy(), today.getYear())),
+                      null,
+                      null,
+                      null,
+                      false);
             }
 
             return;
         }
 
-        TargetRoll targetNumber = new TargetRoll();
-        logger.info("Making Morale Check");
-        logger.info("Current Morale: {} ({})", getMoraleLevel().toString(), getMoraleLevel().ordinal());
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        String moraleReport = MHQMorale.performMoraleCheck(today, this,
+              campaignOptions.getMoraleDecisiveVictoryEffect(), campaignOptions.getMoraleVictoryEffect(),
+              campaignOptions.getMoraleDecisiveDefeatEffect(), campaignOptions.getMoraleDefeatEffect());
+        String flavorText = MHQMorale.getFormattedTitle()
+                                  + "<h2 style='text-align:center;'>" + getName() + "</h2>"
+                                  + moraleLevel.getToolTipText();
+        new ImmersiveDialogNotification(campaign, flavorText, moraleReport, true);
 
-        // Reliability:
-        int reliability = getReliability();
-
-        targetNumber.addModifier(reliability, "reliability");
-        logger.info("Reliability: {}", reliability >= 0 ? "+" + reliability : reliability);
-
-        // Force Type (unimplemented)
-        // TODO once we have force types defined on the StratCon map, we should handle
-        // modifiers here.
-        // 'Mek or Aircraft == +1
-        // Vehicle == +0
-        // Infantry == -1 (if unsupported)
-
-        // Performance
-        int performanceModifier = getPerformanceModifier(today);
-
-        targetNumber.addModifier(performanceModifier, "performanceModifier");
-        logger.info("Performance: {}", performanceModifier >= 0 ? "+" + performanceModifier : performanceModifier);
-
-        // Total morale modifier calculation
-        int roll = d6(2) + targetNumber.getValue();
-        logger.info("Total Modifier: {}", targetNumber.getValue());
-        logger.info("Roll: {}", roll);
-
-        // Morale level determination based on roll value
-        final AtBMoraleLevel[] moraleLevels = AtBMoraleLevel.values();
-
-        if (roll < 5) {
-            moraleLevel = moraleLevels[max(getMoraleLevel().ordinal() - 1, 0)];
-            logger.info("Result: Morale Level -1");
-        } else if ((roll > 9)) {
-            moraleLevel = moraleLevels[min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)];
-            logger.info("Result: Morale Level +1");
-        } else {
-            logger.info("Result: Morale Unchanged");
-        }
-
-        // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
-        if (moraleLevel.isRouted()) {
-            if (contractType.isGarrisonType()) {
-                routEnd = today.plusMonths(max(1, d6() - 3)).minusDays(1);
-
-                PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(campaign, this);
-                if (!campaign.getFriendlyPrisoners().isEmpty()) {
-                    prisoners.handlePrisoners(true, true);
-                }
-
-                if (!campaign.getCurrentPrisoners().isEmpty()) {
-                    prisoners.handlePrisoners(true, false);
-                }
-
-                campaign.setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
-            } else {
-                campaign.addReport("With the enemy routed, any remaining objectives have been" +
-                                         " successfully completed. The contract will conclude tomorrow.");
-                int remainingMonths = getMonthsLeft(campaign.getLocalDate().plusDays(1));
-                routedPayout = getMonthlyPayOut().multipliedBy(remainingMonths);
-                setEndDate(today.plusDays(1));
-            }
-        }
+        MHQMorale.routedMoraleUpdate(campaign, this);
 
         // Reset external morale modifier
         moraleMod = 0;
     }
 
-    private int getReliability() {
-        int reliability = getEnemyQuality();
-
-        Faction enemy = getEnemy();
-        if (enemy.isClan()) {
-            reliability = max(5, reliability + 1);
-        }
-
-        reliability = switch (reliability) {
-            case DRAGOON_F -> -1;
-            case DRAGOON_A, DRAGOON_ASTAR -> +1;
-            default -> 0; // DRAGOON_D, DRAGOON_C, DRAGOON_B
-        };
-
-        if (enemy.isRebel() || enemy.isMinorPower() || enemy.isMercenary() || enemy.isPirate()) {
-            reliability--;
-        } else if (enemy.isClan()) {
-            reliability++;
-        }
-        return reliability;
-    }
-
-    private int getPerformanceModifier(LocalDate today) {
-        int victories = 0;
-        int defeats = 0;
-        LocalDate lastMonth = today.minusMonths(1);
-
-        // Loop through scenarios, counting victories and defeats that fall within the target month
-        for (Scenario scenario : getScenarios()) {
-            if ((scenario.getDate() != null) && lastMonth.isAfter(scenario.getDate())) {
-                continue;
-            }
-
-            ScenarioStatus scenarioStatus = scenario.getStatus();
-
-            if (scenarioStatus.isOverallVictory()) {
-                victories++;
-            } else if (scenarioStatus.isOverallDefeat()) {
-                defeats++;
-            }
-
-            if (scenarioStatus.isDecisiveVictory()) {
-                victories++;
-            } else if (scenarioStatus.isDecisiveDefeat() || scenarioStatus.isRefusedEngagement()) {
-                defeats++;
-            } else if (scenarioStatus.isPyrrhicVictory()) {
-                victories--;
-            }
-        }
-
-        int performanceModifier = 0;
-
-        if (victories > defeats) {
-            if (victories >= (defeats * 2)) {
-                performanceModifier -= 2;
-            } else {
-                performanceModifier -= 1;
-            }
-        } else if (defeats > victories) {
-            if (defeats >= (victories * 2)) {
-                performanceModifier += 2;
-            } else {
-                performanceModifier += 1;
-            }
-        }
-        return performanceModifier;
-    }
 
     /**
      * Updates the enemy faction and enemy bot name for this contract.
@@ -675,84 +566,94 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Retrieves the repair location based on the unit rating and contract type.
+     * Determines the repair location for the contract based on the contract type.
      *
-     * @param unitRating The rating of the unit.
+     * <p>The returned repair location corresponds to the type of operation:</p>
      *
-     * @return The repair location.
+     * <ul>
+     *   <li>Guerrilla warfare contracts: {@link Unit#SITE_IMPROVISED}</li>
+     *   <li>Raid-type contracts: {@link Unit#SITE_FIELD_WORKSHOP}</li>
+     *   <li>All other contracts: {@link Unit#SITE_FACILITY_BASIC}</li>
+     * </ul>
+     *
+     * @return the repair location constant based on the contract type
      */
-    public int getRepairLocation(final int unitRating) {
+    @Override
+    public int getRepairLocation() {
         int repairLocation = Unit.SITE_FACILITY_BASIC;
 
         AtBContractType contractType = getContractType();
 
-        if (contractType.isGuerrillaWarfare()) {
+        if (contractType.isGuerrillaType()) {
             repairLocation = Unit.SITE_IMPROVISED;
         } else if (contractType.isRaidType()) {
             repairLocation = Unit.SITE_FIELD_WORKSHOP;
-        } else if (contractType.isGarrisonType()) {
-            repairLocation = Unit.SITE_FACILITY_MAINTENANCE;
         }
 
-        if (unitRating >= DRAGOON_B) {
-            repairLocation++;
-        }
-
-        return min(repairLocation, Unit.SITE_FACTORY_CONDITIONS);
+        return repairLocation;
     }
 
-    public int getScore() {
-        int score = employerMinorBreaches - playerMinorBreaches;
-        int battles = 0;
-        boolean earlySuccess = false;
-        for (Scenario scenario : getCompletedScenarios()) {
-            // Special Scenarios get no points for victory and only -1 for defeat.
-            if ((scenario instanceof AtBScenario) && ((AtBScenario) scenario).isSpecialScenario()) {
-                if (scenario.getStatus().isOverallDefeat() || scenario.getStatus().isRefusedEngagement()) {
-                    score--;
-                }
-            } else {
-                switch (scenario.getStatus()) {
-                    case DECISIVE_VICTORY:
-                    case VICTORY:
-                    case MARGINAL_VICTORY:
-                    case PYRRHIC_VICTORY:
-                        score++;
-                        battles++;
-                        break;
-                    case DECISIVE_DEFEAT:
-                    case DEFEAT:
-                        score -= 2;
-                        battles++;
-                        break;
-                    case MARGINAL_DEFEAT:
-                        // special scenario defeat
-                        score--;
-                        break;
-                    default:
-                        break;
-                }
-            }
+    /**
+     * Determines the best available repair location from a list of active contracts.
+     *
+     * <p>This method evaluates all active contracts and returns the highest quality repair facility available.
+     * Repair locations are ranked numerically, with higher values representing better facilities. If no active
+     * contracts exist, a basic facility is assumed to be available.</p>
+     *
+     * @param activeContracts the list of active contracts to evaluate for repair facilities
+     *
+     * @return the numeric value of the best available repair location; returns {@link Unit#SITE_FACILITY_BASIC} if no
+     *       contracts are active
+     */
+    public static int getBestRepairLocation(List<AtBContract> activeContracts) {
+        if (activeContracts.isEmpty()) {
+            return Unit.SITE_FACILITY_BASIC;
+        }
 
-            if ((scenario instanceof AtBScenario atBScenario) &&
-                      (atBScenario.getScenarioType() == AtBScenario.BASE_ATTACK) &&
-                      atBScenario.isAttacker() &&
-                      scenario.getStatus().isOverallVictory()) {
-                earlySuccess = true;
-            } else if (getMoraleLevel().isRouted() && !getContractType().isGarrisonType()) {
-                earlySuccess = true;
+        int bestSite = Unit.SITE_IMPROVISED;
+        for (AtBContract contract : activeContracts) {
+            int repairLocation = contract.getRepairLocation();
+            if (repairLocation > bestSite) {
+                bestSite = repairLocation;
             }
         }
 
-        if (battles == 0) {
-            score++;
+        return bestSite;
+    }
+
+    /**
+     * Calculates the overall contract score based on scenario outcomes and modifiers.
+     *
+     * <p>For StratCon campaigns, this returns the current victory points from the campaign state.</p>
+     *
+     * <p>For standard contracts, this aggregates scores from all completed scenarios and applies any arbitrary
+     * modifiers that have been set for this contract.</p>
+     *
+     * @param isUseMaplessMode {@code true} if mapless mode is enabled in StratCon
+     *
+     * @return the total contract score, including victory points or scenario scores plus modifiers
+     */
+    public int getContractScore(boolean isUseMaplessMode) {
+        if (!isUseMaplessMode && stratconCampaignState != null) {
+            return stratconCampaignState.getVictoryPoints();
         }
 
-        if (earlySuccess) {
-            score += 4;
+        return ContractScore.getContractScore(getCompletedScenarios()) + contractScoreArbitraryModifier;
+    }
+
+
+    /**
+     * @return the total available support points, or 0 if StratCon is not enabled for this contract
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public int getCurrentSupportPoints() {
+        if (stratconCampaignState == null) {
+            return 0;
         }
-        score += contractScoreArbitraryModifier;
-        return score;
+
+        return stratconCampaignState.getSupportPoints();
     }
 
     public int getContractScoreArbitraryModifier() {
@@ -786,7 +687,7 @@ public class AtBContract extends Contract {
 
                     for (int i = 0; i < number; i++) {
                         Person person = campaign.newDependent(Gender.RANDOMIZE);
-                        campaign.recruitPerson(person);
+                        campaign.recruitPerson(person, FREE, true, false, false);
                     }
                 } else {
                     campaign.addReport("Bonus: Ronin");
@@ -1116,6 +1017,10 @@ public class AtBContract extends Contract {
         indent = super.writeToXMLBegin(campaign, pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerCode", getEmployerCode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyCode", getEnemyCode());
+
+        if (enemyMercenaryEmployerCode != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyMercenaryEmployerCode", enemyMercenaryEmployerCode);
+        }
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractType", getContractType().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allySkill", getAllySkill().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyQuality", getAllyQuality());
@@ -1212,6 +1117,8 @@ public class AtBContract extends Contract {
                     employerCode = item.getTextContent();
                 } else if (item.getNodeName().equalsIgnoreCase("enemyCode")) {
                     enemyCode = item.getTextContent();
+                } else if (item.getNodeName().equalsIgnoreCase("enemyMercenaryEmployerCode")) {
+                    enemyMercenaryEmployerCode = item.getTextContent();
                 } else if (item.getNodeName().equalsIgnoreCase("contractType")) {
                     setContractType(AtBContractType.parseFromString(item.getTextContent().trim()));
                 } else if (item.getNodeName().equalsIgnoreCase("allySkill")) {
@@ -1288,6 +1195,11 @@ public class AtBContract extends Contract {
                     stratconCampaignState = StratConCampaignState.Deserialize(item);
                     stratconCampaignState.setContract(this);
                     this.setStratConCampaignState(stratconCampaignState);
+
+                    // <50.10 compatibility handler
+                    if (!(getContractType().isGarrisonType() || getContractType().isReliefDuty())) {
+                        stratconCampaignState.setAllowEarlyVictory(true);
+                    }
                 } else if (item.getNodeName().equalsIgnoreCase("parentContractId")) {
                     parentContract = new AtBContractRef(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("employerLiaison")) {
@@ -1413,6 +1325,10 @@ public class AtBContract extends Contract {
         return enemyCode;
     }
 
+    public void setEnemyCode(String enemyCode) {
+        this.enemyCode = enemyCode;
+    }
+
     /**
      * Retrieves the name of the enemy for this contract.
      *
@@ -1434,8 +1350,25 @@ public class AtBContract extends Contract {
         }
     }
 
-    public void setEnemyCode(String enemyCode) {
-        this.enemyCode = enemyCode;
+    public @Nullable String getEnemyMercenaryEmployerCode() {
+        return enemyMercenaryEmployerCode;
+    }
+
+    public @Nullable Faction getEnemyMercenaryEmployer() {
+        return enemyMercenaryEmployerCode == null ? null :
+                     Factions.getInstance().getFaction(enemyMercenaryEmployerCode);
+    }
+
+    /**
+     * Sets the faction code representing the employer of the enemy mercenary forces.
+     *
+     * @param enemyMercenaryEmployerCode the faction code to assign as the employer of opposing mercenary units
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public void setEnemyMercenaryEmployerCode(String enemyMercenaryEmployerCode) {
+        this.enemyMercenaryEmployerCode = enemyMercenaryEmployerCode;
     }
 
     public int getDifficulty() {
@@ -1567,8 +1500,50 @@ public class AtBContract extends Contract {
         this.moraleLevel = moraleLevel;
     }
 
+    /**
+     * Adjusts the current {@link AtBMoraleLevel} by the specified delta and returns the resulting morale level.
+     *
+     * <p>The method computes a new integer morale value by adding the given {@code delta} to the unit's current
+     * morale level, then clamps the result to the valid range defined by {@code MINIMUM_MORALE_LEVEL} and
+     * {@code MAXIMUM_MORALE_LEVEL}. It then attempts to resolve the resulting value to a corresponding
+     * {@link AtBMoraleLevel}.</p>
+     *
+     * <p>If the resolved morale level is valid (i.e., non-{@code null}), the unit's internal morale state is updated.
+     * If no valid enum constant exists for the computed level, the method leaves the current morale unchanged and
+     * returns the existing level.</p>
+     *
+     * <p><b>Note:</b> a positive delta improves the enemy morale, a negative delta decreases enemy morale.</p>
+     *
+     * @param delta the amount to adjust the current morale level by; may be positive or negative
+     *
+     * @return the new {@link AtBMoraleLevel} after applying the delta; if no corresponding morale level exists for the
+     *       computed value, the current morale level is returned unchanged
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public AtBMoraleLevel changeMoraleLevel(final int delta) {
+        int currentLevel = moraleLevel.getLevel();
+        int newLevel = clamp(currentLevel + delta, MINIMUM_MORALE_LEVEL, MAXIMUM_MORALE_LEVEL);
+
+        AtBMoraleLevel newMoraleLevel = AtBMoraleLevel.parseFromLevel(newLevel);
+        if (newMoraleLevel != null) {
+            moraleLevel = newMoraleLevel;
+        }
+
+        return newMoraleLevel != null ? newMoraleLevel : moraleLevel;
+    }
+
     public boolean isPeaceful() {
         return getContractType().isGarrisonType() && getMoraleLevel().isRouted();
+    }
+
+    public LocalDate getRoutEnd() {
+        return routEnd;
+    }
+
+    public void setRoutEnd(LocalDate routEnd) {
+        this.routEnd = routEnd;
     }
 
     @Override
@@ -1692,12 +1667,14 @@ public class AtBContract extends Contract {
         }
 
         if (getContractType().isPirateHunting()) {
-            enemyCode = "PIR";
+            Faction employer = getEmployerFaction();
+            enemyCode = employer.isClan() ? "BAN" : PIRATE_FACTION_CODE;
         } else if (getContractType().isRiotDuty()) {
             enemyCode = "REB";
         }
 
-        setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign));
+        setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
+              contractType.isCadreDuty(), true, 1.0));
         setRequiredCombatElements(ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(campaign));
 
         setPartsAvailabilityLevel(getContractType().calculatePartsAvailabilityLevel());
@@ -2091,147 +2068,35 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Calculates the difficulty of a contract based on the relative power of enemy forces, player forces, and any
-     * allied forces involved in the campaign.
+     * Calculates the difficulty rating of a contract by comparing the estimated combat strength of the opposing
+     * force to the combat strength of the player's participating units.
      *
-     * <p>
-     * The method evaluates the enemy's estimated power against the player's strengths and considers allied
-     * contributions depending on the assigned command rights. The result is a difficulty level mapped between 1 and 10,
-     * where higher values represent more challenging contracts.
-     * </p>
+     * <p>The method performs the following steps:</p>
+     * <ol>
+     *     <li>Determines the opposing force's effective skill level by applying any faction-based adjustments to
+     *     their base {@link SkillLevel}.</li>
+     *     <li>Computes a skill multiplier and applies it to the estimated enemy force power, derived from the game
+     *     year, force quality, and whether generic BV values are used.</li>
+     *     <li>Estimates the total combat power of the player's units based on their BV values and optionally using
+     *     generic BV rules.</li>
+     *     <li>Computes the percentage difference between enemy and player power.</li>
+     *     <li>Maps that percentage difference into a difficulty scale ranging from {@code 1} (easiest) to {@code 10}
+     *     (hardest), centered around {@code 5} as an even match.</li>
+     * </ol>
      *
-     * @param campaign The {@link Campaign} object representing the current game state. Used to extract information
-     *                 about the player's forces, enemy forces, and allied forces.
+     * <p>A negative percentage difference indicates that the player is stronger than the opposing force; a positive
+     * difference indicates the enemy is stronger. Each 20% shift away from parity increases (or decreases)
+     * difficulty by one step.</p>
      *
-     * @return An integer representing the difficulty of the contract:
-     *       <ul>
-     *       <li>1 = very easy</li>
-     *       <li>10 = extremely difficult</li>
-     *       </ul>
-     *       <p>
-     *       <b>WARNING: </b>Returns `-99` (defined as `ERROR`) if the enemy's
-     *       power cannot be calculated.
-     *       </p>
-     *       <p>
-     *       <b>Mapped Result Explanation:</b>
-     *       </p>
-     *       The method divides the absolute percentage difference between enemy
-     *       and player forces by 20
-     *       (rounding up), then adjusts the difficulty accordingly:
-     *       <ul>
-     *       <li>If the player's forces are stronger, the difficulty is adjusted
-     *       downward from a baseline of 5.</li>
-     *       <li>If the enemy's forces are stronger, the difficulty is adjusted
-     *       upward from a baseline of 5.</li>
-     *       <li>If an error is encountered, the difficulty is returned as
-     *       -99</li>
-     *       </ul>
-     *       The result is clamped to fit between the valid range of 1 and 10. Or
-     *       -99 if an error is encountered.
+     * <p>If enemy combat strength cannot be computed, the method returns {@code -99} to signal an error.</p>
      *
-     * @since 0.50.04
-     * @deprecated use {@link #calculateContractDifficulty(int, boolean, List)} instead
+     * @param gameYear          the current in-game year used for estimating enemy technology and BV baselines
+     * @param useGenericBV      whether generic BV values should be used instead of unit-specific BV calculations
+     * @param playerCombatUnits the list of player {@link Entity} objects expected to participate in the contract
+     *
+     * @return a difficulty rating from {@code 1} to {@code 10}, where {@code 5} represents roughly even forces; or
+     * {@code -99} if the enemy power estimation fails
      */
-    @Deprecated(since = "0.50.04")
-    public int calculateContractDifficulty(Campaign campaign) {
-        final int ERROR = -99;
-
-        // Estimate the power of the enemy forces
-        SkillLevel opposingSkill = modifySkillLevelBasedOnFaction(enemyCode, enemySkill);
-        double enemySkillMultiplier = getSkillMultiplier(opposingSkill);
-        int gameYear = campaign.getGameYear();
-        boolean useGenericBV = campaign.getCampaignOptions().isUseGenericBattleValue();
-        double enemyPower = estimateMekStrength(gameYear, useGenericBV, enemyCode, enemyQuality);
-
-        // If we cannot calculate enemy power, abort.
-        if (enemyPower == 0) {
-            return ERROR;
-        }
-
-        enemyPower = (int) round(enemyPower * enemySkillMultiplier);
-
-        // Estimate player power
-        double playerPower = estimatePlayerPower(campaign);
-
-        // Estimate the power of allied forces
-        // TODO pull these directly from Force Generation instead of using magic numbers
-        // TODO estimate the LIAISON ratio by going through each combat lance and
-        // getting the actual average (G)BV for an allied heavy/assault mek.
-        double allyRatio = switch (getCommandRights()) {
-            case INDEPENDENT -> 0; // no allies
-            case LIAISON -> 0.4; // single allied heavy/assault mek, pure guess for now
-            case HOUSE -> 0.25; // allies with 25% the player's (G)BV budget
-            case INTEGRATED -> 0.5; // allies with 50% the player's (G)BV budget
-        };
-
-        if (allyRatio > 0) {
-            SkillLevel alliedSkill = modifySkillLevelBasedOnFaction(employerCode, allySkill);
-            double allySkillMultiplier = getSkillMultiplier(alliedSkill);
-            double allyPower = estimateMekStrength(gameYear, useGenericBV, employerCode, allyQuality);
-            allyPower = allyPower * allySkillMultiplier;
-            // If we cannot calculate ally's power, use player power as a fallback.
-            if (allyPower == 0) {
-                allyPower = playerPower;
-            }
-            playerPower += allyRatio * allyPower;
-            enemyPower += allyRatio * enemyPower;
-        }
-
-        // Calculate difficulty based on the percentage difference between the two forces.
-        double difference = enemyPower - playerPower;
-        double percentDifference = (difference / playerPower) * 100;
-
-        int mappedValue = (int) ceil(Math.abs(percentDifference) / 20);
-        if (percentDifference < 0) {
-            mappedValue = 5 - mappedValue;
-        } else {
-            mappedValue = 5 + mappedValue;
-        }
-
-        return min(max(mappedValue, 1), 10);
-    }
-
-    /**
-     * Calculates the difficulty of a contract based on the relative power of enemy forces, player forces, and any
-     * allied forces involved in the campaign.
-     *
-     * <p>
-     * The method evaluates the enemy's estimated power against the player's strengths and considers allied
-     * contributions depending on the assigned command rights. The result is a difficulty level mapped between 1 and 10,
-     * where higher values represent more challenging contracts.
-     * </p>
-     *
-     * @param gameYear          The current year in the campaign (e.g., from {@link Campaign#getGameYear()})
-     * @param useGenericBV      Whether "Use Generic BV" is enabled in the Campaign Options
-     * @param playerCombatUnits List of Entities representing all combat units for the player. This can be obtained via
-     *                          {@link Campaign#getAllCombatEntities()}.
-     *
-     * @return An integer representing the difficulty of the contract:
-     *       <ul>
-     *       <li>1 = very easy</li>
-     *       <li>10 = extremely difficult</li>
-     *       </ul>
-     *       <p>
-     *       <b>WARNING: </b>Returns `-99` (defined as `ERROR`) if the enemy's
-     *       power cannot be calculated.
-     *       </p>
-     *       <p>
-     *       <b>Mapped Result Explanation:</b>
-     *       </p>
-     *       The method divides the absolute percentage difference between enemy
-     *       and player forces by 20
-     *       (rounding up), then adjusts the difficulty accordingly:
-     *       <ul>
-     *       <li>If the player's forces are stronger, the difficulty is adjusted
-     *       downward from a baseline of 5.</li>
-     *       <li>If the enemy's forces are stronger, the difficulty is adjusted
-     *       upward from a baseline of 5.</li>
-     *       <li>If an error is encountered, the difficulty is returned as
-     *       -99</li>
-     *       </ul>
-     *       The result is clamped to fit between the valid range of 1 and 10. Or
-     *       -99 if an error is encountered.
-     **/
     public int calculateContractDifficulty(int gameYear, boolean useGenericBV, List<Entity> playerCombatUnits) {
         final int ERROR = -99;
 
@@ -2250,36 +2115,12 @@ public class AtBContract extends Contract {
         // Estimate player power
         double playerPower = estimatePlayerPower(playerCombatUnits, useGenericBV);
 
-        // Estimate the power of allied forces
-        // TODO pull these directly from Force Generation instead of using magic numbers
-        // TODO estimate the LIAISON ratio by going through each combat lance and
-        // getting the actual average (G)BV for an allied heavy/assault mek.
-        double allyRatio = switch (getCommandRights()) {
-            case INDEPENDENT -> 0; // no allies
-            case LIAISON -> 0.4; // single allied heavy/assault mek, pure guess for now
-            case HOUSE -> 0.25; // allies with 25% the player's (G)BV budget
-            case INTEGRATED -> 0.5; // allies with 50% the player's (G)BV budget
-        };
-
-        if (allyRatio > 0) {
-            SkillLevel alliedSkill = modifySkillLevelBasedOnFaction(employerCode, allySkill);
-            double allySkillMultiplier = getSkillMultiplier(alliedSkill);
-            double allyPower = estimateMekStrength(gameYear, useGenericBV, employerCode, allyQuality);
-            allyPower = allyPower * allySkillMultiplier;
-            // If we cannot calculate ally's power, use player power as a fallback.
-            if (allyPower == 0) {
-                allyPower = playerPower;
-            }
-            playerPower += allyRatio * allyPower;
-            enemyPower += allyRatio * enemyPower;
-        }
-
-        // Calculate difficulty based on the percentage difference between the two
-        // forces.
+        // Calculate difficulty based on the percentage difference between the two forces.
         double difference = enemyPower - playerPower;
-        double percentDifference = (difference / playerPower) * 100;
+        // Divide by 0 protection
+        double percentDifference = (playerPower != 0 ? (difference / playerPower) : difference) * 100;
 
-        int mappedValue = (int) ceil(Math.abs(percentDifference) / 20);
+        int mappedValue = (int) round(Math.abs(percentDifference) / 20);
         if (percentDifference < 0) {
             mappedValue = 5 - mappedValue;
         } else {
@@ -2307,41 +2148,6 @@ public class AtBContract extends Contract {
         }
 
         return skillLevel;
-    }
-
-    /**
-     * Estimates the power of the player in a campaign based on the battle values of their units.
-     *
-     * @param campaign the object containing the forces and units of the player
-     *
-     * @return average battle value per player unit OR total BV2 divided by total GBV
-     *
-     * @since 0.50.04
-     * @deprecated use {@link #estimatePlayerPower(List, boolean)} instead
-     */
-    @Deprecated(since = "0.50.04")
-    double estimatePlayerPower(Campaign campaign) {
-        int playerPower = 0;
-        int playerGBV = 0;
-        int playerUnitCount = 0;
-        for (Force force : campaign.getAllForces()) {
-            if (!force.isForceType(STANDARD)) {
-                continue;
-            }
-
-            for (UUID unitID : force.getUnits()) {
-                Entity entity = campaign.getUnit(unitID).getEntity();
-                playerPower += entity.calculateBattleValue();
-                playerGBV += entity.getGenericBattleValue();
-                playerUnitCount++;
-            }
-        }
-
-        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
-            return ((double) playerPower) / playerGBV;
-        } else {
-            return ((double) playerPower) / playerUnitCount;
-        }
     }
 
     double estimatePlayerPower(List<Entity> units, boolean useGenericBV) {
@@ -2505,7 +2311,63 @@ public class AtBContract extends Contract {
         transportRoll = roll;
     }
 
+    public void setRoutedPayout(@Nullable Money routedPayout) {
+        this.routedPayout = routedPayout;
+    }
+
     public @Nullable Money getRoutedPayout() {
         return routedPayout;
+    }
+
+    /**
+     * Calculates the number of required Victory Points (VP) needed to achieve overall success for this StratCon
+     * contract.
+     *
+     * <p>The calculation is based on several averaged campaign parameters:
+     * <ul>
+     *     <li><b>Base requirement</b> — Required number of combat teams multiplied by the contract length.</li>
+     *     <li><b>Scenario odds</b> — The mean scenario-odds percentage across all StratCon tracks, converted to a
+     *     probability.</li>
+     *     <li><b>Turning point chance</b> — A scaling factor based on command rights: {@code INTEGRATED} contracts
+     *     assume a 100% chance, while all others use a one-third chance.</li>
+     * </ul>
+     *
+     * <p>The final result estimates the expected number of Turning Points the player must win for overall contract
+     * success. If the player loses a handful of Turning Points, they should still be able to win the contract by
+     * being proactive in the Area of Operations.</p>
+     *
+     * @return the required number of Victory Points, rounded up to the nearest integer
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public int getRequiredVictoryPoints() {
+        if (stratconCampaignState == null) {
+            return 0;
+        }
+
+        double baseRequirement = getRequiredCombatTeams();
+
+        int duration = getLength();
+        if (contractType.isGarrisonType()) {
+            duration = (int) ceil(duration * 0.75); // We assume around 25% of the contract will be peaceful
+        }
+
+        double trackCount = 0;
+        int totalScenarioOdds = 0;
+        for (StratConTrackState trackState : stratconCampaignState.getTracks()) {
+            trackCount++;
+            totalScenarioOdds += trackState.getScenarioOdds();
+        }
+
+        double meanScenarioOdds = totalScenarioOdds / trackCount;
+        double scenarioOdds = meanScenarioOdds / 100.0;
+        double turningPointChance = switch (getCommandRights()) {
+            case INTEGRATED -> 1.0;
+            default -> 0.33;
+        };
+
+        // This result gives us the average number of Turning Points expected for the contract
+        return (int) ceil(baseRequirement * duration * scenarioOdds * turningPointChance);
     }
 }

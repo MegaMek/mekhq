@@ -33,6 +33,8 @@
 
 package mekhq.gui.stratCon;
 
+import static mekhq.MHQConstants.CONFIRMATION_STRATCON_DEPLOY;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -44,6 +46,7 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -51,6 +54,7 @@ import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConCoords;
 import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.gui.StratConPanel;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
@@ -64,6 +68,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
 
     private Campaign campaign;
     private StratConCampaignState currentCampaignState;
+    private boolean restrictToSingleForce;
     private final JList<Force> availableForceList = new JList<>();
     private final JButton btnConfirm;
     private final StratConPanel ownerPanel;
@@ -100,11 +105,16 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         // if we're waiting to assign primary forces, we can only do so from the current track
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
               StratConRulesManager.getAvailableForceIDsForManualDeployment(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX,
-                    campaign, ownerPanel.getCurrentTrack(), false, null, currentCampaignState));
+                    campaign, ownerPanel.getCurrentTrack(), false, null, currentCampaignState, restrictToSingleForce));
 
         availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         availableForceList.setModel(lanceModel);
         availableForceList.setCellRenderer(new ScenarioWizardLanceRenderer(campaign));
+        availableForceList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                btnConfirm.setEnabled(!availableForceList.isSelectionEmpty());
+            }
+        });
 
         forceListContainer.setViewportView(availableForceList);
 
@@ -113,7 +123,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         gbc.gridy++;
 
         getContentPane().add(btnConfirm, gbc);
-        btnConfirm.setEnabled(true);
+        btnConfirm.setEnabled(false);
 
         pack();
         repaint();
@@ -123,9 +133,11 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
     /**
      * Display the track force assignment UI.
      */
-    public void display(Campaign campaign, StratConCampaignState campaignState, StratConCoords coords) {
+    public void display(Campaign campaign, StratConCampaignState campaignState, StratConCoords coords,
+          boolean restrictToSingleForce) {
         this.campaign = campaign;
         this.currentCampaignState = campaignState;
+        this.restrictToSingleForce = restrictToSingleForce;
 
         initializeUI();
     }
@@ -139,6 +151,18 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
             // sometimes the scenario templates take a little while to load, we don't want the user
             // clicking the button fifty times and getting a bunch of scenarios.
             btnConfirm.setEnabled(false);
+
+            // This dialog marks a point of no return, so we ask the player to confirm their decision before moving
+            // forward
+            if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_STRATCON_DEPLOY)) {
+                ImmersiveDialogConfirmation dialog = new ImmersiveDialogConfirmation(campaign,
+                      CONFIRMATION_STRATCON_DEPLOY);
+                if (!dialog.wasConfirmed()) {
+                    btnConfirm.setEnabled(true);
+                    return;
+                }
+            }
+
             for (Force force : availableForceList.getSelectedValuesList()) {
                 StratConRulesManager.deployForceToCoords(ownerPanel.getSelectedCoords(),
                       force.getId(), campaign, currentCampaignState.getContract(), ownerPanel.getCurrentTrack(), false);

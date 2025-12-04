@@ -48,10 +48,10 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.events.units.UnitChangedEvent;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
@@ -65,7 +65,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * units when arriving in the system.</p>
  */
 public class ContractAutomation {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources." + ContractAutomation.class.getSimpleName();
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractAutomation";
     private static final MMLogger logger = MMLogger.create(ContractAutomation.class);
 
     private static final int DIALOG_CONFIRM_OPTION = 0;
@@ -119,10 +119,8 @@ public class ContractAutomation {
         JumpPath jumpPath = contract.getJumpPath(campaign);
         int travelDays = contract.getTravelDays(campaign);
 
-        Money costPerJump = campaign.calculateCostPerJump(true,
-              campaign.getCampaignOptions().isEquipmentContractBase());
-        String totalCost = costPerJump.multipliedBy(jumpPath.getJumps()).toAmountString();
-
+        boolean isUseTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
+        String totalCost = contract.getTransportAmount().dividedBy(isUseTwoWayPay ? 2 : 1).toAmountString();
 
         inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
               "transitDescription.text",
@@ -144,11 +142,21 @@ public class ContractAutomation {
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
             campaign.getApp().getCampaigngui().refreshAllTabs();
             campaign.getApp().getCampaigngui().refreshLocation();
+            boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
 
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "transitDescription.report",
-                  targetSystem,
-                  travelDays));
+            // This will return an empty string if the transaction was successful
+            String jumpReport = TransportCostCalculations.performJumpTransaction(campaign.getFinances(), jumpPath,
+                  campaign.getLocalDate(), contract.getTransportAmount().dividedBy(useTwoWayPay ? 2 : 1),
+                  campaign.getCurrentSystem());
+
+            if (jumpReport.isBlank()) {
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "transitDescription.report",
+                      targetSystem,
+                      travelDays));
+            } else {
+                campaign.addReport(jumpReport);
+            }
         }
     }
 
@@ -160,7 +168,7 @@ public class ContractAutomation {
      *
      * @return A list of all newly mothballed units.
      */
-    private static List<UUID> performAutomatedMothballing(Campaign campaign) {
+    public static List<UUID> performAutomatedMothballing(Campaign campaign) {
         List<UUID> mothballTargets = new ArrayList<>();
         MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
 
@@ -233,5 +241,33 @@ public class ContractAutomation {
 
         // We still want to clear out any units
         campaign.setAutomatedMothballUnits(new ArrayList<>());
+    }
+
+    public static void outOfContractMothballAutomation(Campaign campaign) {
+        final List<String> buttonLabels = List.of(getTextAt(RESOURCE_BUNDLE, "generalConfirm.text"),
+              getTextAt(RESOURCE_BUNDLE, "generalDecline.text"));
+
+        final Person speaker = campaign.getSeniorAdminPerson(TRANSPORT);
+
+        final String commanderAddress = campaign.getCommanderAddress();
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+              "mothballDescription.text.noContract",
+              commanderAddress);
+
+        String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+              "mothballDescription.addendum.noContract");
+
+        ImmersiveDialogSimple mothballDialog = new ImmersiveDialogSimple(campaign,
+              speaker,
+              null,
+              inCharacterMessage,
+              buttonLabels,
+              outOfCharacterMessage,
+              null,
+              false);
+
+        if (mothballDialog.getDialogChoice() == DIALOG_CONFIRM_OPTION) {
+            campaign.setAutomatedMothballUnits(performAutomatedMothballing(campaign));
+        }
     }
 }

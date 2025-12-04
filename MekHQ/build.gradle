@@ -10,6 +10,11 @@ plugins {
     id 'checkstyle'
 }
 
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = true
+    reproducibleFileOrder = true
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -228,7 +233,7 @@ tasks.register('stageFiles', Copy) {
     dependsOn copyLicenseFiles
 
     from projectDir
-    include "campaigns/"
+    include "campaigns/The Learning Ropes.cpnx.gz"
     include "data/**"
     include "docs/**"
     include "mmconf/**"
@@ -247,10 +252,12 @@ tasks.register('stageFiles', Copy) {
     exclude "mmconf/mm.preferences"
     exclude "mmconf/mml.preferences"
 
+    exclude("data/**/*.cache")
+
     into fileStagingDir
 
     doLast {
-        mkdir "${fileStagingDir}/log"
+        mkdir "${fileStagingDir}/logs"
         mkdir "${fileStagingDir}/userdata/data/campaignPresets/"
     }
 }

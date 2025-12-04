@@ -33,6 +33,13 @@
  */
 package mekhq.campaign.parts;
 
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Objects;
@@ -50,7 +57,6 @@ import megamek.common.units.Entity;
 import megamek.common.units.Tank;
 import megamek.common.units.Warship;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -143,7 +149,7 @@ public class Armor extends Part implements IAcquisitionWork {
         toReturn.append("<html><b>Replace ").append(getName());
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
             toReturn.append(" - ")
-                  .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
+                  .append(messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
                         getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"));
         }
         toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
@@ -172,50 +178,42 @@ public class Armor extends Part implements IAcquisitionWork {
     public String getDetails(boolean includeRepairDetails) {
         StringBuilder toReturn = new StringBuilder();
         if (null != unit) {
-            if (isSalvaging()) {
-                toReturn.append(unit.getEntity().getLocationName(location))
-                      .append(rear ? " (Rear)" : "")
-                      .append(", ")
-                      .append(amount)
-                      .append(amount == 1 ? " point" : " points");
-            } else {
+            if (!isSalvaging()) {
                 toReturn.append(unit.getEntity().getLocationName(location))
                       .append(rear ? " (Rear)" : "")
                       .append(", ")
                       .append(amountNeeded)
                       .append(amountNeeded == 1 ? " point" : " points")
                       .append("<br/>");
+            }
 
-                int amountAvailable = getAmountAvailable();
-                if (amountAvailable == 0) {
-                    toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                                              .getFontColorNegativeHexColor(),
-                          "None in stock"));
-                } else if (amountAvailable < amountNeeded) {
-                    toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
-                                                                                        .getFontColorNegativeHexColor()))
+            int amountAvailable = getAmountAvailable();
+            if (amountAvailable == 0) {
+                toReturn.append(messageSurroundedBySpanWithColor(getNegativeColor(),
+                      "None in stock"));
+            } else if (!isSalvaging()) {
+                if (amountAvailable < amountNeeded) {
+                    toReturn.append(spanOpeningWithCustomColor(getNegativeColor()))
                           .append("Only ")
                           .append(amountAvailable)
                           .append(" in stock")
-                          .append(ReportingUtilities.CLOSING_SPAN_TAG);
+                          .append(CLOSING_SPAN_TAG);
                 } else {
-                    toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
-                                                                                        .getFontColorPositiveHexColor()))
+                    toReturn.append(spanOpeningWithCustomColor(getPositiveColor()))
                           .append(amountAvailable)
                           .append(" in stock")
-                          .append(ReportingUtilities.CLOSING_SPAN_TAG);
+                          .append(CLOSING_SPAN_TAG);
                 }
+            }
 
-                PartInventory inventories = campaign.getPartInventory(getNewPart());
-                String orderTransitString = inventories.getTransitOrderedDetails();
-                if (!orderTransitString.isEmpty()) {
-                    toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
-                                                                                        .getFontColorWarningHexColor()))
-                          .append(" (")
-                          .append(orderTransitString)
-                          .append(")")
-                          .append(ReportingUtilities.CLOSING_SPAN_TAG);
-                }
+            PartInventory inventories = campaign.getPartInventory(getNewPart());
+            String orderTransitString = inventories.getTransitOrderedDetails();
+            if (!orderTransitString.isEmpty()) {
+                toReturn.append(spanOpeningWithCustomColor(getWarningColor()))
+                      .append(" (")
+                      .append(orderTransitString)
+                      .append(")")
+                      .append(CLOSING_SPAN_TAG);
             }
 
         } else {
@@ -364,11 +362,11 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public String find(int transitDays) {
+    public String find(int transitDays, double valueMultiplier) {
         Part newPart = getNewPart();
         newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
-        if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
+        if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays)) {
             return "<font color='" +
                          ReportingUtilities.getPositiveColor() +
                          "'><b> part found</b>.</font> It will be delivered in " +
@@ -586,6 +584,15 @@ public class Armor extends Part implements IAcquisitionWork {
 
     public double getArmorPointsPerTon() {
         return ArmorType.of(type, clan).getPointsPerTon();
+    }
+
+    @Override
+    public int getQuantityForPartsInUse() {
+        if (isPartUsedOrReserved()) {
+            return 0;
+        }
+
+        return this.getAmount();
     }
 
     public Part getNewPart() {

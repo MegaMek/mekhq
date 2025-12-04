@@ -32,6 +32,11 @@
  */
 package mekhq.service.mrms;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -58,9 +63,8 @@ import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
@@ -72,6 +76,8 @@ import mekhq.utilities.ReportingUtilities;
 public class MRMSService {
     private static final MMLogger LOGGER = MMLogger.create(MRMSService.class);
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.MRMSService";
+    @Deprecated(since = "0.50.10")
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MRMS",
           MekHQ.getMHQOptions().getLocale());
 
@@ -212,14 +218,12 @@ public class MRMSService {
             parts = filterParts(parts, null, techs, campaign);
 
             if (!parts.isEmpty()) {
+                String color = spanOpeningWithCustomColor(getWarningColor());
                 if (parts.size() == 1) {
-                    campaign.addReport("<font color='" + ReportingUtilities.getNegativeColor()
-                                             + "'>There in still 1 part that is not being worked on.</font>");
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "inProgress.one", color, CLOSING_SPAN_TAG));
                 } else {
-                    campaign.addReport(String.format(
-                          "<font color='" + ReportingUtilities.getNegativeColor()
-                                + "'>There are still %s parts that are not being worked on.</font>",
-                          parts.size()));
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "inProgress.many", color, parts.size(),
+                          CLOSING_SPAN_TAG));
                 }
             }
         }
@@ -372,7 +376,7 @@ public class MRMSService {
                 if (count > 0) {
                     if (count == 1) {
                         campaign.addReport("<font color='" + ReportingUtilities.getNegativeColor()
-                                                 + "'>There in still 1 part that is not being worked on.</font>");
+                                                 + "'>There is still 1 part that is not being worked on.</font>");
                     } else {
                         campaign.addReport(String.format(
                               "<font color='" + ReportingUtilities.getNegativeColor()
@@ -647,14 +651,14 @@ public class MRMSService {
                         if (unfixable) {
                             campaign.addReport(String.format(
                                   "<font color='" +
-                                        ReportingUtilities.getWarningColor()
+                                        getWarningColor()
                                         +
                                         "'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
                                   loc.getName(), unit.getName(), countOfPartsPerLocation.get(locId)));
                         } else {
                             campaign.addReport(String.format(
                                   "<font color='" +
-                                        ReportingUtilities.getWarningColor()
+                                        getWarningColor()
                                         +
                                         "'>Found missing location (%s) on %s which contains %s parts. Going to remove all parts before proceeding with other repairs.</font>",
                                   loc != null ? loc.getName() : Integer.toString(locId), unit.getName(),
@@ -752,8 +756,9 @@ public class MRMSService {
         int highestAvailableTechSkill = -1;
 
         for (Person tech : techs) {
+            SkillModifierData skillModifierData = tech.getSkillModifierData();
             Skill skill = tech.getSkillForWorkingOn(partWork);
-            int experienceLevel = skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes());
+            int experienceLevel = skill.getExperienceLevel(skillModifierData);
 
             if (experienceLevel > highestAvailableTechSkill) {
                 highestAvailableTechSkill = experienceLevel;
@@ -1085,18 +1090,17 @@ public class MRMSService {
                 continue;
             }
 
-            PersonnelOptions options = tech.getOptions();
-            Attributes attributes = tech.getATOWAttributes();
+            SkillModifierData skillModifierData = tech.getSkillModifierData();
 
-            if (mrmsOption.getSkillMin() > skill.getExperienceLevel(options, attributes)) {
+            if (mrmsOption.getSkillMin() > skill.getExperienceLevel(skillModifierData)) {
                 continue;
             }
 
-            if (mrmsOption.getSkillMax() < skill.getExperienceLevel(options, attributes)) {
+            if (mrmsOption.getSkillMax() < skill.getExperienceLevel(skillModifierData)) {
                 continue;
             }
 
-            if (partWork.getSkillMin() > skill.getExperienceLevel(options, attributes)) {
+            if (partWork.getSkillMin() > skill.getExperienceLevel(skillModifierData)) {
                 continue;
             }
 
@@ -1164,11 +1168,11 @@ public class MRMSService {
             // If we're trying to a rush a job, our effective skill goes down
             // Let's make sure we don't put it so high that we can't fix it
             // anymore
+            SkillModifierData skillModifierData = tech.getSkillModifierData();
             if (!increaseTime) {
                 int modePenalty = partWork.getMode().expReduction;
-
                 if (partWork.getSkillMin() >
-                          (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) - modePenalty)) {
+                          (skill.getExperienceLevel(skillModifierData) - modePenalty)) {
                     debugLog(
                           "...... ending calculateNewMRMSWorktime with previousWorkTime due time reduction skill mod now being less that required skill - %s ns",
                           "calculateNewMRMSWorktime",
@@ -1190,7 +1194,8 @@ public class MRMSService {
                 if (targetRoll.getValue() <= mrmsOption.getTargetNumberMax()) {
                     wtc.setWorkTime(previousNewWorkTime);
                 }
-                if (skill.getExperienceLevel(tech.getOptions(), tech.getATOWAttributes()) >=
+
+                if (skill.getExperienceLevel(skillModifierData) >=
                           highestAvailableTechSkill) {
                     wtc.setReachedMaxSkill(true);
                 }
@@ -1301,9 +1306,11 @@ public class MRMSService {
                 return -1;
             }
 
-            int experienceCompare = Integer.compare(skill1.getTotalSkillLevel(tech1.getOptions(),
-                        tech1.getATOWAttributes()),
-                  skill2.getTotalSkillLevel(tech2.getOptions(), tech2.getATOWAttributes()));
+            SkillModifierData tech1SkillModifierData = tech1.getSkillModifierData();
+            SkillModifierData tech2SkillModifierData = tech2.getSkillModifierData();
+
+            int experienceCompare = Integer.compare(skill1.getTotalSkillLevel(tech1SkillModifierData),
+                  skill2.getTotalSkillLevel(tech2SkillModifierData));
             if (experienceCompare != 0) {
                 return experienceCompare;
             }

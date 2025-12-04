@@ -61,7 +61,6 @@ public class ContractPaymentBreakdown {
     private JLabel lblOverheadAmount2;
     private JLabel lblSupportAmount2;
     private JLabel lblTransportAmount2;
-    private JLabel lblTransitAmount2;
     private JLabel lblNetIncome2;
     private JLabel lblAdvanceNetIncome1;
     private JLabel lblAdvanceNetIncome2;
@@ -169,16 +168,6 @@ public class ContractPaymentBreakdown {
         setLblTransportAmount2();
         gridBagConstraintsText.gridy = y;
         mainPanel.add(lblTransportAmount2, gridBagConstraintsText);
-
-        JLabel lblTransitAmount1 = new JLabel(indentation
-                                                    + resourceMap.getString("lblTransitAmount1.text"));
-        gridBagConstraintsLabels.gridy = ++y;
-        mainPanel.add(lblTransitAmount1, gridBagConstraintsLabels);
-
-        lblTransitAmount2 = new JLabel();
-        setLblTransitAmount2();
-        gridBagConstraintsText.gridy = y;
-        mainPanel.add(lblTransitAmount2, gridBagConstraintsText);
 
         JLabel lblFeeAmount1;
         if (contract.payMRBCFee()) {
@@ -314,7 +303,6 @@ public class ContractPaymentBreakdown {
         setLblOverheadAmount2();
         setLblSupportAmount2();
         setLblTransportAmount2();
-        setLblTransitAmount2();
         setLblFeeAmount2();
         setLblNetIncome2();
 
@@ -348,11 +336,8 @@ public class ContractPaymentBreakdown {
     }
 
     private void setLblTransportAmount2() {
-        lblTransportAmount2.setText(contract.getTransportAmount().toAmountAndSymbolString());
-    }
-
-    private void setLblTransitAmount2() {
-        lblTransitAmount2.setText(contract.getTransitAmount().toAmountAndSymbolString());
+        lblTransportAmount2.setText("-" + contract.getTotalTransportationFees(campaign)
+                                                .toAmountAndSymbolString());
     }
 
     private void setLblFeeAmount2() {
@@ -413,8 +398,7 @@ public class ContractPaymentBreakdown {
 
     private void setLblTransportationExpenses2() {
         lblTransportationExpenses2.setText("-" +
-                                                 contract.getTotalTransportationFees(campaign)
-                                                       .toAmountAndSymbolString());
+                                                 contract.getTransportAmount().toAmountAndSymbolString());
     }
 
     private void setLblEstimatedProfit2() {

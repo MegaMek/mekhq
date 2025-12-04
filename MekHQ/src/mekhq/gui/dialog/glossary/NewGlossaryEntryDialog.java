@@ -51,6 +51,7 @@ import megamek.client.ui.util.FlatLafStyleBuilder;
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.ui.EnhancedTabbedPane;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
@@ -58,7 +59,6 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * Dialog for displaying {@link GlossaryEntry} details in a tabbed interface, along with a contents pane listing all
@@ -75,7 +75,7 @@ public class NewGlossaryEntryDialog extends JDialog {
     private static final int PADDING = UIUtil.scaleForGUI(10);
     private static final Dimension DIALOG_SIZE = UIUtil.scaleForGUI(1200, 500);
     private static final int CENTER_PANEL_MINIMUM_WIDTH = UIUtil.scaleForGUI(900);
-    private static final int TEXT_WIDTH = UIUtil.scaleForGUI(500);
+    private static final int TEXT_WIDTH = UIUtil.scaleForGUI(600);
     private static final Dimension BUTTON_SIZE = UIUtil.scaleForGUI(100, 30);
     private static final int CONTENTS_INDENT = UIUtil.scaleForGUI(300);
 
@@ -185,7 +185,7 @@ public class NewGlossaryEntryDialog extends JDialog {
         tabbedPane.setMinimumSize(new Dimension(CENTER_PANEL_MINIMUM_WIDTH, Integer.MIN_VALUE));
         addGlossaryEntry(glossaryEntry);
 
-        JScrollPaneWithSpeed scrollFullGlossary = buildGlossaryPane();
+        FastJScrollPane scrollFullGlossary = buildGlossaryPane();
         JPanel fullContentsWrapper = new JPanel(new BorderLayout());
         fullContentsWrapper.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         fullContentsWrapper.add(scrollFullGlossary, BorderLayout.CENTER);
@@ -238,7 +238,13 @@ public class NewGlossaryEntryDialog extends JDialog {
         String definition = glossaryEntry.getDefinition();
         String formatedGlossaryText = "<h2 style='text-align:center;'>" + title + "</h2>" + definition;
 
-        JTextPane txtDefinition = new JTextPane();
+        JTextPane txtDefinition = new JTextPane() {
+            @Override
+            public boolean getScrollableTracksViewportWidth() {
+                // Always resize to match the viewport width, so no horizontal clipping
+                return true;
+            }
+        };
         txtDefinition.setContentType("text/html");
         String fontStyle = "font-family: Noto Sans;";
         txtDefinition.setText(String.format(
@@ -246,11 +252,8 @@ public class NewGlossaryEntryDialog extends JDialog {
               TEXT_WIDTH, fontStyle, formatedGlossaryText));
         FlatLafStyleBuilder.setFontScaling(txtDefinition, false, 1.1);
         txtDefinition.setEditable(false);
-        txtDefinition.setBorder(null);
         txtDefinition.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         txtDefinition.setCaretPosition(0);
-        txtDefinition.setMaximumSize(new Dimension(TEXT_WIDTH, Integer.MAX_VALUE));
-        txtDefinition.setPreferredSize(new Dimension(TEXT_WIDTH, txtDefinition.getPreferredSize().height));
         txtDefinition.setAlignmentX(Component.CENTER_ALIGNMENT);
         txtDefinition.addHyperlinkListener(e -> {
             if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
@@ -270,7 +273,7 @@ public class NewGlossaryEntryDialog extends JDialog {
         scrollContent.add(Box.createVerticalStrut(PADDING));
         scrollContent.add(txtDefinition);
 
-        JScrollPaneWithSpeed scrollGlossaryEntry = new JScrollPaneWithSpeed(scrollContent);
+        FastJScrollPane scrollGlossaryEntry = new FastJScrollPane(scrollContent);
         scrollGlossaryEntry.setBorder(null);
         scrollGlossaryEntry.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollGlossaryEntry.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -379,12 +382,12 @@ public class NewGlossaryEntryDialog extends JDialog {
     /**
      * Builds the scrollable contents pane listing all glossary entries with links for navigation.
      *
-     * @return a {@link JScrollPaneWithSpeed} containing the formatted glossary contents
+     * @return a {@link FastJScrollPane} containing the formatted glossary contents
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private JScrollPaneWithSpeed buildGlossaryPane() {
+    private FastJScrollPane buildGlossaryPane() {
         StringBuilder formatedGlossaryText = new StringBuilder();
         formatedGlossaryText.append(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.contentsPane.title"));
 
@@ -408,7 +411,7 @@ public class NewGlossaryEntryDialog extends JDialog {
         txtGlossary.setCaretPosition(0);
         txtGlossary.addHyperlinkListener(this::handleHyperlinkClick);
 
-        JScrollPaneWithSpeed scrollGlossary = new JScrollPaneWithSpeed(txtGlossary);
+        FastJScrollPane scrollGlossary = new FastJScrollPane(txtGlossary);
         scrollGlossary.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         return scrollGlossary;

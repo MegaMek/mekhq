@@ -47,7 +47,8 @@ public enum UnitMarketType {
     EMPLOYER("UnitMarketType.EMPLOYER.text"),
     MERCENARY("UnitMarketType.MERCENARY.text"),
     FACTORY("UnitMarketType.FACTORY.text"),
-    BLACK_MARKET("UnitMarketType.BLACK_MARKET.text");
+    BLACK_MARKET("UnitMarketType.BLACK_MARKET.text"),
+    CIVILIAN("UnitMarketType.CIVILIAN.text");
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -82,6 +83,10 @@ public enum UnitMarketType {
     public boolean isBlackMarket() {
         return this == BLACK_MARKET;
     }
+
+    public boolean isCivilianMarket() {
+        return this == CIVILIAN;
+    }
     // endregion Boolean Comparison Methods
 
     // region File I/O
@@ -104,6 +109,8 @@ public enum UnitMarketType {
                     return FACTORY;
                 case 4:
                     return BLACK_MARKET;
+                case 5:
+                    return CIVILIAN;
                 default:
                     break;
             }
@@ -163,14 +170,14 @@ public enum UnitMarketType {
                 case OPEN, MERCENARY -> 0;
                 case EMPLOYER -> -1;
                 case BLACK_MARKET -> Compute.d6(1) <= 2 ? -12 : 12; // forces A/F
-                case FACTORY -> 12; // Forces F
+                case FACTORY, CIVILIAN -> 12; // Forces F
             });
         } else {
             return switch (market) {
                 case OPEN, MERCENARY -> PartQuality.QUALITY_C;
                 case EMPLOYER -> PartQuality.QUALITY_B;
                 case BLACK_MARKET -> Compute.d6(1) <= 2 ? PartQuality.QUALITY_A : PartQuality.QUALITY_F;
-                case FACTORY -> PartQuality.QUALITY_F;
+                case FACTORY, CIVILIAN -> PartQuality.QUALITY_F;
             };
         }
     }

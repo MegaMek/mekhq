@@ -34,6 +34,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -67,6 +68,7 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekGyro;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingMekActuator;
 import mekhq.campaign.parts.missing.MissingMekLocation;
@@ -102,6 +104,8 @@ import org.w3c.dom.NodeList;
  */
 public abstract class Part implements IPartWork, ITechnology {
     private static final MMLogger LOGGER = MMLogger.create(Part.class);
+
+    private static final DecimalFormat TONNAGE_FORMATTER = new DecimalFormat("0.#");
 
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
@@ -219,7 +223,7 @@ public abstract class Part implements IPartWork, ITechnology {
         this.usedForRefitPlanning = false;
         this.daysToArrival = 0;
         this.campaign = c;
-        this.brandNew = false;
+        this.brandNew = true;
         this.quantity = 1;
         this.quality = PartQuality.QUALITY_D;
         this.childParts = new ArrayList<>();
@@ -435,6 +439,13 @@ public abstract class Part implements IPartWork, ITechnology {
         if (isUnitTonnageMatters()) {
             toReturn.append(" (").append(getUnitTonnage()).append(" ton)");
         }
+
+        if (this instanceof MekGyro gyro) {
+            // We only want to display the decimal point if it's not zero
+            String tonnage = TONNAGE_FORMATTER.format(gyro.getTonnage());
+            toReturn.append(" (").append(tonnage).append(" ton)");
+        }
+
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
             toReturn.append(" - ")
                   .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
@@ -464,7 +475,7 @@ public abstract class Part implements IPartWork, ITechnology {
                                                                                                  .getFontColorPositiveHexColor(),
                                              inStock + " in stock");
 
-            toReturn.append(inStockText).append("<br>");
+            toReturn.append("<br>").append(inStockText).append("<br>");
         } else {
             toReturn.append("<br>");
         }
@@ -692,6 +703,7 @@ public abstract class Part implements IPartWork, ITechnology {
             case "VeeStabiliser" -> VeeStabilizer.class.getSimpleName();
             case "MissingVeeStabiliser" -> MissingVeeStabilizer.class.getSimpleName();
             // <50.07 compatibility handlers
+            case "mekhq.campaign.parts.BaArmor" -> "mekhq.campaign.parts.BAArmor";
             case "mekhq.campaign.parts.MekLocation" -> "mekhq.campaign.parts.meks.MekLocation";
             case "mekhq.campaign.parts.MekGyro" -> "mekhq.campaign.parts.meks.MekGyro";
             case "mekhq.campaign.parts.MekLifeSupport" -> "mekhq.campaign.parts.meks.MekLifeSupport";
@@ -1102,6 +1114,15 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     /**
+     * Gets the team member who has reserved this part for overnight work.
+     *
+     * @return the {@link Person} who reserved this part, or {@code null} if the part is not reserved
+     */
+    public Person getReservedBy() {
+        return reservedBy;
+    }
+
+    /**
      * Sets the team member who has reserved this part for work they are performing overnight.
      *
      * @param tech The team member.
@@ -1185,26 +1206,32 @@ public abstract class Part implements IPartWork, ITechnology {
      */
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        StringJoiner sj = new StringJoiner(", ");
+        StringJoiner details = new StringJoiner(", ");
         if (!StringUtils.isEmpty(getLocationName())) {
-            sj.add(getLocationName());
+            details.add(getLocationName());
         }
 
         if (isOmniPodded()) {
-            sj.add("OmniPod");
+            details.add("OmniPod");
         }
 
         if (isUnitTonnageMatters()) {
-            sj.add(getUnitTonnage() + " tons");
+            details.add(getUnitTonnage() + " tons");
+        }
+
+        if (this instanceof MekGyro gyro) {
+            // We only want to display the decimal point if it's not zero
+            String tonnage = TONNAGE_FORMATTER.format(gyro.getTonnage());
+            details.add(tonnage + " ton");
         }
 
         if (includeRepairDetails && hits > 0) {
-            sj.add(hits + (hits == 1 ? " hit" : " hits"));
+            details.add(hits + (hits == 1 ? " hit" : " hits"));
             if (campaign.getCampaignOptions().isPayForRepairs()) {
-                sj.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
+                details.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
             }
         }
-        return sj.toString();
+        return details.toString();
     }
 
     @Override
@@ -1421,6 +1448,48 @@ public abstract class Part implements IPartWork, ITechnology {
      */
     public boolean isSpare() {
         return (unit == null) && (parentPart == null) && (refitUnit == null) && (reservedBy == null);
+    }
+
+    /**
+     * Determines whether this part is currently in use or reserved, making it unavailable as a spare.
+     *
+     * <p>A part is considered used or reserved if it meets any of the following conditions:</p>
+     * <ul>
+     *     <li>It has a parent part (is installed in another part or unit)</li>
+     *     <li>It is reserved for a refit</li>
+     *     <li>It is reserved by a technician</li>
+     * </ul>
+     *
+     * <p>This method uses less restrictive criteria than {@link #isSpare()}, which also checks whether
+     * the part is assigned to a unit.</p>
+     *
+     * @return {@code true} if this part is in use or reserved; {@code false} if it is available as a spare
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public boolean isPartUsedOrReserved() {
+        return !((parentPart == null) && (refitUnit == null) && (reservedBy == null));
+    }
+
+    /**
+     * Gets the quantity of this part if it is currently in use (not available as a spare).
+     *
+     * <p>This method returns {@code 0} if the part is available as a spare (determined by
+     * {@link #isPartUsedOrReserved()}).</p>
+     *
+     * <p>Otherwise, it returns {@code 1} if the part is assigned to a unit, or the part's stored quantity if it is
+     * not.</p>
+     *
+     * @return {@code 0} if the part is available as a spare, {@code 1} if assigned to a unit, otherwise the part's
+     *       quantity
+     */
+    public int getQuantityForPartsInUse() {
+        if (isPartUsedOrReserved()) {
+            return 0;
+        }
+
+        return (this.getUnit() != null) ? 1 : this.getQuantity();
     }
 
     @Override

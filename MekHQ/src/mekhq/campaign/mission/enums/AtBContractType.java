@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.mission.enums;
 
+import static java.lang.Math.round;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.mission.enums.AtBEventType.*;
 
 import java.util.ResourceBundle;
@@ -41,13 +43,10 @@ import megamek.common.eras.EraFlag;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 
 public enum AtBContractType {
-    // TODO: Missing CamOps Mission Types: ASSASSINATION, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID,
-    //  RETAINER, SABOTAGE, TERRORISM, HIGH_RISK
-    // region Enum Declarations
+    // NEVER SORT THESE ENUM ENTRIES. IT WILL BREAK ATB CONTRACT GENERATION.
     GARRISON_DUTY("AtBContractType.GARRISON_DUTY.text", "AtBContractType.GARRISON_DUTY.toolTipText", 18, 1.0),
     CADRE_DUTY("AtBContractType.CADRE_DUTY.text", "AtBContractType.CADRE_DUTY.toolTipText", 12, 0.8),
     SECURITY_DUTY("AtBContractType.SECURITY_DUTY.text", "AtBContractType.SECURITY_DUTY.toolTipText", 6, 1.2),
@@ -62,7 +61,14 @@ public enum AtBContractType {
           1.8),
     OBJECTIVE_RAID("AtBContractType.OBJECTIVE_RAID.text", "AtBContractType.OBJECTIVE_RAID.toolTipText", 3, 1.6),
     RECON_RAID("AtBContractType.RECON_RAID.text", "AtBContractType.RECON_RAID.toolTipText", 3, 1.6),
-    EXTRACTION_RAID("AtBContractType.EXTRACTION_RAID.text", "AtBContractType.EXTRACTION_RAID.toolTipText", 3, 1.6);
+    EXTRACTION_RAID("AtBContractType.EXTRACTION_RAID.text", "AtBContractType.EXTRACTION_RAID.toolTipText", 3, 1.6),
+    ASSASSINATION("AtBContractType.ASSASSINATION.text", "AtBContractType.ASSASSINATION.toolTipText", 3, 1.9),
+    ESPIONAGE("AtBContractType.ESPIONAGE.text", "AtBContractType.ESPIONAGE.toolTipText", 12, 2.4),
+    MOLE_HUNTING("AtBContractType.MOLE_HUNTING.text", "AtBContractType.MOLE_HUNTING.toolTipText", 6, 1.2),
+    OBSERVATION_RAID("AtBContractType.OBSERVATION_RAID.text", "AtBContractType.OBSERVATION_RAID.toolTipText", 3, 1.6),
+    RETAINER("AtBContractType.RETAINER.text", "AtBContractType.RETAINER.toolTipText", 12, 1.3),
+    SABOTAGE("AtBContractType.SABOTAGE.text", "AtBContractType.SABOTAGE.toolTipText", 24, 2.4),
+    TERRORISM("AtBContractType.TERRORISM.text", "AtBContractType.TERRORISM.toolTipText", 3, 1.9);
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -147,29 +153,85 @@ public enum AtBContractType {
         return this == EXTRACTION_RAID;
     }
 
+    public boolean isAssassination() {
+        return this == ASSASSINATION;
+    }
+
+    public boolean isEspionage() {
+        return this == ESPIONAGE;
+    }
+
+    public boolean isMoleHunting() {
+        return this == MOLE_HUNTING;
+    }
+
+    public boolean isRetainer() {
+        return this == RETAINER;
+    }
+
+    public boolean isSabotage() {
+        return this == SABOTAGE;
+    }
+
+    public boolean isTerrorism() {
+        return this == TERRORISM;
+    }
+
+    public boolean isObservationRaid() {
+        return this == OBSERVATION_RAID;
+    }
+
     public boolean isGarrisonType() {
-        return isGarrisonDuty() || isCadreDuty() || isSecurityDuty() || isRiotDuty();
+        return isGarrisonDuty() || isCadreDuty() || isSecurityDuty() || isRiotDuty() || isRetainer();
     }
 
     public boolean isRaidType() {
-        return isDiversionaryRaid() || isObjectiveRaid() || isReconRaid() || isExtractionRaid();
+        return isDiversionaryRaid() ||
+                     isObjectiveRaid() ||
+                     isReconRaid() ||
+                     isExtractionRaid() ||
+                     isObservationRaid() ||
+                     isAssassination();
+    }
+
+    public boolean isGuerrillaType() {
+        return isGuerrillaWarfare() || isTerrorism() || isSabotage() || isEspionage();
     }
     // endregion Boolean Comparison Methods
 
-    public int calculateLength(final boolean variable, final AtBContract contract) {
-        return variable ? calculateVariableLength(contract) : getConstantLength();
+    /**
+     * Calculates the length of the contract in months.
+     *
+     * <p>If variable contract lengths are enabled, the length is calculated with randomization around the base
+     * contract type's standard duration. Otherwise, the constant length defined by the contract type is used.</p>
+     *
+     * @param useVariableContractLengths whether to use variable length calculation
+     *
+     * @return the calculated contract length in months
+     */
+    public int calculateLength(final boolean useVariableContractLengths) {
+        return useVariableContractLengths ? calculateVariableLength() : getConstantLength();
     }
 
-    private int calculateVariableLength(final AtBContract contract) {
-        return switch (this) {
-            case CADRE_DUTY, SECURITY_DUTY -> 4;
-            case GARRISON_DUTY -> 9 + Compute.d6(3);
-            case DIVERSIONARY_RAID, RECON_RAID -> 1;
-            case EXTRACTION_RAID -> 1 + contract.getEnemySkill().ordinal();
-            case OBJECTIVE_RAID, PIRATE_HUNTING -> 3 + Compute.randomInt(3);
-            case PLANETARY_ASSAULT, RELIEF_DUTY -> 4 + Compute.randomInt(3);
-            case GUERRILLA_WARFARE, RIOT_DUTY -> 6;
-        };
+    /**
+     * Calculates a variable contract length with randomization.
+     *
+     * <p>The length is calculated as 75% of the constant length plus a random variance of up to 50% of the constant
+     * length. For example, a contract type with a constant length of 12 months would have a base of 9 months plus 0-6
+     * months variance, resulting in a range of 9-15 months.</p>
+     *
+     * @return the calculated variable contract length in months
+     */
+    private int calculateVariableLength() {
+        int baseLength = (int) round(constantLength * 0.75);
+        int variance = (int) round(constantLength * 0.5);
+
+        if (variance > 0) {
+            return baseLength + randomInt(variance);
+        } else {
+            // If we can't determine variance return the constantLength
+            return constantLength;
+        }
     }
 
     /**
@@ -183,9 +245,9 @@ public enum AtBContractType {
      */
     public int calculatePartsAvailabilityLevel() {
         return switch (this) {
-            case GUERRILLA_WARFARE -> 2;
-            case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID -> 1;
-            case PLANETARY_ASSAULT, RELIEF_DUTY -> 0;
+            case GUERRILLA_WARFARE, ESPIONAGE, SABOTAGE, TERRORISM -> 2;
+            case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID, ASSASSINATION -> 1;
+            case PLANETARY_ASSAULT, RELIEF_DUTY, MOLE_HUNTING -> 0;
             case PIRATE_HUNTING -> -1;
             default -> -2;
         };
@@ -202,18 +264,20 @@ public enum AtBContractType {
      */
     public CombatRole getRequiredCombatRole() {
         return switch (this) {
-            case CADRE_DUTY -> CombatRole.TRAINING;
-            case GARRISON_DUTY, SECURITY_DUTY, RIOT_DUTY -> CombatRole.MANEUVER;
+            case CADRE_DUTY -> CombatRole.CADRE;
+            case GARRISON_DUTY, SECURITY_DUTY, RIOT_DUTY, SABOTAGE, TERRORISM, RETAINER, ASSASSINATION ->
+                  CombatRole.MANEUVER;
             case GUERRILLA_WARFARE, PIRATE_HUNTING, PLANETARY_ASSAULT, RELIEF_DUTY -> CombatRole.FRONTLINE;
-            case DIVERSIONARY_RAID, EXTRACTION_RAID, OBJECTIVE_RAID, RECON_RAID -> CombatRole.PATROL;
+            case DIVERSIONARY_RAID, EXTRACTION_RAID, OBJECTIVE_RAID, RECON_RAID, OBSERVATION_RAID, MOLE_HUNTING,
+                 ESPIONAGE -> CombatRole.PATROL;
         };
     }
 
     /**
      * Generates an event type for the campaign based on the current contract type.
      *
-     * <p>This method calculates a random event, with probabilities defined by
-     * the type of contract. The result is used to trigger specific in-game scenarios or effects.</p>
+     * <p>This method calculates a random event, with probabilities defined by the type of contract. The result is
+     * used to trigger specific in-game scenarios or effects.</p>
      *
      * <p>If StratCon is enabled the event is instead generated by the
      * {@link #generateStratConEvent()} method.</p>
@@ -227,7 +291,7 @@ public enum AtBContractType {
             return generateStratConEvent();
         }
 
-        final int roll = Compute.randomInt(20) + 1;
+        final int roll = randomInt(20) + 1;
 
         switch (this) {
             case DIVERSIONARY_RAID:
@@ -308,10 +372,10 @@ public enum AtBContractType {
      * @return an integer representing the event type.
      */
     public AtBEventType generateStratConEvent() {
-        final int roll = Compute.randomInt(20) + 1;
+        final int roll = randomInt(20) + 1;
 
         switch (this) {
-            case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID -> {
+            case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID, OBSERVATION_RAID -> {
                 return switch (roll) {
                     case 21, 20, 19 -> SPECIAL_EVENTS;
                     case 18 -> REINFORCEMENTS;
@@ -321,7 +385,7 @@ public enum AtBContractType {
                     default -> BONUS_ROLL;
                 };
             }
-            case GARRISON_DUTY -> {
+            case GARRISON_DUTY, RETAINER -> {
                 return switch (roll) {
                     case 21, 20, 19 -> SPECIAL_EVENTS;
                     case 18 -> REINFORCEMENTS;
@@ -347,7 +411,7 @@ public enum AtBContractType {
                     default -> BONUS_ROLL;
                 };
             }
-            case PIRATE_HUNTING -> {
+            case PIRATE_HUNTING, MOLE_HUNTING, ASSASSINATION -> {
                 return switch (roll) {
                     case 21, 20, 19 -> SPECIAL_EVENTS;
                     case 18 -> REINFORCEMENTS;
@@ -372,10 +436,9 @@ public enum AtBContractType {
     }
 
     public int generateSpecialScenarioType(final Campaign campaign) {
-        // Our roll is era-based. If it is pre-spaceflight, early spaceflight, or Age of
-        // War there
-        // cannot be Star League Caches as the Star League hasn't formed
-        final int roll = Compute.randomInt(campaign.getEra().hasFlag(EraFlag.PRE_SPACEFLIGHT,
+        // Our roll is era-based. If it is pre-spaceflight, early spaceflight, or Age of War there cannot be Star
+        // League Caches as the Star League hasn't formed
+        final int roll = randomInt(campaign.getEra().hasFlag(EraFlag.PRE_SPACEFLIGHT,
               EraFlag.EARLY_SPACEFLIGHT, EraFlag.AGE_OF_WAR) ? 12 : 20) + 1;
         return switch (this) {
             case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID -> {
@@ -571,6 +634,20 @@ public enum AtBContractType {
                     return RECON_RAID;
                 case 11:
                     return EXTRACTION_RAID;
+                case 12:
+                    return ASSASSINATION;
+                case 13:
+                    return ESPIONAGE;
+                case 14:
+                    return MOLE_HUNTING;
+                case 15:
+                    return OBSERVATION_RAID;
+                case 16:
+                    return RETAINER;
+                case 17:
+                    return SABOTAGE;
+                case 18:
+                    return TERRORISM;
                 default:
                     break;
             }

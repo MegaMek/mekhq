@@ -34,7 +34,6 @@ package mekhq.campaign.personnel.education;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +44,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
@@ -182,46 +180,5 @@ class AcademyTests {
         when(person.getOriginFaction()).thenReturn(new Faction("FWL", ""));
         when(campaign.getFaction()).thenReturn(new Faction("FWL", ""));
         assertEquals(1.0, academy.getFactionDiscountAdjusted(campaign, person));
-    }
-
-    @Test
-    public void testSkillParser_ValidSkill() {
-        assertEquals(SkillType.S_PILOT_MEK, Academy.skillParser("piloting/mek"));
-        assertEquals(SkillType.S_GUN_MEK, Academy.skillParser("gunnery/mek"));
-        assertEquals(SkillType.S_GUN_MEK, Academy.skillParser("gunnery/mek"));
-        assertEquals(SkillType.S_PILOT_AERO, Academy.skillParser("piloting/aerospace"));
-        assertEquals(SkillType.S_GUN_AERO, Academy.skillParser("gunnery/aerospace"));
-        assertEquals(SkillType.S_PILOT_GVEE, Academy.skillParser("piloting/ground vehicle"));
-        assertEquals(SkillType.S_PILOT_VTOL, Academy.skillParser("piloting/vtol"));
-        assertEquals(SkillType.S_PILOT_NVEE, Academy.skillParser("piloting/naval"));
-        assertEquals(SkillType.S_GUN_VEE, Academy.skillParser("gunnery/vehicle"));
-        assertEquals(SkillType.S_PILOT_JET, Academy.skillParser("piloting/aircraft"));
-        assertEquals(SkillType.S_GUN_JET, Academy.skillParser("gunnery/aircraft"));
-        assertEquals(SkillType.S_PILOT_SPACE, Academy.skillParser("piloting/spacecraft"));
-        assertEquals(SkillType.S_GUN_SPACE, Academy.skillParser("gunnery/spacecraft"));
-        assertEquals(SkillType.S_ARTILLERY, Academy.skillParser("artillery"));
-        assertEquals(SkillType.S_GUN_BA, Academy.skillParser("gunnery/battlearmor"));
-        assertEquals(SkillType.S_GUN_PROTO, Academy.skillParser("gunnery/protomek"));
-        assertEquals(SkillType.S_SMALL_ARMS, Academy.skillParser("small arms"));
-        assertEquals(SkillType.S_ANTI_MEK, Academy.skillParser("anti-mek"));
-        assertEquals(SkillType.S_TECH_MEK, Academy.skillParser("tech/mek"));
-        assertEquals(SkillType.S_TECH_MECHANIC, Academy.skillParser("tech/mechanic"));
-        assertEquals(SkillType.S_TECH_AERO, Academy.skillParser("tech/aero"));
-        assertEquals(SkillType.S_TECH_BA, Academy.skillParser("tech/battlearmor"));
-        assertEquals(SkillType.S_TECH_VESSEL, Academy.skillParser("tech/vessel"));
-        assertEquals(SkillType.S_ASTECH, Academy.skillParser("astech"));
-        assertEquals(SkillType.S_SURGERY, Academy.skillParser("doctor"));
-        assertEquals(SkillType.S_MEDTECH, Academy.skillParser("medtech"));
-        assertEquals(SkillType.S_NAVIGATION, Academy.skillParser("hyperspace navigation"));
-        assertEquals(SkillType.S_ADMIN, Academy.skillParser("administration"));
-        assertEquals(SkillType.S_TACTICS, Academy.skillParser("tactics"));
-        assertEquals(SkillType.S_STRATEGY, Academy.skillParser("strategy"));
-        assertEquals(SkillType.S_NEGOTIATION, Academy.skillParser("negotiation"));
-        assertEquals(SkillType.S_LEADER, Academy.skillParser("leadership"));
-    }
-
-    @Test
-    public void testSkillParser_InvalidSkill() {
-        assertThrows(IllegalStateException.class, () -> Academy.skillParser("invalid_skill"));
     }
 }

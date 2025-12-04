@@ -51,6 +51,27 @@ public class MedicalLogger {
     private static final ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
           MekHQ.getMHQOptions().getLocale());
 
+    public static void inoculation(Person person, LocalDate date, String planetName) {
+        String message = String.format(logEntriesResourceMap.getString("inoculation.text"), planetName);
+        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date,
+              MessageFormat.format(message, planetName));
+        person.addMedicalLogEntry(medicalLogEntry);
+    }
+
+    public static void successfulSurgery(Person person, LocalDate date, String surgeryName) {
+        String message = String.format(logEntriesResourceMap.getString("surgery.text"), surgeryName);
+        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date,
+              MessageFormat.format(message, surgeryName));
+        person.addMedicalLogEntry(medicalLogEntry);
+    }
+
+    public static void failedSurgery(Person person, LocalDate date, String surgeryName) {
+        String message = String.format(logEntriesResourceMap.getString("surgery.failed"), surgeryName);
+        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date,
+              MessageFormat.format(message, surgeryName));
+        person.addMedicalLogEntry(medicalLogEntry);
+    }
+
     public static MedicalLogEntry severedSpine(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("severedSpine.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date,
@@ -200,5 +221,15 @@ public class MedicalLogger {
         }
 
         patient.addMedicalLogEntry(new MedicalLogEntry(date, message));
+    }
+
+    public static void unsuccessfullyTreatedAltAdvancedMedical(Person patient, LocalDate date, String injuryName) {
+        String message = logEntriesResourceMap.getString("unsuccessfullyTreatedAltAdvancedMedical.text");
+        patient.addMedicalLogEntry(new MedicalLogEntry(date, MessageFormat.format(message, injuryName)));
+    }
+
+    public static void permanentInjuryAltAdvancedMedical(Person patient, LocalDate date, String injuryName) {
+        String message = logEntriesResourceMap.getString("permanentInjuryAltAdvancedMedical.text");
+        patient.addMedicalLogEntry(new MedicalLogEntry(date, MessageFormat.format(message, injuryName)));
     }
 }

@@ -33,12 +33,19 @@
 package mekhq.campaign.market.unitMarket;
 
 import static mekhq.campaign.market.enums.UnitMarketRarity.COMMON;
+import static mekhq.campaign.market.enums.UnitMarketRarity.MYTHIC;
 import static mekhq.campaign.market.enums.UnitMarketRarity.RARE;
+import static mekhq.campaign.market.enums.UnitMarketRarity.UBIQUITOUS;
 import static mekhq.campaign.market.enums.UnitMarketRarity.UNCOMMON;
 import static mekhq.campaign.market.enums.UnitMarketRarity.VERY_COMMON;
 import static mekhq.campaign.market.enums.UnitMarketRarity.VERY_RARE;
 import static mekhq.campaign.market.enums.UnitMarketType.getPricePercentage;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getAmazingColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,6 +72,8 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Market";
+
     //region Constructors
     public AtBMonthlyUnitMarket() {
         super(UnitMarketMethod.ATB_MONTHLY);
@@ -98,10 +107,14 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         final List<AtBContract> contracts = campaign.getActiveAtBContracts();
         final AtBContract contract = contracts.isEmpty() ? null : contracts.get(0);
 
-        // Open Market
         Faction faction = campaign.getFaction();
         int rarityModifier = campaign.getCampaignOptions().getUnitMarketRarityModifier();
 
+        // Civilian Market
+        addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, rarityModifier),
+              UnitMarketType.CIVILIAN, UnitType.TANK, faction, IUnitRating.DRAGOON_A, 2);
+
+        // Open Market
         addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
               UnitMarketType.OPEN, UnitType.MEK, faction, IUnitRating.DRAGOON_F, 1);
 
@@ -113,6 +126,18 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
 
         addOffers(campaign, getMarketItemCount(campaign, COMMON, rarityModifier),
               UnitMarketType.OPEN, UnitType.CONV_FIGHTER, faction, IUnitRating.DRAGOON_F, 1);
+
+        addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
+              UnitMarketType.OPEN, UnitType.BATTLE_ARMOR, faction, IUnitRating.DRAGOON_F, 1);
+
+        addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, rarityModifier),
+              UnitMarketType.OPEN, UnitType.INFANTRY, faction, IUnitRating.DRAGOON_F, 1);
+
+        addOffers(campaign, getMarketItemCount(campaign, VERY_RARE, rarityModifier),
+              UnitMarketType.OPEN, UnitType.DROPSHIP, faction, IUnitRating.DRAGOON_F, 4);
+
+        addOffers(campaign, getMarketItemCount(campaign, MYTHIC, rarityModifier),
+              UnitMarketType.OPEN, UnitType.JUMPSHIP, faction, IUnitRating.DRAGOON_F, 4);
 
         if ((contract != null)
                   && (campaign.getLocalDate().isAfter(contract.getStartDate().minusDays(1)))) {
@@ -140,6 +165,12 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, totalModifier),
                   UnitMarketType.EMPLOYER, UnitType.CONV_FIGHTER, faction, IUnitRating.DRAGOON_D, -1);
 
+            addOffers(campaign, getMarketItemCount(campaign, RARE, totalModifier),
+                  UnitMarketType.EMPLOYER, UnitType.BATTLE_ARMOR, faction, IUnitRating.DRAGOON_D, -1);
+
+            addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, totalModifier),
+                  UnitMarketType.EMPLOYER, UnitType.INFANTRY, faction, IUnitRating.DRAGOON_D, -1);
+
             // Unwanted Salvage Market
             faction = contract.getEnemy();
 
@@ -154,6 +185,12 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
 
             addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, totalModifier),
                   UnitMarketType.EMPLOYER, UnitType.CONV_FIGHTER, faction, IUnitRating.DRAGOON_F, 2);
+
+            addOffers(campaign, getMarketItemCount(campaign, RARE, totalModifier),
+                  UnitMarketType.EMPLOYER, UnitType.BATTLE_ARMOR, faction, IUnitRating.DRAGOON_F, 2);
+
+            addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, totalModifier),
+                  UnitMarketType.EMPLOYER, UnitType.INFANTRY, faction, IUnitRating.DRAGOON_F, 2);
         }
 
         // Mercenary Market
@@ -177,6 +214,12 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
 
             addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
                   UnitMarketType.MERCENARY, UnitType.CONV_FIGHTER, faction, IUnitRating.DRAGOON_C, modifier);
+
+            addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
+                  UnitMarketType.MERCENARY, UnitType.BATTLE_ARMOR, faction, IUnitRating.DRAGOON_C, modifier);
+
+            addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, rarityModifier),
+                  UnitMarketType.MERCENARY, UnitType.INFANTRY, faction, IUnitRating.DRAGOON_C, modifier);
         }
 
         // Factory Market
@@ -196,6 +239,12 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
 
                 addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
                       UnitMarketType.FACTORY, UnitType.CONV_FIGHTER, faction, IUnitRating.DRAGOON_A, 2);
+
+                addOffers(campaign, getMarketItemCount(campaign, RARE, rarityModifier),
+                      UnitMarketType.FACTORY, UnitType.BATTLE_ARMOR, faction, IUnitRating.DRAGOON_A, 2);
+
+                addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, rarityModifier),
+                      UnitMarketType.FACTORY, UnitType.INFANTRY, faction, IUnitRating.DRAGOON_A, 2);
             }
         }
 
@@ -212,6 +261,18 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
 
             addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
                   UnitMarketType.FACTORY, UnitType.TANK, faction, IUnitRating.DRAGOON_A, -4);
+
+            addOffers(campaign, getMarketItemCount(campaign, VERY_COMMON, rarityModifier),
+                  UnitMarketType.FACTORY, UnitType.BATTLE_ARMOR, faction, IUnitRating.DRAGOON_A, -4);
+
+            addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, rarityModifier),
+                  UnitMarketType.FACTORY, UnitType.INFANTRY, faction, IUnitRating.DRAGOON_A, -4);
+
+            addOffers(campaign, getMarketItemCount(campaign, VERY_RARE, rarityModifier),
+                  UnitMarketType.FACTORY, UnitType.DROPSHIP, faction, IUnitRating.DRAGOON_A, 0);
+
+            addOffers(campaign, getMarketItemCount(campaign, MYTHIC, rarityModifier),
+                  UnitMarketType.FACTORY, UnitType.JUMPSHIP, faction, IUnitRating.DRAGOON_A, 0);
         }
 
         // Black Market
@@ -230,6 +291,12 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
 
             addOffers(campaign, getMarketItemCount(campaign, RARE, rarityModifier),
                   UnitMarketType.BLACK_MARKET, UnitType.CONV_FIGHTER, faction, IUnitRating.DRAGOON_A, -8);
+
+            addOffers(campaign, getMarketItemCount(campaign, VERY_RARE, rarityModifier),
+                  UnitMarketType.BLACK_MARKET, UnitType.BATTLE_ARMOR, faction, IUnitRating.DRAGOON_A, -8);
+
+            addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, rarityModifier),
+                  UnitMarketType.BLACK_MARKET, UnitType.INFANTRY, faction, IUnitRating.DRAGOON_A, -8);
         }
 
         writeRefreshReport(campaign);
@@ -244,7 +311,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
      * @return an integer representing the count of market items
      */
     private int getMarketItemCount(Campaign campaign, UnitMarketRarity rarity, int rarityModifier) {
-        int totalRarity = rarity.ordinal() + rarityModifier;
+        int totalRarity = rarity.getRarityValue() + rarityModifier;
 
         if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday())) {
             totalRarity -= 4;
@@ -277,35 +344,25 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             final Collection<MissionRole> missionRoles = new ArrayList<>();
 
             if (unitType == UnitType.TANK) {
-                movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
-
-                // should a special unit type be picked? This allows us to force a MissionRole that would otherwise be filtered out
-                int specialUnitChance = campaign.getCampaignOptions().getUnitMarketSpecialUnitChance();
-
-                if (specialUnitChance != 0) {
-                    if ((specialUnitChance == 1) || (Compute.randomInt(specialUnitChance) == 0)) {
-                        // this will need to be incremented by 1,
-                        // whenever we add additional unit types to this special handler
-                        int roll = Compute.randomInt(6);
-
-                        // while this gives even chances for each role,
-                        // it gives greater control to the user
-                        // to define how often they want to see special units.
-                        // really, this is just a Band-Aid fix, and ideally we wouldn't be filtering out these units in the first place
-                        switch (roll) {
-                            case 0 -> missionRoles.add(MissionRole.CIVILIAN);
-                            case 1 -> missionRoles.add(MissionRole.SUPPORT);
-                            case 2 -> missionRoles.add(MissionRole.CARGO);
-                            case 3, 4, 5 -> missionRoles.add(MissionRole.ARTILLERY);
-                            default -> throw new IllegalStateException(
-                                  "Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/addOffers: "
-                                        + roll);
+                if (market.isCivilianMarket()) {
+                    int roll = Compute.randomInt(3);
+                    switch (roll) {
+                        case 0 -> missionRoles.add(MissionRole.CIVILIAN);
+                        case 1 -> missionRoles.add(MissionRole.SUPPORT);
+                        case 2 -> missionRoles.add(MissionRole.CARGO);
+                    }
+                } else {
+                    movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
+                    int specialUnitChance = campaign.getCampaignOptions().getUnitMarketArtilleryUnitChance();
+                    if (specialUnitChance != 0) {
+                        if ((specialUnitChance == 1) || (Compute.randomInt(specialUnitChance) == 0)) {
+                            missionRoles.add(MissionRole.ARTILLERY);
                         }
                     }
                 }
             }
 
-            addSingleUnit(campaign,
+            String unitName = addSingleUnit(campaign,
                   market,
                   unitType,
                   faction,
@@ -313,6 +370,19 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                   movementModes,
                   missionRoles,
                   getPricePercentage(priceModifier));
+            if (unitName != null) {
+                if (unitType == UnitType.DROPSHIP) {
+                    String key = "AtBMonthlyUnitMarket.dropShip.report";
+                    String report = getFormattedTextAt(RESOURCE_BUNDLE, key,
+                          spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG);
+                    campaign.addReport(report);
+                } else if (unitType == UnitType.JUMPSHIP) {
+                    String key = "AtBMonthlyUnitMarket.jumpShip.report";
+                    String report = getFormattedTextAt(RESOURCE_BUNDLE, key,
+                          spanOpeningWithCustomColor(getAmazingColor()), CLOSING_SPAN_TAG);
+                    campaign.addReport(report);
+                }
+            }
         }
     }
 

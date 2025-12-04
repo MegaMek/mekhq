@@ -151,6 +151,8 @@ public class TurnoverAndRetentionTab {
     private JLabel lblFieldKitchenCapacity;
     private JSpinner spnFieldKitchenCapacity;
     private JCheckBox chkFieldKitchenIgnoreNonCombatants;
+    private JLabel lblFatigueUndeploymentThreshold;
+    private JSpinner spnFatigueUndeploymentThreshold;
     private JLabel lblFatigueLeaveThreshold;
     private JSpinner spnFatigueLeaveThreshold;
     //end Fatigue Tab
@@ -189,6 +191,8 @@ public class TurnoverAndRetentionTab {
         lblFieldKitchenCapacity = new JLabel();
         spnFieldKitchenCapacity = new JSpinner();
         chkFieldKitchenIgnoreNonCombatants = new JCheckBox();
+        lblFatigueUndeploymentThreshold = new JLabel();
+        spnFatigueUndeploymentThreshold = new JSpinner();
         lblFatigueLeaveThreshold = new JLabel();
         spnFatigueLeaveThreshold = new JSpinner();
     }
@@ -271,7 +275,7 @@ public class TurnoverAndRetentionTab {
         //start Fatigue Tab
         CampaignOptionsHeaderPanel fatigueHeader = new CampaignOptionsHeaderPanel("FatigueTab",
               getImageDirectory() + "logo_clan_mongoose.png",
-              true, true, 7);
+              true, true, 5);
 
         // Contents
         chkUseFatigue = new CampaignOptionsCheckBox("UseFatigue");
@@ -295,6 +299,14 @@ public class TurnoverAndRetentionTab {
         chkFieldKitchenIgnoreNonCombatants = new CampaignOptionsCheckBox("FieldKitchenIgnoreNonCombatants");
         chkFieldKitchenIgnoreNonCombatants.addMouseListener(createTipPanelUpdater(fatigueHeader,
               "FieldKitchenIgnoreNonCombatants"));
+
+        lblFatigueUndeploymentThreshold = new CampaignOptionsLabel("FatigueUndeploymentThreshold");
+        lblFatigueUndeploymentThreshold.addMouseListener(createTipPanelUpdater(fatigueHeader,
+              "FatigueUndeploymentThreshold"));
+        spnFatigueUndeploymentThreshold = new CampaignOptionsSpinner("FatigueUndeploymentThreshold",
+              9, 0, 17, 1);
+        spnFatigueUndeploymentThreshold.addMouseListener(createTipPanelUpdater(fatigueHeader,
+              "FatigueUndeploymentThreshold"));
 
         lblFatigueLeaveThreshold = new CampaignOptionsLabel("FatigueLeaveThreshold");
         lblFatigueLeaveThreshold.addMouseListener(createTipPanelUpdater(fatigueHeader, "FatigueLeaveThreshold"));
@@ -332,6 +344,12 @@ public class TurnoverAndRetentionTab {
         panelRight.add(lblFieldKitchenCapacity, layoutRight);
         layoutRight.gridx++;
         panelRight.add(spnFieldKitchenCapacity, layoutRight);
+
+        layoutRight.gridx = 0;
+        layoutRight.gridy++;
+        panelRight.add(lblFatigueUndeploymentThreshold, layoutRight);
+        layoutRight.gridx++;
+        panelRight.add(spnFatigueUndeploymentThreshold, layoutRight);
 
         layoutRight.gridx = 0;
         layoutRight.gridy++;
@@ -899,6 +917,7 @@ public class TurnoverAndRetentionTab {
         chkUseInjuryFatigue.setSelected(options.isUseInjuryFatigue());
         spnFieldKitchenCapacity.setValue(options.getFieldKitchenCapacity());
         chkFieldKitchenIgnoreNonCombatants.setSelected(options.isUseFieldKitchenIgnoreNonCombatants());
+        spnFatigueUndeploymentThreshold.setValue(options.getFatigueUndeploymentThreshold());
         spnFatigueLeaveThreshold.setValue(options.getFatigueLeaveThreshold());
     }
 
@@ -956,6 +975,7 @@ public class TurnoverAndRetentionTab {
         options.setUseInjuryFatigue(chkUseInjuryFatigue.isSelected());
         options.setFieldKitchenCapacity((int) spnFieldKitchenCapacity.getValue());
         options.setFieldKitchenIgnoreNonCombatants(chkFieldKitchenIgnoreNonCombatants.isSelected());
+        options.setFatigueUndeploymentThreshold((int) spnFatigueUndeploymentThreshold.getValue());
         options.setFatigueLeaveThreshold((int) spnFatigueLeaveThreshold.getValue());
     }
 }

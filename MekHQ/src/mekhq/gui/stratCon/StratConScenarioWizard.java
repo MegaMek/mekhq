@@ -32,6 +32,7 @@
  */
 package mekhq.gui.stratCon;
 
+import static mekhq.MHQConstants.CONFIRMATION_STRATCON_BATCHALL_BREACH;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
@@ -48,6 +49,7 @@ import static mekhq.campaign.stratCon.StratConRulesManager.processReinforcementD
 import static mekhq.campaign.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.stratCon.StratConScenario.ScenarioState.REINFORCEMENTS_COMMITTED;
 import static mekhq.campaign.utilities.CampaignTransportUtilities.getLeadershipDropdownVectorPair;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -57,26 +59,23 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Minefield;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.ui.FastJScrollPane;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
@@ -85,9 +84,14 @@ import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.StratConPanel;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.StratConReinforcementsConfirmationDialog;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
+import mekhq.gui.dialog.StratConSinglesReinforcementsDialog;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.ArrayUtils;
@@ -97,11 +101,16 @@ import org.apache.commons.math3.util.Pair;
  * UI for managing force/unit assignments for individual StratCon scenarios.
  */
 public class StratConScenarioWizard extends JDialog {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBStratCon";
+    private static final MMLogger LOGGER = MMLogger.create(StratConScenarioWizard.class);
+
     private StratConScenario currentScenario;
     private final Campaign campaign;
     private StratConTrackState currentTrackState;
     private StratConCampaignState currentCampaignState;
+    @Deprecated(since = "0.50.10", forRemoval = false)
     private final String resourcePath = "mekhq.resources.AtBStratCon";
+    @Deprecated(since = "0.50.10", forRemoval = false)
     private final transient ResourceBundle resources = ResourceBundle.getBundle(resourcePath,
           MekHQ.getMHQOptions().getLocale());
 
@@ -114,8 +123,6 @@ public class StratConScenarioWizard extends JDialog {
     private CampaignTransportType selectedCampaignTransportType = null;
 
     private JComboBox<String> cboTransportType = new JComboBox<>();
-
-    private boolean wasCanceled;
 
     private JPanel contentPanel;
     private JButton btnCommit;
@@ -162,14 +169,6 @@ public class StratConScenarioWizard extends JDialog {
         setUI(isPrimaryForce);
     }
 
-    public boolean isWasCanceled() {
-        return wasCanceled;
-    }
-
-    public void setWasCanceled(boolean wasCancelled) {
-        this.wasCanceled = wasCancelled;
-    }
-
     /**
      * Configures and initializes the user interface for the scenario setup wizard. This method dynamically assembles
      * various UI components based on the scenario's state and whether the primary force is being assigned.
@@ -206,6 +205,7 @@ public class StratConScenarioWizard extends JDialog {
     private void setUI(boolean isPrimaryForce) {
         setTitle(resources.getString("scenarioSetupWizard.title"));
         getContentPane().removeAll();
+        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
         // Create a new panel to hold all components
         contentPanel = new JPanel(new CardLayout());
@@ -228,7 +228,13 @@ public class StratConScenarioWizard extends JDialog {
         // Handle optional UI for eligible leadership, defensive points, etc.
         if (isPrimaryForce) {
             gbc.gridy++;
-            int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(S_LEADER, campaign);
+            AtBDynamicScenario backingScenario = currentScenario.getBackingScenario();
+            int leadershipSkill = backingScenario.getLanceCommanderSkill(S_LEADER, campaign);
+
+            if (backingScenario.getStratConScenarioType().isOfficialChallenge()) {
+                leadershipSkill = 0; // No leadership units for combat challenges, that'd be cheating
+            }
+
             eligibleLeadershipUnits = getEligibleLeadershipUnits(campaign, currentScenario, leadershipSkill);
             eligibleLeadershipUnits.sort(Comparator.comparing(this::getForceNameReversed));
 
@@ -396,7 +402,7 @@ public class StratConScenarioWizard extends JDialog {
                 localGbc.gridy = 1;
                 JLabel selectedForceInfo = new JLabel();
                 JList<Force> availableForceList = addAvailableForceList(forcePanel, localGbc, forceTemplate);
-                availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                availableForceList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
                 // Add a listener to handle changes to the selected force
                 availableForceList.addListSelectionListener(e -> {
                     availableForceSelectorChanged(e, selectedForceInfo, false);
@@ -466,7 +472,7 @@ public class StratConScenarioWizard extends JDialog {
 
         // Transport Type
         gbc.gridy++;
-        JLabel lblTransportInstructions = new JLabel(MHQInternationalization.getTextAt(resourcePath,
+        JLabel lblTransportInstructions = new JLabel(getTextAt(resourcePath,
               "lblLeadershipTransportInstructions.text"));
         contentPanel.add(lblTransportInstructions, gbc);
 
@@ -496,7 +502,7 @@ public class StratConScenarioWizard extends JDialog {
      */
     private JList<Force> addAvailableForceList(JPanel parent, GridBagConstraints gbc,
           ScenarioForceTemplate forceTemplate) {
-        JScrollPane forceListContainer = new JScrollPaneWithSpeed();
+        JScrollPane forceListContainer = new FastJScrollPane();
 
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
               StratConRulesManager.getAvailableForceIDsForManualDeployment(forceTemplate.getAllowedUnitType(),
@@ -504,7 +510,8 @@ public class StratConScenarioWizard extends JDialog {
                     currentTrackState,
                     (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS),
                     currentScenario,
-                    currentCampaignState));
+                    currentCampaignState,
+                    false));
 
         JList<Force> availableForceList = new JList<>();
         availableForceList.setModel(lanceModel);
@@ -702,7 +709,7 @@ public class StratConScenarioWizard extends JDialog {
      */
     private void setNavigationButtons(GridBagConstraints constraints, boolean isPrimaryForce) {
         // Create the commit button
-        btnCommit = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCommit.text"));
+        btnCommit = new JButton(getTextAt(resourcePath, "leadershipCommit.text"));
         btnCommit.setActionCommand("COMMIT_CLICK");
         if (isPrimaryForce) {
             btnCommit.addActionListener(evt -> btnCommitClicked(null, false, true));
@@ -710,13 +717,10 @@ public class StratConScenarioWizard extends JDialog {
             btnCommit.addActionListener(evt -> reinforcementConfirmDialog());
         }
 
-        JButton btnCancel = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCancel.text"));
+        JButton btnCancel = new JButton(getTextAt(resourcePath, "leadershipCancel.text"));
         btnCancel.setActionCommand("CANCEL_CLICK");
-        btnCancel.addActionListener(evt -> {
-            wasCanceled = true;
-            closeWizard();
-        });
-        btnCancel.setEnabled(true);
+        btnCancel.setVisible(!isPrimaryForce);
+        btnCancel.addActionListener(evt -> closeWizard());
 
         // Configure layout constraints for the buttons
         constraints.gridwidth = GridBagConstraints.REMAINDER;
@@ -736,7 +740,7 @@ public class StratConScenarioWizard extends JDialog {
                       "lblLeadershipCommitForces.text",
                       primaryForce.getName());
             } else {
-                instructions = MHQInternationalization.getTextAt(resourcePath,
+                instructions = getTextAt(resourcePath,
                       "lblLeadershipCommitForces.fallback.text");
             }
 
@@ -755,58 +759,153 @@ public class StratConScenarioWizard extends JDialog {
     }
 
     /**
-     * Creates and displays the "Reinforcement Confirmation" dialog, allowing the user to review, adjust, and commit
-     * reinforcements to a scenario. The dialog provides information about the current target roll modifiers, the
-     * ability to adjust Support Points, and handles calculation and changes to the reinforcement target number
-     * dynamically.
+     * Handles the reinforcement confirmation flow for the current StratCon scenario.
      *
-     * <p>The dialog includes the following components:</p>
+     * <p>The method selects the appropriate reinforcement workflow based on the campaign's StratCon mode:</p>
      * <ul>
-     *   <li><b>Left Panel:</b> Contains details about the speaker, including an icon (if available)
-     *       and a description of their role in the campaign.</li>
-     *   <li><b>Right Panel:</b> Shows a breakdown of the current target roll modifiers and target number.</li>
-     *   <li><b>Support Point Selector:</b> A spinner that allows the user to adjust the number of
-     *       Support Points they wish to spend to modify the target number. The maximum available
-     *       Support Points are based on the current campaign state.</li>
-     *   <li><b>Check/Confirm Buttons:</b> Includes two confirm buttons (standard and GM-specific)
-     *       that allow the user to commit reinforcements or additional actions, along with a cancel button
-     *       to close the dialog without making any changes.</li>
-     *   <li><b>Info Panel:</b> A supplemental label with additional guidance or information displayed
-     *       below the buttons, which can help inform the user about the reinforcement process or provide
-     *       clarification about decisions made.</li>
+     *     <li>If StratCon Singles Mode is enabled, reinforcement selection is handled through the single-drop
+     *     reinforcement dialog.</li>
+     *     <li>Otherwise, the standard reinforcement confirmation dialog is used.</li>
      * </ul>
      */
     private void reinforcementConfirmDialog() {
+        if (campaign.getCampaignOptions().isUseStratConSinglesMode()) {
+            processSingleDropReinforcements();
+        } else {
+            processNormalReinforcements();
+        }
+    }
+
+    /**
+     * Processes reinforcements when the campaign is operating in StratCon Singles Mode.
+     *
+     * <p>This method opens the {@link StratConSinglesReinforcementsDialog} and reacts to the player's selected
+     * reinforcement option. Depending on the response, the method either re-shows the previous dialog or commits
+     * reinforcements immediately (optionally under GM control).</p>
+     *
+     * <p>Only two responses are valid in Singles Mode:</p>
+     * <ul>
+     *     <li>{@code CANCEL} — The previous dialog is restored.</li>
+     *     <li>{@code REINFORCE_GM_INSTANTLY} — Reinforcements are committed immediately with GM override.</li>
+     * </ul>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void processSingleDropReinforcements() {
+        StratConSinglesReinforcementsDialog dialog = new StratConSinglesReinforcementsDialog(campaign);
+        StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType responseType =
+              dialog.getResponseType();
+        switch (responseType) {
+            case CANCEL -> setVisible(true);
+            case REINFORCE_GM_INSTANTLY -> btnCommitClicked(0, true, true);
+        }
+    }
+
+    /**
+     * Processes reinforcements for standard StratCon scenarios (non-Singles Mode).
+     *
+     * <p>The existing dialog is temporarily hidden while the reinforcement confirmation flow executes. The method
+     * performs the following:</p>
+     *
+     * <ol>
+     *     <li>Checks for special-case restrictions, such as official challenges that prohibit reinforcements.</li>
+     *     <li>Determines the reinforcement Target Number based on command personnel, contract factors, and support
+     *     point availability.</li>
+     *     <li>Handles Clan batchall constraints, including warnings and potential breach tracking.</li>
+     *     <li>Calculates reinforcement cost multipliers and presents the
+     *     {@link StratConReinforcementsConfirmationDialog} to the user.</li>
+     *     <li>Processes the user's selected reinforcement option, applying support point costs, adjusting the Target
+     *     Number, and committing forces accordingly.</li>
+     * </ol>
+     *
+     * <p>Several reinforcement pathways are supported:</p>
+     * <ul>
+     *     <li><b>CANCEL</b> — The previous dialog is restored.</li>
+     *     <li><b>REINFORCE</b> — Reinforcements arrive normally, with support point cost and Target Number
+     *     adjustments applied.</li>
+     *     <li><b>REINFORCE_INSTANTLY</b> — Reinforcements arrive immediately at double support point cost.</li>
+     *     <li><b>GM reinforcement options</b> — Reinforcements are forced with GM override, bypassing support point
+     *     costs.</li>
+     * </ul>
+     *
+     * <p>If reinforcements violate accepted batchall terms, a batchall breach is recorded and processed.</p>
+     *
+     * @since 0.50.10
+     */
+    private void processNormalReinforcements() {
         // Hide the old dialog until we're done.
         // The dialog will be 'disposed' if the confirmation dialog is confirmed and re-shown if the dialog is canceled
         setVisible(false);
         final int SUPPORT_POINTS_MODIFIER = -2;
 
+        if (currentScenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge()) {
+            new ImmersiveDialogNotification(campaign, getTextAt(RESOURCE_BUNDLE, "officialChallenge.notice"), true);
+            return;
+        }
+
         Person commandLiaison = campaign.getSeniorAdminPerson(AdministratorSpecialization.COMMAND);
         TargetRoll targetNumber = calculateReinforcementTargetNumber(commandLiaison,
               currentCampaignState.getContract());
-        // The -1 is due to the default cost for reinforcing
-        int availableSupportPoints = currentCampaignState.getSupportPoints() - 1;
+        int availableSupportPoints = currentCampaignState.getSupportPoints();
+
+        AtBContract contract = currentScenario.getBackingContract(campaign);
+        Faction enemy = contract.getEnemy();
+        boolean isClanEnemy = enemy.isClan();
+        boolean isBatchallAccepted = contract.isBatchallAccepted();
+
+        boolean brokeBatchallTerms = false;
+        if (isClanEnemy && isBatchallAccepted) {
+            boolean backoutOfReinforcements = processBatchallWarningDialog();
+            if (backoutOfReinforcements) {
+                return;
+            }
+
+            brokeBatchallTerms = true;
+        }
+
+        int selectedForceCount = 0;
+        for (String templateID : availableForceLists.keySet()) {
+            selectedForceCount += availableForceLists.get(templateID).getSelectedValuesList().size();
+        }
+
+        if (selectedForceCount == 0) {
+            return;
+        }
 
         StratConReinforcementsConfirmationDialog dialog = new StratConReinforcementsConfirmationDialog(campaign,
-              targetNumber, availableSupportPoints);
+              targetNumber, availableSupportPoints, selectedForceCount);
         StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType responseType =
               dialog.getResponseType();
         switch (responseType) {
             case CANCEL -> setVisible(true);
             case REINFORCE -> {
-                int supportPointsSpent = dialog.getSupportPoints();
-                int supportPointModifier = supportPointsSpent * SUPPORT_POINTS_MODIFIER;
+                // The addition here is to cover the base cost
+                int supportPointsSpent = dialog.getSupportPoints() + 1;
+                currentCampaignState.changeSupportPoints(-(supportPointsSpent * selectedForceCount));
+
+                int supportPointModifier = (dialog.getSupportPoints() * SUPPORT_POINTS_MODIFIER) / selectedForceCount;
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
-                currentCampaignState.changeSupportPoints(-(supportPointsSpent + 1));
+
                 btnCommitClicked(finalTargetNumber, false, false);
+                if (brokeBatchallTerms) {
+                    processBatchallBreach(contract, enemy.getShortName());
+                }
             }
             case REINFORCE_INSTANTLY -> {
-                int supportPointsSpent = dialog.getSupportPoints();
-                int supportPointModifier = supportPointsSpent * SUPPORT_POINTS_MODIFIER;
+                // The addition here is to cover the base cost
+                int supportPointsSpent = dialog.getSupportPoints() + 2;
+                currentCampaignState.changeSupportPoints(-(supportPointsSpent * selectedForceCount));
+
+                int supportPointModifier = (selectedForceCount == 0)
+                        ? 0
+                        : (dialog.getSupportPoints() * SUPPORT_POINTS_MODIFIER) / selectedForceCount;
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
-                currentCampaignState.changeSupportPoints(-(supportPointsSpent + 1) * 2);
+
                 btnCommitClicked(finalTargetNumber, false, true);
+                if (brokeBatchallTerms) {
+                    processBatchallBreach(contract, enemy.getShortName());
+                }
             }
             case REINFORCE_GM -> btnCommitClicked(0, true, false);
             case REINFORCE_GM_INSTANTLY -> btnCommitClicked(0, true, true);
@@ -840,6 +939,8 @@ public class StratConScenarioWizard extends JDialog {
         }
 
         // go through all the force lists and add the selected forces to the scenario
+        List<UUID> delayedReinforcements = currentScenario.getBackingScenario().getFriendlyDelayedReinforcements();
+        List<UUID> instantReinforcements = currentScenario.getBackingScenario().getFriendlyInstantReinforcements();
         for (String templateID : availableForceLists.keySet()) {
             for (Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
                 if (currentScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
@@ -865,17 +966,12 @@ public class StratConScenarioWizard extends JDialog {
                     currentScenario.addForce(force, templateID, campaign);
 
                     if (reinforcementResults == DELAYED) {
-                        List<UUID> delayedReinforcements = currentScenario.getBackingScenario()
-                                                                 .getFriendlyDelayedReinforcements();
-
                         for (UUID unitId : force.getAllUnits(true)) {
                             if (campaign.getUnit(unitId) != null) {
                                 delayedReinforcements.add(unitId);
                             }
                         }
                     } else if (reinforcementResults == INSTANT) {
-                        List<UUID> instantReinforcements = currentScenario.getBackingScenario()
-                                                                 .getFriendlyInstantReinforcements();
 
                         for (UUID unitId : force.getAllUnits(true)) {
                             if (campaign.getUnit(unitId) != null) {
@@ -894,10 +990,12 @@ public class StratConScenarioWizard extends JDialog {
         }
 
         for (Unit unit : availableInfantryUnits.getSelectedValuesList()) {
+            instantReinforcements.add(unit.getId());
             currentScenario.addUnit(unit, ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID, false);
         }
 
         for (Unit unit : availableLeadershipUnits.getSelectedValuesList()) {
+            instantReinforcements.add(unit.getId());
             currentScenario.addUnit(unit, ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID, true);
         }
 
@@ -918,6 +1016,81 @@ public class StratConScenarioWizard extends JDialog {
         }
 
         closeWizard();
+    }
+
+    /**
+     * Displays a warning dialog to the user regarding a Batchall breach and captures their decision.
+     *
+     * <p>The dialog presents an in-character and out-of-character message and allows the user to either cancel or
+     * continue. The dialog will repeat until the user confirms a decision. This method returns {@code true} if the user
+     * chose to continue (did not back out of Batchall), or {@code false} if the user canceled.</p>
+     *
+     * @return {@code true} if the user chose to continue with Batchall, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private boolean processBatchallWarningDialog() {
+        final int CONTINUE_OPTION = 1;
+
+        boolean dialogAccepted = false;
+        boolean backedOutOfBatchall = false;
+
+        Person speaker = campaign.getSeniorAdminPerson(AdministratorSpecialization.COMMAND);
+        String inCharacterMessage = String.format(resources.getString("batchallBreach.ic"),
+              campaign.getCommanderAddress());
+        String outOfCharacterMessage = resources.getString("batchallBreach.ooc");
+        String cancelButton = resources.getString("batchallBreach.button.cancel");
+        String continueButton = resources.getString("batchallBreach.button.continue");
+
+        while (!dialogAccepted) {
+            ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign, speaker, null,
+                  inCharacterMessage, List.of(cancelButton, continueButton), outOfCharacterMessage,
+                  null, true);
+            backedOutOfBatchall = dialog.getDialogChoice() == CONTINUE_OPTION;
+
+            if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_STRATCON_BATCHALL_BREACH)) {
+                ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign,
+                      CONFIRMATION_STRATCON_BATCHALL_BREACH);
+                dialogAccepted = confirmation.wasConfirmed();
+            } else {
+                dialogAccepted = true;
+            }
+        }
+
+        return !backedOutOfBatchall;
+    }
+
+    /**
+     * Processes the consequences of a Batchall breach for the given contract.
+     *
+     * <p>This method marks the Batchall as not accepted in the contract and, if the campaign is configured to track
+     * faction standing, adjusts regard accordingly and adds all relevant standing reports to the campaign log.</p>
+     *
+     * @param contract  the active {@link AtBContract} for which the Batchall was breached
+     * @param enemyCode the code representing the enemy faction involved in the breach
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    private void processBatchallBreach(AtBContract contract, String enemyCode) {
+        contract.setBatchallAccepted(false);
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isTrackFactionStanding()) {
+            FactionStandings factionStandings = campaign.getFactionStandings();
+            double regardMultiplier = campaignOptions.getRegardMultiplier();
+            // We double the regard multiplier for Batchall breaches as agreeing to a Batchall and then breaking it
+            // is far worse than if you never agreed to it in the first place.
+            regardMultiplier *= 2;
+
+            List<String> reports = factionStandings.processRefusedBatchall(campaign.getFaction().getShortName(),
+                  enemyCode, campaign.getGameYear(), regardMultiplier);
+
+            for (String report : reports) {
+                campaign.addReport(report);
+            }
+        }
     }
 
     private void closeWizard() {
@@ -1002,22 +1175,24 @@ public class StratConScenarioWizard extends JDialog {
      */
     private void availableUnitSelectorChanged(ListSelectionEvent event, JLabel selectionCountLabel,
           JLabel unitStatusLabel, int maxSelectionSize, boolean usesBV) {
-        Object source = event.getSource();
-        Vector<Unit> unitVector = new Vector<>();
-
-        if (source instanceof JList<?> objectList) {
-            for (Object item : objectList.getSelectedValuesList()) {
-                if (item instanceof Unit unit) {
-                    unitVector.add(unit);
-                }
-            }
-        }
-
-        if (unitVector.isEmpty()) {
+        if (!(event.getSource() instanceof JList<?>)) {
             return;
         }
 
-        JList<Unit> changedList = new JList<>(unitVector);
+        JList<Unit> changedList = null;
+        Object src = event.getSource();
+        if (src instanceof JList<?> rawList) {
+            ListModel<?> model = rawList.getModel();
+            if (model.getSize() == 0 || model.getElementAt(0) instanceof Unit) {
+                // It's safe to cast
+                changedList = (JList<Unit>) rawList;
+            }
+        }
+
+        if (changedList == null) {
+            LOGGER.warn("Could not cast JList to Unit type safely in availableUnitSelectorChanged");
+            return;
+        }
 
         ListSelectionListener[] listeners = (((JList<?>) event.getSource()).getListSelectionListeners());
         ((JList<?>) event.getSource()).removeListSelectionListener(listeners[0]);

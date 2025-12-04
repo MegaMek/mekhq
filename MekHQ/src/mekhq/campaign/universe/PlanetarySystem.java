@@ -108,6 +108,14 @@ public class PlanetarySystem {
             if (tr == null) {throw new IllegalArgumentException("Invalid PlanetarySophistication name: " + name);}
             return tr;
         }
+
+        public boolean isBetterOrEqualThan(PlanetarySophistication other) {
+            return index <= other.index;
+        }
+
+        public boolean isBetterThan(PlanetarySophistication other) {
+            return index < other.index;
+        }
     }
 
     // --- Planetary Rating Enum ---

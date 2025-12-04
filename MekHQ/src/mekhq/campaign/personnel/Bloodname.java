@@ -260,7 +260,8 @@ public class Bloodname {
         if (faction == null) {
             LOGGER.error(
                   "Random Bloodname attempted for a clan that does not exist.{}Please ensure that your clan exists " +
-                        "in both the clans.xml and bloodnames.xml files as appropriate.",
+                        "in both the clans.xml and bloodnames.xml files as appropriate. This can be ignored for the " +
+                        "Bandit Caste",
                   System.lineSeparator());
             return null;
         } else if (phenotype == null) {

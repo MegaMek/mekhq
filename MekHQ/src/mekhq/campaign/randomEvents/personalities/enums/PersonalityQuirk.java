@@ -37,6 +37,7 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.PERSONALITY_QUIRK;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -315,6 +316,16 @@ public enum PersonalityQuirk {
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
+    private final String label;
+
+    PersonalityQuirk() {
+        this.label = this.generateLabel();
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
     /**
      * Defines the number of individual description variants available for each trait.
      *
@@ -353,10 +364,10 @@ public enum PersonalityQuirk {
      * @return the localized label string corresponding to the enumeration value.
      */
     // region Getters
-    public String getLabel() {
+    private String generateLabel() {
         final String RESOURCE_KEY = name() + ".label";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**

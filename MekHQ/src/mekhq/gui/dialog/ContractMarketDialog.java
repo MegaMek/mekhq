@@ -66,6 +66,7 @@ import mekhq.campaign.market.contractMarket.ContractAutomation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
@@ -327,7 +328,12 @@ public class ContractMarketDialog extends JDialog {
             Vector<String> row = new Vector<>();
             if (contract instanceof AtBContract) {
                 row.add(((AtBContract) contract).getEmployerName(campaign.getGameYear()));
-                row.add(((AtBContract) contract).getEnemyName(campaign.getGameYear()));
+
+                String enemyName = ((AtBContract) contract).getEnemyName(campaign.getGameYear());
+                if (((AtBContract) contract).getEnemy().isMercenary()) {
+                    enemyName = resourceMap.getString("lblEnemy.mercenary");
+                }
+                row.add(enemyName);
                 if (((AtBContract) contract).isSubcontract()) {
                     row.add(((AtBContract) contract).getContractType() + " (Subcontract)");
                 } else {
@@ -597,6 +603,11 @@ public class ContractMarketDialog extends JDialog {
                         campaign.getLocalDate(),
                         selectedContract.getTotalAdvanceAmount(),
                         "Advance funds for " + selectedContract.getName());
+            campaign.getFinances()
+                  .credit(TransactionType.CONTRACT_PAYMENT,
+                        campaign.getLocalDate(),
+                        selectedContract.getTransportAmount(),
+                        "Transport reimbursement for " + selectedContract.getName());
             campaign.addMission(selectedContract);
             // must be invoked after campaign.addMission to ensure presence of mission ID
             selectedContract.acceptContract(campaign);
@@ -629,6 +640,7 @@ public class ContractMarketDialog extends JDialog {
             }
 
             ContractAutomation.contractStartPrompt(campaign, selectedContract);
+            FacilityRentals.offerContractRentalOpportunity(campaign, selectedContract);
 
             contractMarket.removeContract(selectedContract);
             ((DefaultTableModel) tableContracts.getModel()).removeRow(tableContracts.convertRowIndexToModel(
@@ -651,10 +663,10 @@ public class ContractMarketDialog extends JDialog {
 
 
         AtBContractType contractType = ((AtBContract) selectedContract).getContractType();
-        if (contractType.isGarrisonDuty()) {
+        if (contractType.isGarrisonDuty() || contractType.isRetainer()) {
             inCharacterResourceKey = "messageChallengeGarrison.inCharacter";
             outOfCharacterResourceKey = "messageChallengeGarrison.outOfCharacter";
-        } else if (contractType.isGuerrillaWarfare()) {
+        } else if (contractType.isGuerrillaType()) {
             inCharacterResourceKey = "messageChallengeGuerrilla.inCharacter";
             outOfCharacterResourceKey = "messageChallengeGuerrilla.outOfCharacter";
         } else {

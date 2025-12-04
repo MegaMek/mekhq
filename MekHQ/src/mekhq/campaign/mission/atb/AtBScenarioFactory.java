@@ -146,7 +146,7 @@ public class AtBScenarioFactory {
         }
 
         // If we have an active contract, then we can progress with generation
-        Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsTable();
+        Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsAsMap();
 
         List<AtBScenario> scenarios;
         List<Integer> assignedLances = new ArrayList<>();

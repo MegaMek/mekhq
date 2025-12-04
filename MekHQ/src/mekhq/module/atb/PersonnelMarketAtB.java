@@ -44,6 +44,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.module.api.PersonnelMarketMethod;
 
@@ -80,27 +81,15 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                     recruit = campaign.newPerson(PersonnelRole.BA_TECH);
                 } else if (secondaryRoll < 4) {
                     recruit = campaign.newPerson(PersonnelRole.MECHANIC);
-                } else if (secondaryRoll == 4 && campaign.getCampaignOptions().isUseAero()) {
+                } else if (secondaryRoll == 4) {
                     recruit = campaign.newPerson(PersonnelRole.AERO_TEK);
                 } else {
                     recruit = campaign.newPerson(PersonnelRole.MEK_TECH);
                 }
             } else if (roll == 4 || roll == 10) {
                 recruit = campaign.newPerson(PersonnelRole.MEKWARRIOR);
-            } else if (roll == 5 && campaign.getCampaignOptions().isUseAero()) {
-                recruit = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT);
-            } else if (roll == 5 && campaign.getFaction().isClan()) {
-                recruit = campaign.newPerson(PersonnelRole.MEKWARRIOR);
             } else if (roll == 5) {
-                int secondaryRoll = Compute.d6(2);
-                if (secondaryRoll == 2) {
-                    recruit = campaign.newPerson(PersonnelRole.VTOL_PILOT);
-                    // Frequency based on frequency of VTOLs in Xotl 3028 Merc/General
-                } else if (secondaryRoll <= 5) {
-                    recruit = campaign.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER);
-                } else {
-                    recruit = campaign.newPerson(PersonnelRole.VEHICLE_GUNNER);
-                }
+                recruit = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT);
             } else if (roll == 6 || roll == 8) {
                 if (campaign.getFaction().isClan() && (campaign.getGameYear() > 2870) && (Compute.d6(2) > 3)) {
                     recruit = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR);
@@ -116,16 +105,14 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
             if (null != recruit) {
                 potentialRecruits.add(recruit);
 
-                if (recruit.getPrimaryRole().isGroundVehicleDriver()) {
+                if (recruit.getPrimaryRole().isVehicleCrewGround()) {
                     /*
                      * Replace driver with 1-6 crew with equal
                      * chances of being drivers or gunners
                      */
                     potentialRecruits.remove(recruit);
                     for (int i = 0; i < Compute.d6(); i++) {
-                        potentialRecruits.add(campaign.newPerson((Compute.d6() < 4) ?
-                                                                       PersonnelRole.GROUND_VEHICLE_DRIVER
-                                                                       : PersonnelRole.VEHICLE_GUNNER));
+                        potentialRecruits.add(campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND));
                     }
                 }
 
@@ -133,8 +120,8 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 int adminExperienceLevel = EXP_NONE;
                 if (adminHR != null && adminHR.hasSkill(S_ADMIN)) {
                     Skill adminSkill = adminHR.getSkill(S_ADMIN);
-                    adminExperienceLevel = adminSkill.getExperienceLevel(adminHR.getOptions(),
-                          adminHR.getATOWAttributes());
+                    SkillModifierData skillModifierData = adminHR.getSkillModifierData();
+                    adminExperienceLevel = adminSkill.getExperienceLevel(skillModifierData);
                 }
 
                 int gunneryMod = 0;
@@ -171,16 +158,16 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                         adjustSkill(recruit, SkillType.S_GUN_MEK, gunneryMod);
                         adjustSkill(recruit, SkillType.S_PILOT_MEK, pilotingMod);
                         break;
-                    case GROUND_VEHICLE_DRIVER:
+                    case VEHICLE_CREW_GROUND:
                         adjustSkill(recruit, SkillType.S_PILOT_GVEE, pilotingMod);
+                        adjustSkill(recruit, SkillType.S_GUN_VEE, gunneryMod);
                         break;
-                    case NAVAL_VEHICLE_DRIVER:
+                    case VEHICLE_CREW_NAVAL:
                         adjustSkill(recruit, SkillType.S_PILOT_NVEE, pilotingMod);
+                        adjustSkill(recruit, SkillType.S_GUN_VEE, gunneryMod);
                         break;
-                    case VTOL_PILOT:
+                    case VEHICLE_CREW_VTOL:
                         adjustSkill(recruit, SkillType.S_PILOT_VTOL, pilotingMod);
-                        break;
-                    case VEHICLE_GUNNER:
                         adjustSkill(recruit, SkillType.S_GUN_VEE, gunneryMod);
                         break;
                     case AEROSPACE_PILOT:

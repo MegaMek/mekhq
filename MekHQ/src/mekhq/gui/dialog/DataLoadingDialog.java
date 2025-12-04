@@ -54,6 +54,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
+import megamek.Version;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.UIUtil;
@@ -70,6 +71,7 @@ import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
@@ -89,6 +91,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
@@ -319,10 +322,12 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
             setProgress(6);
             final Campaign campaign;
+            boolean isNewCampaign = false;
             if (getCampaignFile() == null) {
                 // region progress 6
                 LOGGER.info("Starting a new campaign");
                 campaign = CampaignFactory.createCampaign();
+                isNewCampaign = true;
 
                 // Campaign Preset
                 final CampaignOptionsPresetPicker campaignOptionsPresetPicker =
@@ -374,10 +379,12 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.setReputation(reputationController);
 
                 // initialize starting faction standings
-                if (campaign.getCampaignOptions().isTrackFactionStanding()) {
+                CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                if (campaignOptions.isTrackFactionStanding()) {
                     FactionStandings factionStandings = campaign.getFactionStandings();
                     String report = factionStandings.updateClimateRegard(campaign.getFaction(),
-                          campaign.getLocalDate(), campaign.getCampaignOptions().getRegardMultiplier());
+                          campaign.getLocalDate(), campaignOptions.getRegardMultiplier(),
+                          true);
                     campaign.addReport(report);
                 }
                 // endregion Progress 6
@@ -389,25 +396,25 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                                            "</b>");
 
                 // Setup Personnel Modules
-                campaign.setMarriage(campaign.getCampaignOptions()
+                campaign.setMarriage(campaignOptions
                                            .getRandomMarriageMethod()
-                                           .getMethod(campaign.getCampaignOptions()));
-                campaign.setDivorce(campaign.getCampaignOptions()
+                                           .getMethod(campaignOptions));
+                campaign.setDivorce(campaignOptions
                                           .getRandomDivorceMethod()
-                                          .getMethod(campaign.getCampaignOptions()));
-                campaign.setProcreation(campaign.getCampaignOptions()
+                                          .getMethod(campaignOptions));
+                campaign.setProcreation(campaignOptions
                                               .getRandomProcreationMethod()
-                                              .getMethod(campaign.getCampaignOptions()));
+                                              .getMethod(campaignOptions));
 
                 // Setup Markets
                 campaign.refreshPersonnelMarkets(true);
-                ContractMarketMethod contractMarketMethod = campaign.getCampaignOptions().getContractMarketMethod();
+                ContractMarketMethod contractMarketMethod = campaignOptions.getContractMarketMethod();
                 campaign.setContractMarket(contractMarketMethod.getContractMarket());
                 if (!contractMarketMethod.isNone()) {
                     campaign.getContractMarket().generateContractOffers(campaign, true);
                 }
-                if (!campaign.getCampaignOptions().getUnitMarketMethod().isNone()) {
-                    campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
+                if (!campaignOptions.getUnitMarketMethod().isNone()) {
+                    campaign.setUnitMarket(campaignOptions.getUnitMarketMethod().getUnitMarket());
                     campaign.getUnitMarket().generateUnitOffers(campaign);
                 }
 
@@ -419,7 +426,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.setGMMode((preset == null) || preset.isGM());
 
                 // AtB
-                if (campaign.getCampaignOptions().isUseAtB()) {
+                if (campaignOptions.isUseAtB()) {
                     campaign.initAtB(true);
                 }
 
@@ -447,11 +454,22 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 unassignCrewFromUnsupportedUnits(campaign.getUnits());
 
                 // Campaign upgrading
-                if (campaign.getVersion().isLowerThan(MHQConstants.VERSION)) {
+                final Version campaignVersion = campaign.getVersion();
+                if (campaignVersion.isLowerThan(MHQConstants.VERSION)) {
                     handleCampaignUpgrading(campaign);
+                }
+
+                // <50.10 compatibility handler
+                if (campaignVersion.isLowerThan(new Version("0.50.10"))) {
+                    new WarAndPeaceProcessor(campaign, true);
                 }
                 // endregion Progress 7
             }
+
+            if (isNewCampaign) {
+                new WarAndPeaceProcessor(campaign, true);
+            }
+
             campaign.setApp(getApplication());
             return campaign;
         }
@@ -476,24 +494,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          * @since 0.50.07
          */
         private static void handleCampaignUpgrading(Campaign campaign) {
-            // As we're upgrading the campaign, we purposefully block load progress until after the upgrade
-            // has completed. This removes any risk of gui interaction with a mid-upgrade campaign object.
-            // During testing this was found to result in a bundle of inconsistent and seemingly random
-            // errors.
-
-            CountDownLatch latch = new CountDownLatch(1);
-
-            CampaignUpgradeDialog.campaignUpgradeDialog(campaign, () -> {
-                MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
-                latch.countDown();
-            });
-
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                LOGGER.warn("Thread was interrupted during campaign upgrade", e);
-            }
+            CampaignUpgradeDialog.campaignUpgradeDialog(campaign,
+                  () -> MekHQ.triggerEvent(new OptionsChangedEvent(campaign)));
         }
 
         /**

@@ -114,7 +114,7 @@ public record NewYearsDayAnnouncement(Campaign campaign) {
      * @return the selected {@link Person}, or {@code null} if no suitable speaker is found
      */
     private @Nullable Person getSpeaker() {
-        List<Person> activePersonnel = campaign.getActivePersonnel(false);
+        List<Person> activePersonnel = campaign.getActivePersonnel(false, false);
 
         Person commander = campaign.getCommander();
         if (commander != null) {

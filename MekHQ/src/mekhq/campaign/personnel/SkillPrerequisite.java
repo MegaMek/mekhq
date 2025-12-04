@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.personnel;
 
+import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
+
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -141,8 +143,15 @@ public class SkillPrerequisite {
                         skillSet.containsKey(SkillType.S_NAVIGATION);
             case UnitType.GUN_EMPLACEMENT, UnitType.TANK ->
                   skillSet.containsKey(SkillType.S_PILOT_GVEE) || skillSet.containsKey(SkillType.S_GUN_VEE);
-            case UnitType.INFANTRY ->
-                  skillSet.containsKey(SkillType.S_SMALL_ARMS) || skillSet.containsKey(SkillType.S_ANTI_MEK);
+            case UnitType.INFANTRY -> {
+                for (String skill : INFANTRY_GUNNERY_SKILLS) {
+                    if (skillSet.containsKey(skill)) {
+                        yield true;
+                    }
+                }
+
+                yield skillSet.containsKey(SkillType.S_ANTI_MEK);
+            }
             case UnitType.NAVAL ->
                   skillSet.containsKey(SkillType.S_PILOT_NVEE) || skillSet.containsKey(SkillType.S_GUN_VEE);
             case UnitType.PROTOMEK -> skillSet.containsKey(SkillType.S_GUN_PROTO);
