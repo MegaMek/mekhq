@@ -54,8 +54,8 @@ import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewY
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
-import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
+import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
@@ -587,10 +587,14 @@ public class CampaignNewDayManager {
         boolean isUseFatigue = campaignOptions.isUseFatigue();
         int fatigueRate = campaignOptions.getFatigueRate();
         boolean useBetterMonthlyIncome = campaignOptions.isUseBetterExtraIncome();
+        boolean isUseAgeEffects = campaignOptions.isUseAgeEffects();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
+
+            int age = person.getAge(today);
+            person.setAgeForAttributeModifiers(isUseAgeEffects ? age : IGNORE_AGE);
 
             PersonnelOptions personnelOptions = person.getOptions();
 
@@ -714,7 +718,6 @@ public class CampaignNewDayManager {
             }
 
             if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
-                int age = person.getAge(today);
                 if (age >= 6 && age <= 12) {
                     peopleWhoCelebrateCommandersDay++;
                 }
@@ -1375,9 +1378,8 @@ public class CampaignNewDayManager {
             }
         }
 
+        // This is where we update all the aging modifiers for the character.
         if (campaignOptions.isUseAgeEffects() && isBirthday) {
-            // This is where we update all the aging modifiers for the character.
-            updateAllSkillAgeModifiers(today, person);
             applyAgingSPA(age, person);
         }
 

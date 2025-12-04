@@ -34,7 +34,6 @@ package mekhq.campaign.personnel.generator;
 
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
-import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 
@@ -179,11 +178,6 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         // generate personality
         PersonalityController.generatePersonality(person);
-
-        // update skill age modifiers
-        if (campaignOptions.isUseAgeEffects()) {
-            updateAllSkillAgeModifiers(campaign.getLocalDate(), person);
-        }
 
         return person;
     }

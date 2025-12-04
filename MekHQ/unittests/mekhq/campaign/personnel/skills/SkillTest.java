@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.skills;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
+import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
@@ -70,7 +71,7 @@ public class SkillTest {
 
         // Act
         int totalModifier = getTotalAttributeModifier(targetNumber, attributes, testSkillType, new ArrayList<>(),
-              new PersonnelOptions());
+              new PersonnelOptions(), IGNORE_AGE);
 
         // Assert
         assertEquals(1, totalModifier);
@@ -97,7 +98,7 @@ public class SkillTest {
 
         // Act
         int totalModifier = getTotalAttributeModifier(targetNumber, attributes, testSkillType, new ArrayList<>(),
-              new PersonnelOptions());
+              new PersonnelOptions(), IGNORE_AGE);
 
         // Assert
         assertEquals(2, totalModifier);
@@ -124,7 +125,7 @@ public class SkillTest {
 
         // Act
         int totalModifier = getTotalAttributeModifier(targetNumber, attributes, testSkillType, new ArrayList<>(),
-              new PersonnelOptions());
+              new PersonnelOptions(), IGNORE_AGE);
 
         // Assert
         assertEquals(0, totalModifier);

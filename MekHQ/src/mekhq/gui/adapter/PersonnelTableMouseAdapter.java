@@ -138,7 +138,6 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.personnel.skills.Aging;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillDeprecationTool;
@@ -770,7 +769,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.addSkill(skillName, targetLevel, 0);
                     }
 
-                    Aging.updateAllSkillAgeModifiers(today, person);
                     person.setPrimaryRole(getCampaign(), randomProfession);
 
                     MekHQ.triggerEvent(new PersonChangedEvent(person));

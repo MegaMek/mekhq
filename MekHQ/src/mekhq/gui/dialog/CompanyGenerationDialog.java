@@ -35,7 +35,6 @@ package mekhq.gui.dialog;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
 import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
-import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 
 import java.awt.Container;
@@ -297,10 +296,6 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
               SkillLevel.GREEN);
 
         SkillLevel actualSkillLevel = person.getSkillLevel(campaign, false);
-        if (campaign.getCampaignOptions().isUseAgeEffects()) {
-            updateAllSkillAgeModifiers(campaign.getLocalDate(), person);
-        }
-
         reRollLoyalty(person, actualSkillLevel);
         reRollAdvantages(campaign, person, actualSkillLevel);
 
