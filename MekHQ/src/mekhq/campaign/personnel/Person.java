@@ -186,8 +186,8 @@ public class Person {
     public static final int MAXIMUM_ENEMY = 0;
 
     public static final String EXTRA_INCOME_LABEL = "EXTRA_INCOME";
-    public static final int MINIMUM_EXTRA_INCOME = -10;
-    public static final int MAXIMUM_EXTRA_INCOME = 10;
+    public static final int MINIMUM_EXTRA_INCOME = ExtraIncome.NEGATIVE_TEN.getTraitLevel();
+    public static final int MAXIMUM_EXTRA_INCOME = ExtraIncome.POSITIVE_TEN.getTraitLevel();
 
     public static final String PROPERTY_LABEL = "PROPERTY";
     public static final int MINIMUM_PROPERTY = 0;
@@ -208,10 +208,6 @@ public class Person {
     public static final String WEALTH_LABEL = "WEALTH";
     public static final int MINIMUM_WEALTH = -1;
     public static final int MAXIMUM_WEALTH = 10;
-
-    public static final String EXTRA_INCOME_LABEL = "EXTRA_INCOME";
-    public static final int MINIMUM_EXTRA_INCOME = ExtraIncome.NEGATIVE_TEN.getTraitLevel();
-    public static final int MAXIMUM_EXTRA_INCOME = ExtraIncome.POSITIVE_TEN.getTraitLevel();
 
     public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
 

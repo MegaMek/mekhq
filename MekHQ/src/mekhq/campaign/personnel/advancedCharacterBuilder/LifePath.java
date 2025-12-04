@@ -344,4 +344,70 @@ public record LifePath(
                   "flexibleXPPickCount must be less than or equal to the total number of flexible XP award groups");
         }
     }
+
+    /**
+     * Returns a new {@link LifePath} instance identical to this one, but with the {@code version} field replaced by the
+     * current game version.
+     *
+     * <p>This acts as a "clone with modification" operation, preserving all other fields exactly as they exist in
+     * this instance.</p>
+     *
+     * @return a new LifePath record with the updated version
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public LifePath resaveWithUpdatedVersion() {
+        return new LifePath(
+              id,
+              MHQConstants.VERSION,
+              xpCost,
+              source,
+              name,
+              flavorText,
+              age,
+              xpDiscount,
+              minimumYear,
+              maximumYear,
+              randomWeight,
+              lifeStages,
+              categories,
+              isPlayerRestricted,
+              requirementsFactions,
+              requirementsLifePath,
+              requirementsCategories,
+              requirementsAttributes,
+              requirementsEdge,
+              requirementsFlexibleAttribute,
+              requirementsTraits,
+              requirementsSkills,
+              requirementsMetaSkills,
+              requirementsAbilities,
+              exclusionsFactions,
+              exclusionsLifePath,
+              exclusionsCategories,
+              exclusionsAttributes,
+              exclusionsEdge,
+              exclusionsFlexibleAttribute,
+              exclusionsTraits,
+              exclusionsSkills,
+              exclusionsMetaSkills,
+              exclusionsAbilities,
+              fixedXPAttributes,
+              fixedXPEdge,
+              fixedXPFlexibleAttribute,
+              fixedXPTraits,
+              fixedXPSkills,
+              fixedXPMetaSkills,
+              fixedXPAbilities,
+              flexibleXPAttributes,
+              flexibleXPEdge,
+              flexibleXPFlexibleAttribute,
+              flexibleXPTraits,
+              flexibleXPSkills,
+              flexibleXPMetaSkills,
+              flexibleXPAbilities,
+              flexibleXPPickCount
+        );
+    }
 }

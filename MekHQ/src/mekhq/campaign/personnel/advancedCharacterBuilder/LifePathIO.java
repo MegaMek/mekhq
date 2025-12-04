@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
+import static mekhq.MHQConstants.CONFIRMATION_UPGRADE_LIFE_PATHS;
 import static mekhq.MHQConstants.LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
 import static mekhq.MHQConstants.LIFE_PATHS_USER_DIRECTORY_PATH;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -62,9 +63,11 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.GUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
@@ -82,24 +85,22 @@ public class LifePathIO {
               new HashMap<>(loadAllLifePathsFromDirectory(campaign, LIFE_PATHS_DEFAULT_DIRECTORY_PATH, true));
 
         String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
-        if (userDirectory == null || userDirectory.isBlank()) {
-            userDirectory = LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
-        } else {
+        if (!StringUtility.isNullOrBlank(userDirectory)) {
             userDirectory = userDirectory + LIFE_PATHS_USER_DIRECTORY_PATH;
-        }
 
-        LOGGER.info("Loading LifePaths from user directory {}", LIFE_PATHS_USER_DIRECTORY_PATH);
-        Map<UUID, LifePath> tempLifePathMap = new HashMap<>(loadAllLifePathsFromDirectory(campaign, userDirectory,
-              false));
+            LOGGER.info("Loading LifePaths from user directory {}", LIFE_PATHS_USER_DIRECTORY_PATH);
+            Map<UUID, LifePath> tempLifePathMap = new HashMap<>(loadAllLifePathsFromDirectory(campaign, userDirectory,
+                  false));
 
-        for (UUID id : tempLifePathMap.keySet()) {
-            if (lifePathMap.containsKey(id)) {
-                LOGGER.warn("Overriding {} with {}.", lifePathMap.get(id).name(),
-                      tempLifePathMap.get(id).name());
-                continue;
+            for (UUID id : tempLifePathMap.keySet()) {
+                if (lifePathMap.containsKey(id)) {
+                    LOGGER.warn("Overriding {} with {}.", lifePathMap.get(id).name(),
+                          tempLifePathMap.get(id).name());
+                    continue;
+                }
+
+                lifePathMap.put(id, tempLifePathMap.get(id));
             }
-
-            lifePathMap.put(id, tempLifePathMap.get(id));
         }
 
         validateLifePath(lifePathMap);
@@ -244,13 +245,19 @@ public class LifePathIO {
                   false);
             isUpgrade = decisionDialog.getDialogChoice() == 1;
 
-            ImmersiveDialogConfirmation confirmDialog = new ImmersiveDialogConfirmation(campaign);
-            dialogConfirmed = confirmDialog.wasConfirmed();
+            if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_UPGRADE_LIFE_PATHS)) {
+                ImmersiveDialogConfirmation confirmDialog = new ImmersiveDialogConfirmation(campaign,
+                      CONFIRMATION_UPGRADE_LIFE_PATHS);
+                dialogConfirmed = confirmDialog.wasConfirmed();
+            } else {
+                dialogConfirmed = true;
+            }
         }
         return isUpgrade;
     }
 
     private static void validateLifePath(Map<UUID, LifePath> lifePathMap) {
+        LOGGER.info("Starting Life Path Validation");
         for (LifePath lifePath : lifePathMap.values()) {
             Collection<Set<UUID>> requirementsLifePaths = lifePath.requirementsLifePath().values();
             for (Set<UUID> allIDs : requirementsLifePaths) {
@@ -270,6 +277,7 @@ public class LifePathIO {
                 }
             }
         }
+        LOGGER.info("{} Life Paths Validated.", lifePathMap.size());
     }
 
     public static Optional<LifePath> loadFromJSONWithDialog() {
@@ -348,8 +356,9 @@ public class LifePathIO {
         saveAction(record, file, includeLegalStatement);
     }
 
-    public static void saveAction(LifePath record, File file, boolean includeLegalStatement) {
+    public static void saveAction(LifePath originalRecord, File file, boolean includeLegalStatement) {
         String legalStatement = getLegalStatement();
+        LifePath newRecord = originalRecord.resaveWithUpdatedVersion();
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -358,7 +367,7 @@ public class LifePathIO {
             printer.indentArraysWith(new DefaultIndenter("    ", DefaultIndenter.SYS_LF));
             printer = printer.withArrayIndenter(new DefaultIndenter("    ", DefaultIndenter.SYS_LF));
             printer = printer.withObjectIndenter(new DefaultIndenter("    ", DefaultIndenter.SYS_LF));
-            String jsonContent = objectMapper.writer(printer).writeValueAsString(record);
+            String jsonContent = objectMapper.writer(printer).writeValueAsString(newRecord);
 
             // Always open the file in OVERWRITE mode (default):
             try (Writer writer = new BufferedWriter(new OutputStreamWriter(
@@ -371,9 +380,8 @@ public class LifePathIO {
 
                 writer.write(jsonContent);
                 writer.flush();
+                LOGGER.info("Wrote LifePathRecord JSON to: {}", file.getAbsolutePath());
             }
-
-            LOGGER.info("Wrote LifePathRecord JSON to: {}", file.getAbsolutePath());
         } catch (Exception e) {
             LOGGER.error("Failed to write LifePathRecord JSON: {}", e.getMessage());
         }

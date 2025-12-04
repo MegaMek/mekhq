@@ -33,6 +33,8 @@
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.MHQConstants.CONFIRMATION_NEW_LIFE_PATH;
+import static mekhq.MHQConstants.CONFIRMATION_REGEN_PATH_ID;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -444,9 +446,12 @@ public class LifePathBuilderDialog extends JDialog {
     }
 
     private void newLifePathAction() {
-        ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign);
-        if (!confirmation.wasConfirmed()) {
-            return;
+        if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_NEW_LIFE_PATH)) {
+            ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign,
+                  CONFIRMATION_NEW_LIFE_PATH);
+            if (!confirmation.wasConfirmed()) {
+                return;
+            }
         }
 
         lifePathId = UUID.randomUUID();
@@ -490,8 +495,13 @@ public class LifePathBuilderDialog extends JDialog {
                   null,
                   false);
 
-            ImmersiveDialogConfirmation confirmationDialog = new ImmersiveDialogConfirmation(campaign);
-            choiceConfirmed = confirmationDialog.wasConfirmed();
+            if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_REGEN_PATH_ID)) {
+                ImmersiveDialogConfirmation confirmationDialog = new ImmersiveDialogConfirmation(campaign,
+                      CONFIRMATION_REGEN_PATH_ID);
+                choiceConfirmed = confirmationDialog.wasConfirmed();
+            } else {
+                choiceConfirmed = true;
+            }
         }
 
         if (dialog.getDialogChoice() == REGENERATE_ID) {
