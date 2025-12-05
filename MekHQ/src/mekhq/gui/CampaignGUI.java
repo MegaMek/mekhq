@@ -70,6 +70,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.xml.parsers.DocumentBuilder;
 
 import megamek.Version;
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
@@ -1816,16 +1817,38 @@ public class CampaignGUI extends JPanel {
         return saveCampaign(getFrame(), getCampaign(), file, false);
     }
 
-    public boolean saveCampaignForBugReport(ActionEvent evt) {
-        logger.info("Saving campaign...");
-        // Choose a file...
-        File file = FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
-        if (file == null) {
-            // I want a file, you know!
-            return false;
+    public void saveCampaignForBugReport(ActionEvent evt) {
+        logger.info("Saving campaign for bug report...");
+
+        // Build file name: '<campaignName><date>_bugReport_<randomCallsign>.cpnx.gz'
+        String randomName = RandomCallsignGenerator.getInstance().generate();
+        String fileName = String.format(
+              "%s%s_bugReport_%s.%s",
+              getCampaign().getName(),
+              getCampaign().getLocalDate().format(
+                    DateTimeFormatter
+                          .ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                          .withLocale(MekHQ.getMHQOptions().getDateLocale())),
+              randomName,
+              "cpnx.gz"
+        );
+
+        // Base campaigns directory
+        String rawDirectory = MekHQ.getCampaignsDirectory().getValue();
+        File directory = new File(rawDirectory);
+
+        // Ensure directory exists
+        if (!directory.exists() && !directory.mkdirs()) {
+            logger.error("Failed to create campaign directory: {}", rawDirectory);
+            return;
         }
 
-        return saveCampaign(getFrame(), getCampaign(), file, true);
+        // Final target file
+        File file = new File(directory, fileName);
+        logger.info("Bug report campaign save target: {}", file.getAbsolutePath());
+
+        // Save campaign with bug-report prep flag enabled
+        saveCampaign(getFrame(), getCampaign(), file, true);
     }
 
     public static boolean saveCampaign(JFrame frame, Campaign campaign, File file) {
