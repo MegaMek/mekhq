@@ -6214,7 +6214,7 @@ public class Campaign implements ITechManager {
         return factionStandingUltimatumsLibrary;
     }
 
-    public void writeToXML(final PrintWriter writer) {
+    public void writeToXML(final PrintWriter writer, boolean isBugReportPrep) {
         int indent = 0;
 
         // File header
@@ -6459,8 +6459,8 @@ public class Campaign implements ITechManager {
         writePartInUseToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "partsInUse");
 
-        if (MekHQ.getMHQOptions().getWriteCustomsToXML()) {
-            writeCustoms(writer);
+        if (isBugReportPrep || MekHQ.getMHQOptions().getWriteCustomsToXML()) {
+            writeCustoms(writer, isBugReportPrep);
         }
 
         // Okay, we're done.
@@ -6468,8 +6468,40 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "campaign");
     }
 
-    private void writeCustoms(PrintWriter pw1) {
-        for (String name : customs) {
+    /**
+     * Writes serialized custom unit definitions to the provided {@link PrintWriter}.
+     *
+     * <p>When invoked for bug report preparation, this method scans all units currently present in the campaign,
+     * extracts their raw short names, and treats them as custom entries to be exported. Each candidate name is resolved
+     * via the {@link MekSummaryCache}; if a definition is found, the source entity is parsed and serialized into
+     * XML.</p>
+     *
+     * <p>BattleMeks are exported using embedded MTF data wrapped in CDATA; all other supported entity types are
+     * exported as BLK content, line-by-line and wrapped in CDATA.</p>
+     *
+     * <p>Units that cannot be located in the cache or that fail parsing are skipped, with errors logged. The
+     * ordering of exported units depends on the underlying {@link Set} implementation.</p>
+     *
+     * <p><b>Note:</b> When {@code isBugReportPrep} is {@code false}, this method replaces the custom set with an
+     * empty list structure rather than populating it, resulting in no output being written.</p>
+     *
+     * @param printWriter     the output writer used to emit formatted {@code <custom>} elements
+     * @param isBugReportPrep whether campaign unit names should be collected for export; if {@code false}, no custom
+     *                        entities will be written by this method
+     */
+    private void writeCustoms(PrintWriter printWriter, boolean isBugReportPrep) {
+        Set<String> customUnits = new HashSet<>();
+        if (isBugReportPrep) {
+            for (Unit unit : units.getUnits()) {
+                Entity entity = unit.getEntity();
+                customUnits.add(entity.getShortNameRaw());
+            }
+        } else {
+            customUnits = new HashSet<String>(customUnits);
+        }
+
+        for (String name : customUnits) {
+            LOGGER.info(name);
             MekSummary ms = MekSummaryCache.getInstance().getMek(name);
             if (ms == null) {
                 continue;
@@ -6485,28 +6517,28 @@ public class Campaign implements ITechManager {
                 continue;
             }
             Entity en = mekFileParser.getEntity();
-            pw1.println("\t<custom>");
-            pw1.println("\t\t<name>" + name + "</name>");
+            printWriter.println("\t<custom>");
+            printWriter.println("\t\t<name>" + name + "</name>");
             if (en instanceof Mek) {
-                pw1.print("\t\t<mtf><![CDATA[");
-                pw1.print(((Mek) en).getMtf());
-                pw1.println("]]></mtf>");
+                printWriter.print("\t\t<mtf><![CDATA[");
+                printWriter.print(((Mek) en).getMtf());
+                printWriter.println("]]></mtf>");
             } else {
                 try {
                     BuildingBlock blk = BLKFile.getBlock(en);
-                    pw1.print("\t\t<blk><![CDATA[");
+                    printWriter.print("\t\t<blk><![CDATA[");
                     for (String s : blk.getAllDataAsString()) {
                         if (s.isEmpty()) {
                             continue;
                         }
-                        pw1.println(s);
+                        printWriter.println(s);
                     }
-                    pw1.println("]]></blk>");
+                    printWriter.println("]]></blk>");
                 } catch (EntitySavingException e) {
                     LOGGER.error("Failed to save custom entity {}", en.getDisplayName(), e);
                 }
             }
-            pw1.println("\t</custom>");
+            printWriter.println("\t</custom>");
         }
     }
 
