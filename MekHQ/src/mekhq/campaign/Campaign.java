@@ -6501,7 +6501,6 @@ public class Campaign implements ITechManager {
         }
 
         for (String name : customUnits) {
-            LOGGER.info(name);
             MekSummary ms = MekSummaryCache.getInstance().getMek(name);
             if (ms == null) {
                 continue;

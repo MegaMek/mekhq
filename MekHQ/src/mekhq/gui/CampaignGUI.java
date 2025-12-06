@@ -33,7 +33,6 @@
  */
 package mekhq.gui;
 
-import static mekhq.MHQConstants.LOGS_PATH;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
@@ -66,14 +65,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.xml.parsers.DocumentBuilder;
 
 import megamek.Version;
-import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
@@ -152,6 +148,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.GoingRogue;
+import mekhq.campaign.utilities.EasyBugReport;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -1459,7 +1456,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new Insets(3, 3, 3, 3);
         pnlButton.add(btnAdvanceDay, gridBagConstraints);
 
-        btnBugReport.addActionListener(this::saveCampaignForBugReport);
+        btnBugReport.addActionListener(evt -> new EasyBugReport(getFrame(), getCampaign()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 0;
@@ -1819,116 +1816,6 @@ public class CampaignGUI extends JPanel {
 
         return saveCampaign(getFrame(), getCampaign(), file, false);
     }
-
-    public void saveCampaignForBugReport(ActionEvent evt) {
-        logger.info("Saving campaign for bug report...");
-
-        // We append a random call sign so multiple report builds on the same in-game date don't overwrite each other
-        String randomName = RandomCallsignGenerator.getInstance().generate();
-
-        // Build file name: '<campaignName><date>_<randomCallsign>.cpnx.gz'
-        String fileName = String.format(
-              "%s%s_%s.%s",
-              getCampaign().getName(),
-              getCampaign().getLocalDate().format(
-                    DateTimeFormatter
-                          .ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                          .withLocale(MekHQ.getMHQOptions().getDateLocale())),
-              randomName,
-              "cpnx.gz"
-        );
-
-        // Base campaigns directory
-        String rawDirectory = MekHQ.getCampaignsDirectory().getValue();
-        File directory = new File(rawDirectory);
-
-        // Ensure directory exists
-        if (!directory.exists() && !directory.mkdirs()) {
-            logger.error("Failed to create campaign directory: {}", rawDirectory);
-            return;
-        }
-
-        // Temporary campaign file used only for building the archive
-        File campaignFile = new File(directory, fileName);
-        logger.info("Bug report campaign temporary save target: {}",
-              campaignFile.getAbsolutePath());
-
-        // Save campaign with bug report prep flag enabled
-        saveCampaign(getFrame(), getCampaign(), campaignFile, true);
-
-        // Now package campaign + logs into a single archive
-        try {
-            File archiveFile = createBugReportArchive(campaignFile);
-            logger.info("Bug report archive created at: {}",
-                  archiveFile.getAbsolutePath());
-
-            // We only want the archive, so delete the loose campaign file
-            if (!campaignFile.delete()) {
-                logger.warn("Unable to delete temporary bug report campaign file: {}",
-                      campaignFile.getAbsolutePath());
-            }
-        } catch (IOException e) {
-            logger.error("Failed to create bug report archive", e);
-            // In this failure case, we intentionally leave the campaignFile so the user still has *something* to
-            // attach if needed.
-        }
-    }
-
-    private File createBugReportArchive(File campaignFile) throws IOException {
-        // Archive name alongside the campaign file
-        String archiveName = campaignFile.getName()
-                                   .replace(".cpnx.gz", ".zip");
-        File archiveFile = new File(campaignFile.getParentFile(), archiveName);
-
-        try (FileOutputStream fos = new FileOutputStream(archiveFile);
-              ZipOutputStream zos = new ZipOutputStream(fos)) {
-
-            // 1) Add the campaign file at the root of the archive
-            addFileToZip(campaignFile, campaignFile.getName(), zos);
-
-            // 2) Add logs under "logs/<filename>"
-            File logsDir = new File(LOGS_PATH);
-            if (!logsDir.isDirectory()) {
-                logger.warn("Logs directory does not exist or is not a directory: {}",
-                      LOGS_PATH);
-                return archiveFile;
-            }
-
-            File[] logFiles = logsDir.listFiles(f -> f.isFile()
-                                                           && (f.getName().endsWith(".log")
-                                                                     || f.getName().endsWith(".log.gz")));
-
-            if (logFiles == null || logFiles.length == 0) {
-                logger.info("No .log or .log.gz files found in {}", LOGS_PATH);
-                return archiveFile;
-            }
-
-            for (File logFile : logFiles) {
-                String entryName = "logs/" + logFile.getName();
-                addFileToZip(logFile, entryName, zos);
-            }
-        }
-
-        return archiveFile;
-    }
-
-    private void addFileToZip(File source,
-          String entryName,
-          ZipOutputStream zos) throws IOException {
-        ZipEntry entry = new ZipEntry(entryName);
-        zos.putNextEntry(entry);
-
-        try (InputStream is = new FileInputStream(source)) {
-            byte[] buffer = new byte[8192];
-            int len;
-            while ((len = is.read(buffer)) != -1) {
-                zos.write(buffer, 0, len);
-            }
-        }
-
-        zos.closeEntry();
-    }
-
 
     public static boolean saveCampaign(JFrame frame, Campaign campaign, File file) {
         return saveCampaign(frame, campaign, file, false);
