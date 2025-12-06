@@ -48,6 +48,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final int MAX_JUMP_RADIUS = 30; //
     public static final int PREGNANCY_STANDARD_DURATION = 280; // standard duration of a pregnancy in days (40 weeks)
     public static final String EGO_OBJECTIVE_NAME = "Player";
+    public static final String DISCORD_LINK = "https://discord.gg/megamek";
     // endregion General Constants
 
     // region Faction Generation Constants

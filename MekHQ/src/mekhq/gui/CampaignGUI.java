@@ -148,7 +148,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.GoingRogue;
-import mekhq.campaign.utilities.EasyBugReport;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -1453,10 +1452,10 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+        gridBagConstraints.insets = new Insets(3, 15, 3, 0);
         pnlButton.add(btnAdvanceDay, gridBagConstraints);
 
-        btnBugReport.addActionListener(evt -> new EasyBugReport(getFrame(), getCampaign()));
+        btnBugReport.addActionListener(evt -> new EasyBugReportDialog(getFrame(), getCampaign()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 0;
@@ -1466,7 +1465,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
+        gridBagConstraints.insets = new Insets(3, 15, 3, 15);
         pnlButton.add(btnBugReport, gridBagConstraints);
 
         return pnlButton;

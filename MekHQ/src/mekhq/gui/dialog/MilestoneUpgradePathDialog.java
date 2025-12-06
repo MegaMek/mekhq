@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.MHQConstants.DISCORD_LINK;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
 
@@ -70,8 +71,6 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
  */
 public class MilestoneUpgradePathDialog {
     private static final MMLogger LOGGER = MMLogger.create(MilestoneUpgradePathDialog.class);
-
-    private final static String DISCORD_LINK = "https://discord.gg/megamek";
 
     /**
      * Displays the milestone upgrade path dialog if upgrades are needed for the supplied campaign.

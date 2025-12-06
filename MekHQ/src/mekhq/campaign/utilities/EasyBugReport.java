@@ -1,3 +1,35 @@
+/*
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
 package mekhq.campaign.utilities;
 
 import static mekhq.MHQConstants.LOGS_PATH;
@@ -24,19 +56,48 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 
+/**
+ * Utility methods for preparing and packaging campaign data for bug reports.
+ *
+ * <p>This helper class centralizes the logic used to:</p>
+ * <ul>
+ *     <li>Save a campaign in a "bug report" configuration</li>
+ *     <li>Prompt the user for a destination archive file</li>
+ *     <li>Create a ZIP file containing the saved campaign and relevant log files</li>
+ * </ul>
+ *
+ * <p>The resulting archive is intended to be attached directly to issue reports for easier debugging and
+ * reproduction.</p>
+ *
+ * @author Illiani
+ * @since 0.50.11
+ */
 public class EasyBugReport {
     private static final MMLogger LOGGER = MMLogger.create(EasyBugReport.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.EasyBugReport";
 
-    private final Campaign campaign;
-
-    public EasyBugReport(JFrame frame, Campaign campaign) {
-        this.campaign = campaign;
-
-        saveCampaignForBugReport(frame);
-    }
-
-    public void saveCampaignForBugReport(JFrame frame) {
+    /**
+     * Saves the given campaign and packages it, along with log files, into a ZIP archive chosen by the user.
+     *
+     * <p>The workflow is:</p>
+     * <ol>
+     *     <li>Derive a default base name using campaign name, in-game date, and a random callsign</li>
+     *     <li>Ensure the campaigns directory exists</li>
+     *     <li>Show a file chooser so the user can confirm or modify the archive name and location</li>
+     *     <li>Save a temporary campaign file tailored for bug reporting</li>
+     *     <li>Create an archive that includes the campaign file and log files</li>
+     *     <li>Delete the temporary campaign file on success</li>
+     * </ol>
+     * <p>If archive creation fails, the temporary campaign file is deliberately left in place so the user still has
+     * something they can attach to a bug report.</p>
+     *
+     * @param frame    the parent frame used as the owner for the file-chooser dialog
+     * @param campaign the campaign whose state will be saved and packaged
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public static void saveCampaignForBugReport(JFrame frame, Campaign campaign) {
         LOGGER.info("Saving campaign for bug report...");
 
         String campaignName = campaign.getName();
@@ -106,7 +167,26 @@ public class EasyBugReport {
         }
     }
 
-    private File createBugReportArchive(File campaignFile, File archiveFile) throws IOException {
+    /**
+     * Creates a ZIP archive containing the given campaign file and any valid log files located under
+     * {@link mekhq.MHQConstants#LOGS_PATH}.
+     *
+     * <p>The campaign file is stored at the root of the archive. Log files are stored under the {@code logs/}
+     * directory within the archive, and are limited to files ending in {@code .log} or {@code .log.gz}.</p>
+     *
+     * <p>If the logs directory does not exist or contains no matching files, the method logs this and still returns
+     * the archive containing only the campaign file.</p>
+     *
+     * @param campaignFile the already-saved campaign file to be included at the root of the archive
+     * @param archiveFile  the target ZIP file to write to
+     *
+     * @return the archive file passed in as {@code archiveFile}, once it has been successfully written
+     *
+     * @throws IOException if an I/O error occurs while writing the archive
+     * @author Illiani
+     * @since 0.50.11
+     */
+    private static File createBugReportArchive(File campaignFile, File archiveFile) throws IOException {
         try (FileOutputStream fileOutputStream = new FileOutputStream(archiveFile);
               ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream)) {
 
@@ -138,7 +218,22 @@ public class EasyBugReport {
         return archiveFile;
     }
 
-    private void addFileToZip(File source, String entryName, ZipOutputStream zipOutputStream) throws IOException {
+    /**
+     * Adds a single file to an open ZIP output stream.
+     *
+     * <p>The file is written using a newly created {@link ZipEntry} with the provided entry name, and its contents
+     * are streamed using a fixed-size buffer until EOF.</p>
+     *
+     * @param source          the source file to read from
+     * @param entryName       the path/name under which the file should appear inside the archive
+     * @param zipOutputStream the open ZIP output stream to which the entry will be written
+     *
+     * @throws IOException if any I/O error occurs while reading or writing
+     * @author Illiani
+     * @since 0.50.11
+     */
+    private static void addFileToZip(File source, String entryName, ZipOutputStream zipOutputStream)
+          throws IOException {
         ZipEntry entry = new ZipEntry(entryName);
         zipOutputStream.putNextEntry(entry);
 
