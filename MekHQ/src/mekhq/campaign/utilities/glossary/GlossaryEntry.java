@@ -147,6 +147,7 @@ public enum GlossaryEntry {
     UNABLE_TO_START_SCENARIO("UNABLE_TO_START_SCENARIO", new Version("0.50.06")),
     VEHICLE_CREWS("VEHICLE_CREWS", new Version("0.50.06")),
     VOCATIONAL_XP("VOCATIONAL_XP", new Version("0.50.06")),
+    QUICK_TRAIN("QUICK_TRAIN", new Version("0.50.11")),
     WINTER_HOLIDAY("WINTER_HOLIDAY", new Version("0.50.06"));
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GlossaryEntry";

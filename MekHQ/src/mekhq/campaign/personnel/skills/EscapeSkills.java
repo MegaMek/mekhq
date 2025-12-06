@@ -66,6 +66,11 @@ import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 public class EscapeSkills {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.EscapeArtist";
 
+    /**
+     * Unmodifiable list of all skill type strings considered to be escape skills.
+     */
+    public static final List<String> ESCAPE_SKILLS = List.of(SkillType.S_ESCAPE_ARTIST, SkillType.S_DISGUISE,
+          SkillType.S_FORGERY, SkillType.S_ACTING, SkillType.S_SLEIGHT_OF_HAND);
     private final static int NO_SKILL_AVAILABLE = -1;
 
     /**
@@ -131,53 +136,20 @@ public class EscapeSkills {
      * @author Illiani
      * @since 0.50.07
      */
-    private static String getHighestEscapeSkill(Person person) {
+    static String getHighestEscapeSkill(Person person) {
         SkillModifierData skillModifierData = person.getSkillModifierData();
 
         int highestSkillLevel = NO_SKILL_AVAILABLE;
         String skillToUse = "";
 
-        Skill escapeArtistSkill = person.getSkill(SkillType.S_ESCAPE_ARTIST);
-        if (escapeArtistSkill != null) {
-            int level = escapeArtistSkill.getTotalSkillLevel(skillModifierData);
-            if (level > highestSkillLevel) {
-                highestSkillLevel = level;
-                skillToUse = SkillType.S_ESCAPE_ARTIST;
-            }
-        }
-
-        Skill disguiseSkill = person.getSkill(SkillType.S_DISGUISE);
-        if (disguiseSkill != null) {
-            int level = disguiseSkill.getTotalSkillLevel(skillModifierData);
-            if (level > highestSkillLevel) {
-                highestSkillLevel = level;
-                skillToUse = SkillType.S_DISGUISE;
-            }
-        }
-
-        Skill forgerySkill = person.getSkill(SkillType.S_FORGERY);
-        if (forgerySkill != null) {
-            int level = forgerySkill.getTotalSkillLevel(skillModifierData);
-            if (level > highestSkillLevel) {
-                highestSkillLevel = level;
-                skillToUse = SkillType.S_FORGERY;
-            }
-        }
-
-        Skill actingSkill = person.getSkill(SkillType.S_ACTING);
-        if (actingSkill != null) {
-            int level = actingSkill.getTotalSkillLevel(skillModifierData);
-            if (level > highestSkillLevel) {
-                highestSkillLevel = level;
-                skillToUse = SkillType.S_ACTING;
-            }
-        }
-
-        Skill sleightOfHandSkill = person.getSkill(SkillType.S_SLEIGHT_OF_HAND);
-        if (sleightOfHandSkill != null) {
-            int level = sleightOfHandSkill.getTotalSkillLevel(skillModifierData);
-            if (level > highestSkillLevel) {
-                skillToUse = SkillType.S_SLEIGHT_OF_HAND;
+        for (String skillName : ESCAPE_SKILLS) {
+            Skill skill = person.getSkill(skillName);
+            if (skill != null) {
+                int level = skill.getTotalSkillLevel(skillModifierData);
+                if (level > highestSkillLevel) {
+                    highestSkillLevel = level;
+                    skillToUse = skillName;
+                }
             }
         }
 
