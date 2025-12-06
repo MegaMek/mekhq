@@ -38,6 +38,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_SENSOR_GEEK;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
+import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
@@ -105,7 +106,6 @@ public class Skill {
     private SkillType type;
     private int level;
     private int bonus;
-    private int agingModifier;
     private boolean hasNaturalAptitude;
 
     protected Skill() {
@@ -118,42 +118,25 @@ public class Skill {
     }
 
     public Skill(String type, int level) {
-        this(SkillType.getType(type), level, 0, 0, false);
+        this(SkillType.getType(type), level, 0, false);
     }
 
     public Skill(String type, int level, int bonus) {
-        this(SkillType.getType(type), level, bonus, 0, false);
+        this(SkillType.getType(type), level, bonus, false);
     }
 
     public Skill(String type, int level, int bonus, boolean hasNaturalAptitude) {
-        this(SkillType.getType(type), level, bonus, 0, hasNaturalAptitude);
-    }
-
-    public Skill(String type, int level, int bonus, int agingModifier) {
-        this(SkillType.getType(type), level, bonus, agingModifier, false);
-    }
-
-    public Skill(String type, int level, int bonus, int agingModifier, boolean hasNaturalAptitude) {
-        this(SkillType.getType(type), level, bonus, agingModifier, hasNaturalAptitude);
+        this(SkillType.getType(type), level, bonus, hasNaturalAptitude);
     }
 
     public Skill(SkillType type, int level, int bonus) {
-        this(type, level, bonus, 0, false);
+        this(type, level, bonus, false);
     }
 
     public Skill(SkillType type, int level, int bonus, boolean hasNaturalAptitude) {
-        this(type, level, bonus, 0, hasNaturalAptitude);
-    }
-
-    public Skill(SkillType type, int level, int bonus, int agingModifier) {
-        this(type, level, bonus, agingModifier, false);
-    }
-
-    public Skill(SkillType type, int level, int bonus, int agingModifier, boolean hasNaturalAptitude) {
         this.type = type;
         this.level = level;
         this.bonus = bonus;
-        this.agingModifier = agingModifier;
         this.hasNaturalAptitude = hasNaturalAptitude;
     }
 
@@ -251,14 +234,6 @@ public class Skill {
 
     public void setBonus(int b) {
         this.bonus = b;
-    }
-
-    public int getAgingModifier() {
-        return agingModifier;
-    }
-
-    public void setAgingModifier(int agingModifier) {
-        this.agingModifier = agingModifier;
     }
 
     public boolean getHasNaturalAptitude() {
@@ -545,7 +520,8 @@ public class Skill {
      * @since 0.50.05
      */
     public static int getTotalAttributeModifier(TargetRoll targetNumber, final Attributes characterAttributes,
-          final SkillType skillType, final List<InjuryEffect> injuryEffects, final PersonnelOptions options) {
+          final SkillType skillType, final List<InjuryEffect> injuryEffects, final PersonnelOptions options,
+          int characterAge) {
         if (targetNumber == null || characterAttributes == null || skillType == null) {
             return 0;
         }
@@ -558,7 +534,10 @@ public class Skill {
                 continue;
             }
 
-            int attributeScore = characterAttributes.getAdjustedAttributeScore(attribute, injuryEffects, options);
+            int attributeScore = characterAttributes.getAdjustedAttributeScore(attribute,
+                  injuryEffects,
+                  options,
+                  characterAge);
             int attributeModifier = getIndividualAttributeModifier(attributeScore);
             totalModifier += attributeModifier;
             targetNumber.addModifier(-attributeModifier, attribute.getLabel());
@@ -612,7 +591,7 @@ public class Skill {
         int baseValue = type.getTarget();
         int valueAdjustment = isCountUp() ? level + bonus : -level - bonus;
 
-        return baseValue + valueAdjustment + (isCountUp() ? agingModifier : -agingModifier);
+        return baseValue + valueAdjustment;
     }
 
     /**
@@ -640,10 +619,11 @@ public class Skill {
             skillModifierData = new SkillModifierData(new PersonnelOptions(),
                   new Attributes(),
                   0,
-                  new ArrayList<>());
+                  new ArrayList<>(),
+                  IGNORE_AGE);
         }
 
-        int baseValue = level + bonus + agingModifier;
+        int baseValue = level + bonus;
 
         int modifiers = getModifiers(skillModifierData);
 
@@ -667,7 +647,7 @@ public class Skill {
         int spaModifiers = getSPAModifiers(skillModifierData.characterOptions(),
               skillModifierData.adjustedReputation());
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), skillModifierData.attributes(), type,
-              skillModifierData.injuryEffects(), skillModifierData.characterOptions());
+              skillModifierData.injuryEffects(), skillModifierData.characterOptions(), skillModifierData.age());
         int totalInjuryModifier = getTotalInjuryModifier(skillModifierData, type);
 
         return spaModifiers + attributeModifiers + totalInjuryModifier;
@@ -787,7 +767,7 @@ public class Skill {
     @Override
     public String toString() {
         SkillModifierData skillModifierData = new SkillModifierData(new PersonnelOptions(), new Attributes(),
-              0, new ArrayList<>());
+              0, new ArrayList<>(), IGNORE_AGE);
         return toString(skillModifierData);
     }
 
@@ -854,12 +834,6 @@ public class Skill {
             tooltip.append(flavorText).append("<br><br>");
         }
 
-        if (agingModifier != 0) {
-            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "tooltip.format.aging",
-                  (agingModifier > 0 ? "+" : "") + agingModifier));
-        }
-
         int spaModifier = getSPAModifiers(skillModifierData.characterOptions(), skillModifierData.adjustedReputation());
         if (spaModifier != 0) {
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -880,7 +854,8 @@ public class Skill {
         PersonnelOptions options = skillModifierData.characterOptions();
         int firstLinkedAttributeModifier = attributes.getAttributeModifier(firstLinkedAttribute,
               activeInjuryEffects,
-              options);
+              options,
+              skillModifierData.age());
         String additionSymbol = getTextAt(RESOURCE_BUNDLE, "tooltip.format.addition");
         tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "tooltip.format.linkedAttribute",
@@ -890,7 +865,7 @@ public class Skill {
         SkillAttribute secondLinkedAttribute = type.getSecondAttribute();
         if (secondLinkedAttribute != SkillAttribute.NONE) {
             int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute,
-                  activeInjuryEffects, options);
+                  activeInjuryEffects, options, skillModifierData.age());
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "tooltip.format.linkedAttribute",
                   secondLinkedAttribute.getLabel(),
@@ -905,7 +880,6 @@ public class Skill {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type.getName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "level", level);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonus", bonus);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "agingModifier", agingModifier);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skill");
     }
 
@@ -928,8 +902,6 @@ public class Skill {
                     retVal.level = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bonus")) {
                     retVal.bonus = MathUtility.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("agingModifier")) {
-                    retVal.agingModifier = MathUtility.parseInt(wn2.getTextContent());
                 }
             }
         } catch (Exception ex) {

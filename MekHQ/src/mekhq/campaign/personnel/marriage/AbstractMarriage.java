@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.personnel.marriage;
 
-import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -429,11 +427,6 @@ public abstract class AbstractMarriage {
             int difference = externalSpouseAge - externalSpouseMaxAge;
 
             externalSpouse.setDateOfBirth(externalSpouse.getDateOfBirth().plusYears(difference));
-        }
-
-        // update skill age modifiers
-        if (campaign.getCampaignOptions().isUseAgeEffects()) {
-            updateAllSkillAgeModifiers(campaign.getLocalDate(), externalSpouse);
         }
 
         // update sexual preferences

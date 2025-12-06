@@ -33,8 +33,6 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
-import static mekhq.campaign.personnel.skills.Aging.clearAllAgeModifiers;
-import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -58,7 +56,6 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -1619,7 +1616,7 @@ public class BiographyTab {
      * If a preset options object is provided, the changes are applied there. Otherwise, they are applied to the current
      * campaign's options.
      *
-     * @param isCampaignUpgrade Is triggered as part of the campaign upgrade process
+     * @param isCampaignUpgrade     Is triggered as part of the campaign upgrade process
      * @param presetCampaignOptions A {@link CampaignOptions} object to update with the current UI settings, or
      *                              {@code null} to apply changes to the campaign's options directly.
      */
@@ -1639,13 +1636,6 @@ public class BiographyTab {
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
         options.setNonBinaryDiceSize((int) spnNonBinaryDiceSize.getValue());
         options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
-        for (Person person : campaign.getPersonnel()) {
-            if (chkUseAgeEffects.isSelected()) {
-                updateAllSkillAgeModifiers(generalTab.getDate(), person);
-            } else {
-                clearAllAgeModifiers(person);
-            }
-        }
         options.setUseAgeEffects(chkUseAgeEffects.isSelected());
         options.setAnnounceOfficersOnly(chkAnnounceOfficersOnly.isSelected());
         options.setAnnounceBirthdays(chkAnnounceBirthdays.isSelected());

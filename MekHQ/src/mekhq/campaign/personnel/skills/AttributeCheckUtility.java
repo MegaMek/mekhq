@@ -432,7 +432,7 @@ public class AttributeCheckUtility {
 
         getBaseTargetNumber(targetNumber, secondSkillAttribute != null);
         getAttributeModifiers(firstSkillAttribute, secondSkillAttribute, characterAttributes, targetNumber,
-              person.getActiveInjuryEffects(), person.getOptions());
+              person.getActiveInjuryEffects(), person.getOptions(), person.getAgeForAttributeModifiers());
 
         targetNumber.addModifier(miscModifier, getFormattedTextAt(RESOURCE_BUNDLE, "AttributeCheck.miscModifier"));
 
@@ -453,15 +453,15 @@ public class AttributeCheckUtility {
      */
     private static void getAttributeModifiers(SkillAttribute firstSkillAttribute, SkillAttribute secondSkillAttribute,
           Attributes characterAttributes, TargetRoll targetNumber, List<InjuryEffect> injuryEffects,
-          PersonnelOptions options) {
+          PersonnelOptions options, int ageForAttributeModifiers) {
         // Because we're adjusting the target number, positive is bad, negative is good
         int firstAttributeModifier = -characterAttributes.getAdjustedAttributeScore(firstSkillAttribute, injuryEffects,
-              options);
+              options, ageForAttributeModifiers);
         targetNumber.addModifier(firstAttributeModifier, firstSkillAttribute.getLabel());
 
         if (secondSkillAttribute != null) {
             int secondAttributeModifier = -characterAttributes.getAdjustedAttributeScore(secondSkillAttribute,
-                  injuryEffects, options);
+                  injuryEffects, options, ageForAttributeModifiers);
             targetNumber.addModifier(secondAttributeModifier, secondSkillAttribute.getLabel());
         }
     }

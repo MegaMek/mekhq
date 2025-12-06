@@ -35,6 +35,7 @@ package mekhq.campaign.unit;
 
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
+import static megamek.common.board.Board.START_NONE;
 import static megamek.common.equipment.MiscType.F_CARGO;
 import static megamek.common.units.EntityWeightClass.WEIGHT_HEAVY;
 import static megamek.common.units.EntityWeightClass.WEIGHT_LIGHT;
@@ -4561,6 +4562,8 @@ public class Unit implements ITechnology {
         entity.setCommander(false);
         entity.getCrew().resetGameState();
         entity.getCrew().setCommandBonus(0);
+        entity.resetPickedUpMekWarriors();
+        entity.setStartingPos(START_NONE);
 
         // Update crew data
         updateCrew(isOnlyCommandersMatter);

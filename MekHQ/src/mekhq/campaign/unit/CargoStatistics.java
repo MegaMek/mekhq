@@ -72,8 +72,12 @@ public record CargoStatistics(Campaign campaign) {
     }
 
     public double getTotalCargoCapacity() {
+        // The use of the convoy cargo capacity here is deliberate, we should not be factoring in temporary cargo
+        // capacity such as roof racks and lift hoists. Otherwise, every unit added to the campaign roster will
+        // increase total cargo capacity exponentially. Cargo units will become redundant, because why would you
+        // bother with a cargo unit when every BattleMek adds capacity equal to its weight? - Illiani, December 3rd 2025
         return getHangar().getUnitsStream()
-                     .mapToDouble(Unit::getCargoCapacityForSalvage)
+                     .mapToDouble(Unit::getCargoCapacityForConvoy)
                      .sum();
     }
 

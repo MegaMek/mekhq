@@ -59,6 +59,7 @@ import java.util.StringJoiner;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.options.IOption;
+import mekhq.MHQConstants;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.InjuryType;
@@ -93,7 +94,8 @@ public enum ProstheticType {
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
-          false),
+          false,
+          List.of()),
     HOOK_HAND("HOOK_HAND",
           CRUDE,
           2,
@@ -103,7 +105,8 @@ public enum ProstheticType {
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
-          false),
+          false,
+          List.of()),
     PEG_LEG("PEG_LEG",
           CRUDE,
           2,
@@ -113,7 +116,8 @@ public enum ProstheticType {
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
-          false),
+          false,
+          List.of()),
     WOODEN_FOOT("WOODEN_FOOT",
           CRUDE,
           2,
@@ -123,7 +127,8 @@ public enum ProstheticType {
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
-          false),
+          false,
+          List.of()),
     SIMPLE_ARM("SIMPLE_ARM",
           SIMPLE,
           2,
@@ -133,7 +138,8 @@ public enum ProstheticType {
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
           false,
           false,
-          false),
+          false,
+          List.of()),
     SIMPLE_CLAW_HAND("SIMPLE_CLAW_HAND",
           SIMPLE,
           2,
@@ -143,7 +149,8 @@ public enum ProstheticType {
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
           false,
           false,
-          false),
+          false,
+          List.of()),
     SIMPLE_LEG("SIMPLE_LEG",
           SIMPLE,
           2,
@@ -153,7 +160,8 @@ public enum ProstheticType {
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
           false,
           false,
-          false),
+          false,
+          List.of()),
     SIMPLE_FOOT("SIMPLE_FOOT",
           SIMPLE,
           2,
@@ -163,7 +171,8 @@ public enum ProstheticType {
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
           false,
           false,
-          false),
+          false,
+          List.of()),
     PROSTHETIC_ARM("PROSTHETIC_ARM",
           STANDARD,
           5,
@@ -173,7 +182,8 @@ public enum ProstheticType {
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
           false,
           false,
-          false),
+          false,
+          List.of()),
     PROSTHETIC_HAND("PROSTHETIC_HAND",
           STANDARD,
           5,
@@ -183,7 +193,8 @@ public enum ProstheticType {
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
           false,
           false,
-          false),
+          false,
+          List.of()),
     PROSTHETIC_LEG("PROSTHETIC_LEG",
           STANDARD,
           5,
@@ -193,7 +204,8 @@ public enum ProstheticType {
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
           false,
           false,
-          false),
+          false,
+          List.of()),
     PROSTHETIC_FOOT("PROSTHETIC_FOOT",
           STANDARD,
           5,
@@ -203,7 +215,8 @@ public enum ProstheticType {
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
           false,
           false,
-          false),
+          false,
+          List.of()),
     ADVANCED_PROSTHETIC_ARM("ADVANCED_PROSTHETIC_ARM",
           ADVANCED,
           5,
@@ -213,7 +226,8 @@ public enum ProstheticType {
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
           false,
           false,
-          false),
+          false,
+          List.of()),
     ADVANCED_PROSTHETIC_HAND("ADVANCED_PROSTHETIC_HAND",
           ADVANCED,
           5,
@@ -223,7 +237,8 @@ public enum ProstheticType {
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
           false,
           false,
-          false),
+          false,
+          List.of()),
     ADVANCED_PROSTHETIC_LEG("ADVANCED_PROSTHETIC_LEG",
           ADVANCED,
           5,
@@ -233,7 +248,8 @@ public enum ProstheticType {
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
           false,
           false,
-          false),
+          false,
+          List.of()),
     ADVANCED_PROSTHETIC_FOOT("ADVANCED_PROSTHETIC_FOOT",
           ADVANCED,
           5,
@@ -243,7 +259,8 @@ public enum ProstheticType {
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
           false,
           false,
-          false),
+          false,
+          List.of()),
     MYOMER_ARM("MYOMER_ARM",
           ENHANCED,
           5,
@@ -253,7 +270,8 @@ public enum ProstheticType {
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
           false,
           true,
-          false),
+          false,
+          List.of()),
     MYOMER_HAND("MYOMER_HAND",
           ENHANCED,
           5,
@@ -263,7 +281,8 @@ public enum ProstheticType {
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
           false,
           true,
-          false),
+          false,
+          List.of()),
     MYOMER_LEG("MYOMER_LEG",
           ENHANCED,
           5,
@@ -273,7 +292,8 @@ public enum ProstheticType {
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
           false,
           true,
-          false),
+          false,
+          List.of()),
     MYOMER_FOOT("MYOMER_FOOT",
           ENHANCED,
           5,
@@ -283,7 +303,8 @@ public enum ProstheticType {
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
           false,
           true,
-          false),
+          false,
+          List.of()),
     CLONED_ARM("CLONED_ARM",
           CLONE,
           5,
@@ -293,7 +314,8 @@ public enum ProstheticType {
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           true,
           false,
-          false),
+          false,
+          List.of()),
     CLONED_HAND("CLONED_HAND",
           CLONE,
           5,
@@ -303,7 +325,8 @@ public enum ProstheticType {
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           true,
           false,
-          false),
+          false,
+          List.of()),
     CLONED_LEG("CLONED_LEG",
           CLONE,
           5,
@@ -313,7 +336,8 @@ public enum ProstheticType {
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           true,
           false,
-          false),
+          false,
+          List.of()),
     CLONED_FOOT("CLONED_FOOT",
           CLONE,
           5,
@@ -323,7 +347,8 @@ public enum ProstheticType {
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           true,
           false,
-          false),
+          false,
+          List.of()),
     EYE_IMPLANT("EYE_IMPLANT",
           SIMPLE,
           2,
@@ -333,7 +358,8 @@ public enum ProstheticType {
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
           false,
           false,
-          false),
+          false,
+          List.of()),
     BIONIC_EAR("BIONIC_EAR",
           STANDARD,
           5,
@@ -343,7 +369,8 @@ public enum ProstheticType {
           AvailabilityValue.A, AvailabilityValue.C, AvailabilityValue.A,
           false,
           false,
-          false),
+          false,
+          List.of()),
     BIONIC_EYE("BIONIC_EYE",
           ADVANCED,
           5,
@@ -353,7 +380,8 @@ public enum ProstheticType {
           AvailabilityValue.A, AvailabilityValue.C, AvailabilityValue.A,
           false,
           false,
-          false),
+          false,
+          List.of()),
     BIONIC_HEART("BIONIC_HEART",
           STANDARD,
           5,
@@ -363,7 +391,8 @@ public enum ProstheticType {
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
           false,
           false,
-          false),
+          false,
+          List.of()),
     BIONIC_LUNGS("BIONIC_LUNGS",
           ADVANCED,
           5,
@@ -373,7 +402,8 @@ public enum ProstheticType {
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
           false,
           false,
-          false),
+          false,
+          List.of()),
     BIONIC_ORGAN_OTHER("BIONIC_ORGAN_OTHER",
           ADVANCED,
           5,
@@ -383,7 +413,8 @@ public enum ProstheticType {
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.C,
           false,
           false,
-          false),
+          false,
+          List.of()),
     COSMETIC_SURGERY("COSMETIC_SURGERY",
           SIMPLE,
           2,
@@ -393,7 +424,8 @@ public enum ProstheticType {
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
-          false),
+          false,
+          List.of()),
     ELECTIVE_MYOMER_ARM("ELECTIVE_MYOMER_ARM",
           ENHANCED,
           5,
@@ -404,6 +436,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("CC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     ELECTIVE_MYOMER_HAND("ELECTIVE_MYOMER_HAND",
@@ -416,6 +449,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("CC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     ELECTIVE_MYOMER_LEG("ELECTIVE_MYOMER_LEG",
@@ -428,6 +462,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("CC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     ENHANCED_IMAGING("ENHANCED_IMAGING",
@@ -440,6 +475,7 @@ public enum ProstheticType {
           true,
           false,
           false,
+          List.of(),
           List.of(UNOFFICIAL_EI_IMPLANT),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     BONE_REINFORCEMENT("BONE_REINFORCEMENT",
@@ -453,6 +489,7 @@ public enum ProstheticType {
           false,
           false,
           List.of(),
+          List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     LIVER_FILTRATION_IMPLANT("LIVER_FILTRATION_IMPLANT",
           ENHANCED,
@@ -464,6 +501,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("TC"),
           List.of(),
           List.of(ATOW_POISON_RESISTANCE, COMPULSION_PAINKILLER_ADDICTION)),
     BIONIC_LUNGS_WITH_TYPE_1_FILTER("BIONIC_LUNGS_WITH_TYPE_1_FILTER",
@@ -476,6 +514,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("TC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     BIONIC_LUNGS_WITH_TYPE_2_FILTER("BIONIC_LUNGS_WITH_TYPE_2_FILTER",
@@ -488,6 +527,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("TC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     BIONIC_LUNGS_WITH_TYPE_3_FILTER("BIONIC_LUNGS_WITH_TYPE_3_FILTER",
@@ -500,6 +540,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("TC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EYE_EM_IR("CYBERNETIC_EYE_EM_IR",
@@ -512,6 +553,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of(),
           List.of(MD_CYBER_IMP_VISUAL),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EYE_TELESCOPE("CYBERNETIC_EYE_TELESCOPE",
@@ -524,6 +566,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of(),
           List.of(MD_CYBER_IMP_LASER),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EYE_LASER("CYBERNETIC_EYE_LASER",
@@ -536,6 +579,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of(),
           List.of(MD_CYBER_IMP_LASER),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EYE_MULTI("CYBERNETIC_EYE_MULTI",
@@ -548,6 +592,7 @@ public enum ProstheticType {
           false,
           false,
           true,
+          List.of(),
           List.of(MD_CYBER_IMP_LASER),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EYE_MULTI_ENHANCED("CYBERNETIC_EYE_MULTI_ENHANCED",
@@ -560,6 +605,7 @@ public enum ProstheticType {
           false,
           false,
           true,
+          List.of(),
           List.of(MD_CYBER_IMP_LASER, MD_CYBER_IMP_VISUAL),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EAR_SIGNAL("CYBERNETIC_EAR_SIGNAL",
@@ -572,6 +618,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of(),
           List.of(MD_COMM_IMPLANT),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_EAR_MULTI("CYBERNETIC_EAR_MULTI",
@@ -584,6 +631,7 @@ public enum ProstheticType {
           false,
           false,
           true,
+          List.of(),
           List.of(MD_BOOST_COMM_IMPLANT),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     CYBERNETIC_SPEECH_IMPLANT("CYBERNETIC_SPEECH_IMPLANT",
@@ -597,6 +645,7 @@ public enum ProstheticType {
           false,
           false,
           List.of(),
+          List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     PHEROMONE_EFFUSER("PHEROMONE_EFFUSER",
           ENHANCED,
@@ -608,6 +657,7 @@ public enum ProstheticType {
           false,
           false,
           true,
+          List.of(),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     COSMETIC_BEAUTY_ENHANCEMENT("COSMETIC_BEAUTY_ENHANCEMENT",
@@ -621,6 +671,7 @@ public enum ProstheticType {
           false,
           false,
           List.of(),
+          List.of(),
           List.of(ATOW_ATTRACTIVE, COMPULSION_PAINKILLER_ADDICTION)),
     COSMETIC_HORROR_ENHANCEMENT("COSMETIC_HORROR_ENHANCEMENT",
           STANDARD,
@@ -633,6 +684,7 @@ public enum ProstheticType {
           false,
           false,
           List.of(),
+          List.of(),
           List.of(FLAW_UNATTRACTIVE, COMPULSION_PAINKILLER_ADDICTION)),
     COSMETIC_TAIL_PROSTHETIC("COSMETIC_TAIL_PROSTHETIC",
           STANDARD,
@@ -644,6 +696,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("MOC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     COSMETIC_ANIMAL_EAR_PROSTHETIC("COSMETIC_ANIMAL_EAR_PROSTHETIC",
@@ -656,6 +709,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("MOC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     COSMETIC_ANIMAL_LEG_PROSTHETIC("COSMETIC_ANIMAL_LEG_PROSTHETIC",
@@ -668,6 +722,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("MOC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     DERMAL_MYOMER_ARM_ARMOR("DERMAL_MYOMER_ARM_ARMOR",
@@ -680,6 +735,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("CC", "MOC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE)),
     DERMAL_MYOMER_ARM_CAMO("DERMAL_MYOMER_LEG_CAMO",
@@ -692,6 +748,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("CC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, MISC_PAIN_RESISTANCE)),
     DERMAL_MYOMER_ARM_TRIPLE("DERMAL_MYOMER_LEG_TRIPLE",
@@ -704,6 +761,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("CC", "MOC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, ATOW_TOUGHNESS)),
     DERMAL_MYOMER_LEG_ARMOR("DERMAL_MYOMER_LEG_ARMOR",
@@ -716,6 +774,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("CC", "MOC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, MISC_PAIN_RESISTANCE)),
     DERMAL_MYOMER_LEG_CAMO("DERMAL_MYOMER_LEG_CAMO",
@@ -728,6 +787,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("CC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE)),
     DERMAL_MYOMER_LEG_TRIPLE("DERMAL_MYOMER_LEG_TRIPLE",
@@ -740,6 +800,7 @@ public enum ProstheticType {
           false,
           false,
           false,
+          List.of("CC", "MOC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, ATOW_TOUGHNESS)),
     VDNI("VDNI",
@@ -752,6 +813,7 @@ public enum ProstheticType {
           false,
           false,
           true,
+          List.of(),
           List.of(MD_VDNI),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     BUFFERED_VDNI("BUFFERED_VDNI",
@@ -764,6 +826,7 @@ public enum ProstheticType {
           false,
           false,
           true,
+          List.of(),
           List.of(MD_BVDNI),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     BUFFERED_VDNI_TRIPLE_CORE("BUFFERED_VDNI_TRIPLE_CORE",
@@ -771,11 +834,12 @@ public enum ProstheticType {
           5,
           AlternateInjuries.BUFFERED_VDNI_TRIPLE_CORE,
           Money.of(5000000),
-          PlanetarySystem.PlanetarySophistication.B,
+          PlanetarySystem.PlanetarySophistication.A,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
           false,
           false,
           true,
+          List.of(),
           List.of(MD_BVDNI, MD_TRIPLE_CORE_PROCESSOR),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     PAIN_SHUNT("PAIN_SHUNT",
@@ -783,11 +847,12 @@ public enum ProstheticType {
           5,
           AlternateInjuries.PAIN_SHUNT,
           Money.of(50000),
-          PlanetarySystem.PlanetarySophistication.B,
+          PlanetarySystem.PlanetarySophistication.A,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
           false,
           false,
           true,
+          List.of(),
           List.of(MD_PAIN_SHUNT),
           List.of(COMPULSION_PAINKILLER_ADDICTION));
 
@@ -809,6 +874,7 @@ public enum ProstheticType {
     private final boolean isComStarOnly;
     private final boolean isClanOnly;
     private final boolean isWordOfBlakeOnly;
+    private final List<String> otherAffiliation;
     private final List<String> associatedPilotOptions;
     private final List<String> associatedPersonnelOptions;
 
@@ -850,7 +916,7 @@ public enum ProstheticType {
     ProstheticType(String lookupName, ProstheticComplexity prostheticType, int surgeryLevel, InjuryType injuryType,
           Money baseCost, PlanetarySystem.PlanetarySophistication requiredPlanetarySophistication,
           AvailabilityValue availabilityEarly, AvailabilityValue availabilityMid, AvailabilityValue availabilityLate,
-          boolean isClanOnly, boolean isComStarOnly, boolean isWordOfBlakeOnly) {
+          boolean isClanOnly, boolean isComStarOnly, boolean isWordOfBlakeOnly, List<String> otherAffiliation) {
         this.lookupName = lookupName;
         this.prostheticType = prostheticType;
         this.surgeryLevel = surgeryLevel;
@@ -863,6 +929,7 @@ public enum ProstheticType {
         this.isClanOnly = isClanOnly;
         this.isComStarOnly = isComStarOnly;
         this.isWordOfBlakeOnly = isWordOfBlakeOnly;
+        this.otherAffiliation = otherAffiliation;
         this.associatedPilotOptions = new ArrayList<>();
         this.associatedPersonnelOptions = new ArrayList<>();
     }
@@ -891,7 +958,8 @@ public enum ProstheticType {
     ProstheticType(String lookupName, ProstheticComplexity prostheticType, int surgeryLevel, InjuryType injuryType,
           Money baseCost, PlanetarySystem.PlanetarySophistication requiredPlanetarySophistication,
           AvailabilityValue availabilityEarly, AvailabilityValue availabilityMid, AvailabilityValue availabilityLate,
-          boolean isClanOnly, boolean isComStarOnly, boolean isWordOfBlakeOnly, List<String> associatedPilotOptions,
+          boolean isClanOnly, boolean isComStarOnly, boolean isWordOfBlakeOnly, List<String> otherAffiliation,
+          List<String> associatedPilotOptions,
           List<String> associatedPersonnelOptions) {
         this.lookupName = lookupName;
         this.prostheticType = prostheticType;
@@ -905,6 +973,7 @@ public enum ProstheticType {
         this.isClanOnly = isClanOnly;
         this.isComStarOnly = isComStarOnly;
         this.isWordOfBlakeOnly = isWordOfBlakeOnly;
+        this.otherAffiliation = otherAffiliation;
         this.associatedPilotOptions = associatedPilotOptions;
         this.associatedPersonnelOptions = associatedPersonnelOptions;
     }
@@ -960,33 +1029,58 @@ public enum ProstheticType {
     }
 
     /**
-     * Determines if the given faction can access this prosthetic type.
+     * Determines whether the specified faction may access this prosthetic type based on faction restrictions and
+     * in-universe technological availability dates.
      *
-     * @param campaignFaction the faction to check
+     * <p>This method evaluates faction-locked prosthetics—such as Clan-exclusive, ComStar-exclusive, or Word of
+     * Blake-exclusive technologies—against the current campaign faction and the provided in-game date. Once certain
+     * historical milestones have passed, these technologies become generally available to all factions.</p>
      *
-     * @return {@code true} if the faction can access this prosthetic type; otherwise {@code false}.
+     * <ul>
+     *     <li><b>Clan-only:</b> Before the Battle of Tukayyid, only Clan campaigns may access Clan-exclusive
+     *     prosthetics. After Tukayyid, these items become broadly available.</li>
+     *     <li><b>ComStar-only:</b> Before the ComStar Schism, access is limited to ComStar, Word of Blake, Star
+     *     League, and Terran Hegemony factions. After the Schism, ComStar-exclusive prosthetics become available to
+     *     all factions.</li>
+     *     <li><b>Word of Blake-only:</b> Before the end of Operation Scour, only Word of Blake factions may access
+     *     these prosthetics. Afterward, they become unrestricted.</li>
+     * </ul>
+     *
+     * @param campaignFaction the faction whose access rules are being evaluated
+     * @param today           the current in-game date used to determine timeline availability
+     *
+     * @return {@code true} if the faction is permitted to access this prosthetic type at the given date.
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public boolean isAvailableToFaction(Faction campaignFaction) {
-        if (isClanOnly) {
+    public boolean isAvailableToFaction(Faction campaignFaction, LocalDate today) {
+        // After Tukayyid Clan tech becomes more widely available, we use that date as the threshold after which
+        // non-Clan campaigns can access Clan-only prosthetics (cloned limbs, mostly)
+        if (isClanOnly && !today.isAfter(MHQConstants.BATTLE_OF_TUKAYYID)) {
             return campaignFaction.isClan();
         }
 
-        // Anything restricted to ComStar is also available to the Word of Blake, Star League, and Terran Hegemony
-        if (isComStarOnly) {
+        // The ComStar Schism was in response to Focht opening up ComStar's secrets to the wider Inner Sphere. We're
+        // going to use that date as the threshold after which ComStar-only prosthetics become available to all
+        // factions.
+        if (isComStarOnly && !today.isAfter(MHQConstants.COMSTAR_SCHISM)) {
             boolean isComStarOrWoBCampaign = campaignFaction.isComStarOrWoB();
             String campaignFactionCode = campaignFaction.getShortName();
+            // Anything restricted to ComStar is also available to the Word of Blake, Star League, and Terran Hegemony.
             boolean isStarLeagueCampaign = campaignFactionCode.equals("SL") || campaignFactionCode.equals("TH");
 
             return isComStarOrWoBCampaign || isStarLeagueCampaign;
         }
 
-        if (isWordOfBlakeOnly) {
+        // While knowledge of the Word of Blake's more advanced prosthetics would likely be suppressed, player
+        // campaigns are universally special cases, so we give them access to this technology after Operation Scour
+        // (the fall of Terra, specifically).
+        if (isWordOfBlakeOnly && !today.isAfter(MHQConstants.OPERATION_SCOUR_ENDS)) {
             return campaignFaction.isWoB();
         }
 
+        // There are no other faction-locked technologies, so just return true.
         return true;
     }
 
@@ -1020,18 +1114,28 @@ public enum ProstheticType {
     }
 
     /**
-     * Calculates the adjusted cost for this prosthetic based on the game year. The price may vary depending on its
-     * availability in that era.
+     * Calculates the adjusted cost of this prosthetic based on the purchasing faction and the current in-game date.
+     * Pricing is influenced by both the prosthetic's availability rating for the given year and whether the requesting
+     * faction has in-faction access to the item.
      *
-     * @param gameYear the current in-game year
+     * <p>The availability rating for the year is resolved and converted into a price multiplier via
+     * {@link #getAvailabilityMultiplier(int, boolean)}. If the multiplier is {@code 0.0}, the prosthetic is considered
+     * unavailable in the specified era or to the specified faction, and this method returns {@code null} .</p>
      *
-     * @return the adjusted cost, or {@code null} if the item is not available
+     * <p>Affiliation rules are evaluated using {@code campaignFactionCode}; factions outside the prosthetic's
+     * permitted affiliation list incur different availability multipliers.</p>
+     *
+     * @param campaignFaction the faction attempting to acquire the prosthetic
+     * @param today           the current in-game date used to determine availability by year
+     *
+     * @return the adjusted cost as a {@link Money} value, or {@code null} if the prosthetic is not available to the
+     *       faction or in the specified year
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public @Nullable Money getCost(int gameYear) {
-        double availabilityMultiplier = getAvailabilityMultiplier(gameYear);
+    public @Nullable Money getCost(Faction campaignFaction, LocalDate today) {
+        double availabilityMultiplier = getAvailabilityMultiplier(today.getYear(), isWrongAffiliation(campaignFaction));
         if (availabilityMultiplier == 0.0) {
             return null;
         }
@@ -1039,25 +1143,36 @@ public enum ProstheticType {
     }
 
     /**
-     * Returns the price multiplier for this prosthetic based on its availability rating in the specified year.
+     * Returns the price multiplier for this prosthetic based on its availability rating in the specified year and
+     * whether the purchasing faction is the same faction that produces the prosthetic.
      *
-     * @param gameYear the current in-game year
+     * <p>The availability rating for the given year is first resolved via {@link #getAvailability(int)}. Each rating
+     * corresponds to two possible multipliers: one applied when the requesting faction is the prosthetic's native
+     * producer, and a higher (or equal) one when the item is being acquired outside its originating faction.</p>
      *
-     * @return a multiplier representing rarity and availability
+     * <p>The {@code outsideFactionAccess} flag indicates whether the campaign faction lacks in-faction production
+     * access. If {@code true}, the prosthetic is treated as rarer and more difficult to acquire, increasing its cost
+     * multiplier.</p>
+     *
+     * @param gameYear             the current in-game year used to determine the prosthetic's availability rating
+     * @param outsideFactionAccess {@code true} if the item is being purchased by a faction other than the one that
+     *                             produces it; {@code false} if the purchasing faction has in-faction access
+     *
+     * @return a price multiplier reflecting rarity and availability for the given conditions
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public double getAvailabilityMultiplier(int gameYear) {
+    public double getAvailabilityMultiplier(int gameYear, boolean outsideFactionAccess) {
         AvailabilityValue availability = getAvailability(gameYear);
         return switch (availability) {
-            case A -> AVAILABILITY_MULTIPLIER_A;
-            case B -> AVAILABILITY_MULTIPLIER_B;
-            case C -> AVAILABILITY_MULTIPLIER_C;
-            case D -> AVAILABILITY_MULTIPLIER_D;
-            case E -> AVAILABILITY_MULTIPLIER_E;
-            case F -> AVAILABILITY_MULTIPLIER_F;
-            case F_STAR -> AVAILABILITY_MULTIPLIER_F_STAR;
+            case A -> outsideFactionAccess ? AVAILABILITY_MULTIPLIER_B : AVAILABILITY_MULTIPLIER_A;
+            case B -> outsideFactionAccess ? AVAILABILITY_MULTIPLIER_C : AVAILABILITY_MULTIPLIER_B;
+            case C -> outsideFactionAccess ? AVAILABILITY_MULTIPLIER_D : AVAILABILITY_MULTIPLIER_C;
+            case D -> outsideFactionAccess ? AVAILABILITY_MULTIPLIER_E : AVAILABILITY_MULTIPLIER_D;
+            case E -> outsideFactionAccess ? AVAILABILITY_MULTIPLIER_F : AVAILABILITY_MULTIPLIER_E;
+            case F -> outsideFactionAccess ? AVAILABILITY_MULTIPLIER_F_STAR : AVAILABILITY_MULTIPLIER_F;
+            case F_STAR -> outsideFactionAccess ? AVAILABILITY_MULTIPLIER_X : AVAILABILITY_MULTIPLIER_F_STAR;
             case X -> AVAILABILITY_MULTIPLIER_X;
         };
     }
@@ -1125,20 +1240,29 @@ public enum ProstheticType {
     }
 
     /**
-     * Builds a localized tooltip summarizing key information about this prosthetic, including cost, surgical
-     * requirements, and attribute modifiers.
+     * Builds a localized, formatted tooltip summarizing all relevant information about this prosthetic for UI display.
+     * The tooltip aggregates cost, surgical requirements, attribute and skill modifiers, recovery time, implants, and
+     * any associated personnel abilities.
      *
-     * <p><b>Note:</b> For consistency, the order shown in the tooltip is meant to mirror that of
+     * <p>This method respects faction-based availability when calculating cost (via
+     * {@link #getCost(Faction, LocalDate)}), and applies Kinder Mode to reduce the displayed recovery time when
+     * requested. Additional elements—such as attribute modifiers, derived skill effects, and associated implant
+     * options—are included only when applicable.</p>
+     *
+     * <p><b>Ordering:</b> For consistency and readability, the display order of sections mirrors that used by
      * {@link InjuryEffect#getTooltip(List)}.</p>
      *
-     * @param gameYear the current in-game year for cost and availability calculation
+     * @param campaignFaction the faction requesting the tooltip, used to determine cost availability and any
+     *                        affiliation-based restrictions
+     * @param today           the current in-game date used for availability and cost calculations
+     * @param isUseKinderMode {@code true} to reduce the listed recovery time by 50%; otherwise {@code false}
      *
-     * @return a formatted tooltip string suitable for UI display
+     * @return a fully formatted HTML-compatible tooltip string suitable for display in Swing-based UI components
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public String getTooltip(int gameYear, boolean isUseKinderMode) {
+    public String getTooltip(Faction campaignFaction, LocalDate today, boolean isUseKinderMode) {
         StringJoiner tooltipPortion = new StringJoiner("<br>- ", "- ", "");
 
         // 1) Surgery level required
@@ -1150,7 +1274,7 @@ public enum ProstheticType {
               prostheticType.toString()));
 
         // 3) Base cost
-        Money cost = getCost(gameYear);
+        Money cost = getCost(campaignFaction, today);
         if (cost != null) {
             tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.cost",
                   cost.toAmountString()));
@@ -1269,6 +1393,53 @@ public enum ProstheticType {
         }
 
         return tooltipPortion.toString();
+    }
+
+    /**
+     * Determines whether the given campaign faction is barred from accessing this prosthetic based on explicit faction
+     * restrictions (Clan-only, ComStar-only, Word of Blake-only) or the additional affiliation list defined for this
+     * item.
+     *
+     * <p>Faction-locked prosthetics follow strict rules:
+     * <ul>
+     *     <li><b>Clan-only:</b> Allowed only to Clan factions.</li>
+     *     <li><b>ComStar-only:</b> Allowed to ComStar, Word of Blake, Star League ("SL"), and Terran Hegemony
+     *     ("TH").</li>
+     *     <li><b>Word of Blake-only:</b> Allowed only to Word of Blake factions.</li>
+     * </ul>
+     *
+     * <p>If none of these explicit restrictions apply, the method falls back to evaluating the
+     * {@code otherAffiliation} list. When this list is non-empty, only factions whose short names appear in it are
+     * permitted.</p>
+     *
+     * <p>If {@code otherAffiliation} is empty and no explicit faction lock applies, the prosthetic is not
+     * affiliation-restricted and this method returns {@code false}.</p>
+     *
+     * @param campaignFaction the faction attempting to access this prosthetic
+     *
+     * @return {@code true} if the faction is not permitted under the prosthetic's affiliation restrictions
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    private boolean isWrongAffiliation(Faction campaignFaction) {
+        String campaignFactionCode = campaignFaction.getShortName();
+
+        if (isClanOnly) {
+            return !campaignFaction.isClan();
+        }
+
+        if (isComStarOnly) {
+            return !campaignFaction.isComStarOrWoB() &&
+                         !campaignFactionCode.equals("SL") &&
+                         !campaignFactionCode.equals("TH");
+        }
+
+        if (isWordOfBlakeOnly) {
+            return !campaignFaction.isWoB();
+        }
+
+        return !otherAffiliation.isEmpty() && !otherAffiliation.contains(campaignFactionCode);
     }
 
     /**

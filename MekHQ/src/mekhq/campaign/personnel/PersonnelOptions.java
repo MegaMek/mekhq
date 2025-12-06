@@ -108,7 +108,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String UNOFFICIAL_NATURAL_THESPIAN = "unofficial_natural_thespian";
     public static final String UNOFFICIAL_BIOLOGICAL_MACHINIST = "unofficial_biological_machinist";
     public static final String FLAW_VACCINE_DODGER = "flaw_vaccine_dodger";
-    public static final String FLAW_SUPER_SPREADER = "flaw_typhoid_mary";
+    public static final String FLAW_SUPER_SPREADER = "flaw_super_spreader";
     public static final String FLAW_POOR_IMMUNE_SYSTEM = "flaw_poor_immune_system";
     public static final String UNOFFICIAL_ADAPTIVE_IMMUNITY = "unofficial_adaptive_immunity";
 
