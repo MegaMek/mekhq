@@ -809,7 +809,9 @@ public class EventEffectsManager {
      * @return A {@link String} summarizing the fatigue effect or an empty string if fatigue is disabled.
      */
     private String eventEffectFatigueOne(EventResult result) {
-        boolean isUseFatigue = campaign.getCampaignOptions().isUseFatigue();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseFatigue = campaignOptions.isUseFatigue();
+        int fatigueRate = campaignOptions.getFatigueRate();
 
         if (!isUseFatigue) {
             return "";
@@ -824,7 +826,7 @@ public class EventEffectsManager {
             return "";
         }
 
-        target.changeFatigue(magnitude);
+        target.changeFatigue(magnitude * fatigueRate);
 
         if (campaign.getCampaignOptions().isUseFatigue()) {
             Fatigue.processFatigueActions(campaign, target);
@@ -861,7 +863,9 @@ public class EventEffectsManager {
      * @return A {@link String} summarizing the collective fatigue effect or an empty string if fatigue is disabled.
      */
     private String eventEffectFatigueAll(EventResult result) {
-        boolean isUseFatigue = campaign.getCampaignOptions().isUseFatigue();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseFatigue = campaignOptions.isUseFatigue();
+        int fatigueRate = campaignOptions.getFatigueRate();
 
         if (!isUseFatigue) {
             return "";
@@ -877,7 +881,7 @@ public class EventEffectsManager {
         }
 
         for (Person target : targets) {
-            target.changeFatigue(magnitude);
+            target.changeFatigue(magnitude * fatigueRate);
 
             if (campaign.getCampaignOptions().isUseFatigue()) {
                 Fatigue.processFatigueActions(campaign, target);
@@ -1093,7 +1097,11 @@ public class EventEffectsManager {
      *       or an empty string if fatigue effects are disabled or there are no valid personnel to target.
      */
     private String eventEffectUniquePoison(EventResult result) {
-        if (!campaign.getCampaignOptions().isUseFatigue()) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseFatigue = campaignOptions.isUseFatigue();
+        int fatigueRate = campaignOptions.getFatigueRate();
+
+        if (!isUseFatigue) {
             return "";
         }
 
@@ -1110,7 +1118,7 @@ public class EventEffectsManager {
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
 
-            int fatigueChange = d6(magnitude);
+            int fatigueChange = d6(magnitude) * fatigueRate;
 
             if (target.getOptions().booleanOption(ATOW_POISON_RESISTANCE)) {
                 continue;

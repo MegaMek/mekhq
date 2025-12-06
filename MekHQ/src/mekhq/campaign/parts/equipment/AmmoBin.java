@@ -33,6 +33,13 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
 import java.io.PrintWriter;
 import java.util.EnumSet;
 import java.util.Objects;
@@ -52,7 +59,6 @@ import megamek.common.units.Jumpship;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
@@ -553,32 +559,27 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                   .append("<br/>");
 
             if (shotsAvailable == 0) {
-                toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                                          .getFontColorNegativeHexColor(),
-                      "None in stock"));
+                toReturn.append(messageSurroundedBySpanWithColor(getNegativeColor(), "None in stock"));
             } else if (shotsAvailable < getShotsNeeded()) {
-                toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
-                                                                                    .getFontColorNegativeHexColor()))
+                toReturn.append(spanOpeningWithCustomColor(getNegativeColor()))
                       .append("Only ")
                       .append(shotsAvailable)
                       .append(" in stock")
-                      .append(ReportingUtilities.CLOSING_SPAN_TAG);
+                      .append(CLOSING_SPAN_TAG);
             } else {
-                toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
-                                                                                    .getFontColorPositiveHexColor()))
+                toReturn.append(spanOpeningWithCustomColor(getPositiveColor()))
                       .append(shotsAvailable)
                       .append(" in stock")
-                      .append(ReportingUtilities.CLOSING_SPAN_TAG);
+                      .append(CLOSING_SPAN_TAG);
             }
 
             String orderTransitString = inventories.getTransitOrderedDetails();
             if (!orderTransitString.isEmpty()) {
-                toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
-                                                                                    .getFontColorWarningHexColor()))
+                toReturn.append(spanOpeningWithCustomColor(getWarningColor()))
                       .append(" (")
                       .append(orderTransitString)
                       .append(")")
-                      .append(ReportingUtilities.CLOSING_SPAN_TAG);
+                      .append(CLOSING_SPAN_TAG);
             }
             return toReturn.toString();
         } else {

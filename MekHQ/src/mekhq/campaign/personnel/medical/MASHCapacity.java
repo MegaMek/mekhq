@@ -36,6 +36,7 @@ import java.util.List;
 
 import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
+import megamek.common.units.Entity;
 import mekhq.campaign.unit.Unit;
 
 public class MASHCapacity {
@@ -59,16 +60,27 @@ public class MASHCapacity {
         int mashTheatreCount = 0;
 
         for (Unit unit : units) {
-            if ((unit.isDeployed())
-                      || (unit.isDamaged())
-                      || (unit.getCrewState().isUncrewed())
-                      || (unit.getCrewState().isPartiallyCrewed())) {
+            if (unit.isDeployed()
+                      || unit.isDamaged()
+                      || !unit.isFullyCrewed()) {
                 continue;
+            }
+
+            // Certain unit types automatically include medical facilities (CamOps pg 191)
+            Entity entity = unit.getEntity();
+            if (entity != null) {
+                if (entity.isDropShip() || entity.isJumpShip()) {
+                    mashTheatreCount++;
+                } else if (entity.isWarShip()) {
+                    mashTheatreCount += 2;
+                } else if (entity.isSpaceStation()) {
+                    mashTheatreCount += 3;
+                }
             }
 
             for (MiscMounted item : unit.getEntity().getMisc()) {
                 if (item.getType().hasFlag(MiscType.F_MASH)) {
-                    mashTheatreCount++;
+                    mashTheatreCount += (int) Math.floor(item.getSize());
                 }
             }
         }

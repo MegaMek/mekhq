@@ -51,9 +51,9 @@ import javax.swing.SwingConstants;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
@@ -87,7 +87,7 @@ public class EquipmentAndSuppliesTab {
     private CampaignOptionsHeaderPanel acquisitionHeader;
     private JPanel pnlAcquisitions;
     private JLabel lblChoiceAcquireSkill;
-    private MMComboBox<String> choiceAcquireSkill;
+    private MMComboBox<AcquisitionsType> choiceAcquireSkill;
     private JCheckBox chkUseFunctionalAppraisal;
     private JLabel lblAcquireClanPenalty;
     private JLabel lblProcurementPersonnelPick;
@@ -264,7 +264,7 @@ public class EquipmentAndSuppliesTab {
     private void initializeAcquisitionTab() {
         pnlAcquisitions = new JPanel();
         lblChoiceAcquireSkill = new JLabel();
-        choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", buildAcquireSkillComboOptions());
+        choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", AcquisitionsType.values());
 
         chkUseFunctionalAppraisal = new JCheckBox();
 
@@ -344,7 +344,7 @@ public class EquipmentAndSuppliesTab {
         // Header
         acquisitionHeader = new CampaignOptionsHeaderPanel("AcquisitionTab",
               getImageDirectory() + "logo_clan_cloud_cobra.png",
-              4);
+              3);
 
         pnlAcquisitions = createAcquisitionPanel();
         pnlAutoLogistics = createAutoLogisticsPanel();
@@ -591,7 +591,7 @@ public class EquipmentAndSuppliesTab {
         // Header
         planetaryAcquisitionHeader = new CampaignOptionsHeaderPanel("PlanetaryAcquisitionTab",
               getImageDirectory() + "logo_rim_worlds_republic.png",
-              14);
+              12);
 
         // Sub-Panels
         JPanel options = createOptionsPanel();
@@ -959,23 +959,6 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Builds a DefaultComboBoxModel containing a predefined set of skill options that can be acquired. The options
-     * include technical, administrative, negotiation, and auto skills.
-     *
-     * @return a DefaultComboBoxModel containing the skill options as string elements.
-     */
-    private static DefaultComboBoxModel<String> buildAcquireSkillComboOptions() {
-        DefaultComboBoxModel<String> acquireSkillModel = new DefaultComboBoxModel<>();
-
-        acquireSkillModel.addElement(CampaignOptions.S_TECH);
-        acquireSkillModel.addElement(SkillType.S_ADMIN);
-        acquireSkillModel.addElement(SkillType.S_NEGOTIATION);
-        acquireSkillModel.addElement(CampaignOptions.S_AUTO);
-
-        return acquireSkillModel;
-    }
-
-    /**
      * Builds a {@link DefaultComboBoxModel} containing options for all available {@link ProcurementPersonnelPick}
      * values.
      *
@@ -1011,7 +994,7 @@ public class EquipmentAndSuppliesTab {
         //start Tech Limits Tab
         CampaignOptionsHeaderPanel techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsTab",
               getImageDirectory() + "logo_clan_ghost_bear.png",
-              3);
+              2);
 
         limitByYearBox = new CampaignOptionsCheckBox("LimitByYearBox");
         limitByYearBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "LimitByYearBox"));
@@ -1122,7 +1105,7 @@ public class EquipmentAndSuppliesTab {
         }
 
         // Acquisitions
-        options.setAcquisitionSkill(choiceAcquireSkill.getSelectedItem());
+        options.setAcquisitionType(choiceAcquireSkill.getSelectedItem());
         options.setUseFunctionalAppraisal(chkUseFunctionalAppraisal.isSelected());
         options.setAcquisitionPersonnelCategory(ProcurementPersonnelPick.values()[cboProcurementPersonnelPick.getSelectedIndex()]);
         options.setClanAcquisitionPenalty((int) spnAcquireClanPenalty.getValue());
@@ -1205,7 +1188,7 @@ public class EquipmentAndSuppliesTab {
         }
 
         // Acquisitions
-        choiceAcquireSkill.setSelectedItem(options.getAcquisitionSkill());
+        choiceAcquireSkill.setSelectedItem(options.getAcquisitionType());
         chkUseFunctionalAppraisal.setSelected(options.isUseFunctionalAppraisal());
         cboProcurementPersonnelPick.setSelectedItem(options.getAcquisitionPersonnelCategory().toString());
         spnAcquireClanPenalty.setValue(options.getClanAcquisitionPenalty());

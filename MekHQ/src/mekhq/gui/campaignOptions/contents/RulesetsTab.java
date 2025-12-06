@@ -36,10 +36,13 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPan
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
@@ -51,6 +54,7 @@ import megamek.common.enums.SkillLevel;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -120,6 +124,7 @@ public class RulesetsTab {
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
+    private JCheckBox chkUseNoTornadoes;
     private JLabel lblFixedMapChance;
     private JSpinner spnFixedMapChance;
 
@@ -151,9 +156,10 @@ public class RulesetsTab {
     private CampaignOptionsHeaderPanel legacyHeader;
     // end Legacy Options
 
-    private JCheckBox chkUseStratCon;
-    private JCheckBox chkUseStratConMaplessMode;
+    private JLabel lblStratConPlayType;
+    private MMComboBox<StratConPlayType> comboStratConPlayType;
     private JCheckBox chkUseAdvancedScouting;
+    private JCheckBox chkNoSeedForces;
     private JCheckBox chkUseGenericBattleValue;
     private JCheckBox chkUseVerboseBidding;
     //end StratCon
@@ -234,6 +240,7 @@ public class RulesetsTab {
         chkUseWeatherConditions = new JCheckBox();
         chkUseLightConditions = new JCheckBox();
         chkUsePlanetaryConditions = new JCheckBox();
+        chkUseNoTornadoes = new JCheckBox();
         lblFixedMapChance = new JLabel();
         spnFixedMapChance = new JSpinner();
 
@@ -555,6 +562,7 @@ public class RulesetsTab {
         chkUseWeatherConditions = new CampaignOptionsCheckBox("UseWeatherConditions");
         chkUseLightConditions = new CampaignOptionsCheckBox("UseLightConditions");
         chkUsePlanetaryConditions = new CampaignOptionsCheckBox("UsePlanetaryConditions");
+        chkUseNoTornadoes = new CampaignOptionsCheckBox("UseNoTornadoes");
         lblFixedMapChance = new CampaignOptionsLabel("FixedMapChance");
         spnFixedMapChance = new CampaignOptionsSpinner("FixedMapChance",
               0, 0, 100, 1);
@@ -574,6 +582,9 @@ public class RulesetsTab {
 
         layout.gridy++;
         panel.add(chkUsePlanetaryConditions, layout);
+
+        layout.gridy++;
+        panel.add(chkUseNoTornadoes, layout);
 
         layout.gridy++;
         layout.gridwidth = 1;
@@ -690,9 +701,30 @@ public class RulesetsTab {
      * Initializes the StratCon (Strategic Context) section of the tab.
      */
     private void initializeStratConTab() {
-        chkUseStratCon = new JCheckBox();
-        chkUseStratConMaplessMode = new JCheckBox();
+        lblStratConPlayType = new JLabel("StratConPlayType");
+        comboStratConPlayType = new MMComboBox<>("StratConPlayType", StratConPlayType.values());
+        comboStratConPlayType.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(
+                  JList<?> list,
+                  Object value,
+                  int index,
+                  boolean isSelected,
+                  boolean cellHasFocus) {
+
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                      list, value, index, isSelected, cellHasFocus);
+
+                if (value instanceof StratConPlayType type) {
+                    label.setToolTipText(type.getTooltip());
+                }
+
+                return label;
+            }
+        });
+
         chkUseAdvancedScouting = new JCheckBox();
+        chkNoSeedForces = new JCheckBox();
         chkUseGenericBattleValue = new JCheckBox();
         chkUseVerboseBidding = new JCheckBox();
     }
@@ -713,7 +745,7 @@ public class RulesetsTab {
               getImageDirectory() + "logo_clan_wolf.png",
               false,
               true,
-              6);
+              4);
 
         // Universal Content
 
@@ -744,6 +776,7 @@ public class RulesetsTab {
         chkUseWeatherConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UseWeatherConditions"));
         chkUseLightConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UseLightConditions"));
         chkUsePlanetaryConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UsePlanetaryConditions"));
+        chkUseNoTornadoes.addMouseListener(createTipPanelUpdater(stratConHeader, "UseNoTornadoes"));
         lblFixedMapChance.addMouseListener(createTipPanelUpdater(stratConHeader, "FixedMapChance"));
         spnFixedMapChance.addMouseListener(createTipPanelUpdater(stratConHeader, "FixedMapChance"));
         lblScenarioModMax.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModMax"));
@@ -770,12 +803,13 @@ public class RulesetsTab {
         chkAutoConfigMunitions.addMouseListener(createTipPanelUpdater(stratConHeader, "AutoConfigMunitions"));
 
         // Content
-        chkUseStratCon = new CampaignOptionsCheckBox("UseStratCon");
-        chkUseStratCon.addMouseListener(createTipPanelUpdater(stratConHeader, "UseStratCon"));
-        chkUseStratConMaplessMode = new CampaignOptionsCheckBox("UseStratConMaplessMode");
-        chkUseStratConMaplessMode.addMouseListener(createTipPanelUpdater(stratConHeader, "UseStratConMaplessMode"));
+        lblStratConPlayType = new CampaignOptionsLabel("StratConPlayType");
+        lblStratConPlayType.addMouseListener(createTipPanelUpdater(stratConHeader, "StratConPlayType"));
+        comboStratConPlayType.addMouseListener(createTipPanelUpdater(stratConHeader, "StratConPlayType"));
         chkUseAdvancedScouting = new CampaignOptionsCheckBox("UseAdvancedScouting");
         chkUseAdvancedScouting.addMouseListener(createTipPanelUpdater(stratConHeader, "UseAdvancedScouting"));
+        chkNoSeedForces = new CampaignOptionsCheckBox("NoSeedForces");
+        chkNoSeedForces.addMouseListener(createTipPanelUpdater(stratConHeader, "NoSeedForces"));
         chkUseGenericBattleValue = new CampaignOptionsCheckBox("UseGenericBattleValue");
         chkUseGenericBattleValue.addMouseListener(createTipPanelUpdater(stratConHeader, "UseGenericBattleValue"));
         chkUseVerboseBidding = new CampaignOptionsCheckBox("UseVerboseBidding");
@@ -792,11 +826,13 @@ public class RulesetsTab {
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(chkUseStratCon, layout);
+        panel.add(lblStratConPlayType, layout);
+        layout.gridx++;
+        panel.add(comboStratConPlayType, layout);
         layout.gridx++;
         panel.add(chkUseAdvancedScouting, layout);
         layout.gridx++;
-        panel.add(chkUseStratConMaplessMode, layout);
+        panel.add(chkNoSeedForces, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -901,6 +937,7 @@ public class RulesetsTab {
         options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
         options.setUseLightConditions(chkUseLightConditions.isSelected());
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
+        options.setUseNoTornadoes(chkUseNoTornadoes.isSelected());
         options.setFixedMapChance((int) spnFixedMapChance.getValue());
         options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
         options.setMoraleVictoryEffect((int) spnMoraleVictory.getValue());
@@ -914,9 +951,9 @@ public class RulesetsTab {
         options.setAutoResolveExperimentalPacarGuiEnabled(chkAutoResolveExperimentalPacarGuiEnabled.isSelected());
 
         // StratCon
-        options.setUseStratCon(chkUseStratCon.isSelected());
-        options.setUseStratConMaplessMode(chkUseStratConMaplessMode.isSelected());
+        options.setStratConPlayType(comboStratConPlayType.getSelectedItem());
         options.setUseAdvancedScouting(chkUseAdvancedScouting.isSelected());
+        options.setNoSeedForces(chkNoSeedForces.isSelected());
         options.setUseGenericBattleValue(chkUseGenericBattleValue.isSelected());
         options.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
     }
@@ -963,6 +1000,7 @@ public class RulesetsTab {
         chkUseWeatherConditions.setSelected(options.isUseWeatherConditions());
         chkUseLightConditions.setSelected(options.isUseLightConditions());
         chkUsePlanetaryConditions.setSelected(options.isUsePlanetaryConditions());
+        chkUseNoTornadoes.setSelected(options.isUseNoTornadoes());
         spnFixedMapChance.setValue(options.getFixedMapChance());
         chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
         spnMoraleVictory.setValue(options.getMoraleVictoryEffect());
@@ -976,9 +1014,9 @@ public class RulesetsTab {
         spnAutoResolveNumberOfScenarios.setValue(options.getAutoResolveNumberOfScenarios());
 
         // StratCon
-        chkUseStratCon.setSelected(options.isUseStratCon());
-        chkUseStratConMaplessMode.setSelected(options.isUseStratConMaplessMode());
+        comboStratConPlayType.setSelectedItem(options.getStratConPlayType());
         chkUseAdvancedScouting.setSelected(options.isUseAdvancedScouting());
+        chkNoSeedForces.setSelected(options.isNoSeedForces());
         chkUseGenericBattleValue.setSelected(options.isUseGenericBattleValue());
         chkUseVerboseBidding.setSelected(options.isUseVerboseBidding());
     }

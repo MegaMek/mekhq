@@ -109,6 +109,7 @@ public enum Reasoning {
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
+    private final String label;
     private final ReasoningComparison comparison;
     private final int level;
 
@@ -127,6 +128,11 @@ public enum Reasoning {
     Reasoning(ReasoningComparison comparison, int level) {
         this.comparison = comparison;
         this.level = level;
+        this.label = generateLabel();
+    }
+
+    public String getLabel() {
+        return label;
     }
 
     /**
@@ -152,7 +158,7 @@ public enum Reasoning {
      * @return the localized label string corresponding to the enumeration value.
      */
     // region Getters
-    public String getLabel() {
+    private String generateLabel() {
         final String RESOURCE_KEY = name() + ".label";
         return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY) + " (" + level + ")";
     }

@@ -72,4 +72,18 @@ public class PatientLogger {
         doctor.addPatientLogEntry(new PatientLogEntry(date,
               MessageFormat.format(message, patient.getFullName(), injuries)));
     }
+
+    public static void successfullyTreatedAltAdvancedMedical(Person doctor, Person patient, LocalDate date,
+          String injuryName) {
+        String message = resources.getString("successfullyTreatedAltAdvancedMedical.text");
+        doctor.addPatientLogEntry(new PatientLogEntry(date,
+              MessageFormat.format(message, patient.getFullName(), injuryName)));
+    }
+
+    public static void successfullyTreatedOwnInjuryAltAdvancedMedical(Person patient, LocalDate date,
+          String injuryName) {
+        String message = resources.getString("successfullyTreatedOwnInjuryAltAdvancedMedical.text");
+        patient.addPatientLogEntry(new PatientLogEntry(date,
+              MessageFormat.format(message, injuryName)));
+    }
 }

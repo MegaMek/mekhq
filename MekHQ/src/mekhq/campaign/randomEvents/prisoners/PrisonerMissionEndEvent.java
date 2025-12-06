@@ -310,11 +310,13 @@ public class PrisonerMissionEndEvent {
     private void processPlayerResponse(Money ransom, boolean isGoodEvent, int choiceIndex, List<Person> prisoners) {
         if (choiceIndex == CHOICE_RELEASE_THEM) {
             removeAllPrisoners(prisoners);
+            return;
         }
 
         if (choiceIndex == CHOICE_EXECUTE_THEM) {
-            removeAllPrisoners(prisoners);
             executePrisoners(prisoners);
+            removeAllPrisoners(prisoners);
+            return;
         }
 
         final LocalDate today = campaign.getLocalDate();

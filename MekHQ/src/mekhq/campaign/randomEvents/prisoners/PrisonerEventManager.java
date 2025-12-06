@@ -41,6 +41,7 @@ import static mekhq.campaign.force.ForceType.SECURITY;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.DayOfWeek;
@@ -59,6 +60,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
@@ -68,6 +70,7 @@ import mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality;
 import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.utilities.ReportingUtilities;
 
@@ -449,6 +452,9 @@ public class PrisonerEventManager {
                   inCharacterMessage,
                   null,
                   outOfCharacterMessage, null, false);
+
+            checkForIntelBreachEvent(campaign, setFree);
+
             return;
         }
 
@@ -466,6 +472,60 @@ public class PrisonerEventManager {
                   outOfCharacterMessage,
                   null,
                   false);
+        }
+    }
+
+    /**
+     * Evaluates whether freeing prisoners during a scenario triggers one or more Intel Breach events, and applies the
+     * resulting morale penalties to a relevant active {@link AtBContract}.
+     *
+     * <p>The chance of an Intel Breach scales with the number of prisoners freed. The method divides the freed
+     * prisoners into groups of up to 50 and performs one breach roll per group. Each roll compares a uniform random
+     * value from {@code 0} (inclusive) to {@code baseChance} (exclusive) against the number of remaining prisoners in
+     * the current group; higher freed prisoner counts result in higher breach probability.</p>
+     *
+     * <p>If at least one breach occurs, the selected contract’s morale level is improved by the number of breaches,
+     * and a corresponding {@link ImmersiveDialogNotification} is displayed to the user. Contracts at
+     * {@link AtBMoraleLevel#OVERWHELMING} or {@link AtBMoraleLevel#ROUTED} morale are excluded from selection.</p>
+     *
+     * @param campaign           the {@link Campaign} context in which the event occurs
+     * @param freedPrisonerCount the total number of prisoners freed by the player
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public static void checkForIntelBreachEvent(Campaign campaign, int freedPrisonerCount) {
+        if (!campaign.getCampaignOptions().getPrisonerCaptureStyle().isMekHQ()) {
+            return;
+        }
+
+        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+        activeContracts.removeIf(contract -> contract.getMoraleLevel().isOverwhelming() ||
+                                                   contract.getMoraleLevel().isRouted());
+        if (activeContracts.isEmpty()) {
+            return; // No risk of event
+        }
+
+        // Did a intel breach occur?
+        int baseChance = 50;
+        boolean hadIntelBreach = freedPrisonerCount > 0 && Compute.randomInt(baseChance) < freedPrisonerCount;
+
+        if (hadIntelBreach) {
+            AtBContract relevantContract = ObjectUtility.getRandomItem(activeContracts);
+            AtBMoraleLevel oldMorale = relevantContract.getMoraleLevel();
+            AtBMoraleLevel newMorale = relevantContract.changeMoraleLevel(1);
+
+            String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "intelBreach.ic",
+                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG);
+            String bottomMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "intelBreach.occ",
+                  relevantContract.getName(),
+                  oldMorale.toString(),
+                  spanOpeningWithCustomColor(getNegativeColor()),
+                  newMorale.toString(),
+                  CLOSING_SPAN_TAG);
+
+            new ImmersiveDialogNotification(campaign, centerMessage, bottomMessage, true);
         }
     }
 

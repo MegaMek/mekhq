@@ -61,6 +61,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EDGE_REPAIR_BREAK_PART = "edge_when_repair_break_part";
     public static final String EDGE_REPAIR_FAILED_REFIT = "edge_when_fail_refit_check";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL = "edge_when_admin_acquire_fail";
+    public static final String EDGE_SALVAGE_ACCIDENTS = "edge_when_salvage_accident";
 
     public static final String TECH_WEAPON_SPECIALIST = "tech_weapon_specialist";
     public static final String TECH_ARMOR_SPECIALIST = "tech_armor_specialist";
@@ -90,6 +91,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String FLAW_POOR_VISION = "flaw_poor_vision";
     public static final String ATOW_GOOD_VISION = "atow_good_vision";
     public static final String FLAW_INTROVERT = "flaw_introvert";
+    public static final String FLAW_IN_FOR_LIFE = "flaw_in_for_life";
     public static final String ATOW_GREGARIOUS = "atow_gregarious";
     public static final String FLAW_IMPATIENT = "flaw_impatient";
     public static final String ATOW_PATIENT = "atow_patient";
@@ -105,6 +107,10 @@ public class PersonnelOptions extends PilotOptions {
     public static final String UNOFFICIAL_PICK_POCKET = "unofficial_pick_pocket";
     public static final String UNOFFICIAL_NATURAL_THESPIAN = "unofficial_natural_thespian";
     public static final String UNOFFICIAL_BIOLOGICAL_MACHINIST = "unofficial_biological_machinist";
+    public static final String FLAW_VACCINE_DODGER = "flaw_vaccine_dodger";
+    public static final String FLAW_SUPER_SPREADER = "flaw_super_spreader";
+    public static final String FLAW_POOR_IMMUNE_SYSTEM = "flaw_poor_immune_system";
+    public static final String UNOFFICIAL_ADAPTIVE_IMMUNITY = "unofficial_adaptive_immunity";
 
     public static final String DARK_SECRET_TRIVIAL = "dark_secret_trivial";
     public static final String DARK_SECRET_SIGNIFICANT = "dark_secret_significant";
@@ -149,8 +155,17 @@ public class PersonnelOptions extends PilotOptions {
     public static final String COMPULSION_PATHOLOGIC_RACISM = "compulsion_pathologic_racism";
     public static final String COMPULSION_XENOPHOBIA = "compulsion_xenophobia";
     public static final String COMPULSION_ADDICTION = "compulsion_addiction";
+    public static final String COMPULSION_PAINKILLER_ADDICTION = "compulsion_addiction_painkillers";
     public static final String COMPULSION_BIONIC_HATE = "compulsion_bionic_hate";
     public static final String COMPULSION_BODY_MOD_ADDICTION = "compulsion_body_mod_addiction";
+    public static final String COMPULSION_OTHER_FACTION_DISLIKE = "compulsion_other_faction_dislike";
+    public static final String COMPULSION_PARENT_FACTION_DISLIKE = "compulsion_parent_faction_dislike";
+    public static final String COMPULSION_INNER_SPHERE_HATE = "compulsion_inner_sphere_hate";
+    public static final String COMPULSION_CLAN_HATE = "compulsion_clan_hate";
+    public static final String COMPULSION_OTHER_FACTION_HATE = "compulsion_other_faction_hate";
+    public static final String COMPULSION_PARENT_FACTION_HATE = "compulsion_parent_faction_hate";
+    public static final String COMPULSION_MERCENARY_HATE = "compulsion_merc_hate";
+    public static final String COMPULSION_PIRATE_HATE = "compulsion_pirate_hate";
 
     public static final String MADNESS_FLASHBACKS = "madness_flashbacks";
     public static final String MADNESS_CONFUSION = "madness_confusion";
@@ -166,6 +181,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final int COMPULSION_CHECK_MODIFIER_MAJOR = 4; // ATOW pg 110
     public static final int COMPULSION_CHECK_MODIFIER_SEVERE = 7; // ATOW pg 110
     public static final int COMPULSION_CHECK_MODIFIER_EXTREME = 10; // ATOW pg 110
+
+    public static final int PAINKILLER_COST = 42; // 7 days of codeine, ATOW pg 319
 
     // ATOW pg 112 (Reputation, Connections)
     public static final Map<String, int[]> DARK_SECRET_MODIFIERS = Map.of(
@@ -241,6 +258,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, FLAW_POOR_VISION, false);
         addOption(l3a, ATOW_GOOD_VISION, false);
         addOption(l3a, FLAW_INTROVERT, false);
+        addOption(l3a, FLAW_IN_FOR_LIFE, false);
         addOption(l3a, ATOW_GREGARIOUS, false);
         addOption(l3a, FLAW_IMPATIENT, false);
         addOption(l3a, ATOW_PATIENT, false);
@@ -256,6 +274,10 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, UNOFFICIAL_NATURAL_THESPIAN, false);
         addOption(l3a, UNOFFICIAL_BIOLOGICAL_MACHINIST, false);
         addOption(l3a, UNOFFICIAL_PICK_POCKET, false);
+        addOption(l3a, FLAW_VACCINE_DODGER, false);
+        addOption(l3a, FLAW_SUPER_SPREADER, false);
+        addOption(l3a, FLAW_POOR_IMMUNE_SYSTEM, false);
+        addOption(l3a, UNOFFICIAL_ADAPTIVE_IMMUNITY, false);
 
         addOption(l3a, DARK_SECRET_TRIVIAL, false);
         addOption(l3a, DARK_SECRET_SIGNIFICANT, false);
@@ -300,8 +322,17 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, COMPULSION_PATHOLOGIC_RACISM, false);
         addOption(l3a, COMPULSION_XENOPHOBIA, false);
         addOption(l3a, COMPULSION_ADDICTION, false);
+        addOption(l3a, COMPULSION_PAINKILLER_ADDICTION, false);
         addOption(l3a, COMPULSION_BIONIC_HATE, false);
         addOption(l3a, COMPULSION_BODY_MOD_ADDICTION, false);
+        addOption(l3a, COMPULSION_OTHER_FACTION_DISLIKE, false);
+        addOption(l3a, COMPULSION_PARENT_FACTION_DISLIKE, false);
+        addOption(l3a, COMPULSION_INNER_SPHERE_HATE, false);
+        addOption(l3a, COMPULSION_CLAN_HATE, false);
+        addOption(l3a, COMPULSION_OTHER_FACTION_HATE, false);
+        addOption(l3a, COMPULSION_PARENT_FACTION_HATE, false);
+        addOption(l3a, COMPULSION_MERCENARY_HATE, false);
+        addOption(l3a, COMPULSION_PIRATE_HATE, false);
 
         addOption(l3a, MADNESS_FLASHBACKS, false);
         addOption(l3a, MADNESS_CONFUSION, false);
@@ -316,6 +347,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);
         addOption(edge, EDGE_REPAIR_FAILED_REFIT, true);
         addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL, true);
+        addOption(edge, EDGE_SALVAGE_ACCIDENTS, true);
 
         List<CustomOption> customs = CustomOption.getCustomAbilities();
         for (CustomOption option : customs) {

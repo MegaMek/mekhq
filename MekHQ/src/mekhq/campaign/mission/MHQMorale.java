@@ -34,6 +34,9 @@ package mekhq.campaign.mission;
 
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.enums.SkillLevel.ELITE;
+import static megamek.common.enums.SkillLevel.GREEN;
+import static megamek.common.enums.SkillLevel.LEGENDARY;
 import static mekhq.campaign.camOpsReputation.IUnitRating.DRAGOON_A;
 import static mekhq.campaign.camOpsReputation.IUnitRating.DRAGOON_ASTAR;
 import static mekhq.campaign.camOpsReputation.IUnitRating.DRAGOON_F;
@@ -54,7 +57,9 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
+import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 
@@ -71,6 +76,21 @@ public class MHQMorale {
     private static final MMLogger LOGGER = MMLogger.create(MHQMorale.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MHQMorale";
 
+    static final int RALLYING_TARGET_NUMBER = 6;
+    static final int NO_CHANGE_TARGET_NUMBER = 7;
+    static final int WAVERING_TARGET_NUMBER = 8;
+
+    /**
+     * Returns the localized title used for the morale check report UI.
+     *
+     * <p>The value is loaded from {@link #RESOURCE_BUNDLE} under the key {@code MHQMorale.check.title} and is
+     * intended for use in dialogs or notifications that initiate a morale check.</p>
+     *
+     * @return the localized morale check title string
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public static String getFormattedTitle() {
         return getTextAt(RESOURCE_BUNDLE, "MHQMorale.check.title");
     }
@@ -125,7 +145,7 @@ public class MHQMorale {
         final TargetRoll targetNumber = new TargetRoll();
 
         // Add modifiers to the target number
-        int reliability = getReliability(contract);
+        int reliability = getReliability(contract.getEnemySkill().getAdjustedValue(), contract.getEnemy());
         targetNumber.addModifier(reliability, getTextAt(RESOURCE_BUNDLE, "MHQMorale.modifier.reliability"));
 
         int performanceModifier = getPerformanceModifier(today, contract, decisiveVictoryModifier, victoryModifier,
@@ -133,13 +153,14 @@ public class MHQMorale {
         targetNumber.addModifier(performanceModifier, getTextAt(RESOURCE_BUNDLE, "MHQMorale.modifier.performance"));
 
         // The actual check
-        int roll = d6(2) + targetNumber.getValue();
-        MoraleOutcome moraleOutcome = getMoraleOutcome(contract, roll);
+        int roll = d6(2);
+        int modifiedRoll = roll + targetNumber.getValue();
+        MoraleOutcome moraleOutcome = getMoraleOutcome(contract, modifiedRoll);
 
         // Generate and return the report
         PerformanceOutcome performanceOutcome = getOutcome(decisiveVictoryModifier, victoryModifier,
               decisiveDefeatModifier, defeatModifier, performanceModifier);
-        return getReport(reliability, performanceOutcome, performanceModifier, moraleOutcome, roll);
+        return getReport(reliability, performanceOutcome, performanceModifier, moraleOutcome, roll, modifiedRoll);
     }
 
     /**
@@ -149,7 +170,8 @@ public class MHQMorale {
      * @param performanceOutcome  The result of performance evaluation.
      * @param performanceModifier The performance modifier
      * @param moraleOutcome       The result of the morale check.
-     * @param roll                The final morale check roll value.
+     * @param roll                The 2d6 roll without modifiers
+     * @param modifiedRoll        The final morale check roll value.
      *
      * @return The formatted morale check report.
      *
@@ -157,7 +179,7 @@ public class MHQMorale {
      * @since 0.50.10
      */
     private static String getReport(int reliability, PerformanceOutcome performanceOutcome, int performanceModifier,
-          MoraleOutcome moraleOutcome, int roll) {
+          MoraleOutcome moraleOutcome, int roll, int modifiedRoll) {
         String reliabilityColor = getWarningColor();
         if (reliability < -1) {
             reliabilityColor = getPositiveColor();
@@ -190,7 +212,9 @@ public class MHQMorale {
               spanOpeningWithCustomColor(performanceColor),
               performanceText,
               performanceModifier >= 0 ? "+" + performanceModifier : performanceModifier,
+              modifiedRoll,
               roll,
+              modifiedRoll - roll,
               spanOpeningWithCustomColor(moraleColor),
               outcome
         );
@@ -211,12 +235,12 @@ public class MHQMorale {
      * @author Illiani
      * @since 0.50.10
      */
-    private static MoraleOutcome getMoraleOutcome(AtBContract contract, int roll) {
+    static MoraleOutcome getMoraleOutcome(AtBContract contract, int roll) {
         AtBMoraleLevel currentMoraleLevel = contract.getMoraleLevel();
         AtBMoraleLevel updatedMoraleLevel = currentMoraleLevel;
         MoraleOutcome moraleOutcome;
 
-        if (roll <= 6) {
+        if (roll <= RALLYING_TARGET_NUMBER) {
             moraleOutcome = MoraleOutcome.RALLYING;
             updatedMoraleLevel = switch (currentMoraleLevel) {
                 case ROUTED -> AtBMoraleLevel.CRITICAL;
@@ -226,7 +250,7 @@ public class MHQMorale {
                 case ADVANCING -> AtBMoraleLevel.DOMINATING;
                 case DOMINATING, OVERWHELMING -> AtBMoraleLevel.OVERWHELMING;
             };
-        } else if (roll >= 8) {
+        } else if (roll >= WAVERING_TARGET_NUMBER) {
             moraleOutcome = MoraleOutcome.WAVERING;
             updatedMoraleLevel = switch (currentMoraleLevel) {
                 case ROUTED, CRITICAL -> AtBMoraleLevel.ROUTED;
@@ -279,62 +303,101 @@ public class MHQMorale {
     }
 
     /**
-     * Calculates the reliability modifier for the enemy based on contract parameters and faction characteristics.
+     * Calculates the overall reliability modifier for an enemy force based on the contract’s parameters and the
+     * characteristics of the opposing faction.
      *
-     * <p>A lower modifier means the OpFor is less likely to lose morale.</p>
+     * <p>This value determines how susceptible the OpFor is to morale loss or reliability degradation during AtB
+     * campaign events. A <b>lower</b> reliability modifier means the enemy is <b>less likely</b> to lose morale.</p>
      *
-     * @param contract The contract to evaluate.
+     * <p>The calculation proceeds in three stages:</p>
+     * <ol>
+     *     <li>Start with the enemy's adjusted skill level from the contract.</li>
+     *     <li>Apply faction-specific adjustments:
+     *     <ul>
+     *         <li><strong>Clan factions:</strong> receive a +1 effective skill boost, capped at {@code LEGENDARY}.
+     *         This increases their effective reliability before the base modifier is applied.</li>
+     *     </ul>
+     *     </li>
+     *     <li>Convert the resulting skill level into a base reliability modifier using
+     *     {@link #getReliabilityModifier(int)}.</li>
+     *     <li>Apply faction-type trait adjustments:
+     *     <ul>
+     *         <li><strong>Rebels, minor powers, mercenaries, pirates:</strong> {@code +1} modifier (better for the
+     *         player).</li>
+     *         <li><strong>Clans:</strong> an additional {@code -1} modifier (“double-dip”), making Clan morale
+     *         harder to break.</li>
+     *     </ul>
+     *     </li>
+     * </ol>
      *
-     * @return The reliability modifier to use for this contract.
+     * @param adjustedSkillLevel the skill rating to evaluate (higher skilled OpFors are harder to break)
+     * @param enemyFaction       the faction the player is facing (some factions are inherently easier or harder to
+     *                           break)
+     *
+     * @return the final reliability modifier after applying skill, faction, and trait adjustments
      *
      * @author Illiani
      * @since 0.50.10
      */
-    static int getReliability(AtBContract contract) {
+    static int getReliability(int adjustedSkillLevel, Faction enemyFaction) {
         int reliabilityModifier;
 
-        int quality = contract.getEnemyQuality();
-        Faction enemy = contract.getEnemy();
-
-        // Clan enemies get a reliability boost: set at A* or +1
-        if (enemy.isClan()) {
-            quality = Math.min(DRAGOON_ASTAR, quality + 1);
+        // Clan enemies get a reliability boost: set at Legendary or +1
+        boolean enemyIsClan = enemyFaction.isClan();
+        if (enemyIsClan) {
+            // It's important to note that here a positive modifier is bad for the player, as when fed into
+            // getReliabilityModifier() it will make the OpFor harder to rout (not easier, as is the case with all
+            // other positive modifiers)
+            adjustedSkillLevel = Math.min(LEGENDARY.getAdjustedValue(), adjustedSkillLevel + 1);
         }
 
-        // Adjust for Dragoon ratings
-        reliabilityModifier = getReliabilityModifier(quality);
+        // Adjust for adjusted skill level
+        reliabilityModifier = getReliabilityModifier(adjustedSkillLevel);
 
         // Adjust for special enemy traits
-        if (enemy.isRebel() || enemy.isMinorPower() || enemy.isMercenary() || enemy.isPirate()) {
-            reliabilityModifier++;
-        } else if (enemy.isClan()) { // Clan forces get to double-dip
-            reliabilityModifier--;
+        if (enemyFaction.isRebel() ||
+                  enemyFaction.isMinorPower() ||
+                  enemyFaction.isMercenary() ||
+                  enemyFaction.isPirate()) {
+            reliabilityModifier++; // Good for the player
+        } else if (enemyIsClan) { // Clan forces get to double-dip
+            reliabilityModifier--; // Bad for the player
         }
 
         return reliabilityModifier;
     }
 
     /**
-     * Calculates the reliability modifier based on force quality rating.
+     * Calculates the reliability modifier based on the provided skill value.
      *
-     * <p>A lower modifier means the OpFor is less likely to lose morale.</p>
+     * <p>This modifier influences how likely the opposing force is to suffer morale loss or reliability degradation
+     * during campaign events. Lower skills improve reliability for the player, while extremely high skills reduce it to
+     * reflect elite forces being more difficult to destabilize.</p>
      *
-     * @param quality the Dragoon rating of the force, using {@code ForceDescriptor} constants (RATING_0 through
-     *                RATING_5, representing F through A*)
+     * <ul>
+     *     <li>If {@code skill <= GREEN.getAdjustedValue()}, the modifier is {@code +1}, improving reliability for
+     *     the player.</li>
+     *     <li>If {@code skill >= ELITE.getAdjustedValue()}, the modifier is {@code -1}, making reliability checks
+     *     harder for the player.</li>
+     *     <li>All values between those thresholds return {@code 0}.</li>
+     * </ul>
      *
-     * @return the reliability modifier: -1 for F-rated forces, +1 for A or A*-rated forces, and 0 for D, C, or B-rated
-     *       forces
+     * @param adjustedSkillLevel the skill rating to evaluate, compared against the adjusted GREEN and ELITE thresholds
+     *
+     * @return {@code +1} for low-skill forces (≤ GREEN), {@code -1} for elite forces (≥ ELITE), and {@code 0} otherwise
      *
      * @author Illiani
      * @since 0.50.10
      */
-    static int getReliabilityModifier(int quality) {
-        int reliabilityModifier;
-        reliabilityModifier = switch (quality) {
-            case DRAGOON_F -> -1;
-            case DRAGOON_A, DRAGOON_ASTAR -> 1;
-            default -> 0; // DRAGOON_D, DRAGOON_C, DRAGOON_B
-        };
+    static int getReliabilityModifier(int adjustedSkillLevel) {
+        int reliabilityModifier = 0;
+
+        if (adjustedSkillLevel <= GREEN.getAdjustedValue()) {
+            reliabilityModifier = 1;
+        } else if (adjustedSkillLevel >= ELITE.getAdjustedValue()) {
+            reliabilityModifier = -1;
+        }
+
         return reliabilityModifier;
     }
 
@@ -398,20 +461,30 @@ public class MHQMorale {
                 defeats += 2;
                 continue;
             }
+
             // Decisive Victory counts as 2 victories
             if (scenarioStatus.isDecisiveVictory()) {
                 victories += 2;
                 continue;
             }
-            // Pyrrhic Victory reduces victory count (negative consequence)
-            if (scenarioStatus.isPyrrhicVictory() || scenarioStatus.isFleetInBeing()) {
+
+            // Pyrrhic Victory counts as both a victory and a defeat (neutral consequence)
+            if (scenarioStatus.isPyrrhicVictory()) {
+                defeats++;
+                victories++;
+                continue;
+            }
+
+            // Fleet in being counts as a single defeat
+            if (scenarioStatus.isFleetInBeing()) {
                 defeats++;
                 continue;
             }
+
             // Overall Victory/Defeat, if not otherwise noted above
             if (scenarioStatus.isOverallVictory()) {
                 victories++;
-            } else if (scenarioStatus.isOverallDefeat()) { // Includes Fleet in Being
+            } else if (scenarioStatus.isOverallDefeat()) {
                 defeats++;
             }
         }
@@ -428,14 +501,37 @@ public class MHQMorale {
         return 0;
     }
 
+    /**
+     * Applies a simplified morale check as the result of a combat challenge, updating the contract's morale level and
+     * triggering routed behavior if necessary.
+     *
+     * <p>This method does <em>not</em> use the full morale calculation. Instead, it forces a fixed roll based on the
+     * overall outcome of the most recent scenario:</p>
+     * <ul>
+     *     <li>Overall victory: roll is treated as {@link #WAVERING_TARGET_NUMBER} (OpFor morale declines).</li>
+     *     <li>Overall defeat: roll is treated as {@link #RALLYING_TARGET_NUMBER} (OpFor morale improves).</li>
+     *     <li>Otherwise: roll defaults to {@link #NO_CHANGE_TARGET_NUMBER}.</li>
+     * </ul>
+     *
+     * <p>After applying the morale outcome, if the contract's morale level is routed,
+     * {@link #routedMoraleUpdate(Campaign, AtBContract)} is invoked to handle follow-up effects such as early
+     * contract end or prisoner handling.</p>
+     *
+     * @param campaign       the active campaign containing contract and prisoner state
+     * @param contract       the contract whose morale is being updated
+     * @param scenarioStatus the outcome of the combat challenge scenario used to determine the forced roll
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public static void processCombatChallengeResults(Campaign campaign, AtBContract contract,
           ScenarioStatus scenarioStatus) {
-        int forcedRoll = 7;
+        int forcedRoll = NO_CHANGE_TARGET_NUMBER;
 
         if (scenarioStatus.isOverallVictory()) {
-            forcedRoll = 8;
+            forcedRoll = WAVERING_TARGET_NUMBER;
         } else if (scenarioStatus.isOverallDefeat()) {
-            forcedRoll = 6;
+            forcedRoll = RALLYING_TARGET_NUMBER;
         }
 
         getMoraleOutcome(contract, forcedRoll);
@@ -445,11 +541,55 @@ public class MHQMorale {
         }
     }
 
+    /**
+     * Applies follow-up effects when a contract's morale has reached a routed state.
+     *
+     * <p>If the contract is not in a routed morale state, this method performs no action.</p>
+     *
+     * <p>When the contract <b>is</b> routed, one of two behaviors is applied, depending on whether the contract can
+     * end early and whether it is a garrison type:</p>
+     *
+     * <ul>
+     *     <li><b>Garrison or non-early finish contracts</b>:
+     *     <ul>
+     *         <li>Sets a {@code routEnd} date a short time in the future, based on a random {@code d6} roll,
+     *         resulting in a delay of roughly one to three months from the current in-game date.</li>
+     *         <li>Processes friendly and enemy prisoners via {@link PrisonerMissionEndEvent}, if any are present.</li>
+     *         <li>Resets the temporary prisoner capacity to {@link PrisonerEventManager#DEFAULT_TEMPORARY_CAPACITY}.</li>
+     *     </ul>
+     *     </li>
+     *
+     *     <li><b>Non-garrison contracts that can end early</b>:
+     *     <ul>
+     *         <li>Displays an immersive notification indicating that the contract is ending early due to routed
+     *         morale.</li>
+     *         <li>Calculates the remaining payout for the routed contract by multiplying the monthly payout by the
+     *         number of months remaining after the next in-game day and stores the result on the contract as the
+     *         routed payout.</li>
+     *         <li>Sets the contract end date to the next in-game day.</li>
+     *     </ul>
+     *     </li>
+     * </ul>
+     *
+     * <p>This method should be called only after {@link AtBContract#getMoraleLevel()} has been updated to a routed
+     * state, and it assumes that the supplied {@link Campaign} and {@link AtBContract} are consistent with that
+     * state.</p>
+     *
+     * @param campaign the campaign providing time, contract, and prisoner state
+     * @param contract the routed contract whose end behavior and prisoner state are being updated
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public static void routedMoraleUpdate(Campaign campaign, AtBContract contract) {
-        LocalDate today = campaign.getLocalDate();
         if (contract.getMoraleLevel().isRouted()) {
-            // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
-            if (contract.getContractType().isGarrisonType()) {
+            LocalDate today = campaign.getLocalDate();
+            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            boolean canEarlyFinish = campaignState == null || campaignState.allowEarlyVictory();
+
+            // Additional morale updates if morale level is set to 'Routed' and the contract type is either a garrison
+            // type or doesn't allow early contract completion
+            if (!canEarlyFinish || contract.getContractType().isGarrisonType()) {
                 contract.setRoutEnd(today.plusMonths(max(1, d6() - 3)).minusDays(1));
 
                 PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(campaign, contract);

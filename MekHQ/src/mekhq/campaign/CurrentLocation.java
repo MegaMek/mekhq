@@ -36,9 +36,10 @@ package mekhq.campaign;
 import static java.lang.Math.ceil;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_TRANSIT_DISORIENTATION_SYNDROME;
+import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.io.PrintWriter;
@@ -57,6 +58,8 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -327,22 +330,8 @@ public class CurrentLocation {
             }
             if (isAtJumpPoint() && (rechargeTime >= neededRechargeTime)) {
                 // jump
-                if (campaignOptions.isPayForTransport()) {
-                    if (campaignOptions.isUseAbilities()) {
-                        for (Person person : campaign.getPersonnelFilteringOutDeparted()) {
-                            if (person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {
-                                Injury injury = TRANSIT_DISORIENTATION_SYNDROME.newInjury(campaign,
-                                      person,
-                                      INTERNAL,
-                                      1);
-                                person.addInjury(injury);
-
-                                if (campaignOptions.isUseFatigue()) {
-                                    person.changeFatigue(campaignOptions.getFatigueRate());
-                                }
-                            }
-                        }
-                    }
+                if (campaignOptions.isUseAbilities()) {
+                    checkForTransitDisorientationSyndrome(campaign, campaignOptions);
                 }
                 campaign.addReport("Jumping to " + jumpPath.get(1).getPrintableName(campaign.getLocalDate()));
                 currentSystem = jumpPath.get(1);
@@ -384,13 +373,101 @@ public class CurrentLocation {
         }
 
         // If we were previously traveling and now aren't, we should check to see if we have arrived at a contract
-        // system earlier than necessary. And, if appropriate, trigger innoculation prompts
+        // system earlier than necessary. And, if appropriate, trigger inoculation prompts and activate mothballed
+        // units
         if (wasTraveling && isOnPlanet()) {
+            // This should be before inoculations so that we can correctly read the TO&E
+            if (!campaign.getAutomatedMothballUnits().isEmpty()) {
+                performAutomatedActivation(campaign);
+            }
+
             if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
                 Inoculations.triggerInoculationPrompt(campaign, false);
             }
+            
             testForEarlyArrival(campaign);
         }
+    }
+
+    /**
+     * Applies Transit Disorientation Syndrome effects to all personnel who have the corresponding flaw.
+     *
+     * <p>This method iterates over all active personnel (excluding departed and absent individuals) and checks
+     * whether each person has the {@code FLAW_TRANSIT_DISORIENTATION_SYNDROME} flag enabled. If so, one of two effects
+     * occurs depending on campaign medical rules:</p>
+     *
+     * <ul>
+     *     <li><b>Advanced Medical enabled:</b>
+     *     <ul>
+     *         <li>An appropriate injury is created and added.</li>
+     *         <li>If the Alternative Advanced Medical system is active, the Alternate Injury version is used;
+     *         otherwise the standard injury is used.</li>
+     *     </ul>
+     *     </li>
+     *     <li><b>Advanced Medical disabled:</b>
+     *     <ul>
+     *         <li>The character simply gains +1 hit.</li>
+     *     </ul>
+     *     </li>
+     * </ul>
+     *
+     * <p>If the Fatigue subsystem is enabled, the character also gains fatigue equal to the configured campaign
+     * fatigue rate.</p>
+     *
+     * @param campaign        the current campaign, used for personnel state and injury construction
+     * @param campaignOptions the campaign's ruleset and configuration
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static void checkForTransitDisorientationSyndrome(Campaign campaign, CampaignOptions campaignOptions) {
+        final boolean useAdvancedMedical = campaignOptions.isUseAdvancedMedical();
+        final boolean useAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
+        final boolean useFatigue = campaignOptions.isUseFatigue();
+        final int fatigueRate = campaignOptions.getFatigueRate();
+
+        for (Person person : campaign.getPersonnelFilteringOutDepartedAndAbsent()) {
+            if (!person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {
+                continue;
+            }
+
+            if (useAdvancedMedical) {
+                Injury injury = createTransitDisorientationInjury(campaign, person, useAltAdvancedMedical);
+                person.addInjury(injury);
+            } else {
+                person.setHits(person.getHits() + 1);
+            }
+
+            if (useFatigue) {
+                person.changeFatigue(fatigueRate);
+            }
+        }
+    }
+
+    /**
+     * Creates the appropriate Transit Disorientation Syndrome injury instance based on the currently active medical
+     * ruleset.
+     *
+     * <p>If the Alternative Advanced Medical system is active, this method uses the {@code AlternateInjuries}
+     * version of the injury definition using a generic location. Otherwise it uses the standard {@code InjuryTypes}
+     * version with an internal location.</p>
+     *
+     * @param campaign              the campaign context needed for injury construction
+     * @param person                the affected character
+     * @param useAltAdvancedMedical whether the Alternative Advanced Medical system is active
+     *
+     * @return an {@link Injury} instance representing Transit Disorientation Syndrome
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static Injury createTransitDisorientationInjury(Campaign campaign, Person person,
+          boolean useAltAdvancedMedical) {
+        return useAltAdvancedMedical
+                     ? AlternateInjuries.TRANSIT_DISORIENTATION_SYNDROME
+                             .newInjury(campaign, person, GENERIC, 1)
+                     : InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME
+                             .newInjury(campaign, person, INTERNAL, 1);
     }
 
     /**

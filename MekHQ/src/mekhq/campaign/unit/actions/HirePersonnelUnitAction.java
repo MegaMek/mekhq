@@ -137,8 +137,24 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
         }
 
         while (unit.canTakeMoreVesselCrew()) {
-            Person person = campaign.newPerson(unit.getEntity().isLargeCraft()
-                                                     ? PersonnelRole.VESSEL_CREW : PersonnelRole.COMBAT_TECHNICIAN);
+            PersonnelRole role;
+            if (unit.getEntity().isLargeCraft()) {
+                role = PersonnelRole.VESSEL_CREW;
+            } else if (unit.getEntity() instanceof Tank) {
+                if (unit.getEntity().getMovementMode().isMarine()) {
+                    role = PersonnelRole.VEHICLE_CREW_NAVAL;
+                } else if (unit.getEntity().getMovementMode().isVTOL()) {
+                    role = PersonnelRole.VEHICLE_CREW_VTOL;
+                } else {
+                    role = PersonnelRole.VEHICLE_CREW_GROUND;
+                }
+            } else if (unit.getEntity().isConventionalFighter()) {
+                role = PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
+            } else {
+                role = PersonnelRole.ASTECH;
+            }
+
+            Person person = campaign.newPerson(role);
             if (person == null) {
                 break;
             }

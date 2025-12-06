@@ -35,8 +35,8 @@ package mekhq.campaign.personnel.procreation;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.enums.BloodGroup.getInheritedBloodGroup;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
-import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.POSTPARTUM_RECOVERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -69,6 +69,9 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.lifeEvents.BirthAnnouncement;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -423,16 +426,15 @@ public abstract class AbstractProcreation {
                   campaign.getLocation().getPlanet());
             baby.setSurname(campaignOptions.getBabySurnameStyle()
                                   .generateBabySurname(mother, father, baby.getGender()));
-            baby.setDateOfBirth(today);
-            baby.removeAllSkills(); // Limit skills by age for children and adolescents
-            baby.setPrimaryRole(campaign, PersonnelRole.DEPENDENT);
 
-            // re-roll SPAs to include in any age and skill adjustments
-            Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
-
-            for (IOption option : Collections.list(options)) {
-                baby.getOptions().getOption(option.getName()).clearValue();
-            }
+            // Every one of these lines fixes a bug we've had with babies. Who knew children were so good at
+            // breaking things?
+            baby.setDateOfBirth(today); // Make sure we don't have any past or future babies
+            baby.removeAllSkills(); // Babies don't have skills beyond making a mess and screaming
+            baby.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.DEPENDENT); // babies can't have jobs
+            baby.setOptions(new PersonnelOptions()); // Stop babies being born with SPAs
+            baby.setPreNominal(""); // Stop babies being born with doctorates
+            baby.setPostNominal(""); // Stop babies being born with post-nominal titles
 
             baby.setBloodGroup(getInheritedBloodGroup(mother.getBloodGroup(),
                   father == null ? getRandomBloodGroup() : father.getBloodGroup()));
@@ -469,7 +471,15 @@ public abstract class AbstractProcreation {
 
             // Apply postpartum effects
             if (campaignOptions.isUseAdvancedMedical()) {
-                Injury injury = POSTPARTUM_RECOVERY.newInjury(campaign, mother, INTERNAL, 1);
+                Injury injury;
+                if (campaignOptions.isUseAlternativeAdvancedMedical() &&
+                          // These injury types don't stack
+                          !AdvancedMedicalAlternate.hasInjuryOfType(mother.getInjuries(),
+                                AlternateInjuries.POSTPARTUM_RECOVERY)) {
+                    injury = AlternateInjuries.POSTPARTUM_RECOVERY.newInjury(campaign, mother, GENERIC, 1);
+                } else {
+                    injury = InjuryTypes.POSTPARTUM_RECOVERY.newInjury(campaign, mother, INTERNAL, 1);
+                }
                 mother.addInjury(injury);
             } else {
                 int currentHits = mother.getHits();

@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.mission.rentals;
 
+import static java.lang.Math.max;
+import static mekhq.MHQConstants.CONFIRMATION_CONTRACT_RENTAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -44,7 +46,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -73,6 +74,7 @@ public class FacilityRentals {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FacilityRentals";
 
     private static final int FACTORY_CONDITIONS_MULTIPLIER = 20;
+    private static final int LARGE_VESSEL_MULTIPLIER = 10;
     private static final int CAPACITY_INCREASE_HOSPITALS = 25; // One MASH Theater
     private static final int CAPACITY_INCREASE_KITCHENS = 150; // One Field Kitchen
     private static final int CAPACITY_INCREASE_SECURITY = 35; // One squad of 7 soldiers
@@ -121,17 +123,20 @@ public class FacilityRentals {
         boolean wasConfirmedOverall = false;
         ContractStartRentalDialog offerDialog;
         while (!wasConfirmedOverall) {
-            offerDialog = new ContractStartRentalDialog(campaign, contract, hospitalCost, kitchenCost, holdingCellCost);
-            wasRentConfirmed = offerDialog.wasConfirmed();
-            ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign);
-            wasConfirmedOverall = confirmation.wasConfirmed();
+            new ContractStartRentalDialog(campaign, contract, hospitalCost, kitchenCost, holdingCellCost);
+
+            if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_CONTRACT_RENTAL)) {
+                ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign,
+                      CONFIRMATION_CONTRACT_RENTAL);
+                wasConfirmedOverall = confirmation.wasConfirmed();
+            } else {
+                wasConfirmedOverall = true;
+            }
         }
 
-        if (wasRentConfirmed) {
-            contract.setHospitalBedsRented(ContractStartRentalDialog.getHospitalSpinnerValue());
-            contract.setKitchensRented(ContractStartRentalDialog.getKitchensSpinnerValue());
-            contract.setHoldingCellsRented(ContractStartRentalDialog.getSecuritySpinnerValue());
-        }
+        contract.setHospitalBedsRented(ContractStartRentalDialog.getHospitalSpinnerValue());
+        contract.setKitchensRented(ContractStartRentalDialog.getKitchensSpinnerValue());
+        contract.setHoldingCellsRented(ContractStartRentalDialog.getSecuritySpinnerValue());
     }
 
     /**
@@ -139,27 +144,34 @@ public class FacilityRentals {
      *
      * <p>Presents dialog, handles cost calculation, and attempts to debit the player's account.</p>
      *
-     * @param campaign   the active campaign
-     * @param unitCount  the number of units intended for bay rental
-     * @param rentalType the type of bay rental (maintenance or factory conditions)
+     * @param campaign                 the active campaign
+     * @param unitCount                the number of units intended for bay rental
+     * @param largeCraftCount          the number of large craft intended for bay rental
+     * @param rentalType               the type of bay rental (maintenance or factory conditions)
      *
      * @return {@code true} if the transaction completes successfully
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static boolean offerBayRentalOpportunity(Campaign campaign, int unitCount, ContractRentalType rentalType) {
+    public static boolean offerBayRentalOpportunity(Campaign campaign, int unitCount, int largeCraftCount,
+          ContractRentalType rentalType) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int baseCost = campaignOptions.getRentedFacilitiesCostRepairBays();
         if (baseCost <= 0) { // This rental option is disabled
             return true;
         }
 
+        // This shouldn't be able to go into negative, but we use max just in case
+        int nonLargeCraft = max(0, unitCount - largeCraftCount);
+        int nonLargeCraftCost = baseCost * nonLargeCraft;
+        int largeCraftCost = baseCost * LARGE_VESSEL_MULTIPLIER * largeCraftCount;
         if (rentalType == ContractRentalType.FACTORY_CONDITIONS) {
-            baseCost *= FACTORY_CONDITIONS_MULTIPLIER;
+            nonLargeCraftCost *= FACTORY_CONDITIONS_MULTIPLIER;
+            largeCraftCost *= FACTORY_CONDITIONS_MULTIPLIER;
         }
 
-        Money totalCost = Money.of(baseCost * unitCount);
+        Money totalCost = Money.of(nonLargeCraftCost + largeCraftCost);
         if (!presentBayRentDialog(campaign, totalCost)) { // The player chose not to rent anything
             return false;
         }
@@ -178,32 +190,18 @@ public class FacilityRentals {
     }
 
     /**
-     * Presents a dialog to the user for confirming bay rental costs, with immersive confirmation workflow.
-     *
-     * <p>This method displays a {@link BayRentalDialog} showing the rental cost and repeatedly prompts
-     * the user through an {@link ImmersiveDialogConfirmation} workflow until the overall confirmation process is
-     * complete. The user may need to confirm multiple times depending on the immersive dialog's requirements.</p>
-     *
-     * <p><b>Note:</b> The method loops until the immersive confirmation workflow is satisfied,
-     * which may involve multiple user interactions.</p>
+     * Presents a dialog to the user for confirming bay rental costs.
      *
      * @param campaign   the {@link Campaign} context for the rental operation
      * @param rentalCost the {@link Money} amount representing the bay rental cost to display
      *
-     * @return {@code true} if the user confirmed the bay rental in the final dialog; {@code false} if declined
+     * @return {@code true} if the user confirmed the bay rental; {@code false} if declined
      *
      * @author Illiani
      * @since 0.50.10
      */
     private static boolean presentBayRentDialog(Campaign campaign, Money rentalCost) {
-        boolean wasConfirmedOverall = false;
-        BayRentalDialog offerDialog = null;
-        while (!wasConfirmedOverall) {
-            offerDialog = new BayRentalDialog(campaign, rentalCost);
-            ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign);
-            wasConfirmedOverall = confirmation.wasConfirmed();
-        }
-
+        BayRentalDialog offerDialog = new BayRentalDialog(campaign, rentalCost);
         return offerDialog.wasConfirmed();
     }
 
@@ -363,12 +361,6 @@ public class FacilityRentals {
     public static boolean shouldBeIgnoredByBayRentals(Unit unit) {
         if (unit.isMothballed()) {
             return true;
-        }
-
-        Entity entity = unit.getEntity();
-        if (entity != null) {
-            // These are left to GM fiat and not handled by MekHQ automatically
-            return entity.isLargeCraft();
         }
 
         return false;

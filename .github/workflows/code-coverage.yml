@@ -15,28 +15,28 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         java-distribution: [ temurin ]
-        java-version: [ 17, 21 ]
+        java-version: [ 17, 21, 25 ]
       fail-fast: false
 
     steps:
       - name: Checkout Data Repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: megamek/mm-data
           path: mm-data
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: mekhq
 
       - name: Checkout MegaMek
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: MegaMek/megamek
           path: megamek
 
       - name: Checkout MegaMekLab
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: MegaMek/megameklab
           path: megameklab

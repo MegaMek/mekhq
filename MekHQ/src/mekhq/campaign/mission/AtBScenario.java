@@ -351,7 +351,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             setLightConditions();
         }
         if (campaignOptions.isUseWeatherConditions()) {
-            setWeatherConditions();
+            setWeatherConditions(campaignOptions.isUseNoTornadoes());
         }
         setMapSize();
         setMapFile();
@@ -402,7 +402,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setLight(TCO.rollLightCondition(getTerrainType()));
     }
 
-    public void setWeatherConditions() {
+    public void setWeatherConditions(boolean isNoTornadoes) {
         // weather is irrelevant in these situations.
         if (getBoardType() == AtBScenario.T_SPACE || getBoardType() == AtBScenario.T_ATMOSPHERE) {
             return;
@@ -412,6 +412,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         if (WeatherRestriction.IsWindRestricted(wind.ordinal(), getAtmosphere().ordinal(), getTemperature())) {
             wind = Wind.CALM;
+        } else if (isNoTornadoes) {
+            if (wind == Wind.TORNADO_F1_TO_F3) {
+                wind = Wind.MOD_GALE;
+            } else if (wind == Wind.TORNADO_F4) {
+                wind = Wind.STRONG_GALE;
+            }
         }
 
         Weather weather = TCO.rollWeatherCondition(getTerrainType());

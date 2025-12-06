@@ -32,6 +32,11 @@
  */
 package mekhq.service.mrms;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -71,6 +76,8 @@ import mekhq.utilities.ReportingUtilities;
 public class MRMSService {
     private static final MMLogger LOGGER = MMLogger.create(MRMSService.class);
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.MRMSService";
+    @Deprecated(since = "0.50.10")
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MRMS",
           MekHQ.getMHQOptions().getLocale());
 
@@ -211,14 +218,12 @@ public class MRMSService {
             parts = filterParts(parts, null, techs, campaign);
 
             if (!parts.isEmpty()) {
+                String color = spanOpeningWithCustomColor(getWarningColor());
                 if (parts.size() == 1) {
-                    campaign.addReport("<font color='" + ReportingUtilities.getNegativeColor()
-                                             + "'>There in still 1 part that is not being worked on.</font>");
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "inProgress.one", color, CLOSING_SPAN_TAG));
                 } else {
-                    campaign.addReport(String.format(
-                          "<font color='" + ReportingUtilities.getNegativeColor()
-                                + "'>There are still %s parts that are not being worked on.</font>",
-                          parts.size()));
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "inProgress.many", color, parts.size(),
+                          CLOSING_SPAN_TAG));
                 }
             }
         }
@@ -371,7 +376,7 @@ public class MRMSService {
                 if (count > 0) {
                     if (count == 1) {
                         campaign.addReport("<font color='" + ReportingUtilities.getNegativeColor()
-                                                 + "'>There in still 1 part that is not being worked on.</font>");
+                                                 + "'>There is still 1 part that is not being worked on.</font>");
                     } else {
                         campaign.addReport(String.format(
                               "<font color='" + ReportingUtilities.getNegativeColor()
@@ -646,14 +651,14 @@ public class MRMSService {
                         if (unfixable) {
                             campaign.addReport(String.format(
                                   "<font color='" +
-                                        ReportingUtilities.getWarningColor()
+                                        getWarningColor()
                                         +
                                         "'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
                                   loc.getName(), unit.getName(), countOfPartsPerLocation.get(locId)));
                         } else {
                             campaign.addReport(String.format(
                                   "<font color='" +
-                                        ReportingUtilities.getWarningColor()
+                                        getWarningColor()
                                         +
                                         "'>Found missing location (%s) on %s which contains %s parts. Going to remove all parts before proceeding with other repairs.</font>",
                                   loc != null ? loc.getName() : Integer.toString(locId), unit.getName(),

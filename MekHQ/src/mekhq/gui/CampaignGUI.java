@@ -99,6 +99,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
+import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
 import mekhq.campaign.events.DayEndingEvent;
@@ -2773,7 +2774,7 @@ public class CampaignGUI extends JPanel {
 
     private void refreshPartsAvailability() {
         if (!getCampaign().getCampaignOptions().isUseAtB() ||
-                  CampaignOptions.S_AUTO.equals(getCampaign().getCampaignOptions().getAcquisitionSkill())) {
+                  getCampaign().getCampaignOptions().getAcquisitionType() == AcquisitionsType.ANY_TECH) {
             lblPartsAvailabilityRating.setText("");
         } else {
             int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel();

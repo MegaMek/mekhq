@@ -35,6 +35,7 @@ package mekhq.campaign.unit;
 
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
+import static megamek.common.board.Board.START_NONE;
 import static megamek.common.equipment.MiscType.F_CARGO;
 import static megamek.common.units.EntityWeightClass.WEIGHT_HEAVY;
 import static megamek.common.units.EntityWeightClass.WEIGHT_LIGHT;
@@ -94,7 +95,6 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.*;
-import megamek.common.units.CrewType;
 import megamek.common.util.C3Util;
 import megamek.common.weapons.attacks.InfantryAttack;
 import megamek.common.weapons.bayWeapons.BayWeapon;
@@ -1223,7 +1223,7 @@ public class Unit implements ITechnology {
         if (!isFunctional()) {
             return "unit is not functional";
         }
-        if (isUnmanned() && !(isUnmannedTrailer())) {
+        if (isUnmanned() && !isNotCrewedEntityType()) {
             return "unit has no pilot";
         }
         if (isRefitting()) {
@@ -4517,8 +4517,18 @@ public class Unit implements ITechnology {
             return null;
         }
 
+        List<Person> validCrew = new ArrayList<>(drivers);
+        if (!entity.isInfantry() && !usesSoldiers()) { // No need to add gunners for these units
+            validCrew.addAll(gunners);
+        }
+
+        // In the event there are no drivers and gunners vessel crew are used as an option of last resort
+        if (drivers.isEmpty() && gunners.isEmpty()) {
+            validCrew.addAll(vesselCrew);
+        }
+
         Person commander = null;
-        for (Person potentialCommander : getCrew()) {
+        for (Person potentialCommander : validCrew) {
             if (commander == null) {
                 commander = potentialCommander;
                 continue;
@@ -4552,6 +4562,8 @@ public class Unit implements ITechnology {
         entity.setCommander(false);
         entity.getCrew().resetGameState();
         entity.getCrew().setCommandBonus(0);
+        entity.resetPickedUpMekWarriors();
+        entity.setStartingPos(START_NONE);
 
         // Update crew data
         updateCrew(isOnlyCommandersMatter);
@@ -4639,7 +4651,7 @@ public class Unit implements ITechnology {
             entity.getCrew().setClanPilot(commander.isClanPersonnel(), 0);
             entity.getCrew().setPortrait(commander.getPortrait().clone(), 0);
             entity.getCrew().setExternalIdAsString(commander.getId().toString(), 0);
-            entity.getCrew().setToughness(commander.getToughness(), 0);
+            entity.getCrew().setToughness(commander.getAdjustedToughness(), 0);
 
             if (entity instanceof Tank) {
                 ((Tank) entity).setCommanderHit(commander.getHits() > 0);
@@ -4838,8 +4850,8 @@ public class Unit implements ITechnology {
      * applies it to the entity's crew option. Solo pilots and infantry units are handled specially to avoid
      * double-counting personnel who serve in multiple roles.</p>
      *
-     * <p>Non-combat crew members (such as vessel crew and combat technicians) are excluded from this calculation as
-     * their Edge is handled separately through MekHQ's non-combat personnel system.</p>
+     * <p>Non-combat crew members (such as vessel crew) are excluded from this calculation as their Edge is handled
+     * separately through MekHQ's non-combat personnel system.</p>
      *
      * @param crewSize         the total size of the crew to use for calculating the average Edge value
      * @param isCommandersOnly {@code true} if the 'Commanders Only' option is enabled for this unit type
@@ -4867,8 +4879,8 @@ public class Unit implements ITechnology {
             }
         }
 
-        // Average the edge values of pilots and gunners. Non-Gunners, non-drivers (i.e. Vessel Crewmembers and
-        // Combat Technicians mostly) handle edge solely through MHQ as noncombat personnel, so aren't considered here
+        // Average the edge values of pilots and gunners. Non-Gunners, non-drivers (i.e., Vessel Crewmembers) handle
+        // edge solely through MHQ as noncombat personnel, so aren't considered here
         int edge = (int) Math.round(sumEdge / crewSize);
         IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
         edgeOption.setValue(edge);
@@ -4895,8 +4907,7 @@ public class Unit implements ITechnology {
         int nGunners = 0;
         int nCrew = 0;
 
-        boolean entityIsConventionalInfantry = entity.hasETypeFlag(Entity.ETYPE_INFANTRY) &&
-                                                     !entity.hasETypeFlag(Entity.ETYPE_BATTLEARMOR);
+        boolean entityIsConventionalInfantry = entity.isConventionalInfantry();
         boolean isTank = entity instanceof Tank; // Includes Wet Naval and VTOLs
 
         // For certain entities both drivers and gunners contribute to gunnery & piloting
@@ -5071,23 +5082,38 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Returns the appropriate list of personnel based on entity type and role.
+     * Returns the appropriate list of personnel based on the entity type and the requested crew role.
      *
-     * <p>For tank entities, this method returns the entire crew regardless of the role specified. For non-tank,
-     * non-infantry entities, it returns either the drivers or gunners list based on the {@code isDrivers} parameter.
+     * <p>If the entity is a tank or infantry unit, this method always returns the full crew, since those unit types
+     * do not distinguish between driver and gunner roles.</p>
      *
-     * @param isTankOrInfantry {@code true} if the entity is a tank or infantry, {@code false} otherwise
-     * @param isDrivers        {@code true} to return drivers, {@code false} to return gunners (ignored if
-     *                         {@code isTankOrInfantry} is {@code true})
+     * <p>For all other entity types, the returned list depends on the {@code isDrivers} flag and the unit’s crew
+     * configuration:</p>
+     * <ul>
+     *     <li>If {@code isDrivers} is {@code true}, the drivers list is returned.</li>
+     *     <li>If the unit is effectively single-crew for this instance (i.e., {@link #getFullCrewSize()} returns
+     *     {@code 1}), the drivers list is returned even if {@code isDrivers} is {@code false}. This avoids returning
+     *     an empty gunner list for units that normally support multiple crew.</li>
+     *     <li>Otherwise, the gunners list is returned as a new {@link ArrayList}, since gunners are stored
+     *     internally as a {@link Set}.</li>
+     * </ul>
      *
-     * @return a list of personnel; for tanks or infantry returns the full crew, for other entities returns either
-     *       drivers or a copy of the gunners list
+     * @param isTankOrInfantry {@code true} if the entity is a tank or infantry unit; when {@code true}, the {@code
+     * isDrivers} flag is ignored
+     * @param isDrivers        {@code true} to request the drivers list, {@code false} to request the gunners list
+     *                                     (unless overridden by single-crew behavior)
+     *
+     * @return a list of personnel appropriate to the entity type and requested role (never {@code null})
      */
     private List<Person> getCompositeCrew(boolean isTankOrInfantry, boolean isDrivers) {
         if (isTankOrInfantry) {
             return getCrew();
         } else {
-            return isDrivers ? drivers : new ArrayList<>(gunners);
+            // if the unit is not always single crew, but in this instance is, the gunners list will be empty. In
+            // such cases we instead want to return the drivers. Otherwise, we return the gunners (converted into an
+            // ArrayList because they're currently stored as a Set).
+            boolean isSingleCrewInThisInstance = getFullCrewSize() == 1;
+            return isDrivers || isSingleCrewInThisInstance ? drivers : new ArrayList<>(gunners);
         }
     }
 
@@ -5178,150 +5204,84 @@ public class Unit implements ITechnology {
         entity.getCrew().setGunneryM(Math.min(max(gunnery, 0), 8), slot);
         entity.getCrew().setGunneryB(Math.min(max(gunnery, 0), 8), slot);
         entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), slot);
-        entity.getCrew().setToughness(person.getToughness(), slot);
+        entity.getCrew().setToughness(person.getAdjustedToughness(), slot);
 
         entity.getCrew().setExternalIdAsString(person.getId().toString(), slot);
         entity.getCrew().setMissing(false, slot);
     }
 
+    /**
+     * Resets the engineer assignment for this unit based on its current crew.
+     *
+     * <p>This method recalculates which {@link Person} should be considered the unit's engineer. The logic depends
+     * on unit type:</p>
+     * <ul>
+     *     <li>If the unit is not self-crewed, the method exits with no changes.</li>
+     *     <li>If the unit is infantry:
+     *         <ul>
+     *             <li>Unmanned infantry has no engineer.</li>
+     *             <li>Otherwise, the engineer is chosen from active crew using
+     *             {@link Person#outRanksUsingSkillTiebreaker} to pick the most qualified.</li>
+     *         </ul>
+     *     </li>
+     *     <li>For all other entities:
+     *         <ul>
+     *             <li>If the vessel crew is empty, there is no engineer.</li>
+     *             <li>Otherwise, the engineer is chosen from the vessel crew using the same ranking logic.</li>
+     *         </ul>
+     *     </li>
+     * </ul>
+     *
+     * <p>After selecting the engineer (or determining that none exists), the method updates all scheduled
+     * maintenance tasks:</p>
+     *
+     * <ul>
+     *     <li>If an engineer is present, all ongoing part tasks are reassigned to that engineer.</li>
+     *     <li>If no engineer exists:
+     *         <ul>
+     *             <li>Any active mothballing is cancelled.</li>
+     *             <li>All ongoing part tasks are cancelled.</li>
+     *         </ul>
+     *     </li>
+     * </ul>
+     *
+     * <p>This ensures that engineering workloads always match the current crew state and avoids leaving tasks
+     * assigned to invalid or nonexistent personnel.</p>
+     */
     public void resetEngineer() {
         if (!isSelfCrewed()) {
             return;
         }
-        int minutesLeft = TECH_WORK_DAY;
-        int overtimeLeft = TECH_WORK_DAY / 2;
-        boolean breakPartReRoll = true;
-        boolean failRefitReRoll = true;
-        if (null != engineer) {
-            minutesLeft = engineer.getMinutesLeft();
-            overtimeLeft = engineer.getOvertimeLeft();
-        } else {
-            // then get the number based on the least amount available to crew members
-            // in the case of Edge, everyone must have the same triggers set for Edge to
-            // work
-            for (Person person : getActiveCrew()) {
-                if (person.getMinutesLeft() < minutesLeft) {
-                    minutesLeft = person.getMinutesLeft();
-                }
 
-                if (person.getOvertimeLeft() < overtimeLeft) {
-                    overtimeLeft = person.getOvertimeLeft();
-                }
-            }
-        }
+        engineer = null; // Unassign engineer
 
         if (getEntity() instanceof Infantry) {
-            if (!isUnmanned()) {
-                engineer = new Person(getCommander().getGivenName(), getCommander().getSurname(), getCampaign());
-                engineer.setEngineer(true);
-                engineer.setClanPersonnel(getCommander().isClanPersonnel());
-                engineer.setMinutesLeft(minutesLeft);
-                engineer.setOvertimeLeft(overtimeLeft);
-                engineer.setId(getCommander().getId());
-                engineer.setPrimaryRoleDirect(PersonnelRole.MECHANIC);
-                engineer.setRank(getCommander().getRankNumeric());
-                // will only be reloading ammo, so doesn't really matter what skill level we
-                // give them - set to regular
-                engineer.addSkill(SkillType.S_TECH_MECHANIC,
-                      SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(),
-                      0);
-                engineer.addSkill(SkillType.S_ADMIN,
-                      SkillType.getType(SkillType.S_ADMIN).getRegularLevel(),
-                      0);
-            } else {
+            if (isUnmanned()) {
                 engineer = null;
+            } else {
+                for (Person person : getActiveCrew()) {
+                    if (engineer == null || person.outRanksUsingSkillTiebreaker(campaign, engineer)) {
+                        engineer = person;
+                    }
+                }
             }
         } else {
-            if (!vesselCrew.isEmpty()) {
-                int nCrew = 0;
-                int sumTechSkill = 0;
-                int sumTechBonus = 0;
-                int sumAdminSkill = -1; // Unskilled
-                int sumAdminBonus = 0;
-                int sumEdge = 0;
-                int sumEdgeUsed = 0;
-                String engineerGivenName = "Nobody";
-                String engineerSurname = "Nobody";
-                int bestRank = Integer.MIN_VALUE;
-                for (Person person : vesselCrew) {
-                    if (engineer != null) {
-                        // If the engineer used edge points, remove some from vessel crewmembers until
-                        // all is paid for
-                        if (engineer.getEdgeUsed() > 0) {
-                            // Don't subtract an Edge if the individual has none left
-                            if (person.getCurrentEdge() > 0) {
-                                person.changeCurrentEdge(-1);
-                                engineer.setEdgeUsed(engineer.getEdgeUsed() - 1);
-                            }
-                        }
-                        // If the engineer gained XP, add it for each crewman
-                        person.awardXP(getCampaign(), engineer.getXP());
-
-                        // Update each crewman's successful task count too
-                        person.setNTasks(person.getNTasks() + engineer.getNTasks());
-                        if (person.getNTasks() >= getCampaign().getCampaignOptions().getNTasksXP()) {
-                            person.awardXP(getCampaign(), getCampaign().getCampaignOptions().getTaskXP());
-                            person.setNTasks(0);
-                        }
-                        sumEdgeUsed = engineer.getEdgeUsed();
-                    }
-                    sumEdge += person.getAdjustedEdge();
-
-                    if (person.hasSkill(SkillType.S_TECH_VESSEL)) {
-                        sumTechSkill += person.getSkill(SkillType.S_TECH_VESSEL).getLevel();
-                        sumTechBonus += person.getSkill(SkillType.S_TECH_VESSEL).getBonus();
-                        nCrew++;
-                    }
-
-                    if (person.hasSkill(SkillType.S_ADMIN)) {
-                        sumAdminSkill += person.getSkill(SkillType.S_ADMIN).getLevel();
-                        sumAdminBonus += person.getSkill(SkillType.S_ADMIN).getBonus();
-                    }
-                    if (!(person.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART))) {
-                        breakPartReRoll = false;
-                    }
-                    if (!(person.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT))) {
-                        failRefitReRoll = false;
-                    }
-                    if (person.getRankNumeric() > bestRank) {
-                        engineerGivenName = person.getGivenName();
-                        engineerSurname = person.getSurname();
-                        bestRank = person.getRankNumeric();
-                    }
-                }
-                if (nCrew > 0) {
-                    engineer = new Person(engineerGivenName, engineerSurname, getCampaign());
-                    engineer.setEngineer(true);
-                    engineer.setClanPersonnel(getCommander().isClanPersonnel());
-                    engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_BREAK_PART, breakPartReRoll);
-                    engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT, failRefitReRoll);
-                    engineer.setMinutesLeft(minutesLeft);
-                    engineer.setOvertimeLeft(overtimeLeft);
-                    engineer.setId(getCommander().getId());
-                    engineer.setPrimaryRoleDirect(PersonnelRole.VESSEL_CREW);
-                    if (bestRank > -1) {
-                        engineer.setRank(bestRank);
-                    }
-                    engineer.addSkill(SkillType.S_TECH_VESSEL, sumTechSkill / nCrew, sumTechBonus / nCrew);
-                    if (sumAdminSkill > -1) {
-                        engineer.addSkill(SkillType.S_ADMIN, sumAdminSkill / nCrew, sumAdminBonus / nCrew);
-                    }
-                    engineer.setEdgeUsed(sumEdgeUsed);
-                    engineer.setCurrentEdge(max(0, (sumEdge - sumEdgeUsed) / nCrew));
-                    engineer.setUnit(this);
-                } else {
-                    engineer = null;
-                }
-            } else {
-                // Needed to fix bug where removed crew doesn't remove engineer
+            if (vesselCrew.isEmpty()) {
                 engineer = null;
+            } else {
+                for (Person person : getVesselCrew()) {
+                    if (engineer == null || person.outRanksUsingSkillTiebreaker(campaign, engineer)) {
+                        engineer = person;
+                    }
+                }
             }
         }
-        if (null != engineer) {
+
+        if (engineer != null) {
             // change reference for any scheduled tasks
-            for (Part p : getParts()) {
-                if (p.isBeingWorkedOn()) {
-                    p.setTech(engineer);
+            for (Part part : getParts()) {
+                if (part.isBeingWorkedOn()) {
+                    part.setTech(engineer);
                 }
             }
         } else {
@@ -5330,9 +5290,9 @@ public class Unit implements ITechnology {
                 mothballTime = 0;
             }
             // cancel any scheduled tasks
-            for (Part p : getParts()) {
-                if (p.isBeingWorkedOn()) {
-                    p.cancelAssignment(true);
+            for (Part part : getParts()) {
+                if (part.isBeingWorkedOn()) {
+                    part.cancelAssignment(true);
                 }
             }
         }
@@ -5395,7 +5355,7 @@ public class Unit implements ITechnology {
 
     // TODO : Switch similar tables in person to use this one instead
     public String determineUnitTechSkillType() {
-        if ((entity instanceof Mek) || (entity instanceof ProtoMek)) {
+        if ((entity instanceof Mek) || (entity instanceof ProtoMek) || (entity instanceof HandheldWeapon)) {
             return SkillType.S_TECH_MEK;
         } else if (entity instanceof BattleArmor) {
             return SkillType.S_TECH_BA;
@@ -5665,6 +5625,9 @@ public class Unit implements ITechnology {
         }
     }
 
+    /**
+     * @return true if the unit has no commander
+     */
     public boolean isUnmanned() {
         return (null == getCommander());
     }
@@ -5675,8 +5638,8 @@ public class Unit implements ITechnology {
      * @return true if this Unit is an unmanned trailer, false if it isn't a trailer or has a crew
      */
     public boolean isUnmannedTrailer() {
-        if (getEntity() instanceof Tank tank) {
-            return tank.isTrailer() && (tank.defaultCrewType().equals(CrewType.NONE));
+        if (isNotCrewedEntityType() && getEntity() instanceof Tank tank) {
+            return tank.isTrailer();
         }
 
         return false;
@@ -5684,6 +5647,14 @@ public class Unit implements ITechnology {
 
     public boolean isHandheldWeapon() {
         return entity instanceof HandheldWeapon;
+    }
+
+    /**
+     * @return true if the unit is always uncrewed, like a Handheld Weapon or unarmed, unpowered trailer. Should not
+     *       return true for remote drone OS. False if the entity is null.
+     */
+    public boolean isNotCrewedEntityType() {
+        return entity != null && entity.isNotCrewedEntityType();
     }
 
     public int getForceId() {
@@ -6366,6 +6337,10 @@ public class Unit implements ITechnology {
 
         if (entity instanceof Jumpship) {
             return 360 * maintenanceMultiplier;
+        }
+
+        if (entity instanceof HandheldWeapon) { // Unofficial
+            return 30;
         }
 
         // Anything that didn't fall into one of the above classifications is self-maintaining, meaning zero.
@@ -7375,7 +7350,7 @@ public class Unit implements ITechnology {
             } else {
                 return PersonnelRole.VEHICLE_CREW_GROUND;
             }
-        } else if (entity.isConventionalFighter()) {
+        } else if (entity instanceof ConvFighter) { // do not use entity.isConventionalFighter here
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
         } else if (entity.isLargeCraft()) {
             return PersonnelRole.VESSEL_PILOT;
@@ -7423,7 +7398,7 @@ public class Unit implements ITechnology {
             } else {
                 return PersonnelRole.VEHICLE_CREW_GROUND;
             }
-        } else if (entity.isConventionalInfantry()) {
+        } else if (entity instanceof ConvFighter) { // do not use entity.isConventionalFighter here
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
         } else if (entity.isSmallCraft() || entity.isLargeCraft()) {
             return PersonnelRole.VESSEL_GUNNER;
@@ -7440,4 +7415,6 @@ public class Unit implements ITechnology {
             return null;
         }
     }
+
+
 }

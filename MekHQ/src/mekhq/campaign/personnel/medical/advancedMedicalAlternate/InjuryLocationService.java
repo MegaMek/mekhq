@@ -46,9 +46,36 @@ import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.medical.BodyLocation;
 
+/**
+ * Service class responsible for determining the location and duration of new injuries when using the Alternate Advanced
+ * Medical system.
+ *
+ * <p>This class encapsulates the logic for:</p>
+ * <ul>
+ *     <li>Selecting a primary {@link BodyLocation} for an injury based on a 2d6 roll and a set of fallback chains
+ *     that respect missing limbs.</li>
+ *     <li>Selecting a more granular secondary location and specific {@link InjuryType} based on the primary location
+ *     and an additional roll.</li>
+ *     <li>Handling special cases such as severed limbs and maximum injury duration multipliers.</li>
+ *     <li>Tracking which major body locations are still present based on existing injuries that imply a missing
+ *     location.</li>
+ * </ul>
+ *
+ * <p>The resulting injury information is returned as an {@link InjuryLocationData} instance containing the injury
+ * type, exact location, and duration multiplier.</p>
+ *
+ * @author Illiani
+ * @since 0.50.10
+ */
 public class InjuryLocationService {
     private static final MMLogger LOGGER = MMLogger.create(InjuryLocationService.class);
 
+    /**
+     * Fallback chains used to determine a primary {@link BodyLocation} from a 2d6 roll. Each entry maps a roll result
+     * to an ordered list of candidate locations. The first available (non-missing) location in the list is selected.
+     *
+     * @since 0.50.10
+     */
     private static final Map<Integer, List<BodyLocation>> PRIMARY_LOCATION_FALLBACK_TABLE = Map.ofEntries(
           Map.entry(2, List.of(BodyLocation.HEAD, BodyLocation.CHEST)),
           Map.entry(3, List.of(BodyLocation.LEFT_FOOT, BodyLocation.LEFT_LEG, BodyLocation.ABDOMEN)),
@@ -62,9 +89,16 @@ public class InjuryLocationService {
           Map.entry(12, List.of(BodyLocation.HEAD, BodyLocation.CHEST))
     );
 
+    /**
+     * Secondary location and injury table keyed by the primary {@link BodyLocation}. For each primary location, a d6
+     * roll selects a specific {@link SecondaryLocation}, which includes the final injury type and the more precise body
+     * location.
+     *
+     * @since 0.50.10
+     */
     private static final Map<BodyLocation, Map<Integer, SecondaryLocation>> SECONDARY_LOCATION_TABLE = Map.ofEntries(
           Map.entry(BodyLocation.HEAD, Map.of(
-                1, new SecondaryLocation(AlternateInjuries.BURN_FACE, BodyLocation.HEAD),
+                1, new SecondaryLocation(AlternateInjuries.BURN_FACE, BodyLocation.FACE),
                 2, new SecondaryLocation(AlternateInjuries.HEARING_LOSS, BodyLocation.EARS),
                 3, new SecondaryLocation(AlternateInjuries.BLINDNESS, BodyLocation.EYES),
                 4, new SecondaryLocation(AlternateInjuries.FRACTURED_JAW, BodyLocation.JAW),
@@ -79,8 +113,8 @@ public class InjuryLocationService {
           )),
           Map.entry(BodyLocation.ABDOMEN, Map.of(
                 1, new SecondaryLocation(AlternateInjuries.BURN_ABDOMINAL, BodyLocation.ABDOMEN),
-                2, new SecondaryLocation(AlternateInjuries.BRUISED_ORGAN, BodyLocation.CHEST),
-                3, new SecondaryLocation(AlternateInjuries.ORGAN_TRAUMA, BodyLocation.CHEST),
+                2, new SecondaryLocation(AlternateInjuries.BRUISED_ORGAN, BodyLocation.ORGANS),
+                3, new SecondaryLocation(AlternateInjuries.ORGAN_TRAUMA, BodyLocation.ORGANS),
                 4, new SecondaryLocation(AlternateInjuries.FRACTURED_GROIN, BodyLocation.GROIN),
                 5, new SecondaryLocation(AlternateInjuries.DISEMBOWELED, BodyLocation.ABDOMEN)
           )),
@@ -142,6 +176,13 @@ public class InjuryLocationService {
           ))
     );
 
+    /**
+     * Tracks whether the major body locations (head, limbs, hands, and feet) are still present. This is initialized
+     * with all locations present and updated based on existing injuries and explicit calls to
+     * {@link #setBodyLocationMissing(BodyLocation)}.
+     *
+     * @since 0.50.10
+     */
     private final Map<BodyLocation, Boolean> limbPresence = new EnumMap<>(Map.ofEntries(
           Map.entry(BodyLocation.HEAD, true),
           Map.entry(BodyLocation.LEFT_ARM, true),
@@ -154,20 +195,75 @@ public class InjuryLocationService {
           Map.entry(BodyLocation.RIGHT_FOOT, true)
     ));
 
+    /**
+     * Marks a specific body location as missing.
+     *
+     * <p>Callers can use this to explicitly remove a limb or body part that is no longer present, in addition
+     * to the automatic detection performed in the constructor.</p>
+     *
+     * @param location the {@link BodyLocation} to mark as missing
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public void setBodyLocationMissing(BodyLocation location) {
         limbPresence.put(location, false);
     }
 
     // Inner records
+
+    /**
+     * Simple value object storing the result of a secondary location roll: the d6 roll itself and the computed injury
+     * duration multiplier.
+     *
+     * @param roll       the final non-exploding roll value (1–5)
+     * @param multiplier the injury duration multiplier (1 to
+     *                   {@link AdvancedMedicalAlternate#MAXIMUM_INJURY_DURATION_MULTIPLIER})
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private record InjuryDurationRoll(int roll, int multiplier) {}
 
+    /**
+     * Value object that associates a specific {@link InjuryType} with a more granular {@link BodyLocation}.
+     *
+     * @param injury   the resolved injury type for this secondary location
+     * @param location the precise body location affected
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private record SecondaryLocation(InjuryType injury, BodyLocation location) {}
 
     // Everything else
+
+    /**
+     * Creates a new {@link InjuryLocationService} for the given person.
+     *
+     * <p>The constructor inspects the person's current injuries and updates {@link #limbPresence} to mark any
+     * locations as missing if their injury type implies a missing location (for example, severed limbs).</p>
+     *
+     * @param person the {@link Person} whose current injuries should be used to initialize limb presence
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public InjuryLocationService(Person person) {
         updateLimbPresence(person.getInjuries());
     }
 
+    /**
+     * Updates {@link #limbPresence} based on a list of existing injuries.
+     *
+     * <p>Any injury whose {@link InjuryType#impliesMissingLocation()} returns {@code true} will cause its associated
+     * {@link BodyLocation} to be marked as missing, provided that location is tracked in {@link #limbPresence}.</p>
+     *
+     * @param injuries the list of injuries to inspect
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private void updateLimbPresence(List<Injury> injuries) {
         injuries.stream()
               .filter(injury -> injury.getType().impliesMissingLocation())
@@ -176,15 +272,65 @@ public class InjuryLocationService {
               .forEach(location -> limbPresence.put(location, false));
     }
 
+    /**
+     * Generates a new {@link InjuryLocationData} instance representing a randomly determined injury location and
+     * duration multiplier.
+     *
+     * <p>This method:</p>
+     * <ol>
+     *   <li>Selects a primary {@link BodyLocation} using
+     *       {@link #getPrimaryBodyLocation()}.</li>
+     *   <li>Resolves a secondary {@link BodyLocation} and {@link InjuryType}
+     *       using {@link #getSecondaryBodyLocation(BodyLocation)}.</li>
+     * </ol>
+     *
+     * @return a new {@link InjuryLocationData} describing the injury type, exact location, and duration multiplier
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public InjuryLocationData getInjuryLocation() {
         BodyLocation primaryLocation = getPrimaryBodyLocation();
         return getSecondaryBodyLocation(primaryLocation);
     }
 
+    /**
+     * Returns whether the given body location is considered present.
+     *
+     * <p>Locations tracked in {@link #limbPresence} will return the stored value. Any other locations default to
+     * {@code true}, meaning they are assumed to be present unless explicitly marked or implied missing.</p>
+     *
+     * @param location the {@link BodyLocation} to check
+     *
+     * @return {@code true} if the location is present, {@code false} if it is missing
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     public boolean hasBodyLocation(BodyLocation location) {
         return limbPresence.getOrDefault(location, true);
     }
 
+    /**
+     * Determines the primary {@link BodyLocation} for a new injury.
+     *
+     * <p>This method rolls 2d6 and uses the result to select a fallback chain from
+     * {@link #PRIMARY_LOCATION_FALLBACK_TABLE}. It then returns the first available (non-missing) location in that
+     * chain.</p>
+     *
+     * <p>Special rules:</p>
+     * <ul>
+     *   <li>A roll of {@code 7} is treated as a leg hit and delegated to
+     *       {@link #getAvailableLegLocation()}.</li>
+     *   <li>If no fallback chain exists for the roll, an error is logged and
+     *       {@link BodyLocation#CHEST} is returned.</li>
+     * </ul>
+     *
+     * @return the selected primary {@link BodyLocation}
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private BodyLocation getPrimaryBodyLocation() {
         int roll = d6(2);
 
@@ -205,6 +351,17 @@ public class InjuryLocationService {
         return findFirstAvailableLocation(fallbackChain);
     }
 
+    /**
+     * Selects an available leg location when the primary roll indicates a leg hit.
+     *
+     * <p>The method randomly prefers either the left or right leg, and then falls back to
+     * {@link BodyLocation#ABDOMEN} if the preferred leg is not available.</p>
+     *
+     * @return the first available leg location, or {@link BodyLocation#ABDOMEN} if no leg is present
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private BodyLocation getAvailableLegLocation() {
         boolean isLeftSide = randomInt(2) == 0;
         BodyLocation preferredLeg = isLeftSide ? BodyLocation.LEFT_LEG : BodyLocation.RIGHT_LEG;
@@ -212,6 +369,19 @@ public class InjuryLocationService {
         return findFirstAvailableLocation(List.of(preferredLeg, BodyLocation.ABDOMEN));
     }
 
+    /**
+     * Returns the first body location in the provided list that is still present.
+     *
+     * <p>The method checks each location using {@link #hasBodyLocation} and returns the first one that is available.
+     * If none of the supplied locations are present, {@link BodyLocation#CHEST} is returned as a safe default.</p>
+     *
+     * @param locations an ordered list of candidate {@link BodyLocation}s
+     *
+     * @return the first present location, or {@link BodyLocation#CHEST} if none are present
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private BodyLocation findFirstAvailableLocation(List<BodyLocation> locations) {
         return locations.stream()
                      .filter(this::hasBodyLocation)
@@ -219,11 +389,34 @@ public class InjuryLocationService {
                      .orElse(BodyLocation.CHEST);
     }
 
+    /**
+     * Resolves the secondary injury location and injury type for a given primary location, including the injury
+     * duration multiplier.
+     *
+     * <p>The process is:</p>
+     * <ol>
+     *     <li>Roll for duration and secondary location using
+     *     {@link #rollForSecondaryLocationAndDurationMultiplier()}.</li>
+     *     <li>If the primary location is a limb and the multiplier is at the maximum value, attempt to treat the
+     *     injury as a severed limb or head by selecting an appropriate {@link InjuryType}.</li>
+     *     <li>Otherwise, look up the secondary location entry in {@link #SECONDARY_LOCATION_TABLE} for the primary
+     *     location and rolled value.</li>
+     *     <li>If no matching entry is found, default to a burned chest injury.</li>
+     * </ol>
+     *
+     * @param primaryLocation the primary {@link BodyLocation} previously determined for the injury
+     *
+     * @return an {@link InjuryLocationData} containing the resolved injury type, secondary location, and duration
+     *       multiplier
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private InjuryLocationData getSecondaryBodyLocation(BodyLocation primaryLocation) {
-        InjuryDurationRoll durationRoll = calculateInjuryDuration();
+        InjuryDurationRoll durationAndLocationRoll = rollForSecondaryLocationAndDurationMultiplier();
 
         boolean isSevered = primaryLocation.isLimb()
-                                  && (durationRoll.multiplier() == MAXIMUM_INJURY_DURATION_MULTIPLIER);
+                                  && (durationAndLocationRoll.multiplier() == MAXIMUM_INJURY_DURATION_MULTIPLIER);
 
         SecondaryLocation secondaryLocation = null;
         if (isSevered) {
@@ -247,15 +440,35 @@ public class InjuryLocationService {
         if (secondaryLocation == null) {
             secondaryLocation = SECONDARY_LOCATION_TABLE
                                       .getOrDefault(primaryLocation, Map.of())
-                                      .getOrDefault(durationRoll.roll(),
+                                      .getOrDefault(durationAndLocationRoll.roll(),
                                             new SecondaryLocation(AlternateInjuries.BURNED_CHEST,
                                                   BodyLocation.CHEST));
         }
 
-        return new InjuryLocationData(secondaryLocation.injury, secondaryLocation.location, durationRoll.multiplier());
+        return new InjuryLocationData(secondaryLocation.injury,
+              secondaryLocation.location,
+              durationAndLocationRoll.multiplier());
     }
 
-    private InjuryDurationRoll calculateInjuryDuration() {
+    /**
+     * Rolls for the secondary location index and calculates the injury duration multiplier, with exploding sixes.
+     *
+     * <p>Rules:</p>
+     * <ul>
+     *     <li>Start with a multiplier of 1 and a single d6 roll.</li>
+     *     <li>While the roll is 6 and the multiplier is below
+     *     {@link AdvancedMedicalAlternate#MAXIMUM_INJURY_DURATION_MULTIPLIER}, increment the multiplier and roll
+     *     again.</li>
+     *     <li>If a roll of 6 occurs when the multiplier is already at the maximum, the final roll value is forced to
+     *     a number between 1 and 5 (inclusive) so that it can be used as a secondary-location table index.</li>
+     * </ul>
+     *
+     * @return an {@link InjuryDurationRoll} holding both the final roll (1–5) and the computed duration multiplier
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private InjuryDurationRoll rollForSecondaryLocationAndDurationMultiplier() {
         int injuryDurationMultiplier = 1;
         int roll = d6(1);
 

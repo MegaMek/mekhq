@@ -33,7 +33,7 @@
 package mekhq.campaign.personnel.enums;
 
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
 
@@ -66,6 +66,7 @@ public enum BloodGroup {
     OO_POSITIVE(37, true, Allele.O, Allele.O),
     OO_NEGATIVE(6, false, Allele.O, Allele.O);
 
+    private final String label;
     private final int chance;  // Represents the probability of occurrence for the blood group.
     private final boolean hasPositiveRhFactor;  // Indicates if the blood group has a positive Rh factor.
     private final List<Allele> alleles;  // Genetic composition of the blood group.
@@ -78,6 +79,7 @@ public enum BloodGroup {
      * @param alleles             the alleles that define the genetic composition of the blood group.
      */
     BloodGroup(int chance, boolean hasPositiveRhFactor, Allele... alleles) {
+        this.label = generateLabel();
         this.chance = chance;
         this.hasPositiveRhFactor = hasPositiveRhFactor;
         this.alleles = List.of(alleles);  // Store alleles as an immutable list.
@@ -85,6 +87,9 @@ public enum BloodGroup {
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
+    public String getLabel() {
+        return label;
+    }
 
     /**
      * Gets the chance value for this blood group.
@@ -136,10 +141,10 @@ public enum BloodGroup {
      *
      * @return the localized name of the blood group.
      */
-    public String getLabel() {
+    private String generateLabel() {
         final String RESOURCE_KEY = name() + ".label";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**

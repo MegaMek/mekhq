@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.turnoverAndRetention;
 
+import static mekhq.campaign.stratCon.StratConRulesManager.isForceDeployedToStratCon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -87,10 +88,9 @@ public class Fatigue {
         int fieldKitchenCount = 0;
 
         for (Unit unit : units) {
-            if ((unit.isDeployed())
-                      || (unit.isDamaged())
-                      || (unit.getCrewState().isUncrewed())
-                      || (unit.getCrewState().isPartiallyCrewed())) {
+            if (unit.isDeployed()
+                      || unit.isDamaged()
+                      || !unit.isFullyCrewed()) {
                 continue;
             }
 
@@ -241,12 +241,17 @@ public class Fatigue {
         }
 
         int leaveThreshold = campaignOptions.getFatigueUndeploymentThreshold();
+        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
 
         for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
             Force force = combatTeam.getForce(campaign);
             if (force == null || force.isDeployed()) {
                 // 'isDeployed' will only return true if the force is deployed to a scenario. In which cases we don't
                 // want to yank the unit back until the next Monday checkpoint.
+                continue;
+            }
+
+            if (!isForceDeployedToStratCon(activeContracts, force.getId())) {
                 continue;
             }
 

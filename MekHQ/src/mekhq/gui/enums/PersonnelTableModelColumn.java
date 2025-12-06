@@ -59,7 +59,10 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.education.Academy;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -129,6 +132,7 @@ public enum PersonnelTableModelColumn {
     ZERO_G("PersonnelTableModelColumn.ZERO_G.text"),
     MEDTECH("PersonnelTableModelColumn.MEDTECH.text"),
     MEDICAL("PersonnelTableModelColumn.MEDICAL.text"),
+    WORK_MINUTES("PersonnelTableModelColumn.WORK_MINUTES.text"),
     TECH_MINUTES("PersonnelTableModelColumn.TECH_MINUTES.text"),
     MEDICAL_CAPACITY("PersonnelTableModelColumn.MEDICAL_CAPACITY.text"),
     APPRAISAL("PersonnelTableModelColumn.APPRAISAL.text"),
@@ -166,7 +170,11 @@ public enum PersonnelTableModelColumn {
     SPA_COUNT("PersonnelTableModelColumn.SPA_COUNT.text"),
     IMPLANT_COUNT("PersonnelTableModelColumn.IMPLANT_COUNT.text"),
     LOYALTY("PersonnelTableModelColumn.LOYALTY.text"),
-    EDUCATION("PersonnelTableModelColumn.EDUCATION.text"),
+    HIGHEST_EDUCATION("PersonnelTableModelColumn.HIGHEST_EDUCATION.text"),
+    CURRENT_EDUCATION("PersonnelTableModelColumn.CURRENT_EDUCATION.text"),
+    ACADEMY("PersonnelTableModelColumn.ACADEMY.text"),
+    COURSE("PersonnelTableModelColumn.COURSE.text"),
+    ACADEMY_DURATION("PersonnelTableModelColumn.ACADEMY_DURATION.text"),
     AGGRESSION("PersonnelTableModelColumn.AGGRESSION.text"),
     AMBITION("PersonnelTableModelColumn.AMBITION.text"),
     GREED("PersonnelTableModelColumn.GREED.text"),
@@ -381,6 +389,10 @@ public enum PersonnelTableModelColumn {
         return this == TECH_MINUTES;
     }
 
+    public boolean isWorkMinutes() {
+        return this == WORK_MINUTES;
+    }
+
     public boolean isMedicalCapacity() {
         return this == MEDICAL_CAPACITY;
     }
@@ -529,10 +541,6 @@ public enum PersonnelTableModelColumn {
         return this == LOYALTY;
     }
 
-    public boolean isEducation() {
-        return this == EDUCATION;
-    }
-
     public boolean isAggression() {
         return this == AGGRESSION;
     }
@@ -620,6 +628,9 @@ public enum PersonnelTableModelColumn {
         final boolean isUseTechAdmin = campaignOptions.isTechsUseAdministration();
         final int baseBedCapacity = campaignOptions.getMaximumPatients();
         final boolean isUseMedicalAdmin = campaignOptions.isDoctorsUseAdministration();
+
+        final Academy currentAcademy = EducationController.getAcademy(person.getEduAcademySet(),
+              person.getEduAcademyNameInSet());
 
         SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgeEffects, isClanCampaign, today, true);
         switch (this) {
@@ -944,6 +955,12 @@ public enum PersonnelTableModelColumn {
                 } else {
                     return "0";
                 }
+            case WORK_MINUTES:
+                if (person.isTechExpanded()) {
+                    return String.valueOf(person.getMinutesLeft());
+                } else {
+                    return "0";
+                }
             case MEDTECH:
                 return person.hasSkill(SkillType.S_MEDTECH) ?
                              Integer.toString(person.getSkill(SkillType.S_MEDTECH)
@@ -1032,7 +1049,7 @@ public enum PersonnelTableModelColumn {
             case EMPLOYED:
                 return resources.getString(person.isEmployed() ? "Yes.text" : "No.text");
             case TOUGHNESS:
-                return Integer.toString(person.getToughness());
+                return Integer.toString(person.getAdjustedToughness());
             case CONNECTIONS:
                 if (person.getBurnedConnectionsEndDate() != null) {
                     return "<html><b><font color='gray'>" +
@@ -1062,8 +1079,18 @@ public enum PersonnelTableModelColumn {
             case LOYALTY:
                 return String.valueOf(person.getAdjustedLoyalty(campaign.getFaction(),
                       campaignOptions.isUseAlternativeAdvancedMedical()));
-            case EDUCATION:
+            case HIGHEST_EDUCATION:
                 return person.getEduHighestEducation().toString();
+            case CURRENT_EDUCATION:
+                return currentAcademy == null ? "" :
+                             EducationLevel.fromString(String.valueOf(currentAcademy.getEducationLevel(person)))
+                                   .toString();
+            case ACADEMY:
+                return currentAcademy == null ? "" : currentAcademy.getName();
+            case COURSE:
+                return currentAcademy == null ? "" : currentAcademy.getQualifications().get(person.getEduCourseIndex());
+            case ACADEMY_DURATION:
+                return currentAcademy == null ? "" : String.valueOf(person.getEduEducationTime());
             case AGGRESSION:
                 Aggression aggression = person.getAggression();
                 sign = aggression.isTraitPositive() ? "+" : "-";
@@ -1253,6 +1280,7 @@ public enum PersonnelTableModelColumn {
                      TECH_BA,
                      TECH_VESSEL,
                      ZERO_G,
+                     WORK_MINUTES,
                      TECH_MINUTES -> true;
                 default -> false;
             };
@@ -1283,7 +1311,7 @@ public enum PersonnelTableModelColumn {
                 default -> false;
             };
             case BIOGRAPHICAL -> switch (this) {
-                case RANK, FIRST_NAME, LAST_NAME, AGE, PERSONNEL_STATUS, PERSONNEL_ROLE, EDUCATION -> true;
+                case RANK, FIRST_NAME, LAST_NAME, AGE, PERSONNEL_STATUS, PERSONNEL_ROLE, HIGHEST_EDUCATION -> true;
                 case ORIGIN_FACTION, ORIGIN_PLANET -> campaign.getCampaignOptions().isShowOriginFaction();
                 case SALARY -> campaign.getCampaignOptions().isPayForSalaries();
                 default -> false;
@@ -1347,6 +1375,17 @@ public enum PersonnelTableModelColumn {
                 case EDGE -> campaign.getCampaignOptions().isUseEdge();
                 default -> false;
             };
+            case EDUCATION -> switch (this) {
+                case RANK,
+                     FIRST_NAME,
+                     LAST_NAME,
+                     HIGHEST_EDUCATION,
+                     CURRENT_EDUCATION,
+                     ACADEMY,
+                     COURSE,
+                     ACADEMY_DURATION -> true;
+                default -> false;
+            };
             case OTHER -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME -> true;
                 case TOUGHNESS -> campaign.getCampaignOptions().isUseToughness();
@@ -1363,7 +1402,7 @@ public enum PersonnelTableModelColumn {
     public Comparator<?> getComparator(final Campaign campaign) {
         return switch (this) {
             case RANK -> new PersonRankStringSorter(campaign);
-            case EDUCATION -> new EducationLevelSorter();
+            case HIGHEST_EDUCATION, CURRENT_EDUCATION -> new EducationLevelSorter();
             case AGE, BIRTHDAY, RECRUITMENT_DATE, LAST_RANK_CHANGE_DATE, DUE_DATE, RETIREMENT_DATE, DEATH_DATE ->
                   new DateStringComparator();
             case SKILL_LEVEL -> new LevelSorter();

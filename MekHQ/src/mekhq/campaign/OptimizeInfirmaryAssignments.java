@@ -128,7 +128,7 @@ public class OptimizeInfirmaryAssignments {
           final int healingWaitingPeriod, final List<Person> patients, List<Person> doctors,
           final boolean isOnContractAndPlanetside) {
         boolean useMASHTheatres = campaign.getCampaignOptions().isUseMASHTheatres();
-        int mashTheatreCapacity = useMASHTheatres ? campaign.getMashTheatreCapacity() : Integer.MAX_VALUE;
+        int mashTheatreCapacity = useMASHTheatres ? campaign.calculateMASHTheaterCapacity() : Integer.MAX_VALUE;
 
         int totalPatientCounter = 0;
         int patientCounter = 0;
@@ -142,7 +142,7 @@ public class OptimizeInfirmaryAssignments {
                 continue;
             }
 
-            if (campaign.getMashTheatresWithinCapacity() && totalPatientCounter >= mashTheatreCapacity) {
+            if (isOnContractAndPlanetside && totalPatientCounter >= mashTheatreCapacity) {
                 // Similar to the above, we're just unassigning doctors for any remaining patients.
                 continue;
             }

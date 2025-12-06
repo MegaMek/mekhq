@@ -527,7 +527,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processDiscontinuationSyndrome(mockCampaign, false, true, false, false);
+        person.processDiscontinuationSyndrome(mockCampaign, false, false, true, 1, false, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(0, person.getFatigue());
@@ -542,7 +542,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processDiscontinuationSyndrome(mockCampaign, false, true, true, false);
+        person.processDiscontinuationSyndrome(mockCampaign, false, false, true, 1, true, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(0, person.getFatigue());
@@ -561,7 +561,7 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
-        person.processDiscontinuationSyndrome(mockCampaign, false, true, true, true);
+        person.processDiscontinuationSyndrome(mockCampaign, false, false, true, 1, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(1, person.getHits());
         assertEquals(2, person.getFatigue());
@@ -580,7 +580,7 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
-        person.processDiscontinuationSyndrome(mockCampaign, true, true, true, true);
+        person.processDiscontinuationSyndrome(mockCampaign, true, false, true, 1, true, true);
         assertEquals(1, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(2, person.getFatigue());
@@ -595,7 +595,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processDiscontinuationSyndrome(mockCampaign, false, false, true, true);
+        person.processDiscontinuationSyndrome(mockCampaign, false, false, false, 1, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(1, person.getHits());
         assertEquals(0, person.getFatigue());
@@ -614,7 +614,7 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
-        person.processDiscontinuationSyndrome(mockCampaign, true, false, true, true);
+        person.processDiscontinuationSyndrome(mockCampaign, true, false, false, 1, true, true);
         assertEquals(1, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(0, person.getFatigue());
@@ -639,7 +639,7 @@ public class PersonTest {
         Person person = new Person(mockCampaign);
         person.setHits(5);
 
-        person.processDiscontinuationSyndrome(mockCampaign, false, false, true, true);
+        person.processDiscontinuationSyndrome(mockCampaign, false, false, false, 1, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(6, person.getHits());
         assertEquals(0, person.getFatigue());
@@ -666,7 +666,7 @@ public class PersonTest {
             person.addInjury(new Injury());
         }
 
-        person.processDiscontinuationSyndrome(mockCampaign, true, false, true, true);
+        person.processDiscontinuationSyndrome(mockCampaign, true, false, false, 1, true, true);
         assertEquals(6, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(0, person.getFatigue());
@@ -681,7 +681,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processCripplingFlashbacks(mockCampaign, false, false, false);
+        person.processCripplingFlashbacks(mockCampaign, false, false, false, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -695,7 +695,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processCripplingFlashbacks(mockCampaign, false, true, false);
+        person.processCripplingFlashbacks(mockCampaign, false, false, true, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -709,7 +709,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processCripplingFlashbacks(mockCampaign, false, true, true);
+        person.processCripplingFlashbacks(mockCampaign, false, false, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(1, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -727,7 +727,7 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
-        person.processCripplingFlashbacks(mockCampaign, true, true, true);
+        person.processCripplingFlashbacks(mockCampaign, true, false, true, true);
         assertEquals(1, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -751,7 +751,7 @@ public class PersonTest {
         Person person = new Person(mockCampaign);
         person.setHits(5);
 
-        person.processCripplingFlashbacks(mockCampaign, false, true, true);
+        person.processCripplingFlashbacks(mockCampaign, false, false, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(6, person.getHits());
         assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
@@ -777,7 +777,7 @@ public class PersonTest {
             person.addInjury(new Injury());
         }
 
-        person.processCripplingFlashbacks(mockCampaign, true, true, true);
+        person.processCripplingFlashbacks(mockCampaign, true, false, true, true);
         assertEquals(6, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
@@ -1047,7 +1047,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processChildlikeRegression(mockCampaign, false, false, false);
+        person.processChildlikeRegression(mockCampaign, false, false, false, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -1061,7 +1061,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processChildlikeRegression(mockCampaign, false, true, false);
+        person.processChildlikeRegression(mockCampaign, false, false, true, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -1075,7 +1075,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processChildlikeRegression(mockCampaign, false, true, true);
+        person.processChildlikeRegression(mockCampaign, false, false, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(1, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -1093,7 +1093,7 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
-        person.processChildlikeRegression(mockCampaign, true, true, true);
+        person.processChildlikeRegression(mockCampaign, true, false, true, true);
         assertEquals(1, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -1117,7 +1117,7 @@ public class PersonTest {
         Person person = new Person(mockCampaign);
         person.setHits(5);
 
-        person.processChildlikeRegression(mockCampaign, false, true, true);
+        person.processChildlikeRegression(mockCampaign, false, false, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(6, person.getHits());
         assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
@@ -1143,7 +1143,7 @@ public class PersonTest {
             person.addInjury(new Injury());
         }
 
-        person.processChildlikeRegression(mockCampaign, true, true, true);
+        person.processChildlikeRegression(mockCampaign, true, false, true, true);
         assertEquals(6, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
@@ -1157,7 +1157,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processCatatonia(mockCampaign, false, false, false);
+        person.processCatatonia(mockCampaign, false, false, false, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -1171,7 +1171,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processCatatonia(mockCampaign, false, true, false);
+        person.processCatatonia(mockCampaign, false, false, true, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -1185,7 +1185,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processCatatonia(mockCampaign, false, true, true);
+        person.processCatatonia(mockCampaign, false, false, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(1, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -1203,7 +1203,7 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
-        person.processCatatonia(mockCampaign, true, true, true);
+        person.processCatatonia(mockCampaign, true, false, true, true);
         assertEquals(1, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -1227,7 +1227,7 @@ public class PersonTest {
         Person person = new Person(mockCampaign);
         person.setHits(5);
 
-        person.processCatatonia(mockCampaign, false, true, true);
+        person.processCatatonia(mockCampaign, false, false, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(6, person.getHits());
         assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
@@ -1253,7 +1253,7 @@ public class PersonTest {
             person.addInjury(new Injury());
         }
 
-        person.processCatatonia(mockCampaign, true, true, true);
+        person.processCatatonia(mockCampaign, true, false, true, true);
         assertEquals(6, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());

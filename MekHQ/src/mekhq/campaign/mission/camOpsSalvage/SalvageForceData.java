@@ -48,10 +48,13 @@ import megamek.common.units.Mek;
 import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.enums.TransporterType;
 
 public record SalvageForceData(Force force, ForceType forceType, @Nullable Person tech, double maximumCargoCapacity,
       double maximumTowCapacity, int salvageCapableUnits, boolean hasTug) {
@@ -72,12 +75,24 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
 
         Hangar hangar = campaign.getHangar();
         for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+            if (!unit.isFullyCrewed()) {
+                continue;
+            }
+
             Entity entity = unit.getEntity();
             if (entity != null) {
                 boolean canSalvage = isSpaceScenario ? entity.canPerformSpaceSalvageOperations() :
                                            entity.canPerformGroundSalvageOperations();
                 if (!canSalvage) {
                     continue;
+                }
+
+                boolean isTrailer = entity instanceof Tank tank && tank.isTrailer();
+                if (isTrailer) {
+                    ITransportAssignment transportAssignment = unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT);
+                    if (transportAssignment == null || !transportAssignment.hasTransport()) {
+                        continue; // If nothing is towing the trailer, it can't reach the salvage operation
+                    }
                 }
 
                 double cargoCapacity = unit.getCargoCapacityForSalvage();
@@ -94,7 +109,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
 
                     hasTug = hasNavalTug;
                 } else {
-                    boolean isTowCapable = entity instanceof Mek || entity instanceof Tank;
+                    boolean isTowCapable = entity instanceof Mek || (entity instanceof Tank && !isTrailer);
                     if (cargoCapacity > 0.0) {
                         salvageCapableUnits++;
                     } else if (isTowCapable) {
@@ -102,7 +117,11 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
                     }
 
                     if (isTowCapable) {
-                        double towCapacity = entity.getWeight();
+                        double currentTowWeight = unit.getTotalWeightOfUnitsAssignedToBeTransported(
+                              CampaignTransportType.TOW_TRANSPORT,
+                              TransporterType.TANK_TRAILER_HITCH);
+
+                        double towCapacity = max(0.0, entity.getWeight() - currentTowWeight);
                         maximumTowCapacity = max(towCapacity, maximumTowCapacity);
                     }
                 }

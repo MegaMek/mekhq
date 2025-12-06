@@ -32,6 +32,14 @@
  */
 package mekhq.gui;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+import static mekhq.campaign.enums.DailyReportType.BATTLE;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.MEDICAL;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 
 import java.awt.BorderLayout;
@@ -54,6 +62,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.common.event.Subscribe;
+import megamek.common.ui.EnhancedTabbedPane;
 import megamek.utilities.ImageUtilities;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
@@ -130,7 +139,14 @@ public final class CommandCenterTab extends CampaignGuiTab {
     JList<String> listObjectives;
 
     // daily report
-    private DailyReportLogPanel panLog;
+    private EnhancedTabbedPane tabLogs;
+    private DailyReportLogPanel pnlGeneralLog;
+    private DailyReportLogPanel pnlSkillLog;
+    private DailyReportLogPanel pnlBattleLog;
+    private DailyReportLogPanel pnlPersonnelLog;
+    private DailyReportLogPanel pnlMedicalLog;
+    private DailyReportLogPanel pnlAcquisitionsLog;
+    private DailyReportLogPanel pnlTechnicalLog;
 
     // procurement table
     private JPanel panProcurement;
@@ -148,6 +164,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     private JLabel lblIcon;
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
+    @Deprecated(since = "0.50.10", forRemoval = true)
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
           MekHQ.getMHQOptions().getLocale());
 
@@ -161,8 +179,32 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     //region Getters/Setters
-    public DailyReportLogPanel getPanLog() {
-        return panLog;
+    public DailyReportLogPanel getGeneralLog() {
+        return pnlGeneralLog;
+    }
+
+    public DailyReportLogPanel getSkillLog() {
+        return pnlSkillLog;
+    }
+
+    public DailyReportLogPanel getBattleLog() {
+        return pnlBattleLog;
+    }
+
+    public DailyReportLogPanel getPersonnelLog() {
+        return pnlPersonnelLog;
+    }
+
+    public DailyReportLogPanel getMedicalLog() {
+        return pnlMedicalLog;
+    }
+
+    public DailyReportLogPanel getAcquisitionsLog() {
+        return pnlAcquisitionsLog;
+    }
+
+    public DailyReportLogPanel getTechnicalLog() {
+        return pnlTechnicalLog;
     }
     //endregion Getters/Setters
 
@@ -195,7 +237,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
-        panCommand.add(panLog, gridBagConstraints);
+        panCommand.add(tabLogs, gridBagConstraints);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = 1;
@@ -443,10 +485,58 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * Initialize the panel for displaying the daily report log
      */
     private void initLogPanel() {
-        panLog = new DailyReportLogPanel(getCampaignGui());
-        panLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
-        panLog.setMinimumSize(new Dimension(400, 100));
-        panLog.setPreferredSize(new Dimension(400, 100));
+        Dimension size = scaleForGUI(400, 100);
+
+        pnlGeneralLog = new DailyReportLogPanel(getCampaignGui());
+        pnlGeneralLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
+        pnlGeneralLog.setMinimumSize(size);
+        pnlGeneralLog.setPreferredSize(size);
+
+        pnlSkillLog = new DailyReportLogPanel(getCampaignGui());
+        pnlSkillLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
+        pnlSkillLog.setMinimumSize(size);
+        pnlSkillLog.setPreferredSize(size);
+
+        pnlBattleLog = new DailyReportLogPanel(getCampaignGui());
+        pnlBattleLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
+        pnlBattleLog.setMinimumSize(size);
+        pnlBattleLog.setPreferredSize(size);
+
+        pnlPersonnelLog = new DailyReportLogPanel(getCampaignGui());
+        pnlPersonnelLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
+        pnlPersonnelLog.setMinimumSize(size);
+        pnlPersonnelLog.setPreferredSize(size);
+
+        pnlMedicalLog = new DailyReportLogPanel(getCampaignGui());
+        pnlMedicalLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
+        pnlMedicalLog.setMinimumSize(size);
+        pnlMedicalLog.setPreferredSize(size);
+
+        pnlAcquisitionsLog = new DailyReportLogPanel(getCampaignGui());
+        pnlAcquisitionsLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
+        pnlAcquisitionsLog.setMinimumSize(size);
+        pnlAcquisitionsLog.setPreferredSize(size);
+
+        pnlTechnicalLog = new DailyReportLogPanel(getCampaignGui());
+        pnlTechnicalLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
+        pnlTechnicalLog.setMinimumSize(size);
+        pnlTechnicalLog.setPreferredSize(size);
+
+        tabLogs = new EnhancedTabbedPane();
+        tabLogs.addTab(GENERAL.getIconString(), pnlGeneralLog);
+        tabLogs.setToolTipTextAt(GENERAL.getTabIndex(), GENERAL.getTooltip());
+        tabLogs.addTab(BATTLE.getIconString(), pnlBattleLog);
+        tabLogs.setToolTipTextAt(BATTLE.getTabIndex(), BATTLE.getTooltip());
+        tabLogs.addTab(PERSONNEL.getIconString(), pnlPersonnelLog);
+        tabLogs.setToolTipTextAt(PERSONNEL.getTabIndex(), PERSONNEL.getTooltip());
+        tabLogs.addTab(MEDICAL.getIconString(), pnlMedicalLog);
+        tabLogs.setToolTipTextAt(MEDICAL.getTabIndex(), MEDICAL.getTooltip());
+        tabLogs.addTab(ACQUISITIONS.getIconString(), pnlAcquisitionsLog);
+        tabLogs.setToolTipTextAt(ACQUISITIONS.getTabIndex(), ACQUISITIONS.getTooltip());
+        tabLogs.addTab(TECHNICAL.getIconString(), pnlTechnicalLog);
+        tabLogs.setToolTipTextAt(TECHNICAL.getTabIndex(), TECHNICAL.getTooltip());
+        tabLogs.addTab(SKILL_CHECKS.getIconString(), pnlSkillLog);
+        tabLogs.setToolTipTextAt(SKILL_CHECKS.getTabIndex(), SKILL_CHECKS.getTooltip());
     }
 
     /**
@@ -643,7 +733,13 @@ public final class CommandCenterTab extends CampaignGuiTab {
     public void refreshAll() {
         refreshBasicInfo();
         refreshProcurementList();
-        refreshLog();
+        refreshGeneralLog();
+        refreshSkillLog();
+        refreshBattleLog();
+        refreshPersonnelLog();
+        refreshMedicalLog();
+        refreshAcquisitionsLog();
+        refreshTechnicalLog();
         refreshObjectives();
     }
 
@@ -795,16 +891,64 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * Initialize a new daily log report
      */
     private void initLog() {
-        String report = getCampaign().getCurrentReportHTML();
-        panLog.refreshLog(report);
+        String generalReport = getCampaign().getCurrentReportHTML();
+        pnlGeneralLog.refreshLog(generalReport);
         getCampaign().fetchAndClearNewReports();
+
+        String skillReport = getCampaign().getSkillReportHTML();
+        pnlSkillLog.refreshLog(skillReport);
+        getCampaign().fetchAndClearNewSkillReports();
+
+        String battleReport = getCampaign().getBattleReportHTML();
+        pnlBattleLog.refreshLog(battleReport);
+        getCampaign().fetchAndClearNewBattleReports();
+
+        String personnelReport = getCampaign().getPersonnelReportHTML();
+        pnlPersonnelLog.refreshLog(personnelReport);
+        getCampaign().fetchAndClearNewPersonnelReports();
+
+        String medicalReport = getCampaign().getMedicalReportHTML();
+        pnlMedicalLog.refreshLog(medicalReport);
+        getCampaign().fetchAndClearNewMedicalReports();
+
+        String acquisitionsReport = getCampaign().getAcquisitionsReportHTML();
+        pnlAcquisitionsLog.refreshLog(acquisitionsReport);
+        getCampaign().fetchAndClearNewAcquisitionsReports();
+
+        String technicalReport = getCampaign().getTechnicalReportHTML();
+        pnlTechnicalLog.refreshLog(technicalReport);
+        getCampaign().fetchAndClearNewTechnicalReports();
     }
 
     /**
      * append new reports to the daily log report
      */
-    synchronized private void refreshLog() {
-        panLog.appendLog(getCampaign().fetchAndClearNewReports());
+    synchronized private void refreshGeneralLog() {
+        pnlGeneralLog.appendLog(getCampaign().fetchAndClearNewReports());
+    }
+
+    synchronized private void refreshSkillLog() {
+        pnlSkillLog.appendLog(getCampaign().fetchAndClearNewSkillReports());
+    }
+
+    synchronized private void refreshBattleLog() {
+        pnlBattleLog.appendLog(getCampaign().fetchAndClearNewBattleReports());
+    }
+
+    synchronized private void refreshPersonnelLog() {
+        pnlPersonnelLog.appendLog(getCampaign().fetchAndClearNewPersonnelReports());
+    }
+
+    synchronized private void refreshMedicalLog() {
+        pnlMedicalLog.appendLog(getCampaign().fetchAndClearNewMedicalReports());
+    }
+
+    synchronized private void refreshAcquisitionsLog() {
+        pnlAcquisitionsLog.appendLog(getCampaign().fetchAndClearNewAcquisitionsReports());
+    }
+
+    synchronized private void refreshTechnicalLog() {
+        pnlTechnicalLog.appendLog(getCampaign().fetchAndClearNewTechnicalReports());
     }
 
     private final ActionScheduler procurementListScheduler = new ActionScheduler(this::refreshProcurementList);
@@ -829,7 +973,13 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(ReportEvent ev) {
-        refreshLog();
+        refreshGeneralLog();
+        refreshSkillLog();
+        refreshBattleLog();
+        refreshPersonnelLog();
+        refreshMedicalLog();
+        refreshAcquisitionsLog();
+        refreshTechnicalLog();
     }
 
     @Subscribe

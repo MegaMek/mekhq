@@ -138,7 +138,7 @@ class PersonnelFilterTest {
     }
 
     @Test
-    void testIsVehicleCrewMember() {
+    void testIsCombatTechnicianMember() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.VEHICLE_CREWMEMBER) {
                 assertTrue(personnelFilter.isVehicleCrewMember());
@@ -177,17 +177,6 @@ class PersonnelFilterTest {
                 assertTrue(personnelFilter.isVTOLPilot());
             } else {
                 assertFalse(personnelFilter.isVTOLPilot());
-            }
-        }
-    }
-
-    @Test
-    void testIsVehicleCrew() {
-        for (final PersonnelFilter personnelFilter : filters) {
-            if (personnelFilter == PersonnelFilter.COMBAT_TECHNICIANS) {
-                assertTrue(personnelFilter.isVehicleCrew());
-            } else {
-                assertFalse(personnelFilter.isVehicleCrew());
             }
         }
     }

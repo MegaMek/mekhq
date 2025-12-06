@@ -145,7 +145,10 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "factionIntroDate", campaignOptions.isFactionIntroDate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAmmoByType", campaignOptions.isUseAmmoByType());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "waitingPeriod", campaignOptions.getWaitingPeriod());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionSkill", campaignOptions.getAcquisitionSkill());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "acquisitionsType",
+              campaignOptions.getAcquisitionType().getLookupName());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "useFunctionalAppraisal",
@@ -211,6 +214,7 @@ public class CampaignOptionsMarshaller {
               "useRandomUnitQualities",
               campaignOptions.isUseRandomUnitQualities());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryModifiers", campaignOptions.isUsePlanetaryModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useNoTornadoes", campaignOptions.isUseNoTornadoes());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "useUnofficialMaintenance",
@@ -1043,6 +1047,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "isUseRiskySalvage",
               campaignOptions.isUseRiskySalvage());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "isEnableSalvageFlagByDefault",
+              campaignOptions.isEnableSalvageFlagByDefault());
         // endregion Contract Market
         // endregion Markets Tab
 
@@ -1069,9 +1077,12 @@ public class CampaignOptionsMarshaller {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities",
               campaignOptions.getPhenotypeProbabilities());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStratCon", campaignOptions.isUseStratCon());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMaplessStratCon", campaignOptions.isUseStratConMaplessMode());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "stratConPlayType",
+              campaignOptions.getStratConPlayType().getLookupName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedScouting", campaignOptions.isUseAdvancedScouting());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noSeedForces", campaignOptions.isNoSeedForces());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useGenericBattleValue", campaignOptions.isUseGenericBattleValue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useVerboseBidding", campaignOptions.isUseVerboseBidding());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeMeks", campaignOptions.getOpForLanceTypeMeks());
@@ -1109,6 +1120,8 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isAssignPortraitOnRoleChange());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowDuplicatePortraits",
               campaignOptions.isAllowDuplicatePortraits());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useGenderedPortraitsOnly",
+              campaignOptions.isUseGenderedPortraitsOnly());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fixedMapChance", campaignOptions.getFixedMapChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaUpgradeIntensity", campaignOptions.getSpaUpgradeIntensity());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModMax", campaignOptions.getScenarioModMax());

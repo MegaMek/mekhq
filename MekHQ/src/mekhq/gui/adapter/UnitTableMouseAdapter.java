@@ -130,6 +130,7 @@ import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
 import mekhq.gui.dialog.reportDialogs.PartQualityReportDialog;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.menus.AssignUnitToForceMenu;
 import mekhq.gui.menus.AssignUnitToPersonMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.model.UnitTableModel;
@@ -331,10 +332,24 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 if (selected >= Unit.SITE_FACILITY_MAINTENANCE) {
                     Campaign campaign = gui.getCampaign();
 
-                    Predicate<Unit> eligibleForBayRental = u -> !FacilityRentals.shouldBeIgnoredByBayRentals(u);
-                    int eligibleUnitCount = (int) Arrays.stream(units)
-                                                        .filter(eligibleForBayRental)
-                                                        .count();
+                    // This counts how many units are eligible and how many are eligible and a large craft. We handle
+                    // it this way to allow us to fetch the counts in a single pass
+                    Predicate<Unit> eligibleForBayRental =
+                          u -> !FacilityRentals.shouldBeIgnoredByBayRentals(u);
+                    long[] counts = Arrays.stream(units)
+                                          .filter(eligibleForBayRental)
+                                          .collect(() -> new long[2], (arr, u) -> {
+                                              arr[0]++; // eligible
+                                              if (u.getEntity().isLargeCraft()) {
+                                                  arr[1]++; // large vessel
+                                              }
+                                          }, (a, b) -> {
+                                              a[0] += b[0];
+                                              a[1] += b[1];
+                                          });
+
+                    int eligibleUnitCount = (int) counts[0];
+                    int eligibleLargeVesselCount = (int) counts[1];
 
                     ContractRentalType rentalType = switch (selected) {
                         case Unit.SITE_FACILITY_MAINTENANCE -> ContractRentalType.MAINTENANCE_BAYS;
@@ -344,6 +359,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                     wasSiteChangeSuccessful = FacilityRentals.offerBayRentalOpportunity(campaign,
                           eligibleUnitCount,
+                          eligibleLargeVesselCount,
                           rentalType);
                 }
 
@@ -947,6 +963,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToPersonMenu(gui.getCampaign(), units));
+            
+            JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToForceMenu(gui.getCampaign(), units));
 
             // if we're using maintenance and have selected something that requires
             // maintenance and

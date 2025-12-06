@@ -38,7 +38,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_SENSOR_GEEK;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
-import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_SKILL_MODIFIER;
+import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
@@ -106,7 +106,7 @@ public class Skill {
     private SkillType type;
     private int level;
     private int bonus;
-    private int agingModifier;
+    private boolean hasNaturalAptitude;
 
     protected Skill() {
 
@@ -117,25 +117,27 @@ public class Skill {
         this.level = this.type.getLevelFromExperience(EXP_REGULAR);
     }
 
-    public Skill(String type, int level, int bonus) {
-        this(SkillType.getType(type), level, bonus);
+    public Skill(String type, int level) {
+        this(SkillType.getType(type), level, 0, false);
     }
 
-    public Skill(String type, int level, int bonus, int agingModifier) {
-        this(SkillType.getType(type), level, bonus, agingModifier);
+    public Skill(String type, int level, int bonus) {
+        this(SkillType.getType(type), level, bonus, false);
+    }
+
+    public Skill(String type, int level, int bonus, boolean hasNaturalAptitude) {
+        this(SkillType.getType(type), level, bonus, hasNaturalAptitude);
     }
 
     public Skill(SkillType type, int level, int bonus) {
-        this.type = type;
-        this.level = level;
-        this.bonus = bonus;
+        this(type, level, bonus, false);
     }
 
-    public Skill(SkillType type, int level, int bonus, int agingModifier) {
+    public Skill(SkillType type, int level, int bonus, boolean hasNaturalAptitude) {
         this.type = type;
         this.level = level;
         this.bonus = bonus;
-        this.agingModifier = agingModifier;
+        this.hasNaturalAptitude = hasNaturalAptitude;
     }
 
     /**
@@ -234,12 +236,12 @@ public class Skill {
         this.bonus = b;
     }
 
-    public int getAgingModifier() {
-        return agingModifier;
+    public boolean getHasNaturalAptitude() {
+        return hasNaturalAptitude;
     }
 
-    public void setAgingModifier(int agingModifier) {
-        this.agingModifier = agingModifier;
+    public void setHasNaturalAptitude(boolean hasNaturalAptitude) {
+        this.hasNaturalAptitude = hasNaturalAptitude;
     }
 
     public SkillType getType() {
@@ -278,6 +280,8 @@ public class Skill {
 
     /**
      * Calculates the skill modifiers for the current skill type based on the character's SPAs.
+     *
+     * <p><b>Usage:</b> Positive modifiers make the skill check easier, negative make it harder.</p>
      *
      * @param characterOptions The {@link PersonnelOptions} with the character's attributes and options.
      * @param reputation       The character's reputation
@@ -370,12 +374,15 @@ public class Skill {
                 modifier -= 1;
             }
 
-            if (hasReligiousFanaticism) {
-                modifier -= 1;
-            }
-
             if (characterOptions.booleanOption(ATOW_ATTRACTIVE)) {
                 modifier += 2;
+            }
+        }
+
+        // Illiterate
+        if (type.hasAttribute(INTELLIGENCE)) {
+            if (characterOptions.booleanOption(FLAW_ILLITERATE)) {
+                modifier -= 4;
             }
         }
 
@@ -513,7 +520,8 @@ public class Skill {
      * @since 0.50.05
      */
     public static int getTotalAttributeModifier(TargetRoll targetNumber, final Attributes characterAttributes,
-          final SkillType skillType) {
+          final SkillType skillType, final List<InjuryEffect> injuryEffects, final PersonnelOptions options,
+          int characterAge) {
         if (targetNumber == null || characterAttributes == null || skillType == null) {
             return 0;
         }
@@ -526,7 +534,10 @@ public class Skill {
                 continue;
             }
 
-            int attributeScore = characterAttributes.getAttribute(attribute);
+            int attributeScore = characterAttributes.getAdjustedAttributeScore(attribute,
+                  injuryEffects,
+                  options,
+                  characterAge);
             int attributeModifier = getIndividualAttributeModifier(attributeScore);
             totalModifier += attributeModifier;
             targetNumber.addModifier(-attributeModifier, attribute.getLabel());
@@ -580,7 +591,7 @@ public class Skill {
         int baseValue = type.getTarget();
         int valueAdjustment = isCountUp() ? level + bonus : -level - bonus;
 
-        return baseValue + valueAdjustment + (isCountUp() ? agingModifier : -agingModifier);
+        return baseValue + valueAdjustment;
     }
 
     /**
@@ -608,11 +619,11 @@ public class Skill {
             skillModifierData = new SkillModifierData(new PersonnelOptions(),
                   new Attributes(),
                   0,
-                  false,
-                  new ArrayList<>());
+                  new ArrayList<>(),
+                  IGNORE_AGE);
         }
 
-        int baseValue = level + bonus + agingModifier;
+        int baseValue = level + bonus;
 
         int modifiers = getModifiers(skillModifierData);
 
@@ -635,39 +646,35 @@ public class Skill {
     private int getModifiers(SkillModifierData skillModifierData) {
         int spaModifiers = getSPAModifiers(skillModifierData.characterOptions(),
               skillModifierData.adjustedReputation());
-        int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), skillModifierData.attributes(), type);
+        int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), skillModifierData.attributes(), type,
+              skillModifierData.injuryEffects(), skillModifierData.characterOptions(), skillModifierData.age());
         int totalInjuryModifier = getTotalInjuryModifier(skillModifierData, type);
 
-        boolean isIntelligenceBased = INTELLIGENCE.equals(type.getFirstAttribute())
-                                            || INTELLIGENCE.equals(type.getSecondAttribute());
-        int literacyModifier = isIntelligenceBased && skillModifierData.isIlliterate()
-                                     ? UNTRAINED_SKILL_MODIFIER : 0;
-
-        return spaModifiers + attributeModifiers + literacyModifier + totalInjuryModifier;
+        return spaModifiers + attributeModifiers + totalInjuryModifier;
     }
 
     public static int getTotalInjuryModifier(SkillModifierData skillModifierData, SkillType type) {
         int totalInjuryModifier = 0;
         for (InjuryEffect injuryEffect : skillModifierData.injuryEffects()) {
-            int firstAttributeModifier = getAttributeModifierFromInjuryEffect(injuryEffect, type.getFirstAttribute());
-            int secondAttributeModifier = getAttributeModifierFromInjuryEffect(injuryEffect, type.getSecondAttribute());
             int perceptionModifier = type.getName().equals(S_PERCEPTION) ? injuryEffect.getPerceptionModifier() : 0;
-            totalInjuryModifier += firstAttributeModifier + secondAttributeModifier + perceptionModifier;
+            int survivalModifier = type.getName().equals(S_SURVIVAL) ? injuryEffect.getSurvivalModifier() : 0;
+            int actingModifier = type.getName().equals(S_ACTING) ? injuryEffect.getActingModifier() : 0;
+            int negotiationModifier = type.getName().equals(S_NEGOTIATION) ? injuryEffect.getNegotiationModifier() : 0;
+            int leadershipModifier = type.getName().equals(S_LEADER) ? injuryEffect.getLeadershipModifier() : 0;
+            int interrogationModifier = type.getName().equals(S_INTERROGATION) ?
+                                              injuryEffect.getInterrogationModifier() :
+                                              0;
+            int acrobaticsModifier = type.getName().equals(S_ACROBATICS) ? injuryEffect.getInterrogationModifier() : 0;
+
+            totalInjuryModifier += perceptionModifier +
+                                         survivalModifier +
+                                         actingModifier +
+                                         negotiationModifier +
+                                         leadershipModifier +
+                                         interrogationModifier +
+                                         acrobaticsModifier;
         }
         return totalInjuryModifier;
-    }
-
-    private static int getAttributeModifierFromInjuryEffect(InjuryEffect injuryEffect, SkillAttribute skillAttribute) {
-        return switch (skillAttribute) {
-            case NONE, EDGE -> 0;
-            case STRENGTH -> injuryEffect.getStrengthModifier();
-            case BODY -> injuryEffect.getBodyModifier();
-            case DEXTERITY -> injuryEffect.getDexterityModifier();
-            case REFLEXES -> injuryEffect.getReflexesModifier();
-            case INTELLIGENCE -> injuryEffect.getIntelligenceModifier();
-            case WILLPOWER -> injuryEffect.getWillpowerModifier();
-            case CHARISMA -> injuryEffect.getCharismaModifier();
-        };
     }
 
     public void improve() {
@@ -760,7 +767,7 @@ public class Skill {
     @Override
     public String toString() {
         SkillModifierData skillModifierData = new SkillModifierData(new PersonnelOptions(), new Attributes(),
-              0, false, new ArrayList<>());
+              0, new ArrayList<>(), IGNORE_AGE);
         return toString(skillModifierData);
     }
 
@@ -791,9 +798,15 @@ public class Skill {
             display = getFinalSkillValue(skillModifierData) + "+";
         }
 
-        if (type.isSkillLevelsMatter()) {
-            int totalSkillLevel = getTotalSkillLevel(skillModifierData);
-            display += String.format(" (%d)", totalSkillLevel);
+        int baseSkillLevel = level;
+        int totalSkillLevel = getTotalSkillLevel(skillModifierData);
+        SkillLevel skillLevel = getSkillLevel(skillModifierData);
+        String skillLevelLabel = skillLevel.getShortName();
+        if (baseSkillLevel != totalSkillLevel) {
+            display += String.format(" (<s><font color='gray'>%d</font></s> %d %s)",
+                  baseSkillLevel, totalSkillLevel, skillLevelLabel);
+        } else {
+            display += String.format(" (%d %s)", baseSkillLevel, skillLevelLabel);
         }
 
         return display;
@@ -821,12 +834,6 @@ public class Skill {
             tooltip.append(flavorText).append("<br><br>");
         }
 
-        if (agingModifier != 0) {
-            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "tooltip.format.aging",
-                  (agingModifier > 0 ? "+" : "") + agingModifier));
-        }
-
         int spaModifier = getSPAModifiers(skillModifierData.characterOptions(), skillModifierData.adjustedReputation());
         if (spaModifier != 0) {
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -841,8 +848,14 @@ public class Skill {
                   (injuryModifier > 0 ? "+" : "") + injuryModifier));
         }
 
+        Attributes attributes = skillModifierData.attributes();
+        List<InjuryEffect> activeInjuryEffects = skillModifierData.injuryEffects();
         SkillAttribute firstLinkedAttribute = type.getFirstAttribute();
-        int firstLinkedAttributeModifier = skillModifierData.attributes().getAttributeModifier(firstLinkedAttribute);
+        PersonnelOptions options = skillModifierData.characterOptions();
+        int firstLinkedAttributeModifier = attributes.getAttributeModifier(firstLinkedAttribute,
+              activeInjuryEffects,
+              options,
+              skillModifierData.age());
         String additionSymbol = getTextAt(RESOURCE_BUNDLE, "tooltip.format.addition");
         tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "tooltip.format.linkedAttribute",
@@ -851,8 +864,8 @@ public class Skill {
 
         SkillAttribute secondLinkedAttribute = type.getSecondAttribute();
         if (secondLinkedAttribute != SkillAttribute.NONE) {
-            int secondLinkedAttributeModifier = skillModifierData.attributes()
-                                                      .getAttributeModifier(secondLinkedAttribute);
+            int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute,
+                  activeInjuryEffects, options, skillModifierData.age());
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "tooltip.format.linkedAttribute",
                   secondLinkedAttribute.getLabel(),
@@ -867,7 +880,6 @@ public class Skill {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type.getName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "level", level);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonus", bonus);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "agingModifier", agingModifier);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skill");
     }
 
@@ -890,8 +902,6 @@ public class Skill {
                     retVal.level = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bonus")) {
                     retVal.bonus = MathUtility.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("agingModifier")) {
-                    retVal.agingModifier = MathUtility.parseInt(wn2.getTextContent());
                 }
             }
         } catch (Exception ex) {

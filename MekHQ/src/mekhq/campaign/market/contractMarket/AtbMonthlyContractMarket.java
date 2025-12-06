@@ -50,6 +50,7 @@ import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -131,8 +132,11 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                           "AtbMonthlyContractMarket.connectionsReport.normal",
                           campaignCommander.getHyperlinkedFullTitle()));
                 } else {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
-                          "AtbMonthlyContractMarket.connectionsReport.none",
+                    String key = "AtbMonthlyContractMarket.connectionsReport.none";
+                    if (campaignCommander.getBurnedConnectionsEndDate() != null) {
+                        key = "AtbMonthlyContractMarket.connectionsReport.burned";
+                    }
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, key,
                           campaignCommander.getHyperlinkedFullTitle()));
                 }
             }
@@ -308,10 +312,11 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
      * calculated after the indicated number of retries, this will return null.
      */
     private @Nullable AtBContract generateAtBContract(Campaign campaign, int unitRatingMod) {
+        AtBContract contract = null;
+
         if (campaign.getFaction().isMercenary()) {
             if (null == campaign.getRetainerEmployerCode()) {
                 int retries = MAXIMUM_GENERATION_RETRIES;
-                AtBContract contract = null;
                 while ((retries > 0) && (contract == null)) {
                     Faction employer = RandomFactionGenerator.getInstance().getEmployerFaction();
                     if (employer == null) {
@@ -322,33 +327,35 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                     String employerCode = employer.getShortName();
                     // Send only 1 retry down because we're handling retries in our loop
                     contract = generateAtBContract(campaign, employerCode, unitRatingMod, 1);
-
-                    // This try-catch is specifically implemented to make testing easier. Otherwise, we would need to
-                    // define the player's TO&E, their Ally's unit availability, and their Enemy's unit availability,
-                    // a RAT generator instance and a whole other pile of stuff. So instead, we let it fail, and if we
-                    // need to specifically define difficulty in a unit test, we can do so by using
-                    // contract.setDifficulty().
-                    try {
-                        if (contract != null) {
-                            checkForEmployerOverride(campaign.getLocalDate(), contract, employerCode);
-                            contract.setDifficulty(contract.calculateContractDifficulty(
-                                  contract.getStartDate().getYear(),
-                                  true,
-                                  campaign.getAllCombatEntities()));
-                        }
-                    } catch (Exception e) {
-                        contract.setDifficulty(5);
-                        logger.error(e, "Unable to calculate difficulty for AtB contract {}", contract);
-                    }
                     retries--;
                 }
-                return contract;
             } else {
-                return generateAtBContract(campaign, campaign.getRetainerEmployerCode(), unitRatingMod);
+                contract = generateAtBContract(campaign, campaign.getRetainerEmployerCode(), unitRatingMod);
             }
         } else {
-            return generateAtBContract(campaign, campaign.getFaction().getShortName(), unitRatingMod);
+            contract = generateAtBContract(campaign, campaign.getFaction().getShortName(), unitRatingMod);
         }
+
+        // This try-catch is specifically implemented to make testing easier. Otherwise, we would need to
+        // define the player's TO&E, their Ally's unit availability, and their Enemy's unit availability,
+        // a RAT generator instance and a whole other pile of stuff. So instead, we let it fail, and if we
+        // need to specifically define difficulty in a unit test, we can do so by using
+        // contract.setDifficulty().
+        try {
+            if (contract != null) {
+                checkForEmployerOverride(campaign.getLocalDate(), contract, contract.getEmployerCode());
+
+                contract.setDifficulty(contract.calculateContractDifficulty(
+                      contract.getStartDate().getYear(),
+                      true,
+                      campaign.getAllCombatEntities()));
+            }
+        } catch (Exception e) {
+            contract.setDifficulty(5);
+            logger.error(e, "Unable to calculate difficulty for AtB contract {}", contract);
+        }
+
+        return contract;
     }
 
     /**
@@ -383,6 +390,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (isDuringJihad
                   && wordOfBlake.validIn(today)
                   && !Objects.equals("WOB", employerCode)
+                  && !Objects.equals("WOB", contract.getEnemyCode())
                   && Compute.randomInt(WOB_CO_OPT_CHANCE) == 0) {
             contract.setEmployerCode("WOB", today.getYear());
         }
@@ -426,7 +434,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         getContractType(campaign, contract);
 
         setEnemyCode(contract);
-        setIsRiotDuty(contract);
 
         /*
          * Addition to AtB rules: factions which are generally neutral
@@ -639,8 +646,17 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
             boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
             boolean isClanCampaign = campaign.isClanCampaign();
-            SkillCheckUtility checkUtility = new SkillCheckUtility(campaignCommander, S_NEGOTIATION, null,
-                  0, false, true, isUseAgingEffects, isClanCampaign, campaign.getLocalDate());
+            SkillCheckUtility checkUtility = new SkillCheckUtility(
+                  getTextAt(RESOURCE_BUNDLE, "AtbMonthlyContractMarket.contractSkillCheck"),
+                  campaignCommander,
+                  S_NEGOTIATION,
+                  null,
+                  0,
+                  false,
+                  true,
+                  isUseAgingEffects,
+                  isClanCampaign,
+                  campaign.getLocalDate());
             negotiationsMarginOfSuccess = max(0, checkUtility.getMarginOfSuccess());
 
             campaign.addReport(checkUtility.getResultsText());

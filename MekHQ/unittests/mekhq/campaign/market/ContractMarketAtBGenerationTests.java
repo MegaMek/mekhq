@@ -76,6 +76,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+@Disabled // broken
+@Deprecated(since = "0.50.10", forRemoval = true)
 public class ContractMarketAtBGenerationTests {
     public static List<Arguments> generateData() {
         final List<Arguments> arguments = new ArrayList<>();

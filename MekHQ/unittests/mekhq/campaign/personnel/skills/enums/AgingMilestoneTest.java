@@ -115,7 +115,7 @@ class AgingMilestoneTest {
             AgingMilestone milestone = Aging.getMilestone(age);
 
             // Act
-            int actual = Aging.getAgeModifier(milestone, attribute, SkillAttribute.NONE);
+            int actual = Aging.getAgeModifier(age, attribute);
 
             int expected = 0;
             for (AgingMilestone validMilestone : AgingMilestone.values()) {
@@ -156,7 +156,7 @@ class AgingMilestoneTest {
 
         AgingMilestone milestone = Aging.getMilestone(personAge);
 
-        int actual = Aging.getAgeModifier(milestone, attribute, SkillAttribute.NONE);
+        int actual = Aging.getAgeModifier(personAge, attribute);
 
         int expected = 0;
         for (AgingMilestone validMilestone : AgingMilestone.values()) {

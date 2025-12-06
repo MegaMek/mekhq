@@ -726,14 +726,26 @@ public class Utilities {
             }
 
             for (int slot = 0; slot < unit.getTotalCrewNeeds(); slot++) {
-                Person p = campaign.newPerson(unit.getEntity().isLargeCraft() ?
-                                                    PersonnelRole.VESSEL_CREW :
-                                                    PersonnelRole.COMBAT_TECHNICIAN,
-                      factionCode,
-                      oldCrew.getGender(numberPeopleGenerated));
+                PersonnelRole role;
+                if (unit.getEntity().isLargeCraft()) {
+                    role = PersonnelRole.VESSEL_CREW;
+                } else if (unit.getEntity() instanceof Tank) {
+                    if (unit.getEntity().getMovementMode().isMarine()) {
+                        role = PersonnelRole.VEHICLE_CREW_NAVAL;
+                    } else if (unit.getEntity().getMovementMode().isVTOL()) {
+                        role = PersonnelRole.VEHICLE_CREW_VTOL;
+                    } else {
+                        role = PersonnelRole.VEHICLE_CREW_GROUND;
+                    }
+                } else if (unit.getEntity().isConventionalFighter()) {
+                    role = PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
+                } else {
+                    role = PersonnelRole.ASTECH;
+                }
+                Person person = campaign.newPerson(role, factionCode, oldCrew.getGender(numberPeopleGenerated));
 
-                migrateCrewData(p, oldCrew, numberPeopleGenerated++, false);
-                vesselCrew.add(p);
+                migrateCrewData(person, oldCrew, numberPeopleGenerated++, false);
+                vesselCrew.add(person);
             }
 
             if (unit.canTakeNavigator()) {
@@ -946,15 +958,15 @@ public class Utilities {
     /**
      * Calculates the age based on the experience level and clan status.
      *
-     * <p>This method computes the age of a character by rolling a given number of exploding
-     * six-sided dice (d6) depending on the specified experience level. It starts with a base age and adds results of
-     * the rolls. If the character is part of a Clan, the dice rolls are halved (rounded up). Additionally, for all
-     * experience levels other than {@code EXP_NONE}, the final result is clamped to a minimum of 18.</p>
+     * <p>This method computes the age of a character by rolling a given number of exploding d6 depending on the
+     * specified experience level. It starts with a base age and adds results of the rolls. If the character is
+     * classified as 'Clan', the dice rolls are halved (rounded up). Additionally, for all experience levels other than
+     * {@code EXP_NONE}, the final result is clamped to a minimum of 16.</p>
      *
-     * <p>An exploding die roll occurs if the roll is 6. In such cases, another die is rolled, and
-     * the result is added to the previous roll (minus one).</p>
+     * <p>An exploding die roll occurs if the roll is 6. In such cases, another die is rolled, and the result is
+     * added to the previous roll (minus one).</p>
      *
-     * <p>The calculated average age for each experience level is shown below:</p>
+     * <p>The calculated average age for each experience level is shown below (rounded to one decimal):</p>
      *
      * <table border="1">
      *   <caption><strong>Average Ages by Experience Level</strong></caption>
@@ -965,28 +977,43 @@ public class Utilities {
      *   </tr>
      *   <tr>
      *     <td>EXP_NONE</td>
-     *     <td>29.4</td>
-     *     <td>29.4</td>
+     *     <td>27.4</td>
+     *     <td>27.4</td>
+     *   </tr>
+     *   <tr>
+     *     <td>EXP_ULTRA_GREEN</td>
+     *     <td>17.3</td>
+     *     <td>16.0</td>
      *   </tr>
      *   <tr>
      *     <td>EXP_GREEN</td>
-     *     <td>18</td>
-     *     <td>18</td>
+     *     <td>19.9</td>
+     *     <td>18.3</td>
      *   </tr>
      *   <tr>
      *     <td>EXP_REGULAR</td>
-     *     <td>24.4</td>
-     *     <td>18.2</td>
+     *     <td>27.8</td>
+     *     <td>22.8</td>
      *   </tr>
      *   <tr>
      *     <td>EXP_VETERAN</td>
-     *     <td>28.6</td>
-     *     <td>20.3</td>
+     *     <td>35.6</td>
+     *     <td>27.3</td>
      *   </tr>
      *   <tr>
      *     <td>EXP_ELITE</td>
-     *     <td>32.8</td>
-     *     <td>22.4</td>
+     *     <td>43.4</td>
+     *     <td>31.7</td>
+     *   </tr>
+     *   <tr>
+     *     <td>EXP_HEROIC</td>
+     *     <td>51.3</td>
+     *     <td>36.3</td>
+     *   </tr>
+     *   <tr>
+     *     <td>EXP_LEGENDARY</td>
+     *     <td>59.1</td>
+     *     <td>40.7</td>
      *   </tr>
      * </table>
      *
@@ -1012,13 +1039,12 @@ public class Utilities {
 
         // How many dice to roll
         int diceCount = switch (experienceLevel) {
-            case EXP_NONE -> 7;
-            case EXP_GREEN -> 1;
-            case EXP_REGULAR -> 2;
-            case EXP_VETERAN -> 3;
-            case EXP_ELITE -> 4;
-            case EXP_HEROIC -> 5;
-            case EXP_LEGENDARY -> 6;
+            case EXP_NONE, EXP_ELITE -> 7;
+            case EXP_GREEN, EXP_ULTRA_GREEN -> 1;
+            case EXP_REGULAR -> 3;
+            case EXP_VETERAN -> 5;
+            case EXP_HEROIC -> 9;
+            case EXP_LEGENDARY -> 11;
             default -> 0;
         };
 
@@ -1037,9 +1063,14 @@ public class Utilities {
             age += roll;
         }
 
+        // Handle Ultra-Green special case
+        if (experienceLevel == EXP_ULTRA_GREEN) {
+            age -= 3;
+        }
+
         // Clamp age, if necessary
         if (experienceLevel != EXP_NONE) {
-            age = max(16, age);
+            age = Math.max(16, age);
         }
 
         return age;

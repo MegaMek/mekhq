@@ -36,6 +36,8 @@ package mekhq.campaign;
 import static java.lang.Math.ceil;
 import static mekhq.campaign.mission.Scenario.T_SPACE;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
+import static mekhq.campaign.randomEvents.prisoners.NonCombatPrisoners.getCivilianCaptives;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.File;
 import java.util.*;
@@ -88,7 +90,8 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.dialog.SalvagePostScenarioPicker;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
+import mekhq.gui.dialog.camOpsSalvage.SalvagePostScenarioPicker;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -98,6 +101,7 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ResolveScenarioTracker {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ResolveScenarioTracker";
     public static final double DAMANGED_PART_COMPENSATION_MODIFIER = 0.2;
 
     Map<UUID, Entity> entities;
@@ -557,7 +561,6 @@ public class ResolveScenarioTracker {
      * <p>
      * This method should be run the first time an entity is loaded into the tracker, either from the game or from a MUL
      * file.
-     *
      */
     private void checkForLostLimbs(Entity en, boolean controlsField) {
         for (int loc = 0; loc < en.locations(); loc++) {
@@ -666,7 +669,7 @@ public class ResolveScenarioTracker {
                     }
                 }
                 // No crew? All's good, no personnel, next.
-                if (u.isUnmannedTrailer()) {
+                if (u.isNotCrewedEntityType()) {
                     continue;
                 }
 
@@ -704,7 +707,7 @@ public class ResolveScenarioTracker {
                     }
                 }
                 // try to find the crew in our pilot and mia vectors
-                Crew pilot = pilots.get(u.getCommander().getId());
+                Crew pilot = u.getCommander() == null ? null : pilots.get(u.getCommander().getId());
                 boolean missingCrew = false;
                 // For multi-crew cockpits, the crew id is the first slot, which is not
                 // necessarily the commander
@@ -1671,6 +1674,27 @@ public class ResolveScenarioTracker {
                 if (campaignOptions.isUseAdvancedMedical()) {
                     person.diagnose(getCampaign(), status.getHits());
                 }
+
+                ServiceLogger.capturedInScenarioDuringMission(person,
+                      campaign.getLocalDate(),
+                      scenario.getName(),
+                      mission.getName());
+            }
+        }
+
+        if (scenario.getStratConScenarioType().isHostileFacility() && control) {
+            new ImmersiveDialogNotification(campaign,
+                  getTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.civilianCaptives"), true);
+
+            Hashtable<UUID, OppositionPersonnelStatus> civilianPersonnel = getCivilianCaptives(campaign, mission);
+            for (UUID pid : civilianPersonnel.keySet()) {
+                OppositionPersonnelStatus status = civilianPersonnel.get(pid);
+                Person person = status.getPerson();
+                if (person == null) {
+                    continue;
+                }
+                MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
+                capturePrisoners.processCaptureOfNPC(person);
 
                 ServiceLogger.capturedInScenarioDuringMission(person,
                       campaign.getLocalDate(),

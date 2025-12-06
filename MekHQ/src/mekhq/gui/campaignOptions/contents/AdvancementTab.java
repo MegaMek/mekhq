@@ -291,7 +291,7 @@ public class AdvancementTab {
         // Header
         xpAwardsHeader = new CampaignOptionsHeaderPanel("XpAwardsTab",
               getImageDirectory() + "logo_clan_steel_viper.png",
-              8);
+              6);
 
         // Contents
         lblXpCostMultiplier = new CampaignOptionsLabel("XpCostMultiplier");
@@ -677,7 +677,7 @@ public class AdvancementTab {
         // Header
         skillRandomizationHeader = new CampaignOptionsHeaderPanel("SkillRandomizationTab",
               getImageDirectory() + "logo_republic_of_the_sphere.png",
-              12);
+              11);
 
         // Contents
         chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness");
@@ -704,10 +704,7 @@ public class AdvancementTab {
         panel.add(pnlPhenotype, layout);
         layout.gridx++;
         panel.add(pnlRandomAbilities, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
+        layout.gridx++;
         panel.add(pnlSkillGroups, layout);
 
         // Create Parent Panel and return
@@ -742,15 +739,11 @@ public class AdvancementTab {
                   null,
                   phenotypes.get(i).getTooltip()));
 
-            layout.gridx++;
+            layout.gridx = 0;
             panel.add(phenotypeLabels[i], layout);
             layout.gridx++;
             panel.add(phenotypeSpinners[i], layout);
-
-            if (i == (phenotypes.size() / 3)) {
-                layout.gridx = -1;
-                layout.gridy++;
-            }
+            layout.gridy++;
         }
 
         return panel;
@@ -801,7 +794,9 @@ public class AdvancementTab {
         panel.add(lblAbilityUltraGreen, layout);
         layout.gridx++;
         panel.add(spnAbilityUltraGreen, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblAbilityGreen, layout);
         layout.gridx++;
         panel.add(spnAbilityGreen, layout);
@@ -811,7 +806,9 @@ public class AdvancementTab {
         panel.add(lblAbilityReg, layout);
         layout.gridx++;
         panel.add(spnAbilityReg, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblAbilityVet, layout);
         layout.gridx++;
         panel.add(spnAbilityVet, layout);
@@ -821,7 +818,9 @@ public class AdvancementTab {
         panel.add(lblAbilityElite, layout);
         layout.gridx++;
         panel.add(spnAbilityElite, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblAbilityHeroic, layout);
         layout.gridx++;
         panel.add(spnAbilityHeroic, layout);
@@ -845,9 +844,11 @@ public class AdvancementTab {
         // Contents
         pnlCommandSkills = createCommandSkillsPanel();
         pnlUtilitySkills = createUtilitySkillsPanel();
+        pnlSecondarySkills = createSecondarySkillPanel();
+
         pnlArtillery = createArtilleryPanel();
         pnlSmallArms = createSmallArmsPanel();
-        pnlSecondarySkills = createSecondarySkillPanel();
+        JPanel pnlGunnerySkillsContainer = createGunnerySkillsContainer();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SkillGroupsPanel");
@@ -858,18 +859,24 @@ public class AdvancementTab {
         panel.add(pnlCommandSkills, layout);
         layout.gridx++;
         panel.add(pnlUtilitySkills, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(pnlSecondarySkills, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(pnlArtillery, layout);
         layout.gridx++;
-        panel.add(pnlSmallArms, layout);
+        panel.add(pnlSecondarySkills, layout);
+        layout.gridx++;
+        panel.add(pnlGunnerySkillsContainer, layout);
 
         return panel;
+    }
+
+    private JPanel createGunnerySkillsContainer() {
+        JPanel pnlGunnerySkillsContainer = new JPanel();
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(pnlGunnerySkillsContainer);
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        pnlGunnerySkillsContainer.add(pnlArtillery, layout);
+        layout.gridy++;
+        pnlGunnerySkillsContainer.add(pnlSmallArms, layout);
+        return pnlGunnerySkillsContainer;
     }
 
     /**
@@ -922,7 +929,9 @@ public class AdvancementTab {
         panel.add(lblCommandSkillsUltraGreen, layout);
         layout.gridx++;
         panel.add(spnCommandSkillsUltraGreen, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblCommandSkillsGreen, layout);
         layout.gridx++;
         panel.add(spnCommandSkillsGreen, layout);
@@ -932,7 +941,9 @@ public class AdvancementTab {
         panel.add(lblCommandSkillsReg, layout);
         layout.gridx++;
         panel.add(spnCommandSkillsReg, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblCommandSkillsVet, layout);
         layout.gridx++;
         panel.add(spnCommandSkillsVet, layout);
@@ -942,7 +953,9 @@ public class AdvancementTab {
         panel.add(lblCommandSkillsElite, layout);
         layout.gridx++;
         panel.add(spnCommandSkillsElite, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblCommandSkillsHeroic, layout);
         layout.gridx++;
         panel.add(spnCommandSkillsHeroic, layout);
@@ -1006,7 +1019,9 @@ public class AdvancementTab {
         panel.add(lblUtilitySkillsUltraGreen, layout);
         layout.gridx++;
         panel.add(spnUtilitySkillsUltraGreen, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblUtilitySkillsGreen, layout);
         layout.gridx++;
         panel.add(spnUtilitySkillsGreen, layout);
@@ -1016,7 +1031,9 @@ public class AdvancementTab {
         panel.add(lblUtilitySkillsReg, layout);
         layout.gridx++;
         panel.add(spnUtilitySkillsReg, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblUtilitySkillsVet, layout);
         layout.gridx++;
         panel.add(spnUtilitySkillsVet, layout);
@@ -1026,7 +1043,9 @@ public class AdvancementTab {
         panel.add(lblUtilitySkillsElite, layout);
         layout.gridx++;
         panel.add(spnUtilitySkillsElite, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblUtilitySkillsHeroic, layout);
         layout.gridx++;
         panel.add(spnUtilitySkillsHeroic, layout);
@@ -1067,7 +1086,9 @@ public class AdvancementTab {
         panel.add(lblCombatSA, layout);
         layout.gridx++;
         panel.add(spnCombatSA, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblSupportSA, layout);
         layout.gridx++;
         panel.add(spnSupportSA, layout);
@@ -1102,7 +1123,9 @@ public class AdvancementTab {
         panel.add(lblArtyProb, layout);
         layout.gridx++;
         panel.add(spnArtyProb, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblArtyBonus, layout);
         layout.gridx++;
         panel.add(spnArtyBonus, layout);
@@ -1149,7 +1172,9 @@ public class AdvancementTab {
         panel.add(lblAntiMekSkill, layout);
         layout.gridx++;
         panel.add(spnAntiMekSkill, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblRoleplaySkillsModifier, layout);
         layout.gridx++;
         panel.add(spnRoleplaySkillsModifier, layout);
@@ -1159,7 +1184,9 @@ public class AdvancementTab {
         panel.add(lblSecondProb, layout);
         layout.gridx++;
         panel.add(spnSecondProb, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblSecondBonus, layout);
         layout.gridx++;
         panel.add(spnSecondBonus, layout);

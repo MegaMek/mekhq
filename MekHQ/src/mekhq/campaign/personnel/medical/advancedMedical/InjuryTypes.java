@@ -261,6 +261,56 @@ public final class InjuryTypes {
             InjuryType.register(150, "alt:ENHANCED_IMAGING", AlternateInjuries.ENHANCED_IMAGING_IMPLANT);
             InjuryType.register(151, "alt:ELECTIVE_IMPLANT_RECOVERY", AlternateInjuries.ELECTIVE_IMPLANT_RECOVERY);
             InjuryType.register(152, "alt:EI_IMPLANT_RECOVERY", AlternateInjuries.EI_IMPLANT_RECOVERY);
+            InjuryType.register(153, "alt:BONE_REINFORCEMENT", AlternateInjuries.BONE_REINFORCEMENT);
+            InjuryType.register(154, "alt:LIVER_FILTRATION_IMPLANT", AlternateInjuries.LIVER_FILTRATION_IMPLANT);
+            InjuryType.register(155,
+                  "alt:BIONIC_LUNGS_WITH_TYPE_1_FILTER",
+                  AlternateInjuries.BIONIC_LUNGS_WITH_TYPE_1_FILTER);
+            InjuryType.register(156,
+                  "alt:BIONIC_LUNGS_WITH_TYPE_2_FILTER",
+                  AlternateInjuries.BIONIC_LUNGS_WITH_TYPE_2_FILTER);
+            InjuryType.register(157,
+                  "alt:BIONIC_LUNGS_WITH_TYPE_3_FILTER",
+                  AlternateInjuries.BIONIC_LUNGS_WITH_TYPE_3_FILTER);
+            InjuryType.register(158, "alt:CYBERNETIC_EYE_EM_IR", AlternateInjuries.CYBERNETIC_EYE_EM_IR);
+            InjuryType.register(159, "alt:CYBERNETIC_EYE_TELESCOPE", AlternateInjuries.CYBERNETIC_EYE_TELESCOPE);
+            InjuryType.register(160, "alt:CYBERNETIC_EYE_LASER", AlternateInjuries.CYBERNETIC_EYE_LASER);
+            InjuryType.register(161, "alt:CYBERNETIC_EYE_MULTI", AlternateInjuries.CYBERNETIC_EYE_MULTI);
+            InjuryType.register(162,
+                  "alt:CYBERNETIC_EYE_MULTI_ENHANCED",
+                  AlternateInjuries.CYBERNETIC_EYE_MULTI_ENHANCED);
+            InjuryType.register(163, "alt:CYBERNETIC_EAR_SIGNAL", AlternateInjuries.CYBERNETIC_EAR_SIGNAL);
+            InjuryType.register(164, "alt:CYBERNETIC_EAR_MULTI", AlternateInjuries.CYBERNETIC_EAR_MULTI);
+            InjuryType.register(165, "alt:CYBERNETIC_SPEECH_IMPLANT", AlternateInjuries.CYBERNETIC_SPEECH_IMPLANT);
+            InjuryType.register(166, "alt:PHEROMONE_EFFUSER", AlternateInjuries.PHEROMONE_EFFUSER);
+            InjuryType.register(167, "alt:COSMETIC_BEAUTY_ENHANCEMENT", AlternateInjuries.COSMETIC_BEAUTY_ENHANCEMENT);
+            InjuryType.register(168, "alt:COSMETIC_HORROR_ENHANCEMENT", AlternateInjuries.COSMETIC_HORROR_ENHANCEMENT);
+            InjuryType.register(169, "alt:COSMETIC_TAIL_PROSTHETIC", AlternateInjuries.COSMETIC_TAIL_PROSTHETIC);
+            InjuryType.register(170,
+                  "alt:COSMETIC_ANIMAL_EAR_PROSTHETIC",
+                  AlternateInjuries.COSMETIC_ANIMAL_EAR_PROSTHETIC);
+            InjuryType.register(171,
+                  "alt:COSMETIC_ANIMAL_LEG_PROSTHETIC",
+                  AlternateInjuries.COSMETIC_ANIMAL_LEG_PROSTHETIC);
+            InjuryType.register(172, "alt:DISCONTINUATION_SYNDROME", AlternateInjuries.DISCONTINUATION_SYNDROME);
+            InjuryType.register(173, "alt:DERMAL_MYOMER_ARM_ARMOR", AlternateInjuries.DERMAL_MYOMER_ARM_ARMOR);
+            InjuryType.register(174, "alt:DERMAL_MYOMER_ARM_CAMO", AlternateInjuries.DERMAL_MYOMER_ARM_CAMO);
+            InjuryType.register(175, "alt:DERMAL_MYOMER_ARM_TRIPLE", AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE);
+            InjuryType.register(176, "alt:DERMAL_MYOMER_LEG_ARMOR", AlternateInjuries.DERMAL_MYOMER_LEG_ARMOR);
+            InjuryType.register(177, "alt:DERMAL_MYOMER_LEG_CAMO", AlternateInjuries.DERMAL_MYOMER_LEG_CAMO);
+            InjuryType.register(178, "alt:DERMAL_MYOMER_LEG_TRIPLE", AlternateInjuries.DERMAL_MYOMER_LEG_TRIPLE);
+            InjuryType.register(179, "alt:VEHICULAR_DNI", AlternateInjuries.VEHICULAR_DNI);
+            InjuryType.register(180, "alt:BUFFERED_VDNI", AlternateInjuries.BUFFERED_VDNI);
+            InjuryType.register(181, "alt:BUFFERED_VDNI_TRIPLE_CORE", AlternateInjuries.BUFFERED_VDNI_TRIPLE_CORE);
+            InjuryType.register(182, "alt:PAIN_SHUNT", AlternateInjuries.PAIN_SHUNT);
+            InjuryType.register(183, "alt:PAIN_SHUNT_RECOVERY", AlternateInjuries.PAIN_SHUNT_RECOVERY);
+            InjuryType.register(184, "alt:POSTPARTUM_RECOVERY", AlternateInjuries.POSTPARTUM_RECOVERY);
+            InjuryType.register(185,
+                  "alt:TRANSIT_DISORIENTATION_SYNDROME",
+                  AlternateInjuries.TRANSIT_DISORIENTATION_SYNDROME);
+            InjuryType.register(186, "alt:CRIPPLING_FLASHBACKS", AlternateInjuries.CRIPPLING_FLASHBACKS);
+            InjuryType.register(187, "alt:CHILDLIKE_REGRESSION", AlternateInjuries.CHILDLIKE_REGRESSION);
+            InjuryType.register(188, "alt:CATATONIA", AlternateInjuries.CATATONIA);
 
             InjuryType.register("am:severed_spine", SEVERED_SPINE);
             InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);

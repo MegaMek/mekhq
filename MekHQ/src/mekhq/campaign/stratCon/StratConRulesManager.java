@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.stratCon;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
@@ -62,6 +63,7 @@ import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsT
 import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.INTERCEPTED;
 import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.SUCCESS;
 import static mekhq.campaign.stratCon.StratConScenarioFactory.convertSpecificUnitTypeToGeneral;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -69,7 +71,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
@@ -84,6 +85,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
@@ -128,6 +130,7 @@ import org.apache.commons.math3.util.Pair;
  * @author NickAragua
  */
 public class StratConRulesManager {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.StratConRulesManager";
     public final static int BASE_LEADERSHIP_BUDGET = 500;
 
     private static final MMLogger LOGGER = MMLogger.create(StratConRulesManager.class);
@@ -200,20 +203,23 @@ public class StratConRulesManager {
      * For each scenario, a scenario odds target number is calculated, and a roll is made against this target. If the
      * roll is less than the target number, a new weekly scenario is created with a random date within the week.
      *
-     * @param campaign      The campaign.
-     * @param campaignState The state of the StratCon campaign.
-     * @param contract      The AtBContract for the campaign.
-     * @param track         The StratCon campaign track.
+     * @param campaign             The campaign.
+     * @param campaignState        The state of the StratCon campaign.
+     * @param contract             The AtBContract for the campaign.
+     * @param track                The StratCon campaign track.
+     * @param isUseStratConSingles If {@code true} only a single scenario will be generated
      */
     public static void generateScenariosDatesForWeek(Campaign campaign, StratConCampaignState campaignState,
-          AtBContract contract, StratConTrackState track) {
-        // maps scenarios to force IDs
-        int scenarioRolls = track.getRequiredLanceCount();
+          AtBContract contract, StratConTrackState track, boolean isUseStratConSingles) {
+        int scenarioRolls = isUseStratConSingles ? 1 :
+                                  // We divide the number of scenario rolls by the number of tracks so that we're not
+                                  // unintentionally multiplying Intensity by tracks
+                                  (int) ceil(track.getRequiredLanceCount() / (double) campaignState.getTrackCount());
         for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
             int targetNum = calculateScenarioOdds(track, contract, false);
             int roll = randomInt(100);
 
-            if (roll < targetNum) {
+            if (isUseStratConSingles || roll < targetNum) {
                 LocalDate scenarioDate = campaign.getLocalDate().plusDays(randomInt(7));
                 campaignState.addWeeklyScenario(scenarioDate);
                 LOGGER.info("StratCon Weekly Scenario Roll: {} vs. {} ({})",
@@ -289,7 +295,7 @@ public class StratConRulesManager {
                       track);
                 // otherwise, pick a random force from the avail
             } else {
-                int randomForceID = getRandomItem(availableForceIDs);
+                Integer randomForceID = getRandomItem(availableForceIDs); // Can be null
 
                 // two scenarios on the same coordinates wind up increasing in size
                 if (track.getScenarios().containsKey(scenarioCoords)) {
@@ -655,7 +661,7 @@ public class StratConRulesManager {
 
         // Finally, finish scenario set up
         finalizeScenario(backingScenario, contract, campaign);
-        setScenarioParametersFromBiome(track, scenario);
+        setScenarioParametersFromBiome(track, scenario, campaign.getCampaignOptions().isUseNoTornadoes());
         swapInPlayerUnits(scenario, campaign, FORCE_NONE);
 
         if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
@@ -741,23 +747,21 @@ public class StratConRulesManager {
             return;
         }
 
-        if (!isCombatChallenge) {
-            ContractCommandRights commandRights = contract.getCommandRights();
-            switch (commandRights) {
-                case INTEGRATED -> {
+        ContractCommandRights commandRights = contract.getCommandRights();
+        switch (commandRights) {
+            case INTEGRATED -> {
+                scenario.setTurningPoint(true);
+                setAttachedUnitsModifier(scenario, contract);
+            }
+            case HOUSE, LIAISON -> {
+                if (randomInt(3) == 0) {
                     scenario.setTurningPoint(true);
                     setAttachedUnitsModifier(scenario, contract);
                 }
-                case HOUSE, LIAISON -> {
-                    if (randomInt(3) == 0 || isObjective) {
-                        scenario.setTurningPoint(true);
-                        setAttachedUnitsModifier(scenario, contract);
-                    }
-                }
-                case INDEPENDENT -> {
-                    if (randomInt(3) == 0 || isObjective) {
-                        scenario.setTurningPoint(true);
-                    }
+            }
+            case INDEPENDENT -> {
+                if (randomInt(3) == 0) {
+                    scenario.setTurningPoint(true);
                 }
             }
         }
@@ -803,7 +807,8 @@ public class StratConRulesManager {
      * Picks the scenario terrain based on the scenario coordinates' biome Note that "finalizeScenario" currently wipes
      * out temperature/map info so this method must be called afterward.
      */
-    public static void setScenarioParametersFromBiome(StratConTrackState track, StratConScenario scenario) {
+    public static void setScenarioParametersFromBiome(StratConTrackState track, StratConScenario scenario,
+          boolean isNoTornadoes) {
         StratConCoords coords = scenario.getCoords();
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
         StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
@@ -856,7 +861,7 @@ public class StratConRulesManager {
                 backingScenario.setMap(mapTypeList.get(randomInt(mapTypeList.size())));
             }
             backingScenario.setLightConditions();
-            backingScenario.setWeatherConditions();
+            backingScenario.setWeatherConditions(isNoTornadoes);
         }
     }
 
@@ -1152,7 +1157,9 @@ public class StratConRulesManager {
             commitPrimaryForces(campaign, revealedScenario, track);
             if (!revealedScenario.getBackingScenario().isFinalized()) {
                 finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
-                setScenarioParametersFromBiome(track, revealedScenario);
+                setScenarioParametersFromBiome(track,
+                      revealedScenario,
+                      campaign.getCampaignOptions().isUseNoTornadoes());
             }
             return;
         }
@@ -1298,8 +1305,8 @@ public class StratConRulesManager {
      *
      * @return The newly set up {@link StratConScenario}.
      */
-    public static @Nullable StratConScenario setupScenario(StratConCoords coords, int forceID, Campaign campaign,
-          AtBContract contract, StratConTrackState track) {
+    public static @Nullable StratConScenario setupScenario(StratConCoords coords, @Nullable Integer forceID,
+          Campaign campaign, AtBContract contract, StratConTrackState track) {
         return setupScenario(coords,
               forceID,
               campaign,
@@ -1332,9 +1339,9 @@ public class StratConRulesManager {
      *
      * @return The newly set up {@link StratConScenario}.
      */
-    public static @Nullable StratConScenario setupScenario(StratConCoords coords, int forceID, Campaign campaign,
-          AtBContract contract, StratConTrackState track, @Nullable ScenarioTemplate template, boolean ignoreFacilities,
-          @Nullable Integer daysTilDeployment) {
+    public static @Nullable StratConScenario setupScenario(StratConCoords coords, @Nullable Integer forceID,
+          Campaign campaign, AtBContract contract, StratConTrackState track, @Nullable ScenarioTemplate template,
+          boolean ignoreFacilities, @Nullable Integer daysTilDeployment) {
         StratConScenario scenario;
 
         if (track.getFacilities().containsKey(coords) && !ignoreFacilities) {
@@ -1522,7 +1529,9 @@ public class StratConRulesManager {
         // Each scout may scan up to scanMultiplier hexes
         // Each scout may scan up to a radius of individualScanRange hexes
         for (ScoutRecord scoutData : scouts) {
-            int individualScanRange = scoutData.entityWeight() <= 35 ? scanRangeIncrease + 1 : scanRangeIncrease;
+            int individualScanRange = useAdvancedScouting && scoutData.entityWeight() <= 35 ?
+                                            scanRangeIncrease + 1 :
+                                            scanRangeIncrease;
             int remainingScans = useAdvancedScouting ? 1 : Integer.MAX_VALUE;
 
             Person scout = scoutData.scout();
@@ -1575,18 +1584,22 @@ public class StratConRulesManager {
                         continue;
                     }
 
-                    SkillCheckUtility skillCheck = new SkillCheckUtility(
-                          scout,
-                          scoutData.skillName(),
-                          List.of(weightModifier, speedModifier, sensorsModifier, skillModifier),
-                          0,
-                          false,
-                          false,
-                          false, // Irrelevant
-                          false, // Irrelevant
-                          campaign.getLocalDate()
-                    );
-                    campaign.addReport(skillCheck.getResultsText());
+                    SkillCheckUtility skillCheck = null;
+                    if (useAdvancedScouting) {
+                        skillCheck = new SkillCheckUtility(
+                              getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.scoutingSkillCheck"),
+                              scout,
+                              scoutData.skillName(),
+                              List.of(weightModifier, speedModifier, sensorsModifier, skillModifier),
+                              0,
+                              false,
+                              false,
+                              false, // Irrelevant
+                              false, // Irrelevant
+                              campaign.getLocalDate()
+                        );
+                        campaign.addReport(skillCheck.getResultsText());
+                    }
 
                     remainingScans--;
 
@@ -1800,12 +1813,14 @@ public class StratConRulesManager {
      * @param campaign the campaign
      */
     private static void increaseFatigue(int forceID, Campaign campaign) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseFatigue = campaignOptions.isUseFatigue();
+        int fatigueRate = campaignOptions.getFatigueRate();
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
-                int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
-                person.changeFatigue(fatigueChangeRate);
+                person.changeFatigue(fatigueRate);
 
-                if (campaign.getCampaignOptions().isUseFatigue()) {
+                if (isUseFatigue) {
                     Fatigue.processFatigueActions(campaign, person);
                 }
             }
@@ -1986,8 +2001,14 @@ public class StratConRulesManager {
         int targetNumber = 9;
         Skill tactics = commander.getSkill(S_TACTICS);
 
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(commander, S_TACTICS, null, 0, true, false,
-              campaign.getCampaignOptions().isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate());
+        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
+              getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.tacticsSkillCheck"),
+              commander,
+              S_TACTICS,
+              null,
+              0,
+              true,
+              false);
         campaign.addReport(skillCheckUtility.getResultsText());
 
         if (skillCheckUtility.isSuccess()) {
@@ -2329,8 +2350,14 @@ public class StratConRulesManager {
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation fails
      */
     private static @Nullable StratConScenario generateScenario(Campaign campaign, AtBContract contract,
-          StratConTrackState track, int forceID, StratConCoords coords, @Nullable Integer daysTilDeployment) {
-        int unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
+          StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
+          @Nullable Integer daysTilDeployment) {
+        int unitType = MEK;
+        ;
+        if (forceID != null) {
+            unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
+        }
+
         ScenarioTemplate template = StratConScenarioFactory.getRandomScenario(unitType);
         // useful for debugging specific scenario types
         // template = StratConScenarioFactory.getSpecificScenario("Defend Grounded
@@ -2371,9 +2398,13 @@ public class StratConRulesManager {
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation failed
      */
     static @Nullable StratConScenario generateScenario(Campaign campaign, AtBContract contract,
-          StratConTrackState track, int forceID, StratConCoords coords, ScenarioTemplate template,
+          StratConTrackState track, @Nullable Integer forceID, StratConCoords coords, ScenarioTemplate template,
           @Nullable Integer daysTilDeployment) {
         StratConScenario scenario = new StratConScenario();
+
+        if (forceID == null) {
+            forceID = FORCE_NONE;
+        }
 
         if (template == null) {
             int unitType = MEK;
@@ -2582,7 +2613,6 @@ public class StratConRulesManager {
      *   <li>Excluding combat teams that are already actively deployed.</li>
      *   <li>Ensuring that combat teams have roles other than "In Reserve" or "Auxiliary"
      *       (unless role restrictions are bypassed).</li>
-     *   <li>If the team role is "Training," it is included only when the contract type is a Cadre Duty.</li>
      * </ul>
      *
      * @param campaign               The {@link Campaign} containing data regarding contracts, combat teams, and their
@@ -2615,7 +2645,7 @@ public class StratConRulesManager {
                 continue;
             }
 
-            // If the combat team doesn't have a valid force (somehow) skip it.
+            // If the combat team doesn't have a valid force (somehow), skip it.
             Force force = combatTeam.getForce(campaign);
             if (force == null) {
                 continue;
@@ -2632,9 +2662,7 @@ public class StratConRulesManager {
                 suitableForces.add(combatTeam.getForceId());
             } else if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
                 if (!combatRole.isTraining()) {
-                    if (!combatRole.isCadre() || contract.getContractType().isCadreDuty()) {
-                        suitableForces.add(combatTeam.getForceId());
-                    }
+                    suitableForces.add(combatTeam.getForceId());
                 }
             }
         }
@@ -2688,15 +2716,18 @@ public class StratConRulesManager {
           StratConCampaignState campaignState, boolean isCombatChallenge) {
         List<Integer> retVal = new ArrayList<>();
 
-        // assemble a set of all force IDs that are currently assigned to tracks that are not this one
-        Set<Integer> forcesInTracks = campaign.getActiveAtBContracts()
-                                            .stream()
-                                            .flatMap(contract -> contract.getStratconCampaignState()
-                                                                       .getTracks()
-                                                                       .stream())
-                                            .filter(track -> (!Objects.equals(track, currentTrack)) || !reinforcements)
-                                            .flatMap(track -> track.getAssignedForceCoords().keySet().stream())
-                                            .collect(Collectors.toSet());
+        // assemble a set of all force IDs that are currently assigned to tracks
+        Set<Integer> forcesInTracks = new HashSet<>();
+        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+            StratConCampaignState state = contract.getStratconCampaignState();
+            if (state == null) {
+                continue;
+            }
+
+            for (StratConTrackState track : state.getTracks()) {
+                forcesInTracks.addAll(track.getAssignedForceCoords().keySet());
+            }
+        }
 
         // if there's an existing scenario, and we're doing reinforcements,
         // prevent forces that failed to deploy from trying to deploy again
@@ -3520,21 +3551,26 @@ public class StratConRulesManager {
         Campaign campaign = ev.getCampaign();
 
         // don't do any of this if StratCon isn't turned on
-        if (!campaign.getCampaignOptions().isUseStratCon()) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (!campaignOptions.isUseStratCon()) {
             return;
         }
+
+        boolean isUseStratConSingles = campaignOptions.isUseStratConSinglesMode();
+        boolean isUseStratConMapless = campaignOptions.isUseStratConMaplessMode();
 
         LocalDate today = campaign.getLocalDate();
         boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
         boolean isStartOfMonth = today.getDayOfMonth() == 1;
 
-        // run scenario generation routine for every track attached to an active
-        // contract
+        // run scenario generation routine for every track attached to an active contract
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
             StratConCampaignState campaignState = contract.getStratconCampaignState();
 
             if (campaignState != null) {
-                for (StratConTrackState track : campaignState.getTracks()) {
+                List<StratConTrackState> tracks = campaignState.getTracks();
+                boolean hasAssignedSingleDropScenario = false;
+                for (StratConTrackState track : tracks) {
                     cleanupPhantomScenarios(track);
 
                     // check if some of the forces have finished deployment
@@ -3543,7 +3579,7 @@ public class StratConRulesManager {
                     // 0-deployment-length tracks
                     processTrackForceReturnDates(track, campaign);
 
-                    if (!campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+                    if (!isUseStratConMapless) {
                         processFacilityEffects(track, campaignState, isStartOfMonth);
                     }
 
@@ -3558,8 +3594,13 @@ public class StratConRulesManager {
                     }
 
                     // on monday, generate new scenario dates
-                    if (isMonday) {
-                        generateScenariosDatesForWeek(campaign, campaignState, contract, track);
+                    if (isMonday && !hasAssignedSingleDropScenario) {
+                        generateScenariosDatesForWeek(campaign, campaignState, contract, track, isUseStratConSingles);
+                    }
+
+                    // Only one scenario/week for Single Drop
+                    if (isUseStratConSingles) {
+                        hasAssignedSingleDropScenario = true;
                     }
                 }
 

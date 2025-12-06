@@ -42,6 +42,7 @@ import java.util.Set;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.medical.BodyLocation.XMLAdapter;
 
@@ -50,6 +51,9 @@ public enum BodyLocation {
     //region Enum Declarations
     HEAD(0, "BodyLocation.HEAD.text"),
     SKULL(12, "BodyLocation.SKULL.text", false, HEAD),
+    BRAIN(47, "BodyLocation.BRAIN.text", false, HEAD),
+    FACE(45, "BodyLocation.FACE.text", false, HEAD),
+    MOUTH(46, "BodyLocation.MOUTH.text", false, HEAD),
     EARS(13, "BodyLocation.EARS.text", false, HEAD),
     EYES(14, "BodyLocation.EYES.text", false, HEAD),
     JAW(15, "BodyLocation.JAW.text", false, HEAD),
@@ -60,6 +64,7 @@ public enum BodyLocation {
     ORGANS(44, "BodyLocation.ORGANS.text", false, CHEST),
     ABDOMEN(4, "BodyLocation.ABDOMEN.text"),
     GROIN(19, "BodyLocation.GROIN.text", false, ABDOMEN),
+    RUMP(46, "BodyLocation.RUMP.text", false, ABDOMEN),
     RIGHT_ARM(5, "BodyLocation.RIGHT_ARM.text", true),
     UPPER_RIGHT_ARM(23, "BodyLocation.UPPER_RIGHT_ARM.text", true, RIGHT_ARM),
     RIGHT_ELBOW(24, "BodyLocation.RIGHT_ELBOW.text", true, RIGHT_ARM),
@@ -93,6 +98,7 @@ public enum BodyLocation {
     RIGHT_KNEE(42, "BodyLocation.RIGHT_KNEE.text", true, RIGHT_FOOT),
     RIGHT_SHIN(43, "BodyLocation.RIGHT_SHIN.text", true, RIGHT_FOOT),
     INTERNAL(7, "BodyLocation.INTERNAL.text"),
+    BONES(44, "BodyLocation.BONES.text"),
     GENERIC(-1, "BodyLocation.GENERIC.text");
     //endregion Enum Declarations
 
@@ -102,7 +108,9 @@ public enum BodyLocation {
     private final String locationName;
     private final BodyLocation parent;
 
-    public static final List<BodyLocation> PRIMARY_LOCATIONS = List.of(
+    // Never use List.of() here it will cause NPEs as null values are a valid comparison to the contents of this list
+    // and List.of() disallows the passing in of null values.
+    public static final List<BodyLocation> PRIMARY_LOCATIONS = Arrays.asList(
           HEAD,
           CHEST,
           ABDOMEN,
@@ -180,8 +188,26 @@ public enum BodyLocation {
         return locationName;
     }
 
-    public BodyLocation Parent() {
+    public BodyLocation getParent() {
         return parent;
+    }
+
+    /**
+     * Fetches the first parent location (or the param location) that is included in {@link #PRIMARY_LOCATIONS}.
+     *
+     * @return the first associated primary location or {@code null} if the location has no associated primary location.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public @Nullable BodyLocation getPrimaryLocation() {
+        BodyLocation location = this;
+
+        while (location != null && !PRIMARY_LOCATIONS.contains(location)) {
+            location = location.getParent();
+        }
+
+        return location;
     }
     //endregion Getters
 

@@ -32,12 +32,9 @@
  */
 package mekhq.gui.dialog;
 
-import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.Person.*;
-import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
-import static mekhq.campaign.personnel.skills.Skill.getCountDownMaxValue;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -649,7 +646,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         lblToughness.setText(resourceMap.getString("lblToughness.text")); // NOI18N
         lblToughness.setName("lblToughness"); // NOI18N
 
-        textToughness.setText(Integer.toString(person.getToughness()));
+        textToughness.setText(Integer.toString(person.getDirectToughness()));
         textToughness.setName("textToughness"); // NOI18N
 
         if (campaign.getCampaignOptions().isUseToughness()) {
@@ -1273,8 +1270,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             lblName = new JLabel(type);
             lblValue = new JLabel();
             if (person.hasSkill(type)) {
-                lblValue.setText(person.getSkill(type)
-                                       .toString(skillModifierData));
+                lblValue.setText(person.getSkill(type).getFinalSkillValue(skillModifierData) + "+");
             } else {
                 lblValue.setText("-");
             }
@@ -1554,18 +1550,24 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             skillLvls.get(type).getModel().setValue(0);
             return;
         }
+
+        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        LocalDate today = campaign.getLocalDate();
+
         SkillType skillType = SkillType.getType(type);
 
         int level = (Integer) skillLvls.get(type).getModel().getValue();
         int bonus = (Integer) skillBonus.get(type).getModel().getValue();
 
-        if (skillType.isCountUp()) {
-            int target = min(getCountUpMaxValue(), skillType.getTarget() + level + bonus);
-            skillValues.get(type).setText("+" + target);
-        } else {
-            int target = max(getCountDownMaxValue(), skillType.getTarget() - level - bonus);
-            skillValues.get(type).setText(target + "+");
-        }
+        Skill skill = new Skill(type);
+        skill.setLevel(level);
+        skill.setBonus(bonus);
+
+        SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgeEffects, isClanCampaign, today, true);
+
+        int target = min(getCountUpMaxValue(), skill.getFinalSkillValue(skillModifierData));
+        skillValues.get(type).setText(target + "+");
     }
 
     private void changeValueEnabled(String type) {
@@ -1702,9 +1704,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             person.setGender((Gender) choiceGender.getSelectedItem());
         }
         person.setDateOfBirth(birthdate);
-        if (campaign.getCampaignOptions().isUseAgeEffects()) {
-            updateAllSkillAgeModifiers(campaign.getLocalDate(), person);
-        }
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
         if (choiceSystem.getSelectedItem() != null && choicePlanet.getSelectedItem() != null) {
             person.setOriginPlanet((Planet) choicePlanet.getSelectedItem());
@@ -1715,7 +1714,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         person.setClanPersonnel(chkClan.isSelected());
 
         if (campaign.getCampaignOptions().isUseToughness()) {
-            person.setToughness(MathUtility.parseInt(textToughness.getText(), person.getToughness()));
+            person.setToughness(MathUtility.parseInt(textToughness.getText(), person.getDirectToughness()));
         }
 
         int newValue = MathUtility.parseInt(textConnections.getText(), person.getConnections());

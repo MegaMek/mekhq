@@ -35,11 +35,13 @@ package mekhq.campaign.market.contractMarket;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.HEROIC;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.io.PrintWriter;
@@ -557,9 +559,20 @@ public abstract class AbstractContractMarket {
             String enemyCode = ObjectUtility.getRandomItem(localFactions);
             contract.setEnemyCode(enemyCode);
         } else {
-            contract.setEnemyCode(RandomFactionGenerator.getInstance()
+            String enemyFactionCode = RandomFactionGenerator.getInstance()
                                         .getEnemy(contract.getEmployerCode(),
-                                              contract.getContractType().isGarrisonType()));
+                                              contract.getContractType().isGarrisonType());
+            Faction enemyFaction = Factions.getInstance().getFaction(enemyFactionCode);
+
+            // If the OpFor isn't Clan, there is a 1-in-5 chance they've hired mercenaries to do their dirty work. So
+            // the original enemy faction is set as the mercenary's employer, while the enemy faction is set to
+            // Mercenaries.
+            if (!enemyFaction.isClan() && !enemyFaction.isAggregate() && randomInt(5) == 0) {
+                contract.setEnemyMercenaryEmployerCode(enemyFactionCode);
+                contract.setEnemyCode(MERCENARY_FACTION_CODE);
+            } else {
+                contract.setEnemyCode(enemyFactionCode);
+            }
         }
     }
 
@@ -585,12 +598,6 @@ public abstract class AbstractContractMarket {
                                     contract.getEnemyCode();
             logger.warn(errorMsg);
             throw new NoContractLocationFoundException(errorMsg);
-        }
-    }
-
-    protected void setIsRiotDuty(AtBContract contract) {
-        if (contract.getContractType().isGarrisonDuty() && contract.getEnemy().isRebel()) {
-            contract.setContractType(AtBContractType.RIOT_DUTY);
         }
     }
 

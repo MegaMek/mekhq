@@ -54,6 +54,7 @@ import java.util.UUID;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Dropship;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -194,6 +195,10 @@ public class CampaignTest {
         when(testCampaign.getTechs(anyBoolean())).thenCallRealMethod();
         when(testCampaign.getTechs(anyBoolean(), anyBoolean())).thenCallRealMethod();
         when(testCampaign.getTechsExpanded(anyBoolean(), anyBoolean(), anyBoolean())).thenCallRealMethod();
+
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        when(testCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+        when(campaignOptions.isTechsUseAdministration()).thenReturn(false);
 
         // Test just getting the list of active techs.
         List<Person> expected = new ArrayList<>(3);

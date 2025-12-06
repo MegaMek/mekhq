@@ -33,7 +33,6 @@
 package mekhq.campaign.personnel.enums;
 
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.KeyEvent;
@@ -55,122 +54,39 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
  */
 public enum PersonnelRole {
     // region Enum Declarations
-    /**
-     * Individual roles with corresponding name texts and mnemonics.
-     */
-    // I used an average of the modifiers from the MekWarrior, Hot Shot, and Grizzled Veteran ATOW Archetypes
-    MEKWARRIOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_M, 4, 5, 6, 6, 4, 4, 4),
-
-    // I used an average of the modifiers from the MekWarrior, and Aerospace Pilot ATOW Archetypes
-    LAM_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 3, 4, 6, 6, 4, 4, 5),
-
-    // ATOW: Tanker Archetype
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    GROUND_VEHICLE_DRIVER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_V, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Tanker Archetype
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    NAVAL_VEHICLE_DRIVER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_N, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Companion Chopper Pilot Archetype
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    VTOL_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
-
-    // ATOW: Tanker Archetype
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    VEHICLE_GUNNER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_G, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    VEHICLE_CREW(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    COMBAT_TECHNICIAN(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Tanker Archetype
-    VEHICLE_CREW_GROUND(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Tanker Archetype
-    VEHICLE_CREW_NAVAL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Tanker Archetype
-    VEHICLE_CREW_VTOL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Aerospace Pilot Archetype
-    AEROSPACE_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_A, 2, 3, 5, 5, 4, 4, 5),
-
-    // ATOW: Aerospace Pilot Archetype
-    CONVENTIONAL_AIRCRAFT_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_C, 2, 3, 5, 5, 4, 4, 5),
-
-    // ATOW: Aerospace Pilot Archetype (most ProtoMek pilots are Aerospace Sibkbo washouts, so this made the most sense)
-    PROTOMEK_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_P, 2, 3, 5, 5, 4, 4, 5),
-
-    // ATOW: Battle Armor Specialist Archetype
-    BATTLE_ARMOUR(PersonnelRoleSubType.COMBAT, true, KeyEvent.VK_B, 7, 6, 4, 5, 3, 4, 4),
-
-    // ATOW: Renegade Warrior Archetype
-    SOLDIER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_S, 5, 5, 4, 5, 4, 6, 3),
-
-    // ATOW: Tanker Archetype
-    VESSEL_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_I, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Tanker Archetype
-    VESSEL_GUNNER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_U, 4, 5, 5, 6, 4, 4, 4),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    VESSEL_CREW(PersonnelRoleSubType.COMBAT, KeyEvent.VK_W, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype
-    VESSEL_NAVIGATOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_Y, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    MEK_TECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_T, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    MECHANIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_E, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    AERO_TEK(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_O, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    BA_TECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
-    // Technician skill)
-    ASTECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
-
-    // ATOW: Communications Specialist Archetype (this might seem like an odd choice, but the Attributes for this Archetype
-    // work really well for this profession). However, we have switched Dexterity and Reflexes.
-    DOCTOR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_D, 3, 4, 5, 4, 6, 4, 4),
-
-    // ATOW: Communications Specialist Archetype (this might seem like an odd choice, but the Attributes for this Archetype
-    // work really well for this profession
-    MEDIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 4, 5, 6, 4, 4),
-
-    // ATOW: Faceman Archetype
-    ADMINISTRATOR_COMMAND(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 3, 3, 4, 6, 3, 5),
-
-    // ATOW: Faceman Archetype
-    ADMINISTRATOR_LOGISTICS(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_L, 3, 3, 3, 4, 6, 3, 5),
-
-    // ATOW: Faceman Archetype
-    ADMINISTRATOR_TRANSPORT(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_R, 3, 3, 3, 4, 6, 3, 5),
-
-    // ATOW: Faceman Archetype
-    ADMINISTRATOR_HR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_H, 3, 3, 3, 4, 6, 3, 5),
+    MEKWARRIOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_M, 4, 4, 5, 5, 4, 4, 4),
+    LAM_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
+    VEHICLE_CREW_GROUND(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
+    VEHICLE_CREW_NAVAL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
+    VEHICLE_CREW_VTOL(PersonnelRoleSubType.COMBAT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
+    AEROSPACE_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_A, 4, 4, 5, 5, 4, 4, 4),
+    CONVENTIONAL_AIRCRAFT_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_C, 4, 4, 5, 5, 4, 4, 4),
+    PROTOMEK_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_P, 4, 4, 5, 5, 4, 4, 4),
+    BATTLE_ARMOUR(PersonnelRoleSubType.COMBAT, true, KeyEvent.VK_B, 4, 4, 5, 5, 4, 4, 4),
+    SOLDIER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_S, 4, 5, 5, 4, 4, 4, 4),
+    VESSEL_PILOT(PersonnelRoleSubType.COMBAT, KeyEvent.VK_I, 4, 4, 5, 5, 4, 4, 4),
+    VESSEL_GUNNER(PersonnelRoleSubType.COMBAT, KeyEvent.VK_U, 4, 4, 5, 5, 4, 4, 4),
+    VESSEL_CREW(PersonnelRoleSubType.COMBAT, KeyEvent.VK_W, 3, 4, 5, 4, 5, 5, 4),
+    VESSEL_NAVIGATOR(PersonnelRoleSubType.COMBAT, KeyEvent.VK_Y, 4, 4, 4, 4, 6, 4, 4),
+    MEK_TECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_T, 4, 4, 5, 3, 5, 5, 4),
+    MECHANIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_E, 4, 4, 5, 3, 5, 5, 4),
+    AERO_TEK(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_O, 4, 4, 5, 3, 5, 5, 4),
+    BA_TECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 3, 5, 5, 4),
+    ASTECH(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 4, 4, 5, 3, 5, 5, 4),
+    DOCTOR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_D, 3, 4, 5, 4, 5, 5, 4),
+    MEDIC(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 5, 4, 5, 5, 4),
+    ADMINISTRATOR_COMMAND(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_UNDEFINED, 3, 4, 4, 4, 5, 5, 5),
+    ADMINISTRATOR_LOGISTICS(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_L, 3, 4, 4, 4, 5, 5, 5),
+    ADMINISTRATOR_TRANSPORT(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_R, 3, 4, 4, 4, 5, 5, 5),
+    ADMINISTRATOR_HR(PersonnelRoleSubType.SUPPORT, KeyEvent.VK_H, 3, 4, 4, 4, 5, 5, 5),
 
     // If we're generating a character without a Profession, we're just going to leave them with middle of the road
-    // Attribute scores (5 in everything)
-    NONE(PersonnelRoleSubType.CIVILIAN, false, KeyEvent.VK_UNDEFINED, 5, 5, 5, 5, 5, 5, 5),
+    // Attribute scores (4 in everything)
+    NONE(PersonnelRoleSubType.CIVILIAN, false, KeyEvent.VK_UNDEFINED, 4, 4, 4, 4, 4, 4, 4),
 
-    // No archetype, but ATOW pg 35 states that the Attribute scores for an average person are 4
+    // No archetype, but ATOW pg 35 states that the Attribute scores for an average person are 4. We've gone with 5
+    // because otherwise it takes +2 levels to get a modifier, but only -1 to get a penalty and players didn't like
+    // that.
     DEPENDENT(KeyEvent.VK_UNDEFINED),
     ADULT_ENTERTAINER(KeyEvent.VK_UNDEFINED),
     ANTIQUARIAN(KeyEvent.VK_UNDEFINED),
@@ -427,12 +343,29 @@ public enum PersonnelRole {
     LOCAL_WARLORD(KeyEvent.VK_UNDEFINED),
     MISCELLANEOUS_JOB(KeyEvent.VK_UNDEFINED),
     NOBLE(KeyEvent.VK_UNDEFINED),
-    COMMON_CRIMINAL(KeyEvent.VK_UNDEFINED);
+    COMMON_CRIMINAL(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    GROUND_VEHICLE_DRIVER(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    NAVAL_VEHICLE_DRIVER(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    VTOL_PILOT(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    VEHICLE_GUNNER(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    VEHICLE_CREW(KeyEvent.VK_UNDEFINED),
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    COMBAT_TECHNICIAN(KeyEvent.VK_UNDEFINED);
     // endregion Enum Declarations
 
     // region Variable Declarations
     private static final MMLogger logger = MMLogger.create(PersonnelRole.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelRole";
+
+    public static final List<PersonnelRole> VEHICLE_CREW_EXTENDED_ROLES = List.of(MEK_TECH, AERO_TEK, MECHANIC,
+          BA_TECH, ASTECH, DOCTOR, MEDIC, COMMS_OPERATOR, TECH_COMMUNICATIONS, SENSOR_TECHNICIAN, SOLDIER,
+          ADMINISTRATOR_COMMAND, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_HR, CHEF,
+          VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL);
 
     private final PersonnelRoleSubType subType;
     private final boolean hasClanName;
@@ -448,7 +381,7 @@ public enum PersonnelRole {
 
     // region Constructors
     PersonnelRole(final int mnemonic) {
-        this(PersonnelRoleSubType.CIVILIAN, false, mnemonic, 4, 4, 4, 4, 4, 4, 4);
+        this(PersonnelRoleSubType.CIVILIAN, false, mnemonic, 5, 5, 5, 5, 5, 5, 5);
     }
 
     PersonnelRole(final PersonnelRoleSubType subType, final int mnemonic, final int strength, final int body,
@@ -492,7 +425,7 @@ public enum PersonnelRole {
      */
     public String getLabel(final boolean isClan) {
         final boolean useClan = isClan && hasClanName;
-        return getFormattedTextAt(RESOURCE_BUNDLE, name() + ".label" + (useClan ? ".clan" : ""));
+        return getTextAt(RESOURCE_BUNDLE, name() + ".label" + (useClan ? ".clan" : ""));
     }
 
     /**
@@ -703,7 +636,7 @@ public enum PersonnelRole {
                     yield List.of(SkillType.S_PILOT_VTOL, SkillType.S_GUN_VEE);
                 }
             }
-            case MECHANIC, COMBAT_TECHNICIAN -> {
+            case MECHANIC -> {
                 if (isTechsUseAdministration) {
                     yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_ADMIN);
                 } else {
@@ -834,7 +767,7 @@ public enum PersonnelRole {
             case MUNITIONS_FACTORY_WORKER -> List.of(SkillType.S_DEMOLITIONS, SkillType.S_ASTECH);
             case MUSICIAN -> List.of(SkillType.S_ART_INSTRUMENT, SkillType.S_INTEREST_MUSIC);
             case ORBITAL_DEFENSE_GUNNER -> List.of(SkillType.S_GUN_VEE, SkillType.S_TECH_MECHANIC);
-            case ORBITAL_SHUTTLE_PILOT -> List.of(SkillType.S_PILOT_AERO, SkillType.S_PROTOCOLS);
+            case ORBITAL_SHUTTLE_PILOT -> List.of(SkillType.S_PILOT_SPACE, SkillType.S_PROTOCOLS);
             case PARAMEDIC -> List.of(SkillType.S_MEDTECH, SkillType.S_PILOT_GVEE);
             case PAINTER -> List.of(SkillType.S_ART_PAINTING, SkillType.S_INTEREST_MYTHOLOGY);
             case PATHFINDER -> List.of(SkillType.S_TRACKING, SkillType.S_SURVIVAL);
@@ -1074,36 +1007,13 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return {@code true} if the personnel has the Combat Technician role, {@code false} otherwise.
-     */
-    public boolean isCombatTechnician() {
-        return this == COMBAT_TECHNICIAN;
-    }
-
-    /**
      * Returns {@code true} if this profession is suitable for vehicle crew positions.
      *
      * @author Illiani
      * @since 0.50.07
      */
     public boolean isVehicleCrewExtended() {
-        return this == COMBAT_TECHNICIAN ||
-                     this == MEK_TECH ||
-                     this == AERO_TEK ||
-                     this == MECHANIC ||
-                     this == BA_TECH ||
-                     this == ASTECH ||
-                     this == DOCTOR ||
-                     this == MEDIC ||
-                     this == COMMS_OPERATOR ||
-                     this == TECH_COMMUNICATIONS ||
-                     this == SENSOR_TECHNICIAN ||
-                     this == SOLDIER ||
-                     this == ADMINISTRATOR_COMMAND ||
-                     this == ADMINISTRATOR_TRANSPORT ||
-                     this == ADMINISTRATOR_LOGISTICS ||
-                     this == ADMINISTRATOR_HR ||
-                     this == CHEF;
+        return VEHICLE_CREW_EXTENDED_ROLES.contains(this);
     }
 
 
@@ -1297,28 +1207,28 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Vehicle Crew/Ground, or the Combat Technician role
+     * @return {@code true} if the character is assigned to Vehicle Crew/Ground
      */
     public boolean isGroundVehicleCrew() {
-        return isVehicleCrewGround() || isCombatTechnician();
+        return isVehicleCrewGround();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Vehicle Crew/Naval, or the Combat Technician role
+     * @return {@code true} if the character is assigned to Vehicle Crew/Naval
      */
     public boolean isNavalVehicleCrew() {
-        return isVehicleCrewNaval() || isCombatTechnician();
+        return isVehicleCrewNaval();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Vehicle Crew/VTOL, or the Combat Technician role
+     * @return {@code true} if the character is assigned to Vehicle Crew/VTOL
      */
     public boolean isVTOLCrew() {
-        return isVehicleCrewVTOL() || isCombatTechnician();
+        return isVehicleCrewVTOL();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Vehicle Crew/x or Combat Technician role
+     * @return {@code true} if the character is assigned to the Vehicle Crew/x role
      */
     public boolean isVehicleCrewMember() {
         return isGroundVehicleCrew() || isNavalVehicleCrew() || isVTOLCrew();
@@ -1364,7 +1274,7 @@ public enum PersonnelRole {
      * @return {@code true} if the character is assigned to a technician role, {@code false} otherwise.
      */
     public boolean isTech() {
-        return isMekTech() || isMechanic() || isCombatTechnician() || isAeroTek() || isBATech() || isVesselCrew();
+        return isMekTech() || isMechanic() || isAeroTek() || isBATech() || isVesselCrew();
     }
 
     /**
@@ -1374,7 +1284,7 @@ public enum PersonnelRole {
      * @return {@code true} if the character is assigned to a technician role, {@code false} otherwise.
      */
     public boolean isTechSecondary() {
-        return isMekTech() || isMechanic() || isCombatTechnician() || isAeroTek() || isBATech();
+        return isMekTech() || isMechanic() || isAeroTek() || isBATech();
     }
 
     /**

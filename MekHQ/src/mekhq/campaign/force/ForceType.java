@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.force;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.logging.MMLogger;
 
@@ -70,6 +70,8 @@ public enum ForceType {
     SALVAGE(4, true, true);
 
     // region Fields
+    private final String displayName;
+    private final String symbol;
     private final int key;
     private final boolean standardizeParents;
     private final boolean childrenInherit;
@@ -86,12 +88,21 @@ public enum ForceType {
      *                           ForceType.
      */
     ForceType(final int key, boolean standardizeParents, boolean childrenInherit) {
+        this.displayName = generateDisplayName();
+        this.symbol = generateSymbol();
         this.key = key;
         this.standardizeParents = standardizeParents;
         this.childrenInherit = childrenInherit;
     }
     // endregion Constructor
 
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
 
     // region Getters
 
@@ -105,11 +116,11 @@ public enum ForceType {
      *
      * @return The localized display name for the current instance.
      */
-    public String getDisplayName() {
+    private String generateDisplayName() {
         final String RESOURCE_BUNDLE = "mekhq.resources.ForceType";
         final String RESOURCE_KEY = name() + ".label";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**
@@ -119,20 +130,13 @@ public enum ForceType {
      * a localization resource key in the {@code ForceType} resource bundle, with keys formatted as
      * {@code [enumName].symbol}.</p>
      *
-     * <p>If the current instance is {@code STANDARD}, an empty string is returned as the symbol.</p>
-     *
-     * @return The localized symbol associated with the current instance, or an empty string if the instance is
-     *       {@code STANDARD}.
+     * @return The localized symbol associated with the current instance.
      */
-    public String getSymbol() {
-        if (this == STANDARD) {
-            return "";
-        }
-
+    private String generateSymbol() {
         final String RESOURCE_BUNDLE = "mekhq.resources.ForceType";
         final String RESOURCE_KEY = name() + ".symbol";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**

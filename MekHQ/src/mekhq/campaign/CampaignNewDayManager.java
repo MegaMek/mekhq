@@ -33,13 +33,13 @@
  */
 package mekhq.campaign;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
-import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
@@ -54,8 +54,8 @@ import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewY
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
-import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
+import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
@@ -69,6 +69,7 @@ import static mekhq.campaign.stratCon.SupportPointNegotiation.negotiateAdditiona
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -81,7 +82,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
@@ -120,6 +120,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Bloodmark;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.RandomDependents;
@@ -138,7 +139,7 @@ import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.medical.MedicalController;
-import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.QuickTrain;
@@ -180,6 +181,9 @@ import mekhq.utilities.ReportingUtilities;
  */
 public class CampaignNewDayManager {
     private static final MMLogger LOGGER = MMLogger.create(CampaignNewDayManager.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
+
+    // Deprecated since 0.50.10, for removal false
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
           MekHQ.getMHQOptions().getLocale());
 
@@ -250,8 +254,34 @@ public class CampaignNewDayManager {
         campaign.getCurrentReport().clear();
         campaign.setCurrentReportHTML("");
         campaign.getNewReports().clear();
-        campaign.getPersonnelWhoAdvancedInXP().clear();
+
+        campaign.getSkillReport().clear();
+        campaign.setSkillReportHTML("");
+        campaign.getNewSkillReports().clear();
+
+        campaign.getBattleReport().clear();
+        campaign.setBattleReportHTML("");
+        campaign.getNewBattleReports().clear();
+
+        campaign.getPersonnelReport().clear();
+        campaign.setPersonnelReportHTML("");
+        campaign.getNewPersonnelReports().clear();
+
+        campaign.getMedicalReport().clear();
+        campaign.setMedicalReportHTML("");
+        campaign.getNewMedicalReports().clear();
+
+        campaign.getAcquisitionsReport().clear();
+        campaign.setAcquisitionsReportHTML("");
+        campaign.getNewAcquisitionsReports().clear();
+
+        campaign.getTechnicalReport().clear();
+        campaign.setTechnicalReportHTML("");
+        campaign.getNewTechnicalReports().clear();
+
         campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(today) + "</b>");
+
+        campaign.getPersonnelWhoAdvancedInXP().clear();
 
         // New Year Changes
         if (isNewYear) {
@@ -468,7 +498,7 @@ public class CampaignNewDayManager {
                         false), campaignOptions.getFieldKitchenCapacity());
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, false),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
-            boolean withinCapacity = campaign.isOnContractAndPlanetside() ||
+            boolean withinCapacity = !campaign.isOnContractAndPlanetside() ||
                                            areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
             campaign.setFieldKitchenWithinCapacity(withinCapacity);
         } else {
@@ -550,12 +580,18 @@ public class CampaignNewDayManager {
                                         campaignOptions.isShowLifeEventDialogCelebrations();
         boolean isCampaignPlanetside = updatedLocation.isOnPlanet();
         boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
+        boolean isUseAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
         boolean isUseFatigue = campaignOptions.isUseFatigue();
+        int fatigueRate = campaignOptions.getFatigueRate();
         boolean useBetterMonthlyIncome = campaignOptions.isUseBetterExtraIncome();
+        boolean isUseAgeEffects = campaignOptions.isUseAgeEffects();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
+
+            int age = person.getAge(today);
+            person.setAgeForAttributeModifiers(isUseAgeEffects ? age : IGNORE_AGE);
 
             PersonnelOptions personnelOptions = person.getOptions();
 
@@ -587,6 +623,10 @@ public class CampaignNewDayManager {
 
             processAnniversaries(person);
 
+            person.checkForIlliterateRemoval();
+
+            AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+
             // Weekly events
             if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
                 if (!campaign.getRandomDeath().processNewWeek(campaign, today, person)) {
@@ -602,7 +642,8 @@ public class CampaignNewDayManager {
                     processFatigueRecovery(campaign, person, isWithinCapacity);
                 }
 
-                processCompulsionsAndMadness(person, personnelOptions, isUseAdvancedMedical, isUseFatigue);
+                processCompulsionsAndMadness(person, personnelOptions, isUseAdvancedMedical, isUseAltAdvancedMedical,
+                      isUseFatigue, fatigueRate);
             }
 
             // Monthly events
@@ -670,11 +711,10 @@ public class CampaignNewDayManager {
             }
 
             if (today.getDayOfYear() == 1 && campaignOptions.isUseAlternativeAdvancedMedical()) {
-                AdvancedMedicalAlternate.performEnhancedImagingDegradationCheck(campaign, person);
+                AdvancedMedicalAlternateImplants.performEnhancedImagingDegradationCheck(campaign, person);
             }
 
             if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
-                int age = person.getAge(today);
                 if (age >= 6 && age <= 12) {
                     peopleWhoCelebrateCommandersDay++;
                 }
@@ -872,7 +912,7 @@ public class CampaignNewDayManager {
             if (campaignState != null && !contract.getEndingDate().equals(today)) {
                 boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
                 int victoryPoints = contract.getContractScore(isUseMaplessMode);
-                int requiredVictoryPoints = isUseMaplessMode ? contract.getRequiredCombatTeams() * 10 : 1;
+                int requiredVictoryPoints = contract.getRequiredVictoryPoints();
 
                 if (campaignState.canEndContractEarly() && victoryPoints >= requiredVictoryPoints) {
                     new ImmersiveDialogNotification(campaign,
@@ -1330,9 +1370,8 @@ public class CampaignNewDayManager {
             }
         }
 
+        // This is where we update all the aging modifiers for the character.
         if (campaignOptions.isUseAgeEffects() && isBirthday) {
-            // This is where we update all the aging modifiers for the character.
-            updateAllSkillAgeModifiers(today, person);
             applyAgingSPA(age, person);
         }
 
@@ -1385,30 +1424,48 @@ public class CampaignNewDayManager {
      * as appropriate. If certain conditions are no longer present, some status flags (such as clinical paranoia) may be
      * reset.</p>
      *
-     * @param person               the person whose conditions are being processed
-     * @param personnelOptions     the set of personnel options or traits affecting which conditions are relevant
-     * @param isUseAdvancedMedical {@code true} if advanced medical rules are applied, {@code false} otherwise
-     * @param isUseFatigue         {@code true} if fatigue rules are applied, {@code false} otherwise
+     * @param person                  the person whose conditions are being processed
+     * @param personnelOptions        the set of personnel options or traits affecting which conditions are relevant
+     * @param isUseAdvancedMedical    {@code true} if advanced medical rules are applied, {@code false} otherwise
+     * @param isUseAltAdvancedMedical {@code true} if alt advanced medical rules are applied, {@code false} otherwise
+     * @param isUseFatigue            {@code true} if fatigue rules are applied, {@code false} otherwise
+     * @param fatigueRate             the user-defined rate at which fatigue is gained
      *
      * @author Illiani
      * @since 0.50.07
      */
     private void processCompulsionsAndMadness(Person person, PersonnelOptions personnelOptions,
-          boolean isUseAdvancedMedical, boolean isUseFatigue) {
+          boolean isUseAdvancedMedical, boolean isUseAltAdvancedMedical, boolean isUseFatigue, int fatigueRate) {
         String gamblingReport = person.gambleWealth();
         if (!gamblingReport.isBlank()) {
             campaign.addReport(gamblingReport);
         }
 
+        if (personnelOptions.booleanOption(COMPULSION_PAINKILLER_ADDICTION)) {
+            int prostheticCount = 1; // Minimum of 1
+            for (Injury injury : person.getInjuries()) {
+                if (injury.getSubType().isProsthetic()) {
+                    prostheticCount++;
+                }
+            }
+
+            Money cost = Money.of(PersonnelOptions.PAINKILLER_COST * prostheticCount);
+            if (!finances.debit(TransactionType.MEDICAL_EXPENSES, today, cost,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "painkillerAddiction.transaction", person.getFullTitle()))) {
+                checkForDiscontinuationSyndrome(person,
+                      isUseAdvancedMedical,
+                      isUseAltAdvancedMedical,
+                      isUseFatigue,
+                      fatigueRate);
+            }
+        }
+
         if (personnelOptions.booleanOption(COMPULSION_ADDICTION)) {
-            int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            person.processDiscontinuationSyndrome(campaign,
+            checkForDiscontinuationSyndrome(person,
                   isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
                   isUseFatigue,
-                  true,
-                  failedWillpowerCheck);
+                  fatigueRate);
         }
 
         if (personnelOptions.booleanOption(MADNESS_FLASHBACKS)) {
@@ -1417,6 +1474,7 @@ public class CampaignNewDayManager {
                   null, modifier);
             person.processCripplingFlashbacks(campaign,
                   isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
                   true,
                   failedWillpowerCheck);
         }
@@ -1452,6 +1510,7 @@ public class CampaignNewDayManager {
                   null, modifier);
             String report = person.processChildlikeRegression(campaign,
                   isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
                   true,
                   failedWillpowerCheck);
             if (!report.isBlank()) {
@@ -1465,6 +1524,7 @@ public class CampaignNewDayManager {
                   null, modifier);
             String report = person.processCatatonia(campaign,
                   isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
                   true,
                   failedWillpowerCheck);
             if (!report.isBlank()) {
@@ -1502,6 +1562,20 @@ public class CampaignNewDayManager {
         if (resetClinicalParanoia) {
             person.setSufferingFromClinicalParanoia(false);
         }
+    }
+
+    private void checkForDiscontinuationSyndrome(Person person, boolean isUseAdvancedMedical,
+          boolean isUseAltAdvancedMedical, boolean isUseFatigue, int fatigueRate) {
+        int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
+        boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
+              null, modifier);
+        person.processDiscontinuationSyndrome(campaign,
+              isUseAdvancedMedical,
+              isUseAltAdvancedMedical,
+              isUseFatigue,
+              fatigueRate,
+              true,
+              failedWillpowerCheck);
     }
 
     @Deprecated(since = "0.50.10", forRemoval = true)
@@ -1701,7 +1775,7 @@ public class CampaignNewDayManager {
                       !updatedLocation.getJumpPath().isEmpty() &&
                       updatedLocation.getJumpPath().getLastSystem().getId().equals(contract.getSystemId())) {
                 // transitTime is measured in days; so we round up to the next whole day
-                contract.setStartAndEndDate(today.plusDays((int) Math.ceil(updatedLocation.getTransitTime())));
+                contract.setStartAndEndDate(today.plusDays((int) ceil(updatedLocation.getTransitTime())));
                 campaign.addReport("The start and end dates of " +
                                          contract.getHyperlinkedName() +
                                          " have been shifted to reflect the current ETA.");
@@ -1736,12 +1810,6 @@ public class CampaignNewDayManager {
                                              " requirements resulted in " +
                                              deficit +
                                              ((deficit == 1) ? " minor contract breach" : " minor contract breaches"));
-                }
-            }
-
-            if (Objects.equals(updatedLocation.getCurrentSystem(), contract.getSystem())) {
-                if (!campaign.getAutomatedMothballUnits().isEmpty()) {
-                    performAutomatedActivation(campaign);
                 }
             }
 

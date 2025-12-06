@@ -96,7 +96,7 @@ public class RelationshipsTab {
     private JCheckBox chkUseRandomPrisonerMarriages;
     private JLabel lblRandomMarriageAgeRange;
     private JSpinner spnRandomMarriageAgeRange;
-    private JLabel lblRandomMarriageOppositeSexDiceSize;
+    private JLabel lblRandomMarriageDiceSize;
     private JSpinner spnRandomMarriageDiceSize;
     private JLabel lblRandomNewDependentMarriage;
     private JSpinner spnRandomNewDependentMarriage;
@@ -259,7 +259,7 @@ public class RelationshipsTab {
         lblRandomMarriageAgeRange = new JLabel();
         spnRandomMarriageAgeRange = new JSpinner();
 
-        lblRandomMarriageOppositeSexDiceSize = new JLabel();
+        lblRandomMarriageDiceSize = new JLabel();
         spnRandomMarriageDiceSize = new JSpinner();
         lblRandomNewDependentMarriage = new JLabel();
         spnRandomNewDependentMarriage = new JSpinner();
@@ -282,7 +282,7 @@ public class RelationshipsTab {
         // Header
         marriageHeader = new CampaignOptionsHeaderPanel("MarriageTab",
               getImageDirectory() + "logo_morgrains_valkyrate.png",
-              5);
+              4);
 
         // Contents
         pnlMarriageGeneralOptions = createMarriageGeneralOptionsPanel();
@@ -400,13 +400,13 @@ public class RelationshipsTab {
               10, 0, 100, 1);
         spnRandomMarriageAgeRange.addMouseListener(createTipPanelUpdater(marriageHeader, "RandomMarriageAgeRange"));
 
-        lblRandomMarriageOppositeSexDiceSize = new CampaignOptionsLabel("RandomMarriageOppositeSexDiceSize");
-        lblRandomMarriageOppositeSexDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
-              "RandomMarriageOppositeSexDiceSize"));
-        spnRandomMarriageDiceSize = new CampaignOptionsSpinner("RandomMarriageOppositeSexDiceSize",
+        lblRandomMarriageDiceSize = new CampaignOptionsLabel("RandomMarriageDiceSize");
+        lblRandomMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
+              "RandomMarriageDiceSize"));
+        spnRandomMarriageDiceSize = new CampaignOptionsSpinner("RandomMarriageDiceSize",
               5000, 0, 100000, 1);
         spnRandomMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
-              "RandomMarriageOppositeSexDiceSize"));
+              "RandomMarriageDiceSize"));
 
         lblRandomNewDependentMarriage = new CampaignOptionsLabel("RandomNewDependentMarriage");
         lblRandomNewDependentMarriage.addMouseListener(createTipPanelUpdater(marriageHeader,
@@ -445,15 +445,9 @@ public class RelationshipsTab {
 
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(lblRandomMarriageOppositeSexDiceSize, layout);
+        panel.add(lblRandomMarriageDiceSize, layout);
         layout.gridx++;
         panel.add(spnRandomMarriageDiceSize, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblPrefersSameSexDiceSize, layout);
-        layout.gridx++;
-        panel.add(spnPrefersSameSexDiceSize, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -473,7 +467,7 @@ public class RelationshipsTab {
         // Header
         divorceHeader = new CampaignOptionsHeaderPanel("DivorceTab",
               getImageDirectory() + "logo_escorpion_imperio.png",
-              5);
+              3);
 
         // Contents
         chkUseManualDivorce = new CampaignOptionsCheckBox("UseManualDivorce");
@@ -605,7 +599,7 @@ public class RelationshipsTab {
         // Header
         procreationHeader = new CampaignOptionsHeaderPanel("ProcreationTab",
               getImageDirectory() + "logo_hanseatic_league.png",
-              9);
+              6);
 
         // Contents
         pnlProcreationGeneralOptionsPanel = createProcreationGeneralOptionsPanel();

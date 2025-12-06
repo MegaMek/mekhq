@@ -477,9 +477,9 @@ public class StratConTab extends CampaignGuiTab {
         }
 
         // special case text reminding player to complete Turning Point scenarios
-        if (!campaignState.getContract().getCommandRights().isIndependent()) {
-            boolean contractIsActive = campaignState.getContract()
-                                             .isActiveOn(getCampaignGui().getCampaign().getLocalDate());
+        AtBContract contract = campaignState.getContract();
+        if (!contract.getCommandRights().isIndependent()) {
+            boolean contractIsActive = contract.isActiveOn(getCampaignGui().getCampaign().getLocalDate());
 
             if (contractIsActive) {
                 sb.append("<span color='")
@@ -498,7 +498,9 @@ public class StratConTab extends CampaignGuiTab {
                       .append(OBJECTIVE_FAILED);
             }
 
-            sb.append(" Maintain Campaign Victory Point count above 0 by completing Turning Point scenarios")
+            sb.append(" Maintain Campaign Victory Point count above <b>")
+                  .append(contract.getRequiredVictoryPoints())
+                  .append("</b> by completing Turning Point scenarios")
                   .append("</span><br/>");
         }
 

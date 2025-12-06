@@ -37,24 +37,27 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.campaignOptions.CampaignOptions.S_AUTO;
-import static mekhq.campaign.campaignOptions.CampaignOptions.S_TECH;
 import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_MONTH;
 import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_WEEK;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.force.ForceType.STANDARD;
+import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.giveEIImplant;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_ASTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
+import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
+import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
@@ -120,11 +123,13 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Quartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.camOpsReputation.IUnitRating;
 import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.events.*;
 import mekhq.campaign.events.loans.LoanNewEvent;
@@ -203,6 +208,8 @@ import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
+import mekhq.campaign.personnel.medical.MASHCapacity;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -333,13 +340,36 @@ public class Campaign implements ITechManager {
     private transient String currentReportHTML;
     private transient List<String> newReports;
 
+    private final ArrayList<String> personnelReport;
+    private transient String personnelReportHTML;
+    private transient List<String> newPersonnelReports;
+
+    private final ArrayList<String> skillReport;
+    private transient String skillReportHTML;
+    private transient List<String> newSkillReports;
+
+    private final ArrayList<String> technicalReport;
+    private transient String technicalReportHTML;
+    private transient List<String> newTechnicalReports;
+
+    private final ArrayList<String> acquisitionsReport;
+    private transient String acquisitionsReportHTML;
+    private transient List<String> newAcquisitionsReports;
+
+    private final ArrayList<String> medicalReport;
+    private transient String medicalReportHTML;
+    private transient List<String> newMedicalReports;
+
+    private final ArrayList<String> battleReport;
+    private transient String battleReportHTML;
+    private transient List<String> newBattleReports;
+
     private boolean fieldKitchenWithinCapacity;
     private int mashTheatreCapacity;
     private int repairBaysRented;
 
-    // this is updated and used per gaming session, it is enabled/disabled via the
-    // Campaign options
-    // we're re-using the LogEntry class that is used to store Personnel entries
+    // this is updated and used per gaming session, it is enabled/disabled via the Campaign options we're re-using
+    // the LogEntry class used to store Personnel entries
     public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<>();
 
     private boolean overtime;
@@ -581,6 +611,30 @@ public class Campaign implements ITechManager {
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
+
+        personnelReport = new ArrayList<>();
+        personnelReportHTML = "";
+        newPersonnelReports = new ArrayList<>();
+
+        skillReport = new ArrayList<>();
+        skillReportHTML = "";
+        newSkillReports = new ArrayList<>();
+
+        technicalReport = new ArrayList<>();
+        technicalReportHTML = "";
+        newTechnicalReports = new ArrayList<>();
+
+        acquisitionsReport = new ArrayList<>();
+        acquisitionsReportHTML = "";
+        newAcquisitionsReports = new ArrayList<>();
+
+        medicalReport = new ArrayList<>();
+        medicalReportHTML = "";
+        newMedicalReports = new ArrayList<>();
+
+        battleReport = new ArrayList<>();
+        battleReportHTML = "";
+        newBattleReports = new ArrayList<>();
 
         // Secondary initialization from passed / derived values
         news = new News(getGameYear(), id.getLeastSignificantBits());
@@ -1360,6 +1414,14 @@ public class Campaign implements ITechManager {
             return;
         }
 
+        if (id == FORCE_NONE) {
+            Force currentForce = getForce(unit.getForceId());
+            unit.setForceId(FORCE_NONE);
+            unit.setScenarioId(NO_ASSIGNED_SCENARIO);
+            MekHQ.triggerEvent(new OrganizationChangedEvent(this, currentForce, unit));
+            return;
+        }
+
         Force force = forceIds.get(id);
         Force prevForce = forceIds.get(unit.getForceId());
         boolean useTransfers = false;
@@ -1709,18 +1771,40 @@ public class Campaign implements ITechManager {
         return scenarios.values();
     }
 
+    public List<Scenario> getActiveScenarios() {
+        return scenarios.values().stream().filter(s -> s.getStatus().isCurrent()).toList();
+    }
+
     public void setLocation(CurrentLocation l) {
         location = l;
     }
 
     /**
-     * Moves immediately to a {@link PlanetarySystem}.
+     * Relocates the campaign immediately to the specified {@link PlanetarySystem}, updating the current location and
+     * firing any associated events or automated behaviors.
      *
-     * @param s The {@link PlanetarySystem} the campaign has been moved to.
+     * <p>This method performs the following actions:</p>
+     * <ul>
+     *     <li>Updates the campaign's {@link CurrentLocation} to the given planetary system.</li>
+     *     <li>Triggers a {@link LocationChangedEvent} to notify listeners of the move.</li>
+     *     <li>If there are no units in automated mothball mode, performs automated activation.</li>
+     *     <li>If enabled by campaign options, checks for possible inoculation prompts related to the Random Diseases
+     *     and Alternative Advanced Medical systems.</li>
+     * </ul>
+     *
+     * @param planetarySystem the destination {@link PlanetarySystem} to move the campaign to
      */
-    public void moveToPlanetarySystem(PlanetarySystem s) {
-        setLocation(new CurrentLocation(s, 0.0));
+    public void moveToPlanetarySystem(PlanetarySystem planetarySystem) {
+        setLocation(new CurrentLocation(planetarySystem, 0.0));
         MekHQ.triggerEvent(new LocationChangedEvent(getLocation(), false));
+
+        if (getAutomatedMothballUnits().isEmpty()) {
+            performAutomatedActivation(this);
+        }
+
+        if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+            Inoculations.triggerInoculationPrompt(this, false);
+        }
     }
 
     public CurrentLocation getLocation() {
@@ -2193,10 +2277,18 @@ public class Campaign implements ITechManager {
     }
 
     public boolean getMashTheatresWithinCapacity() {
-        return isOnContractAndPlanetside() || mashTheatreCapacity >= getPatientsAssignedToDoctors().size();
+        return !isOnContractAndPlanetside() || calculateMASHTheaterCapacity() >= getPatientsAssignedToDoctors().size();
     }
 
-    public int getMashTheatreCapacity() {
+    public int calculateMASHTheaterCapacity() {
+        List<Unit> unitsInTOE = getForce(FORCE_ORIGIN).getAllUnitsAsUnits(units, false);
+        int baseCapacity = MASHCapacity.checkMASHCapacity(unitsInTOE, campaignOptions.getMASHTheatreCapacity());
+        int rentedCapacity = FacilityRentals.getCapacityIncreaseFromRentals(getActiveContracts(),
+              ContractRentalType.HOSPITAL_BEDS);
+        return baseCapacity + rentedCapacity;
+    }
+
+    public int getCachedMashTheaterCapacity() {
         return mashTheatreCapacity;
     }
 
@@ -2384,12 +2476,9 @@ public class Campaign implements ITechManager {
         }
 
         if (employ) {
-            if (person.getPrimaryRole().isAstech()) {
+            if (person.isAstech()) {
                 asTechPoolMinutes += Person.PRIMARY_ROLE_SUPPORT_TIME;
                 asTechPoolOvertime += Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-            } else if (person.getSecondaryRole().isAstech()) {
-                asTechPoolMinutes += Person.SECONDARY_ROLE_SUPPORT_TIME;
-                asTechPoolOvertime += Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
             }
         } else {
             person.setStatus(PersonnelStatus.CAMP_FOLLOWER);
@@ -2426,6 +2515,38 @@ public class Campaign implements ITechManager {
 
         MekHQ.triggerEvent(new PersonNewEvent(person));
         return true;
+    }
+
+    /**
+     * Employs the given camp follower and integrates them into the campaign.
+     *
+     * <p>This method:</p>
+     * <ul>
+     *   <li>Validates that the person is non-null (logging a warning and exiting otherwise).</li>
+     *   <li>Changes the person's status to {@link PersonnelStatus#ACTIVE} effective on the current campaign day.</li>
+     *   <li>Records the recruitment date.</li>
+     *   <li>Increases the campaign's Astech support-time pools if the person has an Astech role (primary or
+     *   secondary).</li>
+     *   <li>Fires a {@link PersonNewEvent} to notify listeners about the new camp follower.</li>
+     * </ul>
+     *
+     * @param person the {@code Person} being employed; may be {@code null}
+     */
+    public void employCampFollower(Person person) {
+        if (person == null) {
+            LOGGER.warn("A null person was passed into employCampFollower.");
+            return;
+        }
+
+        person.changeStatus(this, currentDay, PersonnelStatus.ACTIVE);
+        person.setRecruitment(currentDay);
+
+        if (person.isAstech()) {
+            asTechPoolMinutes += Person.PRIMARY_ROLE_SUPPORT_TIME;
+            asTechPoolOvertime += Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
+        }
+
+        MekHQ.triggerEvent(new PersonNewEvent(person));
     }
 
     private void simulateRelationshipHistory(Person person) {
@@ -3046,11 +3167,8 @@ public class Campaign implements ITechManager {
 
     public List<Person> getPatients() {
         List<Person> patients = new ArrayList<>();
-        for (Person person : getPersonnel()) {
-            if (person.needsFixing() ||
-                      (getCampaignOptions().isUseAdvancedMedical() &&
-                             person.hasInjuries(true) &&
-                             person.getStatus().isActiveFlexible())) {
+        for (Person person : getActivePersonnel(true, true)) {
+            if (person.needsFixing()) {
                 patients.add(person);
             }
         }
@@ -3165,6 +3283,162 @@ public class Campaign implements ITechManager {
         List<String> oldReports = newReports;
         setNewReports(new ArrayList<>());
         return oldReports;
+    }
+
+    public List<String> getSkillReport() {
+        return skillReport;
+    }
+
+    public void setSkillReportHTML(String html) {
+        skillReportHTML = html;
+    }
+
+    public String getSkillReportHTML() {
+        return skillReportHTML;
+    }
+
+    public List<String> getNewSkillReports() {
+        return newSkillReports;
+    }
+
+    public void setNewSkillReports(List<String> reports) {
+        newSkillReports = reports;
+    }
+
+    public List<String> fetchAndClearNewSkillReports() {
+        List<String> oldSkillReports = newSkillReports;
+        setNewSkillReports(new ArrayList<>());
+        return oldSkillReports;
+    }
+
+    public List<String> getTechnicalReport() {
+        return technicalReport;
+    }
+
+    public void setTechnicalReportHTML(String html) {
+        technicalReportHTML = html;
+    }
+
+    public String getTechnicalReportHTML() {
+        return technicalReportHTML;
+    }
+
+    public List<String> getNewTechnicalReports() {
+        return newTechnicalReports;
+    }
+
+    public void setNewTechnicalReports(List<String> reports) {
+        newTechnicalReports = reports;
+    }
+
+    public List<String> fetchAndClearNewTechnicalReports() {
+        List<String> oldTechnicalReports = newTechnicalReports;
+        setNewTechnicalReports(new ArrayList<>());
+        return oldTechnicalReports;
+    }
+
+    public List<String> getAcquisitionsReport() {
+        return acquisitionsReport;
+    }
+
+    public void setAcquisitionsReportHTML(String html) {
+        acquisitionsReportHTML = html;
+    }
+
+    public String getAcquisitionsReportHTML() {
+        return acquisitionsReportHTML;
+    }
+
+    public List<String> getNewAcquisitionsReports() {
+        return newAcquisitionsReports;
+    }
+
+    public void setNewAcquisitionsReports(List<String> reports) {
+        newAcquisitionsReports = reports;
+    }
+
+    public List<String> fetchAndClearNewAcquisitionsReports() {
+        List<String> oldAcquisitionsReports = newAcquisitionsReports;
+        setNewAcquisitionsReports(new ArrayList<>());
+        return oldAcquisitionsReports;
+    }
+
+    public List<String> getMedicalReport() {
+        return medicalReport;
+    }
+
+    public void setMedicalReportHTML(String html) {
+        medicalReportHTML = html;
+    }
+
+    public String getMedicalReportHTML() {
+        return medicalReportHTML;
+    }
+
+    public List<String> getNewMedicalReports() {
+        return newMedicalReports;
+    }
+
+    public void setNewMedicalReports(List<String> reports) {
+        newMedicalReports = reports;
+    }
+
+    public List<String> fetchAndClearNewMedicalReports() {
+        List<String> oldMedicalReports = newMedicalReports;
+        setNewMedicalReports(new ArrayList<>());
+        return oldMedicalReports;
+    }
+
+    public List<String> getPersonnelReport() {
+        return personnelReport;
+    }
+
+    public void setPersonnelReportHTML(String html) {
+        personnelReportHTML = html;
+    }
+
+    public String getPersonnelReportHTML() {
+        return personnelReportHTML;
+    }
+
+    public List<String> getNewPersonnelReports() {
+        return newPersonnelReports;
+    }
+
+    public void setNewPersonnelReports(List<String> reports) {
+        newPersonnelReports = reports;
+    }
+
+    public List<String> fetchAndClearNewPersonnelReports() {
+        List<String> oldPersonnelReports = newPersonnelReports;
+        setNewPersonnelReports(new ArrayList<>());
+        return oldPersonnelReports;
+    }
+
+    public List<String> getBattleReport() {
+        return battleReport;
+    }
+
+    public void setBattleReportHTML(String html) {
+        battleReportHTML = html;
+    }
+
+    public String getBattleReportHTML() {
+        return battleReportHTML;
+    }
+
+    public List<String> getNewBattleReports() {
+        return newBattleReports;
+    }
+
+    public void setNewBattleReports(List<String> reports) {
+        newBattleReports = reports;
+    }
+
+    public List<String> fetchAndClearNewBattleReports() {
+        List<String> oldBattleReports = newBattleReports;
+        setNewBattleReports(new ArrayList<>());
+        return oldBattleReports;
     }
 
     /**
@@ -3334,7 +3608,7 @@ public class Campaign implements ITechManager {
         }
 
         // sort based on available minutes (highest -> lowest)
-        techs.sort(Comparator.comparingInt(person -> -person.getDailyAvailableTechTime(false)));
+        techs.sort(Comparator.comparingInt(person -> -person.getDailyAvailableTechTime(getCampaignOptions().isTechsUseAdministration())));
 
         // finally, sort based on rank (lowest -> highest)
         techs.sort((person1, person2) -> {
@@ -3411,7 +3685,21 @@ public class Campaign implements ITechManager {
      *       found.
      */
     public @Nullable Person getLogisticsPerson() {
-        final String skillName = campaignOptions.getAcquisitionSkill();
+        final AcquisitionsType acquisitionsType = campaignOptions.getAcquisitionType();
+        String fixedSkillName = "";
+        boolean isAnyTech = false;
+
+        switch (acquisitionsType) {
+            case ADMINISTRATION -> fixedSkillName = S_ADMIN;
+            case ANY_TECH -> {
+                isAnyTech = true;
+            }
+            case AUTOMATIC -> {
+                return null;
+            }
+            case NEGOTIATION -> fixedSkillName = S_NEGOTIATION;
+        }
+
         final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
         final int defaultMaxAcquisitions = campaignOptions.getMaxAcquisitions();
 
@@ -3420,9 +3708,7 @@ public class Campaign implements ITechManager {
 
         int bestSkill = -1;
         Person procurementCharacter = null;
-        if (skillName.equals(S_AUTO)) {
-            return null;
-        } else if (skillName.equals(S_TECH)) {
+        if (isAnyTech) {
             for (Person person : getActivePersonnel(false, false)) {
                 if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
@@ -3434,7 +3720,7 @@ public class Campaign implements ITechManager {
 
                 SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
                       currentDay);
-                Skill skill = person.getSkill(skillName);
+                Skill skill = person.getBestTechSkill();
 
                 int totalSkillLevel = Integer.MIN_VALUE;
                 if (skill != null) {
@@ -3459,7 +3745,7 @@ public class Campaign implements ITechManager {
                 SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
                       currentDay);
 
-                Skill skill = person.getSkill(skillName);
+                Skill skill = person.getSkill(fixedSkillName);
 
                 int totalSkillLevel = Integer.MIN_VALUE;
                 if (skill != null) {
@@ -3658,85 +3944,97 @@ public class Campaign implements ITechManager {
      *       empty list if acquisitions automatically succeed.
      */
     public List<Person> getLogisticsPersonnel() {
-        final String skillName = getCampaignOptions().getAcquisitionSkill();
+        final AcquisitionsType acquisitionsType = getCampaignOptions().getAcquisitionType();
 
-        if (skillName.equals(S_AUTO)) {
-            return Collections.emptyList();
-        } else {
-            final int maxAcquisitions = campaignOptions.getMaxAcquisitions();
-            final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
-            List<Person> logisticsPersonnel = new ArrayList<>();
+        String fixedSkillName = "";
+        boolean isAnyTech = false;
 
-            for (Person person : getActivePersonnel(false, false)) {
-                if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
-                    continue;
-                }
+        switch (acquisitionsType) {
+            case ADMINISTRATION -> fixedSkillName = S_ADMIN;
+            case ANY_TECH -> {
+                isAnyTech = true;
+            }
+            case AUTOMATIC -> {
+                return Collections.emptyList();
+            }
+            case NEGOTIATION -> fixedSkillName = S_NEGOTIATION;
+        }
 
-                if ((maxAcquisitions > 0) && (person.getAcquisitions() >= maxAcquisitions)) {
-                    continue;
-                }
-                if (skillName.equals(S_TECH)) {
-                    if (null != person.getBestTechSkill()) {
-                        logisticsPersonnel.add(person);
-                    }
-                } else if (person.hasSkill(skillName)) {
-                    logisticsPersonnel.add(person);
-                }
+        final int maxAcquisitions = campaignOptions.getMaxAcquisitions();
+        final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
+        List<Person> logisticsPersonnel = new ArrayList<>();
+
+        for (Person person : getActivePersonnel(false, false)) {
+            if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
+                continue;
             }
 
-            // Sort by their skill level, descending.
-            boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
-            boolean isClanCampaign = isClanCampaign();
-            logisticsPersonnel.sort((person1, person2) -> {
-                if (skillName.equals(S_TECH)) {
-                    // Person 1
-                    Skill skill = person1.getBestTechSkill();
-
-                    int person1SkillLevel = Integer.MIN_VALUE;
-                    if (skill != null) {
-                        SkillModifierData skillModifierData = person1.getSkillModifierData(isUseAgingEffects,
-                              isClanCampaign, currentDay);
-                        person1SkillLevel = skill.getTotalSkillLevel(skillModifierData);
-                    }
-
-                    // Person 2
-                    skill = person2.getBestTechSkill();
-
-                    int person2SkillLevel = Integer.MIN_VALUE;
-                    if (skill != null) {
-                        SkillModifierData skillModifierData = person2.getSkillModifierData(isUseAgingEffects,
-                              isClanCampaign, currentDay);
-                        person2SkillLevel = skill.getTotalSkillLevel(skillModifierData);
-                    }
-
-                    return Integer.compare(person1SkillLevel, person2SkillLevel);
-                } else {
-                    // Person 1
-                    Skill skill = person1.getSkill(S_TECH);
-
-                    int person1SkillLevel = Integer.MIN_VALUE;
-                    if (skill != null) {
-                        SkillModifierData skillModifierData = person1.getSkillModifierData(isUseAgingEffects,
-                              isClanCampaign, currentDay);
-                        person1SkillLevel = skill.getTotalSkillLevel(skillModifierData);
-                    }
-
-                    // Person 2
-                    skill = person2.getSkill(S_TECH);
-
-                    int person2SkillLevel = Integer.MIN_VALUE;
-                    if (skill != null) {
-                        SkillModifierData skillModifierData = person2.getSkillModifierData(isUseAgingEffects,
-                              isClanCampaign, currentDay);
-                        person2SkillLevel = skill.getTotalSkillLevel(skillModifierData);
-                    }
-
-                    return Integer.compare(person1SkillLevel, person2SkillLevel);
+            if ((maxAcquisitions > 0) && (person.getAcquisitions() >= maxAcquisitions)) {
+                continue;
+            }
+            if (isAnyTech) {
+                if (null != person.getBestTechSkill()) {
+                    logisticsPersonnel.add(person);
                 }
-            });
-
-            return logisticsPersonnel;
+            } else if (person.hasSkill(fixedSkillName)) {
+                logisticsPersonnel.add(person);
+            }
         }
+
+        // Sort by their skill level, descending.
+        boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
+        boolean isClanCampaign = isClanCampaign();
+        boolean finalIsAnyTech = isAnyTech; // Needed for lamba
+        String finalFixedSkillName = fixedSkillName; // Also needed for lamba
+        logisticsPersonnel.sort((person1, person2) -> {
+            if (finalIsAnyTech) {
+                // Person 1
+                Skill skill = person1.getBestTechSkill();
+
+                int person1SkillLevel = Integer.MIN_VALUE;
+                if (skill != null) {
+                    SkillModifierData skillModifierData = person1.getSkillModifierData(isUseAgingEffects,
+                          isClanCampaign, currentDay);
+                    person1SkillLevel = skill.getTotalSkillLevel(skillModifierData);
+                }
+
+                // Person 2
+                skill = person2.getBestTechSkill();
+
+                int person2SkillLevel = Integer.MIN_VALUE;
+                if (skill != null) {
+                    SkillModifierData skillModifierData = person2.getSkillModifierData(isUseAgingEffects,
+                          isClanCampaign, currentDay);
+                    person2SkillLevel = skill.getTotalSkillLevel(skillModifierData);
+                }
+
+                return Integer.compare(person1SkillLevel, person2SkillLevel);
+            } else {
+                // Person 1
+                Skill skill = person1.getSkill(finalFixedSkillName);
+
+                int person1SkillLevel = Integer.MIN_VALUE;
+                if (skill != null) {
+                    SkillModifierData skillModifierData = person1.getSkillModifierData(isUseAgingEffects,
+                          isClanCampaign, currentDay);
+                    person1SkillLevel = skill.getTotalSkillLevel(skillModifierData);
+                }
+
+                // Person 2
+                skill = person2.getSkill(finalFixedSkillName);
+
+                int person2SkillLevel = Integer.MIN_VALUE;
+                if (skill != null) {
+                    SkillModifierData skillModifierData = person2.getSkillModifierData(isUseAgingEffects,
+                          isClanCampaign, currentDay);
+                    person2SkillLevel = skill.getTotalSkillLevel(skillModifierData);
+                }
+
+                return Integer.compare(person1SkillLevel, person2SkillLevel);
+            }
+        });
+
+        return logisticsPersonnel;
     }
 
     /***
@@ -3755,7 +4053,7 @@ public class Campaign implements ITechManager {
             shoppingItem.decrementDaysToWait();
         }
 
-        if (getCampaignOptions().getAcquisitionSkill().equals(S_AUTO)) {
+        if (getCampaignOptions().getAcquisitionType() == AcquisitionsType.AUTOMATIC) {
             return goShoppingAutomatically(sList);
         } else if (!getCampaignOptions().isUsePlanetaryAcquisition()) {
             return goShoppingStandard(sList);
@@ -4984,7 +5282,7 @@ public class Campaign implements ITechManager {
         if (marketStyle == PERSONNEL_MARKET_DISABLED) {
             personnelMarket.generatePersonnelForDay(this);
         } else {
-            if (currentDay.getDayOfMonth() == 1) {
+            if (currentDay.getDayOfMonth() == 1 || isCampaignStart) {
                 newPersonnelMarket.gatherApplications();
 
                 if (newPersonnelMarket.getHasRarePersonnel()) {
@@ -5167,6 +5465,7 @@ public class Campaign implements ITechManager {
         if (unit != null) {
             unit.remove(person, true);
         }
+        person.setDoctorId(null, 0);
         removeAllPatientsFor(person);
         person.removeAllTechJobs(this);
         removeKillsFor(person.getId());
@@ -5178,12 +5477,9 @@ public class Campaign implements ITechManager {
         personnel.remove(person.getId());
 
         // Deal with Astech Pool Minutes
-        if (person.getPrimaryRole().isAstech()) {
+        if (person.isAstech()) {
             asTechPoolMinutes = max(0, asTechPoolMinutes - Person.PRIMARY_ROLE_SUPPORT_TIME);
             asTechPoolOvertime = max(0, asTechPoolOvertime - Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME);
-        } else if (person.getSecondaryRole().isAstech()) {
-            asTechPoolMinutes = max(0, asTechPoolMinutes - Person.SECONDARY_ROLE_SUPPORT_TIME);
-            asTechPoolOvertime = max(0, asTechPoolOvertime - Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME);
         }
         MekHQ.triggerEvent(new PersonRemovedEvent(person));
     }
@@ -5612,14 +5908,17 @@ public class Campaign implements ITechManager {
     /**
      * Starts a new day for the daily log
      *
-     * @param r - the report String
+     * @param report - the report String
      */
-    public void beginReport(String r) {
+    public void beginReport(String report) {
         if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
             // add the new items to our in-memory cache
             addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), ""));
         }
-        addReportInternal(r);
+
+        for (DailyReportType type : DailyReportType.values()) {
+            addReportInternal(type, report);
+        }
     }
 
     /**
@@ -5629,31 +5928,126 @@ public class Campaign implements ITechManager {
      * @param objects Variable list of objects to format into {@code format}
      */
     public void addReport(final String format, final Object... objects) {
-        addReport(String.format(format, objects));
+        addReport(DailyReportType.GENERAL, String.format(format, objects));
     }
 
     /**
      * Adds a report to the daily log
      *
-     * @param r - the report String
+     * @param report - the report String
      */
-    public void addReport(String r) {
+    public void addReport(String report) {
         if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
-            addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), r));
+            addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), report));
         }
-        addReportInternal(r);
+        addReportInternal(DailyReportType.GENERAL, report);
     }
 
-    private void addReportInternal(String r) {
-        currentReport.add(r);
-        if (!currentReportHTML.isEmpty()) {
-            currentReportHTML = currentReportHTML + REPORT_LINEBREAK + r;
-            newReports.add(REPORT_LINEBREAK);
-        } else {
-            currentReportHTML = r;
+    /**
+     * Formats and then adds a report to the daily log
+     *
+     * @param type    what log to place the report in
+     * @param format  String with format markers.
+     * @param objects Variable list of objects to format into {@code format}
+     */
+    public void addReport(final DailyReportType type, final String format, final Object... objects) {
+        addReport(type, String.format(format, objects));
+    }
+
+    /**
+     * Adds a report to the daily log
+     *
+     * @param type   what log to place the report in
+     * @param report - the report String
+     */
+    public void addReport(final DailyReportType type, String report) {
+        if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
+            addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), report));
         }
-        newReports.add(r);
-        MekHQ.triggerEvent(new ReportEvent(this, r));
+        addReportInternal(type, report);
+    }
+
+    private void addReportInternal(final DailyReportType type, final String report) {
+        switch (type) {
+            case GENERAL -> {
+                currentReport.add(report);
+                if (!currentReportHTML.isEmpty()) {
+                    currentReportHTML = currentReportHTML + REPORT_LINEBREAK + report;
+                    newReports.add(REPORT_LINEBREAK);
+                } else {
+                    currentReportHTML = report;
+                }
+
+                newReports.add(report);
+            }
+            case SKILL_CHECKS -> {
+                skillReport.add(report);
+                if (!skillReportHTML.isEmpty()) {
+                    skillReportHTML = skillReportHTML + REPORT_LINEBREAK + report;
+                    newSkillReports.add(REPORT_LINEBREAK);
+                } else {
+                    skillReportHTML = report;
+                }
+
+                newSkillReports.add(report);
+            }
+            case TECHNICAL -> {
+                technicalReport.add(report);
+                if (!technicalReportHTML.isEmpty()) {
+                    technicalReportHTML = technicalReportHTML + REPORT_LINEBREAK + report;
+                    newTechnicalReports.add(REPORT_LINEBREAK);
+                } else {
+                    technicalReportHTML = report;
+                }
+
+                newTechnicalReports.add(report);
+            }
+            case ACQUISITIONS -> {
+                acquisitionsReport.add(report);
+                if (!acquisitionsReportHTML.isEmpty()) {
+                    acquisitionsReportHTML = acquisitionsReportHTML + REPORT_LINEBREAK + report;
+                    newAcquisitionsReports.add(REPORT_LINEBREAK);
+                } else {
+                    acquisitionsReportHTML = report;
+                }
+
+                newAcquisitionsReports.add(report);
+            }
+            case MEDICAL -> {
+                medicalReport.add(report);
+                if (!medicalReportHTML.isEmpty()) {
+                    medicalReportHTML = medicalReportHTML + REPORT_LINEBREAK + report;
+                    newMedicalReports.add(REPORT_LINEBREAK);
+                } else {
+                    medicalReportHTML = report;
+                }
+
+                newMedicalReports.add(report);
+            }
+            case PERSONNEL -> {
+                personnelReport.add(report);
+                if (!personnelReportHTML.isEmpty()) {
+                    personnelReportHTML = personnelReportHTML + REPORT_LINEBREAK + report;
+                    newPersonnelReports.add(REPORT_LINEBREAK);
+                } else {
+                    personnelReportHTML = report;
+                }
+
+                newPersonnelReports.add(report);
+            }
+            case BATTLE -> {
+                battleReport.add(report);
+                if (!battleReportHTML.isEmpty()) {
+                    battleReportHTML = battleReportHTML + REPORT_LINEBREAK + report;
+                    newBattleReports.add(REPORT_LINEBREAK);
+                } else {
+                    battleReportHTML = report;
+                }
+
+                newBattleReports.add(report);
+            }
+        }
+        MekHQ.triggerEvent(new ReportEvent(this, report));
     }
 
     public Camouflage getCamouflage() {
@@ -5894,11 +6288,53 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "nameGen");
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "currentReport");
-        for (String s : currentReport) {
+        for (String report : currentReport) {
             // This cannot use the MHQXMLUtility as it cannot be escaped
-            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + s + "]]></reportLine>");
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "currentReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "skillReport");
+        for (String report : skillReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "skillReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "technicalReport");
+        for (String report : technicalReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "technicalReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "acquisitionsReport");
+        for (String report : acquisitionsReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "acquisitionsReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "medicalReport");
+        for (String report : medicalReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "medicalReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "personnelReport");
+        for (String report : personnelReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "personnelReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "battleReport");
+        for (String report : battleReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "battleReport");
 
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "info");
         // endregion Basic Campaign Info
@@ -6213,11 +6649,10 @@ public class Campaign implements ITechManager {
 
         List<AtBContract> activeAtBContracts = getActiveAtBContracts();
 
-        if (!skipAccessCheck
-                  && campaignOptions.isUseFactionStandingOutlawedSafe()) {
-            FactionHints factionHints = FactionHints.getInstance();
+        FactionHints factionHints = FactionHints.getInstance();
+        if (!skipAccessCheck && campaignOptions.isUseFactionStandingOutlawedSafe()) {
             boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
-                  getCurrentSystem(), end, currentDay, activeAtBContracts, factionHints);
+                  start, end, currentDay, activeAtBContracts, factionHints);
             if (!canAccessSystem) {
                 new ImmersiveDialogSimple(this, getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT), null,
                       String.format(resources.getString("unableToEnterSystem.outlawed.ic"), getCommanderAddress()),
@@ -6250,7 +6685,11 @@ public class Campaign implements ITechManager {
         scoreG.put(current, 0.0);
         closed.add(current);
 
-        FactionHints factionHints = FactionHints.getInstance();
+        // We need this additional check as later we're going to be comparing neighbors, rather than start point.
+        // Which means that if we're passing through more than one Outlawed system en route to our escape our
+        // progress will be blocked.
+        boolean isEscapingOutlawing = !FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
+              null, start, currentDay, activeAtBContracts, factionHints);
 
         // A* search
         final int MAX_JUMPS = 10000;
@@ -6279,10 +6718,11 @@ public class Campaign implements ITechManager {
                 }
 
                 // Skip systems where the campaign is outlawed
-                if (!skipAccessCheck
-                          && campaignOptions.isUseFactionStandingOutlawedSafe()) {
+                if (!skipAccessCheck &&
+                          !isEscapingOutlawing &&
+                          campaignOptions.isUseFactionStandingOutlawedSafe()) {
                     boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(faction, factionStandings,
-                          getCurrentSystem(), neighborSystem, currentDay, activeAtBContracts, factionHints);
+                          currentSystem, neighborSystem, currentDay, activeAtBContracts, factionHints);
                     if (!canAccessSystem) {
                         return;
                     }
@@ -6953,17 +7393,30 @@ public class Campaign implements ITechManager {
      */
     public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, @Nullable Person person,
           final boolean checkDaysToWait, final boolean ignoreAcquisitionsPersonnel) {
-        if (getCampaignOptions().getAcquisitionSkill().equals(S_AUTO)) {
+        if (getCampaignOptions().getAcquisitionType() == AcquisitionsType.AUTOMATIC) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
         }
 
-        String acquisitionsSkill = getCampaignOptions().getAcquisitionSkill();
+        final AcquisitionsType acquisitionsType = campaignOptions.getAcquisitionType();
+        String fixedSkillName = "";
+        boolean isAnyTech = false;
+
+        switch (acquisitionsType) {
+            case ADMINISTRATION -> fixedSkillName = S_ADMIN;
+            case ANY_TECH -> isAnyTech = true;
+            case AUTOMATIC -> {
+                return null;
+            }
+            case NEGOTIATION -> fixedSkillName = S_NEGOTIATION;
+        }
+
         if (ignoreAcquisitionsPersonnel) {
             person = new Person(this);
-            SkillType skillType = SkillType.getType(acquisitionsSkill);
+            fixedSkillName = acquisitionsType == AcquisitionsType.ANY_TECH ? S_TECH_MECHANIC : fixedSkillName;
+            SkillType skillType = getType(fixedSkillName);
             if (skillType != null) {
                 int regularLevel = skillType.getRegularLevel();
-                person.addSkill(acquisitionsSkill, regularLevel, 0);
+                person.addSkill(fixedSkillName, regularLevel, 0);
             }
         }
 
@@ -6972,7 +7425,10 @@ public class Campaign implements ITechManager {
                   "Your procurement personnel have used up all their acquisition attempts for this period");
         }
 
-        final Skill skill = person.getSkillForWorkingOn(acquisitionsSkill);
+        final Skill skill = isAnyTech ? person.getBestTechSkill() : person.getSkillForWorkingOn(fixedSkillName);
+        if (skill == null) {
+            return new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "No skill");
+        }
         if (null != getShoppingList().getShoppingItem(acquisition.getNewEquipment()) && checkDaysToWait) {
             return new TargetRoll(TargetRoll.AUTOMATIC_FAIL,
                   "You must wait until the new cycle to check for this part. Further" +
@@ -7033,10 +7489,8 @@ public class Campaign implements ITechManager {
     }
 
     public void resetAsTechMinutes() {
-        asTechPoolMinutes = Person.PRIMARY_ROLE_SUPPORT_TIME * getNumberPrimaryAsTechs() +
-                                  Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * getNumberSecondaryAsTechs();
-        asTechPoolOvertime = Person.SECONDARY_ROLE_SUPPORT_TIME * getNumberPrimaryAsTechs() +
-                                   Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME * getNumberSecondaryAsTechs();
+        asTechPoolMinutes = Person.PRIMARY_ROLE_SUPPORT_TIME * getNumberAsTechs();
+        asTechPoolOvertime = Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * getNumberAsTechs();
     }
 
     public void setAsTechPoolMinutes(int minutes) {
@@ -7187,7 +7641,7 @@ public class Campaign implements ITechManager {
             // It is possible for very poorly skilled characters to actually be a detriment to their teams. This is
             // by design.
             SkillModifierData skillModifierData = person.getSkillModifierData();
-            int totalSkillLevel = asTechSkill.getFinalSkillValue(skillModifierData);
+            int totalSkillLevel = asTechSkill.getTotalSkillLevel(skillModifierData);
             return (int) floor(totalSkillLevel / ASSISTANT_SKILL_LEVEL_DIVIDER);
         }
 
@@ -7574,8 +8028,12 @@ public class Campaign implements ITechManager {
      * @param person The {@link Person} who should receive a randomized portrait.
      */
     public void assignRandomPortraitFor(final Person person) {
-        final Boolean allowDuplicatePortraits = getCampaignOptions().isAllowDuplicatePortraits();
-        final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(), person, allowDuplicatePortraits);
+        final boolean allowDuplicatePortraits = campaignOptions.isAllowDuplicatePortraits();
+        final boolean genderedPortraitsOnly = campaignOptions.isUseGenderedPortraitsOnly();
+        final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(),
+              person,
+              allowDuplicatePortraits,
+              genderedPortraitsOnly);
         if (!portrait.isDefault()) {
             person.setPortrait(portrait);
         }
@@ -8871,12 +9329,15 @@ public class Campaign implements ITechManager {
      */
     public List<Entity> getAllCombatEntities() {
         List<Entity> units = new ArrayList<>();
-        for (Force force : getAllForces()) {
-            if (!force.isForceType(ForceType.STANDARD)) {
-                continue;
-            }
-            for (UUID unitID : force.getUnits()) {
-                units.add(getUnit(unitID).getEntity());
+        for (CombatTeam combatTeam : getCombatTeamsAsList()) {
+            Force force = getForce(combatTeam.getForceId());
+            if (force != null) {
+                for (Unit unit : force.getAllUnitsAsUnits(getHangar(), true)) {
+                    Entity entity = unit.getEntity();
+                    if (entity != null) {
+                        units.add(entity);
+                    }
+                }
             }
         }
         return units;

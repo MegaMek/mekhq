@@ -33,8 +33,6 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
-import static mekhq.campaign.personnel.skills.Aging.clearAllAgeModifiers;
-import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -54,12 +52,10 @@ import javax.swing.*;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -207,6 +203,7 @@ public class BiographyTab {
     private JButton btnDisableAllPortraits;
     private JCheckBox chkAssignPortraitOnRoleChange;
     private JCheckBox chkAllowDuplicatePortraits;
+    private JCheckBox chkUseGenderedPortraitsOnly;
     //end Name and Portrait Tab
 
     //start Rank Tab
@@ -266,6 +263,7 @@ public class BiographyTab {
         comboFactionNames = new MMComboBox<>("comboFactionNames", getFactionNamesModel());
         chkAssignPortraitOnRoleChange = new JCheckBox();
         chkAllowDuplicatePortraits = new JCheckBox();
+        chkUseGenderedPortraitsOnly = new JCheckBox();
 
         pnlRandomPortrait = new JPanel();
         personnelRoles = PersonnelRole.getCombatRoles();
@@ -430,7 +428,7 @@ public class BiographyTab {
         // Header
         generalHeader = new CampaignOptionsHeaderPanel("BiographyGeneralTab",
               getImageDirectory() + "logo_clan_blood_spirit.png",
-              8);
+              6);
 
         // Contents
         chkUseDylansRandomXP = new CampaignOptionsCheckBox("UseDylansRandomXP");
@@ -632,7 +630,7 @@ public class BiographyTab {
         // Header
         backgroundHeader = new CampaignOptionsHeaderPanel("BackgroundsTab",
               getImageDirectory() + "logo_nueva_castile.png",
-              5);
+              3);
 
         // Contents
         pnlRandomOriginOptions = createRandomOriginOptionsPanel();
@@ -1041,7 +1039,7 @@ public class BiographyTab {
         // Header
         educationHeader = new CampaignOptionsHeaderPanel("EducationTab",
               getImageDirectory() + "logo_taurian_concordat.png",
-              4);
+              3);
 
         // Contents
         chkUseEducationModule = new CampaignOptionsCheckBox("UseEducationModule");
@@ -1340,7 +1338,7 @@ public class BiographyTab {
         // Header
         nameAndPortraitGenerationHeader = new CampaignOptionsHeaderPanel("NameAndPortraitGenerationTab",
               getImageDirectory() + "logo_clan_nova_cat.png",
-              2);
+              5);
 
         // Contents
         chkAssignPortraitOnRoleChange = new CampaignOptionsCheckBox("AssignPortraitOnRoleChange");
@@ -1350,6 +1348,10 @@ public class BiographyTab {
         chkAllowDuplicatePortraits = new CampaignOptionsCheckBox("AllowDuplicatePortraits");
         chkAllowDuplicatePortraits.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
               "AllowDuplicatePortraits"));
+
+        chkUseGenderedPortraitsOnly = new CampaignOptionsCheckBox("UseGenderedPortraitsOnly");
+        chkUseGenderedPortraitsOnly.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
+              "UseGenderedPortraitsOnly"));
 
         chkUseOriginFactionForNames = new CampaignOptionsCheckBox("UseOriginFactionForNames");
         chkUseOriginFactionForNames.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
@@ -1369,13 +1371,14 @@ public class BiographyTab {
         layoutTop.gridx = 0;
         layoutTop.gridy = 0;
         panelTop.add(chkAssignPortraitOnRoleChange, layoutTop);
-        layoutTop.gridy++;
+        layoutTop.gridx++;
         panelTop.add(chkAllowDuplicatePortraits, layoutTop);
+        layoutTop.gridx++;
+        panelTop.add(chkUseGenderedPortraitsOnly, layoutTop);
 
+        layoutTop.gridx = 0;
         layoutTop.gridy++;
         panelTop.add(chkUseOriginFactionForNames, layoutTop);
-        layoutTop.gridx++;
-        panelTop.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(25)));
         layoutTop.gridx++;
         panelTop.add(lblFactionNames, layoutTop);
         layoutTop.gridx++;
@@ -1595,6 +1598,7 @@ public class BiographyTab {
         comboFactionNames.setSelectedItem(RandomNameGenerator.getInstance().getChosenFaction());
         chkAssignPortraitOnRoleChange.setSelected(options.isAssignPortraitOnRoleChange());
         chkAllowDuplicatePortraits.setSelected(options.isAllowDuplicatePortraits());
+        chkUseGenderedPortraitsOnly.setSelected(options.isUseGenderedPortraitsOnly());
 
         final boolean[] usePortraitForRole = options.isUsePortraitForRoles();
         for (int i = 0; i < chkUsePortrait.length; i++) {
@@ -1612,10 +1616,12 @@ public class BiographyTab {
      * If a preset options object is provided, the changes are applied there. Otherwise, they are applied to the current
      * campaign's options.
      *
+     * @param isCampaignUpgrade     Is triggered as part of the campaign upgrade process
      * @param presetCampaignOptions A {@link CampaignOptions} object to update with the current UI settings, or
      *                              {@code null} to apply changes to the campaign's options directly.
      */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(boolean isCampaignUpgrade,
+          @Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         RandomOriginOptions originOptions;
         if (presetCampaignOptions == null) {
@@ -1630,13 +1636,6 @@ public class BiographyTab {
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
         options.setNonBinaryDiceSize((int) spnNonBinaryDiceSize.getValue());
         options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
-        for (Person person : campaign.getPersonnel()) {
-            if (chkUseAgeEffects.isSelected()) {
-                updateAllSkillAgeModifiers(generalTab.getDate(), person);
-            } else {
-                clearAllAgeModifiers(person);
-            }
-        }
         options.setUseAgeEffects(chkUseAgeEffects.isSelected());
         options.setAnnounceOfficersOnly(chkAnnounceOfficersOnly.isSelected());
         options.setAnnounceBirthdays(chkAnnounceBirthdays.isSelected());
@@ -1700,6 +1699,7 @@ public class BiographyTab {
         options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
         options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
         options.setAllowDuplicatePortraits(chkAllowDuplicatePortraits.isSelected());
+        options.setUseGenderedPortraitsOnly(chkUseGenderedPortraitsOnly.isSelected());
         RandomNameGenerator.getInstance().setChosenFaction(comboFactionNames.getSelectedItem());
 
         for (int i = 0; i < chkUsePortrait.length; i++) {
@@ -1713,6 +1713,10 @@ public class BiographyTab {
         }
 
         // Ranks
-        rankSystemsPane.applyToCampaign();
+        if (!isCampaignUpgrade) {
+            // We don't change rank when upgrade the campaign across versions, otherwise the players' rank system
+            // will be changed if the campaign rank system and the one in the preset don't match.`
+            rankSystemsPane.applyToCampaign();
+        }
     }
 }

@@ -68,6 +68,8 @@ import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
+import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -92,9 +94,6 @@ public class CampaignOptions {
 
     public static final int TRANSIT_UNIT_WEEK = 1;
     public static final int TRANSIT_UNIT_MONTH = 2;
-
-    public static final String S_TECH = "Tech";
-    public static final String S_AUTO = "Automatic Success";
 
     public static final double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
     public static final double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
@@ -164,7 +163,7 @@ public class CampaignOptions {
     // region Supplies and Acquisition Tab
     // Acquisition
     private int waitingPeriod;
-    private String acquisitionSkill;
+    private AcquisitionsType acquisitionsType;
     private boolean useFunctionalAppraisal;
     private ProcurementPersonnelPick acquisitionPersonnelCategory;
     private int clanAcquisitionPenalty;
@@ -579,6 +578,7 @@ public class CampaignOptions {
     private final boolean[] usePortraitForRole;
     private boolean assignPortraitOnRoleChange;
     private boolean allowDuplicatePortraits;
+    private boolean useGenderedPortraitsOnly;
     // endregion Name and Portrait Generation
 
     // region Markets Tab
@@ -617,12 +617,15 @@ public class CampaignOptions {
     private boolean isUseTwoWayPay;
     private boolean isUseCamOpsSalvage;
     private boolean isUseRiskySalvage;
+    private boolean isEnableSalvageFlagByDefault;
     // endregion Markets Tab
 
     // region Against the Bot Tab
-    private boolean useStratCon;
-    private boolean useMaplessStratCon;
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    private boolean hadAtBEnabledMarker;
+    private StratConPlayType stratConPlayType;
     private boolean useAdvancedScouting;
+    private boolean noSeedForces;
     private SkillLevel skillLevel;
 
     // Contract Operations
@@ -648,6 +651,7 @@ public class CampaignOptions {
     private boolean useWeatherConditions;
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
+    private boolean useNoTornadoes;
     private int fixedMapChance;
     private int spaUpgradeIntensity;
     private int scenarioModMax;
@@ -713,6 +717,7 @@ public class CampaignOptions {
         reverseQualityNames = false;
         setUseRandomUnitQualities(true);
         setUsePlanetaryModifiers(true);
+        useNoTornadoes = false;
         useUnofficialMaintenance = false;
         logMaintenance = false;
         defaultMaintenanceTime = 4;
@@ -736,7 +741,6 @@ public class CampaignOptions {
         // region Supplies and Acquisitions Tab
         // Acquisition
         waitingPeriod = 7;
-        acquisitionSkill = S_TECH;
         useFunctionalAppraisal = false;
         acquisitionPersonnelCategory = SUPPORT;
         clanAcquisitionPenalty = 0;
@@ -896,7 +900,6 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.VEHICLE_CREW_GROUND, 900);
         setRoleBaseSalary(PersonnelRole.VEHICLE_CREW_NAVAL, 900);
         setRoleBaseSalary(PersonnelRole.VEHICLE_CREW_VTOL, 900);
-        setRoleBaseSalary(PersonnelRole.COMBAT_TECHNICIAN, 900);
         setRoleBaseSalary(PersonnelRole.AEROSPACE_PILOT, 1500);
         setRoleBaseSalary(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT, 900);
         setRoleBaseSalary(PersonnelRole.PROTOMEK_PILOT, 960);
@@ -1231,6 +1234,7 @@ public class CampaignOptions {
         usePortraitForRole[PersonnelRole.MEKWARRIOR.ordinal()] = true;
         assignPortraitOnRoleChange = false;
         allowDuplicatePortraits = true;
+        useGenderedPortraitsOnly = false;
         // endregion Name and Portrait Generation Tab
 
         // region Markets Tab
@@ -1270,12 +1274,14 @@ public class CampaignOptions {
         isUseTwoWayPay = true;
         isUseCamOpsSalvage = false;
         isUseRiskySalvage = false;
+        isEnableSalvageFlagByDefault = true;
         // endregion Markets Tab
 
         // region Against the Bot Tab
-        useStratCon = false;
-        useMaplessStratCon = false;
+        hadAtBEnabledMarker = false;
+        stratConPlayType = StratConPlayType.DISABLED;
         useAdvancedScouting = false;
+        noSeedForces = false;
         setSkillLevel(SkillLevel.REGULAR);
         autoResolveMethod = AutoResolveMethod.PRINCESS;
         autoResolveVictoryChanceEnabled = false;
@@ -4021,6 +4027,14 @@ public class CampaignOptions {
     public void setUseRiskySalvage(final boolean isUseRiskySalvage) {
         this.isUseRiskySalvage = isUseRiskySalvage;
     }
+
+    public boolean isEnableSalvageFlagByDefault() {
+        return isEnableSalvageFlagByDefault;
+    }
+
+    public void setEnableSalvageFlagByDefault(final boolean isEnableSalvageFlagByDefault) {
+        this.isEnableSalvageFlagByDefault = isEnableSalvageFlagByDefault;
+    }
     // endregion Contract Market
     // endregion Markets Tab
 
@@ -4335,6 +4349,14 @@ public class CampaignOptions {
         this.allowDuplicatePortraits = allowDuplicatePortraits;
     }
 
+    public boolean isUseGenderedPortraitsOnly() {
+        return useGenderedPortraitsOnly;
+    }
+
+    public void setUseGenderedPortraitsOnly(final boolean useGenderedPortraitsOnly) {
+        this.useGenderedPortraitsOnly = useGenderedPortraitsOnly;
+    }
+
     public int getVocationalXP() {
         return vocationalXP;
     }
@@ -4431,12 +4453,12 @@ public class CampaignOptions {
         this.waitingPeriod = acquisitionSkill;
     }
 
-    public String getAcquisitionSkill() {
-        return acquisitionSkill;
+    public AcquisitionsType getAcquisitionType() {
+        return acquisitionsType;
     }
 
-    public void setAcquisitionSkill(final String acquisitionSkill) {
-        this.acquisitionSkill = acquisitionSkill;
+    public void setAcquisitionType(final AcquisitionsType acquisitionsType) {
+        this.acquisitionsType = acquisitionsType;
     }
 
     public boolean isUseFunctionalAppraisal() {
@@ -4804,23 +4826,37 @@ public class CampaignOptions {
 
     @Deprecated(since = "0.50.10", forRemoval = false)
     public boolean isUseAtB() {
-        return useStratCon;
+        return isUseStratCon();
     }
 
     public boolean isUseStratCon() {
-        return useStratCon;
+        return getStratConPlayType() != StratConPlayType.DISABLED;
     }
 
-    public void setUseStratCon(final boolean useStratCon) {
-        this.useStratCon = useStratCon;
+    public StratConPlayType getStratConPlayType() {
+        return stratConPlayType;
+    }
+
+    public void setStratConPlayType(final StratConPlayType stratConPlayType) {
+        this.stratConPlayType = stratConPlayType;
+    }
+
+    public boolean isHadAtBEnabledMarker() {
+        return hadAtBEnabledMarker;
+    }
+
+    public void setHadAtBEnabledMarker(boolean hadAtBEnabledMarker) {
+        this.hadAtBEnabledMarker = hadAtBEnabledMarker;
     }
 
     public boolean isUseStratConMaplessMode() {
-        return useMaplessStratCon;
+        return getStratConPlayType() == StratConPlayType.MAPLESS ||
+                     // Singles is a type of mapless mode, so all rules that apply to Mapless also apply to Singles
+                     getStratConPlayType() == StratConPlayType.SINGLES;
     }
 
-    public void setUseStratConMaplessMode(boolean useMaplessStratCon) {
-        this.useMaplessStratCon = useMaplessStratCon;
+    public boolean isUseStratConSinglesMode() {
+        return getStratConPlayType() == StratConPlayType.SINGLES;
     }
 
     public boolean isUseAdvancedScouting() {
@@ -4829,6 +4865,14 @@ public class CampaignOptions {
 
     public void setUseAdvancedScouting(final boolean useAdvancedScouting) {
         this.useAdvancedScouting = useAdvancedScouting;
+    }
+
+    public boolean isNoSeedForces() {
+        return noSeedForces;
+    }
+
+    public void setNoSeedForces(final boolean noSeedForces) {
+        this.noSeedForces = noSeedForces;
     }
 
     /**
@@ -5036,7 +5080,7 @@ public class CampaignOptions {
      *                          {@code false}, this allows the method to ignore StratCon-enabled status.
      */
     public int getAtBBattleChance(CombatRole role, boolean useStratConBypass) {
-        if (useStratCon && useStratConBypass) {
+        if (isUseStratCon() && useStratConBypass) {
             return 0;
         }
 
@@ -5089,6 +5133,14 @@ public class CampaignOptions {
 
     public void setUsePlanetaryConditions(final boolean usePlanetaryConditions) {
         this.usePlanetaryConditions = usePlanetaryConditions;
+    }
+
+    public boolean isUseNoTornadoes() {
+        return useNoTornadoes;
+    }
+
+    public void setUseNoTornadoes(final boolean useNoTornadoes) {
+        this.useNoTornadoes = useNoTornadoes;
     }
 
     /**

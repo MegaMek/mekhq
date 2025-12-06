@@ -126,11 +126,11 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                     c3network += Messages.getString("ChatLounge.C3SNodes", entity.calculateFreeC3Nodes());
                     // an independent master might also be a slave to a company master
                     if (entity.getC3Master() != null) {
-                        c3network += "<br>" + Messages.getString("ChatLounge.C3Slave")
+                        c3network += "<br>" + Messages.getString("ChatLounge.C3Slave") + " "
                                            + entity.getC3Master().getShortName();
                     }
                 } else if (entity.getC3Master() != null) {
-                    c3network += Messages.getString("ChatLounge.C3Slave")
+                    c3network += Messages.getString("ChatLounge.C3Slave") + " "
                                        + entity.getC3Master().getShortName();
                 } else {
                     c3network += Messages.getString("ChatLounge.C3None");

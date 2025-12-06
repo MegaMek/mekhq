@@ -597,17 +597,7 @@ public class Contract extends Mission {
      */
     public Money getTotalTransportationFees(Campaign campaign) {
         if ((null != getSystem()) && campaign.getCampaignOptions().isPayForTransport()) {
-            JumpPath jumpPath = getJumpPath(campaign);
-
-            boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
-            boolean isUseCommandCircuits = campaign.isUseCommandCircuitForContract(this);
-
-            TransportCostCalculations transportCostCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
-            int duration = (int) ceil(jumpPath.getTotalTime(campaign.getLocalDate(),
-                  campaign.getLocation().getTransitTime(), isUseCommandCircuits));
-            Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());
-
-            return jumpCost.multipliedBy(useTwoWayPay ? 2 : 1);
+            return getTransportCost(campaign, false);
         }
 
         return Money.zero();
@@ -619,14 +609,14 @@ public class Contract extends Mission {
      * monthly expenses is the contract duration plus the travel time from the unit's current world to the contract
      * world and back.
      *
-     * @param c The campaign with which this contract is associated.
+     * @param campaign The campaign with which this contract is associated.
      *
      * @return The estimated profit in the current default currency.
      */
-    public Money getEstimatedTotalProfit(Campaign c) {
+    public Money getEstimatedTotalProfit(Campaign campaign) {
         return getTotalAdvanceAmount()
-                     .plus(getTotalMonthlyPayOut(c))
-                     .minus(getTotalTransportationFees(c));
+                     .plus(getTotalMonthlyPayOut(campaign))
+                     .minus(getTransportCost(campaign, false));
     }
 
     /**
@@ -700,20 +690,7 @@ public class Contract extends Mission {
 
         // calculate transportation costs
         if (null != getSystem() && campaign.getCampaignOptions().isPayForTransport()) {
-            JumpPath jumpPath = getJumpPath(campaign);
-
-            TransportCostCalculations transportCostCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
-            boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
-            boolean isUseCommandCircuits = campaign.isUseCommandCircuitForContract(this);
-            int duration = (int) ceil(jumpPath.getTotalTime(campaign.getLocalDate(),
-                  campaign.getLocation().getTransitTime(), isUseCommandCircuits));
-            Money transportCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
-                  jumpPath.getJumps());
-            transportCost = transportCost.dividedBy(100);
-            transportCost = transportCost.multipliedBy(transportComp);
-            transportCost = transportCost.multipliedBy(useTwoWayPay ? 2 : 1);
-
-            transportAmount = transportCost;
+            transportAmount = getTransportCost(campaign, true);
         } else {
             transportAmount = Money.zero();
         }
@@ -776,6 +753,49 @@ public class Contract extends Mission {
         }
 
         setStartAndEndDate(startDate);
+    }
+
+    /**
+     * Calculates the total transport cost for this contract based on the campaign's transport settings and the
+     * contract's jump path.
+     *
+     * <p>The calculation considers the following factors:</p>
+     * <ul>
+     *   <li>The jump path duration, including any command circuit adjustments</li>
+     *   <li>The campaign's transport cost tables (using the Regular experience level)</li>
+     *   <li>Whether the employer pays for a round trip (two-way pay)</li>
+     *   <li>Whether transport compensation should be applied to reduce the final cost</li>
+     * </ul>
+     * <p>When {@code includeTransportCompensation} is true, the method calculates the employer's compensation
+     * percentage and subtracts it from the final transport cost.</p>
+     *
+     * @param campaign                     the current {@link Campaign} used for jump path, transport options, and cost
+     *                                     calculation
+     * @param includeTransportCompensation whether to apply the contract's transport compensation percentage to reduce
+     *                                     the cost
+     *
+     * @return the total {@link Money} required for transport, after applying all applicable modifiers
+     */
+    private Money getTransportCost(Campaign campaign, boolean includeTransportCompensation) {
+        JumpPath jumpPath = getJumpPath(campaign);
+
+        TransportCostCalculations transportCostCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
+        boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
+        boolean isUseCommandCircuits = campaign.isUseCommandCircuitForContract(this);
+        int duration = (int) ceil(jumpPath.getTotalTime(campaign.getLocalDate(),
+              campaign.getLocation().getTransitTime(), isUseCommandCircuits));
+        Money transportCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
+              jumpPath.getJumps());
+
+        // Is the employer paying for both ways?
+        transportCost = transportCost.multipliedBy(useTwoWayPay ? 2 : 1);
+
+        if (includeTransportCompensation) {
+            Money transportCompensation = transportCost.multipliedBy(transportComp / 100.0);
+            transportCost = transportCost.minus(transportCompensation);
+        }
+
+        return transportCost;
     }
 
     /**

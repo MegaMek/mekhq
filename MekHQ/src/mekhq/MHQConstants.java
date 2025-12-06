@@ -220,6 +220,12 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT = "nagUnableToAffordLoanPayment";
     public static final String NAG_UNABLE_TO_AFFORD_JUMP = "nagUnableToAffordJump";
     public static final String NAG_UNABLE_TO_AFFORD_SHOPPING_LIST = "nagUnableToAffordShoppingList";
+
+    public static final String CONFIRMATION_CONTRACT_RENTAL = "confirmationContractRental";
+    public static final String CONFIRMATION_FACTION_STANDINGS_ULTIMATUM = "confirmationFactionStandingsUltimatum";
+    public static final String CONFIRMATION_BEGIN_TRANSIT = "confirmationBeginTransit";
+    public static final String CONFIRMATION_STRATCON_BATCHALL_BREACH = "confirmationStratConBatchallBreach";
+    public static final String CONFIRMATION_STRATCON_DEPLOY = "confirmationStratConDeploy";
     // endregion Nag Tab
 
     // region Miscellaneous Options
@@ -358,6 +364,8 @@ public final class MHQConstants extends SuiteConstants {
     // startregion Important Dates
     public static final LocalDate CLAN_INVASION_FIRST_WAVE_BEGINS = LocalDate.of(3050, 3, 7);
     public static final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
+    public static final LocalDate COMSTAR_SCHISM = LocalDate.of(3052, 9, 21);
+    public static final LocalDate OPERATION_SCOUR_ENDS = LocalDate.of(3078, 1, 1);
     /**
      * The invasion of Luthien kicks off the Jihad
      */

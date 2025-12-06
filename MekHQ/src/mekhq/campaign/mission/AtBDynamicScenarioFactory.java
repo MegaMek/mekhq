@@ -33,9 +33,11 @@
 package mekhq.campaign.mission;
 
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.MissionRole.*;
 import static megamek.codeUtilities.MathUtility.clamp;
+import static megamek.codeUtilities.MathUtility.getGaussianAverage;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.equipment.WeaponType.CLASS_ARTILLERY;
@@ -50,6 +52,10 @@ import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
+import static mekhq.campaign.mission.enums.CombatRole.CADRE;
+import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
+import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
+import static mekhq.campaign.mission.enums.CombatRole.PATROL;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.universe.IUnitGenerator.unitTypeSupportsWeightClass;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
@@ -70,6 +76,7 @@ import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
+import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.OffBoardDirection;
@@ -104,6 +111,7 @@ import mekhq.campaign.Hangar;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.camOpsReputation.IUnitRating;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
@@ -115,6 +123,7 @@ import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -188,7 +197,8 @@ public class AtBDynamicScenarioFactory {
 
         boolean planetsideScenario = template.isPlanetSurface();
 
-        if (campaign.getCampaignOptions().isUsePlanetaryConditions() && planetsideScenario) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isUsePlanetaryConditions() && planetsideScenario) {
             setPlanetaryConditions(scenario, contract, campaign);
         }
 
@@ -198,14 +208,14 @@ public class AtBDynamicScenarioFactory {
         // ground map
         // theoretically some lighting conditions apply to space maps as well, but
         // requires additional work to implement properly
-        if (campaign.getCampaignOptions().isUseLightConditions() && planetsideScenario) {
+        if (campaignOptions.isUseLightConditions() && planetsideScenario) {
             setLightConditions(scenario);
         }
 
         // set weather conditions if the user wants to play with them and is on a ground
         // map
-        if (campaign.getCampaignOptions().isUseWeatherConditions() && planetsideScenario) {
-            setWeather(scenario);
+        if (campaignOptions.isUseWeatherConditions() && planetsideScenario) {
+            setWeather(scenario, campaignOptions.isUseNoTornadoes());
         }
 
         // apply a default "reinforcements" force template if a scenario-specific one
@@ -1772,10 +1782,11 @@ public class AtBDynamicScenarioFactory {
     /**
      * Handles random determination of weather/wind/fog conditions for the given scenario, as per AtB rules
      *
-     * @param scenario The scenario for which to set weather conditions.
+     * @param scenario      The scenario for which to set weather conditions.
+     * @param isNoTornadoes {@code true} if tornadoes should be suppressed into less intense wind levels
      */
-    private static void setWeather(AtBDynamicScenario scenario) {
-        scenario.setWeatherConditions();
+    private static void setWeather(AtBDynamicScenario scenario, boolean isNoTornadoes) {
+        scenario.setWeatherConditions(isNoTornadoes);
     }
 
     /**
@@ -2835,7 +2846,7 @@ public class AtBDynamicScenarioFactory {
         if (skillRoll == 1) {
             skillValue = max(1, skillValue - 1);
         } else if (skillRoll == 6) {
-            skillValue = Math.min(7, skillValue + 1);
+            skillValue = min(7, skillValue + 1);
         }
 
         skill = SkillLevel.parseFromInteger(skillValue);
@@ -2974,7 +2985,7 @@ public class AtBDynamicScenarioFactory {
           Faction faction) {
         int skillLevel = 0;
         if (skill.isGreenOrGreater()) {
-            int adjustedValue = Math.min(skill.getAdjustedValue(), EXP_LEGENDARY);
+            int adjustedValue = min(skill.getAdjustedValue(), EXP_LEGENDARY);
             int commandSkillsModifier = randomSkillPreferences.getCommandSkillsModifier(adjustedValue);
 
             int skillRoll = clamp(d6(2) + commandSkillsModifier, 2, 12);
@@ -3393,38 +3404,47 @@ public class AtBDynamicScenarioFactory {
         // BV budget
         int bvBudget = 0;
 
-        boolean isGenericBattleValue = campaign.getCampaignOptions().isUseGenericBattleValue() &&
-                                             !forceStandardBattleValue;
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isGenericBattleValue = campaignOptions.isUseGenericBattleValue() && !forceStandardBattleValue;
+        boolean isUseNoSeedForce = campaignOptions.isNoSeedForces();
+        boolean isStratConSingles = campaignOptions.isUseStratConSinglesMode();
+
         String generationMethod = isGenericBattleValue ? "Generic BV" : "BV2";
 
-        // deployed player forces:
-        for (int forceID : scenario.getForceIDs()) {
-            ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
-            if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                Force force = campaign.getForce(forceID);
-                if (force != null) {
-                    bvBudget += campaign.getForce(forceID).getTotalBV(campaign, forceStandardBattleValue);
-                    LOGGER.info("Forced BV contribution for {}: {}", force.getName(), bvBudget);
+        // average player forces
+        if (isStratConSingles) {
+            bvBudget = getBVBudgetForStratConSingles(campaign, forceStandardBattleValue);
+        } else if (isUseNoSeedForce) {
+            bvBudget = getBVBudgetWithoutUsingASeedForce(campaign, forceStandardBattleValue);
+        } else {
+            // deployed player forces
+            for (int forceID : scenario.getForceIDs()) {
+                ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+                if (forceTemplate != null && forceTemplate.getContributesToBV()) {
+                    Force force = campaign.getForce(forceID);
+                    if (force != null) {
+                        bvBudget += force.getTotalBV(campaign, forceStandardBattleValue);
+                        LOGGER.info("Forced BV contribution for {}: {}", force.getName(), bvBudget);
+                    }
                 }
             }
-        }
 
-        // deployed individual player units
-        for (UUID unitID : scenario.getIndividualUnitIDs()) {
-            ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
-            if ((forceTemplate != null) && forceTemplate.getContributesToBV()) {
-                if (isGenericBattleValue && !forceStandardBattleValue) {
-                    bvBudget += campaign.getUnit(unitID).getEntity().getGenericBattleValue();
-                } else {
-                    bvBudget += campaign.getUnit(unitID).getEntity().calculateBattleValue();
+            // deployed individual player units
+            for (UUID unitID : scenario.getIndividualUnitIDs()) {
+                ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
+                if ((forceTemplate != null) && forceTemplate.getContributesToBV()) {
+                    if (isGenericBattleValue) {
+                        bvBudget += campaign.getUnit(unitID).getEntity().getGenericBattleValue();
+                    } else {
+                        bvBudget += campaign.getUnit(unitID).getEntity().calculateBattleValue();
+                    }
                 }
             }
-        }
 
-        LOGGER.info("Total Seed Force {}: {}", generationMethod, bvBudget);
+            LOGGER.info("Total Seed Force {}: {}", generationMethod, bvBudget);
+        }
 
         double bvMultiplier = scenario.getEffectivePlayerBVMultiplier();
-
         if (bvMultiplier > 0) {
             bvBudget = (int) round(bvBudget * scenario.getEffectivePlayerBVMultiplier());
         }
@@ -3463,35 +3483,158 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Calculates the current effective player and allied unit count present in the given scenario.
+     * Calculates the total Battle Value (BV) budget to use when generating a StratCon Singles scenario.
      *
-     * @param scenario      The scenario to process.
-     * @param campaign      The campaign in which the scenario resides.
-     * @param isClanBidding {@link Boolean} flag indicating if Clan bidding is enabled.
+     * <p>This method examines the player's available {@link CombatTeam}s and aggregates the Battle Value of all
+     * forces whose roles are considered valid for StratCon Singles generation. Valid roles are:
+     * {@link CombatRole#FRONTLINE}, {@link CombatRole#MANEUVER}, {@link CombatRole#CADRE}, and
+     * {@link CombatRole#PATROL}.</p>
      *
-     * @return The effective unit count for the scenario.
+     * <p>Only Combat Teams with a non-null {@link Force} and a positive BV are counted. If at least one valid force
+     * is found, the BV budget returned is the sum of the BVs of all qualifying forces.</p>
+     *
+     * <p>If the player has no qualifying forces, a default budget of {@code 10,000} BV is returned. This helps
+     * ensure StratCon Singles generation can still proceed even when the player lacks suitable forces.</p>
+     *
+     * @param campaign                 the {@link Campaign} containing the Combat Teams used to determine the BV budget
+     * @param forceStandardBattleValue whether BV should be computed using standard Battle Value rules
+     *
+     * @return the total BV budget for StratCon Singles generation, or the default value if no valid forces are
+     *       available
+     *
+     * @author Illiani
+     * @since 0.50.10
      */
-    public static int calculateEffectiveUnitCount(AtBDynamicScenario scenario, Campaign campaign,
-          boolean isClanBidding) {
-        // for each deployed player and bot force that's marked as contributing to the
-        // unit count budget
-        int unitCount = 0;
+    private static int getBVBudgetForStratConSingles(Campaign campaign, boolean forceStandardBattleValue) {
+        int defaultBVBudget = 10000; // We use this value if the player has no valid forces
 
-        // deployed player forces:
-        for (int forceID : scenario.getForceIDs()) {
-            ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
-            Force force = campaign.getForce(forceID);
+        int totalForces = 0;
+        int totalBattleValue = 0;
+        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+            CombatRole role = combatTeam.getRole();
+            if (!validRoles.contains(role)) {
+                continue;
+            }
 
-            if (forceTemplate != null && forceTemplate.getContributesToUnitCount()) {
-                unitCount += force.getTotalUnitCount(campaign, isClanBidding);
+            Force force = combatTeam.getForce(campaign);
+            if (force != null) {
+                int battleValue = force.getTotalBV(campaign, forceStandardBattleValue);
+                if (battleValue > 0) {
+                    totalForces++;
+                    totalBattleValue += battleValue;
+                }
             }
         }
 
-        // deployed individual player units
-        for (UUID unitID : scenario.getIndividualUnitIDs()) {
-            ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
-            if ((forceTemplate != null) && forceTemplate.getContributesToUnitCount()) {
-                unitCount++;
+        if (totalForces == 0) {
+            LOGGER.info("Found no player forces with BV for StratCon Singles. Returning default budget {}.",
+                  defaultBVBudget);
+            return defaultBVBudget;
+        } else {
+            LOGGER.info("Using StratCon Singles: BV budget of all Combat Teams {} from {} forces",
+                  totalBattleValue, totalForces);
+            return totalBattleValue;
+        }
+    }
+
+    /**
+     * Determines an appropriate Battle Value (BV) budget when generating a force without using a designated seed
+     * force.
+     *
+     * <p>This method scans all player-controlled {@link CombatTeam}s that belong to a set of valid combat roles
+     * (Frontline, Maneuver, Cadre, and Patrol). For each qualifying team, the method retrieves the team's associated
+     * {@link Force} and collects its total BV. These values are then combined to compute a Gaussian-weighted average,
+     * which serves as a representative BV budget for force generation.</p>
+     *
+     * <p><b>Why Gaussian Weighting?</b></p>
+     * <p>A simple arithmetic mean can be disproportionately influenced by unusually large or unusually small
+     * BVs—common in campaigns where mixed-quality lances, ad hoc forces, or partially repaired assets coexist. A
+     * Gaussian-weighted average reduces the impact of such outliers by assigning more weight to values near the center
+     * of the distribution. This produces a more stable and intuitive BV budget for seedless generation.</p>
+     *
+     * <p><b>Behavior</b></p>
+     * <ul>
+     *     <li>Only BVs from valid roles are considered.</li>
+     *     <li>Any force returning a BV of {@code 0} or less is ignored.</li>
+     *     <li>If no valid forces are found, a default BV budget of {@code 10,000} is returned.</li>
+     *     <li>Otherwise, the method delegates to {@link MathUtility#getGaussianAverage(List)} to compute the
+     *     weighted BV budget.</li>
+     * </ul>
+     *
+     * @param campaign                 the current {@link Campaign} context used to resolve combat teams and forces
+     * @param forceStandardBattleValue whether to calculate BV using standardized values rather than full modifiers
+     *
+     * @return the Gaussian-weighted BV budget, or a default value if no valid forces exist
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static int getBVBudgetWithoutUsingASeedForce(Campaign campaign, boolean forceStandardBattleValue) {
+        int defaultBVBudget = 10000; // We use this value if the player has no valid forces
+
+        // We need to start by gathering the different battle values. This is because we need that information for
+        // calculating the gaussian-weighted average. Specifically, we need it to calculate the crude mean (which the
+        // averages will be weighted against).
+        List<Integer> battleValues = new ArrayList<>();
+        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+            CombatRole role = combatTeam.getRole();
+            if (!validRoles.contains(role)) {
+                continue;
+            }
+
+            Force force = combatTeam.getForce(campaign);
+            if (force != null) {
+                int battleValue = force.getTotalBV(campaign, forceStandardBattleValue);
+                if (battleValue > 0) {
+                    battleValues.add(battleValue);
+                }
+            }
+        }
+
+        if (battleValues.isEmpty()) {
+            LOGGER.info("Found no player forces with BV. Returning default budget {}.",
+                  defaultBVBudget);
+            return defaultBVBudget;
+        } else {
+            int gaussianAverage = getGaussianAverage(battleValues);
+            LOGGER.info("Not using a seed force: gaussian-weighted BV budget {} from {} forces",
+                  gaussianAverage, battleValues.size());
+            return gaussianAverage;
+        }
+    }
+
+    public static int calculateEffectiveUnitCount(AtBDynamicScenario scenario, Campaign campaign,
+          boolean isClanBidding) {
+        // for each deployed player and bot force that's marked as contributing to the unit count budget
+        int unitCount = 0;
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseNoSeedForce = campaignOptions.isNoSeedForces();
+        boolean isStratConSingles = campaignOptions.isUseStratConSinglesMode();
+
+        if (isStratConSingles) {
+            unitCount = getUnitCountForStratConSingles(campaign);
+        } else if (isUseNoSeedForce) {
+            unitCount = getUnitCountWithoutUsingASeedForce(campaign);
+        } else {
+            // deployed player forces:
+            for (int forceID : scenario.getForceIDs()) {
+                ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+                Force force = campaign.getForce(forceID);
+
+                if (forceTemplate != null && forceTemplate.getContributesToUnitCount() && force != null) {
+                    unitCount += force.getTotalUnitCount(campaign, isClanBidding);
+                }
+            }
+
+            // deployed individual player units
+            for (UUID unitID : scenario.getIndividualUnitIDs()) {
+                ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
+                if ((forceTemplate != null) && forceTemplate.getContributesToUnitCount()) {
+                    unitCount++;
+                }
             }
         }
 
@@ -3506,6 +3649,124 @@ public class AtBDynamicScenarioFactory {
         }
 
         return unitCount;
+    }
+
+    /**
+     * Determines the total number of units to use when generating a StratCon Singles scenario.
+     *
+     * <p>This method inspects all player {@link CombatTeam}s and sums the number of units contained within forces
+     * whose roles are considered valid for StratCon Singles generation. Valid roles are: {@link CombatRole#FRONTLINE},
+     * {@link CombatRole#MANEUVER}, {@link CombatRole#CADRE}, and {@link CombatRole#PATROL}.</p>
+     *
+     * <p>For each qualifying Combat Team, the force is retrieved and counted if it contains at least one unit. The
+     * total number of units across all valid forces is then returned.</p>
+     *
+     * <p>If the player has no qualifying forces (i.e., no forces with units in the valid role categories), the
+     * method falls back to the faction’s standard default force size as determined by
+     * {@link CombatTeam#getStandardForceSize(Faction)}.</p>
+     *
+     * @param campaign the {@link Campaign} from which Combat Teams and forces are obtained
+     *
+     * @return the total number of units across all valid forces, or the faction’s standard default force size if no
+     *       valid forces contain units
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static int getUnitCountForStratConSingles(Campaign campaign) {
+        int defaultUnitCount = CombatTeam.getStandardForceSize(campaign.getFaction());
+
+        int forceCount = 0;
+        int unitCount = 0;
+        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+            CombatRole role = combatTeam.getRole();
+            if (!validRoles.contains(role)) {
+                continue;
+            }
+
+            Force force = combatTeam.getForce(campaign);
+            if (force != null) {
+                int unitsInForce = force.getAllUnits(false).size();
+                if (unitsInForce != 0) {
+                    forceCount++;
+                    unitCount += unitsInForce;
+                }
+            }
+        }
+
+        if (forceCount == 0) {
+            LOGGER.info("Found no player forces with units for StratCon Singles. Returning default budget {}.",
+                  defaultUnitCount);
+            return defaultUnitCount;
+        } else {
+            LOGGER.info("Using StratCon Singles: total unit count {} from {} forces", unitCount, forceCount);
+            return unitCount;
+        }
+    }
+
+    /**
+     * Determines an appropriate unit-count budget when generating a force without using a designated seed force.
+     *
+     * <p>This method reviews all player-controlled {@link CombatTeam}s whose roles fall within a predefined set of
+     * valid combat roles (Frontline, Maneuver, Cadre, and Patrol). For each qualifying team, the method retrieves the
+     * associated {@link Force} and records the number of units currently assigned to that force.</p>
+     *
+     * <p><b>Why Gaussian Weighting?</b></p>
+     * <p>A simple arithmetic mean can be disproportionately influenced by unusually large or unusually small
+     * unit counts—common in campaigns where mixed-quality lances, ad hoc forces, or partially repaired assets coexist.
+     * A Gaussian-weighted average reduces the impact of such outliers by assigning more weight to values near the
+     * center of the distribution. This produces a more stable and intuitive unit budget for seedless generation.</p>
+     *
+     * <h3>Behavior</h3>
+     * <ul>
+     *     <li>Only forces belonging to valid roles are considered.</li>
+     *     <li>Any force with a unit count of {@code 0} is ignored.</li>
+     *     <li>If no qualifying forces are found, a default unit count is returned. This default is derived from
+     *     {@link CombatTeam#getStandardForceSize(Faction)}, using the faction of the current campaign.</li>
+     *     <li>If valid forces exist, their unit counts are combined using the Gaussian-weighted averaging method to
+     *     produce a representative force size.</li>
+     * </ul>
+     *
+     * @param campaign the current {@link Campaign} context used to gather combat teams and forces
+     *
+     * @return the Gaussian-weighted unit-count budget, or a default value if no valid forces exist
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private static int getUnitCountWithoutUsingASeedForce(Campaign campaign) {
+        int defaultUnitCount = CombatTeam.getStandardForceSize(campaign.getFaction());
+
+        // We need to start by gathering the different unit counts. This is because we need that information for
+        // calculating the gaussian-weighted average. Specifically, we need it to calculate the crude mean (which the
+        // averages will be weighted against).
+        List<Integer> unitCounts = new ArrayList<>();
+        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+            CombatRole role = combatTeam.getRole();
+            if (!validRoles.contains(role)) {
+                continue;
+            }
+
+            Force force = combatTeam.getForce(campaign);
+            if (force != null) {
+                int unitCount = force.getAllUnits(false).size();
+                if (unitCount > 0) {
+                    unitCounts.add(unitCount);
+                }
+            }
+        }
+
+        if (unitCounts.isEmpty()) {
+            LOGGER.info("Found no player forces with units. Returning default budget {}.", defaultUnitCount);
+            return defaultUnitCount;
+        } else {
+            int gaussianAverage = getGaussianAverage(unitCounts);
+            LOGGER.info("Not using a seed force: gaussian-weighted unit count {} from {} forces",
+                  gaussianAverage, unitCounts.size());
+            return gaussianAverage;
+        }
     }
 
     /**

@@ -195,7 +195,7 @@ public abstract class AbstractPersonnelGenerator {
                         person.setPhenotype(Phenotype.MEKWARRIOR);
                     }
                 }
-                case VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL, COMBAT_TECHNICIAN -> {
+                case VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL -> {
                     if (person.getOriginFaction().getShortName().equalsIgnoreCase("CHH") &&
                               (campaign.getGameYear() >= 3100) &&
                               Utilities.rollProbability(campaign.getCampaignOptions()

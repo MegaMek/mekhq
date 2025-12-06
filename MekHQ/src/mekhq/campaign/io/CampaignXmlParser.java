@@ -39,6 +39,7 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
@@ -130,6 +131,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.education.EducationController;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -139,12 +141,14 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.storyArc.StoryArc;
+import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.gui.campaignOptions.optionChangeDialogs.StratConMaplessCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.dialog.MilestoneUpgradePathDialog;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
@@ -246,6 +250,14 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (xn.equalsIgnoreCase("campaignOptions")) {
                     campaign.setCampaignOptions(CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(wn,
                           version));
+
+                    //  < 50.10 compatibility handler
+                    CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                    if (campaignOptions.isHadAtBEnabledMarker() && !campaignOptions.isUseStratCon()) {
+                        // Mapless StratCon replaced AtB in 50.10
+                        campaignOptions.setStratConPlayType(StratConPlayType.MAPLESS);
+                        new StratConMaplessCampaignOptionsChangedConfirmationDialog(campaign);
+                    }
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     campaign.getGameOptions().fillFromXML(wn.getChildNodes());
                 }
@@ -457,9 +469,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             unit.setCampaign(campaign);
             unit.fixReferences(campaign);
 
-            // reset the pilot and entity, to reflect newly assigned personnel
-            unit.resetPilotAndEntity();
-
             if (null != unit.getRefit()) {
                 unit.getRefit().fixReferences(campaign);
 
@@ -542,13 +551,24 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 campaign.addReport(report);
             }
 
-            if (Person.updateSkillsForVehicleCrewProfession(today, person, person.getPrimaryRole(), true) ||
-                      Person.updateSkillsForVehicleCrewProfession(today, person, person.getSecondaryRole(), false)) {
-                String report = getFormattedTextAt(RESOURCE_BUNDLE, "vehicleCrewProfessionSkillChange",
+            // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
+            // potentially as far back as 2014. The next two handlers should never be removed.
+            if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
+                person.setSecondaryRole(PersonnelRole.NONE);
+
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "ineligibleForSecondaryRole",
                       spanOpeningWithCustomColor(getWarningColor()),
                       CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle());
-                campaign.addReport(report);
+                      person.getHyperlinkedFullTitle()));
+            }
+
+            if (!person.canPerformRole(today, person.getPrimaryRole(), true)) {
+                person.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.DEPENDENT);
+
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "ineligibleForPrimaryRole",
+                      spanOpeningWithCustomColor(getNegativeColor()),
+                      CLOSING_SPAN_TAG,
+                      person.getHyperlinkedFullTitle()));
             }
         }
 
@@ -562,6 +582,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 unit.getEntity().setC3UUID();
                 unit.getEntity().setC3NetIdSelf();
             }
+
+            // This needs to be down here so that it can factor in any changes made to personnel prior to this point.
+            unit.resetPilotAndEntity();
         });
         campaign.refreshNetworks();
 
@@ -828,6 +851,132 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                             campaign.getCurrentReport().add(wn2.getTextContent());
                         }
                     }
+                } else if (nodeName.equalsIgnoreCase("skillReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getSkillReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getSkillReport().add(wn2.getTextContent());
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("battleReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getBattleReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getBattleReport().add(wn2.getTextContent());
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("personnelReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getPersonnelReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getPersonnelReport().add(wn2.getTextContent());
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("medicalReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getMedicalReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getMedicalReport().add(wn2.getTextContent());
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("acquisitionsReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getAcquisitionsReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getAcquisitionsReport().add(wn2.getTextContent());
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("technicalReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getTechnicalReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getTechnicalReport().add(wn2.getTextContent());
+                        }
+                    }
                 } else if (nodeName.equalsIgnoreCase("faction")) {
                     Faction faction = Factions.getInstance().getFaction(childNode.getTextContent());
                     campaign.setFaction(faction);
@@ -906,21 +1055,100 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
         }
 
-        // TODO: this could probably be better
+        // Update daily reports
         campaign.setCurrentReportHTML(Utilities.combineString(campaign.getCurrentReport(), Campaign.REPORT_LINEBREAK));
-
-        // Everything's new
         List<String> newReports = new ArrayList<>(campaign.getCurrentReport().size() * 2);
-        boolean firstReport = true;
+        boolean firstGeneralReport = true;
         for (String report : campaign.getCurrentReport()) {
-            if (firstReport) {
-                firstReport = false;
+            if (firstGeneralReport) {
+                firstGeneralReport = false;
             } else {
                 newReports.add(Campaign.REPORT_LINEBREAK);
             }
             newReports.add(report);
         }
         campaign.setNewReports(newReports);
+
+        campaign.setSkillReportHTML(Utilities.combineString(campaign.getSkillReport(), Campaign.REPORT_LINEBREAK));
+        List<String> newSkillReports = new ArrayList<>(campaign.getSkillReport().size() * 2);
+        boolean firstSkillReport = true;
+        for (String report : campaign.getSkillReport()) {
+            if (firstSkillReport) {
+                firstSkillReport = false;
+            } else {
+                newSkillReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newSkillReports.add(report);
+        }
+        campaign.setNewSkillReports(newSkillReports);
+
+        campaign.setBattleReportHTML(Utilities.combineString(campaign.getBattleReport(), Campaign.REPORT_LINEBREAK));
+        List<String> newBattleReports = new ArrayList<>(campaign.getBattleReport().size() * 2);
+        boolean firstBattleReport = true;
+        for (String report : campaign.getBattleReport()) {
+            if (firstBattleReport) {
+                firstBattleReport = false;
+            } else {
+                newBattleReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newBattleReports.add(report);
+        }
+        campaign.setNewBattleReports(newBattleReports);
+
+        campaign.setPersonnelReportHTML(Utilities.combineString(campaign.getPersonnelReport(),
+              Campaign.REPORT_LINEBREAK));
+        List<String> newPersonnelReports = new ArrayList<>(campaign.getPersonnelReport().size() * 2);
+        boolean firstPersonnelReport = true;
+        for (String report : campaign.getPersonnelReport()) {
+            if (firstPersonnelReport) {
+                firstPersonnelReport = false;
+            } else {
+                newPersonnelReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newPersonnelReports.add(report);
+        }
+        campaign.setNewPersonnelReports(newPersonnelReports);
+
+        campaign.setMedicalReportHTML(Utilities.combineString(campaign.getMedicalReport(), Campaign.REPORT_LINEBREAK));
+        List<String> newMedicalReports = new ArrayList<>(campaign.getMedicalReport().size() * 2);
+        boolean firstMedicalReport = true;
+        for (String report : campaign.getMedicalReport()) {
+            if (firstMedicalReport) {
+                firstMedicalReport = false;
+            } else {
+                newMedicalReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newMedicalReports.add(report);
+        }
+        campaign.setNewMedicalReports(newMedicalReports);
+
+        campaign.setAcquisitionsReportHTML(Utilities.combineString(campaign.getAcquisitionsReport(),
+              Campaign.REPORT_LINEBREAK));
+        List<String> newAcquisitionsReports = new ArrayList<>(campaign.getAcquisitionsReport().size() * 2);
+        boolean firstAcquisitionsReport = true;
+        for (String report : campaign.getAcquisitionsReport()) {
+            if (firstAcquisitionsReport) {
+                firstAcquisitionsReport = false;
+            } else {
+                newAcquisitionsReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newAcquisitionsReports.add(report);
+        }
+        campaign.setNewAcquisitionsReports(newAcquisitionsReports);
+
+        campaign.setTechnicalReportHTML(Utilities.combineString(campaign.getTechnicalReport(),
+              Campaign.REPORT_LINEBREAK));
+        List<String> newTechnicalReports = new ArrayList<>(campaign.getTechnicalReport().size() * 2);
+        boolean firstTechnicalReport = true;
+        for (String report : campaign.getTechnicalReport()) {
+            if (firstTechnicalReport) {
+                firstTechnicalReport = false;
+            } else {
+                newTechnicalReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newTechnicalReports.add(report);
+        }
+        campaign.setNewTechnicalReports(newTechnicalReports);
     }
 
     private static void processCombatTeamNodes(Campaign campaign, Node workingNode) {
