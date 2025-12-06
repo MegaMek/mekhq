@@ -35,9 +35,7 @@ package mekhq.gui.dialog;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.Person.*;
-import static mekhq.campaign.personnel.skills.Aging.getAgeModifier;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
-import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -126,7 +124,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private final Map<String, JSpinner> skillLevels = new Hashtable<>();
     private final Map<String, JSpinner> skillBonus = new Hashtable<>();
     private final Map<String, JLabel> skillValues = new Hashtable<>();
-    private final Map<String, JLabel> skillAgeModifiers = new Hashtable<>();
     private final Map<String, JCheckBox> skillChecks = new Hashtable<>();
     private PersonnelOptions options;
     private LocalDate birthdate;
@@ -204,9 +201,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         this.campaign = campaign;
         this.frame = parent;
         this.person = person;
-        if (campaign.getCampaignOptions().isUseAgeEffects()) {
-            updateAllSkillAgeModifiers(campaign.getLocalDate(), person);
-        }
         initializePilotAndOptions();
         setLocationRelativeTo(parent);
         setUserPreferences();
@@ -1493,9 +1487,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
 
         person.setDateOfBirth(birthdate);
-        if (campaign.getCampaignOptions().isUseAgeEffects()) {
-            updateAllSkillAgeModifiers(campaign.getLocalDate(), person);
-        }
         person.setLastRankChangeDate(lastRankChangeDate);
         person.setRetirement(retirement);
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
@@ -1694,11 +1685,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             skillLevels.put(type, spnLevel);
             skillBonus.put(type, spnBonus);
 
-            SkillType skillType = SkillType.getType(type);
-            lblAging = new JLabel(resourceMap.getString("lblAging.text"));
-            int ageModifier = getAgeModifier(milestone, skillType.getFirstAttribute(), skillType.getSecondAttribute());
-            skillAgeModifiers.put(type, new JLabel(ageModifier + ""));
-
             constraints.anchor = GridBagConstraints.WEST;
             constraints.weightx = 0;
             skillsPanel.add(chkSkill, constraints);
@@ -1727,17 +1713,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             constraints.anchor = GridBagConstraints.WEST;
             constraints.weightx = 1.0;
             skillsPanel.add(spnBonus, constraints);
-
-            if (campaign.getCampaignOptions().isUseAgeEffects()) {
-                constraints.gridx = 7;
-                constraints.anchor = GridBagConstraints.WEST;
-                skillsPanel.add(lblAging, constraints);
-
-                constraints.gridx = 8;
-                constraints.anchor = GridBagConstraints.WEST;
-                constraints.weightx = 1.0;
-                skillsPanel.add(skillAgeModifiers.get(type), constraints);
-            }
         }
     }
 
@@ -1778,14 +1753,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             if (skillChecks.get(type).isSelected()) {
                 int level = (Integer) skillLevels.get(type).getModel().getValue();
                 int bonus = (Integer) skillBonus.get(type).getModel().getValue();
-                SkillType skillType = SkillType.getType(type);
-                int ageModifier = 0;
-                if (campaign.getCampaignOptions().isUseAgeEffects()) {
-                    ageModifier = getAgeModifier(milestone,
-                          skillType.getFirstAttribute(),
-                          skillType.getSecondAttribute());
-                }
-                person.addSkill(type, level, bonus, ageModifier);
+                person.addSkill(type, level, bonus);
             } else {
                 person.removeSkill(type);
             }
@@ -1940,16 +1908,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         int level = (Integer) skillLevels.get(type).getModel().getValue();
         int bonus = (Integer) skillBonus.get(type).getModel().getValue();
 
-        int ageModifier = 0;
-        if (isUseAgeEffects) {
-            ageModifier = getAgeModifier(getMilestone(person.getAge(today)),
-                  skillType.getFirstAttribute(), skillType.getSecondAttribute());
-        }
-
         Skill skill = new Skill(type);
         skill.setLevel(level);
         skill.setBonus(bonus);
-        skill.setAgingModifier(ageModifier);
 
         SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgeEffects, isClanCampaign, today, true);
 

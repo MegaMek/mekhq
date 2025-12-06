@@ -50,10 +50,21 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
  * @param attributes         the person's physical and mental attributes
  * @param adjustedReputation the calculated reputation modifier (0 if not applicable)
  * @param injuryEffects      a list of injury effects currently affecting the character
+ * @param age                the age of the character, in years
  *
  * @author Illiani
- * @since 0.50.11
+ * @since 0.50.10
  */
 public record SkillModifierData(PersonnelOptions characterOptions, Attributes attributes, int adjustedReputation,
-      List<InjuryEffect> injuryEffects) {
+      List<InjuryEffect> injuryEffects, int age) {
+    /**
+     * Special age value indicating that aging effects should be ignored.
+     *
+     * <p>When a character's age is set to {@code IGNORE_AGE}, all systems that compute age-based modifiers—such as
+     * attribute adjustments or skill penalties—should treat the character as unaffected by aging. This allows campaigns
+     * or characters to disable aging entirely without altering the underlying age mechanics elsewhere.</p>
+     *
+     * <p>The value {@code -1} is used as a sentinel and does not correspond to any valid chronological age.</p>
+     */
+    public static int IGNORE_AGE = -1;
 }

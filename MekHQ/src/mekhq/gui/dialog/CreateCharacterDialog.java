@@ -35,9 +35,6 @@ package mekhq.gui.dialog;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.Person.*;
-import static mekhq.campaign.personnel.skills.Aging.getAgeModifier;
-import static mekhq.campaign.personnel.skills.Aging.getMilestone;
-import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -1563,16 +1560,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         int level = (Integer) skillLvls.get(type).getModel().getValue();
         int bonus = (Integer) skillBonus.get(type).getModel().getValue();
 
-        int ageModifier = 0;
-        if (isUseAgeEffects) {
-            ageModifier = getAgeModifier(getMilestone(person.getAge(today)),
-                  skillType.getFirstAttribute(), skillType.getSecondAttribute());
-        }
-
         Skill skill = new Skill(type);
         skill.setLevel(level);
         skill.setBonus(bonus);
-        skill.setAgingModifier(ageModifier);
 
         SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgeEffects, isClanCampaign, today, true);
 
@@ -1714,9 +1704,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             person.setGender((Gender) choiceGender.getSelectedItem());
         }
         person.setDateOfBirth(birthdate);
-        if (campaign.getCampaignOptions().isUseAgeEffects()) {
-            updateAllSkillAgeModifiers(campaign.getLocalDate(), person);
-        }
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
         if (choiceSystem.getSelectedItem() != null && choicePlanet.getSelectedItem() != null) {
             person.setOriginPlanet((Planet) choicePlanet.getSelectedItem());

@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.skills;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
+import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.io.PrintWriter;
@@ -235,18 +236,19 @@ public class Attributes {
      * @since 0.50.06
      */
     public int getAttributeModifier(SkillAttribute attribute, List<InjuryEffect> injuryEffects,
-          PersonnelOptions options) {
-        int attributeScore = getAdjustedAttributeScore(attribute, injuryEffects, options);
+          PersonnelOptions options, int characterAge) {
+        int attributeScore = getAdjustedAttributeScore(attribute, injuryEffects, options, characterAge);
         return getIndividualAttributeModifier(attributeScore);
     }
 
     public int getAdjustedAttributeScore(SkillAttribute attribute, List<InjuryEffect> injuryEffects,
-          PersonnelOptions options) {
+          PersonnelOptions options, int characterAge) {
         int attributeScore = getAttribute(attribute);
         int injuryModifier = getAttributeScoreInjuryModifier(attribute, injuryEffects);
+        int agingModifier = getAttributeScoreAgeModifier(attribute, characterAge);
         int abilityModifier = getAbilityAdjustment(attribute, options);
 
-        int total = attributeScore + injuryModifier + abilityModifier;
+        int total = attributeScore + injuryModifier + agingModifier + abilityModifier;
         return clamp(total, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
@@ -365,6 +367,29 @@ public class Attributes {
         }
 
         return totalModifier;
+    }
+
+    /**
+     * Returns the age-based modifier that should be applied to the specified attribute.
+     *
+     * <p>If the campaign or character is configured to ignore aging effects (indicated by {@code IGNORE_AGE}), this
+     * method returns {@code 0}. Otherwise, it delegates to {@link Aging#getAgeModifier(int, SkillAttribute)} to compute
+     * the appropriate modifier for the character's current age.
+     *
+     * <p>This method centralizes the logic for respecting campaign settings or character flags that disable aging,
+     * ensuring that callers do not need to explicitly check for {@code IGNORE_AGE}.
+     *
+     * @param attribute    the {@link SkillAttribute} for which an age modifier is requested
+     * @param characterAge the character’s age in years, or {@code IGNORE_AGE} to disable aging
+     *
+     * @return the age-based modifier for the given attribute, or {@code 0} if aging is ignored
+     */
+    public int getAttributeScoreAgeModifier(SkillAttribute attribute, int characterAge) {
+        if (characterAge == IGNORE_AGE) { // Aging effects are disabled
+            return 0;
+        }
+
+        return Aging.getAgeModifier(characterAge, attribute);
     }
 
     /**
@@ -583,7 +608,8 @@ public class Attributes {
         this.currentEdge = currentEdge;
     }
 
-    public String getTooltip(SkillAttribute attribute, List<InjuryEffect> injuryEffects, PersonnelOptions options) {
+    public String getTooltip(SkillAttribute attribute, List<InjuryEffect> injuryEffects, PersonnelOptions options,
+          int characterAge) {
         StringBuilder tooltip = new StringBuilder();
 
         String flavorText = attribute.getDescription();
@@ -591,7 +617,12 @@ public class Attributes {
             tooltip.append(flavorText).append("<br><br>");
         }
 
-        // TODO aging modifiers
+        int agingModifier = getAttributeScoreAgeModifier(attribute, characterAge);
+        if (agingModifier != 0) {
+            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "tooltip.format.age",
+                  (agingModifier > 0 ? "+" : "") + agingModifier));
+        }
 
         int abilityModifier = getAbilityAdjustment(attribute, options);
         if (abilityModifier != 0) {

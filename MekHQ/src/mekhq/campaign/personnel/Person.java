@@ -60,6 +60,7 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.Advanced
 import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
+import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
@@ -238,6 +239,7 @@ public class Person {
 
     private String biography;
     private LocalDate birthday;
+    private int ageForAttributeModifiers;
     private LocalDate joinedCampaign;
     private LocalDate recruitment;
     private LocalDate lastRankChangeDate;
@@ -1882,6 +1884,33 @@ public class Person {
         return birthday.withYear(currentYear);
     }
 
+    /**
+     * Returns the age value used when calculating age-based attribute modifiers.
+     *
+     * <p>This value may differ from the character's actual age if aging effects are disabled (for example, when
+     * {@code IGNORE_AGE} is used). Systems that apply attribute penalties or bonuses due to aging should reference this
+     * value rather than the raw character age.</p>
+     *
+     * @return the age used for determining attribute-based aging modifiers
+     */
+    public int getAgeForAttributeModifiers() {
+        return ageForAttributeModifiers;
+    }
+
+    /**
+     * Sets the age value used when calculating age-based attribute modifiers.
+     *
+     * <p>This value may differ from the character's actual age if aging effects are disabled (for example, when
+     * {@code IGNORE_AGE} is used). Systems that apply attribute penalties or bonuses due to aging should reference this
+     * value rather than the raw character age.</p>
+     *
+     * @param ageForAttributeModifiers the age to use when determining aging-related attribute modifiers
+     */
+    public void setAgeForAttributeModifiers(final int ageForAttributeModifiers) {
+        this.ageForAttributeModifiers = ageForAttributeModifiers;
+    }
+
+
     public @Nullable LocalDate getDateOfDeath() {
         return dateOfDeath;
     }
@@ -3272,6 +3301,7 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overtimeLeft", overtimeLeft);
             }
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "birthday", getDateOfBirth());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ageForAttributeModifiers", ageForAttributeModifiers);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deathday", getDateOfDeath());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruitment", getRecruitment());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "joinedCampaign", getJoinedCampaign());
@@ -3759,6 +3789,8 @@ public class Person {
                     person.overtimeLeft = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("birthday")) {
                     person.birthday = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("ageForAttributeModifiers")) {
+                    person.ageForAttributeModifiers = MathUtility.parseInt(wn2.getTextContent().trim(), IGNORE_AGE);
                 } else if (nodeName.equalsIgnoreCase("deathday")) {
                     person.dateOfDeath = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("recruitment")) {
@@ -5334,10 +5366,6 @@ public class Person {
         skills.addSkill(skillName, new Skill(skillName, level, bonus));
     }
 
-    public void addSkill(final String skillName, final int level, final int bonus, final int ageModifier) {
-        skills.addSkill(skillName, new Skill(skillName, level, bonus, ageModifier));
-    }
-
     public void removeSkill(final String skillName) {
         skills.removeSkill(skillName);
     }
@@ -6881,8 +6909,10 @@ public class Person {
      * @since 0.50.5
      */
     public int getAttributeScore(final SkillAttribute attribute) {
-        int maximum = getAttributeCap(attribute);
-        return atowAttributes.getAdjustedAttributeScore(attribute, getActiveInjuryEffects(), options);
+        return atowAttributes.getAdjustedAttributeScore(attribute,
+              getActiveInjuryEffects(),
+              options,
+              ageForAttributeModifiers);
     }
 
     /**
@@ -8653,7 +8683,7 @@ public class Person {
         List<InjuryEffect> injuryEffects = excludeInjuryEffects ? new ArrayList<>() :
                                                  getAllActiveInjuryEffects(isAmbidextrous,
                                                        injuries);
-        return new SkillModifierData(options, atowAttributes, 0, injuryEffects);
+        return new SkillModifierData(options, atowAttributes, 0, injuryEffects, ageForAttributeModifiers);
     }
 
     /**
@@ -8708,6 +8738,10 @@ public class Person {
                                                  getAllActiveInjuryEffects(isAmbidextrous,
                                                        injuries);
 
-        return new SkillModifierData(options, atowAttributes, adjustedReputation, injuryEffects);
+        return new SkillModifierData(options,
+              atowAttributes,
+              adjustedReputation,
+              injuryEffects,
+              ageForAttributeModifiers);
     }
 }
