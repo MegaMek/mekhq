@@ -292,6 +292,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String FORCE_ICON_PATH = "data/images/force";
     public static final String PERSONNEL_MARKET_DIRECTORY_PATH = "data/universe/markets/personnelMarket/";
     public static final String MAP_GEN_PATH = "data/mapgen";
+    public static final String LOGS_PATH = "logs";
 
     // region StratCon
     public static final String STRAT_CON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
