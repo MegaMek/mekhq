@@ -55,7 +55,9 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.*;
@@ -94,6 +96,7 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillModifierData;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -406,9 +409,9 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * @author Illiani
      * @since 0.50.10
      */
-    private JComboBox<ProstheticType> createTreatmentComboBox(
-          List<ProstheticType> options) {
-        int gameYear = campaign.getGameYear();
+    private JComboBox<ProstheticType> createTreatmentComboBox(List<ProstheticType> options) {
+        Faction campaignFaction = campaign.getFaction();
+        LocalDate today = campaign.getLocalDate();
         boolean isOnPlanet = campaign.getLocation().isOnPlanet();
         boolean isUseKinderMode = campaign.getCampaignOptions().isUseKinderAlternativeAdvancedMedical();
 
@@ -445,8 +448,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                     setText(type.toString());
 
                     // Build tooltip with base info and exclusions
-                    String baseTooltip = type.getTooltip(gameYear, isUseKinderMode);
-                    String exclusions = getExclusions(isOnPlanet, type, gameYear);
+                    String baseTooltip = type.getTooltip(campaignFaction, today, isUseKinderMode);
+                    String exclusions = getExclusions(isOnPlanet, type, campaignFaction, today);
 
                     if (!exclusions.isBlank()) {
                         enabled = false;
@@ -470,8 +473,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             if (selected == null) {
                 comboBox.setToolTipText(defaultTooltip);
             } else {
-                String baseTooltip = selected.getTooltip(gameYear, isUseKinderMode);
-                baseTooltip += getExclusions(isOnPlanet, selected, gameYear);
+                String baseTooltip = selected.getTooltip(campaignFaction, today, isUseKinderMode);
+                baseTooltip += getExclusions(isOnPlanet, selected, campaignFaction, today);
                 comboBox.setToolTipText(wordWrap(baseTooltip));
             }
             updateSummary(); // Update summary when selection changes
@@ -568,7 +571,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                 surgeryLevelNeeded = neededSurgeryLevel;
             }
 
-            Money cost = surgeryType.getCost(campaign.getGameYear());
+            Money cost = surgeryType.getCost(campaign.getFaction(), campaign.getLocalDate());
             if (cost != null) {
                 totalCost = totalCost.plus(cost);
             }
@@ -599,64 +602,88 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     }
 
     /**
-     * Builds a text snippet describing why a selected prosthetic is excluded at the current time, based on location,
-     * faction, tech rating, and year.
+     * Builds a localized HTML-formatted snippet explaining why the selected prosthetic is currently unavailable to the
+     * patient. This method evaluates all restriction layers—including faction access rules, planetary location, tech
+     * rating requirements, personal prohibitions, and era-based availability—and produces a concatenated set of warning
+     * or exclusion messages.
      *
-     * @param isOnPlanet whether the campaign is currently on a planet
-     * @param selected   the prosthetic type being evaluated
-     * @param gameYear   the current in-game year
+     * <p>Messages are color-coded to distinguish between:
+     * <ul>
+     *     <li><b>Warnings:</b> Soft restrictions that can be resolved by the player (e.g., not being on a planet,
+     *     insufficient local tech level).</li>
+     *     <li><b>Exclusions:</b> Hard restrictions that completely prevent access (e.g., faction incompatibility,
+     *     personal prohibitions such as Hatred of Bionics).</li>
+     * </ul>
      *
-     * @return a concatenated exclusion message, or an empty string if allowed
+     * <p>If GM Mode is enabled, no restrictions apply and an empty string is returned.</p>
+     *
+     * @param isOnPlanet      {@code true} if the campaign is currently located on a planet, which affects access to
+     *                        certain prosthetic types
+     * @param selected        the prosthetic type being evaluated for availability
+     * @param campaignFaction the faction of the campaign, used to determine faction-based access
+     * @param today           the current in-game date, used to check era-based availability
+     *
+     * @return an HTML-formatted string containing all applicable restriction messages, or an empty string if the
+     *       prosthetic is fully allowed
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private String getExclusions(boolean isOnPlanet, ProstheticType selected, int gameYear) {
+    private String getExclusions(boolean isOnPlanet, ProstheticType selected, Faction campaignFaction,
+          LocalDate today) {
         if (isGMMode) {
             return "";
         }
 
         String tooltip = "";
 
+        // Something that the player is currently blocked by, but there is a way for them to bypass (such as changing
+        // location)
+        String warningColor = spanOpeningWithCustomColor(getWarningColor());
+        // Something the player is completely blocked by with no recourse
+        String exclusionColor = spanOpeningWithCustomColor(getNegativeColor());
+
         // Check if selection should be disabled
-        int atowProstheticType = selected.getProstheticType();
-        boolean hasHatredOfBionics = patient.getOptions().booleanOption(COMPULSION_BIONIC_HATE);
-        if (hasHatredOfBionics && atowProstheticType > 2) {
-            tooltip += getTextAt(RESOURCE_BUNDLE,
-                  "AdvancedReplacementLimbDialog.exclusions.refused");
-        }
+        if (selected != null) {
+            int atowProstheticType = selected.getProstheticType();
+            boolean hasHatredOfBionics = patient.getOptions().booleanOption(COMPULSION_BIONIC_HATE);
+            if (hasHatredOfBionics && atowProstheticType > 2) {
+                tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
+                      "AdvancedReplacementLimbDialog.exclusions.refused", exclusionColor, CLOSING_SPAN_TAG);
+            }
 
-        if (!isOnPlanet && atowProstheticType > 2) {
-            tooltip += getTextAt(RESOURCE_BUNDLE,
-                  "AdvancedReplacementLimbDialog.exclusions.planet");
-        }
+            if (!isOnPlanet && atowProstheticType > 2) {
+                tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
+                      "AdvancedReplacementLimbDialog.exclusions.planet", warningColor, CLOSING_SPAN_TAG);
+            }
 
-        if (!selected.isAvailableToFaction(campaign.getFaction())) {
-            if (selected.isClanOnly()) {
-                tooltip += getTextAt(RESOURCE_BUNDLE,
-                      "AdvancedReplacementLimbDialog.exclusions.faction.clan");
-            } else if (selected.isComStarOnly()) {
-                tooltip += getTextAt(RESOURCE_BUNDLE,
-                      "AdvancedReplacementLimbDialog.exclusions.faction.comstar");
-            } else if (selected.isWordOfBlakeOnly()) {
-                tooltip += getTextAt(RESOURCE_BUNDLE,
-                      "AdvancedReplacementLimbDialog.exclusions.faction.wob");
-            } else {
-                tooltip += getTextAt(RESOURCE_BUNDLE,
-                      "AdvancedReplacementLimbDialog.exclusions.faction.generic");
+            if (!selected.isAvailableToFaction(campaign.getFaction(), campaign.getLocalDate())) {
+                if (selected.isClanOnly()) {
+                    tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
+                          "AdvancedReplacementLimbDialog.exclusions.faction.clan", exclusionColor, CLOSING_SPAN_TAG);
+                } else if (selected.isComStarOnly()) {
+                    tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
+                          "AdvancedReplacementLimbDialog.exclusions.faction.comstar", exclusionColor, CLOSING_SPAN_TAG);
+                } else if (selected.isWordOfBlakeOnly()) {
+                    tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
+                          "AdvancedReplacementLimbDialog.exclusions.faction.wob", exclusionColor, CLOSING_SPAN_TAG);
+                } else {
+                    tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
+                          "AdvancedReplacementLimbDialog.exclusions.faction.generic", exclusionColor, CLOSING_SPAN_TAG);
+                }
+            }
+
+            if (!selected.isAvailableInCurrentLocation(campaign.getLocation(), campaign.getLocalDate())) {
+                tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
+                      "AdvancedReplacementLimbDialog.exclusions.tech", warningColor, CLOSING_SPAN_TAG);
+            }
+
+            if (selected.getCost(campaignFaction, today) == null) {
+                tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
+                      "AdvancedReplacementLimbDialog.exclusions.year", warningColor, CLOSING_SPAN_TAG);
             }
         }
 
-        if (!selected.isAvailableInCurrentLocation(campaign.getLocation(),
-              campaign.getLocalDate())) {
-            tooltip += getTextAt(RESOURCE_BUNDLE,
-                  "AdvancedReplacementLimbDialog.exclusions.tech");
-        }
-
-        if (selected.getCost(gameYear) == null) {
-            tooltip += getTextAt(RESOURCE_BUNDLE,
-                  "AdvancedReplacementLimbDialog.exclusions.year");
-        }
         return tooltip;
     }
 
@@ -1022,7 +1049,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                           // We shouldn't hit `null` at this point, as any
                           // null selections should have been filtered out
                           s -> Objects.requireNonNull(
-                                s.type().getCost(gameYear)),
+                                s.type().getCost(campaign.getFaction(), campaign.getLocalDate())),
                           Comparator.reverseOrder() // highest cost first
                     )
         );
@@ -1175,13 +1202,15 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     public Map<BodyLocation, ProstheticType> getSelectedTreatments() {
         Map<BodyLocation, ProstheticType> selections = new HashMap<>();
         boolean isPlanetside = campaign.getLocation().isOnPlanet();
-        int gameYear = campaign.getGameYear();
+        Faction campaignFaction = campaign.getFaction();
+        LocalDate today = campaign.getLocalDate();
         for (Map.Entry<BodyLocation, JComboBox<ProstheticType>> entry :
               treatmentSelections.entrySet()) {
             ProstheticType selectedTreatment =
                   (ProstheticType) entry.getValue().getSelectedItem();
 
-            if (selectedTreatment != null && getExclusions(isPlanetside, selectedTreatment, gameYear).isBlank()) {
+            String exclusions = getExclusions(isPlanetside, selectedTreatment, campaignFaction, today);
+            if (selectedTreatment != null && exclusions.isBlank()) {
                 selections.put(entry.getKey(), selectedTreatment);
             }
         }

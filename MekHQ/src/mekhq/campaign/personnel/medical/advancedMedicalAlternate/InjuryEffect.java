@@ -39,6 +39,7 @@ import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
@@ -48,6 +49,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.universe.Faction;
 
 public enum InjuryEffect {
     NONE("NONE"),
@@ -1685,7 +1687,7 @@ public enum InjuryEffect {
      * Builds a localized tooltip summarizing key information about all active injury effects.
      *
      * <p><b>Note:</b> For consistency, the order shown in the tooltip is meant to mirror that of
-     * {@link ProstheticType#getTooltip(int, boolean)}.</p>
+     * {@link ProstheticType#getTooltip(Faction, LocalDate, boolean)}.</p>
      *
      * @param injuryEffects A list of currently active injury effects
      *

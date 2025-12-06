@@ -33,7 +33,6 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 
@@ -290,9 +289,6 @@ public class NewRecruitDialog extends JDialog {
             randomPortrait();
         }
         refreshRanksCombo();
-        if (getCampaign().getCampaignOptions().isUseAgeEffects()) {
-            updateAllSkillAgeModifiers(getCampaign().getLocalDate(), person);
-        }
         refreshView();
     }
 

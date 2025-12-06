@@ -204,7 +204,7 @@ public class PersonViewPanel extends JScrollablePanel {
         } else {
             Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
             if (!relevantAttributes.isEmpty()) {
-                pnlAttributes = fillAttributeModifiers(relevantAttributes, person.getActiveInjuryEffects());
+                pnlAttributes = fillAttributeModifiers(relevantAttributes);
             }
         }
 
@@ -1983,16 +1983,18 @@ public class PersonViewPanel extends JScrollablePanel {
             }
             JLabel lblName = new JLabel(label);
             List<InjuryEffect> injuryEffects = person.getActiveInjuryEffects();
+            int characterAge = person.getAgeForAttributeModifiers();
             SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
-                  injuryEffects);
+                  injuryEffects, characterAge);
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(),
                   attributes,
                   skill.getType(),
                   injuryEffects,
-                  skillModifierData.characterOptions());
+                  skillModifierData.characterOptions(),
+                  characterAge);
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
             int injuryModifier = Skill.getTotalInjuryModifier(skillModifierData, skill.getType());
-            String adjustment = getSkillAdjustment(skill, attributeModifier, spaModifier, injuryModifier);
+            String adjustment = getSkillAdjustment(attributeModifier, spaModifier, injuryModifier);
 
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
                   skill.toString(skillModifierData),
@@ -2023,9 +2025,8 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlSkills;
     }
 
-    private static String getSkillAdjustment(Skill skill, int attributeModifier, int spaModifier, int injuryModifier) {
-        int ageModifier = skill.getAgingModifier();
-        int totalModifier = attributeModifier + spaModifier + ageModifier + injuryModifier;
+    private static String getSkillAdjustment(int attributeModifier, int spaModifier, int injuryModifier) {
+        int totalModifier = attributeModifier + spaModifier + injuryModifier;
 
         String color = "";
         String icon = "";
@@ -2043,14 +2044,15 @@ public class PersonViewPanel extends JScrollablePanel {
         return adjustment;
     }
 
-    private static String getAttributeAdjustment(int injuryModifier) {
+    private static String getAttributeAdjustment(int injuryModifier, int agingModifier, int abilityModifier) {
+        int totalModifier = injuryModifier + agingModifier + abilityModifier;
         String color = "";
         String icon = "";
-        if (injuryModifier != 0) {
-            color = injuryModifier < 0 ?
+        if (totalModifier != 0) {
+            color = totalModifier < 0 ?
                           ReportingUtilities.getNegativeColor() :
                           ReportingUtilities.getPositiveColor();
-            icon = injuryModifier < 0 ? "&#x25BC" : "&#x25B2";
+            icon = totalModifier < 0 ? "&#x25BC" : "&#x25B2";
         }
 
         String adjustment = "";
@@ -2070,8 +2072,7 @@ public class PersonViewPanel extends JScrollablePanel {
      *
      * @return a {@link JPanel} containing the attribute names and values in a grid layout
      */
-    private JPanel fillAttributeModifiers(Map<SkillAttribute, Integer> relevantAttributes,
-          List<InjuryEffect> injuryEffects) {
+    private JPanel fillAttributeModifiers(Map<SkillAttribute, Integer> relevantAttributes) {
         JPanel pnlAttributes = new JPanel(new GridBagLayout());
         pnlAttributes.setBorder(RoundedLineBorder.createRoundedLineBorder(
               resourceMap.getString("pnlSkills.attributes.modifiers")));
@@ -2097,9 +2098,17 @@ public class PersonViewPanel extends JScrollablePanel {
             JLabel lblName = new JLabel();
             JLabel lblValue = new JLabel();
             String attributeName = attribute.getLabel();
-            String addendum = getAttributeAdjustment(person.getATOWAttributes()
-                                                           .getAttributeScoreInjuryModifier(attribute,
-                                                                 injuryEffects));
+
+            Attributes attributeScores = person.getATOWAttributes();
+            List<InjuryEffect> activeInjuryEffects = person.getActiveInjuryEffects();
+            PersonnelOptions options = person.getOptions();
+            int personAge = person.getAgeForAttributeModifiers();
+
+            int injuryModifier = attributeScores.getAttributeScoreInjuryModifier(attribute, activeInjuryEffects);
+            int agingModifier = attributeScores.getAttributeScoreAgeModifier(attribute, personAge);
+            int abilityModifier = attributeScores.getAbilityAdjustment(attribute, options);
+            String addendum = getAttributeAdjustment(injuryModifier, agingModifier, abilityModifier);
+
             if (attribute != SkillAttribute.EDGE) {
                 int attributeModifier = relevantAttributes.get(attribute);
 
@@ -2118,8 +2127,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 lblValue.setText(value + addendum);
             }
 
-            String tooltip = wordWrap(person.getATOWAttributes()
-                                            .getTooltip(attribute, injuryEffects, person.getOptions()));
+            String tooltip = wordWrap(attributeScores.getTooltip(attribute, activeInjuryEffects, options, personAge));
             lblName.setToolTipText(tooltip);
             lblValue.setToolTipText(tooltip);
 
@@ -2187,33 +2195,45 @@ public class PersonViewPanel extends JScrollablePanel {
             int adjustedEdge = person.getAdjustedEdge();
             int currentEdge = person.getCurrentEdge();
 
+            Attributes attributeScores = person.getATOWAttributes();
             List<InjuryEffect> activeInjuryEffects = person.getActiveInjuryEffects();
             PersonnelOptions options = person.getOptions();
-            String addendum = getAttributeAdjustment(person.getATOWAttributes()
-                                                           .getAttributeScoreInjuryModifier(attribute,
-                                                                 person.getActiveInjuryEffects()));
+            int personAge = person.getAgeForAttributeModifiers();
+
+            int injuryModifier = attributeScores.getAttributeScoreInjuryModifier(attribute, activeInjuryEffects);
+            int agingModifier = attributeScores.getAttributeScoreAgeModifier(attribute, personAge);
+            int abilityModifier = attributeScores.getAbilityAdjustment(attribute, options);
+            String addendum = getAttributeAdjustment(injuryModifier, agingModifier, abilityModifier);
 
             JLabel lblName = new JLabel();
             JLabel lblValue = new JLabel();
             if (attribute != SkillAttribute.EDGE) {
                 String attributeName = attribute.getLabel();
-                int attributeScore = attributes.getAdjustedAttributeScore(attribute, activeInjuryEffects, options);
-                int attributeModifier = attributes.getAttributeModifier(attribute, activeInjuryEffects, options);
+                int attributeScore = attributes.getAdjustedAttributeScore(attribute,
+                      activeInjuryEffects,
+                      options,
+                      personAge);
+                int attributeModifier = attributes.getAttributeModifier(attribute,
+                      activeInjuryEffects,
+                      options,
+                      personAge);
 
                 lblName.setText(attributeName);
                 String value = "<html>" + attributeScore;
                 if (attributeModifier != 0) {
                     value += " (" + (attributeModifier > 0 ? "+" : "") + attributeModifier + ")" + addendum + "</html>";
+                } else {
+                    value += addendum + "</html>";
                 }
 
                 lblValue.setText(value);
                 lblName.setLabelFor(lblValue);
 
                 String tooltip = wordWrap(person.getATOWAttributes()
-                                                .getTooltip(attribute, activeInjuryEffects, options));
+                                                .getTooltip(attribute, activeInjuryEffects, options, personAge));
                 lblName.setToolTipText(tooltip);
                 lblValue.setToolTipText(tooltip);
-            } else if (campaignOptions.isUseEdge() && (baseEdge != 0 || adjustedEdge != 0)) {
+            } else if (campaignOptions.isUseEdge()) {
                 String attributeName = attribute.getLabel();
                 String adjustment = getTraitAdjustmentIcon(baseEdge, adjustedEdge);
                 String value = "<html>" + currentEdge + "/" + adjustedEdge + adjustment + addendum + "</html>";
@@ -2222,7 +2242,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 lblValue.setText(value);
 
                 String tooltip = wordWrap(person.getATOWAttributes()
-                                                .getTooltip(attribute, activeInjuryEffects, options));
+                                                .getTooltip(attribute, activeInjuryEffects, options, personAge));
                 lblName.setToolTipText(tooltip);
                 lblValue.setToolTipText(tooltip);
             }

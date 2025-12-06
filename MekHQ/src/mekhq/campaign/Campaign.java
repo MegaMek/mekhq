@@ -5294,7 +5294,7 @@ public class Campaign implements ITechManager {
         if (marketStyle == PERSONNEL_MARKET_DISABLED) {
             personnelMarket.generatePersonnelForDay(this);
         } else {
-            if (currentDay.getDayOfMonth() == 1) {
+            if (currentDay.getDayOfMonth() == 1 || isCampaignStart) {
                 newPersonnelMarket.gatherApplications();
 
                 if (newPersonnelMarket.getHasRarePersonnel()) {

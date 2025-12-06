@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
+
 import java.util.ArrayList;
 
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -43,6 +45,6 @@ public class TestSkillModifierData {
      * <p><b>Warning:</b> this is intended for use in Unit Tests only.</p>
      */
     public static SkillModifierData createDefault() {
-        return new SkillModifierData(new PersonnelOptions(), new Attributes(), 0, new ArrayList<>());
+        return new SkillModifierData(new PersonnelOptions(), new Attributes(), 0, new ArrayList<>(), IGNORE_AGE);
     }
 }
