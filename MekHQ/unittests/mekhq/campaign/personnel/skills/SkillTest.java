@@ -40,7 +40,10 @@ import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.ArrayList;
+
 import megamek.common.rolls.TargetRoll;
+import mekhq.campaign.personnel.PersonnelOptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -66,7 +69,8 @@ public class SkillTest {
         TargetRoll targetNumber = new TargetRoll();
 
         // Act
-        int totalModifier = getTotalAttributeModifier(targetNumber, attributes, testSkillType);
+        int totalModifier = getTotalAttributeModifier(targetNumber, attributes, testSkillType, new ArrayList<>(),
+              new PersonnelOptions());
 
         // Assert
         assertEquals(1, totalModifier);
@@ -92,7 +96,8 @@ public class SkillTest {
         TargetRoll targetNumber = new TargetRoll();
 
         // Act
-        int totalModifier = getTotalAttributeModifier(targetNumber, attributes, testSkillType);
+        int totalModifier = getTotalAttributeModifier(targetNumber, attributes, testSkillType, new ArrayList<>(),
+              new PersonnelOptions());
 
         // Assert
         assertEquals(2, totalModifier);
@@ -118,7 +123,8 @@ public class SkillTest {
         TargetRoll targetNumber = new TargetRoll();
 
         // Act
-        int totalModifier = getTotalAttributeModifier(targetNumber, attributes, testSkillType);
+        int totalModifier = getTotalAttributeModifier(targetNumber, attributes, testSkillType, new ArrayList<>(),
+              new PersonnelOptions());
 
         // Assert
         assertEquals(0, totalModifier);

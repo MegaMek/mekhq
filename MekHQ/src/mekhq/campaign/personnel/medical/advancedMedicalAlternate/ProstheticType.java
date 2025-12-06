@@ -58,7 +58,6 @@ import java.util.StringJoiner;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
-import megamek.common.enums.TechRating;
 import megamek.common.options.IOption;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.finances.Money;
@@ -68,6 +67,7 @@ import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 
 /**
  * Enumeration representing the various types of prosthetics and artificial body replacements available in the Alternate
@@ -89,8 +89,9 @@ public enum ProstheticType {
           2,
           AlternateInjuries.WOODEN_ARM,
           Money.of(75),
-          TechRating.F,
+          PlanetarySystem.PlanetarySophistication.REGRESSED,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
+          false,
           false,
           false),
     HOOK_HAND("HOOK_HAND",
@@ -98,8 +99,9 @@ public enum ProstheticType {
           2,
           AlternateInjuries.HOOK_HAND,
           Money.of(75),
-          TechRating.F,
+          PlanetarySystem.PlanetarySophistication.REGRESSED,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
+          false,
           false,
           false),
     PEG_LEG("PEG_LEG",
@@ -107,8 +109,9 @@ public enum ProstheticType {
           2,
           AlternateInjuries.PEG_LEG,
           Money.of(75),
-          TechRating.F,
+          PlanetarySystem.PlanetarySophistication.REGRESSED,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
+          false,
           false,
           false),
     WOODEN_FOOT("WOODEN_FOOT",
@@ -116,8 +119,9 @@ public enum ProstheticType {
           2,
           AlternateInjuries.WOODEN_FOOT,
           Money.of(75),
-          TechRating.F,
+          PlanetarySystem.PlanetarySophistication.REGRESSED,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
+          false,
           false,
           false),
     SIMPLE_ARM("SIMPLE_ARM",
@@ -125,8 +129,9 @@ public enum ProstheticType {
           2,
           AlternateInjuries.SIMPLE_ARM,
           Money.of(750),
-          TechRating.E,
+          PlanetarySystem.PlanetarySophistication.F,
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
+          false,
           false,
           false),
     SIMPLE_CLAW_HAND("SIMPLE_CLAW_HAND",
@@ -134,8 +139,9 @@ public enum ProstheticType {
           2,
           AlternateInjuries.SIMPLE_CLAW_HAND,
           Money.of(750),
-          TechRating.E,
+          PlanetarySystem.PlanetarySophistication.F,
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
+          false,
           false,
           false),
     SIMPLE_LEG("SIMPLE_LEG",
@@ -143,8 +149,9 @@ public enum ProstheticType {
           2,
           AlternateInjuries.SIMPLE_LEG,
           Money.of(250),
-          TechRating.E,
+          PlanetarySystem.PlanetarySophistication.F,
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
+          false,
           false,
           false),
     SIMPLE_FOOT("SIMPLE_FOOT",
@@ -152,8 +159,9 @@ public enum ProstheticType {
           2,
           AlternateInjuries.SIMPLE_FOOT,
           Money.of(250),
-          TechRating.E,
+          PlanetarySystem.PlanetarySophistication.F,
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
+          false,
           false,
           false),
     PROSTHETIC_ARM("PROSTHETIC_ARM",
@@ -161,8 +169,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.PROSTHETIC_ARM,
           Money.of(7500),
-          TechRating.D,
+          PlanetarySystem.PlanetarySophistication.D,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
+          false,
           false,
           false),
     PROSTHETIC_HAND("PROSTHETIC_HAND",
@@ -170,8 +179,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.PROSTHETIC_HAND,
           Money.of(7500),
-          TechRating.D,
+          PlanetarySystem.PlanetarySophistication.D,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
+          false,
           false,
           false),
     PROSTHETIC_LEG("PROSTHETIC_LEG",
@@ -179,8 +189,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.PROSTHETIC_LEG,
           Money.of(10000),
-          TechRating.D,
+          PlanetarySystem.PlanetarySophistication.D,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
+          false,
           false,
           false),
     PROSTHETIC_FOOT("PROSTHETIC_FOOT",
@@ -188,8 +199,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.PROSTHETIC_FOOT,
           Money.of(10000),
-          TechRating.D,
+          PlanetarySystem.PlanetarySophistication.D,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
+          false,
           false,
           false),
     ADVANCED_PROSTHETIC_ARM("ADVANCED_PROSTHETIC_ARM",
@@ -197,8 +209,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.ADVANCED_PROSTHETIC_ARM,
           Money.of(25000),
-          TechRating.C,
+          PlanetarySystem.PlanetarySophistication.C,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
+          false,
           false,
           false),
     ADVANCED_PROSTHETIC_HAND("ADVANCED_PROSTHETIC_HAND",
@@ -206,8 +219,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.ADVANCED_PROSTHETIC_HAND,
           Money.of(25000),
-          TechRating.C,
+          PlanetarySystem.PlanetarySophistication.C,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
+          false,
           false,
           false),
     ADVANCED_PROSTHETIC_LEG("ADVANCED_PROSTHETIC_LEG",
@@ -215,8 +229,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.ADVANCED_PROSTHETIC_LEG,
           Money.of(17500),
-          TechRating.C,
+          PlanetarySystem.PlanetarySophistication.C,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
+          false,
           false,
           false),
     ADVANCED_PROSTHETIC_FOOT("ADVANCED_PROSTHETIC_FOOT",
@@ -224,8 +239,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.ADVANCED_PROSTHETIC_FOOT,
           Money.of(17500),
-          TechRating.C,
+          PlanetarySystem.PlanetarySophistication.C,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
+          false,
           false,
           false),
     MYOMER_ARM("MYOMER_ARM",
@@ -233,80 +249,89 @@ public enum ProstheticType {
           5,
           AlternateInjuries.MYOMER_ARM,
           Money.of(200000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
           false,
-          true),
+          true,
+          false),
     MYOMER_HAND("MYOMER_HAND",
           ENHANCED,
           5,
           AlternateInjuries.MYOMER_HAND,
           Money.of(100000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
           false,
-          true),
+          true,
+          false),
     MYOMER_LEG("MYOMER_LEG",
           ENHANCED,
           5,
           AlternateInjuries.MYOMER_LEG,
           Money.of(125000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
           false,
-          true),
+          true,
+          false),
     MYOMER_FOOT("MYOMER_FOOT",
           ENHANCED,
           5,
           AlternateInjuries.MYOMER_FOOT,
           Money.of(50000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
           false,
-          true),
+          true,
+          false),
     CLONED_ARM("CLONED_ARM",
           CLONE,
           5,
           AlternateInjuries.CLONED_ARM,
           Money.of(500000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           true,
+          false,
           false),
     CLONED_HAND("CLONED_HAND",
           CLONE,
           5,
           AlternateInjuries.CLONED_HAND,
           Money.of(300000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           true,
+          false,
           false),
     CLONED_LEG("CLONED_LEG",
           CLONE,
           5,
           AlternateInjuries.CLONED_LEG,
           Money.of(350000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           true,
+          false,
           false),
     CLONED_FOOT("CLONED_FOOT",
           CLONE,
           5,
           AlternateInjuries.CLONED_FOOT,
           Money.of(50000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           true,
+          false,
           false),
     EYE_IMPLANT("EYE_IMPLANT",
           SIMPLE,
           2,
           AlternateInjuries.EYE_IMPLANT,
           Money.of(350),
-          TechRating.E,
+          PlanetarySystem.PlanetarySophistication.F,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
+          false,
           false,
           false),
     BIONIC_EAR("BIONIC_EAR",
@@ -314,8 +339,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.BIONIC_EAR,
           Money.of(100000),
-          TechRating.D,
+          PlanetarySystem.PlanetarySophistication.D,
           AvailabilityValue.A, AvailabilityValue.C, AvailabilityValue.A,
+          false,
           false,
           false),
     BIONIC_EYE("BIONIC_EYE",
@@ -323,8 +349,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.BIONIC_EYE,
           Money.of(220000),
-          TechRating.D,
+          PlanetarySystem.PlanetarySophistication.D,
           AvailabilityValue.A, AvailabilityValue.C, AvailabilityValue.A,
+          false,
           false,
           false),
     BIONIC_HEART("BIONIC_HEART",
@@ -332,8 +359,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.BIONIC_HEART,
           Money.of(500000),
-          TechRating.D,
+          PlanetarySystem.PlanetarySophistication.D,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
+          false,
           false,
           false),
     BIONIC_LUNGS("BIONIC_LUNGS",
@@ -341,8 +369,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.BIONIC_LUNGS,
           Money.of(800000),
-          TechRating.D,
+          PlanetarySystem.PlanetarySophistication.D,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
+          false,
           false,
           false),
     BIONIC_ORGAN_OTHER("BIONIC_ORGAN_OTHER",
@@ -350,8 +379,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.BIONIC_ORGAN_OTHER,
           Money.of(750000),
-          TechRating.D,
+          PlanetarySystem.PlanetarySophistication.D,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.C,
+          false,
           false,
           false),
     COSMETIC_SURGERY("COSMETIC_SURGERY",
@@ -359,8 +389,9 @@ public enum ProstheticType {
           2,
           AlternateInjuries.COSMETIC_SURGERY,
           Money.of(2500),
-          TechRating.E,
+          PlanetarySystem.PlanetarySophistication.F,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
+          false,
           false,
           false),
     ELECTIVE_MYOMER_ARM("ELECTIVE_MYOMER_ARM",
@@ -368,8 +399,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.ELECTIVE_MYOMER_ARM,
           Money.of(300000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
+          false,
           false,
           false,
           List.of(),
@@ -379,8 +411,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.ELECTIVE_MYOMER_HAND,
           Money.of(150000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
+          false,
           false,
           false,
           List.of(),
@@ -390,8 +423,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.ELECTIVE_MYOMER_LEG,
           Money.of(375000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
+          false,
           false,
           false,
           List.of(),
@@ -401,9 +435,10 @@ public enum ProstheticType {
           5,
           AlternateInjuries.ENHANCED_IMAGING_IMPLANT,
           Money.of(1500000),
-          TechRating.A,
+          PlanetarySystem.PlanetarySophistication.A,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D,
           true,
+          false,
           false,
           List.of(UNOFFICIAL_EI_IMPLANT),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
@@ -412,8 +447,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.BONE_REINFORCEMENT,
           Money.of(10000),
-          TechRating.D,
+          PlanetarySystem.PlanetarySophistication.D,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
+          false,
           false,
           false,
           List.of(),
@@ -423,8 +459,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.LIVER_FILTRATION_IMPLANT,
           Money.of(10000),
-          TechRating.C,
+          PlanetarySystem.PlanetarySophistication.C,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
+          false,
           false,
           false,
           List.of(),
@@ -434,8 +471,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.BIONIC_LUNGS_WITH_TYPE_1_FILTER,
           Money.of(805000),
-          TechRating.C,
+          PlanetarySystem.PlanetarySophistication.C,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
+          false,
           false,
           false,
           List.of(),
@@ -445,8 +483,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.BIONIC_LUNGS_WITH_TYPE_2_FILTER,
           Money.of(815000),
-          TechRating.C,
+          PlanetarySystem.PlanetarySophistication.C,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
+          false,
           false,
           false,
           List.of(),
@@ -456,8 +495,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.BIONIC_LUNGS_WITH_TYPE_3_FILTER,
           Money.of(845000),
-          TechRating.C,
+          PlanetarySystem.PlanetarySophistication.C,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
+          false,
           false,
           false,
           List.of(),
@@ -467,8 +507,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.CYBERNETIC_EYE_EM_IR,
           Money.of(650000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.D, AvailabilityValue.E, AvailabilityValue.C,
+          false,
           false,
           false,
           List.of(MD_CYBER_IMP_VISUAL),
@@ -478,8 +519,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.CYBERNETIC_EYE_TELESCOPE,
           Money.of(450000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.D, AvailabilityValue.E, AvailabilityValue.C,
+          false,
           false,
           false,
           List.of(MD_CYBER_IMP_LASER),
@@ -489,8 +531,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.CYBERNETIC_EYE_LASER,
           Money.of(600000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.D, AvailabilityValue.E, AvailabilityValue.C,
+          false,
           false,
           false,
           List.of(MD_CYBER_IMP_LASER),
@@ -500,8 +543,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.CYBERNETIC_EYE_MULTI,
           Money.of(1050000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D,
+          false,
           false,
           true,
           List.of(MD_CYBER_IMP_LASER),
@@ -511,8 +555,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.CYBERNETIC_EYE_MULTI_ENHANCED,
           Money.of(17000000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D,
+          false,
           false,
           true,
           List.of(MD_CYBER_IMP_LASER, MD_CYBER_IMP_VISUAL),
@@ -522,8 +567,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.CYBERNETIC_EAR_SIGNAL,
           Money.of(400000),
-          TechRating.C,
+          PlanetarySystem.PlanetarySophistication.C,
           AvailabilityValue.E, AvailabilityValue.F, AvailabilityValue.C,
+          false,
           false,
           false,
           List.of(MD_COMM_IMPLANT),
@@ -533,8 +579,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.CYBERNETIC_EAR_MULTI,
           Money.of(600000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D,
+          false,
           false,
           true,
           List.of(MD_BOOST_COMM_IMPLANT),
@@ -544,8 +591,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.CYBERNETIC_SPEECH_IMPLANT,
           Money.of(200000),
-          TechRating.D,
+          PlanetarySystem.PlanetarySophistication.D,
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.C,
+          false,
           false,
           false,
           List.of(),
@@ -555,8 +603,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.PHEROMONE_EFFUSER,
           Money.of(40000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
           false,
           true,
           List.of(),
@@ -566,8 +615,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.COSMETIC_BEAUTY_ENHANCEMENT,
           Money.of(15000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C,
+          false,
           false,
           false,
           List.of(),
@@ -577,8 +627,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.COSMETIC_HORROR_ENHANCEMENT,
           Money.of(15000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.E, AvailabilityValue.E, AvailabilityValue.E,
+          false,
           false,
           false,
           List.of(),
@@ -588,8 +639,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.COSMETIC_TAIL_PROSTHETIC,
           Money.of(60000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.F, AvailabilityValue.F, AvailabilityValue.E,
+          false,
           false,
           false,
           List.of(),
@@ -599,8 +651,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.COSMETIC_ANIMAL_EAR_PROSTHETIC,
           Money.of(60000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.F, AvailabilityValue.F, AvailabilityValue.E,
+          false,
           false,
           false,
           List.of(),
@@ -610,8 +663,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.COSMETIC_ANIMAL_LEG_PROSTHETIC,
           Money.of(60000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.F, AvailabilityValue.F, AvailabilityValue.E,
+          false,
           false,
           false,
           List.of(),
@@ -621,8 +675,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.DERMAL_MYOMER_ARM_ARMOR,
           Money.of(450000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.E,
+          false,
           false,
           false,
           List.of(),
@@ -632,8 +687,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.DERMAL_MYOMER_ARM_CAMO,
           Money.of(330000),
-          TechRating.A,
+          PlanetarySystem.PlanetarySophistication.A,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
           false,
           false,
           List.of(),
@@ -643,8 +699,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE,
           Money.of(750000),
-          TechRating.A,
+          PlanetarySystem.PlanetarySophistication.A,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          false,
           false,
           false,
           List.of(),
@@ -654,8 +711,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.DERMAL_MYOMER_LEG_ARMOR,
           Money.of(562500),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.E,
+          false,
           false,
           false,
           List.of(),
@@ -665,8 +723,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.DERMAL_MYOMER_LEG_CAMO,
           Money.of(412500),
-          TechRating.A,
+          PlanetarySystem.PlanetarySophistication.A,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
           false,
           false,
           List.of(),
@@ -676,8 +735,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.DERMAL_MYOMER_LEG_TRIPLE,
           Money.of(937500),
-          TechRating.A,
+          PlanetarySystem.PlanetarySophistication.A,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          false,
           false,
           false,
           List.of(),
@@ -687,8 +747,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.VEHICULAR_DNI,
           Money.of(1400000),
-          TechRating.A,
+          PlanetarySystem.PlanetarySophistication.A,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          false,
           false,
           true,
           List.of(MD_VDNI),
@@ -698,8 +759,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.BUFFERED_VDNI,
           Money.of(2000000),
-          TechRating.A,
+          PlanetarySystem.PlanetarySophistication.A,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          false,
           false,
           true,
           List.of(MD_BVDNI),
@@ -709,8 +771,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.BUFFERED_VDNI_TRIPLE_CORE,
           Money.of(5000000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
           false,
           true,
           List.of(MD_BVDNI, MD_TRIPLE_CORE_PROCESSOR),
@@ -720,8 +783,9 @@ public enum ProstheticType {
           5,
           AlternateInjuries.PAIN_SHUNT,
           Money.of(50000),
-          TechRating.B,
+          PlanetarySystem.PlanetarySophistication.B,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
           false,
           true,
           List.of(MD_PAIN_SHUNT),
@@ -732,12 +796,19 @@ public enum ProstheticType {
     private final int surgeryLevel;
     private final InjuryType injuryType;
     private final Money baseCost;
-    private final TechRating technologyRating;
+    // We have to do a degree of translation here. ATOW tech rating runs A-F, but the normal TW tech rating runs F-A,
+    // but planets don't use tech rating they use Planetary Sophistication. Planetary Sophistication can be converted
+    // into TW tech rating. However, then we run into a UX issue where there is no way for the player to see at-a-glance
+    // what planet they need to be on to gain access to a specific Prosthetic. So we translate ATOW tech rating
+    // directly to Planetary Sophistication. In this way ATOW tech rating A is Regressed, B is Sophistication F, and
+    // so on.
+    private final PlanetarySystem.PlanetarySophistication requiredPlanetarySophistication;
     private final AvailabilityValue availabilityEarly;
     private final AvailabilityValue availabilityMid;
     private final AvailabilityValue availabilityLate;
     private final boolean isComStarOnly;
     private final boolean isClanOnly;
+    private final boolean isWordOfBlakeOnly;
     private final List<String> associatedPilotOptions;
     private final List<String> associatedPersonnelOptions;
 
@@ -761,35 +832,37 @@ public enum ProstheticType {
     /**
      * Constructs a new {@code ProstheticType} entry.
      *
-     * @param lookupName        the resource key for localization and lookup
-     * @param prostheticType    the prosthetic tier (as per ATOW)
-     * @param surgeryLevel      the minimum medical skill or facility level required
-     * @param injuryType        the injury this prosthetic 'inflicts'
-     * @param baseCost          the base market price before modifiers (as per ATOW)
-     * @param technologyRating  the required technology rating for construction (as per ATOW)
-     * @param availabilityEarly availability rating for early eras (pre-2800) (as per ATOW)
-     * @param availabilityMid   availability rating for middle eras (2800–3050) (as per ATOW)
-     * @param availabilityLate  availability rating for late eras (3051+) (as per ATOW)
-     * @param isClanOnly        whether this item is exclusive to Clan factions (as per ATOW)
+     * @param lookupName                      the resource key for localization and lookup
+     * @param prostheticType                  the prosthetic tier (as per ATOW)
+     * @param surgeryLevel                    the minimum medical skill or facility level required
+     * @param injuryType                      the injury this prosthetic 'inflicts'
+     * @param baseCost                        the base market price before modifiers (as per ATOW)
+     * @param requiredPlanetarySophistication the required planetary sophistication for construction (as per ATOW,
+     *                                        translated into planetary sophistication)
+     * @param availabilityEarly               availability rating for early eras (pre-2800) (as per ATOW)
+     * @param availabilityMid                 availability rating for middle eras (2800–3050) (as per ATOW)
+     * @param availabilityLate                availability rating for late eras (3051+) (as per ATOW)
+     * @param isClanOnly                      whether this item is exclusive to Clan factions (as per ATOW)
      *
      * @author Illiani
      * @since 0.50.10
      */
     ProstheticType(String lookupName, ProstheticComplexity prostheticType, int surgeryLevel, InjuryType injuryType,
-          Money baseCost, TechRating technologyRating, AvailabilityValue availabilityEarly,
-          AvailabilityValue availabilityMid, AvailabilityValue availabilityLate, boolean isClanOnly,
-          boolean isComStarOnly) {
+          Money baseCost, PlanetarySystem.PlanetarySophistication requiredPlanetarySophistication,
+          AvailabilityValue availabilityEarly, AvailabilityValue availabilityMid, AvailabilityValue availabilityLate,
+          boolean isClanOnly, boolean isComStarOnly, boolean isWordOfBlakeOnly) {
         this.lookupName = lookupName;
         this.prostheticType = prostheticType;
         this.surgeryLevel = surgeryLevel;
         this.injuryType = injuryType;
         this.baseCost = baseCost;
-        this.technologyRating = technologyRating;
+        this.requiredPlanetarySophistication = requiredPlanetarySophistication;
         this.availabilityEarly = availabilityEarly;
         this.availabilityMid = availabilityMid;
         this.availabilityLate = availabilityLate;
         this.isClanOnly = isClanOnly;
         this.isComStarOnly = isComStarOnly;
+        this.isWordOfBlakeOnly = isWordOfBlakeOnly;
         this.associatedPilotOptions = new ArrayList<>();
         this.associatedPersonnelOptions = new ArrayList<>();
     }
@@ -797,39 +870,41 @@ public enum ProstheticType {
     /**
      * Constructs a new {@code ProstheticType} entry.
      *
-     * @param lookupName                 the resource key for localization and lookup
-     * @param prostheticType             the prosthetic tier (as per ATOW)
-     * @param surgeryLevel               the minimum medical skill or facility level required
-     * @param injuryType                 the injury this prosthetic 'inflicts'
-     * @param baseCost                   the base market price before modifiers (as per ATOW)
-     * @param technologyRating           the required technology rating for construction (as per ATOW)
-     * @param availabilityEarly          availability rating for early eras (pre-2800) (as per ATOW)
-     * @param availabilityMid            availability rating for middle eras (2800–3050) (as per ATOW)
-     * @param availabilityLate           availability rating for late eras (3051+) (as per ATOW)
-     * @param isClanOnly                 whether this item is exclusive to Clan factions (as per ATOW)
-     * @param associatedPilotOptions     Any Pilot Options that should be added to the character when they receive this
-     *                                   prosthetic
-     * @param associatedPersonnelOptions Any Personnel Options that should be added to the character when they received
-     *                                   this prosthetic
+     * @param lookupName                      the resource key for localization and lookup
+     * @param prostheticType                  the prosthetic tier (as per ATOW)
+     * @param surgeryLevel                    the minimum medical skill or facility level required
+     * @param injuryType                      the injury this prosthetic 'inflicts'
+     * @param baseCost                        the base market price before modifiers (as per ATOW)
+     * @param requiredPlanetarySophistication the required technology rating for construction (as per ATOW)
+     * @param availabilityEarly               availability rating for early eras (pre-2800) (as per ATOW)
+     * @param availabilityMid                 availability rating for middle eras (2800–3050) (as per ATOW)
+     * @param availabilityLate                availability rating for late eras (3051+) (as per ATOW)
+     * @param isClanOnly                      whether this item is exclusive to Clan factions (as per ATOW)
+     * @param associatedPilotOptions          Any Pilot Options that should be added to the character when they receive
+     *                                        this prosthetic
+     * @param associatedPersonnelOptions      Any Personnel Options that should be added to the character when they
+     *                                        received this prosthetic
      *
      * @author Illiani
      * @since 0.50.10
      */
     ProstheticType(String lookupName, ProstheticComplexity prostheticType, int surgeryLevel, InjuryType injuryType,
-          Money baseCost, TechRating technologyRating, AvailabilityValue availabilityEarly,
-          AvailabilityValue availabilityMid, AvailabilityValue availabilityLate, boolean isClanOnly,
-          boolean isComStarOnly, List<String> associatedPilotOptions, List<String> associatedPersonnelOptions) {
+          Money baseCost, PlanetarySystem.PlanetarySophistication requiredPlanetarySophistication,
+          AvailabilityValue availabilityEarly, AvailabilityValue availabilityMid, AvailabilityValue availabilityLate,
+          boolean isClanOnly, boolean isComStarOnly, boolean isWordOfBlakeOnly, List<String> associatedPilotOptions,
+          List<String> associatedPersonnelOptions) {
         this.lookupName = lookupName;
         this.prostheticType = prostheticType;
         this.surgeryLevel = surgeryLevel;
         this.injuryType = injuryType;
         this.baseCost = baseCost;
-        this.technologyRating = technologyRating;
+        this.requiredPlanetarySophistication = requiredPlanetarySophistication;
         this.availabilityEarly = availabilityEarly;
         this.availabilityMid = availabilityMid;
         this.availabilityLate = availabilityLate;
         this.isClanOnly = isClanOnly;
         this.isComStarOnly = isComStarOnly;
+        this.isWordOfBlakeOnly = isWordOfBlakeOnly;
         this.associatedPilotOptions = associatedPilotOptions;
         this.associatedPersonnelOptions = associatedPersonnelOptions;
     }
@@ -872,6 +947,18 @@ public enum ProstheticType {
                      this == ELECTIVE_MYOMER_LEG;
     }
 
+    public boolean isClanOnly() {
+        return isClanOnly;
+    }
+
+    public boolean isComStarOnly() {
+        return isComStarOnly;
+    }
+
+    public boolean isWordOfBlakeOnly() {
+        return isWordOfBlakeOnly;
+    }
+
     /**
      * Determines if the given faction can access this prosthetic type.
      *
@@ -883,15 +970,29 @@ public enum ProstheticType {
      * @since 0.50.10
      */
     public boolean isAvailableToFaction(Faction campaignFaction) {
-        if (!campaignFaction.isClan() && isClanOnly) {
-            return false;
+        if (isClanOnly) {
+            return campaignFaction.isClan();
         }
-        return campaignFaction.isComStarOrWoB() || !isComStarOnly;
+
+        // Anything restricted to ComStar is also available to the Word of Blake, Star League, and Terran Hegemony
+        if (isComStarOnly) {
+            boolean isComStarOrWoBCampaign = campaignFaction.isComStarOrWoB();
+            String campaignFactionCode = campaignFaction.getShortName();
+            boolean isStarLeagueCampaign = campaignFactionCode.equals("SL") || campaignFactionCode.equals("TH");
+
+            return isComStarOrWoBCampaign || isStarLeagueCampaign;
+        }
+
+        if (isWordOfBlakeOnly) {
+            return campaignFaction.isWoB();
+        }
+
+        return true;
     }
 
     /**
      * Checks if this prosthetic is available for purchase or use based on the current location and planetary tech
-     * rating.
+     * sophistication rating.
      *
      * @param currentLocation the campaign's current location
      * @param today           the in-game date
@@ -902,21 +1003,20 @@ public enum ProstheticType {
      * @since 0.50.10
      */
     public boolean isAvailableInCurrentLocation(CurrentLocation currentLocation, LocalDate today) {
-        TechRating minimumTechRating = TechRating.E;
-        TechRating prostheticTechLevel = technologyRating;
+        PlanetarySystem.PlanetarySophistication minimumSophistication = PlanetarySystem.PlanetarySophistication.F;
 
-        // In transit: availability limited to rating E or lower
+        // In transit: availability limited to rating F or lower
         if (!currentLocation.isOnPlanet()) {
-            return minimumTechRating.isPlanetaryTechLevelBetterOrEqualThan(prostheticTechLevel);
+            return minimumSophistication.isBetterOrEqualThan(requiredPlanetarySophistication);
         }
 
         Planet planet = currentLocation.getPlanet();
-        TechRating planetTechRating = planet.getTechRating(today);
-        if (planetTechRating == null || minimumTechRating.isPlanetaryTechLevelBetterThan(planetTechRating)) {
-            planetTechRating = minimumTechRating;
+        PlanetarySystem.PlanetarySophistication planetarySophistication = planet.getSocioIndustrial(today).tech;
+        if (planetarySophistication == null || minimumSophistication.isBetterThan(planetarySophistication)) {
+            planetarySophistication = minimumSophistication;
         }
 
-        return planetTechRating.isPlanetaryTechLevelBetterOrEqualThan(prostheticTechLevel);
+        return planetarySophistication.isBetterOrEqualThan(requiredPlanetarySophistication);
     }
 
     /**
@@ -1057,8 +1157,8 @@ public enum ProstheticType {
         }
 
         // 4) Required planetary tech rating
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.techLevel",
-              technologyRating.getName()));
+        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.sophistication",
+              requiredPlanetarySophistication.getName()));
 
         // 5) Estimated recovery time
         int recoveryTime = (int) round(injuryType.getBaseRecoveryTime() * (isUseKinderMode ? 0.5 : 1.0));
@@ -1129,7 +1229,7 @@ public enum ProstheticType {
             int modifier = attributeTotals.getOrDefault(attribute, 0);
             if (modifier != 0) {
                 tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "ProstheticType.tooltip.attribute", modifier, attribute));
+                      "ProstheticType.tooltip.attribute", modifier, attribute.getLabel()));
             }
         }
 
