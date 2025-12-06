@@ -33,6 +33,7 @@
 package mekhq.gui.campaignOptions.optionChangeDialogs;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.MHQConstants.DISCORD_LINK;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
 
@@ -59,7 +60,6 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 public class StratConMaplessCampaignOptionsChangedConfirmationDialog {
     private static final MMLogger LOGGER = MMLogger.create(StratConMaplessCampaignOptionsChangedConfirmationDialog.class);
 
-    private final static String DISCORD_LINK = "https://discord.gg/megamek";
     private final static String ATB_RETIREMENT_LINK = "https://megamek.org/announcements/development/mekhq/2025/11/11/Retiring-the-Colors-Against-the-Bot.html";
 
     public StratConMaplessCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
