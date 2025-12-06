@@ -174,10 +174,6 @@ public class Person {
     // TODO convert these into an enum
     public static final int TRAIT_MODIFICATION_COST = 100;
 
-    public static final String BLOODMARK_LABEL = "BLOODMARK";
-    public static final int MINIMUM_BLOODMARK = 0;
-    public static final int MAXIMUM_BLOODMARK = 5;
-
     public static final String CONNECTIONS_LABEL = "CONNECTIONS";
     public static final int MINIMUM_CONNECTIONS = 0;
     public static final int MAXIMUM_CONNECTIONS = 10;
@@ -185,10 +181,6 @@ public class Person {
     public static final String ENEMY_LABEL = "ENEMY";
     public static final int MINIMUM_ENEMY = -10;
     public static final int MAXIMUM_ENEMY = 0;
-
-    public static final String EXTRA_INCOME_LABEL = "EXTRA_INCOME";
-    public static final int MINIMUM_EXTRA_INCOME = ExtraIncome.NEGATIVE_TEN.getTraitLevel();
-    public static final int MAXIMUM_EXTRA_INCOME = ExtraIncome.POSITIVE_TEN.getTraitLevel();
 
     public static final String PROPERTY_LABEL = "PROPERTY";
     public static final int MINIMUM_PROPERTY = 0;
@@ -202,13 +194,21 @@ public class Person {
     public static final int MINIMUM_TITLE = 0;
     public static final int MAXIMUM_TITLE = 10;
 
+    public static final String WEALTH_LABEL = "WEALTH";
+    public static final int MINIMUM_WEALTH = -1;
+    public static final int MAXIMUM_WEALTH = 10;
+
     public static final String UNLUCKY_LABEL = "UNLUCKY";
     public static final int MINIMUM_UNLUCKY = 0;
     public static final int MAXIMUM_UNLUCKY = 5;
 
-    public static final String WEALTH_LABEL = "WEALTH";
-    public static final int MINIMUM_WEALTH = -1;
-    public static final int MAXIMUM_WEALTH = 10;
+    public static final String BLOODMARK_LABEL = "BLOODMARK";
+    public static final int MINIMUM_BLOODMARK = 0;
+    public static final int MAXIMUM_BLOODMARK = 5;
+
+    public static final String EXTRA_INCOME_LABEL = "EXTRA_INCOME";
+    public static final int MINIMUM_EXTRA_INCOME = ExtraIncome.NEGATIVE_TEN.getTraitLevel();
+    public static final int MAXIMUM_EXTRA_INCOME = ExtraIncome.POSITIVE_TEN.getTraitLevel();
 
     public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
 
