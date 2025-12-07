@@ -5468,7 +5468,14 @@ public class Person {
             }
         }
 
-        return (int) round(cost * multiplier);
+        int adjustedCost = (int) round(cost * multiplier);
+        int xpProgress = skill.getXpProgress();
+        if (xpProgress > 0) {
+            skill.setXpProgress(max(0, xpProgress - adjustedCost));
+            adjustedCost = max(0, adjustedCost - xpProgress);
+        }
+
+        return adjustedCost;
     }
     // endregion skill
 
@@ -6342,7 +6349,7 @@ public class Person {
         boolean isForConventionalInfantry = unit != null && unit.isConventionalInfantry();
         if (isForConventionalInfantry) {
             SkillType mechanicSkillType = SkillType.getType(S_TECH_MECHANIC);
-            return new Skill(S_TECH_MECHANIC, mechanicSkillType.getRegularLevel());
+            return new Skill(S_TECH_MECHANIC, mechanicSkillType.getRegularLevel(), 0);
         }
 
         Skill skill = getSkillForWorkingOn(unit);
