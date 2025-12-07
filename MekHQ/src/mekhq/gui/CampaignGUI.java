@@ -223,6 +223,7 @@ public class CampaignGUI extends JPanel {
     private final RoundedJButton btnCompanyGenerator = new RoundedJButton(resourceMap.getString(
           "btnCompanyGenerator.text"));
     private final RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
+    private final RoundedJButton btnBugReport = new RoundedJButton(resourceMap.getString("btnBugReport.text"));
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
     private final RoundedJButton btnPersonnelMarket =
@@ -1445,8 +1446,21 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
+        gridBagConstraints.insets = new Insets(3, 15, 3, 0);
         pnlButton.add(btnAdvanceDay, gridBagConstraints);
+
+        btnBugReport.addActionListener(evt -> new EasyBugReportDialog(getFrame(), getCampaign()));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new Insets(3, 15, 3, 15);
+        pnlButton.add(btnBugReport, gridBagConstraints);
 
         return pnlButton;
     }
@@ -1793,7 +1807,11 @@ public class CampaignGUI extends JPanel {
             return false;
         }
 
-        return saveCampaign(getFrame(), getCampaign(), file);
+        return saveCampaign(getFrame(), getCampaign(), file, false);
+    }
+
+    public static boolean saveCampaign(JFrame frame, Campaign campaign, File file) {
+        return saveCampaign(frame, campaign, file, false);
     }
 
     /**
@@ -1801,7 +1819,7 @@ public class CampaignGUI extends JPanel {
      *
      * @param frame The parent frame in which to display the error message. May be null.
      */
-    public static boolean saveCampaign(JFrame frame, Campaign campaign, File file) {
+    public static boolean saveCampaign(JFrame frame, Campaign campaign, File file, boolean isForBugReport) {
         String path = file.getPath();
         if (!path.endsWith(".cpnx") && !path.endsWith(".cpnx.gz")) {
             path += ".cpnx";
@@ -1821,7 +1839,7 @@ public class CampaignGUI extends JPanel {
               BufferedOutputStream bos = new BufferedOutputStream(os);
               OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
               PrintWriter pw = new PrintWriter(osw)) {
-            campaign.writeToXML(pw);
+            campaign.writeToXML(pw, isForBugReport);
             pw.flush();
             // delete the backup file because we didn't need it
             if (backupFile.exists() && !backupFile.delete()) {
