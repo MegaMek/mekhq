@@ -32,6 +32,8 @@
  */
 package mekhq.gui.adapter;
 
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
+
 import java.awt.event.ActionEvent;
 import java.util.Optional;
 import javax.swing.JMenu;
@@ -72,7 +74,7 @@ public class FinanceTableMouseAdapter extends JPopupMenuAdapter {
             return;
         }
         if (command.equalsIgnoreCase("DELETE")) {
-            gui.getCampaign().addReport(transaction.voidTransaction());
+            gui.getCampaign().addReport(FINANCES, transaction.voidTransaction());
             financeModel.deleteTransaction(row);
             gui.getCampaign().getFinances().clearCachedBalance();
             MekHQ.triggerEvent(new TransactionVoidedEvent(transaction));
@@ -83,7 +85,7 @@ public class FinanceTableMouseAdapter extends JPopupMenuAdapter {
                 financeModel.setTransaction(row, transaction);
                 gui.getCampaign().getFinances().clearCachedBalance();
                 MekHQ.triggerEvent(new TransactionChangedEvent(dialog.getOldTransaction(), transaction));
-                gui.getCampaign().addReport(transaction.updateTransaction(dialog.getOldTransaction()));
+                gui.getCampaign().addReport(FINANCES, transaction.updateTransaction(dialog.getOldTransaction()));
             }
         }
     }

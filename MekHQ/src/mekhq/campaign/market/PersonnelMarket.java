@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.market;
 
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
@@ -228,7 +229,7 @@ public class PersonnelMarket {
                   .append(" is available.");
         }
 
-        campaign.addReport(report.toString());
+        campaign.addReport(GENERAL, report.toString());
     }
 
     /*

@@ -44,6 +44,9 @@ import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
@@ -128,7 +131,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             Person campaignCommander = campaign.getCommander();
             if (campaignCommander != null && !newCampaign) {
                 if (campaignCommander.getAdjustedConnections(false) > 0) {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                    campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE,
                           "AtbMonthlyContractMarket.connectionsReport.normal",
                           campaignCommander.getHyperlinkedFullTitle()));
                 } else {
@@ -136,7 +139,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                     if (campaignCommander.getBurnedConnectionsEndDate() != null) {
                         key = "AtbMonthlyContractMarket.connectionsReport.burned";
                     }
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, key,
+                    campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, key,
                           campaignCommander.getHyperlinkedFullTitle()));
                 }
             }
@@ -659,7 +662,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                   campaign.getLocalDate());
             negotiationsMarginOfSuccess = max(0, checkUtility.getMarginOfSuccess());
 
-            campaign.addReport(checkUtility.getResultsText());
+            campaign.addReport(SKILL_CHECKS, checkUtility.getResultsText());
         }
 
         contract.setContractType(ContractTypePicker.findMissionType(contract.getEmployerFaction(), connections,
@@ -823,7 +826,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             int roll = d6();
             if (roll == 6) {
                 addFollowup(campaign, contract);
-                campaign.addReport(
+                campaign.addReport(GENERAL,
                       "Your employer has offered a follow-up contract (available on the <a href=\"CONTRACT_MARKET\">contract market</a>).");
             }
         }

@@ -33,6 +33,12 @@
  */
 package mekhq.campaign.parts;
 
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -1270,12 +1276,10 @@ public class Refit extends Part implements IAcquisitionWork {
 
         if (isRefurbishing) {
             if (campaign.getQuartermaster().buyRefurbishment(this)) {
-                campaign.addReport(ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                                             .getFontColorPositiveHexColor(),
+                campaign.addReport(TECHNICAL, messageSurroundedBySpanWithColor(getPositiveColor(),
                       "<b>Refurbishment ready to begin</b>"));
             } else {
-                campaign.addReport(ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                                             .getFontColorNegativeHexColor(),
+                campaign.addReport(TECHNICAL, messageSurroundedBySpanWithColor(getNegativeColor(),
                       "You cannot afford to refurbish " +
                             oldUnit.getEntity().getShortName() +
                             ". Transaction cancelled"));
@@ -1706,7 +1710,7 @@ public class Refit extends Part implements IAcquisitionWork {
         // Validate crew
         List<String> reports = oldUnit.checkForOverCrewing();
         for (String report : reports) {
-            campaign.addReport(report);
+            campaign.addReport(PERSONNEL, report);
         }
         oldUnit.resetPilotAndEntity();
 
@@ -1957,12 +1961,12 @@ public class Refit extends Part implements IAcquisitionWork {
     public String succeed() {
         complete();
         if (isRefurbishing) {
-            return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                             .getFontColorPositiveHexColor(),
+            return messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
+                                                          .getFontColorPositiveHexColor(),
                   "Refurbishment of " + oldUnit.getEntity().getShortName() + " <b>is complete</b>.");
         } else {
-            return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                             .getFontColorPositiveHexColor(),
+            return messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
+                                                          .getFontColorPositiveHexColor(),
                   "The customization of " + oldUnit.getEntity().getShortName() + " <b>is complete</b>.");
         }
     }
@@ -1979,12 +1983,12 @@ public class Refit extends Part implements IAcquisitionWork {
         // Refurbishment doesn't get extra time like standard refits.
         if (isRefurbishing) {
             oldUnit.setRefit(null); // Failed roll results in lost time and money
-            return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                             .getFontColorNegativeHexColor(),
+            return messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
+                                                          .getFontColorNegativeHexColor(),
                   "Refurbishment of " + oldUnit.getEntity().getShortName() + " <b>was unsuccessful</b>");
         } else {
-            return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                             .getFontColorNegativeHexColor(),
+            return messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
+                                                          .getFontColorNegativeHexColor(),
                   "The customization of " +
                         oldUnit.getEntity().getShortName() +
                         " will take <b>" +
@@ -2631,12 +2635,12 @@ public class Refit extends Part implements IAcquisitionWork {
     @Override
     public String find(int transitDays, double valueMultiplier) {
         if (campaign.getQuartermaster().buyPart(this, valueMultiplier, transitDays)) {
-            return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                             .getFontColorPositiveHexColor(),
+            return messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
+                                                          .getFontColorPositiveHexColor(),
                   "<b> refit kit found.</b> Kit will arrive in " + transitDays + " days.");
         } else {
-            return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                             .getFontColorNegativeHexColor(),
+            return messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
+                                                          .getFontColorNegativeHexColor(),
                   "<b> You cannot afford this refit kit. Transaction cancelled</b>.");
         }
     }
@@ -2648,7 +2652,7 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     @Override
     public String failToFind() {
-        return ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getNegativeColor(),
+        return messageSurroundedBySpanWithColor(ReportingUtilities.getNegativeColor(),
               " <b>refit kit not found</b>.");
     }
 

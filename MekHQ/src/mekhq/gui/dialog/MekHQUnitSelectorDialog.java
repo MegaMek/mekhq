@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -200,7 +201,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                     reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
                           "mekSelectorDialog.unsupported.droneOs");
                 }
-                campaign.addReport(String.format(reason,
+                campaign.addReport(ACQUISITIONS, String.format(reason,
                       spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                       CLOSING_SPAN_TAG));
 

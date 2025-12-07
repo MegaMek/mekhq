@@ -35,6 +35,7 @@ package mekhq.gui.dialog.resupplyAndCaches;
 import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
 import static mekhq.campaign.finances.enums.TransactionType.EQUIPMENT_PURCHASE;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.loadPlayerConvoys;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.makeDelivery;
@@ -208,10 +209,11 @@ public class DialogItinerary {
 
                     final List<Part> convoyContents = resupply.getConvoyContents();
                     if (!convoyContents.isEmpty()) {
-                        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyInsufficientSize.text"));
+                        campaign.addReport(ACQUISITIONS,
+                              getFormattedTextAt(RESOURCE_BUNDLE, "convoyInsufficientSize.text"));
 
                         for (Part part : convoyContents) {
-                            campaign.addReport("- " + part.getName());
+                            campaign.addReport(ACQUISITIONS, "- " + part.getName());
                         }
                     }
                 } else {

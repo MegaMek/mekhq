@@ -33,6 +33,7 @@
 package mekhq.gui.stratCon;
 
 import static mekhq.MHQConstants.CONFIRMATION_STRATCON_BATCHALL_BREACH;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
@@ -898,8 +899,11 @@ public class StratConScenarioWizard extends JDialog {
                 currentCampaignState.changeSupportPoints(-(supportPointsSpent * selectedForceCount));
 
                 int supportPointModifier = (selectedForceCount == 0)
-                        ? 0
-                        : (dialog.getSupportPoints() * SUPPORT_POINTS_MODIFIER) / selectedForceCount;
+                                                 ?
+                                                 0
+                                                 :
+                                                 (dialog.getSupportPoints() * SUPPORT_POINTS_MODIFIER) /
+                                                       selectedForceCount;
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
 
                 btnCommitClicked(finalTargetNumber, false, true);
@@ -1088,7 +1092,7 @@ public class StratConScenarioWizard extends JDialog {
                   enemyCode, campaign.getGameYear(), regardMultiplier);
 
             for (String report : reports) {
-                campaign.addReport(report);
+                campaign.addReport(GENERAL, report);
             }
         }
     }

@@ -34,6 +34,7 @@ package mekhq.campaign.universe.factionStanding;
 
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
@@ -384,7 +385,7 @@ public class FactionCensureEvent {
         String report = factionStandings.changeRegardForFaction(campaign.getFaction().getShortName(), factionCode,
               delta, campaign.getGameYear(), campaign.getCampaignOptions().getRegardMultiplier());
 
-        campaign.addReport(report);
+        campaign.addReport(GENERAL, report);
     }
 
     private void processSeniorPersonnelConsequences(boolean isImprisoned) {

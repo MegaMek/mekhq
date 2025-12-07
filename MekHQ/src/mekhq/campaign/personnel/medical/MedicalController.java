@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.medical;
 
+import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -167,7 +168,8 @@ public class MedicalController {
             if (!campaign.getMashTheatresWithinCapacity()) {
                 doctor = null;
                 patient.setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.overTheatreCapacity",
+                campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                      "MedicalController.report.overTheatreCapacity",
                       spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG,
                       patient.getHyperlinkedFullTitle()));
             }
@@ -290,14 +292,14 @@ public class MedicalController {
     private boolean isValidDoctor(Person patient, Person doctor) {
         int medicalCapacity = doctor.getDoctorMedicalCapacity(isDoctorsUseAdministration, maximumPatients);
         if (!doctor.isDoctor()) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.notADoctor",
+            campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.notADoctor",
                   doctor.getHyperlinkedFullTitle(), patient.getHyperlinkedFullTitle()));
             unassignDoctor(patient, doctor);
             return false;
         }
 
         if (campaign.getPatientsFor(doctor) > medicalCapacity) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.overCapacity",
+            campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.overCapacity",
                   doctor.getHyperlinkedFullTitle(), patient.getHyperlinkedFullTitle()));
             unassignDoctor(patient, doctor);
 

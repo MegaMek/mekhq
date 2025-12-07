@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.marriage;
 
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -252,7 +254,7 @@ public abstract class AbstractMarriage {
         PersonalLogger.marriage(spouse, origin, today);
 
         if (!isBackground) {
-            campaign.addReport(String.format(resources.getString("marriage.report"),
+            campaign.addReport(PERSONNEL, String.format(resources.getString("marriage.report"),
                   origin.getHyperlinkedName(),
                   spouse.getHyperlinkedName()));
 
@@ -274,7 +276,7 @@ public abstract class AbstractMarriage {
             ResourceBundle recruitmentResources = ResourceBundle.getBundle("mekhq.resources.Campaign",
                   MekHQ.getMHQOptions().getLocale());
 
-            campaign.addReport(String.format(recruitmentResources.getString("dependentJoinsForce.text"),
+            campaign.addReport(PERSONNEL, String.format(recruitmentResources.getString("dependentJoinsForce.text"),
                   spouse.getHyperlinkedFullTitle()));
         }
 

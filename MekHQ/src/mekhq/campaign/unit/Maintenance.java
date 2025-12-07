@@ -35,6 +35,7 @@ package mekhq.campaign.unit;
 
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.personnel.skills.SkillType.S_ZERO_G_OPERATIONS;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
@@ -114,7 +115,7 @@ public class Maintenance {
 
                 if (!maintained) {
                     // At this point, insufficient minutes is the only reason why maintenance would fail.
-                    campaign.addReport(String.format(resources.getString("maintenanceNotAvailable.text"),
+                    campaign.addReport(TECHNICAL, String.format(resources.getString("maintenanceNotAvailable.text"),
                           unit.getName()));
                 } else {
                     maintained = !tech.isMothballing();
@@ -133,11 +134,11 @@ public class Maintenance {
                       campaign.getLocalDate(),
                       unit.getMaintenanceCost(),
                       "Maintenance for " + unit.getName()))) {
-                    campaign.addReport("<font color='" +
-                                             getNegativeColor() +
-                                             "'><b>You cannot afford to pay maintenance costs for " +
-                                             unit.getHyperlinkedName() +
-                                             "!</b></font>");
+                    campaign.addReport(TECHNICAL, "<font color='" +
+                                                        getNegativeColor() +
+                                                        "'><b>You cannot afford to pay maintenance costs for " +
+                                                        unit.getHyperlinkedName() +
+                                                        "!</b></font>");
                     paidMaintenance = false;
                 }
             }
@@ -174,7 +175,7 @@ public class Maintenance {
                           part.getId(),
                           unit.getName(),
                           unit.getId().toString());
-                    campaign.addReport(String.format(
+                    campaign.addReport(TECHNICAL, String.format(
                           "ERROR: An error occurred performing maintenance on %s for unit %s, check the log",
                           part.getName(),
                           unit.getName()));
@@ -227,17 +228,17 @@ public class Maintenance {
                                    getNegativeColor() +
                                    "'>Could not afford maintenance costs, so check is at a penalty.</font>";
             }
-            campaign.addReport(techNameLinked +
-                                     " performs maintenance on " +
-                                     unit.getHyperlinkedName() +
-                                     ". " +
-                                     paidString +
-                                     qualityString +
-                                     ". " +
-                                     damageString +
-                                     " [<a href='MAINTENANCE|" +
-                                     unit.getId() +
-                                     "'>Get details</a>]");
+            campaign.addReport(TECHNICAL, techNameLinked +
+                                                " performs maintenance on " +
+                                                unit.getHyperlinkedName() +
+                                                ". " +
+                                                paidString +
+                                                qualityString +
+                                                ". " +
+                                                damageString +
+                                                " [<a href='MAINTENANCE|" +
+                                                unit.getId() +
+                                                "'>Get details</a>]");
 
             unit.resetDaysSinceMaintenance();
         }
@@ -563,7 +564,7 @@ public class Maintenance {
             if (tech.isEngineer()) {
                 String report = performEngineerCheck(tech, dailyWorkMinutes);
                 if (!report.isBlank()) {
-                    campaign.addReport(report);
+                    campaign.addReport(TECHNICAL, report);
                 }
                 continue;
             }
@@ -602,7 +603,7 @@ public class Maintenance {
             for (Unit maintainedUnit : immediateToday) {
                 String report = getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.immediateToday",
                       tech.getHyperlinkedFullTitle(), maintainedUnit.getHyperlinkedName());
-                campaign.addReport(report);
+                campaign.addReport(TECHNICAL, report);
                 performImmediateMaintenance(campaign, maintainedUnit);
             }
 
@@ -610,7 +611,7 @@ public class Maintenance {
                 String report = getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.unableToMaintain",
                       spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG,
                       tech.getHyperlinkedFullTitle(), maintainedUnit.getHyperlinkedName());
-                campaign.addReport(report);
+                campaign.addReport(TECHNICAL, report);
             }
         }
     }
@@ -814,7 +815,7 @@ public class Maintenance {
                 Maintenance.doMaintenance(campaign, unit);
             }
         } else {
-            campaign.addReport(getFormattedText("maintenanceAdHoc.unable",
+            campaign.addReport(TECHNICAL, getFormattedText("maintenanceAdHoc.unable",
                   tech.getHyperlinkedFullTitle(),
                   unit.getHyperlinkedName()));
         }

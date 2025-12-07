@@ -34,6 +34,8 @@ package mekhq.campaign.personnel.education;
 
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_CLAN_HATE;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_FACTION_LOYALTY;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_FACTION_PRIDE;
@@ -157,7 +159,7 @@ public class EducationController {
 
         // has the character already failed to apply to this academy?
         if (person.getEduFailedApplications().contains(academyNameInSet + "::" + academy.getEducationLevel(person))) {
-            campaign.addReport(String.format(resources.getString("secondApplication.text"),
+            campaign.addReport(PERSONNEL, String.format(resources.getString("secondApplication.text"),
                   person.getHyperlinkedFullTitle(),
                   academyNameInSet,
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
@@ -182,7 +184,7 @@ public class EducationController {
             // Mark the academy in the person's list of failed applications preventing re-application
             person.addEduFailedApplications(academyNameInSet + "::" + academy.getEducationLevel(person));
 
-            campaign.addReport(String.format(resources.getString("applicationFailure.text"),
+            campaign.addReport(PERSONNEL, String.format(resources.getString("applicationFailure.text"),
                   person.getHyperlinkedFullTitle(),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG,
@@ -247,7 +249,7 @@ public class EducationController {
                 String reportMessage = ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
                                                                                                  .getFontColorNegativeHexColor(),
                       insufficientFundsMessage);
-                campaign.addReport(reportMessage);
+                campaign.addReport(FINANCES, reportMessage);
                 return;
             } else {
                 campaign.getFinances()
@@ -268,16 +270,17 @@ public class EducationController {
 
         // notify the user
         if (person.getPrisonerStatus().isCurrentPrisoner()) {
-            campaign.addReport(String.format(resources.getString("prisonerEscape.text"),
+            campaign.addReport(PERSONNEL, String.format(resources.getString("prisonerEscape.text"),
                   person.getEduAcademyName(),
                   person.getFullTitle(),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
             campaign.removePerson(person);
         } else if (academy.isHomeSchool()) {
-            campaign.addReport(String.format(resources.getString("homeSchool.text"), person.getHyperlinkedFullTitle()));
+            campaign.addReport(PERSONNEL,
+                  String.format(resources.getString("homeSchool.text"), person.getHyperlinkedFullTitle()));
         } else {
-            campaign.addReport(String.format(resources.getString("offToSchool.text"),
+            campaign.addReport(PERSONNEL, String.format(resources.getString("offToSchool.text"),
                   person.getHyperlinkedFullTitle(),
                   person.getEduAcademyName(),
                   person.getEduJourneyTime()));
@@ -619,7 +622,8 @@ public class EducationController {
 
         // has Person just arrived?
         if (person.getEduDaysOfTravel() >= person.getEduJourneyTime()) {
-            campaign.addReport(String.format(resources.getString("arrived.text"), person.getHyperlinkedFullTitle()));
+            campaign.addReport(PERSONNEL,
+                  String.format(resources.getString("arrived.text"), person.getHyperlinkedFullTitle()));
             person.setEduEducationStage(EducationStage.EDUCATION);
         }
     }
@@ -725,7 +729,7 @@ public class EducationController {
         int travelTime = Math.max(2,
               campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
 
-        campaign.addReport(String.format(resources.getString("returningFromSchool.text"),
+        campaign.addReport(PERSONNEL, String.format(resources.getString("returningFromSchool.text"),
               person.getHyperlinkedFullTitle(),
               travelTime));
 
@@ -889,7 +893,7 @@ public class EducationController {
                               person.getHyperlinkedFullTitle(),
                               resultString);
 
-                        campaign.addReport(reportMessage);
+                        campaign.addReport(PERSONNEL, reportMessage);
 
                         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACCIDENTAL);
                     }
@@ -921,7 +925,7 @@ public class EducationController {
               person.getHyperlinkedFullTitle(),
               resultString);
 
-        campaign.addReport(reportMessage);
+        campaign.addReport(PERSONNEL, reportMessage);
 
         if (!academy.isPrepSchool()) {
             person.setEduEducationTime(person.getEduEducationTime() + roll);
@@ -989,7 +993,7 @@ public class EducationController {
                           spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                           CLOSING_SPAN_TAG);
 
-                    campaign.addReport(reportMessage);
+                    campaign.addReport(PERSONNEL, reportMessage);
                 }
 
                 return true;
@@ -1000,7 +1004,7 @@ public class EducationController {
                       spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                       CLOSING_SPAN_TAG);
 
-                campaign.addReport(reportMessage);
+                campaign.addReport(PERSONNEL, reportMessage);
                 return true;
             }
         }
@@ -1046,7 +1050,7 @@ public class EducationController {
 
         String report = String.format(resources.getString(reportText), personTitle, coloredOpen, CLOSING_SPAN_TAG);
 
-        campaign.addReport(report);
+        campaign.addReport(PERSONNEL, report);
     }
 
     /**
@@ -1067,7 +1071,7 @@ public class EducationController {
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG);
 
-            campaign.addReport(reportMessage);
+            campaign.addReport(PERSONNEL, reportMessage);
 
             person.setEduEducationStage(EducationStage.DROPPING_OUT);
 
@@ -1092,7 +1096,7 @@ public class EducationController {
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG);
 
-            campaign.addReport(reportMessage);
+            campaign.addReport(PERSONNEL, reportMessage);
             person.setEduEducationStage(EducationStage.DROPPING_OUT);
         }
     }
@@ -1127,7 +1131,7 @@ public class EducationController {
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG);
 
-                    campaign.addReport(reportMessage);
+                    campaign.addReport(PERSONNEL, reportMessage);
 
                     person.setEduEducationStage(EducationStage.DROPPING_OUT);
                 } else {
@@ -1138,7 +1142,7 @@ public class EducationController {
                           spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                           CLOSING_SPAN_TAG);
 
-                    campaign.addReport(reportMessage);
+                    campaign.addReport(PERSONNEL, reportMessage);
 
                     person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MISSING);
                 }
@@ -1150,7 +1154,7 @@ public class EducationController {
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       CLOSING_SPAN_TAG);
 
-                campaign.addReport(reportMessage);
+                campaign.addReport(PERSONNEL, reportMessage);
 
                 person.setEduEducationStage(EducationStage.DROPPING_OUT);
             }
@@ -1206,7 +1210,7 @@ public class EducationController {
                       CLOSING_SPAN_TAG);
 
             }
-            campaign.addReport(reportMessage);
+            campaign.addReport(PERSONNEL, reportMessage);
 
             ServiceLogger.eduFailed(person,
                   campaign.getLocalDate(),
@@ -1231,7 +1235,7 @@ public class EducationController {
                   CLOSING_SPAN_TAG,
                   roll);
 
-            campaign.addReport(reportMessage);
+            campaign.addReport(PERSONNEL, reportMessage);
 
             person.setEduEducationTime(roll);
 
@@ -1257,7 +1261,7 @@ public class EducationController {
                           CLOSING_SPAN_TAG);
 
                 }
-                campaign.addReport(reportMessage);
+                campaign.addReport(PERSONNEL, reportMessage);
             } else {
                 String reportMessage;
                 if (academy.isHomeSchool()) {
@@ -1276,7 +1280,7 @@ public class EducationController {
                           CLOSING_SPAN_TAG);
 
                 }
-                campaign.addReport(reportMessage);
+                campaign.addReport(PERSONNEL, reportMessage);
             }
 
             ServiceLogger.eduGraduatedPlus(person,
@@ -1315,7 +1319,7 @@ public class EducationController {
                           CLOSING_SPAN_TAG);
 
                 }
-                campaign.addReport(reportMessage);
+                campaign.addReport(PERSONNEL, reportMessage);
             } else {
                 String reportMessage;
                 if (academy.isHomeSchool()) {
@@ -1334,7 +1338,7 @@ public class EducationController {
                           CLOSING_SPAN_TAG);
 
                 }
-                campaign.addReport(reportMessage);
+                campaign.addReport(PERSONNEL, reportMessage);
             }
 
             ServiceLogger.eduGraduatedPlus(person,
@@ -1369,7 +1373,7 @@ public class EducationController {
                       ' ' + resources.getString(graduationEventPicker()));
 
             }
-            campaign.addReport(reportMessage);
+            campaign.addReport(PERSONNEL, reportMessage);
         } else {
             String reportMessage;
             if (academy.isHomeSchool()) {
@@ -1386,7 +1390,7 @@ public class EducationController {
                       "");
 
             }
-            campaign.addReport(reportMessage);
+            campaign.addReport(PERSONNEL, reportMessage);
         }
 
         ServiceLogger.eduGraduated(person,
@@ -1456,7 +1460,7 @@ public class EducationController {
      */
     private static void generatePostGradGraduationReport(Campaign campaign, String personName, String graduationText,
           String qualification, ResourceBundle resources) {
-        campaign.addReport(String.format(resources.getString("graduatedPostGradReport.text"),
+        campaign.addReport(PERSONNEL, String.format(resources.getString("graduatedPostGradReport.text"),
               personName,
               spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
               graduationText,
@@ -1506,7 +1510,7 @@ public class EducationController {
                       CLOSING_SPAN_TAG);
 
             }
-            campaign.addReport(reportMessage);
+            campaign.addReport(PERSONNEL, reportMessage);
         } else {
             String reportMessage;
             if (academy.isHomeSchool()) {
@@ -1522,7 +1526,7 @@ public class EducationController {
                       CLOSING_SPAN_TAG);
 
             }
-            campaign.addReport(reportMessage);
+            campaign.addReport(PERSONNEL, reportMessage);
         }
 
         ServiceLogger.eduGraduated(person,
@@ -1581,7 +1585,7 @@ public class EducationController {
             if (isUseReeducationChangesFaction) {
                 boolean factionChangeBlocked = isFactionChangeBlocked(person, campaignFaction);
                 if (factionChangeBlocked) {
-                    campaign.addReport(getFormattedTextAt(BUNDLE_NAME,
+                    campaign.addReport(PERSONNEL, getFormattedTextAt(BUNDLE_NAME,
                           "inForLife.text",
                           person.getHyperlinkedFullTitle(),
                           spanOpeningWithCustomColor(getWarningColor()),
@@ -1832,11 +1836,12 @@ public class EducationController {
 
                     person.addSkill(skillParsed, skillLevel, bonus);
 
-                    campaign.addReport(String.format(resources.getString("bonusAdded.text"), person.getFirstName()));
+                    campaign.addReport(PERSONNEL,
+                          String.format(resources.getString("bonusAdded.text"), person.getFirstName()));
                 } else {
                     person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
 
-                    campaign.addReport(String.format(resources.getString("bonusXp.text"),
+                    campaign.addReport(PERSONNEL, String.format(resources.getString("bonusXp.text"),
                           person.getFirstName(),
                           campaign.getCampaignOptions().getCurriculumXpRate()));
                 }
@@ -1845,7 +1850,7 @@ public class EducationController {
                 if (curriculum.get(roll).equalsIgnoreCase("xp")) {
                     person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
 
-                    campaign.addReport(String.format(resources.getString("bonusXp.text"),
+                    campaign.addReport(PERSONNEL, String.format(resources.getString("bonusXp.text"),
                           person.getFirstName(),
                           campaign.getCampaignOptions().getCurriculumXpRate()));
                 }

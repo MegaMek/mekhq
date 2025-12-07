@@ -32,6 +32,8 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -597,7 +599,7 @@ public class AcquisitionsDialog extends JDialog {
                 // GM find the actual number required
                 for (int count = 0; count < partCountInfo.getRequiredCount(); count++) {
                     campaignGUI.getCampaign()
-                          .addReport(String.format("GM Acquiring %s. %s",
+                          .addReport(ACQUISITIONS, String.format("GM Acquiring %s. %s",
                                 actualWork.getAcquisitionName(),
                                 actualWork.find(0, 1.0)));
                 }

@@ -34,6 +34,8 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.RESUPPLY_LOOT_BOX_NAME;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -268,7 +270,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         if (tracker.isEmployerEvokingSpecialClause()) {
             String colorOpenWarning = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
             String colorOpenNegative = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
-            campaign.addReport(String.format(resourceMap.getString("txtInstructions.text.salvage.special"),
+            campaign.addReport(GENERAL, String.format(resourceMap.getString("txtInstructions.text.salvage.special"),
                   colorOpenWarning,
                   CLOSING_SPAN_TAG,
                   colorOpenNegative,
@@ -1576,7 +1578,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                         tracker.getDropShipBonus(),
                         resourceMap.getString("dropShipBonus.text"));
 
-            campaign.addReport(String.format(resourceMap.getString("dropShipBonus.report"),
+            campaign.addReport(FINANCES, String.format(resourceMap.getString("dropShipBonus.report"),
                   tracker.getDropShipBonus().toAmountString()));
         }
 

@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.skills;
 
 import static java.lang.Math.floor;
 import static megamek.common.compute.Compute.d6;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -173,7 +174,7 @@ public class EscapeSkills {
           LocalDate today) {
         String report = getEscapeAttemptReport(prisoner, marginOfSuccess);
         if (!report.isBlank()) {
-            campaign.addReport(report);
+            campaign.addReport(PERSONNEL, report);
         }
 
         switch (marginOfSuccess) {

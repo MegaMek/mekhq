@@ -47,6 +47,7 @@ import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
 import static mekhq.campaign.log.LogEntryType.PATIENT;
@@ -1463,74 +1464,76 @@ public class Person {
         } else if (getStatus().isDead() && !status.isDead()) {
             // remove date of death for resurrection
             setDateOfDeath(null);
-            campaign.addReport(String.format(resources.getString("resurrected.report"), getHyperlinkedFullTitle()));
+            campaign.addReport(PERSONNEL,
+                  String.format(resources.getString("resurrected.report"), getHyperlinkedFullTitle()));
             ServiceLogger.resurrected(this, today);
         }
 
         switch (status) {
             case ACTIVE -> {
                 if (getStatus().isMIA()) {
-                    campaign.addReport(String.format(resources.getString("recoveredMIA.report"),
+                    campaign.addReport(PERSONNEL, String.format(resources.getString("recoveredMIA.report"),
                           getHyperlinkedFullTitle()));
                     ServiceLogger.recoveredMia(this, today);
                 } else if (getStatus().isPoW()) {
-                    campaign.addReport(String.format(resources.getString("recoveredPoW.report"),
+                    campaign.addReport(PERSONNEL, String.format(resources.getString("recoveredPoW.report"),
                           getHyperlinkedFullTitle()));
                     ServiceLogger.recoveredPoW(this, campaign.getLocalDate());
                 } else if (getStatus().isOnLeave() || getStatus().isOnMaternityLeave()) {
-                    campaign.addReport(String.format(resources.getString("returnedFromLeave.report"),
+                    campaign.addReport(PERSONNEL, String.format(resources.getString("returnedFromLeave.report"),
                           getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
                 } else if (getStatus().isStudent()) {
-                    campaign.addReport(String.format(resources.getString("returnedFromEducation.report"),
+                    campaign.addReport(PERSONNEL, String.format(resources.getString("returnedFromEducation.report"),
                           getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromEducation(this, campaign.getLocalDate());
                 } else if (getStatus().isMissing()) {
-                    campaign.addReport(String.format(resources.getString("returnedFromMissing.report"),
+                    campaign.addReport(PERSONNEL, String.format(resources.getString("returnedFromMissing.report"),
                           getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromMissing(this, campaign.getLocalDate());
                 } else if (getStatus().isAwol()) {
-                    campaign.addReport(String.format(resources.getString("returnedFromAWOL.report"),
+                    campaign.addReport(PERSONNEL, String.format(resources.getString("returnedFromAWOL.report"),
                           getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromAWOL(this, campaign.getLocalDate());
                 } else {
-                    campaign.addReport(String.format(resources.getString("rehired.report"), getHyperlinkedFullTitle()));
+                    campaign.addReport(PERSONNEL,
+                          String.format(resources.getString("rehired.report"), getHyperlinkedFullTitle()));
                     ServiceLogger.rehired(this, today);
                 }
                 setRetirement(null);
             }
             case RETIRED -> {
-                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                campaign.addReport(PERSONNEL, String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.retired(this, today);
 
                 setRetirement(today);
             }
             case RESIGNED -> {
-                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                campaign.addReport(PERSONNEL, String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.resigned(this, today);
 
                 setRetirement(today);
             }
             case DESERTED -> {
-                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                campaign.addReport(PERSONNEL, String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.deserted(this, today);
 
                 setRetirement(today);
             }
             case DEFECTED -> {
-                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                campaign.addReport(PERSONNEL, String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.defected(this, today);
 
                 setRetirement(today);
             }
             case CAMP_FOLLOWER, SACKED -> {
-                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                campaign.addReport(PERSONNEL, String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.sacked(this, today);
 
                 setRetirement(today);
             }
             case LEFT -> {
-                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                campaign.addReport(PERSONNEL, String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.left(this, today);
 
                 setRetirement(today);
@@ -1541,11 +1544,11 @@ public class Person {
             }
             case PREGNANCY_COMPLICATIONS -> {
                 campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
-                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                campaign.addReport(PERSONNEL, String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
             }
             default -> {
-                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                campaign.addReport(PERSONNEL, String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
             }
         }
@@ -1656,7 +1659,7 @@ public class Person {
         }
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-            campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
+            campaign.addReport(PERSONNEL, String.format(resources.getString("loyaltyChangeGroup.text"),
                   spanOpeningWithCustomColor(getWarningColor()),
                   CLOSING_SPAN_TAG));
         }
@@ -1765,7 +1768,7 @@ public class Person {
         }
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-            campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
+            campaign.addReport(PERSONNEL, String.format(resources.getString("loyaltyChangeGroup.text"),
                   "<span color=" + getWarningColor() + "'>",
                   CLOSING_SPAN_TAG));
         }
@@ -1800,7 +1803,7 @@ public class Person {
               changeString,
               CLOSING_SPAN_TAG);
 
-        campaign.addReport(report);
+        campaign.addReport(PERSONNEL, report);
     }
 
     /**
@@ -2463,7 +2466,7 @@ public class Person {
         }
 
         String spaGainedMessage = getVeterancyAwardReport(spaGained);
-        campaign.addReport(spaGainedMessage);
+        campaign.addReport(PERSONNEL, spaGainedMessage);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
@@ -4363,7 +4366,7 @@ public class Person {
             int adjustedCourseIndex = academy.getAdjustedCourseIndex(currentCourseIndex);
             if (currentCourseIndex != adjustedCourseIndex) {
                 person.setEduCourseIndex(adjustedCourseIndex);
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "Person.education.transfer",
+                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "Person.education.transfer",
                       spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle(), academy.getQualifications().get(adjustedCourseIndex)));
             }

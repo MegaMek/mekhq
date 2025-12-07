@@ -35,6 +35,7 @@ package mekhq.gui;
 import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.MHQConstants.CONFIRMATION_BEGIN_TRANSIT;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.outOfContractMothballAutomation;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
@@ -298,7 +299,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
               getCampaign().getLocalDate(), journeyCost, getCampaign().getCurrentSystem());
 
         if (!jumpReport.isBlank()) {
-            getCampaign().addReport(jumpReport);
+            getCampaign().addReport(GENERAL, jumpReport);
         }
 
         getCampaign().getLocation().setJumpPath(panMap.getJumpPath());

@@ -33,6 +33,8 @@
 package mekhq.gui;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
@@ -530,7 +532,7 @@ public final class BriefingTab extends CampaignGuiTab {
                         Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
                         if (admin != null) {
                             admin.awardXP(getCampaign(), 1);
-                            getCampaign().addReport(admin.getHyperlinkedName() + " has gained 1 XP.");
+                            getCampaign().addReport(PERSONNEL, admin.getHyperlinkedName() + " has gained 1 XP.");
                         }
                     }
                 }
@@ -581,7 +583,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
             for (String report : reports) {
                 if (report != null && !report.isBlank()) {
-                    getCampaign().addReport(report);
+                    getCampaign().addReport(GENERAL, report);
                 }
             }
         }
@@ -1136,8 +1138,8 @@ public final class BriefingTab extends CampaignGuiTab {
      *
      * <p>The returned list is sorted alphabetically by force name.</p>
      *
-     * @param campaign        the current campaign state
-     * @param isSpaceScenario {@code true} if checking for space salvage capabilities, {@code false} for ground
+     * @param campaign              the current campaign state
+     * @param isSpaceScenario       {@code true} if checking for space salvage capabilities, {@code false} for ground
      * @param alreadyAssignedForces a list of salvage forces that have already been assigned to the scenario
      *
      * @return a sorted list of forces capable of salvage operations

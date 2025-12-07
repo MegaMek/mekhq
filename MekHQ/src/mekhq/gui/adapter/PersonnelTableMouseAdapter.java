@@ -37,6 +37,8 @@ import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.finances.enums.TransactionType.MEDICAL_EXPENSES;
 import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditure;
 import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditureExhaustedReportMessage;
@@ -661,7 +663,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       getCampaign().getLocalDate(),
                       skillType.getName(),
                       skill.getLevel());
-                getCampaign().addReport(String.format(resources.getString("improved.format"),
+                getCampaign().addReport(PERSONNEL, String.format(resources.getString("improved.format"),
                       selectedPerson.getHyperlinkedName(),
                       type));
 
@@ -785,7 +787,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.spendXP(cost);
                 final String displayName = SpecialAbility.getDisplayName(selected);
                 PerformanceLogger.paidOffFlaw(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
-                getCampaign().addReport(String.format(resources.getString("removed.format"),
+                getCampaign().addReport(PERSONNEL, String.format(resources.getString("removed.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
                 getCampaign().personUpdated(selectedPerson);
@@ -798,7 +800,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.spendXP(cost);
                 final String displayName = SpecialAbility.getDisplayName(selected);
                 PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
-                getCampaign().addReport(String.format(resources.getString("gained.format"),
+                getCampaign().addReport(PERSONNEL, String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
                 getCampaign().personUpdated(selectedPerson);
@@ -816,7 +818,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_WEAPON_SPECIALIST),
                       selected);
                 PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
-                getCampaign().addReport(String.format(resources.getString("gained.format"),
+                getCampaign().addReport(PERSONNEL, String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
                 getCampaign().personUpdated(selectedPerson);
@@ -832,7 +834,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_SANDBLASTER),
                       selected);
                 PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
-                getCampaign().addReport(String.format(resources.getString("gained.format"),
+                getCampaign().addReport(PERSONNEL, String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
                 getCampaign().personUpdated(selectedPerson);
@@ -848,7 +850,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_SPECIALIST),
                       selected);
                 PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
-                getCampaign().addReport(String.format(resources.getString("gained.format"),
+                getCampaign().addReport(PERSONNEL, String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
                 getCampaign().personUpdated(selectedPerson);
@@ -866,7 +868,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_RANGE_MASTER),
                       selected);
                 PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
-                getCampaign().addReport(String.format(resources.getString("gained.format"),
+                getCampaign().addReport(PERSONNEL, String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
                 getCampaign().personUpdated(selectedPerson);
@@ -882,7 +884,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       SpecialAbility.getDisplayName(OptionsConstants.MISC_ENV_SPECIALIST),
                       selected);
                 PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
-                getCampaign().addReport(String.format(resources.getString("gained.format"),
+                getCampaign().addReport(PERSONNEL, String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
                 getCampaign().personUpdated(selectedPerson);
@@ -898,7 +900,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       SpecialAbility.getDisplayName(OptionsConstants.MISC_HUMAN_TRO),
                       selected);
                 PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
-                getCampaign().addReport(String.format(resources.getString("gained.format"),
+                getCampaign().addReport(PERSONNEL, String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
                 getCampaign().personUpdated(selectedPerson);
@@ -912,7 +914,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s", SpecialAbility.getDisplayName(ability), selected);
                 PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
-                getCampaign().addReport(String.format(resources.getString("spaGainedChoices.format"),
+                getCampaign().addReport(PERSONNEL, String.format(resources.getString("spaGainedChoices.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
                 getCampaign().personUpdated(selectedPerson);
@@ -1111,7 +1113,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                       total.toAmountAndSymbolString()),
                                 resources.getString("ransom.text"),
                                 JOptionPane.YES_NO_OPTION)) {
-                    getCampaign().addReport(String.format(resources.getString("ransomReport.format"),
+                    getCampaign().addReport(FINANCES, String.format(resources.getString("ransomReport.format"),
                           people.length,
                           total.toAmountAndSymbolString()));
                     getCampaign().addFunds(TransactionType.RANSOM, total, resources.getString("ransom.text"));
@@ -1128,7 +1130,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                          .collect(Collectors.toList()));
 
                 if (getCampaign().getFunds().isLessThan(total)) {
-                    getCampaign().addReport(String.format(resources.getString("unableToRansom.format"),
+                    getCampaign().addReport(FINANCES, String.format(resources.getString("unableToRansom.format"),
                           people.length,
                           total.toAmountAndSymbolString()));
                     break;
@@ -1141,7 +1143,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                       total.toAmountAndSymbolString()),
                                 resources.getString("ransom.text"),
                                 JOptionPane.YES_NO_OPTION)) {
-                    getCampaign().addReport(String.format(resources.getString("ransomReport.format"),
+                    getCampaign().addReport(FINANCES, String.format(resources.getString("ransomReport.format"),
                           people.length,
                           total.toAmountAndSymbolString()));
                     getCampaign().removeFunds(TransactionType.RANSOM, total, resources.getString("ransom.text"));
@@ -1250,14 +1252,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (person.getWealth() > MINIMUM_WEALTH) {
                         if (person.isHasPerformedExtremeExpenditure()) {
                             String report = getExpenditureExhaustedReportMessage(person.getHyperlinkedFullTitle());
-                            getCampaign().addReport(report);
+                            getCampaign().addReport(FINANCES, report);
                             continue;
                         }
 
                         String report = performExtremeExpenditure(person,
                               getCampaign().getFinances(),
                               getCampaign().getLocalDate());
-                        getCampaign().addReport(report);
+                        getCampaign().addReport(FINANCES, report);
 
                         if (!person.isFounder()) {
                             person.performForcedDirectionLoyaltyChange(getCampaign(), false, true, true);
@@ -2024,7 +2026,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 getCampaign().getCampaignOptions().getRegardMultiplier());
 
                     for (String report : reports) {
-                        getCampaign().addReport(report);
+                        getCampaign().addReport(PERSONNEL, report);
                     }
                 }
 
@@ -3811,13 +3813,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             miCommander.addActionListener(evt -> {
                 getCampaign().getPersonnel().stream().filter(Person::isCommander).forEach(commander -> {
                     commander.setCommander(false);
-                    getCampaign().addReport(String.format(resources.getString("removedCommander.format"),
+                    getCampaign().addReport(PERSONNEL, String.format(resources.getString("removedCommander.format"),
                           commander.getHyperlinkedFullTitle()));
                     getCampaign().personUpdated(commander);
                 });
                 if (miCommander.isSelected()) {
                     person.setCommander(true);
-                    getCampaign().addReport(String.format(resources.getString("setAsCommander.format"),
+                    getCampaign().addReport(PERSONNEL, String.format(resources.getString("setAsCommander.format"),
                           person.getHyperlinkedFullTitle()));
                     getCampaign().personUpdated(person);
                 }

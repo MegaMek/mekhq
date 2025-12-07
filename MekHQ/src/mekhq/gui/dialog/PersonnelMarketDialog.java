@@ -32,6 +32,8 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -380,9 +382,9 @@ public class PersonnelMarketDialog extends JDialog {
                       .isLessThan((campaign.getCampaignOptions().isPayForRecruitment() ?
                                          selectedPerson.getSalary(campaign).multipliedBy(2) :
                                          Money.zero()).plus(unitCost))) {
-                campaign.addReport("<font color='" +
-                                         ReportingUtilities.getNegativeColor() +
-                                         "'><b>Insufficient funds. Transaction cancelled</b>.</font>");
+                campaign.addReport(FINANCES, "<font color='" +
+                                                   ReportingUtilities.getNegativeColor() +
+                                                   "'><b>Insufficient funds. Transaction cancelled</b>.</font>");
             } else {
                 /*
                  * Adding person to campaign changes pid; grab the old one to

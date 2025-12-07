@@ -45,6 +45,7 @@ import static megamek.common.units.EntityWeightClass.WEIGHT_SMALL_SUPPORT;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_B;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_C;
@@ -5098,10 +5099,10 @@ public class Unit implements ITechnology {
      *     internally as a {@link Set}.</li>
      * </ul>
      *
-     * @param isTankOrInfantry {@code true} if the entity is a tank or infantry unit; when {@code true}, the {@code
-     * isDrivers} flag is ignored
+     * @param isTankOrInfantry {@code true} if the entity is a tank or infantry unit; when {@code true}, the
+     *                         {@code isDrivers} flag is ignored
      * @param isDrivers        {@code true} to request the drivers list, {@code false} to request the gunners list
-     *                                     (unless overridden by single-crew behavior)
+     *                         (unless overridden by single-crew behavior)
      *
      * @return a list of personnel appropriate to the entity type and requested role (never {@code null})
      */
@@ -5833,7 +5834,7 @@ public class Unit implements ITechnology {
             getCampaign().mothball(this);
         } else {
             completeMothball();
-            getCampaign().addReport(getHyperlinkedName() + " has been mothballed");
+            getCampaign().addReport(TECHNICAL, getHyperlinkedName() + " has been mothballed");
         }
     }
 
@@ -5935,7 +5936,7 @@ public class Unit implements ITechnology {
             getCampaign().activate(this);
         } else {
             completeActivation();
-            getCampaign().addReport(getHyperlinkedName() + " has been activated");
+            getCampaign().addReport(TECHNICAL, getHyperlinkedName() + " has been activated");
         }
     }
 

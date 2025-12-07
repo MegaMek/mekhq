@@ -46,6 +46,7 @@ import static megamek.common.planetaryConditions.Atmosphere.THIN;
 import static megamek.common.planetaryConditions.Wind.TORNADO_F4;
 import static megamek.common.units.UnitType.*;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
+import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
@@ -1494,7 +1495,7 @@ public class AtBDynamicScenarioFactory {
             report.append(String.format(resources.getString("nothingBidAway.text"), generatedForce.getName()));
         }
 
-        campaign.addReport(report.toString());
+        campaign.addReport(BATTLE, report.toString());
     }
 
     /**

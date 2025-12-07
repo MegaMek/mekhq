@@ -785,7 +785,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
             for (String report : factionStandingReport.getReports()) {
                 if (report != null && !report.isBlank()) {
-                    getCampaign().addReport(report);
+                    getCampaign().addReport(GENERAL, report);
                 }
             }
         });

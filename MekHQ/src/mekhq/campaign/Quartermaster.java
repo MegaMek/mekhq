@@ -32,6 +32,8 @@
  */
 package mekhq.campaign;
 
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -538,7 +540,7 @@ public record Quartermaster(Campaign campaign) {
         // TODO: move to an event listener, but ensure PartArrivedEvent
         //       includes the quantity which arrived rather than the
         //       quantity in the warehouse.
-        campaign().addReport(part.getArrivalReport());
+        campaign().addReport(ACQUISITIONS, part.getArrivalReport());
 
         // Add the part back to the Warehouse, asking that
         // it be merged with any existing spare part.

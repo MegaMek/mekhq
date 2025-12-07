@@ -34,6 +34,7 @@ package mekhq.campaign.mission.rentals;
 
 import static java.lang.Math.max;
 import static mekhq.MHQConstants.CONFIRMATION_CONTRACT_RENTAL;
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -144,10 +145,10 @@ public class FacilityRentals {
      *
      * <p>Presents dialog, handles cost calculation, and attempts to debit the player's account.</p>
      *
-     * @param campaign                 the active campaign
-     * @param unitCount                the number of units intended for bay rental
-     * @param largeCraftCount          the number of large craft intended for bay rental
-     * @param rentalType               the type of bay rental (maintenance or factory conditions)
+     * @param campaign        the active campaign
+     * @param unitCount       the number of units intended for bay rental
+     * @param largeCraftCount the number of large craft intended for bay rental
+     * @param rentalType      the type of bay rental (maintenance or factory conditions)
      *
      * @return {@code true} if the transaction completes successfully
      *
@@ -181,7 +182,7 @@ public class FacilityRentals {
               ContractRentalType.MAINTENANCE_BAYS)) {
             String report = getFormattedTextAt(RESOURCE_BUNDLE, "FacilityRentals.bay.unableToAfford",
                   spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG, totalCost.toAmountString());
-            campaign.addReport(report);
+            campaign.addReport(FINANCES, report);
 
             return false;
         }
@@ -392,7 +393,7 @@ public class FacilityRentals {
             String report = getFormattedTextAt(RESOURCE_BUNDLE, "FacilityRentals.bay.unableToAffordUpkeep",
                   spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, previousSiteName,
                   unit.getHyperlinkedName(), unit.getCurrentSiteName());
-            campaign.addReport(report);
+            campaign.addReport(FINANCES, report);
 
             MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
         } else {

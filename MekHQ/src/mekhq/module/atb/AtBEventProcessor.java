@@ -32,6 +32,7 @@
  */
 package mekhq.module.atb;
 
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
@@ -103,9 +104,9 @@ public record AtBEventProcessor(Campaign campaign) {
                 doPaidRecruitment(ev.getCampaign());
             } else {
                 ev.getCampaign()
-                      .addReport("<html><font color='" +
-                                       ReportingUtilities.getNegativeColor() +
-                                       "'>Insufficient funds for paid recruitment.</font></html>");
+                      .addReport(FINANCES, "<html><font color='" +
+                                                 ReportingUtilities.getNegativeColor() +
+                                                 "'>Insufficient funds for paid recruitment.</font></html>");
             }
         }
     }

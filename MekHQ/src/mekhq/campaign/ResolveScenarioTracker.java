@@ -34,6 +34,8 @@
 package mekhq.campaign;
 
 import static java.lang.Math.ceil;
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.mission.Scenario.T_SPACE;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
 import static mekhq.campaign.randomEvents.prisoners.NonCombatPrisoners.getCivilianCaptives;
@@ -1726,10 +1728,10 @@ public class ResolveScenarioTracker {
                                 getCampaign().getLocalDate(),
                                 value,
                                 "Battle loss compensation for " + unit.getName());
-                    campaign.addReport(value.toAmountAndSymbolString() +
-                                             " in battle loss compensation for " +
-                                             unit.getName() +
-                                             " has been credited to your account.");
+                    campaign.addReport(FINANCES, value.toAmountAndSymbolString() +
+                                                       " in battle loss compensation for " +
+                                                       unit.getName() +
+                                                       " has been credited to your account.");
                 }
                 campaign.removeUnit(unit.getId());
             } else {
@@ -1754,7 +1756,7 @@ public class ResolveScenarioTracker {
                 if (!unit.isRepairable()) {
                     unit.setSalvage(true);
                 }
-                campaign.addReport(unit.getHyperlinkedName() + " has been recovered.");
+                campaign.addReport(TECHNICAL, unit.getHyperlinkedName() + " has been recovered.");
                 // check for BLC
                 Money newValue = unit.getValueOfAllMissingParts();
                 Money blcValue = newValue.minus(currentValue);
@@ -1779,10 +1781,10 @@ public class ResolveScenarioTracker {
                                 getCampaign().getLocalDate(),
                                 finalValue,
                                 blcString.substring(0, 1).toUpperCase() + blcString.substring(1));
-                    campaign.addReport(finalValue.toAmountAndSymbolString() +
-                                             " in " +
-                                             blcString +
-                                             " has been credited to your account.");
+                    campaign.addReport(FINANCES, finalValue.toAmountAndSymbolString() +
+                                                       " in " +
+                                                       blcString +
+                                                       " has been credited to your account.");
                 }
             }
         }

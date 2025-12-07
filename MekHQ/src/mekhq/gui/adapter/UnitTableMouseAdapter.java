@@ -38,6 +38,7 @@ import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 
@@ -670,7 +671,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
             for (Unit unit : units) {
                 if (!unit.requiresMaintenance()) {
-                    campaign.addReport(String.format(resources.getString("maintenanceAdHoc.noNeed"),
+                    campaign.addReport(TECHNICAL, String.format(resources.getString("maintenanceAdHoc.noNeed"),
                           unit.getHyperlinkedName()));
                     continue;
                 }
@@ -963,7 +964,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToPersonMenu(gui.getCampaign(), units));
-            
+
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToForceMenu(gui.getCampaign(), units));
 
             // if we're using maintenance and have selected something that requires

@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static java.util.Arrays.sort;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
@@ -385,7 +386,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     String report = factionStandings.updateClimateRegard(campaign.getFaction(),
                           campaign.getLocalDate(), campaignOptions.getRegardMultiplier(),
                           true);
-                    campaign.addReport(report);
+                    campaign.addReport(GENERAL, report);
                 }
                 // endregion Progress 6
 

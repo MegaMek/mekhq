@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.io;
 
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
@@ -548,7 +549,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                       spanOpeningWithCustomColor(getWarningColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle());
-                campaign.addReport(report);
+                campaign.addReport(GENERAL, report);
             }
 
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
@@ -556,7 +557,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
                 person.setSecondaryRole(PersonnelRole.NONE);
 
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "ineligibleForSecondaryRole",
+                campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "ineligibleForSecondaryRole",
                       spanOpeningWithCustomColor(getWarningColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle()));
@@ -565,7 +566,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             if (!person.canPerformRole(today, person.getPrimaryRole(), true)) {
                 person.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.DEPENDENT);
 
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "ineligibleForPrimaryRole",
+                campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "ineligibleForPrimaryRole",
                       spanOpeningWithCustomColor(getNegativeColor()),
                       CLOSING_SPAN_TAG,
                       person.getHyperlinkedFullTitle()));
@@ -616,7 +617,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
             List<String> reports = unit.checkForOverCrewing();
             for (String report : reports) {
-                campaign.addReport(report);
+                campaign.addReport(GENERAL, report);
             }
         });
 
@@ -1396,7 +1397,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                         int edgeCost = campaign.getCampaignOptions().getEdgeCost();
                         int rebate = edgeCost * difference;
                         person.awardXP(campaign, rebate);
-                        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE,
                               "CampaignXmlParser.compatibility.edge",
                               spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG,
                               person.getHyperlinkedFullTitle(), difference, rebate));
