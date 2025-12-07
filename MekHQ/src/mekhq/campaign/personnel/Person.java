@@ -5446,7 +5446,8 @@ public class Person {
     public int getCostToImprove(final String skillName, final boolean useReasoning) {
         final Skill skill = getSkill(skillName);
         final SkillType skillType = getType(skillName);
-        int cost = hasSkill(skillName) ? skill.getCostToImprove() : skillType.getCost(0);
+        boolean hasSkill = hasSkill(skillName);
+        int cost = hasSkill ? skill.getCostToImprove() : skillType.getCost(0);
 
         double multiplier = getReasoningXpCostMultiplier(useReasoning);
 
@@ -5469,7 +5470,7 @@ public class Person {
         }
 
         int adjustedCost = (int) round(cost * multiplier);
-        int xpProgress = skill.getXpProgress();
+        int xpProgress = hasSkill ? skill.getXpProgress() : 0;
         if (xpProgress > 0) {
             skill.setXpProgress(max(0, xpProgress - adjustedCost));
             adjustedCost = max(0, adjustedCost - xpProgress);
