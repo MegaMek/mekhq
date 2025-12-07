@@ -6494,7 +6494,9 @@ public class Campaign implements ITechManager {
         if (isBugReportPrep) {
             for (Unit unit : units.getUnits()) {
                 Entity entity = unit.getEntity();
-                customUnits.add(entity.getShortNameRaw());
+                if (entity != null) {
+                    customUnits.add(entity.getShortNameRaw());
+                }
             }
         } else {
             customUnits = new HashSet<>(customs);
