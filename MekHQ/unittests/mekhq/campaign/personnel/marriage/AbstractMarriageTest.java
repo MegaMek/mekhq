@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.marriage;
 
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -458,7 +459,7 @@ public class AbstractMarriageTest {
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         when(mockCampaign.getRankSystem()).thenReturn(mock(RankSystem.class));
-        doNothing().when(mockCampaign).addReport(any());
+        doNothing().when(mockCampaign).addReport(eq(PERSONNEL), any());
 
         final Person origin = new Person("Origin", "Origin", mockCampaign);
         origin.setJoinedCampaign(LocalDate.ofYearDay(3025, 1));
