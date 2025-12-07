@@ -6497,7 +6497,7 @@ public class Campaign implements ITechManager {
                 customUnits.add(entity.getShortNameRaw());
             }
         } else {
-            customUnits = new HashSet<String>(customUnits);
+            customUnits = new HashSet<>(customs);
         }
 
         for (String name : customUnits) {
