@@ -6482,8 +6482,7 @@ public class Campaign implements ITechManager {
      * <p>Units that cannot be located in the cache or that fail parsing are skipped, with errors logged. The
      * ordering of exported units depends on the underlying {@link Set} implementation.</p>
      *
-     * <p><b>Note:</b> When {@code isBugReportPrep} is {@code false}, this method replaces the custom set with an
-     * empty list structure rather than populating it, resulting in no output being written.</p>
+     * <p><b>Note:</b> When {@code isBugReportPrep} is {@code false}, this method replaces the custom set.</p>
      *
      * @param printWriter     the output writer used to emit formatted {@code <custom>} elements
      * @param isBugReportPrep whether campaign unit names should be collected for export; if {@code false}, no custom

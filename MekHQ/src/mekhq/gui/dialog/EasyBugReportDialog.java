@@ -39,8 +39,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -215,16 +213,13 @@ public class EasyBugReportDialog extends ImmersiveDialogCore {
         btnURL.setToolTipText(address);
         btnURL.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnURL.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnURL.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent evt) {
-                if (Desktop.isDesktopSupported()) {
-                    try {
-                        URI uri = new URI(address);
-                        Desktop.getDesktop().browse(uri);
-                    } catch (Exception ex) {
-                        LOGGER.error(ex, "Failed to open URL: {}", address);
-                    }
+        btnURL.addActionListener(e -> {
+            if (Desktop.isDesktopSupported()) {
+                try {
+                    URI uri = new URI(address);
+                    Desktop.getDesktop().browse(uri);
+                } catch (Exception ex) {
+                    LOGGER.error(ex, "Failed to open URL: {}", address);
                 }
             }
         });

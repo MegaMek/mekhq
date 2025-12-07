@@ -41,8 +41,6 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -214,16 +212,13 @@ public class MilestoneUpgradePathDialog {
         btnDiscord.setToolTipText(discordLink);
         btnDiscord.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnDiscord.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnDiscord.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent evt) {
-                if (Desktop.isDesktopSupported()) {
-                    try {
-                        URI uri = new URI(discordLink);
-                        Desktop.getDesktop().browse(uri);
-                    } catch (Exception ex) {
-                        LOGGER.error(ex, "Failed to open URL: {}", discordLink);
-                    }
+        btnDiscord.addActionListener(e -> {
+            if (Desktop.isDesktopSupported()) {
+                try {
+                    URI uri = new URI(discordLink);
+                    Desktop.getDesktop().browse(uri);
+                } catch (Exception ex) {
+                    LOGGER.error(ex, "Failed to open URL: {}", discordLink);
                 }
             }
         });
