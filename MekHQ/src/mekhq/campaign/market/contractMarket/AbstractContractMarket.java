@@ -59,6 +59,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -69,7 +70,6 @@ import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.utilities.ContractUtilities;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -411,15 +411,15 @@ public abstract class AbstractContractMarket {
 
     protected int getQualityRating(int roll) {
         if (roll <= 5) {
-            return IUnitRating.DRAGOON_F;
+            return DragoonRating.DRAGOON_F.getRating();
         } else if (roll <= 8) {
-            return IUnitRating.DRAGOON_D;
+            return DragoonRating.DRAGOON_D.getRating();
         } else if (roll <= 10) {
-            return IUnitRating.DRAGOON_C;
+            return DragoonRating.DRAGOON_C.getRating();
         } else if (roll == 11) {
-            return IUnitRating.DRAGOON_B;
+            return DragoonRating.DRAGOON_B.getRating();
         } else {
-            return IUnitRating.DRAGOON_A;
+            return DragoonRating.DRAGOON_A.getRating();
         }
     }
 

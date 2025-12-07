@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.universe.generators.battleMekQualityGenerators;
 
-import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.universe.enums.BattleMekQualityGenerationMethod;
 
 /**
@@ -48,12 +48,12 @@ public class WindchildBattleMekQualityGenerator extends AbstractBattleMekQuality
     @Override
     public int generate(final int roll) {
         return switch (roll) {
-            case 2, 3, 4 -> IUnitRating.DRAGOON_F;
-            case 5, 6 -> IUnitRating.DRAGOON_D;
-            case 7, 8 -> IUnitRating.DRAGOON_C;
-            case 9, 10 -> IUnitRating.DRAGOON_B;
-            case 11, 12 -> IUnitRating.DRAGOON_A;
-            default -> IUnitRating.DRAGOON_ASTAR;
+            case 2, 3, 4 -> DragoonRating.DRAGOON_F.getRating();
+            case 5, 6 -> DragoonRating.DRAGOON_D.getRating();
+            case 7, 8 -> DragoonRating.DRAGOON_C.getRating();
+            case 9, 10 -> DragoonRating.DRAGOON_B.getRating();
+            case 11, 12 -> DragoonRating.DRAGOON_A.getRating();
+            default -> DragoonRating.DRAGOON_ASTAR.getRating();
         };
     }
 }

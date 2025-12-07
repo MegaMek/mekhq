@@ -66,7 +66,9 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
@@ -78,8 +80,6 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.rating.CamOpsReputation.ReputationController;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -488,7 +488,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         if (contract.getContractType().isCadreDuty()) {
             contract.setAllySkill(campaign.getCampaignOptions().isUseBolsterContractSkill() ? REGULAR : GREEN);
-            contract.setAllyQuality(IUnitRating.DRAGOON_F);
+            contract.setAllyQuality(DragoonRating.DRAGOON_F.getRating());
         }
 
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
@@ -584,7 +584,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         if (contract.getContractType().isCadreDuty()) {
             contract.setAllySkill(campaign.getCampaignOptions().isUseBolsterContractSkill() ? REGULAR : GREEN);
-            contract.setAllyQuality(IUnitRating.DRAGOON_F);
+            contract.setAllyQuality(DragoonRating.DRAGOON_F.getRating());
         }
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
 
@@ -765,26 +765,13 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         // Reputation multiplier
-        if (campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
-            double reputationFactor = campaign.getReputation().getReputationFactor();
+        double reputationFactor = campaign.getReputation().getReputationFactor();
 
-            if (campaignOptions.isClampReputationPayMultiplier()) {
-                reputationFactor = clamp(reputationFactor, 0.5, 2.0);
-            }
-
-            multiplier *= reputationFactor;
-        } else {
-            int unitRatingMod = campaign.getAtBUnitRatingMod();
-            if (unitRatingMod >= IUnitRating.DRAGOON_A) {
-                multiplier *= 2.0;
-            } else if (unitRatingMod == IUnitRating.DRAGOON_B) {
-                multiplier *= 1.5;
-            } else if (unitRatingMod == IUnitRating.DRAGOON_D) {
-                multiplier *= 0.8;
-            } else if (unitRatingMod == IUnitRating.DRAGOON_F) {
-                multiplier *= 0.5;
-            }
+        if (campaignOptions.isClampReputationPayMultiplier()) {
+            reputationFactor = clamp(reputationFactor, 0.5, 2.0);
         }
+
+        multiplier *= reputationFactor;
 
         if (campaignOptions.isUseFactionStandingContractPaySafe()) {
             FactionStandings factionStandings = campaign.getFactionStandings();
@@ -929,15 +916,15 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         mods.mods[CLAUSE_SALVAGE] = adminLogisticsExp - SkillType.EXP_REGULAR;
         mods.mods[CLAUSE_TRANSPORT] = adminTransportExp - SkillType.EXP_REGULAR;
         mods.mods[CLAUSE_SUPPORT] = adminLogisticsExp - SkillType.EXP_REGULAR;
-        if (unitRatingMod >= IUnitRating.DRAGOON_A) {
+        if (unitRatingMod >= DragoonRating.DRAGOON_A.getRating()) {
             mods.mods[Compute.randomInt(4)] += 2;
             mods.mods[Compute.randomInt(4)] += 2;
-        } else if (unitRatingMod == IUnitRating.DRAGOON_B) {
+        } else if (unitRatingMod == DragoonRating.DRAGOON_B.getRating()) {
             mods.mods[Compute.randomInt(4)] += 1;
             mods.mods[Compute.randomInt(4)] += 1;
-        } else if (unitRatingMod == IUnitRating.DRAGOON_C) {
+        } else if (unitRatingMod == DragoonRating.DRAGOON_C.getRating()) {
             mods.mods[Compute.randomInt(4)] += 1;
-        } else if (unitRatingMod <= IUnitRating.DRAGOON_F) {
+        } else if (unitRatingMod <= DragoonRating.DRAGOON_F.getRating()) {
             mods.mods[Compute.randomInt(4)] -= 1;
         }
 

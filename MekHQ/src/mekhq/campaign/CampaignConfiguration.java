@@ -33,10 +33,13 @@
 
 package mekhq.campaign;
 
+import java.time.LocalDate;
+
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.common.Player;
 import megamek.common.game.Game;
 import megamek.common.options.GameOptions;
+import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Finances;
@@ -54,20 +57,17 @@ import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.RandomEventLibraries;
-import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumsLibrary;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
-import java.time.LocalDate;
 
 /**
- * A class for containing and passing Campaign configuration information.
- * This is implemented as a Class rather than as a Record because we need the ability
- * to mutate any given field for testing purposes; the "Wither" functionality from JEP 468
- * would allow us to do this easily with Records but is not yet supported.
+ * A class for containing and passing Campaign configuration information. This is implemented as a Class rather than as
+ * a Record because we need the ability to mutate any given field for testing purposes; the "Wither" functionality from
+ * JEP 468 would allow us to do this easily with Records but is not yet supported.
  */
 public class CampaignConfiguration {
 
@@ -123,31 +123,31 @@ public class CampaignConfiguration {
     }
 
     /**
-     * Partial CampaignConfiguration constructor; takes _some_ information needed to instantiate a Campaign.
-     * Meant for use by CampaignFactory and test methods.
+     * Partial CampaignConfiguration constructor; takes _some_ information needed to instantiate a Campaign. Meant for
+     * use by CampaignFactory and test methods.
      *
-     * @param name Campaign name String
-     * @param date LocalDate start date
-     * @param campaignOpts CampaignOptions instance
-     * @param faction Faction instance
-     * @param techFaction Faction enum value describing tech base
-     * @param currencyManager Default
-     * @param reputationController  Default
-     * @param factionStandings Default
-     * @param rankSystem Default Rank System
-     * @param force List of player's TOE forces
-     * @param finances Default
-     * @param randomEvents Default RandomEventsLibraries
-     * @param ultimatums Default
-     * @param retDefTracker RetirementDefectionTracker instance
-     * @param autosave Autosave service instance
-     * @param behaviorSettings Default behavior settings
-     * @param persMarket Personnel Market (deprecated; replace with new market after refactoring)
+     * @param name                     Campaign name String
+     * @param date                     LocalDate start date
+     * @param campaignOpts             CampaignOptions instance
+     * @param faction                  Faction instance
+     * @param techFaction              Faction enum value describing tech base
+     * @param currencyManager          Default
+     * @param reputationController     Default
+     * @param factionStandings         Default
+     * @param rankSystem               Default Rank System
+     * @param force                    List of player's TOE forces
+     * @param finances                 Default
+     * @param randomEvents             Default RandomEventsLibraries
+     * @param ultimatums               Default
+     * @param retDefTracker            RetirementDefectionTracker instance
+     * @param autosave                 Autosave service instance
+     * @param behaviorSettings         Default behavior settings
+     * @param persMarket               Personnel Market (deprecated; replace with new market after refactoring)
      * @param atbMonthlyContractMarket Contract Market
-     * @param unitMarket Unit Market
-     * @param divorce AbstractDivorce instance, defaults to Disabled
-     * @param marriage AbstractMarriage instance, defaults to Disabled
-     * @param procreation AbstractProcreation instance, defaults to Disabled
+     * @param unitMarket               Unit Market
+     * @param divorce                  AbstractDivorce instance, defaults to Disabled
+     * @param marriage                 AbstractMarriage instance, defaults to Disabled
+     * @param procreation              AbstractProcreation instance, defaults to Disabled
      */
     public CampaignConfiguration(
           String name,
@@ -198,40 +198,42 @@ public class CampaignConfiguration {
     }
 
     /**
-     * Primary CampaignConfiguration constructor; takes all information needed to instantiate a Campaign.
-     * Meant for use by CampaignFactory methods.
+     * Primary CampaignConfiguration constructor; takes all information needed to instantiate a Campaign. Meant for use
+     * by CampaignFactory methods.
      *
-     * @param game Game instance
-     * @param player Player instance
-     * @param name Campaign name String
-     * @param date LocalDate start date
-     * @param campaignOpts CampaignOptions instance
-     * @param gameOptions GameOptions instance, for MegaMek
-     * @param partsStore PartsStore instance (Campaign or user must initialize with campaign reference!)
-     * @param newPersonnelMarket NewPersonnelMarket instance (Campaign or user must initialize with campaign reference!)
-     * @param randomDeath RandomDeath instance (Campaign or user must initialize with campaign reference!)
-     * @param campaignSummary CampaignSummary instance (Campaign or user must initialize with campaign reference!)
-     * @param faction Faction instance
-     * @param techFaction Faction enum value describing tech base
-     * @param currencyManager Default
-     * @param systemsInstance Instance of Systems, for hooking into Systems lookups.
-     * @param startLocation Location of starting planetary system.
-     * @param reputationController  Default
-     * @param factionStandings Default
-     * @param rankSystem Default Rank System
-     * @param force List of player's TOE forces
-     * @param finances Default
-     * @param randomEvents Default RandomEventsLibraries
-     * @param ultimatums Default
-     * @param retDefTracker RetirementDefectionTracker instance
-     * @param autosave Autosave service instance
-     * @param behaviorSettings Default behavior settings
-     * @param persMarket Personnel Market (deprecated; replace with new market after refactoring)
+     * @param game                     Game instance
+     * @param player                   Player instance
+     * @param name                     Campaign name String
+     * @param date                     LocalDate start date
+     * @param campaignOpts             CampaignOptions instance
+     * @param gameOptions              GameOptions instance, for MegaMek
+     * @param partsStore               PartsStore instance (Campaign or user must initialize with campaign reference!)
+     * @param newPersonnelMarket       NewPersonnelMarket instance (Campaign or user must initialize with campaign
+     *                                 reference!)
+     * @param randomDeath              RandomDeath instance (Campaign or user must initialize with campaign reference!)
+     * @param campaignSummary          CampaignSummary instance (Campaign or user must initialize with campaign
+     *                                 reference!)
+     * @param faction                  Faction instance
+     * @param techFaction              Faction enum value describing tech base
+     * @param currencyManager          Default
+     * @param systemsInstance          Instance of Systems, for hooking into Systems lookups.
+     * @param startLocation            Location of starting planetary system.
+     * @param reputationController     Default
+     * @param factionStandings         Default
+     * @param rankSystem               Default Rank System
+     * @param force                    List of player's TOE forces
+     * @param finances                 Default
+     * @param randomEvents             Default RandomEventsLibraries
+     * @param ultimatums               Default
+     * @param retDefTracker            RetirementDefectionTracker instance
+     * @param autosave                 Autosave service instance
+     * @param behaviorSettings         Default behavior settings
+     * @param persMarket               Personnel Market (deprecated; replace with new market after refactoring)
      * @param atbMonthlyContractMarket Contract Market
-     * @param unitMarket Unit Market
-     * @param divorce AbstractDivorce instance, defaults to Disabled
-     * @param marriage AbstractMarriage instance, defaults to Disabled
-     * @param procreation AbstractProcreation instance, defaults to Disabled
+     * @param unitMarket               Unit Market
+     * @param divorce                  AbstractDivorce instance, defaults to Disabled
+     * @param marriage                 AbstractMarriage instance, defaults to Disabled
+     * @param procreation              AbstractProcreation instance, defaults to Disabled
      */
     public CampaignConfiguration(
           Game game,

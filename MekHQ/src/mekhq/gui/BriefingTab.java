@@ -628,12 +628,10 @@ public final class BriefingTab extends CampaignGuiTab {
             scenario.setStatus(DRAW);
         }
 
-        if (getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-            if (mission instanceof AtBContract contract) {
-                if (contract.getEmployerCode().equals(PIRATE_FACTION_CODE)) {
-                    // CamOps 'other crimes' value
-                    getCampaign().changeCrimePirateModifier(10);
-                }
+        if (mission instanceof AtBContract contract) {
+            if (contract.getEmployerCode().equals(PIRATE_FACTION_CODE)) {
+                // CamOps 'other crimes' value
+                getCampaign().changeCrimePirateModifier(10);
             }
         }
 

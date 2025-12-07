@@ -124,10 +124,13 @@ import mekhq.Utilities;
 import mekhq.campaign.Quartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
+import mekhq.campaign.camOpsReputation.IUnitRating;
+import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.events.*;
 import mekhq.campaign.events.loans.LoanNewEvent;
 import mekhq.campaign.events.loans.LoanPaidEvent;
@@ -219,10 +222,6 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.RandomEventLibraries;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
-import mekhq.campaign.rating.CamOpsReputation.ReputationController;
-import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
-import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.stratCon.StratConContractInitializer;
 import mekhq.campaign.stratCon.StratConRulesManager;
@@ -424,6 +423,7 @@ public class Campaign implements ITechManager {
     private String shipSearchResult; // AtB
     private LocalDate shipSearchExpiration; // AtB
     private IUnitGenerator unitGenerator; // deprecated
+    @Deprecated(since = "0.50.10", forRemoval = true)
     private IUnitRating unitRating; // deprecated
     private ReputationController reputation;
     private int crimeRating;
@@ -2875,9 +2875,7 @@ public class Campaign implements ITechManager {
                 }
             }
             // Higher-rated units are more likely to have Blood named
-            if (getCampaignOptions().getUnitRatingMethod().isEnabled()) {
-                bloodnameTarget += IUnitRating.DRAGOON_C - getAtBUnitRatingMod();
-            }
+            bloodnameTarget += DragoonRating.DRAGOON_C.getRating() - getAtBUnitRatingMod();
 
             // Reavings diminish the number of available Blood rights in later eras
             int year = getGameYear();
@@ -7957,40 +7955,21 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns the text representation of the unit rating based on the selected unit rating method. If the unit rating
-     * method is FMMR, the unit rating value is returned. If the unit rating method is Campaign Operations, the
-     * reputation rating and unit rating modification are combined and returned. If the unit rating method is neither
-     * FMMR nor Campaign Operations, "N/A" is returned.
+     * Returns the text representation of the unit rating based on the selected unit rating method.
      *
      * @return The text representation of the unit rating
      */
     public String getUnitRatingText() {
-        UnitRatingMethod unitRatingMethod = campaignOptions.getUnitRatingMethod();
-
-        if (unitRatingMethod.isFMMR()) {
-            return getUnitRating().getUnitRating();
-        } else if (unitRatingMethod.isCampaignOperations()) {
-            return String.valueOf(reputation.getReputationRating());
-        } else {
-            return "N/A";
-        }
+        return String.valueOf(reputation.getReputationRating());
     }
 
     /**
-     * Retrieves the unit rating modifier based on campaign options. If the unit rating method is not enabled, it
-     * returns the default value of IUnitRating.DRAGOON_C. If the unit rating method uses FMMR, it returns the unit
-     * rating as an integer. Otherwise, it calculates the modifier using the getAtBModifier method.
+     * Retrieves the unit rating modifier based on campaign options.
      *
      * @return The unit rating modifier based on the campaign options.
      */
     public int getAtBUnitRatingMod() {
-        if (!getCampaignOptions().getUnitRatingMethod().isEnabled()) {
-            return IUnitRating.DRAGOON_C;
-        }
-
-        return getCampaignOptions().getUnitRatingMethod().isFMMR() ?
-                     getUnitRating().getUnitRatingAsInteger() :
-                     reputation.getAtbModifier();
+        return reputation.getAtbModifier();
     }
 
     /**
@@ -9090,20 +9069,8 @@ public class Campaign implements ITechManager {
      * Returns the type of rating method as selected in the Campaign Options dialog. Lazy-loaded for performance.
      * Default is CampaignOpsReputation
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public IUnitRating getUnitRating() {
-        // if we switched unit rating methods,
-        if (unitRating != null && (unitRating.getUnitRatingMethod() != getCampaignOptions().getUnitRatingMethod())) {
-            unitRating = null;
-        }
-
-        if (unitRating == null) {
-            UnitRatingMethod method = getCampaignOptions().getUnitRatingMethod();
-
-            if (UnitRatingMethod.FLD_MAN_MERCS_REV.equals(method)) {
-                unitRating = new FieldManualMercRevDragoonsRating(this);
-            }
-        }
-
         return unitRating;
     }
 

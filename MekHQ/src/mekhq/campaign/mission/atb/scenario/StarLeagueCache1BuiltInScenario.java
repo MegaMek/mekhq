@@ -45,6 +45,7 @@ import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
@@ -53,7 +54,6 @@ import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 
@@ -150,7 +150,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
                              UnitType.MEK,
                              AtBStaticWeightGenerator.getRandomWeight(campaign, UnitType.MEK, faction),
                              2750,
-                             (roll == 6) ? IUnitRating.DRAGOON_A : IUnitRating.DRAGOON_D);
+                             (roll == 6) ? DragoonRating.DRAGOON_A.getRating() : DragoonRating.DRAGOON_D.getRating());
         }
         Entity en = (ms == null) ?
                           null :

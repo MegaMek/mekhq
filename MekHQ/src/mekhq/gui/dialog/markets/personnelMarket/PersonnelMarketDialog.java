@@ -668,7 +668,7 @@ public class PersonnelMarketDialog extends JDialog {
         String color;
         String closingBrace = CLOSING_SPAN_TAG;
 
-        if (noAvailabilityMessage.isBlank() && campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
+        if (noAvailabilityMessage.isBlank()) {
             if (campaign.getReputation().getReputationRating() < market.getUnitReputationRecruitmentCutoff()) {
                 color = MekHQ.getMHQOptions().getFontColorWarningHexColor();
 

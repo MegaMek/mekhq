@@ -672,7 +672,7 @@ public class PrisonerEventManager {
         boolean crimeNoticed = crimeNoticeRoll < victims;
 
         int penalty = min(MAX_CRIME_PENALTY, victims * 2);
-        if (crimeNoticed && campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
+        if (crimeNoticed) {
             campaign.changeCrimeRating(-penalty);
             campaign.setDateOfLastCrime(campaign.getLocalDate());
         }
