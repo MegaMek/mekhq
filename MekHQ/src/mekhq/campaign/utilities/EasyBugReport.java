@@ -149,7 +149,11 @@ public class EasyBugReport {
 
         LOGGER.info("Bug report campaign temporary save target: {}", campaignFile.getName());
         // Save campaign with bug report prep flag enabled
-        saveCampaign(frame, campaign, campaignFile, true);
+        boolean saveSuccess = saveCampaign(frame, campaign, campaignFile, true);
+        if (!saveSuccess) {
+            LOGGER.error("Failed to save campaign for bug report");
+            return;
+        }
 
         // Now package campaign + logs into the user-chosen archive
         try {
