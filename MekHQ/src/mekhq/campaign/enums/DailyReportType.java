@@ -34,6 +34,8 @@ package mekhq.campaign.enums;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import megamek.common.annotations.Nullable;
+
 /**
  * Represents the various log categories available in the campaign interface.
  *
@@ -113,6 +115,16 @@ public enum DailyReportType {
 
     public int getTabIndex() {
         return tabIndex;
+    }
+
+    public static @Nullable DailyReportType getTypeFromIndex(int tabIndex) {
+        for (DailyReportType type : DailyReportType.values()) {
+            if (tabIndex == type.getTabIndex()) {
+                return type;
+            }
+        }
+
+        return null;
     }
 }
 

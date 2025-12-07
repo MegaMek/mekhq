@@ -101,6 +101,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
 import mekhq.campaign.events.DayEndingEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
@@ -379,6 +380,10 @@ public class CampaignGUI extends JPanel {
             }
         });
 
+        CommandCenterTab commandCenter = getCommandCenterTab();
+        for (DailyReportType type : DailyReportType.values()) {
+            commandCenter.clearDailyReportNag(type.getTabIndex());
+        }
     }
 
     /**
@@ -2688,10 +2693,16 @@ public class CampaignGUI extends JPanel {
      * {@code logNagActive} flag.</p>
      *
      * <p>If no tab is currently selected, a warning is logged and no action is taken.</p>
+     *
+     * @param logType the category of daily report the UI should prompt the user to review
      */
-    public void checkDailyLogNag() {
+    public void checkDailyLogNag(DailyReportType logType) {
         // If we're already nagging, no need to nag again
-        if (logNagActive) {
+        boolean subTabNagActive = getCommandCenterTab().isLogNagActive(logType);
+        int relevantIndex = logType.getTabIndex();
+
+        // We're already nagging
+        if (logNagActive && subTabNagActive) {
             return;
         }
 
@@ -2701,18 +2712,34 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        // Already on the Command Center tab, no nag necessary
+        // If the player is already viewing the correct log tab, no nag needed
         final Component selectedTab = tabMain.getComponentAt(selectedIndex);
-        if (selectedTab instanceof CommandCenterTab) {
-            return;
+        if (selectedTab instanceof CommandCenterTab commandCenterTab) {
+            int logsSelected = commandCenterTab.getTabLogs().getSelectedIndex();
+
+            if (logsSelected == relevantIndex) {
+                return;
+            }
         }
 
         // Loop through the tabs until we find the Command Center tab, then color that tab's label.
         for (int i = 0; i < tabMain.getTabCount(); i++) {
             Component component = tabMain.getComponentAt(i);
-            if (component instanceof CommandCenterTab) {
-                tabMain.setBackgroundAt(i, UIUtil.uiDarkBlue());
-                logNagActive = true;
+
+            if (component instanceof CommandCenterTab commandCenterTab) {
+                // If the player is currently on the Command Center Tab, no need to nag that tab, though we're still
+                // going to nag the sub-tab
+                if (!(selectedTab instanceof CommandCenterTab)) {
+                    tabMain.setBackgroundAt(i, UIUtil.uiDarkBlue());
+                    logNagActive = true;
+                }
+
+                int logsSelected = commandCenterTab.getTabLogs().getSelectedIndex();
+                if (logsSelected != relevantIndex) {
+                    commandCenterTab.nagLogTab(relevantIndex);
+                    commandCenterTab.setLogNagActive(logType, true);
+                }
+
                 break;
             }
         }
