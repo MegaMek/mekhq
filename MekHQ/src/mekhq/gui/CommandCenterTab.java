@@ -35,6 +35,7 @@ package mekhq.gui;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
@@ -149,6 +150,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private DailyReportLogPanel pnlBattleLog;
     private DailyReportLogPanel pnlPersonnelLog;
     private DailyReportLogPanel pnlMedicalLog;
+    private DailyReportLogPanel pnlFinancesLog;
     private DailyReportLogPanel pnlAcquisitionsLog;
     private DailyReportLogPanel pnlTechnicalLog;
 
@@ -156,6 +158,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private boolean logNagActiveBattle = false;
     private boolean logNagActivePersonnel = false;
     private boolean logNagActiveMedical = false;
+    private boolean logNagActiveFinances = false;
     private boolean logNagActiveAcquisitions = false;
     private boolean logNagActiveTechnical = false;
     private boolean logNagActiveSkillChecks = false;
@@ -209,6 +212,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     public DailyReportLogPanel getMedicalLog() {
         return pnlMedicalLog;
+    }
+
+    public DailyReportLogPanel getFinancesLog() {
+        return pnlFinancesLog;
     }
 
     public DailyReportLogPanel getAcquisitionsLog() {
@@ -530,6 +537,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         pnlMedicalLog.setMinimumSize(size);
         pnlMedicalLog.setPreferredSize(size);
 
+        pnlFinancesLog = new DailyReportLogPanel(getCampaignGui());
+        pnlFinancesLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
+        pnlFinancesLog.setMinimumSize(size);
+        pnlFinancesLog.setPreferredSize(size);
+
         pnlAcquisitionsLog = new DailyReportLogPanel(getCampaignGui());
         pnlAcquisitionsLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
         pnlAcquisitionsLog.setMinimumSize(size);
@@ -550,6 +562,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         tabLogs.setToolTipTextAt(PERSONNEL.getTabIndex(), PERSONNEL.getTooltip());
         tabLogs.addTab(MEDICAL.getIconString(), pnlMedicalLog);
         tabLogs.setToolTipTextAt(MEDICAL.getTabIndex(), MEDICAL.getTooltip());
+        tabLogs.addTab(FINANCES.getIconString(), pnlFinancesLog);
+        tabLogs.setToolTipTextAt(FINANCES.getTabIndex(), FINANCES.getTooltip());
         tabLogs.addTab(ACQUISITIONS.getIconString(), pnlAcquisitionsLog);
         tabLogs.setToolTipTextAt(ACQUISITIONS.getTabIndex(), ACQUISITIONS.getTooltip());
         tabLogs.addTab(TECHNICAL.getIconString(), pnlTechnicalLog);
@@ -581,6 +595,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             case BATTLE -> logNagActiveBattle;
             case PERSONNEL -> logNagActivePersonnel;
             case MEDICAL -> logNagActiveMedical;
+            case FINANCES -> logNagActiveFinances;
             case ACQUISITIONS -> logNagActiveAcquisitions;
             case TECHNICAL -> logNagActiveTechnical;
             case SKILL_CHECKS -> logNagActiveSkillChecks;
@@ -593,6 +608,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             case BATTLE -> logNagActiveBattle = isActive;
             case PERSONNEL -> logNagActivePersonnel = isActive;
             case MEDICAL -> logNagActiveMedical = isActive;
+            case FINANCES -> logNagActiveFinances = isActive;
             case ACQUISITIONS -> logNagActiveAcquisitions = isActive;
             case TECHNICAL -> logNagActiveTechnical = isActive;
             case SKILL_CHECKS -> logNagActiveSkillChecks = isActive;
@@ -813,6 +829,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         refreshBattleLog();
         refreshPersonnelLog();
         refreshMedicalLog();
+        refreshFinancesLog();
         refreshAcquisitionsLog();
         refreshTechnicalLog();
     }
@@ -991,6 +1008,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
         pnlMedicalLog.refreshLog(medicalReport, MEDICAL);
         getCampaign().fetchAndClearNewMedicalReports();
 
+        String financesReport = getCampaign().getFinancesReportHTML();
+        pnlFinancesLog.refreshLog(financesReport, FINANCES);
+        getCampaign().fetchAndClearNewFinancesReports();
+
         String acquisitionsReport = getCampaign().getAcquisitionsReportHTML();
         pnlAcquisitionsLog.refreshLog(acquisitionsReport, ACQUISITIONS);
         getCampaign().fetchAndClearNewAcquisitionsReports();
@@ -1021,6 +1042,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     synchronized private void refreshMedicalLog() {
         pnlMedicalLog.appendLog(getCampaign().fetchAndClearNewMedicalReports(), MEDICAL);
+    }
+
+    synchronized private void refreshFinancesLog() {
+        pnlFinancesLog.appendLog(getCampaign().fetchAndClearNewFinancesReports(), FINANCES);
     }
 
     synchronized private void refreshAcquisitionsLog() {
@@ -1058,6 +1083,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         refreshBattleLog();
         refreshPersonnelLog();
         refreshMedicalLog();
+        refreshFinancesLog();
         refreshAcquisitionsLog();
         refreshTechnicalLog();
     }

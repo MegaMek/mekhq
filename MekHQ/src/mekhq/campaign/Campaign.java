@@ -353,6 +353,10 @@ public class Campaign implements ITechManager {
     private transient String technicalReportHTML;
     private transient List<String> newTechnicalReports;
 
+    private final ArrayList<String> financesReport;
+    private transient String financesReportHTML;
+    private transient List<String> newFinancesReports;
+
     private final ArrayList<String> acquisitionsReport;
     private transient String acquisitionsReportHTML;
     private transient List<String> newAcquisitionsReports;
@@ -623,6 +627,10 @@ public class Campaign implements ITechManager {
         technicalReport = new ArrayList<>();
         technicalReportHTML = "";
         newTechnicalReports = new ArrayList<>();
+
+        financesReport = new ArrayList<>();
+        financesReportHTML = "";
+        newFinancesReports = new ArrayList<>();
 
         acquisitionsReport = new ArrayList<>();
         acquisitionsReportHTML = "";
@@ -3339,6 +3347,32 @@ public class Campaign implements ITechManager {
         return oldTechnicalReports;
     }
 
+    public List<String> getFinancesReport() {
+        return financesReport;
+    }
+
+    public void setFinancesReportHTML(String html) {
+        financesReportHTML = html;
+    }
+
+    public String getFinancesReportHTML() {
+        return financesReportHTML;
+    }
+
+    public List<String> getNewFinancesReports() {
+        return newFinancesReports;
+    }
+
+    public void setNewFinancesReports(List<String> reports) {
+        newFinancesReports = reports;
+    }
+
+    public List<String> fetchAndClearNewFinancesReports() {
+        List<String> oldFinancesReports = newFinancesReports;
+        setNewFinancesReports(new ArrayList<>());
+        return oldFinancesReports;
+    }
+
     public List<String> getAcquisitionsReport() {
         return acquisitionsReport;
     }
@@ -6004,6 +6038,17 @@ public class Campaign implements ITechManager {
 
                 newTechnicalReports.add(report);
             }
+            case FINANCES -> {
+                financesReport.add(report);
+                if (!financesReportHTML.isEmpty()) {
+                    financesReportHTML = financesReportHTML + REPORT_LINEBREAK + report;
+                    newFinancesReports.add(REPORT_LINEBREAK);
+                } else {
+                    financesReportHTML = report;
+                }
+
+                newFinancesReports.add(report);
+            }
             case ACQUISITIONS -> {
                 acquisitionsReport.add(report);
                 if (!acquisitionsReportHTML.isEmpty()) {
@@ -6309,6 +6354,13 @@ public class Campaign implements ITechManager {
             writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "technicalReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "financesReport");
+        for (String report : financesReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "financesReport");
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "acquisitionsReport");
         for (String report : acquisitionsReport) {

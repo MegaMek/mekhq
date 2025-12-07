@@ -272,6 +272,10 @@ public class CampaignNewDayManager {
         campaign.setMedicalReportHTML("");
         campaign.getNewMedicalReports().clear();
 
+        campaign.getFinancesReport().clear();
+        campaign.setFinancesReportHTML("");
+        campaign.getNewFinancesReports().clear();
+
         campaign.getAcquisitionsReport().clear();
         campaign.setAcquisitionsReportHTML("");
         campaign.getNewAcquisitionsReports().clear();

@@ -956,6 +956,27 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                             campaign.getAcquisitionsReport().add(wn2.getTextContent());
                         }
                     }
+                } else if (nodeName.equalsIgnoreCase("financesReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getFinancesReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getFinancesReport().add(wn2.getTextContent());
+                        }
+                    }
                 } else if (nodeName.equalsIgnoreCase("technicalReport")) {
                     // First, get all the child nodes;
                     NodeList nl2 = childNode.getChildNodes();
@@ -1121,6 +1142,20 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             newMedicalReports.add(report);
         }
         campaign.setNewMedicalReports(newMedicalReports);
+
+        campaign.setFinancesReportHTML(Utilities.combineString(campaign.getFinancesReport(),
+              Campaign.REPORT_LINEBREAK));
+        List<String> newFinancesReports = new ArrayList<>(campaign.getFinancesReport().size() * 2);
+        boolean firstFinancesReport = true;
+        for (String report : campaign.getFinancesReport()) {
+            if (firstFinancesReport) {
+                firstFinancesReport = false;
+            } else {
+                newFinancesReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newFinancesReports.add(report);
+        }
+        campaign.setNewFinancesReports(newFinancesReports);
 
         campaign.setAcquisitionsReportHTML(Utilities.combineString(campaign.getAcquisitionsReport(),
               Campaign.REPORT_LINEBREAK));
