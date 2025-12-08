@@ -100,6 +100,7 @@ public record LifePath(
       Map<Integer, Map<String, Integer>> fixedXPSkills,
       Map<Integer, Map<SkillSubType, Integer>> fixedXPMetaSkills,
       Map<Integer, Map<String, Integer>> fixedXPNaturalAptitudes,
+      Map<Integer, Map<SkillSubType, Integer>> fixedXPNaturalAptitudesMetaSkills,
       Map<Integer, Map<String, Integer>> fixedXPAbilities,
       // Flexible XP
       Map<Integer, Map<SkillAttribute, Integer>> flexibleXPAttributes,
@@ -109,6 +110,7 @@ public record LifePath(
       Map<Integer, Map<String, Integer>> flexibleXPSkills,
       Map<Integer, Map<SkillSubType, Integer>> flexibleXPMetaSkills,
       Map<Integer, Map<String, Integer>> flexibleXPNaturalAptitudes,
+      Map<Integer, Map<SkillSubType, Integer>> flexibleXPNaturalAptitudesMetaSkills,
       Map<Integer, Map<String, Integer>> flexibleXPAbilities,
       Integer flexibleXPPickCount
 ) {
@@ -147,13 +149,23 @@ public record LifePath(
             //            }
 
             if (fixedXPNaturalAptitudes == null) { // Added in 50.11
-                LOGGER.warn("{} - {}: fixedXPNaturalAptitudes is null, setting to empty array", id, name);
+                LOGGER.warn("{} - {}: fixedXPNaturalAptitudes is null, setting to empty map", id, name);
                 fixedXPNaturalAptitudes = new HashMap<>();
             }
 
+            if (fixedXPNaturalAptitudesMetaSkills == null) { // Added in 50.11
+                LOGGER.warn("{} - {}: fixedXPNaturalAptitudesMetaSkills is null, setting to empty map", id, name);
+                fixedXPNaturalAptitudesMetaSkills = new HashMap<>();
+            }
+
             if (flexibleXPNaturalAptitudes == null) { // Added in 50.11
-                LOGGER.warn("{} - {}: flexibleXPNaturalAptitudes is null, setting to empty array", id, name);
+                LOGGER.warn("{} - {}: flexibleXPNaturalAptitudes is null, setting to empty map", id, name);
                 flexibleXPNaturalAptitudes = new HashMap<>();
+            }
+
+            if (flexibleXPNaturalAptitudesMetaSkills == null) { // Added in 50.11
+                LOGGER.warn("{} - {}: flexibleXPNaturalAptitudesMetaSkills is null, setting to empty map", id, name);
+                flexibleXPNaturalAptitudesMetaSkills = new HashMap<>();
             }
         }
 
@@ -308,6 +320,9 @@ public record LifePath(
         if (fixedXPNaturalAptitudes == null) {
             throw new IllegalArgumentException("fixedXPNaturalAptitudes cannot be null");
         }
+        if (fixedXPNaturalAptitudesMetaSkills == null) {
+            throw new IllegalArgumentException("fixedXPNaturalAptitudesMetaSkills cannot be null");
+        }
         if (fixedXPAbilities == null) {
             throw new IllegalArgumentException("fixedXPAbilities cannot be null");
         }
@@ -332,6 +347,9 @@ public record LifePath(
         }
         if (flexibleXPNaturalAptitudes == null) {
             throw new IllegalArgumentException("flexibleXPNaturalAptitudes cannot be null");
+        }
+        if (flexibleXPNaturalAptitudesMetaSkills == null) {
+            throw new IllegalArgumentException("flexibleXPNaturalAptitudesMetaSkills cannot be null");
         }
         if (flexibleXPAbilities == null) {
             throw new IllegalArgumentException("flexibleXPAbilities cannot be null");
@@ -413,6 +431,7 @@ public record LifePath(
               fixedXPSkills,
               fixedXPMetaSkills,
               fixedXPNaturalAptitudes,
+              fixedXPNaturalAptitudesMetaSkills,
               fixedXPAbilities,
               flexibleXPAttributes,
               flexibleXPEdge,
@@ -421,6 +440,7 @@ public record LifePath(
               flexibleXPSkills,
               flexibleXPMetaSkills,
               flexibleXPNaturalAptitudes,
+              flexibleXPNaturalAptitudesMetaSkills,
               flexibleXPAbilities,
               flexibleXPPickCount
         );

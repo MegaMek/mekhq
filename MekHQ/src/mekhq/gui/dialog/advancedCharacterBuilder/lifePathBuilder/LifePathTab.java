@@ -112,6 +112,7 @@ public class LifePathTab {
     private Map<Integer, Map<String, Integer>> storedSkills = new HashMap<>();
     private Map<Integer, Map<SkillSubType, Integer>> storedMetaSkills = new HashMap<>();
     private Map<Integer, Map<String, Integer>> storedNaturalAptitudes = new HashMap<>();
+    private Map<Integer, Map<SkillSubType, Integer>> storedNaturalAptitudesMetaSkills = new HashMap<>();
     private Map<Integer, Map<String, Integer>> storedAbilities = new HashMap<>();
 
     private final JLabel lblFlexibleXPPicks = new JLabel();
@@ -194,6 +195,15 @@ public class LifePathTab {
 
     public void setNaturalAptitudes(Map<Integer, Map<String, Integer>> storedNaturalAptitudes) {
         this.storedNaturalAptitudes = storedNaturalAptitudes;
+    }
+
+    public Map<Integer, Map<SkillSubType, Integer>> getNaturalAptitudesMetaSkills() {
+        return storedNaturalAptitudesMetaSkills;
+    }
+
+    public void setNaturalAptitudesMetaSkills(
+          Map<Integer, Map<SkillSubType, Integer>> storedNaturalAptitudesMetaSkills) {
+        this.storedNaturalAptitudesMetaSkills = storedNaturalAptitudesMetaSkills;
     }
 
     public Map<Integer, Map<SkillSubType, Integer>> getMetaSkills() {
@@ -474,6 +484,18 @@ public class LifePathTab {
         storedNaturalAptitudes.clear();
         storedNaturalAptitudes.putAll(tempNaturalAptitudes);
 
+        storedNaturalAptitudesMetaSkills.remove(selectedIndex);
+        Map<Integer, Map<SkillSubType, Integer>> tempNaturalAptitudeMetaSkills = new HashMap<>();
+        for (Map.Entry<Integer, Map<SkillSubType, Integer>> entry : storedNaturalAptitudesMetaSkills.entrySet()) {
+            if (entry.getKey() < selectedIndex) {
+                tempNaturalAptitudeMetaSkills.put(entry.getKey(), entry.getValue());
+            } else if (entry.getKey() > selectedIndex) {
+                tempNaturalAptitudeMetaSkills.put(entry.getKey() - 1, entry.getValue());
+            }
+        }
+        storedNaturalAptitudesMetaSkills.clear();
+        storedNaturalAptitudesMetaSkills.putAll(tempNaturalAptitudeMetaSkills);
+
         storedAbilities.remove(selectedIndex);
         Map<Integer, Map<String, Integer>> tempAbilities = new HashMap<>();
         for (Map.Entry<Integer, Map<String, Integer>> entry : storedAbilities.entrySet()) {
@@ -532,6 +554,10 @@ public class LifePathTab {
 
         Map<String, Integer> currentNaturalAptitudes = new HashMap<>(storedNaturalAptitudes.get(selectedIndex));
         storedNaturalAptitudes.put(newIndex, currentNaturalAptitudes);
+
+        Map<SkillSubType, Integer> currentNaturalAptitudeMetaSkills = new HashMap<>(storedNaturalAptitudesMetaSkills.get(
+              selectedIndex));
+        storedNaturalAptitudesMetaSkills.put(newIndex, currentMetaSkills);
 
         Map<String, Integer> currentAbilities = new HashMap<>(storedAbilities.get(selectedIndex));
         storedAbilities.put(newIndex, currentAbilities);
@@ -607,6 +633,17 @@ public class LifePathTab {
         );
         buttonsPanel.add(btnAddTrait);
 
+        storedNaturalAptitudes.put(index, new HashMap<>());
+        storedNaturalAptitudesMetaSkills.put(index, new HashMap<>());
+        String titleAddNaturalAptitude = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.button.addNaturalAptitude.label");
+        String tooltipAddNaturalAptitude = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog." + tabName + ".button.addNaturalAptitude.tooltip");
+        RoundedJButton btnAddNaturalAptitude = new RoundedJButton(titleAddNaturalAptitude);
+        btnAddNaturalAptitude.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddNaturalAptitude)
+        );
+
         // Skills
         storedSkills.put(index, new HashMap<>());
         storedMetaSkills.put(index, new HashMap<>());
@@ -620,16 +657,6 @@ public class LifePathTab {
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddSkill)
         );
         buttonsPanel.add(btnAddSkill);
-
-        storedNaturalAptitudes.put(index, new HashMap<>());
-        String titleAddNaturalAptitude = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.button.addNaturalAptitude.label");
-        String tooltipAddNaturalAptitude = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog." + tabName + ".button.addNaturalAptitude.tooltip");
-        RoundedJButton btnAddNaturalAptitude = new RoundedJButton(titleAddNaturalAptitude);
-        btnAddNaturalAptitude.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddNaturalAptitude)
-        );
 
         if (tabType == LifePathBuilderTabType.FIXED_XP || tabType == LifePathBuilderTabType.FLEXIBLE_XP) {
             buttonsPanel.add(btnAddNaturalAptitude);
@@ -753,9 +780,7 @@ public class LifePathTab {
             int currentIndex = tabLocal.getSelectedIndex();
 
             LifePathSkillPicker picker = new LifePathSkillPicker(storedSkills.get(currentIndex),
-                  storedMetaSkills.get(currentIndex),
-                  tabType,
-                  true);
+                  storedMetaSkills.get(currentIndex), tabType);
             storedSkills.put(currentIndex, picker.getSelectedSkillLevels());
             storedMetaSkills.put(currentIndex, picker.getSelectedMetaSkillLevels());
             standardizedActions(currentIndex, editorProgress);
@@ -768,10 +793,9 @@ public class LifePathTab {
             int currentIndex = tabLocal.getSelectedIndex();
 
             LifePathSkillPicker picker = new LifePathSkillPicker(storedNaturalAptitudes.get(currentIndex),
-                  null,
-                  tabType,
-                  false);
+                  storedNaturalAptitudesMetaSkills.get(currentIndex), tabType);
             storedNaturalAptitudes.put(currentIndex, picker.getSelectedSkillLevels());
+            storedNaturalAptitudesMetaSkills.put(currentIndex, picker.getSelectedMetaSkillLevels());
             standardizedActions(currentIndex, editorProgress);
 
             parent.setVisible(true);
@@ -1041,6 +1065,27 @@ public class LifePathTab {
             }
         }
 
+        Map<SkillSubType, Integer> workingNaturalAptitudesMetaSkills = storedNaturalAptitudesMetaSkills.get(index);
+        if (workingNaturalAptitudesMetaSkills != null && !workingNaturalAptitudesMetaSkills.isEmpty()) {
+            appendBreaker(individualProgressText);
+
+            int counter = 0;
+            int length = workingNaturalAptitudesMetaSkills.size();
+            for (Map.Entry<SkillSubType, Integer> entry : workingNaturalAptitudesMetaSkills.entrySet()) {
+                String label = entry.getKey().getDisplayName();
+                int value = entry.getValue();
+
+                individualProgressText.append(label);
+                individualProgressText.append(value >= 0 ? TEXT_LEAD_POSITIVE : TEXT_LEAD_NEGATIVE);
+                individualProgressText.append(entry.getValue());
+                individualProgressText.append(TEXT_TRAIL);
+                counter++;
+                if (counter != length) {
+                    individualProgressText.append(", ");
+                }
+            }
+        }
+
         // Skills
         Map<String, Integer> workingSkills = storedSkills.get(index);
         if (workingSkills != null && !workingSkills.isEmpty()) {
@@ -1152,8 +1197,9 @@ public class LifePathTab {
         storedFlexibleAttributes.clear();
         storedTraits.clear();
         storedSkills.clear();
-        storedNaturalAptitudes.clear();
         storedMetaSkills.clear();
+        storedNaturalAptitudes.clear();
+        storedNaturalAptitudesMetaSkills.clear();
         storedAbilities.clear();
         spnFlexibleXPPicks.setValue(0);
 

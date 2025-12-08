@@ -48,6 +48,7 @@ public class LifePathXPCostCalculator {
           Map<Integer, Map<String, Integer>> fixedSkills,
           Map<Integer, Map<SkillSubType, Integer>> fixedMetaSkills,
           Map<Integer, Map<String, Integer>> fixedNaturalAptitudes,
+          Map<Integer, Map<SkillSubType, Integer>> fixedNaturalAptitudesMetaSkills,
           Map<Integer, Map<String, Integer>> fixedAbilities,
           int flexibleTabCount,
           int flexiblePickCount,
@@ -58,19 +59,34 @@ public class LifePathXPCostCalculator {
           Map<Integer, Map<String, Integer>> flexibleSkills,
           Map<Integer, Map<SkillSubType, Integer>> flexibleMetaSkills,
           Map<Integer, Map<String, Integer>> flexibleNaturalAptitudes,
+          Map<Integer, Map<SkillSubType, Integer>> flexibleNaturalAptitudesMetaSkills,
           Map<Integer, Map<String, Integer>> flexibleAbilities) {
         // Basic Info
         int globalCost = -discount;
 
         // Fixed XP
-        globalCost += getCost(fixedAttributes, fixedFlexibleAttribute, fixedXPEdge, fixedTraits, fixedSkills,
-              fixedMetaSkills, fixedNaturalAptitudes, fixedAbilities);
+        globalCost += getCost(fixedAttributes,
+              fixedFlexibleAttribute,
+              fixedXPEdge,
+              fixedTraits,
+              fixedSkills,
+              fixedMetaSkills,
+              fixedNaturalAptitudes,
+              fixedNaturalAptitudesMetaSkills,
+              fixedAbilities);
 
         // Flexible XP
         if (flexiblePickCount > 0) {
             int divisor = max(1, flexibleTabCount); // Prevents divide by zero errors
-            int baseCost = getCost(flexibleAttributes, flexibleFlexibleAttribute, flexibleXPEdge, flexibleTraits,
-                  flexibleSkills, flexibleMetaSkills, flexibleNaturalAptitudes, flexibleAbilities);
+            int baseCost = getCost(flexibleAttributes,
+                  flexibleFlexibleAttribute,
+                  flexibleXPEdge,
+                  flexibleTraits,
+                  flexibleSkills,
+                  flexibleMetaSkills,
+                  flexibleNaturalAptitudes,
+                  flexibleNaturalAptitudesMetaSkills,
+                  flexibleAbilities);
             double costPerTab = ((double) baseCost) / divisor;
             globalCost += (int) Math.round(costPerTab * flexiblePickCount);
         }
@@ -83,6 +99,7 @@ public class LifePathXPCostCalculator {
           Map<Integer, Integer> flexibleAttribute, Map<Integer, Integer> edge,
           Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> traits, Map<Integer, Map<String, Integer>> skills,
           Map<Integer, Map<SkillSubType, Integer>> metaSkills, Map<Integer, Map<String, Integer>> naturalAptitudes,
+          Map<Integer, Map<SkillSubType, Integer>> naturalAptitudesMetaSkills,
           Map<Integer, Map<String, Integer>> abilities) {
         int cost = 0;
 
@@ -131,6 +148,13 @@ public class LifePathXPCostCalculator {
         for (Map.Entry<Integer, Map<String, Integer>> entry : naturalAptitudes.entrySet()) {
             Map<String, Integer> storage = entry.getValue();
             for (Map.Entry<String, Integer> skillEntry : storage.entrySet()) {
+                cost += skillEntry.getValue();
+            }
+        }
+
+        for (Map.Entry<Integer, Map<SkillSubType, Integer>> entry : naturalAptitudesMetaSkills.entrySet()) {
+            Map<SkillSubType, Integer> storage = entry.getValue();
+            for (Map.Entry<SkillSubType, Integer> skillEntry : storage.entrySet()) {
                 cost += skillEntry.getValue();
             }
         }

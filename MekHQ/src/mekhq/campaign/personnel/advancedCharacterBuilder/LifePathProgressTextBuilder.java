@@ -39,13 +39,13 @@ import java.util.List;
 import java.util.Set;
 
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTab;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTabBasicInformation;
 
 public class LifePathProgressTextBuilder {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathBuilderDialog";
 
-    public static String getProgressText(
-          mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTabBasicInformation basicInfoTab,
-          LifePathTab requirementsTab, LifePathTab exclusionsTab, LifePathTab fixedXPTab, LifePathTab flexibleXPTab) {
+    public static String getProgressText(LifePathTabBasicInformation basicInfoTab, LifePathTab requirementsTab,
+          LifePathTab exclusionsTab, LifePathTab fixedXPTab, LifePathTab flexibleXPTab) {
         StringBuilder newProgressText = new StringBuilder();
 
         int calculatedCost = LifePathXPCostCalculator.calculateXPCost(basicInfoTab.getDiscount(),
@@ -56,6 +56,7 @@ public class LifePathProgressTextBuilder {
               fixedXPTab.getSkills(),
               fixedXPTab.getMetaSkills(),
               fixedXPTab.getNaturalAptitudes(),
+              fixedXPTab.getNaturalAptitudesMetaSkills(),
               fixedXPTab.getAbilities(),
               flexibleXPTab.getTabCount(),
               flexibleXPTab.getPickCount(),
@@ -66,6 +67,7 @@ public class LifePathProgressTextBuilder {
               flexibleXPTab.getSkills(),
               flexibleXPTab.getMetaSkills(),
               flexibleXPTab.getNaturalAptitudes(),
+              flexibleXPTab.getNaturalAptitudesMetaSkills(),
               flexibleXPTab.getAbilities());
 
         String newBasicText = getNewBasicText(basicInfoTab, calculatedCost);

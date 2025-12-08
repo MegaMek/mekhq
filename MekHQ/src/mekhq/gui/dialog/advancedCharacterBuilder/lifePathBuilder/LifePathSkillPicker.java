@@ -99,8 +99,7 @@ class LifePathSkillPicker extends JDialog {
     }
 
     LifePathSkillPicker(@Nullable Map<String, Integer> selectedSkillLevels,
-          @Nullable Map<SkillSubType, Integer> selectedMetaSkillLevels, LifePathBuilderTabType tabType,
-          boolean includeMetaSkills) {
+          @Nullable Map<SkillSubType, Integer> selectedMetaSkillLevels, LifePathBuilderTabType tabType) {
         super();
 
         // Defensive copies to avoid external modification
@@ -117,7 +116,7 @@ class LifePathSkillPicker extends JDialog {
         setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.title"));
 
         JPanel pnlInstructions = initializeInstructionsPanel(tabType);
-        JPanel pnlOptions = buildOptionsPanel(tabType, includeMetaSkills);
+        JPanel pnlOptions = buildOptionsPanel(tabType);
         JPanel pnlControls = buildControlPanel();
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -183,7 +182,7 @@ class LifePathSkillPicker extends JDialog {
         return pnlControls;
     }
 
-    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType, boolean includeMetaSkills) {
+    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType) {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
@@ -277,8 +276,7 @@ class LifePathSkillPicker extends JDialog {
         }
 
         // Meta Skills
-        if (includeMetaSkills &&
-                  (tabType == LifePathBuilderTabType.FIXED_XP || tabType == LifePathBuilderTabType.FLEXIBLE_XP)) {
+        if (tabType == LifePathBuilderTabType.FIXED_XP || tabType == LifePathBuilderTabType.FLEXIBLE_XP) {
             FastJScrollPane pnlMetaSkills = getMetaSkillOptions(metaSkills, tabType);
             optionPane.addTab(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.meta.label"),
                   pnlMetaSkills);

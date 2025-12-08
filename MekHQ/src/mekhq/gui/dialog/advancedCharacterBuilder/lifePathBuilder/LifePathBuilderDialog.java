@@ -614,6 +614,7 @@ public class LifePathBuilderDialog extends JDialog {
             fixedXPTab.setSkills(record.fixedXPSkills());
             fixedXPTab.setMetaSkills(record.fixedXPMetaSkills());
             fixedXPTab.setNaturalAptitudes(record.fixedXPNaturalAptitudes());
+            fixedXPTab.setNaturalAptitudesMetaSkills(record.fixedXPNaturalAptitudesMetaSkills());
             fixedXPTab.setAbilities(record.fixedXPAbilities());
         }
 
@@ -641,6 +642,7 @@ public class LifePathBuilderDialog extends JDialog {
             flexibleXPTab.setSkills(record.flexibleXPSkills());
             flexibleXPTab.setMetaSkills(record.flexibleXPMetaSkills());
             flexibleXPTab.setNaturalAptitudes(record.flexibleXPNaturalAptitudes());
+            flexibleXPTab.setNaturalAptitudesMetaSkills(record.flexibleXPNaturalAptitudesMetaSkills());
             flexibleXPTab.setAbilities(record.flexibleXPAbilities());
         }
 
@@ -739,6 +741,7 @@ public class LifePathBuilderDialog extends JDialog {
         Map<Integer, Map<String, Integer>> fixedXPSkills = fixedXPTab.getSkills();
         Map<Integer, Map<SkillSubType, Integer>> fixedXPMetaSkills = fixedXPTab.getMetaSkills();
         Map<Integer, Map<String, Integer>> fixedXPNaturalAptitudes = fixedXPTab.getNaturalAptitudes();
+        Map<Integer, Map<SkillSubType, Integer>> fixedXPNaturalAptitudesMetaSkills = fixedXPTab.getNaturalAptitudesMetaSkills();
         Map<Integer, Map<String, Integer>> fixedXPAbilities = fixedXPTab.getAbilities();
 
         // Flexible XP
@@ -749,6 +752,7 @@ public class LifePathBuilderDialog extends JDialog {
         Map<Integer, Map<String, Integer>> flexibleXPSkills = flexibleXPTab.getSkills();
         Map<Integer, Map<SkillSubType, Integer>> flexibleXPMetaSkills = flexibleXPTab.getMetaSkills();
         Map<Integer, Map<String, Integer>> flexibleXPNaturalAptitudes = flexibleXPTab.getNaturalAptitudes();
+        Map<Integer, Map<SkillSubType, Integer>> flexibleXPNaturalAptitudesMetaSkills = flexibleXPTab.getNaturalAptitudesMetaSkills();
         Map<Integer, Map<String, Integer>> flexibleXPAbilities = flexibleXPTab.getAbilities();
         int flexibleXPPickCount = flexibleXPTab.getPickCount();
 
@@ -763,6 +767,7 @@ public class LifePathBuilderDialog extends JDialog {
               fixedXPSkills,
               fixedXPMetaSkills,
               fixedXPNaturalAptitudes,
+              fixedXPNaturalAptitudesMetaSkills,
               fixedXPAbilities,
               flexibleXPTab.getTabCount(),
               flexibleXPPickCount,
@@ -773,6 +778,7 @@ public class LifePathBuilderDialog extends JDialog {
               flexibleXPSkills,
               flexibleXPMetaSkills,
               flexibleXPNaturalAptitudes,
+              flexibleXPNaturalAptitudesMetaSkills,
               flexibleXPAbilities);
 
         // Validation
@@ -844,6 +850,7 @@ public class LifePathBuilderDialog extends JDialog {
               fixedXPSkills,
               fixedXPMetaSkills,
               fixedXPNaturalAptitudes,
+              fixedXPNaturalAptitudesMetaSkills,
               fixedXPAbilities,
               flexibleXPAttributes,
               flexibleXPEdge,
@@ -852,6 +859,7 @@ public class LifePathBuilderDialog extends JDialog {
               flexibleXPSkills,
               flexibleXPMetaSkills,
               flexibleXPNaturalAptitudes,
+              flexibleXPNaturalAptitudesMetaSkills,
               flexibleXPAbilities,
               flexibleXPPickCount);
     }
