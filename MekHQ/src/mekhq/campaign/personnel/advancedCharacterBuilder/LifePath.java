@@ -51,6 +51,9 @@ import mekhq.campaign.personnel.skills.enums.SkillSubType;
  * @since 0.50.07
  */
 public record LifePath(
+      // When adding new params, make sure to also add a corresponding state check to the section commented 'Data
+      // Validation Checks'
+
       // Dynamic
       UUID id,
       Version version,
@@ -96,6 +99,7 @@ public record LifePath(
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> fixedXPTraits,
       Map<Integer, Map<String, Integer>> fixedXPSkills,
       Map<Integer, Map<SkillSubType, Integer>> fixedXPMetaSkills,
+      Map<Integer, Map<String, Integer>> fixedXPNaturalAptitudes,
       Map<Integer, Map<String, Integer>> fixedXPAbilities,
       // Flexible XP
       Map<Integer, Map<SkillAttribute, Integer>> flexibleXPAttributes,
@@ -104,8 +108,9 @@ public record LifePath(
       Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> flexibleXPTraits,
       Map<Integer, Map<String, Integer>> flexibleXPSkills,
       Map<Integer, Map<SkillSubType, Integer>> flexibleXPMetaSkills,
+      Map<Integer, Map<String, Integer>> flexibleXPNaturalAptitudes,
       Map<Integer, Map<String, Integer>> flexibleXPAbilities,
-      int flexibleXPPickCount
+      Integer flexibleXPPickCount
 ) {
     static MMLogger LOGGER = MMLogger.create(LifePath.class);
 
@@ -135,74 +140,33 @@ public record LifePath(
             // class is changed. We only need to keep compatibility handlers until the next Milestone release, at
             // which point they can be removed.
 
-            if (minimumYear == null) { // Added in 50.07
-                LOGGER.warn("{} - {}: Minimum year is null, setting to 0", id, name);
-                minimumYear = 0;
+            // Example
+            //            if (minimumYear == null) { // Added in 50.07
+            //                LOGGER.warn("{} - {}: minimumYear is null, setting to 0", id, name);
+            //                minimumYear = 0;
+            //            }
+
+            if (fixedXPNaturalAptitudes == null) { // Added in 50.11
+                LOGGER.warn("{} - {}: fixedXPNaturalAptitudes is null, setting to empty array", id, name);
+                fixedXPNaturalAptitudes = new HashMap<>();
             }
 
-            if (maximumYear == null) { // Added in 50.07
-                LOGGER.warn("{} - {}: Maximum year is null, setting to 9999", id, name);
-                maximumYear = 9999;
-            }
-
-            if (isPlayerRestricted == null) { // Added in 50.07
-                LOGGER.warn("{} - {}: Player restriction check is null, setting to false", id, name);
-                isPlayerRestricted = false;
-            }
-
-            if (randomWeight == null) { // Added in 50.07
-                LOGGER.warn("{} - {}: Random weight is null, setting to 1.0", id, name);
-                randomWeight = 1.0;
-            }
-
-            if (requirementsEdge == null) { // Added in 50.07
-                LOGGER.warn("{} - {}: requirementsEdge is null, assigning empty map", id, name);
-                requirementsEdge = new HashMap<>();
-            }
-
-            if (exclusionsEdge == null) { // Added in 50.07
-                LOGGER.warn("{} - {}: exclusionsEdge is null, assigning empty map", id, name);
-                exclusionsEdge = new HashMap<>();
-            }
-
-            if (requirementsFlexibleAttribute == null) { // Added in 50.07
-                LOGGER.warn("{} - {}: requirementsFlexibleAttribute is null, assigning empty map", id, name);
-                requirementsFlexibleAttribute = new HashMap<>();
-            }
-
-            if (exclusionsFlexibleAttribute == null) { // Added in 50.07
-                LOGGER.warn("{} - {}: exclusionsFlexibleAttribute is null, assigning empty map", id, name);
-                exclusionsFlexibleAttribute = new HashMap<>();
-            }
-
-            if (fixedXPEdge == null) { // Added in 50.07
-                LOGGER.warn("{} - {}: fixedXPEdge is null, assigning empty map", id, name);
-                fixedXPEdge = new HashMap<>();
-            }
-
-            if (flexibleXPEdge == null) { // Added in 50.07
-                LOGGER.warn("{} - {}: flexibleXPEdge is null, assigning empty map", id, name);
-                flexibleXPEdge = new HashMap<>();
-            }
-
-            if (fixedXPFlexibleAttribute == null) { // Added in 50.07
-                LOGGER.warn("{} - {}: fixedXPFlexibleAttribute is null, assigning empty map", id, name);
-                fixedXPFlexibleAttribute = new HashMap<>();
-            }
-
-            if (flexibleXPFlexibleAttribute == null) { // Added in 50.07
-                LOGGER.warn("{} - {}: flexibleXPFlexibleAttribute is null, assigning empty map", id, name);
-                flexibleXPFlexibleAttribute = new HashMap<>();
+            if (flexibleXPNaturalAptitudes == null) { // Added in 50.11
+                LOGGER.warn("{} - {}: flexibleXPNaturalAptitudes is null, setting to empty array", id, name);
+                flexibleXPNaturalAptitudes = new HashMap<>();
             }
         }
 
         // Data Validation Checks
+
+        // Dynamic
         if (xpCost == null) {
             throw new IllegalArgumentException("xpCost cannot be null");
         }
         if (xpCost < 0) {
             throw new IllegalArgumentException("xpCost must be a non-negative integer");
         }
+        // Basic Info
         if (source == null) {
             throw new IllegalArgumentException("source cannot be null");
         }
@@ -260,6 +224,7 @@ public record LifePath(
         if (isPlayerRestricted == null) {
             throw new IllegalArgumentException("isPlayerRestricted cannot be null");
         }
+        // Requirements
         if (requirementsFactions == null) {
             throw new IllegalArgumentException("requirementsFactions cannot be null");
         }
@@ -272,15 +237,25 @@ public record LifePath(
         if (requirementsAttributes == null) {
             throw new IllegalArgumentException("requirementsAttributes cannot be null");
         }
+        if (requirementsEdge == null) {
+            throw new IllegalArgumentException("requirementsEdge cannot be null");
+        }
+        if (requirementsFlexibleAttribute == null) {
+            throw new IllegalArgumentException("requirementsFlexibleAttribute cannot be null");
+        }
         if (requirementsTraits == null) {
             throw new IllegalArgumentException("requirementsTraits cannot be null");
         }
         if (requirementsSkills == null) {
             throw new IllegalArgumentException("requirementsSkills cannot be null");
         }
+        if (requirementsMetaSkills == null) {
+            throw new IllegalArgumentException("requirementsMetaSkills cannot be null");
+        }
         if (requirementsAbilities == null) {
             throw new IllegalArgumentException("requirementsAbilities cannot be null");
         }
+        // Exclusions
         if (exclusionsFactions == null) {
             throw new IllegalArgumentException("exclusionsFactions cannot be null");
         }
@@ -293,17 +268,33 @@ public record LifePath(
         if (exclusionsAttributes == null) {
             throw new IllegalArgumentException("exclusionsAttributes cannot be null");
         }
+        if (exclusionsEdge == null) {
+            throw new IllegalArgumentException("exclusionsEdge cannot be null");
+        }
+        if (exclusionsFlexibleAttribute == null) {
+            throw new IllegalArgumentException("exclusionsFlexibleAttribute cannot be null");
+        }
         if (exclusionsTraits == null) {
             throw new IllegalArgumentException("exclusionsTraits cannot be null");
         }
         if (exclusionsSkills == null) {
             throw new IllegalArgumentException("exclusionsSkills cannot be null");
         }
+        if (exclusionsMetaSkills == null) {
+            throw new IllegalArgumentException("exclusionsMetaSkills cannot be null");
+        }
         if (exclusionsAbilities == null) {
             throw new IllegalArgumentException("exclusionsAbilities cannot be null");
         }
+        // Fixed XP
         if (fixedXPAttributes == null) {
             throw new IllegalArgumentException("fixedXPAttributes cannot be null");
+        }
+        if (fixedXPEdge == null) {
+            throw new IllegalArgumentException("fixedXPEdge cannot be null");
+        }
+        if (fixedXPFlexibleAttribute == null) {
+            throw new IllegalArgumentException("fixedXPFlexibleAttribute cannot be null");
         }
         if (fixedXPTraits == null) {
             throw new IllegalArgumentException("fixedXPTraits cannot be null");
@@ -311,11 +302,24 @@ public record LifePath(
         if (fixedXPSkills == null) {
             throw new IllegalArgumentException("fixedXPSkills cannot be null");
         }
+        if (fixedXPMetaSkills == null) {
+            throw new IllegalArgumentException("fixedXPMetaSkills cannot be null");
+        }
+        if (fixedXPNaturalAptitudes == null) {
+            throw new IllegalArgumentException("fixedXPNaturalAptitudes cannot be null");
+        }
         if (fixedXPAbilities == null) {
             throw new IllegalArgumentException("fixedXPAbilities cannot be null");
         }
+        // Flexible XP
         if (flexibleXPAttributes == null) {
             throw new IllegalArgumentException("flexibleXPAttributes cannot be null");
+        }
+        if (flexibleXPEdge == null) {
+            throw new IllegalArgumentException("flexibleXPEdge cannot be null");
+        }
+        if (flexibleXPFlexibleAttribute == null) {
+            throw new IllegalArgumentException("flexibleXPFlexibleAttribute cannot be null");
         }
         if (flexibleXPTraits == null) {
             throw new IllegalArgumentException("flexibleXPTraits cannot be null");
@@ -323,8 +327,17 @@ public record LifePath(
         if (flexibleXPSkills == null) {
             throw new IllegalArgumentException("flexibleXPSkills cannot be null");
         }
+        if (flexibleXPMetaSkills == null) {
+            throw new IllegalArgumentException("flexibleXPMetaSkills cannot be null");
+        }
+        if (flexibleXPNaturalAptitudes == null) {
+            throw new IllegalArgumentException("flexibleXPNaturalAptitudes cannot be null");
+        }
         if (flexibleXPAbilities == null) {
             throw new IllegalArgumentException("flexibleXPAbilities cannot be null");
+        }
+        if (flexibleXPPickCount == null) {
+            throw new IllegalArgumentException("flexibleXPPickCount cannot be null");
         }
         if (flexibleXPPickCount < 0) {
             throw new IllegalArgumentException("flexibleXPPickCount must be a non-negative integer");
@@ -399,6 +412,7 @@ public record LifePath(
               fixedXPTraits,
               fixedXPSkills,
               fixedXPMetaSkills,
+              fixedXPNaturalAptitudes,
               fixedXPAbilities,
               flexibleXPAttributes,
               flexibleXPEdge,
@@ -406,6 +420,7 @@ public record LifePath(
               flexibleXPTraits,
               flexibleXPSkills,
               flexibleXPMetaSkills,
+              flexibleXPNaturalAptitudes,
               flexibleXPAbilities,
               flexibleXPPickCount
         );

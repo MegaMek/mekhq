@@ -55,6 +55,7 @@ public class LifePathProgressTextBuilder {
               fixedXPTab.getTraits(),
               fixedXPTab.getSkills(),
               fixedXPTab.getMetaSkills(),
+              fixedXPTab.getNaturalAptitudes(),
               fixedXPTab.getAbilities(),
               flexibleXPTab.getTabCount(),
               flexibleXPTab.getPickCount(),
@@ -64,6 +65,7 @@ public class LifePathProgressTextBuilder {
               flexibleXPTab.getTraits(),
               flexibleXPTab.getSkills(),
               flexibleXPTab.getMetaSkills(),
+              flexibleXPTab.getNaturalAptitudes(),
               flexibleXPTab.getAbilities());
 
         String newBasicText = getNewBasicText(basicInfoTab, calculatedCost);

@@ -613,6 +613,7 @@ public class LifePathBuilderDialog extends JDialog {
             fixedXPTab.setTraits(record.fixedXPTraits());
             fixedXPTab.setSkills(record.fixedXPSkills());
             fixedXPTab.setMetaSkills(record.fixedXPMetaSkills());
+            fixedXPTab.setNaturalAptitudes(record.fixedXPNaturalAptitudes());
             fixedXPTab.setAbilities(record.fixedXPAbilities());
         }
 
@@ -639,6 +640,7 @@ public class LifePathBuilderDialog extends JDialog {
             flexibleXPTab.setTraits(record.flexibleXPTraits());
             flexibleXPTab.setSkills(record.flexibleXPSkills());
             flexibleXPTab.setMetaSkills(record.flexibleXPMetaSkills());
+            flexibleXPTab.setNaturalAptitudes(record.flexibleXPNaturalAptitudes());
             flexibleXPTab.setAbilities(record.flexibleXPAbilities());
         }
 
@@ -736,6 +738,7 @@ public class LifePathBuilderDialog extends JDialog {
         Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> fixedXPTraits = fixedXPTab.getTraits();
         Map<Integer, Map<String, Integer>> fixedXPSkills = fixedXPTab.getSkills();
         Map<Integer, Map<SkillSubType, Integer>> fixedXPMetaSkills = fixedXPTab.getMetaSkills();
+        Map<Integer, Map<String, Integer>> fixedXPNaturalAptitudes = fixedXPTab.getNaturalAptitudes();
         Map<Integer, Map<String, Integer>> fixedXPAbilities = fixedXPTab.getAbilities();
 
         // Flexible XP
@@ -745,16 +748,31 @@ public class LifePathBuilderDialog extends JDialog {
         Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> flexibleXPTraits = flexibleXPTab.getTraits();
         Map<Integer, Map<String, Integer>> flexibleXPSkills = flexibleXPTab.getSkills();
         Map<Integer, Map<SkillSubType, Integer>> flexibleXPMetaSkills = flexibleXPTab.getMetaSkills();
+        Map<Integer, Map<String, Integer>> flexibleXPNaturalAptitudes = flexibleXPTab.getNaturalAptitudes();
         Map<Integer, Map<String, Integer>> flexibleXPAbilities = flexibleXPTab.getAbilities();
         int flexibleXPPickCount = flexibleXPTab.getPickCount();
 
         // Dynamic
         UUID id = lifePathId;
         Version version = MHQConstants.VERSION;
-        int xpCost = LifePathXPCostCalculator.calculateXPCost(xpDiscount, fixedXPAttributes,
-              fixedXPFlexibleAttributes, fixedXPEdge, fixedXPTraits, fixedXPSkills, fixedXPMetaSkills,
-              fixedXPAbilities, flexibleXPTab.getTabCount(), flexibleXPPickCount, flexibleXPAttributes,
-              flexibleXPFlexibleAttributes, flexibleXPEdge, flexibleXPTraits, flexibleXPSkills, flexibleXPMetaSkills,
+        int xpCost = LifePathXPCostCalculator.calculateXPCost(xpDiscount,
+              fixedXPAttributes,
+              fixedXPFlexibleAttributes,
+              fixedXPEdge,
+              fixedXPTraits,
+              fixedXPSkills,
+              fixedXPMetaSkills,
+              fixedXPNaturalAptitudes,
+              fixedXPAbilities,
+              flexibleXPTab.getTabCount(),
+              flexibleXPPickCount,
+              flexibleXPAttributes,
+              flexibleXPFlexibleAttributes,
+              flexibleXPEdge,
+              flexibleXPTraits,
+              flexibleXPSkills,
+              flexibleXPMetaSkills,
+              flexibleXPNaturalAptitudes,
               flexibleXPAbilities);
 
         // Validation
@@ -825,6 +843,7 @@ public class LifePathBuilderDialog extends JDialog {
               fixedXPTraits,
               fixedXPSkills,
               fixedXPMetaSkills,
+              fixedXPNaturalAptitudes,
               fixedXPAbilities,
               flexibleXPAttributes,
               flexibleXPEdge,
@@ -832,6 +851,7 @@ public class LifePathBuilderDialog extends JDialog {
               flexibleXPTraits,
               flexibleXPSkills,
               flexibleXPMetaSkills,
+              flexibleXPNaturalAptitudes,
               flexibleXPAbilities,
               flexibleXPPickCount);
     }

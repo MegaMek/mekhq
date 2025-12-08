@@ -61,6 +61,7 @@ import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.annotations.Nullable;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
@@ -97,20 +98,26 @@ class LifePathSkillPicker extends JDialog {
         return selectedMetaSkillLevels;
     }
 
-    LifePathSkillPicker(Map<String, Integer> selectedSkillLevels, Map<SkillSubType, Integer> selectedMetaSkillLevels,
-          LifePathBuilderTabType tabType) {
+    LifePathSkillPicker(@Nullable Map<String, Integer> selectedSkillLevels,
+          @Nullable Map<SkillSubType, Integer> selectedMetaSkillLevels, LifePathBuilderTabType tabType,
+          boolean includeMetaSkills) {
         super();
 
         // Defensive copies to avoid external modification
-        this.selectedSkillLevels = new HashMap<>(selectedSkillLevels);
-        storedSkillLevels = new HashMap<>(selectedSkillLevels);
-        this.selectedMetaSkillLevels = new HashMap<>(selectedMetaSkillLevels);
-        storedMetaSkillLevels = new HashMap<>(selectedMetaSkillLevels);
+        this.selectedSkillLevels = selectedSkillLevels == null ?
+                                         new HashMap<>() :
+                                         new HashMap<>(selectedSkillLevels);
+        storedSkillLevels = new HashMap<>(this.selectedSkillLevels);
+
+        this.selectedMetaSkillLevels = selectedMetaSkillLevels == null ?
+                                             new HashMap<>() :
+                                             new HashMap<>(selectedMetaSkillLevels);
+        storedMetaSkillLevels = new HashMap<>(this.selectedMetaSkillLevels);
 
         setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.title"));
 
         JPanel pnlInstructions = initializeInstructionsPanel(tabType);
-        JPanel pnlOptions = buildOptionsPanel(tabType);
+        JPanel pnlOptions = buildOptionsPanel(tabType, includeMetaSkills);
         JPanel pnlControls = buildControlPanel();
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -176,7 +183,7 @@ class LifePathSkillPicker extends JDialog {
         return pnlControls;
     }
 
-    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType) {
+    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType, boolean includeMetaSkills) {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
@@ -260,7 +267,8 @@ class LifePathSkillPicker extends JDialog {
         }
 
         // Meta Skills
-        if (tabType == LifePathBuilderTabType.FIXED_XP || tabType == LifePathBuilderTabType.FLEXIBLE_XP) {
+        if (includeMetaSkills &&
+                  (tabType == LifePathBuilderTabType.FIXED_XP || tabType == LifePathBuilderTabType.FLEXIBLE_XP)) {
             FastJScrollPane pnlMetaSkills = getMetaSkillOptions(metaSkills, tabType);
             optionPane.addTab(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.meta.label"),
                   pnlMetaSkills);
