@@ -88,9 +88,7 @@ public class LifePathProgressTextBuilder {
         return newProgressText.toString();
     }
 
-    private static String getNewBasicText(
-          mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTabBasicInformation basicInfoTab,
-          int calculatedCost) {
+    private static String getNewBasicText(LifePathTabBasicInformation basicInfoTab, int calculatedCost) {
         StringBuilder newText = new StringBuilder();
 
         String name = basicInfoTab.getName();

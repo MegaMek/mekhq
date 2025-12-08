@@ -38,6 +38,7 @@ import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_EDGE_SCORE;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderPadding;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -1049,9 +1050,8 @@ public class LifePathTab {
             int counter = 0;
             int length = workingNaturalAptitudes.size();
             for (Map.Entry<String, Integer> entry : workingNaturalAptitudes.entrySet()) {
-                String label = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.naturalAptitude.label") +
-                                     ' ' +
-                                     entry.getKey().replace(SkillType.RP_ONLY_TAG, "");
+                String label = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.naturalAptitude.label",
+                      entry.getKey().replace(SkillType.RP_ONLY_TAG, ""));
                 int value = entry.getValue();
 
                 individualProgressText.append(label);
@@ -1072,7 +1072,8 @@ public class LifePathTab {
             int counter = 0;
             int length = workingNaturalAptitudesMetaSkills.size();
             for (Map.Entry<SkillSubType, Integer> entry : workingNaturalAptitudesMetaSkills.entrySet()) {
-                String label = entry.getKey().getDisplayName();
+                String label = getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.naturalAptitude.label",
+                      entry.getKey().getDisplayName());
                 int value = entry.getValue();
 
                 individualProgressText.append(label);
