@@ -164,7 +164,7 @@ public class LifePathIO {
                                 // Life Paths in the data directory to be resaved with a legal statement. Note that
                                 // both booleans need to be true for this statement inclusion to occur.
                                 boolean overrideUpgradeRequirements = false;
-                                boolean overrideLegalStatementRequirements = false;
+                                boolean overrideLegalStatementRequirements = overrideUpgradeRequirements && false;
 
                                 if (record.version().isLowerThan(MHQConstants.VERSION) || overrideUpgradeRequirements) {
                                     outOfDateLifePaths.put(id, file.getParent());
