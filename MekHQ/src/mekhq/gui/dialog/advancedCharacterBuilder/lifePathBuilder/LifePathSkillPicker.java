@@ -192,6 +192,7 @@ class LifePathSkillPicker extends JDialog {
 
         List<SkillType> combatSkills = new ArrayList<>();
         List<SkillType> supportSkills = new ArrayList<>();
+        List<SkillType> utilitySkills = new ArrayList<>();
         List<SkillType> roleplaySkills1 = new ArrayList<>();
         List<SkillType> roleplaySkills2 = new ArrayList<>();
         List<SkillType> roleplaySkills3 = new ArrayList<>();
@@ -212,6 +213,9 @@ class LifePathSkillPicker extends JDialog {
                 allSkills.remove(skillName);
             } else if (type.isSupportSkill()) {
                 supportSkills.add(type);
+                allSkills.remove(skillName);
+            } else if (type.isUtilitySkill()) {
+                utilitySkills.add(type);
                 allSkills.remove(skillName);
             }
         }
@@ -244,6 +248,12 @@ class LifePathSkillPicker extends JDialog {
             FastJScrollPane pnlSupportSkills = getSkillOptions(supportSkills, tabType);
             optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.support.label"),
                   pnlSupportSkills);
+        }
+
+        if (!utilitySkills.isEmpty()) {
+            FastJScrollPane pnlUtilitySkills = getSkillOptions(utilitySkills, tabType);
+            optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.utility.label"),
+                  pnlUtilitySkills);
         }
 
         if (!roleplaySkills1.isEmpty()) {
