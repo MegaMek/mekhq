@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog;
 
+import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 
@@ -384,14 +385,20 @@ public final class BatchXPDialog extends JDialog {
 
                 int cost = person.getCostToImprove(skillName, campaignOptions.isUseReasoningXpMultiplier());
                 double costMultiplier = campaignOptions.getXpCostMultiplier();
-
                 cost = (int) round(cost * costMultiplier);
+
+                Skill skill = person.getSkill(skillName);
+
+                if (skill != null) {
+                    int progress = skill.getXpProgress();
+                    skill.changeXpProgress(-cost);
+                    cost = max(0, cost - progress);
+                }
 
                 // Improve the skill and deduce the cost
                 person.improveSkill(skillName);
                 person.spendXPOnSkills(campaign, cost);
 
-                Skill skill = person.getSkill(skillName);
                 PerformanceLogger.improvedSkill(campaignOptions.isPersonnelLogSkillGain(),
                       person,
                       campaign.getLocalDate(),
@@ -454,7 +461,12 @@ public final class BatchXPDialog extends JDialog {
                 if (null == skill) {
                     return (cost >= 0) && (cost <= person.getXP());
                 } else {
-                    return (skill.getLevel() < maxSkillLevel) && (cost >= 0) && (cost <= person.getXP());
+                    if (cost < 0) {
+                        return false;
+                    }
+
+                    cost = max(0, cost - skill.getCostToImprove());
+                    return skill.getLevel() < maxSkillLevel && cost <= person.getXP();
                 }
             }
             return true;

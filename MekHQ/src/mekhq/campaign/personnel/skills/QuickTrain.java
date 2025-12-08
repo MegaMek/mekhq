@@ -201,7 +201,7 @@ public class QuickTrain {
                     continue;
                 }
 
-                int improvementCost = person.getCostToImprove(skillName, isUseReasoningMultiplier);
+                int improvementCost = person.getBaseCostToImprove(skillName, isUseReasoningMultiplier);
                 improvementCost = (int) Math.round(improvementCost * xpCostMultiplier);
 
                 if (person.getXP() < improvementCost) {
