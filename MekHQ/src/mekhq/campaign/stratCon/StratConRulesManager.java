@@ -43,6 +43,8 @@ import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.units.UnitType.CONV_FIGHTER;
 import static megamek.common.units.UnitType.JUMPSHIP;
 import static megamek.common.units.UnitType.MEK;
+import static mekhq.campaign.enums.DailyReportType.BATTLE;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.finalizeScenario;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
@@ -1598,7 +1600,7 @@ public class StratConRulesManager {
                               false, // Irrelevant
                               campaign.getLocalDate()
                         );
-                        campaign.addReport(skillCheck.getResultsText());
+                        campaign.addReport(SKILL_CHECKS, skillCheck.getResultsText());
                     }
 
                     remainingScans--;
@@ -1916,7 +1918,7 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsAutomaticSuccess.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(reportStatus.toString());
+            campaign.addReport(BATTLE, reportStatus.toString());
 
             return isInstantlyDeployed ? INSTANT : SUCCESS;
         } else {
@@ -1933,7 +1935,7 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsCriticalFailure.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(reportStatus.toString());
+            campaign.addReport(BATTLE, reportStatus.toString());
             return FAILED;
         }
 
@@ -1943,7 +1945,7 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsSuccess.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(reportStatus.toString());
+            campaign.addReport(BATTLE, reportStatus.toString());
 
             return isInstantlyDeployed ? INSTANT : SUCCESS;
         }
@@ -1958,7 +1960,7 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsCommandFailure.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(reportStatus.toString());
+            campaign.addReport(BATTLE, reportStatus.toString());
             return DELAYED;
         }
 
@@ -1977,7 +1979,7 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsErrorNoCommander.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(reportStatus.toString());
+            campaign.addReport(BATTLE, reportStatus.toString());
             return FAILED;
         }
 
@@ -1990,11 +1992,11 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsErrorUnableToFetchCommander.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(reportStatus.toString());
+            campaign.addReport(BATTLE, reportStatus.toString());
             return FAILED;
         }
 
-        campaign.addReport(reportStatus.toString());
+        campaign.addReport(BATTLE, reportStatus.toString());
 
 
         roll = d6(2);
@@ -2009,13 +2011,13 @@ public class StratConRulesManager {
               0,
               true,
               false);
-        campaign.addReport(skillCheckUtility.getResultsText());
+        campaign.addReport(SKILL_CHECKS, skillCheckUtility.getResultsText());
 
         if (skillCheckUtility.isSuccess()) {
             String reportString = tactics != null ?
                                         resources.getString("reinforcementEvasionSuccessful.text") :
                                         resources.getString("reinforcementEvasionSuccessful.noSkill");
-            campaign.addReport(String.format(reportString,
+            campaign.addReport(BATTLE, String.format(reportString,
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
 
@@ -2026,7 +2028,7 @@ public class StratConRulesManager {
             return DELAYED;
         }
 
-        campaign.addReport(String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
+        campaign.addReport(BATTLE, String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
               spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
               CLOSING_SPAN_TAG,
               roll,
@@ -3446,7 +3448,8 @@ public class StratConRulesManager {
                 int roll = d6();
                 if (allLightUnits && roll == 6) {
                     forcesToUndeploy.add(forceID);
-                    campaign.addReport(String.format(resources.getString("patrol.undeployed"), force.getName()));
+                    campaign.addReport(BATTLE,
+                          String.format(resources.getString("patrol.undeployed"), force.getName()));
                     continue;
                 }
             }
@@ -3454,7 +3457,7 @@ public class StratConRulesManager {
             if ((track.getAssignedForceReturnDates().get(forceID).equals(date) ||
                        track.getAssignedForceReturnDates().get(forceID).isBefore(date))) {
                 forcesToUndeploy.add(forceID);
-                campaign.addReport(String.format(resources.getString("force.undeployed"), force.getName()));
+                campaign.addReport(BATTLE, String.format(resources.getString("force.undeployed"), force.getName()));
             }
         }
 

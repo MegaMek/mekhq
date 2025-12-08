@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.death;
 
 import static megamek.common.eras.EraFlag.*;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.enums.TenYearAgeRange.determineAgeRange;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -671,7 +672,7 @@ public class RandomDeath {
             // Prior to this change, it was exceptionally easy to miss these events.
             String color = ReportingUtilities.getNegativeColor();
             String formatOpener = ReportingUtilities.spanOpeningWithCustomColor(color);
-            campaign.addReport(String.format("%s has %s<b>died</b>%s.",
+            campaign.addReport(PERSONNEL, String.format("%s has %s<b>died</b>%s.",
                   person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));
 
             person.changeStatus(campaign, today, getCause(person, ageGroup, age));

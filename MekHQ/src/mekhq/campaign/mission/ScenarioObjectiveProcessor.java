@@ -33,6 +33,7 @@
 package mekhq.campaign.mission;
 
 import static java.lang.Math.floor;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
 
@@ -473,7 +474,7 @@ public class ScenarioObjectiveProcessor {
                 if (dryRun) {
                     return "Contract ends with victory";
                 } else {
-                    tracker.getCampaign().addReport(
+                    tracker.getCampaign().addReport(GENERAL,
                           String.format("Victory in scenario %s ends the contract with a victory",
                                 tracker.getScenario().getDescription()));
                 }
@@ -482,7 +483,7 @@ public class ScenarioObjectiveProcessor {
                 if (dryRun) {
                     return "Contract ends with loss";
                 } else {
-                    tracker.getCampaign().addReport(
+                    tracker.getCampaign().addReport(GENERAL,
                           String.format("Defeat in scenario %s ends the contract with a defeat",
                                 tracker.getScenario().getDescription()));
                 }
@@ -502,7 +503,7 @@ public class ScenarioObjectiveProcessor {
 
                         if (dropSize > 0) {
                             LogManager.getLogger().info("ScenarioObjectiveProcessor.java");
-                            campaign.addReport("Bonus: Captured Supplies");
+                            campaign.addReport(GENERAL, "Bonus: Captured Supplies");
                             Resupply resupply = new Resupply(campaign, contract, RESUPPLY_LOOT);
                             performResupply(resupply, contract, dropSize);
                         }

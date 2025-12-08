@@ -56,14 +56,14 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -82,7 +82,9 @@ public class ContractMarketAtBGenerationTests {
     public static List<Arguments> generateData() {
         final List<Arguments> arguments = new ArrayList<>();
         for (final int gameYear : Arrays.asList(2750, 3025, 3055, 3067, 3120)) {
-            for (int rating = IUnitRating.DRAGOON_F; rating <= IUnitRating.DRAGOON_ASTAR; rating++) {
+            for (int rating = DragoonRating.DRAGOON_F.getRating();
+                  rating <= DragoonRating.DRAGOON_ASTAR.getRating();
+                  rating++) {
                 arguments.add(Arguments.of(gameYear, rating, false));
                 arguments.add(Arguments.of(gameYear, rating, true));
             }
@@ -100,6 +102,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(campaign.getFaction()).thenReturn(campaignFaction);
@@ -107,7 +113,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -202,6 +207,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(campaign.getFaction()).thenReturn(campaignFaction);
@@ -209,7 +218,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -307,6 +315,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(campaign.getFaction()).thenReturn(campaignFaction);
@@ -314,7 +326,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -412,6 +423,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(campaign.getFaction()).thenReturn(campaignFaction);
@@ -419,7 +434,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -526,6 +540,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(campaign.getFaction()).thenReturn(campaignFaction);
@@ -533,7 +551,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -636,6 +653,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(campaign.getFaction()).thenReturn(campaignFaction);
@@ -671,6 +692,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(campaign.getFaction()).thenReturn(campaignFaction);
@@ -678,7 +703,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -776,6 +800,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(campaign.getFaction()).thenReturn(campaignFaction);
@@ -783,7 +811,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -873,6 +900,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(campaign.getFaction()).thenReturn(campaignFaction);
@@ -880,7 +911,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -978,6 +1008,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(campaign.getFaction()).thenReturn(campaignFaction);
@@ -985,7 +1019,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -1079,6 +1112,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(campaign.getFaction()).thenReturn(campaignFaction);
@@ -1086,7 +1123,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -1184,6 +1220,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(campaign.getFaction()).thenReturn(campaignFaction);
@@ -1191,7 +1231,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -1289,6 +1328,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(campaign.getFaction()).thenReturn(campaignFaction);
@@ -1296,7 +1339,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -1394,6 +1436,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(campaign.getFaction()).thenReturn(campaignFaction);
@@ -1401,7 +1447,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -1497,6 +1542,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
         when(campaignFaction.getShortName()).thenReturn(employer);
@@ -1505,7 +1554,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -1603,6 +1651,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
         when(campaignFaction.getShortName()).thenReturn(employer);
@@ -1611,7 +1663,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -1708,6 +1759,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
         when(campaignFaction.getShortName()).thenReturn(employer);
@@ -1716,7 +1771,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -1814,6 +1868,10 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        ReputationController camOpsReputation = mock(ReputationController.class);
+        when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
+        when(campaign.getReputation()).thenReturn(camOpsReputation);
+
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
         when(campaignFaction.getShortName()).thenReturn(employer);
@@ -1822,7 +1880,6 @@ public class ContractMarketAtBGenerationTests {
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
-        when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 

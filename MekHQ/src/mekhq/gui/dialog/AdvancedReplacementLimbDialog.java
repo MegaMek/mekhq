@@ -36,6 +36,8 @@ import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
+import static mekhq.campaign.enums.DailyReportType.MEDICAL;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_BIONIC_HATE;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_BIOLOGICAL_MACHINIST;
 import static mekhq.campaign.personnel.medical.BodyLocation.*;
@@ -741,7 +743,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         // Notify the player of the results
         if (!successfulSurgeries.isEmpty()) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+            campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE,
                   "AdvancedReplacementLimbDialog.report.successful",
                   spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG,
                   String.join(", ",
@@ -752,7 +754,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         }
 
         if (!unsuccessfulSurgeries.isEmpty()) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+            campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE,
                   "AdvancedReplacementLimbDialog.report.unsuccessful",
                   spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG,
                   String.join(", ",
@@ -1017,7 +1019,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                   spaModifier,
                   true,
                   false);
-            campaign.addReport(skillCheckUtility.getResultsText());
+            campaign.addReport(SKILL_CHECKS, skillCheckUtility.getResultsText());
             if (skillCheckUtility.isSuccess()) {
                 successfulSurgeries.add(surgery);
                 MedicalLogger.successfulSurgery(patient, campaign.getLocalDate(), surgery.type.toString());

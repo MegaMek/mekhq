@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static java.lang.Math.round;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -405,7 +406,7 @@ public final class BatchXPDialog extends JDialog {
         }
 
         if (improvedPersonnelCount > 0) {
-            campaign.addReport(String.format(resourceMap.getString("improvedSkills.format"),
+            campaign.addReport(PERSONNEL, String.format(resourceMap.getString("improvedSkills.format"),
                   skillName,
                   improvedPersonnelCount));
         }

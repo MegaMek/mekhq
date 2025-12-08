@@ -35,6 +35,9 @@ package mekhq.campaign.mission.camOpsSalvage;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.equipment.MiscType.F_NAVAL_TUG_ADAPTOR;
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
+import static mekhq.campaign.enums.DailyReportType.MEDICAL;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
@@ -229,7 +232,8 @@ public class CamOpsSalvageUtilities {
                             campaign.getLocalDate(),
                             unitRansoms,
                             getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.unitSale", scenario.getName()));
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.unitSale.report",
+                campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE,
+                      "CamOpsSalvageUtilities.unitSale.report",
                       unitRansoms.toAmountString(), scenario.getHyperlinkedName()));
 
                 // if this is a contract, add to the salvaged value
@@ -260,8 +264,9 @@ public class CamOpsSalvageUtilities {
                                 getFormattedTextAt(RESOURCE_BUNDLE,
                                       "CamOpsSalvageUtilities.exchange",
                                       scenario.getName()));
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.exchange.report",
-                          playerTakeHome.toAmountString(), scenario.getHyperlinkedName()));
+                    campaign.addReport(FINANCES,
+                          getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.exchange.report",
+                                playerTakeHome.toAmountString(), scenario.getHyperlinkedName()));
                 }
             }
 
@@ -365,8 +370,9 @@ public class CamOpsSalvageUtilities {
 
             if (campaignOptions.isUseEdge() && victim.getCurrentEdge() > 0) {
                 if (victim.getOptions().booleanOption(PersonnelOptions.EDGE_SALVAGE_ACCIDENTS)) {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.reroll",
-                          victim.getHyperlinkedName()));
+                    campaign.addReport(PERSONNEL,
+                          getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.reroll",
+                                victim.getHyperlinkedName()));
                     victim.changeCurrentEdge(-1);
 
                     int roll = d6(2);
@@ -397,8 +403,9 @@ public class CamOpsSalvageUtilities {
         }
 
         if (didAccidentOccur) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.accident",
-                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
+            campaign.addReport(MEDICAL,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.accident",
+                        spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
         }
     }
 

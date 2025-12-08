@@ -35,8 +35,8 @@ package mekhq.campaign.universe.generators.companyGenerators;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekSummary;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.personnel.ranks.Rank;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.AtBRandomMekParameters;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
@@ -92,17 +92,19 @@ public class AtBCompanyGenerator extends AbstractCompanyGenerator {
         if (parameters.isStarLeague() && !faction.isComStarOrWoB()) {
             if (faction.isClan()) {
                 // Clan Pilots generate from Front Line tables instead of Star League
-                parameters.setQuality(IUnitRating.DRAGOON_B);
+                parameters.setQuality(DragoonRating.DRAGOON_B.getRating());
                 return generateMekSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
             } else {
                 // Roll on the Star League Royal table if you get an SL mek with A* Rating
-                final String factionCode = (parameters.getQuality() == IUnitRating.DRAGOON_ASTAR) ? "SL.R" : "SL";
+                final String factionCode = (parameters.getQuality() == DragoonRating.DRAGOON_ASTAR.getRating()) ?
+                                                 "SL.R" :
+                                                 "SL";
                 return generateMekSummary(campaign, parameters, factionCode, getOptions().getStarLeagueYear());
             }
         } else {
             // Clan Pilots Generate from 2nd Line Tables
             if (faction.isClan()) {
-                parameters.setQuality(IUnitRating.DRAGOON_C);
+                parameters.setQuality(DragoonRating.DRAGOON_C.getRating());
             }
             return generateMekSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
         }

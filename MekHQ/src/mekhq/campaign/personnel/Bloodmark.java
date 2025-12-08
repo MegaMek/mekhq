@@ -35,6 +35,7 @@ package mekhq.campaign.personnel;
 import static java.lang.Math.min;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.enums.BloodmarkLevel.BLOODMARK_ZERO;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -251,7 +252,7 @@ public class Bloodmark {
                   spanOpeningWithCustomColor(getPositiveColor()),
                   CLOSING_SPAN_TAG,
                   bountyHunterName);
-            campaign.addReport(report);
+            campaign.addReport(PERSONNEL, report);
             return;
         }
 
@@ -262,7 +263,7 @@ public class Bloodmark {
         processWounds(campaign, person, today, wounds);
 
         String report = getReport(person.getStatus().isDead(), person.getHyperlinkedFullTitle(), bountyHunterName);
-        campaign.addReport(report);
+        campaign.addReport(PERSONNEL, report);
 
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }

@@ -56,6 +56,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import megamek.client.ratgenerator.ForceDescriptor;
+import mekhq.campaign.enums.DragoonRating;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;

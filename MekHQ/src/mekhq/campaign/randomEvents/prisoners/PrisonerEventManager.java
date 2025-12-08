@@ -37,6 +37,8 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.force.ForceType.SECURITY;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -439,7 +441,8 @@ public class PrisonerEventManager {
         if (choice == CHOICE_FREE) {
             for (int i = 0; i < setFree; i++) {
                 Person prisoner = prisoners.get(i);
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "free.report", prisoner.getFullName()));
+                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "free.report",
+                      prisoner.getFullName()));
                 campaign.removePerson(prisoner, false);
             }
 
@@ -634,13 +637,14 @@ public class PrisonerEventManager {
                   prisoners, campaign.getGameYear(), campaignOptions.getRegardMultiplier());
 
             for (String report : reports) {
-                campaign.addReport(report);
+                campaign.addReport(GENERAL, report);
             }
         }
 
         for (int i = 0; i < executions; i++) {
             Person prisoner = prisoners.get(i);
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "execute.report", prisoner.getFullName()));
+            campaign.addReport(PERSONNEL,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "execute.report", prisoner.getFullName()));
             campaign.removePerson(prisoner, false);
         }
 
@@ -672,7 +676,7 @@ public class PrisonerEventManager {
         boolean crimeNoticed = crimeNoticeRoll < victims;
 
         int penalty = min(MAX_CRIME_PENALTY, victims * 2);
-        if (crimeNoticed && campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
+        if (crimeNoticed) {
             campaign.changeCrimeRating(-penalty);
             campaign.setDateOfLastCrime(campaign.getLocalDate());
         }
@@ -700,7 +704,8 @@ public class PrisonerEventManager {
                                           CLOSING_SPAN_TAG);
 
         // Add the report
-        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, key), messageColor, CLOSING_SPAN_TAG, crimeMessage);
+        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, key), messageColor, CLOSING_SPAN_TAG,
+              crimeMessage);
     }
 
     /**

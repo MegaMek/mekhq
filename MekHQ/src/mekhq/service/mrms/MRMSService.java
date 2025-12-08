@@ -32,6 +32,7 @@
  */
 package mekhq.service.mrms;
 
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
@@ -101,17 +102,17 @@ public class MRMSService {
     public static MRMSPartSet performWarehouseMRMS(List<IPartWork> selectedParts,
           MRMSConfiguredOptions configuredOptions, Campaign campaign) {
         if (!configuredOptions.useRepair()) { // Warehouse only uses repair
-            campaign.addReport(resources.getString("MRMS.CompleteDisabled.report"));
+            campaign.addReport(TECHNICAL, resources.getString("MRMS.CompleteDisabled.report"));
             return new MRMSPartSet();
         }
-        campaign.addReport(resources.getString("MRMS.StartWarehouse.report"));
+        campaign.addReport(TECHNICAL, resources.getString("MRMS.StartWarehouse.report"));
 
         List<Person> techs = campaign.getTechs(true);
 
         MRMSPartSet partSet = new MRMSPartSet();
 
         if (techs.isEmpty()) {
-            campaign.addReport(resources.getString("MRMS.NoAvailableTechs.report"));
+            campaign.addReport(TECHNICAL, resources.getString("MRMS.NoAvailableTechs.report"));
         } else {
             Map<PartRepairType, MRMSOption> mrmsOptionsByType = new HashMap<>();
 
@@ -159,17 +160,17 @@ public class MRMSService {
         MRMSConfiguredOptions configuredOptions = new MRMSConfiguredOptions(campaign);
         if (!configuredOptions.isEnabled()) {
             String msg = resources.getString("MRMS.CompleteDisabled.report");
-            campaign.addReport(msg);
+            campaign.addReport(TECHNICAL, msg);
             return msg;
         } else if ((!unit.isSalvage() && !configuredOptions.useRepair()) ||
                          (unit.isSalvage() && !configuredOptions.useSalvage())) {
             String msg = MessageFormat.format(resources.getString("MRMS.CompleteTypeDisabled.report"),
                   unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair"));
-            campaign.addReport(msg);
+            campaign.addReport(TECHNICAL, msg);
             return msg;
         } else if (campaign.requiresAdditionalAsTechs()) {
             String message = resources.getString("MRMS.InsufficientAstechs.report");
-            campaign.addReport(message);
+            campaign.addReport(TECHNICAL, message);
             return message;
         }
 
@@ -209,7 +210,7 @@ public class MRMSService {
                 break;
         }
 
-        campaign.addReport(msg);
+        campaign.addReport(TECHNICAL, msg);
 
         List<Person> techs = campaign.getTechs();
 
@@ -220,10 +221,12 @@ public class MRMSService {
             if (!parts.isEmpty()) {
                 String color = spanOpeningWithCustomColor(getWarningColor());
                 if (parts.size() == 1) {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "inProgress.one", color, CLOSING_SPAN_TAG));
+                    campaign.addReport(TECHNICAL,
+                          getFormattedTextAt(RESOURCE_BUNDLE, "inProgress.one", color, CLOSING_SPAN_TAG));
                 } else {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "inProgress.many", color, parts.size(),
-                          CLOSING_SPAN_TAG));
+                    campaign.addReport(TECHNICAL,
+                          getFormattedTextAt(RESOURCE_BUNDLE, "inProgress.many", color, parts.size(),
+                                CLOSING_SPAN_TAG));
                 }
             }
         }
@@ -234,10 +237,10 @@ public class MRMSService {
     public static void mrmsAllUnits(Campaign campaign) {
         MRMSConfiguredOptions configuredOptions = new MRMSConfiguredOptions(campaign);
         if (!configuredOptions.isEnabled()) {
-            campaign.addReport(resources.getString("MRMS.CompleteDisabled.report"));
+            campaign.addReport(TECHNICAL, resources.getString("MRMS.CompleteDisabled.report"));
             return;
         } else if (campaign.requiresAdditionalAsTechs()) {
-            campaign.addReport(resources.getString("MRMS.InsufficientAstechs.report"));
+            campaign.addReport(TECHNICAL, resources.getString("MRMS.InsufficientAstechs.report"));
             return;
         }
 
@@ -271,7 +274,7 @@ public class MRMSService {
     public static void mrmsUnits(Campaign campaign, List<Unit> units, MRMSConfiguredOptions configuredOptions) {
         // This shouldn't happen but is being added preventatively
         if (!configuredOptions.isEnabled()) {
-            campaign.addReport(resources.getString("MRMS.CompleteDisabled.report"));
+            campaign.addReport(TECHNICAL, resources.getString("MRMS.CompleteDisabled.report"));
             return;
         }
         Map<MRMSUnitAction.STATUS, List<MRMSUnitAction>> unitActionsByStatus = new HashMap<>();
@@ -291,7 +294,7 @@ public class MRMSService {
         }
 
         if (unitActionsByStatus.isEmpty()) {
-            campaign.addReport(resources.getString("MRMS.CompleteNoUnits.report"));
+            campaign.addReport(TECHNICAL, resources.getString("MRMS.CompleteNoUnits.report"));
         } else {
             int totalCount = 0;
             int actionsPerformed = 0;
@@ -338,7 +341,7 @@ public class MRMSService {
                   unitActionsByStatus,
                   MRMSUnitAction.STATUS.UNFIXABLE_LIMB));
 
-            campaign.addReport(sb.toString());
+            campaign.addReport(TECHNICAL, sb.toString());
         }
 
         generateCampaignLogForUnitStatus(unitActionsByStatus,
@@ -375,10 +378,12 @@ public class MRMSService {
 
                 if (count > 0) {
                     if (count == 1) {
-                        campaign.addReport("<font color='" + ReportingUtilities.getNegativeColor()
-                                                 + "'>There is still 1 part that is not being worked on.</font>");
+                        campaign.addReport(TECHNICAL, "<font color='" +
+                                                            ReportingUtilities.getNegativeColor()
+                                                            +
+                                                            "'>There is still 1 part that is not being worked on.</font>");
                     } else {
-                        campaign.addReport(String.format(
+                        campaign.addReport(TECHNICAL, String.format(
                               "<font color='" + ReportingUtilities.getNegativeColor()
                                     + "'>There are still %s parts that are not being worked on %s unit%s.</font>",
                               count, unitCount, (unitCount == 1) ? "" : "s"));
@@ -423,7 +428,7 @@ public class MRMSService {
             sbMsg.append("<br/>- ").append(mrmsUnitAction.getUnit().getName());
         }
 
-        campaign.addReport(sbMsg.toString());
+        campaign.addReport(TECHNICAL, sbMsg.toString());
     }
 
     private static MRMSUnitAction performUnitMRMS(Campaign campaign, Unit unit, boolean isSalvage,
@@ -510,7 +515,7 @@ public class MRMSService {
 
             for (IPartWork partWork : parts) {
                 if ((partWork instanceof Part) && (partWork.getSkillMin() > SkillType.EXP_LEGENDARY)) {
-                    campaign.addReport(((Part) partWork).scrap());
+                    campaign.addReport(TECHNICAL, ((Part) partWork).scrap());
                     refreshParts = true;
                 }
             }
@@ -627,7 +632,7 @@ public class MRMSService {
 
                     for (Part part : locationMap.values()) {
                         if (part instanceof MekLocation) {
-                            campaign.addReport(part.scrap());
+                            campaign.addReport(TECHNICAL, part.scrap());
                         }
                     }
 
@@ -649,14 +654,14 @@ public class MRMSService {
                         }
 
                         if (unfixable) {
-                            campaign.addReport(String.format(
+                            campaign.addReport(TECHNICAL, String.format(
                                   "<font color='" +
                                         getWarningColor()
                                         +
                                         "'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
                                   loc.getName(), unit.getName(), countOfPartsPerLocation.get(locId)));
                         } else {
-                            campaign.addReport(String.format(
+                            campaign.addReport(TECHNICAL, String.format(
                                   "<font color='" +
                                         getWarningColor()
                                         +

@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.divorce;
 
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -224,7 +226,7 @@ public abstract class AbstractDivorce {
             PersonalLogger.divorcedFrom(origin, spouse, today);
             PersonalLogger.divorcedFrom(spouse, origin, today);
 
-            campaign.addReport(String.format(resources.getString("divorce.report"),
+            campaign.addReport(PERSONNEL, String.format(resources.getString("divorce.report"),
                   origin.getHyperlinkedName(), spouse.getHyperlinkedName()));
         } else {
             reasonOrigin = FormerSpouseReason.DIVORCE;
@@ -239,7 +241,7 @@ public abstract class AbstractDivorce {
             PersonalLogger.divorcedFrom(origin, spouse, today);
 
 
-            campaign.addReport(String.format(resources.getString("widowed.report"),
+            campaign.addReport(PERSONNEL, String.format(resources.getString("widowed.report"),
                   origin.getHyperlinkedName(), spouse.getHyperlinkedName()));
         }
 

@@ -35,6 +35,7 @@ package mekhq.gui.dialog.markets.personnelMarket;
 import static java.lang.Math.min;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
@@ -587,7 +588,7 @@ public class PersonnelMarketDialog extends JDialog {
     private void addApplicantActionListener() {
         Person applicant = market.getSingleApplicant();
         if (applicant == null) {
-            campaign.addReport(getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.add.gm.error"));
+            campaign.addReport(GENERAL, getTextAt(RESOURCE_BUNDLE, "button.personnelMarket.add.gm.error"));
             return;
         }
 
@@ -668,7 +669,7 @@ public class PersonnelMarketDialog extends JDialog {
         String color;
         String closingBrace = CLOSING_SPAN_TAG;
 
-        if (noAvailabilityMessage.isBlank() && campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
+        if (noAvailabilityMessage.isBlank()) {
             if (campaign.getReputation().getReputationRating() < market.getUnitReputationRecruitmentCutoff()) {
                 color = MekHQ.getMHQOptions().getFontColorWarningHexColor();
 

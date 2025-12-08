@@ -32,6 +32,8 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -166,15 +168,15 @@ public class HistoricalDailyReportDialog extends JDialog {
         for (LogEntry log : gui.getCampaign().inMemoryLogHistory) {
             if (ChronoUnit.DAYS.between(log.getDate(), gui.getCampaign().getLocalDate()) < days) {
                 if (!log.getDate().equals(trackDay)) {
-                    logPanel.appendLog(Collections.singletonList("<hr>"));
+                    logPanel.appendLog(Collections.singletonList("<hr>"), GENERAL);
                     logPanel.appendLog(Collections.singletonList("<b>" +
                                                                        MekHQ.getMHQOptions()
                                                                              .getDisplayFormattedDate(log.getDate()) +
-                                                                       "</b>"));
-                    logPanel.appendLog(Collections.singletonList("<br><br>"));
+                                                                       "</b>"), GENERAL);
+                    logPanel.appendLog(Collections.singletonList("<br><br>"), GENERAL);
                     trackDay = log.getDate();
                 }
-                logPanel.appendLog(Collections.singletonList(log.getDesc() + "<br>"));
+                logPanel.appendLog(Collections.singletonList(log.getDesc() + "<br>"), GENERAL);
             }
         }
     }

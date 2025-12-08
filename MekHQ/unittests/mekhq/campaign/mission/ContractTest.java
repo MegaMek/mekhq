@@ -49,7 +49,6 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
 
@@ -177,7 +176,6 @@ public class ContractTest {
         when(mockCampaignOptions.isUsePeacetimeCost()).thenReturn(true);
         when(mockCampaignOptions.isPayForTransport()).thenReturn(true);
         when(mockCampaignOptions.isUseTwoWayPay()).thenReturn(true);
-        when(mockCampaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.CAMPAIGN_OPS);
 
         Money jumpCost = Money.of(5);
         Money contractBase = Money.of(10);

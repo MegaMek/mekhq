@@ -37,6 +37,7 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.Gender.RANDOMIZE;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.LEFT;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -209,7 +210,7 @@ public class RandomDependents {
             if (!dependentsToRemove.isEmpty()) {
                 int pluralizer = dependentsToRemove.size();
 
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "dependentLeavesForce.report",
+                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "dependentLeavesForce.report",
                       dependentsToRemove.size(), pluralizer));
 
                 for (Person dependent : dependentsToRemove) {
@@ -266,7 +267,7 @@ public class RandomDependents {
 
                     campaign.recruitPerson(dependent, FREE, true, false, false);
 
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "dependentJoinsForce.report",
+                    campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "dependentJoinsForce.report",
                           dependent.getFullName(),
                           dependent.getPrimaryRole().getLabel(dependent.isClanPersonnel())));
 

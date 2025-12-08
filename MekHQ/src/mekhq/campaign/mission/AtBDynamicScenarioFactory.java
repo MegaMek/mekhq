@@ -46,6 +46,7 @@ import static megamek.common.planetaryConditions.Atmosphere.THIN;
 import static megamek.common.planetaryConditions.Wind.TORNADO_F4;
 import static megamek.common.units.UnitType.*;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
+import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
@@ -109,8 +110,10 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.camOpsReputation.IUnitRating;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
@@ -127,7 +130,6 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratCon.StratConBiomeManifest;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConContractInitializer;
@@ -522,9 +524,9 @@ public class AtBDynamicScenarioFactory {
                     };
 
                     quality = switch (randomInt) {
-                        case 2, 3 -> IUnitRating.DRAGOON_D;
-                        case 4 -> IUnitRating.DRAGOON_C;
-                        default -> IUnitRating.DRAGOON_F;
+                        case 2, 3 -> DragoonRating.DRAGOON_D.getRating();
+                        case 4 -> DragoonRating.DRAGOON_C.getRating();
+                        default -> DragoonRating.DRAGOON_F.getRating();
                     };
                 }
                 break;
@@ -1494,7 +1496,7 @@ public class AtBDynamicScenarioFactory {
             report.append(String.format(resources.getString("nothingBidAway.text"), generatedForce.getName()));
         }
 
-        campaign.addReport(report.toString());
+        campaign.addReport(BATTLE, report.toString());
     }
 
     /**

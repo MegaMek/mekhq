@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static java.util.Arrays.sort;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
@@ -71,6 +72,7 @@ import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
+import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
@@ -83,7 +85,6 @@ import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.campaign.unit.Unit;
@@ -385,7 +386,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     String report = factionStandings.updateClimateRegard(campaign.getFaction(),
                           campaign.getLocalDate(), campaignOptions.getRegardMultiplier(),
                           true);
-                    campaign.addReport(report);
+                    campaign.addReport(GENERAL, report);
                 }
                 // endregion Progress 6
 

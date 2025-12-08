@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -1105,7 +1106,7 @@ public class MRMSDialog extends JDialog {
 
             filterCompletePartsList(true);
 
-            campaignGUI.getCampaign().addReport(msg);
+            campaignGUI.getCampaign().addReport(TECHNICAL, msg);
 
             JOptionPane.showMessageDialog(this,
                   msg,

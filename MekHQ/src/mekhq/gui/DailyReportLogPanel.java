@@ -36,6 +36,9 @@ package mekhq.gui;
 import java.awt.BorderLayout;
 import java.io.Reader;
 import java.io.StringReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -49,6 +52,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.Utilities;
+import mekhq.campaign.enums.DailyReportType;
 
 /**
  * This is a panel for displaying the reporting log for each day. We are putting it into its own panel so that we can
@@ -57,6 +61,8 @@ import mekhq.Utilities;
  * @author Jay Lawson
  */
 public class DailyReportLogPanel extends JPanel {
+    private static final DateTimeFormatter DAILY_REPORT_DATE_FORMAT = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy");
+
     //region Variable Declarations
     private final CampaignGUI gui;
     final JScrollPane logPanel = new FastJScrollPane();
@@ -120,7 +126,7 @@ public class DailyReportLogPanel extends JPanel {
         SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
     }
 
-    public void refreshLog(final String text) {
+    public void refreshLog(final String text, DailyReportType type) {
         if (text.equals(getLogText())) {
             return;
         }
@@ -137,18 +143,22 @@ public class DailyReportLogPanel extends JPanel {
         getTxtLog().setDocument(blank);
         getTxtLog().setCaretPosition(blank.getLength());
 
-        getGUI().checkDailyLogNag();
+        // If there is only one line in the log it means it's just the date header, so we don't want to alert the
+        // player for no reason
+        if (text.lines().count() != 1) {
+            getGUI().checkDailyLogNag(type);
+        }
         SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
     }
 
-    public void appendLog(final List<String> newReports) {
+    public void appendLog(final List<String> newReports, final DailyReportType type) {
         final String addedText = Utilities.combineString(newReports, "");
         if (StringUtility.isNullOrBlank(addedText)) {
             return;
         }
 
         if (getLogText().isBlank()) {
-            refreshLog(addedText);
+            refreshLog(addedText, type);
             return;
         }
 
@@ -161,7 +171,25 @@ public class DailyReportLogPanel extends JPanel {
 
         }
         getTxtLog().setCaretPosition(doc.getLength());
-        getGUI().checkDailyLogNag();
+
+        boolean isDateOnly = false;
+        if (newReports.size() == 1) {
+            String line = newReports.get(0);
+            String inner = line.substring(3, line.length() - 4); // strip <b> and </b>
+
+            // If parsing succeeds, it's a real report date
+            try {
+                LocalDate.parse(inner, DAILY_REPORT_DATE_FORMAT);
+                isDateOnly = true;
+            } catch (DateTimeParseException ignored) {
+                // Not a formatted date — do nothing
+            }
+        }
+
+        // We only want to nag the player if there is something of value. So no nag occurs if we're just adding the date
+        if (!isDateOnly) {
+            getGUI().checkDailyLogNag(type);
+        }
         SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
     }
 }
