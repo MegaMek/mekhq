@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.mission;
 
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.RESUPPLY_MINIMUM_PART_WEIGHT;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
@@ -222,7 +224,7 @@ public class Loot {
                         cash,
                         "Reward for " + getName() + " during " + scenario.getName());
 
-            campaign.addReport(String.format(resources.getString("looted.cash"),
+            campaign.addReport(FINANCES, String.format(resources.getString("looted.cash"),
                   cash.toAmountAndSymbolString(),
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
@@ -263,7 +265,7 @@ public class Loot {
 
         if (!lootedParts.isEmpty()) {
             String lootedPartsReport = lootedParts.toString().replace("[", "").replace("]", "");
-            campaign.addReport(String.format(resources.getString("looted.successful.parts"),
+            campaign.addReport(ACQUISITIONS, String.format(resources.getString("looted.successful.parts"),
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG,
                   lootedPartsReport));
@@ -271,7 +273,7 @@ public class Loot {
 
         if (!abandonedParts.isEmpty()) {
             String abandonedPartsReport = abandonedParts.toString().replace("[", "").replace("]", "");
-            campaign.addReport(String.format(resources.getString("looted.failed.parts"),
+            campaign.addReport(ACQUISITIONS, String.format(resources.getString("looted.failed.parts"),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG,
                   abandonedPartsReport));

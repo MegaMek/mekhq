@@ -34,6 +34,7 @@ package mekhq.gui.dialog;
 
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
@@ -65,8 +66,10 @@ import megamek.common.event.Subscribe;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.events.ReportEvent;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.CommandCenterTab;
 import mekhq.gui.DailyReportLogPanel;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 
@@ -90,6 +93,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
     private DailyReportLogPanel battleLogPanel;
     private DailyReportLogPanel personnelLogPanel;
     private DailyReportLogPanel medicalLogPanel;
+    private DailyReportLogPanel financesLogPanel;
     private DailyReportLogPanel acquisitionsLogPanel;
     private DailyReportLogPanel technicalLogPanel;
     // endregion Variable Declarations
@@ -219,6 +223,14 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         this.medicalLogPanel = medicalLogPanel;
     }
 
+    public DailyReportLogPanel getFinancesLogPanel() {
+        return financesLogPanel;
+    }
+
+    public void setFinancesLogPanel(final DailyReportLogPanel financesLogPanel) {
+        this.financesLogPanel = financesLogPanel;
+    }
+
     public DailyReportLogPanel getAcquisitionsLogPanel() {
         return acquisitionsLogPanel;
     }
@@ -241,27 +253,31 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
     protected Container createCenterPane() {
         // Create Panel Components
         final JPanel advanceDaysDurationPanel = createDurationPanel();
+        CommandCenterTab commandCenterTab = gui.getCommandCenterTab();
 
         setDailyLogPanel(new DailyReportLogPanel(getGUI()));
-        getDailyLogPanel().refreshLog(gui.getCommandCenterTab().getGeneralLog().getLogText());
+        getDailyLogPanel().refreshLog(commandCenterTab.getGeneralLog().getLogText(), GENERAL);
 
         setSkillLogPanel(new DailyReportLogPanel(getGUI()));
-        getSkillLogPanel().refreshLog(gui.getCommandCenterTab().getSkillLog().getLogText());
+        getSkillLogPanel().refreshLog(commandCenterTab.getSkillLog().getLogText(), SKILL_CHECKS);
 
         setBattleLogPanel(new DailyReportLogPanel(getGUI()));
-        getBattleLogPanel().refreshLog(gui.getCommandCenterTab().getBattleLog().getLogText());
+        getBattleLogPanel().refreshLog(commandCenterTab.getBattleLog().getLogText(), BATTLE);
 
         setPersonnelLogPanel(new DailyReportLogPanel(getGUI()));
-        getPersonnelLogPanel().refreshLog(gui.getCommandCenterTab().getPersonnelLog().getLogText());
+        getPersonnelLogPanel().refreshLog(commandCenterTab.getPersonnelLog().getLogText(), PERSONNEL);
 
         setMedicalLogPanel(new DailyReportLogPanel(getGUI()));
-        getMedicalLogPanel().refreshLog(gui.getCommandCenterTab().getMedicalLog().getLogText());
+        getMedicalLogPanel().refreshLog(commandCenterTab.getMedicalLog().getLogText(), MEDICAL);
+
+        setFinancesLogPanel(new DailyReportLogPanel(getGUI()));
+        getFinancesLogPanel().refreshLog(commandCenterTab.getFinancesLog().getLogText(), FINANCES);
 
         setAcquisitionsLogPanel(new DailyReportLogPanel(getGUI()));
-        getAcquisitionsLogPanel().refreshLog(gui.getCommandCenterTab().getAcquisitionsLog().getLogText());
+        getAcquisitionsLogPanel().refreshLog(commandCenterTab.getAcquisitionsLog().getLogText(), ACQUISITIONS);
 
         setTechnicalLogPanel(new DailyReportLogPanel(getGUI()));
-        getTechnicalLogPanel().refreshLog(gui.getCommandCenterTab().getTechnicalLog().getLogText());
+        getTechnicalLogPanel().refreshLog(commandCenterTab.getTechnicalLog().getLogText(), TECHNICAL);
 
         EnhancedTabbedPane dailyReportTab = new EnhancedTabbedPane();
         dailyReportTab.addTab(GENERAL.getIconString(), getDailyLogPanel());
@@ -272,6 +288,8 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         dailyReportTab.setToolTipTextAt(PERSONNEL.getTabIndex(), PERSONNEL.getTooltip());
         dailyReportTab.addTab(MEDICAL.getIconString(), getMedicalLogPanel());
         dailyReportTab.setToolTipTextAt(MEDICAL.getTabIndex(), MEDICAL.getTooltip());
+        dailyReportTab.addTab(FINANCES.getIconString(), getFinancesLogPanel());
+        dailyReportTab.setToolTipTextAt(FINANCES.getTabIndex(), FINANCES.getTooltip());
         dailyReportTab.addTab(ACQUISITIONS.getIconString(), getAcquisitionsLogPanel());
         dailyReportTab.setToolTipTextAt(ACQUISITIONS.getTabIndex(), ACQUISITIONS.getTooltip());
         dailyReportTab.addTab(TECHNICAL.getIconString(), getTechnicalLogPanel());
@@ -419,29 +437,33 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         final List<String> battleReports = new ArrayList<>();
         final List<String> personnelReports = new ArrayList<>();
         final List<String> medicalReports = new ArrayList<>();
+        final List<String> financesReports = new ArrayList<>();
         final List<String> acquisitionsReports = new ArrayList<>();
         final List<String> technicalReports = new ArrayList<>();
+        Campaign campaign = getGUI().getCampaign();
         for (; days > 0; days--) {
             try {
-                if (!getGUI().getCampaign().newDay()) {
+                if (!campaign.newDay()) {
                     break;
                 }
 
-                final String generalReport = getGUI().getCampaign().getCurrentReportHTML();
-                final String skillReport = getGUI().getCampaign().getSkillReportHTML();
-                final String battleReport = getGUI().getCampaign().getBattleReportHTML();
-                final String personnelReport = getGUI().getCampaign().getPersonnelReportHTML();
-                final String medicalReport = getGUI().getCampaign().getMedicalReportHTML();
-                final String acquisitionsReport = getGUI().getCampaign().getAcquisitionsReportHTML();
-                final String technicalReport = getGUI().getCampaign().getTechnicalReportHTML();
+                final String generalReport = campaign.getCurrentReportHTML();
+                final String skillReport = campaign.getSkillReportHTML();
+                final String battleReport = campaign.getBattleReportHTML();
+                final String personnelReport = campaign.getPersonnelReportHTML();
+                final String medicalReport = campaign.getMedicalReportHTML();
+                final String financesReport = campaign.getFinancesReportHTML();
+                final String acquisitionsReport = campaign.getAcquisitionsReportHTML();
+                final String technicalReport = campaign.getTechnicalReportHTML();
                 if (firstDay) {
-                    getDailyLogPanel().refreshLog(generalReport);
-                    getSkillLogPanel().refreshLog(skillReport);
-                    getBattleLogPanel().refreshLog(battleReport);
-                    getPersonnelLogPanel().refreshLog(personnelReport);
-                    getMedicalLogPanel().refreshLog(medicalReport);
-                    getAcquisitionsLogPanel().refreshLog(acquisitionsReport);
-                    getTechnicalLogPanel().refreshLog(technicalReport);
+                    getDailyLogPanel().refreshLog(generalReport, GENERAL);
+                    getSkillLogPanel().refreshLog(skillReport, SKILL_CHECKS);
+                    getBattleLogPanel().refreshLog(battleReport, BATTLE);
+                    getPersonnelLogPanel().refreshLog(personnelReport, PERSONNEL);
+                    getMedicalLogPanel().refreshLog(medicalReport, MEDICAL);
+                    getFinancesLogPanel().refreshLog(financesReport, ACQUISITIONS);
+                    getAcquisitionsLogPanel().refreshLog(acquisitionsReport, ACQUISITIONS);
+                    getTechnicalLogPanel().refreshLog(technicalReport, TECHNICAL);
                     firstDay = false;
                 } else {
                     generalReports.add("<hr>");
@@ -459,19 +481,23 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
                     medicalReports.add("<hr>");
                     medicalReports.add(medicalReport);
 
+                    financesReports.add("<hr>");
+                    financesReports.add(financesReport);
+
                     acquisitionsReports.add("<hr>");
                     acquisitionsReports.add(acquisitionsReport);
 
                     technicalReports.add("<hr>");
                     technicalReports.add(technicalReport);
                 }
-                generalReports.addAll(getGUI().getCampaign().fetchAndClearNewReports());
-                skillReports.addAll(getGUI().getCampaign().fetchAndClearNewSkillReports());
-                battleReports.addAll(getGUI().getCampaign().fetchAndClearNewBattleReports());
-                personnelReports.addAll(getGUI().getCampaign().fetchAndClearNewPersonnelReports());
-                medicalReports.addAll(getGUI().getCampaign().fetchAndClearNewMedicalReports());
-                acquisitionsReports.addAll(getGUI().getCampaign().fetchAndClearNewAcquisitionsReports());
-                technicalReports.addAll(getGUI().getCampaign().fetchAndClearNewTechnicalReports());
+                generalReports.addAll(campaign.fetchAndClearNewReports());
+                skillReports.addAll(campaign.fetchAndClearNewSkillReports());
+                battleReports.addAll(campaign.fetchAndClearNewBattleReports());
+                personnelReports.addAll(campaign.fetchAndClearNewPersonnelReports());
+                medicalReports.addAll(campaign.fetchAndClearNewMedicalReports());
+                financesReports.addAll(campaign.fetchAndClearNewFinancesReports());
+                acquisitionsReports.addAll(campaign.fetchAndClearNewAcquisitionsReports());
+                technicalReports.addAll(campaign.fetchAndClearNewTechnicalReports());
             } catch (Exception ex) {
                 LOGGER.error("", ex);
                 break;
@@ -479,13 +505,14 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         }
 
         setRunning(false);
-        getDailyLogPanel().appendLog(generalReports);
-        getSkillLogPanel().appendLog(skillReports);
-        getBattleLogPanel().appendLog(battleReports);
-        getPersonnelLogPanel().appendLog(personnelReports);
-        getMedicalLogPanel().appendLog(medicalReports);
-        getAcquisitionsLogPanel().appendLog(acquisitionsReports);
-        getTechnicalLogPanel().appendLog(technicalReports);
+        getDailyLogPanel().appendLog(generalReports, GENERAL);
+        getSkillLogPanel().appendLog(skillReports, SKILL_CHECKS);
+        getBattleLogPanel().appendLog(battleReports, BATTLE);
+        getPersonnelLogPanel().appendLog(personnelReports, PERSONNEL);
+        getMedicalLogPanel().appendLog(medicalReports, MEDICAL);
+        getFinancesLogPanel().appendLog(financesReports, FINANCES);
+        getAcquisitionsLogPanel().appendLog(acquisitionsReports, ACQUISITIONS);
+        getTechnicalLogPanel().appendLog(technicalReports, TECHNICAL);
 
         // We couldn't advance all days for some reason,
         // set the spinner to the number of remaining days
@@ -503,13 +530,15 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         if (isRunning()) {
             evt.cancel();
         } else {
-            getDailyLogPanel().refreshLog(getGUI().getCampaign().getCurrentReportHTML());
-            getSkillLogPanel().refreshLog(getGUI().getCampaign().getSkillReportHTML());
-            getBattleLogPanel().refreshLog(getGUI().getCampaign().getBattleReportHTML());
-            getPersonnelLogPanel().refreshLog(getGUI().getCampaign().getPersonnelReportHTML());
-            getMedicalLogPanel().refreshLog(getGUI().getCampaign().getMedicalReportHTML());
-            getAcquisitionsLogPanel().refreshLog(getGUI().getCampaign().getAcquisitionsReportHTML());
-            getTechnicalLogPanel().refreshLog(getGUI().getCampaign().getTechnicalReportHTML());
+            Campaign campaign = getGUI().getCampaign();
+            getDailyLogPanel().refreshLog(campaign.getCurrentReportHTML(), GENERAL);
+            getSkillLogPanel().refreshLog(campaign.getSkillReportHTML(), SKILL_CHECKS);
+            getBattleLogPanel().refreshLog(campaign.getBattleReportHTML(), BATTLE);
+            getPersonnelLogPanel().refreshLog(campaign.getPersonnelReportHTML(), PERSONNEL);
+            getMedicalLogPanel().refreshLog(campaign.getMedicalReportHTML(), MEDICAL);
+            getFinancesLogPanel().refreshLog(campaign.getFinancesReportHTML(), FINANCES);
+            getAcquisitionsLogPanel().refreshLog(campaign.getAcquisitionsReportHTML(), ACQUISITIONS);
+            getTechnicalLogPanel().refreshLog(campaign.getTechnicalReportHTML(), TECHNICAL);
         }
     }
 }

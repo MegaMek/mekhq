@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.skills.SkillType.S_APPRAISAL;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
@@ -224,7 +225,7 @@ public class QuickTrain {
                 PerformanceLogger.improvedSkill(
                       isLogSkillGain, person, today, skillName, skill.getLevel());
 
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "improved.format",
+                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "improved.format",
                       person.getHyperlinkedName(), skillName));
 
                 skillImproved = true;

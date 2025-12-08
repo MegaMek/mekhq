@@ -33,6 +33,7 @@
 package mekhq.campaign.market.unitMarket;
 
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -229,7 +230,7 @@ public abstract class AbstractUnitMarket {
         }
 
         getOffers().add(new UnitMarketOffer(market, unitType, mekSummary, percent, generateTransitDuration(campaign),
-         campaign.getCampaignOptions()));
+              campaign.getCampaignOptions()));
 
         return mekSummary.getName();
     }
@@ -260,7 +261,7 @@ public abstract class AbstractUnitMarket {
      */
     protected void writeRefreshReport(final Campaign campaign) {
         if (campaign.getCampaignOptions().isUnitMarketReportRefresh()) {
-            campaign.addReport(resources.getString("AbstractUnitMarket.RefreshReport.report"));
+            campaign.addReport(GENERAL, resources.getString("AbstractUnitMarket.RefreshReport.report"));
         }
     }
     // endregion Generate Offers

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.market.unitMarket;
 
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.market.enums.UnitMarketRarity.COMMON;
 import static mekhq.campaign.market.enums.UnitMarketRarity.MYTHIC;
 import static mekhq.campaign.market.enums.UnitMarketRarity.RARE;
@@ -405,12 +406,12 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                     String key = "AtBMonthlyUnitMarket.dropShip.report";
                     String report = getFormattedTextAt(RESOURCE_BUNDLE, key,
                           spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG);
-                    campaign.addReport(report);
+                    campaign.addReport(GENERAL, report);
                 } else if (unitType == UnitType.JUMPSHIP) {
                     String key = "AtBMonthlyUnitMarket.jumpShip.report";
                     String report = getFormattedTextAt(RESOURCE_BUNDLE, key,
                           spanOpeningWithCustomColor(getAmazingColor()), CLOSING_SPAN_TAG);
-                    campaign.addReport(report);
+                    campaign.addReport(GENERAL, report);
                 }
             }
         }

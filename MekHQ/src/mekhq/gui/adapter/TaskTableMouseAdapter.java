@@ -32,6 +32,8 @@
  */
 package mekhq.gui.adapter;
 
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
+
 import java.awt.event.ActionEvent;
 import java.util.Optional;
 import javax.swing.JCheckBoxMenuItem;
@@ -99,7 +101,7 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
                     return;
                 }
                 Unit u = p.getUnit();
-                gui.getCampaign().addReport(((Part) p).scrap());
+                gui.getCampaign().addReport(TECHNICAL, ((Part) p).scrap());
                 ((Part) p).setSkillMin(SkillType.EXP_GREEN);
                 if ((u != null) && !u.isRepairable() && !u.hasSalvageableParts()) {
                     gui.getCampaign().removeUnit(u.getId());
@@ -117,7 +119,8 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.contains("FIX")) {
             if (partWork.checkFixable() == null) {
                 for (IPartWork p : parts) {
-                    gui.getCampaign().addReport(String.format("GM Repair, %s %s", p.getPartName(), p.succeed()));
+                    gui.getCampaign()
+                          .addReport(TECHNICAL, String.format("GM Repair, %s %s", p.getPartName(), p.succeed()));
                     if (p.getUnit() != null) {
                         p.getUnit().refreshPodSpace();
                     }

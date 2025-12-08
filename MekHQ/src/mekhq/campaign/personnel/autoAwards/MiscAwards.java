@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.autoAwards;
 
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -315,7 +317,7 @@ public class MiscAwards {
                 final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
                       MekHQ.getMHQOptions().getLocale());
 
-                campaign.addReport(String.format(resources.getString("supportPersonOfTheYear.tex"),
+                campaign.addReport(PERSONNEL, String.format(resources.getString("supportPersonOfTheYear.tex"),
                       campaign.getPerson(person).getHyperlinkedFullTitle(),
                       award.getName(),
                       award.getSet()));

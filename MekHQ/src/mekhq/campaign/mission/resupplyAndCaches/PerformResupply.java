@@ -33,6 +33,8 @@
 package mekhq.campaign.mission.resupplyAndCaches;
 
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
@@ -280,7 +282,7 @@ public class PerformResupply {
         } else {
             final Campaign campaign = resupply.getCampaign();
 
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+            campaign.addReport(ACQUISITIONS, getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoySuccessfulSmuggler.text",
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
@@ -339,7 +341,8 @@ public class PerformResupply {
 
             convoyContents.removeAll(convoyItems);
 
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyDispatched.text", convoy.getName()));
+            campaign.addReport(ACQUISITIONS,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "convoyDispatched.text", convoy.getName()));
             processConvoy(resupply, convoyItems, convoy);
         }
     }
@@ -490,7 +493,7 @@ public class PerformResupply {
     private static void completeSuccessfulDelivery(Resupply resupply, List<Part> convoyContents) {
         final Campaign campaign = resupply.getCampaign();
 
-        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+        campaign.addReport(ACQUISITIONS, getFormattedTextAt(RESOURCE_BUNDLE,
               "convoySuccessful.text",
               spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
               CLOSING_SPAN_TAG));
@@ -550,7 +553,7 @@ public class PerformResupply {
         // We report the error in this fashion, instead of hiding it in the log, as we want to
         // increase the likelihood the player is aware an error has occurred.
         if (template == null) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+            campaign.addReport(ACQUISITIONS, getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoyErrorTemplate.text",
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   templateAddress,
@@ -568,7 +571,7 @@ public class PerformResupply {
             List<StratConTrackState> tracks = campaignState.getTracks();
             track = ObjectUtility.getRandomItem(tracks);
         } catch (NullPointerException e) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+            campaign.addReport(ACQUISITIONS, getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoyErrorTracks.text",
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   templateAddress,
@@ -625,7 +628,7 @@ public class PerformResupply {
             backingScenario.addLoot(loot);
 
             // Announce the situation to the player
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+            campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE,
                   "convoyInterceptedStratCon.text",
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
@@ -688,7 +691,7 @@ public class PerformResupply {
      *                       the delivery will be processed.
      */
     private static void handleFallbackMessage(Resupply resupply, List<Part> convoyContents, Campaign campaign) {
-        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+        campaign.addReport(ACQUISITIONS, getFormattedTextAt(RESOURCE_BUNDLE,
               "convoyEscaped.text",
               spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
               CLOSING_SPAN_TAG));

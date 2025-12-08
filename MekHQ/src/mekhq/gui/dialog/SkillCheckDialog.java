@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.determineTargetNumber;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -118,7 +119,7 @@ public class SkillCheckDialog {
               isUseAgingEffects, isClanCampaign, today);
 
         // Results Dialog
-        campaign.addReport(results.replaceAll("<p>", "<br><br>").replaceAll("</p>", ""));
+        campaign.addReport(SKILL_CHECKS, results.replaceAll("<p>", "<br><br>").replaceAll("</p>", ""));
         showResultsDialog(results);
     }
 

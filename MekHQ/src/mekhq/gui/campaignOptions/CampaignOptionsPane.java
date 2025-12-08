@@ -33,6 +33,7 @@
 package mekhq.gui.campaignOptions;
 
 import static java.lang.Math.round;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
@@ -497,7 +498,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * categories).
      *
      * @param preset       an optional {@link CampaignPreset} used to override campaign options
-     * @param mode     the mode in which the application process was triggered
+     * @param mode         the mode in which the application process was triggered
      * @param isSaveAction determines if this action is saving options to a preset
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, CampaignOptionsDialogMode mode,
@@ -580,7 +581,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             List<String> reports = dialog.getReports();
             for (String report : reports) {
                 if (report != null && !report.isBlank()) {
-                    campaign.addReport(report);
+                    campaign.addReport(GENERAL, report);
                 }
             }
         }

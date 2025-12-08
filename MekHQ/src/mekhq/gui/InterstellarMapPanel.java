@@ -32,6 +32,8 @@
  */
 package mekhq.gui;
 
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+
 import java.awt.*;
 import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.event.ActionEvent;
@@ -340,7 +342,7 @@ public class InterstellarMapPanel extends JPanel {
                     item.addActionListener(evt -> {
                         InterstellarMapPanel.this.campaign.getLocation()
                               .setRecharged(InterstellarMapPanel.this.campaign);
-                        InterstellarMapPanel.this.campaign.addReport("GM: Jumpship drives fully charged");
+                        InterstellarMapPanel.this.campaign.addReport(GENERAL, "GM: Jumpship drives fully charged");
                         hqView.refreshLocation();
                     });
                     menuGM.add(item);

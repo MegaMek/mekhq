@@ -32,6 +32,8 @@
  */
 package mekhq.gui.adapter;
 
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -199,17 +201,18 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (success) {
-            gui.getCampaign().addReport("<font color='" +
-                                              ReportingUtilities.getPositiveColor() +
-                                              "'>"
-                                              +
-                                              String.format(resources.getString(
-                                                          "ProcurementTableMouseAdapter.ProcuredItem.report") + "</font>",
-                                                    acquisition.getAcquisitionName()));
+            gui.getCampaign().addReport(ACQUISITIONS, "<font color='" +
+                                                            ReportingUtilities.getPositiveColor() +
+                                                            "'>"
+                                                            +
+                                                            String.format(resources.getString(
+                                                                        "ProcurementTableMouseAdapter.ProcuredItem.report") +
+                                                                                "</font>",
+                                                                  acquisition.getAcquisitionName()));
             acquisition.decrementQuantity();
         } else {
-            gui.getCampaign().addReport("<font color='" + ReportingUtilities.getNegativeColor() + "'>"
-                                              + String.format(
+            gui.getCampaign().addReport(ACQUISITIONS, "<font color='" + ReportingUtilities.getNegativeColor() + "'>"
+                                                            + String.format(
                   resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report")
                         + "</font>",
                   acquisition.getAcquisitionName()));
@@ -266,13 +269,14 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
             return;
         }
 
-        gui.getCampaign().addReport("<font color='" +
-                                          ReportingUtilities.getPositiveColor() +
-                                          "'>"
-                                          +
-                                          String.format(resources.getString(
-                                                      "ProcurementTableMouseAdapter.GMAdded.report") + "</font>",
-                                                acquisition.getAcquisitionName()));
+        gui.getCampaign().addReport(ACQUISITIONS, "<font color='" +
+                                                        ReportingUtilities.getPositiveColor() +
+                                                        "'>"
+                                                        +
+                                                        String.format(resources.getString(
+                                                                    "ProcurementTableMouseAdapter.GMAdded.report") +
+                                                                            "</font>",
+                                                              acquisition.getAcquisitionName()));
         acquisition.decrementQuantity();
     }
 }

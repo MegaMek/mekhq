@@ -41,6 +41,7 @@ import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.HEROIC;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
@@ -245,7 +246,7 @@ public abstract class AbstractContractMarket {
 
     protected void updateReport(Campaign campaign) {
         if (campaign.getCampaignOptions().isContractMarketReportRefresh()) {
-            campaign.addReport("<a href='CONTRACT_MARKET'>Contract market updated</a>");
+            campaign.addReport(GENERAL, "<a href='CONTRACT_MARKET'>Contract market updated</a>");
         }
     }
 
@@ -560,8 +561,8 @@ public abstract class AbstractContractMarket {
             contract.setEnemyCode(enemyCode);
         } else {
             String enemyFactionCode = RandomFactionGenerator.getInstance()
-                                        .getEnemy(contract.getEmployerCode(),
-                                              contract.getContractType().isGarrisonType());
+                                            .getEnemy(contract.getEmployerCode(),
+                                                  contract.getContractType().isGarrisonType());
             Faction enemyFaction = Factions.getInstance().getFaction(enemyFactionCode);
 
             // If the OpFor isn't Clan, there is a 1-in-5 chance they've hired mercenaries to do their dirty work. So

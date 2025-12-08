@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.stratCon;
 
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -180,7 +181,7 @@ public class SupportPointNegotiation {
         if (currentSupportPoints >= maxSupportPoints) {
             String pluralizer = (maxSupportPoints > 1) || (maxSupportPoints == 0) ? "s" : "";
 
-            campaign.addReport(String.format(resources.getString("supportPoints.maximum"),
+            campaign.addReport(GENERAL, String.format(resources.getString("supportPoints.maximum"),
                   contract.getHyperlinkedName(),
                   spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                   CLOSING_SPAN_TAG,
@@ -230,14 +231,14 @@ public class SupportPointNegotiation {
         // Add a report
         String pluralizer = (negotiatedSupportPoints > 1) || (negotiatedSupportPoints == 0) ? "s" : "";
         if (isInitialNegotiation) {
-            campaign.addReport(String.format(resources.getString("supportPoints.initial"),
+            campaign.addReport(GENERAL, String.format(resources.getString("supportPoints.initial"),
                   contract.getHyperlinkedName(),
                   spanOpeningWithCustomColor(fontColor),
                   negotiatedSupportPoints,
                   CLOSING_SPAN_TAG,
                   pluralizer));
         } else {
-            campaign.addReport(String.format(resources.getString("supportPoints.weekly"),
+            campaign.addReport(GENERAL, String.format(resources.getString("supportPoints.weekly"),
                   spanOpeningWithCustomColor(fontColor),
                   negotiatedSupportPoints,
                   CLOSING_SPAN_TAG,
@@ -300,11 +301,11 @@ public class SupportPointNegotiation {
         String reportKey = String.format("supportPoints.%s.noAdministrators", contract == null ? "weekly" : "initial");
 
         if (contract == null) {
-            campaign.addReport(String.format(resources.getString(reportKey),
+            campaign.addReport(GENERAL, String.format(resources.getString(reportKey),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
         } else {
-            campaign.addReport(String.format(resources.getString(reportKey),
+            campaign.addReport(GENERAL, String.format(resources.getString(reportKey),
                   contract.getHyperlinkedName(),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
