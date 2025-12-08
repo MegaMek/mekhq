@@ -234,12 +234,8 @@ public class Skill {
         return xpProgress;
     }
 
-    public void setXpProgress(int xpProgress) {
-        this.xpProgress = xpProgress;
-    }
-
     public void changeXpProgress(int delta) {
-        this.xpProgress += delta;
+        xpProgress = max(0, xpProgress + delta);
     }
 
     public boolean getHasNaturalAptitude() {

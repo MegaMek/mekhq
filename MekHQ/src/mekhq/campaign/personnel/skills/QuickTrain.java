@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static java.lang.Math.max;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.skills.SkillType.S_APPRAISAL;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
@@ -201,10 +202,11 @@ public class QuickTrain {
                     continue;
                 }
 
-                int improvementCost = person.getBaseCostToImprove(skillName, isUseReasoningMultiplier);
+                int improvementCost = person.getCostToImprove(skillName, isUseReasoningMultiplier);
                 improvementCost = (int) Math.round(improvementCost * xpCostMultiplier);
+                int adjustedCost = max(0, skill.getXpProgress());
 
-                if (person.getXP() < improvementCost) {
+                if ((improvementCost < 0) || (person.getXP() < adjustedCost)) {
                     targetSkillIterator.remove();
                     continue;
                 }
@@ -220,7 +222,8 @@ public class QuickTrain {
                     continue;
                 }
 
-                person.spendXPOnSkills(campaign, improvementCost);
+                person.spendXPOnSkills(campaign, adjustedCost);
+                skill.changeXpProgress(-improvementCost);
 
                 PerformanceLogger.improvedSkill(
                       isLogSkillGain, person, today, skillName, skill.getLevel());
