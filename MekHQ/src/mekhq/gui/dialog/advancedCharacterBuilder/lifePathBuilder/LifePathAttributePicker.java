@@ -244,7 +244,7 @@ class LifePathAttributePicker extends JDialog {
 
         int categoryMinimumValue = getAttributeMinimumValue(tabType, false);
         int categoryMaximumValue = getAttributeMaximumValue(tabType);
-        int keyValue = getDefaultAttributeValue(tabType, categoryMinimumValue, categoryMaximumValue);
+        int keyValue = getDefaultAttributeValue(tabType, false);
 
         for (SkillAttribute attribute : SkillAttribute.values()) {
             if (attribute == SkillAttribute.NONE) {
@@ -273,7 +273,7 @@ class LifePathAttributePicker extends JDialog {
         String edgeTooltip = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.edge.tooltip");
 
         int edgeMinimumValue = getAttributeMinimumValue(tabType, true);
-        int edgeKeyValue = getDefaultAttributeValue(tabType, edgeMinimumValue, categoryMaximumValue);
+        int edgeKeyValue = getDefaultAttributeValue(tabType, true);
         int edgeDefaultValue = selectedEdge == null ? edgeKeyValue : selectedEdge;
 
         LOGGER.info("selectedEdge: {}", selectedEdge);

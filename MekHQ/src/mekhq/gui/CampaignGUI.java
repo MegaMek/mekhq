@@ -1089,7 +1089,7 @@ public class CampaignGUI extends JPanel {
         JMenu menuRoleplay = new JMenu(resourceMap.getString("menuRoleplay.text"));
         JMenuItem miLifePathBuilder = new JMenuItem(resourceMap.getString("miLifePathBuilder.text"));
         miLifePathBuilder.addActionListener(evt -> {
-            new LifePathBuilderDialog(getCampaign(), getFrame(), getCampaign().getGameYear());
+            new LifePathBuilderDialog(getCampaign(), getFrame());
         });
         menuRoleplay.add(miLifePathBuilder);
         menuManage.add(menuRoleplay);

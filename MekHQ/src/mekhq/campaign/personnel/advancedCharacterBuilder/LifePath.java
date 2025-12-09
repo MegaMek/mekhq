@@ -72,6 +72,7 @@ public record LifePath(
       Boolean isPlayerRestricted,
       // Requirements
       Map<Integer, Set<String>> requirementsFactions,
+      Map<Integer, Set<String>> requirementsSystems,
       Map<Integer, Set<UUID>> requirementsLifePath,
       Map<Integer, Map<LifePathCategory, Integer>> requirementsCategories,
       Map<Integer, Map<SkillAttribute, Integer>> requirementsAttributes,
@@ -83,6 +84,7 @@ public record LifePath(
       Map<Integer, Map<String, Integer>> requirementsAbilities,
       // Exclusions
       Map<Integer, Set<String>> exclusionsFactions,
+      Map<Integer, Set<String>> exclusionsSystems,
       Map<Integer, Set<UUID>> exclusionsLifePath,
       Map<Integer, Map<LifePathCategory, Integer>> exclusionsCategories,
       Map<Integer, Map<SkillAttribute, Integer>> exclusionsAttributes,
@@ -167,6 +169,16 @@ public record LifePath(
                 LOGGER.warn("{} - {}: flexibleXPNaturalAptitudesMetaSkills is null, setting to empty map", id, name);
                 flexibleXPNaturalAptitudesMetaSkills = new HashMap<>();
             }
+
+            if (requirementsSystems == null) { // Added in 50.11
+                LOGGER.warn("{} - {}: requirementsSystems is null, setting to empty map", id, name);
+                requirementsSystems = new HashMap<>();
+            }
+
+            if (exclusionsSystems == null) { // Added in 50.11
+                LOGGER.warn("{} - {}: exclusionsSystems is null, setting to empty map", id, name);
+                exclusionsSystems = new HashMap<>();
+            }
         }
 
         // Data Validation Checks
@@ -240,6 +252,9 @@ public record LifePath(
         if (requirementsFactions == null) {
             throw new IllegalArgumentException("requirementsFactions cannot be null");
         }
+        if (requirementsSystems == null) {
+            throw new IllegalArgumentException("requirementsSystems cannot be null");
+        }
         if (requirementsLifePath == null) {
             throw new IllegalArgumentException("requirementsLifePath cannot be null");
         }
@@ -270,6 +285,9 @@ public record LifePath(
         // Exclusions
         if (exclusionsFactions == null) {
             throw new IllegalArgumentException("exclusionsFactions cannot be null");
+        }
+        if (exclusionsSystems == null) {
+            throw new IllegalArgumentException("exclusionsSystems cannot be null");
         }
         if (exclusionsLifePath == null) {
             throw new IllegalArgumentException("exclusionsLifePath cannot be null");
@@ -405,6 +423,7 @@ public record LifePath(
               categories,
               isPlayerRestricted,
               requirementsFactions,
+              requirementsSystems,
               requirementsLifePath,
               requirementsCategories,
               requirementsAttributes,
@@ -415,6 +434,7 @@ public record LifePath(
               requirementsMetaSkills,
               requirementsAbilities,
               exclusionsFactions,
+              exclusionsSystems,
               exclusionsLifePath,
               exclusionsCategories,
               exclusionsAttributes,

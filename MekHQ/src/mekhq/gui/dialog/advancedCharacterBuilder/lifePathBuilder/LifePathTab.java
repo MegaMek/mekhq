@@ -48,6 +48,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,6 +79,8 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
@@ -93,10 +96,12 @@ public class LifePathTab {
     final static int ATTRIBUTE_SPINNER_HIGHEST_VALUE = 1000;
 
     private final Factions factions = Factions.getInstance();
+    private final Systems planetarySystems = Systems.getInstance();
 
     private final LifePathBuilderDialog parent;
     private final EnhancedTabbedPane tabGlobal;
     private final EnhancedTabbedPane tabLocal = new EnhancedTabbedPane();
+    private final LocalDate today;
     private final int gameYear;
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
     private final LifePathBuilderTabType tabType;
@@ -104,6 +109,7 @@ public class LifePathTab {
     private final Map<UUID, LifePath> lifePathLibrary;
 
     private Map<Integer, Set<String>> storedFactions = new HashMap<>();
+    private Map<Integer, Set<String>> storedSystems = new HashMap<>();
     private Map<Integer, Set<UUID>> storedLifePaths = new HashMap<>();
     private Map<Integer, Map<LifePathCategory, Integer>> storedCategories = new HashMap<>();
     private Map<Integer, Map<SkillAttribute, Integer>> storedAttributes = new HashMap<>();
@@ -125,6 +131,14 @@ public class LifePathTab {
 
     public void setFactions(Map<Integer, Set<String>> storedFactions) {
         this.storedFactions = storedFactions;
+    }
+
+    public Map<Integer, Set<String>> getSystems() {
+        return storedSystems;
+    }
+
+    public void setSystems(Map<Integer, Set<String>> storedSystems) {
+        this.storedSystems = storedSystems;
     }
 
     public Map<Integer, Set<UUID>> getLifePaths() {
@@ -239,12 +253,13 @@ public class LifePathTab {
         return tabLocal;
     }
 
-    LifePathTab(LifePathBuilderDialog parent, EnhancedTabbedPane tabGlobal, int gameYear,
+    LifePathTab(LifePathBuilderDialog parent, EnhancedTabbedPane tabGlobal, LocalDate today,
           Map<String, CampaignOptionsAbilityInfo> allAbilityInfo, LifePathBuilderTabType tabType,
           Map<UUID, LifePath> lifePathLibrary) {
         this.parent = parent;
         this.tabGlobal = tabGlobal;
-        this.gameYear = gameYear;
+        this.today = today;
+        this.gameYear = today.getYear();
         this.allAbilityInfo.putAll(allAbilityInfo);
         this.tabType = tabType;
         this.tabName = tabType.getLookupName();
@@ -376,6 +391,18 @@ public class LifePathTab {
         }
         storedFactions.clear();
         storedFactions.putAll(tempFactions);
+
+        storedSystems.remove(selectedIndex);
+        Map<Integer, Set<String>> tempSystems = new HashMap<>();
+        for (Map.Entry<Integer, Set<String>> entry : storedSystems.entrySet()) {
+            if (entry.getKey() < selectedIndex) {
+                tempSystems.put(entry.getKey(), entry.getValue());
+            } else if (entry.getKey() > selectedIndex) {
+                tempSystems.put(entry.getKey() - 1, entry.getValue());
+            }
+        }
+        storedSystems.clear();
+        storedSystems.putAll(tempSystems);
 
         storedLifePaths.remove(selectedIndex);
         Map<Integer, Set<UUID>> tempLifePaths = new HashMap<>();
@@ -529,6 +556,9 @@ public class LifePathTab {
         Set<String> currentFactions = new HashSet<>(storedFactions.get(selectedIndex));
         storedFactions.put(newIndex, currentFactions);
 
+        Set<String> currentSystems = new HashSet<>(storedSystems.get(selectedIndex));
+        storedSystems.put(newIndex, currentSystems);
+
         Set<UUID> currentLifePaths = new HashSet<>(storedLifePaths.get(selectedIndex));
         storedLifePaths.put(newIndex, currentLifePaths);
 
@@ -558,7 +588,7 @@ public class LifePathTab {
 
         Map<SkillSubType, Integer> currentNaturalAptitudeMetaSkills = new HashMap<>(storedNaturalAptitudesMetaSkills.get(
               selectedIndex));
-        storedNaturalAptitudesMetaSkills.put(newIndex, currentMetaSkills);
+        storedNaturalAptitudesMetaSkills.put(newIndex, currentNaturalAptitudeMetaSkills);
 
         Map<String, Integer> currentAbilities = new HashMap<>(storedAbilities.get(selectedIndex));
         storedAbilities.put(newIndex, currentAbilities);
@@ -689,6 +719,20 @@ public class LifePathTab {
         );
         btnAddFaction.setVisible(includeSupplementaryButtons);
         buttonsPanel.add(btnAddFaction);
+
+        // Systems
+        storedSystems.put(index, new HashSet<>());
+
+        String titleAddSystem = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.button.addSystem.label");
+        String tooltipAddSystems = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog." + tabName + ".button.addSystem.tooltip");
+        RoundedJButton btnAddSystem = new RoundedJButton(titleAddSystem);
+        btnAddSystem.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddSystems)
+        );
+        btnAddSystem.setVisible(includeSupplementaryButtons);
+        buttonsPanel.add(btnAddSystem);
 
         // Life Paths
         storedLifePaths.put(index, new HashSet<>());
@@ -826,6 +870,19 @@ public class LifePathTab {
 
             parent.setVisible(true);
         });
+        btnAddSystem.addActionListener(e -> {
+            parent.setVisible(false);
+
+            int currentIndex = tabLocal.getSelectedIndex();
+
+            // TODO replace with System Picker
+            LifePathFactionPicker picker = new LifePathFactionPicker(storedSystems.get(currentIndex), gameYear,
+                  tabType);
+            storedSystems.put(currentIndex, picker.getSelectedFactions());
+            standardizedActions(currentIndex, editorProgress);
+
+            parent.setVisible(true);
+        });
         btnAddLifePath.addActionListener(e -> {
             parent.setVisible(false);
 
@@ -852,14 +909,10 @@ public class LifePathTab {
         });
     }
 
-    private int getDefaultAttributeValue(LifePathBuilderTabType tabType, boolean isEdge) {
+    static int getDefaultAttributeValue(LifePathBuilderTabType tabType, boolean isEdge) {
         int categoryMinimumValue = getAttributeMinimumValue(tabType, isEdge);
         int categoryMaximumValue = getAttributeMaximumValue(tabType);
-        return getDefaultAttributeValue(tabType, categoryMinimumValue, categoryMaximumValue);
-    }
 
-    static int getDefaultAttributeValue(LifePathBuilderTabType tabType, int categoryMinimumValue,
-          int categoryMaximumValue) {
         return switch (tabType) {
             case REQUIREMENTS -> categoryMinimumValue;
             case EXCLUSIONS -> categoryMaximumValue;
@@ -918,6 +971,25 @@ public class LifePathTab {
                     continue;
                 }
                 individualProgressText.append(faction.getFullName(gameYear));
+                if (workingIndex != total - 1) {
+                    individualProgressText.append(", ");
+                }
+                workingIndex++;
+            }
+        }
+
+        // Systems
+        Set<String> workingSystems = storedSystems.get(index);
+        if (workingSystems != null && !workingSystems.isEmpty()) {
+            int workingIndex = 0;
+            int total = workingSystems.size();
+            for (String systemCode : workingSystems) {
+                PlanetarySystem system = planetarySystems.getSystemById(systemCode);
+                if (system == null) {
+                    LOGGER.error("System not found: {}", systemCode);
+                    continue;
+                }
+                individualProgressText.append(system.getName(today));
                 if (workingIndex != total - 1) {
                     individualProgressText.append(", ");
                 }
@@ -994,9 +1066,7 @@ public class LifePathTab {
         }
 
         Integer workingEdge = storedEdge.get(index);
-        int edgeMinimumValue = getAttributeMinimumValue(tabType, true);
-        int edgeMaximumValue = getAttributeMaximumValue(tabType);
-        int edgeDefaultValue = getDefaultAttributeValue(tabType, edgeMinimumValue, edgeMaximumValue);
+        int edgeDefaultValue = getDefaultAttributeValue(tabType, true);
 
         if (workingEdge != null && workingEdge != edgeDefaultValue) {
             appendBreaker(individualProgressText);
@@ -1008,9 +1078,7 @@ public class LifePathTab {
         }
 
         Integer workingFlexibleAttributes = storedFlexibleAttributes.get(index);
-        int flexibleMinimumValue = getAttributeMinimumValue(tabType, true);
-        int flexibleMaximumValue = getAttributeMaximumValue(tabType);
-        int flexibleDefaultValue = getDefaultAttributeValue(tabType, edgeMinimumValue, edgeMaximumValue);
+        int flexibleDefaultValue = getDefaultAttributeValue(tabType, true);
         if (workingFlexibleAttributes != null &&
                   !storedFlexibleAttributes.isEmpty() &&
                   workingFlexibleAttributes != flexibleDefaultValue) {
@@ -1191,6 +1259,7 @@ public class LifePathTab {
         tabLocal.removeAll();
 
         storedFactions.clear();
+        storedSystems.clear();
         storedLifePaths.clear();
         storedCategories.clear();
         storedAttributes.clear();

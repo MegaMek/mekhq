@@ -52,6 +52,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -135,11 +136,11 @@ public class LifePathBuilderDialog extends JDialog {
         return PADDING;
     }
 
-    public LifePathBuilderDialog(Campaign campaign, Frame owner, int gameYear) {
+    public LifePathBuilderDialog(Campaign campaign, Frame owner) {
         super(owner, getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.title"), true);
         this.campaign = campaign;
 
-        JPanel contents = initialize(gameYear);
+        JPanel contents = initialize(campaign.getLocalDate());
 
         SwingUtilities.invokeLater(() -> scrollInstructions.getVerticalScrollBar().setValue(0));
         SwingUtilities.invokeLater(() -> scrollProgress.getVerticalScrollBar().setValue(0));
@@ -173,11 +174,11 @@ public class LifePathBuilderDialog extends JDialog {
               exclusionsTab, fixedXPTab, flexibleXPTab));
     }
 
-    private JPanel initialize(int gameYear) {
+    private JPanel initialize(LocalDate today) {
         buildAllAbilityInfo();
 
         pnlInstructions = initializeInstructionsPanel();
-        EnhancedTabbedPane tabMain = initializeMainPanel(gameYear);
+        EnhancedTabbedPane tabMain = initializeMainPanel(today);
         pnlProgress = initializeProgressPanel();
 
         // Layout using GridBagLayout for a width ratio of 1:2:1
@@ -293,7 +294,7 @@ public class LifePathBuilderDialog extends JDialog {
         return pnlInstructions;
     }
 
-    private EnhancedTabbedPane initializeMainPanel(int gameYear) {
+    private EnhancedTabbedPane initializeMainPanel(LocalDate today) {
         Map<UUID, LifePath> lifePathLibrary = campaign.getLifePathLibrary();
 
         EnhancedTabbedPane tabMain = new EnhancedTabbedPane();
@@ -302,19 +303,19 @@ public class LifePathBuilderDialog extends JDialog {
 
         basicInfoTab = new LifePathTabBasicInformation(this, tabMain);
 
-        fixedXPTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo, LifePathBuilderTabType.FIXED_XP,
+        fixedXPTab = new LifePathTab(this, tabMain, today, allAbilityInfo, LifePathBuilderTabType.FIXED_XP,
               lifePathLibrary);
         fixedXPTab.buildTab();
 
-        flexibleXPTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo, LifePathBuilderTabType.FLEXIBLE_XP,
+        flexibleXPTab = new LifePathTab(this, tabMain, today, allAbilityInfo, LifePathBuilderTabType.FLEXIBLE_XP,
               lifePathLibrary);
         flexibleXPTab.buildTab();
 
-        requirementsTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo, LifePathBuilderTabType.REQUIREMENTS,
+        requirementsTab = new LifePathTab(this, tabMain, today, allAbilityInfo, LifePathBuilderTabType.REQUIREMENTS,
               lifePathLibrary);
         requirementsTab.buildTab();
 
-        exclusionsTab = new LifePathTab(this, tabMain, gameYear, allAbilityInfo, LifePathBuilderTabType.EXCLUSIONS,
+        exclusionsTab = new LifePathTab(this, tabMain, today, allAbilityInfo, LifePathBuilderTabType.EXCLUSIONS,
               lifePathLibrary);
         exclusionsTab.buildTab();
 
@@ -533,6 +534,7 @@ public class LifePathBuilderDialog extends JDialog {
         int requirementsMaxKey = -1;
 
         requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsFactions()));
+        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsSystems()));
         requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsLifePath()));
         requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsCategories()));
         requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsAttributes()));
@@ -547,6 +549,7 @@ public class LifePathBuilderDialog extends JDialog {
 
         if (requirementsMaxKey > -1) {
             requirementsTab.setFactions(record.requirementsFactions());
+            requirementsTab.setSystems(record.requirementsSystems());
             requirementsTab.setLifePaths(record.requirementsLifePath());
             requirementsTab.setCategories(record.requirementsCategories());
             requirementsTab.setAttributes(record.requirementsAttributes());
@@ -711,6 +714,7 @@ public class LifePathBuilderDialog extends JDialog {
 
         // Requirements
         Map<Integer, Set<String>> requirementsFactions = requirementsTab.getFactions();
+        Map<Integer, Set<String>> requirementsSystems = requirementsTab.getSystems();
         Map<Integer, Set<UUID>> requirementsLifePath = requirementsTab.getLifePaths();
         Map<Integer, Map<LifePathCategory, Integer>> requirementsCategories = requirementsTab.getCategories();
         Map<Integer, Map<SkillAttribute, Integer>> requirementsAttributes = requirementsTab.getAttributes();
@@ -723,6 +727,7 @@ public class LifePathBuilderDialog extends JDialog {
 
         // Exclusions
         Map<Integer, Set<String>> exclusionsFactions = exclusionsTab.getFactions();
+        Map<Integer, Set<String>> exclusionsSystems = exclusionsTab.getSystems();
         Map<Integer, Set<UUID>> exclusionsLifePath = exclusionsTab.getLifePaths();
         Map<Integer, Map<LifePathCategory, Integer>> exclusionsCategories = exclusionsTab.getCategories();
         Map<Integer, Map<SkillAttribute, Integer>> exclusionsAttributes = exclusionsTab.getAttributes();
@@ -824,6 +829,7 @@ public class LifePathBuilderDialog extends JDialog {
               categories,
               isPlayerRestricted,
               requirementsFactions,
+              requirementsSystems,
               requirementsLifePath,
               requirementsCategories,
               requirementsAttributes,
@@ -834,6 +840,7 @@ public class LifePathBuilderDialog extends JDialog {
               requirementsMetaSkills,
               requirementsAbilities,
               exclusionsFactions,
+              exclusionsSystems,
               exclusionsLifePath,
               exclusionsCategories,
               exclusionsAttributes,
