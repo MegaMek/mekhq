@@ -111,6 +111,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     // region Personnel Tab
     private JComboBox<PersonnelFilterStyle> optionPersonnelFilterStyle;
     private JCheckBox optionPersonnelFilterOnPrimaryRole;
+    private JCheckBox chkUnifiedDailyReport;
     // endregion Personnel Tab
     // endregion Display
 
@@ -442,6 +443,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         });
 
         optionPersonnelFilterOnPrimaryRole = new JCheckBox(resources.getString("optionPersonnelFilterOnPrimaryRole.text"));
+
+        chkUnifiedDailyReport = new JCheckBox(resources.getString("chkUnifiedDailyReport.text"));
+        chkUnifiedDailyReport.setToolTipText(resources.getString("chkUnifiedDailyReport.toolTipText"));
+        chkUnifiedDailyReport.setName("chkUnifiedDailyReport");
         // endregion Personnel Tab
 
         // Programmatically Assign Accessibility Labels
@@ -507,7 +512,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                             GroupLayout.DEFAULT_SIZE,
                                                             GroupLayout.DEFAULT_SIZE,
                                                             40))
-                                      .addComponent(optionPersonnelFilterOnPrimaryRole));
+                                      .addComponent(optionPersonnelFilterOnPrimaryRole)
+                                      .addComponent(chkUnifiedDailyReport));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
@@ -545,7 +551,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(labelPersonnelFilterStyle)
                                                         .addComponent(optionPersonnelFilterStyle))
-                                        .addComponent(optionPersonnelFilterOnPrimaryRole));
+                                        .addComponent(optionPersonnelFilterOnPrimaryRole)
+                                        .addComponent(chkUnifiedDailyReport));
 
         return body;
     }
@@ -1464,6 +1471,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions()
               .setPersonnelFilterStyle((PersonnelFilterStyle) Objects.requireNonNull(optionPersonnelFilterStyle.getSelectedItem()));
         MekHQ.getMHQOptions().setPersonnelFilterOnPrimaryRole(optionPersonnelFilterOnPrimaryRole.isSelected());
+        MekHQ.getMHQOptions().setUnifiedDailyReport(chkUnifiedDailyReport.isSelected());
 
         // Colours
         MekHQ.getMHQOptions().setDeployedForeground(optionDeployedForeground.getColour());
@@ -1649,6 +1657,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         // Personnel Tab
         optionPersonnelFilterStyle.setSelectedItem(MekHQ.getMHQOptions().getPersonnelFilterStyle());
         optionPersonnelFilterOnPrimaryRole.setSelected(MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole());
+        chkUnifiedDailyReport.setSelected(MekHQ.getMHQOptions().getUnifiedDailyReport());
 
         // Colours
         optionDeployedForeground.setColour(MekHQ.getMHQOptions().getDeployedForeground());
