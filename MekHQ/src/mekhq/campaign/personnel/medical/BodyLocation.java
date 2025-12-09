@@ -49,7 +49,7 @@ import mekhq.campaign.personnel.medical.BodyLocation.XMLAdapter;
 @XmlJavaTypeAdapter(value = XMLAdapter.class)
 public enum BodyLocation {
     //region Enum Declarations
-    HEAD(0, "BodyLocation.HEAD.text"),
+    HEAD(0, "BodyLocation.HEAD.text", true),
     SKULL(12, "BodyLocation.SKULL.text", false, HEAD),
     BRAIN(47, "BodyLocation.BRAIN.text", false, HEAD),
     FACE(45, "BodyLocation.FACE.text", false, HEAD),
@@ -57,7 +57,7 @@ public enum BodyLocation {
     EARS(13, "BodyLocation.EARS.text", false, HEAD),
     EYES(14, "BodyLocation.EYES.text", false, HEAD),
     JAW(15, "BodyLocation.JAW.text", false, HEAD),
-    CHEST(3, "BodyLocation.CHEST.text"),
+    CHEST(3, "BodyLocation.CHEST.text", false),
     RIBS(16, "BodyLocation.RIBS.text", false, CHEST),
     LUNGS(17, "BodyLocation.LUNGS.text", false, CHEST),
     HEART(18, "BodyLocation.HEART.text", false, CHEST),
@@ -97,9 +97,9 @@ public enum BodyLocation {
     RIGHT_ANKLE(41, "BodyLocation.RIGHT_ANKLE.text", true, RIGHT_FOOT),
     RIGHT_KNEE(42, "BodyLocation.RIGHT_KNEE.text", true, RIGHT_FOOT),
     RIGHT_SHIN(43, "BodyLocation.RIGHT_SHIN.text", true, RIGHT_FOOT),
-    INTERNAL(7, "BodyLocation.INTERNAL.text"),
-    BONES(44, "BodyLocation.BONES.text"),
-    GENERIC(-1, "BodyLocation.GENERIC.text");
+    INTERNAL(7, "BodyLocation.INTERNAL.text", false),
+    BONES(44, "BodyLocation.BONES.text", false),
+    GENERIC(-1, "BodyLocation.GENERIC.text", false);
     //endregion Enum Declarations
 
     //region Variable Declarations

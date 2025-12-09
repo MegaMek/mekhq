@@ -60,6 +60,16 @@ public enum InjurySubType {
     /** Mechanical or artificial body replacements. Always count as 0 TW-scale 'Hits.' */
     PROSTHETIC,
 
+    /** Artificial brain enhancement. Implants of this type can be combined. Always count as 0 TW-scale 'Hits.' */
+    IMPLANT_GENERIC,
+
+    /**
+     * A type of Vehicle Direct Neural Interface. A type of implant. All implants of this type are mutually exclusive.
+     * Always count as 0 TW-scale 'Hits.'
+     *
+     */
+    IMPLANT_VDNI,
+
     /** Special injuries caused by Flaws. Always count as 0 TW-scale 'Hits.' */
     FLAW;
 
@@ -97,6 +107,15 @@ public enum InjurySubType {
      */
     public boolean isProsthetic() {
         return this == PROSTHETIC;
+    }
+
+    /**
+     * Checks whether this subtype represents an implant.
+     *
+     * @return {@code true} if this subtype is {@link #IMPLANT_GENERIC}, otherwise {@code false}.
+     */
+    public boolean isImplant() {
+        return this == IMPLANT_GENERIC || this == IMPLANT_VDNI;
     }
 
     /**

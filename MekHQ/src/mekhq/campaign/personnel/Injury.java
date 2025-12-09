@@ -254,13 +254,13 @@ public class Injury {
             if (type.getKey().contains("alt:")) {
                 InjurySubType subType = getSubType();
                 // Prosthetic and Flaw injuries don't count towards a character's total
-                return subType.isProsthetic() || subType.isFlaw() ? 0 : 1;
+                return subType.isProsthetic() || subType.isImplant() || subType.isFlaw() ? 0 : 1;
             }
         } catch (Exception e) {
             LOGGER.error("", e);
         }
 
-        return getSubType().isProsthetic() ? 0 : hits;
+        return getSubType().isProsthetic() || getSubType().isImplant() ? 0 : hits;
     }
 
     public void setHits(int num) {
