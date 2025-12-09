@@ -42,7 +42,7 @@ import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
-import static mekhq.campaign.personnel.medical.BodyLocation.IMPLANT_ONE;
+import static mekhq.campaign.personnel.medical.BodyLocation.BRAIN;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_ARM_ARMOR;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_ARM_CAMO;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_LEG_ARMOR;
@@ -392,7 +392,7 @@ public class AdvancedMedicalAlternateImplants {
      * @param person   the {@link Person} receiving the Enhanced Imaging implant
      */
     public static void giveEIImplant(Campaign campaign, Person person) {
-        Injury injury = ENHANCED_IMAGING_IMPLANT.newInjury(campaign, person, IMPLANT_ONE, 0);
+        Injury injury = ENHANCED_IMAGING_IMPLANT.newInjury(campaign, person, BRAIN, 0);
         person.addInjury(injury);
 
         if (campaign.getCampaignOptions().isUseImplants()) {

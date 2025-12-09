@@ -62,7 +62,7 @@ public enum BodyLocation {
     LUNGS(17, "BodyLocation.LUNGS.text", false, CHEST),
     HEART(18, "BodyLocation.HEART.text", false, CHEST),
     ORGANS(44, "BodyLocation.ORGANS.text", false, CHEST),
-    ABDOMEN(4, "BodyLocation.ABDOMEN.text"),
+    ABDOMEN(4, "BodyLocation.ABDOMEN.text", false),
     GROIN(19, "BodyLocation.GROIN.text", false, ABDOMEN),
     RUMP(46, "BodyLocation.RUMP.text", false, ABDOMEN),
     RIGHT_ARM(5, "BodyLocation.RIGHT_ARM.text", true),
@@ -158,10 +158,6 @@ public enum BodyLocation {
     //endregion Static Initialization
 
     //region Constructors
-    BodyLocation(int id, String localizationString) {
-        this(id, localizationString, false, null);
-    }
-
     BodyLocation(int id, String localizationString, boolean limb) {
         this(id, localizationString, limb, null);
     }
