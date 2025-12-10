@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.education;
 
+import static java.lang.Math.max;
+import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
@@ -45,7 +47,12 @@ import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_OTHER_FACTION
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_OTHER_FACTION_HATE;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_PIRATE_HATE;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_IN_FOR_LIFE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -79,6 +86,7 @@ import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.universe.Faction;
 import mekhq.utilities.ReportingUtilities;
@@ -400,7 +408,7 @@ public class EducationController {
                 person.setEduJourneyTime(2);
                 person.setEduAcademySystem(campaign.getCurrentSystem().getId());
             } else {
-                person.setEduJourneyTime(Math.max(2, person.getEduDaysOfTravel()));
+                person.setEduJourneyTime(max(2, person.getEduDaysOfTravel()));
             }
         }
 
@@ -726,7 +734,7 @@ public class EducationController {
             return;
         }
 
-        int travelTime = Math.max(2,
+        int travelTime = max(2,
               campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
 
         campaign.addReport(PERSONNEL, String.format(resources.getString("returningFromSchool.text"),
@@ -746,7 +754,7 @@ public class EducationController {
      */
     private static void processJourneyHome(Campaign campaign, Person person) {
         // has the journey time changed?
-        int travelTime = Math.max(2,
+        int travelTime = max(2,
               campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
 
         // if so, update the journey time
@@ -886,7 +894,7 @@ public class EducationController {
                         processTrainingInjury(campaign, academy, person, resources);
                     } else {
                         String resultString = String.format(resources.getString("eventTrainingAccidentKilled.text"),
-                              spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                              spanOpeningWithCustomColor(getWarningColor()),
                               CLOSING_SPAN_TAG);
 
                         String reportMessage = String.format(resources.getString("eventTrainingAccident.text"),
@@ -917,7 +925,7 @@ public class EducationController {
         int roll = d6(3);
 
         String resultString = String.format(resources.getString("eventTrainingAccidentWounded.text"),
-              spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+              spanOpeningWithCustomColor(getWarningColor()),
               CLOSING_SPAN_TAG,
               roll);
 
@@ -990,7 +998,7 @@ public class EducationController {
                 } else {
                     String reportMessage = String.format(resources.getString("dropOutRejected.text"),
                           person.getHyperlinkedFullTitle(),
-                          spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                          spanOpeningWithCustomColor(getWarningColor()),
                           CLOSING_SPAN_TAG);
 
                     campaign.addReport(PERSONNEL, reportMessage);
@@ -1001,7 +1009,7 @@ public class EducationController {
                 // might as well scare the player
                 String reportMessage = String.format(resources.getString("dropOutRejected.text"),
                       person.getHyperlinkedFullTitle(),
-                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                      spanOpeningWithCustomColor(getWarningColor()),
                       CLOSING_SPAN_TAG);
 
                 campaign.addReport(PERSONNEL, reportMessage);
@@ -1231,7 +1239,7 @@ public class EducationController {
 
             String reportMessage = String.format(resources.getString("graduatedClassNeeded.text"),
                   person.getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                  spanOpeningWithCustomColor(getWarningColor()),
                   CLOSING_SPAN_TAG,
                   roll);
 
@@ -1500,13 +1508,13 @@ public class EducationController {
             if (academy.isHomeSchool()) {
                 reportMessage = String.format(resources.getString("graduatedBarelyHomeSchooled.text"),
                       person.getHyperlinkedFullTitle(),
-                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                      spanOpeningWithCustomColor(getWarningColor()),
                       CLOSING_SPAN_TAG);
 
             } else {
                 reportMessage = String.format(resources.getString("graduatedBarely.text"),
                       person.getHyperlinkedFullTitle(),
-                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                      spanOpeningWithCustomColor(getWarningColor()),
                       CLOSING_SPAN_TAG);
 
             }
@@ -1695,8 +1703,7 @@ public class EducationController {
                                     .map(String::trim)
                                     .toArray(String[]::new);
 
-        int educationLevel = Math.min(Math.max(academy.getEducationLevel(person) + academy.getBaseAcademicSkillLevel(),
-              0), 5);
+        int educationLevel = clamp(academy.getEducationLevel(person) + academy.getBaseAcademicSkillLevel(), 0, 5);
 
         if (!isGraduating) {
             educationLevel--;
@@ -1752,28 +1759,34 @@ public class EducationController {
     /**
      * Adjusts the skill level of a person until the target level is reached.
      *
-     * @param person      The person whose skill level needs adjustment.
-     * @param skillParsed The name of the skill to adjust.
-     * @param targetLevel The desired target level of the skill.
-     * @param bonus       The bonus to apply when increasing the skill level.
+     * @param person                The person whose skill level needs adjustment.
+     * @param skillParsed           The name of the skill to adjust.
+     * @param targetExperienceLevel The desired target level of the skill.
+     * @param bonus                 The bonus to apply when increasing the skill level.
      */
-    private static void adjustSkillLevel(Person person, String skillParsed, int targetLevel, int bonus) {
-        boolean underTarget = true;
-        while (underTarget) {
-            Skill skill = person.getSkill(skillParsed);
-            if (skill == null) {
-                LOGGER.error("Skill {} not found for person {}", skillParsed, person.getFullTitle());
-                underTarget = false;
-                continue;
-            }
+    private static void adjustSkillLevel(Person person, String skillParsed, int targetExperienceLevel, int bonus) {
+        Skill skill = person.getSkill(skillParsed);
+        if (skill == null) {
+            LOGGER.error("Skill {} not found for person {}", skillParsed, person.getFullTitle());
+            return;
+        }
 
-            int skillLevel = skill.getLevel();
-            int experienceLevel = skill.getType().getExperienceLevel(skillLevel);
+        int currentLevel = skill.getLevel();
+        SkillType type = skill.getType();
+        int targetLevel = switch (targetExperienceLevel) {
+            case EXP_ULTRA_GREEN -> max(0, type.getGreenLevel() - 1);
+            case EXP_GREEN -> type.getGreenLevel();
+            case EXP_REGULAR -> type.getRegularLevel();
+            case EXP_VETERAN -> type.getVeteranLevel();
+            case EXP_ELITE -> type.getEliteLevel();
+            case EXP_HEROIC -> type.getHeroicLevel();
+            case EXP_LEGENDARY -> type.getLegendaryLevel();
+            default -> 0;
+        };
 
-            underTarget = experienceLevel <= targetLevel;
-            if (underTarget) {
-                person.addSkill(skillParsed, skillLevel + 1, bonus);
-            }
+        boolean underTarget = currentLevel <= targetLevel;
+        if (underTarget) {
+            person.addSkill(skillParsed, targetLevel, bonus);
         }
     }
 
@@ -1797,14 +1810,14 @@ public class EducationController {
         double bonusPercentage = (double) bonusCount / 5;
 
         if (EducationLevel.parseToInt(person.getEduHighestEducation()) < academy.getEducationLevel(person)) {
-            int xpRate = Math.max(1, (12 - academy.getFacultySkill()) * (academyDuration / 600));
+            int xpRate = max(1, (12 - academy.getFacultySkill()) * (academyDuration / 600));
 
             xpRate *= campaign.getCampaignOptions().getFacultyXpRate();
 
-            int bonusAmount = (int) Math.max(bonusCount, xpRate * bonusPercentage);
+            int bonusAmount = (int) max(bonusCount, xpRate * bonusPercentage);
             person.awardXP(campaign, xpRate + bonusAmount);
         } else {
-            int bonusAmount = (int) Math.max(bonusCount, 1 * bonusPercentage);
+            int bonusAmount = (int) max(bonusCount, 1 * bonusPercentage);
             person.awardXP(campaign, 1 + bonusAmount);
         }
     }
