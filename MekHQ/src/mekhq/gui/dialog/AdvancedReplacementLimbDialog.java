@@ -36,6 +36,7 @@ import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
+import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_BIONIC_HATE;
@@ -867,7 +868,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private void addImplantsAndAbilities(ProstheticType type) {
         if (campaign.getCampaignOptions().isUseImplants()) {
             for (String implant : type.getAssociatedPilotOptions()) {
-                patient.getOptions().acquireAbility(LVL3_ADVANTAGES, implant, true);
+                patient.getOptions().acquireAbility(MD_ADVANTAGES, implant, true);
             }
         }
 
