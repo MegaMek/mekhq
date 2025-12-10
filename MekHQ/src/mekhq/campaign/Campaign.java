@@ -129,9 +129,9 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Quartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
-import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.camOpsReputation.IUnitRating;
 import mekhq.campaign.camOpsReputation.ReputationController;
+import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -5981,10 +5981,17 @@ public class Campaign implements ITechManager {
      * @param type   what log to place the report in
      * @param report - the report String
      */
-    public void addReport(final DailyReportType type, String report) {
+    public void addReport(DailyReportType type, String report) {
         if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
             addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), report));
         }
+
+        // We handle this here, instead of 'addReportInternal' as we don't want to post multiple new day 'dates' to
+        // the General tab
+        if (MekHQ.getMHQOptions().getUnifiedDailyReport()) {
+            type = GENERAL;
+        }
+
         addReportInternal(type, report);
     }
 
