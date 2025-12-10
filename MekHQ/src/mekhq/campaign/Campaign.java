@@ -95,6 +95,7 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.Player;
 import megamek.common.SimpleTechLevel;
 import megamek.common.annotations.Nullable;
@@ -5982,6 +5983,10 @@ public class Campaign implements ITechManager {
      * @param report - the report String
      */
     public void addReport(DailyReportType type, String report) {
+        if (StringUtility.isNullOrBlank(report)) {
+            return;
+        }
+
         if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
             addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), report));
         }
