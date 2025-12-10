@@ -126,7 +126,7 @@ public class AdvancedMedicalAlternateHealing {
         Set<BodyLocation> prostheticPenalties = new HashSet<>();
         for (Injury injury : patient.getPermanentInjuries()) {
             InjurySubType injurySubType = injury.getSubType();
-            if (injurySubType.isProsthetic() || injurySubType.isImplant()) {
+            if (injurySubType.isPermanentModification()) {
                 BodyLocation location = injury.getLocation();
                 BodyLocation primaryLocation = location.getPrimaryLocation();
 

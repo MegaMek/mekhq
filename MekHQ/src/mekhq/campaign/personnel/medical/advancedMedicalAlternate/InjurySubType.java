@@ -119,6 +119,15 @@ public enum InjurySubType {
     }
 
     /**
+     * Checks whether this subtype represents a permanent modification, such as a prosthetic replacement, or implant.
+     *
+     * @return {@code true} if this subtype is a permanent modification
+     */
+    public boolean isPermanentModification() {
+        return isProsthetic() || isImplant();
+    }
+
+    /**
      * Checks whether this subtype represents an injury caused by a Flaw.
      *
      * @return {@code true} if this subtype is {@link #FLAW}, otherwise {@code false}.

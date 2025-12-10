@@ -2197,7 +2197,7 @@ public class Person {
             boolean hasProsthetic = false;
             for (Injury injury : getPermanentInjuries()) {
                 InjurySubType injurySubType = injury.getSubType();
-                if (injurySubType.isProsthetic() || injurySubType.isImplant()) {
+                if (injurySubType.isPermanentModification()) {
                     hasProsthetic = true;
                     break;
                 }
@@ -7107,13 +7107,13 @@ public class Person {
 
     public List<Injury> getProstheticInjuries() {
         return injuries.stream()
-                     .filter(i -> i.getSubType().isProsthetic() || i.getSubType().isImplant())
+                     .filter(i -> i.getSubType().isPermanentModification())
                      .collect(Collectors.toList());
     }
 
     public List<Injury> getNonProstheticInjuries() {
         return injuries.stream()
-                     .filter(i -> !i.getSubType().isProsthetic() && !i.getSubType().isImplant())
+                     .filter(i -> !i.getSubType().isPermanentModification())
                      .collect(Collectors.toList());
     }
 
@@ -7133,7 +7133,7 @@ public class Person {
     public void clearInjuriesExcludingProsthetics() {
         for (Injury injury : new ArrayList<>(injuries)) {
             InjurySubType injurySubType = injury.getSubType();
-            if (injurySubType.isProsthetic() || injurySubType.isImplant()) {
+            if (injurySubType.isPermanentModification()) {
                 removeInjury(injury);
             }
         }
@@ -7161,7 +7161,7 @@ public class Person {
     public void clearProstheticInjuries() {
         for (Injury injury : new ArrayList<>(injuries)) {
             InjurySubType injurySubType = injury.getSubType();
-            if (injurySubType.isProsthetic() || injurySubType.isImplant()) {
+            if (injurySubType.isPermanentModification()) {
                 removeInjury(injury);
             }
         }

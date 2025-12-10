@@ -1460,7 +1460,7 @@ public class CampaignNewDayManager {
             int prostheticCount = 1; // Minimum of 1
             for (Injury injury : person.getInjuries()) {
                 InjurySubType injurySubType = injury.getSubType();
-                if (injurySubType.isProsthetic() || injurySubType.isImplant()) {
+                if (injurySubType.isPermanentModification()) {
                     prostheticCount++;
                 }
             }

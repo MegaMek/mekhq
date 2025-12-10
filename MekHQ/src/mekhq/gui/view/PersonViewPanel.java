@@ -2806,7 +2806,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         String label;
         InjurySubType injurySubType = injury.getSubType();
-        if (injurySubType.isProsthetic() || injurySubType.isImplant()) {
+        if (injurySubType.isPermanentModification()) {
             label = String.format(resourceMap.getString("format.injuryLabel.prosthetic"), injury.getName());
         } else if (injury.isPermanent()) {
             label = String.format(resourceMap.getString("format.injuryLabel.permanent"), injury.getName(),
