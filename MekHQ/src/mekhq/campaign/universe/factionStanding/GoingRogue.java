@@ -33,7 +33,7 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.MAXIMUM_STANDING_LEVEL;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.POLITICAL_ROLES;
@@ -375,7 +375,7 @@ public class GoingRogue {
               targetRegard,
               campaign.getGameYear(),
               true);
-        campaign.addReport(GENERAL, report);
+        campaign.addReport(POLITICS, report);
     }
 
     /**
@@ -432,7 +432,7 @@ public class GoingRogue {
               campaign.getGameYear(),
               true
         );
-        campaign.addReport(GENERAL, report);
+        campaign.addReport(POLITICS, report);
     }
 
     /**
@@ -464,7 +464,7 @@ public class GoingRogue {
               targetRegard,
               campaign.getGameYear(),
               true);
-        campaign.addReport(GENERAL, report);
+        campaign.addReport(POLITICS, report);
     }
 
     /**

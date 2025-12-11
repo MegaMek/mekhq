@@ -894,6 +894,27 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                             campaign.getBattleReport().add(wn2.getTextContent());
                         }
                     }
+                } else if (nodeName.equalsIgnoreCase("politicsReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getPoliticsReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getPoliticsReport().add(wn2.getTextContent());
+                        }
+                    }
                 } else if (nodeName.equalsIgnoreCase("personnelReport")) {
                     // First, get all the child nodes;
                     NodeList nl2 = childNode.getChildNodes();
@@ -1116,6 +1137,20 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             newBattleReports.add(report);
         }
         campaign.setNewBattleReports(newBattleReports);
+
+        campaign.setPoliticsReportHTML(Utilities.combineString(campaign.getPoliticsReport(),
+              Campaign.REPORT_LINEBREAK));
+        List<String> newPoliticsReports = new ArrayList<>(campaign.getPoliticsReport().size() * 2);
+        boolean firstPoliticsReport = true;
+        for (String report : campaign.getPoliticsReport()) {
+            if (firstPoliticsReport) {
+                firstPoliticsReport = false;
+            } else {
+                newPoliticsReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newPoliticsReports.add(report);
+        }
+        campaign.setNewPoliticsReports(newPoliticsReports);
 
         campaign.setPersonnelReportHTML(Utilities.combineString(campaign.getPersonnelReport(),
               Campaign.REPORT_LINEBREAK));

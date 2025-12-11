@@ -2746,7 +2746,8 @@ public class CampaignGUI extends JPanel {
                     logNagActive = true;
                 }
 
-                int logsSelected = commandCenterTab.getTabLogs().getSelectedIndex();
+                EnhancedTabbedPane tabLogs = commandCenterTab.getTabLogs();
+                int logsSelected = tabLogs.getSelectedIndex();
                 if (logsSelected != relevantIndex) {
                     DailyReportLogPanel reportTab = switch (logType) {
                         case GENERAL -> commandCenterTab.getGeneralLog();
@@ -2756,6 +2757,7 @@ public class CampaignGUI extends JPanel {
                         case FINANCES -> commandCenterTab.getFinancesLog();
                         case ACQUISITIONS -> commandCenterTab.getAcquisitionsLog();
                         case TECHNICAL -> commandCenterTab.getTechnicalLog();
+                        case POLITICS -> commandCenterTab.getPoliticsLog();
                         case SKILL_CHECKS -> commandCenterTab.getSkillLog();
                     };
 

@@ -43,6 +43,7 @@ import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
@@ -270,6 +271,10 @@ public class CampaignNewDayManager {
         campaign.getBattleReport().clear();
         campaign.setBattleReportHTML("");
         campaign.getNewBattleReports().clear();
+
+        campaign.getPoliticsReport().clear();
+        campaign.setPoliticsReportHTML("");
+        campaign.getNewPoliticsReports().clear();
 
         campaign.getPersonnelReport().clear();
         campaign.setPersonnelReportHTML("");
@@ -1203,7 +1208,7 @@ public class CampaignNewDayManager {
         }
 
         if (!personnelToRemove.isEmpty()) {
-            campaign.addReport(GENERAL, resources.getString("personnelRemoval.text"));
+            campaign.addReport(PERSONNEL, resources.getString("personnelRemoval.text"));
         }
     }
 
@@ -1249,7 +1254,7 @@ public class CampaignNewDayManager {
                   today,
                   campaignOptions.getRegardMultiplier(),
                   campaignOptions.isTrackClimateRegardChanges());
-            campaign.addReport(GENERAL, report);
+            campaign.addReport(POLITICS, report);
         }
 
         List<Mission> activeMissions = campaign.getActiveMissions(false);
