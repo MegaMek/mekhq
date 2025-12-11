@@ -2748,8 +2748,21 @@ public class CampaignGUI extends JPanel {
 
                 int logsSelected = commandCenterTab.getTabLogs().getSelectedIndex();
                 if (logsSelected != relevantIndex) {
-                    commandCenterTab.nagLogTab(relevantIndex);
-                    commandCenterTab.setLogNagActive(logType, true);
+                    DailyReportLogPanel reportTab = switch (logType) {
+                        case GENERAL -> commandCenterTab.getGeneralLog();
+                        case BATTLE -> commandCenterTab.getBattleLog();
+                        case PERSONNEL -> commandCenterTab.getPersonnelLog();
+                        case MEDICAL -> commandCenterTab.getMedicalLog();
+                        case FINANCES -> commandCenterTab.getFinancesLog();
+                        case ACQUISITIONS -> commandCenterTab.getAcquisitionsLog();
+                        case TECHNICAL -> commandCenterTab.getTechnicalLog();
+                        case SKILL_CHECKS -> commandCenterTab.getSkillLog();
+                    };
+
+                    if (!DailyReportLogPanel.isDateOnly(List.of(reportTab.getLogText()))) {
+                        commandCenterTab.nagLogTab(relevantIndex);
+                        commandCenterTab.setLogNagActive(logType, true);
+                    }
                 }
 
                 break;
