@@ -42,6 +42,7 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEf
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.FLAW;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.IMPLANT_GENERIC;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.IMPLANT_VDNI;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.NORMAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -279,6 +280,7 @@ public class AlternateInjuries {
     public static final InjuryType BUFFERED_VDNI = new BufferedVDNI();
     public static final InjuryType BUFFERED_VDNI_TRIPLE_CORE = new BufferedVDNITripleCore();
     public static final InjuryType PAIN_SHUNT = new PainShunt();
+    public static final InjuryType IMPLANT_REMOVAL_RECOVERY = new ImplantRemovalRecovery();
 
     // Base injury type classes with common behavior
     private abstract static class BaseInjury extends InjuryType {
@@ -2125,6 +2127,15 @@ public class AlternateInjuries {
             this.injurySubType = IMPLANT_GENERIC;
             this.allowedLocations = Set.of(BRAIN);
             this.injuryEffect = InjuryEffect.PAIN_SHUNT;
+        }
+    }
+
+    public static final class ImplantRemovalRecovery extends BaseInjury {
+        ImplantRemovalRecovery() {
+            super(SEVER_HEALING_DAYS, false, DEADLY, InjuryEffect.BRAIN_TRAUMA, Set.of(BRAIN));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.IMPLANT_REMOVAL_RECOVERY.simpleName");
+            this.injurySubType = NORMAL;
         }
     }
 

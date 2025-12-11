@@ -318,6 +318,7 @@ public final class InjuryTypes {
                   "alt:CYBERNETIC_EAR_BOOSTED_COMMUNICATIONS",
                   AlternateInjuries.CYBERNETIC_EAR_BOOSTED_COMMUNICATIONS);
             InjuryType.register(191, "alt:CYBERNETIC_EAR_ENHANCED", AlternateInjuries.CYBERNETIC_EAR_ENHANCED);
+            InjuryType.register(192, "alt:IMPLANT_REMOVAL_RECOVERY", AlternateInjuries.IMPLANT_REMOVAL_RECOVERY);
 
             InjuryType.register("am:severed_spine", SEVERED_SPINE);
             InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);
