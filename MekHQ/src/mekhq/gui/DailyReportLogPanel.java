@@ -38,7 +38,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -143,9 +142,9 @@ public class DailyReportLogPanel extends JPanel {
         getTxtLog().setDocument(blank);
         getTxtLog().setCaretPosition(blank.getLength());
 
-        // If there is only one line in the log it means it's just the date header, so we don't want to alert the
+        // If there is only one line in the log, it means it's just the date header, so we don't want to alert the
         // player for no reason
-        if (text.lines().count() != 1) {
+        if (!isDateOnly(List.of(text))) {
             getGUI().checkDailyLogNag(type);
         }
         SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
@@ -172,24 +171,49 @@ public class DailyReportLogPanel extends JPanel {
         }
         getTxtLog().setCaretPosition(doc.getLength());
 
-        boolean isDateOnly = false;
-        if (newReports.size() == 1) {
-            String line = newReports.get(0);
-            String inner = line.substring(3, line.length() - 4); // strip <b> and </b>
-
-            // If parsing succeeds, it's a real report date
-            try {
-                LocalDate.parse(inner, DAILY_REPORT_DATE_FORMAT);
-                isDateOnly = true;
-            } catch (DateTimeParseException ignored) {
-                // Not a formatted date — do nothing
-            }
-        }
-
         // We only want to nag the player if there is something of value. So no nag occurs if we're just adding the date
-        if (!isDateOnly) {
+        if (!isDateOnly(newReports)) {
             getGUI().checkDailyLogNag(type);
         }
         SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
+    }
+
+    /**
+     * Checks whether the given list of report lines represents a single, date-only entry.
+     *
+     * <p>This method returns {@code true} only when all the following are true:</p>
+     * <ul>
+     *     <li>{@code reports} contains exactly one element,</li>
+     *     <li>that element is wrapped in {@code <b>} and {@code </b>} tags, and</li>
+     *     <li>the inner text parses successfully as a {@link LocalDate} using the {@link #DAILY_REPORT_DATE_FORMAT}
+     *     formatter.</li>
+     * </ul>
+     *
+     * <p>If the list size is not exactly one, the element is not correctly formatted, or the inner text cannot be
+     * parsed as a date, this method returns {@code false} without throwing an exception.</p>
+     *
+     * @param reports the list of report lines to inspect
+     *
+     * @return {@code true} if the list represents a single bolded, correctly formatted date-only entry; {@code false}
+     *       otherwise
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public static boolean isDateOnly(List<String> reports) {
+        boolean isDateOnly = false;
+        if (reports.size() == 1) {
+            // If parsing succeeds, it's a real report date
+            try {
+                String line = reports.get(0);
+                String inner = line.substring(3, line.length() - 4); // strip <b> and </b>
+
+                LocalDate.parse(inner, DAILY_REPORT_DATE_FORMAT);
+                isDateOnly = true;
+            } catch (Exception ignored) {
+                // Not a formatted date — do nothing
+            }
+        }
+        return isDateOnly;
     }
 }

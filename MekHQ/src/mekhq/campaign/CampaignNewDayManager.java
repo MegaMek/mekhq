@@ -43,6 +43,7 @@ import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
@@ -59,6 +60,7 @@ import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCo
 import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreedomDay;
 import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.SECONDARY_POWER_SUPPLY;
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
@@ -270,6 +272,10 @@ public class CampaignNewDayManager {
         campaign.getBattleReport().clear();
         campaign.setBattleReportHTML("");
         campaign.getNewBattleReports().clear();
+
+        campaign.getPoliticsReport().clear();
+        campaign.setPoliticsReportHTML("");
+        campaign.getNewPoliticsReports().clear();
 
         campaign.getPersonnelReport().clear();
         campaign.setPersonnelReportHTML("");
@@ -1203,7 +1209,7 @@ public class CampaignNewDayManager {
         }
 
         if (!personnelToRemove.isEmpty()) {
-            campaign.addReport(GENERAL, resources.getString("personnelRemoval.text"));
+            campaign.addReport(PERSONNEL, resources.getString("personnelRemoval.text"));
         }
     }
 
@@ -1249,7 +1255,7 @@ public class CampaignNewDayManager {
                   today,
                   campaignOptions.getRegardMultiplier(),
                   campaignOptions.isTrackClimateRegardChanges());
-            campaign.addReport(GENERAL, report);
+            campaign.addReport(POLITICS, report);
         }
 
         List<Mission> activeMissions = campaign.getActiveMissions(false);
@@ -1457,15 +1463,32 @@ public class CampaignNewDayManager {
         }
 
         if (personnelOptions.booleanOption(COMPULSION_PAINKILLER_ADDICTION)) {
-            int prostheticCount = 1; // Minimum of 1
+            int prostheticMedicalReliance = 1; // Minimum of 1
+            int myomerProsthetics = 0;
+            boolean hasPowerSupply = false;
+
             for (Injury injury : person.getInjuries()) {
                 InjurySubType injurySubType = injury.getSubType();
                 if (injurySubType.isPermanentModification()) {
-                    prostheticCount++;
+                    prostheticMedicalReliance++;
+                }
+
+                if (injurySubType.isMyomerProsthetic()) {
+                    myomerProsthetics++;
+                }
+
+                if (!hasPowerSupply && injury.getType() == SECONDARY_POWER_SUPPLY) {
+                    hasPowerSupply = true;
                 }
             }
 
-            Money cost = Money.of(PersonnelOptions.PAINKILLER_COST * prostheticCount);
+            if (!hasPowerSupply) {
+                myomerProsthetics *= 2;
+            }
+
+            int totalProstheticCount = prostheticMedicalReliance + myomerProsthetics;
+
+            Money cost = Money.of(PersonnelOptions.PAINKILLER_COST * totalProstheticCount);
             if (!finances.debit(TransactionType.MEDICAL_EXPENSES, today, cost,
                   getFormattedTextAt(RESOURCE_BUNDLE, "painkillerAddiction.transaction", person.getFullTitle()))) {
                 checkForDiscontinuationSyndrome(person,

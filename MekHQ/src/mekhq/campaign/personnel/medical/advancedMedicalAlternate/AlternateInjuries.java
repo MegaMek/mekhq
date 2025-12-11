@@ -42,6 +42,8 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEf
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.FLAW;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.IMPLANT_GENERIC;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.IMPLANT_VDNI;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.NORMAL;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.PROSTHETIC_MYOMER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -257,6 +259,9 @@ public class AlternateInjuries {
     public static final InjuryType CYBERNETIC_EYE_LASER = new CyberneticEyeLaser();
     public static final InjuryType CYBERNETIC_EYE_MULTI = new CyberneticEyeMulti();
     public static final InjuryType CYBERNETIC_EYE_MULTI_ENHANCED = new CyberneticEyeMultiEnhanced();
+    public static final InjuryType CYBERNETIC_EAR_COMMUNICATIONS = new CyberneticEarCommunications();
+    public static final InjuryType CYBERNETIC_EAR_BOOSTED_COMMUNICATIONS = new CyberneticEarBoostedCommunications();
+    public static final InjuryType CYBERNETIC_EAR_ENHANCED = new CyberneticEarEnhanced();
     public static final InjuryType CYBERNETIC_EAR_SIGNAL = new CyberneticEarSignal();
     public static final InjuryType CYBERNETIC_EAR_MULTI = new CyberneticEarMulti();
     public static final InjuryType CYBERNETIC_SPEECH_IMPLANT = new CyberneticSpeechImplant();
@@ -276,6 +281,8 @@ public class AlternateInjuries {
     public static final InjuryType BUFFERED_VDNI = new BufferedVDNI();
     public static final InjuryType BUFFERED_VDNI_TRIPLE_CORE = new BufferedVDNITripleCore();
     public static final InjuryType PAIN_SHUNT = new PainShunt();
+    public static final InjuryType IMPLANT_REMOVAL_RECOVERY = new ImplantRemovalRecovery();
+    public static final InjuryType SECONDARY_POWER_SUPPLY = new SecondaryPowerSupply();
 
     // Base injury type classes with common behavior
     private abstract static class BaseInjury extends InjuryType {
@@ -1260,7 +1267,7 @@ public class AlternateInjuries {
                   NONE,
                   Set.of(INTERNAL)); // A placeholder effect, we replace it later
             this.maxSeverity = 0; // Prosthetics don't count towards the character's "hits"
-            this.injurySubType = InjurySubType.PROSTHETIC;
+            this.injurySubType = InjurySubType.PROSTHETIC_GENERIC;
         }
     }
 
@@ -1508,6 +1515,7 @@ public class AlternateInjuries {
         MyomerArm() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
             this.injuryEffect = TYPE_5_LIMB_REPLACEMENT;
         }
@@ -1523,6 +1531,7 @@ public class AlternateInjuries {
         MyomerHand() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_HAND, RIGHT_HAND);
             this.injuryEffect = TYPE_5_LIMB_REPLACEMENT;
         }
@@ -1538,6 +1547,7 @@ public class AlternateInjuries {
         MyomerLeg() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
             this.injuryEffect = TYPE_5_LIMB_REPLACEMENT;
         }
@@ -1553,6 +1563,7 @@ public class AlternateInjuries {
         MyomerFoot() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_FOOT, RIGHT_FOOT);
             this.injuryEffect = TYPE_5_LIMB_REPLACEMENT;
         }
@@ -1742,6 +1753,7 @@ public class AlternateInjuries {
         ElectiveMyomerArm() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
             this.injuryEffect = MYOMER_IMPLANT_ARM;
         }
@@ -1757,6 +1769,7 @@ public class AlternateInjuries {
         DermalMyomerArmorArm() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_ARMOR.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
             this.injuryEffect = MYOMER_IMPLANT_ARM;
         }
@@ -1772,6 +1785,7 @@ public class AlternateInjuries {
         DermalMyomerCamoArm() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_CAMO.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
             this.injuryEffect = MYOMER_IMPLANT_ARM;
         }
@@ -1787,6 +1801,7 @@ public class AlternateInjuries {
         DermalMyomerTripleArm() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_TRIPLE.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
             this.injuryEffect = TRIPLE_STRENGTH_MYOMER_IMPLANT_ARM;
         }
@@ -1802,6 +1817,7 @@ public class AlternateInjuries {
         ElectiveMyomerHand() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_HAND, RIGHT_HAND);
             this.injuryEffect = MYOMER_IMPLANT_HAND;
         }
@@ -1817,6 +1833,7 @@ public class AlternateInjuries {
         ElectiveMyomerLeg() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
             this.injuryEffect = MYOMER_IMPLANT_LEG;
         }
@@ -1832,6 +1849,7 @@ public class AlternateInjuries {
         DermalMyomerArmorLeg() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_ARMOR.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
             this.injuryEffect = MYOMER_IMPLANT_LEG;
         }
@@ -1847,6 +1865,7 @@ public class AlternateInjuries {
         DermalMyomerCamoLeg() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_CAMO.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
             this.injuryEffect = MYOMER_IMPLANT_LEG;
         }
@@ -1862,6 +1881,7 @@ public class AlternateInjuries {
         DermalMyomerTripleLeg() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_TRIPLE.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
             this.injuryEffect = TRIPLE_STRENGTH_MYOMER_IMPLANT_LEG;
         }
@@ -1937,7 +1957,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CYBERNETIC_EYE_TELESCOPE.simpleName");
             this.allowedLocations = Set.of(EYES);
-            this.injuryEffect = InjuryEffect.CYBERNETIC_EYE_TELESCOPE;
+            this.injuryEffect = InjuryEffect.EYESIGHT_ENHANCED;
         }
     }
 
@@ -1947,7 +1967,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CYBERNETIC_EYE_LASER.simpleName");
             this.allowedLocations = Set.of(EYES);
-            this.injuryEffect = InjuryEffect.CYBERNETIC_EYE_LASER;
+            this.injuryEffect = InjuryEffect.EYESIGHT_LASER;
         }
     }
 
@@ -1957,7 +1977,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CYBERNETIC_EYE_MULTI.simpleName");
             this.allowedLocations = Set.of(EYES);
-            this.injuryEffect = InjuryEffect.CYBERNETIC_EYE_MULTI;
+            this.injuryEffect = InjuryEffect.EYESIGHT_MULTI;
         }
     }
 
@@ -1967,7 +1987,37 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CYBERNETIC_EYE_MULTI_ENHANCED.simpleName");
             this.allowedLocations = Set.of(EYES);
-            this.injuryEffect = InjuryEffect.CYBERNETIC_EYE_MULTI;
+            this.injuryEffect = InjuryEffect.EYESIGHT_MULTI;
+        }
+    }
+
+    public static final class CyberneticEarCommunications extends Prosthetic {
+        CyberneticEarCommunications() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.CYBERNETIC_EAR_COMMUNICATIONS.simpleName");
+            this.allowedLocations = Set.of(EARS);
+            this.injuryEffect = NONE;
+        }
+    }
+
+    public static final class CyberneticEarBoostedCommunications extends Prosthetic {
+        CyberneticEarBoostedCommunications() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.CYBERNETIC_EAR_BOOSTED_COMMUNICATIONS.simpleName");
+            this.allowedLocations = Set.of(EARS);
+            this.injuryEffect = NONE;
+        }
+    }
+
+    public static final class CyberneticEarEnhanced extends Prosthetic {
+        CyberneticEarEnhanced() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.CYBERNETIC_EAR_ENHANCED.simpleName");
+            this.allowedLocations = Set.of(EARS);
+            this.injuryEffect = InjuryEffect.HEARING_ENHANCED;
         }
     }
 
@@ -1977,7 +2027,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CYBERNETIC_EAR_SIGNAL.simpleName");
             this.allowedLocations = Set.of(EARS);
-            this.injuryEffect = InjuryEffect.CYBERNETIC_EAR_SIGNAL;
+            this.injuryEffect = NONE;
         }
     }
 
@@ -1987,7 +2037,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CYBERNETIC_EAR_MULTI.simpleName");
             this.allowedLocations = Set.of(EARS);
-            this.injuryEffect = InjuryEffect.CYBERNETIC_EAR_MULTI;
+            this.injuryEffect = InjuryEffect.HEARING_ENHANCED;
         }
     }
 
@@ -2008,6 +2058,16 @@ public class AlternateInjuries {
                   "AlternateInjuries.PHEROMONE_EFFUSER.simpleName");
             this.allowedLocations = Set.of(INTERNAL);
             this.injuryEffect = InjuryEffect.PHEROMONE_EFFUSER;
+        }
+    }
+
+    public static final class SecondaryPowerSupply extends Prosthetic {
+        SecondaryPowerSupply() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.SECONDARY_POWER_SUPPLY.simpleName");
+            this.allowedLocations = Set.of(INTERNAL);
+            this.injuryEffect = InjuryEffect.NONE;
         }
     }
 
@@ -2095,6 +2155,15 @@ public class AlternateInjuries {
         }
     }
 
+    public static final class ImplantRemovalRecovery extends BaseInjury {
+        ImplantRemovalRecovery() {
+            super(SEVER_HEALING_DAYS, false, DEADLY, InjuryEffect.BRAIN_TRAUMA, Set.of(BRAIN));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.IMPLANT_REMOVAL_RECOVERY.simpleName");
+            this.injurySubType = NORMAL;
+        }
+    }
+
     public static final class CosmeticLegProsthetic extends Prosthetic {
         CosmeticLegProsthetic() {
             super();
@@ -2106,7 +2175,7 @@ public class AlternateInjuries {
 
         @Override
         public String getName(BodyLocation loc, int severity) {
-            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName",
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COSMETIC_ANIMAL_LEG_PROSTHETIC.simpleName",
                   Utilities.capitalize(loc.locationName()));
         }
     }
@@ -2156,7 +2225,7 @@ public class AlternateInjuries {
 
     public static final class DiscontinuationSyndrome extends BaseInjury {
         DiscontinuationSyndrome() {
-            super(WEEKLY_CHECK_ILLNESS_HEALING_DAYS,
+            super(DISCONTINUATION_SYNDROME_HEALING_DAYS,
                   false,
                   CHRONIC,
                   InjuryEffect.STRESS,

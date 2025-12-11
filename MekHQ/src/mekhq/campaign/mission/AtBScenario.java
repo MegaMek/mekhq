@@ -353,7 +353,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (campaignOptions.isUseWeatherConditions()) {
             setWeatherConditions(campaignOptions.isUseNoTornadoes());
         }
-        setMapSize();
+        setMapSize(campaign);
         setMapFile();
         if (isStandardScenario()) {
             forceCount = 1;
@@ -465,7 +465,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
     }
 
-    public void setMapSize() {
+    public void setMapSize(Campaign campaign) {
         int roll = Compute.randomInt(20) + 1;
         if (roll < 6) {
             setMapSizeX(20);

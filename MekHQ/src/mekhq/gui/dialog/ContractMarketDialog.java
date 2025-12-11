@@ -34,6 +34,7 @@
 package mekhq.gui.dialog;
 
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.universe.Faction.getActiveMercenaryOrganization;
 
 import java.awt.BorderLayout;
@@ -630,7 +631,7 @@ public class ContractMarketDialog extends JDialog {
                                 campaign.getLocalDate(), campaign.getCampaignOptions().getRegardMultiplier(), 1);
 
                     if (standingsReport != null) {
-                        campaign.addReport(GENERAL, standingsReport);
+                        campaign.addReport(POLITICS, standingsReport);
                     }
                 }
 
