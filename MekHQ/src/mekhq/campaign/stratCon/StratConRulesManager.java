@@ -662,8 +662,8 @@ public class StratConRulesManager {
         }
 
         // Finally, finish scenario set up
-        finalizeScenario(backingScenario, contract, campaign);
         setScenarioParametersFromBiome(track, scenario, campaign.getCampaignOptions().isUseNoTornadoes());
+        finalizeScenario(backingScenario, contract, campaign);
         swapInPlayerUnits(scenario, campaign, FORCE_NONE);
 
         if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
