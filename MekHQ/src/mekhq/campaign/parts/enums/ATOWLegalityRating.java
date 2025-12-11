@@ -50,37 +50,49 @@ public enum ATOWLegalityRating {
           AvailabilityValue.C, 1.25,
           AvailabilityValue.D, 1.5,
           AvailabilityValue.E, 2.0,
-          AvailabilityValue.F, 4.0)),
+          AvailabilityValue.F, 4.0,
+          AvailabilityValue.F_STAR, 6.0, // ATOW doesn't include F* or X so we base it on F
+          AvailabilityValue.X, 8.0)),
     B("B", Map.of(AvailabilityValue.A, 1.0,
           AvailabilityValue.B, 2.0,
           AvailabilityValue.C, 2.5,
           AvailabilityValue.D, 2.5, // ATOW states this is 2.0, but that's clearly a typo
           AvailabilityValue.E, 3.0,
-          AvailabilityValue.F, 6.0)),
+          AvailabilityValue.F, 6.0,
+          AvailabilityValue.F_STAR, 9.0,
+          AvailabilityValue.X, 12.0)),
     C("C", Map.of(AvailabilityValue.A, 2.0,
           AvailabilityValue.B, 3.0,
           AvailabilityValue.C, 4.0,
           AvailabilityValue.D, 4.0, // ATOW states this is 3.0, but that's clearly a typo
           AvailabilityValue.E, 4.0,
-          AvailabilityValue.F, 9.0)),
+          AvailabilityValue.F, 9.0,
+          AvailabilityValue.F_STAR, 13.5,
+          AvailabilityValue.X, 18.0)),
     D("D", Map.of(AvailabilityValue.A, 3.0,
           AvailabilityValue.B, 4.0,
           AvailabilityValue.C, 5.0,
           AvailabilityValue.D, 6.0,
           AvailabilityValue.E, 8.0,
-          AvailabilityValue.F, 14.0)),
+          AvailabilityValue.F, 14.0,
+          AvailabilityValue.F_STAR, 21.0,
+          AvailabilityValue.X, 28.0)),
     E("E", Map.of(AvailabilityValue.A, 5.0,
           AvailabilityValue.B, 6.0,
           AvailabilityValue.C, 7.0,
           AvailabilityValue.D, 10.0,
           AvailabilityValue.E, 15.0,
-          AvailabilityValue.F, 21.0)),
+          AvailabilityValue.F, 21.0,
+          AvailabilityValue.F_STAR, 31.5,
+          AvailabilityValue.X, 42.0)),
     F("F", Map.of(AvailabilityValue.A, 7.0,
           AvailabilityValue.B, 9.0,
           AvailabilityValue.C, 11.0,
           AvailabilityValue.D, 13.0,
           AvailabilityValue.E, 20.0,
-          AvailabilityValue.F, 30.0));
+          AvailabilityValue.F, 30.0,
+          AvailabilityValue.F_STAR, 45.0,
+          AvailabilityValue.X, 60.0));
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ATOWLegalityRating";
 
@@ -117,8 +129,8 @@ public enum ATOWLegalityRating {
     }
 
     /**
-     * Returns the enum constant name. This is preferred over the display text
-     * for logging/debugging, as UI layers should use {@link #getDescription()}.
+     * Returns the enum constant name. This is preferred over the display text for logging/debugging, as UI layers
+     * should use {@link #getDescription()}.
      *
      * @return the enum constant identifier (e.g., "A", "B", ...)
      */
