@@ -156,7 +156,7 @@ public class AdvancedMedicalAlternateImplants {
      *   report.</li>
      * </ol>
      *
-     * @param campaign the current {@link Campaign}, used for game year, logging and other campaign context
+     * @param campaign the current {@link Campaign}, used for game year, logging, and other campaign context
      * @param person   the {@link Person} to evaluate; must not be {@code null}
      */
     public static void performEnhancedImagingDegradationCheck(Campaign campaign, Person person) {
@@ -271,7 +271,7 @@ public class AdvancedMedicalAlternateImplants {
             }
         }
 
-        return eligibleProstheticsCount >= prostheticThreshold;
+        return eligibleProstheticsCount == prostheticThreshold;
     }
 
     /**
