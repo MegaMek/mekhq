@@ -62,6 +62,7 @@ import megamek.common.options.IOption;
 import mekhq.MHQConstants;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.ATOWLegalityRating;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.BodyLocation;
@@ -91,6 +92,7 @@ public enum ProstheticType {
           AlternateInjuries.ADVANCED_PROSTHETIC_ARM,
           Money.of(25000),
           PlanetarySystem.PlanetarySophistication.C,
+          ATOWLegalityRating.A,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
           false,
           false,
@@ -102,6 +104,7 @@ public enum ProstheticType {
           AlternateInjuries.ADVANCED_PROSTHETIC_FOOT,
           Money.of(17500),
           PlanetarySystem.PlanetarySophistication.C,
+          ATOWLegalityRating.A,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
           false,
           false,
@@ -113,6 +116,7 @@ public enum ProstheticType {
           AlternateInjuries.ADVANCED_PROSTHETIC_HAND,
           Money.of(25000),
           PlanetarySystem.PlanetarySophistication.C,
+          ATOWLegalityRating.A,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
           false,
           false,
@@ -124,6 +128,7 @@ public enum ProstheticType {
           AlternateInjuries.ADVANCED_PROSTHETIC_LEG,
           Money.of(17500),
           PlanetarySystem.PlanetarySophistication.C,
+          ATOWLegalityRating.A,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
           false,
           false,
@@ -135,6 +140,7 @@ public enum ProstheticType {
           AlternateInjuries.BIONIC_EAR,
           Money.of(100000),
           PlanetarySystem.PlanetarySophistication.D,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.C, AvailabilityValue.A,
           false,
           false,
@@ -146,6 +152,7 @@ public enum ProstheticType {
           AlternateInjuries.BIONIC_EYE,
           Money.of(220000),
           PlanetarySystem.PlanetarySophistication.D,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.C, AvailabilityValue.A,
           false,
           false,
@@ -157,6 +164,7 @@ public enum ProstheticType {
           AlternateInjuries.BIONIC_HEART,
           Money.of(500000),
           PlanetarySystem.PlanetarySophistication.D,
+          ATOWLegalityRating.A,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
           false,
           false,
@@ -168,6 +176,7 @@ public enum ProstheticType {
           AlternateInjuries.BIONIC_LUNGS,
           Money.of(800000),
           PlanetarySystem.PlanetarySophistication.D,
+          ATOWLegalityRating.A,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
           false,
           false,
@@ -179,6 +188,7 @@ public enum ProstheticType {
           AlternateInjuries.BIONIC_LUNGS_WITH_TYPE_1_FILTER,
           Money.of(805000),
           PlanetarySystem.PlanetarySophistication.C,
+          ATOWLegalityRating.C,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
           false,
           false,
@@ -192,6 +202,7 @@ public enum ProstheticType {
           AlternateInjuries.BIONIC_LUNGS_WITH_TYPE_2_FILTER,
           Money.of(815000),
           PlanetarySystem.PlanetarySophistication.C,
+          ATOWLegalityRating.C,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
           false,
           false,
@@ -205,6 +216,7 @@ public enum ProstheticType {
           AlternateInjuries.BIONIC_LUNGS_WITH_TYPE_3_FILTER,
           Money.of(845000),
           PlanetarySystem.PlanetarySophistication.C,
+          ATOWLegalityRating.C,
           AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C,
           false,
           false,
@@ -218,6 +230,7 @@ public enum ProstheticType {
           AlternateInjuries.BIONIC_ORGAN_OTHER,
           Money.of(750000),
           PlanetarySystem.PlanetarySophistication.D,
+          ATOWLegalityRating.A,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.C,
           false,
           false,
@@ -229,6 +242,7 @@ public enum ProstheticType {
           AlternateInjuries.BONE_REINFORCEMENT,
           Money.of(10000),
           PlanetarySystem.PlanetarySophistication.D,
+          ATOWLegalityRating.B,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
@@ -242,6 +256,7 @@ public enum ProstheticType {
           AlternateInjuries.BUFFERED_VDNI,
           Money.of(2000000),
           PlanetarySystem.PlanetarySophistication.A,
+          ATOWLegalityRating.F,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
           false,
           false,
@@ -255,6 +270,7 @@ public enum ProstheticType {
           AlternateInjuries.BUFFERED_VDNI_TRIPLE_CORE,
           Money.of(5000000),
           PlanetarySystem.PlanetarySophistication.A,
+          ATOWLegalityRating.F,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
           false,
           false,
@@ -268,6 +284,7 @@ public enum ProstheticType {
           AlternateInjuries.CLONED_ARM,
           Money.of(500000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.A,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           true,
           false,
@@ -279,6 +296,7 @@ public enum ProstheticType {
           AlternateInjuries.CLONED_FOOT,
           Money.of(50000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.A,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           true,
           false,
@@ -290,6 +308,7 @@ public enum ProstheticType {
           AlternateInjuries.CLONED_HAND,
           Money.of(300000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.A,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           true,
           false,
@@ -301,6 +320,7 @@ public enum ProstheticType {
           AlternateInjuries.CLONED_LEG,
           Money.of(350000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.A,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           true,
           false,
@@ -312,6 +332,7 @@ public enum ProstheticType {
           AlternateInjuries.COSMETIC_ANIMAL_EAR_PROSTHETIC,
           Money.of(60000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.B,
           AvailabilityValue.F, AvailabilityValue.F, AvailabilityValue.E,
           false,
           false,
@@ -325,6 +346,7 @@ public enum ProstheticType {
           AlternateInjuries.COSMETIC_ANIMAL_LEG_PROSTHETIC,
           Money.of(60000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.B,
           AvailabilityValue.F, AvailabilityValue.F, AvailabilityValue.E,
           false,
           false,
@@ -338,6 +360,7 @@ public enum ProstheticType {
           AlternateInjuries.COSMETIC_BEAUTY_ENHANCEMENT,
           Money.of(15000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.A,
           AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.C,
           false,
           false,
@@ -351,6 +374,7 @@ public enum ProstheticType {
           AlternateInjuries.COSMETIC_HORROR_ENHANCEMENT,
           Money.of(15000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.A,
           AvailabilityValue.E, AvailabilityValue.E, AvailabilityValue.E,
           false,
           false,
@@ -364,6 +388,7 @@ public enum ProstheticType {
           AlternateInjuries.COSMETIC_SURGERY,
           Money.of(2500),
           PlanetarySystem.PlanetarySophistication.F,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
@@ -375,6 +400,7 @@ public enum ProstheticType {
           AlternateInjuries.COSMETIC_TAIL_PROSTHETIC,
           Money.of(60000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.B,
           AvailabilityValue.F, AvailabilityValue.F, AvailabilityValue.E,
           false,
           false,
@@ -388,6 +414,7 @@ public enum ProstheticType {
           AlternateInjuries.CYBERNETIC_EAR_BOOSTED_COMMUNICATIONS,
           Money.of(8000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.F,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D,
           false,
           false,
@@ -401,6 +428,7 @@ public enum ProstheticType {
           AlternateInjuries.CYBERNETIC_EAR_COMMUNICATIONS,
           Money.of(8000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.F,
           AvailabilityValue.E, AvailabilityValue.F, AvailabilityValue.D,
           false,
           false,
@@ -414,6 +442,7 @@ public enum ProstheticType {
           AlternateInjuries.CYBERNETIC_EAR_ENHANCED,
           Money.of(200000),
           PlanetarySystem.PlanetarySophistication.D,
+          ATOWLegalityRating.B,
           AvailabilityValue.E, AvailabilityValue.F, AvailabilityValue.C,
           false,
           false,
@@ -427,6 +456,7 @@ public enum ProstheticType {
           AlternateInjuries.CYBERNETIC_EAR_MULTI,
           Money.of(600000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.B,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D,
           false,
           false,
@@ -440,6 +470,7 @@ public enum ProstheticType {
           AlternateInjuries.CYBERNETIC_EAR_SIGNAL,
           Money.of(400000),
           PlanetarySystem.PlanetarySophistication.C,
+          ATOWLegalityRating.C,
           AvailabilityValue.E, AvailabilityValue.F, AvailabilityValue.C,
           false,
           false,
@@ -453,6 +484,7 @@ public enum ProstheticType {
           AlternateInjuries.CYBERNETIC_EYE_EM_IR,
           Money.of(650000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.B,
           AvailabilityValue.D, AvailabilityValue.E, AvailabilityValue.C,
           false,
           false,
@@ -466,6 +498,7 @@ public enum ProstheticType {
           AlternateInjuries.CYBERNETIC_EYE_LASER,
           Money.of(600000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.B,
           AvailabilityValue.D, AvailabilityValue.E, AvailabilityValue.C,
           false,
           false,
@@ -479,6 +512,7 @@ public enum ProstheticType {
           AlternateInjuries.CYBERNETIC_EYE_MULTI,
           Money.of(1050000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.B,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D,
           false,
           false,
@@ -492,6 +526,7 @@ public enum ProstheticType {
           AlternateInjuries.CYBERNETIC_EYE_MULTI_ENHANCED,
           Money.of(17000000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.B,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D,
           false,
           false,
@@ -505,6 +540,7 @@ public enum ProstheticType {
           AlternateInjuries.CYBERNETIC_EYE_TELESCOPE,
           Money.of(450000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.B,
           AvailabilityValue.D, AvailabilityValue.E, AvailabilityValue.C,
           false,
           false,
@@ -518,6 +554,7 @@ public enum ProstheticType {
           AlternateInjuries.CYBERNETIC_SPEECH_IMPLANT,
           Money.of(200000),
           PlanetarySystem.PlanetarySophistication.D,
+          ATOWLegalityRating.C,
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.C,
           false,
           false,
@@ -531,6 +568,7 @@ public enum ProstheticType {
           AlternateInjuries.DERMAL_MYOMER_ARM_ARMOR,
           Money.of(450000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.F,
           AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.E,
           false,
           false,
@@ -544,6 +582,7 @@ public enum ProstheticType {
           AlternateInjuries.DERMAL_MYOMER_ARM_CAMO,
           Money.of(330000),
           PlanetarySystem.PlanetarySophistication.A,
+          ATOWLegalityRating.F,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
           false,
           false,
@@ -557,6 +596,7 @@ public enum ProstheticType {
           AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE,
           Money.of(750000),
           PlanetarySystem.PlanetarySophistication.A,
+          ATOWLegalityRating.F,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
           false,
           false,
@@ -570,6 +610,7 @@ public enum ProstheticType {
           AlternateInjuries.DERMAL_MYOMER_LEG_ARMOR,
           Money.of(562500),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.F,
           AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.E,
           false,
           false,
@@ -583,6 +624,7 @@ public enum ProstheticType {
           AlternateInjuries.DERMAL_MYOMER_LEG_CAMO,
           Money.of(412500),
           PlanetarySystem.PlanetarySophistication.A,
+          ATOWLegalityRating.F,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
           false,
           false,
@@ -596,6 +638,7 @@ public enum ProstheticType {
           AlternateInjuries.DERMAL_MYOMER_LEG_TRIPLE,
           Money.of(937500),
           PlanetarySystem.PlanetarySophistication.A,
+          ATOWLegalityRating.F,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
           false,
           false,
@@ -609,6 +652,7 @@ public enum ProstheticType {
           AlternateInjuries.ELECTIVE_MYOMER_ARM,
           Money.of(300000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.A,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           false,
           false,
@@ -622,6 +666,7 @@ public enum ProstheticType {
           AlternateInjuries.ELECTIVE_MYOMER_HAND,
           Money.of(150000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.A,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           false,
           false,
@@ -635,6 +680,7 @@ public enum ProstheticType {
           AlternateInjuries.ELECTIVE_MYOMER_LEG,
           Money.of(375000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.A,
           AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E,
           false,
           false,
@@ -648,6 +694,7 @@ public enum ProstheticType {
           AlternateInjuries.ENHANCED_IMAGING_IMPLANT,
           Money.of(1500000),
           PlanetarySystem.PlanetarySophistication.A,
+          ATOWLegalityRating.F,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D,
           true,
           false,
@@ -661,6 +708,7 @@ public enum ProstheticType {
           AlternateInjuries.EYE_IMPLANT,
           Money.of(350),
           PlanetarySystem.PlanetarySophistication.F,
+          ATOWLegalityRating.A,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
           false,
           false,
@@ -672,6 +720,7 @@ public enum ProstheticType {
           AlternateInjuries.HOOK_HAND,
           Money.of(75),
           PlanetarySystem.PlanetarySophistication.REGRESSED,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
@@ -683,6 +732,7 @@ public enum ProstheticType {
           AlternateInjuries.LIVER_FILTRATION_IMPLANT,
           Money.of(10000),
           PlanetarySystem.PlanetarySophistication.C,
+          ATOWLegalityRating.C,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
@@ -696,6 +746,7 @@ public enum ProstheticType {
           AlternateInjuries.MYOMER_ARM,
           Money.of(200000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.A,
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
           false,
           true,
@@ -707,6 +758,7 @@ public enum ProstheticType {
           AlternateInjuries.MYOMER_FOOT,
           Money.of(50000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.A,
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
           false,
           true,
@@ -718,6 +770,7 @@ public enum ProstheticType {
           AlternateInjuries.MYOMER_HAND,
           Money.of(100000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.A,
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
           false,
           true,
@@ -729,6 +782,7 @@ public enum ProstheticType {
           AlternateInjuries.MYOMER_LEG,
           Money.of(125000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.A,
           AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
           false,
           true,
@@ -740,6 +794,7 @@ public enum ProstheticType {
           AlternateInjuries.PAIN_SHUNT,
           Money.of(50000),
           PlanetarySystem.PlanetarySophistication.A,
+          ATOWLegalityRating.F,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
           false,
           false,
@@ -753,6 +808,7 @@ public enum ProstheticType {
           AlternateInjuries.PEG_LEG,
           Money.of(75),
           PlanetarySystem.PlanetarySophistication.REGRESSED,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
@@ -764,6 +820,7 @@ public enum ProstheticType {
           AlternateInjuries.PHEROMONE_EFFUSER,
           Money.of(40000),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.E,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
           false,
           false,
@@ -777,6 +834,7 @@ public enum ProstheticType {
           AlternateInjuries.PROSTHETIC_ARM,
           Money.of(7500),
           PlanetarySystem.PlanetarySophistication.D,
+          ATOWLegalityRating.A,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
           false,
           false,
@@ -788,6 +846,7 @@ public enum ProstheticType {
           AlternateInjuries.PROSTHETIC_FOOT,
           Money.of(10000),
           PlanetarySystem.PlanetarySophistication.D,
+          ATOWLegalityRating.A,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
           false,
           false,
@@ -799,6 +858,7 @@ public enum ProstheticType {
           AlternateInjuries.PROSTHETIC_HAND,
           Money.of(7500),
           PlanetarySystem.PlanetarySophistication.D,
+          ATOWLegalityRating.A,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
           false,
           false,
@@ -810,6 +870,7 @@ public enum ProstheticType {
           AlternateInjuries.PROSTHETIC_LEG,
           Money.of(10000),
           PlanetarySystem.PlanetarySophistication.D,
+          ATOWLegalityRating.A,
           AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.B,
           false,
           false,
@@ -821,6 +882,7 @@ public enum ProstheticType {
           AlternateInjuries.SEVERED_ARM,
           Money.of(0),
           PlanetarySystem.PlanetarySophistication.REGRESSED,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
@@ -834,6 +896,7 @@ public enum ProstheticType {
           AlternateInjuries.IMPLANT_REMOVAL_RECOVERY,
           Money.of(0),
           PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
@@ -847,6 +910,7 @@ public enum ProstheticType {
           AlternateInjuries.SEVERED_FOOT,
           Money.of(0),
           PlanetarySystem.PlanetarySophistication.REGRESSED,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
@@ -860,6 +924,7 @@ public enum ProstheticType {
           AlternateInjuries.SEVERED_HAND,
           Money.of(0),
           PlanetarySystem.PlanetarySophistication.REGRESSED,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
@@ -873,6 +938,7 @@ public enum ProstheticType {
           AlternateInjuries.SEVERED_LEG,
           Money.of(0),
           PlanetarySystem.PlanetarySophistication.REGRESSED,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
@@ -886,6 +952,7 @@ public enum ProstheticType {
           AlternateInjuries.SIMPLE_ARM,
           Money.of(750),
           PlanetarySystem.PlanetarySophistication.F,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
           false,
           false,
@@ -897,6 +964,7 @@ public enum ProstheticType {
           AlternateInjuries.SIMPLE_CLAW_HAND,
           Money.of(750),
           PlanetarySystem.PlanetarySophistication.F,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
           false,
           false,
@@ -908,6 +976,7 @@ public enum ProstheticType {
           AlternateInjuries.SIMPLE_FOOT,
           Money.of(250),
           PlanetarySystem.PlanetarySophistication.F,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
           false,
           false,
@@ -919,6 +988,7 @@ public enum ProstheticType {
           AlternateInjuries.SIMPLE_LEG,
           Money.of(250),
           PlanetarySystem.PlanetarySophistication.F,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.B, AvailabilityValue.A,
           false,
           false,
@@ -930,6 +1000,7 @@ public enum ProstheticType {
           AlternateInjuries.VEHICULAR_DNI,
           Money.of(1400000),
           PlanetarySystem.PlanetarySophistication.A,
+          ATOWLegalityRating.F,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
           false,
           false,
@@ -943,6 +1014,7 @@ public enum ProstheticType {
           AlternateInjuries.WOODEN_ARM,
           Money.of(75),
           PlanetarySystem.PlanetarySophistication.REGRESSED,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
@@ -954,6 +1026,7 @@ public enum ProstheticType {
           AlternateInjuries.WOODEN_FOOT,
           Money.of(75),
           PlanetarySystem.PlanetarySophistication.REGRESSED,
+          ATOWLegalityRating.A,
           AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A,
           false,
           false,
@@ -972,6 +1045,7 @@ public enum ProstheticType {
     // directly to Planetary Sophistication. In this way ATOW tech rating A is Regressed, B is Sophistication F, and
     // so on.
     private final PlanetarySystem.PlanetarySophistication requiredPlanetarySophistication;
+    private final ATOWLegalityRating legality;
     private final AvailabilityValue availabilityEarly;
     private final AvailabilityValue availabilityMid;
     private final AvailabilityValue availabilityLate;
@@ -998,7 +1072,6 @@ public enum ProstheticType {
     private static final double AVAILABILITY_MULTIPLIER_F_STAR = 0.0;
     private static final double AVAILABILITY_MULTIPLIER_X = 0.0;
 
-
     /**
      * Constructs a new {@code ProstheticType} entry.
      *
@@ -1019,14 +1092,16 @@ public enum ProstheticType {
      */
     ProstheticType(String lookupName, ProstheticComplexity prostheticType, int surgeryLevel, InjuryType injuryType,
           Money baseCost, PlanetarySystem.PlanetarySophistication requiredPlanetarySophistication,
-          AvailabilityValue availabilityEarly, AvailabilityValue availabilityMid, AvailabilityValue availabilityLate,
-          boolean isClanOnly, boolean isComStarOnly, boolean isWordOfBlakeOnly, List<String> otherAffiliation) {
+          ATOWLegalityRating legality, AvailabilityValue availabilityEarly, AvailabilityValue availabilityMid,
+          AvailabilityValue availabilityLate, boolean isClanOnly, boolean isComStarOnly, boolean isWordOfBlakeOnly,
+          List<String> otherAffiliation) {
         this.lookupName = lookupName;
         this.prostheticType = prostheticType;
         this.surgeryLevel = surgeryLevel;
         this.injuryType = injuryType;
         this.baseCost = baseCost;
         this.requiredPlanetarySophistication = requiredPlanetarySophistication;
+        this.legality = legality;
         this.availabilityEarly = availabilityEarly;
         this.availabilityMid = availabilityMid;
         this.availabilityLate = availabilityLate;
@@ -1061,8 +1136,9 @@ public enum ProstheticType {
      */
     ProstheticType(String lookupName, ProstheticComplexity prostheticType, int surgeryLevel, InjuryType injuryType,
           Money baseCost, PlanetarySystem.PlanetarySophistication requiredPlanetarySophistication,
-          AvailabilityValue availabilityEarly, AvailabilityValue availabilityMid, AvailabilityValue availabilityLate,
-          boolean isClanOnly, boolean isComStarOnly, boolean isWordOfBlakeOnly, List<String> otherAffiliation,
+          ATOWLegalityRating legality, AvailabilityValue availabilityEarly, AvailabilityValue availabilityMid,
+          AvailabilityValue availabilityLate, boolean isClanOnly, boolean isComStarOnly, boolean isWordOfBlakeOnly,
+          List<String> otherAffiliation,
           List<String> associatedPilotOptions,
           List<String> associatedPersonnelOptions) {
         this.lookupName = lookupName;
@@ -1071,6 +1147,7 @@ public enum ProstheticType {
         this.injuryType = injuryType;
         this.baseCost = baseCost;
         this.requiredPlanetarySophistication = requiredPlanetarySophistication;
+        this.legality = legality;
         this.availabilityEarly = availabilityEarly;
         this.availabilityMid = availabilityMid;
         this.availabilityLate = availabilityLate;
@@ -1219,18 +1296,11 @@ public enum ProstheticType {
 
     /**
      * Calculates the adjusted cost of this prosthetic based on the purchasing faction and the current in-game date.
-     * Pricing is influenced by both the prosthetic's availability rating for the given year and whether the requesting
-     * faction has in-faction access to the item.
-     *
-     * <p>The availability rating for the year is resolved and converted into a price multiplier via
-     * {@link #getAvailabilityMultiplier(int, boolean)}. If the multiplier is {@code 0.0}, the prosthetic is considered
-     * unavailable in the specified era or to the specified faction, and this method returns {@code null} .</p>
-     *
-     * <p>Affiliation rules are evaluated using {@code campaignFactionCode}; factions outside the prosthetic's
-     * permitted affiliation list incur different availability multipliers.</p>
+     * Pricing is influenced by both the prosthetic's availability rating for the given year, whether the requesting
+     * faction has in-faction access to the item, and the item's legality.
      *
      * @param campaignFaction the faction attempting to acquire the prosthetic
-     * @param today           the current in-game date used to determine availability by year
+     * @param currentYear     the current in-game year
      *
      * @return the adjusted cost as a {@link Money} value, or {@code null} if the prosthetic is not available to the
      *       faction or in the specified year
@@ -1238,12 +1308,16 @@ public enum ProstheticType {
      * @author Illiani
      * @since 0.50.10
      */
-    public @Nullable Money getCost(Faction campaignFaction, LocalDate today) {
-        double availabilityMultiplier = getAvailabilityMultiplier(today.getYear(), isWrongAffiliation(campaignFaction));
+    public @Nullable Money getCost(Faction campaignFaction, int currentYear) {
+        boolean isWrongAffiliation = isWrongAffiliation(campaignFaction);
+        double availabilityMultiplier = getAvailabilityMultiplier(currentYear, isWrongAffiliation);
         if (availabilityMultiplier == 0.0) {
             return null;
         }
-        return baseCost.multipliedBy(availabilityMultiplier);
+
+        double legalityMultiplier = getLegalityMultiplier(currentYear, isWrongAffiliation);
+
+        return baseCost.multipliedBy(availabilityMultiplier).multipliedBy(legalityMultiplier);
     }
 
     /**
@@ -1268,16 +1342,108 @@ public enum ProstheticType {
      * @since 0.50.10
      */
     public double getAvailabilityMultiplier(int gameYear, boolean outsideFactionAccess) {
-        AvailabilityValue availability = getAvailability(gameYear);
+        AvailabilityValue availability = getAdjustedAvailability(gameYear, outsideFactionAccess);
+
         return switch (availability) {
-            case A -> outsideFactionAccess ? AVAILABILITY_MULTIPLIER_B : AVAILABILITY_MULTIPLIER_A;
-            case B -> outsideFactionAccess ? AVAILABILITY_MULTIPLIER_C : AVAILABILITY_MULTIPLIER_B;
-            case C -> outsideFactionAccess ? AVAILABILITY_MULTIPLIER_D : AVAILABILITY_MULTIPLIER_C;
-            case D -> outsideFactionAccess ? AVAILABILITY_MULTIPLIER_E : AVAILABILITY_MULTIPLIER_D;
-            case E -> outsideFactionAccess ? AVAILABILITY_MULTIPLIER_F : AVAILABILITY_MULTIPLIER_E;
-            case F -> outsideFactionAccess ? AVAILABILITY_MULTIPLIER_F_STAR : AVAILABILITY_MULTIPLIER_F;
-            case F_STAR -> outsideFactionAccess ? AVAILABILITY_MULTIPLIER_X : AVAILABILITY_MULTIPLIER_F_STAR;
+            case A -> AVAILABILITY_MULTIPLIER_A;
+            case B -> AVAILABILITY_MULTIPLIER_B;
+            case C -> AVAILABILITY_MULTIPLIER_C;
+            case D -> AVAILABILITY_MULTIPLIER_D;
+            case E -> AVAILABILITY_MULTIPLIER_E;
+            case F -> AVAILABILITY_MULTIPLIER_F;
+            case F_STAR -> AVAILABILITY_MULTIPLIER_F_STAR;
             case X -> AVAILABILITY_MULTIPLIER_X;
+        };
+    }
+
+    /**
+     * Derives the effective availability value of a prosthetic or implant, accounting for whether the purchase occurs
+     * outside normal faction channels.
+     *
+     * <p>When {@code outsideFactionAccess} is {@code true}, availability is degraded by one step (A→B, B→C, etc.).
+     * When {@code false}, the configured availability is returned unchanged.</p>
+     *
+     * @param outsideFactionAccess {@code true} if the acquisition lacks normal faction access
+     *
+     * @return the adjusted {@link AvailabilityValue} to use for pricing and availability checks
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public AvailabilityValue getAdjustedAvailability(int gameYear, boolean outsideFactionAccess) {
+        AvailabilityValue availability = getAvailability(gameYear);
+        if (!outsideFactionAccess) {
+            return availability;
+        }
+
+        return switch (availability) {
+            case A -> AvailabilityValue.B;
+            case B -> AvailabilityValue.C;
+            case C -> AvailabilityValue.D;
+            case D -> AvailabilityValue.E;
+            case E -> AvailabilityValue.F;
+            case F -> AvailabilityValue.F_STAR;
+            case F_STAR, X -> AvailabilityValue.X;
+        };
+    }
+
+    /**
+     * Computes the price multiplier to apply based on AToW legality and era availability.
+     *
+     * <p>This method first determines the effective {@link AvailabilityValue} for the given {@code gameYear} and
+     * adjusts the configured {@link ATOWLegalityRating legality}. If the adjusted legality is A, B, or C, no black
+     * market premium is applied and the multiplier is {@code 1.0}. For stricter legalities (D–F), the multiplier is
+     * derived from {@link ATOWLegalityRating#getBlackMarketMultiplier(AvailabilityValue)} using the resolved
+     * availability.</p>
+     *
+     * @param gameYear             the current in-universe year used to resolve availability
+     * @param outsideFactionAccess {@code true} if the purchase is attempted without normal faction access (e.g., on the
+     *                             black market); {@code false} for standard in-faction access
+     *
+     * @return the price multiplier to apply; {@code 1.0} when adjusted legality is A→C, otherwise the black-market
+     *       multiplier for the resolved availability under the adjusted legality
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public double getLegalityMultiplier(int gameYear, boolean outsideFactionAccess) {
+        AvailabilityValue availability = getAvailability(gameYear);
+        ATOWLegalityRating adjustedLegality = getAdjustedLegality(outsideFactionAccess);
+
+        // The player is not required to go through the black market
+        if (adjustedLegality == ATOWLegalityRating.A ||
+                  adjustedLegality == ATOWLegalityRating.B ||
+                  adjustedLegality == ATOWLegalityRating.C) {
+            return 1.0;
+        }
+
+        return adjustedLegality.getBlackMarketMultiplier(availability);
+    }
+
+    /**
+     * Derives the effective legality when acquiring a prosthetic or implant, accounting for whether the purchase occurs
+     * outside normal faction channels.
+     *
+     * <p>When {@code outsideFactionAccess} is {@code true}, the legality is degraded by one step (A→B, B→C, C→D,
+     * D→E) and E/F both become F. When {@code false}, the configured legality is returned unchanged.</p>
+     *
+     * @param outsideFactionAccess {@code true} if the acquisition lacks normal faction access
+     *
+     * @return the adjusted {@link ATOWLegalityRating} to use for pricing and availability checks
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    private ATOWLegalityRating getAdjustedLegality(boolean outsideFactionAccess) {
+        if (!outsideFactionAccess) {
+            return legality;
+        }
+        return switch (legality) {
+            case A -> ATOWLegalityRating.B;
+            case B -> ATOWLegalityRating.C;
+            case C -> ATOWLegalityRating.D;
+            case D -> ATOWLegalityRating.E;
+            case E, F -> ATOWLegalityRating.F;
         };
     }
 
@@ -1349,16 +1515,16 @@ public enum ProstheticType {
      * any associated personnel abilities.
      *
      * <p>This method respects faction-based availability when calculating cost (via
-     * {@link #getCost(Faction, LocalDate)}), and applies Kinder Mode to reduce the displayed recovery time when
-     * requested. Additional elements—such as attribute modifiers, derived skill effects, and associated implant
-     * options—are included only when applicable.</p>
+     * {@link #getCost(Faction, int)}), and applies Kinder Mode to reduce the displayed recovery time when requested.
+     * Additional elements—such as attribute modifiers, derived skill effects, and associated implant options—are
+     * included only when applicable.</p>
      *
      * <p><b>Ordering:</b> For consistency and readability, the display order of sections mirrors that used by
      * {@link InjuryEffect#getTooltip(List)}.</p>
      *
      * @param campaignFaction the faction requesting the tooltip, used to determine cost availability and any
      *                        affiliation-based restrictions
-     * @param today           the current in-game date used for availability and cost calculations
+     * @param currentYear     the current in-game year
      * @param isUseKinderMode {@code true} to reduce the listed recovery time by 50%; otherwise {@code false}
      *
      * @return a fully formatted HTML-compatible tooltip string suitable for display in Swing-based UI components
@@ -1366,19 +1532,18 @@ public enum ProstheticType {
      * @author Illiani
      * @since 0.50.10
      */
-    public String getTooltip(Faction campaignFaction, LocalDate today, boolean isUseKinderMode) {
+    public String getTooltip(Faction campaignFaction, int currentYear, boolean isUseKinderMode) {
         StringJoiner tooltipPortion = new StringJoiner("<br>- ", "- ", "");
 
         // 1) Surgery level required
         tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.skill", surgeryLevel));
 
         // 2) ATOW Type
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
-              "ProstheticType.tooltip.type",
+        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.type",
               prostheticType.toString()));
 
         // 3) Base cost
-        Money cost = getCost(campaignFaction, today);
+        Money cost = getCost(campaignFaction, currentYear);
         if (cost != null) {
             tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.cost",
                   cost.toAmountString()));
@@ -1388,18 +1553,29 @@ public enum ProstheticType {
         tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.sophistication",
               requiredPlanetarySophistication.getName()));
 
-        // 5) Estimated recovery time
+        // 5) Availability
+        boolean isWrongAffiliation = isWrongAffiliation(campaignFaction);
+        AvailabilityValue adjustedAvailability = getAdjustedAvailability(currentYear, isWrongAffiliation);
+        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.availability",
+              adjustedAvailability.getDescription(), adjustedAvailability.getName()));
+
+        // 6) Legality
+        ATOWLegalityRating adjustedLegality = getAdjustedLegality(isWrongAffiliation);
+        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.legality",
+              adjustedLegality.getDescription(), adjustedLegality.name()));
+
+        // 7) Estimated recovery time
         int recoveryTime = (int) round(injuryType.getBaseRecoveryTime() * (isUseKinderMode ? 0.5 : 1.0));
         tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.recovery", recoveryTime));
 
-        // 6) Misc
+        // 8) Misc
         InjuryEffect effect = injuryType.getInjuryEffect();
         int toughness = effect.getToughnessModifier();
         if (toughness != 0) {
             tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.toughness", toughness));
         }
 
-        // 7) Skills
+        // 9) Skills
         int gunnery = effect.getGunneryModifier();
         if (gunnery != 0) {
             tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.gunnery", gunnery));
@@ -1442,7 +1618,7 @@ public enum ProstheticType {
             tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.acrobatics", acrobatics));
         }
 
-        // 8) Attribute modifiers
+        // 10) Attribute modifiers
         Map<SkillAttribute, Integer> attributeTotals = new EnumMap<>(SkillAttribute.class);
 
         addToMap(attributeTotals, SkillAttribute.STRENGTH, effect.getStrengthModifier());
@@ -1461,7 +1637,7 @@ public enum ProstheticType {
             }
         }
 
-        // 9) Implants
+        // 11) Implants
         PersonnelOptions options = new PersonnelOptions();
         for (String lookupName : associatedPilotOptions) {
             IOption option = options.getOption(lookupName);
@@ -1488,7 +1664,7 @@ public enum ProstheticType {
                   tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.camo"));
         }
 
-        // 10) Abilities
+        // 12) Abilities
         for (String lookupName : associatedPersonnelOptions) {
             IOption ability = options.getOption(lookupName);
             String label = ability == null ? lookupName : ability.getDisplayableName();

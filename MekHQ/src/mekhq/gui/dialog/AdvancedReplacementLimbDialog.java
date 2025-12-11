@@ -403,7 +403,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      */
     private JComboBox<ProstheticType> createTreatmentComboBox(List<ProstheticType> options) {
         Faction campaignFaction = campaign.getFaction();
-        LocalDate today = campaign.getLocalDate();
+        int currentYear = campaign.getGameYear();
         boolean isOnPlanet = campaign.getLocation().isOnPlanet();
         boolean isUseKinderMode = campaign.getCampaignOptions().isUseKinderAlternativeAdvancedMedical();
 
@@ -439,8 +439,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                     setText(type.toString());
 
                     // Build tooltip with base info and exclusions
-                    String baseTooltip = type.getTooltip(campaignFaction, today, isUseKinderMode);
-                    String exclusions = getExclusions(isOnPlanet, type, campaignFaction, today);
+                    String baseTooltip = type.getTooltip(campaignFaction, currentYear, isUseKinderMode);
+                    String exclusions = getExclusions(isOnPlanet, type, campaignFaction, currentYear);
 
                     if (!exclusions.isBlank()) {
                         enabled = false;
@@ -463,8 +463,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             if (selected == null) {
                 comboBox.setToolTipText(defaultTooltip);
             } else {
-                String baseTooltip = selected.getTooltip(campaignFaction, today, isUseKinderMode);
-                baseTooltip += getExclusions(isOnPlanet, selected, campaignFaction, today);
+                String baseTooltip = selected.getTooltip(campaignFaction, currentYear, isUseKinderMode);
+                baseTooltip += getExclusions(isOnPlanet, selected, campaignFaction, currentYear);
                 comboBox.setToolTipText(wordWrap(baseTooltip));
             }
             updateSummary(); // Update summary when selection changes
@@ -560,7 +560,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                 surgeryLevelNeeded = neededSurgeryLevel;
             }
 
-            Money cost = surgeryType.getCost(campaign.getFaction(), campaign.getLocalDate());
+            Money cost = surgeryType.getCost(campaign.getFaction(), campaign.getGameYear());
             if (cost != null) {
                 totalCost = totalCost.plus(cost);
             }
@@ -608,7 +608,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      *                        certain prosthetic types
      * @param selected        the prosthetic type being evaluated for availability
      * @param campaignFaction the faction of the campaign, used to determine faction-based access
-     * @param today           the current in-game date, used to check era-based availability
+     * @param currentYear     the current in-game year
      *
      * @return an HTML-formatted string containing all applicable restriction messages, or an empty string if the
      *       prosthetic is fully allowed
@@ -617,7 +617,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * @since 0.50.10
      */
     private String getExclusions(boolean isOnPlanet, ProstheticType selected, Faction campaignFaction,
-          LocalDate today) {
+          int currentYear) {
         if (isGMMode) {
             return "";
         }
@@ -665,7 +665,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                       "AdvancedReplacementLimbDialog.exclusions.tech", warningColor, CLOSING_SPAN_TAG);
             }
 
-            if (selected.getCost(campaignFaction, today) == null) {
+            if (selected.getCost(campaignFaction, currentYear) == null) {
                 tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
                       "AdvancedReplacementLimbDialog.exclusions.year", warningColor, CLOSING_SPAN_TAG);
             }
@@ -1054,7 +1054,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                           // We shouldn't hit `null` at this point, as any null selections should have been filtered
                           // out
                           s -> Objects.requireNonNull(
-                                s.type().getCost(campaign.getFaction(), campaign.getLocalDate())),
+                                s.type().getCost(campaign.getFaction(), campaign.getGameYear())),
                           Comparator.reverseOrder() // highest cost first
                     )
         );
@@ -1206,12 +1206,12 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         Map<BodyLocation, ProstheticType> selections = new HashMap<>();
         boolean isPlanetside = campaign.getLocation().isOnPlanet();
         Faction campaignFaction = campaign.getFaction();
-        LocalDate today = campaign.getLocalDate();
+        int currentYear = campaign.getGameYear();
         for (Map.Entry<BodyLocation, JComboBox<ProstheticType>> entry :
               treatmentSelections.entrySet()) {
             ProstheticType selectedTreatment = (ProstheticType) entry.getValue().getSelectedItem();
 
-            String exclusions = getExclusions(isPlanetside, selectedTreatment, campaignFaction, today);
+            String exclusions = getExclusions(isPlanetside, selectedTreatment, campaignFaction, currentYear);
             if (selectedTreatment != null && exclusions.isBlank()) {
                 selections.put(entry.getKey(), selectedTreatment);
             }
