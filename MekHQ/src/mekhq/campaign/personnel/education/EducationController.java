@@ -1773,16 +1773,7 @@ public class EducationController {
 
         int currentLevel = skill.getLevel();
         SkillType type = skill.getType();
-        int targetLevel = switch (targetExperienceLevel) {
-            case EXP_ULTRA_GREEN -> max(0, type.getGreenLevel() - 1);
-            case EXP_GREEN -> type.getGreenLevel();
-            case EXP_REGULAR -> type.getRegularLevel();
-            case EXP_VETERAN -> type.getVeteranLevel();
-            case EXP_ELITE -> type.getEliteLevel();
-            case EXP_HEROIC -> type.getHeroicLevel();
-            case EXP_LEGENDARY -> type.getLegendaryLevel();
-            default -> 0;
-        };
+        int targetLevel = type.getLevelFromExperience(targetExperienceLevel);
 
         boolean underTarget = currentLevel <= targetLevel;
         if (underTarget) {
