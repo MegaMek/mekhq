@@ -311,6 +311,13 @@ public final class InjuryTypes {
             InjuryType.register(186, "alt:CRIPPLING_FLASHBACKS", AlternateInjuries.CRIPPLING_FLASHBACKS);
             InjuryType.register(187, "alt:CHILDLIKE_REGRESSION", AlternateInjuries.CHILDLIKE_REGRESSION);
             InjuryType.register(188, "alt:CATATONIA", AlternateInjuries.CATATONIA);
+            InjuryType.register(189,
+                  "alt:CYBERNETIC_EAR_COMMUNICATIONS",
+                  AlternateInjuries.CYBERNETIC_EAR_COMMUNICATIONS);
+            InjuryType.register(190,
+                  "alt:CYBERNETIC_EAR_BOOSTED_COMMUNICATIONS",
+                  AlternateInjuries.CYBERNETIC_EAR_BOOSTED_COMMUNICATIONS);
+            InjuryType.register(191, "alt:CYBERNETIC_EAR_ENHANCED", AlternateInjuries.CYBERNETIC_EAR_ENHANCED);
 
             InjuryType.register("am:severed_spine", SEVERED_SPINE);
             InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);
