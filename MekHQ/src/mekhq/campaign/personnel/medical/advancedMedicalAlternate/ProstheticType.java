@@ -1494,4 +1494,33 @@ public enum ProstheticType {
     private static void addToMap(Map<SkillAttribute, Integer> map, SkillAttribute key, int value) {
         map.merge(key, value, Integer::sum);
     }
+
+    /**
+     * Fetches the {@link ProstheticType} that corresponds to a given {@link InjuryType} produced by a permanent
+     * modification (implant/prosthetic).
+     *
+     * <p>This is a convenience lookup used when removing or analyzing injuries to determine which prosthetic granted
+     * the effect. If the provided injury type is not a permanent modification, or if no matching prosthetic is defined,
+     * this returns {@code null}.</p>
+     *
+     * @param injuryType the injury type to resolve; ignored if it is not a permanent modification
+     *
+     * @return the matching prosthetic type, or {@code null} if none applies
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public static @Nullable ProstheticType getProstheticFromInjury(InjuryType injuryType) {
+        if (!injuryType.getSubType().isPermanentModification()) {
+            return null;
+        }
+
+        for (ProstheticType prosthetic : ProstheticType.values()) {
+            if (prosthetic.getInjuryType() == injuryType) {
+                return prosthetic;
+            }
+        }
+
+        return null;
+    }
 }

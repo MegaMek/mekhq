@@ -38,16 +38,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.BodyLocation;
 
 public class AdvancedMedicalAlternate {
@@ -279,5 +283,59 @@ public class AdvancedMedicalAlternate {
         }
 
         return false;
+    }
+
+    /**
+     * Removes the specified injury from this person and updates any associated benefits granted by permanent
+     * modifications (prosthetics/implants).
+     *
+     * <p>Behavior details:</p>
+     * <ul>
+     *   <li>Deletes the given {@link Injury} from the internal injury list.</li>
+     *   <li>Invokes {@link AdvancedMedicalAlternate#removeAssociatedInjuryOptions(Injury, List, PersonnelOptions)}
+     *   to disable personnel/pilot options that were provided exclusively by the removed prosthetic or implant.</li>
+     *   <li>Fires a {@link PersonChangedEvent} to notify the rest of the system.</li>
+     * </ul>
+     *
+     * <p>Note: Only options that are not still provided by other existing prosthetics/implants will be disabled.</p>
+     *
+     * @param injury the injury instance to remove; if not present, the method is a no-op
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public static void removeAssociatedInjuryOptions(Injury injury, List<Injury> injuries, PersonnelOptions options) {
+        InjuryType injuryType = injury.getType();
+        ProstheticType prostheticType = ProstheticType.getProstheticFromInjury(injuryType);
+
+        if (prostheticType != null) {
+            Set<String> benefitsToRemove = new HashSet<>(prostheticType.getAssociatedPersonnelOptions());
+            benefitsToRemove.addAll(prostheticType.getAssociatedPilotOptions());
+
+            if (!benefitsToRemove.isEmpty()) {
+                Set<String> providedByOthers = new HashSet<>();
+                for (Injury otherInjury : injuries) {
+                    ProstheticType otherProstheticType = ProstheticType.getProstheticFromInjury(otherInjury.getType());
+                    if (otherProstheticType == null) {
+                        continue;
+                    }
+                    providedByOthers.addAll(otherProstheticType.getAssociatedPersonnelOptions());
+                    providedByOthers.addAll(otherProstheticType.getAssociatedPilotOptions());
+                }
+
+                // Remove any benefits still granted by other prosthetics
+                benefitsToRemove.removeAll(providedByOthers);
+
+                // Apply removals only for benefits no longer granted
+                if (!benefitsToRemove.isEmpty()) {
+                    for (String ability : benefitsToRemove) {
+                        IOption option = options.getOption(ability);
+                        if (option != null) {
+                            option.setValue(false);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
