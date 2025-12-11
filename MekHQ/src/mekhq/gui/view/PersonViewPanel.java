@@ -121,6 +121,7 @@ import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -2804,7 +2805,8 @@ public class PersonViewPanel extends JScrollablePanel {
         String durationText = messageSurroundedBySpanWithColor(durationColor, durationValue);
 
         String label;
-        if (injury.getSubType().isProsthetic()) {
+        InjurySubType injurySubType = injury.getSubType();
+        if (injurySubType.isPermanentModification()) {
             label = String.format(resourceMap.getString("format.injuryLabel.prosthetic"), injury.getName());
         } else if (injury.isPermanent()) {
             label = String.format(resourceMap.getString("format.injuryLabel.permanent"), injury.getName(),
