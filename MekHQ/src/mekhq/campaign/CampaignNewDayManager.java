@@ -59,6 +59,7 @@ import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCo
 import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreedomDay;
 import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.SECONDARY_POWER_SUPPLY;
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
@@ -1470,6 +1471,14 @@ public class CampaignNewDayManager {
                 if (injurySubType.isMyomerProsthetic()) {
                     myomerProsthetics++;
                 }
+
+                if (!hasPowerSupply && injury.getType() == SECONDARY_POWER_SUPPLY) {
+                    hasPowerSupply = true;
+                }
+            }
+
+            if (!hasPowerSupply) {
+                myomerProsthetics *= 2;
             }
 
             int totalProstheticCount = prostheticMedicalReliance + myomerProsthetics;
