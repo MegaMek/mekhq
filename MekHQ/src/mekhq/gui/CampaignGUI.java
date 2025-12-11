@@ -2746,7 +2746,6 @@ public class CampaignGUI extends JPanel {
                     logNagActive = true;
                 }
 
-                EnhancedTabbedPane tabLogs = commandCenterTab.getTabLogs();
                 int logsSelected = commandCenterTab.getTabLogs().getSelectedIndex();
                 if (logsSelected != relevantIndex) {
                     DailyReportLogPanel reportTab = switch (logType) {
@@ -2760,7 +2759,7 @@ public class CampaignGUI extends JPanel {
                         case SKILL_CHECKS -> commandCenterTab.getSkillLog();
                     };
 
-                    if (!DailyReportLogPanel.isIsDateOnly(List.of(reportTab.getLogText()))) {
+                    if (!DailyReportLogPanel.isDateOnly(List.of(reportTab.getLogText()))) {
                         commandCenterTab.nagLogTab(relevantIndex);
                         commandCenterTab.setLogNagActive(logType, true);
                     }
