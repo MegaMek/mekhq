@@ -75,7 +75,7 @@ public final class DiplomacyLabel {
      *                      war declaration); must not be {@code null}
      *
      * @return a list of formatted diplomacy event labels for all faction pairs whose hints begin on the given date;
-     *       never {@code null}, ut may be empty
+     *       never {@code null}, but may be empty
      *
      * @author Illiani
      * @since 0.50.11

@@ -297,8 +297,6 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         dailyReportTab.setToolTipTextAt(GENERAL.getTabIndex(), GENERAL.getTooltip());
         dailyReportTab.addTab(BATTLE.getIconString(), getBattleLogPanel());
         dailyReportTab.setToolTipTextAt(BATTLE.getTabIndex(), BATTLE.getTooltip());
-        dailyReportTab.addTab(POLITICS.getIconString(), getPoliticsLogPanel());
-        dailyReportTab.setToolTipTextAt(POLITICS.getTabIndex(), POLITICS.getTooltip());
         dailyReportTab.addTab(PERSONNEL.getIconString(), getPersonnelLogPanel());
         dailyReportTab.setToolTipTextAt(PERSONNEL.getTabIndex(), PERSONNEL.getTooltip());
         dailyReportTab.addTab(MEDICAL.getIconString(), getMedicalLogPanel());
@@ -309,6 +307,8 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         dailyReportTab.setToolTipTextAt(ACQUISITIONS.getTabIndex(), ACQUISITIONS.getTooltip());
         dailyReportTab.addTab(TECHNICAL.getIconString(), getTechnicalLogPanel());
         dailyReportTab.setToolTipTextAt(TECHNICAL.getTabIndex(), TECHNICAL.getTooltip());
+        dailyReportTab.addTab(POLITICS.getIconString(), getPoliticsLogPanel());
+        dailyReportTab.setToolTipTextAt(POLITICS.getTabIndex(), POLITICS.getTooltip());
         dailyReportTab.addTab(SKILL_CHECKS.getIconString(), getSkillLogPanel());
         dailyReportTab.setToolTipTextAt(SKILL_CHECKS.getTabIndex(), SKILL_CHECKS.getTooltip());
 
