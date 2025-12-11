@@ -590,7 +590,7 @@ public enum ProstheticType {
           List.of("CC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE, MISC_PAIN_RESISTANCE)),
-    DERMAL_MYOMER_ARM_TRIPLE("DERMAL_MYOMER_LEG_TRIPLE",
+    DERMAL_MYOMER_ARM_TRIPLE("DERMAL_MYOMER_ARM_TRIPLE",
           ENHANCED,
           5,
           AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE,
