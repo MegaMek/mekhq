@@ -132,6 +132,7 @@ import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -2195,7 +2196,8 @@ public class Person {
         if (isAlternativeAdvancedMedicalEnabled && hasBodyModAddiction) {
             boolean hasProsthetic = false;
             for (Injury injury : getPermanentInjuries()) {
-                if (injury.getSubType().isProsthetic()) {
+                InjurySubType injurySubType = injury.getSubType();
+                if (injurySubType.isPermanentModification()) {
                     hasProsthetic = true;
                     break;
                 }
@@ -7104,11 +7106,15 @@ public class Person {
     }
 
     public List<Injury> getProstheticInjuries() {
-        return injuries.stream().filter(i -> i.getSubType().isProsthetic()).collect(Collectors.toList());
+        return injuries.stream()
+                     .filter(i -> i.getSubType().isPermanentModification())
+                     .collect(Collectors.toList());
     }
 
     public List<Injury> getNonProstheticInjuries() {
-        return injuries.stream().filter(i -> !i.getSubType().isProsthetic()).collect(Collectors.toList());
+        return injuries.stream()
+                     .filter(i -> !i.getSubType().isPermanentModification())
+                     .collect(Collectors.toList());
     }
 
     /**
@@ -7126,7 +7132,8 @@ public class Person {
      */
     public void clearInjuriesExcludingProsthetics() {
         for (Injury injury : new ArrayList<>(injuries)) {
-            if (!injury.getSubType().isProsthetic()) {
+            InjurySubType injurySubType = injury.getSubType();
+            if (injurySubType.isPermanentModification()) {
                 removeInjury(injury);
             }
         }
@@ -7153,7 +7160,8 @@ public class Person {
      */
     public void clearProstheticInjuries() {
         for (Injury injury : new ArrayList<>(injuries)) {
-            if (injury.getSubType().isProsthetic()) {
+            InjurySubType injurySubType = injury.getSubType();
+            if (injurySubType.isPermanentModification()) {
                 removeInjury(injury);
             }
         }

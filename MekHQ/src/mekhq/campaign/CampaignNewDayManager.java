@@ -148,6 +148,7 @@ import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.QuickTrain;
@@ -1463,7 +1464,8 @@ public class CampaignNewDayManager {
         if (personnelOptions.booleanOption(COMPULSION_PAINKILLER_ADDICTION)) {
             int prostheticCount = 1; // Minimum of 1
             for (Injury injury : person.getInjuries()) {
-                if (injury.getSubType().isProsthetic()) {
+                InjurySubType injurySubType = injury.getSubType();
+                if (injurySubType.isPermanentModification()) {
                     prostheticCount++;
                 }
             }
