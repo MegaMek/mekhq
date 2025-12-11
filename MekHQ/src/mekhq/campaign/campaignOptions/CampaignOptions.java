@@ -626,6 +626,7 @@ public class CampaignOptions {
     private boolean useAdvancedScouting;
     private boolean noSeedForces;
     private SkillLevel skillLevel;
+    private BoardScalingType boardScalingType;
 
     // Contract Operations
     private int moraleVictoryEffect;
@@ -1282,6 +1283,7 @@ public class CampaignOptions {
         useAdvancedScouting = false;
         noSeedForces = false;
         setSkillLevel(SkillLevel.REGULAR);
+        boardScalingType = BoardScalingType.NORMAL;
         autoResolveMethod = AutoResolveMethod.PRINCESS;
         autoResolveVictoryChanceEnabled = false;
         autoResolveNumberOfScenarios = 100;
@@ -4948,6 +4950,14 @@ public class CampaignOptions {
 
     public void setSkillLevel(final SkillLevel skillLevel) {
         this.skillLevel = skillLevel;
+    }
+
+    public BoardScalingType getBoardScalingType() {
+        return boardScalingType;
+    }
+
+    public void setBoardScalingType(final BoardScalingType boardScalingType) {
+        this.boardScalingType = boardScalingType;
     }
 
     public boolean isAeroRecruitsHaveUnits() {
