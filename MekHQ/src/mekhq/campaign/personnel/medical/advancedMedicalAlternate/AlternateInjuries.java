@@ -40,6 +40,8 @@ import static mekhq.campaign.personnel.medical.BodyLocation.*;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate.MAXIMUM_INJURY_DURATION_MULTIPLIER;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect.*;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.FLAW;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.IMPLANT_GENERIC;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.IMPLANT_VDNI;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -2054,6 +2056,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.VEHICULAR_DNI.simpleName");
+            this.injurySubType = IMPLANT_VDNI;
             this.allowedLocations = Set.of(BRAIN);
             this.injuryEffect = NONE;
         }
@@ -2064,6 +2067,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.BUFFERED_VDNI.simpleName");
+            this.injurySubType = IMPLANT_VDNI;
             this.allowedLocations = Set.of(BRAIN);
             this.injuryEffect = NONE;
         }
@@ -2074,6 +2078,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.BUFFERED_VDNI_TRIPLE_CORE.simpleName");
+            this.injurySubType = IMPLANT_VDNI;
             this.allowedLocations = Set.of(BRAIN);
             this.injuryEffect = TRIPLE_CORE_PROCESSOR;
         }
@@ -2084,6 +2089,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.PAIN_SHUNT.simpleName");
+            this.injurySubType = IMPLANT_GENERIC;
             this.allowedLocations = Set.of(BRAIN);
             this.injuryEffect = InjuryEffect.PAIN_SHUNT;
         }
@@ -2109,6 +2115,7 @@ public class AlternateInjuries {
         EnhancedImagingImplant() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ENHANCED_IMAGING.simpleName");
+            this.injurySubType = IMPLANT_GENERIC;
             this.allowedLocations = Set.of(BRAIN);
             this.injuryEffect = NONE;
         }
