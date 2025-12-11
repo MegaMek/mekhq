@@ -576,7 +576,7 @@ public enum ProstheticType {
           List.of("CC", "MOC"),
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION, FLAW_UNATTRACTIVE)),
-    DERMAL_MYOMER_ARM_CAMO("DERMAL_MYOMER_LEG_CAMO",
+    DERMAL_MYOMER_ARM_CAMO("DERMAL_MYOMER_ARM_CAMO",
           ENHANCED,
           5,
           AlternateInjuries.DERMAL_MYOMER_ARM_CAMO,
