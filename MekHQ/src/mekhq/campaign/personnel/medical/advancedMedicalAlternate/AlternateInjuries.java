@@ -255,6 +255,9 @@ public class AlternateInjuries {
     public static final InjuryType CYBERNETIC_EYE_LASER = new CyberneticEyeLaser();
     public static final InjuryType CYBERNETIC_EYE_MULTI = new CyberneticEyeMulti();
     public static final InjuryType CYBERNETIC_EYE_MULTI_ENHANCED = new CyberneticEyeMultiEnhanced();
+    public static final InjuryType CYBERNETIC_EAR_COMMUNICATIONS = new CyberneticEarCommunications();
+    public static final InjuryType CYBERNETIC_EAR_BOOSTED_COMMUNICATIONS = new CyberneticEarBoostedCommunications();
+    public static final InjuryType CYBERNETIC_EAR_ENHANCED = new CyberneticEarEnhanced();
     public static final InjuryType CYBERNETIC_EAR_SIGNAL = new CyberneticEarSignal();
     public static final InjuryType CYBERNETIC_EAR_MULTI = new CyberneticEarMulti();
     public static final InjuryType CYBERNETIC_SPEECH_IMPLANT = new CyberneticSpeechImplant();
@@ -1935,7 +1938,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CYBERNETIC_EYE_TELESCOPE.simpleName");
             this.allowedLocations = Set.of(EYES);
-            this.injuryEffect = InjuryEffect.CYBERNETIC_EYE_TELESCOPE;
+            this.injuryEffect = InjuryEffect.EYESIGHT_ENHANCED;
         }
     }
 
@@ -1945,7 +1948,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CYBERNETIC_EYE_LASER.simpleName");
             this.allowedLocations = Set.of(EYES);
-            this.injuryEffect = InjuryEffect.CYBERNETIC_EYE_LASER;
+            this.injuryEffect = InjuryEffect.EYESIGHT_LASER;
         }
     }
 
@@ -1955,7 +1958,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CYBERNETIC_EYE_MULTI.simpleName");
             this.allowedLocations = Set.of(EYES);
-            this.injuryEffect = InjuryEffect.CYBERNETIC_EYE_MULTI;
+            this.injuryEffect = InjuryEffect.EYESIGHT_MULTI;
         }
     }
 
@@ -1965,7 +1968,37 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CYBERNETIC_EYE_MULTI_ENHANCED.simpleName");
             this.allowedLocations = Set.of(EYES);
-            this.injuryEffect = InjuryEffect.CYBERNETIC_EYE_MULTI;
+            this.injuryEffect = InjuryEffect.EYESIGHT_MULTI;
+        }
+    }
+
+    public static final class CyberneticEarCommunications extends Prosthetic {
+        CyberneticEarCommunications() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.CYBERNETIC_EAR_COMMUNICATIONS.simpleName");
+            this.allowedLocations = Set.of(EARS);
+            this.injuryEffect = NONE;
+        }
+    }
+
+    public static final class CyberneticEarBoostedCommunications extends Prosthetic {
+        CyberneticEarBoostedCommunications() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.CYBERNETIC_EAR_BOOSTED_COMMUNICATIONS.simpleName");
+            this.allowedLocations = Set.of(EARS);
+            this.injuryEffect = NONE;
+        }
+    }
+
+    public static final class CyberneticEarEnhanced extends Prosthetic {
+        CyberneticEarEnhanced() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.CYBERNETIC_EAR_ENHANCED.simpleName");
+            this.allowedLocations = Set.of(EARS);
+            this.injuryEffect = InjuryEffect.HEARING_ENHANCED;
         }
     }
 
@@ -1975,7 +2008,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CYBERNETIC_EAR_SIGNAL.simpleName");
             this.allowedLocations = Set.of(EARS);
-            this.injuryEffect = InjuryEffect.CYBERNETIC_EAR_SIGNAL;
+            this.injuryEffect = NONE;
         }
     }
 
@@ -1985,7 +2018,7 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CYBERNETIC_EAR_MULTI.simpleName");
             this.allowedLocations = Set.of(EARS);
-            this.injuryEffect = InjuryEffect.CYBERNETIC_EAR_MULTI;
+            this.injuryEffect = InjuryEffect.HEARING_ENHANCED;
         }
     }
 
@@ -2149,7 +2182,7 @@ public class AlternateInjuries {
 
     public static final class DiscontinuationSyndrome extends BaseInjury {
         DiscontinuationSyndrome() {
-            super(WEEKLY_CHECK_ILLNESS_HEALING_DAYS,
+            super(DISCONTINUATION_SYNDROME_HEALING_DAYS,
                   false,
                   CHRONIC,
                   InjuryEffect.STRESS,
