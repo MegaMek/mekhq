@@ -7175,6 +7175,10 @@ public class Person {
 
     public void removeInjury(final Injury injury) {
         injuries.remove(injury);
+
+        // We need to make sure we also remove any associated abilities and implants
+        AdvancedMedicalAlternate.removeAssociatedInjuryOptions(injury, injuries, options);
+
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
