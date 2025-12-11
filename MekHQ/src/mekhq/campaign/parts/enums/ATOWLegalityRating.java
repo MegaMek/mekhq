@@ -116,13 +116,13 @@ public enum ATOWLegalityRating {
         return getTextAt(RESOURCE_BUNDLE, "ATOWLegalityRating." + lookupName + ".description");
     }
 
-    @Override
     /**
      * Returns the enum constant name. This is preferred over the display text
      * for logging/debugging, as UI layers should use {@link #getDescription()}.
      *
      * @return the enum constant identifier (e.g., "A", "B", ...)
      */
+    @Override
     public String toString() {
         return this.name();
     }
