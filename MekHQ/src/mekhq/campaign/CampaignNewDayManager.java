@@ -1457,15 +1457,24 @@ public class CampaignNewDayManager {
         }
 
         if (personnelOptions.booleanOption(COMPULSION_PAINKILLER_ADDICTION)) {
-            int prostheticCount = 1; // Minimum of 1
+            int prostheticMedicalReliance = 1; // Minimum of 1
+            int myomerProsthetics = 0;
+            boolean hasPowerSupply = false;
+
             for (Injury injury : person.getInjuries()) {
                 InjurySubType injurySubType = injury.getSubType();
                 if (injurySubType.isPermanentModification()) {
-                    prostheticCount++;
+                    prostheticMedicalReliance++;
+                }
+
+                if (injurySubType.isMyomerProsthetic()) {
+                    myomerProsthetics++;
                 }
             }
 
-            Money cost = Money.of(PersonnelOptions.PAINKILLER_COST * prostheticCount);
+            int totalProstheticCount = prostheticMedicalReliance + myomerProsthetics;
+
+            Money cost = Money.of(PersonnelOptions.PAINKILLER_COST * totalProstheticCount);
             if (!finances.debit(TransactionType.MEDICAL_EXPENSES, today, cost,
                   getFormattedTextAt(RESOURCE_BUNDLE, "painkillerAddiction.transaction", person.getFullTitle()))) {
                 checkForDiscontinuationSyndrome(person,

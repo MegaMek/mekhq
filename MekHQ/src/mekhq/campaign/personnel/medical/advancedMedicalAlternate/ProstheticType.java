@@ -1031,7 +1031,21 @@ public enum ProstheticType {
           false,
           false,
           false,
-          List.of());
+          List.of()),
+    POWER_SUPPLY("POWER_SUPPLY",
+          CRUDE,
+          2,
+          AlternateInjuries.SECONDARY_POWER_SUPPLY,
+          Money.of(4500),
+          PlanetarySystem.PlanetarySophistication.D,
+          ATOWLegalityRating.E,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          false,
+          false,
+          true,
+          List.of(),
+          List.of(MD_VDNI),
+          List.of(COMPULSION_PAINKILLER_ADDICTION));
 
     private final String lookupName;
     private final ProstheticComplexity prostheticType;
@@ -1662,6 +1676,7 @@ public enum ProstheticType {
                   tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.armor"));
             case DERMAL_MYOMER_ARM_CAMO, DERMAL_MYOMER_LEG_CAMO ->
                   tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.camo"));
+            case POWER_SUPPLY -> tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.powerSupply"));
         }
 
         // 12) Abilities

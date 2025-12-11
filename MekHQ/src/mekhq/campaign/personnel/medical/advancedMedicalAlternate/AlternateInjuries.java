@@ -43,6 +43,7 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySu
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.IMPLANT_GENERIC;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.IMPLANT_VDNI;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.NORMAL;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.PROSTHETIC_MYOMER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -281,6 +282,7 @@ public class AlternateInjuries {
     public static final InjuryType BUFFERED_VDNI_TRIPLE_CORE = new BufferedVDNITripleCore();
     public static final InjuryType PAIN_SHUNT = new PainShunt();
     public static final InjuryType IMPLANT_REMOVAL_RECOVERY = new ImplantRemovalRecovery();
+    public static final InjuryType SECONDARY_POWER_SUPPLY = new SecondaryPowerSupply();
 
     // Base injury type classes with common behavior
     private abstract static class BaseInjury extends InjuryType {
@@ -1265,7 +1267,7 @@ public class AlternateInjuries {
                   NONE,
                   Set.of(INTERNAL)); // A placeholder effect, we replace it later
             this.maxSeverity = 0; // Prosthetics don't count towards the character's "hits"
-            this.injurySubType = InjurySubType.PROSTHETIC;
+            this.injurySubType = InjurySubType.PROSTHETIC_GENERIC;
         }
     }
 
@@ -1513,6 +1515,7 @@ public class AlternateInjuries {
         MyomerArm() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
             this.injuryEffect = TYPE_5_LIMB_REPLACEMENT;
         }
@@ -1528,6 +1531,7 @@ public class AlternateInjuries {
         MyomerHand() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_HAND, RIGHT_HAND);
             this.injuryEffect = TYPE_5_LIMB_REPLACEMENT;
         }
@@ -1543,6 +1547,7 @@ public class AlternateInjuries {
         MyomerLeg() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
             this.injuryEffect = TYPE_5_LIMB_REPLACEMENT;
         }
@@ -1558,6 +1563,7 @@ public class AlternateInjuries {
         MyomerFoot() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MYOMER.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_FOOT, RIGHT_FOOT);
             this.injuryEffect = TYPE_5_LIMB_REPLACEMENT;
         }
@@ -1747,6 +1753,7 @@ public class AlternateInjuries {
         ElectiveMyomerArm() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
             this.injuryEffect = MYOMER_IMPLANT_ARM;
         }
@@ -1762,6 +1769,7 @@ public class AlternateInjuries {
         DermalMyomerArmorArm() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_ARMOR.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
             this.injuryEffect = MYOMER_IMPLANT_ARM;
         }
@@ -1777,6 +1785,7 @@ public class AlternateInjuries {
         DermalMyomerCamoArm() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_CAMO.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
             this.injuryEffect = MYOMER_IMPLANT_ARM;
         }
@@ -1792,6 +1801,7 @@ public class AlternateInjuries {
         DermalMyomerTripleArm() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_TRIPLE.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
             this.injuryEffect = TRIPLE_STRENGTH_MYOMER_IMPLANT_ARM;
         }
@@ -1807,6 +1817,7 @@ public class AlternateInjuries {
         ElectiveMyomerHand() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_HAND, RIGHT_HAND);
             this.injuryEffect = MYOMER_IMPLANT_HAND;
         }
@@ -1822,6 +1833,7 @@ public class AlternateInjuries {
         ElectiveMyomerLeg() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
             this.injuryEffect = MYOMER_IMPLANT_LEG;
         }
@@ -1837,6 +1849,7 @@ public class AlternateInjuries {
         DermalMyomerArmorLeg() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_ARMOR.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
             this.injuryEffect = MYOMER_IMPLANT_LEG;
         }
@@ -1852,6 +1865,7 @@ public class AlternateInjuries {
         DermalMyomerCamoLeg() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_CAMO.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
             this.injuryEffect = MYOMER_IMPLANT_LEG;
         }
@@ -1867,6 +1881,7 @@ public class AlternateInjuries {
         DermalMyomerTripleLeg() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DERMAL_MYOMER_TRIPLE.simpleName");
+            this.injurySubType = PROSTHETIC_MYOMER;
             this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
             this.injuryEffect = TRIPLE_STRENGTH_MYOMER_IMPLANT_LEG;
         }
@@ -2046,6 +2061,16 @@ public class AlternateInjuries {
         }
     }
 
+    public static final class SecondaryPowerSupply extends Prosthetic {
+        SecondaryPowerSupply() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.SECONDARY_POWER_SUPPLY.simpleName");
+            this.allowedLocations = Set.of(INTERNAL);
+            this.injuryEffect = InjuryEffect.NONE;
+        }
+    }
+
     public static final class CosmeticBeautyEnhancement extends Prosthetic {
         CosmeticBeautyEnhancement() {
             super();
@@ -2150,7 +2175,7 @@ public class AlternateInjuries {
 
         @Override
         public String getName(BodyLocation loc, int severity) {
-            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELECTIVE_MYOMER.simpleName",
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COSMETIC_ANIMAL_LEG_PROSTHETIC.simpleName",
                   Utilities.capitalize(loc.locationName()));
         }
     }
