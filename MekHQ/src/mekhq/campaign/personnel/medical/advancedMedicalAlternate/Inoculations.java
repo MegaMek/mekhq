@@ -203,7 +203,7 @@ public class Inoculations {
 
         Set<Person> allCivilianPersonnel = new HashSet<>(civilianPersonnelInNeedOfGenericInoculation);
         for (Set<Person> personnel : civilianPersonnelInNeedOfCanonInoculation.values()) {
-            allMilitaryPersonnel.addAll(personnel);
+            allCivilianPersonnel.addAll(personnel);
         }
 
         // Process the inculations and fee payment
