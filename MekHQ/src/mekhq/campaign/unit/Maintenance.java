@@ -420,6 +420,16 @@ public class Maintenance {
 
         target.append(partWork.getAllModsForMaintenance());
 
+        // Apply obsolete quirk modifier
+        Unit unit = partWork.getUnit();
+        if (unit != null && unit.getEntity() != null) {
+            int obsoleteMod = unit.getEntity().getObsoleteRepairModifier(campaign.getGameYear());
+            if (obsoleteMod > 0) {
+                target.addModifier(obsoleteMod,
+                      getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.modifier.obsolete"));
+            }
+        }
+
         if (campaignOptions.isUseEraMods()) {
             target.addModifier(campaign.getFaction().getEraMod(campaign.getGameYear()), "era");
         }
