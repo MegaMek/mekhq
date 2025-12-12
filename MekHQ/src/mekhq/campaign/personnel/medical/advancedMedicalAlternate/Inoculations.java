@@ -170,7 +170,7 @@ public class Inoculations {
               militaryCanonInoculationMultiplier);
 
         Money civilianInoculationCost = INOCULATION_COST_PER_PERSON.multipliedBy(
-              civilianPersonnelInNeedOfCanonInoculation.size());
+              civilianPersonnelInNeedOfGenericInoculation.size());
         int civilianCanonInoculationMultiplier = 0;
         for (Set<Person> personSet : civilianPersonnelInNeedOfCanonInoculation.values()) {
             civilianCanonInoculationMultiplier += personSet.size();
