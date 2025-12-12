@@ -623,7 +623,7 @@ public class Inoculations {
             }
         }
 
-        boolean isInTransit = planetCode != null;
+        boolean isInTransit = planetCode == null;
         triggerDiseaseSpreadMessages(campaign, isInTransit, spreadingGenericDiseases);
         triggerCanonDiseaseSpreadMessages(campaign, isInTransit, true, spreadingCanonDiseasesWithCure);
         triggerCanonDiseaseSpreadMessages(campaign, isInTransit, false, spreadingCanonDiseasesNoCure);
