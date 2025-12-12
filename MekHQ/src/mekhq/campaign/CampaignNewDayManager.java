@@ -254,7 +254,6 @@ public class CampaignNewDayManager {
         today = yesterday.plusDays(1);
         campaign.setLocalDate(today);
         boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
-        boolean isSunday = today.getDayOfWeek() == DayOfWeek.SUNDAY;
         boolean isFirstOfMonth = today.getDayOfMonth() == 1;
         boolean isNewYear = today.getDayOfYear() == 1;
 
