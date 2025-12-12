@@ -1459,7 +1459,7 @@ public class Unit implements ITechnology {
             Money unitCost = Money.of(entity.getAlternateCost());
             double[] usedPartPriceMultipliers = campaign.getCampaignOptions().getUsedPartPriceMultipliers();
 
-            return switch (this.getQuality()) {
+            Money infantryValue = switch (this.getQuality()) {
                 case QUALITY_A -> unitCost.multipliedBy(usedPartPriceMultipliers[0]);
                 case QUALITY_B -> unitCost.multipliedBy(usedPartPriceMultipliers[1]);
                 case QUALITY_C -> unitCost.multipliedBy(usedPartPriceMultipliers[2]);
@@ -1467,6 +1467,14 @@ public class Unit implements ITechnology {
                 case QUALITY_E -> unitCost.multipliedBy(usedPartPriceMultipliers[4]);
                 case QUALITY_F -> unitCost.multipliedBy(usedPartPriceMultipliers[5]);
             };
+
+            // Apply obsolete quirk resale modifier
+            double obsoleteMult = entity.getObsoleteResaleModifier(campaign.getGameYear());
+            if (obsoleteMult < 1.0) {
+                infantryValue = infantryValue.multipliedBy(obsoleteMult);
+            }
+
+            return infantryValue;
         }
 
         // We need to adjust this for equipment that doesn't show up as parts
@@ -1552,6 +1560,12 @@ public class Unit implements ITechnology {
 
         // Scale the final value by the entity's price multiplier
         partsValue = partsValue.multipliedBy(entity.getPriceMultiplier());
+
+        // Apply obsolete quirk resale modifier
+        double obsoleteMult = entity.getObsoleteResaleModifier(campaign.getGameYear());
+        if (obsoleteMult < 1.0) {
+            partsValue = partsValue.multipliedBy(obsoleteMult);
+        }
 
         return partsValue;
     }
