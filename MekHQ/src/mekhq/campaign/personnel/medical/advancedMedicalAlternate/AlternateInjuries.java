@@ -1624,7 +1624,7 @@ public class AlternateInjuries {
 
     public static final class BirthDefect extends BaseInjury {
         BirthDefect() {
-            super(5, true, CHRONIC, BIRTH_DEFECT, Set.of(INTERNAL));
+            super(5, true, CHRONIC, InjuryEffect.BIRTH_DEFECT, Set.of(INTERNAL));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BIRTH_DEFECT.simpleName");
         }
     }
