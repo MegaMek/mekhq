@@ -235,6 +235,7 @@ public class AlternateInjuries {
     public static final InjuryType GENOAN_SPINAL_MENINGITIS = new GenoanSpinalMeningitis();
     public static final InjuryType HYBORIAN_BLOOD_PLAGUE = new HyborianBloodPlague();
     public static final InjuryType KAER_PATHOGEN = new KaerPathogen();
+    public static final InjuryType BIRTH_DEFECT = new BirthDefect();
     public static final InjuryType KILEN_WATTS_SYNDROME = new KilenWattsSyndrome();
     public static final InjuryType KNIGHTS_GRASSE_SYNDROME = new KnightsGrasseSyndrome();
     public static final InjuryType LAENS_REGRET = new LaensRegret();
@@ -1618,6 +1619,13 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.KAER_PATHOGEN.simpleName");
             this.level = CHRONIC;
             this.permanent = true;
+        }
+    }
+
+    public static final class BirthDefect extends BaseInjury {
+        BirthDefect() {
+            super(5, true, CHRONIC, BIRTH_DEFECT, Set.of(INTERNAL));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BIRTH_DEFECT.simpleName");
         }
     }
 

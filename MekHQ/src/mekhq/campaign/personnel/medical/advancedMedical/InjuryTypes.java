@@ -369,6 +369,7 @@ public final class InjuryTypes {
             InjuryType.register(238, "alt:UNOLE_FLU", AlternateInjuries.UNOLE_FLU);
             InjuryType.register(239, "alt:WINSONS_REGRET", AlternateInjuries.WINSONS_REGRET);
             InjuryType.register(240, "alt:YIMPISEE_FEVER", AlternateInjuries.YIMPISEE_FEVER);
+            InjuryType.register(241, "alt:BIRTH_DEFECT", AlternateInjuries.BIRTH_DEFECT);
 
 
             InjuryType.register("am:severed_spine", SEVERED_SPINE);
