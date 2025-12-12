@@ -530,7 +530,7 @@ public class PersonTest {
         person.processDiscontinuationSyndrome(mockCampaign, false, false, true, 1, false, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
-        assertEquals(0, person.getFatigue());
+        assertEquals(0, person.getFatigueDirect());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
     }
 
@@ -545,7 +545,7 @@ public class PersonTest {
         person.processDiscontinuationSyndrome(mockCampaign, false, false, true, 1, true, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
-        assertEquals(0, person.getFatigue());
+        assertEquals(0, person.getFatigueDirect());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
     }
 
@@ -564,7 +564,7 @@ public class PersonTest {
         person.processDiscontinuationSyndrome(mockCampaign, false, false, true, 1, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(1, person.getHits());
-        assertEquals(2, person.getFatigue());
+        assertEquals(2, person.getFatigueDirect());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
     }
 
@@ -583,7 +583,7 @@ public class PersonTest {
         person.processDiscontinuationSyndrome(mockCampaign, true, false, true, 1, true, true);
         assertEquals(1, person.getInjuries().size());
         assertEquals(0, person.getHits());
-        assertEquals(2, person.getFatigue());
+        assertEquals(2, person.getFatigueDirect());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
     }
 
@@ -598,7 +598,7 @@ public class PersonTest {
         person.processDiscontinuationSyndrome(mockCampaign, false, false, false, 1, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(1, person.getHits());
-        assertEquals(0, person.getFatigue());
+        assertEquals(0, person.getFatigueDirect());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
     }
 
@@ -617,7 +617,7 @@ public class PersonTest {
         person.processDiscontinuationSyndrome(mockCampaign, true, false, false, 1, true, true);
         assertEquals(1, person.getInjuries().size());
         assertEquals(0, person.getHits());
-        assertEquals(0, person.getFatigue());
+        assertEquals(0, person.getFatigueDirect());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
     }
 
@@ -642,7 +642,7 @@ public class PersonTest {
         person.processDiscontinuationSyndrome(mockCampaign, false, false, false, 1, true, true);
         assertEquals(0, person.getInjuries().size());
         assertEquals(6, person.getHits());
-        assertEquals(0, person.getFatigue());
+        assertEquals(0, person.getFatigueDirect());
         assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
     }
 
@@ -669,7 +669,7 @@ public class PersonTest {
         person.processDiscontinuationSyndrome(mockCampaign, true, false, false, 1, true, true);
         assertEquals(6, person.getInjuries().size());
         assertEquals(0, person.getHits());
-        assertEquals(0, person.getFatigue());
+        assertEquals(0, person.getFatigueDirect());
         assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
     }
 

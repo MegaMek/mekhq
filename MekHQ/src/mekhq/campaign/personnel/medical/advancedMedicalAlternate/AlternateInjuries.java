@@ -89,6 +89,7 @@ public class AlternateInjuries {
     private static final int WEEKLY_CHECK_ILLNESS_HEALING_DAYS = 7;
     private static final int POSTPARTUM_RECOVERY_HEALING_DAYS = 21; // Internet says 6 weeks
     private static final int TRANSIT_DISORIENTATION_SYNDROME_HEALING_DAYS = 1;
+    private static final int CHILDUS_FEVER_RECOVERY_TIME = 365;
 
     private static final InjuryLevel SEVER_INJURY_LEVEL = CHRONIC;
     private static final InjuryLevel FRACTURE_INJURY_LEVEL = MAJOR;
@@ -205,6 +206,54 @@ public class AlternateInjuries {
     public static final InjuryType VENEREAL_MODERATE = new VenerealModerate();
     public static final InjuryType VENEREAL_SEVERE = new VenerealSevere();
     public static final InjuryType VENEREAL_DEADLY = new VenerealDeadly();
+
+    public static final InjuryType ALARION_HANTA_VIRUS = new AlarionHantaVirus();
+    public static final InjuryType ALBIERO_CONSUMPTION = new AlbieroConsumption();
+    public static final InjuryType ALGEDI_BLOOD_BURN = new AlgediBloodBurn();
+    public static final InjuryType ANCHA_VIRUS = new AnchaVirus();
+    public static final InjuryType BETHOLD_SYNDROME = new BetholdSyndrome();
+    public static final InjuryType BLACK_MARSH_FEVER = new BlackMarshFever();
+    public static final InjuryType BRISBANE_VIRUS = new BrisbaneVirus();
+    public static final InjuryType CHELOSIAN_VIRUS = new ChelosianVirus();
+    public static final InjuryType CHILDUS_FEVER = new ChildusFever();
+    public static final InjuryType CHUNGALOMENINGITIS_AMARIS = new ChungalomeningitisAmaris();
+    public static final InjuryType CHUNGALOMENINGITIS_TRADITIONAL = new ChungalomeningitisTraditional();
+    public static final InjuryType CROMARTY_SUPERFLU = new CromartySuperflu();
+    public static final InjuryType CURSE_OF_EDEN = new CurseOfEden();
+    public static final InjuryType CURSE_OF_GALEDON = new CurseOfGaledon();
+    public static final InjuryType CUSSET_CRUD = new CussetCrud();
+    public static final InjuryType DANGMARS_FEVER = new DangmarsFever();
+    public static final InjuryType DARRS_DISEASE = new DarrsDisease();
+    public static final InjuryType DELPHI_CURSE = new DelphiCurse();
+    public static final InjuryType DEVILITCH = new Devilitch();
+    public static final InjuryType DOWNING_POLTURS_DISEASE = new DowningPoltursDisease();
+    public static final InjuryType EDISON_WHITE_FLU = new EdisonWhiteFlu();
+    public static final InjuryType ELTANIN_BRAIN_FEVER = new EltaninBrainFever();
+    public static final InjuryType FENRIS_PLAGUE = new FenrisPlague();
+    public static final InjuryType GALAX_PATHOGEN = new GalaxPathogen();
+    public static final InjuryType GARMS_SYNDROME = new GarmsSyndrome();
+    public static final InjuryType GENOAN_SPINAL_MENINGITIS = new GenoanSpinalMeningitis();
+    public static final InjuryType HYBORIAN_BLOOD_PLAGUE = new HyborianBloodPlague();
+    public static final InjuryType KAER_PATHOGEN = new KaerPathogen();
+    public static final InjuryType KILEN_WATTS_SYNDROME = new KilenWattsSyndrome();
+    public static final InjuryType KNIGHTS_GRASSE_SYNDROME = new KnightsGrasseSyndrome();
+    public static final InjuryType LAENS_REGRET = new LaensRegret();
+    public static final InjuryType LANDMARK_SUPERVIRUS = new LandmarkSupervirus();
+    public static final InjuryType MIAPLACIDUS_PLAGUE = new MiaplacidusPlague();
+    public static final InjuryType NEISSERIA_MALTHUSIA = new NeisseriaMalthusia();
+    public static final InjuryType NEO_SMALLPOX = new NeoSmallpox();
+    public static final InjuryType NOTILC_SWEATS = new NotilicSweats();
+    public static final InjuryType NYKVARN_VIRUS = new NykvarnVirus();
+    public static final InjuryType OCKHAMS_BLOOD_DISEASE = new OckhamsBloodDisease();
+    public static final InjuryType PINGREE_FEVER = new PingreeFever();
+    public static final InjuryType REDBURN_VIRUS = new RedburnVirus();
+    public static final InjuryType ROCKLAND_FEVER = new RocklandFever();
+    public static final InjuryType SCOURGE_PLAGUE = new ScourgePlague();
+    public static final InjuryType SKOKIE_SHIVERS = new SkokieShivers();
+    public static final InjuryType TOXOPLASMA_GONDII_HARDCOREA = new ToxoplasmaGondiiHardcorea();
+    public static final InjuryType UNOLE_FLU = new UnoleFlu();
+    public static final InjuryType WINSONS_REGRET = new WinsonsRegret();
+    public static final InjuryType YIMPISEE_FEVER = new YimpiseeFever();
     // Prosthetics
     public static final InjuryType WOODEN_ARM = new WoodenArm();
     public static final InjuryType HOOK_HAND = new HookHand();
@@ -720,13 +769,25 @@ public class AlternateInjuries {
     // Diseases
     private abstract static class Disease extends BaseInjury {
         protected Disease() {
-            super(5, // This is just a placeholder value, we assign it elsewhere
+            super(0, // This is just a placeholder value, we assign it elsewhere
                   false,
                   MINOR,
                   NONE,
                   Set.of(INTERNAL));
             this.maxSeverity = 1;
-            this.injurySubType = InjurySubType.DISEASE;
+            this.injurySubType = InjurySubType.DISEASE_GENERIC;
+        }
+    }
+
+    private abstract static class Bioweapon extends BaseInjury {
+        protected Bioweapon() {
+            super(0, // This is just a placeholder value, we assign it elsewhere
+                  false,
+                  MINOR,
+                  NONE,
+                  Set.of(INTERNAL));
+            this.maxSeverity = 1;
+            this.injurySubType = InjurySubType.DISEASE_CANON_BIOWEAPON;
         }
     }
 
@@ -1248,6 +1309,516 @@ public class AlternateInjuries {
             super();
             this.level = DEADLY;
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.VENEREAL_DEADLY.simpleName");
+            this.injuryEffect = DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class AlarionHantaVirus extends Bioweapon {
+        AlarionHantaVirus() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ALARION_HANTA_VIRUS.simpleName");
+            this.level = DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class AlbieroConsumption extends Disease {
+        AlbieroConsumption() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ALBIERO_CONSUMPTION.simpleName");
+            this.level = DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class AlgediBloodBurn extends Disease {
+        AlgediBloodBurn() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ALGEDI_BLOOD_BURN.simpleName");
+            this.level = DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class AnchaVirus extends Disease {
+        AnchaVirus() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ANCHA_VIRUS.simpleName");
+            this.level = DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class BetholdSyndrome extends Disease {
+        BetholdSyndrome() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BETHOLD_SYNDROME.simpleName");
+            this.level = CHRONIC;
+            this.permanent = true;
+        }
+    }
+
+    public static final class BlackMarshFever extends Disease {
+        BlackMarshFever() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BLACK_MARSH_FEVER.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_FLU_SEVERE;
+        }
+    }
+
+    public static final class BrisbaneVirus extends Disease {
+        BrisbaneVirus() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.BRISBANE_VIRUS.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_WEAKNESS_SEVERE;
+        }
+    }
+
+    public static final class ChelosianVirus extends Disease {
+        ChelosianVirus() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CHELOSIAN_VIRUS.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_FLU_SEVERE;
+        }
+    }
+
+    public static final class ChildusFever extends Disease {
+        ChildusFever() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CHILDUS_FEVER.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_WEAKNESS_SEVERE;
+            this.recoveryTime = CHILDUS_FEVER_RECOVERY_TIME;
+        }
+    }
+
+    public static final class ChungalomeningitisAmaris extends Bioweapon {
+        ChungalomeningitisAmaris() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CHUNGALOMENINGITIS_AMARIS.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_TREMORS_SEVERE;
+        }
+    }
+
+    public static final class ChungalomeningitisTraditional extends Disease {
+        ChungalomeningitisTraditional() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CHUNGALOMENINGITIS_TRADITIONAL.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_TREMORS_MODERATE;
+        }
+    }
+
+    public static final class CromartySuperflu extends Disease {
+        CromartySuperflu() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CROMARTY_SUPERFLU.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_FLU_SEVERE;
+        }
+    }
+
+    public static final class CurseOfEden extends Disease {
+        CurseOfEden() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CURSE_OF_EDEN.simpleName");
+            this.level = DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class CurseOfGaledon extends Disease {
+        CurseOfGaledon() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CURSE_OF_GALEDON.simpleName");
+            this.level = DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class CussetCrud extends Disease {
+        CussetCrud() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.CUSSET_CRUD.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_FLU_SEVERE;
+        }
+    }
+
+    public static final class DangmarsFever extends Disease {
+        DangmarsFever() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DANGMARS_FEVER.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_FLU_SEVERE;
+        }
+    }
+
+    public static final class DarrsDisease extends Disease {
+        DarrsDisease() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DARRS_DISEASE.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_FLU_SEVERE;
+        }
+    }
+
+    public static final class DelphiCurse extends Disease {
+        DelphiCurse() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DELPHI_CURSE.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_WEAKNESS_MODERATE;
+            this.permanent = true;
+        }
+    }
+
+    public static final class Devilitch extends Disease {
+        Devilitch() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DEVILITCH.simpleName");
+            this.level = CHRONIC;
+            this.injuryEffect = DISEASE_SORES_SLIGHT;
+        }
+    }
+
+    public static final class DowningPoltursDisease extends Disease {
+        DowningPoltursDisease() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.DOWNING_POLTURS_DISEASE.simpleName");
+            this.level = DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class EdisonWhiteFlu extends Disease {
+        EdisonWhiteFlu() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.EDISON_WHITE_FLU.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_FLU_SEVERE;
+        }
+    }
+
+    public static final class EltaninBrainFever extends Disease {
+        EltaninBrainFever() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ELTANIN_BRAIN_FEVER.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_SIGHT_SEVERE;
+        }
+    }
+
+    public static final class FenrisPlague extends Disease {
+        FenrisPlague() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FENRIS_PLAGUE.simpleName");
+            this.level = MINOR;
+            this.injuryEffect = DISEASE_FLU_MODERATE;
+        }
+    }
+
+    public static final class GalaxPathogen extends Bioweapon {
+        GalaxPathogen() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GALAX_PATHOGEN.simpleName");
+            this.level = DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class GarmsSyndrome extends Disease {
+        GarmsSyndrome() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GARMS_SYNDROME.simpleName");
+            this.level = MINOR;
+            this.injuryEffect = DISEASE_TREMORS_MODERATE;
+        }
+    }
+
+    public static final class GenoanSpinalMeningitis extends Disease {
+        GenoanSpinalMeningitis() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GENOAN_SPINAL_MENINGITIS.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_TREMORS_SEVERE;
+        }
+    }
+
+    public static final class HyborianBloodPlague extends Disease {
+        HyborianBloodPlague() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.HYBORIAN_BLOOD_PLAGUE.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_INFECTION_SEVERE;
+        }
+    }
+
+    public static final class KaerPathogen extends Disease {
+        KaerPathogen() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.KAER_PATHOGEN.simpleName");
+            this.level = CHRONIC;
+            this.permanent = true;
+        }
+    }
+
+    public static final class KilenWattsSyndrome extends Disease {
+        KilenWattsSyndrome() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.KILEN_WATTS_SYNDROME.simpleName");
+            this.level = CHRONIC;
+            this.permanent = true;
+        }
+    }
+
+    public static final class KnightsGrasseSyndrome extends Disease {
+        KnightsGrasseSyndrome() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.KNIGHTS_GRASSE_SYNDROME.simpleName");
+            this.level = CHRONIC;
+            this.permanent = true;
+        }
+    }
+
+    public static final class LaensRegret extends Disease {
+        LaensRegret() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.LAENS_REGRET.simpleName");
+            this.level = MINOR;
+            this.injuryEffect = DISEASE_SORES_SLIGHT;
+        }
+    }
+
+    public static final class LandmarkSupervirus extends Bioweapon {
+        LandmarkSupervirus() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.LANDMARK_SUPERVIRUS.simpleName");
+            this.level = DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class MiaplacidusPlague extends Disease {
+        MiaplacidusPlague() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MIAPLACIDUS_PLAGUE.simpleName");
+            this.level = MINOR;
+            this.injuryEffect = DISEASE_FLU_SLIGHT;
+        }
+    }
+
+    public static final class NeisseriaMalthusia extends Disease {
+        NeisseriaMalthusia() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.NEISSERIA_MALTHUSIA.simpleName");
+            this.level = MINOR;
+            this.injuryEffect = DISEASE_VENEREAL_MODERATE;
+        }
+    }
+
+    public static final class NeoSmallpox extends Disease {
+        NeoSmallpox() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.NEO_SMALLPOX.simpleName");
+            this.level = DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class NotilicSweats extends Disease {
+        NotilicSweats() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.NOTILC_SWEATS.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_TREMORS_SEVERE;
+        }
+    }
+
+    public static final class NykvarnVirus extends Disease {
+        NykvarnVirus() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.NYKVARN_VIRUS.simpleName");
+            this.level = DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class OckhamsBloodDisease extends Disease {
+        OckhamsBloodDisease() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.OCKHAMS_BLOOD_DISEASE.simpleName");
+            this.level = CHRONIC;
+            this.injuryEffect = DISEASE_WEAKNESS_SLIGHT;
+            this.permanent = true;
+        }
+    }
+
+    public static final class PingreeFever extends Disease {
+        PingreeFever() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PINGREE_FEVER.simpleName");
+            this.level = DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class RedburnVirus extends Bioweapon {
+        RedburnVirus() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.REDBURN_VIRUS.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_BREATHING_SEVERE;
+        }
+    }
+
+    public static final class RocklandFever extends Disease {
+        RocklandFever() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ROCKLAND_FEVER.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_SORES_MODERATE;
+        }
+    }
+
+    public static final class ScourgePlague extends Bioweapon {
+        ScourgePlague() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SCOURGE_PLAGUE.simpleName");
+            this.level = DEADLY;
+            this.injuryEffect = DISEASE_DEADLY;
+            this.permanent = true;
+        }
+
+        @Override
+        public boolean impliesDead(BodyLocation loc) {
+            return true;
+        }
+    }
+
+    public static final class SkokieShivers extends Disease {
+        SkokieShivers() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.SKOKIE_SHIVERS.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_TREMORS_SEVERE;
+        }
+    }
+
+    public static final class ToxoplasmaGondiiHardcorea extends Disease {
+        ToxoplasmaGondiiHardcorea() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TOXOPLASMA_GONDII_HARDCOREA.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_FLU_MODERATE;
+        }
+    }
+
+    public static final class UnoleFlu extends Disease {
+        UnoleFlu() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.UNOLE_FLU.simpleName");
+            this.level = MINOR;
+            this.injuryEffect = DISEASE_FLU_SLIGHT;
+        }
+    }
+
+    public static final class WinsonsRegret extends Disease {
+        WinsonsRegret() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WINSONS_REGRET.simpleName");
+            this.level = MAJOR;
+            this.injuryEffect = DISEASE_INFECTION_SEVERE;
+        }
+    }
+
+    public static final class YimpiseeFever extends Disease {
+        YimpiseeFever() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.YIMPISEE_FEVER.simpleName");
+            this.level = DEADLY;
             this.injuryEffect = DISEASE_DEADLY;
             this.permanent = true;
         }

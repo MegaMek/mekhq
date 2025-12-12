@@ -52,6 +52,7 @@ import mekhq.MHQConstants;
  * @since 0.50.07
  */
 public enum GlossaryEntry {
+    CANONICAL_DISEASES("CANONICAL_DISEASES", new Version("0.50.11")),
     ADMIN_STRAIN("HR_STRAIN", new Version("0.50.06")),
     ADVANCED_SCOUTING("ADVANCED_SCOUTING", new Version("0.50.10")),
     AGING("AGING", new Version("0.50.06")),
