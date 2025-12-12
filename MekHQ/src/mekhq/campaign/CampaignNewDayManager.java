@@ -480,7 +480,7 @@ public class CampaignNewDayManager {
                   getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.inCharacter." + keySuffix,
                         campaign.getCommanderAddress()),
                   null,
-                  getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.outOfCharacter" + keySuffix,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.outOfCharacter." + keySuffix,
                         disease.getSimpleName(), systemName),
                   null,
                   false,
