@@ -6623,7 +6623,7 @@ public class Campaign implements ITechManager {
                     continue;
                 }
 
-                mekFileParser = new MekFileParser(mekSummary.getSourceFile(), mekSummary.getEntryName());
+                mekFileParser = new MekFileParser(sourceFile, mekSummary.getEntryName());
             } catch (EntityLoadingException ex) {
                 LOGGER.error("Failed to fetch MekFileParser for {} // {}",
                       mekSummary.getSourceFile(), mekSummary.getEntryName(), ex);
