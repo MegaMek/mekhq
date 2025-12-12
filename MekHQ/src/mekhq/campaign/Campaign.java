@@ -75,6 +75,7 @@ import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.isIneligibleToPerformProcurement;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.time.DayOfWeek;
@@ -6595,7 +6596,12 @@ public class Campaign implements ITechManager {
             for (Unit unit : units.getUnits()) {
                 Entity entity = unit.getEntity();
                 if (entity != null) {
-                    customUnits.add(entity.getShortNameRaw());
+                    String shortName = entity.getShortNameRaw();
+                    if (!StringUtility.isNullOrBlank(shortName)) {
+                        customUnits.add(shortName);
+                    } else {
+                        LOGGER.warn("shortName was null or blank for {}. Skipping", unit.getName());
+                    }
                 }
             }
         } else {
@@ -6603,40 +6609,58 @@ public class Campaign implements ITechManager {
         }
 
         for (String name : customUnits) {
-            MekSummary ms = MekSummaryCache.getInstance().getMek(name);
-            if (ms == null) {
+            MekSummary mekSummary = MekSummaryCache.getInstance().getMek(name);
+            if (mekSummary == null) {
+                LOGGER.warn("mekSummary was null for {}", name);
                 continue;
             }
 
             MekFileParser mekFileParser = null;
             try {
-                mekFileParser = new MekFileParser(ms.getSourceFile());
+                File sourceFile = mekSummary.getSourceFile();
+                if (sourceFile == null) {
+                    LOGGER.warn("sourceFile was null for {}", name);
+                    continue;
+                }
+
+                mekFileParser = new MekFileParser(mekSummary.getSourceFile(), mekSummary.getEntryName());
             } catch (EntityLoadingException ex) {
-                LOGGER.error("", ex);
-            }
-            if (mekFileParser == null) {
+                LOGGER.error("Failed to fetch MekFileParser for {} // {}",
+                      mekSummary.getSourceFile(), mekSummary.getEntryName(), ex);
                 continue;
             }
-            Entity en = mekFileParser.getEntity();
+
+            if (mekFileParser == null) {
+                LOGGER.warn("mekFileParser was null for {}", name);
+                continue;
+            }
+
+            Entity entity = mekFileParser.getEntity();
+            if (entity == null) {
+                LOGGER.warn("mekFileParser returned a null entity {}", name);
+                continue;
+            }
+
             printWriter.println("\t<custom>");
-            printWriter.println("\t\t<name>" + name + "</name>");
-            if (en instanceof Mek) {
+            String escapedName = MHQXMLUtility.escape(name);
+            printWriter.println("\t\t<name>" + escapedName + "</name>");
+            if (entity instanceof Mek) {
                 printWriter.print("\t\t<mtf><![CDATA[");
-                printWriter.print(((Mek) en).getMtf());
+                printWriter.print(((Mek) entity).getMtf());
                 printWriter.println("]]></mtf>");
             } else {
                 try {
-                    BuildingBlock blk = BLKFile.getBlock(en);
+                    BuildingBlock block = BLKFile.getBlock(entity);
                     printWriter.print("\t\t<blk><![CDATA[");
-                    for (String s : blk.getAllDataAsString()) {
-                        if (s.isEmpty()) {
+                    for (String data : block.getAllDataAsString()) {
+                        if (data.isEmpty()) {
                             continue;
                         }
-                        printWriter.println(s);
+                        printWriter.println(data);
                     }
                     printWriter.println("]]></blk>");
                 } catch (EntitySavingException e) {
-                    LOGGER.error("Failed to save custom entity {}", en.getDisplayName(), e);
+                    LOGGER.error("Failed to save custom entity {}", entity.getDisplayName(), e);
                 }
             }
             printWriter.println("\t</custom>");
