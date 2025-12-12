@@ -33,8 +33,6 @@
  */
 package mekhq.campaign.parts;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -106,7 +104,6 @@ import org.w3c.dom.NodeList;
  */
 public abstract class Part implements IPartWork, ITechnology {
     private static final MMLogger LOGGER = MMLogger.create(Part.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
 
     private static final DecimalFormat TONNAGE_FORMATTER = new DecimalFormat("0.#");
 
@@ -978,13 +975,6 @@ public abstract class Part implements IPartWork, ITechnology {
                 mods.addModifier(1, "difficult to maintain");
             }
 
-            // Apply obsolete quirk modifier
-            int obsoleteMod = getUnit().getEntity().getObsoleteRepairModifier(campaign.getGameYear());
-            if (obsoleteMod > 0) {
-                mods.addModifier(obsoleteMod,
-                      getFormattedTextAt(RESOURCE_BUNDLE, "Part.modifier.obsolete"));
-            }
-
             if (getUnit().hasPrototypeTSM() &&
                       ((this instanceof MekLocation) ||
                              (this instanceof MissingMekLocation) ||
@@ -1041,13 +1031,6 @@ public abstract class Part implements IPartWork, ITechnology {
             mods.addModifier(-1, "easy to maintain");
         } else if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
             mods.addModifier(1, "difficult to maintain");
-        }
-
-        // Apply obsolete quirk modifier
-        int obsoleteMod = getUnit().getEntity().getObsoleteRepairModifier(campaign.getGameYear());
-        if (obsoleteMod > 0) {
-            mods.addModifier(obsoleteMod,
-                  getFormattedTextAt(RESOURCE_BUNDLE, "Part.modifier.obsolete"));
         }
 
         if (getUnit().getTech() != null) {
