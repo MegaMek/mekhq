@@ -7189,8 +7189,8 @@ public class Person {
      * Removes all non-prosthetic injuries from this person.
      *
      * <p>Any injury whose subtype does <em>not</em> identify as a prosthetic is removed via
-     * {@link #removeInjury(Injury)}. Prosthetic injuries are left intact. If removal results in the person having no
-     * remaining injuries, the assigned {@code doctorId} is cleared.</p>
+     * {@link #removeInjury(Injury, LocalDate)}. Prosthetic injuries are left intact. If removal results in the person
+     * having no remaining injuries, the assigned {@code doctorId} is cleared.</p>
      *
      * <p>After modifications are complete, a {@link PersonChangedEvent} is fired to notify the campaign of the
      * update.</p>
@@ -7216,7 +7216,7 @@ public class Person {
     /**
      * Removes all prosthetic-related injuries from this person.
      *
-     * <p>Any injury whose subtype identifies as a prosthetic is removed via {@link #removeInjury(Injury)}.
+     * <p>Any injury whose subtype identifies as a prosthetic is removed via {@link #removeInjury(Injury, LocalDate)}.
      * Non-prosthetic injuries remain untouched. If removal results in the person having no remaining injuries, the
      * assigned {@code doctorId} is cleared.</p>
      *
