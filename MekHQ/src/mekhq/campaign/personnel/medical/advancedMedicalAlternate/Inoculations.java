@@ -170,7 +170,7 @@ public class Inoculations {
               militaryCanonInoculationMultiplier);
 
         Money civilianInoculationCost = INOCULATION_COST_PER_PERSON.multipliedBy(
-              civilianPersonnelInNeedOfCanonInoculation.size());
+              civilianPersonnelInNeedOfGenericInoculation.size());
         int civilianCanonInoculationMultiplier = 0;
         for (Set<Person> personSet : civilianPersonnelInNeedOfCanonInoculation.values()) {
             civilianCanonInoculationMultiplier += personSet.size();
@@ -203,7 +203,7 @@ public class Inoculations {
 
         Set<Person> allCivilianPersonnel = new HashSet<>(civilianPersonnelInNeedOfGenericInoculation);
         for (Set<Person> personnel : civilianPersonnelInNeedOfCanonInoculation.values()) {
-            allMilitaryPersonnel.addAll(personnel);
+            allCivilianPersonnel.addAll(personnel);
         }
 
         // Process the inculations and fee payment
@@ -623,7 +623,7 @@ public class Inoculations {
             }
         }
 
-        boolean isInTransit = planetCode != null;
+        boolean isInTransit = planetCode == null;
         triggerDiseaseSpreadMessages(campaign, isInTransit, spreadingGenericDiseases);
         triggerCanonDiseaseSpreadMessages(campaign, isInTransit, true, spreadingCanonDiseasesWithCure);
         triggerCanonDiseaseSpreadMessages(campaign, isInTransit, false, spreadingCanonDiseasesNoCure);
@@ -813,11 +813,13 @@ public class Inoculations {
         String alertColor = spanOpeningWithCustomColor(isInTransit ? getNegativeColor() : getWarningColor());
         alertColor = hasCure ? alertColor : getNegativeColor();
 
-        String reportKey = "Inoculations.spread.bioweapon.noCure";
+        String reportKey;
         if (!hasCure) {
             reportKey = "Inoculations.spread.bioweapon.noCure";
         } else if (isInTransit) {
             reportKey = "Inoculations.spread.bioweapon.normal";
+        } else {
+            reportKey = "Inoculations.spread.bioweapon";
         }
 
         for (String disease : diseases) {

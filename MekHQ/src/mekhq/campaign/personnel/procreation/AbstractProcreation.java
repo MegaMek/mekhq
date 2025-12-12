@@ -503,7 +503,6 @@ public abstract class AbstractProcreation {
 
                 Injury birthDefect = BIRTH_DEFECT.newInjury(campaign, baby, INTERNAL, 1);
                 baby.addInjury(birthDefect);
-                break;
             }
 
             if (mother.getOptions().booleanOption(UNOFFICIAL_DOBROWSKI_SYNDROME)) {
