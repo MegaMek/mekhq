@@ -1056,6 +1056,10 @@ public class CampaignOptionsMarshaller {
 
         // region AtB Tab
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", campaignOptions.getSkillLevel().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "boardScalingType",
+              campaignOptions.getBoardScalingType().getLookupName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveMethod", campaignOptions.getAutoResolveMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,

@@ -662,8 +662,8 @@ public class StratConRulesManager {
         }
 
         // Finally, finish scenario set up
-        finalizeScenario(backingScenario, contract, campaign);
         setScenarioParametersFromBiome(track, scenario, campaign.getCampaignOptions().isUseNoTornadoes());
+        finalizeScenario(backingScenario, contract, campaign);
         swapInPlayerUnits(scenario, campaign, FORCE_NONE);
 
         if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
@@ -1158,10 +1158,10 @@ public class StratConRulesManager {
             revealedScenario.addPrimaryForce(forceID);
             commitPrimaryForces(campaign, revealedScenario, track);
             if (!revealedScenario.getBackingScenario().isFinalized()) {
-                finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
                 setScenarioParametersFromBiome(track,
                       revealedScenario,
                       campaign.getCampaignOptions().isUseNoTornadoes());
+                finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
             }
             return;
         }

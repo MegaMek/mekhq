@@ -95,6 +95,7 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.Player;
 import megamek.common.SimpleTechLevel;
 import megamek.common.annotations.Nullable;
@@ -374,6 +375,10 @@ public class Campaign implements ITechManager {
     private transient String battleReportHTML;
     private transient List<String> newBattleReports;
 
+    private final ArrayList<String> politicsReport;
+    private transient String politicsReportHTML;
+    private transient List<String> newPoliticsReports;
+
     private boolean fieldKitchenWithinCapacity;
     private int mashTheatreCapacity;
     private int repairBaysRented;
@@ -649,6 +654,10 @@ public class Campaign implements ITechManager {
         battleReport = new ArrayList<>();
         battleReportHTML = "";
         newBattleReports = new ArrayList<>();
+
+        politicsReport = new ArrayList<>();
+        politicsReportHTML = "";
+        newPoliticsReports = new ArrayList<>();
 
         // Secondary initialization from passed / derived values
         news = new News(getGameYear(), id.getLeastSignificantBits());
@@ -3482,6 +3491,32 @@ public class Campaign implements ITechManager {
         return oldBattleReports;
     }
 
+    public List<String> getPoliticsReport() {
+        return politicsReport;
+    }
+
+    public void setPoliticsReportHTML(String html) {
+        politicsReportHTML = html;
+    }
+
+    public String getPoliticsReportHTML() {
+        return politicsReportHTML;
+    }
+
+    public List<String> getNewPoliticsReports() {
+        return newPoliticsReports;
+    }
+
+    public void setNewPoliticsReports(List<String> reports) {
+        newPoliticsReports = reports;
+    }
+
+    public List<String> fetchAndClearNewPoliticsReports() {
+        List<String> oldPoliticsReports = newPoliticsReports;
+        setNewPoliticsReports(new ArrayList<>());
+        return oldPoliticsReports;
+    }
+
     /**
      * Finds the active person in a particular role with the highest level in a given, with an optional secondary skill
      * to break ties.
@@ -5982,6 +6017,10 @@ public class Campaign implements ITechManager {
      * @param report - the report String
      */
     public void addReport(DailyReportType type, String report) {
+        if (StringUtility.isNullOrBlank(report)) {
+            return;
+        }
+
         if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
             addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), report));
         }
@@ -6084,6 +6123,17 @@ public class Campaign implements ITechManager {
                 }
 
                 newBattleReports.add(report);
+            }
+            case POLITICS -> {
+                politicsReport.add(report);
+                if (!politicsReportHTML.isEmpty()) {
+                    politicsReportHTML = politicsReportHTML + REPORT_LINEBREAK + report;
+                    newPoliticsReports.add(REPORT_LINEBREAK);
+                } else {
+                    politicsReportHTML = report;
+                }
+
+                newPoliticsReports.add(report);
             }
         }
         MekHQ.triggerEvent(new ReportEvent(this, report));
@@ -6381,6 +6431,13 @@ public class Campaign implements ITechManager {
             writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "battleReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "politicsReport");
+        for (String report : politicsReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "politicsReport");
 
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "info");
         // endregion Basic Campaign Info

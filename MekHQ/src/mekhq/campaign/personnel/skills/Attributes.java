@@ -358,11 +358,7 @@ public class Attributes {
                 case INTELLIGENCE -> effect.getIntelligenceModifier();
                 case WILLPOWER -> effect.getWillpowerModifier();
                 case CHARISMA -> effect.getCharismaModifier();
-                case EDGE -> 0; // There are no Edge modifying injury effects
-                default -> {
-                    LOGGER.error("(getAttributeScoreModifier) Invalid attribute requested: {}", attribute);
-                    yield 0;
-                }
+                case NONE, EDGE -> 0; // There are no Edge modifying injury effects
             };
         }
 

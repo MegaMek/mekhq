@@ -883,7 +883,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
         }
         if (chkReroll[REROLL_MAP_SIZE] != null && chkReroll[REROLL_MAP_SIZE].isSelected()) {
-            scenario.setMapSize();
+            scenario.setMapSize(campaign);
             scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
             scenario.useReroll();
             chkReroll[REROLL_MAP_SIZE].setSelected(false);
