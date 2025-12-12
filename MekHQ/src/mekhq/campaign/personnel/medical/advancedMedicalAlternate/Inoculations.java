@@ -813,11 +813,13 @@ public class Inoculations {
         String alertColor = spanOpeningWithCustomColor(isInTransit ? getNegativeColor() : getWarningColor());
         alertColor = hasCure ? alertColor : getNegativeColor();
 
-        String reportKey = "Inoculations.spread.bioweapon.noCure";
+        String reportKey;
         if (!hasCure) {
             reportKey = "Inoculations.spread.bioweapon.noCure";
         } else if (isInTransit) {
             reportKey = "Inoculations.spread.bioweapon.normal";
+        } else {
+            reportKey = "Inoculations.spread.bioweapon";
         }
 
         for (String disease : diseases) {
