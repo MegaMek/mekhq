@@ -4143,7 +4143,7 @@ public class Person {
                             continue;
                         }
 
-                        if (!wn3.getNodeName().equalsIgnoreCase("canonDiseaseInoculations")) {
+                        if (!wn3.getNodeName().equalsIgnoreCase("canonDiseaseInoculation")) {
                             LOGGER.error("Unknown node type not loaded in Canon Disease Inoculations nodes: {}",
                                   wn3.getNodeName());
                             continue;
