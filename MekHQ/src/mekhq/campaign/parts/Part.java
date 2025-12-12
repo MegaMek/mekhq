@@ -972,17 +972,19 @@ public abstract class Part implements IPartWork, ITechnology {
 
         if (getUnit() != null) {
             mods.append(getUnit().getSiteMod());
-            if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
-                mods.addModifier(-1, "easy to maintain");
-            } else if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
-                mods.addModifier(1, "difficult to maintain");
-            }
+            if (getUnit().getEntity() != null) {
+                if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
+                    mods.addModifier(-1, "easy to maintain");
+                } else if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
+                    mods.addModifier(1, "difficult to maintain");
+                }
 
-            // Apply obsolete quirk modifier
-            int obsoleteMod = getUnit().getEntity().getObsoleteRepairModifier(campaign.getGameYear());
-            if (obsoleteMod > 0) {
-                mods.addModifier(obsoleteMod,
-                      getFormattedTextAt(RESOURCE_BUNDLE, "Part.modifier.obsolete"));
+                // Apply obsolete quirk modifier
+                int obsoleteMod = getUnit().getEntity().getObsoleteRepairModifier(campaign.getGameYear());
+                if (obsoleteMod > 0) {
+                    mods.addModifier(obsoleteMod,
+                          getFormattedTextAt(RESOURCE_BUNDLE, "Part.modifier.obsolete"));
+                }
             }
 
             if (getUnit().hasPrototypeTSM() &&
@@ -1037,17 +1039,19 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         mods.append(getUnit().getSiteMod());
-        if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
-            mods.addModifier(-1, "easy to maintain");
-        } else if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
-            mods.addModifier(1, "difficult to maintain");
-        }
+        if (getUnit().getEntity() != null) {
+            if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
+                mods.addModifier(-1, "easy to maintain");
+            } else if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
+                mods.addModifier(1, "difficult to maintain");
+            }
 
-        // Apply obsolete quirk modifier
-        int obsoleteMod = getUnit().getEntity().getObsoleteRepairModifier(campaign.getGameYear());
-        if (obsoleteMod > 0) {
-            mods.addModifier(obsoleteMod,
-                  getFormattedTextAt(RESOURCE_BUNDLE, "Part.modifier.obsolete"));
+            // Apply obsolete quirk modifier
+            int obsoleteMod = getUnit().getEntity().getObsoleteRepairModifier(campaign.getGameYear());
+            if (obsoleteMod > 0) {
+                mods.addModifier(obsoleteMod,
+                      getFormattedTextAt(RESOURCE_BUNDLE, "Part.modifier.obsolete"));
+            }
         }
 
         if (getUnit().getTech() != null) {

@@ -1469,9 +1469,9 @@ public class Unit implements ITechnology {
             };
 
             // Apply obsolete quirk resale modifier
-            double obsoleteMult = entity.getObsoleteResaleModifier(campaign.getGameYear());
-            if (obsoleteMult < 1.0) {
-                infantryValue = infantryValue.multipliedBy(obsoleteMult);
+            double obsoleteMultiplier = entity.getObsoleteResaleModifier(campaign.getGameYear());
+            if (obsoleteMultiplier < 1.0) {
+                infantryValue = infantryValue.multipliedBy(obsoleteMultiplier);
             }
 
             return infantryValue;
@@ -1559,12 +1559,14 @@ public class Unit implements ITechnology {
         }
 
         // Scale the final value by the entity's price multiplier
-        partsValue = partsValue.multipliedBy(entity.getPriceMultiplier());
+        if (entity != null) {
+            partsValue = partsValue.multipliedBy(entity.getPriceMultiplier());
 
-        // Apply obsolete quirk resale modifier
-        double obsoleteMult = entity.getObsoleteResaleModifier(campaign.getGameYear());
-        if (obsoleteMult < 1.0) {
-            partsValue = partsValue.multipliedBy(obsoleteMult);
+            // Apply obsolete quirk resale modifier
+            double obsoleteMultiplier = entity.getObsoleteResaleModifier(campaign.getGameYear());
+            if (obsoleteMultiplier < 1.0) {
+                partsValue = partsValue.multipliedBy(obsoleteMultiplier);
+            }
         }
 
         return partsValue;
