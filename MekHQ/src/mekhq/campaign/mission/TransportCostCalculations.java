@@ -726,7 +726,9 @@ public class TransportCostCalculations {
                     smallCraftCount++;
                 } else if (entity.isMek()) {
                     mekCount++;
-                } else if (entity.isAerospaceFighter() || entity.isConventionalFighter()) {
+                } else if (entity.isAerospaceFighter() ||
+                                 entity.isConventionalFighter() ||
+                                 entity.isFixedWingSupport()) {
                     asfCount++;
                 } else if (entity.isProtoMek()) {
                     protoMekCount++;
