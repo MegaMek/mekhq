@@ -831,7 +831,7 @@ public class TransportCostCalculations {
 
     int getTotalSmallCraftBays() {
         return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
-                                      // Space stations must be fully shut down to jump and therefore cannot 
+                                      // Space stations must be fully shut down to jump and therefore cannot
                                       // contribute to transport capacity.
                                       .mapToDouble(Unit::getSmallCraftCapacity)
                                       .sum());
