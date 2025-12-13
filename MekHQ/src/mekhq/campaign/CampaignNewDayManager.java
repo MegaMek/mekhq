@@ -1294,19 +1294,10 @@ public class CampaignNewDayManager {
             }
 
             // Accolade check
-            boolean ignoreEmployer = relevantFaction.isMercenaryOrganization();
-            boolean isOnMission = FactionStandingUtilities.isIsOnMission(
-                  !isInTransit,
-                  campaign.getActiveAtBContracts(),
-                  activeMissions,
-                  relevantFactionCode,
-                  updatedLocation.getCurrentSystem(),
-                  ignoreEmployer);
-
             FactionAccoladeLevel newAccoladeLevel = campaign.getFactionStandings().checkForAccolade(
-                  relevantFaction, today, isOnMission);
+                  relevantFaction, today);
 
-            if (newAccoladeLevel != null) {
+            if (newAccoladeLevel != null && newAccoladeLevel != FactionAccoladeLevel.NO_ACCOLADE) {
                 new FactionAccoladeEvent(campaign, relevantFaction, newAccoladeLevel,
                       faction.equals(relevantFaction));
             }
