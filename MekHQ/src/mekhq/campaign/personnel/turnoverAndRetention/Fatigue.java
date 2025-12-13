@@ -176,7 +176,7 @@ public class Fatigue {
      * @param person   the person whose fatigue actions are being processed.
      */
     public static void processFatigueActions(Campaign campaign, Person person) {
-        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.getPermanentFatigue(),
+        int effectiveFatigue = getEffectiveFatigue(person.getAdjustedFatigue(), person.getPermanentFatigue(),
               person.isClanPersonnel(), person.getSkillLevel(campaign, false, true));
 
         if (!campaign.getCampaignOptions().isUseFatigue()) {
@@ -265,7 +265,7 @@ public class Fatigue {
                 }
 
                 for (Person person : unit.getCrew()) {
-                    int fatigue = person.getFatigue();
+                    int fatigue = person.getAdjustedFatigue();
                     int permanentFatigue = person.getPermanentFatigue();
                     boolean isClan = person.isClanPersonnel();
                     SkillLevel experienceLevel = person.getSkillLevel(campaign, false, true);
@@ -293,13 +293,6 @@ public class Fatigue {
             }
         }
     }
-
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public static int getEffectiveFatigue(int fatigue, boolean isClan, SkillLevel skillLevel,
-          boolean areFieldKitchensWithinCapacity) {
-        return getEffectiveFatigue(fatigue, 0, isClan, skillLevel);
-    }
-
 
     /**
      * Calculates the effective fatigue level for a given person based on various modifiers.
@@ -355,7 +348,7 @@ public class Fatigue {
      */
     public static void processFatigueRecovery(Campaign campaign, Person person,
           boolean fieldKitchensAreWithinCapacity) {
-        if (person.getFatigue() > 0) {
+        if (person.getFatigueDirect() > 0) {
             int fatigueAdjustment = FATIGUE_RECOVERY_RATE;
 
             if (person.getStatus().isOnLeave() || campaign.getActiveContracts().isEmpty()) {
@@ -368,7 +361,7 @@ public class Fatigue {
 
             person.changeFatigue(-fatigueAdjustment);
 
-            if (person.getFatigue() < 0) {
+            if (person.getFatigueDirect() < 0) {
                 person.setFatigue(0);
             }
         }
@@ -379,7 +372,7 @@ public class Fatigue {
             }
 
             if (person.getIsRecoveringFromFatigue()) {
-                if (person.getFatigue() <= 0) {
+                if (person.getFatigueDirect() <= 0) {
                     campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "fatigueRecovered.text",
                           person.getHyperlinkedFullTitle(),
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),

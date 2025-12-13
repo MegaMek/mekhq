@@ -196,7 +196,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
 
     private void deleteEntry() {
         Injury entry = injuryModel.getEntryAt(injuriesTable.getSelectedRow());
-        person.removeInjury(entry);
+        person.removeInjury(entry, campaign.getLocalDate());
         refreshTable();
     }
 

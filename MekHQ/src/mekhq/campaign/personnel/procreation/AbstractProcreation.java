@@ -33,11 +33,14 @@
 package mekhq.campaign.personnel.procreation;
 
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_DOBROWSKI_SYNDROME;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.enums.BloodGroup.getInheritedBloodGroup;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.BIRTH_DEFECT;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.KAER_PATHOGEN;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -46,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import megamek.codeUtilities.MathUtility;
@@ -61,6 +65,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
@@ -420,6 +425,10 @@ public abstract class AbstractProcreation {
         }
 
         // Create Babies
+        Set<InjuryType> activeInjuryTypes = mother.getActiveInjuryTypes();
+        if (father != null) {
+            activeInjuryTypes.addAll(father.getActiveInjuryTypes());
+        }
         for (int i = 0; i < size; i++) {
             // Create a baby
             final Person baby = campaign.newDependent(Gender.RANDOMIZE,
@@ -485,6 +494,21 @@ public abstract class AbstractProcreation {
             } else {
                 int currentHits = mother.getHits();
                 mother.setHits(currentHits + 1);
+            }
+
+            // Check for hereditary diseases
+            if (activeInjuryTypes.contains(KAER_PATHOGEN)) {
+                Injury kaerPathogen = KAER_PATHOGEN.newInjury(campaign, baby, INTERNAL, 1);
+                baby.addInjury(kaerPathogen);
+
+                Injury birthDefect = BIRTH_DEFECT.newInjury(campaign, baby, INTERNAL, 1);
+                baby.addInjury(birthDefect);
+            }
+
+            if (mother.getOptions().booleanOption(UNOFFICIAL_DOBROWSKI_SYNDROME)) {
+                baby.getOptions().getOption(UNOFFICIAL_DOBROWSKI_SYNDROME).setValue(true);
+            } else if (father != null && father.getOptions().booleanOption(UNOFFICIAL_DOBROWSKI_SYNDROME)) {
+                baby.getOptions().getOption(UNOFFICIAL_DOBROWSKI_SYNDROME).setValue(true);
             }
 
             // Alert the player

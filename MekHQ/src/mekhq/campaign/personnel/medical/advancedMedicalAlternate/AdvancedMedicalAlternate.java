@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
 import static mekhq.campaign.personnel.medical.BodyLocation.HEAD;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -113,7 +114,7 @@ public class AdvancedMedicalAlternate {
         return newInjury;
     }
 
-    public static void purgeIllogicalInjuries(Person person) {
+    public static void purgeIllogicalInjuries(Person person, LocalDate today) {
         List<Injury> injuries = person.getInjuries();
 
         // Collect all severed locations
@@ -138,7 +139,7 @@ public class AdvancedMedicalAlternate {
 
         // Remove each injury
         for (Injury injury : injuriesToRemove) {
-            person.removeInjury(injury);
+            person.removeInjury(injury, today);
         }
     }
 

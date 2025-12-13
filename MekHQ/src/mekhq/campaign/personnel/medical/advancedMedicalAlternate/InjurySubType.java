@@ -40,7 +40,7 @@ package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
  * <ul>
  *   <li>{@link #NORMAL} — Standard or conventional injuries.</li>
  *   <li>{@link #BURN} — Thermal or chemical burn injuries.</li>
- *   <li>{@link #DISEASE} — Injuries or conditions caused by illness or infection.</li>
+ *   <li>{@link #DISEASE_GENERIC} — Injuries or conditions caused by illness or infection.</li>
  *   <li>{@link #PROSTHETIC_GENERIC} — Artificial or mechanical replacements for body parts.</li>
  * </ul>
  *
@@ -55,7 +55,13 @@ public enum InjurySubType {
     BURN,
 
     /** Illness or infection-related conditions. */
-    DISEASE,
+    DISEASE_GENERIC,
+
+    /** Canon illness or infection-related conditions. */
+    DISEASE_CANON_GENERIC,
+
+    /** Canon illness caused by a bioweapon attack. */
+    DISEASE_CANON_BIOWEAPON,
 
     /** Mechanical or artificial body replacements. Always count as 0 TW-scale 'Hits.' */
     PROSTHETIC_GENERIC,
@@ -97,10 +103,30 @@ public enum InjurySubType {
     /**
      * Checks whether this subtype represents a disease-related injury.
      *
-     * @return {@code true} if this subtype is {@link #DISEASE}, otherwise {@code false}.
+     * @return {@code true} if this subtype is {@link #DISEASE_GENERIC}, {@link #DISEASE_CANON_GENERIC}, or
+     *       {@link #DISEASE_CANON_BIOWEAPON}, otherwise {@code false}.
      */
     public boolean isDisease() {
-        return this == DISEASE;
+        return this == DISEASE_GENERIC || this == DISEASE_CANON_GENERIC || this == DISEASE_CANON_BIOWEAPON;
+    }
+
+    /**
+     * Checks whether this subtype represents a canon disease-related injury.
+     *
+     * @return {@code true} if this subtype is {@link #DISEASE_CANON_GENERIC}, or {@link #DISEASE_CANON_BIOWEAPON},
+     *       otherwise {@code false}.
+     */
+    public boolean isCanonDisease() {
+        return this == DISEASE_CANON_GENERIC || this == DISEASE_CANON_BIOWEAPON;
+    }
+
+    /**
+     * Checks whether this subtype represents a bioweapon disease-related injury.
+     *
+     * @return {@code true} if this subtype is {@link #DISEASE_CANON_BIOWEAPON}, otherwise {@code false}.
+     */
+    public boolean isBioweaponDisease() {
+        return this == DISEASE_CANON_BIOWEAPON;
     }
 
     /**

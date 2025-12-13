@@ -191,7 +191,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
             }
             boolean personIsFatigued = (campaign.getCampaignOptions().isUseFatigue()
                                               &&
-                                              (getEffectiveFatigue(person.getFatigue(),
+                                              (getEffectiveFatigue(person.getAdjustedFatigue(),
                                                     person.getPermanentFatigue(),
                                                     person.isClanPersonnel(),
                                                     person.getSkillLevel(campaign, false, true)) >= 5));
