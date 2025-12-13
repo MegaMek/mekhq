@@ -314,7 +314,6 @@ public class FactionJudgment {
      * @param faction                    the faction issuing the accolade
      * @param today                      the current date for consideration in improvement logic
      * @param currentStandingWithFaction the current standing level with the faction, which may affect eligibility
-     * @param hasActiveContract          {@code true} if the campaign has an active contract, otherwise {@code false}
      *
      * @return the new {@link FactionAccoladeLevel} if increased, or {@code null} if no increase was made
      *
@@ -322,13 +321,13 @@ public class FactionJudgment {
      * @since 0.50.07
      */
     public @Nullable FactionAccoladeLevel increaseAccoladeForFaction(final Faction faction, final LocalDate today,
-          FactionStandingLevel currentStandingWithFaction, boolean hasActiveContract) {
+          FactionStandingLevel currentStandingWithFaction) {
         String factionCode = faction.getShortName();
         AccoladeEntry accoladeEntry = factionAccolades.get(factionCode);
 
         if (accoladeEntry == null) {
             setAccoladeForFaction(factionCode, FactionAccoladeLevel.TAKING_NOTICE_0, today);
-            LOGGER.debug("Faction {} has no accolade entry, assigning TAKING_NOTICE", factionCode);
+            LOGGER.debug("Faction {} has no accolade entry, assigning TAKING_NOTICE_0", factionCode);
             return FactionAccoladeLevel.TAKING_NOTICE_0;
         }
 
@@ -354,7 +353,7 @@ public class FactionJudgment {
         }
 
         // This accolade requires an active contract
-        if (updatedAccoladeLevel.is(FactionAccoladeLevel.TRIUMPH_OR_REMEMBRANCE) && !hasActiveContract) {
+        if (updatedAccoladeLevel.is(FactionAccoladeLevel.TRIUMPH_OR_REMEMBRANCE)) {
             LOGGER.debug("Faction {} cannot improve accolade due to lack of active contract", factionCode);
             return null;
         }
@@ -381,7 +380,7 @@ public class FactionJudgment {
 
             if (censureEntry != null) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, factionCode);
-                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "level", censureEntry.level().toString());
+                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "level", censureEntry.level().name());
                 MHQXMLUtility.writeSimpleXMLTag(writer, indent, "issueDate", censureEntry.issueDate().toString());
                 MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, factionCode);
             }
@@ -394,7 +393,7 @@ public class FactionJudgment {
 
             if (accoladeEntry != null) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, factionCode);
-                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "level", accoladeEntry.level().toString());
+                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "level", accoladeEntry.level().name());
                 MHQXMLUtility.writeSimpleXMLTag(writer, indent, "issueDate", accoladeEntry.issueDate().toString());
                 MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, factionCode);
             }
