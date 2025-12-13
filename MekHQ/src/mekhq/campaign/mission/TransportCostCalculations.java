@@ -766,7 +766,7 @@ public class TransportCostCalculations {
      *     <li>They are not associated with any unit.</li>
      *     <li>Their associated unit does not have an associated entity.</li>
      *     <li>The entity associated with their unit is not a WarShip, JumpShip, or DropShip.</li>
-     * </ul
+     * </ul>
      *
      * @return The total count of passengers based on the conditions specified.
      */
@@ -785,7 +785,9 @@ public class TransportCostCalculations {
                 continue;
             }
 
-            if (!entity.isWarShip() && !entity.isJumpShip() && !entity.isDropShip()) {
+            // We exclude Space Stations here, as CamOps pg 35 states that only crew of the below unit types are
+            // excluded from passenger counts
+            if (!entity.isSmallCraft() && !entity.isWarShip() && !entity.isJumpShip() && !entity.isDropShip()) {
                 passengerCount++;
             }
         }
