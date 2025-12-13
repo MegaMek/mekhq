@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.gui.campaignOptions.CampaignOptionsPane.triggerUpgradeFreebies;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -55,6 +56,7 @@ import mekhq.CampaignPreset;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
@@ -156,8 +158,15 @@ public class CampaignUpgradeDialog {
                 }
 
                 CampaignPreset chosenPreset = presets.get(comboChoiceIndex);
+
+                CampaignOptionsFreebieTracker oldOptions = new CampaignOptionsFreebieTracker(campaign.getCampaignOptions());
+                CampaignOptionsFreebieTracker newOptions = new CampaignOptionsFreebieTracker(chosenPreset.getCampaignOptions());
+                triggerUpgradeFreebies(campaign, oldOptions, newOptions, false);
+
+                campaign.setCampaignOptions(chosenPreset.getCampaignOptions());
                 campaign.setGameOptions(chosenPreset.getGameOptions());
                 campaign.setRandomSkillPreferences(chosenPreset.getRandomSkillPreferences());
+
                 Map<String, SkillType> presetSkills = chosenPreset.getSkills();
                 for (final String skillName : SkillType.getSkillList()) {
                     SkillType storedType = SkillType.getType(skillName);
