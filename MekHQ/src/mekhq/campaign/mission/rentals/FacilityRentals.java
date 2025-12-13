@@ -44,9 +44,12 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
+import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -54,6 +57,7 @@ import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.unit.Unit;
@@ -454,5 +458,55 @@ public class FacilityRentals {
 
         return finances.debit(TransactionType.RENT, today, rentalCost,
               getFormattedTextAt(RESOURCE_BUNDLE, "FacilityRentals.rental." + rentalType, rentalCost.toAmountString()));
+    }
+
+    public static boolean processBayChangeRequest(Campaign campaign, Unit[] selectedUnits, int bayType) {
+        List<AtBContract> activeAtBContracts = campaign.getActiveAtBContracts();
+        boolean isOffContractOrOnGarrison = activeAtBContracts.isEmpty();
+
+        for (AtBContract atBContract : activeAtBContracts) {
+            if (atBContract.getContractType().isGarrisonType()) {
+                isOffContractOrOnGarrison = true;
+                break;
+            }
+        }
+
+        if (!isOffContractOrOnGarrison || !campaign.getLocation().isOnPlanet()) {
+            BayRentalDialog.showNoFacilitiesAvailableDialog(campaign);
+            return false;
+        }
+
+        // This counts how many units are eligible and how many are eligible and a large craft. We handle
+        // it this way to allow us to fetch the counts in a single pass
+        Predicate<Unit> eligibleForBayRental =
+              unit -> !FacilityRentals.shouldBeIgnoredByBayRentals(unit);
+        long[] counts = Arrays.stream(selectedUnits)
+                              .filter(eligibleForBayRental)
+                              .collect(() -> new long[2], (results, unit) -> {
+                                  if (!unit.isDeployed()) {
+                                      results[0]++; // eligible
+                                      Entity entity = unit.getEntity();
+                                      if (entity != null && entity.isLargeCraft()) {
+                                          results[1]++; // large vessel
+                                      }
+                                  }
+                              }, (a, b) -> {
+                                  a[0] += b[0];
+                                  a[1] += b[1];
+                              });
+
+        int eligibleUnitCount = (int) counts[0];
+        int eligibleLargeVesselCount = (int) counts[1];
+
+        ContractRentalType rentalType = switch (bayType) {
+            case Unit.SITE_FACILITY_MAINTENANCE -> ContractRentalType.MAINTENANCE_BAYS;
+            case Unit.SITE_FACTORY_CONDITIONS -> ContractRentalType.FACTORY_CONDITIONS;
+            default -> null; // Should never happen as we're already filtering out invalid sites
+        };
+
+        return FacilityRentals.offerBayRentalOpportunity(campaign,
+              eligibleUnitCount,
+              eligibleLargeVesselCount,
+              rentalType);
     }
 }
