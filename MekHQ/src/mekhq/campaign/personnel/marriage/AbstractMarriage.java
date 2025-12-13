@@ -364,7 +364,7 @@ public abstract class AbstractMarriage {
             potentialSpouses = new ArrayList<>();
 
             for (Person potentialSpouse : activePersonnel) {
-                if (isPotentialRandomSpouse(campaign, today, person, potentialSpouse, prefersMen, prefersWomen)) {
+                if (isPotentialRandomSpouse(campaign, today, person, potentialSpouse)) {
                     potentialSpouses.add(potentialSpouse);
                 }
             }
@@ -453,14 +453,10 @@ public abstract class AbstractMarriage {
      * @return true if they are a valid potential random spouse
      */
     protected boolean isPotentialRandomSpouse(final Campaign campaign, final LocalDate today, final Person person,
-          final Person potentialSpouse, final boolean prefersMen, final boolean prefersWomen) {
+          final Person potentialSpouse) {
         // A Potential Spouse must:
         // 1. Be a compatible gender
-        Gender potentialSpouseGender = potentialSpouse.getGender();
-        boolean isCompatibleGender = (prefersMen && potentialSpouseGender.isMale())
-                                           || (prefersWomen && potentialSpouseGender.isFemale());
-
-        if (!isCompatibleGender) {
+        if (!isGenderCompatible(person, potentialSpouse)) {
             return false;
         }
 
@@ -470,8 +466,13 @@ public abstract class AbstractMarriage {
         }
 
         // 3. Be within the random marriage age range
+        return isWithinAgeRange(campaign.getCampaignOptions().getRandomMarriageAgeRange(), today, person,
+              potentialSpouse);
+    }
+
+    private static boolean isWithinAgeRange(int ageRange, LocalDate today, Person person, Person potentialSpouse) {
         final int ageDifference = Math.abs(potentialSpouse.getAge(today) - person.getAge(today));
-        return ageDifference <= campaign.getCampaignOptions().getRandomMarriageAgeRange();
+        return ageDifference <= ageRange;
     }
     //endregion Random Marriage
     //endregion New Day
@@ -485,10 +486,12 @@ public abstract class AbstractMarriage {
      * @return {@code true} if their orientations are compatible; {@code false} otherwise
      */
     public static boolean isGenderCompatible(Person person, Person potentialSpouse) {
-        boolean spouseIsMale = potentialSpouse.getGender().isMale();
-        boolean spouseIsFemale = potentialSpouse.getGender().isFemale();
+        return likesGender(person, potentialSpouse) && likesGender(potentialSpouse, person);
+    }
 
-        return (person.isPrefersMen() && spouseIsMale)
-                     || (person.isPrefersWomen() && spouseIsFemale);
+    private static boolean likesGender(Person liker, Person other) {
+        Gender gender = other.getGender();
+        return (liker.isPrefersMen() && gender.isMale())
+                     || (liker.isPrefersWomen() && gender.isFemale());
     }
 }
