@@ -39,6 +39,7 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 
@@ -90,5 +91,18 @@ public class BayRentalDialog extends ImmersiveDialogSimple {
 
     private static String getOutOfCharacterMessage() {
         return getFormattedTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.outOfCharacter.bay");
+    }
+
+    public static void showNoFacilitiesAvailableDialog(Campaign campaign) {
+        boolean isInSpace = !campaign.getLocation().isOnPlanet();
+
+        String message;
+        if (isInSpace) {
+            message = getTextAt(RESOURCE_BUNDLE, "UnitBayRental.inSpace");
+        } else {
+            message = getTextAt(RESOURCE_BUNDLE, "UnitBayRental.wrongContractType");
+        }
+
+        new ImmersiveDialogNotification(campaign, message, true);
     }
 }
