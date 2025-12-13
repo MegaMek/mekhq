@@ -1804,16 +1804,11 @@ public class CampaignNewDayManager {
         // Second, we process them and any already generated scenarios
         for (AtBContract contract : contracts) {
             /*
-             * Situations like a delayed start or running out of funds during transit can
-             * delay arrival until after the contract start. In that case, shift the
-             * starting and ending dates before making any battle rolls. We check that the
-             * unit is actually on route to the planet in case the user is using a custom
-             * system for transport or splitting the unit, etc.
+             * Situations like a delayed start or running out of funds during transit can delay arrival until after
+             * the contract start. In that case, shift the starting and ending dates before making any battle rolls.
              */
-            if (!updatedLocation.isOnPlanet() &&
-                      !updatedLocation.getJumpPath().isEmpty() &&
-                      updatedLocation.getJumpPath().getLastSystem().getId().equals(contract.getSystemId())) {
-                // transitTime is measured in days; so we round up to the next whole day
+            if (updatedLocation.getCurrentSystem() != contract.getSystem()) {
+                // transitTime is measured in days, so we round up to the next whole day
                 contract.setStartAndEndDate(today.plusDays((int) ceil(updatedLocation.getTransitTime())));
                 campaign.addReport(GENERAL, "The start and end dates of " +
                                                   contract.getHyperlinkedName() +
