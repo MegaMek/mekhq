@@ -56,6 +56,9 @@ import java.util.UUID;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SpaceStation;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
@@ -79,20 +82,137 @@ public class TransportCostCalculationsTest {
 
     private TransportCostCalculations transportCostCalculations;
 
+    private Hangar mockHangar;
+
     @BeforeEach
     public void setup() {
+        mockHangar = mock(Hangar.class);
+        when(mockHangarStatistics.getHangar()).thenReturn(mockHangar);
+
+        // Always return a fresh Stream per invocation
+        setHangarUnits(List.of());
+
         transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),
               new ArrayList<>(),
               mockCargoStatistics,
               mockHangarStatistics,
               EXP_REGULAR);
-        transportCostCalculations.setTotalCost(Money.zero()); // Initialize total cost
+        transportCostCalculations.setTotalCost(Money.zero());
+    }
+
+    // Helpers
+
+    private void setHangarUnits(List<Unit> units) {
+        when(mockHangar.getUnitsStream()).thenAnswer(inv -> units.stream());
+    }
+
+    private Unit unitWithEntity(Entity entity) {
+        Unit unit = mock(Unit.class);
+        when(unit.getEntity()).thenReturn(entity);
+        return unit;
+    }
+
+    private Unit unitWithEntityAndDocks(Entity entity, int docks) {
+        Unit unit = unitWithEntity(entity);
+        when(unit.getDocks()).thenReturn(docks);
+        return unit;
+    }
+
+    private Unit unitWithSmallCraftCapacity(double cap) {
+        Unit unit = unitWithEntity(mock(Entity.class));
+        when(unit.getSmallCraftCapacity()).thenReturn(cap);
+        return unit;
+    }
+
+    private Unit unitWithASFCapacity(double cap) {
+        Unit unit = unitWithEntity(mock(Entity.class));
+        when(unit.getASFCapacity()).thenReturn(cap);
+        return unit;
+    }
+
+    private Unit unitWithMekCapacity(double cap) {
+        Unit unit = unitWithEntity(mock(Entity.class));
+        when(unit.getMekCapacity()).thenReturn(cap);
+        return unit;
+    }
+
+    private Unit unitWithSuperHeavyVehicleCapacity(double cap) {
+        Unit unit = unitWithEntity(mock(Entity.class));
+        when(unit.getSuperHeavyVehicleCapacity()).thenReturn(cap);
+        return unit;
+    }
+
+    private Unit unitWithHeavyVehicleCapacity(double cap) {
+        Unit unit = unitWithEntity(mock(Entity.class));
+        when(unit.getHeavyVehicleCapacity()).thenReturn(cap);
+        return unit;
+    }
+
+    private Unit unitWithLightVehicleCapacity(double cap) {
+        Unit unit = unitWithEntity(mock(Entity.class));
+        when(unit.getLightVehicleCapacity()).thenReturn(cap);
+        return unit;
+    }
+
+    private Unit unitWithProtoMekCapacity(double cap) {
+        Unit unit = unitWithEntity(mock(Entity.class));
+        when(unit.getProtoMekCapacity()).thenReturn(cap);
+        return unit;
+    }
+
+    private Unit unitWithBattleArmorCapacity(double cap) {
+        Unit unit = unitWithEntity(mock(Entity.class));
+        when(unit.getBattleArmorCapacity()).thenReturn(cap);
+        return unit;
+    }
+
+    private Unit unitWithInfantryCapacity(double cap) {
+        Unit unit = unitWithEntity(mock(Entity.class));
+        when(unit.getInfantryCapacity()).thenReturn(cap);
+        return unit;
+    }
+
+    private Unit unitThatIsSpaceStationAndWouldOtherwiseAddCapacity() {
+        // Used to verify SpaceStation filtering paths (all totals except SmallCraft bays filter these out)
+        SpaceStation station = mock(SpaceStation.class);
+        Unit unit = unitWithEntity(station);
+
+        when(unit.getSmallCraftCapacity()).thenReturn((double) 0);
+        when(unit.getASFCapacity()).thenReturn((double) 10);
+        when(unit.getMekCapacity()).thenReturn((double) 0);
+        when(unit.getSuperHeavyVehicleCapacity()).thenReturn((double) 0);
+        when(unit.getHeavyVehicleCapacity()).thenReturn((double) 0);
+        when(unit.getLightVehicleCapacity()).thenReturn((double) 0);
+        when(unit.getProtoMekCapacity()).thenReturn((double) 0);
+        when(unit.getBattleArmorCapacity()).thenReturn((double) 0);
+        when(unit.getInfantryCapacity()).thenReturn((double) 0);
+
+        return unit;
+    }
+
+    private Unit unitThatIsJumpShipWithDocks(int docks) {
+        Jumpship jumpship = mock(Jumpship.class);
+        return unitWithEntityAndDocks(jumpship, docks);
+    }
+
+    // Tests
+
+    @Test
+    void getTotalASFBays_ignoresSpaceStations() {
+        Unit spaceStation = unitThatIsSpaceStationAndWouldOtherwiseAddCapacity();
+        Unit normalCarrier = unitWithASFCapacity(2); // should count
+
+        setHangarUnits(List.of(spaceStation, normalCarrier));
+
+        assertEquals(2, transportCostCalculations.getTotalASFBays(),
+              "Space stations must not contribute to ASF bay totals");
     }
 
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void testCalculateAdditionalJumpCollarsRequirements_notEnoughCollars(int additionalDropShips) {
-        when(mockHangarStatistics.getTotalDockingCollars()).thenReturn(0);
+        setHangarUnits(List.of());
+
         transportCostCalculations.setDropShipCount(0);
         transportCostCalculations.setAdditionalDropShipsRequired(additionalDropShips);
 
@@ -112,7 +232,8 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void testCalculateAdditionalJumpCollarsRequirements_enoughCollars(int additionalDropShips) {
-        when(mockHangarStatistics.getTotalDockingCollars()).thenReturn(additionalDropShips);
+        setHangarUnits(List.of(unitThatIsJumpShipWithDocks(additionalDropShips)));
+
         transportCostCalculations.setDropShipCount(0);
         transportCostCalculations.setAdditionalDropShipsRequired(0);
 
@@ -273,6 +394,9 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_smallCraft_noSpareBays(int bayRequirementCount) {
+        // 0 existing bays
+        setHangarUnits(List.of());
+
         transportCostCalculations.setSmallCraftCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
 
@@ -288,9 +412,9 @@ public class TransportCostCalculationsTest {
 
     @ParameterizedTest
     @ValueSource(ints = { 3, 5, 10 })
-    public void calculateAdditionalBayRequirementsFromUnits_smallCraft_tooFewExistingBays(
-          int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSmallCraftBays()).thenReturn(bayRequirementCount - 1);
+    public void calculateAdditionalBayRequirementsFromUnits_smallCraft_tooFewExistingBays(int bayRequirementCount) {
+        // existing = bayRequirementCount - 1
+        setHangarUnits(List.of(unitWithSmallCraftCapacity(bayRequirementCount - 1)));
 
         transportCostCalculations.setSmallCraftCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
@@ -309,7 +433,8 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_smallCraft_tooManyExistingBays(int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSmallCraftBays()).thenReturn(bayRequirementCount + 1);
+        // existing = bayRequirementCount + 1
+        setHangarUnits(List.of(unitWithSmallCraftCapacity(bayRequirementCount + 1)));
 
         transportCostCalculations.setSmallCraftCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
@@ -329,8 +454,8 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_aerospaceOrConventionalFighter_noSpareBays(
           int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSmallCraftBays()).thenReturn(0);
-        when(mockHangarStatistics.getTotalASFBays()).thenReturn(0);
+        // totalSmallCraftBays=0, totalASFBays=0
+        setHangarUnits(List.of());
 
         transportCostCalculations.setSmallCraftCount(0);
         transportCostCalculations.setASFCount(bayRequirementCount);
@@ -350,8 +475,8 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_aerospaceOrConventionalFighter_tooFewExistingBays(
           int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSmallCraftBays()).thenReturn(0);
-        when(mockHangarStatistics.getTotalASFBays()).thenReturn(bayRequirementCount - 1);
+        // totalASFBays = bayRequirementCount - 1
+        setHangarUnits(List.of(unitWithASFCapacity(bayRequirementCount - 1)));
 
         transportCostCalculations.setSmallCraftCount(0);
         transportCostCalculations.setASFCount(bayRequirementCount);
@@ -372,8 +497,8 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_aerospaceOrConventionalFighter_tooManyExistingBays(
           int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSmallCraftBays()).thenReturn(0);
-        when(mockHangarStatistics.getTotalASFBays()).thenReturn(bayRequirementCount + 1);
+        // totalASFBays = bayRequirementCount + 1
+        setHangarUnits(List.of(unitWithASFCapacity(bayRequirementCount + 1)));
 
         transportCostCalculations.setSmallCraftCount(0);
         transportCostCalculations.setASFCount(bayRequirementCount);
@@ -394,8 +519,8 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_aerospaceOrConventionalFighter_surplusCompatibleBays(
           int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSmallCraftBays()).thenReturn(3);
-        when(mockHangarStatistics.getTotalASFBays()).thenReturn(0);
+        // totalSmallCraftBays=3, totalASFBays=0
+        setHangarUnits(List.of(unitWithSmallCraftCapacity(3)));
 
         transportCostCalculations.setSmallCraftCount(0);
         transportCostCalculations.setASFCount(bayRequirementCount);
@@ -415,7 +540,7 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_mek_noSpareBays(int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalMekBays()).thenReturn(0);
+        setHangarUnits(List.of());
 
         transportCostCalculations.setMekCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
@@ -432,9 +557,8 @@ public class TransportCostCalculationsTest {
 
     @ParameterizedTest
     @ValueSource(ints = { 3, 5, 10 })
-    public void calculateAdditionalBayRequirementsFromUnits_mek_tooFewExistingBays(
-          int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalMekBays()).thenReturn(bayRequirementCount - 1);
+    public void calculateAdditionalBayRequirementsFromUnits_mek_tooFewExistingBays(int bayRequirementCount) {
+        setHangarUnits(List.of(unitWithMekCapacity(bayRequirementCount - 1)));
 
         transportCostCalculations.setMekCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
@@ -453,7 +577,7 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_mek_tooManyExistingBays(int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalMekBays()).thenReturn(bayRequirementCount + 1);
+        setHangarUnits(List.of(unitWithMekCapacity(bayRequirementCount + 1)));
 
         transportCostCalculations.setMekCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
@@ -472,7 +596,7 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_superHeavyVehicle_noSpareBays(int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(0);
+        setHangarUnits(List.of());
 
         transportCostCalculations.setSuperHeavyVehicleCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
@@ -491,7 +615,7 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_superHeavyVehicle_tooFewExistingBays(
           int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(bayRequirementCount - 1);
+        setHangarUnits(List.of(unitWithSuperHeavyVehicleCapacity(bayRequirementCount - 1)));
 
         transportCostCalculations.setSuperHeavyVehicleCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
@@ -511,7 +635,7 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_superHeavyVehicle_tooManyExistingBays(
           int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(bayRequirementCount + 1);
+        setHangarUnits(List.of(unitWithSuperHeavyVehicleCapacity(bayRequirementCount + 1)));
 
         transportCostCalculations.setSuperHeavyVehicleCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
@@ -530,8 +654,8 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_heavyVehicle_noSpareBays(int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(0);
-        when(mockHangarStatistics.getTotalHeavyVehicleBays()).thenReturn(0);
+        // Ensure no compatible surplus in super-heavy bays
+        setHangarUnits(List.of());
 
         transportCostCalculations.setSuperHeavyVehicleCount(0);
         transportCostCalculations.setHeavyVehicleCount(bayRequirementCount);
@@ -549,10 +673,8 @@ public class TransportCostCalculationsTest {
 
     @ParameterizedTest
     @ValueSource(ints = { 3, 5, 10 })
-    public void calculateAdditionalBayRequirementsFromUnits_heavyVehicle_tooFewExistingBays(
-          int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(0);
-        when(mockHangarStatistics.getTotalHeavyVehicleBays()).thenReturn(bayRequirementCount - 1);
+    public void calculateAdditionalBayRequirementsFromUnits_heavyVehicle_tooFewExistingBays(int bayRequirementCount) {
+        setHangarUnits(List.of(unitWithHeavyVehicleCapacity(bayRequirementCount - 1)));
 
         transportCostCalculations.setSuperHeavyVehicleCount(0);
         transportCostCalculations.setHeavyVehicleCount(bayRequirementCount);
@@ -571,10 +693,8 @@ public class TransportCostCalculationsTest {
 
     @ParameterizedTest
     @ValueSource(ints = { 3, 5, 10 })
-    public void calculateAdditionalBayRequirementsFromUnits_heavyVehicle_tooManyExistingBays(
-          int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(0);
-        when(mockHangarStatistics.getTotalHeavyVehicleBays()).thenReturn(bayRequirementCount + 1);
+    public void calculateAdditionalBayRequirementsFromUnits_heavyVehicle_tooManyExistingBays(int bayRequirementCount) {
+        setHangarUnits(List.of(unitWithHeavyVehicleCapacity(bayRequirementCount + 1)));
 
         transportCostCalculations.setSuperHeavyVehicleCount(0);
         transportCostCalculations.setHeavyVehicleCount(bayRequirementCount);
@@ -595,8 +715,8 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_heavyVehicle_surplusCompatibleBays(
           int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(3);
-        when(mockHangarStatistics.getTotalHeavyVehicleBays()).thenReturn(0);
+        // totalSuperHeavyVehicleBays = 3 can cover heavy vehicles
+        setHangarUnits(List.of(unitWithSuperHeavyVehicleCapacity(3)));
 
         transportCostCalculations.setSuperHeavyVehicleCount(0);
         transportCostCalculations.setHeavyVehicleCount(bayRequirementCount);
@@ -616,9 +736,7 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_lightVehicle_noSpareBays(int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(0);
-        when(mockHangarStatistics.getTotalHeavyVehicleBays()).thenReturn(0);
-        when(mockHangarStatistics.getTotalLightVehicleBays()).thenReturn(0);
+        setHangarUnits(List.of());
 
         transportCostCalculations.setSuperHeavyVehicleCount(0);
         transportCostCalculations.setHeavyVehicleCount(0);
@@ -637,11 +755,8 @@ public class TransportCostCalculationsTest {
 
     @ParameterizedTest
     @ValueSource(ints = { 3, 5, 10 })
-    public void calculateAdditionalBayRequirementsFromUnits_lightVehicle_tooFewExistingBays(
-          int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(0);
-        when(mockHangarStatistics.getTotalHeavyVehicleBays()).thenReturn(0);
-        when(mockHangarStatistics.getTotalLightVehicleBays()).thenReturn(bayRequirementCount - 1);
+    public void calculateAdditionalBayRequirementsFromUnits_lightVehicle_tooFewExistingBays(int bayRequirementCount) {
+        setHangarUnits(List.of(unitWithLightVehicleCapacity(bayRequirementCount - 1)));
 
         transportCostCalculations.setSuperHeavyVehicleCount(0);
         transportCostCalculations.setHeavyVehicleCount(0);
@@ -661,11 +776,8 @@ public class TransportCostCalculationsTest {
 
     @ParameterizedTest
     @ValueSource(ints = { 3, 5, 10 })
-    public void calculateAdditionalBayRequirementsFromUnits_lightVehicle_tooManyExistingBays(
-          int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(0);
-        when(mockHangarStatistics.getTotalHeavyVehicleBays()).thenReturn(0);
-        when(mockHangarStatistics.getTotalLightVehicleBays()).thenReturn(bayRequirementCount + 1);
+    public void calculateAdditionalBayRequirementsFromUnits_lightVehicle_tooManyExistingBays(int bayRequirementCount) {
+        setHangarUnits(List.of(unitWithLightVehicleCapacity(bayRequirementCount + 1)));
 
         transportCostCalculations.setSuperHeavyVehicleCount(0);
         transportCostCalculations.setHeavyVehicleCount(0);
@@ -687,9 +799,7 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_lightVehicle_surplusCompatibleBays_superHeavy(
           int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(3);
-        when(mockHangarStatistics.getTotalHeavyVehicleBays()).thenReturn(0);
-        when(mockHangarStatistics.getTotalLightVehicleBays()).thenReturn(0);
+        setHangarUnits(List.of(unitWithSuperHeavyVehicleCapacity(3)));
 
         transportCostCalculations.setSuperHeavyVehicleCount(0);
         transportCostCalculations.setHeavyVehicleCount(0);
@@ -711,9 +821,7 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_lightVehicle_surplusCompatibleBays_heavy(
           int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(0);
-        when(mockHangarStatistics.getTotalHeavyVehicleBays()).thenReturn(3);
-        when(mockHangarStatistics.getTotalLightVehicleBays()).thenReturn(0);
+        setHangarUnits(List.of(unitWithHeavyVehicleCapacity(3)));
 
         transportCostCalculations.setSuperHeavyVehicleCount(0);
         transportCostCalculations.setHeavyVehicleCount(0);
@@ -735,9 +843,7 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_lightVehicle_surplusCompatibleBays_superHeavyAndHeavy(
           int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(2);
-        when(mockHangarStatistics.getTotalHeavyVehicleBays()).thenReturn(1);
-        when(mockHangarStatistics.getTotalLightVehicleBays()).thenReturn(0);
+        setHangarUnits(List.of(unitWithSuperHeavyVehicleCapacity(2), unitWithHeavyVehicleCapacity(1)));
 
         transportCostCalculations.setSuperHeavyVehicleCount(0);
         transportCostCalculations.setHeavyVehicleCount(0);
@@ -761,7 +867,7 @@ public class TransportCostCalculationsTest {
         double protoMekBayUsage = (double) bayRequirementCount / PROTOMEKS_PER_BAY;
         int expectedBaysRequired = max(0, MathUtility.roundAwayFromZero(protoMekBayUsage));
 
-        when(mockHangarStatistics.getTotalProtoMekBays()).thenReturn(0);
+        setHangarUnits(List.of());
 
         transportCostCalculations.setProtoMekCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
@@ -780,7 +886,8 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_protoMek_tooFewSpareBays(int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalProtoMekBays()).thenReturn(1);
+        // totalProtoMekBays = 1
+        setHangarUnits(List.of(unitWithProtoMekCapacity(1)));
 
         double protoMekBayUsage = 1 - bayRequirementCount;
         protoMekBayUsage = protoMekBayUsage / PROTOMEKS_PER_BAY;
@@ -807,7 +914,8 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_protoMek_tooManySpareBays(int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalProtoMekBays()).thenReturn(bayRequirementCount);
+        // totalProtoMekBays = bayRequirementCount
+        setHangarUnits(List.of(unitWithProtoMekCapacity(bayRequirementCount)));
 
         transportCostCalculations.setProtoMekCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
@@ -832,7 +940,7 @@ public class TransportCostCalculationsTest {
         double battleArmorBayUsage = (double) bayRequirementCount / BATTLE_ARMOR_SQUADS_PER_BAY;
         int expectedBaysRequired = max(0, MathUtility.roundAwayFromZero(battleArmorBayUsage));
 
-        when(mockHangarStatistics.getTotalBattleArmorBays()).thenReturn(0);
+        setHangarUnits(List.of());
 
         transportCostCalculations.setBattleArmorCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
@@ -851,7 +959,8 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 6, 8, 11, 24 })
     public void calculateAdditionalBayRequirementsFromUnits_battleArmor_tooFewSpareBays(int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalBattleArmorBays()).thenReturn(1);
+        // totalBattleArmorBays = 1
+        setHangarUnits(List.of(unitWithBattleArmorCapacity(1)));
 
         double battleArmorBayUsage = 1 - bayRequirementCount;
         battleArmorBayUsage = battleArmorBayUsage / BATTLE_ARMOR_SQUADS_PER_BAY;
@@ -877,7 +986,7 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 6, 8, 11, 24 })
     public void calculateAdditionalBayRequirementsFromUnits_battleArmor_tooManySpareBays(int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalBattleArmorBays()).thenReturn(bayRequirementCount);
+        setHangarUnits(List.of(unitWithBattleArmorCapacity(bayRequirementCount)));
 
         transportCostCalculations.setBattleArmorCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
@@ -898,7 +1007,7 @@ public class TransportCostCalculationsTest {
         double infantryBayUsage = (double) bayRequirementCount / PLATOONS_PER_BAY;
         int expectedBaysRequired = max(0, MathUtility.roundAwayFromZero(infantryBayUsage));
 
-        when(mockHangarStatistics.getTotalInfantryBays()).thenReturn(0);
+        setHangarUnits(List.of());
 
         transportCostCalculations.setInfantryCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
@@ -917,7 +1026,8 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 6, 8, 11, 24 })
     public void calculateAdditionalBayRequirementsFromUnits_infantry_tooFewSpareBays(int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalInfantryBays()).thenReturn(1);
+        // totalInfantryBays = 1
+        setHangarUnits(List.of(unitWithInfantryCapacity(1)));
 
         double infantryBayUsage = 1 - bayRequirementCount;
         infantryBayUsage = infantryBayUsage / PLATOONS_PER_BAY;
@@ -943,7 +1053,7 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 6, 8, 11, 24 })
     public void calculateAdditionalBayRequirementsFromUnits_infantry_tooManySpareBays(int bayRequirementCount) {
-        when(mockHangarStatistics.getTotalInfantryBays()).thenReturn(bayRequirementCount);
+        setHangarUnits(List.of(unitWithInfantryCapacity(bayRequirementCount)));
 
         transportCostCalculations.setInfantryCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
@@ -961,6 +1071,7 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_otherUnit_noSpareBays(int bayRequirementCount) {
+        // This one doesn't use hangar totals; keep as-is
         transportCostCalculations.setOtherUnitCount(bayRequirementCount);
         transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
 
@@ -988,11 +1099,11 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
-        transportCostCalculations.countUnitsByType();
+        local.countUnitsByType();
 
-        int countedUnits = transportCostCalculations.getDropShipCount();
+        int countedUnits = local.getDropShipCount();
         assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
     }
 
@@ -1011,11 +1122,11 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
-        transportCostCalculations.countUnitsByType();
+        local.countUnitsByType();
 
-        int countedUnits = transportCostCalculations.getSmallCraftCount();
+        int countedUnits = local.getSmallCraftCount();
         assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
     }
 
@@ -1035,11 +1146,11 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
-        transportCostCalculations.countUnitsByType();
+        local.countUnitsByType();
 
-        int countedUnits = transportCostCalculations.getMekCount();
+        int countedUnits = local.getMekCount();
         assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
     }
 
@@ -1060,11 +1171,11 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
-        transportCostCalculations.countUnitsByType();
+        local.countUnitsByType();
 
-        int countedUnits = transportCostCalculations.getAsfCount();
+        int countedUnits = local.getAsfCount();
         assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
     }
 
@@ -1086,11 +1197,11 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
-        transportCostCalculations.countUnitsByType();
+        local.countUnitsByType();
 
-        int countedUnits = transportCostCalculations.getAsfCount();
+        int countedUnits = local.getAsfCount();
         assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
     }
 
@@ -1113,11 +1224,11 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
-        transportCostCalculations.countUnitsByType();
+        local.countUnitsByType();
 
-        int countedUnits = transportCostCalculations.getProtoMekCount();
+        int countedUnits = local.getProtoMekCount();
         assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
     }
 
@@ -1141,11 +1252,11 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
-        transportCostCalculations.countUnitsByType();
+        local.countUnitsByType();
 
-        int countedUnits = transportCostCalculations.getBattleArmorCount();
+        int countedUnits = local.getBattleArmorCount();
         assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
     }
 
@@ -1170,11 +1281,11 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
-        transportCostCalculations.countUnitsByType();
+        local.countUnitsByType();
 
-        int countedUnits = transportCostCalculations.getInfantryCount();
+        int countedUnits = local.getInfantryCount();
         assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
     }
 
@@ -1199,11 +1310,11 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
-        transportCostCalculations.countUnitsByType();
+        local.countUnitsByType();
 
-        int countedUnits = transportCostCalculations.getOtherUnitCount();
+        int countedUnits = local.getOtherUnitCount();
         assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
     }
 
@@ -1221,19 +1332,19 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
-        transportCostCalculations.countUnitsByType();
+        local.countUnitsByType();
 
-        int countedSuperHeavyVehicles = transportCostCalculations.getSuperHeavyVehicleCount();
+        int countedSuperHeavyVehicles = local.getSuperHeavyVehicleCount();
         assertEquals(unitCount, countedSuperHeavyVehicles,
               "Expected " + unitCount + " units but was " + countedSuperHeavyVehicles);
 
-        int countedHeavyVehicles = transportCostCalculations.getHeavyVehicleCount();
+        int countedHeavyVehicles = local.getHeavyVehicleCount();
         assertEquals(0, countedHeavyVehicles,
               "Expected " + unitCount + " units but was " + countedHeavyVehicles);
 
-        int countedLightVehicles = transportCostCalculations.getLightVehicleCount();
+        int countedLightVehicles = local.getLightVehicleCount();
         assertEquals(0, countedLightVehicles,
               "Expected " + unitCount + " units but was " + countedLightVehicles);
     }
@@ -1252,19 +1363,19 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
-        transportCostCalculations.countUnitsByType();
+        local.countUnitsByType();
 
-        int countedSuperHeavyVehicles = transportCostCalculations.getSuperHeavyVehicleCount();
+        int countedSuperHeavyVehicles = local.getSuperHeavyVehicleCount();
         assertEquals(0, countedSuperHeavyVehicles,
               "Expected " + unitCount + " units but was " + countedSuperHeavyVehicles);
 
-        int countedHeavyVehicles = transportCostCalculations.getHeavyVehicleCount();
+        int countedHeavyVehicles = local.getHeavyVehicleCount();
         assertEquals(unitCount, countedHeavyVehicles,
               "Expected " + unitCount + " units but was " + countedHeavyVehicles);
 
-        int countedLightVehicles = transportCostCalculations.getLightVehicleCount();
+        int countedLightVehicles = local.getLightVehicleCount();
         assertEquals(0, countedLightVehicles,
               "Expected " + unitCount + " units but was " + countedLightVehicles);
     }
@@ -1283,19 +1394,19 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(units, new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
-        transportCostCalculations.countUnitsByType();
+        local.countUnitsByType();
 
-        int countedSuperHeavyVehicles = transportCostCalculations.getSuperHeavyVehicleCount();
+        int countedSuperHeavyVehicles = local.getSuperHeavyVehicleCount();
         assertEquals(0, countedSuperHeavyVehicles,
               "Expected " + unitCount + " units but was " + countedSuperHeavyVehicles);
 
-        int countedHeavyVehicles = transportCostCalculations.getHeavyVehicleCount();
+        int countedHeavyVehicles = local.getHeavyVehicleCount();
         assertEquals(0, countedHeavyVehicles,
               "Expected " + unitCount + " units but was " + countedHeavyVehicles);
 
-        int countedLightVehicles = transportCostCalculations.getLightVehicleCount();
+        int countedLightVehicles = local.getLightVehicleCount();
         assertEquals(unitCount, countedLightVehicles,
               "Expected " + unitCount + " units but was " + countedLightVehicles);
     }
@@ -1311,13 +1422,13 @@ public class TransportCostCalculationsTest {
             passengers.add(person);
         }
 
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(new ArrayList<>(),
               passengers,
               mockCargoStatistics,
               mockHangarStatistics,
               EXP_REGULAR);
 
-        double additionalPassengerBaysCost = transportCostCalculations.getAdditionalPassengerBaysCost();
+        double additionalPassengerBaysCost = local.getAdditionalPassengerBaysCost();
         double expectedCost = round(additionalPassengerBaysCost * PASSENGERS_COST);
         assertEquals(additionalPassengerBaysCost, expectedCost,
               "Expected additional passenger bays cost to be " +
@@ -1325,14 +1436,13 @@ public class TransportCostCalculationsTest {
                     " but was " +
                     additionalPassengerBaysCost);
 
-        double totalAdditionalBaysRequired = transportCostCalculations.getAdditionalPassengerBaysRequired();
+        double totalAdditionalBaysRequired = local.getAdditionalPassengerBaysRequired();
         int expectedAdditionalBays = (int) ceil(totalAdditionalBaysRequired / BAYS_PER_DROPSHIP);
         assertEquals(expectedAdditionalBays, totalAdditionalBaysRequired,
               "Expected total additional bays required to be " +
                     expectedAdditionalBays +
                     " but was " +
                     totalAdditionalBaysRequired);
-
     }
 
     @Test
@@ -1382,7 +1492,7 @@ public class TransportCostCalculationsTest {
 
     @Test
     public void testGetTotalCost_whenTotalCostIsSet() {
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(
+        TransportCostCalculations local = new TransportCostCalculations(
               new ArrayList<>(),
               new ArrayList<>(),
               mockCargoStatistics,
@@ -1390,15 +1500,15 @@ public class TransportCostCalculationsTest {
               EXP_REGULAR
         );
         Money expectedCost = Money.of(1000);
-        transportCostCalculations.setTotalCost(expectedCost);
+        local.setTotalCost(expectedCost);
 
-        Money actualCost = transportCostCalculations.getTotalCost();
+        Money actualCost = local.getTotalCost();
         assertEquals(expectedCost, actualCost, "Expected total cost to be " + expectedCost + " but was " + actualCost);
     }
 
     @Test
     public void testGetTotalCost_whenTotalCostIsNull() {
-        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(
+        TransportCostCalculations local = new TransportCostCalculations(
               new ArrayList<>(),
               new ArrayList<>(),
               mockCargoStatistics,
@@ -1406,7 +1516,7 @@ public class TransportCostCalculationsTest {
               EXP_REGULAR
         );
 
-        Money actualCost = transportCostCalculations.getTotalCost();
+        Money actualCost = local.getTotalCost();
         assertNull(actualCost, "Expected total cost to be null but was " + actualCost);
     }
 
@@ -1591,7 +1701,6 @@ public class TransportCostCalculationsTest {
         setAllPersonnel(List.of(nullUnit, personWithNullUnitEntity, personWithSmallCraftUnit,
               personWithWarShipUnit, personWithJumpShipUnit, personWithDropShipUnit, normalPerson));
 
-        // person with null unit, person with unit with null entity, person with normal unit
         assertEquals(3, invokeGetPassengerCount());
     }
 
@@ -1627,7 +1736,6 @@ public class TransportCostCalculationsTest {
 
         setAllPersonnel(List.of(nullUnit, personWithNullUnitEntity, personWithDropShipUnit, normalPerson));
 
-        // person with null unit, person with unit with null entity, person with normal unit
         assertEquals(3, invokeGetPassengerCount());
     }
 
@@ -1663,7 +1771,6 @@ public class TransportCostCalculationsTest {
 
         setAllPersonnel(List.of(nullUnit, personWithNullUnitEntity, personWithJumpShipUnit, normalPerson));
 
-        // person with null unit, person with unit with null entity, person with normal unit
         assertEquals(3, invokeGetPassengerCount());
     }
 
@@ -1699,7 +1806,6 @@ public class TransportCostCalculationsTest {
 
         setAllPersonnel(List.of(nullUnit, personWithNullUnitEntity, personWithWarShipUnit, normalPerson));
 
-        // person with null unit, person with unit with null entity, person with normal unit
         assertEquals(3, invokeGetPassengerCount());
     }
 
@@ -1735,7 +1841,6 @@ public class TransportCostCalculationsTest {
 
         setAllPersonnel(List.of(nullUnit, personWithNullUnitEntity, personWithSmallCraftUnit, normalPerson));
 
-        // person with null unit, person with unit with null entity, person with normal unit
         assertEquals(3, invokeGetPassengerCount());
     }
 
@@ -1746,7 +1851,7 @@ public class TransportCostCalculationsTest {
     }
 
     private void setAllPersonnel(List<Person> people) throws Exception {
-        Field allPersonnel = transportCostCalculations.getClass().getDeclaredField("allPersonnel"); // rename if needed
+        Field allPersonnel = transportCostCalculations.getClass().getDeclaredField("allPersonnel");
         allPersonnel.setAccessible(true);
         allPersonnel.set(transportCostCalculations, people);
     }

@@ -53,6 +53,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
+import megamek.common.units.SpaceStation;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
@@ -496,7 +497,7 @@ public class TransportCostCalculations {
 
         countUnitsByType();
         calculateAdditionalBayRequirementsFromUnits();
-        calculateAdditionalBayRequirementsFromPassengers(hangarStatistics.getTotalLargeCraftPassengerCapacity());
+        calculateAdditionalBayRequirementsFromPassengers(getTotalLargeCraftPassengerCapacity());
         additionalDropShipsRequired += (int) ceil(totalAdditionalBaysRequired / BAYS_PER_DROPSHIP);
 
         calculateAdditionalJumpCollarsRequirements();
@@ -550,7 +551,7 @@ public class TransportCostCalculations {
      * @since 50.10
      */
     void calculateAdditionalJumpCollarsRequirements() {
-        int totalCollars = hangarStatistics.getTotalDockingCollars();
+        int totalCollars = getTotalDockingCollars();
         int collarUsage = totalCollars - dropShipCount;
         additionalCollarsRequired = -min(0, collarUsage);
         additionalCollarsRequired += additionalDropShipsRequired;
@@ -600,7 +601,7 @@ public class TransportCostCalculations {
      */
     void calculateAdditionalBayRequirementsFromUnits() {
         // Small Craft
-        int smallCraftBays = hangarStatistics.getTotalSmallCraftBays();
+        int smallCraftBays = getTotalSmallCraftBays();
         int smallCraftBayUsage = smallCraftBays - smallCraftCount;
         additionalSmallCraftBaysRequired = -min(0, smallCraftBayUsage);
         additionalSmallCraftBaysCost = round(additionalSmallCraftBaysRequired * SMALL_CRAFT_COST);
@@ -608,21 +609,21 @@ public class TransportCostCalculations {
         int smallCraftSpareCapacity = max(0, smallCraftBayUsage);
 
         // ASF (including Conv Fighters)
-        int asfBays = hangarStatistics.getTotalASFBays() + smallCraftSpareCapacity;
+        int asfBays = getTotalASFBays() + smallCraftSpareCapacity;
         int asfBayUsage = asfBays - asfCount;
         additionalASFBaysRequired = -min(0, asfBayUsage);
         additionalASFBaysCost = round(additionalASFBaysRequired * ASF_COST);
         totalCost = totalCost.plus(additionalASFBaysCost);
 
         // Meks
-        int mekBays = hangarStatistics.getTotalMekBays();
+        int mekBays = getTotalMekBays();
         int mekBayUsage = mekBays - mekCount;
         additionalMekBaysRequired = -min(0, mekBayUsage);
         additionalMekBaysCost = round(additionalMekBaysRequired * MEK_COST);
         totalCost = totalCost.plus(additionalMekBaysCost);
 
         // Super Heavy Vehicles
-        int superHeavyVehicleBays = hangarStatistics.getTotalSuperHeavyVehicleBays();
+        int superHeavyVehicleBays = getTotalSuperHeavyVehicleBays();
         int superHeavyVehicleBayUsage = superHeavyVehicleBays - superHeavyVehicleCount;
         additionalSuperHeavyVehicleBaysRequired = -min(0, superHeavyVehicleBayUsage);
         int superHeavyVehicleSpareCapacity = max(0, superHeavyVehicleBayUsage);
@@ -630,7 +631,7 @@ public class TransportCostCalculations {
         totalCost = totalCost.plus(additionalSuperHeavyVehicleBaysCost);
 
         // Heavy Vehicles`
-        int heavyVehicleBays = hangarStatistics.getTotalHeavyVehicleBays() + superHeavyVehicleSpareCapacity;
+        int heavyVehicleBays = getTotalHeavyVehicleBays() + superHeavyVehicleSpareCapacity;
         int heavyVehicleBayUsage = heavyVehicleBays - heavyVehicleCount;
         additionalHeavyVehicleBaysRequired = -min(0, heavyVehicleBayUsage);
         int heavyVehicleSpareCapacity = max(0, heavyVehicleBayUsage);
@@ -639,14 +640,14 @@ public class TransportCostCalculations {
 
         // Light Vehicles
         // heavyVehicleSpareCapacity also factors in any surplus super heavy vehicle bays
-        int lightVehicleBays = hangarStatistics.getTotalLightVehicleBays() + heavyVehicleSpareCapacity;
+        int lightVehicleBays = getTotalLightVehicleBays() + heavyVehicleSpareCapacity;
         int lightVehicleBayUsage = lightVehicleBays - lightVehicleCount;
         additionalLightVehicleBaysRequired = -min(0, lightVehicleBayUsage);
         additionalLightVehicleBaysCost = round(additionalLightVehicleBaysRequired * LIGHT_VEHICLE_COST);
         totalCost = totalCost.plus(additionalLightVehicleBaysCost);
 
         // ProtoMeks
-        int protoMekBays = hangarStatistics.getTotalProtoMekBays();
+        int protoMekBays = getTotalProtoMekBays();
         double protoMekBayUsage = protoMekBays - protoMekCount;
         protoMekBayUsage = protoMekBayUsage / PROTOMEKS_PER_BAY;
         int adjustedProtoMekBayUsage = MathUtility.roundAwayFromZero(protoMekBayUsage);
@@ -655,7 +656,7 @@ public class TransportCostCalculations {
         totalCost = totalCost.plus(additionalProtoMekBaysCost);
 
         // Battle Armor
-        int battleArmorBays = hangarStatistics.getTotalBattleArmorBays();
+        int battleArmorBays = getTotalBattleArmorBays();
         double battleArmorBayUsage = battleArmorBays - battleArmorCount;
         battleArmorBayUsage = battleArmorBayUsage / BATTLE_ARMOR_SQUADS_PER_BAY;
         int adjustedBattleArmorBayUsage = MathUtility.roundAwayFromZero(battleArmorBayUsage);
@@ -664,7 +665,7 @@ public class TransportCostCalculations {
         totalCost = totalCost.plus(additionalBattleArmorBaysCost);
 
         // Infantry
-        int infantryBays = hangarStatistics.getTotalInfantryBays();
+        int infantryBays = getTotalInfantryBays();
         double infantryBayUsage = infantryBays - infantryCount;
         infantryBayUsage = infantryBayUsage / PLATOONS_PER_BAY;
         int adjustedInfantryBayUsage = MathUtility.roundAwayFromZero(infantryBayUsage);
@@ -736,7 +737,8 @@ public class TransportCostCalculations {
                     battleArmorCount++;
                 } else if (entity.isInfantry()) {
                     infantryCount++;
-                } else if (!(entity instanceof Jumpship) && !entity.isHandheldWeapon()) { // Includes WarShips
+                } else if (!(entity instanceof Jumpship) && !entity.isHandheldWeapon()) {
+                    // Includes WarShips
                     otherUnitCount++;
                 }
             }
@@ -826,4 +828,105 @@ public class TransportCostCalculations {
 
         return "";
     }
+
+    int getTotalSmallCraftBays() {
+        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
+                                      // Space stations must be fully shut down to jump and therefore cannot 
+                                      // contribute to transport capacity.
+                                      .mapToDouble(Unit::getSmallCraftCapacity)
+                                      .sum());
+    }
+
+    int getTotalASFBays() {
+        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
+                                      // Space stations must be fully shut down to jump and therefore cannot 
+                                      // contribute to transport capacity.
+                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
+                                      .mapToDouble(Unit::getASFCapacity)
+                                      .sum());
+    }
+
+    int getTotalMekBays() {
+        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
+                                      // Space stations must be fully shut down to jump and therefore cannot 
+                                      // contribute to transport capacity.
+                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
+                                      .mapToDouble(Unit::getMekCapacity)
+                                      .sum());
+    }
+
+    int getTotalSuperHeavyVehicleBays() {
+        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
+                                      // Space stations must be fully shut down to jump and therefore cannot 
+                                      // contribute to transport capacity.
+                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
+                                      .mapToDouble(Unit::getSuperHeavyVehicleCapacity)
+                                      .sum());
+    }
+
+    int getTotalHeavyVehicleBays() {
+        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
+                                      // Space stations must be fully shut down to jump and therefore cannot 
+                                      // contribute to transport capacity.
+                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
+                                      .mapToDouble(Unit::getHeavyVehicleCapacity)
+                                      .sum());
+    }
+
+    int getTotalLightVehicleBays() {
+        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
+                                      // Space stations must be fully shut down to jump and therefore cannot 
+                                      // contribute to transport capacity.
+                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
+                                      .mapToDouble(Unit::getLightVehicleCapacity)
+                                      .sum());
+    }
+
+    int getTotalProtoMekBays() {
+        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
+                                      // Space stations must be fully shut down to jump and therefore cannot 
+                                      // contribute to transport capacity.
+                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
+                                      .mapToDouble(Unit::getProtoMekCapacity)
+                                      .sum());
+    }
+
+    int getTotalBattleArmorBays() {
+        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
+                                      // Space stations must be fully shut down to jump and therefore cannot 
+                                      // contribute to transport capacity.
+                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
+                                      .mapToDouble(Unit::getBattleArmorCapacity)
+                                      .sum());
+    }
+
+    int getTotalInfantryBays() {
+        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
+                                      // Space stations must be fully shut down to jump and therefore cannot 
+                                      // contribute to transport capacity.
+                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
+                                      .mapToDouble(Unit::getInfantryCapacity)
+                                      .sum());
+    }
+
+    public int getTotalDockingCollars() {
+        return hangarStatistics.getHangar().getUnitsStream()
+                     // Space stations must be fully shut down to jump and therefore cannot contribute to transport 
+                     // capacity.
+                     .filter(u -> !(u.getEntity() instanceof SpaceStation))
+                     .filter(u -> u.getEntity() instanceof Jumpship)
+                     .mapToInt(Unit::getDocks)
+                     .sum();
+    }
+
+    public int getTotalLargeCraftPassengerCapacity() {
+        return hangarStatistics.getHangar().getUnitsStream()
+                     // Space stations must be fully shut down to jump and therefore cannot contribute to transport 
+                     // capacity.
+                     .filter(u -> !(u.getEntity() instanceof SpaceStation))
+                     .filter(u -> u.getEntity().isLargeCraft() || u.getEntity().isSmallCraft())
+                     .mapToInt(u -> u.getEntity().getNPassenger() + u.getEntity().getBayPersonnel())
+                     .sum();
+    }
+
 }
