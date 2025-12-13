@@ -766,7 +766,7 @@ public class TransportCostCalculations {
      *     <li>They are not associated with any unit.</li>
      *     <li>Their associated unit does not have an associated entity.</li>
      *     <li>The entity associated with their unit is not a large craft.</li>
-     * </ul
+     * </ul>
      *
      * @return The total count of passengers based on the conditions specified.
      */
