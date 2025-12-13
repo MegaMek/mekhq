@@ -476,16 +476,16 @@ public class FacilityRentals {
      */
     public static boolean processBayChangeRequest(Campaign campaign, Unit[] selectedUnits, int bayType) {
         List<AtBContract> activeAtBContracts = campaign.getActiveAtBContracts();
-        boolean isOffContractOrOnGarrison = activeAtBContracts.isEmpty();
+        boolean isBayRentalAllowed = activeAtBContracts.isEmpty();
 
         for (AtBContract atBContract : activeAtBContracts) {
             if (atBContract.getContractType().isGarrisonType()) {
-                isOffContractOrOnGarrison = true;
+                isBayRentalAllowed = true;
                 break;
             }
         }
 
-        if (!isOffContractOrOnGarrison || !campaign.getLocation().isOnPlanet()) {
+        if (!isBayRentalAllowed || !campaign.getLocation().isOnPlanet()) {
             BayRentalDialog.showNoFacilitiesAvailableDialog(campaign);
             return false;
         }
