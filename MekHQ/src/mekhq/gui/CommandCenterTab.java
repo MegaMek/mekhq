@@ -583,7 +583,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         });
     }
 
-    void clearDailyReportNag(int selectedIndex) {
+    public void clearDailyReportNag(int selectedIndex) {
         DailyReportType type = DailyReportType.getTypeFromIndex(selectedIndex);
         if (type != null) {
             tabLogs.setBackgroundAt(selectedIndex, null);
