@@ -504,6 +504,10 @@ public class FacilityRentals {
             default -> null; // Should never happen as we're already filtering out invalid sites
         };
 
+        if (rentalType == null) {
+            return true; // We don't want a bug preventing bay changes.
+        }
+
         return FacilityRentals.offerBayRentalOpportunity(campaign,
               eligibleUnitCount,
               eligibleLargeVesselCount,
