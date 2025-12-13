@@ -828,6 +828,8 @@ public class Academy implements Comparable<Academy> {
         if (personnel.size() == 1) {
             for (String skillName : skillNames) {
                 if (skillName.equalsIgnoreCase("xp")) {
+                    tooltip.append(skillName.toUpperCase()).append(" (");
+
                     if (EducationLevel.parseToInt(person.getEduHighestEducation()) >= educationLevel) {
                         tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
                     } else {
