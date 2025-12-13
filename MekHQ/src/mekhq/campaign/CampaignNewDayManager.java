@@ -103,6 +103,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.NewDayEvent;
@@ -174,6 +175,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUltimatum;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
+import mekhq.gui.CommandCenterTab;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.ReportingUtilities;
@@ -221,6 +223,13 @@ public class CampaignNewDayManager {
      * @return <code>true</code> if the new day arrived
      */
     public boolean newDay() {
+        // Clear previous daily report nags (we want this up top so that we can make sure no messages have been
+        // posted prior to this point).
+        CommandCenterTab commandCenter = campaign.getApp().getCampaigngui().getCommandCenterTab();
+        for (DailyReportType type : DailyReportType.values()) {
+            commandCenter.clearDailyReportNag(type.getTabIndex());
+        }
+
         // clear previous retirement information
         campaign.getTurnoverRetirementInformation().clear();
 
