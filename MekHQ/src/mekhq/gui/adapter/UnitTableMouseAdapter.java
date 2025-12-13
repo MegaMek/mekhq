@@ -41,6 +41,7 @@ import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.campaign.unit.Unit.SITE_FIELD_WORKSHOP;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -49,13 +50,11 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -68,6 +67,7 @@ import javax.swing.JTable;
 import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.client.ui.dialogs.abstractDialogs.BVDisplayDialog;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.AmmoType;
@@ -99,7 +99,6 @@ import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -321,59 +320,26 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.contains(COMMAND_CHANGE_SITE)) {
-            try {
-                int selected = Integer.parseInt(command.split(":")[1]);
-                boolean selectedIsValid = selected > -1 && selected < Unit.SITE_UNKNOWN;
-                if (!selectedIsValid) {
-                    return;
-                }
+            int selected = MathUtility.parseInt(command.split(":")[1], SITE_FIELD_WORKSHOP);
+            boolean selectedIsValid = selected > -1 && selected < Unit.SITE_UNKNOWN;
+            if (!selectedIsValid) {
+                return;
+            }
 
-                boolean wasSiteChangeSuccessful = true;
+            boolean wasSiteChangeSuccessful = true;
+            Campaign campaign = gui.getCampaign();
+            if (selected >= Unit.SITE_FACILITY_MAINTENANCE &&
+                      campaign.getCampaignOptions().getRentedFacilitiesCostRepairBays() > 0) {
+                wasSiteChangeSuccessful = FacilityRentals.processBayChangeRequest(campaign, units, selected);
+            }
 
-                if (selected >= Unit.SITE_FACILITY_MAINTENANCE) {
-                    Campaign campaign = gui.getCampaign();
-
-                    // This counts how many units are eligible and how many are eligible and a large craft. We handle
-                    // it this way to allow us to fetch the counts in a single pass
-                    Predicate<Unit> eligibleForBayRental =
-                          u -> !FacilityRentals.shouldBeIgnoredByBayRentals(u);
-                    long[] counts = Arrays.stream(units)
-                                          .filter(eligibleForBayRental)
-                                          .collect(() -> new long[2], (arr, u) -> {
-                                              arr[0]++; // eligible
-                                              if (u.getEntity().isLargeCraft()) {
-                                                  arr[1]++; // large vessel
-                                              }
-                                          }, (a, b) -> {
-                                              a[0] += b[0];
-                                              a[1] += b[1];
-                                          });
-
-                    int eligibleUnitCount = (int) counts[0];
-                    int eligibleLargeVesselCount = (int) counts[1];
-
-                    ContractRentalType rentalType = switch (selected) {
-                        case Unit.SITE_FACILITY_MAINTENANCE -> ContractRentalType.MAINTENANCE_BAYS;
-                        case Unit.SITE_FACTORY_CONDITIONS -> ContractRentalType.FACTORY_CONDITIONS;
-                        default -> null; // Should never happen as we're already filtering out invalid sites
-                    };
-
-                    wasSiteChangeSuccessful = FacilityRentals.offerBayRentalOpportunity(campaign,
-                          eligibleUnitCount,
-                          eligibleLargeVesselCount,
-                          rentalType);
-                }
-
-                if (wasSiteChangeSuccessful) {
-                    for (Unit unit : units) {
-                        if (!unit.isDeployed()) {
-                            unit.setSite(selected);
-                            MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
-                        }
+            if (wasSiteChangeSuccessful) {
+                for (Unit unit : units) {
+                    if (!unit.isDeployed()) {
+                        unit.setSite(selected);
+                        MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
                     }
                 }
-            } catch (Exception e) {
-                LOGGER.error("", e);
             }
         } else if (command.equals(COMMAND_SALVAGE)) {
             for (Unit unit : units) {
@@ -852,7 +818,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             // endregion Determine if to Display
 
             // change the location
-            menu = new JMenu("Change site");
+            menu = new JMenu("Change Site");
             boolean allSameSite = StaticChecks.areAllSameSite(units);
 
             for (int i = 0; i < Unit.SITE_UNKNOWN; i++) {
