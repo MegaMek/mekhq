@@ -47,12 +47,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_OTHER_FACTION
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_OTHER_FACTION_HATE;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_PIRATE_HATE;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_IN_FOR_LIFE;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -1830,8 +1825,15 @@ public class EducationController {
         for (int i = 0; i < bonusCount; i++) {
             int roll = randomInt(curriculum.size());
 
-            try {
-                String skillParsed = Academy.skillParser(curriculum.get(roll));
+            String skillName = curriculum.get(roll);
+            if (skillName.equalsIgnoreCase("xp")) {
+                person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
+
+                campaign.addReport(PERSONNEL, String.format(resources.getString("bonusXp.text"),
+                      person.getFirstName(),
+                      campaign.getCampaignOptions().getCurriculumXpRate()));
+            } else if (!skillName.equalsIgnoreCase("none")) {
+                String skillParsed = Academy.skillParser(skillName);
 
                 // if 'person' already has a +1 bonus for the skill, we give them XP, instead
                 if (person.getSkill(skillParsed).getBonus() < 1) {
@@ -1843,15 +1845,6 @@ public class EducationController {
                     campaign.addReport(PERSONNEL,
                           String.format(resources.getString("bonusAdded.text"), person.getFirstName()));
                 } else {
-                    person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
-
-                    campaign.addReport(PERSONNEL, String.format(resources.getString("bonusXp.text"),
-                          person.getFirstName(),
-                          campaign.getCampaignOptions().getCurriculumXpRate()));
-                }
-            } catch (Exception e) {
-                // if we get this, it means the 'skill' was XP or None
-                if (curriculum.get(roll).equalsIgnoreCase("xp")) {
                     person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
 
                     campaign.addReport(PERSONNEL, String.format(resources.getString("bonusXp.text"),
