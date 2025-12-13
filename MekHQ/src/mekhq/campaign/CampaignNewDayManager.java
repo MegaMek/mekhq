@@ -1285,8 +1285,6 @@ public class CampaignNewDayManager {
             }
 
             // Accolade check
-            boolean ignoreEmployer = relevantFaction.isMercenaryOrganization();
-
             FactionAccoladeLevel newAccoladeLevel = campaign.getFactionStandings().checkForAccolade(
                   relevantFaction, today);
 

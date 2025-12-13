@@ -352,12 +352,6 @@ public class FactionJudgment {
             return null;
         }
 
-        // This accolade requires an active contract
-        if (updatedAccoladeLevel.is(FactionAccoladeLevel.TRIUMPH_OR_REMEMBRANCE)) {
-            LOGGER.debug("Faction {} cannot improve accolade due to lack of active contract", factionCode);
-            return null;
-        }
-
         LOGGER.debug("Increasing accolade level for faction {} to {}", factionCode, updatedAccoladeLevel);
         setAccoladeForFaction(factionCode, updatedAccoladeLevel, today);
 
