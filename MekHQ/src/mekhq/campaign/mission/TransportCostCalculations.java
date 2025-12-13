@@ -753,12 +753,48 @@ public class TransportCostCalculations {
      * @since 50.10
      */
     void calculateAdditionalBayRequirementsFromPassengers(int passengerCapacity) {
-        int passengerCount = allPersonnel.size();
+        int passengerCount = getPassengerCount();
         int additionalPassengerNeeds = max(0, passengerCount - passengerCapacity);
         additionalPassengerBaysRequired = (int) ceil(additionalPassengerNeeds / PASSENGERS_PER_BAY);
         additionalPassengerBaysCost = round(additionalPassengerBaysRequired * PASSENGERS_COST);
         totalCost = totalCost.plus(additionalPassengerBaysCost);
         totalAdditionalBaysRequired += additionalPassengerBaysRequired;
+    }
+
+    /**
+     * Calculates and returns the total number of passengers. A person is considered a passenger if:
+     *
+     * <ul>
+     *     <li>They are not associated with any unit.</li>
+     *     <li>Their associated unit does not have an associated entity.</li>
+     *     <li>The entity associated with their unit is not a WarShip, JumpShip, or DropShip.</li>
+     * </ul>
+     *
+     * @return The total count of passengers based on the conditions specified.
+     */
+    private int getPassengerCount() {
+        int passengerCount = 0;
+        for (Person person : allPersonnel) {
+            Unit unit = person.getUnit();
+            if (unit == null) {
+                passengerCount++;
+                continue;
+            }
+
+            Entity entity = unit.getEntity();
+            if (entity == null) {
+                passengerCount++;
+                continue;
+            }
+
+            // We exclude Space Stations here, as CamOps pg 35 states that only crew of the below unit types are
+            // excluded from passenger counts
+            if (!entity.isSmallCraft() && !entity.isWarShip() && !entity.isJumpShip() && !entity.isDropShip()) {
+                passengerCount++;
+            }
+        }
+
+        return passengerCount;
     }
 
     /**

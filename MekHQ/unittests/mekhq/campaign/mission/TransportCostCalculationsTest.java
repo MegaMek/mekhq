@@ -40,14 +40,18 @@ import static mekhq.campaign.mission.TransportCostCalculations.*;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import megamek.codeUtilities.MathUtility;
@@ -1374,5 +1378,376 @@ public class TransportCostCalculationsTest {
               mockCurrentPlanetarySystem);
 
         assertTrue(report.isBlank(), "Journey cost exceeds available funds");
+    }
+
+    @Test
+    public void testGetTotalCost_whenTotalCostIsSet() {
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(
+              new ArrayList<>(),
+              new ArrayList<>(),
+              mockCargoStatistics,
+              mockHangarStatistics,
+              EXP_REGULAR
+        );
+        Money expectedCost = Money.of(1000);
+        transportCostCalculations.setTotalCost(expectedCost);
+
+        Money actualCost = transportCostCalculations.getTotalCost();
+        assertEquals(expectedCost, actualCost, "Expected total cost to be " + expectedCost + " but was " + actualCost);
+    }
+
+    @Test
+    public void testGetTotalCost_whenTotalCostIsNull() {
+        TransportCostCalculations transportCostCalculations = new TransportCostCalculations(
+              new ArrayList<>(),
+              new ArrayList<>(),
+              mockCargoStatistics,
+              mockHangarStatistics,
+              EXP_REGULAR
+        );
+
+        Money actualCost = transportCostCalculations.getTotalCost();
+        assertNull(actualCost, "Expected total cost to be null but was " + actualCost);
+    }
+
+    @Test
+    void countsPersonAsPassenger_whenUnitIsNull() throws Exception {
+        Person person = mock(Person.class);
+        when(person.getUnit()).thenReturn(null);
+
+        setAllPersonnel(List.of(person));
+
+        assertEquals(1, invokeGetPassengerCount());
+    }
+
+    @Test
+    void countsPersonAsPassenger_whenEntityIsNull() throws Exception {
+        Person person = mock(Person.class);
+        Unit unit = mock(Unit.class);
+
+        when(person.getUnit()).thenReturn(unit);
+        when(unit.getEntity()).thenReturn(null);
+
+        setAllPersonnel(List.of(person));
+
+        assertEquals(1, invokeGetPassengerCount());
+    }
+
+    @Test
+    void doesNotCountPersonAsPassenger_whenEntityIsSmallCraft() throws Exception {
+        Person person = mock(Person.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+
+        when(person.getUnit()).thenReturn(unit);
+        when(unit.getEntity()).thenReturn(entity);
+
+        when(entity.isSmallCraft()).thenReturn(true);
+        when(entity.isWarShip()).thenReturn(false);
+        when(entity.isJumpShip()).thenReturn(false);
+        when(entity.isDropShip()).thenReturn(false);
+
+        setAllPersonnel(List.of(person));
+
+        assertEquals(0, invokeGetPassengerCount());
+    }
+
+    @Test
+    void doesNotCountPersonAsPassenger_whenEntityIsWarShip() throws Exception {
+        Person person = mock(Person.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+
+        when(person.getUnit()).thenReturn(unit);
+        when(unit.getEntity()).thenReturn(entity);
+
+        when(entity.isSmallCraft()).thenReturn(false);
+        when(entity.isWarShip()).thenReturn(true);
+        when(entity.isJumpShip()).thenReturn(false);
+        when(entity.isDropShip()).thenReturn(false);
+
+        setAllPersonnel(List.of(person));
+
+        assertEquals(0, invokeGetPassengerCount());
+    }
+
+    @Test
+    void doesNotCountPersonAsPassenger_whenEntityIsJumpShip() throws Exception {
+        Person person = mock(Person.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+
+        when(person.getUnit()).thenReturn(unit);
+        when(unit.getEntity()).thenReturn(entity);
+
+        when(entity.isSmallCraft()).thenReturn(false);
+        when(entity.isWarShip()).thenReturn(false);
+        when(entity.isJumpShip()).thenReturn(true);
+        when(entity.isDropShip()).thenReturn(false);
+
+        setAllPersonnel(List.of(person));
+
+        assertEquals(0, invokeGetPassengerCount());
+    }
+
+    @Test
+    void doesNotCountPersonAsPassenger_whenEntityIsDropShip() throws Exception {
+        Person person = mock(Person.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+
+        when(person.getUnit()).thenReturn(unit);
+        when(unit.getEntity()).thenReturn(entity);
+
+        when(entity.isSmallCraft()).thenReturn(false);
+        when(entity.isWarShip()).thenReturn(false);
+        when(entity.isJumpShip()).thenReturn(false);
+        when(entity.isDropShip()).thenReturn(true);
+
+        setAllPersonnel(List.of(person));
+
+        assertEquals(0, invokeGetPassengerCount());
+    }
+
+    @Test
+    void countsPersonAsPassenger_whenEntityIsNoneOfExcludedTypes() throws Exception {
+        Person person = mock(Person.class);
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+
+        when(person.getUnit()).thenReturn(unit);
+        when(unit.getEntity()).thenReturn(entity);
+
+        when(entity.isSmallCraft()).thenReturn(false);
+        when(entity.isWarShip()).thenReturn(false);
+        when(entity.isJumpShip()).thenReturn(false);
+        when(entity.isDropShip()).thenReturn(false);
+
+        setAllPersonnel(List.of(person));
+
+        assertEquals(1, invokeGetPassengerCount());
+    }
+
+    @Test
+    void countsMixedCasesCorrectly() throws Exception {
+        Person nullUnit = mock(Person.class);
+        when(nullUnit.getUnit()).thenReturn(null);
+
+        Person personWithNullUnitEntity = mock(Person.class);
+        Unit unitWithNullEntity = mock(Unit.class);
+        when(personWithNullUnitEntity.getUnit()).thenReturn(unitWithNullEntity);
+        when(unitWithNullEntity.getEntity()).thenReturn(null);
+
+        Person personWithSmallCraftUnit = mock(Person.class);
+        Unit smallCraftUnit = mock(Unit.class);
+        Entity smallCraftEntity = mock(Entity.class);
+        when(personWithSmallCraftUnit.getUnit()).thenReturn(smallCraftUnit);
+        when(smallCraftUnit.getEntity()).thenReturn(smallCraftEntity);
+        when(smallCraftEntity.isSmallCraft()).thenReturn(true);
+        when(smallCraftEntity.isWarShip()).thenReturn(false);
+        when(smallCraftEntity.isJumpShip()).thenReturn(false);
+        when(smallCraftEntity.isDropShip()).thenReturn(false);
+
+        Person personWithWarShipUnit = mock(Person.class);
+        Unit warShipUnit = mock(Unit.class);
+        Entity warShipEntity = mock(Entity.class);
+        when(personWithWarShipUnit.getUnit()).thenReturn(warShipUnit);
+        when(warShipUnit.getEntity()).thenReturn(warShipEntity);
+        when(warShipEntity.isSmallCraft()).thenReturn(false);
+        when(warShipEntity.isWarShip()).thenReturn(true);
+        when(warShipEntity.isJumpShip()).thenReturn(false);
+        when(warShipEntity.isDropShip()).thenReturn(false);
+
+        Person personWithJumpShipUnit = mock(Person.class);
+        Unit jumpShipUnit = mock(Unit.class);
+        Entity jumpShipEntity = mock(Entity.class);
+        when(personWithJumpShipUnit.getUnit()).thenReturn(jumpShipUnit);
+        when(jumpShipUnit.getEntity()).thenReturn(jumpShipEntity);
+        when(jumpShipEntity.isSmallCraft()).thenReturn(false);
+        when(jumpShipEntity.isWarShip()).thenReturn(false);
+        when(jumpShipEntity.isJumpShip()).thenReturn(true);
+        when(jumpShipEntity.isDropShip()).thenReturn(false);
+
+        Person personWithDropShipUnit = mock(Person.class);
+        Unit dropShipUnit = mock(Unit.class);
+        Entity dropShipEntity = mock(Entity.class);
+        when(personWithDropShipUnit.getUnit()).thenReturn(dropShipUnit);
+        when(dropShipUnit.getEntity()).thenReturn(dropShipEntity);
+        when(dropShipEntity.isSmallCraft()).thenReturn(false);
+        when(dropShipEntity.isWarShip()).thenReturn(false);
+        when(dropShipEntity.isJumpShip()).thenReturn(false);
+        when(dropShipEntity.isDropShip()).thenReturn(true);
+
+        Person normalPerson = mock(Person.class);
+        Unit normalUnit = mock(Unit.class);
+        Entity normalUnitEntity = mock(Entity.class);
+        when(normalPerson.getUnit()).thenReturn(normalUnit);
+        when(normalUnit.getEntity()).thenReturn(normalUnitEntity);
+        when(normalUnitEntity.isSmallCraft()).thenReturn(false);
+        when(normalUnitEntity.isWarShip()).thenReturn(false);
+        when(normalUnitEntity.isJumpShip()).thenReturn(false);
+        when(normalUnitEntity.isDropShip()).thenReturn(false);
+
+        setAllPersonnel(List.of(nullUnit, personWithNullUnitEntity, personWithSmallCraftUnit,
+              personWithWarShipUnit, personWithJumpShipUnit, personWithDropShipUnit, normalPerson));
+
+        // person with null unit, person with unit with null entity, person with normal unit
+        assertEquals(3, invokeGetPassengerCount());
+    }
+
+    @Test
+    void countsDropShipCorrectly() throws Exception {
+        Person nullUnit = mock(Person.class);
+        when(nullUnit.getUnit()).thenReturn(null);
+
+        Person personWithNullUnitEntity = mock(Person.class);
+        Unit unitWithNullEntity = mock(Unit.class);
+        when(personWithNullUnitEntity.getUnit()).thenReturn(unitWithNullEntity);
+        when(unitWithNullEntity.getEntity()).thenReturn(null);
+
+        Person personWithDropShipUnit = mock(Person.class);
+        Unit dropShipUnit = mock(Unit.class);
+        Entity dropShipEntity = mock(Entity.class);
+        when(personWithDropShipUnit.getUnit()).thenReturn(dropShipUnit);
+        when(dropShipUnit.getEntity()).thenReturn(dropShipEntity);
+        when(dropShipEntity.isSmallCraft()).thenReturn(false);
+        when(dropShipEntity.isWarShip()).thenReturn(false);
+        when(dropShipEntity.isJumpShip()).thenReturn(false);
+        when(dropShipEntity.isDropShip()).thenReturn(true);
+
+        Person normalPerson = mock(Person.class);
+        Unit normalUnit = mock(Unit.class);
+        Entity normalUnitEntity = mock(Entity.class);
+        when(normalPerson.getUnit()).thenReturn(normalUnit);
+        when(normalUnit.getEntity()).thenReturn(normalUnitEntity);
+        when(normalUnitEntity.isSmallCraft()).thenReturn(false);
+        when(normalUnitEntity.isWarShip()).thenReturn(false);
+        when(normalUnitEntity.isJumpShip()).thenReturn(false);
+        when(normalUnitEntity.isDropShip()).thenReturn(false);
+
+        setAllPersonnel(List.of(nullUnit, personWithNullUnitEntity, personWithDropShipUnit, normalPerson));
+
+        // person with null unit, person with unit with null entity, person with normal unit
+        assertEquals(3, invokeGetPassengerCount());
+    }
+
+    @Test
+    void countsJumpShipCorrectly() throws Exception {
+        Person nullUnit = mock(Person.class);
+        when(nullUnit.getUnit()).thenReturn(null);
+
+        Person personWithNullUnitEntity = mock(Person.class);
+        Unit unitWithNullEntity = mock(Unit.class);
+        when(personWithNullUnitEntity.getUnit()).thenReturn(unitWithNullEntity);
+        when(unitWithNullEntity.getEntity()).thenReturn(null);
+
+        Person personWithJumpShipUnit = mock(Person.class);
+        Unit jumpShipUnit = mock(Unit.class);
+        Entity jumpShipEntity = mock(Entity.class);
+        when(personWithJumpShipUnit.getUnit()).thenReturn(jumpShipUnit);
+        when(jumpShipUnit.getEntity()).thenReturn(jumpShipEntity);
+        when(jumpShipEntity.isSmallCraft()).thenReturn(false);
+        when(jumpShipEntity.isWarShip()).thenReturn(false);
+        when(jumpShipEntity.isJumpShip()).thenReturn(true);
+        when(jumpShipEntity.isDropShip()).thenReturn(false);
+
+        Person normalPerson = mock(Person.class);
+        Unit normalUnit = mock(Unit.class);
+        Entity normalUnitEntity = mock(Entity.class);
+        when(normalPerson.getUnit()).thenReturn(normalUnit);
+        when(normalUnit.getEntity()).thenReturn(normalUnitEntity);
+        when(normalUnitEntity.isSmallCraft()).thenReturn(false);
+        when(normalUnitEntity.isWarShip()).thenReturn(false);
+        when(normalUnitEntity.isJumpShip()).thenReturn(false);
+        when(normalUnitEntity.isDropShip()).thenReturn(false);
+
+        setAllPersonnel(List.of(nullUnit, personWithNullUnitEntity, personWithJumpShipUnit, normalPerson));
+
+        // person with null unit, person with unit with null entity, person with normal unit
+        assertEquals(3, invokeGetPassengerCount());
+    }
+
+    @Test
+    void countsWarShipCorrectly() throws Exception {
+        Person nullUnit = mock(Person.class);
+        when(nullUnit.getUnit()).thenReturn(null);
+
+        Person personWithNullUnitEntity = mock(Person.class);
+        Unit unitWithNullEntity = mock(Unit.class);
+        when(personWithNullUnitEntity.getUnit()).thenReturn(unitWithNullEntity);
+        when(unitWithNullEntity.getEntity()).thenReturn(null);
+
+        Person personWithWarShipUnit = mock(Person.class);
+        Unit warShipUnit = mock(Unit.class);
+        Entity warShipEntity = mock(Entity.class);
+        when(personWithWarShipUnit.getUnit()).thenReturn(warShipUnit);
+        when(warShipUnit.getEntity()).thenReturn(warShipEntity);
+        when(warShipEntity.isSmallCraft()).thenReturn(false);
+        when(warShipEntity.isWarShip()).thenReturn(true);
+        when(warShipEntity.isJumpShip()).thenReturn(false);
+        when(warShipEntity.isDropShip()).thenReturn(false);
+
+        Person normalPerson = mock(Person.class);
+        Unit normalUnit = mock(Unit.class);
+        Entity normalUnitEntity = mock(Entity.class);
+        when(normalPerson.getUnit()).thenReturn(normalUnit);
+        when(normalUnit.getEntity()).thenReturn(normalUnitEntity);
+        when(normalUnitEntity.isSmallCraft()).thenReturn(false);
+        when(normalUnitEntity.isWarShip()).thenReturn(false);
+        when(normalUnitEntity.isJumpShip()).thenReturn(false);
+        when(normalUnitEntity.isDropShip()).thenReturn(false);
+
+        setAllPersonnel(List.of(nullUnit, personWithNullUnitEntity, personWithWarShipUnit, normalPerson));
+
+        // person with null unit, person with unit with null entity, person with normal unit
+        assertEquals(3, invokeGetPassengerCount());
+    }
+
+    @Test
+    void countsSmallCraftCorrectly() throws Exception {
+        Person nullUnit = mock(Person.class);
+        when(nullUnit.getUnit()).thenReturn(null);
+
+        Person personWithNullUnitEntity = mock(Person.class);
+        Unit unitWithNullEntity = mock(Unit.class);
+        when(personWithNullUnitEntity.getUnit()).thenReturn(unitWithNullEntity);
+        when(unitWithNullEntity.getEntity()).thenReturn(null);
+
+        Person personWithSmallCraftUnit = mock(Person.class);
+        Unit smallCraftUnit = mock(Unit.class);
+        Entity smallCraftEntity = mock(Entity.class);
+        when(personWithSmallCraftUnit.getUnit()).thenReturn(smallCraftUnit);
+        when(smallCraftUnit.getEntity()).thenReturn(smallCraftEntity);
+        when(smallCraftEntity.isSmallCraft()).thenReturn(true);
+        when(smallCraftEntity.isWarShip()).thenReturn(false);
+        when(smallCraftEntity.isJumpShip()).thenReturn(false);
+        when(smallCraftEntity.isDropShip()).thenReturn(false);
+
+        Person normalPerson = mock(Person.class);
+        Unit normalUnit = mock(Unit.class);
+        Entity normalUnitEntity = mock(Entity.class);
+        when(normalPerson.getUnit()).thenReturn(normalUnit);
+        when(normalUnit.getEntity()).thenReturn(normalUnitEntity);
+        when(normalUnitEntity.isSmallCraft()).thenReturn(false);
+        when(normalUnitEntity.isWarShip()).thenReturn(false);
+        when(normalUnitEntity.isJumpShip()).thenReturn(false);
+        when(normalUnitEntity.isDropShip()).thenReturn(false);
+
+        setAllPersonnel(List.of(nullUnit, personWithNullUnitEntity, personWithSmallCraftUnit, normalPerson));
+
+        // person with null unit, person with unit with null entity, person with normal unit
+        assertEquals(3, invokeGetPassengerCount());
+    }
+
+    private int invokeGetPassengerCount() throws Exception {
+        Method getPassengerCount = transportCostCalculations.getClass().getDeclaredMethod("getPassengerCount");
+        getPassengerCount.setAccessible(true);
+        return (int) getPassengerCount.invoke(transportCostCalculations);
+    }
+
+    private void setAllPersonnel(List<Person> people) throws Exception {
+        Field allPersonnel = transportCostCalculations.getClass().getDeclaredField("allPersonnel"); // rename if needed
+        allPersonnel.setAccessible(true);
+        allPersonnel.set(transportCostCalculations, people);
     }
 }
