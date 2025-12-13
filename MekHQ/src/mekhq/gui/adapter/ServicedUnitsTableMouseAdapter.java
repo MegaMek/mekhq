@@ -32,6 +32,8 @@
  */
 package mekhq.gui.adapter;
 
+import static mekhq.campaign.unit.Unit.SITE_FIELD_WORKSHOP;
+
 import java.awt.event.ActionEvent;
 import java.util.Optional;
 import javax.swing.JCheckBoxMenuItem;
@@ -41,6 +43,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.equipment.AmmoType;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -95,7 +98,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.contains("CHANGE_SITE")) {
-            int selected = Integer.parseInt(command.split(":")[1]);
+            int selected = MathUtility.parseInt(command.split(":")[1], SITE_FIELD_WORKSHOP);
             boolean selectedIsValid = selected > -1 && selected < Unit.SITE_UNKNOWN;
             if (!selectedIsValid) {
                 return;

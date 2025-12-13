@@ -41,6 +41,7 @@ import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.campaign.unit.Unit.SITE_FIELD_WORKSHOP;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -66,6 +67,7 @@ import javax.swing.JTable;
 import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.client.ui.dialogs.abstractDialogs.BVDisplayDialog;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.AmmoType;
@@ -318,7 +320,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.contains(COMMAND_CHANGE_SITE)) {
-            int selected = Integer.parseInt(command.split(":")[1]);
+            int selected = MathUtility.parseInt(command.split(":")[1], SITE_FIELD_WORKSHOP);
             boolean selectedIsValid = selected > -1 && selected < Unit.SITE_UNKNOWN;
             if (!selectedIsValid) {
                 return;
