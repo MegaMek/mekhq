@@ -488,6 +488,19 @@ public class Force {
         return allUnits;
     }
 
+    public List<Unit> getUnitsAsUnits(Hangar hangar) {
+        List<Unit> allUnits = new ArrayList<>();
+
+        for (UUID unitId : getUnits()) {
+            Unit unit = hangar.getUnit(unitId);
+            if (unit != null) {
+                allUnits.add(unit);
+            }
+        }
+
+        return allUnits;
+    }
+
     /**
      * Add a unit id to the units vector. In general, this should not be called directly to add unid because they will
      * not be assigned a force id. Use {@link Campaign#addUnitToForce(Unit, int)} instead

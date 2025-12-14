@@ -158,6 +158,7 @@ public class MarketsTab {
     private JRadioButton btnContractEquipment;
     private JLabel lblEquipPercent;
     private JSpinner spnEquipPercent;
+    private JCheckBox chkUseAlternatePaymentMode;
     private JCheckBox chkEquipContractSaleValue;
     private JLabel lblDropShipPercent;
     private JSpinner spnDropShipPercent;
@@ -560,6 +561,7 @@ public class MarketsTab {
         btnContractEquipment = new JRadioButton();
         lblEquipPercent = new JLabel();
         spnEquipPercent = new JSpinner();
+        chkUseAlternatePaymentMode = new JCheckBox();
         chkEquipContractSaleValue = new JCheckBox();
         lblDropShipPercent = new JLabel();
         spnDropShipPercent = new JSpinner();
@@ -758,12 +760,14 @@ public class MarketsTab {
               "lblContractPersonnel.tooltip"));
         spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractPersonnel"));
 
-        // Create a ButtonGroup to link the buttons
         ButtonGroup contractGroup = new ButtonGroup();
         contractGroup.add(btnContractEquipment);
         contractGroup.add(btnContractPersonnel);
 
-        // Add other components here...
+        chkUseAlternatePaymentMode = new CampaignOptionsCheckBox("UseAlternatePaymentMode");
+        chkUseAlternatePaymentMode.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "UseAlternatePaymentMode"));
+
         chkEquipContractSaleValue = new CampaignOptionsCheckBox("EquipContractSaleValue");
         chkEquipContractSaleValue.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "EquipContractSaleValue"));
@@ -826,6 +830,9 @@ public class MarketsTab {
         layoutValuePercent.gridy = 0;
         layoutValuePercent.gridwidth = 1;
         panelValuePercent.add(chkEquipContractSaleValue, layoutValuePercent);
+
+        layoutValuePercent.gridy++;
+        panelValuePercent.add(chkUseAlternatePaymentMode, layoutValuePercent);
 
         layoutValuePercent.gridy++;
         panelValuePercent.add(lblEquipPercent, layoutValuePercent);
@@ -941,6 +948,7 @@ public class MarketsTab {
             btnContractPersonnel.setSelected(true);
         }
         spnEquipPercent.setValue(options.getEquipmentContractPercent());
+        chkUseAlternatePaymentMode.setSelected(options.isUseAlternatePaymentMode());
         chkEquipContractSaleValue.setSelected(options.isEquipmentContractSaleValue());
         spnDropShipPercent.setValue(options.getDropShipContractPercent());
         spnJumpShipPercent.setValue(options.getJumpShipContractPercent());
@@ -1012,6 +1020,7 @@ public class MarketsTab {
         options.setDropShipContractPercent((double) spnDropShipPercent.getValue());
         options.setJumpShipContractPercent((double) spnJumpShipPercent.getValue());
         options.setWarShipContractPercent((double) spnWarShipPercent.getValue());
+        options.setUseAlternatePaymentMode(chkUseAlternatePaymentMode.isSelected());
         options.setEquipmentContractSaleValue(chkEquipContractSaleValue.isSelected());
         options.setMercSizeLimited(chkMercSizeLimited.isSelected());
         options.setBLCSaleValue(chkBLCSaleValue.isSelected());
