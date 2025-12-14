@@ -993,7 +993,7 @@ public class MRMSService {
         WorkTime workTime = WorkTime.NORMAL;
         if (canChangeWorkTime) {
 
-             workTime = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
+            workTime = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
 
             if (null == workTime) {
                 debugLog("[ERROR] Null work-time from techToWorktimeMap for %s", "repairPart", tech.getFullName());

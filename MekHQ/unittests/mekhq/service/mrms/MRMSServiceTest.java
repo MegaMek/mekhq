@@ -649,7 +649,6 @@ public class MRMSServiceTest {
             fixPerson.setMinutesLeft(fixPerson.getMinutesLeft() - fixPartWork.getActualTime());
             armor.setAmountNeeded(0);
             armor.setAmount(armorAmount);
-            //when(((Person) inv.getArgument(1)).getMinutesLeft()).thenReturn()
             timeSpent.add(((Armor) inv.getArgument(0)).getMode());
             return "Mock Part Fix";
         }).when(mockCampaign).fixPart(argThat(new IPartWorkMatch(armor)), any(Person.class));
@@ -694,7 +693,7 @@ public class MRMSServiceTest {
     }
 
     @Nested
-    public class testMRMSUnitsCarryover {
+    public class TestMRMSUnitsCarryover {
         Unit unit;
         List<Person> realTechs;
 
@@ -845,12 +844,12 @@ public class MRMSServiceTest {
          * - Tech has low skill (GREEN level), requiring target number adjustment
          * - With extra time needed, repair would take 45+ minutes (exceeds 40)
          * - With carryover disabled, this should not be attempted because the time check
-         *   happens BEFORE the work time calculation adjusts for extra time
+         *   now accounts for work time modifiers, so extra time is factored into the carryover decision
          *
          * Expected: No repairs should be performed
          */
         @Test
-        public void testMRMSUnitsCarryoverEnabledWithLowSkillNeedingExtraTime() {
+        public void testMRMSUnitsCarryoverDisabledWithLowSkillNeedingExtraTime() {
             // Arrange
             when(mockCampaignOptions.isMRMSAllowCarryover()).thenReturn(false);
             when(mockCampaignOptions.isMRMSOptimizeToCompleteToday()).thenReturn(false);
