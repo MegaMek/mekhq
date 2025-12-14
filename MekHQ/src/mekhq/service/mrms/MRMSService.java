@@ -961,11 +961,10 @@ public class MRMSService {
 
         setPartWorkTime(partWork, workTime);
 
-        String result;
         if (warehouseMode && (partWork instanceof Part)) {
             campaign.fixWarehousePart((Part) partWork, tech);
         } else {
-            result = campaign.fixPart(partWork, tech);
+            campaign.fixPart(partWork, tech);
         }
 
         // If this tech has no time left, filter them out so we don't
