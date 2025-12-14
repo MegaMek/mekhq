@@ -115,6 +115,11 @@ public enum AlternatePaymentModelValues {
 
     private static final MMLogger LOGGER = MMLogger.create(AlternatePaymentModelValues.class);
 
+
+    // With a slope of 0.1233 we're going to hit our floor around 4 battalions (or factional equivalent)
+    static final double DIMINISHING_RETURNS_SLOPE = 0.1233; // higher = faster diminishing returns
+    static final double DIMINISHING_RETURNS_FLOOR = 0.1; // floor: never worth less than 10%
+
     private final Money value;
 
     /**
@@ -407,10 +412,6 @@ public enum AlternatePaymentModelValues {
 
         int diminishingReturnsStart = getDiminishingReturnsStart(campaignFaction);
 
-        // With a slope of 0.0625 we're going to hit our floor around two regiments (or factional equivalent)
-        final double slope = 0.0625; // higher = faster diminishing returns
-        final double minMultiplier = 0.10; // floor: never worth less than 10%
-
         Money total = Money.zero();
         for (int i = 0; i < unitValues.size(); i++) {
             Money unitValue = unitValues.get(i);
@@ -418,8 +419,8 @@ public enum AlternatePaymentModelValues {
             double multiplier = 1.0;
             if (i >= diminishingReturnsStart) {
                 int distanceFromCutOff = (i - diminishingReturnsStart) + 1;
-                multiplier = 1.0 / (1.0 + slope * distanceFromCutOff);
-                multiplier = Math.max(minMultiplier, multiplier);
+                multiplier = 1.0 / (1.0 + DIMINISHING_RETURNS_SLOPE * distanceFromCutOff);
+                multiplier = Math.max(DIMINISHING_RETURNS_FLOOR, multiplier);
             }
 
             total = total.plus(unitValue.multipliedBy(multiplier));

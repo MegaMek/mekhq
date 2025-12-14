@@ -38,6 +38,8 @@ import static megamek.common.units.EntityWeightClass.WEIGHT_LIGHT;
 import static megamek.common.units.EntityWeightClass.WEIGHT_MEDIUM;
 import static megamek.common.units.EntityWeightClass.WEIGHT_SUPER_HEAVY;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.DIMINISHING_RETURNS_FLOOR;
+import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.DIMINISHING_RETURNS_SLOPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -49,6 +51,7 @@ import static org.mockito.Mockito.when;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import megamek.common.units.Entity;
@@ -420,7 +423,7 @@ class AlternatePaymentModelValuesTest {
         Faction faction = dummyFaction();
 
         try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
-            // Even if this is called, it shouldn't matter for empty list
+            // Even if this is called, it shouldn't matter for an empty list
             combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
                   .thenReturn(36);
 
@@ -484,8 +487,8 @@ class AlternatePaymentModelValuesTest {
         // standard force size = 1 => cutoff = 2
         // indices:
         // 0,1 => full value
-        // 2 => distance=1 => 1/(1+0.0625*1)
-        // 3 => distance=2 => 1/(1+0.0625*2)
+        // 2 => distance=1 => 1/(1+slope*1)
+        // 3 => distance=2 => 1/(1+slope*2)
         List<Money> values = new ArrayList<>(List.of(
               Money.of(1),   // will be sorted
               Money.of(100),
@@ -500,21 +503,18 @@ class AlternatePaymentModelValuesTest {
             // Build expected using the exact same math & Money operations as the method (avoids rounding mismatches)
             List<Money> sorted = new ArrayList<>(values);
             sorted.sort(Money::compareTo);
-            // Money::compareTo is ascending; reverse it to match the method
-            java.util.Collections.reverse(sorted);
+            Collections.reverse(sorted);
 
             final int diminishingReturnsStart = 2;
-            final double slope = 0.0625;
-            final double minMultiplier = 0.10;
 
             Money expected = Money.zero();
             for (int i = 0; i < sorted.size(); i++) {
                 Money unitValue = sorted.get(i);
                 double multiplier = 1.0;
                 if (i >= diminishingReturnsStart) {
-                    int d = (i - diminishingReturnsStart) + 1;
-                    multiplier = 1.0 / (1.0 + slope * d);
-                    multiplier = Math.max(minMultiplier, multiplier);
+                    int distance = (i - diminishingReturnsStart) + 1;
+                    multiplier = 1.0 / (1.0 + DIMINISHING_RETURNS_SLOPE * distance);
+                    multiplier = Math.max(DIMINISHING_RETURNS_FLOOR, multiplier);
                 }
                 expected = expected.plus(unitValue.multipliedBy(multiplier));
             }
@@ -529,15 +529,14 @@ class AlternatePaymentModelValuesTest {
     void hitsFloorAtExpectedDistance_whenCutoffIsSmallEnough() throws Exception {
         Faction faction = dummyFaction();
 
-        // We want at least one unit to be floored.
-        // With slope=0.0625 and minMultiplier=0.10, floor begins when:
-        // 1/(1 + 0.0625*d) <= 0.10  => d >= 144.
+        // With slope=0.1233 and minMultiplier=0.10, floor begins when:
+        // 1/(1 + slope*distance) <= 0.10  => distance >= 73 (since 9/0.1233 ≈ 72.98).
         //
         // Use standard force size = 1 => cutoff = 2, so index for first floored unit is:
-        // i = cutoff + d - 1 = 2 + 144 - 1 = 145 (0-based)
-        // => list size must be >= 146.
+        // i = cutoff + distance - 1 = 2 + 73 - 1 = 74 (0-based)
+        // => list size must be >= 75.
         List<Money> values = new ArrayList<>();
-        for (int i = 0; i < 146; i++) {
+        for (int i = 0; i < 75; i++) {
             values.add(Money.of(1));
         }
 
@@ -547,18 +546,15 @@ class AlternatePaymentModelValuesTest {
 
             Money result = invokeAdjustValuesForDiminishingReturns(faction, values);
 
-            // Compute expected with the same math; ensures we validate floor behavior without hardcoding a number
             final int diminishingReturnsStart = 2;
-            final double slope = 0.0625;
-            final double minMultiplier = 0.10;
 
             Money expected = Money.zero();
-            for (int i = 0; i < 146; i++) {
+            for (int i = 0; i < 75; i++) {
                 double multiplier = 1.0;
                 if (i >= diminishingReturnsStart) {
-                    int d = (i - diminishingReturnsStart) + 1;
-                    multiplier = 1.0 / (1.0 + slope * d);
-                    multiplier = Math.max(minMultiplier, multiplier);
+                    int distance = (i - diminishingReturnsStart) + 1;
+                    multiplier = 1.0 / (1.0 + DIMINISHING_RETURNS_SLOPE * distance);
+                    multiplier = Math.max(DIMINISHING_RETURNS_FLOOR, multiplier);
                 }
                 expected = expected.plus(Money.of(1).multipliedBy(multiplier));
             }
@@ -587,23 +583,20 @@ class AlternatePaymentModelValuesTest {
 
             Money actual = invokeAdjustValuesForDiminishingReturns(faction, values);
 
-            // Expected by explicitly applying discount after sorting
             List<Money> sorted = new ArrayList<>(values);
             sorted.sort(Money::compareTo);
-            java.util.Collections.reverse(sorted);
+            Collections.reverse(sorted);
 
             final int diminishingReturnsStart = 2;
-            final double slope = 0.0625;
-            final double minMultiplier = 0.10;
 
             Money expected = Money.zero();
             for (int i = 0; i < sorted.size(); i++) {
                 Money unitValue = sorted.get(i);
                 double multiplier = 1.0;
                 if (i >= diminishingReturnsStart) {
-                    int d = (i - diminishingReturnsStart) + 1;
-                    multiplier = 1.0 / (1.0 + slope * d);
-                    multiplier = Math.max(minMultiplier, multiplier);
+                    int distance = (i - diminishingReturnsStart) + 1;
+                    multiplier = 1.0 / (1.0 + DIMINISHING_RETURNS_SLOPE * distance);
+                    multiplier = Math.max(DIMINISHING_RETURNS_FLOOR, multiplier);
                 }
                 expected = expected.plus(unitValue.multipliedBy(multiplier));
             }
