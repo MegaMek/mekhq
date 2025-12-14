@@ -119,6 +119,7 @@ public enum AlternatePaymentModelValues {
     // With a slope of 0.1233 we're going to hit our floor around 4 battalions (or factional equivalent)
     static final double DIMINISHING_RETURNS_SLOPE = 0.1233; // higher = faster diminishing returns
     static final double DIMINISHING_RETURNS_FLOOR = 0.1; // floor: never worth less than 10%
+    static final double DIMINISHING_RETURNS_POWER = 2.0; // >1 makes diminishing returns much stricter
 
     private final Money value;
 
@@ -419,7 +420,8 @@ public enum AlternatePaymentModelValues {
             double multiplier = 1.0;
             if (i >= diminishingReturnsStart) {
                 int distanceFromCutOff = (i - diminishingReturnsStart) + 1;
-                multiplier = 1.0 / (1.0 + DIMINISHING_RETURNS_SLOPE * distanceFromCutOff);
+                multiplier = 1.0 / Math.pow(1.0 + DIMINISHING_RETURNS_SLOPE * distanceFromCutOff,
+                      DIMINISHING_RETURNS_POWER);
                 multiplier = Math.max(DIMINISHING_RETURNS_FLOOR, multiplier);
             }
 

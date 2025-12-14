@@ -39,6 +39,7 @@ import static megamek.common.units.EntityWeightClass.WEIGHT_MEDIUM;
 import static megamek.common.units.EntityWeightClass.WEIGHT_SUPER_HEAVY;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.DIMINISHING_RETURNS_FLOOR;
+import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.DIMINISHING_RETURNS_POWER;
 import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.DIMINISHING_RETURNS_SLOPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -487,8 +488,8 @@ class AlternatePaymentModelValuesTest {
         // standard force size = 1 => cutoff = 2
         // indices:
         // 0,1 => full value
-        // 2 => distance=1 => 1/(1+slope*1)
-        // 3 => distance=2 => 1/(1+slope*2)
+        // 2 => distance=1 => 1/(1+slope*1)^power
+        // 3 => distance=2 => 1/(1+slope*2)^power
         List<Money> values = new ArrayList<>(List.of(
               Money.of(1),   // will be sorted
               Money.of(100),
@@ -513,7 +514,7 @@ class AlternatePaymentModelValuesTest {
                 double multiplier = 1.0;
                 if (i >= diminishingReturnsStart) {
                     int distance = (i - diminishingReturnsStart) + 1;
-                    multiplier = 1.0 / (1.0 + DIMINISHING_RETURNS_SLOPE * distance);
+                    multiplier = 1.0 / Math.pow(1.0 + DIMINISHING_RETURNS_SLOPE * distance, DIMINISHING_RETURNS_POWER);
                     multiplier = Math.max(DIMINISHING_RETURNS_FLOOR, multiplier);
                 }
                 expected = expected.plus(unitValue.multipliedBy(multiplier));
@@ -529,14 +530,19 @@ class AlternatePaymentModelValuesTest {
     void hitsFloorAtExpectedDistance_whenCutoffIsSmallEnough() throws Exception {
         Faction faction = dummyFaction();
 
-        // With slope=0.1233 and minMultiplier=0.10, floor begins when:
-        // 1/(1 + slope*distance) <= 0.10  => distance >= 73 (since 9/0.1233 ≈ 72.98).
+        // With power applied, floor begins when:
+        // 1/(1 + slope*distance)^power <= floor
+        // => distance >= (floor^(-1/power) - 1) / slope
+        //
+        // For slope=0.1233, power=2.0, floor=0.10:
+        // floor^(-1/2) = sqrt(10) ≈ 3.1623
+        // distance >= (3.1623 - 1) / 0.1233 ≈ 17.54 => 18
         //
         // Use standard force size = 1 => cutoff = 2, so index for first floored unit is:
-        // i = cutoff + distance - 1 = 2 + 73 - 1 = 74 (0-based)
-        // => list size must be >= 75.
+        // i = cutoff + distance - 1 = 2 + 18 - 1 = 19 (0-based)
+        // => list size must be >= 20.
         List<Money> values = new ArrayList<>();
-        for (int i = 0; i < 75; i++) {
+        for (int i = 0; i < 20; i++) {
             values.add(Money.of(1));
         }
 
@@ -549,11 +555,11 @@ class AlternatePaymentModelValuesTest {
             final int diminishingReturnsStart = 2;
 
             Money expected = Money.zero();
-            for (int i = 0; i < 75; i++) {
+            for (int i = 0; i < 20; i++) {
                 double multiplier = 1.0;
                 if (i >= diminishingReturnsStart) {
                     int distance = (i - diminishingReturnsStart) + 1;
-                    multiplier = 1.0 / (1.0 + DIMINISHING_RETURNS_SLOPE * distance);
+                    multiplier = 1.0 / Math.pow(1.0 + DIMINISHING_RETURNS_SLOPE * distance, DIMINISHING_RETURNS_POWER);
                     multiplier = Math.max(DIMINISHING_RETURNS_FLOOR, multiplier);
                 }
                 expected = expected.plus(Money.of(1).multipliedBy(multiplier));
@@ -595,7 +601,7 @@ class AlternatePaymentModelValuesTest {
                 double multiplier = 1.0;
                 if (i >= diminishingReturnsStart) {
                     int distance = (i - diminishingReturnsStart) + 1;
-                    multiplier = 1.0 / (1.0 + DIMINISHING_RETURNS_SLOPE * distance);
+                    multiplier = 1.0 / Math.pow(1.0 + DIMINISHING_RETURNS_SLOPE * distance, DIMINISHING_RETURNS_POWER);
                     multiplier = Math.max(DIMINISHING_RETURNS_FLOOR, multiplier);
                 }
                 expected = expected.plus(unitValue.multipliedBy(multiplier));
