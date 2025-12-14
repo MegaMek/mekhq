@@ -36,6 +36,7 @@ import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
+import static megamek.common.units.Jumpship.DRIVE_CORE_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
@@ -123,11 +124,14 @@ public class TransportCostCalculations {
     static final double OTHER_UNIT_COST = 50000 / PER_DAY_DIVIDER; // (Unofficial)
     static final double CARGO_PER_TON_COST = 100000 / 1200.0 / PER_DAY_DIVIDER;
 
+
     // Some bays can accept multiple units. These values are based on the bay sizes of various DropShips. Largely
     // Unions and union equivalents.
     static final int PLATOONS_PER_BAY = 4;
     static final int BATTLE_ARMOR_SQUADS_PER_BAY = 4;
     static final int PROTOMEKS_PER_BAY = 5;
+    static final double SPACE_STATION_ADAPTOR_COLLAR_NEED_DIVIDER = 50000.0; // StratOps pg 55
+    static final double SPACE_STATION_MODULAR_COLLAR_NEED_DIVIDER = 100000.0; // StratOps pg 55
 
     // The only canon passenger DropShip is the Princess Luxury Liner. However, hiring one using CamOps rules proves
     // unreasonably expensive. Therefore, we're instead assuming that the player can find retrofit DropShips that has
@@ -721,8 +725,10 @@ public class TransportCostCalculations {
 
             // Non-vehicle entities are categorized based on the entity types
             else {
-                if (entity.isDropShip() || entity.isSpaceStation()) { // Both require jump collars
+                if (entity.isDropShip()) { // Both require jump collars
                     dropShipCount++;
+                } else if (entity instanceof SpaceStation spaceStation) { // Typecasting is purposeful here
+                    dropShipCount += getAdditionalCollarNeeds(spaceStation);
                 } else if (entity.isSmallCraft()) {
                     smallCraftCount++;
                 } else if (entity.isMek()) {
@@ -743,6 +749,46 @@ public class TransportCostCalculations {
                 }
             }
         }
+    }
+
+    /**
+     * Calculates how many additional JumpShip docking collars are required to transport a {@link SpaceStation}.
+     *
+     * <p>This method only considers stations that are actually capable of making a jump. If the station has no drive
+     * core ({@code DRIVE_CORE_NONE}) or {@link SpaceStation#canJump()} is {@code false}, this method returns {@code 0}
+     * because a non-jump-capable station cannot meaningfully contribute to collar requirements.</p>
+     *
+     * <p>For jump-capable stations, the collar requirement is based on tonnage and the station type:</p>
+     * <ul>
+     *     <li>If the station has a KF adapter, collars needed are {@code ceil(tonnage / SPACE_STATION_ADAPTOR_COLLAR_NEED_DIVIDER)}.</li>
+     *     <li>If the station is modular, collars needed are {@code ceil(tonnage / SPACE_STATION_MODULAR_COLLAR_NEED_DIVIDER)}.</li>
+     *     <li>If neither condition applies, the station is treated as requiring {@code 0} additional collars.</li>
+     * </ul>
+     *
+     * @param spaceStation the {@link SpaceStation} to evaluate; must not be {@code null}
+     *
+     * @return the number of additional docking collars required for the given station, or {@code 0} if none are
+     *       required
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    private static int getAdditionalCollarNeeds(SpaceStation spaceStation) {
+        // This unit can't jump, so no point in adding a collar requirement
+        if (spaceStation.getDriveCoreType() == DRIVE_CORE_NONE || !spaceStation.canJump()) {
+            return 0;
+        }
+
+        double tonnage = spaceStation.getTonnage();
+        if (spaceStation.hasKFAdapter()) {
+            return (int) ceil(tonnage / SPACE_STATION_ADAPTOR_COLLAR_NEED_DIVIDER);
+        }
+
+        if (spaceStation.isModular()) {
+            return (int) ceil(tonnage / SPACE_STATION_MODULAR_COLLAR_NEED_DIVIDER);
+        }
+
+        return 0;
     }
 
     /**

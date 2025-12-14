@@ -36,6 +36,7 @@ import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
+import static megamek.common.units.Jumpship.DRIVE_CORE_NONE;
 import static mekhq.campaign.mission.TransportCostCalculations.*;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,6 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
@@ -1856,5 +1859,97 @@ public class TransportCostCalculationsTest {
         Field allPersonnel = transportCostCalculations.getClass().getDeclaredField("allPersonnel");
         allPersonnel.setAccessible(true);
         allPersonnel.set(transportCostCalculations, people);
+    }
+
+    @Test
+    void returnsZero_whenDriveCoreIsNone() throws Exception {
+        SpaceStation station = mock(SpaceStation.class);
+        when(station.getDriveCoreType()).thenReturn(DRIVE_CORE_NONE);
+        when(station.canJump()).thenReturn(true); // irrelevant due to drive core none
+
+        assertEquals(0, invokeGetAdditionalCollarNeeds(station));
+        verify(station, never()).getTonnage();
+    }
+
+    @Test
+    void returnsZero_whenCannotJump() throws Exception {
+        SpaceStation station = mock(SpaceStation.class);
+        when(station.getDriveCoreType()).thenReturn(123); // anything but DRIVE_CORE_NONE
+        when(station.canJump()).thenReturn(false);
+
+        assertEquals(0, invokeGetAdditionalCollarNeeds(station));
+        verify(station, never()).getTonnage();
+    }
+
+    @Test
+    void returnsCeilTonnageOverAdaptorDivider_whenHasKfAdapter() throws Exception {
+        SpaceStation station = mock(SpaceStation.class);
+        when(station.getDriveCoreType()).thenReturn(123);
+        when(station.canJump()).thenReturn(true);
+        when(station.getTonnage()).thenReturn(1000.0);
+        when(station.hasKFAdapter()).thenReturn(true);
+        when(station.isModular()).thenReturn(true); // adapter branch should win
+
+        int expected = (int) Math.ceil(1000.0 / getAdaptorDivider());
+        assertEquals(expected, invokeGetAdditionalCollarNeeds(station));
+    }
+
+    @Test
+    void returnsCeilTonnageOverModularDivider_whenModularAndNoAdapter() throws Exception {
+        SpaceStation station = mock(SpaceStation.class);
+        when(station.getDriveCoreType()).thenReturn(123);
+        when(station.canJump()).thenReturn(true);
+        when(station.getTonnage()).thenReturn(1000.0);
+        when(station.hasKFAdapter()).thenReturn(false);
+        when(station.isModular()).thenReturn(true);
+
+        int expected = (int) Math.ceil(1000.0 / getModularDivider());
+        assertEquals(expected, invokeGetAdditionalCollarNeeds(station));
+    }
+
+    @Test
+    void returnsZero_whenNeitherAdapterNorModular() throws Exception {
+        SpaceStation station = mock(SpaceStation.class);
+        when(station.getDriveCoreType()).thenReturn(123);
+        when(station.canJump()).thenReturn(true);
+        when(station.getTonnage()).thenReturn(1000.0);
+        when(station.hasKFAdapter()).thenReturn(false);
+        when(station.isModular()).thenReturn(false);
+
+        assertEquals(0, invokeGetAdditionalCollarNeeds(station));
+    }
+
+    @Test
+    void adaptorBranch_roundingUsesCeil() throws Exception {
+        SpaceStation station = mock(SpaceStation.class);
+        when(station.getDriveCoreType()).thenReturn(123);
+        when(station.canJump()).thenReturn(true);
+        when(station.hasKFAdapter()).thenReturn(true);
+        when(station.isModular()).thenReturn(false);
+
+        double divider = getAdaptorDivider();
+
+        when(station.getTonnage()).thenReturn(divider); // exact multiple => 1
+        assertEquals(1, invokeGetAdditionalCollarNeeds(station));
+
+        when(station.getTonnage()).thenReturn(divider + 0.0001); // just over => 2
+        assertEquals(2, invokeGetAdditionalCollarNeeds(station));
+    }
+
+    private static int invokeGetAdditionalCollarNeeds(SpaceStation station) throws Exception {
+        Method getAdditionalCollarNeeds = TransportCostCalculations.class.getDeclaredMethod("getAdditionalCollarNeeds",
+              SpaceStation.class);
+        getAdditionalCollarNeeds.setAccessible(true);
+        return (int) getAdditionalCollarNeeds.invoke(null, station);
+    }
+
+    private static double getAdaptorDivider() throws Exception {
+        return (double) TransportCostCalculations.class.getDeclaredField("SPACE_STATION_ADAPTOR_COLLAR_NEED_DIVIDER")
+                              .get(null);
+    }
+
+    private static double getModularDivider() throws Exception {
+        return (double) TransportCostCalculations.class.getDeclaredField("SPACE_STATION_MODULAR_COLLAR_NEED_DIVIDER")
+                              .get(null);
     }
 }
