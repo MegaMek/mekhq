@@ -7227,8 +7227,7 @@ public class Person {
     }
 
     public boolean needsAMFixing() {
-        return !injuries.isEmpty() &&
-                     injuries.stream().anyMatch(injury -> (injury.getTime() > 0) || !injury.isPermanent());
+        return !injuries.isEmpty();
     }
 
     /**
