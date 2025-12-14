@@ -861,12 +861,12 @@ public class MRMSService {
             // Fallback TN check to account for discrepancies between Techs
             TargetRoll targetRoll = campaign.getTargetFor(partWork, tech);
             if (canChangeWorkTime) {
-                WorkTime wt = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
-                if (null == wt) {
+                WorkTime workTime = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
+                if (null == workTime) {
                     debugLog("[ERROR] Null work-time from techToWorktimeMap for %s", "repairPart", tech.getFullName());
-                    wt = WorkTime.NORMAL;
+                    workTime = WorkTime.NORMAL;
                 }
-                ((Part) partWork).setMode(wt);
+                ((Part) partWork).setMode(workTime);
                 // Get updated TN with worktime in mind
                 targetRoll = campaign.getTargetFor(partWork, tech);
                 ((Part) partWork).resetModeToNormal();
@@ -894,8 +894,8 @@ public class MRMSService {
 
             boolean isSameDayTech;
 
-            WorkTime wt = getWorkTime(canChangeWorkTime, techSkillToWorktimeMap, skill, tech);
-            int expectedTime = getExpectedWorkTime((partWork), wt);
+            WorkTime workTime = getWorkTime(canChangeWorkTime, techSkillToWorktimeMap, skill, tech);
+            int expectedTime = getExpectedWorkTime((partWork), workTime);
 
             if ((tech.getMinutesLeft() < expectedTime)) {
                 if (!configuredOptions.isAllowCarryover()) {
