@@ -159,9 +159,8 @@ public class CampaignUpgradeDialog {
 
                 CampaignPreset chosenPreset = presets.get(comboChoiceIndex);
 
+                // This needs to be before we start changing options
                 CampaignOptionsFreebieTracker oldOptions = new CampaignOptionsFreebieTracker(campaign.getCampaignOptions());
-                CampaignOptionsFreebieTracker newOptions = new CampaignOptionsFreebieTracker(chosenPreset.getCampaignOptions());
-                triggerUpgradeFreebies(campaign, oldOptions, newOptions, false);
 
                 campaign.setCampaignOptions(chosenPreset.getCampaignOptions());
                 campaign.setGameOptions(chosenPreset.getGameOptions());
@@ -202,6 +201,9 @@ public class CampaignUpgradeDialog {
                 }
 
                 SpecialAbility.replaceSpecialAbilities(chosenPreset.getSpecialAbilities());
+
+                CampaignOptionsFreebieTracker newOptions = new CampaignOptionsFreebieTracker(chosenPreset.getCampaignOptions());
+                triggerUpgradeFreebies(campaign, oldOptions, newOptions, false);
 
                 LOGGER.info("Applying {} during upgrade process", chosenPreset.getTitle());
             }

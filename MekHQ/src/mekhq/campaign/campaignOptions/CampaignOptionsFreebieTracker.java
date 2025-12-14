@@ -49,17 +49,18 @@ package mekhq.campaign.campaignOptions;
  * <p>The values captured here are intentionally reduced to simple booleans so they can be compared cheaply and
  * reliably via the record's generated {@link #equals(Object)} and {@link #hashCode()} implementations.</p>
  *
- * @param awardVeterancySPAs    whether the campaign awards veterancy SPAs
- * @param trackFactionStanding  whether faction standing is tracked
- * @param trackPrisoners        whether prisoners are tracked (derived from prisoner capture style)
- * @param useMASHTheatres       whether MASH theatres are enabled
- * @param useFatigue            whether fatigue rules are enabled
- * @param useAdvancedSalvage    whether advanced salvage rules are enabled
- * @param useStratCon           whether StratCon is enabled
- * @param useMapless            whether StratCon mapless mode is enabled
- * @param useAdvancedScouting   whether advanced scouting is enabled (and applicable)
- * @param useAltAdvancedMedical whether alternative advanced medical rules are enabled
- * @param useDiseases           whether random diseases are enabled (and applicable)
+ * @param awardVeterancySPAs        whether the campaign awards veterancy SPAs
+ * @param trackFactionStanding      whether faction standing is tracked
+ * @param trackPrisoners            whether prisoners are tracked (derived from prisoner capture style)
+ * @param useMASHTheatres           whether MASH theatres are enabled
+ * @param useFatigue                whether fatigue rules are enabled
+ * @param useAdvancedSalvage        whether advanced salvage rules are enabled
+ * @param useStratCon               whether StratCon is enabled
+ * @param useMapless                whether StratCon mapless mode is enabled
+ * @param useAdvancedScouting       whether advanced scouting is enabled (and applicable)
+ * @param useAltAdvancedMedical     whether alternative advanced medical rules are enabled
+ * @param useDiseases               whether random diseases are enabled (and applicable)
+ * @param useDiminishingContractPay whether diminishing returns are applied to contract pay
  *
  * @author Illiani
  * @since 0.50.11
@@ -67,7 +68,7 @@ package mekhq.campaign.campaignOptions;
 public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean trackFactionStanding,
       boolean trackPrisoners, boolean useMASHTheatres, boolean useFatigue, boolean useAdvancedSalvage,
       boolean useStratCon, boolean useMapless, boolean useAdvancedScouting, boolean useAltAdvancedMedical,
-      boolean useDiseases) {
+      boolean useDiseases, boolean useDiminishingContractPay) {
     /**
      * Creates a tracker snapshot from the provided {@link CampaignOptions}.
      *
@@ -76,6 +77,7 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
      *   <li>{@code trackPrisoners} is derived from the prisoner capture style,</li>
      *   <li>{@code useAdvancedScouting} only applies when StratCon is enabled,</li>
      *   <li>{@code useDiseases} only applies when alternative advanced medical is enabled.</li>
+     *   <li>{@code useDiminishingContractPay} only applies when certain contract payment models are also selected.</li>
      * </ul>
      *
      * @param options source options to snapshot
@@ -95,7 +97,14 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
               options.isUseStratConMaplessMode(),
               options.isUseAdvancedScouting() && options.isUseStratCon(),
               options.isUseAlternativeAdvancedMedical(),
-              options.isUseAlternativeAdvancedMedical() && options.isUseRandomDiseases()
+              options.isUseAlternativeAdvancedMedical() && options.isUseRandomDiseases(),
+              options.isUseDiminishingContractPay() && isIsDiminishingContractPayRelevant(options)
         );
+    }
+
+    private static boolean isIsDiminishingContractPayRelevant(CampaignOptions options) {
+        return options.isUsePeacetimeCost() ||
+                     options.isEquipmentContractBase() ||
+                     options.isUseAlternatePaymentMode();
     }
 }
