@@ -603,6 +603,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         boolean oldIsUseAdvancedScouting = oldOptions.useAdvancedScouting() && oldIsUseStratCon;
         boolean oldIsUseAltAdvancedMedical = oldOptions.useAltAdvancedMedical();
         boolean oldIsUseDiseases = oldIsUseAltAdvancedMedical && oldOptions.useDiseases();
+        boolean oldUseNormalizedContractPayModel = oldOptions.useNormalizedContractPayModel();
         boolean oldIsDiminishReturnsContractPay = oldOptions.useDiminishingContractPay();
 
         boolean newIsTrackFactionStandings = newOptions.trackFactionStanding();
@@ -673,6 +674,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         boolean newIsUseDiseases = newIsUseAltAdvancedMedical && newOptions.useDiseases();
         if (!isStartUp && newIsUseDiseases && !oldIsUseDiseases) { // Has tracking changed?
             inoculateAllCharacters(campaign);
+        }
+
+        boolean newUseNormalizedContractPayModel = newOptions.useNormalizedContractPayModel();
+        if (!isStartUp && newUseNormalizedContractPayModel && !oldUseNormalizedContractPayModel) {
+            new NormalizedContractPayCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
         boolean newIsDiminishReturnsContractPay = newOptions.useDiminishingContractPay();

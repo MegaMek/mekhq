@@ -40,16 +40,16 @@ import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 
-public class DiminishingReturnsCampaignOptionsChangedConfirmationDialog {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.DiminishingReturnsCampaignOptionsChangedConfirmationDialog";
+public class NormalizedContractPayCampaignOptionsChangedConfirmationDialog {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.NormalizedContractPayCampaignOptionsChangedConfirmationDialog";
 
-    public DiminishingReturnsCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
+    public NormalizedContractPayCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
         String message = getTextAt(RESOURCE_BUNDLE,
-              "DiminishingReturnsCampaignOptionsChangedConfirmationDialog.message");
+              "NormalizedContractPayCampaignOptionsChangedConfirmationDialog.message");
         String cancelButton = getTextAt(RESOURCE_BUNDLE,
-              "DiminishingReturnsCampaignOptionsChangedConfirmationDialog.button.cancel");
+              "NormalizedContractPayCampaignOptionsChangedConfirmationDialog.button.cancel");
         String confirmButton = getTextAt(RESOURCE_BUNDLE,
-              "DiminishingReturnsCampaignOptionsChangedConfirmationDialog.button.confirm");
+              "NormalizedContractPayCampaignOptionsChangedConfirmationDialog.button.confirm");
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               null,
