@@ -1868,7 +1868,7 @@ public class TransportCostCalculationsTest {
         when(station.canJump()).thenReturn(true); // irrelevant due to drive core none
 
         assertEquals(0, invokeGetAdditionalCollarNeeds(station));
-        verify(station, never()).getTonnage();
+        verify(station, never()).getWeight();
     }
 
     @Test
@@ -1878,7 +1878,7 @@ public class TransportCostCalculationsTest {
         when(station.canJump()).thenReturn(false);
 
         assertEquals(0, invokeGetAdditionalCollarNeeds(station));
-        verify(station, never()).getTonnage();
+        verify(station, never()).getWeight();
     }
 
     @Test
@@ -1886,7 +1886,7 @@ public class TransportCostCalculationsTest {
         SpaceStation station = mock(SpaceStation.class);
         when(station.getDriveCoreType()).thenReturn(123);
         when(station.canJump()).thenReturn(true);
-        when(station.getTonnage()).thenReturn(1000.0);
+        when(station.getWeight()).thenReturn(1000.0);
         when(station.hasKFAdapter()).thenReturn(true);
         when(station.isModular()).thenReturn(true); // adapter branch should win
 
@@ -1899,7 +1899,7 @@ public class TransportCostCalculationsTest {
         SpaceStation station = mock(SpaceStation.class);
         when(station.getDriveCoreType()).thenReturn(123);
         when(station.canJump()).thenReturn(true);
-        when(station.getTonnage()).thenReturn(1000.0);
+        when(station.getWeight()).thenReturn(1000.0);
         when(station.hasKFAdapter()).thenReturn(false);
         when(station.isModular()).thenReturn(true);
 
@@ -1912,7 +1912,7 @@ public class TransportCostCalculationsTest {
         SpaceStation station = mock(SpaceStation.class);
         when(station.getDriveCoreType()).thenReturn(123);
         when(station.canJump()).thenReturn(true);
-        when(station.getTonnage()).thenReturn(1000.0);
+        when(station.getWeight()).thenReturn(1000.0);
         when(station.hasKFAdapter()).thenReturn(false);
         when(station.isModular()).thenReturn(false);
 
@@ -1929,10 +1929,10 @@ public class TransportCostCalculationsTest {
 
         double divider = getAdaptorDivider();
 
-        when(station.getTonnage()).thenReturn(divider); // exact multiple => 1
+        when(station.getWeight()).thenReturn(divider); // exact multiple => 1
         assertEquals(1, invokeGetAdditionalCollarNeeds(station));
 
-        when(station.getTonnage()).thenReturn(divider + 0.0001); // just over => 2
+        when(station.getWeight()).thenReturn(divider + 0.0001); // just over => 2
         assertEquals(2, invokeGetAdditionalCollarNeeds(station));
     }
 
