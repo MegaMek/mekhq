@@ -285,13 +285,24 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.equals(COMMAND_SELL)) {
+            boolean isGMMode = gui.getCampaign().isGM();
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
                     Money sellValue = unit.getSellValue();
                     String text = sellValue.toAmountAndSymbolString();
-                    if (0 ==
-                              JOptionPane.showConfirmDialog(null,
-                                    "Do you really want to sell " + unit.getName() + " for " + text,
+
+                    // Build the confirmation message
+                    String message;
+                    if (isGMMode) {
+                        // GM mode: show detailed breakdown
+                        message = "Do you really want to sell " + unit.getName() + " for " + text + "?\n\n" +
+                                        "Value Breakdown:\n" + unit.getSellValueBreakdown();
+                    } else {
+                        message = "Do you really want to sell " + unit.getName() + " for " + text + "?";
+                    }
+
+                    if (0 == JOptionPane.showConfirmDialog(null,
+                          message,
                                     "Sell Unit?",
                                     JOptionPane.YES_NO_OPTION)) {
                         gui.getCampaign().getQuartermaster().sellUnit(unit);

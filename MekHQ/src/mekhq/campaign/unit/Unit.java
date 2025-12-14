@@ -1572,6 +1572,137 @@ public class Unit implements ITechnology {
         return partsValue;
     }
 
+    /**
+     * Returns a detailed breakdown of how the sell value is calculated. Shows buy new price, current worth based on
+     * quality, and final sell price. Useful for GM mode to understand what factors affect the unit's sale price.
+     *
+     * @return A formatted string showing the sell value breakdown
+     */
+    public String getSellValueBreakdown() {
+        StringBuilder breakdown = new StringBuilder();
+
+        // Get the "buy new" price
+        Money buyNewPrice = getBuyCost();
+        breakdown.append("Buy New: ").append(buyNewPrice.toAmountAndSymbolString()).append("\n");
+
+        // Get quality info
+        String qualityName = getQuality().toName(campaign.getCampaignOptions().isReverseQualityNames());
+        double[] usedPartPriceMultipliers = campaign.getCampaignOptions().getUsedPartPriceMultipliers();
+        double qualityMultiplier = usedPartPriceMultipliers[getQuality().toNumeric()];
+
+        // Calculate current worth (before obsolete modifier)
+        Money currentWorth = getSellValueBeforeObsolete();
+        breakdown.append("Quality (").append(qualityName).append("): x")
+              .append(String.format("%.2f", qualityMultiplier)).append("\n");
+        breakdown.append("Current Worth: ").append(currentWorth.toAmountAndSymbolString()).append("\n");
+
+        // Check for obsolete quirk
+        Money sellFor = currentWorth;
+        if (entity != null) {
+            double obsoleteMultiplier = entity.getObsoleteResaleModifier(campaign.getGameYear());
+            if (obsoleteMultiplier < 1.0) {
+                int yearsObsolete = campaign.getGameYear() - entity.getObsoleteYearForModifiers(campaign.getGameYear());
+                breakdown.append("Obsolete (").append(yearsObsolete).append(" years): x")
+                      .append(String.format("%.2f", obsoleteMultiplier)).append("\n");
+                sellFor = currentWorth.multipliedBy(obsoleteMultiplier);
+            }
+        }
+
+        breakdown.append("-----------------\n");
+        breakdown.append("Sell For: ").append(sellFor.toAmountAndSymbolString());
+        return breakdown.toString();
+    }
+
+    /**
+     * Calculates the sell value before applying the obsolete quirk modifier. This represents the "current worth" of the
+     * unit based on its parts and quality.
+     *
+     * @return The unit's value before obsolete modifier
+     */
+    private Money getSellValueBeforeObsolete() {
+        // Infantry uses alternate calculation
+        if (entity instanceof Infantry) {
+            Money unitCost = Money.of(entity.getAlternateCost());
+            double[] usedPartPriceMultipliers = campaign.getCampaignOptions().getUsedPartPriceMultipliers();
+            double qualityMultiplier = usedPartPriceMultipliers[getQuality().toNumeric()];
+            return unitCost.multipliedBy(qualityMultiplier);
+        }
+
+        // Standard calculation - sum of parts (includes quality via getActualValue)
+        Money partsValue = Money.zero();
+        for (Part part : parts) {
+            partsValue = partsValue.plus(part.getActualValue().multipliedBy(part.getQuantity()));
+        }
+
+        // Spacecraft additions
+        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
+            if (entity instanceof SmallCraft) {
+                partsValue = partsValue.plus(200000.0 + 10.0 * entity.getWeight()); // bridge
+                partsValue = partsValue.plus(200000.0); // computer
+            }
+            if ((entity instanceof Jumpship js) && !(entity instanceof SpaceStation)) {
+                Money driveCost = Money.zero();
+                driveCost = driveCost.plus(50000.0 * (30.0 + (js.getWeight() / 7500.0))); // sail
+                if (js.getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT && js.hasLF()) {
+                    driveCost = driveCost.multipliedBy(15);
+                } else if (js.getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT) {
+                    driveCost = driveCost.multipliedBy(5);
+                } else if (js.hasLF()) {
+                    driveCost = driveCost.multipliedBy(3);
+                }
+                // Drive Support Systems
+                if (js instanceof Warship) {
+                    driveCost = driveCost.plus(20000000.0 * (50.0 + js.getWeight() / 10000.0));
+                } else {
+                    driveCost = driveCost.plus(10000000.0 * (js.getWeight() / 10000.0));
+                }
+                partsValue = partsValue.plus(driveCost);
+
+                if (js.hasHPG()) {
+                    partsValue = partsValue.plus(1000000000.0);
+                }
+                partsValue = partsValue.plus(200.0 * js.getFuel() / js.getFuelPerTon());
+                partsValue = partsValue.plus(js.getArmorWeight(js.locations()) * ArmorType.forEntity(js).getCost());
+
+                Money sinkCost = Money.of(2000.0 + 4000.0 * js.getHeatType());
+                partsValue = partsValue.plus(sinkCost.multipliedBy(js.getOHeatSinks()));
+
+                int bayDoors = 0;
+                Money bayCost = Money.zero();
+                for (Bay next : js.getTransportBays()) {
+                    bayDoors += next.getDoors();
+                    if ((next instanceof MekBay) || (next instanceof ASFBay) || (next instanceof SmallCraftBay)) {
+                        bayCost = bayCost.plus(20000.0 * next.getCapacity());
+                    }
+                    if ((next instanceof LightVehicleBay) || (next instanceof HeavyVehicleBay)) {
+                        bayCost = bayCost.plus(20000.0 * next.getCapacity());
+                    }
+                }
+                partsValue = partsValue.plus(bayCost.plus(bayDoors * 1000.0));
+                partsValue = partsValue.plus((js.getLifeBoats() + js.getEscapePods()) * 5000.0);
+            }
+        }
+
+        // ProtoMek heat sinks
+        if (entity instanceof ProtoMek) {
+            int sinks = 0;
+            for (Mounted<?> mount : entity.getWeaponList()) {
+                if (mount.getType().hasFlag(WeaponType.F_ENERGY)) {
+                    WeaponType wType = (WeaponType) mount.getType();
+                    sinks += wType.getHeat();
+                }
+            }
+            partsValue = partsValue.plus(2000.0 * sinks);
+        }
+
+        // Apply entity price multiplier
+        if (entity != null) {
+            partsValue = partsValue.multipliedBy(entity.getPriceMultiplier());
+        }
+
+        return partsValue;
+    }
+
     public double getCargoCapacityForSalvage() {
         return getCargoCapacity(Math.max(0, getEntity().getOriginalWalkMP() - 1), ForceType.SALVAGE);
     }
