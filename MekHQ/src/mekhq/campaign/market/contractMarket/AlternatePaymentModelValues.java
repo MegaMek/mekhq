@@ -38,7 +38,10 @@ import static megamek.common.units.EntityWeightClass.WEIGHT_LIGHT;
 import static megamek.common.units.EntityWeightClass.WEIGHT_MEDIUM;
 import static megamek.common.units.EntityWeightClass.WEIGHT_SUPER_HEAVY;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+import static mekhq.campaign.force.FormationLevel.BATTALION;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import megamek.common.battleArmor.BattleArmor;
@@ -48,8 +51,11 @@ import megamek.common.units.Infantry;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 
 /**
  * Enumerates the per-unit baseline values used by the "Alternate Payment Model" when evaluating contract compensation.
@@ -61,8 +67,8 @@ import mekhq.campaign.unit.Unit;
  * <p>Primary usage:</p>
  * <ul>
  *     <li>Use {@link #getValue()} to retrieve the baseline {@link Money} value for a given category.</li>
- *     <li>Use {@link #getForceValue(List, Hangar, boolean, double, double, double, double)} to compute the total
- *     contract value for a set of forces, applying contract percentage multipliers per category.</li>
+ *     <li>Use {@link #getForceValue(Faction, List, Hangar, boolean, boolean, double, double, double, double)} to
+ *     compute the total contract value for a set of forces, applying contract percentage multipliers per category.</li>
  * </ul>
  *
  * <p><b>Notes:</b></p>
@@ -135,9 +141,9 @@ public enum AlternatePaymentModelValues {
         return value;
     }
 
-
     /**
-     * Calculates the total alternate-payment-model value of the supplied forces, applying contract multipliers.
+     * Calculates the total alternate-payment-model value of the supplied forces, applying contract multipliers and
+     * (optionally) diminishing returns.
      *
      * <p>This method iterates all forces and includes only those that are:</p>
      * <ul>
@@ -145,18 +151,24 @@ public enum AlternatePaymentModelValues {
      *     <li>marked as a {@code combat role} (as determined by {@code force.getCombatRoleInMemory().isCombatRole()}).</li>
      * </ul>
      *
-     * <p>For each included force, all units returned by {@link Force#getAllUnitsAsUnits(Hangar, boolean)} are
-     * examined. Null units and units whose {@link Unit#getEntity()} is {@code null} are skipped.</p>
+     * <p>For each included force, all units returned by {@link Force#getUnitsAsUnits(Hangar)} are examined.
+     * {@code null} units and units whose {@link Unit#getEntity()} is {@code null} are skipped.</p>
      *
-     * <p>The category-specific multiplier percentages are provided as whole percentages (e.g. {@code 50.0} for 50%)
-     * and are converted into multipliers by dividing by 100.0.</p>
+     * <p>The category-specific percentage parameters are provided as whole percentages (for example, {@code 50.0} for
+     * 50%) and are converted into fractional multipliers by dividing by {@code 100.0}.</p>
      *
+     * <p>If {@code useDiminishingContractPay} is {@code true} and the number of included units exceeds the
+     * diminishing returns start ({@link #getDiminishingReturnsStart(Faction)}), the total is computed via
+     * {@link #adjustValuesForDiminishingReturns(Faction, List)}. Otherwise, the method returns the straight sum.</p>
+     *
+     * @param campaignFaction           the current campaign faction (used to determine the diminishing-returns cutoff)
      * @param allForces                 the forces to evaluate
      * @param hangar                    the campaign hangar used for resolving units within forces
+     * @param useDiminishingContractPay whether diminishing returns should be applied (only when relevant)
      * @param excludeInfantry           if {@code true}, infantry and battle armor entities contribute
      *                                  {@link Money#zero()} to the total
-     * @param combatUnitContractPercent percentage multiplier for combat units (e.g. BattleMeks, vehicles, fighters,
-     *                                  ProtoMeks, etc.)
+     * @param combatUnitContractPercent percentage multiplier for combat units (for example, BattleMeks, vehicles,
+     *                                  fighters, ProtoMeks, etc.)
      * @param dropShipContractPercent   percentage multiplier for DropShips (large craft)
      * @param warShipContractPercent    percentage multiplier for WarShips (large craft; the non-drop, non-jump branch)
      * @param jumpShipContractPercent   percentage multiplier for JumpShips (large craft)
@@ -166,15 +178,16 @@ public enum AlternatePaymentModelValues {
      * @author Illiani
      * @since 0.50.11
      */
-    public static Money getForceValue(List<Force> allForces, Hangar hangar, boolean excludeInfantry,
-          double combatUnitContractPercent, double dropShipContractPercent, double warShipContractPercent,
-          double jumpShipContractPercent) {
+    public static Money getForceValue(Faction campaignFaction, List<Force> allForces, Hangar hangar,
+          boolean useDiminishingContractPay, boolean excludeInfantry, double combatUnitContractPercent,
+          double dropShipContractPercent, double warShipContractPercent, double jumpShipContractPercent) {
         final double combatMultiplier = combatUnitContractPercent / 100.0;
         final double dropShipMultiplier = dropShipContractPercent / 100.0;
         final double warShipMultiplier = warShipContractPercent / 100.0;
         final double jumpShipMultiplier = jumpShipContractPercent / 100.0;
 
-        Money total = Money.zero();
+        Money total = Money.zero(); // We store this here in case we're not using diminishing returns
+        List<Money> unitValues = new ArrayList<>();
 
         for (Force force : allForces) {
             if (!force.getForceType().isStandard() || !force.getCombatRoleInMemory().isCombatRole()) {
@@ -196,8 +209,19 @@ public enum AlternatePaymentModelValues {
                       dropShipMultiplier,
                       warShipMultiplier,
                       jumpShipMultiplier);
+                unitValues.add(valueAdded);
                 total = total.plus(valueAdded);
             }
+        }
+
+        if (unitValues.isEmpty()) {
+            return Money.zero();
+        }
+
+        // Only process diminishing returns if it is both enabled and relevant.
+        boolean isAffectedByDiminishingReturns = unitValues.size() > getDiminishingReturnsStart(campaignFaction);
+        if (useDiminishingContractPay && isAffectedByDiminishingReturns) {
+            return adjustValuesForDiminishingReturns(campaignFaction, unitValues);
         }
 
         return total;
@@ -274,6 +298,10 @@ public enum AlternatePaymentModelValues {
             double multiplier = entity.isDropShip() ?
                                       dropShipMultiplier :
                                       (entity.isJumpShip() ? jumpShipMultiplier : warShipMultiplier);
+            if (multiplier <= 0) {
+                return Money.zero();
+            }
+
             return LARGE_CRAFT.getValue().multipliedBy(multiplier);
         }
 
@@ -337,5 +365,89 @@ public enum AlternatePaymentModelValues {
         }
 
         return Money.zero();
+    }
+
+    /**
+     * Applies a diminishing-returns curve to a list of per-unit values and returns the discounted total.
+     *
+     * <p>The intent is to reduce the marginal value of very large forces by progressively discounting unit
+     * contributions after a configurable cutoff, while leaving the first portion of the force at full value.</p>
+     *
+     * <p><b>How it works</b></p>
+     * <ol>
+     *     <li>The input {@code unitValues} list is sorted in descending order so that the highest-value units are
+     *     counted first at full value (i.e., the least valuable units are discounted first).</li>
+     *     <li>A cutoff index is computed as {@code 2 * battalionSize}, where {@code battalionSize} is derived from
+     *     {@link CombatTeam#getStandardForceSize(Faction, int)} using {@link FormationLevel#BATTALION} depth.</li>
+     *     <li>For units beyond the cutoff, a diminishing multiplier is applied:
+     *     {@code multiplier = 1 / (1 + slope * distanceFromCutOff)}.</li>
+     *     <li>The multiplier is floored at {@code minMultiplier} so unit contributions never drop below a fixed
+     *     percentage of their original value.</li>
+     * </ol>
+     *
+     * <p>Units at indices {@code 0 .. diminishingReturnsStart-1} receive a multiplier of {@code 1.0} (no discount).
+     * The first discounted unit uses {@code distanceFromCutOff = 1}.</p>
+     *
+     * <p><b>Side effect:</b> this method sorts {@code unitValues} in-place. If callers need the original ordering
+     * preserved, pass a copy of the list instead.</p>
+     *
+     * @param campaignFaction the campaign's faction, used to determine the factional-equivalent battalion size for the
+     *                        cutoff computation; must not be {@code null}
+     * @param unitValues      a list of per-unit {@link Money} values to be summed with diminishing returns applied;
+     *                        must not be {@code null}
+     *
+     * @return the discounted total {@link Money} value after applying diminishing returns
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public static Money adjustValuesForDiminishingReturns(Faction campaignFaction, List<Money> unitValues) {
+        // Discount the least valuable units first
+        unitValues.sort(Comparator.reverseOrder());
+
+        int diminishingReturnsStart = getDiminishingReturnsStart(campaignFaction);
+
+        // With a slope of 0.0625 we're going to hit our floor around two regiments (or factional equivalent)
+        final double slope = 0.0625; // higher = faster diminishing returns
+        final double minMultiplier = 0.10; // floor: never worth less than 10%
+
+        Money total = Money.zero();
+        for (int i = 0; i < unitValues.size(); i++) {
+            Money unitValue = unitValues.get(i);
+
+            double multiplier = 1.0;
+            if (i >= diminishingReturnsStart) {
+                int distanceFromCutOff = (i - diminishingReturnsStart) + 1;
+                multiplier = 1.0 / (1.0 + slope * distanceFromCutOff);
+                multiplier = Math.max(minMultiplier, multiplier);
+            }
+
+            total = total.plus(unitValue.multipliedBy(multiplier));
+        }
+
+        return total;
+    }
+
+    /**
+     * Returns the unit-count index at which diminishing returns begin for the given campaign faction.
+     *
+     * <p>The cutoff is defined as {@code 2 * battalionSize}, where {@code battalionSize} is the faction-adjusted
+     * standard force size computed by {@link CombatTeam#getStandardForceSize(Faction, int)} for a
+     * {@link FormationLevel#BATTALION} formation depth.</p>
+     *
+     * <p>Units with indices {@code 0 .. (start - 1)} are not discounted; the first discounted unit is at index
+     * {@code start}. Callers typically compare the total unit count against this value to determine whether diminishing
+     * returns are relevant.</p>
+     *
+     * @param campaignFaction the campaign faction used to determine the factional-equivalent battalion size; must not
+     *                        be {@code null}
+     *
+     * @return the zero-based cutoff index where diminishing returns start
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public static int getDiminishingReturnsStart(Faction campaignFaction) {
+        return CombatTeam.getStandardForceSize(campaignFaction, BATTALION.getDepth()) * 2;
     }
 }
