@@ -7101,6 +7101,30 @@ public class Person {
         return totalSeverity;
     }
 
+    /**
+     * Calculates a severity score for this person based on current hits and non-permanent injuries.
+     *
+     * <p>The returned value starts with the person's current {@code hits} value, then adds the hit contribution from
+     * each injury that is <em>not</em> permanent. Permanent injuries are intentionally excluded from this
+     * calculation.</p>
+     *
+     * @return the total severity score, consisting of {@code hits} plus the sum of {@link Injury#getHits()} for all
+     *       non-permanent injuries
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public int getNonPermanentInjurySeverity() {
+        int totalSeverity = hits;
+        for (Injury injury : injuries) {
+            if (!injury.isPermanent()) {
+                totalSeverity += injury.getHits();
+            }
+        }
+
+        return totalSeverity;
+    }
+
     public List<Injury> getPermanentInjuries() {
         return injuries.stream().filter(Injury::isPermanent).collect(Collectors.toList());
     }
