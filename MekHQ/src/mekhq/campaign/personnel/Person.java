@@ -8773,15 +8773,11 @@ public class Person {
      *
      * @since 0.50.11
      */
-    @Nullable
-    public Integer getAdvancedAsTechContribution() {
+    public int getAdvancedAsTechContribution() {
         int contribution;
         if (advancedAsTechContribution == null) {
             Skill asTechSkill = getSkill(S_ASTECH);
             if (asTechSkill != null) {
-                PersonnelOptions options = getOptions();
-                Attributes attributes = getATOWAttributes();
-
                 // It is possible for very poorly skilled characters to actually be a detriment to their teams. This is
                 // by design.
                 SkillModifierData skillModifierData = getSkillModifierData();

@@ -3034,7 +3034,11 @@ public class Campaign implements ITechManager {
         String cacheKey = "includePrisoners:" + includePrisoners + "_" + "includeCampFollowers:" + includeCampFollowers;
 
         // If the cache value is known and not empty, let's just use that
-        if (activePersonnelCache.containsKey(cacheKey) && !activePersonnelCache.get(cacheKey).isEmpty()) {
+        // An empty list will be cached after loading so we will always
+        // recalculate if it's empty. And if it's empty, it should be quick, right?
+        if (activePersonnelCache != null &&
+                  activePersonnelCache.containsKey(cacheKey) &&
+                  !activePersonnelCache.get(cacheKey).isEmpty()) {
             return new ArrayList<>(activePersonnelCache.get(cacheKey));
         }
 
@@ -3062,6 +3066,9 @@ public class Campaign implements ITechManager {
             activePersonnel.add(person);
         }
 
+        if (activePersonnelCache == null) {
+            activePersonnelCache = new HashMap<>();
+        }
         activePersonnelCache.put(cacheKey, new ArrayList<>(activePersonnel));
         return activePersonnel;
     }
@@ -9662,22 +9669,5 @@ public class Campaign implements ITechManager {
      */
     public void setSystemsInstance(Systems systemsInstance) {
         this.systemsInstance = systemsInstance;
-    }
-
-    /**
-     * Handles updates to personnel records.
-     *
-     * <p>Clears cached values</p>
-     *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
-     * wrong.</p>
-     *
-     * @param personEvent the event containing updates related to a person in the campaign
-     */
-    @Subscribe
-    public void handlePersonUpdate(PersonEvent personEvent) {
-        invalidateActivePersonnelCache();
-        Person person = personEvent.getPerson();
-        person.invalidateAdvancedAsTechContribution();
     }
 }
