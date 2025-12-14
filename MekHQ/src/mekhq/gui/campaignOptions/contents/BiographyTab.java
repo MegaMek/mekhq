@@ -1709,5 +1709,8 @@ public class BiographyTab {
             }
             options.setUsePortraitForRole(i, chkUsePortrait[i].isSelected());
         }
+
+        // Ranks
+        rankSystemsPane.applyToCampaign();
     }
 }
