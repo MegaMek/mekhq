@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 
+import megamek.common.units.BuildingEntity;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SpaceStation;
@@ -108,6 +109,12 @@ public class JumpBlockers {
 
         for (Unit unit : campaign.getUnits()) {
             Entity entity = unit.getEntity();
+            // Buildings are, by their nature, not able to leave the planet they're on.
+            if (entity instanceof BuildingEntity) {
+                nonJumpCapableUnits.add(unit);
+                continue;
+            }
+
             if (entity instanceof Jumpship jumpship) {
                 if (jumpship instanceof SpaceStation spaceStation) {
                     if (spaceStation.hasKFAdapter()) {
