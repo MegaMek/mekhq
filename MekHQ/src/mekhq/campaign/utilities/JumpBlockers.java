@@ -47,6 +47,7 @@ import megamek.common.units.Jumpship;
 import megamek.common.units.SpaceStation;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Quartermaster;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -165,11 +166,13 @@ public class JumpBlockers {
 
         final String buttonCancel = getTextAt(RESOURCE_BUNDLE, "JumpBlockers.unableToJump.button.cancel");
         final String buttonGM = getTextAt(RESOURCE_BUNDLE, "JumpBlockers.unableToJump.button.gm");
+        final String buttonSell = getTextAt(RESOURCE_BUNDLE, "JumpBlockers.unableToJump.button.sell");
         final String buttonAbandon = getTextAt(RESOURCE_BUNDLE, "JumpBlockers.unableToJump.button.abandon");
 
         final int cancelJumpChoiceIndex = 0;
         final int gmOverrideChoiceIndex = 1;
-        final int abandonUnits = 2;
+        final int sellUnits = 2;
+        final int abandonUnits = 3;
 
         int choiceIndex = cancelJumpChoiceIndex;
         boolean wasOverallConfirmed = false;
@@ -178,7 +181,7 @@ public class JumpBlockers {
                   campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT),
                   null,
                   centerMessage,
-                  List.of(buttonCancel, buttonGM, buttonAbandon),
+                  List.of(buttonCancel, buttonGM, buttonSell, buttonAbandon),
                   bottomMessage,
                   null,
                   true,
@@ -186,7 +189,7 @@ public class JumpBlockers {
 
             choiceIndex = notice.getDialogChoice();
 
-            if (choiceIndex == abandonUnits) {
+            if (choiceIndex == sellUnits || choiceIndex == abandonUnits) {
                 if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_ABANDON_UNITS)) {
                     wasOverallConfirmed = new ImmersiveDialogConfirmation(campaign,
                           CONFIRMATION_ABANDON_UNITS).wasConfirmed();
@@ -199,6 +202,14 @@ public class JumpBlockers {
 
         return switch (choiceIndex) {
             case gmOverrideChoiceIndex -> true;
+            case sellUnits -> {
+                Quartermaster quartermaster = campaign.getQuartermaster();
+                for (Unit unit : nonJumpCapableUnits) {
+                    quartermaster.sellUnit(unit);
+                }
+
+                yield true;
+            }
             case abandonUnits -> {
                 for (Unit unit : nonJumpCapableUnits) {
                     campaign.removeUnit(unit.getId());
