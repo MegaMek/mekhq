@@ -76,6 +76,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 public class TransportCostCalculationsTest {
+
     private static final LocalDate today = LocalDate.of(3151, 1, 1);
     private static final CargoStatistics mockCargoStatistics = mock(CargoStatistics.class);
     private static final HangarStatistics mockHangarStatistics = mock(HangarStatistics.class);
@@ -89,7 +90,7 @@ public class TransportCostCalculationsTest {
         mockHangar = mock(Hangar.class);
         when(mockHangarStatistics.getHangar()).thenReturn(mockHangar);
 
-        // Always return a fresh Stream per invocation
+        // Getters now use getUnits() (Collection), not getUnitsStream()
         setHangarUnits(List.of());
 
         transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),
@@ -103,7 +104,8 @@ public class TransportCostCalculationsTest {
     // Helpers
 
     private void setHangarUnits(List<Unit> units) {
-        when(mockHangar.getUnitsStream()).thenAnswer(inv -> units.stream());
+        // IMPORTANT: return a Collection<Unit> because production code iterates getUnits()
+        when(mockHangar.getUnits()).thenReturn(units);
     }
 
     private Unit unitWithEntity(Entity entity) {
@@ -118,74 +120,74 @@ public class TransportCostCalculationsTest {
         return unit;
     }
 
-    private Unit unitWithSmallCraftCapacity(double cap) {
+    private Unit unitWithSmallCraftCapacity(double capacity) {
         Unit unit = unitWithEntity(mock(Entity.class));
-        when(unit.getSmallCraftCapacity()).thenReturn(cap);
+        when(unit.getSmallCraftCapacity()).thenReturn(capacity);
         return unit;
     }
 
-    private Unit unitWithASFCapacity(double cap) {
+    private Unit unitWithASFCapacity(double capacity) {
         Unit unit = unitWithEntity(mock(Entity.class));
-        when(unit.getASFCapacity()).thenReturn(cap);
+        when(unit.getASFCapacity()).thenReturn(capacity);
         return unit;
     }
 
-    private Unit unitWithMekCapacity(double cap) {
+    private Unit unitWithMekCapacity(double capacity) {
         Unit unit = unitWithEntity(mock(Entity.class));
-        when(unit.getMekCapacity()).thenReturn(cap);
+        when(unit.getMekCapacity()).thenReturn(capacity);
         return unit;
     }
 
-    private Unit unitWithSuperHeavyVehicleCapacity(double cap) {
+    private Unit unitWithSuperHeavyVehicleCapacity(double capacity) {
         Unit unit = unitWithEntity(mock(Entity.class));
-        when(unit.getSuperHeavyVehicleCapacity()).thenReturn(cap);
+        when(unit.getSuperHeavyVehicleCapacity()).thenReturn(capacity);
         return unit;
     }
 
-    private Unit unitWithHeavyVehicleCapacity(double cap) {
+    private Unit unitWithHeavyVehicleCapacity(double capacity) {
         Unit unit = unitWithEntity(mock(Entity.class));
-        when(unit.getHeavyVehicleCapacity()).thenReturn(cap);
+        when(unit.getHeavyVehicleCapacity()).thenReturn(capacity);
         return unit;
     }
 
-    private Unit unitWithLightVehicleCapacity(double cap) {
+    private Unit unitWithLightVehicleCapacity(double capacity) {
         Unit unit = unitWithEntity(mock(Entity.class));
-        when(unit.getLightVehicleCapacity()).thenReturn(cap);
+        when(unit.getLightVehicleCapacity()).thenReturn(capacity);
         return unit;
     }
 
-    private Unit unitWithProtoMekCapacity(double cap) {
+    private Unit unitWithProtoMekCapacity(double capacity) {
         Unit unit = unitWithEntity(mock(Entity.class));
-        when(unit.getProtoMekCapacity()).thenReturn(cap);
+        when(unit.getProtoMekCapacity()).thenReturn(capacity);
         return unit;
     }
 
-    private Unit unitWithBattleArmorCapacity(double cap) {
+    private Unit unitWithBattleArmorCapacity(double capacity) {
         Unit unit = unitWithEntity(mock(Entity.class));
-        when(unit.getBattleArmorCapacity()).thenReturn(cap);
+        when(unit.getBattleArmorCapacity()).thenReturn(capacity);
         return unit;
     }
 
-    private Unit unitWithInfantryCapacity(double cap) {
+    private Unit unitWithInfantryCapacity(double capacity) {
         Unit unit = unitWithEntity(mock(Entity.class));
-        when(unit.getInfantryCapacity()).thenReturn(cap);
+        when(unit.getInfantryCapacity()).thenReturn(capacity);
         return unit;
     }
 
     private Unit unitThatIsSpaceStationAndWouldOtherwiseAddCapacity() {
-        // Used to verify SpaceStation filtering paths (all totals except SmallCraft bays filter these out)
+        // Production getters skip SpaceStation via `unit.getEntity() instanceof SpaceStation`
         SpaceStation station = mock(SpaceStation.class);
         Unit unit = unitWithEntity(station);
 
-        when(unit.getSmallCraftCapacity()).thenReturn((double) 0);
-        when(unit.getASFCapacity()).thenReturn((double) 10);
-        when(unit.getMekCapacity()).thenReturn((double) 0);
-        when(unit.getSuperHeavyVehicleCapacity()).thenReturn((double) 0);
-        when(unit.getHeavyVehicleCapacity()).thenReturn((double) 0);
-        when(unit.getLightVehicleCapacity()).thenReturn((double) 0);
-        when(unit.getProtoMekCapacity()).thenReturn((double) 0);
-        when(unit.getBattleArmorCapacity()).thenReturn((double) 0);
-        when(unit.getInfantryCapacity()).thenReturn((double) 0);
+        when(unit.getSmallCraftCapacity()).thenReturn(0.0);
+        when(unit.getASFCapacity()).thenReturn(10.0);
+        when(unit.getMekCapacity()).thenReturn(0.0);
+        when(unit.getSuperHeavyVehicleCapacity()).thenReturn(0.0);
+        when(unit.getHeavyVehicleCapacity()).thenReturn(0.0);
+        when(unit.getLightVehicleCapacity()).thenReturn(0.0);
+        when(unit.getProtoMekCapacity()).thenReturn(0.0);
+        when(unit.getBattleArmorCapacity()).thenReturn(0.0);
+        when(unit.getInfantryCapacity()).thenReturn(0.0);
 
         return unit;
     }

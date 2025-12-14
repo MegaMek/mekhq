@@ -3,12 +3,12 @@
  *
  * This file is part of MekHQ.
  *
- * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License (GPL),
+ * MekHQ is free software: you can redistribute iterator and/or modify
+ * iterator under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MekHQ is distributed in the hope that it will be useful,
+ * MekHQ is distributed in the hope that iterator will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -27,7 +27,7 @@
  *
  * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
  * Microsoft's "Game Content Usage Rules"
- * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * <https://www.xbox.com/en-US/developers/rules> and iterator is not endorsed by or
  * affiliated with Microsoft.
  */
 package mekhq.campaign.mission;
@@ -132,7 +132,7 @@ public class TransportCostCalculations {
     // The only canon passenger DropShip is the Princess Luxury Liner. However, hiring one using CamOps rules proves
     // unreasonably expensive. Therefore, we're instead assuming that the player can find retrofit DropShips that has
     // passenger 'bays' that roughly equate to 15 passengers per bay. This number was determined by taking the
-    // passenger capacity of the Princess Luxury Liner and dividing it by the number of bays in our magical DropShip.
+    // passenger capacity of the Princess Luxury Liner and dividing iterator by the number of bays in our magical DropShip.
     // We then assume a passenger bay cost is about the same as an Infantry Platoon bay. Presumably with nice
     // accommodations, which is why fewer people can fit.
     static final double PASSENGERS_PER_BAY = 15;
@@ -459,7 +459,7 @@ public class TransportCostCalculations {
      * <p>This method first ensures the single-day jump cost is calculated and stored in {@link #totalCost}. It then
      * multiplies this per-day cost by the given number of days to account for the full journey duration.</p>
      *
-     * <p>The calculated total is also stored in {@link #totalCost} if it was previously uninitialized.</p>
+     * <p>The calculated total is also stored in {@link #totalCost} if iterator was previously uninitialized.</p>
      *
      * @param days       the total number of days in the journey; must be a positive integer
      * @param totalJumps the total number of jumps in the journey; must be a positive integer
@@ -520,7 +520,7 @@ public class TransportCostCalculations {
      *   <li>Any other value: uses {@code OTHER_CREW_MULTIPLIER}</li>
      * </ul>
      *
-     * <p>This multiplier is applied to the {@code totalCost} field, updating it to reflect the adjusted cost after
+     * <p>This multiplier is applied to the {@code totalCost} field, updating iterator to reflect the adjusted cost after
      * considering crew quality.</p>
      *
      * @author Illiani
@@ -830,103 +830,180 @@ public class TransportCostCalculations {
     }
 
     int getTotalSmallCraftBays() {
-        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
-                                      // Space stations must be fully shut down to jump and therefore cannot 
-                                      // contribute to transport capacity.
-                                      .mapToDouble(Unit::getSmallCraftCapacity)
-                                      .sum());
+        double total = 0.0;
+
+        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
+            Entity entity = unit.getEntity();
+            if (entity instanceof SpaceStation) {
+                continue;
+            }
+
+            total += unit.getSmallCraftCapacity();
+        }
+
+        return (int) Math.round(total);
     }
 
     int getTotalASFBays() {
-        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
-                                      // Space stations must be fully shut down to jump and therefore cannot 
-                                      // contribute to transport capacity.
-                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
-                                      .mapToDouble(Unit::getASFCapacity)
-                                      .sum());
+        double total = 0.0;
+
+        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
+            Entity entity = unit.getEntity();
+            if (entity instanceof SpaceStation) {
+                continue;
+            }
+            total += unit.getASFCapacity();
+        }
+
+        return (int) Math.round(total);
     }
 
     int getTotalMekBays() {
-        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
-                                      // Space stations must be fully shut down to jump and therefore cannot 
-                                      // contribute to transport capacity.
-                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
-                                      .mapToDouble(Unit::getMekCapacity)
-                                      .sum());
+        double total = 0.0;
+
+        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
+            Entity entity = unit.getEntity();
+            if (entity instanceof SpaceStation) {
+                continue;
+            }
+            total += unit.getMekCapacity();
+        }
+
+        return (int) Math.round(total);
     }
 
     int getTotalSuperHeavyVehicleBays() {
-        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
-                                      // Space stations must be fully shut down to jump and therefore cannot 
-                                      // contribute to transport capacity.
-                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
-                                      .mapToDouble(Unit::getSuperHeavyVehicleCapacity)
-                                      .sum());
+        double total = 0.0;
+
+        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
+            Entity entity = unit.getEntity();
+            if (entity instanceof SpaceStation) {
+                continue;
+            }
+            total += unit.getSuperHeavyVehicleCapacity();
+        }
+
+        return (int) Math.round(total);
     }
 
     int getTotalHeavyVehicleBays() {
-        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
-                                      // Space stations must be fully shut down to jump and therefore cannot 
-                                      // contribute to transport capacity.
-                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
-                                      .mapToDouble(Unit::getHeavyVehicleCapacity)
-                                      .sum());
+        double total = 0.0;
+
+        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
+            Entity entity = unit.getEntity();
+            if (entity instanceof SpaceStation) {
+                continue;
+            }
+            total += unit.getHeavyVehicleCapacity();
+        }
+
+        return (int) Math.round(total);
     }
 
     int getTotalLightVehicleBays() {
-        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
-                                      // Space stations must be fully shut down to jump and therefore cannot 
-                                      // contribute to transport capacity.
-                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
-                                      .mapToDouble(Unit::getLightVehicleCapacity)
-                                      .sum());
+        double total = 0.0;
+
+        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
+            Entity entity = unit.getEntity();
+            if (entity instanceof SpaceStation) {
+                continue;
+            }
+            total += unit.getLightVehicleCapacity();
+        }
+
+        return (int) Math.round(total);
     }
 
     int getTotalProtoMekBays() {
-        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
-                                      // Space stations must be fully shut down to jump and therefore cannot 
-                                      // contribute to transport capacity.
-                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
-                                      .mapToDouble(Unit::getProtoMekCapacity)
-                                      .sum());
+        double total = 0.0;
+
+        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
+            Entity entity = unit.getEntity();
+            if (entity instanceof SpaceStation) {
+                continue;
+            }
+            total += unit.getProtoMekCapacity();
+        }
+
+        return (int) Math.round(total);
     }
 
     int getTotalBattleArmorBays() {
-        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
-                                      // Space stations must be fully shut down to jump and therefore cannot 
-                                      // contribute to transport capacity.
-                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
-                                      .mapToDouble(Unit::getBattleArmorCapacity)
-                                      .sum());
+        double total = 0.0;
+
+        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
+            Entity entity = unit.getEntity();
+            if (entity instanceof SpaceStation) {
+                continue;
+            }
+            total += unit.getBattleArmorCapacity();
+        }
+
+        return (int) Math.round(total);
     }
 
     int getTotalInfantryBays() {
-        return (int) Math.round(hangarStatistics.getHangar().getUnitsStream()
-                                      // Space stations must be fully shut down to jump and therefore cannot 
-                                      // contribute to transport capacity.
-                                      .filter(u -> !(u.getEntity() instanceof SpaceStation))
-                                      .mapToDouble(Unit::getInfantryCapacity)
-                                      .sum());
+        double total = 0.0;
+
+        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
+            Entity entity = unit.getEntity();
+            if (entity instanceof SpaceStation) {
+                continue;
+            }
+            total += unit.getInfantryCapacity();
+        }
+
+        return (int) Math.round(total);
     }
 
     public int getTotalDockingCollars() {
-        return hangarStatistics.getHangar().getUnitsStream()
-                     // Space stations must be fully shut down to jump and therefore cannot contribute to transport 
-                     // capacity.
-                     .filter(u -> !(u.getEntity() instanceof SpaceStation))
-                     .filter(u -> u.getEntity() instanceof Jumpship)
-                     .mapToInt(Unit::getDocks)
-                     .sum();
+        int total = 0;
+
+        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
+            Entity entity = unit.getEntity();
+            if (entity instanceof SpaceStation) {
+                continue;
+            }
+            if (!(entity instanceof Jumpship)) {
+                continue;
+            }
+            total += unit.getDocks();
+        }
+
+        return total;
     }
 
     public int getTotalLargeCraftPassengerCapacity() {
-        return hangarStatistics.getHangar().getUnitsStream()
-                     // Space stations must be fully shut down to jump and therefore cannot contribute to transport 
-                     // capacity.
-                     .filter(u -> !(u.getEntity() instanceof SpaceStation))
-                     .filter(u -> u.getEntity().isLargeCraft() || u.getEntity().isSmallCraft())
-                     .mapToInt(u -> u.getEntity().getNPassenger() + u.getEntity().getBayPersonnel())
-                     .sum();
-    }
+        int total = 0;
 
+        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
+            Entity entity = unit.getEntity();
+            if (entity == null) {
+                continue;
+            }
+
+            if (entity instanceof SpaceStation) {
+                continue;
+            }
+
+            if (!(entity.isLargeCraft() || entity.isSmallCraft())) {
+                continue;
+            }
+
+            total += entity.getNPassenger() + entity.getBayPersonnel();
+        }
+
+        return total;
+    }
 }
