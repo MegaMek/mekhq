@@ -414,6 +414,9 @@ public class Person {
     private boolean hidePersonality;
     // endregion Flags
 
+    // Cache
+    private transient Integer advancedAsTechContribution = null;
+
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData;
 
@@ -8758,5 +8761,49 @@ public class Person {
               adjustedReputation,
               injuryEffects,
               ageForAttributeModifiers);
+    }
+
+    /**
+     * Calculates the individual AsTech contribution for a person based on their {@link SkillType#S_ASTECH} skill.
+     *
+     * <p>If the person has the {@link SkillType#S_ASTECH} skill, this returns their total skill level considering
+     * all modifiers. If the skill is absent, returns {@code 0}.</p>
+     *
+     * @param person the {@link Person} whose contribution is to be calculated
+     *
+     * @return the total skill level for {@link SkillType#S_ASTECH}, or {@code 0} if not present
+     *
+     * @since 0.50.11
+     */
+    @Nullable
+    public Integer getAdvancedAsTechContribution() {
+        int contribution;
+        if (advancedAsTechContribution == null) {
+            Skill asTechSkill = getSkill(S_ASTECH);
+            if (asTechSkill != null) {
+                PersonnelOptions options = getOptions();
+                Attributes attributes = getATOWAttributes();
+
+                // It is possible for very poorly skilled characters to actually be a detriment to their teams. This is
+                // by design.
+                SkillModifierData skillModifierData = getSkillModifierData();
+                int totalSkillLevel = asTechSkill.getTotalSkillLevel(skillModifierData);
+                contribution = (int) floor(totalSkillLevel / Campaign.ASSISTANT_SKILL_LEVEL_DIVIDER);
+            } else {
+                contribution = 0;
+            }
+            setAdvancedAsTechContribution(contribution);
+        } else {
+            contribution = advancedAsTechContribution;
+        }
+        return contribution;
+    }
+
+    public void invalidateAdvancedAsTechContribution() {
+        advancedAsTechContribution = null;
+    }
+
+    public void setAdvancedAsTechContribution(int contribution) {
+        advancedAsTechContribution = contribution;
     }
 }
